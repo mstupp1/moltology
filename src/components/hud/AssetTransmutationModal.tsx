@@ -28,7 +28,7 @@ export const AssetTransmutationModal: React.FC<AssetTransmutationModalProps> = (
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="bg-[#171c1c] border-2 border-[#00ffff] w-full max-w-lg p-6 chamfer-corner-lg shadow-hud-cyan relative space-y-6 animate-flicker">
+      <div className="bg-[#171c1c] border-2 border-[#00ffff] w-full max-w-lg p-6 chamfer-corner-lg shadow-hud-cyan relative space-y-6">
         {/* Close Button */}
         <button
           onClick={onClose}

@@ -24,7 +24,20 @@ export const IsolationShellWidget: React.FC = () => {
       </div>
 
       {/* Main Switch Container */}
-      <div className="bg-[#0f1414] border border-[#3a4a49] p-4 text-center space-y-3 chamfer-corner">
+      <div className="bg-[#0f1414] border border-[#3a4a49] p-4 text-center space-y-3 chamfer-corner relative overflow-hidden">
+        {/* Force Field Visual Graphic */}
+        <div className="w-24 h-24 mx-auto relative">
+          <img 
+            src="/images/isolation_shell_dome.png" 
+            alt="Isolation Force Field Dome" 
+            className={`w-full h-full object-contain transition-all duration-500 ${
+              engaged 
+                ? 'drop-shadow-[0_0_12px_rgba(0,255,255,0.7)] scale-105' 
+                : 'grayscale opacity-40 scale-95'
+            }`}
+          />
+        </div>
+
         <div className="text-[10px] text-[#839493] uppercase tracking-widest font-mono">
           ISOLATION FORCE-FIELD STATUS
         </div>

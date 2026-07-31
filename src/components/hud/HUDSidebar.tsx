@@ -1,28 +1,29 @@
 import React from 'react'
-import { LayoutDashboard, ShoppingBag, GitMerge, ShieldAlert, Cpu, Layers } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, GitMerge, ShieldAlert, Cpu, Layers, Sparkles, Lock } from 'lucide-react'
 
 interface HUDSidebarProps {
   currentRoute: string
   onNavigate: (route: string) => void
+  isMarketGated?: boolean
 }
 
-export const HUDSidebar: React.FC<HUDSidebarProps> = ({ currentRoute, onNavigate }) => {
+export const HUDSidebar: React.FC<HUDSidebarProps> = ({ currentRoute, onNavigate, isMarketGated = true }) => {
   const navItems = [
-    { id: 'dashboard', label: 'THE MOLT-CYCLE LECTURES', icon: LayoutDashboard, path: '/' },
-    { id: 'science', label: 'MOLTOLOGY SCIENCE', icon: Cpu, path: '/pipeline' },
-    { id: 'market', label: 'THE BENTHIC MARKET', icon: ShoppingBag, badge: 'NEW / EXCHANGE', path: '/market' },
+    { id: 'landing', label: 'TEMPLE LANDING PAGE', icon: Sparkles, path: '/', badge: 'PORTAL' },
+    { id: 'dashboard', label: 'THE MOLT-CYCLE LECTURES', icon: LayoutDashboard, path: '/dashboard' },
+    { id: 'market', label: 'THE BENTHIC MARKET', icon: ShoppingBag, badge: isMarketGated ? 'GATED' : 'LIVE', path: '/market' },
     { id: 'pipeline', label: 'CARCINIZATION PIPELINE', icon: GitMerge, path: '/pipeline' },
-    { id: 'isolation', label: 'ISOLATION PROTOCOLS', icon: ShieldAlert, path: '/' },
-    { id: 'chassis', label: 'CHASSIS CONFIGURATOR', icon: Layers, path: '/' },
+    { id: 'isolation', label: 'ISOLATION PROTOCOLS', icon: ShieldAlert, path: '/dashboard' },
+    { id: 'chassis', label: 'CHASSIS CONFIGURATOR', icon: Layers, path: '/dashboard' },
   ]
 
   return (
-    <aside className="w-full md:w-64 bg-[#0a0f0f] border-r border-[#3a4a49] flex flex-col justify-between select-none p-3 gap-6">
+    <aside className="w-full md:w-64 bg-[#070b0b] border-r border-[#3a4a49] flex flex-col justify-between select-none p-3 gap-6 relative z-10">
       <div className="space-y-4">
         {/* Module Section Label */}
-        <div className="text-[10px] text-[#839493] font-mono tracking-widest px-2 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-[#00ffff] inline-block" />
-          SYSTEM MODULES
+        <div className="text-[10px] text-[#ff5540] font-mono tracking-widest px-2 flex items-center gap-2 font-bold">
+          <span className="w-1.5 h-1.5 bg-[#ff0000] inline-block" />
+          SYSTEM & TEMPLE MODULES
         </div>
 
         {/* Navigation Buttons */}
@@ -40,12 +41,18 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({ currentRoute, onNavigate
                     : 'bg-[#0f1414] border-[#3a4a49]/60 text-[#839493] hover:text-[#dfe3e3] hover:border-[#839493] hover:bg-[#171c1c]/50'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#00ffff]' : 'text-[#839493]'}`} />
+                <div className="flex items-center gap-2.5 truncate">
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#00ffff]' : 'text-[#839493]'}`} />
                   <span className="truncate">{item.label}</span>
                 </div>
                 {item.badge && (
-                  <span className="text-[9px] px-1 py-0.5 bg-[#ff0000]/20 border border-[#ff0000] text-[#ff5540] font-bold">
+                  <span className={`text-[9px] px-1.5 py-0.5 font-bold shrink-0 border ${
+                    item.badge === 'PORTAL'
+                      ? 'bg-[#ff0000]/20 border-[#ff0000] text-[#ff5540]'
+                      : item.badge === 'GATED'
+                      ? 'bg-[#ff0000]/20 border-[#ff0000] text-[#ff5540]'
+                      : 'bg-[#00ffff]/20 border-[#00ffff] text-[#00ffff]'
+                  }`}>
                     {item.badge}
                   </span>
                 )}
@@ -56,10 +63,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({ currentRoute, onNavigate
       </div>
 
       {/* Crustacean Visual Widget */}
-      <div className="bg-[#171c1c] border border-[#3a4a49] p-3 text-center chamfer-corner relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-gradient-to-b from-[#00ffff] to-transparent pointer-events-none" />
+      <div className="bg-[#0f1414] border border-[#3a4a49] p-3 text-center chamfer-corner relative overflow-hidden shadow-chitin-plate">
+        <div className="absolute inset-0 opacity-10 bg-gradient-to-b from-[#ff0000] to-transparent pointer-events-none" />
         <div className="text-3xl my-1 animate-pulse">🦀</div>
-        <div className="font-grotesk text-xs font-bold text-[#00ffff] tracking-widest uppercase">
+        <div className="font-grotesk text-xs font-bold text-[#ff5540] tracking-widest uppercase">
           CYBER-LOBSTER CHASSIS
         </div>
         <p className="text-[10px] text-[#839493] mt-1 italic font-mono">
