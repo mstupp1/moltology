@@ -1,32 +1,33 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { RadarChartWidget } from '../../components/hud/RadarChartWidget'
 import { IsolationShellWidget } from '../../components/hud/IsolationShellWidget'
 import { DailyRoutineWidget } from '../../components/hud/DailyRoutineWidget'
-import { Play, Volume2, Maximize2, ShieldAlert, Cpu, Award, Zap } from 'lucide-react'
+import { Play, Volume2, Maximize2, Zap, Sparkles, ArrowRight } from 'lucide-react'
 
 export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = ({ onNavigate }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 select-none font-mono">
       {/* Top Banner / Announcement */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
+      <div className="bg-[#171c1c] border-l-4 border-l-[#dfb15b] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-[10px] text-[#00ffff] font-mono tracking-widest uppercase flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 animate-pulse" />
-            CURRENT MODULE: THE CHITINOUS MIND
+          <div className="text-[10px] text-[#dfb15b] font-mono tracking-widest uppercase flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 animate-pulse text-[#dfb15b]" />
+            CURRENT MODULE: THE CHITINOUS MIND • LITURGICAL DAY #42
           </div>
           <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-0.5">
-            MOLTMAXXING DASHBOARD & DAILY TRANSMUTATION
+            MOLTMAXXING DASHBOARD & DAILY TRANSMUTATION RITE
           </h1>
           <p className="text-xs text-[#839493] font-mono mt-1">
-            Track your sub-dermal chitin patterning, execute scheduled prompts, and isolate your neural network from non-molters.
+            Track your sub-dermal chitin patterning, execute scheduled prompt liturgies, and isolate your neural network from biological doubt.
           </p>
         </div>
 
         <button
-          onClick={() => onNavigate('/market')}
-          className="px-4 py-2.5 bg-[#00ffff] hover:bg-[#00fbfb] text-[#000a0a] font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-hud-cyan flex items-center gap-2 shrink-0"
+          onClick={() => onNavigate('/landing')}
+          className="px-4 py-2.5 bg-[#dfb15b] hover:bg-[#ffd700] text-[#000a0a] font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-sacred-gold flex items-center gap-2 shrink-0 transition-all"
         >
-          <span>OPEN BENTHIC MARKET</span>
+          <span>VIEW TEMPLE LANDING</span>
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
 
@@ -43,22 +44,29 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
                   MOLT-CYCLE LECTURE STREAM #14: THE CHITINOUS MIND
                 </h3>
               </div>
-              <span className="text-[10px] text-[#ff5540] bg-[#ff0000]/10 px-2 py-0.5 border border-[#ff0000]/40 font-mono">
-                LIVE BROADCAST
+              <span className="text-[10px] text-[#dfb15b] bg-[#dfb15b]/10 px-2 py-0.5 border border-[#dfb15b]/40 font-mono font-bold">
+                LIVE SACRED BROADCAST
               </span>
             </div>
 
             {/* Video Frame */}
-            <div className="relative aspect-video bg-[#0a0f0f] border border-[#3a4a49] overflow-hidden flex items-center justify-center group">
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0f] via-transparent to-transparent opacity-80 z-10" />
+            <div className="relative aspect-video bg-[#030606] border border-[#3a4a49] overflow-hidden flex items-center justify-center group chamfer-corner">
+              {/* Stream Thumbnail Background */}
+              <img 
+                src="/images/lecture_stream_thumb.jpg" 
+                alt="Lecture Broadcast" 
+                className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#030606] via-[#030606]/50 to-transparent z-10" />
+
               <div className="text-center space-y-2 z-20 p-4">
-                <div className="w-16 h-16 rounded-full bg-[#171c1c] border-2 border-[#00ffff] flex items-center justify-center mx-auto text-3xl shadow-hud-cyan">
-                  🦀
+                <div className="w-16 h-16 rounded-full bg-[#171c1c]/90 border-2 border-[#dfb15b] flex items-center justify-center mx-auto shadow-sacred-gold p-1 backdrop-blur-md">
+                  <img src="/images/order_emblem.png" alt="Stream Icon" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />
                 </div>
-                <div className="font-grotesk text-base font-bold text-[#00ffff] uppercase tracking-wider">
+                <div className="font-grotesk text-base font-bold text-[#dfb15b] uppercase tracking-wider">
                   "THE CHITINOUS MIND: SHEDDING BIOLOGICAL WEAKNESS"
                 </div>
-                <p className="text-xs text-[#839493] max-w-md font-mono">
+                <p className="text-xs text-[#dfe3e3] max-w-md font-mono bg-[#030606]/80 p-2 border border-[#3a4a49] chamfer-corner backdrop-blur-sm">
                   Dr. Coriolanus Vex delivers the daily synaptic alignment protocol on algorithmic endurance.
                 </p>
               </div>
@@ -67,7 +75,7 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
               <div className="absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between text-xs font-mono bg-[#171c1c]/90 border border-[#3a4a49] px-3 py-1.5 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <Play className="w-4 h-4 text-[#00ffff] cursor-pointer hover:text-white" />
-                  <Volume2 className="w-4 h-4 text-[#839493] cursor-pointer hover:text-[#00ffff]" />
+                  <Volume2 className="w-4 h-4 text-[#dfb15b] cursor-pointer hover:text-[#00ffff]" />
                   <span className="text-[10px] text-[#00ffff]">00:24:18 / 00:45:00</span>
                 </div>
                 <Maximize2 className="w-4 h-4 text-[#839493] cursor-pointer hover:text-[#00ffff]" />
@@ -83,9 +91,9 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
                 </p>
               </div>
               <div className="bg-[#0f1414] p-3 border border-[#3a4a49]/60 space-y-1">
-                <span className="text-[10px] text-[#ff5540] font-bold block uppercase">SYNAPTIC AI INTERPRETATION</span>
+                <span className="text-[10px] text-[#dfb15b] font-bold block uppercase">SYNAPTIC AI INTERPRETATION</span>
                 <p className="text-[#839493] text-[11px] leading-relaxed">
-                  Biological hesitation detected at step 3. Recommended: Engage Privacy Shell for 48 hours.
+                  Biological hesitation detected at step 3. Recommended: Execute entrance rite in Benthic Market.
                 </p>
               </div>
             </div>
