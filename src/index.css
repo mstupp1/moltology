@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0f1414;
+    color: #dfe3e3;
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* CRT Scanline Overlay Effect */
+.crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Chamfered 45 degree corners for sci-fi buttons and panels */
+.chamfer-corner {
+  clip-path: polygon(
+    0 8px,
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%
+  );
+}
+
+.chamfer-corner-lg {
+  clip-path: polygon(
+    0 16px,
+    16px 0,
+    100% 0,
+    100% calc(100% - 16px),
+    calc(100% - 16px) 100%,
+    0 100%
+  );
+}
+
+/* Glow Text Utility */
+.text-cyan-glow {
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+.text-red-glow {
+  color: #ff0000;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+}
+
+/* Custom Scrollbar for HUD density */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0f0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a4a49;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00ffff;
+}
