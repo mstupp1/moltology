@@ -11,102 +11,76 @@
   }
 }
 
-/* Chamfered 45 degree corners for sci-fi buttons and panels */
+/* Sleek HUD buttons and panels with standard continuous borders (No diagonal cut corners) */
 .chamfer-corner {
-  clip-path: polygon(
-    0 8px,
-    8px 0,
-    100% 0,
-    100% calc(100% - 8px),
-    calc(100% - 8px) 100%,
-    0 100%
-  );
+  clip-path: none !important;
+  border-radius: 4px;
 }
 
 .chamfer-corner-lg {
-  clip-path: polygon(
-    0 16px,
-    16px 0,
-    100% 0,
-    100% calc(100% - 16px),
-    calc(100% - 16px) 100%,
-    0 100%
-  );
+  clip-path: none !important;
+  border-radius: 8px;
 }
 
-/* Glow Text Utility */
+/* Glow Text Utility - Crisp high contrast without fuzzy blur */
 .text-cyan-glow {
   color: #00ffff;
-  text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+  text-shadow: none;
 }
 
 .text-red-glow {
-  color: #ff0000;
-  text-shadow: 0 0 14px rgba(255, 0, 0, 0.9);
+  color: #ff5540;
+  text-shadow: none;
 }
 
 .text-magenta-glow {
   color: #ff0055;
-  text-shadow: 0 0 14px rgba(255, 0, 85, 0.85);
+  text-shadow: none;
 }
 
-/* Dark Biomorphic Neumorphism & Chitin Glass */
+/* Dark Biomorphic Panels & Chitin Glass - Solid, clear 1px borders */
 .chitin-card {
-  background: rgba(15, 20, 20, 0.85);
-  border: 1px solid rgba(0, 255, 255, 0.18);
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
-    0 8px 32px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 20, 20, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
 }
 
 .chitin-card-inset {
   background: rgba(7, 11, 11, 0.95);
-  box-shadow: 
-    inset 2px 2px 8px rgba(0, 0, 0, 0.9),
-    inset -1px -1px 4px rgba(0, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 1px 1px 6px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .chitin-card-interactive {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease-in-out;
 }
 
 .chitin-card-interactive:hover {
-  border-color: rgba(0, 255, 255, 0.5);
-  box-shadow: 
-    0 0 20px rgba(0, 255, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+  border-color: rgba(0, 255, 255, 0.7);
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
 /* Background Sacred Geometry Grid Overlay */
 .bg-sacred-grid {
   background-image: 
-    linear-gradient(to right, rgba(255, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 .bg-radial-abyss {
-  background: radial-gradient(circle at 50% 30%, rgba(255, 0, 0, 0.12) 0%, rgba(15, 20, 20, 0.96) 65%, #030606 100%);
+  background: radial-gradient(circle at 50% 30%, rgba(255, 0, 0, 0.1) 0%, rgba(15, 20, 20, 0.98) 65%, #030606 100%);
 }
 
 .bg-radial-sacred {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.14) 0%, rgba(15, 20, 20, 0.98) 75%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.12) 0%, rgba(15, 20, 20, 0.98) 75%);
 }
 
-/* Cathode Scanline Effect */
+/* Cathode Scanline Effect Disabled for visual clarity */
 .scanline-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0) 50%,
-    rgba(0, 0, 0, 0.3) 50%,
-    rgba(0, 0, 0, 0.3)
-  );
-  background-size: 100% 4px;
+  display: none !important;
 }
 
 /* Watermark Text Header / Edge Watermark */

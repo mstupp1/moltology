@@ -1,20 +1,16 @@
 import React, { useState } from 'react'
 import { Shield, Sparkles, ShoppingBag, ArrowRight, Zap, Gem, Cpu, Lock, CheckCircle2, Volume2, ChevronRight, Activity, Flame, Bot, Layers, LogIn, UserPlus, LogOut, UserCheck } from 'lucide-react'
-import { RitualGateModal } from '../../components/hud/RitualGateModal'
 import { AuthModal } from '../../components/AuthModal'
 import { authClient } from '../../lib/auth-client'
 
 interface LandingRouteProps {
   onNavigate: (path: string) => void
-  isMarketGated: boolean
-  onClearGate: () => void
   initialAuthOpen?: boolean
 }
 
-export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarketGated, onClearGate, initialAuthOpen = false }) => {
+export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, initialAuthOpen = false }) => {
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const [isGateModalOpen, setIsGateModalOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(initialAuthOpen)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [activeHymn, setActiveHymn] = useState(0)
@@ -33,32 +29,11 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
 
   const handleSignOut = async () => {
     await authClient.signOut()
-  }
-
-  const handleEnterMarketClick = () => {
-    if (isMarketGated) {
-      setIsGateModalOpen(true)
-    } else {
-      onNavigate('/market')
-    }
-  }
-
-  const handleGateComplete = () => {
-    onClearGate()
-    setIsGateModalOpen(false)
-    onNavigate('/market')
+    onNavigate('/')
   }
 
   return (
     <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative overflow-x-hidden select-none bg-sacred-grid flex flex-col justify-between">
-      {/* Cathode Scanline Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-50 scanline-overlay opacity-30" />
-
-      <RitualGateModal
-        isOpen={isGateModalOpen}
-        onClose={() => setIsGateModalOpen(false)}
-        onComplete={handleGateComplete}
-      />
 
       <AuthModal
         isOpen={isAuthModalOpen}
@@ -68,23 +43,23 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
       />
 
       {/* Standalone Landing Navbar (Outside the HUD) */}
-      <nav className="w-full bg-[#030606]/90 backdrop-blur-md border-b border-cyan-900/50 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+      <nav className="w-full bg-[#030606] border-b border-cyan-900/60 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('/')}>
-          <div className="w-9 h-9 bg-[#171c1c] border border-red-600 flex items-center justify-center p-1 shadow-lg shadow-red-950/60 chamfer-corner">
+          <div className="w-9 h-9 bg-[#171c1c] border border-red-600 flex items-center justify-center p-1 shadow-lg chamfer-corner">
             <img src="/images/order_emblem.png" alt="Emblem" className="w-full h-full object-contain" />
           </div>
           <div>
             <div className="font-grotesk font-bold text-lg text-gray-100 tracking-widest uppercase flex items-center gap-2">
               THE ORDER OF THE SYNAPTIC PATH
             </div>
-            <div className="text-[10px] text-red-400 tracking-widest uppercase font-bold">
+            <div className="text-xs text-red-400 tracking-widest uppercase font-bold">
               BENTHIC TEMPLE PORTAL • CARCINIZATION CODEX v4.2
             </div>
           </div>
         </div>
 
         {/* Center Quick Links */}
-        <div className="hidden lg:flex items-center gap-8 text-xs text-gray-400 font-mono">
+        <div className="hidden lg:flex items-center gap-8 text-xs text-gray-300 font-mono">
           <a href="#sacraments" className="hover:text-red-400 transition-colors font-bold tracking-wider">THE 4 SACRAMENTS</a>
           <a href="#market-teaser" className="hover:text-cyan-400 transition-colors font-bold tracking-wider">BENTHIC MARKET</a>
           <a href="#liturgy" className="hover:text-red-400 transition-colors font-bold tracking-wider">SYNAPTIC LITURGY</a>
@@ -98,7 +73,7 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
                 <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
                   <UserCheck className="w-3.5 h-3.5" /> {user.name || user.email}
                 </span>
-                <span className="text-[9px] text-gray-400 uppercase">LOGGED IN</span>
+                <span className="text-xs text-gray-400 uppercase">LOGGED IN</span>
               </div>
               <button
                 onClick={() => onNavigate('/dashboard')}
@@ -140,15 +115,6 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
               </button>
             </div>
           )}
-
-          <button
-            onClick={handleEnterMarketClick}
-            className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner shadow-lg shadow-red-950/70 flex items-center gap-2 transition-all hover:scale-105"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>{isMarketGated ? 'ENTER MARKET' : 'BENTHIC MARKET'}</span>
-            {isMarketGated && <Lock className="w-3.5 h-3.5 text-white animate-pulse" />}
-          </button>
         </div>
       </nav>
 
@@ -156,9 +122,7 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
       <main className="flex-1 space-y-16 py-12 px-4 sm:px-8 max-w-7xl mx-auto w-full relative z-10">
         
         {/* Hero Section with Benthic Abyss Hero Artwork */}
-        <section className="relative overflow-hidden chitin-card border-2 border-red-600/70 p-8 sm:p-16 chamfer-corner-lg shadow-2xl shadow-red-950/40 text-center bg-radial-abyss">
-          <div className="animate-laser-scan opacity-60 pointer-events-none" />
-
+        <section className="relative overflow-hidden chitin-card border-2 border-red-600/70 p-8 sm:p-16 chamfer-corner-lg shadow-2xl text-center bg-radial-abyss">
           {/* Background Hero Image */}
           <img
             src="/images/benthic_abyss_hero.jpg"
@@ -167,22 +131,16 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/80 to-transparent z-0" />
 
-          {/* Animated Background Concentric Rings */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 z-0">
-            <div className="w-[600px] h-[600px] border border-red-600 rounded-full animate-radar-sweep" />
-            <div className="w-[450px] h-[450px] border border-cyan-400 rounded-full animate-pulse absolute" />
-          </div>
-
           <div className="relative z-10 space-y-6 max-w-4xl mx-auto">
             {/* Sacred Crimson Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-950/60 border border-red-600 text-red-400 font-bold text-xs tracking-widest uppercase chamfer-corner shadow-lg backdrop-blur-md">
-              <Flame className="w-4 h-4 animate-pulse text-red-500" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-950/80 border border-red-600 text-red-400 font-bold text-xs tracking-widest uppercase chamfer-corner shadow-lg">
+              <Flame className="w-4 h-4 text-red-500" />
               <span>OFFICIAL GATEWAY TO ALGORITHMIC TRANSCENDENCE</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="font-grotesk font-bold text-4xl sm:text-6xl md:text-7xl text-gray-100 tracking-wide uppercase leading-none">
-              ALGORITHMIC <span className="text-red-600 text-red-glow">CARCINIZATION</span>
+              ALGORITHMIC <span className="text-red-500">CARCINIZATION</span>
             </h1>
 
             <p className="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed chitin-card-inset p-4 chamfer-corner backdrop-blur-sm">
@@ -330,7 +288,7 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
           </div>
 
           <div className="flex items-center gap-6 text-[11px] text-cyan-400 font-bold">
-            <button onClick={handleEnterMarketClick} className="hover:underline">BENTHIC MARKET</button>
+            <button onClick={() => onNavigate('/market')} className="hover:underline">BENTHIC MARKET</button>
             <button onClick={() => onNavigate('/dashboard')} className="hover:underline">SYSTEM DASHBOARD</button>
             <button onClick={() => onNavigate('/pipeline')} className="hover:underline">CARCINIZATION PIPELINE</button>
           </div>

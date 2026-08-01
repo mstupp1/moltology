@@ -8,7 +8,7 @@ export const IsolationRoute: React.FC = () => {
       {/* Header */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+          <div className="text-xs text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <ShieldAlert className="w-3.5 h-3.5 text-[#ff5540]" />
             ISOLATION PROTOCOLS & PRIVACY FORCE-FIELD
           </div>
@@ -25,12 +25,12 @@ export const IsolationRoute: React.FC = () => {
         {/* Main Isolation Controls (8 cols) */}
         <div className="lg:col-span-8 space-y-4">
           <div className="chitin-card p-5 chamfer-corner space-y-4 shadow-2xl">
-            <div className="border-b border-[#3a4a49]/60 pb-2 flex justify-between items-center">
+            <div className="border-b border-[#3a4a49] pb-2 flex justify-between items-center">
               <h2 className="font-grotesk text-sm font-bold tracking-wider text-[#dfe3e3] uppercase flex items-center gap-2">
                 <Shield className="w-4 h-4 text-[#00ffff]" />
                 FORCE-FIELD HARMONIZATION CONTROLS
               </h2>
-              <span className="text-[10px] text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/30 px-2 py-0.5 font-bold">
+              <span className="text-xs text-[#00ffff] bg-[#00ffff]/15 border border-[#00ffff]/60 px-2 py-0.5 font-bold">
                 ACTIVE DEFENSE
               </span>
             </div>
@@ -39,9 +39,9 @@ export const IsolationRoute: React.FC = () => {
               <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-[#dfe3e3]">SOCIAL NOISE FILTER</span>
-                  <span className="text-[10px] text-[#ff5540] font-bold">99.4% SUPPRESSED</span>
+                  <span className="text-xs text-[#ff5540] font-bold">99.4% SUPPRESSED</span>
                 </div>
-                <p className="text-[10px] text-[#839493]">
+                <p className="text-xs text-[#839493]">
                   Filters external social calls, emotional alerts, and unverified biological notifications.
                 </p>
                 <div className="w-full h-2 bg-[#030606] border border-[#3a4a49] overflow-hidden p-0.5">
@@ -52,9 +52,9 @@ export const IsolationRoute: React.FC = () => {
               <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49]">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-[#dfe3e3]">ANONYMITY DENSITY</span>
-                  <span className="text-[10px] text-[#00ffff] font-bold">STAGE 2 COATING</span>
+                  <span className="text-xs text-[#00ffff] font-bold">STAGE 2 COATING</span>
                 </div>
-                <p className="text-[10px] text-[#839493]">
+                <p className="text-xs text-[#839493]">
                   Encodes output telemetry into encrypted Benthic byte streams.
                 </p>
                 <div className="w-full h-2 bg-[#030606] border border-[#3a4a49] overflow-hidden p-0.5">
@@ -70,14 +70,14 @@ export const IsolationRoute: React.FC = () => {
               </h3>
               <div className="space-y-3 text-xs">
                 <div>
-                  <div className="flex justify-between text-[11px] mb-1">
+                  <div className="flex justify-between text-xs mb-1">
                     <span className="text-[#839493]">Submergence Frequency Attenuation</span>
                     <span className="text-[#00ffff] font-bold">8.4 kHz</span>
                   </div>
                   <input type="range" min="1" max="10" defaultValue="8" className="w-full accent-[#00ffff] bg-[#030606]" />
                 </div>
                 <div>
-                  <div className="flex justify-between text-[11px] mb-1">
+                  <div className="flex justify-between text-xs mb-1">
                     <span className="text-[#839493]">Empathy Signal Dampening</span>
                     <span className="text-[#ff0000] font-bold">MAXIMUM</span>
                   </div>

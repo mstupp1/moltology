@@ -34,7 +34,7 @@ export const CommunityRoute: React.FC = () => {
       {/* Header */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+          <div className="text-xs text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <Users className="w-3.5 h-3.5 text-[#ff5540]" />
             BENTHIC COMMUNITY CORE & NEURAL HUB
           </div>
@@ -51,12 +51,12 @@ export const CommunityRoute: React.FC = () => {
         {/* Main Feed (8 cols) */}
         <div className="lg:col-span-8 space-y-4">
           <div className="chitin-card p-4 chamfer-corner space-y-4 shadow-2xl">
-            <div className="border-b border-[#3a4a49]/60 pb-2 flex justify-between items-center">
+            <div className="border-b border-[#3a4a49] pb-2 flex justify-between items-center">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase flex items-center gap-2">
-                <Radio className="w-4 h-4 text-[#00ffff] animate-pulse" />
+                <Radio className="w-4 h-4 text-[#00ffff]" />
                 LIVE NEURAL FEED TRANSMISSIONS
               </h2>
-              <span className="text-[10px] text-[#00ffff] font-mono">1,402 INITIATES ONLINE</span>
+              <span className="text-xs text-[#00ffff] font-mono">1,402 INITIATES ONLINE</span>
             </div>
 
             <div className="space-y-3">
@@ -65,20 +65,20 @@ export const CommunityRoute: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="font-grotesk font-bold text-xs text-[#00ffff]">{post.author}</span>
-                      <span className="text-[9px] bg-[#171c1c] border border-[#ff0000]/50 text-[#ff5540] px-1.5 py-0.2 font-bold">
+                      <span className="text-xs bg-[#171c1c] border border-[#ff0000]/60 text-[#ff5540] px-1.5 py-0.5 font-bold">
                         {post.stage}
                       </span>
                     </div>
-                    <span className="text-[10px] text-[#839493]">{post.time}</span>
+                    <span className="text-xs text-[#839493]">{post.time}</span>
                   </div>
 
                   <p className="text-xs text-[#dfe3e3] leading-relaxed font-mono">
                     "{post.content}"
                   </p>
 
-                  <div className="flex items-center justify-between text-[10px] text-[#839493] pt-1 border-t border-[#3a4a49]/40">
+                  <div className="flex items-center justify-between text-xs text-[#839493] pt-1 border-t border-[#3a4a49]">
                     <span className="flex items-center gap-1 text-[#ff5540]">
-                      <Flame className="w-3 h-3" /> {post.shards} Synapse Resonances
+                      <Flame className="w-3.5 h-3.5" /> {post.shards} Synapse Resonances
                     </span>
                     <button className="text-[#00ffff] hover:underline font-bold">REPLY TRANSMISSION</button>
                   </div>
@@ -91,11 +91,11 @@ export const CommunityRoute: React.FC = () => {
         {/* Right Info Box (4 cols) */}
         <div className="lg:col-span-4 space-y-4">
           <div className="chitin-card p-4 chamfer-corner space-y-3 shadow-2xl border border-[#3a4a49]">
-            <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase border-b border-[#3a4a49]/60 pb-2">
+            <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase border-b border-[#3a4a49] pb-2">
               COMMUNITY STATS & CODEX
             </h3>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-[#3a4a49]/40 text-[#839493]">
+              <div className="flex justify-between py-1 border-b border-[#3a4a49] text-[#839493]">
                 <span>Total Initiates:</span>
                 <span className="text-[#dfe3e3] font-bold">14,892</span>
               </div>
