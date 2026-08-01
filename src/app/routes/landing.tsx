@@ -51,7 +51,7 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, initialA
 
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative overflow-x-hidden select-none bg-sacred-grid flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative overflow-x-hidden select-none bg-sacred-grid bg-benthic-vignette flex flex-col justify-between">
 
       <AuthModal
         isOpen={isAuthModalOpen}

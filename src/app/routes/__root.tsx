@@ -17,14 +17,20 @@ export const RootLayout: React.FC<RootLayoutProps> = ({
 }) => {
   return (
     <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
-      {/* High Quality Full-Bleed Background Image (bg-cover bg-center preserving native resolution) */}
+      {/* Full-Bleed Underwater Background Image with high visibility */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 opacity-100 pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 opacity-85 pointer-events-none"
         style={{ backgroundImage: `url('/images/underwater_looking_up.jpg')` }}
       />
 
+      {/* Sacred Grid Overlay */}
+      <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0 pointer-events-none" />
+
+      {/* Deep Benthic Blue Vignette & Top Ambient Lighting Overlay */}
+      <div className="absolute inset-0 bg-benthic-vignette z-0 pointer-events-none" />
+
       {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#030708]/40 to-[#030708] z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/60 z-0 pointer-events-none" />
 
       {/* Matrix Digital Code Rain & Particle Canvas Background */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
@@ -40,7 +46,7 @@ export const RootLayout: React.FC<RootLayoutProps> = ({
         <HUDSidebar currentRoute={currentRoute} onNavigate={onNavigate} />
 
         {/* Main Panel Content Workspace with Translucent Glass Backdrop */}
-        <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/15 backdrop-blur-xs border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
+        <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/20 backdrop-blur-xs border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
           {children}
         </main>
       </div>
