@@ -6,6 +6,9 @@ import { DashboardRoute } from './app/routes/index'
 import { MarketRoute } from './app/routes/market'
 import { PipelineRoute } from './app/routes/pipeline'
 import { LandingRoute } from './app/routes/landing'
+import { IsolationRoute } from './app/routes/isolation'
+import { ChassisRoute } from './app/routes/chassis'
+import { CommunityRoute } from './app/routes/community'
 
 const App: React.FC = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname || '/')
@@ -49,6 +52,12 @@ const App: React.FC = () => {
         )
       case '/pipeline':
         return <PipelineRoute />
+      case '/isolation':
+        return <IsolationRoute />
+      case '/chassis':
+        return <ChassisRoute />
+      case '/community':
+        return <CommunityRoute />
       case '/dashboard':
       default:
         return <DashboardRoute onNavigate={handleNavigate} />

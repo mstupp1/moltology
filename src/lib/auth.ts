@@ -12,6 +12,8 @@ export const auth = betterAuth({
       account: schema.accounts,
     }
   }),
+  secret: process.env.BETTER_AUTH_SECRET || 'PS0yaqeAhowuDCfO4+124SdItaj/zyURRPmj2GQKa2M=',
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
   emailAndPassword: {
     enabled: true,
   },

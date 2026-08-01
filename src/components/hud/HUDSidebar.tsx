@@ -44,19 +44,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       id: 'isolation',
       label: 'ISOLATION PROTOCOLS',
       icon: ShieldAlert,
-      path: '/dashboard',
+      path: '/isolation',
     },
     {
       id: 'chassis',
       label: 'CHASSIS CONFIGURATOR',
       icon: Sliders,
-      path: '/dashboard',
+      path: '/chassis',
     },
     {
       id: 'community',
       label: 'BENTHIC COMMUNITY CORE',
       icon: Users,
-      path: '/dashboard',
+      path: '/community',
     },
   ]
 

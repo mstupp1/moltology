@@ -3,6 +3,7 @@ import { HUDHeader } from '../../components/hud/HUDHeader'
 import { HUDSidebar } from '../../components/hud/HUDSidebar'
 import { BiomechanicalCanvas } from '../../components/hud/BiomechanicalCanvas'
 import { CommandPalette } from '../../components/hud/CommandPalette'
+import { SynapticOracleWidget } from '../../components/hud/SynapticOracleWidget'
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -34,6 +35,9 @@ export const RootLayout: React.FC<RootLayoutProps> = ({ children, currentRoute, 
           {children}
         </main>
       </div>
+
+      {/* Floating AI Oracle Assistant */}
+      <SynapticOracleWidget />
 
       {/* Global Slogan Footer strictly matching Reference Screenshots */}
       <footer className="w-full bg-[#030606] border-t border-[#3a4a49]/60 py-1.5 px-6 text-[10px] text-[#839493] font-mono flex items-center justify-between z-20">
