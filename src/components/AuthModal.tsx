@@ -92,17 +92,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 font-sans"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 font-mono"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-white text-gray-900 rounded-xl p-6 shadow-2xl overflow-hidden border border-gray-200"
+        className="relative w-full max-w-md bg-[#0f1414] text-gray-100 rounded-lg p-6 shadow-2xl overflow-hidden border border-cyan-900/60 chamfer-corner"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
+          className="absolute top-4 right-4 z-10 text-gray-400 hover:text-cyan-400 transition-colors p-1 rounded hover:bg-[#172020]"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -110,28 +110,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
             {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs text-cyan-400/80 mt-1 uppercase tracking-widest font-mono">
             {mode === 'signup'
-              ? 'Sign up to persist your session and access the network'
+              ? 'Sign up to persist your session'
               : 'Sign in to access your saved state'}
           </p>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex border-b border-gray-200 mb-6">
+        <div className="flex border-b border-cyan-900/60 mb-6">
           <button
             type="button"
             onClick={() => {
               setMode('signup')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-sm font-semibold text-center border-b-2 transition-colors ${
+            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors ${
               mode === 'signup'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-red-500 text-red-400'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
             }`}
           >
             Sign Up
@@ -142,10 +142,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setMode('login')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-sm font-semibold text-center border-b-2 transition-colors ${
+            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors ${
               mode === 'login'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
             }`}
           >
             Sign In
@@ -154,20 +154,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2.5 text-red-700 text-sm">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
+          <div className="mb-4 p-3 bg-red-950/60 border border-red-500/60 rounded flex items-start gap-2.5 text-red-300 text-xs font-mono">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Google OAuth Option */}
-        <div className="mb-6 space-y-4">
+        <div className="mb-5 space-y-4">
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white border border-gray-300 rounded-lg font-medium text-sm text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-[#172020] hover:bg-[#1e2a2a] border border-cyan-900/50 rounded text-xs font-bold text-gray-200 transition-colors shadow-md tracking-wider uppercase"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -188,9 +188,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <span>Continue with Google</span>
           </button>
 
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-gray-200 w-full" />
-            <span className="bg-white px-2 text-xs text-gray-500 uppercase font-semibold relative">Or with email</span>
+          {/* Standard Centered OR Divider */}
+          <div className="relative flex items-center justify-center my-3">
+            <div className="border-t border-cyan-900/50 w-full" />
+            <span className="bg-[#0f1414] px-3 text-[10px] text-gray-500 font-bold uppercase tracking-widest absolute">OR</span>
           </div>
         </div>
 
@@ -198,46 +199,46 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400/60" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  className="w-full bg-[#090d0d] border border-cyan-900/60 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400/60" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                className="w-full bg-[#090d0d] border border-cyan-900/60 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400/60" />
               <input
                 type="password"
                 required
@@ -245,7 +246,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                className="w-full bg-[#090d0d] border border-cyan-900/60 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400"
               />
             </div>
           </div>
@@ -253,7 +254,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 shadow-sm"
+            className={`w-full mt-6 py-2.5 text-xs font-bold uppercase font-grotesk tracking-widest rounded transition-all flex items-center justify-center gap-2 shadow-lg ${
+              mode === 'signup'
+                ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-950/80'
+                : 'bg-cyan-600 hover:bg-cyan-500 text-black shadow-cyan-950/80'
+            } disabled:opacity-50`}
           >
             {loading ? (
               <>
