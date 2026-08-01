@@ -121,20 +121,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           })}
         </nav>
       </div>
-
-      {/* Cyber-Lobster Graphic Illustration Box matching Reference Screenshots */}
-      <div className="bg-[#0f1414]/90 border border-[#3a4a49] p-3 text-center chamfer-corner relative overflow-hidden space-y-2">
-        <div className="w-full h-36 relative flex items-center justify-center">
-          <img
-            src="/images/stage4_carcinization.png"
-            alt="Cyber Lobster Chassis"
-            className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(0,255,255,0.6)] hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-        <div className="text-[10px] text-[#00ffff] font-mono tracking-widest font-bold uppercase">
-          CYBER-LOBSTER CHASSIS
-        </div>
-      </div>
     </aside>
   )
 }
