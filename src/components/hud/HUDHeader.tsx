@@ -35,6 +35,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => onNavigate && onNavigate('/dashboard')}
       />
 
       {/* Top Center Main Header Title */}
