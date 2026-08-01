@@ -63,7 +63,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     {
       id: 'market',
       label: 'THE MARKET',
-      sublabel: '(NEW / EXCHANGE)',
       icon: ShoppingCart,
       path: '/market',
     },
@@ -250,7 +249,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.path)}
-                    className={`w-full text-left px-3.5 py-3 relative flex items-start gap-3.5 transition-all duration-150 group ${
+                    className={`w-full text-left px-3.5 py-3 relative flex items-center gap-3.5 transition-all duration-150 group ${
                       isActive
                         ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
                         : 'bg-transparent hover:bg-white/[0.03]'
@@ -262,12 +261,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     )}
 
                     <Icon
-                      className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${
+                      className={`w-4 h-4 shrink-0 transition-colors ${
                         isActive ? 'text-[#ff5555]' : 'text-[#7a8e9e] group-hover:text-[#dfe3e3]'
                       }`}
                     />
 
-                    <div className="flex flex-col min-w-0">
+                    <div className="flex flex-col min-w-0 justify-center">
                       <span
                         className={`text-xs md:text-[13px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
                           isActive ? 'text-white font-semibold' : 'text-[#9eb0c0] group-hover:text-[#dfe3e3]'
@@ -275,11 +274,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       >
                         {item.label}
                       </span>
-                      {item.sublabel && (
-                        <span className="text-[10px] md:text-[11px] font-mono text-[#ff5555] tracking-wide mt-1 leading-none font-normal">
-                          {item.sublabel}
-                        </span>
-                      )}
                     </div>
                   </button>
                 )
