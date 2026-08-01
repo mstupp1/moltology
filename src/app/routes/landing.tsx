@@ -8,12 +8,14 @@ interface LandingRouteProps {
   onNavigate: (path: string) => void
   isMarketGated: boolean
   onClearGate: () => void
+  initialAuthOpen?: boolean
 }
 
-export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarketGated, onClearGate }) => {
-  const { data: session } = authClient.useSession()
+export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarketGated, onClearGate, initialAuthOpen = false }) => {
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [isGateModalOpen, setIsGateModalOpen] = useState(false)
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(initialAuthOpen)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [activeHymn, setActiveHymn] = useState(0)
 
@@ -90,11 +92,11 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
 
         {/* Right CTA Nav Actions */}
         <div className="flex items-center gap-3">
-          {session ? (
+          {user ? (
             <div className="flex items-center gap-3">
               <div className="hidden md:flex flex-col text-right">
                 <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                  <UserCheck className="w-3.5 h-3.5" /> {session.user.name || session.user.email}
+                  <UserCheck className="w-3.5 h-3.5" /> {user.name || user.email}
                 </span>
                 <span className="text-[9px] text-gray-400 uppercase">LOGGED IN</span>
               </div>
@@ -188,16 +190,16 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
             </p>
 
             {/* Auth Banner Status on Landing */}
-            {session && (
+            {user && (
               <div className="p-3 bg-emerald-950/40 border border-emerald-500/50 rounded max-w-md mx-auto flex items-center justify-center gap-2 text-emerald-300 text-xs font-mono">
                 <UserCheck className="w-4 h-4 text-emerald-400" />
-                <span>AUTHENTICATED AS {session.user.name || session.user.email}</span>
+                <span>AUTHENTICATED AS {user.name || user.email}</span>
               </div>
             )}
 
             {/* Action CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-6">
-              {!session ? (
+              {!user ? (
                 <>
                   <button
                     onClick={() => openAuth('signup')}

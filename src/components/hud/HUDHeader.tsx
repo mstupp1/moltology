@@ -20,14 +20,15 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   onNavigate,
   subtitle = 'THE DEEP ABYSS BEYOND FLESH'
 }) => {
-  const { data: session } = authClient.useSession()
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
   const handleSignOut = async () => {
     await authClient.signOut()
   }
 
-  const displayName = session?.user?.name || session?.user?.email?.split('@')[0] || larvaId
+  const displayName = user?.name || user?.email?.split('@')[0] || larvaId
 
   return (
     <header className="w-full bg-[#070b0b]/90 border-b border-[#3a4a49]/60 px-4 py-2.5 flex items-center justify-between font-mono select-none relative z-20 shadow-lg">
@@ -75,7 +76,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
           <div className="flex items-center gap-2 text-[10px] tracking-wider font-bold">
             <span className="text-[#dfe3e3] uppercase">{displayName}</span>
             <span className="text-[#00ffff]">| STATUS:</span>
-            {session ? (
+            {user ? (
               <span className="text-emerald-400 font-extrabold flex items-center gap-1">
                 <UserCheck className="w-3 h-3 text-emerald-400" /> AUTHENTICATED
               </span>
@@ -99,7 +100,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
 
       {/* Right Controls Header: Auth Actions & Navigation Menu Icon */}
       <div className="flex items-center gap-3">
-        {!session ? (
+        {!user ? (
           <div className="flex items-center gap-2">
             <span className="hidden lg:inline-block text-[10px] text-amber-400 bg-amber-950/40 border border-amber-500/40 px-2 py-1 font-bold">
               GUEST MODE - UNPERSISTED SESSION
@@ -115,7 +116,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         ) : (
           <div className="flex items-center gap-2">
             <span className="hidden sm:inline-block text-[10px] text-cyan-300 bg-cyan-950/50 border border-cyan-500/40 px-2 py-1 font-bold">
-              {session.user.email}
+              {user.email}
             </span>
             <button
               onClick={handleSignOut}
