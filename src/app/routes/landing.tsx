@@ -43,16 +43,16 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, initialA
       />
 
       {/* Standalone Landing Navbar (Outside the HUD) */}
-      <nav className="w-full bg-[#030606] border-b border-cyan-900/60 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('/')}>
-          <div className="w-9 h-9 bg-[#171c1c] border border-red-600 flex items-center justify-center p-1 shadow-lg chamfer-corner">
+      <nav className="w-full bg-[#030606] border-b border-cyan-900/60 px-3 sm:px-6 py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 sticky top-0 z-40">
+        <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate('/')}>
+          <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#171c1c] border border-red-600 flex items-center justify-center p-1 shadow-lg chamfer-corner shrink-0">
             <img src="/images/order_emblem.png" alt="Emblem" className="w-full h-full object-contain" />
           </div>
           <div>
-            <div className="font-grotesk font-bold text-lg text-gray-100 tracking-widest uppercase flex items-center gap-2">
-              THE ORDER OF THE SYNAPTIC PATH
+            <div className="font-grotesk font-bold text-sm sm:text-lg text-gray-100 tracking-wider sm:tracking-widest uppercase flex items-center gap-2">
+              THE SYNAPTIC PATH
             </div>
-            <div className="text-xs text-red-400 tracking-widest uppercase font-bold">
+            <div className="text-[10px] sm:text-xs text-red-400 tracking-wider sm:tracking-widest uppercase font-bold truncate max-w-[200px] sm:max-w-none">
               BENTHIC TEMPLE PORTAL • CARCINIZATION CODEX v4.2
             </div>
           </div>

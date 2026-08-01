@@ -90,22 +90,22 @@ export const SynapticOracleWidget: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-40 font-mono">
+    <div className="fixed bottom-3 left-3 sm:left-6 sm:bottom-6 z-40 font-mono max-w-[calc(100vw-1.5rem)]">
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-[#0f1414]/90 text-cyan-400 border border-cyan-500/50 p-3 shadow-xl shadow-cyan-950/60 hover:border-cyan-400 hover:scale-105 transition-all flex items-center space-x-2 chamfer-corner group"
+          className="bg-[#0f1414]/95 text-cyan-400 border border-cyan-500/60 p-2.5 sm:p-3 shadow-xl shadow-cyan-950/80 hover:border-cyan-400 hover:scale-105 transition-all flex items-center space-x-2 chamfer-corner group"
         >
           <div className="relative">
             <BrainCircuit className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform" />
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
           </div>
-          <span className="text-xs tracking-wider hidden sm:inline">
-            SYNAPTIC ORACLE AI
+          <span className="text-xs tracking-wider text-cyan-300 font-bold">
+            ORACLE AI
           </span>
         </button>
       ) : (
-        <div className="w-80 sm:w-96 bg-[#090d0d] border border-cyan-500/40 shadow-2xl shadow-cyan-950/80 flex flex-col h-[480px] chamfer-corner-lg overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
+        <div className="w-[calc(100vw-1.5rem)] sm:w-96 bg-[#090d0d] border border-cyan-500/50 shadow-2xl shadow-cyan-950/90 flex flex-col h-[420px] sm:h-[480px] chamfer-corner-lg overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
           {/* Oracle Header */}
           <div className="bg-[#0f1414] border-b border-cyan-900/50 p-3 flex items-center justify-between">
             <div className="flex items-center space-x-2">
