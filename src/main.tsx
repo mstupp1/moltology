@@ -12,6 +12,7 @@ import { LandingRoute } from './app/routes/landing'
 import { IsolationRoute } from './app/routes/isolation'
 import { ChassisRoute } from './app/routes/chassis'
 import { CommunityRoute } from './app/routes/community'
+import { AuthRoute } from './app/routes/auth'
 
 const App: React.FC = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname || '/')
@@ -32,7 +33,17 @@ const App: React.FC = () => {
     setIsMarketGated(false)
   }
 
-  // Standalone routes outside of the Market/HUD layout
+  const isAuthPath = 
+    currentPath === '/sign-up' || 
+    currentPath === '/sign-in' || 
+    currentPath === '/login' || 
+    currentPath === '/signup' || 
+    currentPath.startsWith('/auth')
+
+  if (isAuthPath) {
+    return <AuthRoute onNavigate={handleNavigate} />
+  }
+
   if (currentPath === '/' || currentPath === '/landing') {
     return (
       <LandingRoute
