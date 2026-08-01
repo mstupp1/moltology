@@ -90,7 +90,7 @@ export const SynapticOracleWidget: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-3 left-3 sm:left-6 sm:bottom-6 z-40 font-mono max-w-[calc(100vw-1.5rem)]">
+    <div className="fixed bottom-8 right-3 sm:right-6 sm:bottom-12 z-40 font-mono max-w-[calc(100vw-1.5rem)]">
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}

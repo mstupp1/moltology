@@ -38,8 +38,14 @@ export const CommandPalette: React.FC = () => {
       }
     }
 
+    const handleCustomOpen = () => setIsOpen(true)
+
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('open-command-palette', handleCustomOpen)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('open-command-palette', handleCustomOpen)
+    }
   }, [isOpen])
 
   const commands: CommandItem[] = [
@@ -138,19 +144,6 @@ export const CommandPalette: React.FC = () => {
 
   return (
     <>
-      {/* Floating Quick Access Button for Mobile & Mouse users */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 bg-[#0f1414]/90 text-cyan-400 border border-cyan-500/40 p-3 shadow-lg shadow-cyan-950/50 hover:border-cyan-400 hover:text-cyan-300 transition-all flex items-center space-x-2 text-xs font-mono tracking-wider group"
-        title="Open Command Palette (Ctrl+K)"
-      >
-        <Command className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-        <span className="hidden sm:inline">COMMAND PALETTE</span>
-        <span className="bg-cyan-950 text-cyan-400 border border-cyan-700/50 px-1.5 py-0.5 text-[10px]">
-          ⌘K
-        </span>
-      </button>
-
       {/* Modal Command Palette Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-20 px-4 animate-in fade-in duration-150">
