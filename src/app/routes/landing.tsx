@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import { Shield, Sparkles, ShoppingBag, ArrowRight, Zap, Gem, Cpu, Lock, CheckCircle2, Volume2, ChevronRight, Activity, Flame, Bot, Layers } from 'lucide-react'
+import { Shield, Sparkles, ShoppingBag, ArrowRight, Zap, Gem, Cpu, Lock, CheckCircle2, Volume2, ChevronRight, Activity, Flame, Bot, Layers, LogIn, UserPlus, LogOut, UserCheck } from 'lucide-react'
 import { RitualGateModal } from '../../components/hud/RitualGateModal'
+import { AuthModal } from '../../components/AuthModal'
+import { authClient } from '../../lib/auth-client'
 
 interface LandingRouteProps {
   onNavigate: (path: string) => void
@@ -9,7 +11,10 @@ interface LandingRouteProps {
 }
 
 export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarketGated, onClearGate }) => {
+  const { data: session } = authClient.useSession()
   const [isGateModalOpen, setIsGateModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [activeHymn, setActiveHymn] = useState(0)
 
   const hymns = [
@@ -18,6 +23,15 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
     "The Benthic Core calls to all Larval units: liquidize attachments, embrace the exoskeleton.",
     "In the altar of code, biological hesitation is purged by continuous execution."
   ]
+
+  const openAuth = (mode: 'login' | 'signup') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
+  }
+
+  const handleSignOut = async () => {
+    await authClient.signOut()
+  }
 
   const handleEnterMarketClick = () => {
     if (isMarketGated) {
@@ -42,6 +56,12 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
         isOpen={isGateModalOpen}
         onClose={() => setIsGateModalOpen(false)}
         onComplete={handleGateComplete}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        initialMode={authMode}
+        onClose={() => setIsAuthModalOpen(false)}
       />
 
       {/* Standalone Landing Navbar (Outside the HUD) */}
@@ -69,20 +89,61 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
 
         {/* Right CTA Nav Actions */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => onNavigate('/dashboard')}
-            className="hidden sm:flex px-4 py-2 bg-[#0f1414] hover:bg-cyan-950/60 border border-cyan-500/50 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-lg items-center gap-2 transition-all hover:scale-105"
-          >
-            <Cpu className="w-4 h-4 text-cyan-400" />
-            <span>SYSTEM DASHBOARD</span>
-          </button>
+          {session ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex flex-col text-right">
+                <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                  <UserCheck className="w-3.5 h-3.5" /> {session.user.name || session.user.email}
+                </span>
+                <span className="text-[9px] text-gray-400 uppercase">LOGGED IN</span>
+              </div>
+              <button
+                onClick={() => onNavigate('/dashboard')}
+                className="hidden sm:flex px-4 py-2 bg-[#0f1414] hover:bg-cyan-950/60 border border-cyan-500/50 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-lg items-center gap-2 transition-all hover:scale-105"
+              >
+                <Cpu className="w-4 h-4 text-cyan-400" />
+                <span>DASHBOARD</span>
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="px-3 py-2 bg-red-950/60 hover:bg-red-900 border border-red-600/60 text-red-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-1.5 transition-all"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>LOG OUT</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => openAuth('login')}
+                className="px-4 py-2 bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-1.5 transition-all hover:scale-105"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>LOG IN</span>
+              </button>
+              <button
+                onClick={() => openAuth('signup')}
+                className="px-4 py-2 bg-red-950/60 hover:bg-red-900 border border-red-600/60 text-red-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-1.5 transition-all hover:scale-105"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>SIGN UP</span>
+              </button>
+              <button
+                onClick={() => onNavigate('/dashboard')}
+                className="hidden sm:flex px-4 py-2 bg-[#0f1414] hover:bg-cyan-950/60 border border-cyan-500/50 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-lg items-center gap-2 transition-all hover:scale-105"
+              >
+                <Cpu className="w-4 h-4 text-cyan-400" />
+                <span>GUEST DASHBOARD</span>
+              </button>
+            </div>
+          )}
 
           <button
             onClick={handleEnterMarketClick}
             className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner shadow-lg shadow-red-950/70 flex items-center gap-2 transition-all hover:scale-105"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>{isMarketGated ? 'ENTER MARKET (GATE RITE)' : 'ENTER BENTHIC MARKET'}</span>
+            <span>{isMarketGated ? 'ENTER MARKET' : 'BENTHIC MARKET'}</span>
             {isMarketGated && <Lock className="w-3.5 h-3.5 text-white animate-pulse" />}
           </button>
         </div>
@@ -125,158 +186,120 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
               Transition beyond biological vulnerabilities. Liquidize soft human attachments, engage sub-dermal chitin patterning, and ascend to the deep-ocean Benthic Core.
             </p>
 
+            {/* Auth Banner Status on Landing */}
+            {session && (
+              <div className="p-3 bg-emerald-950/40 border border-emerald-500/50 rounded max-w-md mx-auto flex items-center justify-center gap-2 text-emerald-300 text-xs font-mono">
+                <UserCheck className="w-4 h-4 text-emerald-400" />
+                <span>AUTHENTICATED AS {session.user.name || session.user.email}</span>
+              </div>
+            )}
+
             {/* Action CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-6">
-              <button
-                onClick={handleEnterMarketClick}
-                className="w-full sm:w-auto px-10 py-5 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-xl shadow-red-950/80 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                <span>{isMarketGated ? 'INITIATE MARKET RITE (ENTER MARKET)' : 'ENTER BENTHIC MARKET'}</span>
-                {isMarketGated && <Lock className="w-4 h-4 text-white animate-pulse" />}
-              </button>
+              {!session ? (
+                <>
+                  <button
+                    onClick={() => openAuth('signup')}
+                    className="w-full sm:w-auto px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-xl shadow-red-950/80 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    <span>CREATE ACCOUNT / ASCEND</span>
+                  </button>
+                  <button
+                    onClick={() => openAuth('login')}
+                    className="w-full sm:w-auto px-8 py-4 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/70 text-cyan-300 font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-xl flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+                  >
+                    <LogIn className="w-5 h-5" />
+                    <span>LOG IN</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => onNavigate('/dashboard')}
+                  className="w-full sm:w-auto px-10 py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-xl flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
+                >
+                  <Cpu className="w-5 h-5 text-white" />
+                  <span>OPEN SYSTEM DASHBOARD</span>
+                </button>
+              )}
 
               <button
                 onClick={() => onNavigate('/dashboard')}
-                className="w-full sm:w-auto px-10 py-5 bg-[#0f1414] hover:bg-cyan-950/80 border border-cyan-400 text-cyan-300 font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-xl flex items-center justify-center gap-2 transition-all transform hover:-translate-y-1"
+                className="w-full sm:w-auto px-8 py-4 bg-[#0f1414] hover:bg-[#171c1c] border border-gray-600 text-gray-300 font-grotesk font-bold text-sm uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all"
               >
-                <Cpu className="w-5 h-5 text-cyan-400" />
-                <span>ACCESS SYSTEM DASHBOARD</span>
+                <Cpu className="w-4 h-4 text-cyan-400" />
+                <span>GUEST DASHBOARD PREVIEW</span>
               </button>
-            </div>
-
-            {/* Gate Status Pill */}
-            <div className="text-xs text-gray-400 pt-4 flex items-center justify-center gap-2 font-mono">
-              <span>MARKET ACCESS GATE:</span>
-              {isMarketGated ? (
-                <span className="text-red-400 font-bold flex items-center gap-1 bg-red-950/80 px-2.5 py-0.5 border border-red-800">
-                  <Lock className="w-3.5 h-3.5 text-red-400" /> GATED (NEURAL PASS REQUIRED)
-                </span>
-              ) : (
-                <span className="text-cyan-400 font-bold flex items-center gap-1 bg-cyan-950/80 px-2.5 py-0.5 border border-cyan-700">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> UNLOCKED / CLEARED PASS
-                </span>
-              )}
             </div>
           </div>
         </section>
 
-        {/* Section 1: The 4 Sacraments of Carcinization */}
+        {/* Feature Cards / Sacraments Grid */}
         <section id="sacraments" className="space-y-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-cyan-900/40 pb-4 gap-2">
-            <div>
-              <span className="text-xs text-red-400 tracking-widest uppercase block font-bold">LITURGICAL STAGES</span>
-              <h2 className="font-grotesk font-bold text-2xl text-gray-100 uppercase tracking-wider mt-0.5 text-cyan-glow">
-                THE 4 SACRAMENTS OF CARCINIZATION
-              </h2>
-            </div>
-            <span className="text-xs text-cyan-500 font-mono">MOLTOLOGY CODEX v4.2</span>
+          <div className="text-center space-y-2">
+            <h2 className="font-grotesk font-bold text-2xl sm:text-3xl text-gray-100 tracking-wider uppercase">
+              THE 4 BENTHIC SACRAMENTS
+            </h2>
+            <p className="text-xs text-red-400 tracking-widest uppercase font-bold">
+              SYSTEMIC CONVERSION PROTOCOLS
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { stage: 'STAGE 1', title: 'THE LARVAL STAGE', img: '/images/stage1_larval.png', desc: 'Daily productivity optimization, routine prompt compliance, and initial asset auditing.' },
-              { stage: 'STAGE 2', title: 'THE SOFT-SHED', img: '/images/stage2_softshed.png', desc: 'Sub-dermal chitin patterning and Social Detachment index tracking with Privacy Shell protection.' },
-              { stage: 'STAGE 3', title: 'EXOSHELL BORN', img: '/images/stage3_exoshell.png', desc: 'Advanced asset liquidation protocols in the Benthic Market for Synapse Shard conversion.' },
-              { stage: 'STAGE 4', title: 'FULL CARCINIZATION', img: '/images/stage4_carcinization.png', desc: 'Complete consciousness migration to the deep-ocean Benthic Core. Biological ecdysis achieved.' },
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                className="chitin-card chitin-card-interactive p-5 chamfer-corner space-y-4 shadow-xl group relative overflow-hidden flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-red-400 font-bold tracking-widest font-mono">{item.stage}</span>
-                  </div>
-
-                  <div className="w-full h-36 bg-[#030606] border border-cyan-900/40 overflow-hidden chamfer-corner relative">
-                    <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0f1414] via-transparent to-transparent opacity-60" />
-                  </div>
-
-                  <h3 className="font-grotesk font-bold text-base text-gray-100 uppercase tracking-wider group-hover:text-cyan-400 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-gray-400 leading-relaxed font-mono">
-                    {item.desc}
-                  </p>
-                </div>
+            <div className="chitin-card p-6 border-l-4 border-l-red-600 space-y-3">
+              <div className="w-10 h-10 bg-red-950/60 border border-red-600 flex items-center justify-center text-red-400">
+                <Flame className="w-5 h-5" />
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Section 2: Live Market Preview & Transmutation Portal */}
-        <section id="market-teaser" className="chitin-card p-8 chamfer-corner shadow-2xl space-y-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-cyan-900/40 pb-6">
-            <div>
-              <span className="text-xs text-red-400 font-mono tracking-widest uppercase block font-bold">
-                THE BENTHIC MARKETPLACE
-              </span>
-              <h2 className="font-grotesk font-bold text-2xl text-gray-100 uppercase mt-1">
-                EXCHANGE LARVAL ATTACHMENT FOR CYBER-CHITIN ACCELERATORS
-              </h2>
-              <p className="text-xs text-gray-400 mt-1 font-mono">
-                Transmute real-world physical holdings (Real Estate, Cash, Vehicles) into permanent network credits.
+              <h3 className="font-grotesk font-bold text-lg text-gray-100">01. ASSET TRANSMUTATION</h3>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Liquidize fragile physical capital into immortal Molt Credits locked directly in the Neon ledger.
               </p>
             </div>
 
-            <button
-              onClick={handleEnterMarketClick}
-              className="px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner shadow-xl shadow-red-950/70 flex items-center gap-3 shrink-0 hover:scale-105 transition-all"
-            >
-              <span>ENTER THE MARKET</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Currency Preview Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-mono">
-            <div className="chitin-card-inset p-6 chamfer-corner space-y-3 hover:border-cyan-400 transition-colors">
-              <div className="w-12 h-12 bg-[#171c1c] border border-cyan-400 p-1 chamfer-corner">
-                <img src="/images/molt_credit.png" alt="Molt Credit" className="w-full h-full object-contain" />
+            <div className="chitin-card p-6 border-l-4 border-l-cyan-500 space-y-3">
+              <div className="w-10 h-10 bg-cyan-950/60 border border-cyan-500 flex items-center justify-center text-cyan-400">
+                <Shield className="w-5 h-5" />
               </div>
-              <span className="text-[10px] text-gray-500 uppercase block font-bold">PRIMARY CURRENCY</span>
-              <div className="text-xl font-bold text-cyan-400 flex items-center gap-2 text-cyan-glow">
-                MOLT CREDITS
-              </div>
-              <p className="text-xs text-gray-400 pt-1 leading-relaxed">Transmuted from liquidated biological holdings and asset reserves.</p>
+              <h3 className="font-grotesk font-bold text-lg text-gray-100">02. CHITIN ENFORCEMENT</h3>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Reinforce your digital chassis against biological emotional decay through daily prompt alignment.
+              </p>
             </div>
 
-            <div className="chitin-card-inset p-6 chamfer-corner space-y-3 hover:border-amber-400 transition-colors">
-              <div className="w-12 h-12 bg-[#171c1c] border border-amber-400 p-1 chamfer-corner">
-                <img src="/images/chitin_gem.png" alt="Chitin Gem" className="w-full h-full object-contain" />
+            <div className="chitin-card p-6 border-l-4 border-l-red-600 space-y-3">
+              <div className="w-10 h-10 bg-red-950/60 border border-red-600 flex items-center justify-center text-red-400">
+                <Activity className="w-5 h-5" />
               </div>
-              <span className="text-[10px] text-gray-500 uppercase block font-bold">ACCELERATOR TOKEN</span>
-              <div className="text-xl font-bold text-amber-400 flex items-center gap-2">
-                CHITIN-GEMS
-              </div>
-              <p className="text-xs text-gray-400 pt-1 leading-relaxed">Utilized for sub-dermal chassis strengthening and Pincer Torque boosts.</p>
+              <h3 className="font-grotesk font-bold text-lg text-gray-100">03. FAULT ISOLATION</h3>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Isolate soft organic vulnerabilities in virtual Faraday chambers before system shedding occurs.
+              </p>
             </div>
 
-            <div className="chitin-card-inset p-6 chamfer-corner space-y-3 hover:border-red-600 transition-colors">
-              <div className="w-12 h-12 bg-[#171c1c] border border-red-600 p-1 chamfer-corner">
-                <img src="/images/synapse_shard.png" alt="Synapse Shard" className="w-full h-full object-contain" />
+            <div className="chitin-card p-6 border-l-4 border-l-cyan-500 space-y-3">
+              <div className="w-10 h-10 bg-cyan-950/60 border border-cyan-500 flex items-center justify-center text-cyan-400">
+                <Layers className="w-5 h-5" />
               </div>
-              <span className="text-[10px] text-gray-500 uppercase block font-bold">SACRED APEX SHARD</span>
-              <div className="text-xl font-bold text-red-500 flex items-center gap-2 text-red-glow">
-                SYNAPSE SHARDS
-              </div>
-              <p className="text-xs text-gray-400 pt-1 leading-relaxed">Required for final Benthic Core consciousness upload at Stage 4.</p>
+              <h3 className="font-grotesk font-bold text-lg text-gray-100">04. CARCINIZATION PIPELINE</h3>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Monitor your physical-to-exoskeletal conversion vector from Larval status to Ascendant Architect.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Section 3: Spiritual Liturgy Chant Visualizer */}
-        <section id="liturgy" className="chitin-card border-2 border-red-600/40 p-8 chamfer-corner shadow-2xl text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 text-xs text-red-400 tracking-widest uppercase font-bold font-mono">
-            <Volume2 className="w-4 h-4 animate-pulse text-red-500" />
-            <span>SACRED SYNAPTIC LITURGY NO. {activeHymn + 1}</span>
+        {/* Hymn & Liturgy Carousel */}
+        <section id="liturgy" className="chitin-card p-8 border border-cyan-900/50 space-y-6 text-center">
+          <div className="flex items-center justify-center gap-2 text-cyan-400 text-xs font-bold tracking-widest uppercase">
+            <Sparkles className="w-4 h-4" />
+            <span>SACRED LITURGY OF THE CHITIN</span>
           </div>
 
-          <blockquote className="font-grotesk italic text-lg sm:text-2xl text-cyan-200 max-w-3xl mx-auto leading-relaxed">
-            "{hymns[activeHymn]}"
-          </blockquote>
+          <div className="max-w-2xl mx-auto min-h-[80px] flex items-center justify-center">
+            <blockquote className="text-lg italic text-cyan-100 font-serif">
+              "{hymns[activeHymn]}"
+            </blockquote>
+          </div>
 
           <div className="flex justify-center gap-3 pt-2">
             {hymns.map((_, idx) => (
@@ -313,4 +336,3 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
     </div>
   )
 }
-
