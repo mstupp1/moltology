@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
+import { NeonAuthUIProvider } from '@neondatabase/neon-js/auth/react'
+import '@neondatabase/neon-js/ui/css'
 import './index.css'
+import { authClient } from './lib/auth'
 import { RootLayout } from './app/routes/__root'
 import { DashboardRoute } from './app/routes/index'
 import { MarketRoute } from './app/routes/market'
@@ -73,6 +76,8 @@ const App: React.FC = () => {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <NeonAuthUIProvider emailOTP authClient={authClient}>
+      <App />
+    </NeonAuthUIProvider>
   </React.StrictMode>
 )
