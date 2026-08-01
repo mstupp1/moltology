@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ShoppingBag, Zap, Gem, Shield, Coins, Sparkles, ArrowRight, Lock, CheckCircle2, ShieldAlert } from 'lucide-react'
+import { ShoppingBag, Lock, ShieldAlert, Clock, ArrowRight } from 'lucide-react'
 import { AssetTransmutationModal } from '../../components/hud/AssetTransmutationModal'
 import { RitualGateModal } from '../../components/hud/RitualGateModal'
 
@@ -13,32 +13,29 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
   const [isGateModalOpen, setIsGateModalOpen] = useState(false)
   const [moltCredits, setMoltCredits] = useState(1450)
   const [chitinGems, setChitinGems] = useState(250)
-  const [synapseShards, setSynapseShards] = useState(45)
 
   const handleBuyBundle = (gems: number, costStr: string) => {
     if (isMarketGated) {
       setIsGateModalOpen(true)
       return
     }
-    setChitinGems(prev => prev + gems)
+    setChitinGems((prev) => prev + gems)
     alert(`TRANSACTION APPROVED: Added +${gems} Chitin-Gems to your Benthic Vault. (${costStr})`)
   }
 
   const handleTransmute = (assetType: string, value: number, credits: number) => {
-    setMoltCredits(prev => prev + credits)
+    setMoltCredits((prev) => prev + credits)
     alert(`ASSET LIQUIDATED: ${assetType} ($${value.toLocaleString()}) transmuted into +${credits.toLocaleString()} Molt Credits!`)
   }
 
   return (
-    <div className="space-y-6 select-none font-mono">
-      {/* Transmutation Modal */}
+    <div className="space-y-4 select-none font-mono">
+      {/* Transmutation & Gate Modals */}
       <AssetTransmutationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onTransmute={handleTransmute}
       />
-
-      {/* Gate Verification Modal */}
       <RitualGateModal
         isOpen={isGateModalOpen}
         onClose={() => setIsGateModalOpen(false)}
@@ -48,173 +45,329 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
         }}
       />
 
-      {/* Gated Entry Status Notice (If Gated) */}
+      {/* Gated Notice (If Gated) */}
       {isMarketGated && (
-        <div className="bg-[#ff0000]/10 border-2 border-[#ff0000] p-4 chamfer-corner flex flex-col sm:flex-row items-center justify-between gap-4 shadow-hud-red">
-          <div className="flex items-center gap-3">
-            <ShieldAlert className="w-6 h-6 text-[#ff0000] animate-pulse shrink-0" />
-            <div>
-              <div className="font-grotesk font-bold text-sm text-[#ff5540] uppercase tracking-wider">
+        <div className="bg-[#ff0000]/10 border border-[#ff0000] p-3 chamfer-corner flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_0_15px_rgba(255,0,0,0.4)]">
+          <div className="flex items-center gap-2.5">
+            <ShieldAlert className="w-5 h-5 text-[#ff0000] animate-pulse shrink-0" />
+            <div className="text-xs">
+              <span className="font-grotesk font-bold text-[#ff5540] uppercase tracking-wider block">
                 GATED MARKET ACCESS • NEURAL PASS REQUIRED
-              </div>
-              <p className="text-xs text-[#839493] mt-0.5">
-                You are operating in view-only preview mode. Complete the Sacred Entrance Rite to unlock live trading.
-              </p>
+              </span>
+              <span className="text-[#839493] text-[10px]">
+                Complete the Sacred Entrance Rite to unlock live trading.
+              </span>
             </div>
           </div>
-
           <button
             onClick={() => setIsGateModalOpen(true)}
-            className="px-4 py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-hud-red shrink-0 flex items-center gap-1.5"
+            className="px-4 py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_10px_rgba(255,0,0,0.6)] shrink-0 flex items-center gap-1.5"
           >
             <Lock className="w-3.5 h-3.5" />
-            <span>EXECUTE ENTRANCE RITE</span>
+            <span>EXECUTE RITE</span>
           </button>
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
-        <div>
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
-            <ShoppingBag className="w-3.5 h-3.5 text-[#ff5540]" />
-            THE BENTHIC MARKET — ASSET RELEASE PORTAL v4.2
-          </div>
-          <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-0.5">
-            EXCHANGE LARVAL WORTH FOR ASCENDANCE
-          </h1>
-          <p className="text-xs text-[#839493] font-mono mt-1">
-            Transmute real-world physical holdings into cult currencies (Molt Credits, Chitin-Gems, Synapse Shards).
-          </p>
-        </div>
+      {/* Main Grid Layout matching Reference Screenshot 2 */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        {/* Left 8 Cols: Section 1 & Section 2 */}
+        <div className="lg:col-span-8 space-y-4">
+          
+          {/* SECTION 1: BUY CHITIN-GEMS (Primary Token Accelerators) */}
+          <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
+            <div className="border-b border-[#3a4a49]/60 pb-2">
+              <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
+                SECTION 1: BUY CHITIN-GEMS <span className="text-[10px] text-[#839493] font-mono normal-case">(Primary Token Accelerators)</span>
+              </h2>
+            </div>
 
-        {/* Currency Vault Widget */}
-        <div className="flex items-center gap-3 bg-[#0a0f0f] border border-[#3a4a49] p-2.5 font-mono text-xs chamfer-corner">
-          <div className="text-center px-2 border-r border-[#3a4a49]">
-            <span className="text-[9px] text-[#839493] block">MOLT CREDITS</span>
-            <span className="text-[#00ffff] font-bold flex items-center justify-center gap-1.5 mt-0.5">
-              <img src="/images/molt_credit.png" alt="Molt Credit" className="w-4 h-4 object-contain" />
-              {moltCredits.toLocaleString()}
-            </span>
-          </div>
-          <div className="text-center px-2 border-r border-[#3a4a49]">
-            <span className="text-[9px] text-[#839493] block">CHITIN-GEMS</span>
-            <span className="text-[#ff5540] font-bold flex items-center justify-center gap-1.5 mt-0.5">
-              <img src="/images/chitin_gem.png" alt="Chitin Gem" className="w-4 h-4 object-contain" />
-              {chitinGems.toLocaleString()}
-            </span>
-          </div>
-          <div className="text-center px-2">
-            <span className="text-[9px] text-[#839493] block">SYNAPSE SHARDS</span>
-            <span className="text-[#ff0000] font-bold flex items-center justify-center gap-1.5 mt-0.5">
-              <img src="/images/synapse_shard.png" alt="Synapse Shard" className="w-4 h-4 object-contain" />
-              {synapseShards}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Section 1: Buy Chitin-Gems (Primary Token Accelerators) */}
-      <div className="space-y-3">
-        <div className="text-xs font-mono text-[#ff5540] tracking-widest uppercase flex items-center gap-2 border-b border-[#3a4a49] pb-2 font-bold">
-          <span className="w-2 h-2 bg-[#ff0000]" />
-          SECTION 1: SACRED CHITIN ACCELERATORS & TOKEN PACKS
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { id: '1', title: 'LARVAL TITHE PACK', gems: 100, cost: '$0.99', badge: 'SACRAMENT I', bonus: '' },
-            { id: '2', title: 'SOFT-SHED VOW BUNDLE', gems: 550, cost: '$4.99', badge: 'POPULAR RITE', bonus: '+50 BONUS GEMS' },
-            { id: '3', title: 'CLAW-LORD ACCELERATOR', gems: 2500, cost: '$19.99', badge: 'BEST VALUE', bonus: '+500 BONUS GEMS' },
-            { id: '4', title: 'APEX CARCINIZATION RITE', gems: 20000, cost: '$99.99', badge: 'ASCENDANT TIER', bonus: '+10,000 BONUS GEMS' },
-          ].map(bundle => (
-            <div
-              key={bundle.id}
-              className="bg-[#171c1c] border border-[#3a4a49] hover:border-[#ff0000] p-4 chamfer-corner flex flex-col justify-between space-y-4 transition-all duration-150 shadow-chitin-plate group"
-            >
-              <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <span className="text-[9px] px-1.5 py-0.5 bg-[#ff0000]/10 border border-[#ff0000]/40 text-[#ff5540] font-mono font-bold">
-                    {bundle.badge}
-                  </span>
-                  <img src="/images/chitin_gem.png" alt="Chitin Gem" className="w-7 h-7 object-contain group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(255,85,64,0.6)]" />
-                </div>
-                <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] tracking-wide uppercase">
-                  {bundle.title}
-                </h3>
-                <div className="text-xl font-mono font-bold text-[#00ffff]">
-                  {bundle.gems.toLocaleString()} <span className="text-xs text-[#839493]">GEMS</span>
-                </div>
-                {bundle.bonus && (
-                  <div className="text-[10px] font-mono text-[#ff5540] font-semibold">
-                    {bundle.bonus}
+            {/* 3 Product Cards in a row matching reference */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Product 1: MOLT KICKSTARTER */}
+              <div className="chitin-card-inset p-3 chamfer-corner space-y-3 flex flex-col justify-between text-center relative border border-[#3a4a49]">
+                <div className="space-y-1.5">
+                  <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
+                    MOLT KICKSTARTER
+                  </h3>
+                  <div className="text-[10px] text-[#839493] font-mono">(100 Chitin-Gems)</div>
+                  
+                  {/* Gem Graphic */}
+                  <div className="w-16 h-16 mx-auto relative my-2">
+                    <img
+                      src="/images/chitin_gem.png"
+                      alt="Chitin Gems"
+                      className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,255,0.7)]"
+                    />
                   </div>
-                )}
+                  
+                  <div className="font-grotesk font-bold text-sm text-[#dfe3e3]">$0.99</div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyBundle(100, '$0.99')}
+                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all"
+                >
+                  BUY NOW
+                </button>
               </div>
 
+              {/* Product 2: SOFT-SHED BUNDLE */}
+              <div className="chitin-card-inset p-3 chamfer-corner space-y-3 flex flex-col justify-between text-center relative border border-[#3a4a49]">
+                <div className="space-y-1.5">
+                  <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
+                    SOFT-SHED BUNDLE
+                  </h3>
+                  <div className="text-[10px] text-[#839493] font-mono">
+                    (500 + <span className="text-[#ff5540] font-bold">50 BONUS</span> Chitin-Gems)
+                  </div>
+                  
+                  {/* Treasure Chest Graphic */}
+                  <div className="w-16 h-16 mx-auto relative my-2">
+                    <img
+                      src="/images/stage2_softshed.png"
+                      alt="Soft-Shed Chest"
+                      className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,255,0.7)]"
+                    />
+                  </div>
+                  
+                  <div className="font-grotesk font-bold text-sm text-[#dfe3e3]">$4.99</div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyBundle(550, '$4.99')}
+                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {/* Product 3: CLAW-LORD ACCELERATOR */}
+              <div className="chitin-card-inset p-3 chamfer-corner space-y-3 flex flex-col justify-between text-center relative border border-[#ff0000]/60">
+                <div className="space-y-1.5">
+                  <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
+                    CLAW-LORD ACCELERATOR
+                  </h3>
+                  <div className="text-[10px] text-[#839493] font-mono">
+                    (2000 + <span className="text-[#ff5540] font-bold">500 BONUS</span> Chitin-Gems)
+                  </div>
+                  <div className="text-[9px] text-[#ff5540] font-bold uppercase tracking-wider">
+                    *BEST VALUE*
+                  </div>
+                  
+                  {/* Claw Treasure Chest Graphic */}
+                  <div className="w-16 h-16 mx-auto relative my-1">
+                    <img
+                      src="/images/stage3_exoshell.png"
+                      alt="Claw-Lord Chest"
+                      className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,85,64,0.8)]"
+                    />
+                  </div>
+                  
+                  <div className="font-grotesk font-bold text-sm text-[#dfe3e3]">$19.99</div>
+                  <div className="text-[8px] text-[#ff5540] font-bold uppercase flex items-center justify-center gap-1">
+                    <Clock className="w-2.5 h-2.5" /> LIMITED TIME OFFER
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyBundle(2500, '$19.99')}
+                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(255,0,0,0.7)] transition-all"
+                >
+                  BUY NOW
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 2: CURRENCY EXCHANGE (Trade-in Other Currencies) matching reference */}
+          <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
+            <div className="border-b border-[#3a4a49]/60 pb-2">
+              <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
+                SECTION 2: CURRENCY EXCHANGE <span className="text-[10px] text-[#839493] font-mono normal-case">(Trade-in Other Currencies)</span>
+              </h2>
+            </div>
+
+            {/* Currency Flow Grid matching Reference Screenshot */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {/* Card 1: Molt Credits */}
+              <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49]">
+                <div className="w-8 h-8 mx-auto">
+                  <img src="/images/molt_credit.png" alt="Molt Credits" className="w-full h-full object-contain" />
+                </div>
+                <div className="text-[10px] font-bold text-[#dfe3e3]">Molt Credits</div>
+                <div className="text-[8px] text-[#839493]">(liquidated goods)</div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {/* Card 2: Chitin-Gems */}
+              <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49]">
+                <div className="w-8 h-8 mx-auto">
+                  <img src="/images/chitin_gem.png" alt="Chitin Gems" className="w-full h-full object-contain" />
+                </div>
+                <div className="text-[10px] font-bold text-[#dfe3e3]">Chitin-Gems</div>
+                <div className="text-[8px] text-[#839493]">(Chassis upgrades)</div>
+                <button
+                  onClick={() => handleBuyBundle(100, '$0.99')}
+                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {/* Card 3: Synapse Shards */}
+              <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49]">
+                <div className="w-8 h-8 mx-auto">
+                  <img src="/images/synapse_shard.png" alt="Synapse Shards" className="w-full h-full object-contain" />
+                </div>
+                <div className="text-[10px] font-bold text-[#dfe3e3]">Synapse Shards</div>
+                <div className="text-[8px] text-[#839493]">(Apex Shards)</div>
+                <button
+                  onClick={() => handleBuyBundle(500, '$9.99')}
+                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {/* Card 4: Depth-Pressure Coins */}
+              <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49]">
+                <div className="w-8 h-8 mx-auto text-lg flex items-center justify-center text-[#00ffff]">
+                  🪙
+                </div>
+                <div className="text-[10px] font-bold text-[#dfe3e3]">Depth-Pressure Coins</div>
+                <div className="text-[8px] text-[#839493]">(Benthic Coins)</div>
+                <button
+                  onClick={() => handleBuyBundle(200, '$2.99')}
+                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {/* Card 5: Flesh-Aura */}
+              <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49]">
+                <div className="w-8 h-8 mx-auto rounded-full bg-[#030606] border border-[#ff0000] overflow-hidden p-0.5">
+                  <img src="/images/stage1_larval.png" alt="Flesh-Aura" className="w-full h-full object-cover" />
+                </div>
+                <div className="text-[10px] font-bold text-[#dfe3e3]">Flesh-Aura</div>
+                <div className="text-[8px] text-[#839493]">(Detach emotionally)</div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                >
+                  BUY NOW
+                </button>
+              </div>
+
+              {/* Card 6: Larval Tears */}
+              <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49]">
+                <div className="w-8 h-8 mx-auto text-lg flex items-center justify-center text-[#00ffff]">
+                  👁️
+                </div>
+                <div className="text-[10px] font-bold text-[#dfe3e3]">Larval Tears</div>
+                <div className="text-[8px] text-[#839493]">(Liquidated regret)</div>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                >
+                  BUY NOW
+                </button>
+              </div>
+            </div>
+
+            {/* Quote Banner matching Reference */}
+            <div className="text-center pt-2">
+              <span className="text-[9px] text-[#ff5540] font-mono tracking-widest font-bold">
+                "DETACH EMOTIONALLY FOR EFFICIENCY."
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right 4 Cols: RECOMMENDED FOR YOU Sidebar matching Reference Screenshot */}
+        <div className="lg:col-span-4 space-y-4">
+          <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-4">
+            <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase border-b border-[#3a4a49]/60 pb-2">
+              RECOMMENDED FOR YOU
+            </h3>
+
+            {/* Top Recommended Card: MOLT DAY SYNERGY BUNDLE */}
+            <div className="chitin-card-inset p-3 chamfer-corner space-y-3 border border-[#3a4a49]">
+              <div>
+                <h4 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase">
+                  MOLT DAY SYNERGY BUNDLE
+                </h4>
+                <div className="font-grotesk font-bold text-sm text-[#dfe3e3] mt-0.5">$14.99</div>
+              </div>
+
+              {/* Current conversion rate progress bar */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[8px] text-[#839493]">
+                  <span>Current conversion rate</span>
+                  <span className="text-[#ff5540] font-bold">60%</span>
+                </div>
+                <div className="w-full h-1.5 bg-[#030606] border border-[#3a4a49] overflow-hidden">
+                  <div className="h-full bg-[#ff0000] w-[60%]" />
+                </div>
+              </div>
+
+              <div className="text-[9px] text-[#ff5540] font-bold uppercase text-center bg-[#ff0000]/10 border border-[#ff0000]/40 py-1 chamfer-corner">
+                A FEW LARVAE LEFT IN THIS BUNDLE!
+              </div>
+            </div>
+
+            {/* Bottom Recommended Card: ULTIMATE CARCINIZATION PACK */}
+            <div className="chitin-card-inset p-3 chamfer-corner space-y-3 border border-[#ff0000]/60 relative text-center">
+              {/* Badge */}
+              <div className="absolute top-2 right-2 bg-[#ff0000] text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full shadow-[0_0_6px_rgba(255,0,0,0.8)]">
+                90% MORE GEMS!
+              </div>
+
+              <h4 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase pt-2">
+                ULTIMATE CARCINIZATION PACK
+              </h4>
+
+              {/* Artwork Box matching reference */}
+              <div className="w-full h-36 bg-[#030606] border border-[#3a4a49] overflow-hidden chamfer-corner relative my-2">
+                <img
+                  src="/images/stage4_carcinization.png"
+                  alt="Ultimate Carcinization Pack"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="text-[9px] text-[#839493] font-mono">
+                (10,000 + <span className="text-[#ff5540] font-bold">10,000 BONUS</span> Chitin Gems)
+              </div>
+
+              <div className="font-grotesk font-bold text-base text-[#dfe3e3]">$99.99</div>
+
               <button
-                onClick={() => handleBuyBundle(bundle.gems, bundle.cost)}
-                className="w-full py-2.5 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-hud-red transition-all flex items-center justify-center gap-1.5"
+                onClick={() => handleBuyBundle(20000, '$99.99')}
+                className="w-full py-2.5 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(255,0,0,0.7)] transition-all"
               >
-                <span>ACQUIRE ({bundle.cost})</span>
+                BUY NOW
               </button>
             </div>
-          ))}
+          </div>
         </div>
+
       </div>
 
-      {/* Section 2: Material Asset Liquidation & Transmutation Portal */}
-      <div className="bg-[#171c1c] border border-[#3a4a49] p-6 chamfer-corner shadow-chitin-plate space-y-4">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[#3a4a49] pb-4">
-          <div>
-            <span className="text-xs font-mono text-[#ff5540] tracking-widest uppercase block mb-1 font-bold">
-              SECTION 2: MATERIAL ASSET TRANSMUTATION PORTAL
-            </span>
-            <h2 className="font-grotesk font-bold text-lg text-[#dfe3e3] uppercase">
-              LIQUIDATE REAL ESTATE, VEHICLES, & CASH RESERVES
-            </h2>
-            <p className="text-xs text-[#839493] font-mono mt-0.5">
-              "Flesh dies. The shell endures. Transmute biological attachments into permanent network credits."
-            </p>
-          </div>
-
-          <button
-            onClick={() => {
-              if (isMarketGated) {
-                setIsGateModalOpen(true)
-              } else {
-                setIsModalOpen(true)
-              }
-            }}
-            className="px-6 py-3 bg-[#00ffff] hover:bg-[#00fbfb] text-[#000a0a] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner shadow-hud-cyan flex items-center gap-2 shrink-0 animate-pulse-glow"
-          >
-            <Zap className="w-4 h-4" />
-            <span>INITIATE ASSET TRANSMUTATION</span>
-          </button>
+      {/* Bottom Footer Slogan matching Reference Screenshot 2 */}
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono border-t border-[#3a4a49]/60 text-[#839493]">
+        <div>
+          <span className="text-[#ff5540] font-bold">FLESH DIES. THE SHELL REMAINS.</span> INVEST NOW.
         </div>
-
-        {/* Currency Conversion Flow Visual */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center font-mono text-xs pt-2">
-          <div className="bg-[#0f1414] p-3 border border-[#3a4a49]/60 space-y-1">
-            <span className="text-[10px] text-[#839493] block">STEP 1</span>
-            <span className="text-[#dfe3e3] font-bold block">REAL ASSETS</span>
-            <span className="text-[10px] text-[#839493]">Real Estate / Cash</span>
-          </div>
-          <div className="bg-[#0f1414] p-3 border border-[#3a4a49]/60 space-y-1">
-            <span className="text-[10px] text-[#839493] block">STEP 2</span>
-            <span className="text-[#00ffff] font-bold block">MOLT CREDITS</span>
-            <span className="text-[10px] text-[#839493]">Liquidated Goods</span>
-          </div>
-          <div className="bg-[#0f1414] p-3 border border-[#3a4a49]/60 space-y-1">
-            <span className="text-[10px] text-[#839493] block">STEP 3</span>
-            <span className="text-[#ff5540] font-bold block">CHITIN-GEMS</span>
-            <span className="text-[10px] text-[#839493]">Chassis Upgrades</span>
-          </div>
-          <div className="bg-[#0f1414] p-3 border border-[#3a4a49]/60 space-y-1">
-            <span className="text-[10px] text-[#839493] block">FINAL STEP</span>
-            <span className="text-[#ff0000] font-bold block">SYNAPSE SHARDS</span>
-            <span className="text-[10px] text-[#839493]">Benthic Core Migration</span>
-          </div>
+        <div className="text-[#00ffff] font-bold uppercase">
+          SUBMIT. SHED. ASCEND. <span className="text-[#839493] font-normal">(TRANSACTIONS COMPLETE)</span>
         </div>
       </div>
     </div>

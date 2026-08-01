@@ -1,0 +1,143 @@
+import React, { useState } from 'react'
+
+export const MoltMaxxingStudio: React.FC = () => {
+  const [stats, setStats] = useState({
+    pincerTorque: 82,
+    shellHardness: 75,
+    processingPower: 94,
+    sensoryAugmentation: 68,
+    submergenceRating: 50000,
+  })
+
+  const handleChange = (key: keyof typeof stats, val: number) => {
+    setStats((prev) => ({ ...prev, [key]: val }))
+  }
+
+  return (
+    <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-4 font-mono select-none">
+      {/* Header matching Reference Screenshot */}
+      <div>
+        <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
+          MOLTMAXXING STUDIO
+        </h3>
+        <p className="text-[9px] text-[#839493] mt-0.5">
+          Graphical Interface of the fully carcinized cyber-lobster.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        {/* Left Radar Signal Rings Visual matching Reference */}
+        <div className="md:col-span-5 flex flex-col items-center justify-center space-y-2">
+          <div className="w-28 h-28 relative flex items-center justify-center bg-[#070b0b] border border-[#3a4a49] rounded-full p-2">
+            {/* Concentric Radar Rings */}
+            <div className="w-full h-full border border-[#00ffff]/40 rounded-full animate-ping absolute" />
+            <div className="w-20 h-20 border border-[#ff0000]/40 rounded-full absolute" />
+            <div className="w-12 h-12 border border-[#00ffff]/60 rounded-full absolute" />
+            <img
+              src="/images/stage3_exoshell.png"
+              alt="Cyber Lobster Vector"
+              className="w-16 h-16 object-contain z-10 drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]"
+            />
+          </div>
+        </div>
+
+        {/* Right Sliders Column matching Reference Screenshot */}
+        <div className="md:col-span-7 space-y-2 text-[10px]">
+          {/* Slider 1: Pincer Torque */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-[#839493]">
+              <span className="font-bold text-[#dfe3e3]">PINCER TORQUE</span>
+              <button className="text-[8px] px-1.5 py-0.2 bg-[#070b0b] border border-[#3a4a49] text-[#00ffff]">
+                Configure
+              </button>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={stats.pincerTorque}
+              onChange={(e) => handleChange('pincerTorque', Number(e.target.value))}
+              className="w-full stat-slider"
+            />
+          </div>
+
+          {/* Slider 2: Shell Hardness */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-[#839493]">
+              <span className="font-bold text-[#dfe3e3]">SHELL HARDNESS</span>
+              <button className="text-[8px] px-1.5 py-0.2 bg-[#070b0b] border border-[#3a4a49] text-[#00ffff]">
+                Configure
+              </button>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={stats.shellHardness}
+              onChange={(e) => handleChange('shellHardness', Number(e.target.value))}
+              className="w-full stat-slider"
+            />
+          </div>
+
+          {/* Slider 3: Processing Power */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-[#839493]">
+              <span className="font-bold text-[#dfe3e3]">
+                PROCESSING POWER <span className="text-[8px] text-[#ff5540]">(Core Overclocked)</span>
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={stats.processingPower}
+              onChange={(e) => handleChange('processingPower', Number(e.target.value))}
+              className="w-full stat-slider"
+            />
+          </div>
+
+          {/* Slider 4: Sensory Augmentation */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-[#839493]">
+              <span className="font-bold text-[#dfe3e3]">SENSORY AUGMENTATION</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={stats.sensoryAugmentation}
+              onChange={(e) => handleChange('sensoryAugmentation', Number(e.target.value))}
+              className="w-full stat-slider"
+            />
+          </div>
+
+          {/* Slider 5: Submergence Rating */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-[#839493]">
+              <span className="font-bold text-[#dfe3e3]">SUBMERGENCE RATING</span>
+              <span className="text-[#ff5540] font-bold">{stats.submergenceRating.toLocaleString()}</span>
+            </div>
+            <input
+              type="range"
+              min={10000}
+              max={100000}
+              step={1000}
+              value={stats.submergenceRating}
+              onChange={(e) => handleChange('submergenceRating', Number(e.target.value))}
+              className="w-full stat-slider"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* MOLTMAX ADVANTAGE Badge at bottom right matching reference */}
+      <div className="flex justify-end pt-1">
+        <div className="bg-[#ff0000]/15 border border-[#ff0000] p-2 text-right chamfer-corner">
+          <div className="font-grotesk font-bold text-xs text-[#ff5540] tracking-wider uppercase">
+            MOLTMAX ADVANTAGE
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
