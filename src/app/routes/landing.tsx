@@ -62,6 +62,7 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, isMarket
         isOpen={isAuthModalOpen}
         initialMode={authMode}
         onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => onNavigate('/dashboard')}
       />
 
       {/* Standalone Landing Navbar (Outside the HUD) */}
