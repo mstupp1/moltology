@@ -106,7 +106,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         onSuccess={() => onNavigate('/dashboard')}
       />
 
-      <aside className="w-full md:w-72 h-full bg-[#070b0b]/45 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/60 flex flex-col select-none p-3.5 gap-3 relative z-30 shrink-0 md:overflow-y-auto shadow-2xl">
+      <aside className="w-full md:w-72 h-auto md:h-full bg-[#070b0b]/45 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/60 flex flex-col select-none p-3.5 gap-3 relative z-30 shrink-0 md:overflow-y-auto shadow-2xl">
         {/* Mobile Accordion Top Bar */}
         <div className="flex md:hidden items-center justify-between gap-2 p-1">
           <div
@@ -170,7 +170,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Main Content Container - Always visible on Desktop, toggling on Mobile */}
         <div
-          className={`flex-1 flex flex-col justify-between space-y-4 ${
+          className={`flex-1 flex flex-col justify-between space-y-4 max-h-[calc(100vh-6rem)] overflow-y-auto md:max-h-none ${
             isMobileOpen ? 'block' : 'hidden md:flex'
           }`}
         >

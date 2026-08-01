@@ -87,6 +87,13 @@
   background: radial-gradient(circle at 50% 50%, rgba(255, 69, 58, 0.12) 0%, rgba(15, 20, 20, 0.98) 75%);
 }
 
+/* Deep Benthic Blue Vignette & Top Ambient Lighting */
+.bg-benthic-vignette {
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 195, 255, 0.12), transparent 70%),
+    radial-gradient(ellipse 95% 95% at 50% 50%, transparent 50%, rgba(3, 7, 8, 0.6) 100%);
+}
+
 /* Cathode Scanline Effect Disabled for visual clarity */
 .scanline-overlay {
   display: none !important;
