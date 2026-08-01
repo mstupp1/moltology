@@ -16,7 +16,6 @@ import { AuthRoute } from './app/routes/auth'
 
 const App: React.FC = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname || '/')
-  const [isMarketGated, setIsMarketGated] = useState(true)
 
   useEffect(() => {
     const onPopState = () => setCurrentPath(window.location.pathname)
@@ -27,10 +26,6 @@ const App: React.FC = () => {
   const handleNavigate = (path: string) => {
     window.history.pushState({}, '', path)
     setCurrentPath(path)
-  }
-
-  const handleClearGate = () => {
-    setIsMarketGated(false)
   }
 
   const isAuthPath = 
@@ -48,8 +43,6 @@ const App: React.FC = () => {
     return (
       <LandingRoute
         onNavigate={handleNavigate}
-        isMarketGated={isMarketGated}
-        onClearGate={handleClearGate}
       />
     )
   }
@@ -58,12 +51,7 @@ const App: React.FC = () => {
   const renderRoute = () => {
     switch (currentPath) {
       case '/market':
-        return (
-          <MarketRoute
-            isMarketGated={isMarketGated}
-            onClearGate={handleClearGate}
-          />
-        )
+        return <MarketRoute />
       case '/pipeline':
         return <PipelineRoute />
       case '/isolation':
@@ -79,7 +67,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <RootLayout currentRoute={currentPath} onNavigate={handleNavigate} isMarketGated={isMarketGated}>
+    <RootLayout currentRoute={currentPath} onNavigate={handleNavigate}>
       {renderRoute()}
     </RootLayout>
   )

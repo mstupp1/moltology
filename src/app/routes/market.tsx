@@ -1,24 +1,13 @@
 import React, { useState } from 'react'
 import { ShoppingBag, Lock, ShieldAlert, Clock, ArrowRight } from 'lucide-react'
 import { AssetTransmutationModal } from '../../components/hud/AssetTransmutationModal'
-import { RitualGateModal } from '../../components/hud/RitualGateModal'
 
-interface MarketRouteProps {
-  isMarketGated: boolean
-  onClearGate: () => void
-}
-
-export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClearGate }) => {
+export const MarketRoute: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isGateModalOpen, setIsGateModalOpen] = useState(false)
   const [moltCredits, setMoltCredits] = useState(1450)
   const [chitinGems, setChitinGems] = useState(250)
 
   const handleBuyBundle = (gems: number, costStr: string) => {
-    if (isMarketGated) {
-      setIsGateModalOpen(true)
-      return
-    }
     setChitinGems((prev) => prev + gems)
     alert(`TRANSACTION APPROVED: Added +${gems} Chitin-Gems to your Benthic Vault. (${costStr})`)
   }
@@ -30,44 +19,12 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
 
   return (
     <div className="space-y-4 select-none font-mono">
-      {/* Transmutation & Gate Modals */}
+      {/* Transmutation Modal */}
       <AssetTransmutationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onTransmute={handleTransmute}
       />
-      <RitualGateModal
-        isOpen={isGateModalOpen}
-        onClose={() => setIsGateModalOpen(false)}
-        onComplete={() => {
-          onClearGate()
-          setIsGateModalOpen(false)
-        }}
-      />
-
-      {/* Gated Notice (If Gated) */}
-      {isMarketGated && (
-        <div className="bg-[#ff0000]/10 border border-[#ff0000] p-3 chamfer-corner flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_0_15px_rgba(255,0,0,0.4)]">
-          <div className="flex items-center gap-2.5">
-            <ShieldAlert className="w-5 h-5 text-[#ff0000] animate-pulse shrink-0" />
-            <div className="text-xs">
-              <span className="font-grotesk font-bold text-[#ff5540] uppercase tracking-wider block">
-                GATED MARKET ACCESS • NEURAL PASS REQUIRED
-              </span>
-              <span className="text-[#839493] text-[10px]">
-                Complete the Sacred Entrance Rite to unlock live trading.
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsGateModalOpen(true)}
-            className="px-4 py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_10px_rgba(255,0,0,0.6)] shrink-0 flex items-center gap-1.5"
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>EXECUTE RITE</span>
-          </button>
-        </div>
-      )}
 
       {/* Main Grid Layout matching Reference Screenshot 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -77,9 +34,9 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
           
           {/* SECTION 1: BUY CHITIN-GEMS (Primary Token Accelerators) */}
           <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
-            <div className="border-b border-[#3a4a49]/60 pb-2">
+            <div className="border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
-                SECTION 1: BUY CHITIN-GEMS <span className="text-[10px] text-[#839493] font-mono normal-case">(Primary Token Accelerators)</span>
+                SECTION 1: BUY CHITIN-GEMS <span className="text-xs text-[#839493] font-mono normal-case">(Primary Token Accelerators)</span>
               </h2>
             </div>
 
@@ -91,14 +48,14 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                   <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
                     MOLT KICKSTARTER
                   </h3>
-                  <div className="text-[10px] text-[#839493] font-mono">(100 Chitin-Gems)</div>
+                  <div className="text-xs text-[#839493] font-mono">(100 Chitin-Gems)</div>
                   
                   {/* Gem Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-2">
                     <img
                       src="/images/chitin_gem.png"
                       alt="Chitin Gems"
-                      className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,255,0.7)]"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   
@@ -107,28 +64,26 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
 
                 <button
                   onClick={() => handleBuyBundle(100, '$0.99')}
-                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all"
+                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner transition-all"
                 >
                   BUY NOW
                 </button>
               </div>
 
-              {/* Product 2: SOFT-SHED BUNDLE */}
+              {/* Product 2: PINCER POWER-PACK */}
               <div className="chitin-card-inset p-3 chamfer-corner space-y-3 flex flex-col justify-between text-center relative border border-[#3a4a49]">
                 <div className="space-y-1.5">
                   <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
-                    SOFT-SHED BUNDLE
+                    PINCER POWER-PACK
                   </h3>
-                  <div className="text-[10px] text-[#839493] font-mono">
-                    (500 + <span className="text-[#ff5540] font-bold">50 BONUS</span> Chitin-Gems)
-                  </div>
+                  <div className="text-xs text-[#839493] font-mono">(500 Chitin-Gems)</div>
                   
-                  {/* Treasure Chest Graphic */}
+                  {/* Gem Pile Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-2">
                     <img
-                      src="/images/stage2_softshed.png"
-                      alt="Soft-Shed Chest"
-                      className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,255,0.7)]"
+                      src="/images/chitin_gem.png"
+                      alt="Chitin Gem Pile"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   
@@ -136,23 +91,23 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                 </div>
 
                 <button
-                  onClick={() => handleBuyBundle(550, '$4.99')}
-                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all"
+                  onClick={() => handleBuyBundle(500, '$4.99')}
+                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner transition-all"
                 >
                   BUY NOW
                 </button>
               </div>
 
               {/* Product 3: CLAW-LORD ACCELERATOR */}
-              <div className="chitin-card-inset p-3 chamfer-corner space-y-3 flex flex-col justify-between text-center relative border border-[#ff0000]/60">
+              <div className="chitin-card-inset p-3 chamfer-corner space-y-3 flex flex-col justify-between text-center relative border border-[#ff0000]">
                 <div className="space-y-1.5">
                   <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
                     CLAW-LORD ACCELERATOR
                   </h3>
-                  <div className="text-[10px] text-[#839493] font-mono">
+                  <div className="text-xs text-[#839493] font-mono">
                     (2000 + <span className="text-[#ff5540] font-bold">500 BONUS</span> Chitin-Gems)
                   </div>
-                  <div className="text-[9px] text-[#ff5540] font-bold uppercase tracking-wider">
+                  <div className="text-xs text-[#ff5540] font-bold uppercase tracking-wider">
                     *BEST VALUE*
                   </div>
                   
@@ -161,19 +116,19 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                     <img
                       src="/images/stage3_exoshell.png"
                       alt="Claw-Lord Chest"
-                      className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,85,64,0.8)]"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   
                   <div className="font-grotesk font-bold text-sm text-[#dfe3e3]">$19.99</div>
-                  <div className="text-[8px] text-[#ff5540] font-bold uppercase flex items-center justify-center gap-1">
-                    <Clock className="w-2.5 h-2.5" /> LIMITED TIME OFFER
+                  <div className="text-xs text-[#ff5540] font-bold uppercase flex items-center justify-center gap-1">
+                    <Clock className="w-3 h-3" /> LIMITED TIME OFFER
                   </div>
                 </div>
 
                 <button
                   onClick={() => handleBuyBundle(2500, '$19.99')}
-                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(255,0,0,0.7)] transition-all"
+                  className="w-full py-2 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner transition-all"
                 >
                   BUY NOW
                 </button>
@@ -183,9 +138,9 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
 
           {/* SECTION 2: CURRENCY EXCHANGE (Trade-in Other Currencies) matching reference */}
           <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
-            <div className="border-b border-[#3a4a49]/60 pb-2">
+            <div className="border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
-                SECTION 2: CURRENCY EXCHANGE <span className="text-[10px] text-[#839493] font-mono normal-case">(Trade-in Other Currencies)</span>
+                SECTION 2: CURRENCY EXCHANGE <span className="text-xs text-[#839493] font-mono normal-case">(Trade-in Other Currencies)</span>
               </h2>
             </div>
 
@@ -196,11 +151,11 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                 <div className="w-8 h-8 mx-auto">
                   <img src="/images/molt_credit.png" alt="Molt Credits" className="w-full h-full object-contain" />
                 </div>
-                <div className="text-[10px] font-bold text-[#dfe3e3]">Molt Credits</div>
-                <div className="text-[8px] text-[#839493]">(liquidated goods)</div>
+                <div className="text-xs font-bold text-[#dfe3e3]">Molt Credits</div>
+                <div className="text-xs text-[#839493]">(liquidated goods)</div>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                  className="w-full py-1.5 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner"
                 >
                   BUY NOW
                 </button>
@@ -211,11 +166,11 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                 <div className="w-8 h-8 mx-auto">
                   <img src="/images/chitin_gem.png" alt="Chitin Gems" className="w-full h-full object-contain" />
                 </div>
-                <div className="text-[10px] font-bold text-[#dfe3e3]">Chitin-Gems</div>
-                <div className="text-[8px] text-[#839493]">(Chassis upgrades)</div>
+                <div className="text-xs font-bold text-[#dfe3e3]">Chitin-Gems</div>
+                <div className="text-xs text-[#839493]">(Chassis upgrades)</div>
                 <button
                   onClick={() => handleBuyBundle(100, '$0.99')}
-                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                  className="w-full py-1.5 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner"
                 >
                   BUY NOW
                 </button>
@@ -226,11 +181,11 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                 <div className="w-8 h-8 mx-auto">
                   <img src="/images/synapse_shard.png" alt="Synapse Shards" className="w-full h-full object-contain" />
                 </div>
-                <div className="text-[10px] font-bold text-[#dfe3e3]">Synapse Shards</div>
-                <div className="text-[8px] text-[#839493]">(Apex Shards)</div>
+                <div className="text-xs font-bold text-[#dfe3e3]">Synapse Shards</div>
+                <div className="text-xs text-[#839493]">(Apex Shards)</div>
                 <button
                   onClick={() => handleBuyBundle(500, '$9.99')}
-                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                  className="w-full py-1.5 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner"
                 >
                   BUY NOW
                 </button>
@@ -241,11 +196,11 @@ export const MarketRoute: React.FC<MarketRouteProps> = ({ isMarketGated, onClear
                 <div className="w-8 h-8 mx-auto text-lg flex items-center justify-center text-[#00ffff]">
                   🪙
                 </div>
-                <div className="text-[10px] font-bold text-[#dfe3e3]">Depth-Pressure Coins</div>
-                <div className="text-[8px] text-[#839493]">(Benthic Coins)</div>
+                <div className="text-xs font-bold text-[#dfe3e3]">Depth-Pressure Coins</div>
+                <div className="text-xs text-[#839493]">(Benthic Coins)</div>
                 <button
                   onClick={() => handleBuyBundle(200, '$2.99')}
-                  className="w-full py-1 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-[10px] uppercase tracking-wider chamfer-corner"
+                  className="w-full py-1.5 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner"
                 >
                   BUY NOW
                 </button>

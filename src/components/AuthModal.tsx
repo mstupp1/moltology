@@ -96,7 +96,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-[#0f1414] text-gray-100 rounded-lg p-6 shadow-2xl overflow-hidden border border-cyan-900/60 chamfer-corner"
+        className="relative w-full max-w-md bg-[#0f1414] text-gray-100 p-6 shadow-2xl overflow-hidden border border-cyan-900/60 chamfer-corner"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -190,8 +190,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Standard Centered OR Divider */}
           <div className="relative flex items-center justify-center my-3">
-            <div className="border-t border-cyan-900/50 w-full" />
-            <span className="bg-[#0f1414] px-3 text-[10px] text-gray-500 font-bold uppercase tracking-widest absolute">OR</span>
+            <div className="border-t border-cyan-800 w-full" />
+            <span className="bg-[#0f1414] px-3 text-xs text-gray-400 font-bold uppercase tracking-widest absolute">OR</span>
           </div>
         </div>
 
@@ -199,46 +199,46 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
             <div>
-              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+              <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400/60" />
+                <User className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full bg-[#090d0d] border border-cyan-900/60 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#090d0d] border border-cyan-800 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+            <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400/60" />
+              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full bg-[#090d0d] border border-cyan-900/60 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                className="w-full bg-[#090d0d] border border-cyan-800 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+            <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400/60" />
+              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400" />
               <input
                 type="password"
                 required
@@ -246,7 +246,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#090d0d] border border-cyan-900/60 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400"
+                className="w-full bg-[#090d0d] border border-cyan-800 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
               />
             </div>
           </div>

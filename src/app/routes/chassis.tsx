@@ -8,7 +8,7 @@ export const ChassisRoute: React.FC = () => {
       {/* Header */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+          <div className="text-xs text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <Sliders className="w-3.5 h-3.5 text-[#ff5540]" />
             CHASSIS CONFIGURATOR & BIOMECHANICAL SUITE
           </div>
@@ -30,34 +30,34 @@ export const ChassisRoute: React.FC = () => {
         {/* Right Column: Cyber Chassis Visualization & Spec Sheet (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           <div className="chitin-card p-4 chamfer-corner space-y-4 shadow-2xl border border-[#3a4a49]">
-            <div className="border-b border-[#3a4a49]/60 pb-2 flex justify-between items-center">
+            <div className="border-b border-[#3a4a49] pb-2 flex justify-between items-center">
               <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
                 ACTIVE CYBER-CHASSIS MATRIX
               </h3>
-              <span className="text-[10px] text-[#00ffff] font-mono font-bold">STAGE 4 READY</span>
+              <span className="text-xs text-[#00ffff] font-mono font-bold">STAGE 4 READY</span>
             </div>
 
             <div className="w-full h-56 bg-[#030606] border border-[#3a4a49] chamfer-corner relative flex items-center justify-center p-4 group overflow-hidden">
               <img
                 src="/images/stage4_carcinization.png"
                 alt="Cyber Lobster Chassis Preview"
-                className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,255,255,0.7)] group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute top-2 left-2 text-[9px] text-[#00ffff] bg-[#070b0b]/90 border border-[#00ffff]/30 px-2 py-0.5 font-bold">
+              <div className="absolute top-2 left-2 text-xs text-[#00ffff] bg-[#070b0b] border border-[#00ffff]/60 px-2 py-0.5 font-bold">
                 REINFORCED PINCER V3
               </div>
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-[#3a4a49]/40 text-[#839493]">
+              <div className="flex justify-between py-1 border-b border-[#3a4a49] text-[#839493]">
                 <span>Chitin Armor Rating:</span>
                 <span className="text-[#dfe3e3] font-bold">9,450 PSI</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[#3a4a49]/40 text-[#839493]">
+              <div className="flex justify-between py-1 border-b border-[#3a4a49] text-[#839493]">
                 <span>Pincer Hydraulic Torque:</span>
                 <span className="text-[#00ffff] font-bold">1,200 kN</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[#3a4a49]/40 text-[#839493]">
+              <div className="flex justify-between py-1 border-b border-[#3a4a49] text-[#839493]">
                 <span>Synaptic Response Time:</span>
                 <span className="text-[#ff5540] font-bold">0.42 ms</span>
               </div>

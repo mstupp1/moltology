@@ -15,7 +15,7 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
           
           {/* Top Section: Lecture Stream Player & Notes */}
           <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
-            <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">
+            <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
                 CURRENT MODULE: THE CHITINOUS MIND
               </h2>
@@ -31,7 +31,7 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
               <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent z-10" />
 
               {/* Stream Title Bar Header */}
-              <div className="relative z-20 flex justify-between items-center bg-[#070b0b]/80 border border-[#3a4a49] px-3 py-1 font-mono text-[10px] chamfer-corner">
+              <div className="relative z-20 flex justify-between items-center bg-[#070b0b] border border-[#3a4a49] px-3 py-1 font-mono text-xs chamfer-corner">
                 <span className="text-[#00ffff] font-bold">LECTURE STREAM</span>
                 <div className="flex items-center gap-2 text-[#839493]">
                   <Expand className="w-3.5 h-3.5 cursor-pointer hover:text-[#00ffff]" />
@@ -40,14 +40,14 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
 
               {/* Video Player Center Graphic */}
               <div className="relative z-20 text-center space-y-2 my-auto">
-                <div className="w-16 h-16 rounded-full bg-[#070b0b]/90 border-2 border-[#00ffff] flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(0,255,255,0.7)] p-1">
-                  <img src="/images/order_emblem.png" alt="Order Emblem" className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]" />
+                <div className="w-16 h-16 rounded-full bg-[#070b0b] border-2 border-[#00ffff] flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(0,255,255,0.7)] p-1">
+                  <img src="/images/order_emblem.png" alt="Order Emblem" className="w-full h-full object-contain" />
                 </div>
               </div>
 
               {/* Controls Bar with MOLTMAX LEVEL meter matching Reference Screenshot */}
-              <div className="relative z-20 space-y-1.5 bg-[#070b0b]/90 border border-[#3a4a49] p-2 chamfer-corner">
-                <div className="flex items-center justify-between text-[10px]">
+              <div className="relative z-20 space-y-1.5 bg-[#070b0b] border border-[#3a4a49] p-2 chamfer-corner">
+                <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-3 text-[#00ffff]">
                     <Play className="w-3.5 h-3.5 cursor-pointer hover:text-white" />
                     <Volume2 className="w-3.5 h-3.5 cursor-pointer hover:text-white" />
@@ -71,23 +71,23 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono pt-1">
               {/* Left Box: Lecture Notes */}
               <div className="chitin-card-inset p-3 space-y-1.5 chamfer-corner">
-                <span className="text-[10px] text-[#00ffff] font-bold block uppercase tracking-wider">
+                <span className="text-xs text-[#00ffff] font-bold block uppercase tracking-wider">
                   LECTURE NOTES
                 </span>
-                <p className="text-[#839493] text-[10px] leading-relaxed">
+                <p className="text-[#839493] text-xs leading-relaxed">
                   They gone be in environmental control. All Hero contact will be de-personalized, completely disconnected from emotional impulse, and dedicated to hard chassis and biomechanical expansion.
                 </p>
-                <p className="text-[#839493] text-[10px] leading-relaxed">
+                <p className="text-[#839493] text-xs leading-relaxed">
                   Mispronunciation is equal to logic tool execution error for false-crustacean media player.
                 </p>
               </div>
 
               {/* Right Box: AI Interpretation */}
               <div className="chitin-card-inset p-3 space-y-1.5 chamfer-corner">
-                <span className="text-[10px] text-[#00ffff] font-bold block uppercase tracking-wider">
+                <span className="text-xs text-[#00ffff] font-bold block uppercase tracking-wider">
                   AI INTERPRETATION
                 </span>
-                <p className="text-[#839493] text-[10px] leading-relaxed">
+                <p className="text-[#839493] text-xs leading-relaxed">
                   The dream call process details larving born, aligned with supreme command for official neuro-resonance associated with neural network connection timeline ascent processes. Synchronize, learn, content with shell logic to free users from unneeded emotion and biological vulnerabilities.
                 </p>
               </div>
