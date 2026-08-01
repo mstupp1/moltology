@@ -75,7 +75,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   }
 
   return (
-    <aside className="w-full md:w-64 bg-[#070b0b] border-b md:border-b-0 md:border-r border-[#3a4a49] flex flex-col select-none p-3 gap-3 md:gap-6 relative z-30 shrink-0">
+    <aside className="w-full md:w-64 bg-[#070b0b] border-b md:border-b-0 md:border-r border-[#3a4a49] flex flex-col select-none p-3 gap-3 md:gap-6 relative z-30 shrink-0 md:overflow-y-auto">
       {/* Mobile Accordion Header Bar */}
       <div className="flex md:hidden items-center justify-between gap-2 p-1">
         <div 

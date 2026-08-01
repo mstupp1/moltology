@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ShieldAlert, LogIn, LogOut, UserCheck } from 'lucide-react'
+import { ShieldAlert, LogIn, LogOut, UserCheck, Search, Command } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 
@@ -31,33 +31,46 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
 
   const displayName = user?.name || user?.email?.split('@')[0] || larvaId
 
+  const handleOpenCommandPalette = () => {
+    window.dispatchEvent(new CustomEvent('open-command-palette'))
+  }
+
   return (
-    <header className="w-full bg-[#070b0b] border-b border-[#3a4a49] px-4 py-2.5 flex items-center justify-between font-mono select-none relative z-20 shadow-lg">
+    <header className="w-full bg-[#070b0b] border-b border-[#3a4a49] px-4 py-2 flex items-center justify-between font-mono select-none relative z-20 shadow-lg shrink-0">
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={() => onNavigate && onNavigate('/dashboard')}
       />
 
-      {/* Top Center Main Header Title */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-2 text-center pointer-events-none hidden md:block">
-        <h1 className="font-grotesk font-bold text-lg md:text-xl text-[#00ffff] tracking-widest uppercase">
-          MOLTISM PORTAL v4.2
-        </h1>
-        <p className="text-xs text-[#00ffff]/80 tracking-[0.25em] uppercase font-bold -mt-0.5">
-          {subtitle}
-        </p>
+      {/* Top Center Search Bar launching Command Palette */}
+      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:block">
+        <button
+          onClick={handleOpenCommandPalette}
+          className="flex items-center justify-between w-64 lg:w-96 bg-[#030606] hover:bg-[#0b0f0f] border border-[#3a4a49] hover:border-[#00ffff]/70 px-3 py-1.5 text-xs text-[#839493] transition-all chamfer-corner group shadow-inner"
+          title="Search protocols and commands (⌘K)"
+        >
+          <div className="flex items-center gap-2 text-[#839493] group-hover:text-[#dfe3e3] truncate">
+            <Search className="w-3.5 h-3.5 text-[#00ffff] group-hover:scale-110 transition-transform" />
+            <span className="truncate">Search commands & protocols...</span>
+          </div>
+          <div className="flex items-center gap-1 bg-[#0f1414] border border-[#3a4a49] text-[#00ffff] px-1.5 py-0.5 text-[10px] font-bold shrink-0">
+            <Command className="w-3 h-3" />
+            <span>K</span>
+          </div>
+        </button>
       </div>
 
-      {/* Mobile Title */}
-      <div className="md:hidden flex items-center gap-2 cursor-pointer" onClick={() => onNavigate && onNavigate('/')}>
-        <div className="w-8 h-8 rounded bg-[#171c1c] border border-[#ff0000] flex items-center justify-center p-1 text-[#ff0000]">
-          <span className="text-base">🦞</span>
-        </div>
-        <div>
-          <div className="font-grotesk font-bold text-sm text-[#00ffff]">MOLTISM PORTAL v4.2</div>
-          <div className="text-xs text-gray-400">THE DEEP ABYSS</div>
-        </div>
+      {/* Mobile Search Button */}
+      <div className="md:hidden flex items-center gap-2">
+        <button
+          onClick={handleOpenCommandPalette}
+          className="flex items-center gap-2 bg-[#030606] hover:bg-[#0b0f0f] border border-[#3a4a49] active:border-[#00ffff] px-2.5 py-1 text-xs text-[#839493] chamfer-corner"
+        >
+          <Search className="w-3.5 h-3.5 text-[#00ffff]" />
+          <span className="text-xs font-mono text-[#dfe3e3]">Search</span>
+          <span className="bg-[#0f1414] text-[#00ffff] border border-[#3a4a49] text-[9px] px-1 py-0.2 font-bold">⌘K</span>
+        </button>
       </div>
 
       {/* Left/Center Profile Bar matching Reference Screenshots */}
