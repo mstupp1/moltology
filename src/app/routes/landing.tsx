@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Shield, Sparkles, ArrowRight, Flame, Layers, LogIn, UserPlus, LogOut, UserCheck, Cpu, Activity, CheckCircle2 } from 'lucide-react'
 import { AuthModal } from '../../components/AuthModal'
 import { authClient } from '../../lib/auth-client'
+import { BenthicCTAButton } from '../../components/hud/BenthicCTAButton'
 
 interface LandingRouteProps {
   onNavigate: (path: string) => void
@@ -78,38 +79,40 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, initialA
         {/* Streamlined Right Actions (No Repetitive CTAs) */}
         <div className="flex items-center gap-3">
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:flex text-xs text-emerald-400 font-bold items-center gap-1.5 bg-emerald-950/40 px-3 py-1 border border-emerald-500/30 rounded">
-                <UserCheck className="w-3.5 h-3.5" />
-                <span className="truncate max-w-[120px]">{user.name || user.email}</span>
-              </span>
-              <button
-                onClick={() => onNavigate('/dashboard')}
-                className="px-4 py-2 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105"
-              >
-                <Cpu className="w-4 h-4" />
-                <span>DASHBOARD</span>
-              </button>
+                <div className="flex items-center gap-3">
+                  <span className="hidden sm:flex text-xs text-emerald-400 font-bold items-center gap-1.5 bg-emerald-950/40 px-3 py-1 border border-emerald-500/30 rounded">
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span className="truncate max-w-[120px]">{user.name || user.email}</span>
+                  </span>
+                  <button
+                    onClick={() => onNavigate('/dashboard')}
+                    className="px-4 py-2 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105"
+                  >
+                    <Cpu className="w-4 h-4" />
+                    <span>DASHBOARD</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => openAuth('login')}
+                    className="px-3.5 py-1.5 text-gray-300 hover:text-cyan-400 text-xs font-bold tracking-wider transition-colors"
+                  >
+                    LOG IN
+                  </button>
+                  <BenthicCTAButton
+                    size="sm"
+                    onClick={() => openAuth('signup')}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>JOIN PATH</span>
+                    </span>
+                  </BenthicCTAButton>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => openAuth('login')}
-                className="px-3.5 py-1.5 text-gray-300 hover:text-cyan-400 text-xs font-bold tracking-wider transition-colors"
-              >
-                LOG IN
-              </button>
-              <button
-                onClick={() => openAuth('signup')}
-                className="px-4 py-2 bg-red-600/90 hover:bg-red-500 text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-md flex items-center gap-1.5 transition-all hover:scale-105"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>JOIN PATH</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </nav>
+          </nav>
 
       {/* Main Content Area */}
       <main className="flex-1 space-y-16 py-10 px-4 sm:px-8 max-w-6xl mx-auto w-full relative z-10">
@@ -146,13 +149,15 @@ export const LandingRoute: React.FC<LandingRouteProps> = ({ onNavigate, initialA
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               {!user ? (
                 <>
-                  <button
+                  <BenthicCTAButton
+                    size="lg"
                     onClick={() => openAuth('signup')}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-xl shadow-red-950/80 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
                   >
-                    <span>ASCEND NOW</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                    <span className="flex items-center gap-2">
+                      <span>ASCEND NOW</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </BenthicCTAButton>
                   <button
                     onClick={() => onNavigate('/dashboard')}
                     className="w-full sm:w-auto px-7 py-3.5 bg-[#0f1414] hover:bg-[#171c1c] border border-cyan-500/40 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all hover:border-cyan-400"

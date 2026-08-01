@@ -51,10 +51,10 @@ export const RootLayout: React.FC<RootLayoutProps> = ({
       {/* Global Slogan Footer */}
       <footer className="w-full bg-[#030606]/90 border-t border-[#3a4a49]/70 py-1 px-4 text-[10px] md:text-xs text-[#839493] font-mono flex items-center justify-between z-20 shrink-0 backdrop-blur-sm">
         <div className="flex items-center gap-1.5 font-bold tracking-widest text-[#dfe3e3]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#ff0000] animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#ff453a] animate-pulse" />
           <span>FLESH DIES. SHELL ENDURES.</span>
         </div>
-        <div className="flex items-center gap-2 text-[#00ffff] font-bold tracking-widest uppercase">
+        <div className="flex items-center gap-2 text-[#00c3ff] font-bold tracking-widest uppercase">
           <span>SUBMIT. SHED. ASCEND.</span>
         </div>
       </footer>

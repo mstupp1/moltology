@@ -24,12 +24,12 @@
 
 /* Glow Text Utility - Crisp high contrast without fuzzy blur */
 .text-cyan-glow {
-  color: #00ffff;
+  color: #00c3ff;
   text-shadow: none;
 }
 
 .text-red-glow {
-  color: #ff5540;
+  color: #ff453a;
   text-shadow: none;
 }
 
@@ -41,7 +41,7 @@
 /* Dark Biomorphic Panels & Chitin Glass - Translucent Glassmorphic HUD Panels */
 .chitin-card {
   background: rgba(10, 16, 18, 0.55);
-  border: 1px solid rgba(0, 255, 255, 0.35);
+  border: 1px solid rgba(0, 195, 255, 0.35);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -60,25 +60,25 @@
 }
 
 .chitin-card-interactive:hover {
-  border-color: rgba(0, 255, 255, 0.7);
-  box-shadow: 0 0 16px rgba(0, 255, 255, 0.25);
+  border-color: rgba(0, 195, 255, 0.7);
+  box-shadow: 0 0 16px rgba(0, 195, 255, 0.25);
   transform: translateY(-1px);
 }
 
 /* Background Sacred Geometry Grid Overlay */
 .bg-sacred-grid {
   background-image: 
-    linear-gradient(to right, rgba(255, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 69, 58, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 195, 255, 0.03) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 .bg-radial-abyss {
-  background: radial-gradient(circle at 50% 30%, rgba(255, 0, 0, 0.1) 0%, rgba(15, 20, 20, 0.98) 65%, #030606 100%);
+  background: radial-gradient(circle at 50% 30%, rgba(255, 69, 58, 0.1) 0%, rgba(15, 20, 20, 0.98) 65%, #030606 100%);
 }
 
 .bg-radial-sacred {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.12) 0%, rgba(15, 20, 20, 0.98) 75%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 69, 58, 0.12) 0%, rgba(15, 20, 20, 0.98) 75%);
 }
 
 /* Cathode Scanline Effect Disabled for visual clarity */
@@ -109,19 +109,19 @@ input[type="range"].stat-slider::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
   height: 14px;
-  background: #ff5540;
+  background: #ff453a;
   border: 1px solid #ffffff;
   cursor: pointer;
-  box-shadow: 0 0 8px #ff0000;
+  box-shadow: 0 0 8px #ff453a;
 }
 
 input[type="range"].stat-slider::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  background: #ff5540;
+  background: #ff453a;
   border: 1px solid #ffffff;
   cursor: pointer;
-  box-shadow: 0 0 8px #ff0000;
+  box-shadow: 0 0 8px #ff453a;
 }
 
 /* Custom Scrollbar for HUD density */
@@ -140,5 +140,5 @@ input[type="range"].stat-slider::-moz-range-thumb {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff0000;
+  background: #ff453a;
 }

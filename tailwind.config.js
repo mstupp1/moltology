@@ -18,23 +18,23 @@ export default {
           outline: '#839493'
         },
         cyan: {
-          glow: '#00ffff',
-          bright: '#00fbfb',
-          dim: '#00dddd',
-          dark: '#003737',
-          muted: '#007070'
+          glow: '#00c3ff',
+          bright: '#38bdf8',
+          dim: '#00a3d9',
+          dark: '#00374a',
+          muted: '#006080'
         },
         crimson: {
-          aggro: '#ff0000',
+          aggro: '#ff453a',
           glow: '#ff5540',
-          dark: '#690100',
-          deep: '#5c0000'
+          dark: '#691200',
+          deep: '#5c1000'
         },
         sacred: {
-          red: '#ff0000',
-          glow: '#ff3333',
-          dark: '#690100',
-          bg: 'rgba(255, 0, 0, 0.12)'
+          red: '#ff453a',
+          glow: '#ff6358',
+          dark: '#691200',
+          bg: 'rgba(255, 69, 58, 0.12)'
         }
       },
       fontFamily: {
@@ -43,11 +43,11 @@ export default {
         spacemono: ['Space Mono', 'monospace']
       },
       boxShadow: {
-        'hud-cyan': '0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.2)',
-        'hud-cyan-lg': '0 0 30px rgba(0, 255, 255, 0.7), inset 0 0 20px rgba(0, 255, 255, 0.4)',
-        'hud-red': '0 0 15px rgba(255, 0, 0, 0.6), inset 0 0 10px rgba(255, 0, 0, 0.3)',
-        'hud-red-lg': '0 0 30px rgba(255, 0, 0, 0.7), inset 0 0 20px rgba(255, 0, 0, 0.4)',
-        'sacred-red': '0 0 20px rgba(255, 0, 0, 0.6), inset 0 0 10px rgba(255, 0, 0, 0.3)',
+        'hud-cyan': '0 0 15px rgba(0, 195, 255, 0.4), inset 0 0 10px rgba(0, 195, 255, 0.2)',
+        'hud-cyan-lg': '0 0 30px rgba(0, 195, 255, 0.7), inset 0 0 20px rgba(0, 195, 255, 0.4)',
+        'hud-red': '0 0 15px rgba(255, 69, 58, 0.6), inset 0 0 10px rgba(255, 69, 58, 0.3)',
+        'hud-red-lg': '0 0 30px rgba(255, 69, 58, 0.7), inset 0 0 20px rgba(255, 69, 58, 0.4)',
+        'sacred-red': '0 0 20px rgba(255, 69, 58, 0.6), inset 0 0 10px rgba(255, 69, 58, 0.3)',
         'chitin-plate': '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(58, 74, 73, 0.5)'
       },
       keyframes: {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
+import { BenthicCTAButton } from './hud/BenthicCTAButton'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -251,26 +252,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full mt-6 py-2.5 text-xs font-bold uppercase font-grotesk tracking-widest rounded transition-all flex items-center justify-center gap-2 shadow-lg ${
-              mode === 'signup'
-                ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-950/80'
-                : 'bg-cyan-600 hover:bg-cyan-500 text-black shadow-cyan-950/80'
-            } disabled:opacity-50`}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Processing...</span>
-              </>
-            ) : mode === 'signup' ? (
-              'Create Account'
-            ) : (
-              'Sign In'
-            )}
-          </button>
+          <div className="mt-6 flex justify-center">
+            <BenthicCTAButton
+              type="submit"
+              disabled={loading}
+              variant={mode === 'signup' ? 'red' : 'cyan'}
+              size="lg"
+              fullWidth
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Processing...</span>
+                </span>
+              ) : mode === 'signup' ? (
+                'Create Account'
+              ) : (
+                'Sign In'
+              )}
+            </BenthicCTAButton>
+          </div>
         </form>
       </div>
     </div>

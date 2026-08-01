@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Home, Car, DollarSign, Gift, Zap, X, ArrowRight } from 'lucide-react'
+import { BenthicCTAButton } from './BenthicCTAButton'
 
 interface AssetTransmutationModalProps {
   isOpen: boolean
@@ -126,13 +127,18 @@ export const AssetTransmutationModal: React.FC<AssetTransmutationModalProps> = (
           </div>
 
           {/* Submit Action */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-[#ff0000] hover:bg-[#ff5540] text-white font-grotesk font-bold text-sm tracking-widest uppercase transition-all shadow-hud-red chamfer-corner flex items-center justify-center gap-2"
-          >
-            <span>CONFIRM LIQUIDATION & TRANSMUTE</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex justify-center pt-2">
+            <BenthicCTAButton
+              type="submit"
+              size="lg"
+              fullWidth
+            >
+              <span className="flex items-center justify-center gap-2">
+                <span>CONFIRM LIQUIDATION & TRANSMUTE</span>
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </BenthicCTAButton>
+          </div>
         </form>
       </div>
     </div>

@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import {
   BookOpen,
   FlaskConical,
-  Coins,
+  ShoppingCart,
   ShieldAlert,
   Sliders,
   Users,
+  Atom,
   Menu,
   X,
   Search,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
+import { BenthicCTAButton } from './BenthicCTAButton'
 
 interface HUDSidebarProps {
   currentRoute: string
@@ -48,34 +50,34 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const navItems = [
     {
       id: 'lectures',
-      label: 'THE MOLT-CYCLE LECTURES',
+      label: 'MOLT-CYCLE LECTURES',
       icon: BookOpen,
       path: '/dashboard',
     },
     {
       id: 'science',
       label: 'MOLTOLOGY SCIENCE',
-      icon: FlaskConical,
+      icon: Atom,
       path: '/pipeline',
     },
     {
       id: 'market',
       label: 'THE MARKET',
       sublabel: '(NEW / EXCHANGE)',
-      icon: Coins,
+      icon: ShoppingCart,
       path: '/market',
+    },
+    {
+      id: 'chassis',
+      label: 'CHASSIS CONFIGURATOR',
+      icon: Atom,
+      path: '/chassis',
     },
     {
       id: 'isolation',
       label: 'ISOLATION PROTOCOLS',
       icon: ShieldAlert,
       path: '/isolation',
-    },
-    {
-      id: 'chassis',
-      label: 'CHASSIS CONFIGURATOR',
-      icon: Sliders,
-      path: '/chassis',
     },
     {
       id: 'community',
@@ -112,7 +114,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             onClick={() => handleNavClick('/')}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <div className="w-7 h-7 rounded bg-[#171c1c] border border-[#ff0000] flex items-center justify-center p-0.5 shadow-md">
+            <div className="w-7 h-7 rounded bg-[#171c1c] border border-[#ff453a] flex items-center justify-center p-0.5 shadow-md">
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
@@ -123,7 +125,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <div className="font-grotesk font-bold text-xs text-[#dfe3e3] tracking-wider">
                 THE SYNAPTIC PATH
               </div>
-              <div className="text-[10px] text-[#00ffff] font-mono flex items-center gap-1">
+              <div className="text-[10px] text-[#00c3ff] font-mono flex items-center gap-1">
                 <span>ACTIVE:</span>
                 <span className="text-[#ff5540] truncate max-w-[130px] font-bold">
                   {activeItem.label}
@@ -134,12 +136,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="px-3 py-1.5 bg-[#0f1414]/90 hover:bg-[#171c1c] border border-[#00ffff]/60 text-[#00ffff] font-mono font-bold text-xs flex items-center gap-1.5 chamfer-corner shadow-md active:scale-95 transition-all"
+            className="px-3 py-1.5 bg-[#0f1414]/90 hover:bg-[#171c1c] border border-[#00c3ff]/60 text-[#00c3ff] font-mono font-bold text-xs flex items-center gap-1.5 chamfer-corner shadow-md active:scale-95 transition-all"
           >
             {isMobileOpen ? (
-              <X className="w-4 h-4 text-[#ff0000]" />
+              <X className="w-4 h-4 text-[#ff453a]" />
             ) : (
-              <Menu className="w-4 h-4 text-[#00ffff]" />
+              <Menu className="w-4 h-4 text-[#00c3ff]" />
             )}
             <span>{isMobileOpen ? 'CLOSE' : 'HUD MENU'}</span>
           </button>
@@ -148,9 +150,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {/* Desktop Header Logo */}
         <div
           onClick={() => handleNavClick('/')}
-          className="hidden md:flex items-center gap-3 p-2.5 bg-[#0f1414]/50 border border-[#3a4a49] chamfer-corner cursor-pointer hover:border-[#ff0000] transition-colors group backdrop-blur-sm shrink-0"
+          className="hidden md:flex items-center gap-3 p-2.5 bg-[#0f1414]/50 border border-[#3a4a49] chamfer-corner cursor-pointer hover:border-[#ff453a] transition-colors group backdrop-blur-sm shrink-0"
         >
-          <div className="w-8 h-8 rounded bg-[#171c1c] border border-[#ff0000] flex items-center justify-center p-0.5 shadow-[0_0_8px_rgba(255,0,0,0.4)]">
+          <div className="w-8 h-8 rounded bg-[#171c1c] border border-[#ff453a] flex items-center justify-center p-0.5 shadow-[0_0_8px_rgba(255,69,58,0.4)]">
             <img
               src="/images/order_emblem.png"
               alt="Order Emblem"
@@ -161,7 +163,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             <div className="font-grotesk font-bold text-xs text-[#dfe3e3] tracking-widest group-hover:text-[#ff5540] transition-colors">
               THE SYNAPTIC PATH
             </div>
-            <div className="text-[10px] text-[#00ffff] font-mono tracking-wider">
+            <div className="text-[10px] text-[#00c3ff] font-mono tracking-wider">
               BENTHIC TEMPLE HUD
             </div>
           </div>
@@ -178,7 +180,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             <div className="p-3 bg-[#0f1414]/50 border border-[#3a4a49]/80 chamfer-corner space-y-2.5 backdrop-blur-sm shadow-inner">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-[#030606] border-2 border-[#00ffff] overflow-hidden flex items-center justify-center p-0.5 shadow-[0_0_10px_rgba(0,255,255,0.4)]">
+                  <div className="w-10 h-10 rounded-full bg-[#030606] border-2 border-[#00c3ff] overflow-hidden flex items-center justify-center p-0.5 shadow-[0_0_10px_rgba(0,195,255,0.4)]">
                     <img
                       src="/images/stage1_larval.png"
                       alt="Larva Unit"
@@ -191,7 +193,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <div className="text-xs font-bold text-[#dfe3e3] uppercase truncate tracking-wider">
                     {displayName}
                   </div>
-                  <div className="text-[10px] font-mono flex items-center gap-1 text-[#00ffff]">
+                  <div className="text-[10px] font-mono flex items-center gap-1 text-[#00c3ff]">
                     {user ? (
                       <span className="text-emerald-400 font-bold flex items-center gap-0.5">
                         <UserCheck className="w-3 h-3 text-emerald-400" /> AUTHENTICATED
@@ -210,8 +212,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <span className="text-[#ff5540] font-bold">68%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-3 bg-[#030606] border border-[#ff0000]/80 rounded-full overflow-hidden p-0.5">
-                    <div className="h-full bg-gradient-to-r from-[#ff0000] via-[#ff5540] to-[#ff0000] w-[68%] rounded-full shadow-[0_0_6px_rgba(255,0,0,0.6)]" />
+                  <div className="flex-1 h-3 bg-[#030606] border border-[#ff453a]/80 rounded-full overflow-hidden p-0.5">
+                    <div className="h-full bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff453a] w-[68%] rounded-full shadow-[0_0_6px_rgba(255,69,58,0.6)]" />
                   </div>
                   <span className="text-xs text-[#ff5540] shrink-0" title="Exoshell Claw Progress">
                     🦞
@@ -223,21 +225,21 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {/* Relocated Command Search Bar (⌘K) */}
             <button
               onClick={handleOpenCommandPalette}
-              className="w-full flex items-center justify-between bg-[#030606]/80 hover:bg-[#0b0f0f] border border-[#3a4a49] hover:border-[#00ffff]/70 px-3 py-2 text-xs text-[#839493] transition-all chamfer-corner group shadow-inner"
+              className="w-full flex items-center justify-between bg-[#030606]/80 hover:bg-[#0b0f0f] border border-[#3a4a49] hover:border-[#00c3ff]/70 px-3 py-2 text-xs text-[#839493] transition-all chamfer-corner group shadow-inner"
               title="Search protocols and commands (⌘K)"
             >
               <div className="flex items-center gap-2 text-[#839493] group-hover:text-[#dfe3e3] truncate">
-                <Search className="w-3.5 h-3.5 text-[#00ffff] group-hover:scale-110 transition-transform" />
+                <Search className="w-3.5 h-3.5 text-[#00c3ff] group-hover:scale-110 transition-transform" />
                 <span className="truncate text-xs font-mono">Search commands...</span>
               </div>
-              <div className="flex items-center gap-1 bg-[#0f1414] border border-[#3a4a49] text-[#00ffff] px-1.5 py-0.5 text-[10px] font-bold shrink-0">
+              <div className="flex items-center gap-1 bg-[#0f1414] border border-[#3a4a49] text-[#00c3ff] px-1.5 py-0.5 text-[10px] font-bold shrink-0">
                 <Command className="w-3 h-3" />
                 <span>K</span>
               </div>
             </button>
 
             {/* Navigation Items List */}
-            <nav className="space-y-1.5">
+            <nav className="divide-y divide-[#1e2d37]/80 border-y border-[#1e2d37]/80 bg-[#080d10]/40 overflow-hidden">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive =
@@ -248,54 +250,71 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.path)}
-                    className={`w-full text-left px-3 py-2.5 font-mono text-xs flex items-center justify-between transition-all duration-150 border chamfer-corner ${
+                    className={`w-full text-left px-3.5 py-3 relative flex items-start gap-3.5 transition-all duration-150 group ${
                       isActive
-                        ? 'bg-[#171c1c]/90 border-[#ff0000] text-[#ff5540] font-bold shadow-[0_0_10px_rgba(255,0,0,0.3)]'
-                        : 'bg-[#0f1414]/70 border-[#3a4a49]/80 text-[#839493] hover:text-[#dfe3e3] hover:border-[#00ffff] hover:bg-[#171c1c]/80'
+                        ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
+                        : 'bg-transparent hover:bg-white/[0.03]'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 truncate">
-                      <Icon
-                        className={`w-4 h-4 shrink-0 ${
-                          isActive ? 'text-[#ff0000]' : 'text-[#839493]'
+                    {/* Active Red Vertical Accent Bar */}
+                    {isActive && (
+                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_10px_rgba(255,59,48,0.8)]" />
+                    )}
+
+                    <Icon
+                      className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${
+                        isActive ? 'text-[#ff5555]' : 'text-[#7a8e9e] group-hover:text-[#dfe3e3]'
+                      }`}
+                    />
+
+                    <div className="flex flex-col min-w-0">
+                      <span
+                        className={`text-xs md:text-[13px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
+                          isActive ? 'text-white font-semibold' : 'text-[#9eb0c0] group-hover:text-[#dfe3e3]'
                         }`}
-                      />
-                      <span className="truncate text-xs tracking-wide">
+                      >
                         {item.label}
                       </span>
+                      {item.sublabel && (
+                        <span className="text-[10px] md:text-[11px] font-mono text-[#ff5555] tracking-wide mt-1 leading-none font-normal">
+                          {item.sublabel}
+                        </span>
+                      )}
                     </div>
-                    {item.sublabel && (
-                      <span className="text-[10px] text-[#ff5540] font-bold shrink-0 ml-1">
-                        {item.sublabel}
-                      </span>
-                    )}
                   </button>
                 )
               })}
             </nav>
 
             {/* Relocated Auth Action Buttons */}
-            <div className="pt-1">
+            <div className="pt-1 flex justify-center">
               {!user ? (
-                <button
+                <BenthicCTAButton
+                  variant="cyan"
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="w-full py-2 bg-cyan-600/90 hover:bg-cyan-500 text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all shadow-md active:scale-95"
+                  fullWidth
                 >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>SIGN IN TO PERSIST</span>
-                </button>
+                  <span className="flex items-center justify-center gap-2">
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>SIGN IN TO PERSIST</span>
+                  </span>
+                </BenthicCTAButton>
               ) : (
-                <div className="p-2 bg-[#0f1414]/80 border border-[#3a4a49] chamfer-corner space-y-2">
-                  <div className="text-[10px] text-cyan-300 font-mono truncate">
+                <div className="w-full p-2 bg-[#0f1414]/80 border border-[#3a4a49] chamfer-corner space-y-2">
+                  <div className="text-[10px] text-cyan-300 font-mono truncate text-center">
                     {user.email}
                   </div>
-                  <button
+                  <BenthicCTAButton
+                    variant="red"
+                    size="sm"
                     onClick={handleSignOut}
-                    className="w-full py-1.5 bg-red-950/80 hover:bg-red-900 border border-red-600 text-red-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-1.5 transition-all"
+                    fullWidth
                   >
-                    <LogOut className="w-3.5 h-3.5 text-red-400" />
-                    <span>LOG OUT</span>
-                  </button>
+                    <span className="flex items-center justify-center gap-1.5">
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>LOG OUT</span>
+                    </span>
+                  </BenthicCTAButton>
                 </div>
               )}
             </div>
@@ -303,13 +322,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
           <div className="pt-2 border-t border-[#3a4a49]/40 space-y-2 shrink-0">
-            <div className="w-full aspect-square max-h-44 rounded bg-[#030606]/60 border border-[#00ffff]/30 overflow-hidden relative group p-1 flex items-center justify-center">
+            <div className="w-full aspect-square max-h-44 rounded bg-[#030606]/60 border border-[#00c3ff]/30 overflow-hidden relative group p-1 flex items-center justify-center">
               <img
                 src="/images/benthic_lobster_sidebar.jpg"
                 alt="Benthic Lobster"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(0,255,255,0.4)] group-hover:scale-105 transition-transform"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(0,195,255,0.4)] group-hover:scale-105 transition-transform"
               />
-              <div className="absolute bottom-1 right-2 text-[9px] font-mono text-[#00ffff]/70 bg-[#030606]/80 px-1 border border-[#00ffff]/30">
+              <div className="absolute bottom-1 right-2 text-[9px] font-mono text-[#00c3ff]/70 bg-[#030606]/80 px-1 border border-[#00c3ff]/30">
                 CARAPACE v4.2
               </div>
             </div>
