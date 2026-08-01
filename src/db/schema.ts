@@ -1,6 +1,7 @@
-import { pgTable, text, integer, timestamp, boolean, uuid, decimal, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
-// Better Auth Users Table with Moltism Extensions
+// Users Table with Moltism Extensions
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -17,7 +18,12 @@ export const users = pgTable('users', {
   chitinGems: integer('chitinGems').default(250).notNull(),
   synapseShards: integer('synapseShards').default(45).notNull(),
   depthPressureCoins: integer('depthPressureCoins').default(12).notNull(),
-})
+}, (table) => [
+  pgPolicy('users_isolation_policy', {
+    for: 'all',
+    using: sql`id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
 
 // User Biometric Stats Table (Moltmaxxing Dashboard)
 export const userStats = pgTable('user_stats', {
@@ -31,7 +37,12 @@ export const userStats = pgTable('user_stats', {
   socialDetachmentIndex: integer('socialDetachmentIndex').default(94).notNull(),
   submergenceDepthRating: integer('submergenceDepthRating').default(3400).notNull(), // in fathoms
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-})
+}, (table) => [
+  pgPolicy('user_stats_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
 
 // Liquidated Assets Table
 export const assets = pgTable('assets', {
@@ -43,7 +54,12 @@ export const assets = pgTable('assets', {
   moltCreditsReceived: decimal('moltCreditsReceived', { precision: 12, scale: 2 }).notNull(),
   status: text('status').default('TRANSMUTED').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
-})
+}, (table) => [
+  pgPolicy('assets_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
 
 // Daily Alignment Routines
 export const dailyRoutines = pgTable('daily_routines', {
@@ -53,7 +69,12 @@ export const dailyRoutines = pgTable('daily_routines', {
   description: text('description').notNull(),
   completed: boolean('completed').default(false).notNull(),
   date: text('date').notNull(),
-})
+}, (table) => [
+  pgPolicy('daily_routines_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
 
 // Better Auth Sessions Table
 export const sessions = pgTable('sessions', {
