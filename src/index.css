@@ -53,7 +53,7 @@
 /* Dark Biomorphic Neumorphism & Chitin Glass */
 .chitin-card {
   background: rgba(15, 20, 20, 0.85);
-  border: 1px solid rgba(0, 255, 255, 0.15);
+  border: 1px solid rgba(0, 255, 255, 0.18);
   box-shadow: 
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.8),
@@ -66,7 +66,7 @@
   box-shadow: 
     inset 2px 2px 8px rgba(0, 0, 0, 0.9),
     inset -1px -1px 4px rgba(0, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .chitin-card-interactive {
@@ -109,63 +109,42 @@
   background-size: 100% 4px;
 }
 
-/* Animated Radar Sweep */
-@keyframes radarSweep {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+/* Watermark Text Header / Edge Watermark */
+.edge-watermark {
+  letter-spacing: 0.25em;
+  font-family: 'Space Mono', monospace;
+  opacity: 0.35;
+  user-select: none;
 }
 
-.animate-radar-sweep {
-  animation: radarSweep 6s linear infinite;
+/* Custom Red-to-Cyan Range Slider */
+input[type="range"].stat-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #030606;
+  height: 6px;
+  border: 1px solid #3a4a49;
+  border-radius: 0px;
 }
 
-/* Animated Laser Scanner */
-@keyframes laserScan {
-  0% {
-    top: 0%;
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    top: 100%;
-    opacity: 0.8;
-  }
+input[type="range"].stat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #ff5540;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 8px #ff0000;
 }
 
-.animate-laser-scan {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #00ffff, transparent);
-  animation: laserScan 3s ease-in-out infinite alternate;
-  box-shadow: 0 0 10px #00ffff;
-}
-
-/* Pulse Ring Animation */
-@keyframes pulseRing {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 12px rgba(0, 255, 255, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
-  }
-}
-
-.animate-pulse-ring {
-  animation: pulseRing 2.5s infinite;
+input[type="range"].stat-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #ff5540;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 8px #ff0000;
 }
 
 /* Custom Scrollbar for HUD density */
@@ -186,4 +165,3 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #ff0000;
 }
-

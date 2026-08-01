@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
 import { ShieldCheck, Zap, Activity } from 'lucide-react'
 
@@ -21,13 +21,16 @@ export const RadarChartWidget: React.FC<RadarChartWidgetProps> = ({
     clawStrength: 70
   }
 }) => {
-  const data = [
-    { subject: 'PINCER TORQUE', A: stats.pincerTorque, fullMark: 100 },
-    { subject: 'SHELL HARDNESS', A: stats.shellHardness, fullMark: 100 },
-    { subject: 'PROCESSING', A: stats.processingPower, fullMark: 100 },
-    { subject: 'DURABILITY', A: stats.durability, fullMark: 100 },
-    { subject: 'CLAW STRENGTH', A: stats.clawStrength, fullMark: 100 },
-  ]
+  const data = useMemo(
+    () => [
+      { subject: 'PINCER TORQUE', A: stats.pincerTorque, fullMark: 100 },
+      { subject: 'SHELL HARDNESS', A: stats.shellHardness, fullMark: 100 },
+      { subject: 'PROCESSING', A: stats.processingPower, fullMark: 100 },
+      { subject: 'DURABILITY', A: stats.durability, fullMark: 100 },
+      { subject: 'CLAW STRENGTH', A: stats.clawStrength, fullMark: 100 },
+    ],
+    [stats.pincerTorque, stats.shellHardness, stats.processingPower, stats.durability, stats.clawStrength]
+  )
 
   return (
     <div className="bg-[#171c1c] border border-[#3a4a49] p-4 chamfer-corner shadow-chitin-plate flex flex-col justify-between h-full">
