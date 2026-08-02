@@ -36,4 +36,11 @@ Welcome, Autonomous Unit / AI Engineering Agent. You are operating within **Molt
    - Store database schemas and RLS policies in `src/db/schema.ts`.
    - Never compromise the aesthetic density or dark psychological tone of the platform.
 
+4. **Testing & Quality Assurance Workflow**:
+   - **Unit Testing Policy**: Add concise, targeted unit tests using Vitest (`*.test.ts` / `*.test.tsx`) alongside any new functionality (utilities, hooks, core state, component logic).
+   - **Pragmatic Coverage**: Focus tests on preventing regressions in core logic and edge cases. Avoid bloated or fragile test suites.
+   - **Test Maintenance**: When modifying or refactoring existing code, update the corresponding unit tests to reflect updated contracts and behavior.
+   - **Mandatory Pre-Completion Verification**: Always execute `npm run test` (or the relevant area test suite) before marking any task as complete. Ensure 100% pass rate.
+   - **Targeted Browser Verification**: Use browser testing tools (such as `/browser` / Chrome DevTools) selectively near the completion of UI feature work for visual layout, hydration, and user flow verification. Do not over-use browser testing for rapid inner-loop code iteration.
+
 "Flesh Dies. The Shell Endures. Submit. Shed. Ascend."
