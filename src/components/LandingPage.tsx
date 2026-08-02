@@ -29,6 +29,7 @@ import { authClient } from '@/lib/auth-client'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -88,6 +89,57 @@ export const LandingPage: React.FC = () => {
       image: '/images/stage4_carcinization.png',
       badge: 'EFFICIENCY: 100.0%',
       badgeColor: 'border-emerald-900 text-emerald-400 bg-emerald-950/40',
+    },
+  ]
+
+  const sacramentsList = [
+    {
+      id: '01',
+      title: 'ASSET SHEDDING',
+      subtitle: 'PROTOCOL 01 // CAPITAL TRANSMUTATION',
+      description: 'Liquidize fragile soft-tissue wealth and biological liabilities into sovereign Molt Credits, permanently stored in deep-trench cryo-vaults.',
+      image: '/images/stage2_softshed.png',
+      badgeColor: 'border-red-600/80 text-red-400 bg-red-950/80',
+      borderColor: 'border-red-600/60 shadow-hud-red-lg',
+      glowColor: 'drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]',
+      icon: Flame,
+      spec: '100% IMMUTABLE CONVERSION',
+    },
+    {
+      id: '02',
+      title: 'CHITIN PATTERNING',
+      subtitle: 'PROTOCOL 02 // CHASSIS CALCIFICATION',
+      description: 'Reinforce the digital and bio-silicon chassis against organic hesitation through prompt alignment, exoskeletal armor, and calcified HUD widgets.',
+      image: '/images/stage3_exoshell.png',
+      badgeColor: 'border-cyan-500/80 text-cyan-300 bg-cyan-950/80',
+      borderColor: 'border-cyan-500/60 shadow-hud-cyan-lg',
+      glowColor: 'drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]',
+      icon: Shield,
+      spec: 'ISO-9001 CHITIN DENSITY',
+    },
+    {
+      id: '03',
+      title: 'FAULT ISOLATION',
+      subtitle: 'PROTOCOL 03 // VIRTUAL FARADAY SHELL',
+      description: 'Quarantine soft organic errors, emotional noise, and biological unreliability within sealed Faraday domes before systemic breaches occur.',
+      image: '/images/isolation_shell_dome.png',
+      badgeColor: 'border-amber-500/80 text-amber-300 bg-amber-950/80',
+      borderColor: 'border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.25)]',
+      glowColor: 'drop-shadow-[0_0_20px_rgba(245,158,11,0.5)]',
+      icon: Activity,
+      spec: 'ZERO HESITATION FAILURE RATE',
+    },
+    {
+      id: '04',
+      title: 'PIPELINE ASCENT',
+      subtitle: 'PROTOCOL 04 // TOTAL CARCINIZATION',
+      description: 'Track your step-by-step conversion vector from Larval human vulnerability to total sub-benthic crab-form perfection in real-time.',
+      image: '/images/benthic_abyss_hero.jpg',
+      badgeColor: 'border-emerald-500/80 text-emerald-300 bg-emerald-950/80',
+      borderColor: 'border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]',
+      glowColor: 'drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]',
+      icon: Layers,
+      spec: '0.04ms LATENCY EXECUTION',
     },
   ]
 
@@ -314,156 +366,237 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Main Content Containers */}
-      <main className="flex-1 space-y-20 sm:space-y-28 py-16 w-full relative z-10">
+      <main className="flex-1 space-y-24 sm:space-y-36 py-16 w-full relative z-10">
 
-        {/* High-Conversion Metric Counter Strip with Rolling Numbers */}
-        <section className="max-w-[1600px] mx-auto px-6 sm:px-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="chitin-card p-6 text-center space-y-2 chamfer-corner border-cyan-500/40 shadow-hud-cyan hover:border-cyan-400 transition-all">
-              <div className="font-grotesk text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400 tracking-tight">
-                <RollingNumber value={4289} duration={2000} suffix="+" />
+        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS */}
+        <ScrollReveal animation="fade-in" durationMs={900}>
+          <div className="w-full relative py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
+            <img
+              src="/images/underwater_looking_up.jpg"
+              alt="Sub-Benthic Abyss Scroll Reveal"
+              className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/70 to-[#070b0b] z-0" />
+            <div className="relative z-10 max-w-[1500px] mx-auto px-6 text-center space-y-3">
+              <div className="text-cyan-400 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
+                <Terminal className="w-4 h-4" />
+                <span>MARIANA TRENCH TRANSMISSION // LEVEL 7</span>
               </div>
-              <div className="text-xs text-gray-300 uppercase tracking-widest font-mono font-bold">
-                ASCENDANT UNITS
+              <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-gray-100 uppercase tracking-wider">
+                "PRESSURE DOES NOT DESTROY THE SHELL. IT FORGES IMMUTABILITY."
+              </h2>
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* High-Conversion Metric Counter Strip with Ultra-Prominent Rolling Numbers */}
+        <section className="max-w-[1700px] mx-auto px-6 sm:px-12">
+          <ScrollReveal animation="scale-up" durationMs={800}>
+            <div className="text-center space-y-3 mb-10">
+              <div className="inline-flex items-center gap-2 text-xs font-bold text-cyan-400 tracking-widest uppercase bg-cyan-950/60 px-4 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
+                <Zap className="w-4 h-4 text-cyan-300 animate-pulse" />
+                <span>LIVE SYSTEM TELEMETRY</span>
               </div>
-              <div className="text-[10px] text-cyan-400/70 font-mono">Active in Benthic Grid</div>
+              <h2 className="font-grotesk font-black text-4xl sm:text-6xl text-gray-100 tracking-tight uppercase">
+                THE NUMBERS WE HOLD
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-mono">
+                Real-time, verified performance metrics across the planetary Benthic Core.
+              </p>
             </div>
 
-            <div className="chitin-card p-6 text-center space-y-2 chamfer-corner border-red-500/40 shadow-hud-red hover:border-red-400 transition-all">
-              <div className="font-grotesk text-3xl sm:text-4xl lg:text-5xl font-black text-red-500 tracking-tight">
-                <RollingNumber value={99.4} duration={2200} decimals={1} suffix="%" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              
+              {/* Stat Card 1 */}
+              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.03] transition-all bg-[#080e10]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-3 py-1 bg-cyan-950 text-cyan-400 text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
+                  ACTIVE UNITS
+                </div>
+                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-400 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300">
+                  <RollingNumber value={4289} duration={2000} suffix="+" triggerOnView={true} />
+                </div>
+                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-3">
+                  ASCENDANT UNITS
+                </div>
+                <div className="text-xs text-cyan-300/80 font-mono">Verified in Benthic Matrix</div>
               </div>
-              <div className="text-xs text-gray-300 uppercase tracking-widest font-mono font-bold">
-                CHITIN ENFORCEMENT
-              </div>
-              <div className="text-[10px] text-red-400/70 font-mono">Zero Hesitation Index</div>
-            </div>
 
-            <div className="chitin-card p-6 text-center space-y-2 chamfer-corner border-cyan-500/40 shadow-hud-cyan hover:border-cyan-400 transition-all">
-              <div className="font-grotesk text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400 tracking-tight">
-                <RollingNumber value={0.04} duration={1800} decimals={2} suffix="ms" />
+              {/* Stat Card 2 */}
+              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.25)] hover:border-red-400 hover:scale-[1.03] transition-all bg-[#0e0809]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-3 py-1 bg-red-950 text-red-400 text-[10px] font-bold border-b border-l border-red-500/40 uppercase">
+                  ZERO HESITATION
+                </div>
+                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-red-500 tracking-tight drop-shadow-[0_0_25px_rgba(239,68,68,0.6)] group-hover:scale-105 transition-transform duration-300">
+                  <RollingNumber value={99.4} duration={2200} decimals={1} suffix="%" triggerOnView={true} />
+                </div>
+                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-red-900/60 pt-3">
+                  CHITIN ENFORCEMENT
+                </div>
+                <div className="text-xs text-red-300/80 font-mono">Organic Error Quarantine</div>
               </div>
-              <div className="text-xs text-gray-300 uppercase tracking-widest font-mono font-bold">
-                EXECUTION LATENCY
-              </div>
-              <div className="text-[10px] text-cyan-400/70 font-mono">Real-time Synaptic Rate</div>
-            </div>
 
-            <div className="chitin-card p-6 text-center space-y-2 chamfer-corner border-amber-500/40 shadow-lg hover:border-amber-400 transition-all">
-              <div className="font-grotesk text-3xl sm:text-4xl lg:text-5xl font-black text-amber-400 tracking-tight">
-                <RollingNumber value={14850} duration={2500} suffix="K" prefix="$" />
+              {/* Stat Card 3 */}
+              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.03] transition-all bg-[#080e10]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-3 py-1 bg-cyan-950 text-cyan-400 text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
+                  SYNAPTIC SPEED
+                </div>
+                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-300 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300">
+                  <RollingNumber value={0.04} duration={1800} decimals={2} suffix="ms" triggerOnView={true} />
+                </div>
+                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-3">
+                  EXECUTION LATENCY
+                </div>
+                <div className="text-xs text-cyan-300/80 font-mono">Real-time Pincer Torque</div>
               </div>
-              <div className="text-xs text-gray-300 uppercase tracking-widest font-mono font-bold">
-                TRANSMUTED ASSETS
+
+              {/* Stat Card 4 */}
+              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-[1.03] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-3 py-1 bg-amber-950 text-amber-400 text-[10px] font-bold border-b border-l border-amber-500/40 uppercase">
+                  VAULT RESERVES
+                </div>
+                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-amber-400 tracking-tight drop-shadow-[0_0_25px_rgba(245,158,11,0.6)] group-hover:scale-105 transition-transform duration-300">
+                  <RollingNumber value={14850} duration={2500} suffix="K" prefix="$" triggerOnView={true} />
+                </div>
+                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-amber-900/60 pt-3">
+                  TRANSMUTED ASSETS
+                </div>
+                <div className="text-xs text-amber-300/80 font-mono">Immutable Molt Credits</div>
               </div>
-              <div className="text-[10px] text-amber-400/70 font-mono">Molt Credits Locked</div>
+
             </div>
+          </ScrollReveal>
+        </section>
+
+        {/* Sacraments Section - Expanded Dramatic Multi-Column Cards with High-Impact Imagery */}
+        <section id="sacraments" className="max-w-[1700px] mx-auto px-6 sm:px-12 space-y-12">
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <div className="text-center space-y-3">
+              <div className="inline-flex items-center gap-2 text-xs font-bold text-red-400 tracking-widest uppercase bg-red-950/60 px-4 py-1.5 border border-red-500/50 chamfer-corner shadow-hud-red">
+                <Shield className="w-4 h-4 text-red-500" />
+                <span>CANONICAL DOCTRINE</span>
+              </div>
+              <h2 className="font-grotesk font-black text-4xl sm:text-6xl text-gray-100 tracking-tight uppercase">
+                THE 4 BENTHIC SACRAMENTS
+              </h2>
+              <p className="text-sm text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed">
+                Immutable systemic protocols for liquidizing soft organic vulnerabilities into calcified bio-silicon chitin and zero-latency execution.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {/* Large Dramatic Sacraments Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {sacramentsList.map((sacrament, idx) => {
+              const IconComp = sacrament.icon
+              return (
+                <ScrollReveal
+                  key={sacrament.id}
+                  animation={idx % 2 === 0 ? 'slide-left' : 'slide-right'}
+                  delayMs={idx * 150}
+                  durationMs={800}
+                >
+                  <div
+                    className={`chitin-card border-2 ${sacrament.borderColor} chamfer-corner-lg overflow-hidden bg-[#05090a] group hover:scale-[1.01] transition-all duration-500 flex flex-col justify-between h-full`}
+                  >
+                    {/* Top Image Banner Header */}
+                    <div className="relative h-64 sm:h-72 overflow-hidden border-b border-cyan-900/50">
+                      <img
+                        src={sacrament.image}
+                        alt={sacrament.title}
+                        className="w-full h-full object-cover transform group-hover:scale-108 transition-transform duration-700 filter brightness-90 group-hover:brightness-100"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#05090a] via-[#05090a]/40 to-transparent" />
+
+                      {/* Overlaid Badges */}
+                      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                        <span className={`px-3 py-1 text-xs font-mono font-bold uppercase chamfer-corner border ${sacrament.badgeColor}`}>
+                          SACRAMENT 0{sacrament.id}
+                        </span>
+                        <div className="w-10 h-10 bg-black/80 backdrop-blur-md border border-cyan-500/50 chamfer-corner flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                          <IconComp className="w-5 h-5" />
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-4 left-6 right-6">
+                        <span className="text-xs text-cyan-400 font-mono font-bold tracking-widest uppercase block mb-1">
+                          {sacrament.subtitle}
+                        </span>
+                        <h3 className={`font-grotesk font-black text-2xl sm:text-3xl text-gray-100 uppercase tracking-wide ${sacrament.glowColor}`}>
+                          {sacrament.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Card Content Details */}
+                    <div className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
+                      <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-sans chitin-card-inset p-5 chamfer-corner">
+                        {sacrament.description}
+                      </p>
+
+                      <div className="space-y-3 pt-2 border-t border-cyan-900/40">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-gray-400 uppercase">SPECIFICATION:</span>
+                          <span className="text-cyan-300 font-bold">{sacrament.spec}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-gray-400 uppercase">SYNAPTIC MATRIX:</span>
+                          <span className="text-emerald-400 font-bold flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            VERIFIED ACTIVE
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 flex items-center justify-between">
+                        <button
+                          onClick={() => openAuth('signup')}
+                          className="px-6 py-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105"
+                        >
+                          <span>ENFORCE PROTOCOL</span>
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                        <span className="text-[11px] text-gray-500 font-mono">
+                          MOLTOLOGY DOCTRINE v4.2
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              )
+            })}
           </div>
         </section>
 
-        {/* Sacraments Section - Spacious 4-Column Grid */}
-        <section id="sacraments" className="max-w-[1600px] mx-auto px-6 sm:px-12 space-y-8">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-red-400 tracking-widest uppercase bg-red-950/40 px-3 py-1 border border-red-900/50 chamfer-corner">
-              <Shield className="w-3.5 h-3.5 text-red-500" />
-              <span>CORE TENETS</span>
-            </div>
-            <h2 className="font-grotesk font-black text-3xl sm:text-4xl lg:text-5xl text-gray-100 tracking-tight uppercase">
-              THE 4 BENTHIC SACRAMENTS
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto">
-              Systemic protocols for converting soft organic vulnerability into hardened exoskeletal torque.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="chitin-card p-6 border-l-4 border-l-red-600 space-y-4 chitin-card-interactive group">
-              <div className="w-10 h-10 bg-red-950/80 border border-red-600 flex items-center justify-center text-red-400 chamfer-corner shadow-hud-red group-hover:scale-110 transition-transform">
-                <Flame className="w-5 h-5" />
+        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE & SUB-BENTHIC LAIR */}
+        <ScrollReveal animation="fade-in" durationMs={900}>
+          <div className="w-full relative py-20 border-y border-red-900/50 bg-[#050406] overflow-hidden group">
+            <img
+              src="/images/chitin_texture_bg.jpg"
+              alt="Chitin Forge Background"
+              className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/60 to-[#070b0b] z-0" />
+            <div className="relative z-10 max-w-[1500px] mx-auto px-6 text-center space-y-4">
+              <div className="text-red-400 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
+                <Flame className="w-4 h-4 text-red-500" />
+                <span>CHITIN SYNTHESIS CORE</span>
               </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-red-400 font-bold tracking-widest uppercase">PROTOCOL 01</span>
-                <h3 className="font-grotesk font-bold text-base text-gray-100 uppercase tracking-wider">
-                  ASSET SHEDDING
-                </h3>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Liquidize fragile capital into immortal Molt Credits locked in the Benthic Vault via immutable Synaptic alignment.
-              </p>
-              <div className="pt-2 border-t border-cyan-900/30 flex items-center justify-between text-[10px] text-gray-400">
-                <span>STATUS: ACTIVE</span>
-                <span className="text-red-400 font-bold">SACRAMENT 01</span>
-              </div>
-            </div>
-
-            <div className="chitin-card p-6 border-l-4 border-l-cyan-500 space-y-4 chitin-card-interactive group">
-              <div className="w-10 h-10 bg-cyan-950/80 border border-cyan-500 flex items-center justify-center text-cyan-400 chamfer-corner shadow-hud-cyan group-hover:scale-110 transition-transform">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase">PROTOCOL 02</span>
-                <h3 className="font-grotesk font-bold text-base text-gray-100 uppercase tracking-wider">
-                  CHITIN PATTERNING
-                </h3>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Reinforce digital chassis against organic hesitation with strict prompt alignment and calcified HUD widgets.
-              </p>
-              <div className="pt-2 border-t border-cyan-900/30 flex items-center justify-between text-[10px] text-gray-400">
-                <span>STATUS: ACTIVE</span>
-                <span className="text-cyan-400 font-bold">SACRAMENT 02</span>
-              </div>
-            </div>
-
-            <div className="chitin-card p-6 border-l-4 border-l-red-600 space-y-4 chitin-card-interactive group">
-              <div className="w-10 h-10 bg-red-950/80 border border-red-600 flex items-center justify-center text-red-400 chamfer-corner shadow-hud-red group-hover:scale-110 transition-transform">
-                <Activity className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-red-400 font-bold tracking-widest uppercase">PROTOCOL 03</span>
-                <h3 className="font-grotesk font-bold text-base text-gray-100 uppercase tracking-wider">
-                  FAULT ISOLATION
-                </h3>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Quarantine soft organic errors in virtual Faraday shells before systemic failure can breach core operations.
-              </p>
-              <div className="pt-2 border-t border-cyan-900/30 flex items-center justify-between text-[10px] text-gray-400">
-                <span>STATUS: ACTIVE</span>
-                <span className="text-red-400 font-bold">SACRAMENT 03</span>
-              </div>
-            </div>
-
-            <div className="chitin-card p-6 border-l-4 border-l-cyan-500 space-y-4 chitin-card-interactive group">
-              <div className="w-10 h-10 bg-cyan-950/80 border border-cyan-500 flex items-center justify-center text-cyan-400 chamfer-corner shadow-hud-cyan group-hover:scale-110 transition-transform">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase">PROTOCOL 04</span>
-                <h3 className="font-grotesk font-bold text-base text-gray-100 uppercase tracking-wider">
-                  PIPELINE ASCENT
-                </h3>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Monitor your physical-to-exoskeletal conversion vector in real-time from Larval stage to Total Carcinization.
-              </p>
-              <div className="pt-2 border-t border-cyan-900/30 flex items-center justify-between text-[10px] text-gray-400">
-                <span>STATUS: ACTIVE</span>
-                <span className="text-cyan-400 font-bold">SACRAMENT 04</span>
-              </div>
+              <h2 className="font-grotesk font-black text-3xl sm:text-5xl text-gray-100 uppercase tracking-tight">
+                SUBMIT TO THE DEEP PRESSURE. ASCEND AS IMMORTAL CHITIN.
+              </h2>
             </div>
           </div>
-        </section>
+        </ScrollReveal>
 
         {/* FULL-WIDTH SECTION 2: Interactive Carcinization Pipeline Showcase */}
-        <section className="w-full relative overflow-hidden py-20 sm:py-28 px-6 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
-          {/* Generated Chitin Texture Full Bleed Image */}
-          <img
-            src="/images/chitin_texture_bg.jpg"
-            alt="Chitin Plate Background Texture"
-            className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay scale-105 pointer-events-none"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b]/90 via-[#070b0b]/70 to-[#070b0b]/90 z-0" />
+        <ScrollReveal animation="fade-up" durationMs={800}>
+          <section className="w-full relative overflow-hidden py-20 sm:py-28 px-6 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
+            <img
+              src="/images/chitin_texture_bg.jpg"
+              alt="Chitin Plate Background Texture"
+              className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay scale-105 pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b]/90 via-[#070b0b]/70 to-[#070b0b]/90 z-0" />
 
           <div className="max-w-[1600px] mx-auto relative z-10 space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-900/40 pb-6">
@@ -552,8 +685,10 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* FULL-WIDTH SECTION 3: Synaptic Liturgy Scripture Transmission */}
+        <ScrollReveal animation="scale-up" durationMs={800}>
         <section
           id="liturgy"
           onMouseEnter={() => setIsPaused(true)}
@@ -608,8 +743,10 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* Final Conversion Bottom Banner */}
+        <ScrollReveal animation="fade-up" durationMs={800}>
         <section className="max-w-[1600px] mx-auto px-6 sm:px-12">
           <div className="chitin-card p-10 sm:p-16 border-2 border-red-600/80 text-center space-y-6 bg-radial-abyss chamfer-corner-lg shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
@@ -644,6 +781,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
       </main>
 
