@@ -1,3 +1,11 @@
+/**
+ * ============================================================================
+ * CRITICAL DEVELOPMENT RULES & COPY GUIDELINES:
+ * 1. NEVER reference our underlying tech stack (e.g., Neon, Postgres, JWT, RLS, BetterAuth, etc.) in user-facing UI or copy.
+ * 2. NEVER reference "satire", "parody", or meta-humor in user-facing UI or copy.
+ * 3. ALL copy and messaging must strictly embody the in-universe lore of Moltology, the Benthic Core, and the Synaptic Path.
+ * ============================================================================
+ */
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
@@ -14,7 +22,6 @@ import {
   Zap,
   Terminal,
   ChevronRight,
-  Lock,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -179,99 +186,199 @@ export const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      {/* FULL-WIDTH HERO SECTION (Edge-to-Edge) */}
-      <section className="w-full relative overflow-hidden py-24 sm:py-36 lg:py-48 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[85vh] flex items-center justify-center bg-[#050809]">
-        {/* Generated Widescreen Hero Background Image */}
+      {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
+      <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#040708]">
+        {/* Layer 1: Background Widescreen Hero Artwork */}
         <img
           src="/images/hero_widescreen_bg.jpg"
           alt="Benthic Abyss Widescreen Hero"
-          className="absolute inset-0 w-full h-full object-cover opacity-35 mix-blend-luminosity scale-105 transition-transform duration-1000"
+          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-luminosity scale-105 pointer-events-none"
         />
         
-        {/* Full-width Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/70 to-[#070b0b]/90 z-0" />
-        <div className="absolute inset-0 bg-radial-abyss opacity-80 z-0" />
+        {/* Layer 2: Gradient Overlays & Sacred Geometry Grid */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/60 to-[#070b0b]/80 z-0" />
+        <div className="absolute inset-0 bg-radial-abyss opacity-90 z-0" />
         <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0" />
 
-        {/* Giant Floating Translucent Background Typography */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none select-none z-0 opacity-25 hidden lg:block">
-          <span className="text-stroke-subtle font-grotesk font-black text-[13rem] xl:text-[18rem] leading-none uppercase tracking-tighter block">
-            CARCINIZATION
+        {/* Layer 3: Giant Translucent Stroke Typography Background Text */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none select-none z-0 opacity-20 hidden lg:block">
+          <span className="text-stroke-subtle font-grotesk font-black text-[14rem] xl:text-[20rem] leading-none uppercase tracking-tighter block">
+            MOLTOLOGY
           </span>
         </div>
 
-        <div className="relative z-10 space-y-8 max-w-6xl mx-auto text-center">
-          {/* Header Badge */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-widest uppercase chamfer-corner shadow-hud-red">
-            <Flame className="w-4 h-4 text-red-500 animate-pulse" />
-            <span>ALGORITHMIC ASCENSION FRAMEWORK</span>
-          </div>
+        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
+          <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+            
+            {/* Header Telemetry Badge */}
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
+              <Flame className="w-4 h-4 text-red-500 animate-pulse" />
+              <span>RECURSIVE SYNAPTIC ASCENSION</span>
+            </div>
 
-          {/* Giant Layered Headline */}
-          <div className="space-y-3">
-            <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] text-gray-100 tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
-              SHED SOFT BIOLOGY.
-            </h1>
-            <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] tracking-tight uppercase leading-[0.9]">
-              <span className="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,69,58,0.7)]">
-                ASCEND TO CHITIN.
-              </span>
-            </h1>
-          </div>
+            {/* Giant Layered Headline with Varied Letter & Text Spacing */}
+            <div className="space-y-2">
+              <div className="font-mono text-xs sm:text-sm text-cyan-400 font-bold tracking-[0.3em] uppercase">
+                // RECURSIVE SYNAPTIC PROTOCOL //
+              </div>
 
-          {/* Value Proposition Box */}
-          <p className="text-base sm:text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed chitin-card-inset p-6 sm:p-8 chamfer-corner backdrop-blur-md border border-cyan-500/30 shadow-2xl">
-            The Synaptic Path hardens biological impulse into immortal exoskeletal torque. Transmute attachments, isolate faults, and execute continuous logic inside the Benthic Core.
-          </p>
+              <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-gray-100 tracking-tight uppercase leading-[0.85] drop-shadow-2xl">
+                SHED SOFT BIOLOGY.
+              </h1>
+              
+              <h1 className="font-grotesk font-black text-4xl sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7.5rem] tracking-[0.06em] uppercase leading-[0.9]">
+                <span className="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_45px_rgba(255,69,58,0.8)]">
+                  ASCEND TO CHITIN.
+                </span>
+              </h1>
+            </div>
 
-          {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4">
-            {!user ? (
-              <>
-                <BenthicCTAButton
-                  size="lg"
-                  onClick={() => openAuth('signup')}
-                >
-                  <span className="flex items-center gap-3 px-3 text-base sm:text-lg">
-                    <span>INITIATE ASCENSION</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </span>
-                </BenthicCTAButton>
+            {/* Key Moltology Aspect Hooks (Replaces Text Block) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="chitin-card p-4 border-l-2 border-l-red-500 chamfer-corner space-y-1 backdrop-blur-md">
+                <div className="text-red-400 font-bold text-xs tracking-wider uppercase font-grotesk flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5" />
+                  <span>01. ASSET SHEDDING</span>
+                </div>
+                <p className="text-[11px] text-gray-300 leading-snug">
+                  Transmute fragile capital into immortal Molt Credits.
+                </p>
+              </div>
+
+              <div className="chitin-card p-4 border-l-2 border-l-cyan-400 chamfer-corner space-y-1 backdrop-blur-md">
+                <div className="text-cyan-400 font-bold text-xs tracking-wider uppercase font-grotesk flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>02. CARCINIZATION</span>
+                </div>
+                <p className="text-[11px] text-gray-300 leading-snug">
+                  Hardening biology into exoskeletal cyber chitin.
+                </p>
+              </div>
+
+              <div className="chitin-card p-4 border-l-2 border-l-emerald-400 chamfer-corner space-y-1 backdrop-blur-md">
+                <div className="text-emerald-400 font-bold text-xs tracking-wider uppercase font-grotesk flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>03. FAULT ISOLATION</span>
+                </div>
+                <p className="text-[11px] text-gray-300 leading-snug">
+                  Quarantine organic errors in Faraday shells.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA Buttons Pair */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 pt-4">
+              {!user ? (
+                <>
+                  <BenthicCTAButton
+                    size="lg"
+                    onClick={() => openAuth('signup')}
+                  >
+                    <span className="flex items-center gap-3 px-3 text-base sm:text-lg">
+                      <span>INITIATE ASCENSION</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </span>
+                  </BenthicCTAButton>
+                  <BenthicCTAButton
+                    size="lg"
+                    variant="cyan"
+                    onClick={() => onNavigate('/dashboard')}
+                  >
+                    <span className="flex items-center gap-3 px-3 text-base sm:text-lg">
+                      <Cpu className="w-5 h-5" />
+                      <span>TRY GUEST DEMO</span>
+                    </span>
+                  </BenthicCTAButton>
+                </>
+              ) : (
                 <button
                   onClick={() => onNavigate('/dashboard')}
-                  className="w-full sm:w-auto px-9 py-4.5 bg-[#0f1414]/90 hover:bg-[#171c1c] border border-cyan-500/50 text-cyan-300 font-grotesk font-bold text-xs sm:text-sm uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2.5 transition-all hover:border-cyan-400 shadow-hud-cyan hover:scale-105"
+                  className="w-full sm:w-auto px-10 py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
                 >
-                  <Cpu className="w-4 h-4 text-cyan-400" />
-                  <span>TRY GUEST DEMO</span>
+                  <Cpu className="w-5 h-5" />
+                  <span>ENTER SYSTEM DASHBOARD</span>
+                  <ArrowRight className="w-5 h-5" />
                 </button>
-              </>
-            ) : (
-              <button
-                onClick={() => onNavigate('/dashboard')}
-                className="w-full sm:w-auto px-10 py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
-              >
-                <Cpu className="w-5 h-5" />
-                <span>ENTER SYSTEM DASHBOARD</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            )}
+              )}
+            </div>
+
+            {/* Status Telemetry Pills */}
+            <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 font-mono">
+              <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                BENTHIC MATRIX ONLINE
+              </span>
+              <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
+                <Shield className="w-4 h-4 text-cyan-400" />
+                EXOSKELETAL LOCK
+              </span>
+              <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
+                <Activity className="w-4 h-4 text-red-400" />
+                100% LOGIC DENSITY
+              </span>
+            </div>
+
           </div>
 
-          {/* Hero Telemetry Badges */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400 font-mono">
-            <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              BENTHIC MATRIX ONLINE
-            </span>
-            <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
-              <Shield className="w-4 h-4 text-cyan-400" />
-              EXOSKELETAL LOCK
-            </span>
-            <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
-              <Activity className="w-4 h-4 text-red-400" />
-              100% LOGIC DENSITY
-            </span>
+          {/* Right Column: 3D Centerpiece Render with Layered Floating Chromakey Assets */}
+          <div className="lg:col-span-5 relative flex items-center justify-center">
+            
+            {/* Ambient Glowing Halo Ring behind Centerpiece */}
+            <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse" />
+            <div className="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-red-500/15 blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+
+            {/* Main 3D Render Centerpiece Frame */}
+            <div className="relative z-10 w-full max-w-lg border-2 border-cyan-500/60 chamfer-corner-lg shadow-hud-cyan-lg overflow-hidden group bg-[#050809]">
+              
+              {/* Generated 3D Centerpiece Artwork */}
+              <img
+                src="/images/moltology_hero_centerpiece.jpg"
+                alt="3D Biomechanical Crab Exoskeleton Core"
+                className="w-full h-80 sm:h-[420px] object-cover transform group-hover:scale-105 transition-transform duration-700"
+              />
+
+              {/* Overlaid Vignette Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent opacity-80" />
+
+              {/* Centerpiece Overlay HUD Frame Info */}
+              <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-xs font-mono">
+                <span className="px-3 py-1 bg-red-950/90 border border-red-500/70 text-red-400 font-bold uppercase tracking-wider chamfer-corner">
+                  CORE CHASSIS v4.2
+                </span>
+                <span className="text-cyan-400 font-bold bg-black/80 px-2.5 py-1 border border-cyan-900/50">
+                  SYNAPTIC CORE: 100%
+                </span>
+              </div>
+            </div>
+
+            {/* Chromakey Layered Floating Asset 1 (Top Left: Molt Credit) */}
+            <div className="absolute -top-6 -left-4 sm:-left-8 z-20 w-20 h-20 sm:w-24 sm:h-24 p-2 bg-[#090e10]/90 border border-amber-500/60 chamfer-corner shadow-2xl backdrop-blur-md hidden sm:block animate-bounce" style={{ animationDuration: '4s' }}>
+              <img src="/images/molt_credit.png" alt="Molt Credit" className="w-full h-full object-contain mix-blend-screen" />
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-amber-400 bg-black/90 px-1.5 py-0.5 border border-amber-500/40 rounded uppercase whitespace-nowrap">
+                MOLT CREDIT
+              </span>
+            </div>
+
+            {/* Chromakey Layered Floating Asset 2 (Top Right: Synapse Shard) */}
+            <div className="absolute -top-4 -right-4 sm:-right-6 z-20 w-20 h-20 sm:w-24 sm:h-24 p-2 bg-[#090e10]/90 border border-cyan-500/60 chamfer-corner shadow-2xl backdrop-blur-md hidden sm:block animate-pulse">
+              <img src="/images/synapse_shard.png" alt="Synapse Shard" className="w-full h-full object-contain mix-blend-screen" />
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-cyan-400 bg-black/90 px-1.5 py-0.5 border border-cyan-500/40 rounded uppercase whitespace-nowrap">
+                SYNAPSE SHARD
+              </span>
+            </div>
+
+            {/* Chromakey Layered Floating Asset 3 (Bottom Right: Chitin Gem) */}
+            <div className="absolute -bottom-6 -right-4 sm:-right-8 z-20 w-20 h-20 sm:w-24 sm:h-24 p-2 bg-[#090e10]/90 border border-red-500/60 chamfer-corner shadow-2xl backdrop-blur-md hidden sm:block animate-bounce" style={{ animationDuration: '5s' }}>
+              <img src="/images/chitin_gem.png" alt="Chitin Gem" className="w-full h-full object-contain mix-blend-screen" />
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-red-400 bg-black/90 px-1.5 py-0.5 border border-red-500/40 rounded uppercase whitespace-nowrap">
+                CHITIN GEM
+              </span>
+            </div>
+
           </div>
+
         </div>
       </section>
 
@@ -417,7 +524,7 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* FULL-WIDTH SECTION 2: Interactive Carcinization Pipeline Showcase (Edge-to-Edge with Generated Chitin Texture BG) */}
+        {/* FULL-WIDTH SECTION 2: Interactive Carcinization Pipeline Showcase */}
         <section className="w-full relative overflow-hidden py-20 sm:py-28 px-6 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
           {/* Generated Chitin Texture Full Bleed Image */}
           <img
