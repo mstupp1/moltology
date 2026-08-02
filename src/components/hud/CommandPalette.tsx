@@ -12,6 +12,7 @@ import {
   X,
   Command,
   BookOpen,
+  Scroll,
   LayoutDashboard,
 } from 'lucide-react'
 
@@ -59,6 +60,17 @@ export const CommandPalette: React.FC = () => {
       shortcut: 'G H',
       action: () => {
         navigate({ to: '/dashboard' })
+        setIsOpen(false)
+      },
+    },
+    {
+      id: 'nav-codex',
+      label: 'Open Sacred Codex & Canonical Scriptures',
+      category: 'Navigation',
+      icon: <Scroll className="w-4 h-4 text-[#ffd700]" />,
+      shortcut: 'G C',
+      action: () => {
+        navigate({ to: '/codex' })
         setIsOpen(false)
       },
     },
