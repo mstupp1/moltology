@@ -1,11 +1,13 @@
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { handlerWithServer, publicServerFn, authenticatedServerFn } from './functions'
-import { changelogs, users, userStats } from '../../db/schema'
+import { changelogs, users, userStats, galleryPins } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
 import type { ChangelogEntry } from '../changelogs-data'
+import { INITIAL_GALLERY_PINS } from '../gallery-data'
+import type { GalleryPin } from '../gallery-data'
 import { getPresignedViewUrl } from '../s3-client'
 
 type Db = ReturnType<typeof getDb>
@@ -182,4 +184,47 @@ export const getS3AssetUrlFn = handlerWithServer(
   }),
   getS3AssetUrlHandler,
 )
+
+/**
+ * Server Function: Get gallery pins from DB or return preloaded initial catalog.
+ */
+const getGalleryPinsHandler = async ({ context }: ServerFnArgs): Promise<GalleryPin[]> => {
+  const dbClient = context?.db || getDb()
+  try {
+    const records = await dbClient
+      .select()
+      .from(galleryPins)
+      .orderBy(desc(galleryPins.createdAt))
+
+    if (records && records.length > 0) {
+      return records.map((r) => ({
+        id: r.id,
+        userId: r.userId,
+        title: r.title,
+        description: r.description,
+        prompt: r.prompt || undefined,
+        s3Key: r.s3Key,
+        imageUrl: r.imageUrl,
+        aspectRatio: r.aspectRatio as GalleryPin['aspectRatio'],
+        category: r.category as GalleryPin['category'],
+        tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        authorStage: r.authorStage,
+        pinCount: r.pinCount,
+        views: r.views,
+        likes: r.likes,
+        isPreloaded: r.isPreloaded,
+        createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
+      }))
+    }
+  } catch (error) {
+    console.warn('[ServerFn getGalleryPinsFn] DB query failed, using preloaded gallery fallback:', error)
+  }
+
+  return INITIAL_GALLERY_PINS
+}
+
+export const getGalleryPinsFn = handlerWithServer(publicServerFn, getGalleryPinsHandler)
+
 

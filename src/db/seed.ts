@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/neon-http'
 import * as dotenv from 'dotenv'
 import * as schema from './schema'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
+import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
 
 dotenv.config()
 
@@ -195,9 +196,35 @@ export async function seedDatabase(databaseUrl?: string) {
         })
         .onConflictDoNothing()
     }
-    console.log(`✓ Seeded ${INITIAL_CHANGELOGS.length} changelog entries`)
+    // 6. Seed Gallery Pins
+    console.log('[SEED] Seeding gallery pins...')
+    for (const pin of INITIAL_GALLERY_PINS) {
+      await db
+        .insert(schema.galleryPins)
+        .values({
+          title: pin.title,
+          description: pin.description,
+          prompt: pin.prompt,
+          s3Key: pin.s3Key,
+          imageUrl: pin.imageUrl,
+          aspectRatio: pin.aspectRatio,
+          category: pin.category,
+          tags: pin.tags,
+          authorName: pin.authorName,
+          authorAvatar: pin.authorAvatar,
+          authorStage: pin.authorStage,
+          pinCount: pin.pinCount,
+          views: pin.views,
+          likes: pin.likes,
+          isPreloaded: true,
+          createdAt: new Date(pin.createdAt),
+        })
+        .onConflictDoNothing()
+    }
+    console.log(`✓ Seeded ${INITIAL_GALLERY_PINS.length} gallery pin entries`)
 
     console.log('[SEED] ✓ All mock database seeding tasks completed successfully!')
+
     return { success: true }
   } catch (error) {
     console.error('[SEED] Error executing database seed:', error)
