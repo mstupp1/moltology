@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode, useState } from 'react'
-import { AlertCircle, ChevronDown, ChevronRight, RefreshCw, ShieldAlert, Home } from 'lucide-react'
+import { AlertCircle, ChevronDown, ChevronRight, RefreshCw, Home, Copy, Check } from 'lucide-react'
 
 interface Props {
   children: ReactNode
@@ -23,7 +23,7 @@ export class HUDErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('[HUD Error Boundary caught error]:', error, errorInfo)
+    console.error('[Error Boundary caught error]:', error, errorInfo)
   }
 
   public resetErrorBoundary = () => {
@@ -53,8 +53,17 @@ export function HUDErrorFallback({
   reset?: () => void
 }) {
   const [showDetails, setShowDetails] = useState(false)
-  const errorMessage = error instanceof Error ? error.message : String(error || 'An unexpected quantum anomaly occurred in the benthic core.')
+  const [copied, setCopied] = useState(false)
+
+  const errorMessage =
+    error instanceof Error ? error.message : String(error || 'An unexpected runtime error occurred.')
   const errorStack = error instanceof Error ? error.stack : undefined
+  const errorCode =
+    error && typeof error === 'object' && 'code' in error && typeof (error as any).code === 'string'
+      ? (error as any).code
+      : error instanceof Error
+        ? error.name
+        : 'ERR_RUNTIME_EXCEPTION'
 
   const handleReset = () => {
     if (reset) {
@@ -64,66 +73,86 @@ export function HUDErrorFallback({
     }
   }
 
-  return (
-    <div className="min-h-[450px] w-full flex items-center justify-center p-4 sm:p-8 bg-[#030708] font-mono text-[#dfe3e3] relative overflow-hidden select-none">
-      {/* Sacred Grid Overlay */}
-      <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0 pointer-events-none" />
-      {/* Ambient Red Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(255,69,58,0.15),transparent_70%)] z-0 pointer-events-none" />
+  const handleCopy = async () => {
+    const errorDetails = [
+      `Error: ${errorMessage}`,
+      `Code: ${errorCode}`,
+      `Timestamp: ${new Date().toISOString()}`,
+      typeof window !== 'undefined' ? `URL: ${window.location.href}` : null,
+      errorStack ? `\nStack Trace:\n${errorStack}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
 
-      <div className="relative z-10 max-w-2xl w-full chitin-card p-6 sm:p-8 border-[#ff453a]/50 shadow-[0_0_40px_rgba(255,69,58,0.2)] rounded-lg bg-[#070c0e]/90 backdrop-blur-md">
-        {/* Header HUD Badge */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#ff453a]/30 mb-6">
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(errorDetails)
+      } else if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea')
+        textarea.value = errorDetails
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy error details:', err)
+    }
+  }
+
+  return (
+    <div className="min-h-[400px] w-full flex items-center justify-center p-4 sm:p-6 bg-[#090d0e] text-[#dfe3e3] font-sans">
+      <div className="w-full max-w-2xl bg-[#111719] border border-red-500/20 rounded-lg p-6 shadow-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-[#232d30] mb-5">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#ff453a] animate-ping" />
-            <span className="text-xs font-mono tracking-widest text-[#ff453a] uppercase font-bold">
-              [CRITICAL ANOMALOUS OVERFLOW]
+            <span className="w-2 h-2 rounded-full bg-red-500" />
+            <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">
+              Application Error
             </span>
           </div>
-          <span className="text-[10px] text-[#607070] font-mono tracking-wider">
-            ERR_CODE: 0x88F9A
+          <span className="text-xs font-mono text-[#8a999e] bg-[#0c1011] px-2 py-0.5 rounded border border-[#232d30]">
+            {errorCode}
           </span>
         </div>
 
-        {/* Hero Alert Title */}
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 rounded-lg bg-[#ff453a]/10 border border-[#ff453a]/30 shrink-0">
-            <ShieldAlert className="w-8 h-8 text-[#ff453a]" />
+        {/* Error Info */}
+        <div className="flex items-start gap-3.5 mb-5">
+          <div className="p-2.5 rounded-md bg-red-500/10 border border-red-500/20 shrink-0 mt-0.5">
+            <AlertCircle className="w-5 h-5 text-red-400" />
           </div>
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#ffffff] tracking-wide mb-1 font-sans">
-              SYNAPTIC LINK CORRUPTED
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-semibold text-[#ffffff] mb-1">
+              Something went wrong
             </h2>
-            <p className="text-xs text-[#90a0a0] leading-relaxed">
-              The execution thread encountered an unhandled exception. Benthic containment active.
+            <p className="text-xs text-[#9ab0b5] leading-relaxed">
+              An unhandled exception occurred during application execution.
             </p>
           </div>
         </div>
 
         {/* Error Message Box */}
-        <div className="p-4 mb-6 rounded bg-[#030606] border border-[#ff453a]/30 text-xs text-[#ff6b61] font-mono leading-relaxed break-words flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#ff453a]" />
-          <div>
-            <span className="font-bold uppercase tracking-wider text-[#ff453a]">EXCEPTION DETAILS: </span>
-            {errorMessage}
-          </div>
+        <div className="p-3.5 mb-5 rounded bg-[#0b0e0f] border border-red-500/20 text-xs font-mono text-red-300 leading-relaxed break-words">
+          {errorMessage}
         </div>
 
-        {/* Collapsible Telemetry / Stack Trace */}
+        {/* Expandable Stack Trace */}
         {errorStack && (
-          <div className="mb-6 border border-[#3a4a49]/40 rounded overflow-hidden">
+          <div className="mb-5 border border-[#232d30] rounded-md overflow-hidden bg-[#090d0e]">
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="w-full flex items-center justify-between p-3 bg-[#0a1214] text-xs text-[#90a0a0] hover:text-[#00c3ff] transition-colors"
+              className="w-full flex items-center justify-between p-3 text-xs text-[#9ab0b5] hover:text-[#ffffff] bg-[#0d1214] transition-colors"
             >
-              <span className="flex items-center gap-2 font-mono uppercase tracking-wider">
+              <span className="flex items-center gap-2 font-medium">
                 {showDetails ? <ChevronDown className="w-4 h-4 text-[#00c3ff]" /> : <ChevronRight className="w-4 h-4" />}
-                INSPECT TELEMETRY DUMP
+                {showDetails ? 'Hide technical details' : 'Show technical details'}
               </span>
-              <span className="text-[10px] text-[#506060]">STACK TRACE</span>
+              <span className="text-[11px] text-[#63757a] font-mono">Stack Trace</span>
             </button>
             {showDetails && (
-              <pre className="p-4 bg-[#020405] text-[11px] text-[#00c3ff]/80 font-mono overflow-x-auto max-h-48 border-t border-[#3a4a49]/40 whitespace-pre-wrap leading-relaxed select-text">
+              <pre className="p-4 bg-[#06090a] text-[11px] text-[#88c0d0] font-mono overflow-x-auto max-h-48 border-t border-[#232d30] whitespace-pre-wrap leading-relaxed select-text">
                 {errorStack}
               </pre>
             )}
@@ -131,23 +160,33 @@ export function HUDErrorFallback({
         )}
 
         {/* Action Controls */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+        <div className="flex flex-wrap items-center gap-2.5 pt-1">
+          <button
+            onClick={handleCopy}
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded bg-[#1a2326] hover:bg-[#232d31] text-[#dfe3e3] border border-[#2e3b3f] transition-colors text-xs font-medium"
+          >
+            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-[#9ab0b5]" />}
+            {copied ? 'Copied' : 'Copy Error Details'}
+          </button>
+
           <button
             onClick={handleReset}
-            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-[#ff453a]/15 hover:bg-[#ff453a]/25 text-[#ff453a] border border-[#ff453a]/40 hover:border-[#ff453a] transition-all text-xs font-mono tracking-wider font-semibold shadow-lg hover:shadow-[0_0_15px_rgba(255,69,58,0.3)]"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 transition-colors text-xs font-medium"
           >
             <RefreshCw className="w-4 h-4" />
-            REINITIALIZE CORE
+            Reload Page
           </button>
+
           <a
             href="/"
-            className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-[#00c3ff]/10 hover:bg-[#00c3ff]/20 text-[#00c3ff] border border-[#00c3ff]/30 hover:border-[#00c3ff] transition-all text-xs font-mono tracking-wider font-semibold"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded bg-[#142228] hover:bg-[#1a2b33] text-[#00c3ff] border border-[#00c3ff]/30 transition-colors text-xs font-medium sm:ml-auto"
           >
             <Home className="w-4 h-4" />
-            RETURN TO NEURAL HUB
+            Go to Home
           </a>
         </div>
       </div>
     </div>
   )
 }
+
