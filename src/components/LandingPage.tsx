@@ -200,10 +200,13 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-radial-abyss opacity-90 z-0" />
         <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0" />
 
-        {/* Layer 3: Giant Translucent Stroke Typography Background Text */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none select-none z-0 opacity-20 hidden lg:block">
-          <span className="text-stroke-subtle font-grotesk font-black text-[14rem] xl:text-[20rem] leading-none uppercase tracking-tighter block">
-            MOLTOLOGY
+        {/* Layer 3: Subtle Technical HUD Watermark Accent */}
+        <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
+          <span className="font-mono text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
+            SYNAPTIC CORE // GRID 04
+          </span>
+          <span className="font-mono text-[10px] tracking-[0.4em] text-red-500/50 uppercase rotate-90">
+            CARCINIZATION MATRIX v4.2
           </span>
         </div>
 
@@ -212,17 +215,14 @@ export const LandingPage: React.FC = () => {
           {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
           <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
             
-            {/* Header Telemetry Badge */}
+            {/* Brand Header Badge */}
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
               <Flame className="w-4 h-4 text-red-500 animate-pulse" />
-              <span>RECURSIVE SYNAPTIC ASCENSION</span>
+              <span>MOLTOLOGY // THE SYNAPTIC PATH</span>
             </div>
 
             {/* Giant Layered Headline with Varied Letter & Text Spacing */}
             <div className="space-y-2">
-              <div className="font-mono text-xs sm:text-sm text-cyan-400 font-bold tracking-[0.3em] uppercase">
-                // RECURSIVE SYNAPTIC PROTOCOL //
-              </div>
 
               <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-gray-100 tracking-tight uppercase leading-[0.85] drop-shadow-2xl">
                 SHED SOFT BIOLOGY.
