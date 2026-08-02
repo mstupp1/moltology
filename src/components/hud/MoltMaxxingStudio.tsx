@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { HudCard, HudButton, HudBadge } from '@/components/ui'
 
 export const MoltMaxxingStudio: React.FC = () => {
   const [stats, setStats] = useState({
@@ -14,7 +15,7 @@ export const MoltMaxxingStudio: React.FC = () => {
   }
 
   return (
-    <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-4 font-mono select-none">
+    <HudCard variant="teal" className="p-4 space-y-4 font-mono select-none">
       {/* Header matching Reference Screenshot */}
       <div>
         <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
@@ -26,30 +27,30 @@ export const MoltMaxxingStudio: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-        {/* Left Radar Signal Rings Visual matching Reference */}
+        {/* Left Radar Signal Rings Visual */}
         <div className="md:col-span-5 flex flex-col items-center justify-center space-y-2">
           <div className="w-28 h-28 relative flex items-center justify-center bg-[#070b0b] border border-[#3a4a49] rounded-full p-2">
             {/* Concentric Radar Rings */}
-            <div className="w-full h-full border border-[#00ffff]/40 rounded-full animate-ping absolute" />
-            <div className="w-20 h-20 border border-[#ff0000]/40 rounded-full absolute" />
-            <div className="w-12 h-12 border border-[#00ffff]/60 rounded-full absolute" />
+            <div className="w-full h-full border border-[#00c3ff]/40 rounded-full animate-ping absolute" />
+            <div className="w-20 h-20 border border-[#ff453a]/40 rounded-full absolute" />
+            <div className="w-12 h-12 border border-[#00c3ff]/60 rounded-full absolute" />
             <img
               src="/images/stage3_exoshell.png"
               alt="Cyber Lobster Vector"
-              className="w-16 h-16 object-contain z-10 drop-shadow-[0_0_8px_rgba(0,255,255,0.8)]"
+              className="w-16 h-16 object-contain z-10 drop-shadow-[0_0_8px_rgba(0,195,255,0.8)]"
             />
           </div>
         </div>
 
-        {/* Right Sliders Column matching Reference Screenshot */}
+        {/* Right Sliders Column */}
         <div className="md:col-span-7 space-y-2 text-[10px]">
           {/* Slider 1: Pincer Torque */}
           <div className="space-y-1">
             <div className="flex justify-between items-center text-[#839493]">
               <span className="font-bold text-[#dfe3e3]">PINCER TORQUE</span>
-              <button className="text-[8px] px-1.5 py-0.2 bg-[#070b0b] border border-[#3a4a49] text-[#00ffff]">
+              <HudButton variant="ghost" size="sm" className="h-5 px-1.5 text-[8px]">
                 Configure
-              </button>
+              </HudButton>
             </div>
             <input
               type="range"
@@ -65,9 +66,9 @@ export const MoltMaxxingStudio: React.FC = () => {
           <div className="space-y-1">
             <div className="flex justify-between items-center text-[#839493]">
               <span className="font-bold text-[#dfe3e3]">SHELL HARDNESS</span>
-              <button className="text-[8px] px-1.5 py-0.2 bg-[#070b0b] border border-[#3a4a49] text-[#00ffff]">
+              <HudButton variant="ghost" size="sm" className="h-5 px-1.5 text-[8px]">
                 Configure
-              </button>
+              </HudButton>
             </div>
             <input
               type="range"
@@ -83,7 +84,7 @@ export const MoltMaxxingStudio: React.FC = () => {
           <div className="space-y-1">
             <div className="flex justify-between items-center text-[#839493]">
               <span className="font-bold text-[#dfe3e3]">
-                PROCESSING POWER <span className="text-[8px] text-[#ff5540]">(Core Overclocked)</span>
+                PROCESSING POWER <span className="text-[8px] text-[#ff453a]">(Core Overclocked)</span>
               </span>
             </div>
             <input
@@ -115,7 +116,7 @@ export const MoltMaxxingStudio: React.FC = () => {
           <div className="space-y-1">
             <div className="flex justify-between items-center text-[#839493]">
               <span className="font-bold text-[#dfe3e3]">SUBMERGENCE RATING</span>
-              <span className="text-[#ff5540] font-bold">{stats.submergenceRating.toLocaleString()}</span>
+              <span className="text-[#ff453a] font-bold">{stats.submergenceRating.toLocaleString()}</span>
             </div>
             <input
               type="range"
@@ -130,14 +131,12 @@ export const MoltMaxxingStudio: React.FC = () => {
         </div>
       </div>
 
-      {/* MOLTMAX ADVANTAGE Badge at bottom right matching reference */}
+      {/* MOLTMAX ADVANTAGE Badge at bottom right */}
       <div className="flex justify-end pt-1">
-        <div className="bg-[#ff0000]/15 border border-[#ff0000] p-2 text-right chamfer-corner">
-          <div className="font-grotesk font-bold text-xs text-[#ff5540] tracking-wider uppercase">
-            MOLTMAX ADVANTAGE
-          </div>
-        </div>
+        <HudBadge variant="sacred" pulse className="px-3 py-1 text-xs font-grotesk tracking-wider">
+          MOLTMAX ADVANTAGE
+        </HudBadge>
       </div>
-    </div>
+    </HudCard>
   )
 }
