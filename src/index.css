@@ -28,21 +28,38 @@
   border-radius: 8px;
 }
 
+/* Performant Text Layering & Stroke Outline for Widescreen Typography */
+.text-stroke-subtle {
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.08);
+  color: transparent;
+}
+
+.text-stroke-cyan {
+  -webkit-text-stroke: 1.5px rgba(0, 195, 255, 0.25);
+  color: transparent;
+}
+
+.text-stroke-red {
+  -webkit-text-stroke: 1.5px rgba(255, 69, 58, 0.25);
+  color: transparent;
+}
+
 /* Glow Text Utility - Crisp high contrast without fuzzy blur */
 .text-cyan-glow {
   color: #00c3ff;
-  text-shadow: none;
+  text-shadow: 0 0 20px rgba(0, 195, 255, 0.5);
 }
 
 .text-red-glow {
   color: #ff453a;
-  text-shadow: none;
+  text-shadow: 0 0 20px rgba(255, 69, 58, 0.5);
 }
 
 .text-magenta-glow {
   color: #ff0055;
-  text-shadow: none;
+  text-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
 }
+
 
 /* Dark Biomorphic Panels & Chitin Glass - Translucent Glassmorphic HUD Panels */
 .chitin-card {

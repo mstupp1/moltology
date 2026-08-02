@@ -13,3 +13,5 @@ export { HudSelect, type HudSelectProps, type HudSelectOption } from './HudSelec
 export { HudBadge, type HudBadgeProps } from './HudBadge'
 export { HudStatBox, type HudStatBoxProps } from './HudStatBox'
 export { HudSkeleton, type HudSkeletonProps } from './HudSkeleton'
+export { RollingNumber, type RollingNumberProps } from './RollingNumber'
+
