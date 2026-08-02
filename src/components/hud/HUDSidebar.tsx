@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
   LayoutDashboard,
@@ -18,6 +18,8 @@ import {
   UserCheck,
   LifeBuoy,
   HelpCircle,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
@@ -35,6 +37,39 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const currentRoute = location.pathname
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
+  // Sync state with localStorage safely on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('moltology_hud_sidebar_collapsed')
+      if (saved !== null) {
+        setIsCollapsed(saved === 'true')
+      }
+    }
+  }, [])
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('moltology_hud_sidebar_collapsed', String(next))
+      }
+      return next
+    })
+  }
+
+  // Keyboard shortcut (⌘B / Ctrl+B) to toggle collapse
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault()
+        toggleCollapse()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
@@ -115,7 +150,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         onSuccess={() => navigate({ to: '/dashboard' })}
       />
 
-      <aside className="w-full md:w-72 h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none p-3.5 gap-3 relative z-30 shrink-0 md:overflow-y-auto shadow-2xl">
+      <aside
+        className={`w-full ${
+          isCollapsed ? 'md:w-[72px] md:p-2' : 'md:w-72 md:p-3.5'
+        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none p-3.5 gap-3 relative z-30 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar`}
+      >
         {/* Mobile Accordion Top Bar */}
         <div className="flex md:hidden items-center justify-between gap-2 p-1">
           <div
@@ -155,31 +194,69 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </button>
         </div>
 
-        {/* Desktop Header Logo */}
+        {/* Desktop Header Logo & Toggle Button */}
         <div
-          onClick={() => handleNavClick('/')}
-          className="hidden md:flex items-center gap-3 p-2.5 bg-[#0f1414]/50 border border-[#3a4a49] chamfer-corner cursor-pointer hover:border-[#ff453a] transition-colors group backdrop-blur-sm shrink-0"
+          className={`hidden md:flex items-center border border-[#3a4a49] chamfer-corner backdrop-blur-sm shrink-0 transition-all duration-300 relative group/brand ${
+            isCollapsed
+              ? 'flex-col p-2 gap-2 bg-[#0f1414]/70 justify-center'
+              : 'justify-between p-2.5 bg-[#0f1414]/50 hover:border-[#ff453a]/60'
+          }`}
         >
-          <div className="w-8 h-8 rounded bg-[#171c1c] border border-[#ff453a] flex items-center justify-center p-0.5 shadow-[0_0_8px_rgba(255,69,58,0.4)]">
-            <img
-              src="/images/order_emblem.png"
-              alt="Order Emblem"
-              className="w-full h-full object-contain group-hover:scale-110 transition-transform"
-            />
-          </div>
-          <div>
-            <div className="font-grotesk font-bold text-xs text-[#dfe3e3] tracking-widest group-hover:text-[#ff5540] transition-colors">
-              THE SYNAPTIC PATH
+          <div
+            onClick={() => handleNavClick('/')}
+            className={`flex items-center gap-2.5 cursor-pointer group/logo ${
+              isCollapsed ? 'justify-center w-full' : 'min-w-0'
+            }`}
+          >
+            <div className="w-8 h-8 rounded bg-[#171c1c] border border-[#ff453a] flex items-center justify-center p-0.5 shadow-[0_0_8px_rgba(255,69,58,0.4)] shrink-0 transition-transform group-hover/logo:scale-105">
+              <img
+                src="/images/order_emblem.png"
+                alt="Order Emblem"
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div className="text-[10px] text-[#00c3ff] font-mono tracking-wider">
-              BENTHIC TEMPLE HUD
-            </div>
+
+            {!isCollapsed && (
+              <div className="overflow-hidden whitespace-nowrap transition-all duration-300 min-w-0">
+                <div className="font-grotesk font-bold text-xs text-[#dfe3e3] tracking-widest group-hover/logo:text-[#ff5540] transition-colors truncate">
+                  THE SYNAPTIC PATH
+                </div>
+                <div className="text-[10px] text-[#00c3ff] font-mono tracking-wider truncate">
+                  BENTHIC TEMPLE HUD
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* Toggle Collapse Button */}
+          <button
+            onClick={toggleCollapse}
+            className={`p-1.5 bg-[#030606]/80 hover:bg-[#00c3ff]/15 border border-[#3a4a49] hover:border-[#00c3ff] text-[#00c3ff] transition-all chamfer-corner active:scale-95 shrink-0 flex items-center justify-center shadow-md ${
+              isCollapsed ? 'w-full py-1' : ''
+            }`}
+            title={isCollapsed ? 'Expand Sidebar (⌘B)' : 'Collapse Sidebar (⌘B)'}
+          >
+            {isCollapsed ? (
+              <ChevronsRight className="w-4 h-4 text-[#00c3ff] animate-pulse" />
+            ) : (
+              <ChevronsLeft className="w-4 h-4 text-[#7a8e9e] hover:text-[#00c3ff]" />
+            )}
+          </button>
+
+          {/* Brand Tooltip when collapsed */}
+          {isCollapsed && (
+            <div className="absolute left-full ml-3 top-2 z-50 pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
+              <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
+                <span className="text-[#00c3ff]">THE SYNAPTIC PATH</span>
+                <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Main Content Container - Always visible on Desktop, toggling on Mobile */}
         <div
-          className={`flex-1 flex flex-col justify-between space-y-4 max-h-[calc(100vh-6rem)] overflow-y-auto md:max-h-none ${
+          className={`flex-1 flex flex-col justify-between space-y-4 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-6rem)] md:max-h-none ${
             isMobileOpen ? 'block' : 'hidden md:flex'
           }`}
         >
@@ -196,7 +273,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.path)}
-                    className={`w-full text-left px-3.5 py-3 relative flex items-center gap-3.5 transition-all duration-150 group ${
+                    className={`w-full text-left relative flex items-center transition-all duration-150 group/navitem ${
+                      isCollapsed
+                        ? 'justify-center px-0 py-3'
+                        : 'px-3.5 py-3 gap-3.5'
+                    } ${
                       isActive
                         ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
                         : 'bg-transparent hover:bg-white/[0.03]'
@@ -209,19 +290,37 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-colors ${
-                        isActive ? 'text-[#ff5555]' : 'text-[#7a8e9e] group-hover:text-[#dfe3e3]'
+                        isActive
+                          ? 'text-[#ff5555]'
+                          : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
                       }`}
                     />
 
-                    <div className="flex flex-col min-w-0 justify-center">
-                      <span
-                        className={`text-xs md:text-[13px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
-                          isActive ? 'text-white font-semibold' : 'text-[#9eb0c0] group-hover:text-[#dfe3e3]'
-                        }`}
-                      >
-                        {item.label}
-                      </span>
-                    </div>
+                    {!isCollapsed && (
+                      <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap transition-all duration-300">
+                        <span
+                          className={`text-xs md:text-[13px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
+                            isActive
+                              ? 'text-white font-semibold'
+                              : 'text-[#9eb0c0] group-hover/navitem:text-[#dfe3e3]'
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Cybernetic Floating Tooltip when collapsed */}
+                    {isCollapsed && (
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-all duration-200 translate-x-1 group-hover/navitem:translate-x-0">
+                        <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]" />
+                          <span className="tracking-wider uppercase">
+                            {item.label}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </button>
                 )
               })}
@@ -230,19 +329,39 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
           <div className="pt-2 border-t border-[#3a4a49]/40 space-y-2 shrink-0">
-            <div className="w-full aspect-square max-h-44 rounded bg-[#030606]/60 border border-[#00c3ff]/30 overflow-hidden relative group p-1 flex items-center justify-center">
-              <img
-                src="/images/benthic_lobster_sidebar.jpg"
-                alt="Benthic Lobster"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(0,195,255,0.4)] group-hover:scale-105 transition-transform"
-              />
-              <div className="absolute bottom-1 right-2 text-[9px] font-mono text-[#00c3ff]/70 bg-[#030606]/80 px-1 border border-[#00c3ff]/30">
-                CARAPACE v4.2
+            {isCollapsed ? (
+              <div className="relative group/lobster flex justify-center py-1">
+                <div className="w-10 h-10 rounded bg-[#030606]/60 border border-[#00c3ff]/50 overflow-hidden flex items-center justify-center p-1 shadow-[0_0_10px_rgba(0,195,255,0.3)] hover:border-[#00c3ff] transition-colors cursor-pointer">
+                  <img
+                    src="/images/benthic_lobster_sidebar.jpg"
+                    alt="Benthic Lobster"
+                    className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(0,195,255,0.5)] group-hover/lobster:scale-110 transition-transform"
+                  />
+                </div>
+                {/* Tooltip */}
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
+                  <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
+                    <span className="text-[#dfe3e3]">CARAPACE v4.2</span>
+                    <span className="text-[9px] text-[#ff5540]">• ONLINE</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="w-full aspect-square max-h-44 rounded bg-[#030606]/60 border border-[#00c3ff]/30 overflow-hidden relative group p-1 flex items-center justify-center">
+                <img
+                  src="/images/benthic_lobster_sidebar.jpg"
+                  alt="Benthic Lobster"
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(0,195,255,0.4)] group-hover:scale-105 transition-transform"
+                />
+                <div className="absolute bottom-1 right-2 text-[9px] font-mono text-[#00c3ff]/70 bg-[#030606]/80 px-1 border border-[#00c3ff]/30">
+                  CARAPACE v4.2
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </aside>
     </>
   )
 }
+
