@@ -101,7 +101,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     },
     {
       id: 'lectures',
-      label: 'MOLT-CYCLE LECTURES',
+      label: 'MOLT ACADEMY',
       icon: BookOpen,
       path: '/lectures',
     },
