@@ -158,7 +158,7 @@ export const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative overflow-x-hidden select-none bg-sacred-grid bg-benthic-vignette bg-pro-noise flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none bg-sacred-grid bg-benthic-vignette bg-pro-noise flex flex-col justify-between">
       <AuthModal
         isOpen={isAuthModalOpen}
         initialMode={authMode}

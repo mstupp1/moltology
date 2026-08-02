@@ -210,7 +210,7 @@ export const OrgPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative overflow-x-hidden select-none bg-sacred-grid bg-benthic-vignette bg-pro-noise flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none bg-sacred-grid bg-benthic-vignette bg-pro-noise flex flex-col justify-between">
       <AuthModal
         isOpen={isAuthModalOpen}
         initialMode={authMode}
@@ -329,43 +329,43 @@ export const OrgPage: React.FC = () => {
           </div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center border-b border-cyan-900/40 mb-10 overflow-x-auto pb-1">
+        <div className="flex justify-center gap-2 mb-10 overflow-x-auto pb-1 bg-[#050809] p-1.5 rounded-full border border-cyan-900/40 w-fit mx-auto">
           <button
             onClick={() => setActiveTab('mission')}
-            className={`px-6 py-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 ${
+            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
               activeTab === 'mission'
-                ? 'border-cyan-400 text-cyan-400 bg-cyan-950/30'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
+                ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50 shadow-md'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-[#0c1415]'
             }`}
           >
             CORE MISSION
           </button>
           <button
             onClick={() => setActiveTab('vision')}
-            className={`px-6 py-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 ${
+            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
               activeTab === 'vision'
-                ? 'border-cyan-400 text-cyan-400 bg-cyan-950/30'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
+                ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50 shadow-md'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-[#0c1415]'
             }`}
           >
             PLANETARY VISION
           </button>
           <button
             onClick={() => setActiveTab('safety')}
-            className={`px-6 py-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 ${
+            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
               activeTab === 'safety'
-                ? 'border-emerald-400 text-emerald-400 bg-emerald-950/30'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
+                ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/50 shadow-md'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-[#0c1415]'
             }`}
           >
             SAFETY & POSITIVITY
           </button>
           <button
             onClick={() => setActiveTab('perks')}
-            className={`px-6 py-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 ${
+            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
               activeTab === 'perks'
-                ? 'border-cyan-400 text-cyan-400 bg-cyan-950/30'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
+                ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50 shadow-md'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-[#0c1415]'
             }`}
           >
             MEMBER PERKS

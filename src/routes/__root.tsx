@@ -39,7 +39,7 @@ function RootDocument() {
       <head>
         <HeadContent />
       </head>
-      <body className="bg-[#0f1414] text-[#dfe3e3] font-mono antialiased overflow-x-hidden selection:bg-[#00ffff] selection:text-[#000a0a]">
+      <body className="bg-[#0f1414] text-[#dfe3e3] font-mono antialiased selection:bg-[#00ffff] selection:text-[#000a0a]">
         <HUDErrorBoundary>
           <ToastProvider>
             <NeonAuthUIProvider emailOTP authClient={authClient}>

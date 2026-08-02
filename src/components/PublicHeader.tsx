@@ -52,8 +52,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     <header
       className={`w-full px-4 sm:px-8 lg:px-12 py-3 sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#030606]/95 backdrop-blur-2xl border-b border-cyan-500/50 shadow-[0_4px_30px_rgba(0,255,255,0.18)]'
-          : 'bg-[#030606]/85 backdrop-blur-xl border-b border-cyan-900/40 shadow-lg'
+          ? 'bg-[#030606]/95 backdrop-blur-2xl border-b border-[#121c1d] shadow-xl'
+          : 'bg-[#030606]/85 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
       }`}
     >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
