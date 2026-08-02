@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { uploadObject, getPresignedViewUrl, ensureBucketExists, DEFAULT_BUCKET } from "../src/lib/s3-client";
 
-const PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "images");
+const PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "images", "gallery");
 
 function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
@@ -36,7 +36,7 @@ async function getAllFiles(dirPath: string, relativePrefix: string = ""): Promis
       const subFiles = await getAllFiles(fullPath, relativePath);
       files = files.concat(subFiles);
     } else if (entry.isFile()) {
-      files.push({ fullPath, key: `images/${relativePath}` });
+      files.push({ fullPath, key: `images/gallery/${relativePath}` });
     }
   }
 

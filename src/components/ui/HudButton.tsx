@@ -34,12 +34,12 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
 
     const variantClasses = {
       cyan: cn(
-        'border border-[#00c3ff] bg-gradient-to-r from-[#05222b] via-[#093d4a] to-[#062833] text-[#00c3ff] hover:text-white',
+        'border border-[#00c3ff] bg-gradient-to-r from-[#05222b] via-[#093d4a] to-[#062833] text-white',
         glow && 'shadow-[0_0_12px_rgba(0,195,255,0.4),inset_0_0_8px_rgba(0,195,255,0.2)] hover:shadow-[0_0_20px_rgba(0,195,255,0.7),inset_0_0_12px_rgba(0,195,255,0.4)]',
         'hover:border-[#33d1ff] hover:bg-[#00c3ff]/20'
       ),
       crimson: cn(
-        'border border-[#ff453a] bg-gradient-to-r from-[#4d1014] via-[#7a1820] to-[#591217] text-[#ff453a] hover:text-white',
+        'border border-[#ff453a] bg-gradient-to-r from-[#4d1014] via-[#7a1820] to-[#591217] text-white',
         glow && 'shadow-[0_0_12px_rgba(255,69,58,0.4),inset_0_0_8px_rgba(255,69,58,0.2)] hover:shadow-[0_0_20px_rgba(255,69,58,0.7),inset_0_0_12px_rgba(255,69,58,0.4)]',
         'hover:border-[#ff6658] hover:bg-[#ff453a]/20'
       ),
@@ -74,9 +74,9 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
         )}
         {...props}
       >
-        {icon && iconPosition === 'left' && <span className="shrink-0">{icon}</span>}
-        <span className="relative z-10 truncate">{children}</span>
-        {icon && iconPosition === 'right' && <span className="shrink-0">{icon}</span>}
+        {icon && iconPosition === 'left' && <span className="shrink-0 flex items-center justify-center">{icon}</span>}
+        <span className="relative z-10 inline-flex items-center justify-center gap-2 truncate">{children}</span>
+        {icon && iconPosition === 'right' && <span className="shrink-0 flex items-center justify-center">{icon}</span>}
       </button>
     )
   }

@@ -21,6 +21,7 @@ import {
   HelpCircle,
   ChevronsLeft,
   ChevronsRight,
+  LayoutGrid,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
@@ -128,6 +129,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       label: 'ISOLATION PROTOCOLS',
       icon: ShieldAlert,
       path: '/isolation',
+    },
+    {
+      id: 'gallery',
+      label: 'MOLT PIN VAULT',
+      icon: LayoutGrid,
+      path: '/gallery',
     },
     {
       id: 'community',

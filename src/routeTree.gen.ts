@@ -21,6 +21,7 @@ import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudCommunityRouteImport } from './routes/_hud/community'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
+import { Route as HudGalleryRouteImport } from './routes/_hud/gallery'
 import { Route as HudIsolationRouteImport } from './routes/_hud/isolation'
 import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
@@ -86,6 +87,11 @@ const HudDashboardRoute = HudDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => HudRoute,
 } as any)
+const HudGalleryRoute = HudGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudIsolationRoute = HudIsolationRouteImport.update({
   id: '/isolation',
   path: '/isolation',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/codex': typeof HudCodexRoute
   '/community': typeof HudCommunityRoute
   '/dashboard': typeof HudDashboardRoute
+  '/gallery': typeof HudGalleryRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/codex': typeof HudCodexRoute
   '/community': typeof HudCommunityRoute
   '/dashboard': typeof HudDashboardRoute
+  '/gallery': typeof HudGalleryRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/community': typeof HudCommunityRoute
   '/_hud/dashboard': typeof HudDashboardRoute
+  '/_hud/gallery': typeof HudGalleryRoute
   '/_hud/isolation': typeof HudIsolationRoute
   '/_hud/lectures': typeof HudLecturesRoute
   '/_hud/market': typeof HudMarketRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/community'
     | '/dashboard'
+    | '/gallery'
     | '/isolation'
     | '/lectures'
     | '/market'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/community'
     | '/dashboard'
+    | '/gallery'
     | '/isolation'
     | '/lectures'
     | '/market'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_hud/codex'
     | '/_hud/community'
     | '/_hud/dashboard'
+    | '/_hud/gallery'
     | '/_hud/isolation'
     | '/_hud/lectures'
     | '/_hud/market'
@@ -323,6 +335,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudDashboardRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/gallery': {
+      id: '/_hud/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof HudGalleryRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/isolation': {
       id: '/_hud/isolation'
       path: '/isolation'
@@ -366,6 +385,7 @@ interface HudRouteChildren {
   HudCodexRoute: typeof HudCodexRoute
   HudCommunityRoute: typeof HudCommunityRoute
   HudDashboardRoute: typeof HudDashboardRoute
+  HudGalleryRoute: typeof HudGalleryRoute
   HudIsolationRoute: typeof HudIsolationRoute
   HudLecturesRoute: typeof HudLecturesRoute
   HudMarketRoute: typeof HudMarketRoute
@@ -378,6 +398,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudCodexRoute: HudCodexRoute,
   HudCommunityRoute: HudCommunityRoute,
   HudDashboardRoute: HudDashboardRoute,
+  HudGalleryRoute: HudGalleryRoute,
   HudIsolationRoute: HudIsolationRoute,
   HudLecturesRoute: HudLecturesRoute,
   HudMarketRoute: HudMarketRoute,
