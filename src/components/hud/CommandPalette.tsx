@@ -94,6 +94,17 @@ export const CommandPalette: React.FC = () => {
       },
     },
     {
+      id: 'nav-support',
+      label: 'Open Benthic Support Portal & System Changelog',
+      category: 'Navigation',
+      icon: <Terminal className="w-4 h-4 text-cyan-400" />,
+      shortcut: 'G S',
+      action: () => {
+        navigate({ to: '/support' })
+        setIsOpen(false)
+      },
+    },
+    {
       id: 'ritual-purge',
       label: 'Initiate Purge Protocol (Clear Neural Cache)',
       category: 'Rituals',

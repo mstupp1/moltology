@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { LogIn, LogOut, Search, Command } from 'lucide-react'
+import { useNavigate, useLocation } from '@tanstack/react-router'
+import { LogIn, LogOut, Search, Command, HelpCircle, LifeBuoy } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
@@ -18,6 +18,8 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   larvaId = 'LARVA UNIT AB371',
 }) => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const currentRoute = location.pathname
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -128,8 +130,26 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         </button>
       </div>
 
-      {/* Far Right Controls: Auth Actions with BenthicCTAButton Styling */}
-      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 relative z-20">
+      {/* Far Right Controls: Support & Auth Actions */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 relative z-20">
+        {/* Support Portal Top Bar Action (Pro App Header Style) */}
+        <button
+          onClick={() => navigate({ to: '/support' })}
+          className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-mono font-bold transition-all chamfer-corner border group ${
+            currentRoute === '/support'
+              ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.4)]'
+              : 'bg-[#030606]/80 text-[#839493] border-[#3a4a49] hover:border-[#00ffff]/60 hover:text-white'
+          }`}
+          title="Open Benthic Support Portal & System Changelog"
+        >
+          <LifeBuoy
+            className={`w-3.5 h-3.5 transition-transform group-hover:rotate-45 ${
+              currentRoute === '/support' ? 'text-[#00ffff] animate-spin-slow' : 'text-[#00ffff]'
+            }`}
+          />
+          <span className="hidden sm:inline tracking-wider">SUPPORT</span>
+        </button>
+
         {!user ? (
           <BenthicCTAButton
             variant="cyan"

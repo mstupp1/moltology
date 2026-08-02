@@ -15,6 +15,8 @@ import {
   LogIn,
   LogOut,
   UserCheck,
+  LifeBuoy,
+  HelpCircle,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'

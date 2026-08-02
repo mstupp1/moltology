@@ -65,8 +65,32 @@ async function applyRLS() {
       );
     `
 
+    // Enable RLS and DDL for changelogs table
+    await sql`
+      CREATE TABLE IF NOT EXISTS changelogs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        version TEXT NOT NULL,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        content TEXT NOT NULL,
+        "isPublished" BOOLEAN NOT NULL DEFAULT true,
+        "releasedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+        "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `
+    await sql`ALTER TABLE changelogs ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS changelogs_public_read_policy ON changelogs;`
+    await sql`
+      CREATE POLICY changelogs_public_read_policy ON changelogs
+      FOR SELECT
+      USING (true);
+    `
+    console.log('✓ RLS and schema initialized for changelogs table')
+
     console.log('✓ Row Level Security (RLS) policies successfully created!')
   } catch (error) {
+
     console.error('Error enabling RLS policies:', error)
     process.exit(1)
   }
