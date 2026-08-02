@@ -1,9 +1,8 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { authClient } from './auth-client'
+import { env } from '../env'
 
-export const NEON_JWKS_URL = 
-  (import.meta as any).env?.VITE_NEON_JWKS_URL || 
-  'https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech/neondb/auth/.well-known/jwks.json'
+export const NEON_JWKS_URL = env.VITE_NEON_JWKS_URL
 
 // Remote JWKS key set for verifying Neon Auth JWTs server-side or in API handlers
 const JWKS = createRemoteJWKSet(new URL(NEON_JWKS_URL))
