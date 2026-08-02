@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
-import { BenthicCTAButton } from './hud/BenthicCTAButton'
+import { HudCard, HudInput, HudButton } from '@/components/ui'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -97,14 +97,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 font-mono overflow-y-auto"
       onClick={onClose}
     >
-      <div
-        className="relative w-full max-w-md my-auto max-h-[88vh] flex flex-col bg-[#0f1414] text-gray-100 p-6 shadow-2xl overflow-y-auto border border-cyan-900/60 chamfer-corner"
+      <HudCard
+        variant="teal"
+        showCornerBrackets
+        className="relative w-full max-w-md my-auto max-h-[88vh] flex flex-col p-6 shadow-2xl overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-gray-400 hover:text-cyan-400 transition-colors p-1 rounded hover:bg-[#172020]"
+          className="absolute top-4 right-4 z-10 text-[#839493] hover:text-[#00c3ff] transition-colors p-1 rounded-none hover:bg-[#172020] cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -115,7 +117,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <h2 className="text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
             {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-xs text-cyan-400/80 mt-1 uppercase tracking-widest font-mono">
+          <p className="text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-mono">
             {mode === 'signup'
               ? 'Sign up to persist your session'
               : 'Sign in to access your saved state'}
@@ -123,17 +125,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Tab Selector */}
-        <div className="flex border-b border-cyan-900/60 mb-6">
+        <div className="flex border-b border-[#3a4a49]/60 mb-6">
           <button
             type="button"
             onClick={() => {
               setMode('signup')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors ${
+            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer ${
               mode === 'signup'
-                ? 'border-red-500 text-red-400'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
+                ? 'border-[#ff453a] text-[#ff453a]'
+                : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
             }`}
           >
             Sign Up
@@ -144,10 +146,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setMode('login')
               setError(null)
             }}
-            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors ${
+            className={`flex-1 py-2.5 text-xs font-bold font-grotesk tracking-wider uppercase text-center border-b-2 transition-colors cursor-pointer ${
               mode === 'login'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
+                ? 'border-[#00c3ff] text-[#00c3ff]'
+                : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
             }`}
           >
             Sign In
@@ -156,20 +158,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3 bg-red-950/60 border border-red-500/60 rounded flex items-start gap-2.5 text-red-300 text-xs font-mono">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+          <div className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-mono">
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Google OAuth Option */}
         <div className="mb-5 space-y-4">
-          <button
-            type="button"
+          <HudButton
+            variant="dark"
+            fullWidth
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-[#172020] hover:bg-[#1e2a2a] border border-cyan-900/50 rounded text-xs font-bold text-gray-200 transition-colors shadow-md tracking-wider uppercase"
+            className="gap-3 py-2.5"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -188,76 +191,55 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               />
             </svg>
             <span>Continue with Google</span>
-          </button>
+          </HudButton>
 
           {/* Standard Centered OR Divider */}
           <div className="relative flex items-center justify-center my-3">
-            <div className="border-t border-cyan-800 w-full" />
-            <span className="bg-[#0f1414] px-3 text-xs text-gray-400 font-bold uppercase tracking-widest absolute">OR</span>
+            <div className="border-t border-[#3a4a49] w-full" />
+            <span className="bg-[#0f1414] px-3 text-xs text-[#839493] font-bold uppercase tracking-widest absolute">OR</span>
           </div>
         </div>
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
-            <div>
-              <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400" />
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your Name"
-                  className="w-full bg-[#090d0d] border border-cyan-800 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
-                />
-              </div>
-            </div>
+            <HudInput
+              label="Full Name"
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your Name"
+              startIcon={<User className="w-4 h-4 text-[#00c3ff]" />}
+            />
           )}
 
-          <div>
-            <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-                className="w-full bg-[#090d0d] border border-cyan-800 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
-              />
-            </div>
-          </div>
+          <HudInput
+            label="Email Address"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="name@example.com"
+            startIcon={<Mail className="w-4 h-4 text-[#00c3ff]" />}
+          />
 
-          <div>
-            <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-cyan-400" />
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-[#090d0d] border border-cyan-800 rounded px-3 py-2 pl-9 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
-              />
-            </div>
-          </div>
+          <HudInput
+            label="Password"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            startIcon={<Lock className="w-4 h-4 text-[#00c3ff]" />}
+          />
 
           <div className="mt-6 flex justify-center">
-            <BenthicCTAButton
+            <HudButton
               type="submit"
               disabled={loading}
-              variant={mode === 'signup' ? 'red' : 'cyan'}
+              variant={mode === 'signup' ? 'crimson' : 'cyan'}
               size="lg"
               fullWidth
             >
@@ -271,10 +253,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               ) : (
                 'Sign In'
               )}
-            </BenthicCTAButton>
+            </HudButton>
           </div>
         </form>
-      </div>
+      </HudCard>
     </div>
   )
 

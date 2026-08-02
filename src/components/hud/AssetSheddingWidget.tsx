@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { HelpCircle, Car, Home, Gift, Briefcase, ChevronDown } from 'lucide-react'
+import { HelpCircle, Car, Home, Gift, Briefcase } from 'lucide-react'
+import { HudCard, HudSelect, HudButton } from '@/components/ui'
 
 export const AssetSheddingWidget: React.FC = () => {
   const navigate = useNavigate()
@@ -9,14 +10,14 @@ export const AssetSheddingWidget: React.FC = () => {
   const goToMarket = () => navigate({ to: '/market' })
 
   return (
-    <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3 font-mono select-none flex flex-col justify-between h-full">
+    <HudCard variant="teal" className="p-4 space-y-3 font-mono select-none flex flex-col justify-between h-full">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between">
           <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
             ASSET SHEDDING OVERVIEW
           </h3>
-          <HelpCircle className="w-3.5 h-3.5 text-[#00ffff]" />
+          <HelpCircle className="w-3.5 h-3.5 text-[#00c3ff]" />
         </div>
         <p className="text-[9px] text-[#839493] mt-0.5 leading-relaxed">
           Liquidizes assets to liquidate goods for non-conforming geeks.
@@ -24,18 +25,15 @@ export const AssetSheddingWidget: React.FC = () => {
       </div>
 
       {/* Select Dropdown matching reference */}
-      <div className="relative">
-        <select
-          value={selectedCurrency}
-          onChange={(e) => setSelectedCurrency(e.target.value)}
-          className="w-full bg-[#070b0b] border border-[#3a4a49] text-[#00ffff] font-bold text-xs p-2 appearance-none focus:outline-none focus:border-[#00ffff] chamfer-corner cursor-pointer"
-        >
-          <option value="Molt Credits">Molt Credits</option>
-          <option value="Chitin-Gems">Chitin-Gems</option>
-          <option value="Synapse Shards">Synapse Shards</option>
-        </select>
-        <ChevronDown className="w-4 h-4 text-[#00ffff] absolute right-2 top-2.5 pointer-events-none" />
-      </div>
+      <HudSelect
+        value={selectedCurrency}
+        onChange={(e) => setSelectedCurrency(e.target.value)}
+        options={[
+          { value: 'Molt Credits', label: 'Molt Credits' },
+          { value: 'Chitin-Gems', label: 'Chitin-Gems' },
+          { value: 'Synapse Shards', label: 'Synapse Shards' },
+        ]}
+      />
 
       {/* Balance Section matching reference */}
       <div className="space-y-2 pt-1">
@@ -44,38 +42,46 @@ export const AssetSheddingWidget: React.FC = () => {
           <span className="text-[8px] text-[#839493]">Running total</span>
         </div>
 
-        {/* Icon Action Grid matching Reference Screenshot (Car, House, Gift, Luxury Car) */}
+        {/* Icon Action Grid matching Reference Screenshot */}
         <div className="grid grid-cols-4 gap-2 pt-1">
-          <button 
+          <HudButton
+            variant="dark"
+            size="sm"
             onClick={goToMarket}
-            className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Vehicles"
+            className="p-2.5 h-auto flex items-center justify-center group"
           >
             <Car className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </button>
-          <button 
+          </HudButton>
+          <HudButton
+            variant="dark"
+            size="sm"
             onClick={goToMarket}
-            className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Real Estate"
+            className="p-2.5 h-auto flex items-center justify-center group"
           >
             <Home className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </button>
-          <button 
+          </HudButton>
+          <HudButton
+            variant="dark"
+            size="sm"
             onClick={goToMarket}
-            className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Luxury Assets"
+            className="p-2.5 h-auto flex items-center justify-center group"
           >
             <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </button>
-          <button 
+          </HudButton>
+          <HudButton
+            variant="dark"
+            size="sm"
             onClick={goToMarket}
-            className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Business Holdings"
+            className="p-2.5 h-auto flex items-center justify-center group"
           >
             <Briefcase className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </button>
+          </HudButton>
         </div>
       </div>
-    </div>
+    </HudCard>
   )
 }
