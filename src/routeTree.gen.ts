@@ -14,6 +14,7 @@ import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as OrgRouteImport } from './routes/org'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -50,6 +51,11 @@ const LandingRoute = LandingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrgRoute = OrgRouteImport.update({
+  id: '/org',
+  path: '/org',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/org': typeof OrgRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/org': typeof OrgRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/org': typeof OrgRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/landing'
     | '/login'
+    | '/org'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/landing'
     | '/login'
+    | '/org'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/landing'
     | '/login'
+    | '/org'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
@@ -244,6 +256,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
+  OrgRoute: typeof OrgRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SignupRoute: typeof SignupRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/org': {
+      id: '/org'
+      path: '/org'
+      fullPath: '/org'
+      preLoaderRoute: typeof OrgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -414,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
+  OrgRoute: OrgRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SignupRoute: SignupRoute,
