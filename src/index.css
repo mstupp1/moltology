@@ -87,11 +87,17 @@
   background: radial-gradient(circle at 50% 50%, rgba(255, 69, 58, 0.12) 0%, rgba(15, 20, 20, 0.98) 75%);
 }
 
-/* Deep Benthic Blue Vignette & Top Ambient Lighting */
+/* Pro App Multi-Layer Vignette & Ambient Top Spotlight */
 .bg-benthic-vignette {
   background: 
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 195, 255, 0.12), transparent 70%),
-    radial-gradient(ellipse 95% 95% at 50% 50%, transparent 50%, rgba(3, 7, 8, 0.6) 100%);
+    radial-gradient(ellipse 75% 45% at 50% -5%, rgba(0, 195, 255, 0.22), transparent 75%),
+    radial-gradient(circle at 15% 85%, rgba(255, 69, 58, 0.08), transparent 50%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 25%, rgba(3, 7, 8, 0.88) 100%);
+}
+
+/* Pro App Micro-Grain Noise Texture */
+.bg-pro-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
 /* Cathode Scanline Effect Disabled for visual clarity */
