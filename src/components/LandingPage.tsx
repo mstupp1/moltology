@@ -22,11 +22,13 @@ import {
   Zap,
   Terminal,
   ChevronRight,
+  Building2,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
+import { PublicHeader } from '@/components/PublicHeader'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -112,79 +114,8 @@ export const LandingPage: React.FC = () => {
         onSuccess={() => onNavigate('/dashboard')}
       />
 
-      {/* Navigation Header */}
-      <nav className="w-full bg-[#030606]/90 backdrop-blur-xl border-b border-cyan-900/40 px-6 sm:px-12 lg:px-16 py-4 sticky top-0 z-50">
-        <div className="max-w-[1700px] mx-auto flex items-center justify-between">
-          <div
-            className="flex items-center gap-3.5 cursor-pointer group"
-            onClick={() => onNavigate('/')}
-          >
-            <div className="w-10 h-10 bg-[#171c1c] border border-red-600/80 flex items-center justify-center p-1 shadow-lg chamfer-corner shrink-0 group-hover:border-cyan-400 transition-colors">
-              <img
-                src="/images/order_emblem.png"
-                alt="Emblem"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div>
-              <div className="font-grotesk font-bold text-lg text-gray-100 tracking-wider uppercase flex items-center gap-2">
-                <span>THE SYNAPTIC PATH</span>
-              </div>
-              <div className="text-[10px] text-red-400 font-bold tracking-widest uppercase truncate flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                BENTHIC CORE ARCHITECTURE
-              </div>
-            </div>
-          </div>
-
-          {/* Header Action Items */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <button
-              onClick={() => onNavigate('/market')}
-              className="hidden lg:flex items-center gap-1.5 text-xs text-gray-300 hover:text-cyan-400 font-bold tracking-wider transition-colors px-3.5 py-2 border border-cyan-900/40 hover:border-cyan-500/50 bg-[#0f1414]/60 chamfer-corner"
-            >
-              <Zap className="w-3.5 h-3.5 text-cyan-400" />
-              <span>MARKET</span>
-            </button>
-
-            {user ? (
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:flex text-xs text-emerald-400 font-bold items-center gap-1.5 bg-emerald-950/40 px-3.5 py-2 border border-emerald-500/30 rounded">
-                  <UserCheck className="w-3.5 h-3.5" />
-                  <span className="truncate max-w-[140px]">
-                    {user.name || user.email}
-                  </span>
-                </span>
-                <button
-                  onClick={() => onNavigate('/dashboard')}
-                  className="px-5 py-2.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105 shadow-hud-cyan"
-                >
-                  <Cpu className="w-4 h-4" />
-                  <span>DASHBOARD</span>
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => openAuth('login')}
-                  className="px-4 py-2 text-gray-300 hover:text-cyan-400 text-xs font-bold tracking-wider transition-colors"
-                >
-                  LOG IN
-                </button>
-                <BenthicCTAButton
-                  size="sm"
-                  onClick={() => openAuth('signup')}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <UserPlus className="w-3.5 h-3.5" />
-                    <span>JOIN PATH</span>
-                  </span>
-                </BenthicCTAButton>
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
+      {/* Shared Navigation Header */}
+      <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
       {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
       <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#040708]">
@@ -730,9 +661,18 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-cyan-400 font-bold">
-            <button onClick={() => onNavigate('/market')} className="hover:text-white uppercase transition-colors">
-              BENTHIC MARKET
+            <button onClick={() => onNavigate('/org')} className="hover:text-white uppercase transition-colors flex items-center gap-1">
+              <Building2 className="w-3.5 h-3.5" />
+              <span>MOLTOLOGY ORG</span>
             </button>
+            <a
+              href="https://www.etsy.com/shop/SaasTrash"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:text-amber-300 uppercase transition-colors flex items-center gap-1 font-bold"
+            >
+              <span>STORE</span>
+            </a>
             <button onClick={() => onNavigate('/dashboard')} className="hover:text-white uppercase transition-colors">
               SYSTEM DASHBOARD
             </button>
