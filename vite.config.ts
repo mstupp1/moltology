@@ -1,8 +1,11 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
 import path from 'path'
+
+const isTest = Boolean(process.env.VITEST)
 
 export default defineConfig({
   resolve: {
@@ -20,9 +23,13 @@ export default defineConfig({
       usePolling: false
     }
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+  },
   plugins: [
-    tanstackStart(),
-    nitro(),
+    ...(isTest ? [] : [tanstackStart(), nitro()]),
     viteReact(),
   ],
 })
