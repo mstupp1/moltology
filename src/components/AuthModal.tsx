@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
 import { BenthicCTAButton } from './hud/BenthicCTAButton'
@@ -91,13 +92,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   }
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 font-mono"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 font-mono overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md bg-[#0f1414] text-gray-100 p-6 shadow-2xl overflow-hidden border border-cyan-900/60 chamfer-corner"
+        className="relative w-full max-w-md my-auto max-h-[88vh] flex flex-col bg-[#0f1414] text-gray-100 p-6 shadow-2xl overflow-y-auto border border-cyan-900/60 chamfer-corner"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -276,4 +277,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
