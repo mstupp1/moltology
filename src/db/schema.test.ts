@@ -1,22 +1,22 @@
 import { describe, it, expect } from 'vitest'
-import { users, userStats, assets, dailyRoutines, sessions, accounts, changelogs } from './schema'
+import { profiles, users, userStats, assets, dailyRoutines, changelogs, neonAuthUser } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
+    expect(profiles).toBeDefined()
     expect(users).toBeDefined()
     expect(userStats).toBeDefined()
     expect(assets).toBeDefined()
     expect(dailyRoutines).toBeDefined()
-    expect(sessions).toBeDefined()
-    expect(accounts).toBeDefined()
     expect(changelogs).toBeDefined()
+    expect(neonAuthUser).toBeDefined()
   })
 
-  it('defines required fields on the users table', () => {
-    expect(users.id).toBeDefined()
-    expect(users.email).toBeDefined()
-    expect(users.stage).toBeDefined()
-    expect(users.moltCredits).toBeDefined()
+  it('defines required fields on the profiles table', () => {
+    expect(profiles.id).toBeDefined()
+    expect(profiles.stage).toBeDefined()
+    expect(profiles.moltCredits).toBeDefined()
+    expect(profiles.chitinGems).toBeDefined()
   })
 
   it('defines required fields on the userStats table', () => {

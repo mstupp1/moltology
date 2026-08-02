@@ -1,34 +1,41 @@
-import { pgTable, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
-// Users Table with Moltism Extensions
-export const users = pgTable('users', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  emailVerified: boolean('emailVerified').default(false).notNull(),
+// Neon Managed Auth Schema Reference
+export const neonAuthSchema = pgSchema('neon_auth')
+export const neonAuthUser = neonAuthSchema.table('user', {
+  id: uuid('id').primaryKey(),
+  email: text('email').notNull(),
+  name: text('name'),
   image: text('image'),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-  
-  // Cult Stage & Stats
-  stage: integer('stage').default(1).notNull(), // 1: Larva, 2: Soft-Shed, 3: Architect, 4: Ascendant
+  emailVerified: boolean('emailVerified'),
+})
+
+// Moltology Cult User Profiles Table (Extends neon_auth.user with domain stats)
+export const profiles = pgTable('profiles', {
+  id: text('id').primaryKey(),
   larvaId: text('larvaId').default('LARVA UNIT #8971').notNull(),
+  stage: integer('stage').default(1).notNull(), // 1: Larva, 2: Soft-Shed, 3: Architect, 4: Ascendant
   moltCredits: decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull(),
   chitinGems: integer('chitinGems').default(250).notNull(),
   synapseShards: integer('synapseShards').default(45).notNull(),
   depthPressureCoins: integer('depthPressureCoins').default(12).notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
-  pgPolicy('users_isolation_policy', {
+  pgPolicy('profiles_isolation_policy', {
     for: 'all',
     using: sql`id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
 ])
 
+// Alias users export to profiles for backward compatibility if needed
+export const users = profiles
+
 // User Biometric Stats Table (Moltmaxxing Dashboard)
 export const userStats = pgTable('user_stats', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   pincerTorque: integer('pincerTorque').default(78).notNull(),
   shellHardness: integer('shellHardness').default(64).notNull(),
   processingPower: integer('processingPower').default(92).notNull(),
@@ -47,7 +54,7 @@ export const userStats = pgTable('user_stats', {
 // Liquidated Assets Table
 export const assets = pgTable('assets', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   assetType: text('assetType').notNull(), // Real Estate, Vehicles, Luxury Goods, Cash Reserves
   description: text('description').notNull(),
   estimatedValueUsd: decimal('estimatedValueUsd', { precision: 12, scale: 2 }).notNull(),
@@ -64,7 +71,7 @@ export const assets = pgTable('assets', {
 // Daily Alignment Routines
 export const dailyRoutines = pgTable('daily_routines', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   timeSlot: text('timeSlot').notNull(), // e.g. "05:30 - Prompt Construction"
   description: text('description').notNull(),
   completed: boolean('completed').default(false).notNull(),
@@ -75,35 +82,6 @@ export const dailyRoutines = pgTable('daily_routines', {
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
 ])
-
-// Better Auth Sessions Table
-export const sessions = pgTable('sessions', {
-  id: text('id').primaryKey(),
-  expiresAt: timestamp('expiresAt').notNull(),
-  token: text('token').notNull().unique(),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-  ipAddress: text('ipAddress'),
-  userAgent: text('userAgent'),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
-})
-
-// Better Auth Accounts Table
-export const accounts = pgTable('accounts', {
-  id: text('id').primaryKey(),
-  accountId: text('accountId').notNull(),
-  providerId: text('providerId').notNull(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  accessToken: text('accessToken'),
-  refreshToken: text('refreshToken'),
-  idToken: text('idToken'),
-  accessTokenExpiresAt: timestamp('accessTokenExpiresAt'),
-  refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt'),
-  scope: text('scope'),
-  password: text('password'),
-  createdAt: timestamp('createdAt').notNull().defaultNow(),
-  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
-})
 
 // Public System Transmutation Changelogs Table
 export const changelogs = pgTable('changelogs', {
@@ -126,7 +104,7 @@ export const changelogs = pgTable('changelogs', {
 // Pinterest Style Gallery Pins Table
 export const galleryPins = pgTable('gallery_pins', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').references(() => users.id, { onDelete: 'set null' }),
+  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
   title: text('title').notNull(),
   description: text('description').notNull(),
   prompt: text('prompt'),
@@ -149,5 +127,3 @@ export const galleryPins = pgTable('gallery_pins', {
     using: sql`true`
   })
 ])
-
-

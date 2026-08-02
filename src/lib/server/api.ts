@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { handlerWithServer, publicServerFn, authenticatedServerFn } from './functions'
-import { changelogs, users, userStats, galleryPins } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'

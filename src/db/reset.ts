@@ -20,9 +20,7 @@ export async function resetDatabase(databaseUrl?: string) {
         daily_routines, 
         assets, 
         user_stats, 
-        sessions, 
-        accounts, 
-        users, 
+        profiles, 
         changelogs 
       RESTART IDENTITY CASCADE;
     `
@@ -37,6 +35,7 @@ export async function resetDatabase(databaseUrl?: string) {
       await sql`DROP TABLE IF EXISTS sessions CASCADE;`
       await sql`DROP TABLE IF EXISTS accounts CASCADE;`
       await sql`DROP TABLE IF EXISTS users CASCADE;`
+      await sql`DROP TABLE IF EXISTS profiles CASCADE;`
       await sql`DROP TABLE IF EXISTS changelogs CASCADE;`
       console.log('[RESET] ✓ Dropped all existing tables for clean schema re-push.')
       return { success: true }
