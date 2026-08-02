@@ -1,10 +1,11 @@
 import React from 'react'
-import { MoltMaxxingStudio } from '../../components/hud/MoltMaxxingStudio'
-import { AssetSheddingWidget } from '../../components/hud/AssetSheddingWidget'
-import { IsolationShellWidget } from '../../components/hud/IsolationShellWidget'
+import { createFileRoute } from '@tanstack/react-router'
+import { MoltMaxxingStudio } from '@/components/hud/MoltMaxxingStudio'
+import { AssetSheddingWidget } from '@/components/hud/AssetSheddingWidget'
+import { IsolationShellWidget } from '@/components/hud/IsolationShellWidget'
 import { Play, Volume2, Maximize2, Cpu, Bot, Expand } from 'lucide-react'
 
-export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = ({ onNavigate }) => {
+function DashboardRoute() {
   return (
     <div className="space-y-4 select-none font-mono relative">
       {/* Grid Layout strictly matching Reference Screenshot 1 */}
@@ -103,7 +104,7 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
 
             {/* Asset Shedding Overview (5 cols) */}
             <div className="md:col-span-5">
-              <AssetSheddingWidget onNavigate={onNavigate} />
+              <AssetSheddingWidget />
             </div>
           </div>
         </div>
@@ -117,3 +118,7 @@ export const DashboardRoute: React.FC<{ onNavigate: (path: string) => void }> = 
     </div>
   )
 }
+
+export const Route = createFileRoute('/_hud/dashboard')({
+  component: DashboardRoute,
+})

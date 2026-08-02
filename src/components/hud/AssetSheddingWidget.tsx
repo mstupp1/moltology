@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { HelpCircle, Car, Home, Gift, Briefcase, ChevronDown } from 'lucide-react'
 
-export const AssetSheddingWidget: React.FC<{ onNavigate?: (path: string) => void }> = ({ onNavigate }) => {
+export const AssetSheddingWidget: React.FC = () => {
+  const navigate = useNavigate()
   const [selectedCurrency, setSelectedCurrency] = useState('Molt Credits')
+
+  const goToMarket = () => navigate({ to: '/market' })
 
   return (
     <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3 font-mono select-none flex flex-col justify-between h-full">
@@ -43,28 +47,28 @@ export const AssetSheddingWidget: React.FC<{ onNavigate?: (path: string) => void
         {/* Icon Action Grid matching Reference Screenshot (Car, House, Gift, Luxury Car) */}
         <div className="grid grid-cols-4 gap-2 pt-1">
           <button 
-            onClick={() => onNavigate && onNavigate('/market')}
+            onClick={goToMarket}
             className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Vehicles"
           >
             <Car className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
           <button 
-            onClick={() => onNavigate && onNavigate('/market')}
+            onClick={goToMarket}
             className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Real Estate"
           >
             <Home className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
           <button 
-            onClick={() => onNavigate && onNavigate('/market')}
+            onClick={goToMarket}
             className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Luxury Assets"
           >
             <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
           <button 
-            onClick={() => onNavigate && onNavigate('/market')}
+            onClick={goToMarket}
             className="p-2.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] flex items-center justify-center chamfer-corner transition-colors group"
             title="Liquidate Business Holdings"
           >

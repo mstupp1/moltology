@@ -1,20 +1,18 @@
 import React, { useEffect } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { AuthView } from '@neondatabase/neon-js/auth/react'
-import { authClient } from '../../lib/auth-client'
+import { authClient } from '@/lib/auth-client'
 
-interface AuthRouteProps {
-  onNavigate: (path: string) => void
-}
-
-export const AuthRoute: React.FC<AuthRouteProps> = ({ onNavigate }) => {
+function AuthRoute() {
+  const navigate = useNavigate()
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
   useEffect(() => {
     if (user) {
-      onNavigate('/dashboard')
+      navigate({ to: '/dashboard' })
     }
-  }, [user, onNavigate])
+  }, [user, navigate])
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-gray-900 font-sans flex flex-col items-center justify-center p-4">
@@ -24,7 +22,7 @@ export const AuthRoute: React.FC<AuthRouteProps> = ({ onNavigate }) => {
       </div>
       <button
         type="button"
-        onClick={() => onNavigate('/')}
+        onClick={() => navigate({ to: '/' })}
         className="mt-6 text-xs text-gray-500 hover:text-gray-900 underline font-sans"
       >
         ← Return to Landing Page
@@ -32,3 +30,7 @@ export const AuthRoute: React.FC<AuthRouteProps> = ({ onNavigate }) => {
     </div>
   )
 }
+
+export const Route = createFileRoute('/auth')({
+  component: AuthRoute,
+})

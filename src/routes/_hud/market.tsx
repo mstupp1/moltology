@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
 import { ShoppingBag, Lock, ShieldAlert, Clock, ArrowRight } from 'lucide-react'
-import { AssetTransmutationModal } from '../../components/hud/AssetTransmutationModal'
-import { BenthicCTAButton } from '../../components/hud/BenthicCTAButton'
+import { AssetTransmutationModal } from '@/components/hud/AssetTransmutationModal'
+import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 
-export const MarketRoute: React.FC = () => {
+function MarketRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [moltCredits, setMoltCredits] = useState(1450)
   const [chitinGems, setChitinGems] = useState(250)
@@ -373,3 +374,7 @@ export const MarketRoute: React.FC = () => {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_hud/market')({
+  component: MarketRoute,
+})

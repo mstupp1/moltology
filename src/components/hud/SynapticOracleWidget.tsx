@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Bot,
   Send,
@@ -18,21 +18,34 @@ interface Message {
   timestamp: string
 }
 
+const formatTime = () =>
+  new Date().toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+const INITIAL_MESSAGE: Message = {
+  id: 'init-1',
+  sender: 'oracle',
+  text: 'Greetings, Initiate. I am the Synaptic Oracle AI. How may I guide your ascendance through the Benthic Path today?',
+  timestamp: '',
+}
+
 export const SynapticOracleWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'init-1',
-      sender: 'oracle',
-      text: 'Greetings, Initiate. I am the Synaptic Oracle AI. How may I guide your ascendance through the Benthic Path today?',
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    },
-  ])
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE])
+
+  useEffect(() => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === INITIAL_MESSAGE.id && !msg.timestamp
+          ? { ...msg, timestamp: formatTime() }
+          : msg,
+      ),
+    )
+  }, [])
 
   const oracleAnswers: Record<string, string> = {
     ascend:
@@ -53,10 +66,7 @@ export const SynapticOracleWidget: React.FC = () => {
       id: Date.now().toString(),
       sender: 'user',
       text: textToSend,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+      timestamp: formatTime(),
     }
 
     setMessages((prev) => [...prev, userMsg])
@@ -78,10 +88,7 @@ export const SynapticOracleWidget: React.FC = () => {
         id: (Date.now() + 1).toString(),
         sender: 'oracle',
         text: responseText,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+        timestamp: formatTime(),
       }
 
       setMessages((prev) => [...prev, oracleMsg])

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { LogIn, LogOut, Search, Command } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
@@ -9,15 +10,14 @@ interface HUDHeaderProps {
   larvaId?: string
   submergenceRating?: number
   socialDetachment?: number
-  onNavigate?: (path: string) => void
   subtitle?: string
 }
 
 export const HUDHeader: React.FC<HUDHeaderProps> = ({
   stage = 1,
   larvaId = 'LARVA UNIT AB371',
-  onNavigate,
 }) => {
+  const navigate = useNavigate()
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -30,9 +30,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
 
   const handleSignOut = async () => {
     await authClient.signOut()
-    if (onNavigate) {
-      onNavigate('/')
-    }
+    navigate({ to: '/' })
   }
 
   const displayName = user?.name || user?.email?.split('@')[0]?.toUpperCase() || larvaId
@@ -47,7 +45,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         isOpen={isAuthModalOpen}
         initialMode={authMode}
         onClose={() => setIsAuthModalOpen(false)}
-        onSuccess={() => onNavigate && onNavigate('/dashboard')}
+        onSuccess={() => navigate({ to: '/dashboard' })}
       />
 
       {/* Left: Unit Avatar & Mobile-Optimized Conversion Process Meter */}

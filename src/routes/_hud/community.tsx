@@ -1,7 +1,8 @@
 import React from 'react'
+import { createFileRoute } from '@tanstack/react-router'
 import { Users, Radio, MessageSquare, ShieldCheck, Cpu, Terminal, Flame } from 'lucide-react'
 
-export const CommunityRoute: React.FC = () => {
+function CommunityRoute() {
   const communityPosts = [
     {
       id: '1',
@@ -123,3 +124,7 @@ export const CommunityRoute: React.FC = () => {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_hud/community')({
+  component: CommunityRoute,
+})
