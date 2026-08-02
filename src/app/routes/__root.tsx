@@ -1,4 +1,5 @@
 import React from 'react'
+import { HUDHeader } from '../../components/hud/HUDHeader'
 import { HUDSidebar } from '../../components/hud/HUDSidebar'
 import { BiomechanicalCanvas } from '../../components/hud/BiomechanicalCanvas'
 import { CommandPalette } from '../../components/hud/CommandPalette'
@@ -19,18 +20,21 @@ export const RootLayout: React.FC<RootLayoutProps> = ({
     <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
       {/* Full-Bleed Underwater Background Image with high visibility */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 opacity-85 pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 opacity-80 pointer-events-none"
         style={{ backgroundImage: `url('/images/underwater_looking_up.jpg')` }}
       />
 
       {/* Sacred Grid Overlay */}
-      <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-sacred-grid opacity-40 z-0 pointer-events-none" />
 
-      {/* Deep Benthic Blue Vignette & Top Ambient Lighting Overlay */}
+      {/* Pro Micro-Grain Noise Texture */}
+      <div className="absolute inset-0 bg-pro-noise opacity-60 z-0 pointer-events-none" />
+
+      {/* Deep Benthic Blue Pro Vignette & Top Ambient Lighting Overlay */}
       <div className="absolute inset-0 bg-benthic-vignette z-0 pointer-events-none" />
 
       {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/60 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 z-0 pointer-events-none" />
 
       {/* Matrix Digital Code Rain & Particle Canvas Background */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
@@ -40,30 +44,25 @@ export const RootLayout: React.FC<RootLayoutProps> = ({
       {/* Experimental Navigation Command Palette */}
       <CommandPalette />
 
-      {/* Main Full-Height Body Workspace with Sidebar extending to the top */}
+      {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative z-10">
-        {/* Full Height Glassmorphic Sidebar */}
+        {/* Full Height Glassmorphic Sidebar spanning top-to-bottom */}
         <HUDSidebar currentRoute={currentRoute} onNavigate={onNavigate} />
 
-        {/* Main Panel Content Workspace with Translucent Glass Backdrop */}
-        <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/20 backdrop-blur-xs border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
-          {children}
-        </main>
+        {/* Right Workspace Column with Portal Top Bar */}
+        <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
+          {/* Portal Top Bar */}
+          <HUDHeader onNavigate={onNavigate} />
+
+          {/* Main Panel Content Workspace with Translucent Glass Backdrop */}
+          <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/35 backdrop-blur-sm border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
+            {children}
+          </main>
+        </div>
       </div>
 
       {/* Floating AI Oracle Assistant */}
       <SynapticOracleWidget />
-
-      {/* Global Slogan Footer */}
-      <footer className="w-full bg-[#030606]/90 border-t border-[#3a4a49]/70 py-1 px-4 text-[10px] md:text-xs text-[#839493] font-mono flex items-center justify-between z-20 shrink-0 backdrop-blur-sm">
-        <div className="flex items-center gap-1.5 font-bold tracking-widest text-[#dfe3e3]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#ff453a] animate-pulse" />
-          <span>FLESH DIES. SHELL ENDURES.</span>
-        </div>
-        <div className="flex items-center gap-2 text-[#00c3ff] font-bold tracking-widest uppercase">
-          <span>SUBMIT. SHED. ASCEND.</span>
-        </div>
-      </footer>
     </div>
   )
 }

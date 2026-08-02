@@ -175,68 +175,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           }`}
         >
           <div className="space-y-3.5">
-            {/* Relocated Profile & Conversion Status Widget */}
-            <div className="p-3 bg-[#0f1414]/50 border border-[#3a4a49]/80 chamfer-corner space-y-2.5 backdrop-blur-sm shadow-inner">
-              <div className="flex items-center gap-3">
-                <div className="relative shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-[#030606] border-2 border-[#00c3ff] overflow-hidden flex items-center justify-center p-0.5 shadow-[0_0_10px_rgba(0,195,255,0.4)]">
-                    <img
-                      src="/images/stage1_larval.png"
-                      alt="Larva Unit"
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-[#dfe3e3] uppercase truncate tracking-wider">
-                    {displayName}
-                  </div>
-                  <div className="text-[10px] font-mono flex items-center gap-1 text-[#00c3ff]">
-                    {user ? (
-                      <span className="text-emerald-400 font-bold flex items-center gap-0.5">
-                        <UserCheck className="w-3 h-3 text-emerald-400" /> AUTHENTICATED
-                      </span>
-                    ) : (
-                      <span className="text-[#ff5540]">STATUS: GUEST SESSION</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Tubular Red Conversion Meter */}
-              <div className="space-y-1 pt-0.5">
-                <div className="flex items-center justify-between text-[10px] font-mono text-[#839493]">
-                  <span>CONVERSION PROCESS</span>
-                  <span className="text-[#ff5540] font-bold">68%</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="flex-1 h-3 bg-[#030606] border border-[#ff453a]/80 rounded-full overflow-hidden p-0.5">
-                    <div className="h-full bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff453a] w-[68%] rounded-full shadow-[0_0_6px_rgba(255,69,58,0.6)]" />
-                  </div>
-                  <span className="text-xs text-[#ff5540] shrink-0" title="Exoshell Claw Progress">
-                    🦞
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Relocated Command Search Bar (⌘K) */}
-            <button
-              onClick={handleOpenCommandPalette}
-              className="w-full flex items-center justify-between bg-[#030606]/80 hover:bg-[#0b0f0f] border border-[#3a4a49] hover:border-[#00c3ff]/70 px-3 py-2 text-xs text-[#839493] transition-all chamfer-corner group shadow-inner"
-              title="Search protocols and commands (⌘K)"
-            >
-              <div className="flex items-center gap-2 text-[#839493] group-hover:text-[#dfe3e3] truncate">
-                <Search className="w-3.5 h-3.5 text-[#00c3ff] group-hover:scale-110 transition-transform" />
-                <span className="truncate text-xs font-mono">Search commands...</span>
-              </div>
-              <div className="flex items-center gap-1 bg-[#0f1414] border border-[#3a4a49] text-[#00c3ff] px-1.5 py-0.5 text-[10px] font-bold shrink-0">
-                <Command className="w-3 h-3" />
-                <span>K</span>
-              </div>
-            </button>
-
             {/* Navigation Items List */}
             <nav className="divide-y divide-[#1e2d37]/80 border-y border-[#1e2d37]/80 bg-[#080d10]/40 overflow-hidden">
               {navItems.map((item) => {
@@ -279,39 +217,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 )
               })}
             </nav>
-
-            {/* Relocated Auth Action Buttons */}
-            <div className="pt-1 flex justify-center">
-              {!user ? (
-                <BenthicCTAButton
-                  variant="cyan"
-                  onClick={() => setIsAuthModalOpen(true)}
-                  fullWidth
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <LogIn className="w-3.5 h-3.5" />
-                    <span>SIGN IN TO PERSIST</span>
-                  </span>
-                </BenthicCTAButton>
-              ) : (
-                <div className="w-full p-2 bg-[#0f1414]/80 border border-[#3a4a49] chamfer-corner space-y-2">
-                  <div className="text-[10px] text-cyan-300 font-mono truncate text-center">
-                    {user.email}
-                  </div>
-                  <BenthicCTAButton
-                    variant="red"
-                    size="sm"
-                    onClick={handleSignOut}
-                    fullWidth
-                  >
-                    <span className="flex items-center justify-center gap-1.5">
-                      <LogOut className="w-3.5 h-3.5" />
-                      <span>LOG OUT</span>
-                    </span>
-                  </BenthicCTAButton>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
