@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { eq } from 'drizzle-orm'
 import * as dotenv from 'dotenv'
 import * as schema from './schema'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
@@ -180,12 +181,17 @@ export async function seedDatabase(databaseUrl?: string) {
     }
     console.log(`✓ Seeded ${MOCK_SEED_DAILY_ROUTINES.length} daily routine entries`)
 
-    // 5. Seed Changelogs
+    // 5. Seed Changelogs (Unique version seed)
     console.log('[SEED] Seeding system changelogs...')
     for (const item of INITIAL_CHANGELOGS) {
-      await db
-        .insert(schema.changelogs)
-        .values({
+      const existing = await db
+        .select()
+        .from(schema.changelogs)
+        .where(eq(schema.changelogs.version, item.version))
+        .limit(1)
+
+      if (existing.length === 0) {
+        await db.insert(schema.changelogs).values({
           version: item.version,
           title: item.title,
           category: item.category,
@@ -194,7 +200,7 @@ export async function seedDatabase(databaseUrl?: string) {
           isPublished: true,
           releasedAt: item.releasedAt ? new Date(item.releasedAt) : new Date(),
         })
-        .onConflictDoNothing()
+      }
     }
     // 6. Seed Gallery Pins
     console.log('[SEED] Seeding gallery pins...')

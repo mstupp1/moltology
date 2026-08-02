@@ -26,9 +26,10 @@ import { getPublicChangelogs, type ChangelogEntry } from '@/lib/changelogs'
 import { seo } from '@/lib/seo'
 
 function SupportPortalRoute() {
+  const loaderData = Route.useLoaderData()
   const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket' | 'diagnostics'>('changelog')
-  const [changelogs, setChangelogs] = useState<ChangelogEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [changelogs, setChangelogs] = useState<ChangelogEntry[]>(loaderData?.changelogs || [])
+  const [loading, setLoading] = useState(!loaderData?.changelogs)
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({ v1_0_0: true, v1_4_2: true })
@@ -41,12 +42,18 @@ function SupportPortalRoute() {
 
   useEffect(() => {
     let isMounted = true
-    getPublicChangelogs().then((data) => {
-      if (isMounted) {
-        setChangelogs(data)
-        setLoading(false)
-      }
-    })
+    getPublicChangelogs()
+      .then((data) => {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          setChangelogs(data)
+          setLoading(false)
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setLoading(false)
+        }
+      })
     return () => {
       isMounted = false
     }
@@ -61,7 +68,7 @@ function SupportPortalRoute() {
 
   const categories = ['ALL', 'TRANSMUTATION', 'CHASSIS_UPGRADE', 'SECURITY_ISOLATION', 'FEATURE', 'BUG_PURGE']
 
-  const filteredChangelogs = changelogs.filter((entry) => {
+  const filteredChangelogs = (Array.isArray(changelogs) ? changelogs : []).filter((entry) => {
     const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory
     const matchesSearch =
       entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -518,6 +525,15 @@ function SupportPortalRoute() {
 }
 
 export const Route = createFileRoute('/_hud/support')({
+  loader: async () => {
+    try {
+      const data = await getPublicChangelogs()
+      return { changelogs: Array.isArray(data) ? data : [] }
+    } catch (err) {
+      console.error('[Support Route Loader] Failed fetching changelogs:', err)
+      return { changelogs: [] }
+    }
+  },
   component: SupportPortalRoute,
   head: () => ({
     meta: seo({ title: 'Benthic Support Portal & System Changelog | Moltology' }),
