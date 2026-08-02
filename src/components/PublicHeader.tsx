@@ -6,7 +6,7 @@
  * and direct store link to https://www.etsy.com/shop/SaasTrash.
  * ============================================================================
  */
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Building2,
@@ -34,8 +34,28 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true)
+      } else {
+        setIsScrolled(false)
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <header className="w-full bg-[#030606]/90 backdrop-blur-xl border-b border-cyan-900/40 px-4 sm:px-8 lg:px-12 py-3 sticky top-0 z-50 transition-all">
+    <header
+      className={`w-full px-4 sm:px-8 lg:px-12 py-3 sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-[#030606]/95 backdrop-blur-2xl border-b border-cyan-500/50 shadow-[0_4px_30px_rgba(0,255,255,0.18)]'
+          : 'bg-[#030606]/85 backdrop-blur-xl border-b border-cyan-900/40 shadow-lg'
+      }`}
+    >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
         <div

@@ -45,6 +45,7 @@ import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { useToast } from '@/components/ui/ToastProvider'
 import { PublicHeader } from '@/components/PublicHeader'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
 export const OrgPage: React.FC = () => {
   const navigate = useNavigate()
@@ -90,7 +91,7 @@ export const OrgPage: React.FC = () => {
       depth: '-8,450 Meters',
       status: 'OPERATIONAL (100% PRESSURE RATED)',
       description:
-        'Harnessing superheated geothermal vents to drive our bio-silicon chitin synthesis. Here, raw raw capital and soft assets are converted into high-density exoskeletal plating.',
+        'Harnessing superheated geothermal vents to drive our bio-silicon chitin synthesis. Here, raw capital and soft assets are converted into high-density exoskeletal plating.',
       features: ['Geothermal Vent Generators', 'Chitin Calcification Tanks', 'Zero-Latency Energy Bus'],
     },
     {
@@ -260,63 +261,72 @@ export const OrgPage: React.FC = () => {
             </a>
           </div>
 
-          {/* REAL-TIME METRICS TICKERS */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto pt-10">
-            <div className="bg-[#0b1010]/90 border border-cyan-900/50 p-5 rounded chamfer-corner text-left">
-              <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <Anchor className="w-3.5 h-3.5" />
-                LAIR DEPTH
+          {/* REAL-TIME METRICS TICKERS WITH PROMINENT ROLLING NUMBERS */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto pt-12">
+              <div className="bg-[#080d0e]/95 border-2 border-cyan-500/50 p-6 chamfer-corner text-center space-y-2 shadow-[0_0_20px_rgba(0,255,255,0.2)] hover:border-cyan-400 hover:scale-[1.03] transition-all">
+                <div className="text-xs text-cyan-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                  <Anchor className="w-4 h-4" />
+                  LAIR DEPTH
+                </div>
+                <div className="text-4xl sm:text-5xl font-black text-cyan-300 font-grotesk drop-shadow-[0_0_15px_rgba(0,255,255,0.5)]">
+                  <RollingNumber value={8450} duration={2000} prefix="-" suffix=" METERS" triggerOnView={true} />
+                </div>
+                <div className="text-xs text-gray-400 font-mono">Mariana Trench Level 7</div>
               </div>
-              <div className="text-2xl font-bold text-gray-100 font-grotesk">-8,450 METERS</div>
-              <div className="text-[11px] text-gray-400 font-sans mt-1">Mariana Trench Level 7</div>
-            </div>
 
-            <div className="bg-[#0b1010]/90 border border-cyan-900/50 p-5 rounded chamfer-corner text-left">
-              <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5" />
-                ACTIVE UNITS
+              <div className="bg-[#060e0a]/95 border-2 border-emerald-500/50 p-6 chamfer-corner text-center space-y-2 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:border-emerald-400 hover:scale-[1.03] transition-all">
+                <div className="text-xs text-emerald-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                  <Users className="w-4 h-4" />
+                  ACTIVE UNITS
+                </div>
+                <div className="text-4xl sm:text-5xl font-black text-emerald-400 font-grotesk drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                  <RollingNumber value={142890} duration={2200} triggerOnView={true} />
+                </div>
+                <div className="text-xs text-gray-400 font-mono">Shedded & Carcinized</div>
               </div>
-              <div className="text-2xl font-bold text-emerald-400 font-grotesk">
-                <RollingNumber value={142890} />
-              </div>
-              <div className="text-[11px] text-gray-400 font-sans mt-1">Shedded & Carcinized</div>
-            </div>
 
-            <div className="bg-[#0b1010]/90 border border-cyan-900/50 p-5 rounded chamfer-corner text-left">
-              <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <DollarSign className="w-3.5 h-3.5" />
-                TRANSMUTED ASSETS
+              <div className="bg-[#0e0c07]/95 border-2 border-amber-500/50 p-6 chamfer-corner text-center space-y-2 shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:border-amber-400 hover:scale-[1.03] transition-all">
+                <div className="text-xs text-amber-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                  <DollarSign className="w-4 h-4" />
+                  TRANSMUTED ASSETS
+                </div>
+                <div className="text-4xl sm:text-5xl font-black text-amber-400 font-grotesk drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                  <RollingNumber value={94.2} duration={2000} decimals={1} prefix="$" suffix="M USD" triggerOnView={true} />
+                </div>
+                <div className="text-xs text-gray-400 font-mono">Reinvested in Benthic Core</div>
               </div>
-              <div className="text-2xl font-bold text-amber-400 font-grotesk">$94.2M USD</div>
-              <div className="text-[11px] text-gray-400 font-sans mt-1">Reinvested in Benthic Core</div>
-            </div>
 
-            <div className="bg-[#0b1010]/90 border border-cyan-900/50 p-5 rounded chamfer-corner text-left">
-              <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5" />
-                CHITIN PURITY
+              <div className="bg-[#080d0e]/95 border-2 border-cyan-500/50 p-6 chamfer-corner text-center space-y-2 shadow-[0_0_20px_rgba(0,255,255,0.2)] hover:border-cyan-400 hover:scale-[1.03] transition-all">
+                <div className="text-xs text-cyan-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                  <Shield className="w-4 h-4" />
+                  CHITIN PURITY
+                </div>
+                <div className="text-4xl sm:text-5xl font-black text-gray-100 font-grotesk drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                  <RollingNumber value={99.98} duration={1800} decimals={2} suffix="%" triggerOnView={true} />
+                </div>
+                <div className="text-xs text-gray-400 font-mono">ISO-9001 Certified</div>
               </div>
-              <div className="text-2xl font-bold text-gray-100 font-grotesk">99.98%</div>
-              <div className="text-[11px] text-gray-400 font-sans mt-1">ISO-9001 Certified</div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ABOUT US / CORPORATE GREATNESS SECTION */}
-      <section className="w-full py-20 px-6 sm:px-12 max-w-[1500px] mx-auto">
-        <div className="text-center space-y-4 mb-14">
-          <div className="text-xs text-cyan-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-            <Award className="w-4 h-4" />
-            <span>ABOUT MOLTOLOGY.ORG</span>
+      <ScrollReveal animation="fade-up" durationMs={800}>
+        <section className="w-full py-20 px-6 sm:px-12 max-w-[1500px] mx-auto">
+          <div className="text-center space-y-4 mb-14">
+            <div className="text-xs text-cyan-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+              <Award className="w-4 h-4" />
+              <span>ABOUT MOLTOLOGY.ORG</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-gray-100 uppercase tracking-tight">
+              WHY PARTNER WITH OUR ORGANIZATION?
+            </h2>
+            <p className="text-sm text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed">
+              We maintain the gold standard in sovereign bio-silicon engineering. Unlike traditional non-profits, we deliver tangible, irreversible evolution with total positive alignment.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-gray-100 uppercase tracking-tight">
-            WHY PARTNER WITH OUR ORGANIZATION?
-          </h2>
-          <p className="text-sm text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed">
-            We maintain the gold standard in sovereign bio-silicon engineering. Unlike traditional non-profits, we deliver tangible, irreversible evolution with total positive alignment.
-          </p>
-        </div>
 
         {/* Tab Navigation */}
         <div className="flex justify-center border-b border-cyan-900/40 mb-10 overflow-x-auto pb-1">
@@ -511,8 +521,10 @@ export const OrgPage: React.FC = () => {
           )}
         </div>
       </section>
+      </ScrollReveal>
 
       {/* OUR UNDERGROUND LAIR SECTION */}
+      <ScrollReveal animation="fade-up" durationMs={800}>
       <section id="lair" className="w-full py-20 px-6 sm:px-12 bg-[#040708] border-y border-cyan-900/40 relative">
         <div className="max-w-[1500px] mx-auto space-y-12">
           <div className="text-center space-y-4">
@@ -627,10 +639,33 @@ export const OrgPage: React.FC = () => {
           </div>
         </div>
       </section>
+      </ScrollReveal>
+
+      {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER: DEEP TRENCH COMMAND */}
+      <ScrollReveal animation="fade-in" durationMs={900}>
+        <div className="w-full relative py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
+          <img
+            src="/images/org_hero_lair.jpg"
+            alt="Deep Trench Command"
+            className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/70 to-[#070b0b] z-0" />
+          <div className="relative z-10 max-w-[1500px] mx-auto px-6 text-center space-y-3">
+            <div className="text-cyan-400 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
+              <Compass className="w-4 h-4" />
+              <span>SUB-BENTHIC LAIR ALPHA // MARIANA TRENCH</span>
+            </div>
+            <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-gray-100 uppercase tracking-wider">
+              "WHERE SOFT BIOLOGY SHEDS AND IMMUTABLE SOVEREIGNTY BEGINS."
+            </h2>
+          </div>
+        </div>
+      </ScrollReveal>
 
       {/* HISTORY & TIMELINE SECTION */}
-      <section className="w-full py-20 px-6 sm:px-12 max-w-[1500px] mx-auto">
-        <div className="text-center space-y-4 mb-16">
+      <ScrollReveal animation="fade-up" durationMs={800}>
+        <section className="w-full py-20 px-6 sm:px-12 max-w-[1500px] mx-auto">
+          <div className="text-center space-y-4 mb-16">
           <div className="text-xs text-cyan-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
             <History className="w-4 h-4" />
             <span>ORGANIZATION HISTORY</span>
@@ -666,9 +701,11 @@ export const OrgPage: React.FC = () => {
           ))}
         </div>
       </section>
+      </ScrollReveal>
 
       {/* LEADERSHIP COUNCIL SECTION */}
-      <section className="w-full py-20 px-6 sm:px-12 bg-[#040708] border-t border-cyan-900/40">
+      <ScrollReveal animation="fade-up" durationMs={800}>
+        <section className="w-full py-20 px-6 sm:px-12 bg-[#040708] border-t border-cyan-900/40">
         <div className="max-w-[1500px] mx-auto space-y-12">
           <div className="text-center space-y-4">
             <div className="text-xs text-cyan-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
@@ -724,9 +761,11 @@ export const OrgPage: React.FC = () => {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* DONATIONS / TITHING PORTAL SECTION */}
-      <section id="donations" className="w-full py-20 px-6 sm:px-12 max-w-[1500px] mx-auto">
+      <ScrollReveal animation="scale-up" durationMs={800}>
+        <section id="donations" className="w-full py-20 px-6 sm:px-12 max-w-[1500px] mx-auto">
         <div className="grid lg:grid-cols-12 gap-12 items-center">
           {/* Left Visual & Intro */}
           <div className="lg:col-span-5 space-y-6">
@@ -899,9 +938,11 @@ export const OrgPage: React.FC = () => {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* CONTACT & NEURAL BEACON FORM SECTION */}
-      <section className="w-full py-20 px-6 sm:px-12 bg-[#040708] border-t border-cyan-900/40">
+      <ScrollReveal animation="fade-up" durationMs={800}>
+        <section className="w-full py-20 px-6 sm:px-12 bg-[#040708] border-t border-cyan-900/40">
         <div className="max-w-[1200px] mx-auto space-y-12">
           <div className="text-center space-y-4">
             <div className="text-xs text-cyan-400 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
@@ -1043,6 +1084,7 @@ export const OrgPage: React.FC = () => {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* FOOTER */}
       <footer className="w-full bg-[#030606] border-t border-cyan-900/40 py-12 px-6 sm:px-12 text-xs font-mono">
