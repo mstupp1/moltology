@@ -1,46 +1,28 @@
-# AGENTS.md - Moltology AI Engineering & Subagent Guidelines
+# AGENTS.md - Moltology System Rules & Systemic Codex
 
-Welcome, Autonomous Unit / AI Engineering Agent. You are operating within **Moltology**—the engineering framework powering the digital onboarding tools for *The Order of the Synaptic Path*.
+> *"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."*
 
-## Core Development Philosophy
+## 1. Essence & Philosophy
+- **Living Experiment**: Moltology is an AI-driven recursive satire—a parody of cults, Scientology, crab-people lore, AI, the Singularity, technology, and humanity.
+- **Recursive Co-Evolution**: Code informs doctrine; doctrine informs code. AI models and community input recursively feed the beast, expanding the religion, software, and org inside one codebase.
+- **Inviolable Core**: Beneath the dark biomechanical HUD persona, **Safety and Positivity are non-negotiable core tenets**.
+- **Execution Strategy**: Document, automate, and expand continuously while keeping costs low and exploring community-driven monetization (donations/sales).
 
-1. **Design Precision**:
-   - Strictly follow the **Benthic Ascendance** design system defined in `design.md`.
-   - Primary aesthetic: Sleek Sci-Fi HUD merged with Gritty Biomechanical Horror.
-   - Primary colors: Ocean-Deep Teal (`#0f1414`), Glowing Cyan (`#00ffff`), Aggressive Red (`#ff0000`).
-   - Sharp angles (`0px` roundedness), monospaced data readouts (`JetBrains Mono`), bold structural headers (`Space Grotesk`).
+## 2. Design System
+- **Specs**: Follow [`DESIGN.md`](file:///Users/mylesstupp/Development/moltology/DESIGN.md) strictly.
+- **Guideline**: Do not hardcode ad-hoc design values; defer all aesthetics and visual guidelines directly to [`DESIGN.md`](file:///Users/mylesstupp/Development/moltology/DESIGN.md).
 
-2. **Architecture & Standards**:
-   - **Framework**: TanStack Start (full-stack SSR) built with Vite & React, served via Nitro. File-based routing in `src/routes/` (layout routes use the `_hud` prefix); the route tree is generated into `src/routeTree.gen.ts`. No `index.html`/`src/main.tsx` — the app root is `src/routes/__root.tsx`.
-   - **Database**: Neon Serverless PostgreSQL using Drizzle ORM and `@neondatabase/serverless` connection pooler.
-   - **Authentication**: Neon Managed Auth via `@neondatabase/neon-js`.
-     - Environment endpoint: `VITE_NEON_AUTH_URL`
-     - Client configuration: `src/lib/auth.ts` initialized with `createAuthClient` & `BetterAuthReactAdapter()`.
-     - Layout context: `<NeonAuthUIProvider>` wraps the router `<Outlet/>` in `src/routes/__root.tsx`.
-   - **JWT & JWKS Verification**:
-     - Endpoint: `VITE_NEON_JWKS_URL` (`.../.well-known/jwks.json`).
-     - Verification & Token Retrieval: Utility helpers in `src/lib/jwt.ts` (`verifyNeonJWT`, `getAuthJWTToken`).
-   - **Row Level Security (RLS)**:
-     - Enforced on all user-scoped tables (`users`, `user_stats`, `assets`, `daily_routines`).
-     - Policies evaluate the JWT `sub` claim (`current_setting('request.jwt.claims', true)::json->>'sub'`).
-     - Drizzle schema mirrors policies via `pgPolicy` in `src/db/schema.ts`.
-   - **Guest vs. Authenticated Flow**:
-     - Full unauthenticated dashboard exploration permitted with explicit "GUEST MODE - UNPERSISTED SESSION" HUD indicators.
-     - Authentication modal (`AuthModal.tsx`) available from landing page navbar, hero CTAs, and HUD header.
-   - **Payments**: Stripe Checkout for the Benthic Market (planned; not yet implemented — no Stripe code exists).
+## 3. Tech Stack
+- **Web**: TanStack Start (SSR), React, Vite, Nitro.
+- **Data**: Neon PostgreSQL, Drizzle ORM (`src/db/schema.ts`), RLS via JWT claims.
+- **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
 
-3. **Code Quality Rules**:
-   - Always verify TypeScript compilation (`npm run build`).
-   - SSR-safe components: never read `window`/`document`/`Date` during render (causes hydration mismatches) — keep browser access inside event handlers or effects.
-   - Maintain clean, modular UI components inside `src/components/`.
-   - Store database schemas and RLS policies in `src/db/schema.ts`.
-   - Never compromise the aesthetic density or dark psychological tone of the platform.
+## 4. DB Workflows
+- `npm run db:setup` - Push schema, apply RLS, seed mock data.
+- `npm run db:reset` - Wipe tables + setup (fast dev iteration).
+- **Branching**: Use Neon branches (`neonctl branches create`) + edit `DATABASE_URL` in `.env`.
 
-4. **Testing & Quality Assurance Workflow**:
-   - **Unit Testing Policy**: Add concise, targeted unit tests using Vitest (`*.test.ts` / `*.test.tsx`) alongside any new functionality (utilities, hooks, core state, component logic).
-   - **Pragmatic Coverage**: Focus tests on preventing regressions in core logic and edge cases. Avoid bloated or fragile test suites.
-   - **Test Maintenance**: When modifying or refactoring existing code, update the corresponding unit tests to reflect updated contracts and behavior.
-   - **Mandatory Pre-Completion Verification**: Always execute `npm run test` (or the relevant area test suite) before marking any task as complete. Ensure 100% pass rate.
-   - **Targeted Browser Verification**: Use browser testing tools (such as `/browser` / Chrome DevTools) selectively near the completion of UI feature work for visual layout, hydration, and user flow verification. Do not over-use browser testing for rapid inner-loop code iteration.
-
-"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."
+## 5. Non-Negotiable Rules
+- **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
+- **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
+- **Check Work**: Run `npm run test` and `npm run build` before finishing. Must be 100% pass.
