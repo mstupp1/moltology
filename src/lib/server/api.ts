@@ -6,8 +6,10 @@ import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
 import type { ChangelogEntry } from '../changelogs-data'
+import { getPresignedViewUrl } from '../s3-client'
 
 type Db = ReturnType<typeof getDb>
+
 
 interface AuthUser extends JWTPayload {
   id?: string
@@ -152,3 +154,32 @@ export const updateUserStatsFn = handlerWithServer(
   }),
   updateUserStatsHandler,
 )
+
+interface GetAssetUrlInput {
+  key: string
+  expiresIn?: number
+}
+
+/**
+ * Server Function: Get presigned URL for an S3 asset key.
+ */
+const getS3AssetUrlHandler = async ({ data }: ServerFnArgs<GetAssetUrlInput>) => {
+  if (!data?.key) {
+    throw new Error('Key parameter is required')
+  }
+  const url = await getPresignedViewUrl(data.key, undefined, data.expiresIn || 3600)
+  return { url }
+}
+
+export const getS3AssetUrlFn = handlerWithServer(
+  publicServerFn.validator((data: GetAssetUrlInput) => {
+    return z
+      .object({
+        key: z.string().min(1),
+        expiresIn: z.number().min(60).max(86400).optional(),
+      })
+      .parse(data)
+  }),
+  getS3AssetUrlHandler,
+)
+

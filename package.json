@@ -18,6 +18,8 @@
     "db:reset": "tsx src/db/reset.ts && npm run db:setup"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1101.0",
+    "@aws-sdk/s3-request-presigner": "^3.1101.0",
     "@daveyplate/better-auth-ui": "^3.4.0",
     "@neondatabase/neon-js": "^0.6.2-beta",
     "@neondatabase/serverless": "^0.10.4",

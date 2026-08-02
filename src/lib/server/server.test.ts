@@ -4,10 +4,11 @@ import { extractAuthToken } from './middleware'
 import { getDb } from '../../db'
 import { publicServerFn, authenticatedServerFn } from './functions'
 import { executeServerFn } from './execute'
-import { getPublicChangelogsFn } from './api'
+import { getPublicChangelogsFn, getS3AssetUrlFn } from './api'
 import type { ChangelogEntry } from '../changelogs-data'
 
 describe('Server Error & Formatting', () => {
+
   it('should instantiate ServerError with custom status and code', () => {
     const err = new ServerError('Forbidden resource', 'FORBIDDEN', 403, { id: 123 })
     expect(err.message).toBe('Forbidden resource')
@@ -101,4 +102,13 @@ describe('Server Functions', () => {
     expect(changelogs.length).toBeGreaterThan(0)
     expect(changelogs[0]).toHaveProperty('version')
   })
+
+  it('should execute getS3AssetUrlFn and return a valid presigned URL', async () => {
+    const result = await executeServerFn<{ url: string }>(getS3AssetUrlFn, undefined, { key: 'images/order_emblem.png' })
+    expect(result).toHaveProperty('url')
+    expect(result.url).toContain('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/order_emblem.png')
+  })
+
 })
+
+
