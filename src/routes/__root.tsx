@@ -5,6 +5,8 @@ import '@neondatabase/neon-js/ui/css'
 import { authClient } from '@/lib/auth'
 import '@/index.css'
 import { seo } from '@/lib/seo'
+import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -27,6 +29,7 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  errorComponent: HUDErrorFallback,
   component: RootDocument,
 })
 
@@ -37,11 +40,16 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body className="bg-[#0f1414] text-[#dfe3e3] font-mono antialiased overflow-x-hidden selection:bg-[#00ffff] selection:text-[#000a0a]">
-        <NeonAuthUIProvider emailOTP authClient={authClient}>
-          <Outlet />
-        </NeonAuthUIProvider>
+        <HUDErrorBoundary>
+          <ToastProvider>
+            <NeonAuthUIProvider emailOTP authClient={authClient}>
+              <Outlet />
+            </NeonAuthUIProvider>
+          </ToastProvider>
+        </HUDErrorBoundary>
         <Scripts />
       </body>
     </html>
   )
 }
+
