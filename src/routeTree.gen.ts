@@ -21,6 +21,7 @@ import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCommunityRouteImport } from './routes/_hud/community'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudIsolationRouteImport } from './routes/_hud/isolation'
+import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
 import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
@@ -84,6 +85,11 @@ const HudIsolationRoute = HudIsolationRouteImport.update({
   path: '/isolation',
   getParentRoute: () => HudRoute,
 } as any)
+const HudLecturesRoute = HudLecturesRouteImport.update({
+  id: '/lectures',
+  path: '/lectures',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudMarketRoute = HudMarketRouteImport.update({
   id: '/market',
   path: '/market',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof HudCommunityRoute
   '/dashboard': typeof HudDashboardRoute
   '/isolation': typeof HudIsolationRoute
+  '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
   '/pipeline': typeof HudPipelineRoute
   '/support': typeof HudSupportRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/community': typeof HudCommunityRoute
   '/dashboard': typeof HudDashboardRoute
   '/isolation': typeof HudIsolationRoute
+  '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
   '/pipeline': typeof HudPipelineRoute
   '/support': typeof HudSupportRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_hud/community': typeof HudCommunityRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/isolation': typeof HudIsolationRoute
+  '/_hud/lectures': typeof HudLecturesRoute
   '/_hud/market': typeof HudMarketRoute
   '/_hud/pipeline': typeof HudPipelineRoute
   '/_hud/support': typeof HudSupportRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/isolation'
+    | '/lectures'
     | '/market'
     | '/pipeline'
     | '/support'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/dashboard'
     | '/isolation'
+    | '/lectures'
     | '/market'
     | '/pipeline'
     | '/support'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/_hud/community'
     | '/_hud/dashboard'
     | '/_hud/isolation'
+    | '/_hud/lectures'
     | '/_hud/market'
     | '/_hud/pipeline'
     | '/_hud/support'
@@ -299,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudIsolationRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/lectures': {
+      id: '/_hud/lectures'
+      path: '/lectures'
+      fullPath: '/lectures'
+      preLoaderRoute: typeof HudLecturesRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/market': {
       id: '/_hud/market'
       path: '/market'
@@ -328,6 +347,7 @@ interface HudRouteChildren {
   HudCommunityRoute: typeof HudCommunityRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudIsolationRoute: typeof HudIsolationRoute
+  HudLecturesRoute: typeof HudLecturesRoute
   HudMarketRoute: typeof HudMarketRoute
   HudPipelineRoute: typeof HudPipelineRoute
   HudSupportRoute: typeof HudSupportRoute
@@ -338,6 +358,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudCommunityRoute: HudCommunityRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudIsolationRoute: HudIsolationRoute,
+  HudLecturesRoute: HudLecturesRoute,
   HudMarketRoute: HudMarketRoute,
   HudPipelineRoute: HudPipelineRoute,
   HudSupportRoute: HudSupportRoute,

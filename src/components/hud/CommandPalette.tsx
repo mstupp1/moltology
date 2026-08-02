@@ -11,6 +11,8 @@ import {
   Layers,
   X,
   Command,
+  BookOpen,
+  LayoutDashboard,
 } from 'lucide-react'
 
 interface CommandItem {
@@ -50,13 +52,24 @@ export const CommandPalette: React.FC = () => {
 
   const commands: CommandItem[] = [
     {
-      id: 'nav-hud',
-      label: 'Navigate to Primary HUD Telemetry',
+      id: 'nav-hub',
+      label: 'Open Portal Command Hub (Mainpage)',
       category: 'Navigation',
-      icon: <Activity className="w-4 h-4 text-cyan-400" />,
+      icon: <LayoutDashboard className="w-4 h-4 text-[#00ffff]" />,
       shortcut: 'G H',
       action: () => {
         navigate({ to: '/dashboard' })
+        setIsOpen(false)
+      },
+    },
+    {
+      id: 'nav-lectures',
+      label: 'Open Molt-Cycle Lectures Stream & Notes',
+      category: 'Navigation',
+      icon: <BookOpen className="w-4 h-4 text-[#00ffff]" />,
+      shortcut: 'G L',
+      action: () => {
+        navigate({ to: '/lectures' })
         setIsOpen(false)
       },
     },

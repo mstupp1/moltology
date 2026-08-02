@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
+  LayoutDashboard,
   BookOpen,
   FlaskConical,
   ShoppingCart,
@@ -51,10 +52,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const navItems = [
     {
+      id: 'hub',
+      label: 'COMMAND HUB',
+      icon: LayoutDashboard,
+      path: '/dashboard',
+    },
+    {
       id: 'lectures',
       label: 'MOLT-CYCLE LECTURES',
       icon: BookOpen,
-      path: '/dashboard',
+      path: '/lectures',
     },
     {
       id: 'science',
