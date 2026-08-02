@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
   LayoutDashboard,
   BookOpen,
+  Scroll,
   FlaskConical,
   ShoppingCart,
   ShieldAlert,
@@ -91,6 +92,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       label: 'COMMAND HUB',
       icon: LayoutDashboard,
       path: '/dashboard',
+    },
+    {
+      id: 'codex',
+      label: 'THE SACRED CODEX',
+      icon: Scroll,
+      path: '/codex',
     },
     {
       id: 'lectures',
