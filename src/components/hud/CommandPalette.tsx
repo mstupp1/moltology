@@ -76,7 +76,7 @@ export const CommandPalette: React.FC = () => {
     },
     {
       id: 'nav-lectures',
-      label: 'Open Molt-Cycle Lectures Stream & Notes',
+      label: 'Open Molt Academy & Neural Courses',
       category: 'Navigation',
       icon: <BookOpen className="w-4 h-4 text-[#00ffff]" />,
       shortcut: 'G L',
