@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { HelpCircle, Car, Home, Gift, Briefcase } from 'lucide-react'
-import { HudCard, HudSelect, HudButton } from '@/components/ui'
+import { HelpCircle } from 'lucide-react'
+import { HudCard, HudSelect, HudButton, ChromaElement } from '@/components/ui'
 
 export const AssetSheddingWidget: React.FC = () => {
   const navigate = useNavigate()
@@ -42,46 +42,71 @@ export const AssetSheddingWidget: React.FC = () => {
           <span className="text-[8px] text-[#839493]">Running total</span>
         </div>
 
-        {/* Icon Action Grid matching Reference Screenshot */}
+        {/* 3D Chroma Keyed Asset Action Grid */}
         <div className="grid grid-cols-4 gap-2 pt-1">
           <HudButton
             variant="dark"
             size="sm"
             onClick={goToMarket}
-            title="Liquidate Vehicles"
-            className="p-2.5 h-auto flex items-center justify-center group"
+            title="Liquidate Hover Vehicles"
+            className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
-            <Car className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <ChromaElement
+              src="/images/extracted/asset_vehicle_3d.jpg"
+              alt="Hover Vehicle"
+              blendMode="screen"
+              glowColor="cyan"
+              className="w-9 h-9 object-contain"
+            />
           </HudButton>
           <HudButton
             variant="dark"
             size="sm"
             onClick={goToMarket}
-            title="Liquidate Real Estate"
-            className="p-2.5 h-auto flex items-center justify-center group"
+            title="Liquidate Abyssal Strongholds"
+            className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
-            <Home className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <ChromaElement
+              src="/images/extracted/asset_citadel_3d.jpg"
+              alt="Abyssal Citadel"
+              blendMode="screen"
+              glowColor="cyan"
+              className="w-9 h-9 object-contain"
+            />
           </HudButton>
           <HudButton
             variant="dark"
             size="sm"
             onClick={goToMarket}
-            title="Liquidate Luxury Assets"
-            className="p-2.5 h-auto flex items-center justify-center group"
+            title="Liquidate Bio-Relic Vaults"
+            className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
-            <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <ChromaElement
+              src="/images/extracted/asset_relic_3d.jpg"
+              alt="Bio Relic Vault"
+              blendMode="screen"
+              glowColor="crimson"
+              className="w-9 h-9 object-contain"
+            />
           </HudButton>
           <HudButton
             variant="dark"
             size="sm"
             onClick={goToMarket}
-            title="Liquidate Business Holdings"
-            className="p-2.5 h-auto flex items-center justify-center group"
+            title="Liquidate Enterprise Holdings"
+            className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
-            <Briefcase className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <ChromaElement
+              src="/images/extracted/asset_enterprise_3d.jpg"
+              alt="Enterprise Briefcase"
+              blendMode="screen"
+              glowColor="cyan"
+              className="w-9 h-9 object-contain"
+            />
           </HudButton>
         </div>
       </div>
     </HudCard>
   )
 }
+

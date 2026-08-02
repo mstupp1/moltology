@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { HudCard, HudButton, HudBadge } from '@/components/ui'
+import { HudCard, HudButton, HudBadge, ChromaElement } from '@/components/ui'
 
 export const MoltMaxxingStudio: React.FC = () => {
   const [stats, setStats] = useState({
@@ -27,17 +27,29 @@ export const MoltMaxxingStudio: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-        {/* Left Radar Signal Rings Visual */}
+        {/* Left Radar & 3D Chroma-Keyed Schematic Visual */}
         <div className="md:col-span-5 flex flex-col items-center justify-center space-y-2">
-          <div className="w-28 h-28 relative flex items-center justify-center bg-[#070b0b] border border-[#3a4a49] rounded-full p-2">
-            {/* Concentric Radar Rings */}
-            <div className="w-full h-full border border-[#00c3ff]/40 rounded-full animate-ping absolute" />
-            <div className="w-20 h-20 border border-[#ff453a]/40 rounded-full absolute" />
-            <div className="w-12 h-12 border border-[#00c3ff]/60 rounded-full absolute" />
-            <img
-              src="/images/stage3_exoshell.png"
-              alt="Cyber Lobster Vector"
-              className="w-16 h-16 object-contain z-10 drop-shadow-[0_0_8px_rgba(0,195,255,0.8)]"
+          <div className="w-36 h-36 relative flex items-center justify-center bg-[#030606] border border-[#00c3ff]/40 rounded-full p-2 shadow-[0_0_15px_rgba(0,195,255,0.2)]">
+            {/* Concentric Radar Rings & Crosshair Lines */}
+            <div className="w-full h-full border border-[#00c3ff]/30 rounded-full animate-ping absolute" />
+            <div className="w-28 h-28 border border-[#ff453a]/40 rounded-full absolute" />
+            <div className="w-16 h-16 border border-[#00c3ff]/60 rounded-full absolute" />
+            <div className="w-full h-[1px] bg-[#00c3ff]/30 absolute top-1/2 left-0 pointer-events-none" />
+            <div className="h-full w-[1px] bg-[#00c3ff]/30 absolute left-1/2 top-0 pointer-events-none" />
+
+            {/* Target Reticle Corners */}
+            <div className="absolute top-1 left-1 text-[8px] text-[#00c3ff]">┌</div>
+            <div className="absolute top-1 right-1 text-[8px] text-[#00c3ff]">┐</div>
+            <div className="absolute bottom-1 left-1 text-[8px] text-[#00c3ff]">└</div>
+            <div className="absolute bottom-1 right-1 text-[8px] text-[#00c3ff]">┘</div>
+
+            {/* 3D Chroma Keyed Cyber Lobster Schematic */}
+            <ChromaElement
+              src="/images/extracted/cyber_lobster_3d_chroma.jpg"
+              alt="Cyber Lobster 3D Schematic"
+              blendMode="screen"
+              glowColor="cyan"
+              className="w-28 h-28 object-contain"
             />
           </div>
         </div>

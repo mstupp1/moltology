@@ -14,4 +14,5 @@ export { HudBadge, type HudBadgeProps } from './HudBadge'
 export { HudStatBox, type HudStatBoxProps } from './HudStatBox'
 export { HudSkeleton, type HudSkeletonProps } from './HudSkeleton'
 export { RollingNumber, type RollingNumberProps } from './RollingNumber'
+export { ChromaElement, type ChromaElementProps } from './ChromaElement'
 

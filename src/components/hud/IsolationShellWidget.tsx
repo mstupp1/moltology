@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Info, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { HudCard, HudBadge, HudButton } from '@/components/ui'
+import { HudCard, HudBadge, HudButton, ChromaElement } from '@/components/ui'
 
 export const IsolationShellWidget: React.FC = () => {
   const [engaged, setEngaged] = useState(true)
@@ -14,6 +14,18 @@ export const IsolationShellWidget: React.FC = () => {
             ISOLATION FORCE-FIELD
           </h3>
           <Info className="w-3.5 h-3.5 text-[#00c3ff]" />
+        </div>
+
+        {/* 3D Force-field Shield Node Graphic */}
+        <div className="flex justify-center my-1 relative">
+          <ChromaElement
+            src="/images/extracted/forcefield_dome_3d.jpg"
+            alt="3D Forcefield Dome"
+            blendMode="screen"
+            glowColor={engaged ? 'crimson' : 'cyan'}
+            pulse={engaged}
+            className="w-28 h-28 object-contain"
+          />
         </div>
 
         <div className="space-y-2 text-[10px]">
@@ -31,13 +43,14 @@ export const IsolationShellWidget: React.FC = () => {
 
           {/* Active Shield Badge */}
           <div className="p-1">
-            <HudBadge variant="cyan" dot pulse className="w-full justify-center py-1.5 text-[9px]">
+            <HudBadge variant={engaged ? 'crimson' : 'cyan'} dot pulse className="w-full justify-center py-1.5 text-[9px]">
               <CheckCircle2 className="w-3.5 h-3.5 mr-1 inline" />
-              FORCE-FIELD ACTIVE
+              {engaged ? 'FORCE-FIELD ACTIVE' : 'SHIELD DORMANT'}
             </HudBadge>
           </div>
         </div>
       </HudCard>
+
 
       {/* Bottom Panel: MOLT PRIVACY SHELL */}
       <HudCard variant="crimson" className="p-4 space-y-4">

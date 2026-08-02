@@ -54,14 +54,15 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
       <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1 sm:flex-initial">
         {/* Unit Avatar Circle with Cyan Glow Ring */}
         <div className="relative shrink-0">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#030606] border-2 border-[#00c3ff] overflow-hidden flex items-center justify-center p-0.5 shadow-[0_0_10px_rgba(0,195,255,0.6)]">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#030606] border-2 border-[#00c3ff] overflow-hidden flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(0,195,255,0.8)]">
             <img 
-              src="/images/stage1_larval.png" 
-              alt="Larva Unit" 
-              className="w-full h-full object-cover rounded-full filter contrast-110" 
+              src="/images/extracted/larva_unit_3d.jpg" 
+              alt="Larva Unit 3D" 
+              className="w-full h-full object-cover rounded-full filter contrast-125" 
             />
           </div>
         </div>
+
 
         {/* Tubular Conversion Meter & Monospace Status Readout */}
         <div className="flex flex-col gap-0.5 sm:gap-1 min-w-0 flex-1">
