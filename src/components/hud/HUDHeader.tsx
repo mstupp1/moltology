@@ -21,6 +21,12 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
+
+  const openAuth = (mode: 'login' | 'signup' = 'login') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
+  }
 
   const handleSignOut = async () => {
     await authClient.signOut()
@@ -36,9 +42,10 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   }
 
   return (
-    <header className="w-full bg-[#05090a]/95 backdrop-blur-md border-b border-[#3a4a49]/70 px-2.5 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between font-mono select-none relative z-30 shadow-2xl shrink-0 gap-2 overflow-x-clip">
+    <header className="w-full bg-[#060a0b]/70 backdrop-blur-md border-b border-[#3a4a49]/65 px-2.5 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between font-mono select-none relative z-30 shadow-2xl shrink-0 gap-2 overflow-x-clip">
       <AuthModal
         isOpen={isAuthModalOpen}
+        initialMode={authMode}
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={() => onNavigate && onNavigate('/dashboard')}
       />
@@ -93,8 +100,8 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         </div>
       </div>
 
-      {/* Screen-Centered Command Palette Launcher (⌘K) - Desktop */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex items-center z-10">
+      {/* Screen-Centered Command Palette Launcher (⌘K) - Viewport Screen Centered */}
+      <div className="fixed left-1/2 -translate-x-1/2 top-3 hidden md:flex items-center z-40">
         <button
           onClick={handleOpenCommandPalette}
           className="flex items-center justify-between w-64 lg:w-80 bg-[#030606]/90 hover:bg-[#0d1415] border border-[#3a4a49] hover:border-[#00c3ff]/80 px-3.5 py-1.5 text-xs text-[#839493] transition-all chamfer-corner group shadow-2xl"
@@ -129,7 +136,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
           <BenthicCTAButton
             variant="cyan"
             size="sm"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => openAuth('login')}
             className="!px-2.5 sm:!px-4 !py-1"
           >
             <span className="flex items-center gap-1 text-[10px] sm:text-xs">
