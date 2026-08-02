@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   MOCK_SEED_USERS,
+  MOCK_SEED_AUTH_USERS,
   MOCK_SEED_USER_STATS,
   MOCK_SEED_ASSETS,
   MOCK_SEED_DAILY_ROUTINES,
@@ -13,10 +14,12 @@ describe('Database Seed Data & CLI Utilities', () => {
     expect(MOCK_SEED_USERS.length).toBeGreaterThan(0)
     for (const user of MOCK_SEED_USERS) {
       expect(user.id).toBeTruthy()
-      expect(user.email).toContain('@')
       expect(user.stage).toBeGreaterThanOrEqual(1)
       expect(user.stage).toBeLessThanOrEqual(4)
       expect(typeof user.moltCredits).toBe('string')
+    }
+    for (const authUser of MOCK_SEED_AUTH_USERS) {
+      expect(authUser.email).toContain('@')
     }
   })
 

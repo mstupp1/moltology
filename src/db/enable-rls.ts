@@ -16,13 +16,15 @@ async function applyRLS() {
 
   try {
     // 1. Enable RLS on user-scoped tables
-    await sql`ALTER TABLE users ENABLE ROW LEVEL SECURITY;`
-    await sql`ALTER TABLE user_stats ENABLE ROW LEVEL SECURITY;`
-    await sql`ALTER TABLE assets ENABLE ROW LEVEL SECURITY;`
-    await sql`ALTER TABLE daily_routines ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on users, user_stats, assets, daily_routines')
+    await sql`ALTER TABLE IF EXISTS profiles ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS users ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS user_stats ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS assets ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS daily_routines ENABLE ROW LEVEL SECURITY;`
+    console.log('✓ RLS enabled on profiles, user_stats, assets, daily_routines')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
+    await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
     await sql`DROP POLICY IF EXISTS users_isolation_policy ON users;`
     await sql`DROP POLICY IF EXISTS user_stats_isolation_policy ON user_stats;`
     await sql`DROP POLICY IF EXISTS assets_isolation_policy ON assets;`
@@ -30,7 +32,7 @@ async function applyRLS() {
 
     // 3. Create RLS policies for user isolation against Neon Auth JWT 'sub' claim
     await sql`
-      CREATE POLICY users_isolation_policy ON users
+      CREATE POLICY profiles_isolation_policy ON profiles
       FOR ALL
       USING (
         id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
@@ -65,6 +67,34 @@ async function applyRLS() {
       );
     `
 
+    // 4. Create trigger to auto-populate public.profiles on neon_auth.user creation
+    try {
+      await sql`
+        CREATE OR REPLACE FUNCTION public.handle_new_neon_user()
+        RETURNS trigger AS $$
+        BEGIN
+          INSERT INTO public.profiles (id)
+          VALUES (NEW.id)
+          ON CONFLICT (id) DO NOTHING;
+          RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql SECURITY DEFINER;
+      `
+
+      await sql`
+        DROP TRIGGER IF EXISTS on_neon_auth_user_created ON neon_auth.user;
+      `
+
+      await sql`
+        CREATE TRIGGER on_neon_auth_user_created
+          AFTER INSERT ON neon_auth.user
+          FOR EACH ROW EXECUTE PROCEDURE public.handle_new_neon_user();
+      `
+      console.log('✓ Automatic profile creation trigger configured on neon_auth.user')
+    } catch (triggerErr) {
+      console.warn('⚠️ Could not attach trigger to neon_auth.user (schema missing or restricted):', triggerErr)
+    }
+
     // Enable RLS and DDL for changelogs table
     await sql`
       CREATE TABLE IF NOT EXISTS changelogs (
@@ -90,7 +120,6 @@ async function applyRLS() {
 
     console.log('✓ Row Level Security (RLS) policies successfully created!')
   } catch (error) {
-
     console.error('Error enabling RLS policies:', error)
     process.exit(1)
   }
