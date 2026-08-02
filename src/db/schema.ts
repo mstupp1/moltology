@@ -104,3 +104,22 @@ export const accounts = pgTable('accounts', {
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
+
+// Public System Transmutation Changelogs Table
+export const changelogs = pgTable('changelogs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  version: text('version').notNull(),
+  title: text('title').notNull(),
+  category: text('category').notNull(), // TRANSMUTATION, CHASSIS_UPGRADE, SECURITY_ISOLATION, BUG_PURGE
+  summary: text('summary').notNull(),
+  content: text('content').notNull(),
+  isPublished: boolean('isPublished').default(true).notNull(),
+  releasedAt: timestamp('releasedAt').defaultNow().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('changelogs_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  })
+])
+
