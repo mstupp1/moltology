@@ -1,7 +1,8 @@
 import React from 'react'
+import { createFileRoute } from '@tanstack/react-router'
 import { GitMerge, Shield, Cpu, Zap, CheckCircle2, Lock, ArrowRight } from 'lucide-react'
 
-export const PipelineRoute: React.FC = () => {
+function PipelineRoute() {
   const stages = [
     {
       num: 1,
@@ -170,3 +171,7 @@ export const PipelineRoute: React.FC = () => {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_hud/pipeline')({
+  component: PipelineRoute,
+})

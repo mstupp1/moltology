@@ -5,3 +5,6 @@ dist
 .DS_Store
 .output
 .vercel
+.nitro
+.tanstack
+.vinxi

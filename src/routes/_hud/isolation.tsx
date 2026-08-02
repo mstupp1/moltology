@@ -1,8 +1,9 @@
 import React from 'react'
+import { createFileRoute } from '@tanstack/react-router'
 import { ShieldAlert, Shield, Lock, EyeOff, Radio, AlertTriangle } from 'lucide-react'
-import { IsolationShellWidget } from '../../components/hud/IsolationShellWidget'
+import { IsolationShellWidget } from '@/components/hud/IsolationShellWidget'
 
-export const IsolationRoute: React.FC = () => {
+function IsolationRoute() {
   return (
     <div className="space-y-6 font-mono select-none">
       {/* Header */}
@@ -96,3 +97,7 @@ export const IsolationRoute: React.FC = () => {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_hud/isolation')({
+  component: IsolationRoute,
+})

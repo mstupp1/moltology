@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
   BookOpen,
   FlaskConical,
@@ -20,16 +21,15 @@ import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 
 interface HUDSidebarProps {
-  currentRoute: string
-  onNavigate: (route: string) => void
   larvaId?: string
 }
 
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
-  currentRoute,
-  onNavigate,
   larvaId = 'LARVA UNIT #8971',
 }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const currentRoute = location.pathname
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
@@ -38,7 +38,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const handleSignOut = async () => {
     await authClient.signOut()
-    onNavigate('/')
+    navigate({ to: '/' })
   }
 
   const displayName = user?.name || user?.email?.split('@')[0] || larvaId
@@ -94,7 +94,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     ) || navItems[0]
 
   const handleNavClick = (path: string) => {
-    onNavigate(path)
+    navigate({ to: path })
     setIsMobileOpen(false)
   }
 
@@ -103,7 +103,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onSuccess={() => onNavigate('/dashboard')}
+        onSuccess={() => navigate({ to: '/dashboard' })}
       />
 
       <aside className="w-full md:w-72 h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none p-3.5 gap-3 relative z-30 shrink-0 md:overflow-y-auto shadow-2xl">

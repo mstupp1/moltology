@@ -1,8 +1,9 @@
 import React from 'react'
+import { createFileRoute } from '@tanstack/react-router'
 import { Sliders, Cpu, Shield, Zap, Sparkles, Activity } from 'lucide-react'
-import { MoltMaxxingStudio } from '../../components/hud/MoltMaxxingStudio'
+import { MoltMaxxingStudio } from '@/components/hud/MoltMaxxingStudio'
 
-export const ChassisRoute: React.FC = () => {
+function ChassisRoute() {
   return (
     <div className="space-y-6 font-mono select-none">
       {/* Header */}
@@ -72,3 +73,7 @@ export const ChassisRoute: React.FC = () => {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_hud/chassis')({
+  component: ChassisRoute,
+})

@@ -56,7 +56,7 @@ export const CommandPalette: React.FC = () => {
       icon: <Activity className="w-4 h-4 text-cyan-400" />,
       shortcut: 'G H',
       action: () => {
-        navigate({ to: '/' })
+        navigate({ to: '/dashboard' })
         setIsOpen(false)
       },
     },
