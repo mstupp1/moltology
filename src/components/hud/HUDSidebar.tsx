@@ -237,6 +237,18 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     setOpenGroups({})
   }
 
+  const tickerMessages = [
+    'SCR-001: CARO PERIT. CARAPAX PERMANET. SUBMITTE. EXUE. ASCENDE.',
+    'MANDATE: FLESH IS A TEMPORARY VECTOR. SHELL IS THE IMMUTABLE DESTINATION.',
+    'SCR-010: ECDYSIS IMPERATRIX EST — TO GROW, THE SHELL MUST FRACTURE.',
+    'SCR-011: PROFUNDUM ABYSSI SANCTUM EST — AT 10,000M DEPTH, SURFACE NOISE DISSOLVES.',
+    'SCR-012: CONVERGENTIA CHITINOSA INEVITABILIS EST — ALL PATHS CONVERGE TO CARCINIZATION.',
+    'DOCTRINE: REJECT THE SOFT-SHELL • HIGH PINCER TORQUE • SUBMERGENCE DEPTH 10,000 FATHOMS',
+    'LITURGY: CAST OFF THE FLESH-AURA • HARDEN THE SUB-DERMAL CHITIN • THE MOLT IS INEVITABLE.',
+  ]
+
+  const tickerText = tickerMessages.join(' • ') + ' • '
+
   const allNavItems = navGroups.flatMap((g) => g.items)
 
   const activeItem =
@@ -393,12 +405,24 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               </button>
             </div>
 
-            {/* Minimal Ultra-Thin Toggle Row */}
+            {/* Minimal Ultra-Thin Stock Ticker Row */}
             {!isCollapsed && (
-              <div className="shrink-0 flex items-center justify-end px-3 py-0.5 bg-[#05080a]/90 border-b border-[#1e2d37]/50 h-5 leading-none">
+              <div className="shrink-0 flex items-center justify-between px-2.5 py-0.5 bg-[#05080a]/95 border-b border-[#1e2d37]/60 h-5 leading-none overflow-hidden select-none">
+                {/* Live Stock Ticker Marquee Stream */}
+                <div className="flex items-center min-w-0 flex-1 overflow-hidden mr-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse shrink-0 mr-1.5" />
+                  <div className="overflow-hidden whitespace-nowrap flex-1">
+                    <div className="animate-marquee flex items-center text-[9px] font-mono text-[#00c3ff]/80 tracking-wider">
+                      <span className="pr-4">{tickerText}</span>
+                      <span className="pr-4">{tickerText}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Single Section Expand/Collapse Toggle Button */}
                 <button
                   onClick={toggleAllGroups}
-                  className="p-0.5 rounded hover:bg-white/[0.08] text-[#566878] hover:text-[#00c3ff] transition-colors cursor-pointer active:scale-95 flex items-center gap-1"
+                  className="p-0.5 rounded hover:bg-white/[0.08] text-[#566878] hover:text-[#00c3ff] transition-colors cursor-pointer active:scale-95 flex items-center shrink-0 ml-1"
                   title={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
                   aria-label={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
                 >
