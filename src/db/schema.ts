@@ -108,7 +108,7 @@ export const galleryPins = pgTable('gallery_pins', {
   title: text('title').notNull(),
   description: text('description').notNull(),
   prompt: text('prompt'),
-  s3Key: text('s3Key').notNull(),
+  s3Key: text('s3Key').notNull().unique(),
   imageUrl: text('imageUrl').notNull(),
   aspectRatio: text('aspectRatio').default('3:4').notNull(), // '3:4', '1:1', '9:16', '4:3', '2:3'
   category: text('category').default('SACRED DOCTRINE').notNull(), // 'SACRED DOCTRINE', 'BIOMECHANICAL', 'CARCINIZATION', 'LARVAL STAGES', 'DEEP ABYSS', 'SYNAPTIC HARDWARE'

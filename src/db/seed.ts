@@ -245,7 +245,7 @@ export async function seedDatabase(databaseUrl?: string) {
           isPreloaded: true,
           createdAt: new Date(pin.createdAt),
         })
-        .onConflictDoNothing()
+        .onConflictDoNothing({ target: schema.galleryPins.s3Key })
     }
     console.log(`✓ Seeded ${INITIAL_GALLERY_PINS.length} gallery pin entries`)
 
