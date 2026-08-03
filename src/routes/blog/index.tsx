@@ -19,6 +19,7 @@ import { getBlogPostsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { BlogTopSlider } from '@/components/blog/BlogTopSlider'
 
 export const Route = createFileRoute('/blog/')({
   component: BlogIndexPage,
@@ -72,6 +73,10 @@ function BlogIndexPage() {
     setIsAuthModalOpen(true)
   }
 
+  const handleSelectPost = (slug: string) => {
+    navigate({ to: `/blog/$slug`, params: { slug } })
+  }
+
   return (
     <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between">
       {/* Background Overlays */}
@@ -87,27 +92,33 @@ function BlogIndexPage() {
         onSuccess={() => navigate({ to: '/dashboard' })}
       />
 
-      <PublicHeader activePage="home" onOpenAuth={openAuth} />
+      <PublicHeader activePage="blog" onOpenAuth={openAuth} />
 
-      {/* Header Banner */}
-      <section className="w-full relative py-16 sm:py-24 px-6 sm:px-12 border-b border-cyan-900/40 bg-[#040708] overflow-hidden">
+      {/* Top Featured Transmissions Hero Slider Section */}
+      <section className="w-full relative py-8 sm:py-12 px-4 sm:px-12 border-b border-cyan-900/40 bg-[#040708] overflow-hidden">
         <div className="absolute inset-0 bg-radial-abyss opacity-80 z-0" />
-        <div className="relative z-10 max-w-[1500px] mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
-            <BookOpen className="w-4 h-4 text-red-500 animate-pulse" />
-            <span>THE SYNAPTIC CHRONICLES // OFFICIAL BLOG</span>
+        <div className="relative z-10 max-w-[1600px] mx-auto space-y-8">
+          {/* Header Badge & Title */}
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
+              <BookOpen className="w-4 h-4 text-red-500 animate-pulse" />
+              <span>THE SYNAPTIC CHRONICLES // OFFICIAL BLOG</span>
+            </div>
+
+            <h1 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-gray-100 uppercase tracking-tight leading-none drop-shadow-2xl">
+              DOCTRINE & <span className="text-cyan-400">AI TELEMETRY</span>
+            </h1>
+
+            <p className="text-xs sm:text-sm text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed">
+              Explorations into agentic AI, test-time compute, autonomous swarms, and the step-by-step conversion vector from larval human vulnerability to total carcinization.
+            </p>
           </div>
 
-          <h1 className="font-grotesk font-black text-4xl sm:text-6xl lg:text-7xl text-gray-100 uppercase tracking-tight leading-none drop-shadow-2xl">
-            DOCTRINE & <span className="text-cyan-400">AI TELEMETRY</span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed">
-            Explorations into agentic AI, test-time compute, autonomous swarms, and the step-by-step conversion vector from larval human vulnerability to total carcinization.
-          </p>
+          {/* Interactive Top Slider */}
+          <BlogTopSlider posts={posts} onSelectPost={handleSelectPost} />
 
           {/* Search & Filter Controls */}
-          <div className="pt-6 max-w-3xl mx-auto flex flex-col sm:flex-row items-center gap-4">
+          <div className="pt-4 max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-4">
             <div className="relative w-full">
               <Search className="w-4 h-4 text-cyan-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
