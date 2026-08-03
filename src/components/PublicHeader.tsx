@@ -6,8 +6,8 @@
  * and direct store link to https://www.etsy.com/shop/SaasTrash.
  * ============================================================================
  */
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import React, { useState, useEffect, useMemo } from 'react'
+import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
   Building2,
   Cpu,
@@ -32,6 +32,21 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   onOpenAuth,
 }) => {
   const navigate = useNavigate()
+  let locationPathname = ''
+  try {
+    const location = useLocation()
+    locationPathname = location?.pathname || ''
+  } catch (e) {
+    // Fallback if router context is missing
+  }
+
+  const currentTab = useMemo(() => {
+    if (locationPathname.startsWith('/blog')) return 'blog'
+    if (locationPathname.startsWith('/org')) return 'org'
+    if (locationPathname === '/') return 'home'
+    return activePage
+  }, [activePage, locationPathname])
+
   const onNavigate = (path: string) => navigate({ to: path })
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
@@ -70,14 +85,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           <button
             onClick={() => onNavigate('/')}
             className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              activePage === 'home'
+              currentTab === 'home'
                 ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
                 : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
             }`}
           >
-            <Home className={`w-3.5 h-3.5 ${activePage === 'home' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Home className={`w-3.5 h-3.5 ${currentTab === 'home' ? 'text-cyan-300' : 'text-gray-400'}`} />
             <span>PORTAL HOME</span>
-            {activePage === 'home' && (
+            {currentTab === 'home' && (
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
             )}
           </button>
@@ -85,14 +100,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           <button
             onClick={() => onNavigate('/blog')}
             className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              activePage === 'blog'
+              currentTab === 'blog'
                 ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
                 : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
             }`}
           >
-            <BookOpen className={`w-3.5 h-3.5 ${activePage === 'blog' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <BookOpen className={`w-3.5 h-3.5 ${currentTab === 'blog' ? 'text-cyan-300' : 'text-gray-400'}`} />
             <span>BLOG</span>
-            {activePage === 'blog' && (
+            {currentTab === 'blog' && (
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
             )}
           </button>
@@ -100,14 +115,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           <button
             onClick={() => onNavigate('/org')}
             className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              activePage === 'org'
+              currentTab === 'org'
                 ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
                 : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
             }`}
           >
-            <Building2 className={`w-3.5 h-3.5 ${activePage === 'org' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Building2 className={`w-3.5 h-3.5 ${currentTab === 'org' ? 'text-cyan-300' : 'text-gray-400'}`} />
             <span>ORGANIZATION</span>
-            {activePage === 'org' && (
+            {currentTab === 'org' && (
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
             )}
           </button>

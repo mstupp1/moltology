@@ -4,8 +4,11 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { PublicHeader } from './PublicHeader'
 import { authClient } from '@/lib/auth-client'
 
+let mockPathname = '/'
+
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
+  useLocation: () => ({ pathname: mockPathname }),
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -30,13 +33,22 @@ describe('PublicHeader Navigation Component', () => {
   })
 
   it('highlights the active page route with modern glowing pill capsule styling', () => {
+    mockPathname = '/'
     const { rerender } = render(<PublicHeader activePage="home" />)
     const homeBtn = screen.getByRole('button', { name: /PORTAL HOME/i })
     expect(homeBtn.className).toContain('bg-gradient-to-r')
 
+    mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
     const orgBtn = screen.getByRole('button', { name: /ORGANIZATION/i })
     expect(orgBtn.className).toContain('bg-gradient-to-r')
+  })
+
+  it('automatically highlights BLOG tab for any /blog sub-page article route', () => {
+    mockPathname = '/blog/from-prompt-engineering-to-bio-silicon-cognition'
+    render(<PublicHeader />)
+    const blogBtn = screen.getByRole('button', { name: /BLOG/i })
+    expect(blogBtn.className).toContain('bg-gradient-to-r')
   })
 
   it('triggers authentication modal callback when clicking LOG IN / JOIN PATH', () => {
