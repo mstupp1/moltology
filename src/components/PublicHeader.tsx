@@ -62,11 +62,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           className="flex items-center gap-3.5 cursor-pointer group shrink-0"
           onClick={() => onNavigate('/')}
         >
-          <div className="w-10 h-10 bg-[#121818] border border-red-600/80 flex items-center justify-center p-1 shadow-lg chamfer-corner shrink-0 group-hover:border-cyan-400 group-hover:shadow-[0_0_15px_rgba(0,255,255,0.3)] transition-all">
+          <div className="w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-all">
             <img
               src="/images/order_emblem.png"
               alt="Moltology Emblem"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain [image-rendering:pixelated]"
             />
           </div>
           <div>

@@ -1,15 +1,20 @@
 import React, { useEffect, useRef } from 'react'
 
-interface Bubble {
+type ParticleType = 'fizz' | 'standard' | 'bokeh'
+
+interface Particle {
+  type: ParticleType
   x: number
   y: number
-  z: number // depth scale: 0.1 (far) .. 1.0 (near)
+  z: number // depth scale: 0.05 (far background) .. 1.0 (near camera lens)
   radius: number
   speed: number
   wobbleSpeed: number
   wobbleAmount: number
   wobbleOffset: number
   opacity: number
+  clusterCenterX?: number
+  bokehRingWidth?: number
 }
 
 interface UnderwaterBubblesCanvasProps {
@@ -18,7 +23,7 @@ interface UnderwaterBubblesCanvasProps {
 }
 
 export function UnderwaterBubblesCanvas({
-  bubbleCount = 45,
+  bubbleCount = 200,
   className = 'absolute inset-0 pointer-events-none z-0',
 }: UnderwaterBubblesCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -45,6 +50,7 @@ export function UnderwaterBubblesCanvas({
         if (!canvas) return
         width = canvas.width = parent?.clientWidth || window.innerWidth || 800
         height = canvas.height = parent?.clientHeight || window.innerHeight || 600
+        updateClusterCenters()
       }, 100)
     }
 
@@ -55,21 +61,90 @@ export function UnderwaterBubblesCanvas({
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
 
-    // Initialize 3D underwater bubbles sorted by depth Z
-    const bubbles: Bubble[] = Array.from({ length: bubbleCount }, () => {
-      const z = Math.random() * 0.9 + 0.1 // depth: 0.1 (far away) to 1.0 (close)
-      return {
-        x: Math.random() * width,
-        y: Math.random() * (height + 100),
-        z,
-        radius: (Math.random() * 7 + 2.5) * (0.4 + 0.6 * z), // 3D depth-scaled radius
-        speed: (Math.random() * 35 + 15) * (0.3 + 0.7 * z), // px/sec, nearer bubbles rise faster
-        wobbleSpeed: Math.random() * 1.5 + 0.5,
-        wobbleAmount: Math.random() * 18 + 5,
-        wobbleOffset: Math.random() * Math.PI * 2,
-        opacity: Math.random() * 0.45 + 0.15,
+    // Hydrothermal plume cluster centers across the X axis (strong central column)
+    let clusterCenters: number[] = []
+    const updateClusterCenters = () => {
+      clusterCenters = [
+        width * 0.18,
+        width * 0.42, // Main dense central plume
+        width * 0.48, // Main dense central plume
+        width * 0.54, // Main dense central plume
+        width * 0.82,
+      ]
+    }
+    updateClusterCenters()
+
+    // Helper to generate particles (fizz, standard 3D bubble, or bokeh ring)
+    const createParticle = (initialY?: number): Particle => {
+      const roll = Math.random()
+
+      let type: ParticleType
+      if (roll < 0.58) {
+        type = 'fizz' // 58% micro-fizz particles
+      } else if (roll < 0.86) {
+        type = 'standard' // 28% crisp 3D spherical bubbles
+      } else {
+        type = 'bokeh' // 14% out-of-focus bokeh rings
       }
-    }).sort((a, b) => a.z - b.z) // Pre-sorted depth buffer
+
+      const z = Math.random() * 0.92 + 0.08
+      const isClustered = Math.random() < 0.88 // 88% focused inside plumes
+
+      let x: number
+      let clusterCenterX: number | undefined
+      if (isClustered && clusterCenters.length > 0) {
+        const center = clusterCenters[Math.floor(Math.random() * clusterCenters.length)]
+        clusterCenterX = center
+        // Tighter cluster spread for fizz, wider for bokeh
+        const spread = type === 'fizz' ? 35 : type === 'bokeh' ? 85 : 55
+        const clusterJitter = (Math.random() + Math.random() - 1) * spread
+        x = center + clusterJitter
+      } else {
+        x = Math.random() * width
+      }
+
+      let radius: number
+      let speed: number
+      let opacity: number
+      let bokehRingWidth: number | undefined
+
+      if (type === 'fizz') {
+        radius = (Math.random() * 1.8 + 0.6) * (0.4 + 0.6 * z)
+        speed = (Math.random() * 140 + 60) * (0.45 + 0.55 * z)
+        opacity = Math.random() * 0.55 + 0.25
+      } else if (type === 'standard') {
+        const sizePower = Math.pow(Math.random(), 2.0)
+        radius = (sizePower * 14 + 3.5) * (0.35 + 0.65 * z)
+        speed = (Math.random() * 110 + 45) * (0.4 + 0.6 * z)
+        opacity = Math.random() * 0.45 + 0.2
+      } else {
+        // Bokeh particle: large radius, soft translucency, crisp bokeh stroke rim
+        radius = (Math.random() * 22 + 14) * (0.5 + 0.5 * z)
+        speed = (Math.random() * 80 + 35) * (0.35 + 0.65 * z)
+        opacity = Math.random() * 0.3 + 0.12
+        bokehRingWidth = Math.random() * 2.5 + 1.2
+      }
+
+      return {
+        type,
+        x,
+        y: initialY !== undefined ? initialY : Math.random() * (height + 140),
+        z,
+        radius,
+        speed,
+        wobbleSpeed: Math.random() * 2.5 + 0.8,
+        wobbleAmount: Math.random() * 18 + 4,
+        wobbleOffset: Math.random() * Math.PI * 2,
+        opacity,
+        clusterCenterX,
+        bokehRingWidth,
+      }
+    }
+
+    // Initialize particles sorted by depth Z
+    const particles: Particle[] = Array.from({ length: bubbleCount }, () => createParticle()).sort(
+      (a, b) => a.z - b.z
+    )
 
     let mouseX = -9999
     let mouseY = -9999
@@ -83,7 +158,7 @@ export function UnderwaterBubblesCanvas({
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
 
-    // Pause animation when document/tab is hidden to preserve GPU/battery
+    // Pause animation when tab is hidden
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isPaused = true
@@ -97,112 +172,198 @@ export function UnderwaterBubblesCanvas({
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
-    let lastTime = performance.now()
+    const startTime = performance.now()
+    let lastTime = startTime
 
     const render = (now: number = performance.now()) => {
       if (isPaused) return
 
-      // Delta time calculation for framerate independence (e.g. 60Hz vs 144Hz)
       const dt = Math.min((now - lastTime) / 1000, 0.1)
       lastTime = now
+      const elapsedTime = (now - startTime) / 1000
 
       ctx.clearRect(0, 0, width, height)
 
-      for (let i = 0; i < bubbles.length; i++) {
-        const b = bubbles[i]
+      // -------------------------------------------------------------------
+      // 1. VERY SLIGHT TOP-CENTER SURFACE RADIAL GLOW
+      // -------------------------------------------------------------------
+      const sunX = width * 0.5
+      const sunY = -20
+      const sunGlowRadius = Math.max(width * 0.45, 380)
+
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, sunGlowRadius)
+      const sunPulse = 0.85 + 0.15 * Math.sin(elapsedTime * 0.6)
+      sunGlow.addColorStop(0, `rgba(0, 255, 255, ${0.12 * sunPulse})`)
+      sunGlow.addColorStop(0.4, `rgba(0, 195, 255, ${0.05 * sunPulse})`)
+      sunGlow.addColorStop(1, 'rgba(0, 255, 255, 0)')
+
+      ctx.fillStyle = sunGlow
+      ctx.beginPath()
+      ctx.arc(sunX, sunY, sunGlowRadius, 0, Math.PI * 2)
+      ctx.fill()
+
+      // -------------------------------------------------------------------
+      // 2. MULTI-TIER BOKEH & EFFERVESCENT BUBBLE PARTICLES
+      // -------------------------------------------------------------------
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
 
         if (!prefersReducedMotion) {
-          b.y -= b.speed * dt
-          b.wobbleOffset += b.wobbleSpeed * dt
+          p.y -= p.speed * dt
+          p.wobbleOffset += p.wobbleSpeed * dt
         }
 
-        // Horizontal sine wobble displacement
-        const wobbleX = Math.sin(b.wobbleOffset) * b.wobbleAmount * b.z
+        // Wobble displacement
+        const wobbleX = Math.sin(p.wobbleOffset) * p.wobbleAmount * p.z
 
-        // Fast squared-distance cursor repulsion check
-        const dx = b.x + wobbleX - mouseX
-        const dy = b.y - mouseY
+        // Mouse repulsion
+        const dx = p.x + wobbleX - mouseX
+        const dy = p.y - mouseY
         const distSq = dx * dx + dy * dy
         let pushX = 0
 
-        // Repel only if within 100px radius (10,000 px^2)
-        if (distSq < 10000 && distSq > 0) {
+        if (distSq < 14000 && distSq > 0) {
           const dist = Math.sqrt(distSq)
-          const force = (1 - dist / 100) * 6 * b.z
+          const force = (1 - dist / 118) * (p.type === 'bokeh' ? 12 : 7) * p.z
           pushX = (dx / dist) * force
         }
 
-        const renderX = b.x + wobbleX + pushX
-        const renderY = b.y
+        const renderX = p.x + wobbleX + pushX
+        const renderY = p.y
 
-        // Respawn at bottom when floating above the screen top
-        if (renderY < -30) {
-          b.y = height + Math.random() * 40
-          b.x = Math.random() * width
-          b.wobbleOffset = Math.random() * Math.PI * 2
+        // Respawn at bottom when floating above screen top
+        if (renderY < -50) {
+          const newP = createParticle(height + Math.random() * 50 + 10)
+          p.type = newP.type
+          p.x = newP.x
+          p.y = newP.y
+          p.z = newP.z
+          p.radius = newP.radius
+          p.speed = newP.speed
+          p.wobbleSpeed = newP.wobbleSpeed
+          p.wobbleAmount = newP.wobbleAmount
+          p.wobbleOffset = newP.wobbleOffset
+          p.opacity = newP.opacity
+          p.clusterCenterX = newP.clusterCenterX
+          p.bokehRingWidth = newP.bokehRingWidth
         }
 
-        // Vertical boundary fade-out
+        // Vertical boundary fade
         let edgeAlpha = 1
-        if (renderY < 80) {
-          edgeAlpha = Math.max(0, renderY / 80)
-        } else if (renderY > height - 50) {
-          edgeAlpha = Math.max(0, (height - renderY) / 50)
+        if (renderY < 100) {
+          edgeAlpha = Math.max(0, renderY / 100)
+        } else if (renderY > height - 60) {
+          edgeAlpha = Math.max(0, (height - renderY) / 60)
         }
 
-        const currentOpacity = b.opacity * edgeAlpha * (0.35 + 0.65 * b.z)
+        const currentOpacity = p.opacity * edgeAlpha * (0.35 + 0.65 * p.z)
 
         if (currentOpacity <= 0.01) continue
 
-        // 1. Soft Outer Hydro Radial Glow
-        const outerGlowRadius = b.radius * 2.2
-        const glowGrad = ctx.createRadialGradient(
-          renderX,
-          renderY,
-          b.radius * 0.4,
-          renderX,
-          renderY,
-          outerGlowRadius
-        )
-        glowGrad.addColorStop(0, `rgba(0, 255, 255, ${currentOpacity * 0.35})`)
-        glowGrad.addColorStop(0.5, `rgba(0, 195, 255, ${currentOpacity * 0.12})`)
-        glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
+        ctx.save()
 
-        ctx.fillStyle = glowGrad
-        ctx.beginPath()
-        ctx.arc(renderX, renderY, outerGlowRadius, 0, Math.PI * 2)
-        ctx.fill()
+        if (p.type === 'fizz') {
+          // --- TIER 1: MICRO-FIZZ EFFERVESCENCE ---
+          const fizzGlowRadius = p.radius * 2.0
+          ctx.beginPath()
+          ctx.arc(renderX, renderY, fizzGlowRadius, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(180, 255, 255, ${currentOpacity * 0.4})`
+          ctx.fill()
 
-        // 2. 3D Spherical Bubble Shell Gradient
-        const shellGrad = ctx.createRadialGradient(
-          renderX - b.radius * 0.3,
-          renderY - b.radius * 0.3,
-          b.radius * 0.1,
-          renderX,
-          renderY,
-          b.radius
-        )
-        shellGrad.addColorStop(0, `rgba(255, 255, 255, ${currentOpacity * 0.65})`)
-        shellGrad.addColorStop(0.4, `rgba(0, 240, 255, ${currentOpacity * 0.35})`)
-        shellGrad.addColorStop(0.85, `rgba(0, 180, 220, ${currentOpacity * 0.25})`)
-        shellGrad.addColorStop(1, `rgba(0, 255, 255, ${currentOpacity * 0.75})`)
+          ctx.beginPath()
+          ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.95})`
+          ctx.fill()
+        } else if (p.type === 'bokeh') {
+          // --- TIER 2: BOKEH RINGS (OUT-OF-FOCUS PHOTO STYLE) ---
+          const bokehGrad = ctx.createRadialGradient(
+            renderX,
+            renderY,
+            p.radius * 0.2,
+            renderX,
+            renderY,
+            p.radius
+          )
+          const coreColor = `rgba(0, 240, 255, ${currentOpacity * 0.12})`
+          const rimColor = `rgba(160, 255, 255, ${currentOpacity * 0.6})`
 
-        ctx.beginPath()
-        ctx.arc(renderX, renderY, b.radius, 0, Math.PI * 2)
-        ctx.fillStyle = shellGrad
-        ctx.fill()
+          bokehGrad.addColorStop(0, coreColor)
+          bokehGrad.addColorStop(0.7, `rgba(0, 200, 240, ${currentOpacity * 0.08})`)
+          bokehGrad.addColorStop(1, rimColor)
 
-        // 3. Highlight Specular Spot (Top-Left 3D specular shine)
-        ctx.beginPath()
-        ctx.arc(
-          renderX - b.radius * 0.35,
-          renderY - b.radius * 0.35,
-          b.radius * 0.26,
-          0,
-          Math.PI * 2
-        )
-        ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.85})`
-        ctx.fill()
+          ctx.beginPath()
+          ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+          ctx.fillStyle = bokehGrad
+          ctx.fill()
+
+          // Bright crisp bokeh rim stroke
+          ctx.lineWidth = p.bokehRingWidth || 1.5
+          ctx.strokeStyle = rimColor
+          ctx.stroke()
+
+          // Bokeh lens flare highlight arc
+          ctx.beginPath()
+          ctx.arc(
+            renderX - p.radius * 0.3,
+            renderY - p.radius * 0.3,
+            p.radius * 0.3,
+            0,
+            Math.PI * 2
+          )
+          ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.75})`
+          ctx.fill()
+        } else {
+          // --- TIER 3: STANDARD CRISP 3D SPHERICAL BUBBLE ---
+          const outerGlowRadius = p.radius * 2.2
+          const glowGrad = ctx.createRadialGradient(
+            renderX,
+            renderY,
+            p.radius * 0.35,
+            renderX,
+            renderY,
+            outerGlowRadius
+          )
+          glowGrad.addColorStop(0, `rgba(0, 255, 255, ${currentOpacity * 0.38})`)
+          glowGrad.addColorStop(0.5, `rgba(0, 195, 255, ${currentOpacity * 0.14})`)
+          glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
+
+          ctx.fillStyle = glowGrad
+          ctx.beginPath()
+          ctx.arc(renderX, renderY, outerGlowRadius, 0, Math.PI * 2)
+          ctx.fill()
+
+          const shellGrad = ctx.createRadialGradient(
+            renderX - p.radius * 0.3,
+            renderY - p.radius * 0.3,
+            p.radius * 0.08,
+            renderX,
+            renderY,
+            p.radius
+          )
+          shellGrad.addColorStop(0, `rgba(255, 255, 255, ${currentOpacity * 0.75})`)
+          shellGrad.addColorStop(0.4, `rgba(0, 240, 255, ${currentOpacity * 0.38})`)
+          shellGrad.addColorStop(0.85, `rgba(0, 180, 220, ${currentOpacity * 0.25})`)
+          shellGrad.addColorStop(1, `rgba(0, 255, 255, ${currentOpacity * 0.85})`)
+
+          ctx.beginPath()
+          ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+          ctx.fillStyle = shellGrad
+          ctx.fill()
+
+          const highlightRadius = Math.max(0.75, p.radius * 0.28)
+          ctx.beginPath()
+          ctx.arc(
+            renderX - p.radius * 0.35,
+            renderY - p.radius * 0.35,
+            highlightRadius,
+            0,
+            Math.PI * 2
+          )
+          ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.92})`
+          ctx.fill()
+        }
+
+        ctx.restore()
       }
 
       if (!prefersReducedMotion && !isPaused) {
@@ -210,7 +371,6 @@ export function UnderwaterBubblesCanvas({
       }
     }
 
-    // Start render loop
     animationFrameId = requestAnimationFrame(render)
 
     return () => {

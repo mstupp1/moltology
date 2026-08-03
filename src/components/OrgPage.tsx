@@ -1095,8 +1095,8 @@ export const OrgPage: React.FC = () => {
       <footer className="w-full bg-[#030606] border-t border-cyan-900/40 py-12 px-6 sm:px-12 text-xs font-mono">
         <div className="max-w-[1500px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#171c1c] border border-cyan-500/80 flex items-center justify-center p-1">
-              <img src="/images/order_emblem.png" alt="Emblem" className="w-full h-full object-contain" />
+            <div className="w-8 h-8 flex items-center justify-center shrink-0">
+              <img src="/images/order_emblem.png" alt="Emblem" className="w-full h-full object-contain [image-rendering:pixelated]" />
             </div>
             <div>
               <div className="font-grotesk font-bold text-gray-200">MOLTOLOGY.ORG FOUNDATION</div>

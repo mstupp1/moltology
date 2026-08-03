@@ -39,7 +39,7 @@ function HudContent() {
         />
 
         {/* 3D Hydro Dynamic Bubbling Effect */}
-        <UnderwaterBubblesCanvas bubbleCount={55} className="absolute inset-0 pointer-events-none z-[1] opacity-80" />
+        <UnderwaterBubblesCanvas bubbleCount={220} className="absolute inset-0 pointer-events-none z-[1] opacity-85" />
 
         {/* Electric Cyan CRT Phosphor Ambient Radial Glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.45)_0%,rgba(0,195,255,0.2)_55%,transparent_85%)] z-[2]" />
