@@ -17,7 +17,7 @@ function OracleRouteComponent() {
   useEffect(() => {
     if (!userId) return
     setIsLoadingThreads(true)
-    getAIThreadsFn()
+    getAIThreadsFn({ data: { userId } })
       .then((data) => {
         if (Array.isArray(data)) {
           setThreads(data)

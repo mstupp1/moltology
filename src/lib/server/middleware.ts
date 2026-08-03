@@ -20,6 +20,25 @@ export function extractAuthToken(request?: Request | null): string | null {
     return customHeader.trim()
   }
 
+  const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie')
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(';').map((c) => c.trim())
+    for (const cookie of cookies) {
+      const [name, ...valParts] = cookie.split('=')
+      const val = valParts.join('=')
+      if (
+        (name === 'better-auth.session_token' ||
+          name === '__Secure-better-auth.session_token' ||
+          name === 'session_token' ||
+          name === 'neon_auth_token' ||
+          name === 'auth_token') &&
+        val
+      ) {
+        return decodeURIComponent(val)
+      }
+    }
+  }
+
   return null
 }
 

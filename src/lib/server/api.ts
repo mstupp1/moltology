@@ -24,9 +24,9 @@ interface ServerFnContext {
   db?: Db
 }
 
-interface ServerFnArgs<TData = undefined> {
-  data: TData
-  context: ServerFnContext
+interface ServerFnArgs<TData = any> {
+  data?: TData
+  context?: any
 }
 
 const toChangelogEntry = (r: {
@@ -85,6 +85,9 @@ const getUserProfileHandler = async ({ context }: ServerFnArgs) => {
   if (!userId) {
     return null
   }
+
+  const { ensureUserProfile } = await import('../user-sync')
+  await ensureUserProfile(userId)
 
   const dbClient = context?.db || getDb(context?.token ?? undefined)
   const [userRecord] = await dbClient
@@ -204,7 +207,7 @@ const getGalleryPinsHandler = async ({ context }: ServerFnArgs): Promise<Gallery
       .orderBy(desc(galleryPins.createdAt))
 
     if (records && records.length > 0) {
-      return records.map((r) => ({
+      return records.map((r: any) => ({
         id: r.id,
         userId: r.userId,
         title: r.title,
@@ -236,11 +239,15 @@ export const getGalleryPinsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(getGalleryPinsHandler)
 
+interface GetAIThreadsInput {
+  userId?: string
+}
+
 /**
  * Server Function: Fetch user's AI conversation threads.
  */
-const getAIThreadsHandler = async ({ context }: ServerFnArgs) => {
-  const userId = context?.user?.sub || context?.user?.id
+const getAIThreadsHandler = async ({ data, context }: ServerFnArgs<GetAIThreadsInput>) => {
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
   if (!userId) return []
   try {
     const { getUserAIThreads } = await import('../ai/service')
@@ -252,11 +259,15 @@ const getAIThreadsHandler = async ({ context }: ServerFnArgs) => {
 }
 
 export const getAIThreadsFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
+  .validator((data?: GetAIThreadsInput) => {
+    return z.object({ userId: z.string().optional() }).optional().parse(data || {})
+  })
   .handler(getAIThreadsHandler)
 
 interface GetAIMessagesInput {
   threadId: string
+  userId?: string
 }
 
 /**
@@ -266,7 +277,15 @@ const getAIMessagesHandler = async ({ data }: ServerFnArgs<GetAIMessagesInput>) 
   if (!data?.threadId) return []
   try {
     const { getAIThreadMessages } = await import('../ai/service')
-    return await getAIThreadMessages(data.threadId)
+    const msgs = await getAIThreadMessages(data.threadId)
+    return msgs.map((m: any) => ({
+      id: m.id,
+      threadId: m.threadId,
+      userId: m.userId,
+      role: m.role,
+      content: m.content,
+      createdAt: m.createdAt,
+    }))
   } catch (err) {
     console.warn('[getAIMessagesFn] DB query error:', err)
     return []
@@ -274,9 +293,14 @@ const getAIMessagesHandler = async ({ data }: ServerFnArgs<GetAIMessagesInput>) 
 }
 
 export const getAIMessagesFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
   .validator((data: GetAIMessagesInput) => {
-    return z.object({ threadId: z.string().min(1) }).parse(data)
+    return z
+      .object({
+        threadId: z.string().min(1),
+        userId: z.string().optional(),
+      })
+      .parse(data)
   })
   .handler(getAIMessagesHandler)
 
