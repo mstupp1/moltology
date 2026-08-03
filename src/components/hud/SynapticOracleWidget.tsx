@@ -31,13 +31,10 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
   }
 
-  // Hide the floating button completely when sidebar drawer is open
-  if (oracle?.mode === 'sidebar') {
+  // Hide the floating button completely when sidebar drawer or dedicated page is active
+  if (oracle?.mode === 'sidebar' || oracle?.mode === 'page') {
     return null
   }
-
-  // If Oracle is active in page mode, reflect badge or hide
-  const isOtherModeActive = oracle && oracle.mode === 'page'
 
 
   return (
