@@ -15,6 +15,7 @@ import {
   Home,
   ShoppingBag,
   ExternalLink,
+  BookOpen,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { HeaderBrand } from '@/components/ui'
@@ -22,7 +23,7 @@ import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 
 export interface PublicHeaderProps {
-  activePage?: 'home' | 'org' | 'store'
+  activePage?: 'home' | 'org' | 'blog' | 'store'
   onOpenAuth?: (mode: 'login' | 'signup') => void
 }
 
@@ -82,6 +83,21 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           </button>
 
           <button
+            onClick={() => onNavigate('/blog')}
+            className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
+              activePage === 'blog'
+                ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
+                : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
+            }`}
+          >
+            <BookOpen className={`w-3.5 h-3.5 ${activePage === 'blog' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <span>BLOG</span>
+            {activePage === 'blog' && (
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
+            )}
+          </button>
+
+          <button
             onClick={() => onNavigate('/org')}
             className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
               activePage === 'org'
@@ -95,6 +111,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
             )}
           </button>
+
 
           <a
             href="https://www.etsy.com/shop/SaasTrash"

@@ -23,6 +23,7 @@ import {
   Terminal,
   ChevronRight,
   Building2,
+  BookOpen,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -205,11 +206,28 @@ export const LandingPage: React.FC = () => {
           {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
           <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
             
-            {/* Brand Header Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
-              <Flame className="w-4 h-4 text-red-500 animate-pulse" />
-              <span>MOLTOLOGY // THE SYNAPTIC PATH</span>
+            {/* Top Announcement Bar Ticker for New AI Blog Post */}
+            <div
+              onClick={() => onNavigate('/blog/from-prompt-engineering-to-bio-silicon-cognition')}
+              className="inline-flex items-center gap-3 px-4 py-2 bg-[#091114]/90 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 text-xs font-mono chamfer-corner shadow-hud-cyan cursor-pointer transition-all duration-300 group hover:scale-[1.02]"
+            >
+              <span className="px-2 py-0.5 bg-cyan-950 text-cyan-400 font-bold uppercase text-[10px] border border-cyan-500/40">
+                NEW ARTICLE
+              </span>
+              <span className="truncate max-w-xs sm:max-w-md font-sans text-gray-200 group-hover:text-cyan-300 transition-colors">
+                AI Courses as Stage 1 of Carcinization
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 text-cyan-400 group-hover:translate-x-1 transition-transform" />
             </div>
+
+            {/* Brand Header Badge */}
+            <div className="flex items-center gap-2.5 justify-center lg:justify-start">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
+                <Flame className="w-4 h-4 text-red-500 animate-pulse" />
+                <span>MOLTOLOGY // THE SYNAPTIC PATH</span>
+              </div>
+            </div>
+
 
             {/* Giant Layered Headline with Varied Letter & Text Spacing */}
             <div className="space-y-2">
