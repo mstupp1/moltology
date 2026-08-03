@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { BrainCircuit, MessageSquare, Plus, ShieldCheck, Database } from 'lucide-react'
+import { MessageSquare, Plus } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
@@ -71,41 +71,6 @@ function OracleRouteComponent() {
 
   return (
     <div className="h-full flex flex-col space-y-4 font-mono text-[#dfe3e3]">
-      {/* Route Header Banner */}
-      <div className="bg-[#060a0a]/90 border border-cyan-900/60 p-4 chamfer-corner flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
-        <div className="flex items-center space-x-3">
-          <div className="p-2.5 bg-cyan-950/80 border border-cyan-500/60 text-cyan-400 chamfer-corner">
-            <BrainCircuit className="w-6 h-6 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-cyan-300 tracking-wider flex items-center gap-2">
-              SYNAPTIC ORACLE ARCHITECTURE
-              <span className="text-[10px] bg-emerald-950 border border-emerald-700 text-emerald-300 px-1.5 py-0.5">
-                DEEPSEEK V4 FLASH
-              </span>
-            </h1>
-            <p className="text-xs text-gray-400">
-              Direct portal link to the Benthic Intelligence Matrix. Query scriptures, ask for stage ascension clearance, or transmute doctrine.
-            </p>
-          </div>
-        </div>
-
-        {/* User Session Badge */}
-        <div className="flex items-center gap-2 text-xs">
-          {userId ? (
-            <div className="flex items-center gap-1.5 bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 px-3 py-1.5 chamfer-corner">
-              <Database className="w-4 h-4 text-emerald-400" />
-              <span>PERSISTENCE ENABLED</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 bg-amber-950/40 border border-amber-800/50 text-amber-300 px-3 py-1.5 chamfer-corner">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
-              <span>EPHEMERAL SESSION (GUEST)</span>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Main Grid: Thread History Sidebar (if logged in) + Full Chat Panel */}
       <div className="flex-1 min-h-[500px] flex flex-col md:flex-row gap-4 overflow-hidden">
         {/* Thread History Sidebar (Logged In Users) */}
