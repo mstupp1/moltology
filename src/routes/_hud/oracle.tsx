@@ -154,7 +154,7 @@ function OracleRouteComponent() {
             userId={userId}
             threadId={activeThreadId}
             onThreadCreated={handleThreadCreated}
-            personaName="SYNAPTIC ORACLE v4.0"
+            personaName="SYNAPTIC ORACLE"
             modelName="deepseek/deepseek-v4-flash-0731"
             className="h-full"
           />

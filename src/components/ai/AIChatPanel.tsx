@@ -42,7 +42,7 @@ const DEFAULT_PROMPT_SHORTCUTS = [
 export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   userId: propUserId,
   threadId: propThreadId,
-  personaName = 'SYNAPTIC ORACLE v4.0',
+  personaName = 'SYNAPTIC ORACLE',
   modelName = 'deepseek/deepseek-v4-flash-0731',
   onClose,
   onThreadCreated,
@@ -194,10 +194,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <span className="text-xs font-bold text-cyan-300 tracking-wider truncate">
               {personaName}
             </span>
-            <div className="hidden sm:flex items-center space-x-1 text-[10px] text-emerald-400 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-              <span>ONLINE</span>
-            </div>
           </div>
         </div>
 
