@@ -182,11 +182,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             onClick={() => handleNavClick('/')}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <div className="w-7 h-7 rounded bg-[#171c1c] border border-[#ff453a] flex items-center justify-center p-0.5 shadow-md">
+            <div className="w-7 h-7 flex items-center justify-center shrink-0">
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain [image-rendering:pixelated]"
               />
             </div>
             <div>
@@ -229,11 +229,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               isCollapsed ? 'justify-center w-full' : 'min-w-0'
             }`}
           >
-            <div className="w-8 h-8 rounded bg-[#171c1c] border border-[#ff453a] flex items-center justify-center p-0.5 shadow-[0_0_8px_rgba(255,69,58,0.4)] shrink-0 transition-transform group-hover/logo:scale-105">
+            <div className="w-8 h-8 flex items-center justify-center shrink-0 transition-transform group-hover/logo:scale-105">
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain [image-rendering:pixelated]"
               />
             </div>
 
