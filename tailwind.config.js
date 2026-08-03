@@ -40,7 +40,9 @@ export default {
       fontFamily: {
         grotesk: ['Space Grotesk', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
-        spacemono: ['Space Mono', 'monospace']
+        spacemono: ['Space Mono', 'monospace'],
+        cinzel: ['Cinzel', 'Trajan Pro', 'Georgia', 'serif'],
+        garamond: ['EB Garamond', 'Georgia', 'serif'],
       },
       boxShadow: {
         'hud-cyan': '0 0 15px rgba(0, 195, 255, 0.4), inset 0 0 10px rgba(0, 195, 255, 0.2)',
