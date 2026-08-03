@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, assets, dailyRoutines, changelogs, neonAuthUser } from './schema'
+import { profiles, users, userStats, assets, dailyRoutines, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -10,6 +10,9 @@ describe('Database Schema & RLS Policies', () => {
     expect(dailyRoutines).toBeDefined()
     expect(changelogs).toBeDefined()
     expect(neonAuthUser).toBeDefined()
+    expect(galleryPins).toBeDefined()
+    expect(aiThreads).toBeDefined()
+    expect(aiMessages).toBeDefined()
   })
 
   it('defines required fields on the profiles table', () => {
@@ -31,5 +34,11 @@ describe('Database Schema & RLS Policies', () => {
     expect(changelogs.version).toBeDefined()
     expect(changelogs.title).toBeDefined()
     expect(changelogs.isPublished).toBeDefined()
+  })
+
+  it('defines required fields and unique constraint on galleryPins table', () => {
+    expect(galleryPins.id).toBeDefined()
+    expect(galleryPins.s3Key).toBeDefined()
+    expect(galleryPins.s3Key.isUnique).toBe(true)
   })
 })

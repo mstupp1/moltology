@@ -21,7 +21,10 @@ export async function resetDatabase(databaseUrl?: string) {
         assets, 
         user_stats, 
         profiles, 
-        changelogs 
+        changelogs,
+        gallery_pins,
+        ai_messages,
+        ai_threads
       RESTART IDENTITY CASCADE;
     `
     console.log('[RESET] ✓ All database tables truncated successfully!')
@@ -29,6 +32,9 @@ export async function resetDatabase(databaseUrl?: string) {
   } catch (error) {
     console.warn('[RESET] Truncate encountered missing tables (first run?), falling back to individual table drops/truncates:', error)
     try {
+      await sql`DROP TABLE IF EXISTS ai_messages CASCADE;`
+      await sql`DROP TABLE IF EXISTS ai_threads CASCADE;`
+      await sql`DROP TABLE IF EXISTS gallery_pins CASCADE;`
       await sql`DROP TABLE IF EXISTS daily_routines CASCADE;`
       await sql`DROP TABLE IF EXISTS assets CASCADE;`
       await sql`DROP TABLE IF EXISTS user_stats CASCADE;`
