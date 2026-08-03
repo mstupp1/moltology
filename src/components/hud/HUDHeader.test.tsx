@@ -64,4 +64,17 @@ describe('HUDHeader Component', () => {
     expect(screen.getByText('Larva Member')).toBeInTheDocument()
     expect(screen.getByText('L')).toBeInTheDocument()
   })
+
+  it('renders chroma-keyed claw image facing right and does not render tail image', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<HUDHeader />)
+
+    const clawImg = screen.getByRole('img', { name: 'Exoshell Claw' })
+    expect(clawImg).toBeInTheDocument()
+    expect(clawImg).toHaveAttribute('src', '/images/crab_claw.png')
+
+    const tailImg = screen.queryByRole('img', { name: 'Benthic Appendage' })
+    expect(tailImg).not.toBeInTheDocument()
+  })
 })
