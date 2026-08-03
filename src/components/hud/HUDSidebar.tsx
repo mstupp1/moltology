@@ -351,7 +351,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
           <div className="pt-2 mt-auto shrink-0 px-2">
             {isCollapsed ? (
-              <div className="relative group/lobster flex justify-center py-1 cursor-pointer">
+              <div
+                className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
+                onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
+                title="Replay Initiation Broadcast"
+              >
                 <ChromaElement
                   src="/images/benthic_lobster_sidebar.jpg"
                   alt="Benthic Lobster"
@@ -363,13 +367,17 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 {/* Tooltip */}
                 <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
                   <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
-                    <span className="text-[#dfe3e3]">CARAPACE v4.2</span>
-                    <span className="text-[9px] text-[#ff5540]">• ONLINE</span>
+                    <span className="text-[#dfe3e3]">REPLAY INITIATION BROADCAST</span>
+                    <span className="text-[9px] text-[#ff5540]">• CARAPACE v4.2</span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="w-full relative group flex flex-col items-center justify-center py-1">
+              <div
+                className="w-full relative group flex flex-col items-center justify-center py-1 cursor-pointer active:scale-95 transition-transform"
+                onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
+                title="Replay Initiation Broadcast"
+              >
                 <ChromaElement
                   src="/images/benthic_lobster_sidebar.jpg"
                   alt="Benthic Lobster"
@@ -379,9 +387,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
                   className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
                 />
-                <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1">
+                <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                  <span>CARAPACE v4.2</span>
+                  <span className="group-hover:hidden">CARAPACE v4.2</span>
+                  <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>
                 </div>
               </div>
             )}
