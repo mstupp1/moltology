@@ -2,13 +2,15 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins, blogPosts } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
 import type { ChangelogEntry } from '../changelogs-data'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
+import { INITIAL_BLOG_POSTS } from '../blog-data'
+import type { BlogPostData } from '../blog-data'
 import { getPresignedViewUrl } from '../s3-client'
 
 type Db = ReturnType<typeof getDb>
@@ -482,6 +484,89 @@ export const sendChatMessageFn = createServerFn({ method: 'POST' })
       .parse(data)
   })
   .handler(sendChatMessageHandler)
+
+/**
+ * Server Function: Get all published blog posts from database or fallback to seed data.
+ */
+export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
+  const dbClient = context?.db || getDb()
+  try {
+    const records = await dbClient
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.isPublished, true))
+      .orderBy(desc(blogPosts.publishedAt))
+
+    if (records.length > 0) {
+      return records.map((r: any) => ({
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        summary: r.summary,
+        content: r.content,
+        coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        category: r.category,
+        tags: (r.tags as string[]) || [],
+        readTimeMinutes: r.readTimeMinutes,
+        isPublished: r.isPublished,
+        publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
+      }))
+    }
+  } catch (err) {
+    console.warn('[getBlogPostsFn] Error loading from DB, using fallback blog data:', err)
+  }
+  return INITIAL_BLOG_POSTS
+}
+
+export const getBlogPostsFn = createServerFn({ method: 'GET' })
+  .middleware(publicMiddleware)
+  .handler(getBlogPostsHandler)
+
+/**
+ * Server Function: Get single blog post by slug.
+ */
+export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFnArgs<string>) => {
+  if (!slug) return null
+  const dbClient = context?.db || getDb()
+  try {
+    const records = await dbClient
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.slug, slug))
+      .limit(1)
+
+    if (records.length > 0) {
+      const r = records[0]
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        summary: r.summary,
+        content: r.content,
+        coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        category: r.category,
+        tags: (r.tags as string[]) || [],
+        readTimeMinutes: r.readTimeMinutes,
+        isPublished: r.isPublished,
+        publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
+      }
+    }
+  } catch (err) {
+    console.warn(`[getBlogPostBySlugFn] Error loading post ${slug} from DB, fallback checking:`, err)
+  }
+
+  const fallback = INITIAL_BLOG_POSTS.find((p) => p.slug === slug)
+  return fallback ?? null
+}
+
+export const getBlogPostBySlugFn = createServerFn({ method: 'GET' })
+  .middleware(publicMiddleware)
+  .validator((slug: string) => slug)
+  .handler(getBlogPostBySlugHandler)
 
 
 

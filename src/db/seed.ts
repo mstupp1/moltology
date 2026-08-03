@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv'
 import * as schema from './schema'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
 import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
+import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 
 dotenv.config()
 
@@ -248,6 +249,29 @@ export async function seedDatabase(databaseUrl?: string) {
         .onConflictDoNothing({ target: schema.galleryPins.s3Key })
     }
     console.log(`✓ Seeded ${INITIAL_GALLERY_PINS.length} gallery pin entries`)
+
+    // 7. Seed Blog Posts
+    console.log('[SEED] Seeding blog posts...')
+    for (const post of INITIAL_BLOG_POSTS) {
+      await db
+        .insert(schema.blogPosts)
+        .values({
+          slug: post.slug,
+          title: post.title,
+          summary: post.summary,
+          content: post.content,
+          coverImageUrl: post.coverImageUrl,
+          authorName: post.authorName,
+          authorAvatar: post.authorAvatar,
+          category: post.category,
+          tags: post.tags,
+          readTimeMinutes: post.readTimeMinutes,
+          isPublished: post.isPublished,
+          publishedAt: new Date(post.publishedAt),
+        })
+        .onConflictDoNothing({ target: schema.blogPosts.slug })
+    }
+    console.log(`✓ Seeded ${INITIAL_BLOG_POSTS.length} blog post entries`)
 
     console.log('[SEED] ✓ All mock database seeding tasks completed successfully!')
 

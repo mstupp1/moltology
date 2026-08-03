@@ -159,3 +159,29 @@ export const aiMessages = pgTable('ai_messages', {
   })
 ])
 
+// Blog Posts Table
+export const blogPosts = pgTable('blog_posts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  summary: text('summary').notNull(),
+  content: text('content').notNull(),
+  coverImageUrl: text('coverImageUrl'),
+  authorId: text('authorId').references(() => profiles.id, { onDelete: 'set null' }),
+  authorName: text('authorName').default('High Ascendant Carcinus').notNull(),
+  authorAvatar: text('authorAvatar').default('/images/order_emblem.png').notNull(),
+  category: text('category').default('SACRED DOCTRINE').notNull(),
+  tags: jsonb('tags').$type<string[]>().default([]).notNull(),
+  readTimeMinutes: integer('readTimeMinutes').default(5).notNull(),
+  views: integer('views').default(0).notNull(),
+  isPublished: boolean('isPublished').default(true).notNull(),
+  publishedAt: timestamp('publishedAt').defaultNow().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('blog_posts_public_read_policy', {
+    for: 'select',
+    using: sql`"isPublished" = true`
+  })
+])
+
