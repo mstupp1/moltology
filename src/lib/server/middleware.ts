@@ -46,18 +46,12 @@ export function extractAuthToken(request?: Request | null): string | null {
  * Middleware for logging server function performance and errors.
  */
 export const loggingMiddleware = createMiddleware().server(async ({ request, next }) => {
-  const startTime = Date.now()
-  const method = request?.method || 'RPC'
-  const url = request?.url || 'serverFn'
-
   try {
-    const result = await next()
-    const duration = Date.now() - startTime
-    console.log(`[ServerFn] ${method} ${url} - Completed in ${duration}ms`)
-    return result
+    return await next()
   } catch (error) {
-    const duration = Date.now() - startTime
-    console.error(`[ServerFn Error] ${method} ${url} - Failed after ${duration}ms:`, error)
+    const method = request?.method || 'RPC'
+    const url = request?.url || 'serverFn'
+    console.error(`[ServerFn Error] ${method} ${url}:`, error)
     throw error
   }
 })
