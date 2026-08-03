@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrainCircuit, User } from 'lucide-react'
+import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   from: 'user' | 'assistant' | 'system'
@@ -61,5 +62,8 @@ export const MessageResponse: React.FC<{ children: React.ReactNode; className?: 
   children,
   className = '',
 }) => {
-  return <p className={`whitespace-pre-wrap ${className}`}>{children}</p>
+  if (typeof children === 'string') {
+    return <MarkdownRenderer content={children} className={className} />
+  }
+  return <div className={`whitespace-pre-wrap ${className}`}>{children}</div>
 }

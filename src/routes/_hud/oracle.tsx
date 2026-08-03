@@ -34,6 +34,19 @@ function OracleRouteComponent() {
     setActiveThreadId(null)
   }
 
+  const handleThreadCreated = (newThreadId: string) => {
+    setActiveThreadId(newThreadId)
+    if (userId) {
+      getAIThreadsFn({ data: { userId } })
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setThreads(data)
+          }
+        })
+        .catch((err) => console.warn('Failed to refresh threads after creation:', err))
+    }
+  }
+
   return (
     <div className="h-full flex flex-col space-y-4 font-mono text-[#dfe3e3]">
       {/* Route Header Banner */}
@@ -118,6 +131,7 @@ function OracleRouteComponent() {
           <AIChatPanel
             userId={userId}
             threadId={activeThreadId}
+            onThreadCreated={handleThreadCreated}
             personaName="SYNAPTIC ORACLE v4.0"
             modelName="deepseek/deepseek-v4-flash-0731"
             className="h-full"
