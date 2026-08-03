@@ -43,6 +43,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const navigate = useNavigate()
   const location = useLocation()
   const currentRoute = location.pathname
+  const [pendingRoute, setPendingRoute] = useState<string | null>(null)
+  const effectiveRoute = pendingRoute || currentRoute
+
+  useEffect(() => {
+    setPendingRoute(null)
+  }, [currentRoute])
+
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -192,17 +199,17 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => ({
-    [getActiveGroupId(currentRoute)]: true,
+    [getActiveGroupId(effectiveRoute)]: true,
   }))
 
   // Ensure section containing active route is open without closing other sections
   useEffect(() => {
-    const activeId = getActiveGroupId(currentRoute)
+    const activeId = getActiveGroupId(effectiveRoute)
     setOpenGroups((prev) => {
       if (prev[activeId]) return prev
       return { ...prev, [activeId]: true }
     })
-  }, [currentRoute])
+  }, [effectiveRoute])
 
   const toggleGroup = (groupId: string) => {
     setOpenGroups((prev) => ({
@@ -254,11 +261,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const activeItem =
     allNavItems.find(
       (item) =>
-        currentRoute === item.path ||
-        (item.path !== '/' && currentRoute.startsWith(item.path))
+        effectiveRoute === item.path ||
+        (item.path !== '/' && effectiveRoute.startsWith(item.path))
     ) || allNavItems[0]
 
   const handleNavClick = (path: string) => {
+    setPendingRoute(path)
     navigate({ to: path })
     setIsMobileOpen(false)
   }
@@ -354,10 +362,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           )}
         </button>
 
-        {/* Main Content Container - Always visible on Desktop, toggling on Mobile */}
+        {/* Main Content Container - Always visible on Desktop, toggling smoothly on Mobile */}
         <div
-          className={`flex-1 flex flex-col justify-between space-y-0 overflow-hidden min-h-0 max-h-[calc(100vh-6rem)] md:max-h-none ${
-            isMobileOpen ? 'block' : 'hidden md:flex'
+          className={`flex-1 flex flex-col justify-between space-y-0 overflow-hidden min-h-0 transition-all duration-300 ease-in-out ${
+            isMobileOpen
+              ? 'max-h-[calc(100vh-4rem)] opacity-100 flex'
+              : 'max-h-0 opacity-0 hidden md:max-h-none md:opacity-100 md:flex'
           }`}
         >
             {/* Search Bar — full width, above nav */}
@@ -422,8 +432,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 const isOpen = !!openGroups[group.id]
                 const isGroupActive = group.items.some(
                   (item) =>
-                    currentRoute === item.path ||
-                    (item.path !== '/' && currentRoute.startsWith(item.path))
+                    effectiveRoute === item.path ||
+                    (item.path !== '/' && effectiveRoute.startsWith(item.path))
                 )
 
                 if (isCollapsed) {
@@ -432,34 +442,35 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       {group.items.map((item) => {
                         const Icon = item.icon
                         const isActive =
-                          currentRoute === item.path ||
-                          (item.path !== '/' && currentRoute.startsWith(item.path))
+                          effectiveRoute === item.path ||
+                          (item.path !== '/' && effectiveRoute.startsWith(item.path))
 
                         return (
                           <button
                             key={item.id}
                             onClick={() => handleNavClick(item.path)}
-                            className={`w-full text-left relative flex items-center justify-center py-3.5 transition-all duration-150 group/navitem ${
+                            className={`w-full text-left relative flex items-center justify-center py-3.5 transition-colors duration-150 group/navitem cursor-pointer ${
                               isActive
-                                ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
-                                : 'bg-transparent hover:bg-white/[0.03]'
+                                ? 'bg-[#ff3b30]/10'
+                                : 'bg-transparent hover:bg-white/[0.04]'
                             }`}
                           >
                             {isActive && (
-                              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_10px_rgba(255,59,48,0.8)]" />
+                              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)]" />
                             )}
 
                             <Icon
-                              className={`w-4 h-4 shrink-0 transition-colors ${
+                              className={`w-4 h-4 shrink-0 ${
                                 isActive
                                   ? 'text-[#ff5555]'
-                                  : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
+                                  : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
                               }`}
                             />
 
-                            <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-all duration-200 translate-x-1 group-hover/navitem:translate-x-0">
-                              <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]" />
+                            {/* Clean Floating Tooltip */}
+                            <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
+                              <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
                                 <span className="tracking-wider uppercase">
                                   {item.label}
                                 </span>
@@ -476,58 +487,65 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <div key={group.id} className="border-b border-[#1e2d37]/80">
                     <button
                       onClick={() => toggleGroup(group.id)}
-                      className="w-full flex items-center justify-between px-3.5 py-2 bg-[#091014]/90 hover:bg-[#0e171d] border-b border-[#1e2d37]/50 text-left transition-all group/groupheader cursor-pointer select-none"
+                      className="w-full flex items-center justify-between px-3.5 py-2 bg-[#091014]/90 hover:bg-[#0e171d] border-b border-[#1e2d37]/50 text-left transition-colors duration-150 group/groupheader cursor-pointer select-none"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         {isGroupActive && !isOpen && (
                           <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.9)] shrink-0 animate-pulse" />
                         )}
-                        <span className="font-mono text-[10px] font-bold text-[#00c3ff]/80 group-hover/groupheader:text-[#00c3ff] tracking-wider uppercase truncate">
+                        <span className="font-mono text-[10px] font-bold text-[#00c3ff]/80 group-hover/groupheader:text-[#00c3ff] tracking-wider uppercase truncate transition-colors duration-150">
                           {group.title}
                         </span>
                       </div>
                       <div className="flex items-center shrink-0 ml-2">
-                        {isOpen ? (
-                          <ChevronDown className="w-3.5 h-3.5 text-[#566878] group-hover/groupheader:text-[#00c3ff] transition-transform" />
-                        ) : (
-                          <ChevronRight className="w-3.5 h-3.5 text-[#566878] group-hover/groupheader:text-[#00c3ff] transition-transform" />
-                        )}
+                        <ChevronRight
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ease-in-out ${
+                            isOpen ? 'rotate-90 text-[#00c3ff]' : 'rotate-0 text-[#566878] group-hover/groupheader:text-[#00c3ff]'
+                          }`}
+                        />
                       </div>
                     </button>
 
-                    {isOpen && (
-                      <div className="divide-y divide-[#1e2d37]/40 bg-[#080d10]/40">
+                    {/* Smooth Collapsible Section Content */}
+                    <div
+                      className={`grid transition-[grid-template-rows,opacity] duration-250 ease-in-out ${
+                        isOpen
+                          ? 'grid-rows-[1fr] opacity-100'
+                          : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                      }`}
+                    >
+                      <div className="overflow-hidden divide-y divide-[#1e2d37]/40 bg-[#080d10]/40">
                         {group.items.map((item) => {
                           const Icon = item.icon
                           const isActive =
-                            currentRoute === item.path ||
-                            (item.path !== '/' && currentRoute.startsWith(item.path))
+                            effectiveRoute === item.path ||
+                            (item.path !== '/' && effectiveRoute.startsWith(item.path))
 
                           return (
                             <button
                               key={item.id}
                               onClick={() => handleNavClick(item.path)}
-                              className={`w-full text-left relative flex items-center transition-all duration-150 group/navitem px-4 py-2.5 pl-5 gap-3 ${
+                              className={`w-full text-left relative flex items-center transition-colors duration-150 group/navitem px-4 py-2.5 pl-5 gap-3 cursor-pointer ${
                                 isActive
-                                  ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
-                                  : 'bg-transparent hover:bg-white/[0.03]'
+                                  ? 'bg-[#ff3b30]/10'
+                                  : 'bg-transparent hover:bg-white/[0.04]'
                               }`}
                             >
                               {isActive && (
-                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_10px_rgba(255,59,48,0.8)]" />
+                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)]" />
                               )}
 
                               <Icon
-                                className={`w-4 h-4 shrink-0 transition-colors ${
+                                className={`w-4 h-4 shrink-0 ${
                                   isActive
                                     ? 'text-[#ff5555]'
-                                    : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
+                                    : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
                                 }`}
                               />
 
-                              <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap transition-all duration-300">
+                              <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap">
                                 <span
-                                  className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
+                                  className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
                                     isActive
                                       ? 'text-white font-semibold'
                                       : 'text-[#9eb0c0] group-hover/navitem:text-[#dfe3e3]'
@@ -540,7 +558,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                           )
                         })}
                       </div>
-                    )}
+                    </div>
                   </div>
                 )
               })}
@@ -599,29 +617,31 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {/* Help / Support Link */}
             <button
               onClick={() => navigate({ to: '/support' })}
-              className={`w-full flex items-center transition-all duration-150 group/help ${
+              className={`w-full flex items-center transition-all duration-200 ease-out group/help cursor-pointer ${
                 isCollapsed ? 'justify-center px-0 py-3.5' : 'px-4 py-3 gap-3'
               } ${
                 currentRoute === '/support'
                   ? 'bg-gradient-to-r from-[#00ffff]/15 via-[#00ffff]/05 to-transparent text-[#00ffff]'
-                  : 'hover:bg-white/[0.03] text-[#839493] hover:text-[#dfe3e3]'
+                  : 'hover:bg-gradient-to-r hover:from-[#00c3ff]/12 hover:to-transparent text-[#839493] hover:text-[#dfe3e3]'
               }`}
               title="Benthic Support Portal"
             >
               <LifeBuoy
-                className={`w-4 h-4 shrink-0 transition-colors ${
+                className={`w-4 h-4 shrink-0 transition-all duration-200 ease-out group-hover/help:scale-110 ${
                   currentRoute === '/support'
                     ? 'text-[#00ffff] animate-spin-slow'
-                    : 'text-[#00c3ff] group-hover/help:text-[#dfe3e3]'
+                    : 'text-[#00c3ff] group-hover/help:text-[#00ffff] group-hover/help:drop-shadow-[0_0_6px_rgba(0,195,255,0.6)]'
                 }`}
               />
               {!isCollapsed && (
-                <span className="text-xs font-sans font-medium tracking-wide uppercase">HELP &amp; SUPPORT</span>
+                <span className="text-xs font-sans font-medium tracking-wide uppercase group-hover/help:translate-x-1 transition-transform duration-200 ease-out">
+                  HELP &amp; SUPPORT
+                </span>
               )}
               {isCollapsed && (
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-all duration-200">
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-all duration-200 ease-out translate-x-2 group-hover/help:translate-x-0">
                   <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
                     HELP &amp; SUPPORT
                   </div>
                 </div>

@@ -53,7 +53,7 @@ function BlogPostDetail() {
   if (!post) {
     return (
       <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono flex flex-col justify-between items-center py-20">
-        <PublicHeader activePage="home" />
+        <PublicHeader activePage="blog" />
         <div className="text-center chitin-card border border-red-900/60 p-12 chamfer-corner max-w-lg">
           <Terminal className="w-12 h-12 text-red-500 mx-auto mb-4 animate-pulse" />
           <h2 className="font-grotesk text-2xl font-bold text-gray-100 uppercase">
@@ -173,7 +173,7 @@ function BlogPostDetail() {
         onSuccess={() => navigate({ to: '/dashboard' })}
       />
 
-      <PublicHeader activePage="home" onOpenAuth={(mode) => { setAuthMode(mode); setIsAuthModalOpen(true); }} />
+      <PublicHeader activePage="blog" onOpenAuth={(mode) => { setAuthMode(mode); setIsAuthModalOpen(true); }} />
 
       {/* Top Hero Banner */}
       <article className="flex-1 w-full relative z-10">
