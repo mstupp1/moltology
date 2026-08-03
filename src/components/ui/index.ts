@@ -16,4 +16,6 @@ export { HudSkeleton, type HudSkeletonProps } from './HudSkeleton'
 export { RollingNumber, type RollingNumberProps } from './RollingNumber'
 export { ChromaElement, type ChromaElementProps } from './ChromaElement'
 export { MarkdownRenderer, type MarkdownRendererProps } from './MarkdownRenderer'
+export { HUDPageLoader } from './HUDPageLoader'
+export { HUDSpinner, type HUDSpinnerProps, type HUDSpinnerSize, type HUDSpinnerVariant } from './HUDSpinner'
 
