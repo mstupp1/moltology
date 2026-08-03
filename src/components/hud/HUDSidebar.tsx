@@ -345,7 +345,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             </nav>
 
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
-          <div className="pt-2 mt-auto shrink-0 px-2">
+          <div className="mt-auto shrink-0 px-4 pb-5 pt-3">
             {isCollapsed ? (
               <div
                 className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
