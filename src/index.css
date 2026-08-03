@@ -207,3 +207,19 @@ input[type="range"].stat-slider::-moz-range-thumb {
   background-image: radial-gradient(rgba(0, 255, 255, 0.5) 1px, transparent 1px);
   background-size: 4px 4px;
 }
+
+/* Horizontal Stock Ticker Marquee Animation */
+@keyframes hud-marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: hud-marquee 55s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
