@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { ServerError, formatServerError } from './error'
 import { extractAuthToken } from './middleware'
 import { getDb } from '../../db'
-import { publicServerFn, authenticatedServerFn } from './functions'
+import { publicMiddleware, authenticatedMiddleware } from './functions'
 import { executeServerFn } from './execute'
 import { getPublicChangelogsFn, getS3AssetUrlFn } from './api'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -91,9 +91,9 @@ describe('Database Client Factory (getDb)', () => {
 })
 
 describe('Server Functions', () => {
-  it('should define publicServerFn and authenticatedServerFn builders', () => {
-    expect(publicServerFn).toBeDefined()
-    expect(authenticatedServerFn).toBeDefined()
+  it('should define publicMiddleware and authenticatedMiddleware stacks', () => {
+    expect(publicMiddleware).toBeDefined()
+    expect(authenticatedMiddleware).toBeDefined()
   })
 
   it('should execute getPublicChangelogsFn and return entries within context', async () => {

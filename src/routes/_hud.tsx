@@ -1,10 +1,24 @@
+import React, { useState, useEffect } from 'react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { HUDHeader } from '@/components/hud/HUDHeader'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
+import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
+import { authClient } from '@/lib/auth-client'
 
 function HudLayout() {
+  const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const userId = user?.id || user?.sub || null
+
+  useEffect(() => {
+    const handleToggle = () => setIsAIDrawerOpen((prev) => !prev)
+    window.addEventListener('toggle-ai-drawer', handleToggle)
+    return () => window.removeEventListener('toggle-ai-drawer', handleToggle)
+  }, [])
+
   return (
     <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
       {/* Full-Bleed Underwater Background Image with high visibility */}
@@ -36,20 +50,30 @@ function HudLayout() {
         {/* Full Height Glassmorphic Sidebar spanning top-to-bottom */}
         <HUDSidebar />
 
-        {/* Right Workspace Column with Portal Top Bar */}
-        <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
-          {/* Portal Top Bar */}
-          <HUDHeader />
+        {/* Workspace Column & Optional Right AI Drawer */}
+        <div className="flex-1 min-w-0 flex h-full overflow-hidden">
+          {/* Main Workspace */}
+          <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
+            {/* Portal Top Bar */}
+            <HUDHeader />
 
-          {/* Main Panel Content Workspace with Translucent Glass Backdrop */}
-          <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/35 backdrop-blur-sm border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
-            <Outlet />
-          </main>
+            {/* Main Panel Content Workspace with Translucent Glass Backdrop */}
+            <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/35 backdrop-blur-sm border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
+              <Outlet />
+            </main>
+          </div>
+
+          {/* Right-Hand Dockable AI Sidebar Drawer */}
+          <AISidebarDrawer
+            isOpen={isAIDrawerOpen}
+            onClose={() => setIsAIDrawerOpen(false)}
+            userId={userId}
+          />
         </div>
       </div>
 
       {/* Floating AI Oracle Assistant */}
-      <SynapticOracleWidget />
+      <SynapticOracleWidget userId={userId} />
     </div>
   )
 }
@@ -57,3 +81,4 @@ function HudLayout() {
 export const Route = createFileRoute('/_hud')({
   component: HudLayout,
 })
+

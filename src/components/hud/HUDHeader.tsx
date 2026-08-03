@@ -151,6 +151,16 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
           <span className="hidden sm:inline tracking-wider">SUPPORT</span>
         </button>
 
+        {/* Oracle AI Right Sidebar Drawer Toggle */}
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('toggle-ai-drawer'))}
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-mono font-bold transition-all chamfer-corner border bg-[#030606]/80 text-cyan-300 border-[#3a4a49] hover:border-cyan-400 hover:text-white group"
+          title="Toggle Docked Oracle AI Panel"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+          <span className="hidden sm:inline tracking-wider">ORACLE DOCK</span>
+        </button>
+
         {!user ? (
           <BenthicCTAButton
             variant="cyan"

@@ -95,6 +95,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       path: '/dashboard',
     },
     {
+      id: 'oracle',
+      label: 'SYNAPTIC ORACLE',
+      icon: Atom,
+      path: '/oracle',
+    },
+    {
       id: 'codex',
       label: 'THE SACRED CODEX',
       icon: Scroll,

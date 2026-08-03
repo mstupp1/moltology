@@ -8,6 +8,8 @@ function getRawEnv(): Record<string, unknown> {
     DATABASE_URL: processEnv.DATABASE_URL || importMetaEnv.DATABASE_URL || importMetaEnv.VITE_DATABASE_URL,
     VITE_NEON_AUTH_URL: importMetaEnv.VITE_NEON_AUTH_URL || processEnv.VITE_NEON_AUTH_URL,
     VITE_NEON_JWKS_URL: importMetaEnv.VITE_NEON_JWKS_URL || processEnv.VITE_NEON_JWKS_URL,
+    VERCEL_OIDC_TOKEN: processEnv.VERCEL_OIDC_TOKEN || importMetaEnv.VERCEL_OIDC_TOKEN,
+    AI_GATEWAY_API_KEY: processEnv.AI_GATEWAY_API_KEY || importMetaEnv.AI_GATEWAY_API_KEY,
     NODE_ENV: processEnv.NODE_ENV || importMetaEnv.MODE,
   }
 }
@@ -25,6 +27,8 @@ export const envSchema = z.object({
     .string()
     .url()
     .default('https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech/neondb/auth/.well-known/jwks.json'),
+  VERCEL_OIDC_TOKEN: z.string().optional(),
+  AI_GATEWAY_API_KEY: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 

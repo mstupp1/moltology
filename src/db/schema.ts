@@ -127,3 +127,35 @@ export const galleryPins = pgTable('gallery_pins', {
     using: sql`true`
   })
 ])
+
+// Generic AI Conversations & Threads Table
+export const aiThreads = pgTable('ai_threads', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  title: text('title').default('Ascendance Consultation').notNull(),
+  persona: text('persona').default('oracle').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('ai_threads_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
+// Generic AI Messages Table
+export const aiMessages = pgTable('ai_messages', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  threadId: uuid('threadId').notNull().references(() => aiThreads.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(), // 'user' | 'assistant' | 'system'
+  content: text('content').notNull(),
+  parts: jsonb('parts').$type<Record<string, unknown>[]>().default([]).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('ai_messages_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+

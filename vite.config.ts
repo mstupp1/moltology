@@ -29,7 +29,14 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
   },
   plugins: [
-    ...(isTest ? [] : [tanstackStart(), nitro()]),
+    ...(isTest
+      ? []
+      : [
+          tanstackStart({
+            routeFileIgnorePattern: '.*\\.test\\..*',
+          }),
+          nitro(),
+        ]),
     viteReact(),
   ],
 })
