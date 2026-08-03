@@ -29,7 +29,7 @@ import {
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
-import { ChromaElement } from '../ui'
+import { ChromaElement, HeaderBrand } from '../ui'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 
@@ -274,28 +274,28 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-30 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
+        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
       >
         {/* Mobile Accordion Top Bar */}
         <div className="flex md:hidden items-center justify-between gap-2 p-3">
           <div
             onClick={() => handleNavClick('/')}
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer group/mobilebrand"
           >
             <div className="w-7 h-7 flex items-center justify-center shrink-0">
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain filter drop-shadow-[0_2px_5px_rgba(0,195,255,0.35)] transition-all"
               />
             </div>
             <div>
-              <div className="font-grotesk font-bold text-xs text-[#dfe3e3] tracking-wider">
+              <div className="font-grotesk font-extrabold text-xs text-white tracking-wider drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] [text-shadow:0_0_10px_rgba(0,195,255,0.4)]">
                 THE SYNAPTIC PATH
               </div>
-              <div className="text-[10px] text-[#00c3ff] font-mono flex items-center gap-1">
-                <span>ACTIVE:</span>
-                <span className="text-[#ff5540] truncate max-w-[130px] font-bold">
+              <div className="text-[10px] text-[#00c3ff] font-mono font-bold flex items-center gap-1">
+                <span className="text-[#00c3ff]/80">ACTIVE:</span>
+                <span className="text-[#ff5540] truncate max-w-[130px] font-bold drop-shadow-[0_0_6px_rgba(255,85,64,0.6)]">
                   {activeItem.label}
                 </span>
               </div>
@@ -321,37 +321,18 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             isCollapsed ? 'justify-center py-3 px-1' : 'px-2 py-3'
           }`}
         >
-          <div
+          <HeaderBrand
+            subtext="BENTHIC TEMPLE HUD"
+            isCollapsed={isCollapsed}
             onClick={() => handleNavClick('/')}
-            className={`flex items-center gap-3 cursor-pointer group/logo rounded-lg px-2.5 py-2 hover:bg-white/[0.05] transition-all duration-200 ${
-              isCollapsed ? 'justify-center w-full' : 'min-w-0 flex-1'
-            }`}
-          >
-            <div className="w-10 h-10 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover/logo:scale-110">
-              <img
-                src="/images/order_emblem.png"
-                alt="Order Emblem"
-                className="w-full h-full object-contain"
-              />
-            </div>
-
-            {!isCollapsed && (
-              <div className="overflow-hidden whitespace-nowrap transition-all duration-300 min-w-0">
-                <div className="font-grotesk font-bold text-sm text-[#dfe3e3] tracking-widest group-hover/logo:text-[#ff5540] transition-colors truncate leading-tight">
-                  THE SYNAPTIC PATH
-                </div>
-                <div className="text-[11px] text-[#00c3ff] font-mono tracking-wider truncate mt-0.5">
-                  BENTHIC TEMPLE HUD
-                </div>
-              </div>
-            )}
-          </div>
+            className={isCollapsed ? 'justify-center w-full' : 'min-w-0 flex-1'}
+          />
 
           {/* Brand Tooltip when collapsed */}
           {isCollapsed && (
             <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
               <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
-                <span className="text-[#00c3ff]">THE SYNAPTIC PATH</span>
+                <span className="text-[#00c3ff] drop-shadow-[0_0_8px_rgba(0,195,255,0.6)]">THE SYNAPTIC PATH</span>
                 <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD</span>
               </div>
             </div>

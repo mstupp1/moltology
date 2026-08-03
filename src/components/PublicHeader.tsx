@@ -17,6 +17,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { HeaderBrand } from '@/components/ui'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 
@@ -58,27 +59,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
         {/* Shared Brand Logo & Emblem */}
-        <div
-          className="flex items-center gap-3.5 cursor-pointer group shrink-0"
+        <HeaderBrand
+          subtext="MOLTOLOGY.ORG FOUNDATION"
           onClick={() => onNavigate('/')}
-        >
-          <div className="w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-all">
-            <img
-              src="/images/order_emblem.png"
-              alt="Moltology Emblem"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div>
-            <div className="font-grotesk font-bold text-base sm:text-lg text-gray-100 tracking-wider uppercase flex items-center gap-2">
-              <span>THE SYNAPTIC PATH</span>
-            </div>
-            <div className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase truncate flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              MOLTOLOGY.ORG FOUNDATION
-            </div>
-          </div>
-        </div>
+        />
 
         {/* Central Modern Pill Navigation Capsule */}
         <nav aria-label="Main Navigation" className="hidden md:flex items-center bg-[#090e0f]/90 border border-cyan-900/50 p-1.5 rounded-full shadow-inner shadow-cyan-950/60 backdrop-blur-md">
