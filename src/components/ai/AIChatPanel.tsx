@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { BrainCircuit, X, RefreshCw, AlertCircle } from 'lucide-react'
+import {
+  BrainCircuit,
+  X,
+  RefreshCw,
+  AlertCircle,
+  Minimize2,
+  PanelRight,
+  Maximize2,
+} from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { sendChatMessageFn, getAIMessagesFn } from '../../lib/server/api'
+import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 
 export interface AIChatPanelProps {
   userId?: string | null
@@ -14,6 +23,7 @@ export interface AIChatPanelProps {
   onThreadCreated?: (newThreadId: string) => void
   isCompact?: boolean
   className?: string
+  showModeControls?: boolean
 }
 
 interface ChatMessage {
@@ -30,16 +40,22 @@ const DEFAULT_PROMPT_SHORTCUTS = [
 ]
 
 export const AIChatPanel: React.FC<AIChatPanelProps> = ({
-  userId,
-  threadId: initialThreadId,
+  userId: propUserId,
+  threadId: propThreadId,
   personaName = 'SYNAPTIC ORACLE v4.0',
   modelName = 'deepseek/deepseek-v4-flash-0731',
   onClose,
   onThreadCreated,
   isCompact = false,
   className = '',
+  showModeControls = true,
 }) => {
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(initialThreadId || null)
+  const oracle = useSafeOracle()
+
+  const userId = propUserId !== undefined ? propUserId : oracle?.userId || null
+  const activeThreadId =
+    oracle?.activeThreadId !== undefined ? oracle.activeThreadId : propThreadId || null
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -63,12 +79,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const [messages, setMessages] = useState<ChatMessage[]>([initialWelcome])
 
-  // Sync active thread ID when prop changes
-  useEffect(() => {
-    setActiveThreadId(initialThreadId || null)
-  }, [initialThreadId])
-
-  // Reset to blank consultation screen when activeThreadId is null, or fetch thread messages if set
+  // Reset to welcome screen when activeThreadId is null, or fetch thread messages if set
   useEffect(() => {
     if (!activeThreadId) {
       setMessages([{ ...initialWelcome, timestamp: getTimeString() }])
@@ -77,16 +88,20 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
     if (!userId) return
 
-    getAIMessagesFn({ data: { threadId: activeThreadId, userId: userId || undefined } })
+    getAIMessagesFn({ data: { threadId: activeThreadId, userId } })
       .then((records) => {
         if (Array.isArray(records) && records.length > 0) {
           const mapped: ChatMessage[] = records.map((r: any) => ({
             id: r.id,
             role: r.role,
             content: r.content,
-            timestamp: r.createdAt && isMounted
-              ? new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              : '',
+            timestamp:
+              r.createdAt && isMounted
+                ? new Date(r.createdAt).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : '',
           }))
           setMessages(mapped)
         }
@@ -126,7 +141,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       })
 
       if (res?.threadId && res.threadId !== activeThreadId) {
-        setActiveThreadId(res.threadId)
+        if (oracle) {
+          oracle.setActiveThreadId(res.threadId)
+          oracle.refreshThreads()
+        }
         if (onThreadCreated) {
           onThreadCreated(res.threadId)
         }
@@ -147,51 +165,102 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }
 
+  const handleModeSwitch = (targetMode: OracleMode) => {
+    if (oracle) {
+      oracle.setMode(targetMode)
+    }
+  }
+
+  const handleClose = () => {
+    if (oracle) {
+      oracle.setMode('closed')
+    }
+    if (onClose) {
+      onClose()
+    }
+  }
+
   return (
     <div
       className={`flex flex-col bg-[#080d0d] border border-cyan-900/60 shadow-2xl font-mono overflow-hidden ${
-        isCompact ? 'h-[460px]' : 'h-full'
+        isCompact ? 'h-[480px]' : 'h-full'
       } ${className}`}
     >
-      {/* Header */}
-      <div className="bg-[#0e1414] border-b border-cyan-900/50 px-3 py-2.5 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <BrainCircuit className="w-5 h-5 text-cyan-400 animate-pulse" />
-          <div>
-            <div className="text-xs font-bold text-cyan-300 tracking-wider flex items-center gap-1.5">
-              <span>{personaName}</span>
-              <span className="text-[9px] bg-cyan-950 border border-cyan-700/60 text-cyan-400 px-1 py-0.2">
-                GATEWAY
-              </span>
-            </div>
-            <div className="text-[10px] text-emerald-400 flex items-center space-x-1">
+      {/* Shared Simplified Header */}
+      <div className="bg-[#0b1010] border-b border-cyan-900/50 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center space-x-2 min-w-0">
+          <BrainCircuit className="w-4 h-4 text-cyan-400 animate-pulse shrink-0" />
+          <div className="flex items-center gap-2 truncate">
+            <span className="text-xs font-bold text-cyan-300 tracking-wider truncate">
+              {personaName}
+            </span>
+            <div className="hidden sm:flex items-center space-x-1 text-[10px] text-emerald-400 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-              <span className="truncate max-w-[180px]">{modelName}</span>
+              <span>ONLINE</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-1">
+
+        {/* Mode Switcher & Panel Controls */}
+        <div className="flex items-center space-x-1 shrink-0">
+          {showModeControls && oracle && (
+            <div className="flex items-center bg-[#040707] border border-cyan-900/70 p-0.5 chamfer-corner space-x-0.5">
+              <button
+                onClick={() => handleModeSwitch('popout')}
+                className={`p-1 transition-all rounded-none ${
+                  oracle.mode === 'popout'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/80 shadow-[0_0_8px_rgba(0,195,255,0.4)]'
+                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/40'
+                }`}
+                title="Popout Overlay Widget"
+              >
+                <Minimize2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => handleModeSwitch('sidebar')}
+                className={`p-1 transition-all rounded-none ${
+                  oracle.mode === 'sidebar'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/80 shadow-[0_0_8px_rgba(0,195,255,0.4)]'
+                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/40'
+                }`}
+                title="Dock to Right Sidebar"
+              >
+                <PanelRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => handleModeSwitch('page')}
+                className={`p-1 transition-all rounded-none ${
+                  oracle.mode === 'page'
+                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/80 shadow-[0_0_8px_rgba(0,195,255,0.4)]'
+                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/40'
+                }`}
+                title="Expand to Full Dedicated Page"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           <button
             onClick={() => setMessages([{ ...initialWelcome, timestamp: getTimeString() }])}
-            className="text-gray-500 hover:text-cyan-400 p-1 transition-colors"
-            title="Reset Chat"
+            className="text-gray-400 hover:text-cyan-300 p-1 transition-colors"
+            title="Reset Conversation"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
           </button>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-red-400 p-1 transition-colors"
-              title="Close Panel"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-red-400 p-1 transition-colors"
+            title="Close Panel"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
       {/* Prompt Shortcuts */}
-      <div className="px-3 py-1.5 bg-[#050808] border-b border-cyan-950 flex gap-1.5 overflow-x-auto text-[10px] no-scrollbar">
+      <div className="px-3 py-1.5 bg-[#050808] border-b border-cyan-950 flex gap-1.5 overflow-x-auto text-[10px] no-scrollbar shrink-0">
         {DEFAULT_PROMPT_SHORTCUTS.map((item, idx) => (
           <button
             key={idx}
@@ -205,7 +274,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="bg-red-950/80 border-b border-red-800 px-3 py-1.5 text-[11px] text-red-300 flex items-center justify-between">
+        <div className="bg-red-950/80 border-b border-red-800 px-3 py-1.5 text-[11px] text-red-300 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-1.5">
             <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
             <span>{errorMessage}</span>
@@ -217,7 +286,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       )}
 
       {/* Message Canvas */}
-      <Conversation className="flex-1">
+      <Conversation className="flex-1 min-h-0">
         <ConversationContent>
           {messages.map((msg) => (
             <Message
@@ -243,7 +312,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       </Conversation>
 
       {/* Input Box */}
-      <PromptInput onSubmit={handlePromptSubmit} status={isSending ? 'streaming' : 'ready'} />
+      <div className="shrink-0">
+        <PromptInput onSubmit={handlePromptSubmit} status={isSending ? 'streaming' : 'ready'} />
+      </div>
     </div>
   )
 }

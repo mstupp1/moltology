@@ -5,19 +5,27 @@ import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
+import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
 
-function HudLayout() {
+function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
+  const oracle = useSafeOracle()
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
 
   useEffect(() => {
-    const handleToggle = () => setIsAIDrawerOpen((prev) => !prev)
+    const handleToggle = () => {
+      if (oracle) {
+        oracle.toggleMode('sidebar')
+      } else {
+        setIsAIDrawerOpen((prev) => !prev)
+      }
+    }
     window.addEventListener('toggle-ai-drawer', handleToggle)
     return () => window.removeEventListener('toggle-ai-drawer', handleToggle)
-  }, [])
+  }, [oracle])
 
   return (
     <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
@@ -78,7 +86,14 @@ function HudLayout() {
   )
 }
 
+function HudLayout() {
+  return (
+    <OracleProvider>
+      <HudContent />
+    </OracleProvider>
+  )
+}
+
 export const Route = createFileRoute('/_hud')({
   component: HudLayout,
 })
-
