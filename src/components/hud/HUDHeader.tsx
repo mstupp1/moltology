@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from '@tanstack/react-router'
-import { LogIn, LogOut, Search, Command, HelpCircle, LifeBuoy } from 'lucide-react'
+import { LogIn, Search, Command, HelpCircle, LifeBuoy } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
+import { UserAvatar } from '../UserAvatar'
+import { UserAvatarMenu } from '../UserAvatarMenu'
 
 interface HUDHeaderProps {
   stage?: number
@@ -30,11 +32,6 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
     setIsAuthModalOpen(true)
   }
 
-  const handleSignOut = async () => {
-    await authClient.signOut()
-    navigate({ to: '/' })
-  }
-
   const displayName = user?.name || user?.email?.split('@')[0]?.toUpperCase() || larvaId
 
   const handleOpenCommandPalette = () => {
@@ -54,13 +51,13 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
       <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1 sm:flex-initial">
         {/* Unit Avatar Circle with Cyan Glow Ring */}
         <div className="relative shrink-0">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#030606] border-2 border-[#00c3ff] overflow-hidden flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(0,195,255,0.8)]">
-            <img 
-              src="/images/extracted/larva_unit_3d.jpg" 
-              alt="Larva Unit 3D" 
-              className="w-full h-full object-cover rounded-full filter contrast-125" 
-            />
-          </div>
+          <UserAvatar
+            user={user}
+            fallbackSrc="/images/extracted/larva_unit_3d.jpg"
+            alt={user ? (user.name || user.email || 'User Avatar') : 'Larva Unit 3D'}
+            size="md"
+            className="border-2 border-[#00c3ff] shadow-[0_0_12px_rgba(0,195,255,0.8)] filter contrast-125"
+          />
         </div>
 
 
@@ -148,7 +145,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
               currentRoute === '/support' ? 'text-[#00ffff] animate-spin-slow' : 'text-[#00ffff]'
             }`}
           />
-          <span className="hidden sm:inline tracking-wider">SUPPORT</span>
+          <span className="hidden sm:inline tracking-wider">HELP</span>
         </button>
 
 
@@ -166,22 +163,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
             </span>
           </BenthicCTAButton>
         ) : (
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <span className="hidden xl:inline-block text-[11px] text-[#00c3ff] bg-[#0f1414] border border-[#3a4a49] px-2.5 py-1 font-mono font-bold truncate max-w-[160px] rounded-full shadow-inner">
-              {user.email}
-            </span>
-            <BenthicCTAButton
-              variant="red"
-              size="sm"
-              onClick={handleSignOut}
-              className="!px-2.5 sm:!px-4 !py-1"
-            >
-              <span className="flex items-center gap-1 text-[10px] sm:text-xs">
-                <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span>LOG OUT</span>
-              </span>
-            </BenthicCTAButton>
-          </div>
+          <UserAvatarMenu user={user} onNavigate={(path) => navigate({ to: path })} />
         )}
       </div>
     </header>

@@ -9,6 +9,8 @@ export interface ChromaElementProps {
   containerClassName?: string
   pulse?: boolean
   hoverScale?: boolean
+  maskRadial?: boolean
+  terminalEffects?: boolean
 }
 
 export const ChromaElement: React.FC<ChromaElementProps> = ({
@@ -20,20 +22,29 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
   containerClassName = '',
   pulse = false,
   hoverScale = true,
+  maskRadial = true,
+  terminalEffects = true,
 }) => {
   const glowStyles = {
-    cyan: 'drop-shadow-[0_0_12px_rgba(0,195,255,0.7)]',
-    crimson: 'drop-shadow-[0_0_12px_rgba(255,69,58,0.7)]',
-    gold: 'drop-shadow-[0_0_12px_rgba(255,215,0,0.7)]',
+    cyan: 'drop-shadow-[0_0_16px_rgba(0,195,255,0.85)] drop-shadow-[0_0_30px_rgba(0,195,255,0.4)]',
+    crimson: 'drop-shadow-[0_0_16px_rgba(255,69,58,0.85)] drop-shadow-[0_0_30px_rgba(255,69,58,0.4)]',
+    gold: 'drop-shadow-[0_0_16px_rgba(255,215,0,0.85)] drop-shadow-[0_0_30px_rgba(255,215,0,0.4)]',
     none: '',
   }[glowColor]
 
-  const blendStyle = {
-    screen: { mixBlendMode: 'screen' as const },
-    lighten: { mixBlendMode: 'lighten' as const },
-    'color-dodge': { mixBlendMode: 'color-dodge' as const },
-    normal: {},
-  }[blendMode]
+  const blendStyle: React.CSSProperties = {
+    ...(blendMode === 'screen' ? { mixBlendMode: 'screen' } : {}),
+    ...(blendMode === 'lighten' ? { mixBlendMode: 'lighten' } : {}),
+    ...(blendMode === 'color-dodge' ? { mixBlendMode: 'color-dodge' } : {}),
+    ...(maskRadial
+      ? {
+          WebkitMaskImage:
+            'radial-gradient(circle at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 75%)',
+          maskImage:
+            'radial-gradient(circle at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 75%)',
+        }
+      : {}),
+  }
 
   return (
     <div
@@ -44,7 +55,7 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
       {/* Background Radial Glow */}
       {glowColor !== 'none' && (
         <div
-          className={`absolute inset-0 rounded-full blur-xl opacity-30 pointer-events-none ${
+          className={`absolute inset-0 rounded-full blur-2xl opacity-40 pointer-events-none ${
             glowColor === 'cyan'
               ? 'bg-[#00c3ff]'
               : glowColor === 'crimson'
@@ -63,6 +74,14 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
           hoverScale ? 'hover:scale-105' : ''
         } ${glowStyles} ${className}`}
       />
+
+      {/* CRT Terminal Overlays: Static Scanlines & Grain */}
+      {terminalEffects && (
+        <>
+          <div className="absolute inset-0 rounded-full crt-scanlines pointer-events-none z-20" />
+          <div className="absolute inset-0 rounded-full crt-grain opacity-35 mix-blend-overlay pointer-events-none z-20" />
+        </>
+      )}
     </div>
   )
 }

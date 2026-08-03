@@ -11,7 +11,6 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   Building2,
   Cpu,
-  UserCheck,
   UserPlus,
   Home,
   ShoppingBag,
@@ -19,6 +18,7 @@ import {
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
+import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 
 export interface PublicHeaderProps {
   activePage?: 'home' | 'org' | 'store'
@@ -128,12 +128,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="hidden sm:flex text-xs text-emerald-400 font-bold items-center gap-1.5 bg-emerald-950/40 px-3.5 py-2 border border-emerald-500/30 rounded-full">
-                <UserCheck className="w-3.5 h-3.5" />
-                <span className="truncate max-w-[140px]">
-                  {user.name || user.email}
-                </span>
-              </span>
               <button
                 onClick={() => onNavigate('/dashboard')}
                 className="px-5 py-2 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105 shadow-hud-cyan"
@@ -141,6 +135,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 <Cpu className="w-4 h-4" />
                 <span>DASHBOARD</span>
               </button>
+              <UserAvatarMenu user={user} onNavigate={onNavigate} />
             </div>
           ) : (
             <div className="flex items-center gap-3">

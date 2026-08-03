@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PublicHeader } from './PublicHeader'
+import { authClient } from '@/lib/auth-client'
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
@@ -9,7 +10,8 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: () => ({ data: null }),
+    useSession: vi.fn(() => ({ data: null })),
+    signOut: vi.fn(),
   },
 }))
 
@@ -44,5 +46,29 @@ describe('PublicHeader Navigation Component', () => {
     const loginBtn = screen.getByRole('button', { name: /LOG IN/i })
     fireEvent.click(loginBtn)
     expect(onOpenAuth).toHaveBeenCalledWith('login')
+  })
+
+  it('renders user SSO avatar menu when user is signed in', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'user-1',
+          name: 'Google User',
+          email: 'googleuser@gmail.com',
+          image: 'https://lh3.googleusercontent.com/sso-avatar.jpg',
+        },
+      },
+    } as any)
+
+    render(<PublicHeader activePage="home" />)
+
+    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
+    expect(avatarBtn).toBeInTheDocument()
+
+    // Click avatar button to reveal dropdown
+    fireEvent.click(avatarBtn)
+
+    expect(screen.getByText('Google User')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 })
