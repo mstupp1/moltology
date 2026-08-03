@@ -434,9 +434,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               }`}
               title="Benthic Support Portal"
             >
-              {currentRoute === '/support' && (
-                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.8)]" />
-              )}
               <LifeBuoy
                 className={`w-4 h-4 shrink-0 transition-colors ${
                   currentRoute === '/support'
@@ -482,16 +479,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   user={user}
                   onNavigate={(path) => navigate({ to: path })}
                   align="left"
+                  openDirection="up"
                 />
                 {!isCollapsed && (
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-xs font-medium text-[#dfe3e3] truncate font-grotesk">
+                    <span className="text-xs font-medium text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
                       {user.name || user.email?.split('@')[0] || 'OPERATIVE'}
                     </span>
-                    <span className="text-[10px] text-[#00c3ff] font-mono tracking-wide flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                      AUTHENTICATED
-                    </span>
+                    {user.email && (
+                      <span className="text-[10px] text-[#7a8e9e] truncate mt-0.5">
+                        {user.email}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>

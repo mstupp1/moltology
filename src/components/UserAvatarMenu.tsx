@@ -14,6 +14,7 @@ export interface UserAvatarMenuProps {
   }
   onNavigate?: (path: string) => void
   align?: 'left' | 'right'
+  openDirection?: 'up' | 'down'
 }
 
 /**
@@ -25,6 +26,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   user,
   onNavigate,
   align = 'right',
+  openDirection = 'down',
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -89,7 +91,9 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
         <div
           className={`absolute ${
             align === 'right' ? 'right-0' : 'left-0'
-          } mt-2 w-64 bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 animate-in fade-in zoom-in-95 duration-150 font-mono`}
+          } ${
+            openDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
+          } w-64 bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 animate-in fade-in zoom-in-95 duration-150 font-mono`}
         >
           {/* Top User Header Info Section */}
           <div className="flex items-center gap-3 pb-3 border-b border-[#121c1d]">
@@ -99,18 +103,15 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               className="border-2 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.6)]"
             />
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-bold text-[#dfe3e3] truncate font-grotesk">
+              <span className="text-xs font-bold text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
                 {displayName}
               </span>
               {user.email && (
-                <span className="text-[10px] text-[#7a8e9e] truncate">
+                <span className="text-[10px] text-[#7a8e9e] truncate mt-0.5">
                   {user.email}
                 </span>
               )}
-              <span className="text-[9px] text-[#00c3ff] font-bold tracking-wider uppercase mt-0.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] animate-pulse" />
-                AUTHENTICATED
-              </span>
             </div>
           </div>
 
