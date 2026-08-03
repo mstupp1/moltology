@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
-import { handlerWithServer, publicServerFn, authenticatedServerFn } from './functions'
+import { createServerFn } from '@tanstack/react-start'
+import { publicMiddleware, authenticatedMiddleware } from './functions'
 import { changelogs, profiles, users, userStats, galleryPins } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
@@ -72,7 +73,9 @@ const getPublicChangelogsHandler = async ({ context }: ServerFnArgs) => {
   return INITIAL_CHANGELOGS
 }
 
-export const getPublicChangelogsFn = handlerWithServer(publicServerFn, getPublicChangelogsHandler)
+export const getPublicChangelogsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .handler(getPublicChangelogsHandler)
 
 /**
  * Server Function: Get authenticated user profile.
@@ -93,7 +96,9 @@ const getUserProfileHandler = async ({ context }: ServerFnArgs) => {
   return userRecord || null
 }
 
-export const getUserProfileFn = handlerWithServer(authenticatedServerFn, getUserProfileHandler)
+export const getUserProfileFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .handler(getUserProfileHandler)
 
 /**
  * Server Function: Get authenticated user stats.
@@ -114,7 +119,9 @@ const getUserStatsHandler = async ({ context }: ServerFnArgs) => {
   return stats || null
 }
 
-export const getUserStatsFn = handlerWithServer(authenticatedServerFn, getUserStatsHandler)
+export const getUserStatsFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .handler(getUserStatsHandler)
 
 interface UserStatsInput {
   pincerTorque?: number
@@ -144,8 +151,9 @@ const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<UserStatsI
   return updated
 }
 
-export const updateUserStatsFn = handlerWithServer(
-  authenticatedServerFn.validator((data: UserStatsInput) => {
+export const updateUserStatsFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .validator((data: UserStatsInput) => {
     return z
       .object({
         pincerTorque: z.number().min(0).max(100).optional(),
@@ -153,9 +161,8 @@ export const updateUserStatsFn = handlerWithServer(
         clawStrength: z.number().min(0).max(100).optional(),
       })
       .parse(data)
-  }),
-  updateUserStatsHandler,
-)
+  })
+  .handler(updateUserStatsHandler)
 
 interface GetAssetUrlInput {
   key: string
@@ -173,17 +180,17 @@ const getS3AssetUrlHandler = async ({ data }: ServerFnArgs<GetAssetUrlInput>) =>
   return { url }
 }
 
-export const getS3AssetUrlFn = handlerWithServer(
-  publicServerFn.validator((data: GetAssetUrlInput) => {
+export const getS3AssetUrlFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: GetAssetUrlInput) => {
     return z
       .object({
         key: z.string().min(1),
         expiresIn: z.number().min(60).max(86400).optional(),
       })
       .parse(data)
-  }),
-  getS3AssetUrlHandler,
-)
+  })
+  .handler(getS3AssetUrlHandler)
 
 /**
  * Server Function: Get gallery pins from DB or return preloaded initial catalog.
@@ -225,6 +232,231 @@ const getGalleryPinsHandler = async ({ context }: ServerFnArgs): Promise<Gallery
   return INITIAL_GALLERY_PINS
 }
 
-export const getGalleryPinsFn = handlerWithServer(publicServerFn, getGalleryPinsHandler)
+export const getGalleryPinsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .handler(getGalleryPinsHandler)
+
+/**
+ * Server Function: Fetch user's AI conversation threads.
+ */
+const getAIThreadsHandler = async ({ context }: ServerFnArgs) => {
+  const userId = context?.user?.sub || context?.user?.id
+  if (!userId) return []
+  try {
+    const { getUserAIThreads } = await import('../ai/service')
+    return await getUserAIThreads(userId)
+  } catch (err) {
+    console.warn('[getAIThreadsFn] DB query error:', err)
+    return []
+  }
+}
+
+export const getAIThreadsFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .handler(getAIThreadsHandler)
+
+interface GetAIMessagesInput {
+  threadId: string
+}
+
+/**
+ * Server Function: Fetch messages for a specific AI thread.
+ */
+const getAIMessagesHandler = async ({ data }: ServerFnArgs<GetAIMessagesInput>) => {
+  if (!data?.threadId) return []
+  try {
+    const { getAIThreadMessages } = await import('../ai/service')
+    return await getAIThreadMessages(data.threadId)
+  } catch (err) {
+    console.warn('[getAIMessagesFn] DB query error:', err)
+    return []
+  }
+}
+
+export const getAIMessagesFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .validator((data: GetAIMessagesInput) => {
+    return z.object({ threadId: z.string().min(1) }).parse(data)
+  })
+  .handler(getAIMessagesHandler)
+
+interface CreateAIThreadInput {
+  title?: string
+  persona?: string
+}
+
+/**
+ * Server Function: Create a new AI conversation thread.
+ */
+const createAIThreadHandler = async ({ data, context }: ServerFnArgs<CreateAIThreadInput>) => {
+  const userId = context?.user?.sub || context?.user?.id
+  if (!userId) throw new Error('Unauthenticated')
+  const { createAIThread } = await import('../ai/service')
+  return await createAIThread({
+    userId,
+    title: data?.title || 'Ascendance Consultation',
+    persona: data?.persona || 'oracle',
+  })
+}
+
+export const createAIThreadFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .validator((data: CreateAIThreadInput) => {
+    return z.object({ title: z.string().optional(), persona: z.string().optional() }).parse(data)
+  })
+  .handler(createAIThreadHandler)
+
+interface SendChatMessageInput {
+  messages: Array<{ role: string; content?: string; text?: string }>
+  userId?: string
+  threadId?: string
+}
+
+/**
+ * Server Function: Send a message to AI gateway (DeepSeek V4 / GPT-4o-mini fallback) with guardrails & DB persistence.
+ */
+export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<SendChatMessageInput>) => {
+  const { messages, userId: inputUserId, threadId: inputThreadId } = data || {}
+  const authUserId = context?.user?.sub || context?.user?.id
+  const userId = authUserId || inputUserId
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    throw new Error('Messages array is required')
+  }
+
+  const lastMsg = messages[messages.length - 1]
+  const userText = lastMsg?.content || lastMsg?.text || ''
+
+  const { validateInputGuardrails, checkRateLimit } = await import('../ai/guardrails')
+  const clientIp = '127.0.0.1'
+  const rateLimit = checkRateLimit(userId || clientIp, 30, 60 * 1000)
+  if (!rateLimit.success) {
+    throw new Error('Rate limit exceeded. Please wait a moment before sending more messages.')
+  }
+
+  const guardrail = validateInputGuardrails(userText)
+  if (!guardrail.allowed) {
+    throw new Error(guardrail.reason || 'Message blocked by AI guardrails.')
+  }
+
+  const { saveAIMessage, createAIThread } = await import('../ai/service')
+  let activeThreadId = inputThreadId
+
+  // Safe DB Thread creation & User message logging
+  if (userId) {
+    try {
+      if (!activeThreadId) {
+        const newThread = await createAIThread({
+          userId,
+          title: userText.slice(0, 30) + '...',
+          persona: 'oracle',
+        })
+        activeThreadId = newThread?.id || activeThreadId
+      }
+
+      if (activeThreadId) {
+        await saveAIMessage({
+          threadId: activeThreadId,
+          userId,
+          role: 'user',
+          content: userText,
+        })
+      }
+    } catch (dbErr) {
+      console.warn('[sendChatMessageFn] DB thread/message logging warning:', dbErr)
+    }
+  }
+
+  const { generateText } = await import('ai')
+  const { buildSystemPrompt } = await import('../ai/codex-prompt')
+
+  let assistantText = ''
+  const systemPrompt = buildSystemPrompt()
+  const payloadMessages = messages.map((m) => ({
+    role: m.role as any,
+    content: m.content || m.text || '',
+  }))
+
+  // Model cascade: try DeepSeek V4 first; if free tier credit limit occurs on Gateway, fall back to gpt-4o-mini
+  const candidateModels = ['deepseek/deepseek-v4-flash-0731', 'openai/gpt-4o-mini']
+  let lastError: Error | null = null
+
+  for (const modelCandidate of candidateModels) {
+    try {
+      const result = await generateText({
+        model: modelCandidate as any,
+        system: systemPrompt,
+        messages: payloadMessages,
+      })
+      if (result.text) {
+        assistantText = result.text
+        break
+      }
+    } catch (err: any) {
+      console.warn(`[Vercel AI Gateway] Model candidate '${modelCandidate}' failed:`, err.message)
+      lastError = err
+    }
+  }
+
+  if (!assistantText) {
+    try {
+      const { openai } = await import('@ai-sdk/openai')
+      const result = await generateText({
+        model: openai('gpt-4o-mini'),
+        system: systemPrompt,
+        messages: payloadMessages,
+      })
+      if (result.text) {
+        assistantText = result.text
+      }
+    } catch (err: any) {
+      console.warn('[AI SDK Direct OpenAI] Fallback failed:', err.message)
+    }
+  }
+
+  if (!assistantText) {
+    assistantText = `[SYNAPTIC ORACLE SYSTEM ERROR] The Benthic neural gateway encountered network turbulence (${lastError?.message || 'Gateway Unavailable'}). Pull Vercel environment variables locally using "vc env pull .env.local" or configure VERCEL_OIDC_TOKEN.`
+  }
+
+  // Safe DB Assistant message logging
+  if (userId && activeThreadId && assistantText) {
+    try {
+      await saveAIMessage({
+        threadId: activeThreadId,
+        userId,
+        role: 'assistant',
+        content: assistantText,
+      })
+    } catch (dbErr) {
+      console.warn('[sendChatMessageFn] DB assistant response logging warning:', dbErr)
+    }
+  }
+
+  return {
+    text: assistantText,
+    threadId: activeThreadId,
+  }
+}
+
+export const sendChatMessageFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: SendChatMessageInput) => {
+    return z
+      .object({
+        messages: z.array(
+          z.object({
+            role: z.string(),
+            content: z.string().optional(),
+            text: z.string().optional(),
+          })
+        ),
+        userId: z.string().optional(),
+        threadId: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(sendChatMessageHandler)
+
+
 
 
