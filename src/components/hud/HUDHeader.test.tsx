@@ -25,10 +25,10 @@ describe('HUDHeader Component', () => {
     const img = screen.getByRole('img', { name: 'Larva Unit 3D' })
     expect(img).toBeInTheDocument()
     expect(img).toHaveAttribute('src', '/images/extracted/larva_unit_3d.jpg')
-    expect(screen.getByText('SIGN IN TO PERSIST')).toBeInTheDocument()
+    expect(screen.getByText('CONVERSION IN PROGRESS')).toBeInTheDocument()
   })
 
-  it('renders Google SSO avatar image and opens dropdown menu on click with username and signout option', () => {
+  it('renders Google SSO avatar image when user is signed in', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -42,19 +42,12 @@ describe('HUDHeader Component', () => {
 
     render(<HUDHeader />)
 
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    expect(avatarBtn).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
-
-    // Click avatar button to toggle dropdown menu
-    fireEvent.click(avatarBtn)
-
-    expect(screen.getAllByText('Carcinus Ascendant').length).toBeGreaterThan(0)
-    expect(screen.getByText('carcinus@moltology.org')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    const avatarImg = screen.getByRole('img', { name: 'Carcinus Ascendant' })
+    expect(avatarImg).toBeInTheDocument()
+    expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
   })
 
-  it('renders letter avatar fallback when signed in user has no image and opens dropdown', () => {
+  it('renders letter avatar fallback when signed in user has no image', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -68,10 +61,7 @@ describe('HUDHeader Component', () => {
 
     render(<HUDHeader />)
 
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    fireEvent.click(avatarBtn)
-
-    expect(screen.getAllByText('Larva Member').length).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    expect(screen.getByText('Larva Member')).toBeInTheDocument()
+    expect(screen.getByText('L')).toBeInTheDocument()
   })
 })
