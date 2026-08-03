@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
+import { getUserProfileFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 
 interface AuthModalProps {
@@ -34,6 +35,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   useEffect(() => {
     if (user && isOpen) {
+      getUserProfileFn().catch(() => {})
       if (onSuccess) onSuccess()
       onClose()
     }
@@ -69,6 +71,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (res?.error) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
         } else {
+          await getUserProfileFn().catch(() => {})
           if (onSuccess) onSuccess()
           onClose()
         }
@@ -80,6 +83,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (res?.error) {
           setError(res.error.message || 'Invalid email or password.')
         } else {
+          await getUserProfileFn().catch(() => {})
           if (onSuccess) onSuccess()
           onClose()
         }

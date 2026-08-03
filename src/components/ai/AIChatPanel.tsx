@@ -84,7 +84,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Fetch thread messages if activeThreadId is provided
   useEffect(() => {
     if (!activeThreadId || !userId) return
-    getAIMessagesFn({ data: { threadId: activeThreadId } })
+    getAIMessagesFn({ data: { threadId: activeThreadId, userId: userId || undefined } })
       .then((records) => {
         if (Array.isArray(records) && records.length > 0) {
           const mapped: ChatMessage[] = records.map((r: any) => ({
