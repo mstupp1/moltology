@@ -7,7 +7,7 @@ import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
 import type { ChangelogEntry } from '../changelogs-data'
-import { INITIAL_GALLERY_PINS } from '../gallery-data'
+import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
 import { getPresignedViewUrl } from '../s3-client'
 
@@ -214,7 +214,9 @@ const getGalleryPinsHandler = async ({ context }: ServerFnArgs): Promise<Gallery
         description: r.description,
         prompt: r.prompt || undefined,
         s3Key: r.s3Key,
-        imageUrl: r.imageUrl,
+        imageUrl: (r.imageUrl && r.imageUrl.startsWith('http'))
+          ? r.imageUrl
+          : `${S3_BASE_URL}/${r.s3Key ? r.s3Key.replace(/^\//, '') : ''}`,
         aspectRatio: r.aspectRatio as GalleryPin['aspectRatio'],
         category: r.category as GalleryPin['category'],
         tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
