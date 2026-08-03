@@ -42,10 +42,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       {!isPopoutActive ? (
         <button
           onClick={handleToggle}
-          className={`bg-[#0f1414]/95 text-cyan-400 border border-cyan-500/60 p-2.5 sm:p-3 shadow-xl shadow-cyan-950/80 hover:border-cyan-400 hover:scale-105 transition-all flex items-center space-x-2 chamfer-corner group ${
-            isOtherModeActive ? 'opacity-80 border-cyan-700/40' : ''
-          }`}
-          title={isOtherModeActive ? `Oracle currently active in ${oracle.mode} mode` : 'Open Oracle AI Popout'}
+          className="bg-[#0f1414]/95 text-cyan-400 border border-cyan-500/60 p-2.5 sm:p-3 shadow-xl shadow-cyan-950/80 hover:border-cyan-400 hover:scale-105 transition-all flex items-center space-x-2 chamfer-corner group"
+          title="Open Oracle AI Popout"
         >
           <div className="relative">
             <BrainCircuit className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform" />
@@ -54,11 +52,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
           <span className="text-xs tracking-wider text-cyan-300 font-bold">
             ORACLE AI
           </span>
-          {isOtherModeActive && (
-            <span className="text-[9px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-1 py-0.2 uppercase">
-              {oracle.mode}
-            </span>
-          )}
         </button>
       ) : (
         <div className="w-[calc(100vw-1.5rem)] sm:w-96 rounded-none overflow-hidden chamfer-corner-lg animate-in slide-in-from-bottom-5 duration-200 shadow-2xl shadow-cyan-950/90 border border-cyan-500/70">
