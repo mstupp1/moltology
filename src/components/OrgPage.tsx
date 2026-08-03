@@ -210,7 +210,12 @@ export const OrgPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none bg-sacred-grid bg-benthic-vignette bg-pro-noise flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between">
+      {/* Ambient Sci-Fi Vignette & Sacred Grid Backdrops */}
+      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
+      <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-40" />
+      <div className="fixed inset-0 bg-pro-noise pointer-events-none z-0 opacity-30" />
+
       <AuthModal
         isOpen={isAuthModalOpen}
         initialMode={authMode}
