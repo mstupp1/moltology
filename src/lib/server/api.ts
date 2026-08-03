@@ -79,6 +79,65 @@ export const getPublicChangelogsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(getPublicChangelogsHandler)
 
+interface PublicChangelogsQueryInput {
+  category?: string
+  limit?: number
+}
+
+/**
+ * Server Function: Public REST API Endpoint handler for system changelogs with security headers & filtering.
+ */
+export const getPublicChangelogsRestApiHandler = async ({ data, context }: ServerFnArgs<PublicChangelogsQueryInput>) => {
+  const dbClient = context?.db || getDb()
+  let results: ChangelogEntry[] = []
+  try {
+    const records = await dbClient
+      .select()
+      .from(changelogs)
+      .where(eq(changelogs.isPublished, true))
+      .orderBy(desc(changelogs.releasedAt))
+
+    if (records && records.length > 0) {
+      results = records.map(toChangelogEntry)
+    } else {
+      results = INITIAL_CHANGELOGS.filter((c) => c.isPublished !== false)
+    }
+  } catch (error) {
+    console.warn('[getPublicChangelogsRestApiHandler] DB query warning:', error)
+    results = INITIAL_CHANGELOGS.filter((c) => c.isPublished !== false)
+  }
+
+  if (data?.category && data.category !== 'ALL') {
+    const catUpper = data.category.toUpperCase()
+    results = results.filter((c) => c.category?.toUpperCase() === catUpper)
+  }
+
+  if (data?.limit && data.limit > 0) {
+    results = results.slice(0, data.limit)
+  }
+
+  return {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Cache-Control': 'public, max-age=60, s-maxage=300',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    },
+    data: results,
+  }
+}
+
+export const getPublicChangelogsRestApiFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: PublicChangelogsQueryInput) => {
+    return z.object({ category: z.string().optional(), limit: z.number().optional() }).optional().parse(data || {})
+  })
+  .handler(getPublicChangelogsRestApiHandler)
+
+
 /**
  * Server Function: Get authenticated user profile.
  */
