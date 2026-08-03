@@ -21,7 +21,9 @@
 - **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
 
 ## 5. DB Workflows
-- `npm run db:setup` - Push schema, apply RLS, seed mock data.
+- `npm run db:generate` - Generate Drizzle SQL migrations in `drizzle/` from `src/db/schema.ts`.
+- `npm run db:migrate` - Apply pending Drizzle migrations from `drizzle/` to Neon DB.
+- `npm run db:setup` - Apply migrations (`db:migrate`), enable RLS (`db:rls`), and seed mock data (`db:seed`).
 - `npm run db:reset` - Wipe tables + setup (fast dev iteration).
 - **Branching**: Use Neon branches (`neonctl branches create`) + edit `DATABASE_URL` in `.env`.
 
