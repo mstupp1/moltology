@@ -12,6 +12,28 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    version: 'v1.5.0',
+    title: 'Synaptic Oracle Multi-Mode AI Hub & Navigation Overhaul',
+    category: 'FEATURE',
+    summary: 'Integrated multi-mode AI Oracle thread context, overhauled HUD sidebar navigation and profile identity menus, deployed next-gen Benthic particle FX, and published core legal policies.',
+    content: `### 🧠 Synaptic Oracle AI & Multi-Mode Hub
+- Integrated **OracleContext** managing centralized AI thread state across popout, sidebar, and page layouts.
+- Added **MarkdownRenderer** supporting rich syntax highlighting within chat responses.
+- Expanded database schema with \`ai_threads\`, \`ai_messages\`, and \`gallery_pins\` tables with S3 asset resolution and unique constraints.
+
+### 🧭 Navigation & User Identity HUD
+- Redesigned HUD sidebar navigation with collapsible floating toggle button, search command palette, and directional **UserAvatarMenu**.
+- Built automated identity auto-sync and session auto-provisioning across public and private headers.
+
+### 🌊 Benthic Particle FX & Visual Refinements
+- Deployed high-performance **UnderwaterBubblesCanvas** featuring multi-type particle physics and cluster plumes.
+- Upgraded HUD CRT scanline effects, animated conversion meter, custom HUD loaders/spinners, and interactive splash audio.
+
+### 📜 Legal & Compliance Framework
+- Implemented **Privacy Policy** and **Terms of Service** documentation routes linked across landing footers.`,
+    releasedAt: '2026-08-03T09:15:00Z',
+  },
+  {
     version: 'v1.0.0',
     title: 'Moltology 1.0 Official System Launch',
     category: 'FEATURE',
