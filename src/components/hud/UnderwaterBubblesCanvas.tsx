@@ -13,18 +13,221 @@ interface Particle {
   wobbleAmount: number
   wobbleOffset: number
   opacity: number
+  variantIndex: number
   clusterCenterX?: number
   bokehRingWidth?: number
 }
 
-interface UnderwaterBubblesCanvasProps {
+export interface UnderwaterBubblesCanvasProps {
   bubbleCount?: number
   className?: string
+  /**
+   * Single URL to a custom bubble graphic asset.
+   */
+  customBubbleSrc?: string
+  /**
+   * Array of URLs for distinct bubble graphic variants.
+   */
+  customBubbleSrcs?: string[]
+  /**
+   * Chroma key color mode for custom image assets: 'green' | 'black' | 'auto'. Defaults to 'black'.
+   */
+  chromaKeyMode?: 'green' | 'black' | 'auto'
+}
+
+const DEFAULT_BUBBLE_VARIANTS = [
+  '/images/bubble_variant_1.jpg',
+  '/images/bubble_variant_2.jpg',
+  '/images/bubble_variant_3.jpg',
+]
+
+/**
+ * Creates a chroma-keyed transparent offscreen canvas from a source image or canvas.
+ * Keying out green screen or black background pixels to 0 alpha for ultra-fast sprite rendering.
+ */
+export function createChromaKeyedSprite(
+  source: HTMLCanvasElement | HTMLImageElement,
+  keyMode: 'green' | 'black' | 'auto' = 'auto'
+): HTMLCanvasElement {
+  const width = (source as HTMLImageElement).naturalWidth || source.width || 128
+  const height = (source as HTMLImageElement).naturalHeight || source.height || 128
+
+  const offscreen = document.createElement('canvas')
+  offscreen.width = width
+  offscreen.height = height
+
+  const ctx = offscreen.getContext('2d', { alpha: true })
+  if (!ctx) return offscreen
+
+  ctx.drawImage(source, 0, 0, width, height)
+
+  try {
+    const imgData = ctx.getImageData(0, 0, width, height)
+    const data = imgData.data
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i]
+      const g = data[i + 1]
+      const b = data[i + 2]
+
+      let isKeyPixel = false
+      const isGreenPixel = g > 100 && g > r * 1.3 && g > b * 1.3
+      const isBlackPixel = r < 25 && g < 25 && b < 25
+
+      if ((keyMode === 'green' || keyMode === 'auto') && isGreenPixel) {
+        isKeyPixel = true
+      } else if ((keyMode === 'black' || keyMode === 'auto') && isBlackPixel) {
+        isKeyPixel = true
+      }
+
+      if (isKeyPixel) {
+        data[i + 3] = 0 // Transparent alpha
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0)
+  } catch (err) {
+    // Tainted canvas security fallback: screen blend mode will key out black background
+  }
+
+  return offscreen
+}
+
+/**
+ * Pre-renders high-detail 3D Glass Spherical Bubble sprite to an offscreen canvas.
+ */
+function createStandardBubbleSprite(size = 128): HTMLCanvasElement {
+  const offscreen = document.createElement('canvas')
+  offscreen.width = size
+  offscreen.height = size
+
+  const ctx = offscreen.getContext('2d', { alpha: true })
+  if (!ctx) return offscreen
+
+  const center = size / 2
+  const radius = size * 0.42
+
+  if (typeof ctx.createRadialGradient === 'function') {
+    const glowGrad = ctx.createRadialGradient(center, center, radius * 0.35, center, center, size * 0.5)
+    glowGrad.addColorStop(0, 'rgba(0, 255, 255, 0.65)')
+    glowGrad.addColorStop(0.5, 'rgba(0, 195, 255, 0.25)')
+    glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
+
+    ctx.fillStyle = glowGrad
+    ctx.beginPath()
+    ctx.arc(center, center, size * 0.5, 0, Math.PI * 2)
+    ctx.fill()
+
+    const shellGrad = ctx.createRadialGradient(
+      center - radius * 0.3,
+      center - radius * 0.3,
+      radius * 0.08,
+      center,
+      center,
+      radius
+    )
+    shellGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
+    shellGrad.addColorStop(0.38, 'rgba(0, 240, 255, 0.65)')
+    shellGrad.addColorStop(0.82, 'rgba(0, 180, 220, 0.45)')
+    shellGrad.addColorStop(1, 'rgba(0, 255, 255, 0.95)')
+
+    ctx.beginPath()
+    ctx.arc(center, center, radius, 0, Math.PI * 2)
+    ctx.fillStyle = shellGrad
+    ctx.fill()
+  } else {
+    ctx.beginPath()
+    ctx.arc(center, center, radius, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.8)'
+    ctx.fill()
+  }
+
+  const highlightRadius = radius * 0.28
+  ctx.beginPath()
+  ctx.arc(
+    center - radius * 0.35,
+    center - radius * 0.35,
+    highlightRadius,
+    0,
+    Math.PI * 2
+  )
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.98)'
+  ctx.fill()
+
+  return offscreen
+}
+
+/**
+ * Pre-renders Chroma-Keyed Bokeh Ring Bubble sprite to an offscreen canvas.
+ */
+function createBokehBubbleSprite(size = 128): HTMLCanvasElement {
+  const offscreen = document.createElement('canvas')
+  offscreen.width = size
+  offscreen.height = size
+
+  const ctx = offscreen.getContext('2d', { alpha: true })
+  if (!ctx) return offscreen
+
+  const center = size / 2
+  const radius = size * 0.44
+
+  if (typeof ctx.createRadialGradient === 'function') {
+    const bokehGrad = ctx.createRadialGradient(center, center, radius * 0.2, center, center, radius)
+    bokehGrad.addColorStop(0, 'rgba(0, 240, 255, 0.25)')
+    bokehGrad.addColorStop(0.7, 'rgba(0, 200, 240, 0.18)')
+    bokehGrad.addColorStop(1, 'rgba(160, 255, 255, 0.85)')
+
+    ctx.beginPath()
+    ctx.arc(center, center, radius, 0, Math.PI * 2)
+    ctx.fillStyle = bokehGrad
+    ctx.fill()
+  } else {
+    ctx.beginPath()
+    ctx.arc(center, center, radius, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'
+    ctx.fill()
+  }
+
+  ctx.lineWidth = 3
+  ctx.strokeStyle = 'rgba(160, 255, 255, 0.85)'
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.arc(center - radius * 0.3, center - radius * 0.3, radius * 0.3, 0, Math.PI * 2)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+  ctx.fill()
+
+  return offscreen
+}
+
+/**
+ * Pre-renders Micro-Fizz Particle sprite to an offscreen canvas.
+ */
+function createFizzBubbleSprite(size = 32): HTMLCanvasElement {
+  const offscreen = document.createElement('canvas')
+  offscreen.width = size
+  offscreen.height = size
+
+  const ctx = offscreen.getContext('2d', { alpha: true })
+  if (!ctx) return offscreen
+
+  const center = size / 2
+  const radius = size * 0.4
+
+  ctx.beginPath()
+  ctx.arc(center, center, radius, 0, Math.PI * 2)
+  ctx.fillStyle = 'rgba(220, 255, 255, 0.95)'
+  ctx.fill()
+
+  return offscreen
 }
 
 export function UnderwaterBubblesCanvas({
   bubbleCount = 200,
   className = 'absolute inset-0 pointer-events-none z-0',
+  customBubbleSrc,
+  customBubbleSrcs,
+  chromaKeyMode = 'black',
 }: UnderwaterBubblesCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -42,7 +245,31 @@ export function UnderwaterBubblesCanvas({
     let width = (canvas.width = parent?.clientWidth || window.innerWidth || 800)
     let height = (canvas.height = parent?.clientHeight || window.innerHeight || 600)
 
-    // Cache top radial sun glow to avoid allocating gradient objects inside requestAnimationFrame
+    // -------------------------------------------------------------------
+    // PRE-RENDERED HARDWARE-ACCELERATED SPRITE TEXTURE CACHE
+    // -------------------------------------------------------------------
+    const standardSprite = createStandardBubbleSprite(128)
+    const bokehSprite = createBokehBubbleSprite(128)
+    const fizzSprite = createFizzBubbleSprite(32)
+
+    const targetSources = customBubbleSrcs
+      ? customBubbleSrcs
+      : customBubbleSrc
+      ? [customBubbleSrc]
+      : DEFAULT_BUBBLE_VARIANTS
+
+    const customSprites: HTMLCanvasElement[] = []
+
+    if (typeof window !== 'undefined') {
+      targetSources.forEach((src, idx) => {
+        const img = new Image()
+        img.onload = () => {
+          customSprites[idx] = createChromaKeyedSprite(img, chromaKeyMode)
+        }
+        img.src = src
+      })
+    }
+
     let cachedSunGlow: CanvasGradient | string | null = null
     const updateSunGlowCache = () => {
       const sunX = width * 0.5
@@ -51,17 +278,16 @@ export function UnderwaterBubblesCanvas({
 
       if (typeof ctx.createRadialGradient === 'function') {
         const glow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, sunGlowRadius)
-        glow.addColorStop(0, 'rgba(0, 255, 255, 0.12)')
-        glow.addColorStop(0.4, 'rgba(0, 195, 255, 0.05)')
+        glow.addColorStop(0, 'rgba(0, 255, 255, 0.18)')
+        glow.addColorStop(0.4, 'rgba(0, 195, 255, 0.08)')
         glow.addColorStop(1, 'rgba(0, 255, 255, 0)')
         cachedSunGlow = glow
       } else {
-        cachedSunGlow = 'rgba(0, 255, 255, 0.05)'
+        cachedSunGlow = 'rgba(0, 255, 255, 0.08)'
       }
     }
     updateSunGlowCache()
 
-    // Debounced resize handling
     let resizeTimeout: ReturnType<typeof setTimeout>
     const handleResize = () => {
       clearTimeout(resizeTimeout)
@@ -76,47 +302,43 @@ export function UnderwaterBubblesCanvas({
 
     window.addEventListener('resize', handleResize, { passive: true })
 
-    // Respect user reduced-motion preference
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
 
-    // Hydrothermal plume cluster centers across the X axis (strong central column)
     let clusterCenters: number[] = []
     const updateClusterCenters = () => {
       clusterCenters = [
-        width * 0.18,
-        width * 0.42, // Main dense central plume
-        width * 0.48, // Main dense central plume
-        width * 0.54, // Main dense central plume
-        width * 0.82,
+        width * 0.15,
+        width * 0.35,
+        width * 0.50,
+        width * 0.65,
+        width * 0.85,
       ]
     }
     updateClusterCenters()
 
-    // Helper to generate particles (fizz, standard 3D bubble, or bokeh ring)
     const createParticle = (initialY?: number): Particle => {
       const roll = Math.random()
 
       let type: ParticleType
-      if (roll < 0.58) {
-        type = 'fizz' // 58% micro-fizz particles
-      } else if (roll < 0.86) {
-        type = 'standard' // 28% crisp 3D spherical bubbles
+      if (roll < 0.45) {
+        type = 'fizz'
+      } else if (roll < 0.82) {
+        type = 'standard'
       } else {
-        type = 'bokeh' // 14% out-of-focus bokeh rings
+        type = 'bokeh'
       }
 
       const z = Math.random() * 0.92 + 0.08
-      const isClustered = Math.random() < 0.88 // 88% focused inside plumes
+      const isClustered = Math.random() < 0.88
 
       let x: number
       let clusterCenterX: number | undefined
       if (isClustered && clusterCenters.length > 0) {
         const center = clusterCenters[Math.floor(Math.random() * clusterCenters.length)]
         clusterCenterX = center
-        // Tighter cluster spread for fizz, wider for bokeh
-        const spread = type === 'fizz' ? 35 : type === 'bokeh' ? 85 : 55
+        const spread = type === 'fizz' ? 45 : type === 'bokeh' ? 95 : 65
         const clusterJitter = (Math.random() + Math.random() - 1) * spread
         x = center + clusterJitter
       } else {
@@ -129,21 +351,22 @@ export function UnderwaterBubblesCanvas({
       let bokehRingWidth: number | undefined
 
       if (type === 'fizz') {
-        radius = (Math.random() * 1.8 + 0.6) * (0.4 + 0.6 * z)
+        radius = (Math.random() * 3.0 + 1.2) * (0.5 + 0.5 * z)
         speed = (Math.random() * 140 + 60) * (0.45 + 0.55 * z)
-        opacity = Math.random() * 0.55 + 0.25
+        opacity = Math.random() * 0.6 + 0.35
       } else if (type === 'standard') {
-        const sizePower = Math.pow(Math.random(), 2.0)
-        radius = (sizePower * 14 + 3.5) * (0.35 + 0.65 * z)
+        const sizePower = Math.pow(Math.random(), 1.8)
+        radius = (sizePower * 26 + 8.0) * (0.4 + 0.6 * z)
         speed = (Math.random() * 110 + 45) * (0.4 + 0.6 * z)
-        opacity = Math.random() * 0.45 + 0.2
+        opacity = Math.random() * 0.65 + 0.35
       } else {
-        // Bokeh particle: large radius, soft translucency, crisp bokeh stroke rim
-        radius = (Math.random() * 22 + 14) * (0.5 + 0.5 * z)
+        radius = (Math.random() * 34 + 20) * (0.5 + 0.5 * z)
         speed = (Math.random() * 80 + 35) * (0.35 + 0.65 * z)
-        opacity = Math.random() * 0.3 + 0.12
+        opacity = Math.random() * 0.45 + 0.25
         bokehRingWidth = Math.random() * 2.5 + 1.2
       }
+
+      const variantIndex = Math.floor(Math.random() * targetSources.length)
 
       return {
         type,
@@ -153,15 +376,15 @@ export function UnderwaterBubblesCanvas({
         radius,
         speed,
         wobbleSpeed: Math.random() * 2.5 + 0.8,
-        wobbleAmount: Math.random() * 18 + 4,
+        wobbleAmount: Math.random() * 20 + 6,
         wobbleOffset: Math.random() * Math.PI * 2,
         opacity,
+        variantIndex,
         clusterCenterX,
         bokehRingWidth,
       }
     }
 
-    // Initialize particles sorted by depth Z
     const particles: Particle[] = Array.from({ length: bubbleCount }, () => createParticle()).sort(
       (a, b) => a.z - b.z
     )
@@ -178,7 +401,6 @@ export function UnderwaterBubblesCanvas({
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
 
-    // Pause animation when tab is hidden
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isPaused = true
@@ -203,9 +425,6 @@ export function UnderwaterBubblesCanvas({
 
       ctx.clearRect(0, 0, width, height)
 
-      // -------------------------------------------------------------------
-      // 1. VERY SLIGHT TOP-CENTER SURFACE RADIAL GLOW (CACHED)
-      // -------------------------------------------------------------------
       if (cachedSunGlow) {
         const sunX = width * 0.5
         const sunY = -20
@@ -217,12 +436,7 @@ export function UnderwaterBubblesCanvas({
         ctx.fill()
       }
 
-      // -------------------------------------------------------------------
-      // 2. MULTI-TIER BOKEH & EFFERVESCENT BUBBLE PARTICLES
-      // Batch micro-fizz particles for zero path recreation latency
-      // -------------------------------------------------------------------
-      const fizzParticles: { x: number; y: number; r: number }[] = []
-
+      // Hardware-accelerated multi-variant sprite draw loop
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
@@ -231,10 +445,8 @@ export function UnderwaterBubblesCanvas({
           p.wobbleOffset += p.wobbleSpeed * dt
         }
 
-        // Wobble displacement
         const wobbleX = Math.sin(p.wobbleOffset) * p.wobbleAmount * p.z
 
-        // Mouse repulsion
         const dx = p.x + wobbleX - mouseX
         const dy = p.y - mouseY
         const distSq = dx * dx + dy * dy
@@ -242,15 +454,14 @@ export function UnderwaterBubblesCanvas({
 
         if (distSq < 14000 && distSq > 0) {
           const dist = Math.sqrt(distSq)
-          const force = (1 - dist / 118) * (p.type === 'bokeh' ? 12 : 7) * p.z
+          const force = (1 - dist / 118) * (p.type === 'bokeh' ? 14 : 9) * p.z
           pushX = (dx / dist) * force
         }
 
         const renderX = p.x + wobbleX + pushX
         const renderY = p.y
 
-        // Respawn at bottom when floating above screen top
-        if (renderY < -50) {
+        if (renderY < -60) {
           const newP = createParticle(height + Math.random() * 50 + 10)
           p.type = newP.type
           p.x = newP.x
@@ -262,11 +473,11 @@ export function UnderwaterBubblesCanvas({
           p.wobbleAmount = newP.wobbleAmount
           p.wobbleOffset = newP.wobbleOffset
           p.opacity = newP.opacity
+          p.variantIndex = newP.variantIndex
           p.clusterCenterX = newP.clusterCenterX
           p.bokehRingWidth = newP.bokehRingWidth
         }
 
-        // Vertical boundary fade
         let edgeAlpha = 1
         if (renderY < 100) {
           edgeAlpha = Math.max(0, renderY / 100)
@@ -274,121 +485,31 @@ export function UnderwaterBubblesCanvas({
           edgeAlpha = Math.max(0, (height - renderY) / 60)
         }
 
-        const currentOpacity = p.opacity * edgeAlpha * (0.35 + 0.65 * p.z)
+        const currentOpacity = p.opacity * edgeAlpha * (0.45 + 0.55 * p.z)
 
         if (currentOpacity <= 0.01) continue
 
-        if (p.type === 'fizz') {
-          // Collect micro-fizz positions to draw in a single batched path pass
-          fizzParticles.push({ x: renderX, y: renderY, r: p.radius })
-        } else if (p.type === 'bokeh') {
-          // --- TIER 2: BOKEH RINGS ---
-          if (typeof ctx.createRadialGradient === 'function') {
-            const bokehGrad = ctx.createRadialGradient(
-              renderX,
-              renderY,
-              p.radius * 0.2,
-              renderX,
-              renderY,
-              p.radius
-            )
-            bokehGrad.addColorStop(0, `rgba(0, 240, 255, ${currentOpacity * 0.12})`)
-            bokehGrad.addColorStop(0.7, `rgba(0, 200, 240, ${currentOpacity * 0.08})`)
-            bokehGrad.addColorStop(1, `rgba(160, 255, 255, ${currentOpacity * 0.6})`)
+        // Select sprite texture from custom variants or fallbacks
+        const customVariant = customSprites[p.variantIndex]
+        const activeSprite =
+          customVariant ||
+          (p.type === 'fizz' ? fizzSprite : p.type === 'bokeh' ? bokehSprite : standardSprite)
 
-            ctx.beginPath()
-            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-            ctx.fillStyle = bokehGrad
-            ctx.fill()
-          } else {
-            ctx.beginPath()
-            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-            ctx.fill()
+        ctx.globalAlpha = currentOpacity
+        const size = p.radius * 2
+
+        if (typeof ctx.drawImage === 'function') {
+          if (customVariant && (chromaKeyMode === 'black' || chromaKeyMode === 'auto')) {
+            ctx.globalCompositeOperation = 'screen'
           }
 
-          ctx.lineWidth = p.bokehRingWidth || 1.5
-          ctx.strokeStyle = `rgba(160, 255, 255, ${currentOpacity * 0.6})`
-          ctx.stroke()
+          ctx.drawImage(activeSprite, renderX - p.radius, renderY - p.radius, size, size)
 
-          ctx.beginPath()
-          ctx.arc(
-            renderX - p.radius * 0.3,
-            renderY - p.radius * 0.3,
-            p.radius * 0.3,
-            0,
-            Math.PI * 2
-          )
-          ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.75})`
-          ctx.fill()
-        } else {
-          // --- TIER 3: STANDARD CRISP 3D SPHERICAL BUBBLE ---
-          const outerGlowRadius = p.radius * 2.2
-          if (typeof ctx.createRadialGradient === 'function') {
-            const glowGrad = ctx.createRadialGradient(
-              renderX,
-              renderY,
-              p.radius * 0.35,
-              renderX,
-              renderY,
-              outerGlowRadius
-            )
-            glowGrad.addColorStop(0, `rgba(0, 255, 255, ${currentOpacity * 0.38})`)
-            glowGrad.addColorStop(0.5, `rgba(0, 195, 255, ${currentOpacity * 0.14})`)
-            glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
-
-            ctx.fillStyle = glowGrad
-            ctx.beginPath()
-            ctx.arc(renderX, renderY, outerGlowRadius, 0, Math.PI * 2)
-            ctx.fill()
-
-            const shellGrad = ctx.createRadialGradient(
-              renderX - p.radius * 0.3,
-              renderY - p.radius * 0.3,
-              p.radius * 0.08,
-              renderX,
-              renderY,
-              p.radius
-            )
-            shellGrad.addColorStop(0, `rgba(255, 255, 255, ${currentOpacity * 0.75})`)
-            shellGrad.addColorStop(0.4, `rgba(0, 240, 255, ${currentOpacity * 0.38})`)
-            shellGrad.addColorStop(0.85, `rgba(0, 180, 220, ${currentOpacity * 0.25})`)
-            shellGrad.addColorStop(1, `rgba(0, 255, 255, ${currentOpacity * 0.85})`)
-
-            ctx.beginPath()
-            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-            ctx.fillStyle = shellGrad
-            ctx.fill()
-          } else {
-            ctx.beginPath()
-            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-            ctx.fill()
-          }
-
-          const highlightRadius = Math.max(0.75, p.radius * 0.28)
-          ctx.beginPath()
-          ctx.arc(
-            renderX - p.radius * 0.35,
-            renderY - p.radius * 0.35,
-            highlightRadius,
-            0,
-            Math.PI * 2
-          )
-          ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.92})`
-          ctx.fill()
+          ctx.globalCompositeOperation = 'source-over'
         }
       }
 
-      // Render all micro-fizz particles in a single batched path fill for ultra-low draw-call latency
-      if (fizzParticles.length > 0) {
-        ctx.fillStyle = 'rgba(220, 255, 255, 0.75)'
-        ctx.beginPath()
-        for (let j = 0; j < fizzParticles.length; j++) {
-          const fp = fizzParticles[j]
-          ctx.moveTo(fp.x + fp.r, fp.y)
-          ctx.arc(fp.x, fp.y, fp.r, 0, Math.PI * 2)
-        }
-        ctx.fill()
-      }
+      ctx.globalAlpha = 1.0
 
       if (!prefersReducedMotion && !isPaused) {
         animationFrameId = requestAnimationFrame(render)
@@ -404,7 +525,7 @@ export function UnderwaterBubblesCanvas({
       window.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [bubbleCount])
+  }, [bubbleCount, customBubbleSrc, customBubbleSrcs, chromaKeyMode])
 
   return (
     <canvas
@@ -415,3 +536,5 @@ export function UnderwaterBubblesCanvas({
     />
   )
 }
+
+
