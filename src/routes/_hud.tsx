@@ -29,26 +29,32 @@ function HudContent() {
 
   return (
     <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
-      {/* Full-Bleed Underwater Background Image with high visibility */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0 opacity-80 pointer-events-none"
-        style={{ backgroundImage: `url('/images/underwater_looking_up.jpg')` }}
-      />
+      {/* Dedicated Portal CRT Screen Background (Behind UI) */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
+        {/* Full-Bleed Underwater Background Image with vivid cyan mix-blend */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 mix-blend-screen filter drop-shadow-[0_0_45px_rgba(0,255,255,0.65)]"
+          style={{ backgroundImage: `url('/images/underwater_looking_up.jpg')` }}
+        />
 
-      {/* Sacred Grid Overlay */}
-      <div className="absolute inset-0 bg-sacred-grid opacity-40 z-0 pointer-events-none" />
+        {/* Electric Cyan CRT Phosphor Ambient Radial Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.45)_0%,rgba(0,195,255,0.2)_55%,transparent_85%)]" />
 
-      {/* Pro Micro-Grain Noise Texture */}
-      <div className="absolute inset-0 bg-pro-noise opacity-60 z-0 pointer-events-none" />
+        {/* High-Contrast CRT Scanlines Overlay on Background Image */}
+        <div className="absolute inset-0 crt-scanlines opacity-90" />
 
-      {/* Deep Benthic Blue Pro Vignette & Top Ambient Lighting Overlay */}
-      <div className="absolute inset-0 bg-benthic-vignette z-0 pointer-events-none" />
+        {/* Micro-Grain Noise Texture on Background Image */}
+        <div className="absolute inset-0 crt-grain opacity-75 mix-blend-overlay" />
 
-      {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 z-0 pointer-events-none" />
+        {/* Sacred Grid Overlay */}
+        <div className="absolute inset-0 bg-sacred-grid opacity-35" />
 
-      {/* Matrix Digital Code Rain & Particle Canvas Background */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" />
+        {/* Deep Benthic Blue Pro Vignette Overlay */}
+        <div className="absolute inset-0 bg-benthic-vignette opacity-70" />
+
+        {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80" />
+      </div>
 
       {/* Experimental Navigation Command Palette */}
       <CommandPalette />
@@ -65,8 +71,8 @@ function HudContent() {
             {/* Portal Top Bar */}
             <HUDHeader />
 
-            {/* Main Panel Content Workspace with Translucent Glass Backdrop */}
-            <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/35 backdrop-blur-sm border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
+            {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
+            <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/10 backdrop-blur-[1px] border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
               <Outlet />
             </main>
           </div>
