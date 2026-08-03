@@ -3,7 +3,7 @@ import { ServerError, formatServerError } from './error'
 import { extractAuthToken } from './middleware'
 import { getDb } from '../../db'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { getPublicChangelogsHandler, getS3AssetUrlHandler } from './api'
+import { getPublicChangelogsHandler, getS3AssetUrlHandler, createChangelogHandler } from './api'
 import type { ChangelogEntry } from '../changelogs-data'
 
 describe('Server Error & Formatting', () => {
@@ -108,6 +108,15 @@ describe('Server Functions', () => {
     expect(result.url).toContain('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/order_emblem.png')
   })
 
+  it('should throw an error when createChangelogHandler is called unauthenticated', async () => {
+    await expect(
+      createChangelogHandler({
+        data: { version: 'v9.9.9', title: 'Test', category: 'TEST', summary: 'Test', content: 'Test' },
+        context: {},
+      })
+    ).rejects.toThrow('Unauthenticated')
+  })
 })
+
 
 

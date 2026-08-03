@@ -14,6 +14,7 @@ export const neonAuthUser = neonAuthSchema.table('user', {
 // Moltology Cult User Profiles Table (Extends neon_auth.user with domain stats)
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey(),
+  role: text('role').default('user').notNull(), // 'user' | 'admin' | 'super_admin'
   larvaId: text('larvaId').default('LARVA UNIT #8971').notNull(),
   stage: integer('stage').default(1).notNull(), // 1: Larva, 2: Soft-Shed, 3: Architect, 4: Ascendant
   moltCredits: decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull(),
@@ -98,6 +99,14 @@ export const changelogs = pgTable('changelogs', {
   pgPolicy('changelogs_public_read_policy', {
     for: 'select',
     using: sql`true`
+  }),
+  pgPolicy('changelogs_admin_insert_policy', {
+    for: 'insert',
+    withCheck: sql`EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        AND profiles.role IN ('admin', 'super_admin')
+    )`
   })
 ])
 

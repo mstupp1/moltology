@@ -13,5 +13,11 @@ describe('User Sync & Auto Profile Creation', () => {
   it('runs ensureUserProfile safely for valid user ID string', async () => {
     const testUserId = 'test-user-sync-id-' + Date.now()
     await expect(ensureUserProfile(testUserId)).resolves.not.toThrow()
+
+    // Clean up test profile row from database
+    const { getDb } = await import('../db')
+    const { profiles } = await import('../db/schema')
+    const { eq } = await import('drizzle-orm')
+    await getDb().delete(profiles).where(eq(profiles.id, testUserId)).catch(() => {})
   })
 })

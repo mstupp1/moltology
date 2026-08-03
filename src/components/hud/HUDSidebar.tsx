@@ -28,6 +28,8 @@ import {
   Terminal,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
+import { getUserProfileFn } from '../../lib/server/api'
+import { getAuthJWTToken } from '../../lib/jwt'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
@@ -89,6 +91,27 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!user?.id) {
+      setUserRole(null)
+      return
+    }
+    let isMounted = true
+    getAuthJWTToken()
+      .catch(() => null)
+      .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
+      .then((profile) => {
+        if (isMounted) setUserRole(profile?.role ?? null)
+      })
+      .catch(() => {
+        if (isMounted) setUserRole(null)
+      })
+    return () => {
+      isMounted = false
+    }
+  }, [user?.id])
 
   const handleSignOut = async () => {
     await authClient.signOut()
@@ -676,18 +699,31 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <div className={`flex items-center transition-all duration-150 group/profile hover:bg-white/[0.03] ${
                 isCollapsed ? 'justify-center px-0 py-3.5' : 'px-4 py-3 gap-3'
               }`}>
-                <UserAvatarMenu
-                  user={user}
-                  onNavigate={(path) => navigate({ to: path })}
-                  align="left"
-                  openDirection="up"
-                />
+                <div className="relative">
+                  <UserAvatarMenu
+                    user={user}
+                    userRole={userRole}
+                    onNavigate={(path) => navigate({ to: path })}
+                    align="left"
+                    openDirection="up"
+                  />
+                  {userRole && ['admin', 'super_admin'].includes(userRole) && isCollapsed && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none" title={userRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'} />
+                  )}
+                </div>
                 {!isCollapsed && (
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-xs font-medium text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
-                      {user.name || user.email?.split('@')[0] || 'OPERATIVE'}
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                      <span className="text-xs font-medium text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
+                        {user.name || user.email?.split('@')[0] || 'OPERATIVE'}
+                      </span>
+                      {userRole && ['admin', 'super_admin'].includes(userRole) && (
+                        <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shadow-[0_0_8px_rgba(0,255,255,0.4)] shrink-0">
+                          {userRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                        </span>
+                      )}
+                    </div>
                     {user.email && (
                       <span className="text-[10px] text-[#7a8e9e] truncate mt-0.5">
                         {user.email}

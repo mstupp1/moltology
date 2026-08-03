@@ -21,18 +21,37 @@ import {
   Layers,
   MessageSquare,
   Sparkles,
+  Plus,
+  X,
 } from 'lucide-react'
-import { getPublicChangelogs, type ChangelogEntry } from '@/lib/changelogs'
+import { getPublicChangelogs, createChangelog, type ChangelogEntry } from '@/lib/changelogs'
+import { getUserProfileFn } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
+import { authClient } from '@/lib/auth-client'
 import { seo } from '@/lib/seo'
 
 function SupportPortalRoute() {
   const loaderData = Route.useLoaderData()
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket' | 'diagnostics'>('changelog')
   const [changelogs, setChangelogs] = useState<ChangelogEntry[]>(loaderData?.changelogs || [])
   const [loading, setLoading] = useState(!loaderData?.changelogs)
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({ v1_0_0: true, v1_4_2: true })
+
+  // Admin User Role & Modal state
+  const [userRole, setUserRole] = useState<string>('user')
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false)
+  const [newVersion, setNewVersion] = useState('')
+  const [newTitle, setNewTitle] = useState('')
+  const [newCategory, setNewCategory] = useState('TRANSMUTATION')
+  const [newSummary, setNewSummary] = useState('')
+  const [newContent, setNewContent] = useState('')
+  const [newIsPublished, setNewIsPublished] = useState(true)
+  const [isSubmittingLog, setIsSubmittingLog] = useState(false)
+  const [adminMessage, setAdminMessage] = useState<string | null>(null)
 
   // Ticket Form state
   const [ticketSubject, setTicketSubject] = useState('')
@@ -42,6 +61,16 @@ function SupportPortalRoute() {
 
   useEffect(() => {
     let isMounted = true
+    getAuthJWTToken()
+      .catch(() => null)
+      .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user?.id } }))
+      .then((profile) => {
+        if (isMounted && profile?.role) {
+          setUserRole(profile.role)
+        }
+      })
+      .catch(() => {})
+
     getPublicChangelogs()
       .then((data) => {
         if (isMounted && Array.isArray(data) && data.length > 0) {
@@ -104,6 +133,37 @@ function SupportPortalRoute() {
     }, 4000)
   }
 
+  const handleCreateChangelog = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newVersion || !newTitle || !newSummary || !newContent) return
+    setIsSubmittingLog(true)
+    setAdminMessage(null)
+    try {
+      const entry = await createChangelog({
+        version: newVersion,
+        title: newTitle,
+        category: newCategory,
+        summary: newSummary,
+        content: newContent,
+        isPublished: newIsPublished,
+      })
+      setChangelogs((prev) => [entry, ...prev])
+      setIsAdminModalOpen(false)
+      setNewVersion('')
+      setNewTitle('')
+      setNewSummary('')
+      setNewContent('')
+      setAdminMessage('✓ System Transmutation Log successfully published to database!')
+    } catch (err: any) {
+      console.error('Failed creating changelog:', err)
+      setAdminMessage(`❌ Failed to publish log: ${err?.message || 'Unauthorized or network error'}`)
+    } finally {
+      setIsSubmittingLog(false)
+    }
+  }
+
+  const isAdmin = ['admin', 'super_admin'].includes(userRole)
+
   return (
     <div className="space-y-6 select-none font-mono text-[#dfe3e3] pb-10">
       {/* Header Banner matching Benthic Ascendance HUD standard */}
@@ -128,11 +188,18 @@ function SupportPortalRoute() {
             </div>
           </div>
 
-          {/* Realtime Status Indicator */}
-          <div className="flex items-center gap-2 bg-[#05090a] border border-[#3a4a49] px-3 py-1.5 chamfer-corner">
-            <span className="w-2 h-2 rounded-full bg-[#00ffff] animate-ping" />
-            <span className="text-xs text-[#00ffff] font-bold">SYSTEM STATUS: OPTIMAL</span>
-            <span className="text-xs text-[#839493] border-l border-[#3a4a49] pl-2 ml-1">3,400 FATHOMS</span>
+          {/* Realtime Status Indicator & Admin Badge */}
+          <div className="flex flex-wrap items-center gap-2">
+            {isAdmin && (
+              <span className="text-[10px] text-[#00ffff] font-extrabold tracking-widest uppercase bg-[#00ffff]/15 border border-[#00ffff] px-2.5 py-1 chamfer-corner shadow-[0_0_10px_rgba(0,255,255,0.4)]">
+                ROLE: {userRole.toUpperCase()}
+              </span>
+            )}
+            <div className="flex items-center gap-2 bg-[#05090a] border border-[#3a4a49] px-3 py-1.5 chamfer-corner">
+              <span className="w-2 h-2 rounded-full bg-[#00ffff] animate-ping" />
+              <span className="text-xs text-[#00ffff] font-bold">SYSTEM STATUS: OPTIMAL</span>
+              <span className="text-xs text-[#839493] border-l border-[#3a4a49] pl-2 ml-1">3,400 FATHOMS</span>
+            </div>
           </div>
         </div>
 
@@ -191,10 +258,18 @@ function SupportPortalRoute() {
         </div>
       </div>
 
+      {adminMessage && (
+        <div className={`p-3 chamfer-corner text-xs font-bold font-mono border ${
+          adminMessage.startsWith('✓') ? 'bg-[#00ffff]/10 border-[#00ffff] text-[#00ffff]' : 'bg-[#ff0055]/10 border-[#ff0055] text-[#ff0055]'
+        }`}>
+          {adminMessage}
+        </div>
+      )}
+
       {/* TAB 1: SYSTEM CHANGELOG */}
       {activeTab === 'changelog' && (
         <div className="space-y-4">
-          {/* Controls Bar: Search & Category Filter */}
+          {/* Controls Bar: Search, Category Filter & Admin Add Log */}
           <div className="chitin-card p-4 chamfer-corner flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
             {/* Search Input */}
             <div className="relative flex-1">
@@ -208,23 +283,35 @@ function SupportPortalRoute() {
               />
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-              <Filter className="w-3.5 h-3.5 text-[#839493] shrink-0" />
-              <span className="text-xs text-[#839493] shrink-0 mr-1">FILTER:</span>
-              {categories.map((cat) => (
+            {/* Category Filter Pills & Admin Action */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                <Filter className="w-3.5 h-3.5 text-[#839493] shrink-0" />
+                <span className="text-xs text-[#839493] shrink-0 mr-1">FILTER:</span>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`text-[10px] font-bold px-2.5 py-1 border transition-all whitespace-nowrap chamfer-corner ${
+                      selectedCategory === cat
+                        ? 'border-[#00ffff] bg-[#00ffff]/20 text-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.3)]'
+                        : 'border-[#3a4a49] bg-[#070b0b] text-[#839493] hover:text-[#dfe3e3] hover:border-[#00ffff]/40'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {isAdmin && (
                 <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`text-[10px] font-bold px-2.5 py-1 border transition-all whitespace-nowrap chamfer-corner ${
-                    selectedCategory === cat
-                      ? 'border-[#00ffff] bg-[#00ffff]/20 text-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.3)]'
-                      : 'border-[#3a4a49] bg-[#070b0b] text-[#839493] hover:text-[#dfe3e3] hover:border-[#00ffff]/40'
-                  }`}
+                  onClick={() => setIsAdminModalOpen(true)}
+                  className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.3)] active:scale-95 shrink-0"
                 >
-                  {cat}
+                  <Plus className="w-3.5 h-3.5 text-[#00ffff]" />
+                  <span>ADD TRANSMUTATION LOG</span>
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
@@ -517,6 +604,134 @@ function SupportPortalRoute() {
                 <span>3,400 FATHOMS</span>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN CHANGELOG ENTRY MODAL */}
+      {isAdminModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="chitin-card w-full max-w-2xl p-6 chamfer-corner space-y-4 shadow-[0_0_40px_rgba(0,255,255,0.2)] border border-[#00ffff] bg-[#070b0b] relative">
+            <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#00ffff] animate-pulse" />
+                <h2 className="font-grotesk text-base font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  PUBLISH SYSTEM TRANSMUTATION LOG
+                </h2>
+              </div>
+              <button
+                onClick={() => setIsAdminModalOpen(false)}
+                className="text-[#839493] hover:text-[#00ffff] p-1 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateChangelog} className="space-y-4 font-mono text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[#839493] font-bold block uppercase">
+                    VERSION (E.G., v1.5.0)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="v1.5.0"
+                    value={newVersion}
+                    onChange={(e) => setNewVersion(e.target.value)}
+                    className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[#839493] font-bold block uppercase">
+                    CATEGORY
+                  </label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
+                  >
+                    <option value="TRANSMUTATION">TRANSMUTATION</option>
+                    <option value="CHASSIS_UPGRADE">CHASSIS_UPGRADE</option>
+                    <option value="SECURITY_ISOLATION">SECURITY_ISOLATION</option>
+                    <option value="BUG_PURGE">BUG_PURGE</option>
+                    <option value="FEATURE">FEATURE</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[#839493] font-bold block uppercase">
+                  TRANSMUTATION TITLE
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Admin Changelog System Transmutation"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[#839493] font-bold block uppercase">
+                  SUMMARY OVERVIEW
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Brief summary of what changed in this version..."
+                  value={newSummary}
+                  onChange={(e) => setNewSummary(e.target.value)}
+                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[#839493] font-bold block uppercase">
+                  RELEASE NOTES / MARKDOWN DETAILS
+                </label>
+                <textarea
+                  required
+                  rows={5}
+                  placeholder="Bullet points and markdown content for release notes..."
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-[#3a4a49]">
+                <label className="flex items-center gap-2 text-[#839493] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newIsPublished}
+                    onChange={(e) => setNewIsPublished(e.target.checked)}
+                    className="accent-[#00ffff] w-4 h-4"
+                  />
+                  <span>PUBLISH IMMEDIATELY</span>
+                </label>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsAdminModalOpen(false)}
+                    className="px-4 py-2 border border-[#3a4a49] text-[#839493] hover:text-white text-xs font-bold chamfer-corner"
+                  >
+                    CANCEL
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingLog}
+                    className="px-5 py-2 bg-[#00ffff]/20 hover:bg-[#00ffff]/30 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.4)] disabled:opacity-50"
+                  >
+                    {isSubmittingLog ? 'PUBLISHING...' : 'PUBLISH TO NEON DB'}
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}

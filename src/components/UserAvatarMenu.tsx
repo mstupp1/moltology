@@ -11,7 +11,9 @@ export interface UserAvatarMenuProps {
     image?: string | null
     avatar?: string | null
     picture?: string | null
+    role?: string | null
   }
+  userRole?: string | null
   onNavigate?: (path: string) => void
   align?: 'left' | 'right'
   openDirection?: 'up' | 'down'
@@ -24,6 +26,7 @@ export interface UserAvatarMenuProps {
  */
 export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   user,
+  userRole,
   onNavigate,
   align = 'right',
   openDirection = 'down',
@@ -67,6 +70,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   }, [isOpen])
 
   const displayName = user.name || user.email?.split('@')[0] || 'Operative'
+  const effectiveRole = userRole || user.role
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
@@ -103,10 +107,17 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               className="border-2 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.6)]"
             />
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-bold text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
-                {displayName}
-              </span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
+                  {displayName}
+                </span>
+                {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
+                  <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shadow-[0_0_8px_rgba(0,255,255,0.4)] shrink-0">
+                    {effectiveRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                  </span>
+                )}
+              </div>
               {user.email && (
                 <span className="text-[10px] text-[#7a8e9e] truncate mt-0.5">
                   {user.email}

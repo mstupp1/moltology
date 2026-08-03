@@ -95,6 +95,9 @@ async function applyRLS() {
       console.warn('⚠️ Could not attach trigger to neon_auth.user (schema missing or restricted):', triggerErr)
     }
 
+    // Ensure role column exists on profiles table
+    await sql`ALTER TABLE IF EXISTS profiles ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user';`
+
     // Enable RLS and DDL for changelogs table
     await sql`
       CREATE TABLE IF NOT EXISTS changelogs (
@@ -115,6 +118,18 @@ async function applyRLS() {
       CREATE POLICY changelogs_public_read_policy ON changelogs
       FOR SELECT
       USING (true);
+    `
+    await sql`DROP POLICY IF EXISTS changelogs_admin_insert_policy ON changelogs;`
+    await sql`
+      CREATE POLICY changelogs_admin_insert_policy ON changelogs
+      FOR INSERT
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+      );
     `
     console.log('✓ RLS and schema initialized for changelogs table')
 
