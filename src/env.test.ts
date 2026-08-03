@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { validateEnv, env, envSchema } from './env'
 
 describe('src/env.ts - Environment Variable Validation', () => {
@@ -37,18 +37,24 @@ describe('src/env.ts - Environment Variable Validation', () => {
   })
 
   it('throws an error when VITE_NEON_AUTH_URL is not a valid URL', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() =>
       validateEnv({
         VITE_NEON_AUTH_URL: 'not-a-valid-url',
       })
     ).toThrow(/Invalid environment variables/)
+    expect(spy).toHaveBeenCalled()
+    spy.mockRestore()
   })
 
   it('throws an error when NODE_ENV is an invalid enum value', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() =>
       validateEnv({
         NODE_ENV: 'invalid_env',
       })
     ).toThrow(/Invalid environment variables/)
+    expect(spy).toHaveBeenCalled()
+    spy.mockRestore()
   })
 })

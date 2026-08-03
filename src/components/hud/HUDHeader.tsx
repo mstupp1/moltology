@@ -4,8 +4,6 @@ import { LogIn, LogOut, Search, Command, HelpCircle, LifeBuoy } from 'lucide-rea
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
-import { useSafeOracle } from './OracleContext'
-
 
 interface HUDHeaderProps {
   stage?: number
@@ -152,32 +150,6 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
           />
           <span className="hidden sm:inline tracking-wider">SUPPORT</span>
         </button>
-
-        {/* Oracle AI Right Sidebar Drawer Toggle */}
-        {(() => {
-          const oracle = useSafeOracle()
-          const isSidebarActive = oracle?.mode === 'sidebar'
-          return (
-            <button
-              onClick={() => {
-                if (oracle) {
-                  oracle.toggleMode('sidebar')
-                } else {
-                  window.dispatchEvent(new CustomEvent('toggle-ai-drawer'))
-                }
-              }}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-mono font-bold transition-all chamfer-corner border group ${
-                isSidebarActive
-                  ? 'bg-cyan-950/90 text-cyan-300 border-cyan-400 shadow-[0_0_12px_rgba(0,195,255,0.5)]'
-                  : 'bg-[#030606]/80 text-cyan-300 border-[#3a4a49] hover:border-cyan-400 hover:text-white'
-              }`}
-              title="Toggle Docked Oracle AI Panel"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-              <span className="hidden sm:inline tracking-wider">ORACLE DOCK</span>
-            </button>
-          )
-        })()}
 
 
         {!user ? (
