@@ -54,7 +54,7 @@ const toChangelogEntry = (r: {
 /**
  * Server Function: Get public changelogs from database or initial seed data.
  */
-const getPublicChangelogsHandler = async ({ context }: ServerFnArgs) => {
+export const getPublicChangelogsHandler = async ({ context }: ServerFnArgs) => {
   const dbClient = context?.db || getDb()
   try {
     const records = await dbClient
@@ -172,7 +172,7 @@ interface GetAssetUrlInput {
 /**
  * Server Function: Get presigned URL for an S3 asset key.
  */
-const getS3AssetUrlHandler = async ({ data }: ServerFnArgs<GetAssetUrlInput>) => {
+export const getS3AssetUrlHandler = async ({ data }: ServerFnArgs<GetAssetUrlInput>) => {
   if (!data?.key) {
     throw new Error('Key parameter is required')
   }

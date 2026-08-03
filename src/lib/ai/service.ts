@@ -1,6 +1,7 @@
 import { eq, desc, asc } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { aiThreads, aiMessages } from '../../db/schema'
+import { ensureUserProfile } from '../user-sync'
 
 export interface CreateThreadInput {
   userId: string
@@ -20,6 +21,7 @@ export interface SaveMessageInput {
  * Creates a new AI conversation thread in Neon Postgres.
  */
 export async function createAIThread(input: CreateThreadInput) {
+  await ensureUserProfile(input.userId)
   const dbClient = getDb()
   const [thread] = await dbClient
     .insert(aiThreads)
