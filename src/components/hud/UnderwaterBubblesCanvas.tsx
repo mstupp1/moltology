@@ -222,6 +222,10 @@ function createFizzBubbleSprite(size = 32): HTMLCanvasElement {
   return offscreen
 }
 
+// Global persistent particle store and sprite cache across route transitions & re-mounts
+let globalParticles: Particle[] | null = null
+let globalCustomSpritesCache: Record<string, HTMLCanvasElement> = {}
+
 export function UnderwaterBubblesCanvas({
   bubbleCount = 200,
   className = 'absolute inset-0 pointer-events-none z-0',
@@ -262,11 +266,17 @@ export function UnderwaterBubblesCanvas({
 
     if (typeof window !== 'undefined') {
       targetSources.forEach((src, idx) => {
-        const img = new Image()
-        img.onload = () => {
-          customSprites[idx] = createChromaKeyedSprite(img, chromaKeyMode)
+        if (globalCustomSpritesCache[src]) {
+          customSprites[idx] = globalCustomSpritesCache[src]
+        } else {
+          const img = new Image()
+          img.onload = () => {
+            const sprite = createChromaKeyedSprite(img, chromaKeyMode)
+            globalCustomSpritesCache[src] = sprite
+            customSprites[idx] = sprite
+          }
+          img.src = src
         }
-        img.src = src
       })
     }
 
@@ -385,9 +395,16 @@ export function UnderwaterBubblesCanvas({
       }
     }
 
-    const particles: Particle[] = Array.from({ length: bubbleCount }, () => createParticle()).sort(
-      (a, b) => a.z - b.z
-    )
+    // Reuse persistent global particle positions across page changes & re-renders
+    let particles: Particle[]
+    if (globalParticles && globalParticles.length === bubbleCount) {
+      particles = globalParticles
+    } else {
+      particles = Array.from({ length: bubbleCount }, () => createParticle()).sort(
+        (a, b) => a.z - b.z
+      )
+      globalParticles = particles
+    }
 
     let mouseX = -9999
     let mouseY = -9999
