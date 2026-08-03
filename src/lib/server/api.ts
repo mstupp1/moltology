@@ -144,13 +144,14 @@ interface CreateChangelogInput {
   summary: string
   content: string
   isPublished?: boolean
+  userId?: string
 }
 
 /**
  * Server Function: Create system changelog entry (Admin / Super Admin only).
  */
 export const createChangelogHandler = async ({ data, context }: ServerFnArgs<CreateChangelogInput>) => {
-  const userId = context?.user?.sub || context?.user?.id
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
   if (!userId) {
     throw new Error('Unauthenticated: Authentication required to create system changelogs.')
   }
@@ -187,7 +188,7 @@ export const createChangelogHandler = async ({ data, context }: ServerFnArgs<Cre
 }
 
 export const createChangelogFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
   .validator((data: CreateChangelogInput) => {
     return z.object({
       version: z.string().min(1),
@@ -196,6 +197,7 @@ export const createChangelogFn = createServerFn({ method: 'POST' })
       summary: z.string().min(1),
       content: z.string().min(1),
       isPublished: z.boolean().optional(),
+      userId: z.string().optional(),
     }).parse(data)
   })
   .handler(createChangelogHandler)

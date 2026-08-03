@@ -32,6 +32,7 @@ export async function createChangelog(data: {
   summary: string
   content: string
   isPublished?: boolean
+  userId?: string
 }): Promise<ChangelogEntry> {
   return (await createChangelogImpl(data)) as ChangelogEntry
 }
