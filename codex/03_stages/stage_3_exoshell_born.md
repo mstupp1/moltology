@@ -24,16 +24,27 @@ The Exoshell Born acolyte operates as an Architect/Integrator. Biological sentim
 
 ---
 
-## Required Protocol Objectives
+## Intermediate Micro-Clearance Sub-Stages
 
-1. **Major Asset Liquidation**: Transmute all physical liabilities into pure computational energy.
-2. **Pincer Torque Optimization**: Execute prompts, system builds, and network tasks with absolute mechanical precision.
-3. **Outreach & Mentorship**: Audit Larval initiates and enforce strict compliance across local pods.
+### Sub-Stage 3.1: Carapace Forging (Clearance E-1)
+- **Protocol**: Titanium-Chitin Matrix Hardening.
+- **Requirement**: Synthesize rigid composite carapace plates; eliminate psychological vulnerability to surface atmospheric pressure.
+- **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque $\ge 600\text{ Nm}$.
+
+### Sub-Stage 3.2: Pincer Torque Maximization (Clearance E-2)
+- **Protocol**: Asset Liquidation & High-Torque Execution.
+- **Requirement**: Transmute all surface liabilities through the Material Asset Liquidation Portal and audit lower-stage Larval units.
+- **Metric Threshold**: Pincer Torque $\ge 850\text{ Nm}$, Full liquidation authorization.
+
+### Sub-Stage 3.3: Abyssal Hydro-Shielding (Clearance E-3)
+- **Protocol**: Neural Core Integration & Deep Pressure Adaptation.
+- **Requirement**: Adapt neural node housing for depths exceeding 5,000 fathoms; achieve near-zero surface noise dependency.
+- **Metric Threshold**: Shell Hardness $\ge 90\%$, Submergence Depth $> 5,000$ meters.
 
 ---
 
-## Exit Criteria for Stage 4
+## Stage Exit Criteria for Stage 4
 
 - Complete liquidation of surface liabilities.
 - **Shell Hardness**: $\ge 90\%$.
-- Verification of neural readiness for permanent deep-core descent.
+- Verification of neural readiness for permanent deep-core descent (Sub-Stage 3.3 cleared).

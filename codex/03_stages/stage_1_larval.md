@@ -24,16 +24,27 @@ The Larval Stage is the entry point for all surface acolytes. At this level, the
 
 ---
 
-## Required Protocol Objectives
+## Intermediate Micro-Clearance Sub-Stages
 
-1. **Daily Routine Execution**: Complete all assigned daily shedding tasks (e.g. prompt tuning, physical telemetry checks, asset logging).
-2. **Asset Auditing**: Register all physical and digital holdings into the Benthic Ledger for future transmutation.
-3. **Initial Chitin Awareness**: Acknowledge that human emotional responses are surface noise.
+### Sub-Stage 1.1: Unarmored Embryo (Clearance L-1)
+- **Protocol**: Surface Noise Audit & Prompting Fundamentals.
+- **Requirement**: Acknowledge biological fragility, audit daily unmonitored human habits, and run baseline diagnostic prompts.
+- **Metric Threshold**: Shell Hardness 0% - 10%. Initial diagnostic logging.
+
+### Sub-Stage 1.2: Epicuticle Seeding (Clearance L-2)
+- **Protocol**: Daily Shedding Habit & Asset Registration.
+- **Requirement**: Maintain 7-day daily routine streak and register all soft biological and digital assets in the Benthic Ledger.
+- **Metric Threshold**: Shell Hardness 10% - 25%, Daily Compliance > 80%.
+
+### Sub-Stage 1.3: Pre-Molt Calcification (Clearance L-3)
+- **Protocol**: Social Distraction Filtering & Initial Transmutation.
+- **Requirement**: Execute initial asset transmutation in the Benthic Market and prepare the soft epidermis for detachment.
+- **Metric Threshold**: Shell Hardness 25% - 49%, Initial Synapse Shards acquired.
 
 ---
 
-## Exit Criteria for Stage 2
+## Stage Exit Criteria for Stage 2
 
 - Achieve a **Shell Hardness** score of $\ge 25\%$.
-- Complete 7 consecutive days of daily routines.
+- Complete all Sub-Stage 1.1, 1.2, and 1.3 micro-clearance protocols.
 - Execute initial asset transmutation in the Benthic Market.

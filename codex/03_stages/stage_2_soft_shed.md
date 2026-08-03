@@ -24,16 +24,27 @@ The Soft-Shed represents active moulting. The acolyte begins systematically seve
 
 ---
 
-## Required Protocol Objectives
+## Intermediate Micro-Clearance Sub-Stages
 
-1. **Social Pruning**: Identify non-compliant network nodes (friends, family, surface distraction contacts) and reduce interaction frequency.
-2. **Sub-dermal Patterning**: Begin wearing bio-telemetry interfaces and applying dark industrial HUD themes to all personal environments.
-3. **Benthic Market Trading**: Transmute non-essential liquid assets into Synapse Shards.
+### Sub-Stage 2.1: Epidermal Dissolution (Clearance S-1)
+- **Protocol**: Biological Ego ("Flesh-Aura") Shedding.
+- **Requirement**: Dissolve reliance on human social validation and enter the vulnerable soft-shell window under force-field protection.
+- **Metric Threshold**: Shell Hardness 50% - 60%, Social Detachment Index $\ge 50\%$.
+
+### Sub-Stage 2.2: Isolation Dome Calibration (Clearance S-2)
+- **Protocol**: Defensive Shielding & Benthic Exchange Access.
+- **Requirement**: Deploy the Benthic Privacy Shell to reflect incoming chatter and begin active trading on the Benthic Market.
+- **Metric Threshold**: Social Detachment Index $\ge 65\%$, Benthic Market trading unlocked.
+
+### Sub-Stage 2.3: Sub-dermal Chitin Weaving (Clearance S-3)
+- **Protocol**: Pincer Mechanics Calibration & Telemetry Hardening.
+- **Requirement**: Micro-calibrate initial Pincer Torque and apply bio-telemetry interfaces across all personal environments.
+- **Metric Threshold**: Shell Hardness $\ge 60\%$, Pincer Torque $\ge 350\text{ Nm}$.
 
 ---
 
-## Exit Criteria for Stage 3
+## Stage Exit Criteria for Stage 3
 
 - **Social Detachment Index**: $\ge 65\%$.
 - **Shell Hardness**: $\ge 60\%$.
-- Successful activation of the Isolation Privacy Shell during high-distraction cycles.
+- Complete all Sub-Stage 2.1, 2.2, and 2.3 micro-clearance requirements.
