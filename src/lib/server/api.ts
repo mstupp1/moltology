@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
@@ -507,9 +507,13 @@ export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
         coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
+        authorRole: r.authorRole || 'Stage 4 Ascendant',
         category: r.category,
         tags: (r.tags as string[]) || [],
         readTimeMinutes: r.readTimeMinutes,
+        views: r.views ?? 0,
+        likes: r.likes ?? 0,
+        isFeatured: r.isFeatured ?? false,
         isPublished: r.isPublished,
         publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
       }))
@@ -548,9 +552,13 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
         coverImageUrl: r.coverImageUrl || '/images/ai_learning_ascension_cover.jpg',
         authorName: r.authorName,
         authorAvatar: r.authorAvatar,
+        authorRole: r.authorRole || 'Stage 4 Ascendant',
         category: r.category,
         tags: (r.tags as string[]) || [],
         readTimeMinutes: r.readTimeMinutes,
+        views: r.views ?? 0,
+        likes: r.likes ?? 0,
+        isFeatured: r.isFeatured ?? false,
         isPublished: r.isPublished,
         publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
       }
@@ -567,6 +575,40 @@ export const getBlogPostBySlugFn = createServerFn({ method: 'GET' })
   .middleware(publicMiddleware)
   .validator((slug: string) => slug)
   .handler(getBlogPostBySlugHandler)
+
+/**
+ * Server Function: Increment blog post view count.
+ */
+export const incrementBlogPostViewsHandler = async ({ data: slug, context }: ServerFnArgs<string>) => {
+  if (!slug) return null
+  const dbClient = context?.db || getDb()
+  try {
+    const records = await dbClient
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.slug, slug))
+      .limit(1)
+
+    if (records.length > 0) {
+      const r = records[0]
+      const updated = await dbClient
+        .update(blogPosts)
+        .set({ views: (r.views || 0) + 1 })
+        .where(eq(blogPosts.slug, slug))
+        .returning()
+      return updated[0]?.views ?? r.views + 1
+    }
+  } catch (err) {
+    console.warn(`[incrementBlogPostViewsFn] Failed to increment views for ${slug}:`, err)
+  }
+  return null
+}
+
+export const incrementBlogPostViewsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((slug: string) => slug)
+  .handler(incrementBlogPostViewsHandler)
+
 
 
 

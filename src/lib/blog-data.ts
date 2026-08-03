@@ -1,4 +1,5 @@
 export interface BlogPostData {
+  id?: string
   slug: string
   title: string
   summary: string
@@ -6,9 +7,13 @@ export interface BlogPostData {
   coverImageUrl: string
   authorName: string
   authorAvatar: string
+  authorRole?: string
   category: string
   tags: string[]
   readTimeMinutes: number
+  views?: number
+  likes?: number
+  isFeatured?: boolean
   isPublished: boolean
   publishedAt: string
 }

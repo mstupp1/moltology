@@ -22,30 +22,40 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { BlogTopSlider } from '@/components/blog/BlogTopSlider'
 
 export const Route = createFileRoute('/blog/')({
+  loader: async () => {
+    try {
+      const fetched = await getBlogPostsFn()
+      if (fetched && fetched.length > 0) return fetched as BlogPostData[]
+    } catch (e) {
+      console.warn('Loader error fetching blog posts:', e)
+    }
+    return INITIAL_BLOG_POSTS
+  },
+  head: () => ({
+    meta: [
+      { title: 'The Synaptic Chronicles | Moltology Blog' },
+      { name: 'description', content: 'Official blog transmissions, AI telemetry, and sacrosanct carcinization doctrine.' },
+      { property: 'og:title', content: 'The Synaptic Chronicles | Moltology Blog' },
+      { property: 'og:description', content: 'Explorations into agentic AI, test-time compute, and exoskeletal ascension.' },
+    ],
+  }),
   component: BlogIndexPage,
 })
 
 function BlogIndexPage() {
+  const loaderPosts = Route.useLoaderData() as BlogPostData[]
   const navigate = useNavigate()
-  const [posts, setPosts] = useState<BlogPostData[]>(INITIAL_BLOG_POSTS)
+  const [posts, setPosts] = useState<BlogPostData[]>(loaderPosts || INITIAL_BLOG_POSTS)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
   useEffect(() => {
-    async function loadPosts() {
-      try {
-        const fetched = await getBlogPostsFn()
-        if (fetched && fetched.length > 0) {
-          setPosts(fetched as BlogPostData[])
-        }
-      } catch (err) {
-        console.warn('Using initial fallback blog posts:', err)
-      }
+    if (loaderPosts && loaderPosts.length > 0) {
+      setPosts(loaderPosts)
     }
-    loadPosts()
-  }, [])
+  }, [loaderPosts])
 
   const categories = useMemo(() => {
     const set = new Set<string>()
