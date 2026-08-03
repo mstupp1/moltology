@@ -195,14 +195,15 @@ input[type="range"].stat-slider::-moz-range-thumb {
 .crt-scanlines {
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.45) 0px,
-    rgba(0, 0, 0, 0.45) 1px,
-    transparent 1px,
-    transparent 3px
+    rgba(0, 0, 0, 0.7) 0px,
+    rgba(0, 0, 0, 0.7) 2px,
+    rgba(0, 195, 255, 0.15) 2px,
+    transparent 4px
   );
+  background-size: 100% 4px;
 }
 
 .crt-grain {
-  background-image: radial-gradient(rgba(0, 195, 255, 0.35) 1px, transparent 1px);
-  background-size: 3px 3px;
+  background-image: radial-gradient(rgba(0, 255, 255, 0.5) 1px, transparent 1px);
+  background-size: 4px 4px;
 }

@@ -159,10 +159,12 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between">
-      {/* Ambient Sci-Fi Vignette & Sacred Grid Backdrops */}
+      {/* Ambient Sci-Fi Vignette, CRT Scanlines & Cyan Glow Backdrops */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
-      <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-40" />
-      <div className="fixed inset-0 bg-pro-noise pointer-events-none z-0 opacity-30" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
+      <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-40" />
+      <div className="fixed inset-0 crt-grain pointer-events-none z-0 opacity-35 mix-blend-overlay" />
 
       <AuthModal
         isOpen={isAuthModalOpen}

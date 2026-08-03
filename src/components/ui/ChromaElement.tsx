@@ -26,9 +26,9 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
   terminalEffects = true,
 }) => {
   const glowStyles = {
-    cyan: 'drop-shadow-[0_0_16px_rgba(0,195,255,0.85)] drop-shadow-[0_0_30px_rgba(0,195,255,0.4)]',
-    crimson: 'drop-shadow-[0_0_16px_rgba(255,69,58,0.85)] drop-shadow-[0_0_30px_rgba(255,69,58,0.4)]',
-    gold: 'drop-shadow-[0_0_16px_rgba(255,215,0,0.85)] drop-shadow-[0_0_30px_rgba(255,215,0,0.4)]',
+    cyan: 'drop-shadow-[0_0_8px_rgba(0,195,255,0.45)]',
+    crimson: 'drop-shadow-[0_0_8px_rgba(255,69,58,0.45)]',
+    gold: 'drop-shadow-[0_0_8px_rgba(255,215,0,0.45)]',
     none: '',
   }[glowColor]
 
@@ -55,7 +55,7 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
       {/* Background Radial Glow */}
       {glowColor !== 'none' && (
         <div
-          className={`absolute inset-0 rounded-full blur-2xl opacity-40 pointer-events-none ${
+          className={`absolute inset-0 rounded-full blur-md opacity-20 pointer-events-none ${
             glowColor === 'cyan'
               ? 'bg-[#00c3ff]'
               : glowColor === 'crimson'
