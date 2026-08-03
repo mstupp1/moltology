@@ -15,9 +15,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OrgRouteImport } from './routes/org'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudCommunityRouteImport } from './routes/_hud/community'
@@ -59,6 +61,11 @@ const OrgRoute = OrgRouteImport.update({
   path: '/org',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
@@ -72,6 +79,11 @@ const SignUpRoute = SignUpRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HudChassisRoute = HudChassisRouteImport.update({
@@ -136,9 +148,11 @@ export interface FileRoutesByFullPath {
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/org': typeof OrgRoute
+  '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/community': typeof HudCommunityRoute
@@ -157,9 +171,11 @@ export interface FileRoutesByTo {
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/org': typeof OrgRoute
+  '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/community': typeof HudCommunityRoute
@@ -180,9 +196,11 @@ export interface FileRoutesById {
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/org': typeof OrgRoute
+  '/privacy': typeof PrivacyRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/community': typeof HudCommunityRoute
@@ -203,9 +221,11 @@ export interface FileRouteTypes {
     | '/landing'
     | '/login'
     | '/org'
+    | '/privacy'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
+    | '/terms'
     | '/chassis'
     | '/codex'
     | '/community'
@@ -224,9 +244,11 @@ export interface FileRouteTypes {
     | '/landing'
     | '/login'
     | '/org'
+    | '/privacy'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
+    | '/terms'
     | '/chassis'
     | '/codex'
     | '/community'
@@ -246,9 +268,11 @@ export interface FileRouteTypes {
     | '/landing'
     | '/login'
     | '/org'
+    | '/privacy'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
+    | '/terms'
     | '/_hud/chassis'
     | '/_hud/codex'
     | '/_hud/community'
@@ -269,9 +293,11 @@ export interface RootRouteChildren {
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   OrgRoute: typeof OrgRoute
+  PrivacyRoute: typeof PrivacyRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SignupRoute: typeof SignupRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -318,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign-in': {
       id: '/sign-in'
       path: '/sign-in'
@@ -337,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_hud/chassis': {
@@ -456,9 +496,11 @@ const rootRouteChildren: RootRouteChildren = {
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   OrgRoute: OrgRoute,
+  PrivacyRoute: PrivacyRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SignupRoute: SignupRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

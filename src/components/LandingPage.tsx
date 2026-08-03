@@ -830,11 +830,27 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-[1700px] mx-auto mt-6 pt-4 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 gap-2">
+        <div className="max-w-[1700px] mx-auto mt-6 pt-4 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 gap-3">
           <div>© {new Date().getFullYear()} MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.</div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-            <span>CHITIN MATRIX ENFORCED</span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => onNavigate('/privacy')}
+              className="hover:text-cyan-400 transition-colors uppercase tracking-wider"
+            >
+              Privacy Policy
+            </button>
+            <span className="text-gray-700">·</span>
+            <button
+              onClick={() => onNavigate('/terms')}
+              className="hover:text-cyan-400 transition-colors uppercase tracking-wider"
+            >
+              Terms of Service
+            </button>
+            <span className="text-gray-700">·</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span>CHITIN MATRIX ENFORCED</span>
+            </div>
           </div>
         </div>
       </footer>
