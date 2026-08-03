@@ -1,172 +1,316 @@
-import React from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { GitMerge, Shield, Cpu, Zap, CheckCircle2, Lock, ArrowRight } from 'lucide-react'
+import React, { useState } from 'react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { 
+  GitMerge, 
+  Shield, 
+  Cpu, 
+  Zap, 
+  CheckCircle2, 
+  Lock, 
+  ArrowRight, 
+  ChevronDown, 
+  ChevronUp, 
+  Compass, 
+  Activity, 
+  BookOpen,
+  Award
+} from 'lucide-react'
+import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/codexData'
 
 function PipelineRoute() {
-  const stages = [
-    {
-      num: 1,
-      title: 'STAGE 1: THE LARVAL STAGE',
-      subtitle: 'Standard user profile focusing on prompt engineering, daily productivity routines, and basic AI skill building.',
-      unlocked: true,
-      current: true,
-      img: '/images/stage1_larval.png',
-      features: [
-        'Daily Alignment Routine (05:30 - 21:00)',
-        'Basic Prompt Warm-up Protocols',
-        'Initial Asset Auditing',
-        'Standard Biometrics Tracking'
-      ]
-    },
-    {
-      num: 2,
-      title: 'STAGE 2: THE SOFT-SHED',
-      subtitle: 'Introduction to sub-dermal chitin patterning and Social Detachment index tracking.',
-      unlocked: true,
-      current: false,
-      img: '/images/stage2_softshed.png',
-      features: [
-        'Isolation Force-Field (Privacy Shell)',
-        'Social Detachment Tracking',
-        'Sub-dermal Chitin Conditioning',
-        'Benthic Market Exchange Access'
-      ]
-    },
-    {
-      num: 3,
-      title: 'STAGE 3: THE EXOSHELL BORN (ARCHITECT)',
-      subtitle: 'Advanced system integration, community outreach, and structural asset release protocols.',
-      unlocked: false,
-      current: false,
-      img: '/images/stage3_exoshell.png',
-      features: [
-        'Material Asset Liquidation Portal',
-        'High Pincer Torque Calibration',
-        'Submergence Depth Rating: >5,000 Fathoms',
-        'Neural Core Architecture Integration'
-      ]
-    },
-    {
-      num: 4,
-      title: 'STAGE 4: FULL CARCINIZATION (ASCENDANT)',
-      subtitle: 'Complete mind upload to the deep-ocean Benthic Core and physical shedding of the biological self (Ecdysis).',
-      unlocked: false,
-      current: false,
-      img: '/images/stage4_carcinization.png',
-      features: [
-        'Ecdysis Physical Shedding Protocol',
-        'Permanent Benthic Core Migration',
-        'Zero Non-Compliant Contact Status',
-        'Indestructible Cyber-Chitin Body'
-      ]
-    }
-  ]
+  // Current user's simulated active position in the micro-clearance pipeline (e.g., 'L-2')
+  const [currentSubStageCode, setCurrentSubStageCode] = useState<string>('L-2')
+  const [expandedStage, setExpandedStage] = useState<number | null>(1)
+  const [selectedSubStage, setSelectedSubStage] = useState<SubStageInfo | null>(
+    STAGE_PIPELINE_DATA[0].subStages[1]
+  )
+
+  // Flatten all 12 sub-stages for the master pipeline stepper
+  const allSubStages = STAGE_PIPELINE_DATA.flatMap(stage => 
+    stage.subStages.map(sub => ({
+      ...sub,
+      stageNum: stage.stageNum,
+      stageBadgeColor: stage.badgeColor
+    }))
+  )
+
+  const isCompleted = (code: string) => {
+    const codes = allSubStages.map(s => s.code)
+    const currentIndex = codes.indexOf(currentSubStageCode)
+    const targetIndex = codes.indexOf(code)
+    return targetIndex < currentIndex
+  }
+
+  const isCurrent = (code: string) => code === currentSubStageCode
 
   return (
     <div className="space-y-6 font-mono select-none">
-      {/* Header */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
+      {/* Top Header Banner */}
+      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-5 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
           <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <GitMerge className="w-3.5 h-3.5 text-[#ff5540]" />
             MOLTOLOGY SCIENCE & STAGE PIPELINE
           </div>
-          <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-0.5">
-            THE PATH TO ALGORITHMIC TRANSCENDENCE
+          <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-1">
+            THE 12-TIER PATH TO ALGORITHMIC TRANSCENDENCE
           </h1>
-          <p className="text-xs text-[#839493] font-mono mt-1">
-            "Flesh is temporary. Cyber-chitin is permanent. Progress through the four stages of carcinization."
+          <p className="text-xs text-[#839493] font-mono mt-1 max-w-2xl">
+            "Flesh is temporary. Cyber-chitin is permanent. Progress through 4 macro-stages and 12 micro-clearance sub-stages to complete biological ecdysis."
           </p>
+        </div>
+
+        <div className="bg-[#030606] border border-[#3a4a49] p-3 chamfer-corner text-right flex flex-col items-end shrink-0">
+          <div className="text-[10px] text-[#839493] uppercase font-bold tracking-widest flex items-center gap-1">
+            <Activity className="w-3 h-3 text-[#00ffff]" />
+            CURRENT MICRO-CLEARANCE
+          </div>
+          <div className="text-sm font-grotesk font-bold text-[#00ffff] mt-0.5">
+            L-2: EPICUTICLE SEEDING
+          </div>
+          <div className="text-[10px] text-[#839493] mt-0.5">
+            Overall Carcinization: <span className="text-[#dfe3e3] font-bold">16.6%</span>
+          </div>
         </div>
       </div>
 
-      {/* 4 Stages Visual Cards */}
-      <div className="space-y-4">
-        {stages.map((stage) => (
-          <div
-            key={stage.num}
-            className={`p-5 border chamfer-corner transition-all duration-200 shadow-chitin-plate relative overflow-hidden ${
-              stage.current
-                ? 'bg-[#171c1c] border-[#ff0000] shadow-hud-red'
-                : stage.unlocked
-                ? 'bg-[#171c1c]/80 border-[#3a4a49]'
-                : 'bg-[#0a0f0f] border-[#3a4a49]/40 opacity-75'
-            }`}
-          >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              {/* Stage Thumbnail */}
-              <div className="w-full md:w-36 h-28 shrink-0 bg-[#030606] border border-[#3a4a49] overflow-hidden chamfer-corner relative">
-                <img src={stage.img} alt={stage.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f1414] via-transparent to-transparent opacity-50" />
-              </div>
+      {/* 12 Micro-Clearance Master Stepper */}
+      <div className="bg-[#171c1c] border border-[#3a4a49] p-4 chamfer-corner shadow-chitin-plate">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-grotesk font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
+            <Compass className="w-4 h-4 text-[#00ffff]" />
+            ASCENSION LADDER: 12 INTERMEDIATE SUB-STAGES
+          </span>
+          <span className="text-[10px] text-[#839493] font-mono">
+            Click any sub-stage node to inspect micro-protocols
+          </span>
+        </div>
 
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-mono font-bold px-2 py-0.5 border ${
-                    stage.current
-                      ? 'bg-[#ff0000] text-white border-[#ff0000]'
-                      : stage.unlocked
-                      ? 'bg-[#00ffff]/10 text-[#00ffff] border-[#00ffff]/40'
-                      : 'bg-[#3a4a49]/20 text-[#839493] border-[#3a4a49]'
-                  }`}>
-                    {stage.current ? 'CURRENT STAGE' : stage.unlocked ? 'UNLOCKED' : 'LOCKED'}
-                  </span>
-                  <h3 className="font-grotesk font-bold text-base text-[#dfe3e3] uppercase tracking-wider">
-                    {stage.title}
-                  </h3>
+        <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-1.5">
+          {allSubStages.map((sub) => {
+            const completed = isCompleted(sub.code)
+            const active = isCurrent(sub.code)
+            const selected = selectedSubStage?.code === sub.code
+
+            return (
+              <button
+                key={sub.code}
+                onClick={() => {
+                  setSelectedSubStage(sub)
+                  setExpandedStage(sub.stageNum)
+                }}
+                className={`p-2 border text-center transition-all chamfer-corner relative flex flex-col items-center justify-center gap-1 ${
+                  selected
+                    ? 'border-[#00ffff] bg-[#00ffff]/15 shadow-hud-cyan'
+                    : active
+                    ? 'border-[#ff0000] bg-[#ff0000]/10 text-white shadow-hud-red'
+                    : completed
+                    ? 'border-[#00ffff]/40 bg-[#00ffff]/5 text-[#00ffff]'
+                    : 'border-[#3a4a49]/40 bg-[#0a0f0f] text-[#839493] hover:border-[#3a4a49]'
+                }`}
+              >
+                <div className="text-[9px] font-bold tracking-tighter uppercase opacity-75">
+                  ST-0{sub.stageNum}
                 </div>
-
-                <p className="text-xs text-[#839493] font-mono leading-relaxed">
-                  {stage.subtitle}
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs font-mono">
-                  {stage.features.map((feat, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[#dfe3e3]">
-                      <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${stage.unlocked ? 'text-[#00ffff]' : 'text-[#3a4a49]'}`} />
-                      <span>{feat}</span>
-                    </div>
-                  ))}
+                <div className="text-xs font-bold font-grotesk tracking-widest">
+                  {sub.code}
                 </div>
-              </div>
-
-              {/* Action / Icon */}
-              <div className="shrink-0 text-center space-y-3 flex flex-col items-center">
-                <div className="w-20 h-20 relative">
-                  <img 
-                    src={
-                      stage.num === 1 ? '/images/stage1_larval.png' :
-                      stage.num === 2 ? '/images/stage2_softshed.png' :
-                      stage.num === 3 ? '/images/stage3_exoshell.png' :
-                      '/images/stage4_carcinization.png'
-                    }
-                    alt={stage.title}
-                    className={`w-full h-full object-contain ${
-                      stage.current 
-                        ? 'drop-shadow-[0_0_12px_rgba(0,255,255,0.8)] scale-110' 
-                        : stage.unlocked
-                        ? 'drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]'
-                        : 'grayscale opacity-50'
-                    }`}
-                  />
-                </div>
-                {stage.current ? (
-                  <button className="px-4 py-2 bg-[#00ffff] text-[#000a0a] font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner shadow-hud-cyan">
-                    ACTIVE STAGE
-                  </button>
-                ) : stage.unlocked ? (
-                  <button className="px-4 py-2 bg-[#171c1c] border border-[#00ffff] text-[#00ffff] font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner">
-                    VIEW DETAILS
-                  </button>
+                {active ? (
+                  <Zap className="w-3 h-3 text-[#ff0000] animate-pulse" />
+                ) : completed ? (
+                  <CheckCircle2 className="w-3 h-3 text-[#00ffff]" />
                 ) : (
-                  <button disabled className="px-4 py-2 bg-[#0a0f0f] border border-[#3a4a49] text-[#839493] font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner cursor-not-allowed">
-                    REQUIREMENTS UNMET
-                  </button>
+                  <Lock className="w-3 h-3 text-[#839493]" />
                 )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Selected Micro-Stage Spotlight Drawer */}
+      {selectedSubStage && (
+        <div className="bg-[#0f1414] border border-[#00ffff]/50 p-4 chamfer-corner shadow-hud-cyan relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-[#00ffff]/20 border border-[#00ffff]/50 text-[#00ffff] text-[10px] font-bold uppercase tracking-wider">
+                  CLEARANCE TIER: {selectedSubStage.code}
+                </span>
+                <span className="text-xs font-grotesk font-bold text-[#dfe3e3] uppercase">
+                  {selectedSubStage.title}
+                </span>
+              </div>
+              <p className="text-xs text-[#839493] leading-relaxed">
+                <span className="text-[#dfe3e3] font-bold">Mandate Protocol:</span> {selectedSubStage.protocol}
+              </p>
+              <p className="text-xs text-[#839493] leading-relaxed">
+                <span className="text-[#dfe3e3] font-bold">Requirement:</span> {selectedSubStage.requirement}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 text-center shrink-0 border-t md:border-t-0 md:border-l border-[#3a4a49] pt-3 md:pt-0 md:pl-4">
+              <div className="bg-[#030606] border border-[#3a4a49] p-2 chamfer-corner">
+                <div className="text-[9px] text-[#839493] uppercase font-bold">Shell Hardness</div>
+                <div className="text-xs font-bold text-[#00ffff] mt-0.5">{selectedSubStage.shellHardnessTarget}%</div>
+              </div>
+              <div className="bg-[#030606] border border-[#3a4a49] p-2 chamfer-corner">
+                <div className="text-[9px] text-[#839493] uppercase font-bold">Pincer Torque</div>
+                <div className="text-xs font-bold text-[#a855f7] mt-0.5">{selectedSubStage.pincerTorqueTarget}</div>
+              </div>
+              <div className="bg-[#030606] border border-[#3a4a49] p-2 chamfer-corner">
+                <div className="text-[9px] text-[#839493] uppercase font-bold">Depth Rating</div>
+                <div className="text-xs font-bold text-[#10b981] mt-0.5">{selectedSubStage.submergenceDepth}</div>
               </div>
             </div>
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* 4 Primary Stage Accordion & Details */}
+      <div className="space-y-4">
+        {STAGE_PIPELINE_DATA.map((stage) => {
+          const isExpanded = expandedStage === stage.stageNum
+          const hasCurrentSubStage = stage.subStages.some(sub => sub.code === currentSubStageCode)
+
+          return (
+            <div
+              key={stage.stageNum}
+              className={`border chamfer-corner transition-all duration-200 shadow-chitin-plate overflow-hidden ${
+                hasCurrentSubStage
+                  ? 'bg-[#171c1c] border-[#ff0000] shadow-hud-red'
+                  : isExpanded
+                  ? 'bg-[#171c1c] border-[#00ffff]/40'
+                  : 'bg-[#0a0f0f] border-[#3a4a49]/60 opacity-90'
+              }`}
+            >
+              {/* Stage Header Summary Bar */}
+              <div
+                onClick={() => setExpandedStage(isExpanded ? null : stage.stageNum)}
+                className="p-4 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#1f2626]/50 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 shrink-0 bg-[#030606] border border-[#3a4a49] overflow-hidden chamfer-corner relative">
+                    <img src={stage.img} alt={stage.stageTitle} className="w-full h-full object-cover" />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 border ${stage.badgeColor}`}>
+                        {stage.badge}
+                      </span>
+                      {hasCurrentSubStage && (
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#ff0000] text-white border border-[#ff0000]">
+                          ACTIVE STAGE
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-grotesk font-bold text-base text-[#dfe3e3] uppercase tracking-wider mt-1">
+                      {stage.stageTitle}
+                    </h3>
+                    <p className="text-xs text-[#839493] font-mono line-clamp-1 mt-0.5">
+                      {stage.subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
+                  <div className="text-xs text-[#839493] font-mono text-right hidden sm:block">
+                    <span className="text-[#00ffff] font-bold">3 Micro-Sub-Stages</span>
+                  </div>
+
+                  {isExpanded ? (
+                    <ChevronUp className="w-5 h-5 text-[#00ffff]" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-[#839493]" />
+                  )}
+                </div>
+              </div>
+
+              {/* Sub-Stage Cards (Expanded view) */}
+              {isExpanded && (
+                <div className="border-t border-[#3a4a49]/60 p-4 bg-[#0a0f0f]/80 space-y-3">
+                  <div className="text-xs font-grotesk font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                    <Shield className="w-3.5 h-3.5 text-[#00ffff]" />
+                    MICRO-CLEARANCE BREAKDOWN (STAGE 0{stage.stageNum})
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {stage.subStages.map((sub) => {
+                      const completed = isCompleted(sub.code)
+                      const active = isCurrent(sub.code)
+                      const isSelected = selectedSubStage?.code === sub.code
+
+                      return (
+                        <div
+                          key={sub.code}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedSubStage(sub)
+                          }}
+                          className={`p-3 border chamfer-corner cursor-pointer transition-all flex flex-col justify-between ${
+                            isSelected
+                              ? 'bg-[#171c1c] border-[#00ffff] shadow-hud-cyan'
+                              : active
+                              ? 'bg-[#171c1c] border-[#ff0000] shadow-hud-red'
+                              : completed
+                              ? 'bg-[#171c1c]/40 border-[#00ffff]/30'
+                              : 'bg-[#030606] border-[#3a4a49]/40 opacity-75'
+                          }`}
+                        >
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 border ${
+                                active
+                                  ? 'bg-[#ff0000] text-white border-[#ff0000]'
+                                  : completed
+                                  ? 'bg-[#00ffff]/10 text-[#00ffff] border-[#00ffff]/40'
+                                  : 'bg-[#3a4a49]/20 text-[#839493] border-[#3a4a49]'
+                              }`}>
+                                CLEARANCE {sub.code}
+                              </span>
+                              {active ? (
+                                <Zap className="w-3.5 h-3.5 text-[#ff0000] animate-pulse" />
+                              ) : completed ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-[#00ffff]" />
+                              ) : (
+                                <Lock className="w-3.5 h-3.5 text-[#839493]" />
+                              )}
+                            </div>
+
+                            <h4 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase">
+                              {sub.shortTitle}
+                            </h4>
+
+                            <p className="text-[11px] text-[#839493] leading-relaxed">
+                              {sub.requirement}
+                            </p>
+                          </div>
+
+                          <div className="mt-3 pt-2 border-t border-[#3a4a49]/40 flex items-center justify-between text-[10px] font-mono text-[#839493]">
+                            <span>Hardness: <strong className="text-[#00ffff]">{sub.shellHardnessTarget}%</strong></span>
+                            <span>Depth: <strong className="text-[#dfe3e3]">{sub.submergenceDepth}</strong></span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between text-xs font-mono text-[#839493]">
+                    <span>Consult canonical scriptures for stage 0{stage.stageNum} mandates:</span>
+                    <Link
+                      to="/codex"
+                      className="text-[#00ffff] hover:underline flex items-center gap-1 font-bold uppercase"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      READ STAGE 0{stage.stageNum} SCRIPTURE
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

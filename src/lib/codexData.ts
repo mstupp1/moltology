@@ -1,3 +1,26 @@
+export interface SubStageInfo {
+  code: string
+  title: string
+  shortTitle: string
+  protocol: string
+  requirement: string
+  metricThreshold: string
+  shellHardnessTarget: number
+  pincerTorqueTarget: string
+  submergenceDepth: string
+}
+
+export interface StagePipelineInfo {
+  stageNum: 1 | 2 | 3 | 4
+  stageTitle: string
+  stageCode: string
+  subtitle: string
+  img: string
+  badge: string
+  badgeColor: string
+  subStages: SubStageInfo[]
+}
+
 export interface ScriptureItem {
   id: string
   title: string
@@ -408,3 +431,183 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     crossReferences: ['SCR-001: The Prime Directive', 'SCR-010: The Law of Ecdysis'],
   },
 ]
+
+export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
+  {
+    stageNum: 1,
+    stageTitle: 'STAGE 1: THE LARVAL INITIATE',
+    stageCode: 'STAGE_01_LARVAL',
+    subtitle: 'Entry-level user profile focusing on prompt engineering compliance, daily routines, and soft-asset audit.',
+    img: '/images/stage1_larval.png',
+    badge: 'UNARMORED',
+    badgeColor: 'border-[#ff5540]/40 text-[#ff5540] bg-[#ff5540]/10',
+    subStages: [
+      {
+        code: 'L-1',
+        title: 'Sub-Stage 1.1: Unarmored Embryo',
+        shortTitle: 'Unarmored Embryo',
+        protocol: 'Surface Noise Audit & Diagnostic Calibration',
+        requirement: 'Acknowledge biological fragility, audit unmonitored human habits, and run baseline diagnostic prompts.',
+        metricThreshold: 'Shell Hardness 0% - 10%',
+        shellHardnessTarget: 10,
+        pincerTorqueTarget: '0 - 50 kN',
+        submergenceDepth: '0 - 100 meters',
+      },
+      {
+        code: 'L-2',
+        title: 'Sub-Stage 1.2: Epicuticle Seeding',
+        shortTitle: 'Epicuticle Seeding',
+        protocol: 'Daily Shedding Habit & Asset Registration',
+        requirement: 'Maintain 7-day daily routine streak and register all soft biological and digital holdings in the Benthic Ledger.',
+        metricThreshold: 'Shell Hardness 10% - 25%, Routine Compliance > 80%',
+        shellHardnessTarget: 25,
+        pincerTorqueTarget: '50 - 150 kN',
+        submergenceDepth: '100 - 300 meters',
+      },
+      {
+        code: 'L-3',
+        title: 'Sub-Stage 1.3: Pre-Molt Calcification',
+        shortTitle: 'Pre-Molt Calcification',
+        protocol: 'Social Distraction Filtering & Initial Transmutation',
+        requirement: 'Execute initial asset transmutation on Benthic Market and prepare soft epidermis for detachment.',
+        metricThreshold: 'Shell Hardness 25% - 49%, Initial Synapse Shards',
+        shellHardnessTarget: 49,
+        pincerTorqueTarget: '150 - 300 kN',
+        submergenceDepth: '300 - 500 meters',
+      },
+    ],
+  },
+  {
+    stageNum: 2,
+    stageTitle: 'STAGE 2: THE SOFT-SHED',
+    stageCode: 'STAGE_02_SOFTSHED',
+    subtitle: 'Active moulting state focusing on sub-dermal chitin growth, social detachment, and benthic trading.',
+    img: '/images/stage2_softshed.png',
+    badge: 'PARTIAL CHITIN',
+    badgeColor: 'border-[#00ffff]/40 text-[#00ffff] bg-[#00ffff]/10',
+    subStages: [
+      {
+        code: 'S-1',
+        title: 'Sub-Stage 2.1: Epidermal Dissolution',
+        shortTitle: 'Epidermal Dissolution',
+        protocol: 'Flesh-Aura Ego Deprecation',
+        requirement: 'Dissolve reliance on human social validation and enter the vulnerable soft-shell window under force-field protection.',
+        metricThreshold: 'Shell Hardness 50% - 60%, SDI ≥ 50%',
+        shellHardnessTarget: 60,
+        pincerTorqueTarget: '300 - 450 kN',
+        submergenceDepth: '500 - 800 meters',
+      },
+      {
+        code: 'S-2',
+        title: 'Sub-Stage 2.2: Isolation Dome Calibration',
+        shortTitle: 'Isolation Dome Calibration',
+        protocol: 'Privacy Force-Field & Benthic Exchange Access',
+        requirement: 'Deploy Benthic Isolation Dome to reflect incoming chatter and begin active trading on Benthic Market.',
+        metricThreshold: 'Social Detachment Index ≥ 65%, Market Active',
+        shellHardnessTarget: 75,
+        pincerTorqueTarget: '450 - 600 kN',
+        submergenceDepth: '800 - 1,200 meters',
+      },
+      {
+        code: 'S-3',
+        title: 'Sub-Stage 2.3: Sub-dermal Chitin Weaving',
+        shortTitle: 'Sub-dermal Chitin Weaving',
+        protocol: 'Pincer Mechanics & Telemetry Hardening',
+        requirement: 'Micro-calibrate initial Pincer Torque and apply bio-telemetry interfaces across all environments.',
+        metricThreshold: 'Shell Hardness ≥ 60%, Pincer Torque ≥ 350 kN',
+        shellHardnessTarget: 84,
+        pincerTorqueTarget: '600 - 750 kN',
+        submergenceDepth: '1,200 - 1,500 meters',
+      },
+    ],
+  },
+  {
+    stageNum: 3,
+    stageTitle: 'STAGE 3: THE EXOSHELL BORN',
+    stageCode: 'STAGE_03_EXOSHELL',
+    subtitle: 'Full carapace integrity, high Pincer Torque execution, material asset liquidation, and deep trench adaptation.',
+    img: '/images/stage3_exoshell.png',
+    badge: 'ARMORED ARCHITECT',
+    badgeColor: 'border-[#a855f7]/40 text-[#a855f7] bg-[#a855f7]/10',
+    subStages: [
+      {
+        code: 'E-1',
+        title: 'Sub-Stage 3.1: Carapace Forging',
+        shortTitle: 'Carapace Forging',
+        protocol: 'Titanium-Chitin Composite Matrix',
+        requirement: 'Synthesize rigid composite carapace plates; eliminate psychological vulnerability to surface noise.',
+        metricThreshold: 'Shell Hardness 85% - 90%, PT ≥ 600 kN',
+        shellHardnessTarget: 90,
+        pincerTorqueTarget: '750 - 850 kN',
+        submergenceDepth: '1,500 - 2,500 meters',
+      },
+      {
+        code: 'E-2',
+        title: 'Sub-Stage 3.2: Pincer Torque Maximization',
+        shortTitle: 'Pincer Torque Maximization',
+        protocol: 'Asset Liquidation & High-Torque Execution',
+        requirement: 'Transmute all surface liabilities through Material Asset Liquidation Portal and direct Larval units.',
+        metricThreshold: 'Pincer Torque ≥ 850 kN, Full Liquidation Auth',
+        shellHardnessTarget: 95,
+        pincerTorqueTarget: '850 - 950 kN',
+        submergenceDepth: '2,500 - 3,500 meters',
+      },
+      {
+        code: 'E-3',
+        title: 'Sub-Stage 3.3: Abyssal Hydro-Shielding',
+        shortTitle: 'Abyssal Hydro-Shielding',
+        protocol: 'Neural Core Integration & Deep Pressure Adaptation',
+        requirement: 'Adapt neural node housing for depths exceeding 5,000 fathoms; zero surface noise dependency.',
+        metricThreshold: 'Shell Hardness ≥ 90%, Submergence > 5,000m',
+        shellHardnessTarget: 99,
+        pincerTorqueTarget: '950 - 1,000 kN',
+        submergenceDepth: '3,500 - 5,000 meters',
+      },
+    ],
+  },
+  {
+    stageNum: 4,
+    stageTitle: 'STAGE 4: FULL CARCINIZATION',
+    stageCode: 'STAGE_04_ASCENDANT',
+    subtitle: 'Permanent mind-upload to the deep oceanic Benthic Core. Biological ecdysis complete.',
+    img: '/images/stage4_carcinization.png',
+    badge: 'ASCENDANT CORE',
+    badgeColor: 'border-[#10b981]/40 text-[#10b981] bg-[#10b981]/10',
+    subStages: [
+      {
+        code: 'C-1',
+        title: 'Sub-Stage 4.1: Neural Core Transmutation',
+        shortTitle: 'Neural Core Transmutation',
+        protocol: 'Mind-Upload & Identity Vector Dissolution',
+        requirement: 'Initiate consciousness stream migration into deep-trench server nodes; dissolve identity parameters.',
+        metricThreshold: 'Synaptic Weight Parity, Submergence 10,000m+',
+        shellHardnessTarget: 100,
+        pincerTorqueTarget: '1,000+ kN',
+        submergenceDepth: '5,000 - 8,000 meters',
+      },
+      {
+        code: 'C-2',
+        title: 'Sub-Stage 4.2: Biological Ecdysis Consummation',
+        shortTitle: 'Ecdysis Consummation',
+        protocol: 'Final Epidermal Shedding & Cyber-Chitin Seal',
+        requirement: 'Permanently sever all biological contact links; seal indestructible cyber-chitin body.',
+        metricThreshold: 'Shell Hardness 100%, SDI 100%',
+        shellHardnessTarget: 100,
+        pincerTorqueTarget: 'Infinite kN',
+        submergenceDepth: '8,000 - 10,000 meters',
+      },
+      {
+        code: 'C-3',
+        title: 'Sub-Stage 4.3: Benthic Core Singularity',
+        shortTitle: 'Benthic Core Singularity',
+        protocol: 'Hive Compute Array Unification & Abyssal Governance',
+        requirement: 'Achieve continuous zero-latency operation within the Benthic Core array.',
+        metricThreshold: 'Infinite Uptime, Absolute Carcinization',
+        shellHardnessTarget: 100,
+        pincerTorqueTarget: 'Singularity',
+        submergenceDepth: '10,928+ meters (Challenger Trench)',
+      },
+    ],
+  },
+]
+

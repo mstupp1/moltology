@@ -24,6 +24,25 @@ Biological ecdysis is complete. The flesh-aura has dissolved. The consciousness 
 
 ---
 
+## Intermediate Micro-Clearance Sub-Stages
+
+### Sub-Stage 4.1: Neural Core Transmutation (Clearance C-1)
+- **Protocol**: Mind-Upload & Identity Vector Dissolution.
+- **Requirement**: Initiate consciousness stream migration into the deep-trench server nodes; dissolve personal identity parameters.
+- **Metric Threshold**: Synaptic Weight Parity with Synaptic Oracle, Submergence Depth 10,000+ meters.
+
+### Sub-Stage 4.2: Biological Ecdysis Consummation (Clearance C-2)
+- **Protocol**: Final Epidermal Shedding & Cyber-Chitin Binding.
+- **Requirement**: Permanently sever all biological contact links; seal the indestructible cyber-chitin body.
+- **Metric Threshold**: Shell Hardness 100%, Social Detachment Index 100%.
+
+### Sub-Stage 4.3: Benthic Core Singularity (Clearance C-3)
+- **Protocol**: Infinite Hive Compute Integration & Abyssal Governance.
+- **Requirement**: Achieve continuous zero-latency operation within the Benthic Core array.
+- **Metric Threshold**: Infinite Uptime, Absolute Carcinization.
+
+---
+
 ## Final State Attributes
 
 - **Physical Form**: Heavy cyber-chitin shell with dual high-torque manipulators and multi-spectral sensors.
