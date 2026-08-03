@@ -18,11 +18,12 @@ import {
   LogOut,
   UserCheck,
   LifeBuoy,
-  HelpCircle,
   ChevronsLeft,
   ChevronsRight,
   ChevronDown,
   ChevronRight,
+  Plus,
+  Minus,
   LayoutGrid,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
@@ -194,18 +195,46 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     [getActiveGroupId(currentRoute)]: true,
   }))
 
-  // Auto-expand only the section currently active on route change
+  // Ensure section containing active route is open without closing other sections
   useEffect(() => {
     const activeId = getActiveGroupId(currentRoute)
-    setOpenGroups({ [activeId]: true })
+    setOpenGroups((prev) => {
+      if (prev[activeId]) return prev
+      return { ...prev, [activeId]: true }
+    })
   }, [currentRoute])
 
   const toggleGroup = (groupId: string) => {
-    setOpenGroups((prev) => {
-      const isCurrentlyOpen = !!prev[groupId]
-      // Accordion mode: Expand target group, collapse others unless closing target
-      return isCurrentlyOpen ? {} : { [groupId]: true }
-    })
+    setOpenGroups((prev) => ({
+      ...prev,
+      [groupId]: !prev[groupId],
+    }))
+  }
+
+  const areAnyGroupsOpen = navGroups.some((g) => !!openGroups[g.id])
+
+  const toggleAllGroups = () => {
+    if (areAnyGroupsOpen) {
+      setOpenGroups({})
+    } else {
+      const allOpen = navGroups.reduce<Record<string, boolean>>((acc, g) => {
+        acc[g.id] = true
+        return acc
+      }, {})
+      setOpenGroups(allOpen)
+    }
+  }
+
+  const expandAllGroups = () => {
+    const allOpen = navGroups.reduce<Record<string, boolean>>((acc, g) => {
+      acc[g.id] = true
+      return acc
+    }, {})
+    setOpenGroups(allOpen)
+  }
+
+  const collapseAllGroups = () => {
+    setOpenGroups({})
   }
 
   const allNavItems = navGroups.flatMap((g) => g.items)
@@ -363,6 +392,24 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 )}
               </button>
             </div>
+
+            {/* Minimal Ultra-Thin Toggle Row */}
+            {!isCollapsed && (
+              <div className="shrink-0 flex items-center justify-end px-3 py-0.5 bg-[#05080a]/90 border-b border-[#1e2d37]/50 h-5 leading-none">
+                <button
+                  onClick={toggleAllGroups}
+                  className="p-0.5 rounded hover:bg-white/[0.08] text-[#566878] hover:text-[#00c3ff] transition-colors cursor-pointer active:scale-95 flex items-center gap-1"
+                  title={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
+                  aria-label={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
+                >
+                  {areAnyGroupsOpen ? (
+                    <ChevronDown className="w-3 h-3 text-[#566878] hover:text-[#00c3ff] transition-transform" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 text-[#566878] hover:text-[#00c3ff] transition-transform" />
+                  )}
+                </button>
+              </div>
+            )}
 
             {/* Navigation Items List */}
             <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10]/40 overflow-y-auto overflow-x-hidden min-h-0">
