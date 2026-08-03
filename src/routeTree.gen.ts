@@ -20,6 +20,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as HudApiDocsRouteImport } from './routes/_hud/api-docs'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudCommunityRouteImport } from './routes/_hud/community'
@@ -87,6 +88,11 @@ const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
   getParentRoute: () => rootRouteImport,
+} as any)
+const HudApiDocsRoute = HudApiDocsRouteImport.update({
+  id: '/api-docs',
+  path: '/api-docs',
+  getParentRoute: () => HudRoute,
 } as any)
 const HudChassisRoute = HudChassisRouteImport.update({
   id: '/chassis',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/api-docs': typeof HudApiDocsRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/community': typeof HudCommunityRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/api-docs': typeof HudApiDocsRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/community': typeof HudCommunityRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/_hud/api-docs': typeof HudApiDocsRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/community': typeof HudCommunityRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/signup'
     | '/terms'
+    | '/api-docs'
     | '/chassis'
     | '/codex'
     | '/community'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/signup'
     | '/terms'
+    | '/api-docs'
     | '/chassis'
     | '/codex'
     | '/community'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/signup'
     | '/terms'
+    | '/_hud/api-docs'
     | '/_hud/chassis'
     | '/_hud/codex'
     | '/_hud/community'
@@ -405,6 +417,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_hud/api-docs': {
+      id: '/_hud/api-docs'
+      path: '/api-docs'
+      fullPath: '/api-docs'
+      preLoaderRoute: typeof HudApiDocsRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/chassis': {
       id: '/_hud/chassis'
       path: '/chassis'
@@ -500,6 +519,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface HudRouteChildren {
+  HudApiDocsRoute: typeof HudApiDocsRoute
   HudChassisRoute: typeof HudChassisRoute
   HudCodexRoute: typeof HudCodexRoute
   HudCommunityRoute: typeof HudCommunityRoute
@@ -514,6 +534,7 @@ interface HudRouteChildren {
 }
 
 const HudRouteChildren: HudRouteChildren = {
+  HudApiDocsRoute: HudApiDocsRoute,
   HudChassisRoute: HudChassisRoute,
   HudCodexRoute: HudCodexRoute,
   HudCommunityRoute: HudCommunityRoute,

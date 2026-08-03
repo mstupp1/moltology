@@ -25,6 +25,7 @@ import {
   Plus,
   Minus,
   LayoutGrid,
+  Terminal,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
@@ -140,6 +141,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           label: 'MOLTOLOGY SCIENCE',
           icon: FlaskConical,
           path: '/pipeline',
+        },
+        {
+          id: 'api-docs',
+          label: 'REST API DOCS',
+          icon: Terminal,
+          path: '/api-docs',
         },
       ],
     },
