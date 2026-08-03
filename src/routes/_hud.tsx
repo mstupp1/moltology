@@ -8,13 +8,31 @@ import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
 import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
+import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
 
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
+  const [showWelcome, setShowWelcome] = useState(false)
   const oracle = useSafeOracle()
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
+
+  // Show welcome splash once per user on first login
+  useEffect(() => {
+    if (!userId) return
+    const key = `moltology:welcomed:${userId}`
+    if (!localStorage.getItem(key)) {
+      setShowWelcome(true)
+    }
+  }, [userId])
+
+  const handleDismissWelcome = () => {
+    if (userId) {
+      localStorage.setItem(`moltology:welcomed:${userId}`, '1')
+    }
+    setShowWelcome(false)
+  }
 
   useEffect(() => {
     const handleToggle = () => {
@@ -28,8 +46,22 @@ function HudContent() {
     return () => window.removeEventListener('toggle-ai-drawer', handleToggle)
   }, [oracle])
 
+  // Allow re-launching the welcome splash via lobster click
+  useEffect(() => {
+    const handleRelaunch = () => setShowWelcome(true)
+    window.addEventListener('launch-welcome-splash', handleRelaunch)
+    return () => window.removeEventListener('launch-welcome-splash', handleRelaunch)
+  }, [])
+
   return (
     <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
+      {/* First-time welcome splash */}
+      {showWelcome && (
+        <WelcomeSplash
+          userName={user?.name || user?.email}
+          onDismiss={handleDismissWelcome}
+        />
+      )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
         {/* Full-Bleed Underwater Background Image with vivid cyan mix-blend */}
