@@ -27,6 +27,8 @@ import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement } from '../ui'
+import { UserAvatar } from '../UserAvatar'
+import { UserAvatarMenu } from '../UserAvatarMenu'
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -275,10 +277,36 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Main Content Container - Always visible on Desktop, toggling on Mobile */}
         <div
-          className={`flex-1 flex flex-col justify-between space-y-4 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-6rem)] md:max-h-none ${
+          className={`flex-1 flex flex-col justify-between space-y-0 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-6rem)] md:max-h-none ${
             isMobileOpen ? 'block' : 'hidden md:flex'
           }`}
         >
+            {/* Search Bar — full width, above nav */}
+            <div className="shrink-0 border-b border-[#1e2d37]/80">
+              <button
+                onClick={handleOpenCommandPalette}
+                className={`w-full flex items-center justify-between px-4 py-3 bg-[#080d10]/60 hover:bg-[#0d1415] text-xs font-mono text-[#839493] hover:text-[#dfe3e3] transition-all group ${
+                  isCollapsed ? 'justify-center px-0' : ''
+                }`}
+                title="Search commands & protocols (⌘K)"
+              >
+                {isCollapsed ? (
+                  <Search className="w-4 h-4 text-[#00c3ff] group-hover:scale-110 transition-transform mx-auto" />
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 truncate">
+                      <Search className="w-3.5 h-3.5 text-[#00c3ff] group-hover:scale-110 transition-transform shrink-0" />
+                      <span className="truncate">Search commands & protocols...</span>
+                    </div>
+                    <div className="flex items-center gap-0.5 bg-[#0f1414] border border-[#3a4a49] text-[#00c3ff] px-1.5 py-0.5 text-[10px] font-bold shrink-0 ml-2">
+                      <Command className="w-3 h-3" />
+                      <span>K</span>
+                    </div>
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Navigation Items List */}
             <nav className="divide-y divide-[#1e2d37]/80 bg-[#080d10]/40 overflow-hidden">
               {navItems.map((item) => {
@@ -344,50 +372,128 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               })}
             </nav>
 
-          {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
-          <div className="mt-auto shrink-0 px-4 pb-5 pt-3">
-            {isCollapsed ? (
-              <div
-                className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
-                onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
-                title="Replay Initiation Broadcast"
-              >
-                <ChromaElement
-                  src="/images/benthic_lobster_sidebar.jpg"
-                  alt="Benthic Lobster"
-                  blendMode="screen"
-                  glowColor="cyan"
-                  containerClassName="w-9 h-9"
-                  className="w-full h-full object-contain"
-                />
-                {/* Tooltip */}
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
-                  <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
-                    <span className="text-[#dfe3e3]">REPLAY INITIATION BROADCAST</span>
-                    <span className="text-[9px] text-[#ff5540]">• CARAPACE v4.2</span>
+          {/* Bottom Controls: Lobster + Help + Profile / Auth */}
+          <div className={`mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60`}>
+
+            {/* Lobster Emblem */}
+            <div className="px-4 pb-4 pt-3 border-b border-[#1e2d37]/60">
+              {isCollapsed ? (
+                <div
+                  className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
+                  onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
+                  title="Replay Initiation Broadcast"
+                >
+                  <ChromaElement
+                    src="/images/benthic_lobster_sidebar.jpg"
+                    alt="Benthic Lobster"
+                    blendMode="screen"
+                    glowColor="cyan"
+                    containerClassName="w-9 h-9"
+                    className="w-full h-full object-contain"
+                  />
+                  {/* Tooltip */}
+                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
+                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
+                      <span className="text-[#dfe3e3]">REPLAY INITIATION BROADCAST</span>
+                      <span className="text-[9px] text-[#ff5540]">• CARAPACE v4.2</span>
+                    </div>
                   </div>
                 </div>
+              ) : (
+                <div
+                  className="w-full relative group flex flex-col items-center justify-center py-1 cursor-pointer active:scale-95 transition-transform"
+                  onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
+                  title="Replay Initiation Broadcast"
+                >
+                  <ChromaElement
+                    src="/images/benthic_lobster_sidebar.jpg"
+                    alt="Benthic Lobster"
+                    blendMode="screen"
+                    glowColor="cyan"
+                    maskRadial={true}
+                    containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
+                    className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
+                  />
+                  <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
+                    <span className="group-hover:hidden">CARAPACE v4.2</span>
+                    <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Help / Support Link */}
+            <button
+              onClick={() => navigate({ to: '/support' })}
+              className={`w-full flex items-center transition-all duration-150 group/help ${
+                isCollapsed ? 'justify-center px-0 py-3.5' : 'px-4 py-3 gap-3'
+              } ${
+                currentRoute === '/support'
+                  ? 'bg-gradient-to-r from-[#00ffff]/15 via-[#00ffff]/05 to-transparent text-[#00ffff]'
+                  : 'hover:bg-white/[0.03] text-[#839493] hover:text-[#dfe3e3]'
+              }`}
+              title="Benthic Support Portal"
+            >
+              {currentRoute === '/support' && (
+                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.8)]" />
+              )}
+              <LifeBuoy
+                className={`w-4 h-4 shrink-0 transition-colors ${
+                  currentRoute === '/support'
+                    ? 'text-[#00ffff] animate-spin-slow'
+                    : 'text-[#00c3ff] group-hover/help:text-[#dfe3e3]'
+                }`}
+              />
+              {!isCollapsed && (
+                <span className="text-xs font-sans font-medium tracking-wide uppercase">HELP &amp; SUPPORT</span>
+              )}
+              {isCollapsed && (
+                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-all duration-200">
+                  <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]" />
+                    HELP &amp; SUPPORT
+                  </div>
+                </div>
+              )}
+            </button>
+
+            {/* Profile / Auth */}
+            {!user ? (
+              <div className={`w-full ${
+                isCollapsed ? 'flex justify-center px-0 py-3' : 'px-3 py-3'
+              }`}>
+                <BenthicCTAButton
+                  variant="cyan"
+                  size="sm"
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className={isCollapsed ? '!px-2 !py-1.5' : 'w-full !py-2'}
+                >
+                  <span className="flex items-center gap-1.5 text-[11px]">
+                    <LogIn className="w-3.5 h-3.5" />
+                    {!isCollapsed && <span>SIGN IN TO PERSIST</span>}
+                  </span>
+                </BenthicCTAButton>
               </div>
             ) : (
-              <div
-                className="w-full relative group flex flex-col items-center justify-center py-1 cursor-pointer active:scale-95 transition-transform"
-                onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
-                title="Replay Initiation Broadcast"
-              >
-                <ChromaElement
-                  src="/images/benthic_lobster_sidebar.jpg"
-                  alt="Benthic Lobster"
-                  blendMode="screen"
-                  glowColor="cyan"
-                  maskRadial={true}
-                  containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
-                  className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
+              <div className={`flex items-center transition-all duration-150 group/profile hover:bg-white/[0.03] ${
+                isCollapsed ? 'justify-center px-0 py-3.5' : 'px-4 py-3 gap-3'
+              }`}>
+                <UserAvatarMenu
+                  user={user}
+                  onNavigate={(path) => navigate({ to: path })}
+                  align="left"
                 />
-                <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                  <span className="group-hover:hidden">CARAPACE v4.2</span>
-                  <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>
-                </div>
+                {!isCollapsed && (
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-xs font-medium text-[#dfe3e3] truncate font-grotesk">
+                      {user.name || user.email?.split('@')[0] || 'OPERATIVE'}
+                    </span>
+                    <span className="text-[10px] text-[#00c3ff] font-mono tracking-wide flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
+                      AUTHENTICATED
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
