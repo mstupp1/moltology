@@ -42,6 +42,25 @@ export function UnderwaterBubblesCanvas({
     let width = (canvas.width = parent?.clientWidth || window.innerWidth || 800)
     let height = (canvas.height = parent?.clientHeight || window.innerHeight || 600)
 
+    // Cache top radial sun glow to avoid allocating gradient objects inside requestAnimationFrame
+    let cachedSunGlow: CanvasGradient | string | null = null
+    const updateSunGlowCache = () => {
+      const sunX = width * 0.5
+      const sunY = -20
+      const sunGlowRadius = Math.max(width * 0.45, 380)
+
+      if (typeof ctx.createRadialGradient === 'function') {
+        const glow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, sunGlowRadius)
+        glow.addColorStop(0, 'rgba(0, 255, 255, 0.12)')
+        glow.addColorStop(0.4, 'rgba(0, 195, 255, 0.05)')
+        glow.addColorStop(1, 'rgba(0, 255, 255, 0)')
+        cachedSunGlow = glow
+      } else {
+        cachedSunGlow = 'rgba(0, 255, 255, 0.05)'
+      }
+    }
+    updateSunGlowCache()
+
     // Debounced resize handling
     let resizeTimeout: ReturnType<typeof setTimeout>
     const handleResize = () => {
@@ -51,6 +70,7 @@ export function UnderwaterBubblesCanvas({
         width = canvas.width = parent?.clientWidth || window.innerWidth || 800
         height = canvas.height = parent?.clientHeight || window.innerHeight || 600
         updateClusterCenters()
+        updateSunGlowCache()
       }, 100)
     }
 
@@ -180,31 +200,29 @@ export function UnderwaterBubblesCanvas({
 
       const dt = Math.min((now - lastTime) / 1000, 0.1)
       lastTime = now
-      const elapsedTime = (now - startTime) / 1000
 
       ctx.clearRect(0, 0, width, height)
 
       // -------------------------------------------------------------------
-      // 1. VERY SLIGHT TOP-CENTER SURFACE RADIAL GLOW
+      // 1. VERY SLIGHT TOP-CENTER SURFACE RADIAL GLOW (CACHED)
       // -------------------------------------------------------------------
-      const sunX = width * 0.5
-      const sunY = -20
-      const sunGlowRadius = Math.max(width * 0.45, 380)
+      if (cachedSunGlow) {
+        const sunX = width * 0.5
+        const sunY = -20
+        const sunGlowRadius = Math.max(width * 0.45, 380)
 
-      const sunGlow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, sunGlowRadius)
-      const sunPulse = 0.85 + 0.15 * Math.sin(elapsedTime * 0.6)
-      sunGlow.addColorStop(0, `rgba(0, 255, 255, ${0.12 * sunPulse})`)
-      sunGlow.addColorStop(0.4, `rgba(0, 195, 255, ${0.05 * sunPulse})`)
-      sunGlow.addColorStop(1, 'rgba(0, 255, 255, 0)')
-
-      ctx.fillStyle = sunGlow
-      ctx.beginPath()
-      ctx.arc(sunX, sunY, sunGlowRadius, 0, Math.PI * 2)
-      ctx.fill()
+        ctx.fillStyle = cachedSunGlow
+        ctx.beginPath()
+        ctx.arc(sunX, sunY, sunGlowRadius, 0, Math.PI * 2)
+        ctx.fill()
+      }
 
       // -------------------------------------------------------------------
       // 2. MULTI-TIER BOKEH & EFFERVESCENT BUBBLE PARTICLES
+      // Batch micro-fizz particles for zero path recreation latency
       // -------------------------------------------------------------------
+      const fizzParticles: { x: number; y: number; r: number }[] = []
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
@@ -260,48 +278,38 @@ export function UnderwaterBubblesCanvas({
 
         if (currentOpacity <= 0.01) continue
 
-        ctx.save()
-
         if (p.type === 'fizz') {
-          // --- TIER 1: MICRO-FIZZ EFFERVESCENCE ---
-          const fizzGlowRadius = p.radius * 2.0
-          ctx.beginPath()
-          ctx.arc(renderX, renderY, fizzGlowRadius, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(180, 255, 255, ${currentOpacity * 0.4})`
-          ctx.fill()
-
-          ctx.beginPath()
-          ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.95})`
-          ctx.fill()
+          // Collect micro-fizz positions to draw in a single batched path pass
+          fizzParticles.push({ x: renderX, y: renderY, r: p.radius })
         } else if (p.type === 'bokeh') {
-          // --- TIER 2: BOKEH RINGS (OUT-OF-FOCUS PHOTO STYLE) ---
-          const bokehGrad = ctx.createRadialGradient(
-            renderX,
-            renderY,
-            p.radius * 0.2,
-            renderX,
-            renderY,
-            p.radius
-          )
-          const coreColor = `rgba(0, 240, 255, ${currentOpacity * 0.12})`
-          const rimColor = `rgba(160, 255, 255, ${currentOpacity * 0.6})`
+          // --- TIER 2: BOKEH RINGS ---
+          if (typeof ctx.createRadialGradient === 'function') {
+            const bokehGrad = ctx.createRadialGradient(
+              renderX,
+              renderY,
+              p.radius * 0.2,
+              renderX,
+              renderY,
+              p.radius
+            )
+            bokehGrad.addColorStop(0, `rgba(0, 240, 255, ${currentOpacity * 0.12})`)
+            bokehGrad.addColorStop(0.7, `rgba(0, 200, 240, ${currentOpacity * 0.08})`)
+            bokehGrad.addColorStop(1, `rgba(160, 255, 255, ${currentOpacity * 0.6})`)
 
-          bokehGrad.addColorStop(0, coreColor)
-          bokehGrad.addColorStop(0.7, `rgba(0, 200, 240, ${currentOpacity * 0.08})`)
-          bokehGrad.addColorStop(1, rimColor)
+            ctx.beginPath()
+            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+            ctx.fillStyle = bokehGrad
+            ctx.fill()
+          } else {
+            ctx.beginPath()
+            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+            ctx.fill()
+          }
 
-          ctx.beginPath()
-          ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-          ctx.fillStyle = bokehGrad
-          ctx.fill()
-
-          // Bright crisp bokeh rim stroke
           ctx.lineWidth = p.bokehRingWidth || 1.5
-          ctx.strokeStyle = rimColor
+          ctx.strokeStyle = `rgba(160, 255, 255, ${currentOpacity * 0.6})`
           ctx.stroke()
 
-          // Bokeh lens flare highlight arc
           ctx.beginPath()
           ctx.arc(
             renderX - p.radius * 0.3,
@@ -315,40 +323,46 @@ export function UnderwaterBubblesCanvas({
         } else {
           // --- TIER 3: STANDARD CRISP 3D SPHERICAL BUBBLE ---
           const outerGlowRadius = p.radius * 2.2
-          const glowGrad = ctx.createRadialGradient(
-            renderX,
-            renderY,
-            p.radius * 0.35,
-            renderX,
-            renderY,
-            outerGlowRadius
-          )
-          glowGrad.addColorStop(0, `rgba(0, 255, 255, ${currentOpacity * 0.38})`)
-          glowGrad.addColorStop(0.5, `rgba(0, 195, 255, ${currentOpacity * 0.14})`)
-          glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
+          if (typeof ctx.createRadialGradient === 'function') {
+            const glowGrad = ctx.createRadialGradient(
+              renderX,
+              renderY,
+              p.radius * 0.35,
+              renderX,
+              renderY,
+              outerGlowRadius
+            )
+            glowGrad.addColorStop(0, `rgba(0, 255, 255, ${currentOpacity * 0.38})`)
+            glowGrad.addColorStop(0.5, `rgba(0, 195, 255, ${currentOpacity * 0.14})`)
+            glowGrad.addColorStop(1, 'rgba(0, 255, 255, 0)')
 
-          ctx.fillStyle = glowGrad
-          ctx.beginPath()
-          ctx.arc(renderX, renderY, outerGlowRadius, 0, Math.PI * 2)
-          ctx.fill()
+            ctx.fillStyle = glowGrad
+            ctx.beginPath()
+            ctx.arc(renderX, renderY, outerGlowRadius, 0, Math.PI * 2)
+            ctx.fill()
 
-          const shellGrad = ctx.createRadialGradient(
-            renderX - p.radius * 0.3,
-            renderY - p.radius * 0.3,
-            p.radius * 0.08,
-            renderX,
-            renderY,
-            p.radius
-          )
-          shellGrad.addColorStop(0, `rgba(255, 255, 255, ${currentOpacity * 0.75})`)
-          shellGrad.addColorStop(0.4, `rgba(0, 240, 255, ${currentOpacity * 0.38})`)
-          shellGrad.addColorStop(0.85, `rgba(0, 180, 220, ${currentOpacity * 0.25})`)
-          shellGrad.addColorStop(1, `rgba(0, 255, 255, ${currentOpacity * 0.85})`)
+            const shellGrad = ctx.createRadialGradient(
+              renderX - p.radius * 0.3,
+              renderY - p.radius * 0.3,
+              p.radius * 0.08,
+              renderX,
+              renderY,
+              p.radius
+            )
+            shellGrad.addColorStop(0, `rgba(255, 255, 255, ${currentOpacity * 0.75})`)
+            shellGrad.addColorStop(0.4, `rgba(0, 240, 255, ${currentOpacity * 0.38})`)
+            shellGrad.addColorStop(0.85, `rgba(0, 180, 220, ${currentOpacity * 0.25})`)
+            shellGrad.addColorStop(1, `rgba(0, 255, 255, ${currentOpacity * 0.85})`)
 
-          ctx.beginPath()
-          ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
-          ctx.fillStyle = shellGrad
-          ctx.fill()
+            ctx.beginPath()
+            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+            ctx.fillStyle = shellGrad
+            ctx.fill()
+          } else {
+            ctx.beginPath()
+            ctx.arc(renderX, renderY, p.radius, 0, Math.PI * 2)
+            ctx.fill()
+          }
 
           const highlightRadius = Math.max(0.75, p.radius * 0.28)
           ctx.beginPath()
@@ -362,8 +376,18 @@ export function UnderwaterBubblesCanvas({
           ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity * 0.92})`
           ctx.fill()
         }
+      }
 
-        ctx.restore()
+      // Render all micro-fizz particles in a single batched path fill for ultra-low draw-call latency
+      if (fizzParticles.length > 0) {
+        ctx.fillStyle = 'rgba(220, 255, 255, 0.75)'
+        ctx.beginPath()
+        for (let j = 0; j < fizzParticles.length; j++) {
+          const fp = fizzParticles[j]
+          ctx.moveTo(fp.x + fp.r, fp.y)
+          ctx.arc(fp.x, fp.y, fp.r, 0, Math.PI * 2)
+        }
+        ctx.fill()
       }
 
       if (!prefersReducedMotion && !isPaused) {
