@@ -188,7 +188,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
-                className="w-full h-full object-contain [image-rendering:pixelated]"
+                className="w-full h-full object-contain"
               />
             </div>
             <div>
@@ -233,7 +233,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
-                className="w-full h-full object-contain [image-rendering:pixelated]"
+                className="w-full h-full object-contain"
               />
             </div>
 

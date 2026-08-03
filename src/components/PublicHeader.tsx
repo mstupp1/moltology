@@ -66,7 +66,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             <img
               src="/images/order_emblem.png"
               alt="Moltology Emblem"
-              className="w-full h-full object-contain [image-rendering:pixelated]"
+              className="w-full h-full object-contain"
             />
           </div>
           <div>
