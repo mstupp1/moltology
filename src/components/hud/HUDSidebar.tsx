@@ -173,11 +173,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
       <aside
         className={`w-full ${
-          isCollapsed ? 'md:w-[72px] md:p-2' : 'md:w-72 md:p-3.5'
-        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none p-3.5 gap-3 relative z-30 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar`}
+          isCollapsed ? 'md:w-[72px]' : 'md:w-72'
+        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-30 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
       >
         {/* Mobile Accordion Top Bar */}
-        <div className="flex md:hidden items-center justify-between gap-2 p-1">
+        <div className="flex md:hidden items-center justify-between gap-2 p-3">
           <div
             onClick={() => handleNavClick('/')}
             className="flex items-center gap-2 cursor-pointer"
@@ -215,21 +215,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </button>
         </div>
 
-        {/* Desktop Header Logo & Toggle Button */}
+        {/* Desktop Header Logo */}
         <div
-          className={`hidden md:flex items-center border border-[#3a4a49] chamfer-corner backdrop-blur-sm shrink-0 transition-all duration-300 relative group/brand ${
-            isCollapsed
-              ? 'flex-col p-2 gap-2 bg-[#0f1414]/70 justify-center'
-              : 'justify-between p-2.5 bg-[#0f1414]/50 hover:border-[#ff453a]/60'
+          className={`hidden md:flex items-center shrink-0 transition-all duration-300 relative group/brand border-b border-[#1e2d37]/60 ${
+            isCollapsed ? 'justify-center py-3 px-1' : 'px-2 py-3'
           }`}
         >
           <div
             onClick={() => handleNavClick('/')}
-            className={`flex items-center gap-2.5 cursor-pointer group/logo ${
-              isCollapsed ? 'justify-center w-full' : 'min-w-0'
+            className={`flex items-center gap-3 cursor-pointer group/logo rounded-lg px-2.5 py-2 hover:bg-white/[0.05] transition-all duration-200 ${
+              isCollapsed ? 'justify-center w-full' : 'min-w-0 flex-1'
             }`}
           >
-            <div className="w-8 h-8 flex items-center justify-center shrink-0 transition-transform group-hover/logo:scale-105">
+            <div className="w-10 h-10 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover/logo:scale-110">
               <img
                 src="/images/order_emblem.png"
                 alt="Order Emblem"
@@ -239,34 +237,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
             {!isCollapsed && (
               <div className="overflow-hidden whitespace-nowrap transition-all duration-300 min-w-0">
-                <div className="font-grotesk font-bold text-xs text-[#dfe3e3] tracking-widest group-hover/logo:text-[#ff5540] transition-colors truncate">
+                <div className="font-grotesk font-bold text-sm text-[#dfe3e3] tracking-widest group-hover/logo:text-[#ff5540] transition-colors truncate leading-tight">
                   THE SYNAPTIC PATH
                 </div>
-                <div className="text-[10px] text-[#00c3ff] font-mono tracking-wider truncate">
+                <div className="text-[11px] text-[#00c3ff] font-mono tracking-wider truncate mt-0.5">
                   BENTHIC TEMPLE HUD
                 </div>
               </div>
             )}
           </div>
 
-          {/* Toggle Collapse Button */}
-          <button
-            onClick={toggleCollapse}
-            className={`p-1.5 bg-[#030606]/80 hover:bg-[#00c3ff]/15 border border-[#3a4a49] hover:border-[#00c3ff] text-[#00c3ff] transition-all chamfer-corner active:scale-95 shrink-0 flex items-center justify-center shadow-md ${
-              isCollapsed ? 'w-full py-1' : ''
-            }`}
-            title={isCollapsed ? 'Expand Sidebar (⌘B)' : 'Collapse Sidebar (⌘B)'}
-          >
-            {isCollapsed ? (
-              <ChevronsRight className="w-4 h-4 text-[#00c3ff] animate-pulse" />
-            ) : (
-              <ChevronsLeft className="w-4 h-4 text-[#7a8e9e] hover:text-[#00c3ff]" />
-            )}
-          </button>
-
           {/* Brand Tooltip when collapsed */}
           {isCollapsed && (
-            <div className="absolute left-full ml-3 top-2 z-50 pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
+            <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
               <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
                 <span className="text-[#00c3ff]">THE SYNAPTIC PATH</span>
                 <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD</span>
@@ -275,15 +258,29 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           )}
         </div>
 
+        {/* Sidebar Rail Toggle — fixed so it always renders above all stacking contexts */}
+        <button
+          onClick={toggleCollapse}
+          className={`hidden md:flex fixed top-[72px] z-[200] w-5 h-5 rounded-full bg-[#0d1618] border border-[#2a3a42] hover:border-[#00c3ff]/70 text-[#566878] hover:text-[#00c3ff] items-center justify-center shadow-xl transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 hover:shadow-[0_0_8px_rgba(0,195,255,0.4)] ${
+            isCollapsed ? '-translate-x-1/2 left-[72px]' : '-translate-x-1/2 left-72'
+          }`}
+          title={isCollapsed ? 'Expand Sidebar (⌘B)' : 'Collapse Sidebar (⌘B)'}
+        >
+          {isCollapsed ? (
+            <ChevronsRight className="w-2.5 h-2.5" />
+          ) : (
+            <ChevronsLeft className="w-2.5 h-2.5" />
+          )}
+        </button>
+
         {/* Main Content Container - Always visible on Desktop, toggling on Mobile */}
         <div
           className={`flex-1 flex flex-col justify-between space-y-4 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-6rem)] md:max-h-none ${
             isMobileOpen ? 'block' : 'hidden md:flex'
           }`}
         >
-          <div className="space-y-3.5">
             {/* Navigation Items List */}
-            <nav className="divide-y divide-[#1e2d37]/80 border-y border-[#1e2d37]/80 bg-[#080d10]/40 overflow-hidden">
+            <nav className="divide-y divide-[#1e2d37]/80 bg-[#080d10]/40 overflow-hidden">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive =
@@ -296,8 +293,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     onClick={() => handleNavClick(item.path)}
                     className={`w-full text-left relative flex items-center transition-all duration-150 group/navitem ${
                       isCollapsed
-                        ? 'justify-center px-0 py-3'
-                        : 'px-3.5 py-3 gap-3.5'
+                        ? 'justify-center px-0 py-3.5'
+                        : 'px-4 py-3 gap-3.5'
                     } ${
                       isActive
                         ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
@@ -346,7 +343,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 )
               })}
             </nav>
-          </div>
 
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
           <div className="pt-2 mt-auto shrink-0 px-2">
