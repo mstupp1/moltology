@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
-import { getBlogPostBySlugFn } from '@/lib/server/api'
+import { getBlogPostBySlugFn, incrementBlogPostViewsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
@@ -49,6 +49,12 @@ function BlogPostDetail() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (post?.slug) {
+      incrementBlogPostViewsFn({ data: post.slug }).catch(() => {})
+    }
+  }, [post?.slug])
 
   if (!post) {
     return (
@@ -218,7 +224,7 @@ function BlogPostDetail() {
                     {post.authorName}
                   </div>
                   <div className="text-[11px] text-cyan-400 font-mono">
-                    STAGE 4 ASCENDANT // ARCHITECT
+                    {post.authorRole || 'STAGE 4 ASCENDANT // ARCHITECT'}
                   </div>
                 </div>
               </div>

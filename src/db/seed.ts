@@ -263,9 +263,13 @@ export async function seedDatabase(databaseUrl?: string) {
           coverImageUrl: post.coverImageUrl,
           authorName: post.authorName,
           authorAvatar: post.authorAvatar,
+          authorRole: post.authorRole || 'Stage 4 Ascendant',
           category: post.category,
           tags: post.tags,
           readTimeMinutes: post.readTimeMinutes,
+          views: post.views || 42,
+          likes: post.likes || 12,
+          isFeatured: post.isFeatured || false,
           isPublished: post.isPublished,
           publishedAt: new Date(post.publishedAt),
         })

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, assets, dailyRoutines, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages } from './schema'
+import { profiles, users, userStats, assets, dailyRoutines, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -13,6 +13,8 @@ describe('Database Schema & RLS Policies', () => {
     expect(galleryPins).toBeDefined()
     expect(aiThreads).toBeDefined()
     expect(aiMessages).toBeDefined()
+    expect(blogPosts).toBeDefined()
+    expect(blogComments).toBeDefined()
   })
 
   it('defines required fields on the profiles table', () => {
@@ -40,5 +42,19 @@ describe('Database Schema & RLS Policies', () => {
     expect(galleryPins.id).toBeDefined()
     expect(galleryPins.s3Key).toBeDefined()
     expect(galleryPins.s3Key.isUnique).toBe(true)
+  })
+
+  it('defines required fields and unique constraint on blogPosts and blogComments tables', () => {
+    expect(blogPosts.id).toBeDefined()
+    expect(blogPosts.slug).toBeDefined()
+    expect(blogPosts.slug.isUnique).toBe(true)
+    expect(blogPosts.title).toBeDefined()
+    expect(blogPosts.authorRole).toBeDefined()
+    expect(blogPosts.likes).toBeDefined()
+    expect(blogPosts.isFeatured).toBeDefined()
+
+    expect(blogComments.id).toBeDefined()
+    expect(blogComments.postId).toBeDefined()
+    expect(blogComments.content).toBeDefined()
   })
 })

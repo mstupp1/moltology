@@ -170,10 +170,13 @@ export const blogPosts = pgTable('blog_posts', {
   authorId: text('authorId').references(() => profiles.id, { onDelete: 'set null' }),
   authorName: text('authorName').default('High Ascendant Carcinus').notNull(),
   authorAvatar: text('authorAvatar').default('/images/order_emblem.png').notNull(),
+  authorRole: text('authorRole').default('Stage 4 Ascendant').notNull(),
   category: text('category').default('SACRED DOCTRINE').notNull(),
   tags: jsonb('tags').$type<string[]>().default([]).notNull(),
   readTimeMinutes: integer('readTimeMinutes').default(5).notNull(),
   views: integer('views').default(0).notNull(),
+  likes: integer('likes').default(0).notNull(),
+  isFeatured: boolean('isFeatured').default(false).notNull(),
   isPublished: boolean('isPublished').default(true).notNull(),
   publishedAt: timestamp('publishedAt').defaultNow().notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
@@ -184,4 +187,25 @@ export const blogPosts = pgTable('blog_posts', {
     using: sql`"isPublished" = true`
   })
 ])
+
+// Blog Post Comments Table
+export const blogComments = pgTable('blog_comments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  postId: uuid('postId').notNull().references(() => blogPosts.id, { onDelete: 'cascade' }),
+  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
+  authorName: text('authorName').default('Ascendant Initiate').notNull(),
+  authorAvatar: text('authorAvatar').default('/images/stage1_larva.png').notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('blog_comments_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  }),
+  pgPolicy('blog_comments_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
 
