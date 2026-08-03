@@ -21,6 +21,8 @@ import {
   HelpCircle,
   ChevronsLeft,
   ChevronsRight,
+  ChevronDown,
+  ChevronRight,
   LayoutGrid,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
@@ -90,75 +92,130 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     window.dispatchEvent(new CustomEvent('open-command-palette'))
   }
 
-  const navItems = [
+  const navGroups = [
     {
-      id: 'hub',
-      label: 'COMMAND HUB',
-      icon: LayoutDashboard,
-      path: '/dashboard',
+      id: 'core',
+      title: 'CORE COMMAND',
+      items: [
+        {
+          id: 'hub',
+          label: 'COMMAND HUB',
+          icon: LayoutDashboard,
+          path: '/dashboard',
+        },
+        {
+          id: 'oracle',
+          label: 'SYNAPTIC ORACLE',
+          icon: Atom,
+          path: '/oracle',
+        },
+      ],
     },
     {
-      id: 'oracle',
-      label: 'SYNAPTIC ORACLE',
-      icon: Atom,
-      path: '/oracle',
+      id: 'knowledge',
+      title: 'KNOWLEDGE & DOCTRINE',
+      items: [
+        {
+          id: 'codex',
+          label: 'THE SACRED CODEX',
+          icon: Scroll,
+          path: '/codex',
+        },
+        {
+          id: 'lectures',
+          label: 'MOLT ACADEMY',
+          icon: BookOpen,
+          path: '/lectures',
+        },
+        {
+          id: 'science',
+          label: 'MOLTOLOGY SCIENCE',
+          icon: FlaskConical,
+          path: '/pipeline',
+        },
+      ],
     },
     {
-      id: 'codex',
-      label: 'THE SACRED CODEX',
-      icon: Scroll,
-      path: '/codex',
+      id: 'operations',
+      title: 'OPERATIONS & GEAR',
+      items: [
+        {
+          id: 'market',
+          label: 'THE MARKET',
+          icon: ShoppingCart,
+          path: '/market',
+        },
+        {
+          id: 'chassis',
+          label: 'CHASSIS CONFIGURATOR',
+          icon: Sliders,
+          path: '/chassis',
+        },
+        {
+          id: 'isolation',
+          label: 'ISOLATION PROTOCOLS',
+          icon: ShieldAlert,
+          path: '/isolation',
+        },
+      ],
     },
     {
-      id: 'lectures',
-      label: 'MOLT ACADEMY',
-      icon: BookOpen,
-      path: '/lectures',
-    },
-    {
-      id: 'science',
-      label: 'MOLTOLOGY SCIENCE',
-      icon: Atom,
-      path: '/pipeline',
-    },
-    {
-      id: 'market',
-      label: 'THE MARKET',
-      icon: ShoppingCart,
-      path: '/market',
-    },
-    {
-      id: 'chassis',
-      label: 'CHASSIS CONFIGURATOR',
-      icon: Atom,
-      path: '/chassis',
-    },
-    {
-      id: 'isolation',
-      label: 'ISOLATION PROTOCOLS',
-      icon: ShieldAlert,
-      path: '/isolation',
-    },
-    {
-      id: 'gallery',
-      label: 'MOLT PIN VAULT',
-      icon: LayoutGrid,
-      path: '/gallery',
-    },
-    {
-      id: 'community',
-      label: 'BENTHIC COMMUNITY CORE',
-      icon: Users,
-      path: '/community',
+      id: 'community_vault',
+      title: 'COMMUNITY & VAULT',
+      items: [
+        {
+          id: 'gallery',
+          label: 'MOLT PIN VAULT',
+          icon: LayoutGrid,
+          path: '/gallery',
+        },
+        {
+          id: 'community',
+          label: 'BENTHIC COMMUNITY CORE',
+          icon: Users,
+          path: '/community',
+        },
+      ],
     },
   ]
 
+  const getActiveGroupId = (route: string) => {
+    const found = navGroups.find((group) =>
+      group.items.some(
+        (item) =>
+          route === item.path ||
+          (item.path !== '/' && route.startsWith(item.path))
+      )
+    )
+    return found ? found.id : navGroups[0].id
+  }
+
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => ({
+    [getActiveGroupId(currentRoute)]: true,
+  }))
+
+  // Auto-expand only the section currently active on route change
+  useEffect(() => {
+    const activeId = getActiveGroupId(currentRoute)
+    setOpenGroups({ [activeId]: true })
+  }, [currentRoute])
+
+  const toggleGroup = (groupId: string) => {
+    setOpenGroups((prev) => {
+      const isCurrentlyOpen = !!prev[groupId]
+      // Accordion mode: Expand target group, collapse others unless closing target
+      return isCurrentlyOpen ? {} : { [groupId]: true }
+    })
+  }
+
+  const allNavItems = navGroups.flatMap((g) => g.items)
+
   const activeItem =
-    navItems.find(
+    allNavItems.find(
       (item) =>
         currentRoute === item.path ||
         (item.path !== '/' && currentRoute.startsWith(item.path))
-    ) || navItems[0]
+    ) || allNavItems[0]
 
   const handleNavClick = (path: string) => {
     navigate({ to: path })
@@ -277,7 +334,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Main Content Container - Always visible on Desktop, toggling on Mobile */}
         <div
-          className={`flex-1 flex flex-col justify-between space-y-0 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-6rem)] md:max-h-none ${
+          className={`flex-1 flex flex-col justify-between space-y-0 overflow-hidden min-h-0 max-h-[calc(100vh-6rem)] md:max-h-none ${
             isMobileOpen ? 'block' : 'hidden md:flex'
           }`}
         >
@@ -308,66 +365,131 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             </div>
 
             {/* Navigation Items List */}
-            <nav className="divide-y divide-[#1e2d37]/80 bg-[#080d10]/40 overflow-hidden">
-              {navItems.map((item) => {
-                const Icon = item.icon
-                const isActive =
-                  currentRoute === item.path ||
-                  (item.path !== '/' && currentRoute.startsWith(item.path))
+            <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10]/40 overflow-y-auto overflow-x-hidden min-h-0">
+              {navGroups.map((group, groupIdx) => {
+                const isOpen = !!openGroups[group.id]
+                const isGroupActive = group.items.some(
+                  (item) =>
+                    currentRoute === item.path ||
+                    (item.path !== '/' && currentRoute.startsWith(item.path))
+                )
+
+                if (isCollapsed) {
+                  return (
+                    <div key={group.id} className={groupIdx > 0 ? 'border-t border-[#1e2d37]/80 pt-1' : ''}>
+                      {group.items.map((item) => {
+                        const Icon = item.icon
+                        const isActive =
+                          currentRoute === item.path ||
+                          (item.path !== '/' && currentRoute.startsWith(item.path))
+
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleNavClick(item.path)}
+                            className={`w-full text-left relative flex items-center justify-center py-3.5 transition-all duration-150 group/navitem ${
+                              isActive
+                                ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
+                                : 'bg-transparent hover:bg-white/[0.03]'
+                            }`}
+                          >
+                            {isActive && (
+                              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_10px_rgba(255,59,48,0.8)]" />
+                            )}
+
+                            <Icon
+                              className={`w-4 h-4 shrink-0 transition-colors ${
+                                isActive
+                                  ? 'text-[#ff5555]'
+                                  : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
+                              }`}
+                            />
+
+                            <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-all duration-200 translate-x-1 group-hover/navitem:translate-x-0">
+                              <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]" />
+                                <span className="tracking-wider uppercase">
+                                  {item.label}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )
+                }
 
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavClick(item.path)}
-                    className={`w-full text-left relative flex items-center transition-all duration-150 group/navitem ${
-                      isCollapsed
-                        ? 'justify-center px-0 py-3.5'
-                        : 'px-4 py-3 gap-3.5'
-                    } ${
-                      isActive
-                        ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
-                        : 'bg-transparent hover:bg-white/[0.03]'
-                    }`}
-                  >
-                    {/* Active Red Vertical Accent Bar */}
-                    {isActive && (
-                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_10px_rgba(255,59,48,0.8)]" />
-                    )}
-
-                    <Icon
-                      className={`w-4 h-4 shrink-0 transition-colors ${
-                        isActive
-                          ? 'text-[#ff5555]'
-                          : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
-                      }`}
-                    />
-
-                    {!isCollapsed && (
-                      <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap transition-all duration-300">
-                        <span
-                          className={`text-xs md:text-[13px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
-                            isActive
-                              ? 'text-white font-semibold'
-                              : 'text-[#9eb0c0] group-hover/navitem:text-[#dfe3e3]'
-                          }`}
-                        >
-                          {item.label}
+                  <div key={group.id} className="border-b border-[#1e2d37]/80">
+                    <button
+                      onClick={() => toggleGroup(group.id)}
+                      className="w-full flex items-center justify-between px-3.5 py-2 bg-[#091014]/90 hover:bg-[#0e171d] border-b border-[#1e2d37]/50 text-left transition-all group/groupheader cursor-pointer select-none"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {isGroupActive && !isOpen && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.9)] shrink-0 animate-pulse" />
+                        )}
+                        <span className="font-mono text-[10px] font-bold text-[#00c3ff]/80 group-hover/groupheader:text-[#00c3ff] tracking-wider uppercase truncate">
+                          {group.title}
                         </span>
                       </div>
-                    )}
+                      <div className="flex items-center shrink-0 ml-2">
+                        {isOpen ? (
+                          <ChevronDown className="w-3.5 h-3.5 text-[#566878] group-hover/groupheader:text-[#00c3ff] transition-transform" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5 text-[#566878] group-hover/groupheader:text-[#00c3ff] transition-transform" />
+                        )}
+                      </div>
+                    </button>
 
-                    {/* Cybernetic Floating Tooltip when collapsed */}
-                    {isCollapsed && (
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-all duration-200 translate-x-1 group-hover/navitem:translate-x-0">
-                        <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff]" />
-                          <span className="tracking-wider uppercase">
-                            {item.label}
-                          </span>
-                        </div>
+                    {isOpen && (
+                      <div className="divide-y divide-[#1e2d37]/40 bg-[#080d10]/40">
+                        {group.items.map((item) => {
+                          const Icon = item.icon
+                          const isActive =
+                            currentRoute === item.path ||
+                            (item.path !== '/' && currentRoute.startsWith(item.path))
+
+                          return (
+                            <button
+                              key={item.id}
+                              onClick={() => handleNavClick(item.path)}
+                              className={`w-full text-left relative flex items-center transition-all duration-150 group/navitem px-4 py-2.5 pl-5 gap-3 ${
+                                isActive
+                                  ? 'bg-gradient-to-r from-[#ff3b30]/20 via-[#ff3b30]/06 to-transparent'
+                                  : 'bg-transparent hover:bg-white/[0.03]'
+                              }`}
+                            >
+                              {isActive && (
+                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_10px_rgba(255,59,48,0.8)]" />
+                              )}
+
+                              <Icon
+                                className={`w-4 h-4 shrink-0 transition-colors ${
+                                  isActive
+                                    ? 'text-[#ff5555]'
+                                    : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
+                                }`}
+                              />
+
+                              <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap transition-all duration-300">
+                                <span
+                                  className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors ${
+                                    isActive
+                                      ? 'text-white font-semibold'
+                                      : 'text-[#9eb0c0] group-hover/navitem:text-[#dfe3e3]'
+                                  }`}
+                                >
+                                  {item.label}
+                                </span>
+                              </div>
+                            </button>
+                          )
+                        })}
                       </div>
                     )}
-                  </button>
+                  </div>
                 )
               })}
             </nav>

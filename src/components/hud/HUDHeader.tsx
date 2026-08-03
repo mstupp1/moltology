@@ -160,7 +160,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
               }}
             />
 
-            {/* ── CRAB CLAW (chroma-keyed via mix-blend-mode) ── */}
+            {/* ── CRAB CLAW (chroma-keyed transparent PNG facing right) ── */}
             <div
               className="absolute top-1/2 pointer-events-none z-20"
               style={{
@@ -171,13 +171,11 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
                 marginTop: '-1px',
               }}
             >
-              {/* Green-screen removal via multiply + the image itself */}
               <img
-                src="/images/crab_claw_chroma.jpg"
+                src="/images/crab_claw.png"
                 alt="Exoshell Claw"
                 className="w-full h-full object-contain"
                 style={{
-                  mixBlendMode: 'screen',
                   filter: 'drop-shadow(0 0 6px rgba(255,80,30,0.9)) drop-shadow(0 0 12px rgba(255,80,30,0.5)) brightness(0.95) saturate(1.4)',
                 }}
                 draggable={false}
@@ -201,30 +199,6 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         </div>
 
       </div>{/* end center col */}
-
-      {/* ── RIGHT: Biomech arm / tail thumbnail (large screens) ── */}
-      <div
-        className="relative shrink-0 hidden lg:block z-10"
-        style={{ width: '80px', height: '40px', overflow: 'visible' }}
-        title="Benthic Appendage Status"
-      >
-        <img
-          src="/images/crab_tail_chroma.jpg"
-          alt="Benthic Appendage"
-          className="absolute"
-          style={{
-            right: '-12px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            height: '54px',
-            width: 'auto',
-            mixBlendMode: 'screen',
-            filter: 'drop-shadow(0 0 8px rgba(0,195,255,0.7)) brightness(0.9) saturate(1.3)',
-            objectFit: 'contain',
-          }}
-          draggable={false}
-        />
-      </div>
 
       {/* Keyframe styles */}
       <style>{`
