@@ -59,7 +59,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             userId={userId}
             isCompact={true}
             onClose={handleClose}
-            personaName="SYNAPTIC ORACLE v4.0"
+            personaName="SYNAPTIC ORACLE"
             modelName="deepseek/deepseek-v4-flash-0731"
           />
         </div>
