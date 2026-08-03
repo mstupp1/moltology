@@ -11,6 +11,7 @@ export interface AIChatPanelProps {
   personaName?: string
   modelName?: string
   onClose?: () => void
+  onThreadCreated?: (newThreadId: string) => void
   isCompact?: boolean
   className?: string
 }
@@ -34,6 +35,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   personaName = 'SYNAPTIC ORACLE v4.0',
   modelName = 'deepseek/deepseek-v4-flash-0731',
   onClose,
+  onThreadCreated,
   isCompact = false,
   className = '',
 }) => {
@@ -61,29 +63,20 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const [messages, setMessages] = useState<ChatMessage[]>([initialWelcome])
 
-  // Populate initial welcome timestamp safely on client mount
-  useEffect(() => {
-    if (isMounted) {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === 'welcome-1' && !msg.timestamp
-            ? { ...msg, timestamp: getTimeString() }
-            : msg
-        )
-      )
-    }
-  }, [isMounted])
-
   // Sync active thread ID when prop changes
   useEffect(() => {
-    if (initialThreadId !== undefined) {
-      setActiveThreadId(initialThreadId)
-    }
+    setActiveThreadId(initialThreadId || null)
   }, [initialThreadId])
 
-  // Fetch thread messages if activeThreadId is provided
+  // Reset to blank consultation screen when activeThreadId is null, or fetch thread messages if set
   useEffect(() => {
-    if (!activeThreadId || !userId) return
+    if (!activeThreadId) {
+      setMessages([{ ...initialWelcome, timestamp: getTimeString() }])
+      return
+    }
+
+    if (!userId) return
+
     getAIMessagesFn({ data: { threadId: activeThreadId, userId: userId || undefined } })
       .then((records) => {
         if (Array.isArray(records) && records.length > 0) {
@@ -134,6 +127,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
       if (res?.threadId && res.threadId !== activeThreadId) {
         setActiveThreadId(res.threadId)
+        if (onThreadCreated) {
+          onThreadCreated(res.threadId)
+        }
       }
 
       const assistantMsg: ChatMessage = {

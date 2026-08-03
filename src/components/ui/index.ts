@@ -15,4 +15,5 @@ export { HudStatBox, type HudStatBoxProps } from './HudStatBox'
 export { HudSkeleton, type HudSkeletonProps } from './HudSkeleton'
 export { RollingNumber, type RollingNumberProps } from './RollingNumber'
 export { ChromaElement, type ChromaElementProps } from './ChromaElement'
+export { MarkdownRenderer, type MarkdownRendererProps } from './MarkdownRenderer'
 
