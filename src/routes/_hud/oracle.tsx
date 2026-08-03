@@ -1,34 +1,54 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { BrainCircuit, MessageSquare, Plus, ShieldCheck, Sparkles, Terminal, Database } from 'lucide-react'
+import { BrainCircuit, MessageSquare, Plus, ShieldCheck, Database } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
+import { useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
 import { getAIThreadsFn } from '@/lib/server/api'
 
 function OracleRouteComponent() {
+  const oracle = useSafeOracle()
+
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
+  const userId = propOrContextUserId(user, oracle?.userId)
 
-  const [threads, setThreads] = useState<any[]>([])
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
-  const [isLoadingThreads, setIsLoadingThreads] = useState(false)
+  function propOrContextUserId(u: any, contextId?: string | null) {
+    if (contextId !== undefined) return contextId
+    return u?.id || u?.sub || null
+  }
+
+  const [localThreads, setLocalThreads] = useState<any[]>([])
+  const [localActiveThreadId, setLocalActiveThreadId] = useState<string | null>(null)
+  const [localIsLoading, setLocalIsLoading] = useState(false)
+
+  const threads = oracle ? oracle.threads : localThreads
+  const activeThreadId = oracle ? oracle.activeThreadId : localActiveThreadId
+  const isLoadingThreads = oracle ? oracle.isLoadingThreads : localIsLoading
+
+  const setActiveThreadId = (id: string | null) => {
+    if (oracle) {
+      oracle.setActiveThreadId(id)
+    } else {
+      setLocalActiveThreadId(id)
+    }
+  }
 
   useEffect(() => {
-    if (!userId) return
-    setIsLoadingThreads(true)
+    if (oracle || !userId) return
+    setLocalIsLoading(true)
     getAIThreadsFn({ data: { userId } })
       .then((data) => {
         if (Array.isArray(data)) {
-          setThreads(data)
-          if (data.length > 0 && !activeThreadId) {
-            setActiveThreadId(data[0].id)
+          setLocalThreads(data)
+          if (data.length > 0 && !localActiveThreadId) {
+            setLocalActiveThreadId(data[0].id)
           }
         }
       })
       .catch((err) => console.warn('Failed to load user AI threads:', err))
-      .finally(() => setIsLoadingThreads(false))
-  }, [userId])
+      .finally(() => setLocalIsLoading(false))
+  }, [userId, oracle])
 
   const handleCreateNewThread = () => {
     setActiveThreadId(null)
@@ -36,11 +56,13 @@ function OracleRouteComponent() {
 
   const handleThreadCreated = (newThreadId: string) => {
     setActiveThreadId(newThreadId)
-    if (userId) {
+    if (oracle) {
+      oracle.refreshThreads()
+    } else if (userId) {
       getAIThreadsFn({ data: { userId } })
         .then((data) => {
           if (Array.isArray(data)) {
-            setThreads(data)
+            setLocalThreads(data)
           }
         })
         .catch((err) => console.warn('Failed to refresh threads after creation:', err))
