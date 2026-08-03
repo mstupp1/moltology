@@ -19,6 +19,7 @@ describe('Database Schema & RLS Policies', () => {
 
   it('defines required fields on the profiles table', () => {
     expect(profiles.id).toBeDefined()
+    expect(profiles.role).toBeDefined()
     expect(profiles.stage).toBeDefined()
     expect(profiles.moltCredits).toBeDefined()
     expect(profiles.chitinGems).toBeDefined()

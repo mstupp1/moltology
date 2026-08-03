@@ -137,31 +137,111 @@ export const getPublicChangelogsRestApiFn = createServerFn({ method: 'POST' })
   })
   .handler(getPublicChangelogsRestApiHandler)
 
+interface CreateChangelogInput {
+  version: string
+  title: string
+  category: string
+  summary: string
+  content: string
+  isPublished?: boolean
+}
+
+/**
+ * Server Function: Create system changelog entry (Admin / Super Admin only).
+ */
+export const createChangelogHandler = async ({ data, context }: ServerFnArgs<CreateChangelogInput>) => {
+  const userId = context?.user?.sub || context?.user?.id
+  if (!userId) {
+    throw new Error('Unauthenticated: Authentication required to create system changelogs.')
+  }
+
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const [userRecord] = await dbClient
+    .select({ role: profiles.role })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  if (!userRecord || !['admin', 'super_admin'].includes(userRecord.role)) {
+    throw new Error('Unauthorized: Admin or Super Admin privileges required to post changelogs.')
+  }
+
+  if (!data) {
+    throw new Error('Input payload missing for changelog creation.')
+  }
+
+  const [inserted] = await dbClient
+    .insert(changelogs)
+    .values({
+      version: data.version,
+      title: data.title,
+      category: data.category,
+      summary: data.summary,
+      content: data.content,
+      isPublished: data.isPublished !== false,
+      releasedAt: new Date(),
+    })
+    .returning()
+
+  return toChangelogEntry(inserted)
+}
+
+export const createChangelogFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .validator((data: CreateChangelogInput) => {
+    return z.object({
+      version: z.string().min(1),
+      title: z.string().min(1),
+      category: z.string().min(1),
+      summary: z.string().min(1),
+      content: z.string().min(1),
+      isPublished: z.boolean().optional(),
+    }).parse(data)
+  })
+  .handler(createChangelogHandler)
+
+
 
 /**
  * Server Function: Get authenticated user profile.
+ * Accepts optional `token` (Neon JWT) or `userId` fallback for client components
+ * where the JWT isn't available via cookies (Neon's get-j-w-t-token is unavailable).
  */
-const getUserProfileHandler = async ({ context }: ServerFnArgs) => {
-  const userId = context?.user?.sub || context?.user?.id
-  if (!userId) {
-    return null
+const getUserProfileHandler = async ({ data, context }: ServerFnArgs<{ token?: string; userId?: string }>) => {
+  let userId = context?.user?.sub || context?.user?.id
+
+  // Try explicit JWT if middleware couldn't resolve from cookies
+  if (!userId && data?.token) {
+    const { verifyNeonJWT } = await import('../jwt')
+    const verification = await verifyNeonJWT(data.token)
+    if (verification.valid && verification.payload?.sub) {
+      userId = verification.payload.sub
+    }
   }
+
+  // Final fallback: userId passed directly from client session
+  if (!userId && data?.userId) {
+    userId = data.userId
+  }
+
+  if (!userId) return null
 
   const { ensureUserProfile } = await import('../user-sync')
   await ensureUserProfile(userId)
 
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
-  const [userRecord] = await dbClient
+  const dbClient = context?.db || getDb(context?.token ?? data?.token ?? undefined)
+  const [profileRecord] = await dbClient
     .select()
-    .from(users)
-    .where(eq(users.id, userId))
+    .from(profiles)
+    .where(eq(profiles.id, userId))
     .limit(1)
 
-  return userRecord || null
+  return profileRecord || null
 }
 
 export const getUserProfileFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) => data ?? {})
   .handler(getUserProfileHandler)
 
 /**
