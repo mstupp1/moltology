@@ -146,6 +146,7 @@ function SupportPortalRoute() {
         summary: newSummary,
         content: newContent,
         isPublished: newIsPublished,
+        userId: user?.id,
       })
       setChangelogs((prev) => [entry, ...prev])
       setIsAdminModalOpen(false)
