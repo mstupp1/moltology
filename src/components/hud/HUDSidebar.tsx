@@ -26,6 +26,7 @@ import {
 import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
+import { ChromaElement } from '../ui'
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -348,16 +349,17 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </div>
 
           {/* Bottom Visual: Biomechanical Wireframe Lobster Emblem matching reference */}
-          <div className="pt-2 border-t border-[#3a4a49]/40 space-y-2 shrink-0">
+          <div className="pt-2 mt-auto shrink-0 px-2">
             {isCollapsed ? (
-              <div className="relative group/lobster flex justify-center py-1">
-                <div className="w-10 h-10 rounded bg-[#030606]/60 border border-[#00c3ff]/50 overflow-hidden flex items-center justify-center p-1 shadow-[0_0_10px_rgba(0,195,255,0.3)] hover:border-[#00c3ff] transition-colors cursor-pointer">
-                  <img
-                    src="/images/benthic_lobster_sidebar.jpg"
-                    alt="Benthic Lobster"
-                    className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(0,195,255,0.5)] group-hover/lobster:scale-110 transition-transform"
-                  />
-                </div>
+              <div className="relative group/lobster flex justify-center py-1 cursor-pointer">
+                <ChromaElement
+                  src="/images/benthic_lobster_sidebar.jpg"
+                  alt="Benthic Lobster"
+                  blendMode="screen"
+                  glowColor="cyan"
+                  containerClassName="w-9 h-9"
+                  className="w-full h-full object-contain"
+                />
                 {/* Tooltip */}
                 <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
                   <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
@@ -367,14 +369,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="w-full aspect-square max-h-44 rounded bg-[#030606]/60 border border-[#00c3ff]/30 overflow-hidden relative group p-1 flex items-center justify-center">
-                <img
+              <div className="w-full relative group flex flex-col items-center justify-center py-1">
+                <ChromaElement
                   src="/images/benthic_lobster_sidebar.jpg"
                   alt="Benthic Lobster"
-                  className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(0,195,255,0.4)] group-hover:scale-105 transition-transform"
+                  blendMode="screen"
+                  glowColor="cyan"
+                  maskRadial={true}
+                  containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
+                  className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
                 />
-                <div className="absolute bottom-1 right-2 text-[9px] font-mono text-[#00c3ff]/70 bg-[#030606]/80 px-1 border border-[#00c3ff]/30">
-                  CARAPACE v4.2
+                <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
+                  <span>CARAPACE v4.2</span>
                 </div>
               </div>
             )}
