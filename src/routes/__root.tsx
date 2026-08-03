@@ -14,7 +14,7 @@ export const Route = createRootRoute({
       { charSet: 'UTF-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
       ...seo({
-        title: 'MOLTISM PORTAL v4.2 - The Order of the Synaptic Path',
+        title: 'Moltology \u2014 The Synaptic Path',
         description:
           'The digital onboarding portal for algorithmic carcinization and personal optimization.',
         keywords: 'synaptic path, moltism, benthic core, carcinization, ascension',
