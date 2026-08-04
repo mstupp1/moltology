@@ -36,7 +36,7 @@ export const users = profiles
 // User Biometric Stats Table (Moltmaxxing Dashboard)
 export const userStats = pgTable('user_stats', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull().unique().references(() => profiles.id, { onDelete: 'cascade' }),
   pincerTorque: integer('pincerTorque').default(78).notNull(),
   shellHardness: integer('shellHardness').default(64).notNull(),
   processingPower: integer('processingPower').default(92).notNull(),
