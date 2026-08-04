@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Clock, Calendar, RefreshCw, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award } from 'lucide-react'
+import { Clock, Calendar, RefreshCw, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
+import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 
 export interface AlignmentTask {
   id: string
@@ -46,6 +47,9 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
 
   // Local state for tasks if not passed via props
   const [localTasks, setLocalTasks] = useState<AlignmentTask[]>(propTasks || DEFAULT_ALIGNMENT_TASKS)
+
+  const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
+    useAlignmentReminders(localTasks)
 
   // Sync prop tasks if updated
   useEffect(() => {
@@ -236,8 +240,24 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                 </span>
               </div>
               
-              {/* Quick 12H/24H & Mode buttons */}
+              {/* Quick 12H/24H, Mode & Reminder buttons */}
               <div className="flex items-center gap-1 text-[10px]">
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleReminders(); playTickSound(); }}
+                  className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded flex items-center gap-1"
+                  title="Toggle automated 10m prior toast reminders"
+                >
+                  {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
+                  <span>{remindersEnabled ? '10M' : 'OFF'}</span>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); triggerTestReminder(); }}
+                  className="px-1.5 py-0.5 bg-[#071214] border border-yellow-400/40 text-yellow-400 font-bold rounded flex items-center gap-0.5"
+                  title="Dispatch instant 10m reminder test toast"
+                >
+                  <Zap className="w-2.5 h-2.5 text-yellow-400" />
+                  <span>TEST</span>
+                </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); setIs24Hour(!is24Hour); playTickSound(); }}
                   className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded"
@@ -275,6 +295,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
             <div className="grid grid-cols-1 gap-1.5 max-h-72 overflow-y-auto pr-1">
               {localTasks.map((t) => {
                 const isNext = t.id === nextTask.id && !allTasksCompleted
+                const reminderTime = getTaskReminderTime(t.time)
                 return (
                   <div
                     key={t.id}
@@ -305,9 +326,16 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                         )}
                       </button>
 
-                      <span className={`text-[11px] font-mono font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
-                        [{t.time}]
-                      </span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className={`text-[11px] font-mono font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                          [{t.time}]
+                        </span>
+                        {reminderTime && (
+                          <span className="text-[9px] text-[#ffb700] bg-[#091214] px-1 rounded border border-[#ffb700]/30 hidden sm:inline-flex items-center gap-0.5">
+                            <Bell className="w-2 h-2" /> {reminderTime}
+                          </span>
+                        )}
+                      </div>
 
                       <span className={`text-[11px] font-mono font-bold truncate ${
                         t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
