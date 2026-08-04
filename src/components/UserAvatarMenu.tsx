@@ -70,7 +70,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   }, [isOpen])
 
   const displayName = user.name || user.email?.split('@')[0] || 'Operative'
-  const effectiveRole = userRole || user.role
+  const isSuperAdminEmail = user.email?.toLowerCase() === 'mylesstupp@gmail.com'
+  const effectiveRole =
+    userRole === 'super_admin' || isSuperAdminEmail
+      ? 'super_admin'
+      : userRole === 'admin' || user.role === 'admin'
+      ? 'admin'
+      : userRole || user.role
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>

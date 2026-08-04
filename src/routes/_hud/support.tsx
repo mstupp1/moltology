@@ -66,26 +66,18 @@ function SupportPortalRoute() {
       .catch(() => null)
       .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
       .then((profile) => {
-        if (isMounted && profile?.role) setUserRole(profile.role)
-      })
-      .catch(() => {})
-    return () => { isMounted = false }
-  }, [user?.id])
-
-  useEffect(() => {
-    let isMounted = true
-    getPublicChangelogs()
-      .then((data) => {
-        if (isMounted && Array.isArray(data) && data.length > 0) {
-          setChangelogs(data)
-          setLoading(false)
+        if (isMounted) {
+          const role = profile?.role || (user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : user?.role || 'user')
+          setUserRole(role)
         }
       })
       .catch(() => {
-        if (isMounted) setLoading(false)
+        if (isMounted && user?.email?.toLowerCase() === 'mylesstupp@gmail.com') {
+          setUserRole('super_admin')
+        }
       })
     return () => { isMounted = false }
-  }, [])
+  }, [user?.id, user?.email, user?.role])
 
   const toggleExpand = (version: string) => {
     setExpandedEntries((prev) => ({
@@ -162,7 +154,12 @@ function SupportPortalRoute() {
     }
   }
 
-  const isAdmin = ['admin', 'super_admin'].includes(userRole)
+  const effectiveRole =
+    userRole === 'super_admin' || user?.email?.toLowerCase() === 'mylesstupp@gmail.com'
+      ? 'super_admin'
+      : userRole || user?.role || 'user'
+
+  const isAdmin = ['admin', 'super_admin'].includes(effectiveRole)
 
   return (
     <div className="space-y-6 select-none font-mono text-[#dfe3e3] pb-10">
@@ -192,7 +189,7 @@ function SupportPortalRoute() {
           <div className="flex flex-wrap items-center gap-2">
             {isAdmin && (
               <span className="text-[10px] text-[#00ffff] font-extrabold tracking-widest uppercase bg-[#00ffff]/15 border border-[#00ffff] px-2.5 py-1 chamfer-corner shadow-[0_0_10px_rgba(0,255,255,0.4)]">
-                ROLE: {userRole.toUpperCase()}
+                ROLE: {effectiveRole.toUpperCase()}
               </span>
             )}
             <div className="flex items-center gap-2 bg-[#05090a] border border-[#3a4a49] px-3 py-1.5 chamfer-corner">
