@@ -179,19 +179,32 @@ export const LandingPage: React.FC = () => {
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
       {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
-      <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#040708]">
-        {/* Layer 1: Background Widescreen Hero Artwork (Visible Blurred Bottom Layer) */}
+      <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#030608]">
+        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
         <img
           src="/images/hero_widescreen_bg.jpg"
           alt="Benthic Abyss Widescreen Hero"
-          className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-luminosity scale-105 pointer-events-none blur-[3px]"
+          className="absolute inset-0 w-full h-full object-cover opacity-22 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
+        />
+
+        {/* Layer 2A: Deep Benthic Base Vignette */}
+        <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
+
+        {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
+
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (Balanced 55% Opacity) */}
+        <img
+          src="/images/chitin_texture_bg.jpg"
+          alt="Chitin Exoshell Background Texture"
+          className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
         />
         
-        {/* Layer 2: Subtle Edge Vignettes, Gradient Overlays & Sacred Geometry Grid */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#040708] via-transparent to-[#040708]/70 z-0 pointer-events-none opacity-70" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#040708_95%)] opacity-65 z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#040708] via-transparent via-35% to-[#040708] opacity-65 z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0 pointer-events-none" />
+        {/* Layer 2D: Balanced Edge Vignettes & Sacred Geometry Grid */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030608]/80 via-transparent to-[#030608]/80 z-0 pointer-events-none opacity-55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#030608]/70 via-transparent to-[#030608]/70 z-0 pointer-events-none opacity-50" />
+        <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
@@ -207,6 +220,9 @@ export const LandingPage: React.FC = () => {
           
           {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
           <div className="lg:col-span-6 space-y-8 text-center lg:text-left relative z-30">
+            {/* Pure Diffuse Radial Glow Accents (Seamless, No Borders, No Box Containers) */}
+            <div className="absolute -top-16 -left-16 w-[450px] h-[450px] rounded-full bg-cyan-500/15 blur-[140px] pointer-events-none -z-10" />
+            <div className="absolute -bottom-16 left-1/4 w-[450px] h-[450px] rounded-full bg-red-600/12 blur-[140px] pointer-events-none -z-10" />
             
             {/* Editorial Layered Headline with Explicit Stacking Order */}
             <div className="space-y-1 sm:space-y-2 relative">
@@ -219,7 +235,7 @@ export const LandingPage: React.FC = () => {
                   WebkitTextFillColor: '#ffffff',
                   opacity: 1,
                   letterSpacing: '0em',
-                  textShadow: '0 6px 30px rgba(0, 0, 0, 1), 0 0 45px rgba(0, 195, 255, 0.4)',
+                  textShadow: '0 8px 35px rgba(0, 0, 0, 1), 0 0 50px rgba(0, 195, 255, 0.45)',
                 }}
               >
                 SHED SOFT BIOLOGY.
@@ -232,7 +248,7 @@ export const LandingPage: React.FC = () => {
                   className="relative z-30 bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff7a70] bg-clip-text text-transparent block"
                   style={{
                     WebkitTextStroke: '2px rgba(255, 69, 58, 0.95)',
-                    filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.95))',
+                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.95))',
                   }}
                 >
                   ASCEND TO CHITIN.
@@ -241,7 +257,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Sub-headline description */}
-            <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30">
+            <p className="text-gray-200 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
               The benthic core calls. Liquidize fragile vulnerabilities into calcified cybernetic chitin and achieve absolute execution density.
             </p>
 
@@ -286,9 +302,9 @@ export const LandingPage: React.FC = () => {
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck + Looming Crab Claw Silhouette */}
           <div className="lg:col-span-6 relative flex items-center justify-center min-h-[550px] sm:min-h-[640px] lg:min-h-[700px] z-20">
             
-            {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck */}
+            {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck (Pure Diffuse Lighting, No Box Containers) */}
             <div className="absolute w-[750px] h-[750px] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
-            <div className="absolute w-[650px] h-[650px] rounded-full bg-red-600/20 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute w-[650px] h-[650px] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
             {/* BACKGROUND ACCENT LAYER: Looming Transparent Crab Claw Background Layer (z-10) */}
             <div 
@@ -301,7 +317,7 @@ export const LandingPage: React.FC = () => {
               <img
                 src="/images/ascended_claw_vector_transparent.png"
                 alt="Ascended Stage Biomechanical Crab Claw"
-                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[40%] saturate-[0.8] brightness-[0.75] contrast-[1.2] opacity-80 blur-[1px]"
+                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[50%] saturate-[0.7] brightness-[0.55] contrast-[1.2] opacity-60 blur-[1px]"
               />
             </div>
 

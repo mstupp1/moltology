@@ -128,22 +128,22 @@ export const HeroShuffleDeck: React.FC = () => {
     >
       {/* Ambient Outer Glow */}
       <div
-        className={`absolute -inset-4 rounded-3xl opacity-35 blur-2xl transition-all duration-700 pointer-events-none ${
+        className={`absolute -inset-4 rounded-3xl opacity-50 blur-3xl transition-all duration-700 pointer-events-none ${
           activeCard.accentColor === 'cyan'
-            ? 'bg-cyan-500/30'
+            ? 'bg-cyan-500/40'
             : activeCard.accentColor === 'amber'
-            ? 'bg-amber-500/30'
+            ? 'bg-amber-500/40'
             : activeCard.accentColor === 'emerald'
-            ? 'bg-emerald-500/30'
+            ? 'bg-emerald-500/40'
             : activeCard.accentColor === 'purple'
-            ? 'bg-purple-500/30'
-            : 'bg-red-500/30'
+            ? 'bg-purple-500/40'
+            : 'bg-red-500/40'
         }`}
       />
 
       {/* Main Video Viewport - Professional 16:9 Widescreen Rectangular Frame */}
       <div
-        className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-2xl transition-all duration-700`}
+        className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-700`}
       >
         {/* Crossfading Media Stack (Video or Image) */}
         {CARDS.map((card, idx) => {
