@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
   Users,
   Radio,
@@ -334,9 +335,7 @@ function CommunityRoute() {
           </button>
 
           {loadingTopicDetail ? (
-            <div className="chitin-card p-12 text-center text-xs text-[#839493]">
-              Loading Neural Transmission...
-            </div>
+            <HudGhostCard lines={4} />
           ) : activeTopicData ? (
             <div className="space-y-6">
               {/* Main Topic Post */}
@@ -596,8 +595,10 @@ function CommunityRoute() {
 
             {/* Topics Feed */}
             {loading ? (
-              <div className="chitin-card p-12 text-center text-xs text-[#839493]">
-                Loading Neural Feed Transmissions...
+              <div className="space-y-4">
+                <HudGhostCard lines={3} />
+                <HudGhostCard lines={3} />
+                <HudGhostCard lines={3} />
               </div>
             ) : topics.length === 0 ? (
               <div className="chitin-card p-12 text-center space-y-3">

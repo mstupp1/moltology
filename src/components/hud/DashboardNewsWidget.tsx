@@ -15,8 +15,14 @@ import {
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
+import { DashboardNewsGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 
-export function DashboardNewsWidget() {
+export interface DashboardNewsWidgetProps {
+  isLoading?: boolean
+}
+
+export function DashboardNewsWidget({ isLoading = false }: DashboardNewsWidgetProps) {
   const navigate = useNavigate()
   const [posts, setPosts] = useState<BlogPostData[]>(INITIAL_BLOG_POSTS)
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
@@ -70,45 +76,46 @@ export function DashboardNewsWidget() {
   }
 
   return (
-    <div className="chitin-card p-4 sm:p-5 chamfer-corner space-y-4 shadow-2xl relative overflow-hidden">
-      {/* In-HUD Full Article Modal Reader */}
-      {activePost && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-mono text-sm space-y-4">
-            <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Radio className="w-4 h-4 text-[#ff5540] animate-pulse" />
-                <span className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
-                  {activePost.category}
-                </span>
-                <span className="text-xs text-[#839493]">| {activePost.readTimeMinutes} MIN READ</span>
-              </div>
-              <button
-                onClick={() => setActivePost(null)}
-                className="text-[#839493] hover:text-[#ff453a] p-1 transition-colors"
-                title="Close Modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-              {activePost.coverImageUrl && (
-                <div className="relative h-48 sm:h-56 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
-                  <img
-                    src={activePost.coverImageUrl}
-                    alt={activePost.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f0f] via-transparent to-transparent opacity-80" />
+    <HudGhostWidget isLoading={isLoading} skeleton={<DashboardNewsGhost />}>
+      <div className="chitin-card p-4 sm:p-5 chamfer-corner space-y-4 shadow-2xl relative overflow-hidden">
+        {/* In-HUD Full Article Modal Reader */}
+        {activePost && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
+            <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-mono text-sm space-y-4">
+              <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Radio className="w-4 h-4 text-[#ff5540] animate-pulse" />
+                  <span className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
+                    {activePost.category}
+                  </span>
+                  <span className="text-xs text-[#839493]">| {activePost.readTimeMinutes} MIN READ</span>
                 </div>
-              )}
+                <button
+                  onClick={() => setActivePost(null)}
+                  className="text-[#839493] hover:text-[#ff453a] p-1 transition-colors"
+                  title="Close Modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-              <div>
-                <h2 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] uppercase tracking-wide leading-snug">
-                  {activePost.title}
-                </h2>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-mono">
+              <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+                {activePost.coverImageUrl && (
+                  <div className="relative h-48 sm:h-56 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
+                    <img
+                      src={activePost.coverImageUrl}
+                      alt={activePost.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f0f] via-transparent to-transparent opacity-80" />
+                  </div>
+                )}
+
+                <div>
+                  <h2 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] uppercase tracking-wide leading-snug">
+                    {activePost.title}
+                  </h2>
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-mono">
                   <div className="flex items-center gap-1.5">
                     {activePost.authorAvatar && (
                       <img
@@ -349,6 +356,7 @@ export function DashboardNewsWidget() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </HudGhostWidget>
   )
 }

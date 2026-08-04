@@ -29,7 +29,8 @@ import {
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
 import { DashboardNewsWidget } from '@/components/hud/DashboardNewsWidget'
-
+import { ActivityFeedGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 
 // Mock Activity Data
 interface ActivityItem {
@@ -107,7 +108,7 @@ function DashboardRoute() {
       <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs text-[#00ffff] tracking-widest font-mono uppercase font-bold">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-[#00ffff] tracking-widest font-mono uppercase font-bold">
               <Sparkles className="w-4 h-4 text-[#00ffff]" />
               <span>COMMAND HUB & NEURAL TELEMETRY</span>
               <span className="bg-[#00ffff]/15 text-[#00ffff] px-2 py-0.5 border border-[#00ffff]/40 text-[10px]">

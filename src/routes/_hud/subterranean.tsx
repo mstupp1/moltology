@@ -16,6 +16,8 @@ import {
   Eye,
   ShieldAlert,
 } from 'lucide-react'
+import { SubterraneanHubGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 
 export const Route = createFileRoute('/_hud/subterranean')({
   component: SubterraneanRoute,
@@ -166,18 +168,18 @@ function SubterraneanRoute() {
               CONTAINMENT PURGE ACTIVE
             </h2>
             <p className="text-xs text-[#dfe3e3]">
-              MUTAGENIC GREEN SLUDGE FLUSHED. RE-ENGAGEMENT OF HYDROSTATIC CARAPACE SEALS IN PROGRESS...
+              MUTAGENIC SLUDGE RE-CIRCULATION IN PROGRESS. MAINTAIN HYDRAULIC ISOLATION.
             </p>
           </div>
         </div>
       )}
 
-      {/* Main Subterranean Header Banner */}
-      <div className="bg-[#08140c] border-l-4 border-l-[#39ff14] border border-[#1b3b24] p-5 chamfer-corner flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-[0_0_30px_rgba(57,255,20,0.15)]">
+      {/* Subterranean Header Banner */}
+      <div className="bg-[#030a05] border border-[#1b3b24] p-6 chamfer-corner shadow-2xl relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <div className="text-xs text-[#39ff14] font-mono tracking-widest uppercase flex items-center gap-2 font-bold">
+          <div className="text-xs text-[#39ff14] font-mono tracking-widest uppercase flex flex-wrap items-center gap-2 font-bold">
             <Biohazard className="w-4 h-4 text-[#39ff14] animate-pulse" />
-            SUBTERRANEAN DEPTHS // LEVEL -7 BIO-VAT VAULT
+            <span>SUBTERRANEAN DEPTHS // LEVEL -7 BIO-VAT VAULT</span>
           </div>
           <h1 className="font-grotesk font-bold text-2xl text-[#39ff14] tracking-wider uppercase mt-1 drop-shadow-[0_0_12px_rgba(57,255,20,0.4)]">
             MUTAGENIC HYBRID RESEARCH CHAMBERS

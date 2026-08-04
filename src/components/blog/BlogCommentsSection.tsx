@@ -17,6 +17,7 @@ import {
   type BlogCommentEntry,
 } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
+import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 
 interface BlogCommentsSectionProps {
   postId?: string
@@ -286,11 +287,9 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
       {/* Comments Feed */}
       <div className="space-y-4">
         {loadingComments ? (
-          <div className="p-8 text-center chitin-card border border-cyan-900/30 chamfer-corner">
-            <Loader2 className="w-6 h-6 text-cyan-400 animate-spin mx-auto mb-2" />
-            <p className="font-mono text-xs text-gray-400 uppercase">
-              RETRIEVING SYNAPTIC LOGS...
-            </p>
+          <div className="space-y-3">
+            <HudGhostCard lines={2} />
+            <HudGhostCard lines={2} />
           </div>
         ) : comments.length === 0 ? (
           <div className="p-8 text-center chitin-card border border-cyan-900/30 chamfer-corner space-y-2">
