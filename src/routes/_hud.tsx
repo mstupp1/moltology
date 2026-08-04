@@ -18,19 +18,21 @@ function HudContent() {
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
 
-  // Show welcome splash once per user on first login
+  const isPending = sessionRes?.isPending
+  const targetId = isPending ? null : userId || 'guest'
+
+  // Show welcome splash once per user or guest on first visit
   useEffect(() => {
-    if (!userId) return
-    const key = `moltology:welcomed:${userId}`
+    if (!targetId) return
+    const key = `moltology:welcomed:${targetId}`
     if (!localStorage.getItem(key)) {
       setShowWelcome(true)
     }
-  }, [userId])
+  }, [targetId])
 
   const handleDismissWelcome = () => {
-    if (userId) {
-      localStorage.setItem(`moltology:welcomed:${userId}`, '1')
-    }
+    const activeId = userId || 'guest'
+    localStorage.setItem(`moltology:welcomed:${activeId}`, '1')
     setShowWelcome(false)
   }
 
@@ -58,7 +60,7 @@ function HudContent() {
       {/* First-time welcome splash */}
       {showWelcome && (
         <WelcomeSplash
-          userName={user?.name || user?.email}
+          userName={user?.name || user?.email || 'Guest'}
           onDismiss={handleDismissWelcome}
         />
       )}
@@ -137,7 +139,7 @@ function HudContent() {
   )
 }
 
-function HudLayout() {
+export function HudLayout() {
   return (
     <OracleProvider>
       <HudContent />
