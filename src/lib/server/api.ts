@@ -147,6 +147,8 @@ interface CreateChangelogInput {
   userId?: string
 }
 
+import { ensureUserProfile } from '../user-sync'
+
 /**
  * Server Function: Create system changelog entry (Admin / Super Admin only).
  */
@@ -155,6 +157,8 @@ export const createChangelogHandler = async ({ data, context }: ServerFnArgs<Cre
   if (!userId) {
     throw new Error('Unauthenticated: Authentication required to create system changelogs.')
   }
+
+  await ensureUserProfile(userId)
 
   const dbClient = context?.db || getDb(context?.token ?? undefined)
   const [userRecord] = await dbClient

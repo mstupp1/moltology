@@ -63,4 +63,17 @@ describe('UserAvatarMenu Component', () => {
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByText('Carcinus Ascendant')).not.toBeInTheDocument()
   })
+
+  it('renders SUPER ADMIN badge when user email matches super admin email', () => {
+    const superAdminUser = {
+      ...mockUser,
+      email: 'mylesstupp@gmail.com',
+    }
+    render(<UserAvatarMenu user={superAdminUser} />)
+
+    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
+    fireEvent.click(avatarBtn)
+
+    expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
+  })
 })

@@ -93,6 +93,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [userRole, setUserRole] = useState<string | null>(null)
 
+  const effectiveUserRole =
+    userRole === 'super_admin' || user?.email?.toLowerCase() === 'mylesstupp@gmail.com'
+      ? 'super_admin'
+      : userRole || user?.role || null
+
   useEffect(() => {
     if (!user?.id) {
       setUserRole(null)
@@ -103,15 +108,21 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       .catch(() => null)
       .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
       .then((profile) => {
-        if (isMounted) setUserRole(profile?.role ?? null)
+        if (isMounted) {
+          const role = profile?.role || (user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : user?.role || null)
+          setUserRole(role)
+        }
       })
       .catch(() => {
-        if (isMounted) setUserRole(null)
+        if (isMounted) {
+          const role = user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : (user?.role || null)
+          setUserRole(role)
+        }
       })
     return () => {
       isMounted = false
     }
-  }, [user?.id])
+  }, [user?.id, user?.email, user?.role])
 
   const handleSignOut = async () => {
     await authClient.signOut()
@@ -702,13 +713,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 <div className="relative">
                   <UserAvatarMenu
                     user={user}
-                    userRole={userRole}
+                    userRole={effectiveUserRole}
                     onNavigate={(path) => navigate({ to: path })}
                     align="left"
                     openDirection="up"
                   />
-                  {userRole && ['admin', 'super_admin'].includes(userRole) && isCollapsed && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none" title={userRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'} />
+                  {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && isCollapsed && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none" title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'} />
                   )}
                 </div>
                 {!isCollapsed && (
@@ -718,9 +729,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
                         {user.name || user.email?.split('@')[0] || 'OPERATIVE'}
                       </span>
-                      {userRole && ['admin', 'super_admin'].includes(userRole) && (
+                      {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && (
                         <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shadow-[0_0_8px_rgba(0,255,255,0.4)] shrink-0">
-                          {userRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                          {effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
                         </span>
                       )}
                     </div>

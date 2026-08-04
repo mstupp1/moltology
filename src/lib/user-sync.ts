@@ -1,24 +1,44 @@
 import { getDb } from '../db'
 import { profiles, userStats } from '../db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
+
+export const SUPER_ADMIN_EMAILS = ['mylesstupp@gmail.com']
 
 /**
  * Idempotently ensures a `profiles` and `user_stats` row exist for a Neon Auth user id.
- *
- * Neon Managed Auth does not create a `profiles` row for new users, but tables
- * like `ai_threads`, `user_stats`, and `assets` FK-reference `profiles.id`.
- * Without a matching row, writes silently fail. This upsert guarantees the
- * profile and default stats exist the first time a user is seen.
+ * Automatically elevates known super admin accounts (e.g. mylesstupp@gmail.com) in `profiles`.
  */
 export async function ensureUserProfile(userId?: string | null) {
   if (!userId) return null
   try {
     const db = getDb()
-    const [profile] = await db
+
+    let isSuperAdmin = false
+    try {
+      const authUserRes = await db.execute(
+        sql`SELECT email FROM neon_auth.user WHERE id::text = ${userId} LIMIT 1`
+      )
+      const email = (authUserRes?.rows?.[0] as { email?: string } | undefined)?.email
+      if (email && SUPER_ADMIN_EMAILS.includes(email.toLowerCase())) {
+        isSuperAdmin = true
+      }
+    } catch {
+      // Fallback if neon_auth.user table cannot be queried directly
+    }
+
+    const initialRole = isSuperAdmin ? 'super_admin' : 'user'
+    const insertQuery = db
       .insert(profiles)
-      .values({ id: userId })
-      .onConflictDoNothing()
-      .returning()
+      .values({ id: userId, role: initialRole })
+
+    const [profile] = isSuperAdmin
+      ? await insertQuery
+          .onConflictDoUpdate({
+            target: profiles.id,
+            set: { role: 'super_admin' },
+          })
+          .returning()
+      : await insertQuery.onConflictDoNothing().returning()
 
     // Idempotently ensure user_stats row exists for profile
     const existingStats = await db
@@ -40,4 +60,5 @@ export async function ensureUserProfile(userId?: string | null) {
     return null
   }
 }
+
 
