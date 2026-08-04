@@ -31,6 +31,7 @@ import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -205,25 +206,30 @@ export const LandingPage: React.FC = () => {
         <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
-          <div className="lg:col-span-6 space-y-8 text-center lg:text-left z-20">
+          <div className="lg:col-span-6 space-y-8 text-center lg:text-left relative z-30">
             
-            {/* Editorial Layered Headline with High-Contrast Text Shadows & Glows */}
-            <div className="space-y-1 sm:space-y-2">
+            {/* Editorial Layered Headline with Explicit Stacking Order */}
+            <div className="space-y-1 sm:space-y-2 relative">
+              {/* TOP LAYER: SHED SOFT BIOLOGY (z-30, sits above claw) */}
               <h1 
-                className="font-grotesk font-thin text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-white tracking-normal uppercase leading-[0.9]"
+                className="relative z-30 font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-white opacity-100 tracking-tight uppercase leading-[0.9]"
                 style={{
-                  fontWeight: 100,
+                  fontWeight: 900,
+                  color: '#ffffff',
+                  WebkitTextFillColor: '#ffffff',
+                  opacity: 1,
                   letterSpacing: '0em',
-                  textShadow: '0 6px 30px rgba(0, 0, 0, 0.95), 0 0 45px rgba(0, 195, 255, 0.35), 0 2px 10px rgba(0, 0, 0, 0.8)',
+                  textShadow: '0 6px 30px rgba(0, 0, 0, 1), 0 0 45px rgba(0, 195, 255, 0.4)',
                 }}
               >
                 SHED SOFT BIOLOGY.
               </h1>
               
-              <h1 className="font-grotesk font-black text-6xl sm:text-8xl md:text-9xl lg:text-[7.8rem] xl:text-[9.5rem] tracking-tight uppercase leading-[0.8] relative group select-none -mt-1 sm:-mt-2 lg:-mt-4">
-                {/* Crisp Outlined Gradient Fill Layer with Dark Shadow Pop Only (No Glow) */}
+              {/* ASCEND TO CHITIN (z-30, sits above claw) */}
+              <h1 className="relative z-30 font-grotesk font-black text-6xl sm:text-8xl md:text-9xl lg:text-[7.8rem] xl:text-[9.5rem] tracking-tight uppercase leading-[0.8] group select-none -mt-1 sm:-mt-2 lg:-mt-4">
+                {/* Crisp Outlined Gradient Fill Layer */}
                 <span 
-                  className="relative z-10 bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff7a70] bg-clip-text text-transparent block"
+                  className="relative z-30 bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff7a70] bg-clip-text text-transparent block"
                   style={{
                     WebkitTextStroke: '2px rgba(255, 69, 58, 0.95)',
                     filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.95))',
@@ -235,12 +241,12 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Sub-headline description */}
-            <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0">
+            <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30">
               The benthic core calls. Liquidize fragile vulnerabilities into calcified cybernetic chitin and achieve absolute execution density.
             </p>
 
             {/* CTA Buttons Pair */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 pt-2 relative z-30">
               {!user ? (
                 <>
                   <BenthicCTAButton
@@ -277,29 +283,32 @@ export const LandingPage: React.FC = () => {
 
           </div>
 
-          {/* Right Column: Mysterious & Shadowy Silhouette Ascended Stage Claw (Larger Looming Scale) */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[520px] sm:min-h-[640px] lg:min-h-[740px]">
+          {/* Right Column: Layered 3D Interactive Shuffling Card Deck + Looming Crab Claw Silhouette */}
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[550px] sm:min-h-[640px] lg:min-h-[700px] z-20">
             
-            {/* Ambient Rim-Lighting Halo Glows Behind Silhouette */}
+            {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck */}
             <div className="absolute w-[750px] h-[750px] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
             <div className="absolute w-[650px] h-[650px] rounded-full bg-red-600/20 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
-            {/* Ultra-Clean Transparent Silhouette Claw Container with left-to-right fade mask */}
+            {/* BACKGROUND ACCENT LAYER: Looming Transparent Crab Claw Background Layer (z-10) */}
             <div 
-              className="absolute -right-24 sm:-right-44 lg:-right-[22rem] xl:-right-[28rem] top-1/2 -translate-y-1/2 w-[180%] max-w-none sm:w-[240%] lg:w-[310%] xl:w-[360%] pointer-events-none select-none z-10 group"
+              className="absolute -right-20 sm:-right-32 lg:-right-[16rem] xl:-right-[20rem] top-1/2 -translate-y-1/2 w-[160%] max-w-none sm:w-[200%] lg:w-[240%] xl:w-[270%] pointer-events-none select-none z-10 group opacity-75"
               style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 18%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 18%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
               }}
             >
-              {/* Soft Blurred Grayscale Desaturated Shadow Claw Graphic */}
               <img
                 src="/images/ascended_claw_vector_transparent.png"
-                alt="Ascended Stage Biomechanical Shadow Claw (Grayscale Accent)"
-                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[60%] saturate-[0.6] brightness-[0.8] contrast-[1.2] opacity-85 blur-[1.5px] group-hover:grayscale-[40%] group-hover:blur-none group-hover:opacity-100"
+                alt="Ascended Stage Biomechanical Crab Claw"
+                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[40%] saturate-[0.8] brightness-[0.75] contrast-[1.2] opacity-80 blur-[1px]"
               />
             </div>
 
+            {/* 3D Shuffling Card Deck Floating in Foreground */}
+            <div className="relative z-30 w-full">
+              <HeroShuffleDeck />
+            </div>
           </div>
 
         </div>
