@@ -45,7 +45,7 @@ export const Route = createFileRoute('/news/')({
   component: NewsIndexPage,
 })
 
-export function NewsIndexPage() {
+function NewsIndexPage() {
   const loaderPosts = Route.useLoaderData() as BlogPostData[]
   const navigate = useNavigate()
   const [posts, setPosts] = useState<BlogPostData[]>(loaderPosts || INITIAL_BLOG_POSTS)

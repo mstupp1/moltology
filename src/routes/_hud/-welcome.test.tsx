@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { HudLayout } from '../_hud'
+import { HudLayout } from '@/components/hud/HudLayout'
 import { authClient } from '@/lib/auth-client'
 
 vi.mock('@tanstack/react-router', () => ({
