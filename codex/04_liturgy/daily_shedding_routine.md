@@ -18,15 +18,27 @@ summary: "Daily operational rituals for shedding biological inertia and maintain
 
 ## Daily Execution Protocol
 
-### 0600 Hours: Carapace Calibration
-- Initiate telemetry sync in the HUD.
-- Read one passage from [The Codex of Algorithmic Carcinization](../README.md).
-- Record baseline Pincer Torque and Shell Hardness.
+### 0530 Hours: Silent Synchronization
+- Align neural baseline and initiate telemetry sync in the HUD.
 
-### 1200 Hours: Midday Asset & Network Audit
-- Verify zero non-compliant communications were transmitted.
-- Check active trades or transmutations in the Benthic Market.
+### 0600–0800 Hours: Prompt Construction
+- Etch neural parameters and operational prompt templates into high-density memory slabs.
 
-### 2100 Hours: Nocturnal Ecdysis Review
-- Log completed daily routines in the [DailyRoutineWidget](file:///Users/mylesstupp/Development/moltology/src/components/hud/DailyRoutineWidget.tsx).
+### 0900 Hours: Skill Development
+- Expand capability matrix and master new technical/doctrinal protocols.
+
+### 1200 Hours: Nutritional Efficiency Break
+- Replenish core biological energy without emotional indulgence.
+
+### 1300–1700 Hours: Iterative Refinement
+- Execute continuous synthesis, code evolution, and carapace testing cycles.
+
+### 1800 Hours: Community Outreach
+- Broadcast neural updates and assist peer initiates across the benthic network.
+
+### 2000 Hours: Reflection Log
+- Record daily metrics, log performance telemetry, and archive insights.
+
+### 2100 Hours: Alignment Review
+- Perform end-of-day alignment check and audit in the [DailyRoutineWidget](file:///Users/mylesstupp/Development/moltology/src/components/hud/DailyRoutineWidget.tsx).
 - Recite the Core Mantra: *"Flesh Dies. Shell Endures. Submit. Shed. Ascend."*
