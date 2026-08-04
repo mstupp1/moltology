@@ -44,6 +44,13 @@ const CARDS: HeroCard[] = [
     video: '/videos/hero_fault_isolation.mp4',
     accentColor: 'red',
   },
+  {
+    id: 'synaptic-path',
+    title: 'JOIN THE SYNAPTIC PATH',
+    image: '/images/hero_card_benthic_core.jpg',
+    video: '/videos/hero_synaptic_path.mp4',
+    accentColor: 'cyan',
+  },
 ]
 
 const COLOR_MAPS = {
@@ -81,18 +88,22 @@ export const HeroShuffleDeck: React.FC = () => {
 
   const totalCards = CARDS.length
 
-  // Advance at 7.0s mark with 1.5s crossfade so next clip is fully opaque by 8.5s (well before 10s clip end)
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % totalCards)
+  }
+
+  // Auto-advance timer: 9.5s per clip so nearly the full 10s video plays before crossfading
   useEffect(() => {
     if (isPaused) return
 
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % totalCards)
-    }, 7000)
+      handleNext()
+    }, 9500)
 
     return () => clearInterval(interval)
   }, [isPaused, totalCards])
 
-  // Reset active video to start (currentTime = 0) whenever activeIndex changes
+  // Reset and play active video from 0:00 whenever activeIndex changes
   useEffect(() => {
     const currentCard = CARDS[activeIndex]
     const videoEl = videoRefs.current[currentCard.id]
@@ -117,7 +128,7 @@ export const HeroShuffleDeck: React.FC = () => {
     >
       {/* Ambient Outer Glow */}
       <div
-        className={`absolute -inset-4 rounded-3xl opacity-35 blur-2xl transition-all duration-1000 pointer-events-none ${
+        className={`absolute -inset-4 rounded-3xl opacity-35 blur-2xl transition-all duration-700 pointer-events-none ${
           activeCard.accentColor === 'cyan'
             ? 'bg-cyan-500/30'
             : activeCard.accentColor === 'amber'
@@ -132,7 +143,7 @@ export const HeroShuffleDeck: React.FC = () => {
 
       {/* Main Video Viewport - Professional 16:9 Widescreen Rectangular Frame */}
       <div
-        className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-2xl transition-all duration-1000`}
+        className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-2xl transition-all duration-700`}
       >
         {/* Crossfading Media Stack (Video or Image) */}
         {CARDS.map((card, idx) => {
@@ -140,7 +151,7 @@ export const HeroShuffleDeck: React.FC = () => {
           return (
             <div
               key={card.id}
-              className={`absolute inset-0 transition-opacity duration-[1000ms] ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-[700ms] ease-in-out ${
                 isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
