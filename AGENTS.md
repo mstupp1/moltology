@@ -20,12 +20,29 @@
 - **Data**: Neon PostgreSQL, Drizzle ORM (`src/db/schema.ts`), RLS via JWT claims.
 - **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
 
-## 5. DB Workflows
-- `npm run db:generate` - Generate Drizzle SQL migrations in `drizzle/` from `src/db/schema.ts`.
-- `npm run db:migrate` - Apply pending Drizzle migrations from `drizzle/` to Neon DB.
-- `npm run db:setup` - Apply migrations (`db:migrate`), enable RLS (`db:rls`), and seed mock data (`db:seed`).
-- `npm run db:reset` - Wipe tables + setup (fast dev iteration).
-- **Branching**: Use Neon branches (`neonctl branches create`) + edit `DATABASE_URL` in `.env`.
+## 5. Database, Branching & Migration Strategy
+
+### Neon Branch Architecture (Solo Dev)
+- **`main` Branch (Production)**: The live production database with active user data. Production deployments connect `DATABASE_URL` to `main`.
+- **`dev` Branch (Local Development)**: A copy-on-write clone of `main`. Local `.env` connects `DATABASE_URL` to `dev`.
+
+### Migration Workflow (4-Step Rule for Schema Updates)
+1. **Edit Schema**: Modify TypeScript definitions in [`src/db/schema.ts`](file:///Users/mylesstupp/Development/moltology/src/db/schema.ts).
+2. **Generate Migration**: Run `npm run db:generate`. This creates a new versioned `.sql` file in `drizzle/`.
+3. **Apply & Test in Dev**: Run `npm run db:setup` (or `npm run db:migrate`) against your local `.env` (`dev` branch), then verify with `npm run test`.
+4. **Ship to Production**: Commit `src/db/schema.ts` AND `drizzle/*.sql` files. On production deploy, run `npm run db:migrate` (and `npm run db:rls` if RLS changed) against the `main` branch.
+
+### Command Reference
+- `npm run db:generate` — Compare `schema.ts` against `drizzle/` and generate a new SQL migration.
+- `npm run db:migrate` — Execute pending SQL migrations from `drizzle/` on the DB in `DATABASE_URL`.
+- `npm run db:rls` — Apply/enforce Row-Level Security policies (`src/db/enable-rls.ts`).
+- `npm run db:seed` — Seed development database with mock data (`src/db/seed.ts`).
+- `npm run db:setup` — Run `db:migrate` ➔ `db:rls` ➔ `db:seed` in sequence.
+- `npm run db:reset` — Drop tables and re-run `db:setup` (clean slate for `dev` branch).
+
+### Neon Branching Quick Commands
+- Reset `dev` branch to mirror `main`: `neonctl branches reset dev --parent main`
+- Create isolated feature branch: `neonctl branches create --name feature-name --parent main`
 
 ## 6. Non-Negotiable Rules
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
