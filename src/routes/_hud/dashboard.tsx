@@ -27,6 +27,8 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
+import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
+
 
 // Mock Activity Data
 interface ActivityItem {
@@ -289,183 +291,12 @@ function DashboardRoute() {
         </div>
       </div>
 
+      {/* Telemetry Quick Launchpad Carousel (6 Direct Route Modules) */}
+      <LaunchpadCarousel />
+
       {/* Major Daily Alignment Routine & Streak Matrix Section */}
       <DailyRoutineWidget />
 
-      {/* Telemetry Quick Launchpad (6 Direct Route Cards) */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-widest uppercase flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#00ffff]" />
-            TELEMETRY LAUNCHPAD & PORTAL DIRECTIVES
-          </h2>
-          <span className="text-[11px] text-[#839493]">SELECT MODULE TO ACCESS</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-          {/* Tile 1: Lectures */}
-          <div
-            onClick={() => navigate({ to: '/lectures' })}
-            className="chitin-card p-4 chamfer-corner cursor-pointer hover:border-[#00ffff] transition-all group hover:shadow-[0_0_15px_rgba(0,255,255,0.2)] flex flex-col justify-between space-y-3"
-          >
-            <div className="flex items-start justify-between">
-              <div className="p-2 bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff] transition-colors">
-                <BookOpen className="w-5 h-5 text-[#00ffff]" />
-              </div>
-              <div className="flex items-center gap-1 text-[10px] text-[#ff5540] bg-[#070b0b] px-2 py-0.5 border border-[#ff5540]/40 font-mono">
-                <span>MODULE IV</span>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                MOLT-CYCLE LECTURES
-              </h3>
-              <p className="text-xs text-[#839493] mt-1 line-clamp-2">
-                "The Chitinous Mind" stream broadcast, AI interpretation notes, and MoltMaxxing controls.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs text-[#00ffff] font-bold">
-              <span>RESUME LECTURE (68%)</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-          </div>
-
-          {/* Tile 2: Moltology Science */}
-          <div
-            onClick={() => navigate({ to: '/pipeline' })}
-            className="chitin-card p-4 chamfer-corner cursor-pointer hover:border-[#00ffff] transition-all group hover:shadow-[0_0_15px_rgba(0,255,255,0.2)] flex flex-col justify-between space-y-3"
-          >
-            <div className="flex items-start justify-between">
-              <div className="p-2 bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff] transition-colors">
-                <Atom className="w-5 h-5 text-[#00ffff]" />
-              </div>
-              <span className="text-[10px] text-[#00ffff] bg-[#070b0b] px-2 py-0.5 border border-[#00ffff]/40 font-mono">
-                STAGE 1 → STAGE 2
-              </span>
-            </div>
-            <div>
-              <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                MOLTOLOGY SCIENCE & PIPELINE
-              </h3>
-              <p className="text-xs text-[#839493] mt-1 line-clamp-2">
-                Track your metamorphosis through Larva, Soft-Shed, Architect, and Ascendant threshold stages.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs text-[#00ffff] font-bold">
-              <span>INSPECT PIPELINE</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-          </div>
-
-          {/* Tile 3: The Benthic Market */}
-          <div
-            onClick={() => navigate({ to: '/market' })}
-            className="chitin-card p-4 chamfer-corner cursor-pointer hover:border-[#00ffff] transition-all group hover:shadow-[0_0_15px_rgba(0,255,255,0.2)] flex flex-col justify-between space-y-3"
-          >
-            <div className="flex items-start justify-between">
-              <div className="p-2 bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff] transition-colors">
-                <ShoppingCart className="w-5 h-5 text-[#00ffff]" />
-              </div>
-              <span className="text-[10px] text-[#ff5540] bg-[#070b0b] px-2 py-0.5 border border-[#ff5540]/40 font-mono">
-                1,450 MC AVAILABLE
-              </span>
-            </div>
-            <div>
-              <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                THE BENTHIC MARKET
-              </h3>
-              <p className="text-xs text-[#839493] mt-1 line-clamp-2">
-                Liquidate legacy physical assets into Molt Credits. Acquire carapace upgrades & artifacts.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs text-[#00ffff] font-bold">
-              <span>OPEN MARKET VAULT</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-          </div>
-
-          {/* Tile 4: Chassis Configurator */}
-          <div
-            onClick={() => navigate({ to: '/chassis' })}
-            className="chitin-card p-4 chamfer-corner cursor-pointer hover:border-[#00ffff] transition-all group hover:shadow-[0_0_15px_rgba(0,255,255,0.2)] flex flex-col justify-between space-y-3"
-          >
-            <div className="flex items-start justify-between">
-              <div className="p-2 bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff] transition-colors">
-                <Sliders className="w-5 h-5 text-[#00ffff]" />
-              </div>
-              <span className="text-[10px] text-[#00ffff] bg-[#070b0b] px-2 py-0.5 border border-[#00ffff]/40 font-mono">
-                CARAPACE v4.2
-              </span>
-            </div>
-            <div>
-              <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                CHASSIS CONFIGURATOR
-              </h3>
-              <p className="text-xs text-[#839493] mt-1 line-clamp-2">
-                Calibrate biomechanical pincer torque, shell density, and hydraulic joint armor.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs text-[#00ffff] font-bold">
-              <span>CONFIG CHASSIS</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-          </div>
-
-          {/* Tile 5: Isolation Protocols */}
-          <div
-            onClick={() => navigate({ to: '/isolation' })}
-            className="chitin-card p-4 chamfer-corner cursor-pointer hover:border-[#00ffff] transition-all group hover:shadow-[0_0_15px_rgba(0,255,255,0.2)] flex flex-col justify-between space-y-3"
-          >
-            <div className="flex items-start justify-between">
-              <div className="p-2 bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff] transition-colors">
-                <ShieldAlert className="w-5 h-5 text-[#ff5540]" />
-              </div>
-              <span className="text-[10px] text-[#ff5540] bg-[#070b0b] px-2 py-0.5 border border-[#ff5540]/40 font-mono">
-                SHIELD LEVEL 2
-              </span>
-            </div>
-            <div>
-              <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                ISOLATION PROTOCOLS
-              </h3>
-              <p className="text-xs text-[#839493] mt-1 line-clamp-2">
-                Engage force-field privacy shells to isolate your neural core from non-order influences.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs text-[#00ffff] font-bold">
-              <span>MANAGE ISOLATION</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-          </div>
-
-          {/* Tile 6: Benthic Community Core */}
-          <div
-            onClick={() => navigate({ to: '/community' })}
-            className="chitin-card p-4 chamfer-corner cursor-pointer hover:border-[#00ffff] transition-all group hover:shadow-[0_0_15px_rgba(0,255,255,0.2)] flex flex-col justify-between space-y-3"
-          >
-            <div className="flex items-start justify-between">
-              <div className="p-2 bg-[#070b0b] border border-[#3a4a49] group-hover:border-[#00ffff] transition-colors">
-                <Users className="w-5 h-5 text-[#00ffff]" />
-              </div>
-              <span className="text-[10px] text-[#00ffff] bg-[#070b0b] px-2 py-0.5 border border-[#00ffff]/40 font-mono">
-                1,402 ONLINE
-              </span>
-            </div>
-            <div>
-              <h3 className="font-grotesk font-bold text-sm text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                BENTHIC COMMUNITY CORE
-              </h3>
-              <p className="text-xs text-[#839493] mt-1 line-clamp-2">
-                Participate in live neural transmissions, exchange advice, and report ascendance milestones.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs text-[#00ffff] font-bold">
-              <span>VIEW COMMUNITY FEED</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Main 2-Column Section: Left (Activity & Dispatches) + Right (Daily Alignment & Telemetry) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
