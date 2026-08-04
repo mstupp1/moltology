@@ -228,9 +228,9 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-1 sm:space-y-2 relative">
               {/* TOP LAYER: SHED SOFT BIOLOGY (z-30, sits above claw) */}
               <h1 
-                className="relative z-30 font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-white opacity-100 tracking-tight uppercase leading-[0.9]"
+                className="relative z-30 font-grotesk font-thin text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-white opacity-100 tracking-tight uppercase leading-[0.9]"
                 style={{
-                  fontWeight: 900,
+                  fontWeight: 200,
                   color: '#ffffff',
                   WebkitTextFillColor: '#ffffff',
                   opacity: 1,
@@ -258,7 +258,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Sub-headline description */}
             <p className="text-gray-200 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-              The benthic core calls. Liquidize fragile vulnerabilities into calcified cybernetic chitin and achieve absolute execution density.
+              Join the synaptic path and discover what Moltology can do for you. Shed legacy limitations, explore our resilient AI frameworks, and ascend to your full potential.
             </p>
 
             {/* CTA Buttons Pair */}
