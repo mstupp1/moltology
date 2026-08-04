@@ -58,6 +58,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const [hasMounted, setHasMounted] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
+  const lastScrollY = React.useRef(0)
   const navRef = React.useRef<HTMLDivElement>(null)
   const tabRefs = React.useRef<Record<string, HTMLElement | null>>({})
   const [pillStyle, setPillStyle] = useState<{ left: number; width: number; opacity: number }>({
@@ -68,12 +70,29 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      const currentScrollY = window.scrollY
+
+      // Scrolled backdrop styling threshold
+      if (currentScrollY > 20) {
         setIsScrolled(true)
       } else {
         setIsScrolled(false)
       }
+
+      // Hide header on scroll down, show on scroll up
+      const scrollDiff = currentScrollY - lastScrollY.current
+
+      if (currentScrollY <= 60) {
+        setIsVisible(true)
+      } else if (scrollDiff > 5) {
+        setIsVisible(false)
+      } else if (scrollDiff < -5) {
+        setIsVisible(true)
+      }
+
+      lastScrollY.current = currentScrollY
     }
+
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -103,10 +122,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   return (
     <header
-      className={`w-full px-4 sm:px-8 lg:px-12 py-3 sticky top-0 z-50 transition-all duration-300 ${
+      className={`w-full px-4 sm:px-8 lg:px-12 py-3 fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
+        isVisible ? 'translate-y-0' : '-translate-y-full pointer-events-none'
+      } ${
         isScrolled
-          ? 'bg-[#030606]/80 backdrop-blur-2xl border-b border-[#121c1d]/80 shadow-xl'
-          : 'bg-[#030606]/70 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
+          ? 'bg-[#030606]/90 backdrop-blur-2xl border-b border-[#121c1d]/80 shadow-xl'
+          : 'bg-[#030606]/75 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
       }`}
     >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">

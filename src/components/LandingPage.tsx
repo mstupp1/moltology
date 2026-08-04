@@ -180,7 +180,7 @@ export const LandingPage: React.FC = () => {
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
       {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
-      <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#030608]">
+      <section className="w-full relative overflow-hidden pt-24 sm:pt-32 lg:pt-36 pb-16 sm:pb-24 lg:pb-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#030608]">
         {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
         <img
           src="/images/hero_widescreen_bg.jpg"
@@ -206,6 +206,9 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-[#030608]/80 via-transparent to-[#030608]/80 z-0 pointer-events-none opacity-55" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#030608]/70 via-transparent to-[#030608]/70 z-0 pointer-events-none opacity-50" />
         <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
+
+        {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
+        <div className="absolute top-0 left-0 right-0 h-48 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">

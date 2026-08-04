@@ -227,13 +227,14 @@ export const OrgPage: React.FC = () => {
       <PublicHeader activePage="org" onOpenAuth={openAuth} />
 
       {/* HERO SECTION */}
-      <section className="w-full relative overflow-hidden py-16 sm:py-24 px-6 sm:px-12 border-b border-cyan-900/40 bg-[#040708]">
+      <section className="w-full relative overflow-hidden pt-24 sm:pt-32 pb-16 sm:pb-24 px-6 sm:px-12 border-b border-cyan-900/40 bg-[#040708]">
         <img
           src="/images/org_hero_lair.jpg"
           alt="Underground Sub-Benthic Lair"
           className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity pointer-events-none scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/70 to-[#070b0b]/90 z-0" />
+        <div className="absolute top-0 left-0 right-0 h-44 sm:h-56 bg-gradient-to-b from-[#040708] via-[#040708]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
         <div className="max-w-[1500px] mx-auto relative z-10 text-center space-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 text-xs font-bold tracking-widest uppercase chamfer-corner">

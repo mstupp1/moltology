@@ -82,4 +82,23 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByText('Google User')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
+
+  it('hides header when scrolling down past threshold and shows header when scrolling up', () => {
+    const { container } = render(<PublicHeader activePage="home" />)
+    const headerEl = container.querySelector('header')!
+
+    expect(headerEl.className).toContain('translate-y-0')
+
+    // Simulate scroll down
+    Object.defineProperty(window, 'scrollY', { value: 150, writable: true })
+    fireEvent.scroll(window)
+
+    expect(headerEl.className).toContain('-translate-y-full')
+
+    // Simulate scroll up
+    Object.defineProperty(window, 'scrollY', { value: 100, writable: true })
+    fireEvent.scroll(window)
+
+    expect(headerEl.className).toContain('translate-y-0')
+  })
 })

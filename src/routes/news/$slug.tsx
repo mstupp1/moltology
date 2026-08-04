@@ -182,8 +182,9 @@ function NewsPostDetail() {
 
       {/* Top Hero Banner */}
       <article className="flex-1 w-full relative z-10">
-        <header className="w-full relative py-12 sm:py-20 px-6 sm:px-12 border-b border-cyan-900/50 bg-[#040708] overflow-hidden">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <header className="w-full relative pt-20 sm:pt-28 pb-12 sm:pb-20 px-6 sm:px-12 border-b border-cyan-900/50 bg-[#040708] overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#040708] via-[#040708]/90 via-45% to-transparent z-[1] pointer-events-none" />
+          <div className="max-w-4xl mx-auto space-y-6 relative z-10">
             <Link
               to="/news"
               className="inline-flex items-center gap-2 text-xs font-mono font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase"
