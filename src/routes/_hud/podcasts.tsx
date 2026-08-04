@@ -23,6 +23,8 @@ import { PodcastPlayer } from '../../components/podcast/PodcastPlayer'
 import { INITIAL_PODCASTS } from '../../lib/podcast-data'
 import type { PodcastEpisode } from '../../lib/podcast-data'
 import { getPodcastsFn } from '../../lib/server/api'
+import { MoltNationLogo } from '../../components/news/MoltNationLogo'
+
 
 export const Route = createFileRoute('/_hud/podcasts')({
   component: PodcastsPage,
@@ -78,35 +80,33 @@ function PodcastsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#040708] text-[#dfe3e3] p-4 md:p-8 space-y-8 max-w-7xl mx-auto">
-      {/* HUD Page Header */}
-      <div className="relative bg-[#060a0b]/80 border border-[#00c3ff]/40 p-6 md:p-8 shadow-[0_0_30px_rgba(0,195,255,0.1)] overflow-hidden chamfer-corner">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#00c3ff]/5 rounded-full filter blur-3xl pointer-events-none" />
-
+    <div className="space-y-5 font-mono select-none relative">
+      {/* MoltNation Page Header */}
+      <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#00ffff] shadow-[0_0_8px_#00ffff] animate-pulse" />
-              <span className="font-mono text-xs text-[#00c3ff] font-bold tracking-widest uppercase">
-                BENTHIC FREQUENCY TRANSMISSIONS • AUDIO PODCAST HUB
+              <MoltNationLogo size="sm" theme="dark" />
+              <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-mono font-bold uppercase tracking-widest chamfer-corner">
+                ★ MOLTNATION PATRIOT FREQUENCY ★
               </span>
             </div>
-            <h1 className="text-2xl md:text-4xl font-grotesk font-extrabold text-white tracking-wider uppercase">
-              BENTHIC PODCASTS
+            <h1 className="text-xl sm:text-3xl font-grotesk font-extrabold text-[#dfe3e3] tracking-wider uppercase">
+              MOLTNATION PODCASTS
             </h1>
-            <p className="text-xs md:text-sm font-mono text-[#839493] mt-2 max-w-2xl leading-relaxed">
-              Listen to sacred doctrine, ecdysis mechanics, and bio-silicon transmutations. All transmissions default to <span className="text-[#00ffff] font-bold">1.2x playback speed</span> for high-density cognitive absorption.
+            <p className="text-xs font-mono text-[#839493] mt-1 max-w-2xl leading-relaxed">
+              Listen to sacrosanct doctrine, ecdysis mechanics, and bio-silicon transmutations. All patriot broadcasts default to <span className="text-[#00ffff] font-bold">1.2x playback speed</span> for high-density cognitive absorption.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="px-4 py-2 bg-[#091014] border border-[#00c3ff]/50 text-[#00c3ff] font-mono text-xs font-bold flex items-center gap-2 shadow-[0_0_10px_rgba(0,195,255,0.2)]">
-              <Zap className="w-4 h-4 text-[#00ffff]" />
+            <div className="px-3 py-1.5 bg-[#030606] border border-[#00ffff]/40 text-[#00ffff] font-mono text-xs font-bold flex items-center gap-2 chamfer-corner shadow-md">
+              <Zap className="w-4 h-4 text-amber-400" />
               <span>DEFAULT SPEED: 1.2X</span>
             </div>
-            <div className="px-4 py-2 bg-[#091014] border border-[#ff5540]/50 text-[#ff5540] font-mono text-xs font-bold flex items-center gap-2">
-              <Radio className="w-4 h-4 text-[#ff5540] animate-pulse" />
-              <span>LIVE FREQUENCY</span>
+            <div className="px-3 py-1.5 bg-[#030606] border border-red-500/50 text-red-400 font-mono text-xs font-bold flex items-center gap-2 chamfer-corner shadow-md">
+              <Radio className="w-4 h-4 text-red-500 animate-pulse" />
+              <span>PATRIOT FREQUENCY</span>
             </div>
           </div>
         </div>
@@ -115,44 +115,44 @@ function PodcastsPage() {
       {/* Active Podcast Player Hero */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-mono font-bold text-[#00c3ff] uppercase tracking-wider flex items-center gap-2">
+          <h2 className="text-xs font-mono font-bold text-[#00ffff] uppercase tracking-wider flex items-center gap-2">
             <Headphones className="w-4 h-4 text-[#00ffff]" />
             <span>NOW PLAYING TRANSMISSION</span>
           </h2>
-          <span className="text-xs font-mono text-[#839493]">
-            AUTOMATIC 1.2X RATE INITIALIZED
+          <span className="text-xs font-mono text-red-400 font-bold">
+            1.2X PATRIOT RATE ACTIVE
           </span>
         </div>
 
-        <PodcastPlayer episode={activeEpisode} />
+        <PodcastPlayer episode={activeEpisode} theme="moltnation" />
       </div>
 
       {/* Database & S3 Storage Architecture Info Card */}
-      <div className="bg-[#060a0b]/60 border border-[#1e2d37] p-5 rounded-none space-y-3">
-        <div className="flex items-center justify-between border-b border-[#1e2d37] pb-2">
+      <div className="chitin-card border border-[#3a4a49] p-4 sm:p-5 chamfer-corner space-y-3 shadow-xl">
+        <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
           <div className="flex items-center gap-2">
-            <Database className="w-4 h-4 text-[#00c3ff]" />
-            <h3 className="text-xs font-mono font-bold text-[#00c3ff] uppercase tracking-wider">
+            <Database className="w-4 h-4 text-[#00ffff]" />
+            <h3 className="text-xs font-mono font-bold text-[#00ffff] uppercase tracking-wider">
               STORAGE ARCHITECTURE: NEON POSTGRES + AWS S3 / CLOUDFLARE R2
             </h3>
           </div>
-          <span className="px-2 py-0.5 bg-[#00c3ff]/10 text-[#00c3ff] text-[10px] font-mono font-bold border border-[#00c3ff]/40">
+          <span className="px-2 py-0.5 bg-[#00ffff]/15 text-[#00ffff] text-[10px] font-mono font-bold border border-[#00ffff]/40 chamfer-corner">
             DUAL STORAGE MODEL
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono text-[#839493]">
-          <div className="flex items-start gap-2.5 bg-[#091014] p-3 border border-[#1e2d37]/80">
-            <Database className="w-5 h-5 text-[#00c3ff] shrink-0 mt-0.5" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono text-[#839493]">
+          <div className="flex items-start gap-2.5 bg-[#070b0b]/80 border border-[#3a4a49] p-3 chamfer-corner">
+            <Database className="w-4 h-4 text-[#00ffff] shrink-0 mt-0.5" />
             <div>
-              <span className="text-white font-bold block mb-1">Database Layer (Neon Postgres)</span>
+              <span className="text-[#dfe3e3] font-bold block mb-0.5">Database Layer (Neon Postgres)</span>
               Stores structured episode metadata: titles, descriptions, transcripts, tags, published dates, duration, play counts, and likes.
             </div>
           </div>
-          <div className="flex items-start gap-2.5 bg-[#091014] p-3 border border-[#1e2d37]/80">
-            <Cloud className="w-5 h-5 text-[#00ffff] shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2.5 bg-[#070b0b]/80 border border-[#3a4a49] p-3 chamfer-corner">
+            <Cloud className="w-4 h-4 text-[#00ffff] shrink-0 mt-0.5" />
             <div>
-              <span className="text-white font-bold block mb-1">Media Storage Layer (Public Static / S3 R2 CDN)</span>
+              <span className="text-[#dfe3e3] font-bold block mb-0.5">Media Storage Layer (Public Static / S3 R2 CDN)</span>
               Binary audio files (`.m4a`, `.mp3`) are served via local static paths during dev (`public/audio/`) and `s3Key` CDN URLs in production.
             </div>
           </div>
@@ -160,17 +160,17 @@ function PodcastsPage() {
       </div>
 
       {/* Episode Filters & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-[#1e2d37]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2 border-t border-[#3a4a49]">
         {/* Category Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition-all whitespace-nowrap ${
+              className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition-all whitespace-nowrap chamfer-corner border ${
                 selectedCategory === cat
-                  ? 'bg-[#00c3ff] text-[#060a0b] shadow-[0_0_10px_rgba(0,195,255,0.4)]'
-                  : 'bg-[#091014] text-[#839493] hover:text-white border border-[#1e2d37]'
+                  ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff] font-extrabold'
+                  : 'bg-[#070b0b] text-[#839493] hover:text-[#dfe3e3] border-[#3a4a49]'
               }`}
             >
               {cat}
@@ -180,44 +180,44 @@ function PodcastsPage() {
 
         {/* Search Input */}
         <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#7a8e9e]" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#00ffff]" />
           <input
             type="text"
             placeholder="Search transmissions & tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#091014] border border-[#1e2d37] focus:border-[#00c3ff] text-xs font-mono text-white pl-9 pr-3 py-2 outline-none transition-colors"
+            className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs font-mono text-[#dfe3e3] pl-9 pr-3 py-2 outline-none chamfer-corner transition-colors"
           />
         </div>
       </div>
 
       {/* Podcast Episodes Grid */}
-      <div className="space-y-4">
-        <h3 className="text-xs font-mono font-bold text-[#7a8e9e] uppercase tracking-wider">
+      <div className="space-y-3">
+        <h3 className="text-xs font-mono font-bold text-[#839493] uppercase tracking-wider">
           ALL TRANSMISSIONS ({filteredEpisodes.length})
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredEpisodes.map((ep) => {
             const isActive = activeEpisode.id === ep.id
 
             return (
               <div
                 key={ep.id}
-                className={`bg-[#060a0b] border transition-all duration-300 p-6 flex flex-col justify-between space-y-4 relative group chamfer-corner ${
+                className={`p-5 chitin-card border transition-all chamfer-corner flex flex-col justify-between space-y-4 shadow-xl ${
                   isActive
-                    ? 'border-[#00c3ff] shadow-[0_0_20px_rgba(0,195,255,0.2)] bg-[#091419]/80'
-                    : 'border-[#1e2d37] hover:border-[#00c3ff]/50 hover:bg-[#080e12]'
+                    ? 'border-[#00ffff] bg-gradient-to-r from-[#0d1618] via-[#101d20] to-[#0d1618] border-l-4 border-l-[#00ffff] shadow-[0_0_15px_rgba(0,195,255,0.2)]'
+                    : 'border-[#3a4a49] hover:border-[#00ffff]/60 bg-[#070b0b]'
                 }`}
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 bg-[#00c3ff]/10 text-[#00c3ff] text-[10px] font-mono font-bold border border-[#00c3ff]/40 uppercase tracking-wider">
+                    <span className="px-2.5 py-0.5 bg-[#00ffff]/15 text-[#00ffff] text-[10px] font-mono font-bold border border-[#00ffff]/40 uppercase tracking-wider chamfer-corner">
                       {ep.category}
                     </span>
-                    <div className="flex items-center gap-3 text-xs font-mono text-[#7a8e9e]">
+                    <div className="flex items-center gap-3 text-xs font-mono text-[#839493]">
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#00c3ff]" />
+                        <Clock className="w-3.5 h-3.5 text-[#00ffff]" />
                         {formatDuration(ep.durationSeconds)}
                       </span>
                       <span className="flex items-center gap-1">
@@ -228,7 +228,7 @@ function PodcastsPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-lg font-grotesk font-extrabold text-white group-hover:text-[#00ffff] transition-colors">
+                    <h4 className="text-lg font-grotesk font-extrabold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors">
                       {ep.title}
                     </h4>
                     <p className="text-xs font-mono text-[#839493] mt-1 line-clamp-3 leading-relaxed">
@@ -241,7 +241,7 @@ function PodcastsPage() {
                     {ep.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-0.5 bg-[#0d161a] text-[#7a8e9e] text-[10px] font-mono border border-[#1e2d37]"
+                        className="px-2 py-0.5 bg-[#030606] text-[#839493] text-[10px] font-mono border border-[#3a4a49] chamfer-corner"
                       >
                         #{tag}
                       </span>
@@ -249,18 +249,18 @@ function PodcastsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[#1e2d37]/80">
+                <div className="flex items-center justify-between pt-3 border-t border-[#3a4a49]">
                   <div className="flex items-center gap-2">
                     <img
                       src={ep.authorAvatar}
                       alt={ep.authorName}
-                      className="w-7 h-7 rounded-full border border-[#00c3ff]/50 object-cover"
+                      className="w-7 h-7 rounded-full border border-cyan-500/50 object-cover"
                     />
                     <div>
-                      <div className="text-xs font-mono text-white font-bold">
+                      <div className="text-xs font-mono text-[#dfe3e3] font-bold">
                         {ep.authorName}
                       </div>
-                      <div className="text-[10px] font-mono text-[#7a8e9e]">
+                      <div className="text-[10px] font-mono text-[#839493]">
                         {ep.authorRole}
                       </div>
                     </div>
@@ -268,10 +268,10 @@ function PodcastsPage() {
 
                   <button
                     onClick={() => setActiveEpisode(ep)}
-                    className={`px-4 py-2 font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-md ${
+                    className={`px-4 py-2 font-mono text-xs font-bold flex items-center gap-2 transition-all chamfer-corner ${
                       isActive
-                        ? 'bg-[#00c3ff] text-[#060a0b] shadow-[0_0_12px_rgba(0,195,255,0.5)]'
-                        : 'bg-[#0d161a] border border-[#00c3ff]/60 text-[#00c3ff] hover:bg-[#00c3ff] hover:text-[#060a0b]'
+                        ? 'bg-[#00ffff] text-[#060a0b] shadow-[0_0_12px_rgba(0,195,255,0.4)] font-extrabold'
+                        : 'bg-[#030606] border border-[#3a4a49] text-[#00ffff] hover:border-[#00ffff] hover:bg-[#070b0b]'
                     }`}
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />

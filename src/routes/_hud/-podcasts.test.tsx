@@ -20,7 +20,7 @@ describe('PodcastPlayer Component', () => {
     render(<PodcastPlayer episode={episode} />)
 
     expect(screen.getByText(episode.title)).toBeDefined()
-    expect(screen.getByText('1.2x DEFAULTRATE')).toBeDefined()
+    expect(screen.getByText('1.2X PATRIOT SPEED')).toBeDefined()
     expect(screen.getByText('1.2x')).toBeDefined()
   })
 

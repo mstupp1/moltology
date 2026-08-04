@@ -23,6 +23,11 @@ import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import { MoltNationBannerBg } from '@/components/news/MoltNationBannerBg'
+import { PodcastPlayer } from '@/components/podcast/PodcastPlayer'
+import { INITIAL_PODCASTS } from '@/lib/podcast-data'
+import type { PodcastEpisode } from '@/lib/podcast-data'
+import { getPodcastsFn } from '@/lib/server/api'
+
 
 export const Route = createFileRoute('/news/')({
   loader: async () => {
@@ -56,6 +61,23 @@ function NewsIndexPage() {
   const [activeVideoTitle, setActiveVideoTitle] = useState<string>(
     'MOLTNATION-TV LIVE: Sub-Benthic Telemetry & Freedom Compute Keynote'
   )
+  const [podcastEpisodes, setPodcastEpisodes] = useState<PodcastEpisode[]>(INITIAL_PODCASTS)
+  const [activePodcast, setActivePodcast] = useState<PodcastEpisode>(INITIAL_PODCASTS[0])
+
+  useEffect(() => {
+    let isMounted = true
+    getPodcastsFn()
+      .then((res) => {
+        if (isMounted && res && res.length > 0) {
+          setPodcastEpisodes(res as PodcastEpisode[])
+        }
+      })
+      .catch(() => null)
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
 
   useEffect(() => {
     if (loaderPosts && loaderPosts.length > 0) {
@@ -470,6 +492,129 @@ function NewsIndexPage() {
 
           </div>
         )}
+
+        {/* MOLTNATION RADIO & PODCASTS SECTION */}
+        <section id="podcasts" className="w-full space-y-5 p-5 sm:p-6 bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] chamfer-corner shadow-2xl relative select-none">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#3a4a49] pb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-ping" />
+                <span className="px-2 py-0.5 bg-red-950/90 border border-red-500/80 text-red-400 font-extrabold font-mono text-[10px] uppercase tracking-widest chamfer-corner">
+                  ★ MOLTNATION PATRIOT RADIO ★
+                </span>
+                <span className="px-2.5 py-0.5 bg-[#00ffff]/15 border border-[#00ffff]/40 text-[#00ffff] font-mono text-[10px] font-bold uppercase tracking-wider chamfer-corner">
+                  1.2X PATRIOT PLAYBACK SPEED
+                </span>
+              </div>
+              <h2 className="font-grotesk font-black text-2xl md:text-3xl text-[#dfe3e3] uppercase tracking-tight flex items-center gap-3">
+                <Radio className="w-7 h-7 text-[#00ffff] animate-pulse" />
+                <span>MOLTNATION PODCAST DISPATCHES</span>
+              </h2>
+              <p className="text-xs text-[#839493] font-mono mt-1">
+                Official audio transmissions on bio-silicon carcinization, ecdysis mechanics, and swarm telemetry—defaulting to 1.2x playback speed for rapid neural absorption.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start md:self-auto">
+              <span className="px-3 py-1 bg-[#030606] border border-[#3a4a49] text-[#00ffff] font-mono text-xs font-bold flex items-center gap-1.5 chamfer-corner">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span>2 EPISODES READY</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Embedded Podcast Player */}
+          <div className="space-y-3">
+            <PodcastPlayer episode={activePodcast} theme="moltnation" />
+          </div>
+
+          {/* Episodes Grid List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+            {podcastEpisodes.map((ep) => {
+              const isSelected = activePodcast.id === ep.id
+
+              return (
+                <div
+                  key={ep.id}
+                  className={`p-5 chitin-card border transition-all chamfer-corner flex flex-col justify-between space-y-4 shadow-xl ${
+                    isSelected
+                      ? 'border-[#00ffff] bg-gradient-to-r from-[#0d1618] via-[#101d20] to-[#0d1618] border-l-4 border-l-[#00ffff] shadow-[0_0_15px_rgba(0,195,255,0.2)]'
+                      : 'border-[#3a4a49] hover:border-[#00ffff]/60 bg-[#070b0b]'
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/40 text-[10px] font-mono font-bold uppercase tracking-wider chamfer-corner">
+                        {ep.category}
+                      </span>
+                      <div className="flex items-center gap-3 text-xs font-mono text-[#839493]">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-[#00ffff]" />
+                          {Math.floor(ep.durationSeconds / 60)}m {ep.durationSeconds % 60}s
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Radio className="w-3.5 h-3.5 text-[#ff5540]" />
+                          {ep.playCount} plays
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-grotesk font-bold text-lg text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors">
+                        {ep.title}
+                      </h4>
+                      <p className="text-xs text-[#839493] font-sans mt-1 line-clamp-3 leading-relaxed">
+                        {ep.description}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      {ep.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 bg-[#030606] text-[#839493] text-[10px] font-mono border border-[#3a4a49] chamfer-corner"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-[#3a4a49]">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={ep.authorAvatar}
+                        alt={ep.authorName}
+                        className="w-7 h-7 rounded-full border border-cyan-500/50 object-cover"
+                      />
+                      <div>
+                        <div className="text-xs font-mono text-[#dfe3e3] font-bold">
+                          {ep.authorName}
+                        </div>
+                        <div className="text-[10px] font-mono text-[#839493]">
+                          {ep.authorRole}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setActivePodcast(ep)}
+                      className={`px-4 py-2 font-grotesk text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all chamfer-corner ${
+                        isSelected
+                          ? 'bg-[#00ffff] text-[#060a0b] shadow-[0_0_12px_rgba(0,195,255,0.4)] font-extrabold'
+                          : 'bg-[#030606] border border-[#3a4a49] text-[#00ffff] hover:border-[#00ffff] hover:bg-[#070b0b]'
+                      }`}
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>{isSelected ? 'PLAYING NOW' : 'LISTEN (1.2X)'}</span>
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
 
         {/* FULL-WIDTH CNN BROADCAST BANNER ("STREAMING NOW ON ALL ACCESS") */}
         <section className="w-full bg-[#030607] border-y border-cyan-900/60 py-10 px-4 sm:px-8 chamfer-corner relative overflow-hidden shadow-2xl">
