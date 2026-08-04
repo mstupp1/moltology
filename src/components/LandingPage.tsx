@@ -243,12 +243,15 @@ export const LandingPage: React.FC = () => {
               
               {/* ASCEND TO CHITIN (z-30, sits above claw) */}
               <h1 className="relative z-30 font-grotesk font-black text-6xl sm:text-8xl md:text-9xl lg:text-[7.8rem] xl:text-[9.5rem] tracking-tight uppercase leading-[0.8] group select-none -mt-1 sm:-mt-2 lg:-mt-4">
-                {/* Crisp Outlined Gradient Fill Layer */}
+                {/* Luminous Red Chitin Textured Layer */}
                 <span 
-                  className="relative z-30 bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff7a70] bg-clip-text text-transparent block"
+                  className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
-                    WebkitTextStroke: '2px rgba(255, 69, 58, 0.95)',
-                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.95))',
+                    backgroundImage: `linear-gradient(to right, rgba(255, 107, 90, 0.95), rgba(255, 85, 64, 0.92), rgba(255, 69, 58, 0.95)), url('/images/chitin_texture_bg.jpg')`,
+                    backgroundBlendMode: 'lighten',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 1)) drop-shadow(0 0 35px rgba(255, 69, 58, 0.55))',
                   }}
                 >
                   ASCEND TO CHITIN.
