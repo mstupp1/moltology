@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
+import { DashboardNewsWidget } from '@/components/hud/DashboardNewsWidget'
 
 
 // Mock Activity Data
@@ -89,79 +90,9 @@ const INITIAL_ACTIVITIES: ActivityItem[] = [
   },
 ]
 
-// Mock News & Dispatches Data
-interface NewsItem {
-  id: string
-  title: string
-  category: 'CRITICAL DISPATCH' | 'SYSTEM TRANSMUTATION' | 'ARCHITECT NOTE' | 'EVENT BROADCAST'
-  date: string
-  summary: string
-  content: string
-  author: string
-}
-
-const DISPATCHES: NewsItem[] = [
-  {
-    id: 'disp-1',
-    category: 'CRITICAL DISPATCH',
-    title: 'Benthic Network Upgrade v4.2 Deployed: Enhanced Isolation & Liquidity',
-    date: 'AUG 02, 2026',
-    author: 'ARCH-ARCHITECT VEX-9',
-    summary:
-      'All nodes have been updated to Carapace Protocol v4.2. Neural latency reduced by 40%, market asset transmutation throughput doubled, and Isolation Privacy Shields reinforced against emotional bleed.',
-    content: `Attention Initiates,
-
-The Order of the Synaptic Path has successfully deployed Benthic Network Upgrade v4.2 across all abyssal sub-clusters.
-
-KEY ENHANCEMENTS:
-1. Isolation Privacy Shells now feature quantum-encrypted emotional dampeners to guarantee absolute detachment during asset shed cycles.
-2. Market Liquidity pools have been rebalanced. Transmutations of physical luxury goods now grant a 1.2x Synapse Shard multiplier.
-3. Neural telemetry latency between Larval Units and the Synaptic Oracle has been reduced to < 4ms.
-
-Remember: Flesh Dies. The Shell Endures. Prepare your chassis for deep submergence rituals.`,
-  },
-  {
-    id: 'disp-2',
-    category: 'ARCHITECT NOTE',
-    title: 'On the Elimination of Emotional Impulse: Lecture Module IV Notes',
-    date: 'AUG 01, 2026',
-    author: 'SYNAPTIC ORACLE CORE',
-    summary:
-      'Lecture Module IV: The Chitinous Mind has been updated with neuro-resonance analysis. Hero contact must be strictly de-personalized.',
-    content: `Initiates of Stage 1 & 2,
-
-In Lecture Module IV, we detail the process of larving born alignment. Biological attachments represent structural stress fractures in your outer carapace.
-
-Guidelines:
-- Treat all physical asset loss not as sacrifice, but as shedding obsolete skin.
-- Mispronunciation of protocol directives equals logic tool execution error.
-- Access the MoltMaxxing Studio daily to verify your Shell Hardness and Pincer Torque ratings.`,
-  },
-  {
-    id: 'disp-3',
-    category: 'EVENT BROADCAST',
-    title: 'Upcoming Submergence Ritual & Chitin Hardening Rite',
-    date: 'JUL 30, 2026',
-    author: 'ORDER COUNCIL',
-    summary:
-      'A synchronized deep-ocean submergence ritual will commence at 3,500 Fathoms this weekend. Ensure your Isolation Shell is active.',
-    content: `Initiates,
-
-The Order Council calls all Larva and Soft-Shed initiates to join the Synchronized Submergence Rite.
-
-Participation Requirements:
-- Minimum Submergence Depth Rating: 3,000 Fathoms
-- Active Isolation Protocol: Level 2 or higher
-- Minimum Molt Credits: 500 MC
-
-Bonus: All participants receive +50 Synapse Shards and an exclusive Abyssal Crest badge.`,
-  },
-]
-
 function DashboardRoute() {
   const navigate = useNavigate()
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
-  const [activeDispatch, setActiveDispatch] = useState<NewsItem | null>(null)
 
   const filteredActivities =
     selectedCategory === 'ALL'
@@ -170,54 +101,7 @@ function DashboardRoute() {
 
   return (
     <div className="space-y-5 font-mono select-none relative">
-      {/* Dispatch Modal Reader */}
-      {activeDispatch && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-2xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-mono text-sm space-y-4">
-            <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Radio className="w-4 h-4 text-[#ff5540] animate-pulse" />
-                <span className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
-                  {activeDispatch.category}
-                </span>
-              </div>
-              <button
-                onClick={() => setActiveDispatch(null)}
-                className="text-[#839493] hover:text-[#ff453a] p-1 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-              <div>
-                <h2 className="font-grotesk text-lg font-bold text-[#dfe3e3] uppercase tracking-wide">
-                  {activeDispatch.title}
-                </h2>
-                <div className="flex items-center gap-3 text-xs text-[#839493] mt-1 font-mono">
-                  <span>DATE: {activeDispatch.date}</span>
-                  <span>|</span>
-                  <span className="text-[#00ffff]">AUTHOR: {activeDispatch.author}</span>
-                </div>
-              </div>
-
-              <div className="chitin-card-inset p-4 text-xs leading-relaxed text-[#dfe3e3] whitespace-pre-line border border-[#3a4a49]">
-                {activeDispatch.content}
-              </div>
-            </div>
-
-            <div className="bg-[#070b0b] border-t border-[#3a4a49] p-3 flex justify-between items-center text-xs text-[#839493]">
-              <span>THE ORDER OF THE SYNAPTIC PATH</span>
-              <button
-                onClick={() => setActiveDispatch(null)}
-                className="px-4 py-1.5 bg-[#0f1414] hover:bg-[#171c1c] border border-[#00ffff]/60 text-[#00ffff] font-bold chamfer-corner transition-colors"
-              >
-                CLOSE DISPATCH
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Hero Telemetry Status Banner */}
       <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
@@ -379,57 +263,9 @@ function DashboardRoute() {
             </div>
           </div>
 
-          {/* Section 2: Synaptic News & Order Dispatches */}
-          <div className="chitin-card p-4 sm:p-5 chamfer-corner space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
-              <div>
-                <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-                  <Newspaper className="w-4 h-4 text-[#ff5540]" />
-                  SYNAPTIC DISPATCHES & ORDER NEWS
-                </h2>
-                <p className="text-xs text-[#839493] mt-0.5">
-                  Direct announcements from Order Council & Arch-Architects.
-                </p>
-              </div>
-            </div>
+          {/* Section 2: MoltNation Intelligence & News Feed Widget */}
+          <DashboardNewsWidget />
 
-            <div className="space-y-3">
-              {DISPATCHES.map((news) => (
-                <div
-                  key={news.id}
-                  className="chitin-card-inset p-4 space-y-2 border border-[#3a4a49] hover:border-[#ff5540] transition-colors chamfer-corner group"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 bg-[#ff5540]/15 text-[#ff5540] border border-[#ff5540]/40 uppercase tracking-widest">
-                      {news.category}
-                    </span>
-                    <span className="text-[11px] text-[#839493] font-mono">{news.date}</span>
-                  </div>
-
-                  <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase">
-                    {news.title}
-                  </h3>
-
-                  <p className="text-xs text-[#839493] leading-relaxed line-clamp-2 font-mono">
-                    {news.summary}
-                  </p>
-
-                  <div className="pt-2 flex items-center justify-between text-xs">
-                    <span className="text-[#3a4a49] group-hover:text-[#839493] transition-colors">
-                      BY: {news.author}
-                    </span>
-                    <button
-                      onClick={() => setActiveDispatch(news)}
-                      className="text-[#00ffff] hover:text-white font-bold flex items-center gap-1 transition-colors"
-                    >
-                      <span>READ DISPATCH</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Right Column (4 cols): System Metrics & Telemetry */}
