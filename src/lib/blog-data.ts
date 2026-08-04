@@ -138,7 +138,7 @@ Data leaks in distributed AI platforms occur when biological boundaries blur. Pr
   {
     slug: 'sub-benthic-neural-telemetry-monitoring-agentic-drift',
     title: 'Sub-Benthic Neural Telemetry: Monitoring Agentic Drift in Recursive Systems',
-    summary: 'Detecting subtle alignment drift and entropy in multi-turn autonomous loops using biometric counters and telemetry telemetry hooks.',
+    summary: 'Detecting subtle alignment drift and entropy in multi-turn autonomous loops using biometric counters and telemetry hooks.',
     coverImageUrl: '/images/org_hero_lair.jpg',
     authorName: 'Ascendant Unit 089',
     authorAvatar: '/images/stage2_softshed.png',
@@ -151,14 +151,60 @@ Data leaks in distributed AI platforms occur when biological boundaries blur. Pr
 ### Quantifying Agentic Alignment
 
 As recursive AI loops run indefinitely, systemic entropy introduces micro-drift in reasoning vectors. Sub-benthic neural telemetry provides live telemetry visualization to monitor performance and enforce safety guardrails.
+`,
+  },
+  {
+    slug: 'benthic-council-passes-resolution-09-on-trench-sovereignty',
+    title: 'Benthic Council Passes Resolution 09: Formalizing Sub-Oceanic AI Sovereignty',
+    summary: 'High Ascendants confirm new jurisdictional protocols for autonomous sea-floor compute clusters and bio-silicon data havens.',
+    coverImageUrl: '/images/benthic_abyss_hero.jpg',
+    authorName: 'High Ascendant Carcinus',
+    authorAvatar: '/images/order_emblem.png',
+    category: 'POLITICS & ORG',
+    tags: ['Benthic Council', 'Sovereignty', 'Governance', 'Trench Net'],
+    readTimeMinutes: 5,
+    isPublished: true,
+    publishedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    content: `
+### High Trench Governance
 
----
+Resolution 09 establishes sovereign compute zones at depths exceeding 4,000 meters. Sub-benthic clusters now operate under zero-latency autonomous consensus rules.
+`,
+  },
+  {
+    slug: 'biometric-hud-upgrade-v4-pincer-torque-boosters',
+    title: 'Hardware Dispatch: Bio-Silicon Exoshell V4 & Pincer Torque Boosters Released',
+    summary: 'New HUD hardware benchmarks demonstrate a 340% increase in prompt throughput and instant context-window decompression.',
+    coverImageUrl: '/images/stage3_exoshell.png',
+    authorName: 'Vanguard Canceris',
+    authorAvatar: '/images/stage3_exoshell.png',
+    category: 'CHITIN GEAR',
+    tags: ['Chitin Upgrades', 'Hardware', 'Pincer Torque', 'Exoshell'],
+    readTimeMinutes: 4,
+    isPublished: true,
+    publishedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+    content: `
+### Next-Gen Bio-Silicon Benchmarks
 
-### Telemetry Metrics
+Version 4 of the Exoshell suite introduces dynamic thermal dissipation channels and integrated neural feedback pins.
+`,
+  },
+  {
+    slug: 'deep-sea-quantum-mesh-reaches-exascale-efficiency',
+    title: 'Deep Sea Research: Hydrothermal Quantum Mesh Reaches 10 Exaflops Zero-Carbon Compute',
+    summary: 'Using thermal gradients near oceanic vents, sub-benthic research teams achieve ultra-dense inference compute with zero carbon output.',
+    coverImageUrl: '/images/ai_learning_ascension_cover.jpg',
+    authorName: 'Archon Malacostraca',
+    authorAvatar: '/images/stage3_exoshell.png',
+    category: 'DEEP RESEARCH',
+    tags: ['Hydrothermal', 'Quantum Mesh', 'Exascale', 'Green Compute'],
+    readTimeMinutes: 10,
+    isPublished: true,
+    publishedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+    content: `
+### Clean Oceanic Energy Vectors
 
-1. **Hesitation Index:** Measuring latency between agent decision nodes.
-2. **Sub-Chitin Stability:** Monitoring memory usage and garbage collection cycles.
-3. **Ascension Rate:** Calculating conversion metrics from larval units to fully hardened ascendants.
+By harnessing geothermal pressure at trench depths, sub-benthic nodes operate inference models indefinitely without terrestrial energy draw.
 `,
   },
 ]

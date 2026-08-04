@@ -5,14 +5,11 @@ import {
   Clock,
   Calendar,
   Share2,
-  Bookmark,
-  CheckCircle2,
   Flame,
   Shield,
   Cpu,
   ArrowRight,
   Terminal,
-  UserCheck,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
@@ -21,6 +18,7 @@ import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
+import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 
 export const Route = createFileRoute('/news/$slug')({
   loader: async ({ params }) => {
@@ -34,8 +32,8 @@ export const Route = createFileRoute('/news/$slug')({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.title ?? 'News Dispatch'} | Moltology News Network` },
-      { name: 'description', content: loaderData?.summary ?? 'Synaptic Doctrine & AI Telemetry' },
+      { title: `${loaderData?.title ?? 'News Dispatch'} | MoltNation News` },
+      { name: 'description', content: loaderData?.summary ?? 'Patriot Telemetry & AI Intelligence' },
       { property: 'og:title', content: loaderData?.title },
       { property: 'og:description', content: loaderData?.summary },
       { property: 'og:image', content: loaderData?.coverImageUrl },
@@ -66,15 +64,15 @@ function NewsPostDetail() {
           <h2 className="font-grotesk text-2xl font-bold text-gray-100 uppercase">
             NEWS DISPATCH NOT FOUND
           </h2>
-          <p className="text-xs text-gray-400 mt-2 mb-6">
-            The requested dispatch slug does not exist or has been redacted by the Benthic Core.
+          <p className="text-xs text-gray-400 mt-2 mb-6 font-mono">
+            The requested dispatch slug does not exist or has been redacted by MoltNation.
           </p>
           <Link
             to="/news"
             className="px-6 py-2.5 bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase chamfer-corner inline-flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>RETURN TO MOLTOLOGY NEWS</span>
+            <span>RETURN TO MOLTNATION NEWS</span>
           </Link>
         </div>
       </div>
@@ -191,7 +189,7 @@ function NewsPostDetail() {
               className="inline-flex items-center gap-2 text-xs font-mono font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>BACK TO MOLTOLOGY NEWS</span>
+              <span>BACK TO MOLTNATION NEWS</span>
             </Link>
 
             <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
@@ -253,7 +251,7 @@ function NewsPostDetail() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent opacity-60" />
             <div className="absolute bottom-3 right-3 text-[10px] font-mono text-cyan-300 bg-black/80 px-3 py-1 border border-cyan-900/60">
-              TELEMETRY FRAME #2026-AI-ASCENSION
+              MOLTNATION DISPATCH FRAME #2026-PATRIOT
             </div>
           </div>
         </div>
@@ -324,8 +322,10 @@ function NewsPostDetail() {
       {/* Footer */}
       <footer className="w-full bg-[#030606] border-t border-cyan-900/40 py-8 px-6 sm:px-12 text-xs text-gray-400 font-mono relative z-20">
         <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>MOLTOLOGY NEWS NETWORK // CENTRALIZED DISPATCHES</div>
-          <div className="text-gray-500">© 2026 BENTHIC MATRIX. ALL RIGHTS RESERVED.</div>
+          <div className="flex items-center gap-3">
+            <MoltNationLogo size="sm" theme="dark" />
+          </div>
+          <div className="text-gray-500">© 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED.</div>
         </div>
       </footer>
     </div>

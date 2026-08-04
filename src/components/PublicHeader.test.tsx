@@ -22,9 +22,8 @@ describe('PublicHeader Navigation Component', () => {
   it('renders shared brand emblem, title, and route links including Etsy STORE', () => {
     render(<PublicHeader activePage="home" />)
 
-    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
-    expect(screen.getByText('PORTAL HOME')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /THE SYNAPTIC PATH/i })).toBeInTheDocument()
     expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
     
     const storeLink = screen.getByRole('link', { name: /STORE/i })
@@ -32,23 +31,23 @@ describe('PublicHeader Navigation Component', () => {
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
   })
 
-  it('highlights the active page route with modern glowing pill capsule styling', () => {
+  it('highlights the active page route with flat pill capsule styling', () => {
     mockPathname = '/'
     const { rerender } = render(<PublicHeader activePage="home" />)
-    const homeBtn = screen.getByRole('button', { name: /PORTAL HOME/i })
-    expect(homeBtn.className).toContain('bg-gradient-to-r')
+    const homeBtn = screen.getByRole('button', { name: /THE SYNAPTIC PATH/i })
+    expect(homeBtn.className).toContain('text-cyan-300')
 
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
     const orgBtn = screen.getByRole('button', { name: /ORGANIZATION/i })
-    expect(orgBtn.className).toContain('bg-gradient-to-r')
+    expect(orgBtn.className).toContain('text-cyan-300')
   })
 
   it('automatically highlights NEWS tab for any /news sub-page article route', () => {
     mockPathname = '/news/from-prompt-engineering-to-bio-silicon-cognition'
     render(<PublicHeader />)
     const blogBtn = screen.getByRole('button', { name: /NEWS/i })
-    expect(blogBtn.className).toContain('bg-gradient-to-r')
+    expect(blogBtn.className).toContain('text-cyan-300')
   })
 
   it('triggers authentication modal callback when clicking LOG IN / JOIN PATH', () => {

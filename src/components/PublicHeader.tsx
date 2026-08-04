@@ -12,7 +12,6 @@ import {
   Building2,
   Cpu,
   UserPlus,
-  Home,
   ShoppingBag,
   ExternalLink,
   Newspaper,
@@ -26,6 +25,8 @@ export interface PublicHeaderProps {
   activePage?: 'home' | 'org' | 'blog' | 'news' | 'store'
   onOpenAuth?: (mode: 'login' | 'signup') => void
 }
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
 
 export const PublicHeader: React.FC<PublicHeaderProps> = ({
   activePage = 'home',
@@ -52,7 +53,18 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null)
+  const targetTab = hoveredTab || currentTab
+
+  const [hasMounted, setHasMounted] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const navRef = React.useRef<HTMLDivElement>(null)
+  const tabRefs = React.useRef<Record<string, HTMLElement | null>>({})
+  const [pillStyle, setPillStyle] = useState<{ left: number; width: number; opacity: number }>({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,6 +77,29 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useIsomorphicLayoutEffect(() => {
+    const updatePill = () => {
+      const activeEl = tabRefs.current[targetTab]
+      const navContainer = navRef.current
+      if (activeEl && navContainer) {
+        const activeRect = activeEl.getBoundingClientRect()
+        const navRect = navContainer.getBoundingClientRect()
+        setPillStyle({
+          left: activeRect.left - navRect.left,
+          width: activeRect.width,
+          opacity: 1,
+        })
+        if (!hasMounted) {
+          requestAnimationFrame(() => setHasMounted(true))
+        }
+      }
+    }
+
+    updatePill()
+    window.addEventListener('resize', updatePill)
+    return () => window.removeEventListener('resize', updatePill)
+  }, [targetTab])
 
   return (
     <header
@@ -82,60 +117,88 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         />
 
         {/* Central Modern Pill Navigation Capsule */}
-        <nav aria-label="Main Navigation" className="hidden md:flex items-center bg-[#090e0f]/90 border border-cyan-900/50 p-1.5 rounded-full shadow-inner shadow-cyan-950/60 backdrop-blur-md">
+        <nav
+          ref={navRef}
+          onMouseLeave={() => setHoveredTab(null)}
+          aria-label="Main Navigation"
+          className="relative hidden md:flex items-center gap-0.5 bg-[#080d0e]/80 border border-cyan-950/80 p-1 rounded-full backdrop-blur-md"
+        >
+          {/* Smooth Continuous Sliding Active Pill Background */}
+          <div
+            aria-hidden="true"
+            className={`absolute top-1 bottom-1 left-0 rounded-full bg-cyan-950/80 border border-cyan-500/40 pointer-events-none z-0 shadow-sm ${
+              hasMounted
+                ? 'transition-[transform,width] duration-300 ease-[cubic-bezier(0.2,1,0.3,1)]'
+                : 'transition-none'
+            }`}
+            style={{
+              transform: `translate3d(${pillStyle.left}px, 0, 0)`,
+              width: `${pillStyle.width}px`,
+              opacity: pillStyle.opacity,
+            }}
+          />
+
           <button
+            ref={(el) => { tabRefs.current['home'] = el }}
             onClick={() => onNavigate('/')}
-            className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              currentTab === 'home'
-                ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
-                : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
+            onMouseEnter={() => setHoveredTab('home')}
+            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+              targetTab === 'home'
+                ? 'text-cyan-300'
+                : 'text-gray-400'
             }`}
           >
-            <Home className={`w-3.5 h-3.5 ${currentTab === 'home' ? 'text-cyan-300' : 'text-gray-400'}`} />
-            <span>PORTAL HOME</span>
-            {currentTab === 'home' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
-            )}
+            <img
+              src="/images/order_emblem.png"
+              alt="The Synaptic Path Logo"
+              className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
+                targetTab === 'home'
+                  ? 'grayscale-0'
+                  : 'grayscale opacity-60'
+              }`}
+            />
+            <span>THE SYNAPTIC PATH</span>
           </button>
 
           <button
+            ref={(el) => { tabRefs.current['news'] = el }}
             onClick={() => onNavigate('/news')}
-            className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              currentTab === 'news'
-                ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
-                : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
+            onMouseEnter={() => setHoveredTab('news')}
+            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+              targetTab === 'news'
+                ? 'text-cyan-300'
+                : 'text-gray-400'
             }`}
           >
-            <Newspaper className={`w-3.5 h-3.5 ${currentTab === 'news' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Newspaper className={`w-3.5 h-3.5 transition-colors duration-300 ${targetTab === 'news' ? 'text-cyan-300' : 'text-gray-400'}`} />
             <span>NEWS</span>
-            {currentTab === 'news' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
-            )}
           </button>
 
           <button
+            ref={(el) => { tabRefs.current['org'] = el }}
             onClick={() => onNavigate('/org')}
-            className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              currentTab === 'org'
-                ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
-                : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
+            onMouseEnter={() => setHoveredTab('org')}
+            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+              targetTab === 'org'
+                ? 'text-cyan-300'
+                : 'text-gray-400'
             }`}
           >
-            <Building2 className={`w-3.5 h-3.5 ${currentTab === 'org' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Building2 className={`w-3.5 h-3.5 transition-colors duration-300 ${targetTab === 'org' ? 'text-cyan-300' : 'text-gray-400'}`} />
             <span>ORGANIZATION</span>
-            {currentTab === 'org' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
-            )}
           </button>
-
 
           <a
+            ref={(el) => { tabRefs.current['store'] = el }}
             href="https://www.etsy.com/shop/SaasTrash"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 hover:shadow-[0_0_12px_rgba(245,158,11,0.25)] flex items-center gap-2 group"
+            onMouseEnter={() => setHoveredTab('store')}
+            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+              targetTab === 'store' ? 'text-amber-300' : 'text-amber-400/80'
+            }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+            <ShoppingBag className="w-3.5 h-3.5 text-amber-400 group-hover:scale-105 transition-transform" />
             <span>STORE</span>
             <ExternalLink className="w-3 h-3 text-amber-500 opacity-70 group-hover:opacity-100" />
           </a>
