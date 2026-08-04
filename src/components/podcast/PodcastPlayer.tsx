@@ -22,6 +22,7 @@ interface PodcastPlayerProps {
   episode: PodcastEpisode
   onClose?: () => void
   isSticky?: boolean
+  theme?: 'hud' | 'moltnation'
 }
 
 const SPEED_OPTIONS = [0.8, 1.0, 1.2, 1.5, 1.75, 2.0]
@@ -30,6 +31,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
   episode,
   onClose,
   isSticky = false,
+  theme = 'moltnation',
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -203,41 +205,42 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
         preload="metadata"
       />
 
-      {/* Main HUD Podcast Player Card */}
+      {/* Main Command Hub Podcast Player Card */}
       <div
-        className={`bg-[#060a0b]/90 backdrop-blur-md border border-[#00c3ff]/40 shadow-[0_0_25px_rgba(0,195,255,0.15)] relative overflow-hidden transition-all duration-300 ${
+        className={`bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl relative select-none transition-all duration-300 ${
           isSticky
-            ? 'fixed bottom-0 left-0 right-0 z-50 md:left-72 p-4 border-t-2 border-t-[#00c3ff]'
-            : 'p-6 rounded-none chamfer-corner'
+            ? 'fixed bottom-0 left-0 right-0 z-50 md:left-72 border-t-2 border-t-[#00ffff]'
+            : ''
         }`}
       >
-        {/* Subtle Ambient HUD Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#00c3ff]/5 rounded-full filter blur-3xl pointer-events-none" />
+        {/* Ambient Subtle Glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#00ffff]/5 rounded-full filter blur-3xl pointer-events-none" />
 
         {/* Player Header Info */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-3 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded bg-[#0a1215] border border-[#00c3ff]/60 flex items-center justify-center relative shrink-0 shadow-[0_0_12px_rgba(0,195,255,0.3)]">
+            <div className="w-12 h-12 rounded bg-[#030606] border border-[#3a4a49] flex items-center justify-center relative shrink-0 chamfer-corner shadow-md">
               <Radio
                 className={`w-6 h-6 ${
-                  isPlaying ? 'text-[#00ffff] animate-pulse' : 'text-[#7a8e9e]'
+                  isPlaying ? 'text-[#00ffff] animate-pulse' : 'text-[#839493]'
                 }`}
               />
               {isPlaying && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#ff3b30] rounded-full shadow-[0_0_8px_#ff3b30] animate-ping" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#ff5540] rounded-full shadow-[0_0_8px_#ff5540] animate-ping" />
               )}
             </div>
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="px-2 py-0.5 bg-[#00c3ff]/10 border border-[#00c3ff]/50 text-[#00c3ff] text-[10px] font-mono font-bold uppercase tracking-wider">
-                  {episode.category}
+              <div className="flex items-center gap-2 mb-1">
+                <span className="bg-[#00ffff]/15 text-[#00ffff] px-2 py-0.5 border border-[#00ffff]/40 text-[10px] font-mono font-bold uppercase tracking-wider chamfer-corner">
+                  {theme === 'moltnation' ? '★ MOLTNATION RADIO ★' : episode.category}
                 </span>
-                <span className="text-[11px] font-mono text-[#ff5540] font-bold">
-                  1.2x DEFAULTRATE
+                <span className="text-[10px] font-mono text-[#ff5540] font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ff5540] animate-ping" />
+                  1.2X PATRIOT SPEED
                 </span>
               </div>
-              <h3 className="text-base md:text-lg font-grotesk font-extrabold text-white truncate tracking-wide">
+              <h3 className="font-grotesk font-extrabold text-base sm:text-lg text-[#dfe3e3] truncate tracking-wider uppercase">
                 {episode.title}
               </h3>
               <p className="text-xs font-mono text-[#839493] truncate">
@@ -250,34 +253,34 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
           <div className="flex items-center gap-2 self-end md:self-auto">
             <button
               onClick={toggleLike}
-              className={`p-2 border transition-all text-xs font-mono flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 border transition-all text-xs font-mono flex items-center gap-1.5 chamfer-corner ${
                 isLiked
-                  ? 'bg-[#ff3b30]/20 border-[#ff3b30] text-[#ff5555]'
-                  : 'bg-[#091014] border-[#1e2d37] text-[#839493] hover:text-white hover:border-[#00c3ff]/50'
+                  ? 'bg-[#ff5540]/20 border-[#ff5540] text-[#ff5550]'
+                  : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3] hover:border-[#00ffff]'
               }`}
               title="Endorse Transmission"
             >
-              <Heart className={`w-4 h-4 ${isLiked ? 'fill-[#ff5555]' : ''}`} />
+              <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-[#ff5550]' : ''}`} />
               <span>{likeCount}</span>
             </button>
 
             <button
               onClick={() => setIsTranscriptOpen(true)}
-              className="p-2 bg-[#091014] border border-[#1e2d37] hover:border-[#00c3ff]/60 text-[#839493] hover:text-[#00c3ff] transition-all text-xs font-mono flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#839493] hover:text-[#00ffff] text-xs font-mono flex items-center gap-1.5 chamfer-corner transition-all"
               title="View Transcript"
             >
-              <FileText className="w-4 h-4" />
+              <FileText className="w-3.5 h-3.5 text-[#00ffff]" />
               <span className="hidden sm:inline">TRANSCRIPT</span>
             </button>
 
             <button
               onClick={handleShare}
-              className="p-2 bg-[#091014] border border-[#1e2d37] hover:border-[#00c3ff]/60 text-[#839493] hover:text-[#00ffff] transition-all text-xs font-mono relative"
+              className="p-2 bg-[#070b0b] border border-[#3a4a49] hover:border-[#00ffff] text-[#839493] hover:text-[#00ffff] text-xs font-mono relative chamfer-corner transition-all"
               title="Share Transmission Link"
             >
-              <Share2 className="w-4 h-4" />
+              <Share2 className="w-3.5 h-3.5 text-[#00ffff]" />
               {copiedLink && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#00c3ff] text-[#060a0b] text-[10px] font-mono font-bold whitespace-nowrap shadow-lg">
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#00ffff] text-[#060a0b] text-[10px] font-mono font-bold whitespace-nowrap chamfer-corner shadow-lg">
                   COPIED!
                 </span>
               )}
@@ -286,21 +289,21 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-2 bg-[#091014] border border-[#1e2d37] hover:border-[#ff5540] text-[#7a8e9e] hover:text-[#ff5540] transition-all"
+                className="p-2 bg-[#070b0b] border border-[#3a4a49] hover:border-[#ff5540] text-[#839493] hover:text-[#ff5540] chamfer-corner transition-all"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
         </div>
 
-        {/* Audio Waveform Canvas */}
-        <div className="w-full h-10 bg-[#040708] border border-[#1e2d37]/80 mb-4 relative overflow-hidden flex items-center">
+        {/* Audio Waveform Canvas Box */}
+        <div className="w-full h-10 bg-[#030606] border border-[#3a4a49] chamfer-corner mb-3 relative overflow-hidden flex items-center">
           <canvas
             ref={canvasRef}
             width={600}
             height={40}
-            className="w-full h-full object-cover opacity-80"
+            className="w-full h-full object-cover opacity-85"
           />
         </div>
 
@@ -319,7 +322,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
                 max={duration || 100}
                 value={currentTime}
                 onChange={handleSeek}
-                className="w-full h-2 bg-[#0b1216] border border-[#1e2d37] appearance-none cursor-pointer accent-[#00c3ff] focus:outline-none"
+                className="w-full h-2 bg-[#030606] border border-[#3a4a49] appearance-none cursor-pointer accent-[#00ffff] focus:outline-none chamfer-corner"
               />
             </div>
 
@@ -334,7 +337,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => skipTime(-15)}
-                className="p-2 bg-[#091014] border border-[#1e2d37] hover:border-[#00c3ff]/60 text-[#7a8e9e] hover:text-[#00c3ff] transition-all active:scale-95"
+                className="p-2 bg-[#070b0b] hover:bg-[#0f1616] border border-[#3a4a49] hover:border-[#00ffff] text-[#839493] hover:text-[#dfe3e3] text-xs font-mono font-bold chamfer-corner transition-all active:scale-95 shadow-md"
                 title="Rewind 15 seconds"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -342,7 +345,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
 
               <button
                 onClick={togglePlay}
-                className="w-12 h-12 bg-gradient-to-r from-[#00c3ff] to-[#00ffff] hover:from-[#00ffff] hover:to-[#00c3ff] text-[#060a0b] font-bold flex items-center justify-center shadow-[0_0_15px_rgba(0,195,255,0.5)] active:scale-95 transition-all chamfer-corner"
+                className="w-12 h-12 bg-gradient-to-r from-[#00c3ff] to-[#00ffff] hover:from-[#00ffff] hover:to-[#00c3ff] text-[#060a0b] font-bold flex items-center justify-center chamfer-corner shadow-[0_0_15px_rgba(0,195,255,0.4)] active:scale-95 transition-all"
                 title={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
@@ -354,7 +357,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
 
               <button
                 onClick={() => skipTime(15)}
-                className="p-2 bg-[#091014] border border-[#1e2d37] hover:border-[#00c3ff]/60 text-[#7a8e9e] hover:text-[#00c3ff] transition-all active:scale-95"
+                className="p-2 bg-[#070b0b] hover:bg-[#0f1616] border border-[#3a4a49] hover:border-[#00ffff] text-[#839493] hover:text-[#dfe3e3] text-xs font-mono font-bold chamfer-corner transition-all active:scale-95 shadow-md"
                 title="Forward 15 seconds"
               >
                 <RotateCw className="w-4 h-4" />
@@ -367,7 +370,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setIsSpeedMenuOpen(!isSpeedMenuOpen)}
-                  className="px-3 py-1.5 bg-[#0d161a] border border-[#00c3ff]/70 hover:border-[#00ffff] text-[#00c3ff] font-mono font-bold text-xs flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,195,255,0.2)] active:scale-95 transition-all"
+                  className="px-3 py-1.5 bg-[#070b0b] hover:bg-[#0f1616] border border-[#3a4a49] hover:border-[#00ffff] text-[#00ffff] font-mono font-bold text-xs flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,195,255,0.2)] chamfer-corner active:scale-95 transition-all"
                   title="Select Playback Speed"
                 >
                   <Gauge className="w-3.5 h-3.5 text-[#00ffff]" />
@@ -379,8 +382,8 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
 
                 {/* Speed Menu Dropdown */}
                 {isSpeedMenuOpen && (
-                  <div className="absolute bottom-full right-0 mb-2 w-32 bg-[#060a0b] border border-[#00c3ff] shadow-xl z-50 p-1 divide-y divide-[#1e2d37]">
-                    <div className="px-2 py-1 text-[10px] font-mono text-[#7a8e9e] font-bold uppercase">
+                  <div className="absolute bottom-full right-0 mb-2 w-36 bg-[#030606] border border-[#00ffff] shadow-2xl z-50 p-1.5 divide-y divide-[#3a4a49] chamfer-corner">
+                    <div className="px-2 py-1 text-[10px] font-mono text-[#00ffff] font-bold uppercase tracking-wider">
                       PLAYBACK SPEED
                     </div>
                     <div className="py-1 space-y-0.5">
@@ -388,10 +391,10 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
                         <button
                           key={speed}
                           onClick={() => handleSpeedSelect(speed)}
-                          className={`w-full text-left px-2.5 py-1 text-xs font-mono flex items-center justify-between transition-colors ${
+                          className={`w-full text-left px-2.5 py-1 text-xs font-mono flex items-center justify-between chamfer-corner transition-colors ${
                             playbackSpeed === speed
-                              ? 'bg-[#00c3ff]/20 text-[#00ffff] font-bold'
-                              : 'text-[#839493] hover:bg-[#121c22] hover:text-white'
+                              ? 'bg-[#00ffff]/20 text-[#00ffff] font-bold border border-[#00ffff]/50'
+                              : 'text-[#839493] hover:bg-[#0f1616] hover:text-[#dfe3e3]'
                           }`}
                         >
                           <span>{speed}x</span>
@@ -408,15 +411,15 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
               </div>
 
               {/* Volume Slider */}
-              <div className="hidden sm:flex items-center gap-2 bg-[#091014] border border-[#1e2d37] px-2.5 py-1">
+              <div className="hidden sm:flex items-center gap-2 bg-[#070b0b] border border-[#3a4a49] px-3 py-1 chamfer-corner">
                 <button
                   onClick={() => setIsMuted(!isMuted)}
-                  className="text-[#7a8e9e] hover:text-[#00c3ff] transition-colors"
+                  className="text-[#839493] hover:text-[#00ffff] transition-colors"
                 >
                   {isMuted || volume === 0 ? (
                     <VolumeX className="w-4 h-4 text-[#ff5540]" />
                   ) : (
-                    <Volume2 className="w-4 h-4 text-[#00c3ff]" />
+                    <Volume2 className="w-4 h-4 text-[#00ffff]" />
                   )}
                 </button>
                 <input
@@ -429,7 +432,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
                     setVolume(parseFloat(e.target.value))
                     setIsMuted(false)
                   }}
-                  className="w-16 h-1.5 bg-[#0b1216] appearance-none cursor-pointer accent-[#00c3ff]"
+                  className="w-16 h-1.5 bg-[#030606] appearance-none cursor-pointer accent-[#00ffff]"
                 />
               </div>
             </div>
