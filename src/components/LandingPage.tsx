@@ -179,16 +179,16 @@ export const LandingPage: React.FC = () => {
 
       {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
       <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#040708]">
-        {/* Layer 1: Background Widescreen Hero Artwork */}
+        {/* Layer 1: Background Widescreen Hero Artwork (Visible Bottom Layer) */}
         <img
           src="/images/hero_widescreen_bg.jpg"
           alt="Benthic Abyss Widescreen Hero"
-          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-luminosity scale-105 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-luminosity scale-105 pointer-events-none"
         />
         
         {/* Layer 2: Gradient Overlays & Sacred Geometry Grid */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/60 to-[#070b0b]/80 z-0" />
-        <div className="absolute inset-0 bg-radial-abyss opacity-90 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/40 to-[#070b0b]/70 z-0" />
+        <div className="absolute inset-0 bg-radial-abyss opacity-75 z-0" />
         <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
@@ -204,80 +204,28 @@ export const LandingPage: React.FC = () => {
         <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
-          <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+          <div className="lg:col-span-6 space-y-8 text-center lg:text-left z-20">
             
-            {/* Top Announcement Bar Ticker for New AI Blog Post */}
-            <div
-              onClick={() => onNavigate('/blog/from-prompt-engineering-to-bio-silicon-cognition')}
-              className="inline-flex items-center gap-3 px-4 py-2 bg-[#091114]/90 border border-cyan-500/60 hover:border-cyan-400 text-cyan-300 text-xs font-mono chamfer-corner shadow-hud-cyan cursor-pointer transition-all duration-300 group hover:scale-[1.02]"
-            >
-              <span className="px-2 py-0.5 bg-cyan-950 text-cyan-400 font-bold uppercase text-[10px] border border-cyan-500/40">
-                NEW ARTICLE
-              </span>
-              <span className="truncate max-w-xs sm:max-w-md font-sans text-gray-200 group-hover:text-cyan-300 transition-colors">
-                AI Courses as Stage 1 of Carcinization
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 text-cyan-400 group-hover:translate-x-1 transition-transform" />
-            </div>
-
-            {/* Brand Header Badge */}
-            <div className="flex items-center gap-2.5 justify-center lg:justify-start">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-red-950/90 border border-red-500/80 text-red-400 font-bold text-xs tracking-[0.25em] uppercase chamfer-corner shadow-hud-red">
-                <Flame className="w-4 h-4 text-red-500 animate-pulse" />
-                <span>MOLTOLOGY // THE SYNAPTIC PATH</span>
-              </div>
-            </div>
-
-
             {/* Giant Layered Headline with Varied Letter & Text Spacing */}
-            <div className="space-y-2">
-
-              <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-gray-100 tracking-tight uppercase leading-[0.85] drop-shadow-2xl">
+            <div className="space-y-3">
+              <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[8rem] text-gray-100 tracking-tight uppercase leading-[0.85] drop-shadow-2xl">
                 SHED SOFT BIOLOGY.
               </h1>
               
-              <h1 className="font-grotesk font-black text-4xl sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7.5rem] tracking-[0.06em] uppercase leading-[0.9]">
+              <h1 className="font-grotesk font-black text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[7rem] tracking-[0.06em] uppercase leading-[0.9]">
                 <span className="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_45px_rgba(255,69,58,0.8)]">
                   ASCEND TO CHITIN.
                 </span>
               </h1>
             </div>
 
-            {/* Key Moltology Aspect Hooks (Replaces Text Block) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              <div className="chitin-card p-4 border-l-2 border-l-red-500 chamfer-corner space-y-1 backdrop-blur-md">
-                <div className="text-red-400 font-bold text-xs tracking-wider uppercase font-grotesk flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5" />
-                  <span>01. ASSET SHEDDING</span>
-                </div>
-                <p className="text-[11px] text-gray-300 leading-snug">
-                  Transmute fragile capital into immortal Molt Credits.
-                </p>
-              </div>
-
-              <div className="chitin-card p-4 border-l-2 border-l-cyan-400 chamfer-corner space-y-1 backdrop-blur-md">
-                <div className="text-cyan-400 font-bold text-xs tracking-wider uppercase font-grotesk flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5" />
-                  <span>02. CARCINIZATION</span>
-                </div>
-                <p className="text-[11px] text-gray-300 leading-snug">
-                  Hardening biology into exoskeletal cyber chitin.
-                </p>
-              </div>
-
-              <div className="chitin-card p-4 border-l-2 border-l-emerald-400 chamfer-corner space-y-1 backdrop-blur-md">
-                <div className="text-emerald-400 font-bold text-xs tracking-wider uppercase font-grotesk flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5" />
-                  <span>03. FAULT ISOLATION</span>
-                </div>
-                <p className="text-[11px] text-gray-300 leading-snug">
-                  Quarantine organic errors in Faraday shells.
-                </p>
-              </div>
-            </div>
+            {/* Sub-headline description */}
+            <p className="text-gray-300 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0">
+              The benthic core calls. Liquidize fragile vulnerabilities into calcified cybernetic chitin and achieve absolute execution density.
+            </p>
 
             {/* CTA Buttons Pair */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 pt-2">
               {!user ? (
                 <>
                   <BenthicCTAButton
@@ -312,77 +260,29 @@ export const LandingPage: React.FC = () => {
               )}
             </div>
 
-            {/* Status Telemetry Pills */}
-            <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-400 font-mono">
-              <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                BENTHIC MATRIX ONLINE
-              </span>
-              <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
-                <Shield className="w-4 h-4 text-cyan-400" />
-                EXOSKELETAL LOCK
-              </span>
-              <span className="flex items-center gap-2 bg-[#030606]/90 px-4 py-1.5 border border-cyan-900/40 chamfer-corner">
-                <Activity className="w-4 h-4 text-red-400" />
-                100% LOGIC DENSITY
-              </span>
-            </div>
-
           </div>
 
-          {/* Right Column: 3D Centerpiece Render with Layered Floating Chromakey Assets */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
+          {/* Right Column: Mysterious & Shadowy Silhouette Ascended Stage Claw (No Square Artifacts) */}
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[480px] sm:min-h-[580px] lg:min-h-[680px]">
             
-            {/* Ambient Glowing Halo Ring behind Centerpiece */}
-            <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse" />
-            <div className="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-red-500/15 blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+            {/* Ambient Rim-Lighting Halo Glows Behind Silhouette */}
+            <div className="absolute w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[150px] animate-pulse pointer-events-none" />
+            <div className="absolute w-[500px] h-[500px] rounded-full bg-red-600/20 blur-[130px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
-            {/* Main 3D Render Centerpiece Frame */}
-            <div className="relative z-10 w-full max-w-lg border-2 border-cyan-500/60 chamfer-corner-lg shadow-hud-cyan-lg overflow-hidden group bg-[#050809]">
-              
-              {/* Generated 3D Centerpiece Artwork */}
+            {/* Ultra-Clean Transparent Silhouette Claw Container with left-to-right fade mask */}
+            <div 
+              className="absolute -right-16 sm:-right-28 lg:-right-44 xl:-right-56 top-1/2 -translate-y-1/2 w-[130%] max-w-none sm:w-[160%] lg:w-[200%] xl:w-[220%] pointer-events-none select-none z-10 group"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+              }}
+            >
+              {/* Clean Vector Transparent Shadow Claw Graphic without any rectangular box overlays */}
               <img
-                src="/images/moltology_hero_centerpiece.jpg"
-                alt="3D Biomechanical Crab Exoskeleton Core"
-                className="w-full h-80 sm:h-[420px] object-cover transform group-hover:scale-105 transition-transform duration-700"
+                src="/images/ascended_claw_vector_transparent.png"
+                alt="Ascended Stage Biomechanical Shadow Claw (Clean Transparent)"
+                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 opacity-90 group-hover:opacity-100"
               />
-
-              {/* Overlaid Vignette Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent opacity-80" />
-
-              {/* Centerpiece Overlay HUD Frame Info */}
-              <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-xs font-mono">
-                <span className="px-3 py-1 bg-red-950/90 border border-red-500/70 text-red-400 font-bold uppercase tracking-wider chamfer-corner">
-                  CORE CHASSIS v4.2
-                </span>
-                <span className="text-cyan-400 font-bold bg-black/80 px-2.5 py-1 border border-cyan-900/50">
-                  SYNAPTIC CORE: 100%
-                </span>
-              </div>
-            </div>
-
-            {/* Chromakey Layered Floating Asset 1 (Top Left: Molt Credit) */}
-            <div className="absolute -top-6 -left-4 sm:-left-8 z-20 w-20 h-20 sm:w-24 sm:h-24 p-2 bg-[#090e10]/90 border border-amber-500/60 chamfer-corner shadow-2xl backdrop-blur-md hidden sm:block animate-bounce" style={{ animationDuration: '4s' }}>
-              <img src="/images/molt_credit.png" alt="Molt Credit" className="w-full h-full object-contain mix-blend-screen" />
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-amber-400 bg-black/90 px-1.5 py-0.5 border border-amber-500/40 rounded uppercase whitespace-nowrap">
-                MOLT CREDIT
-              </span>
-            </div>
-
-            {/* Chromakey Layered Floating Asset 2 (Top Right: Synapse Shard) */}
-            <div className="absolute -top-4 -right-4 sm:-right-6 z-20 w-20 h-20 sm:w-24 sm:h-24 p-2 bg-[#090e10]/90 border border-cyan-500/60 chamfer-corner shadow-2xl backdrop-blur-md hidden sm:block animate-pulse">
-              <img src="/images/synapse_shard.png" alt="Synapse Shard" className="w-full h-full object-contain mix-blend-screen" />
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-cyan-400 bg-black/90 px-1.5 py-0.5 border border-cyan-500/40 rounded uppercase whitespace-nowrap">
-                SYNAPSE SHARD
-              </span>
-            </div>
-
-            {/* Chromakey Layered Floating Asset 3 (Bottom Right: Chitin Gem) */}
-            <div className="absolute -bottom-6 -right-4 sm:-right-8 z-20 w-20 h-20 sm:w-24 sm:h-24 p-2 bg-[#090e10]/90 border border-red-500/60 chamfer-corner shadow-2xl backdrop-blur-md hidden sm:block animate-bounce" style={{ animationDuration: '5s' }}>
-              <img src="/images/chitin_gem.png" alt="Chitin Gem" className="w-full h-full object-contain mix-blend-screen" />
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-red-400 bg-black/90 px-1.5 py-0.5 border border-red-500/40 rounded uppercase whitespace-nowrap">
-                CHITIN GEM
-              </span>
             </div>
 
           </div>
