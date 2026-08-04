@@ -26,6 +26,7 @@ import {
   Info,
   TrendingUp,
 } from 'lucide-react'
+import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 
 // Mock Activity Data
 interface ActivityItem {
@@ -160,27 +161,6 @@ function DashboardRoute() {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
   const [activeDispatch, setActiveDispatch] = useState<NewsItem | null>(null)
 
-  // Daily Alignment Checklist State
-  const [routines, setRoutines] = useState([
-    { id: 1, timeSlot: '05:30', name: 'Silent Synchronization', completed: true },
-    { id: 2, timeSlot: '06:00–08:00', name: 'Prompt Construction', completed: true },
-    { id: 3, timeSlot: '09:00', name: 'Skill Development', completed: true },
-    { id: 4, timeSlot: '12:00', name: 'Nutritional Efficiency Break', completed: false },
-    { id: 5, timeSlot: '13:00–17:00', name: 'Iterative Refinement', completed: false },
-    { id: 6, timeSlot: '18:00', name: 'Community Outreach', completed: false },
-    { id: 7, timeSlot: '20:00', name: 'Reflection Log', completed: false },
-    { id: 8, timeSlot: '21:00', name: 'Alignment Review', completed: false },
-  ])
-
-  const toggleRoutine = (id: number) => {
-    setRoutines((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, completed: !r.completed } : r))
-    )
-  }
-
-  const completedCount = routines.filter((r) => r.completed).length
-  const routineProgressPct = Math.round((completedCount / routines.length) * 100)
-
   const filteredActivities =
     selectedCategory === 'ALL'
       ? INITIAL_ACTIVITIES
@@ -308,6 +288,9 @@ function DashboardRoute() {
           </div>
         </div>
       </div>
+
+      {/* Major Daily Alignment Routine & Streak Matrix Section */}
+      <DailyRoutineWidget />
 
       {/* Telemetry Quick Launchpad (6 Direct Route Cards) */}
       <div className="space-y-2">
@@ -618,67 +601,41 @@ function DashboardRoute() {
           </div>
         </div>
 
-        {/* Right Column (4 cols): Daily Alignment Checklist & System Metrics */}
+        {/* Right Column (4 cols): System Metrics & Telemetry */}
         <div className="lg:col-span-4 space-y-5">
-          {/* Daily Alignment Checklist */}
-          <div className="chitin-card p-4 chamfer-corner space-y-4 shadow-2xl">
-            <div className="border-b border-[#3a4a49] pb-3 flex items-center justify-between">
-              <div>
-                <h2 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-widest uppercase flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
-                  DAILY ALIGNMENT ROUTINES
-                </h2>
-                <div className="text-[10px] text-[#00ffff] font-mono mt-0.5">
-                  PROGRESS: {completedCount}/{routines.length} ({routineProgressPct}%)
-                </div>
+          {/* Alignment Status Summary Card */}
+          <div className="chitin-card p-4 chamfer-corner space-y-3.5 shadow-2xl">
+            <div className="border-b border-[#3a4a49] pb-2 flex items-center justify-between">
+              <h2 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-widest uppercase flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
+                ALIGNMENT TELEMETRY
+              </h2>
+              <span className="text-[10px] text-[#00ffff] font-mono font-bold">7-DAY STREAK 🔥</span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between items-center bg-[#070b0b] p-2 border border-[#3a4a49]">
+                <span className="text-[#839493]">ACTIVE STREAK</span>
+                <span className="text-[#ff5540] font-bold">7 DAYS</span>
+              </div>
+              <div className="flex justify-between items-center bg-[#070b0b] p-2 border border-[#3a4a49]">
+                <span className="text-[#839493]">CONSISTENCY RATING</span>
+                <span className="text-[#00ffff] font-bold">96.4% ALIGNED</span>
+              </div>
+              <div className="flex justify-between items-center bg-[#070b0b] p-2 border border-[#3a4a49]">
+                <span className="text-[#839493]">XP MULTIPLIER</span>
+                <span className="text-[#00ffff] font-bold">1.5x ACTIVE</span>
               </div>
             </div>
 
-            {/* Routine Progress Tube */}
-            <div className="w-full h-2 bg-[#030606] border border-[#3a4a49] overflow-hidden p-0.5">
-              <div
-                className="h-full bg-gradient-to-r from-[#00ffff] to-[#ff5540] transition-all duration-300"
-                style={{ width: `${routineProgressPct}%` }}
-              />
-            </div>
-
-            {/* Checklist Items */}
-            <div className="space-y-2">
-              {routines.map((r) => (
-                <div
-                  key={r.id}
-                  onClick={() => toggleRoutine(r.id)}
-                  className={`p-2.5 border text-xs cursor-pointer transition-all chamfer-corner flex items-start gap-2.5 ${
-                    r.completed
-                      ? 'bg-[#00ffff]/08 border-[#00ffff]/40 text-[#dfe3e3]'
-                      : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#839493]'
-                  }`}
-                >
-                  <button className="mt-0.5 shrink-0">
-                    {r.completed ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
-                    ) : (
-                      <Circle className="w-4 h-4 text-[#3a4a49]" />
-                    )}
-                  </button>
-                  <div className="space-y-0.5 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold text-[#00ffff] bg-[#030606] px-1 border border-[#3a4a49]">
-                        {r.timeSlot}
-                      </span>
-                    </div>
-                    <p className={`leading-tight ${r.completed ? 'line-through text-[#839493]' : ''}`}>
-                      {r.name}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="pt-2 text-center border-t border-[#3a4a49]/60">
-              <span className="text-[10px] text-[#839493]">
-                COMPLETING ROUTINES BOOSTS CHITIN HARDNESS
-              </span>
+            <div className="pt-1 text-center">
+              <a
+                href="#daily-routine-hub"
+                className="text-[11px] text-[#00ffff] hover:underline font-bold flex items-center justify-center gap-1"
+              >
+                <span>VIEW COMPLETE 8-TASK ROUTINE MATRIX</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
 
