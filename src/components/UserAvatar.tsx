@@ -35,8 +35,26 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   alt,
 }) => {
   const [imageError, setImageError] = useState(false)
+  const [activeVaultAvatar, setActiveVaultAvatar] = useState<string | null>(null)
 
-  const imageUrl = src ?? user?.image ?? user?.avatar ?? user?.picture ?? null
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('moltology_saved_avatars')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          const active = parsed.find((a: any) => a.isActive)
+          if (active?.imageUrl) {
+            setActiveVaultAvatar(active.imageUrl)
+          }
+        }
+      } catch (e) {
+        // ignore JSON errors
+      }
+    }
+  }, [])
+
+  const imageUrl = src ?? user?.image ?? user?.avatar ?? user?.picture ?? activeVaultAvatar ?? null
   const displayName = name ?? user?.name ?? email ?? user?.email ?? ''
   const displayAlt = alt ?? displayName ?? 'User avatar'
 

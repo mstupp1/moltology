@@ -21,6 +21,7 @@ export const profiles = pgTable('profiles', {
   chitinGems: integer('chitinGems').default(250).notNull(),
   synapseShards: integer('synapseShards').default(45).notNull(),
   depthPressureCoins: integer('depthPressureCoins').default(12).notNull(),
+  activeAvatarId: text('activeAvatarId'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
@@ -286,6 +287,27 @@ export const forumPosts = pgTable('forum_posts', {
     withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
 ])
+
+// User Custom Mutated Avatars Vault Table
+export const userAvatars = pgTable('user_avatars', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  name: text('name').default('Carcinized Unit').notNull(),
+  stage: integer('stage').default(1).notNull(), // 1 to 4
+  carcinizationLevel: integer('carcinizationLevel').default(50).notNull(), // 0-100
+  cyberneticsLevel: integer('cyberneticsLevel').default(50).notNull(), // 0-100
+  cosmetics: jsonb('cosmetics').$type<string[]>().default([]).notNull(), // array of equipped item IDs
+  imageUrl: text('imageUrl').notNull(),
+  isActive: boolean('isActive').default(false).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('user_avatars_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
 
 
 
