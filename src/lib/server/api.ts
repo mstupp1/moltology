@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, podcasts } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
@@ -13,6 +13,9 @@ import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
+import { INITIAL_PODCASTS } from '../podcast-data'
+import type { PodcastEpisode } from '../podcast-data'
+
 
 import { getPresignedViewUrl } from '../s3-client'
 
@@ -1510,6 +1513,54 @@ export const upvoteForumTopicFn = createServerFn({ method: 'POST' })
     return z.object({ topicId: z.string().min(1) }).parse(data)
   })
   .handler(upvoteForumTopicHandler)
+
+/**
+ * Server Function: Get podcast episodes
+ */
+export const getPodcastsHandler = async ({ context }: ServerFnArgs) => {
+  const dbClient = context?.db || getDb()
+  try {
+    const records = await dbClient
+      .select()
+      .from(podcasts)
+      .where(eq(podcasts.isPublished, true))
+      .orderBy(desc(podcasts.publishedAt))
+
+    if (records && records.length > 0) {
+      return records.map((r: any) => ({
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        subtitle: r.subtitle || '',
+        description: r.description,
+        audioUrl: r.audioUrl,
+        s3Key: r.s3Key || undefined,
+        durationSeconds: r.durationSeconds,
+        fileSizeBytes: r.fileSizeBytes || undefined,
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        authorRole: r.authorRole,
+        category: r.category,
+        tags: (r.tags as string[]) || [],
+        playCount: r.playCount,
+        likes: r.likes,
+        isFeatured: r.isFeatured,
+        isPublished: r.isPublished,
+        transcript: r.transcript || '',
+        publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
+      }))
+    }
+  } catch (error) {
+    console.warn('[ServerFn getPodcastsFn] DB query failed, using static fallback:', error)
+  }
+
+  return INITIAL_PODCASTS
+}
+
+export const getPodcastsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .handler(getPodcastsHandler)
+
 
 
 

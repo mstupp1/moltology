@@ -36,6 +36,13 @@
       "when": 1785876054416,
       "tag": "0004_dark_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785880562158,
+      "tag": "0005_acoustic_cassandra_nova",
+      "breakpoints": true
     }
   ]
 }

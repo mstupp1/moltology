@@ -26,6 +26,7 @@ import {
   Minus,
   LayoutGrid,
   Terminal,
+  Radio,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -169,6 +170,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           label: 'MOLT ACADEMY',
           icon: BookOpen,
           path: '/lectures',
+        },
+        {
+          id: 'podcasts',
+          label: 'BENTHIC PODCASTS',
+          icon: Radio,
+          path: '/podcasts',
         },
         {
           id: 'science',
