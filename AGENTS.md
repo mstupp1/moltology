@@ -47,4 +47,6 @@
 ## 6. Non-Negotiable Rules
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
 - **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
-- **Check Work**: Run `npm run test` and `npm run build` before finishing. Must be 100% pass.
+- **Check Work**: 
+  - **Scoped / Minor Changes** (e.g., UI tweaks, single component updates): Run targeted Vitest tests for modified files (e.g., `npx vitest run path/to/file.test.ts`) and ensure clean TypeScript/build verification (`npm run build`).
+  - **Major / Full Work Completion**: Run the full test suite (`npm run test`) and `npm run build` before final delivery/commit. Must be 100% pass.
