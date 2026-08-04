@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import { authClient } from '../../lib/auth-client'
 import { UserAvatar } from '../UserAvatar'
+import { DigitalClock } from './DigitalClock'
 
 interface HUDHeaderProps {
   stage?: number
@@ -199,6 +200,9 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         </div>
 
       </div>{/* end center col */}
+
+      {/* ── RIGHT: Compact Digital Chronometer & Alignment Telemetry ── */}
+      <DigitalClock variant="header" className="hidden sm:flex shrink-0 z-10" />
 
       {/* Keyframe styles */}
       <style>{`
