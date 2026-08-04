@@ -119,7 +119,7 @@ export function BlogTopSlider({
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-950/90 border border-red-500/80 text-red-400 font-mono font-bold text-[11px] tracking-wider uppercase chamfer-corner shadow-hud-red">
               <Flame className="w-3.5 h-3.5 text-red-500 animate-pulse" />
-              <span>FEATURED TRANSMISSION // #{String(currentIndex + 1).padStart(2, '0')}</span>
+              <span>LEAD NEWS DISPATCH // BREAKING COVERAGE #{String(currentIndex + 1).padStart(2, '0')}</span>
             </span>
 
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono font-bold text-[10px] uppercase chamfer-corner">
@@ -192,7 +192,7 @@ export function BlogTopSlider({
                 onClick={() => onSelectPost(currentPost.slug)}
                 className="group inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-black font-grotesk font-black text-xs uppercase tracking-wider chamfer-corner shadow-[0_0_20px_rgba(0,195,255,0.4)] transition-all transform hover:scale-[1.03] active:scale-95"
               >
-                <span>OPEN TRANSMISSION</span>
+                <span>READ DISPATCH</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </button>
             </div>

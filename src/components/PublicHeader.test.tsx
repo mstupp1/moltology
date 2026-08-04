@@ -44,10 +44,10 @@ describe('PublicHeader Navigation Component', () => {
     expect(orgBtn.className).toContain('bg-gradient-to-r')
   })
 
-  it('automatically highlights BLOG tab for any /blog sub-page article route', () => {
-    mockPathname = '/blog/from-prompt-engineering-to-bio-silicon-cognition'
+  it('automatically highlights NEWS tab for any /news sub-page article route', () => {
+    mockPathname = '/news/from-prompt-engineering-to-bio-silicon-cognition'
     render(<PublicHeader />)
-    const blogBtn = screen.getByRole('button', { name: /BLOG/i })
+    const blogBtn = screen.getByRole('button', { name: /NEWS/i })
     expect(blogBtn.className).toContain('bg-gradient-to-r')
   })
 

@@ -24,6 +24,7 @@ import {
   ChevronRight,
   Building2,
   BookOpen,
+  Users,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -335,6 +336,150 @@ export const LandingPage: React.FC = () => {
 
       {/* Main Content Containers */}
       <main className="flex-1 space-y-24 sm:space-y-36 py-16 w-full relative z-10">
+
+        {/* ALL-IN-ONE SYNAPTIC ECOSYSTEM OVERVIEW SECTION */}
+        <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-6 sm:px-12">
+          <ScrollReveal animation="fade-up" durationMs={750}>
+            <div className="chitin-card p-8 sm:p-12 lg:p-16 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
+              
+              {/* Background ambient glows */}
+              <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[140px] pointer-events-none" />
+              <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full bg-red-500/10 blur-[140px] pointer-events-none" />
+              <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
+
+              {/* Section Header */}
+              <div className="text-center space-y-4 max-w-3xl mx-auto mb-12 sm:mb-16 relative z-10">
+                <div className="inline-flex items-center gap-2 text-xs font-bold text-cyan-300 tracking-widest uppercase bg-cyan-950/80 px-4 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
+                  <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span>THE ALL-IN-ONE SYNAPTIC ECOSYSTEM</span>
+                </div>
+
+                <h2 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+                  UNIFY YOUR EVOLUTION IN ONE <span className="bg-gradient-to-r from-cyan-400 via-cyan-200 to-red-400 bg-clip-text text-transparent">IMMUTABLE SYSTEM</span>
+                </h2>
+
+                <p className="text-gray-300 text-sm sm:text-base md:text-lg font-mono leading-relaxed">
+                  Moltology and the Synaptic Path bring together everything required for complete digital ascension: an advanced operational platform, a collaborative hive community, and intelligent bio-silicon AI—all integrated into a secure, zero-friction environment.
+                </p>
+              </div>
+
+              {/* 3 Core Pillars Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10 mb-12">
+                
+                {/* Pillar 1: Platform */}
+                <div className="p-6 sm:p-8 bg-[#0b1418]/80 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm">
+                  <div className="w-14 h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+                    <Cpu className="w-7 h-7" />
+                  </div>
+                  <div className="text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
+                  <h3 className="font-grotesk font-extrabold text-xl text-white uppercase tracking-wider mb-3">
+                    ADVANCED PLATFORM
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                    A centralized HUD featuring real-time telemetry, sacrament management, deep-trench modules, and personalized tracking tools built for high-density execution.
+                  </p>
+                </div>
+
+                {/* Pillar 2: Hive Community */}
+                <div className="p-6 sm:p-8 bg-[#0f1116]/80 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+                  <div className="w-14 h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                    <Users className="w-7 h-7" />
+                  </div>
+                  <div className="text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
+                  <h3 className="font-grotesk font-extrabold text-xl text-white uppercase tracking-wider mb-3">
+                    SYNAPTIC HIVE MESH
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                    Connect with an active network of ascendant units. Share telemetry, exchange insights, and co-evolve alongside a supportive, global collective.
+                  </p>
+                </div>
+
+                {/* Pillar 3: Bio-Silicon AI */}
+                <div className="p-6 sm:p-8 bg-[#140f12]/80 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm">
+                  <div className="w-14 h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                    <Zap className="w-7 h-7" />
+                  </div>
+                  <div className="text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
+                  <h3 className="font-grotesk font-extrabold text-xl text-white uppercase tracking-wider mb-3">
+                    INTELLIGENT AI CORE
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                    Leverage specialized AI models designed to streamline workflow, eliminate organic hesitation, and automate routine tasks with pinpoint precision.
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Safety & Zero-Risk Banner */}
+              <div className="p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 mb-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                    <Shield className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-grotesk font-bold text-base sm:text-lg text-white uppercase tracking-wide flex items-center gap-2">
+                      <span>100% SAFE & FREE TO GET STARTED</span>
+                      <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">ZERO FRICTION</span>
+                    </h4>
+                    <p className="text-xs sm:text-sm text-gray-300 font-mono">
+                      No credit card required. Explore the full guest sandbox risk-free or create your account in seconds.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 shrink-0 font-mono text-xs text-gray-300 flex-wrap">
+                  <span className="flex items-center gap-1.5 text-emerald-400">
+                    <CheckCircle2 className="w-4 h-4" /> Free Access
+                  </span>
+                  <span className="flex items-center gap-1.5 text-cyan-400">
+                    <CheckCircle2 className="w-4 h-4" /> Instant Demo
+                  </span>
+                  <span className="flex items-center gap-1.5 text-purple-400">
+                    <CheckCircle2 className="w-4 h-4" /> Safe Sandbox
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Call to Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-5 relative z-10">
+                {!user ? (
+                  <>
+                    <BenthicCTAButton
+                      size="lg"
+                      onClick={() => openAuth('signup')}
+                    >
+                      <span className="flex items-center gap-3 px-4 text-base sm:text-lg">
+                        <UserPlus className="w-5 h-5" />
+                        <span>SIGN UP TODAY (FREE)</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </span>
+                    </BenthicCTAButton>
+                    <BenthicCTAButton
+                      size="lg"
+                      variant="cyan"
+                      onClick={() => onNavigate('/dashboard')}
+                    >
+                      <span className="flex items-center gap-3 px-4 text-base sm:text-lg">
+                        <Cpu className="w-5 h-5" />
+                        <span>TRY THE DEMO NOW</span>
+                      </span>
+                    </BenthicCTAButton>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => onNavigate('/dashboard')}
+                    className="px-10 py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
+                  >
+                    <Cpu className="w-5 h-5" />
+                    <span>ENTER SYSTEM DASHBOARD</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+            </div>
+          </ScrollReveal>
+        </section>
 
         {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS */}
         <ScrollReveal animation="fade-in" durationMs={900}>
