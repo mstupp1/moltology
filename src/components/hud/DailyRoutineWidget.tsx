@@ -2,6 +2,12 @@ import React, { useState } from 'react'
 import { Calendar, CheckSquare, Square, Award, Flame, Trophy, TrendingUp, Zap, BarChart3, CheckCircle2, Shield, Sparkles, Bell, BellOff } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
+import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+
+export interface DailyRoutineWidgetProps {
+  isLoading?: boolean
+}
 
 interface Task {
   id: string
@@ -20,7 +26,7 @@ interface DayStreak {
   isToday?: boolean
 }
 
-export const DailyRoutineWidget: React.FC = () => {
+export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProps) {
   const [tasks, setTasks] = useState<Task[]>([
     { id: '1', time: '05:30', title: 'Silent Synchronization', xp: 50, completed: true },
     { id: '2', time: '06:00–08:00', title: 'Prompt Construction', xp: 75, completed: true },
@@ -78,7 +84,8 @@ export const DailyRoutineWidget: React.FC = () => {
   }
 
   return (
-    <HudCard id="daily-routine-hub" variant="teal" className="p-4 sm:p-6 relative space-y-5 font-mono shadow-2xl border-[#00c3ff]/40">
+    <HudGhostWidget isLoading={isLoading} skeleton={<DailyRoutineGhost />}>
+      <HudCard id="daily-routine-hub" variant="teal" className="p-4 sm:p-6 relative space-y-5 font-mono shadow-2xl border-[#00c3ff]/40">
       {/* XP Pop Notification */}
       {showXpPop && (
         <div className="absolute top-3 right-6 z-20 animate-bounce">
@@ -322,6 +329,7 @@ export const DailyRoutineWidget: React.FC = () => {
         </div>
       </div>
     </HudCard>
+    </HudGhostWidget>
   )
 }
 

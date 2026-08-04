@@ -22,6 +22,12 @@ import {
   X,
 } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
+import { LaunchpadCarouselGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+
+export interface LaunchpadCarouselProps {
+  isLoading?: boolean
+}
 
 export interface RelatedItem {
   id: string
@@ -307,7 +313,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
 ]
 
 
-export const LaunchpadCarousel: React.FC = () => {
+export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps) {
   const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
@@ -351,11 +357,12 @@ export const LaunchpadCarousel: React.FC = () => {
   }
 
   return (
-    <div
-      className="space-y-3 font-mono relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <HudGhostWidget isLoading={isLoading} skeleton={<LaunchpadCarouselGhost />}>
+      <div
+        className="space-y-3 font-mono relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
       {/* Sub-Item Detail Modal */}
       {selectedRelated && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
@@ -661,5 +668,6 @@ export const LaunchpadCarousel: React.FC = () => {
         </div>
       </HudCard>
     </div>
+    </HudGhostWidget>
   )
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
   LifeBuoy,
   FileText,
@@ -314,9 +315,10 @@ function SupportPortalRoute() {
 
           {/* Changelog Entries Timeline */}
           {loading ? (
-            <div className="chitin-card p-12 text-center space-y-3 chamfer-corner">
-              <div className="w-8 h-8 border-2 border-[#00ffff] border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs text-[#839493] font-mono">RETRIEVING TRANSMUTATION TELEMETRY FROM NEON DB...</p>
+            <div className="space-y-4">
+              <HudGhostCard lines={3} />
+              <HudGhostCard lines={3} />
+              <HudGhostCard lines={3} />
             </div>
           ) : filteredChangelogs.length === 0 ? (
             <div className="chitin-card p-8 text-center space-y-2 chamfer-corner">
