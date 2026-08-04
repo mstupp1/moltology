@@ -217,4 +217,75 @@ export const blogComments = pgTable('blog_comments', {
   })
 ])
 
+// Forum Categories Table
+export const forumCategories = pgTable('forum_categories', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  icon: text('icon').default('MessageSquare').notNull(),
+  color: text('color').default('#00ffff').notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('forum_categories_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  })
+])
+
+// Forum Topics (Threads) Table
+export const forumTopics = pgTable('forum_topics', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  categoryId: uuid('categoryId').notNull().references(() => forumCategories.id, { onDelete: 'cascade' }),
+  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
+  authorName: text('authorName').default('Ascendant Initiate').notNull(),
+  authorAvatar: text('authorAvatar').default('/images/stage1_larva.png').notNull(),
+  authorStage: integer('authorStage').default(1).notNull(),
+  title: text('title').notNull(),
+  slug: text('slug').notNull().unique(),
+  content: text('content').notNull(),
+  isPinned: boolean('isPinned').default(false).notNull(),
+  isLocked: boolean('isLocked').default(false).notNull(),
+  views: integer('views').default(0).notNull(),
+  repliesCount: integer('repliesCount').default(0).notNull(),
+  upvotes: integer('upvotes').default(0).notNull(),
+  lastReplyAt: timestamp('lastReplyAt').defaultNow().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('forum_topics_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  }),
+  pgPolicy('forum_topics_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
+// Forum Posts (Replies) Table
+export const forumPosts = pgTable('forum_posts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  topicId: uuid('topicId').notNull().references(() => forumTopics.id, { onDelete: 'cascade' }),
+  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
+  authorName: text('authorName').default('Ascendant Initiate').notNull(),
+  authorAvatar: text('authorAvatar').default('/images/stage1_larva.png').notNull(),
+  authorStage: integer('authorStage').default(1).notNull(),
+  content: text('content').notNull(),
+  upvotes: integer('upvotes').default(0).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('forum_posts_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  }),
+  pgPolicy('forum_posts_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
+
 

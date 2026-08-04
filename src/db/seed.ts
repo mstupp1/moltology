@@ -6,6 +6,8 @@ import * as schema from './schema'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
 import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
 import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
+import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
+
 
 dotenv.config()
 
@@ -287,7 +289,70 @@ export async function seedDatabase(databaseUrl?: string) {
     }
     console.log(`✓ Seeded ${INITIAL_BLOG_POSTS.length} blog post entries`)
 
+    // 8. Seed Forum Categories, Topics, and Posts
+    console.log('[SEED] Seeding forum categories, topics & posts...')
+    for (const cat of INITIAL_FORUM_CATEGORIES) {
+      await db
+        .insert(schema.forumCategories)
+        .values({
+          id: cat.id,
+          slug: cat.slug,
+          name: cat.name,
+          description: cat.description,
+          icon: cat.icon,
+          color: cat.color,
+          sortOrder: cat.sortOrder,
+        })
+        .onConflictDoNothing({ target: schema.forumCategories.slug })
+    }
+    console.log(`✓ Seeded ${INITIAL_FORUM_CATEGORIES.length} forum categories`)
+
+    for (const topic of INITIAL_FORUM_TOPICS) {
+      await db
+        .insert(schema.forumTopics)
+        .values({
+          id: topic.id,
+          categoryId: topic.categoryId,
+          userId: topic.userId,
+          authorName: topic.authorName,
+          authorAvatar: topic.authorAvatar,
+          authorStage: topic.authorStage,
+          title: topic.title,
+          slug: topic.slug,
+          content: topic.content,
+          isPinned: topic.isPinned,
+          isLocked: topic.isLocked,
+          views: topic.views,
+          repliesCount: topic.repliesCount,
+          upvotes: topic.upvotes,
+          lastReplyAt: new Date(topic.lastReplyAt),
+          createdAt: new Date(topic.createdAt),
+        })
+        .onConflictDoNothing({ target: schema.forumTopics.slug })
+
+      if (topic.posts && topic.posts.length > 0) {
+        for (const p of topic.posts) {
+          await db
+            .insert(schema.forumPosts)
+            .values({
+              id: p.id,
+              topicId: p.topicId,
+              userId: p.userId,
+              authorName: p.authorName,
+              authorAvatar: p.authorAvatar,
+              authorStage: p.authorStage,
+              content: p.content,
+              upvotes: p.upvotes,
+              createdAt: new Date(p.createdAt),
+            })
+            .onConflictDoNothing()
+        }
+      }
+    }
+    console.log(`✓ Seeded ${INITIAL_FORUM_TOPICS.length} forum topics and associated replies`)
+
     console.log('[SEED] ✓ All mock database seeding tasks completed successfully!')
+
 
     return { success: true }
   } catch (error) {
