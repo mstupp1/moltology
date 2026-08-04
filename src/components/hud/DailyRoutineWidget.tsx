@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Calendar, CheckSquare, Square, Award, Flame, Trophy, TrendingUp, Zap, BarChart3, CheckCircle2, Shield, Sparkles } from 'lucide-react'
+import { Calendar, CheckSquare, Square, Award, Flame, Trophy, TrendingUp, Zap, BarChart3, CheckCircle2, Shield, Sparkles, Bell, BellOff } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
+import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 
 interface Task {
   id: string
@@ -34,6 +35,9 @@ export const DailyRoutineWidget: React.FC = () => {
   const [streakDays] = useState(7)
   const [hoveredDay, setHoveredDay] = useState<DayStreak | null>(null)
   const [showXpPop, setShowXpPop] = useState<number | null>(null)
+
+  const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
+    useAlignmentReminders(tasks)
 
   const completedTasks = tasks.filter(t => t.completed)
   const completedCount = completedTasks.length
@@ -122,50 +126,78 @@ export const DailyRoutineWidget: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Column (7 cols): Clean Vertical List of 8 Tasks */}
         <div className="lg:col-span-7 space-y-3">
-          <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">
+          <div className="flex flex-wrap items-center justify-between border-b border-[#3a4a49]/60 pb-2 gap-2">
             <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#00c3ff]" />
               DAILY ALIGNMENT SCHEDULE ({completedCount}/{tasks.length})
             </span>
-            <span className="text-[11px] text-[#839493]">TOGGLE COMPLETION</span>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleReminders}
+                className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors"
+                title="Toggle automated 10-minute prior toast reminders"
+              >
+                {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
+                <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
+              </button>
+
+              <button
+                onClick={() => triggerTestReminder()}
+                className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-[#3a4a49] hover:border-yellow-400 bg-[#030606] text-yellow-400 transition-colors"
+                title="Dispatch instant 10m reminder toast alert"
+              >
+                <Zap className="w-3 h-3 text-yellow-400" />
+                <span>TEST TOAST</span>
+              </button>
+            </div>
           </div>
 
           <div className="space-y-2 font-mono text-xs">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                onClick={() => toggleTask(task.id)}
-                className={`p-3 border transition-all cursor-pointer flex items-center justify-between chamfer-corner group ${
-                  task.completed
-                    ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
-                    : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  {task.completed ? (
-                    <CheckSquare className="w-4.5 h-4.5 text-[#00c3ff] shrink-0" />
-                  ) : (
-                    <Square className="w-4.5 h-4.5 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
-                  )}
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.2 border border-[#3a4a49]">
-                        {task.time}
+            {tasks.map((task) => {
+              const reminderTime = getTaskReminderTime(task.time)
+              return (
+                <div
+                  key={task.id}
+                  onClick={() => toggleTask(task.id)}
+                  className={`p-3 border transition-all cursor-pointer flex items-center justify-between chamfer-corner group ${
+                    task.completed
+                      ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
+                      : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {task.completed ? (
+                      <CheckSquare className="w-4.5 h-4.5 text-[#00c3ff] shrink-0" />
+                    ) : (
+                      <Square className="w-4.5 h-4.5 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
+                    )}
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.2 border border-[#3a4a49]">
+                          {task.time}
+                        </span>
+                        {reminderTime && (
+                          <span className="text-[9px] text-[#ffb700] bg-[#091214] px-1.5 py-0.2 border border-[#ffb700]/30 flex items-center gap-1">
+                            <Bell className="w-2.5 h-2.5 text-[#ffb700]" />
+                            {reminderTime} (10m REMINDER)
+                          </span>
+                        )}
+                      </div>
+                      <span className={`text-xs font-bold block truncate ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
+                        {task.title}
                       </span>
                     </div>
-                    <span className={`text-xs font-bold block truncate ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
-                      {task.title}
-                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-2 shrink-0 ml-2">
+                    <HudBadge variant={task.completed ? 'cyan' : 'warning'}>
+                      +{task.xp} XP
+                    </HudBadge>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-2 shrink-0 ml-2">
-                  <HudBadge variant={task.completed ? 'cyan' : 'warning'}>
-                    +{task.xp} XP
-                  </HudBadge>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
