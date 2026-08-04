@@ -605,11 +605,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               })}
             </nav>
 
-          {/* Bottom Controls: Lobster + Help + Profile / Auth */}
-          <div className={`mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60`}>
-
+          {/* Bottom Controls: Lobster + Combined Help & Profile/Auth */}
+          <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60">
             {/* Lobster Emblem */}
-            <div className="px-4 pb-4 pt-3 border-b border-[#1e2d37]/60">
+            <div className="px-4 pb-3 pt-3 border-b border-[#1e2d37]/60">
               {isCollapsed ? (
                 <div
                   className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
@@ -655,95 +654,80 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 </div>
               )}
             </div>
-            {/* Help / Support Link */}
-            <button
-              onClick={() => navigate({ to: '/support' })}
-              className={`w-full flex items-center transition-all duration-200 ease-out group/help cursor-pointer ${
-                isCollapsed ? 'justify-center px-0 py-3.5' : 'px-4 py-3 gap-3'
-              } ${
-                currentRoute === '/support'
-                  ? 'bg-gradient-to-r from-[#00ffff]/15 via-[#00ffff]/05 to-transparent text-[#00ffff]'
-                  : 'hover:bg-gradient-to-r hover:from-[#00c3ff]/12 hover:to-transparent text-[#839493] hover:text-[#dfe3e3]'
-              }`}
-              title="Benthic Support Portal"
-            >
-              <LifeBuoy
-                className={`w-4 h-4 shrink-0 transition-all duration-200 ease-out group-hover/help:scale-110 ${
-                  currentRoute === '/support'
-                    ? 'text-[#00ffff] animate-spin-slow'
-                    : 'text-[#00c3ff] group-hover/help:text-[#00ffff] group-hover/help:drop-shadow-[0_0_6px_rgba(0,195,255,0.6)]'
-                }`}
-              />
-              {!isCollapsed && (
-                <span className="text-xs font-sans font-medium tracking-wide uppercase group-hover/help:translate-x-1 transition-transform duration-200 ease-out">
-                  HELP &amp; SUPPORT
-                </span>
-              )}
-              {isCollapsed && (
-                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-all duration-200 ease-out translate-x-2 group-hover/help:translate-x-0">
-                  <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                    HELP &amp; SUPPORT
-                  </div>
-                </div>
-              )}
-            </button>
 
-            {/* Profile / Auth */}
-            {!user ? (
-              <div className={`w-full ${
-                isCollapsed ? 'flex justify-center px-0 py-3' : 'px-3 py-3'
-              }`}>
+            {/* Combined Row: Help & Support + User Avatar / Auth */}
+            <div
+              className={`flex items-center transition-all duration-150 ${
+                isCollapsed
+                  ? 'justify-around px-2 py-3'
+                  : 'justify-between px-3.5 py-2.5 gap-2'
+              }`}
+            >
+              {/* Help & Support Link */}
+              <button
+                onClick={() => navigate({ to: '/support' })}
+                className={`flex items-center transition-all duration-200 ease-out group/help cursor-pointer rounded-lg p-1.5 ${
+                  isCollapsed ? 'justify-center' : 'gap-2.5'
+                } ${
+                  currentRoute === '/support'
+                    ? 'bg-[#00ffff]/15 text-[#00ffff]'
+                    : 'hover:bg-[#00c3ff]/10 text-[#839493] hover:text-[#dfe3e3]'
+                }`}
+                title="Benthic Support Portal"
+              >
+                <LifeBuoy
+                  className={`w-4 h-4 shrink-0 transition-all duration-200 ease-out group-hover/help:scale-110 ${
+                    currentRoute === '/support'
+                      ? 'text-[#00ffff] animate-spin-slow'
+                      : 'text-[#00c3ff] group-hover/help:text-[#00ffff] group-hover/help:drop-shadow-[0_0_6px_rgba(0,195,255,0.6)]'
+                  }`}
+                />
+                {!isCollapsed && (
+                  <span className="text-xs font-sans font-medium tracking-wide uppercase transition-colors duration-200">
+                    HELP &amp; SUPPORT
+                  </span>
+                )}
+                {isCollapsed && (
+                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-all duration-200 ease-out translate-x-2 group-hover/help:translate-x-0">
+                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
+                      HELP &amp; SUPPORT
+                    </div>
+                  </div>
+                )}
+              </button>
+
+              {/* Profile / Auth Avatar Menu */}
+              {!user ? (
                 <BenthicCTAButton
                   variant="cyan"
                   size="sm"
                   onClick={() => setIsAuthModalOpen(true)}
-                  className={isCollapsed ? '!px-2 !py-1.5' : 'w-full !py-2'}
+                  className={isCollapsed ? '!px-2 !py-1.5' : '!px-3 !py-1.5'}
                 >
                   <span className="flex items-center gap-1.5 text-[11px]">
                     <LogIn className="w-3.5 h-3.5" />
-                    {!isCollapsed && <span>SIGN IN TO PERSIST</span>}
+                    {!isCollapsed && <span>SIGN IN</span>}
                   </span>
                 </BenthicCTAButton>
-              </div>
-            ) : (
-              <div className={`flex items-center transition-all duration-150 group/profile hover:bg-white/[0.03] ${
-                isCollapsed ? 'justify-center px-0 py-3.5' : 'px-4 py-3 gap-3'
-              }`}>
-                <div className="relative">
+              ) : (
+                <div className="relative flex items-center">
                   <UserAvatarMenu
                     user={user}
                     userRole={effectiveUserRole}
                     onNavigate={(path) => navigate({ to: path })}
-                    align="left"
+                    align={isCollapsed ? 'left' : 'right'}
                     openDirection="up"
                   />
                   {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && isCollapsed && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none" title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'} />
+                    <span
+                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none"
+                      title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                    />
                   )}
                 </div>
-                {!isCollapsed && (
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                      <span className="text-xs font-medium text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
-                        {user.name || user.email?.split('@')[0] || 'OPERATIVE'}
-                      </span>
-                      {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && (
-                        <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shadow-[0_0_8px_rgba(0,255,255,0.4)] shrink-0">
-                          {effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
-                        </span>
-                      )}
-                    </div>
-                    {user.email && (
-                      <span className="text-[10px] text-[#7a8e9e] truncate mt-0.5">
-                        {user.email}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </aside>
