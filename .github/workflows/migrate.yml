@@ -1,0 +1,39 @@
+name: Database Migration (Production Main)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'drizzle/**'
+      - 'src/db/schema.ts'
+      - 'src/db/enable-rls.ts'
+      - '.github/workflows/migrate.yml'
+
+jobs:
+  migrate:
+    name: Run Drizzle SQL Migrations & RLS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Apply Database Migrations on Main
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run db:migrate
+
+      - name: Apply Row-Level Security Policies on Main
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run db:rls
