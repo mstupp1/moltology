@@ -655,78 +655,89 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               )}
             </div>
 
-            {/* Combined Row: Help & Support + User Avatar / Auth */}
+            {/* Combined Row: Help & Support (styled identical to sidebar nav items with blue tab) + User Avatar / Auth */}
             <div
-              className={`flex items-center transition-all duration-150 ${
-                isCollapsed
-                  ? 'justify-around px-2 py-3'
-                  : 'justify-between px-3.5 py-2.5 gap-2'
+              className={`flex items-center justify-between relative border-t border-[#1e2d37]/80 transition-colors duration-150 ${
+                currentRoute === '/support'
+                  ? 'bg-[#00c3ff]/10'
+                  : 'bg-[#080d10]/40 hover:bg-white/[0.04]'
               }`}
             >
-              {/* Help & Support Link */}
+              {/* Help & Support Nav Item */}
               <button
-                onClick={() => navigate({ to: '/support' })}
-                className={`flex items-center transition-all duration-200 ease-out group/help cursor-pointer rounded-lg p-1.5 ${
-                  isCollapsed ? 'justify-center' : 'gap-2.5'
-                } ${
-                  currentRoute === '/support'
-                    ? 'bg-[#00ffff]/15 text-[#00ffff]'
-                    : 'hover:bg-[#00c3ff]/10 text-[#839493] hover:text-[#dfe3e3]'
+                onClick={() => handleNavClick('/support')}
+                className={`flex-1 text-left relative flex items-center transition-colors duration-150 group/help cursor-pointer ${
+                  isCollapsed ? 'justify-center py-3.5 px-2' : 'px-4 py-2.5 pl-5 gap-3'
                 }`}
                 title="Benthic Support Portal"
               >
+                {currentRoute === '/support' && (
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
+                )}
+
                 <LifeBuoy
-                  className={`w-4 h-4 shrink-0 transition-all duration-200 ease-out group-hover/help:scale-110 ${
+                  className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
                     currentRoute === '/support'
-                      ? 'text-[#00ffff] animate-spin-slow'
-                      : 'text-[#00c3ff] group-hover/help:text-[#00ffff] group-hover/help:drop-shadow-[0_0_6px_rgba(0,195,255,0.6)]'
+                      ? 'text-[#00ffff]'
+                      : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
                   }`}
                 />
+
                 {!isCollapsed && (
-                  <span className="text-xs font-sans font-medium tracking-wide uppercase transition-colors duration-200">
+                  <span
+                    className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
+                      currentRoute === '/support'
+                        ? 'text-white font-semibold'
+                        : 'text-[#9eb0c0] group-hover/help:text-[#dfe3e3]'
+                    }`}
+                  >
                     HELP &amp; SUPPORT
                   </span>
                 )}
                 {isCollapsed && (
-                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-all duration-200 ease-out translate-x-2 group-hover/help:translate-x-0">
-                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,195,255,0.4)] whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                      HELP &amp; SUPPORT
+                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
+                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
+                      <span className="tracking-wider uppercase">
+                        HELP &amp; SUPPORT
+                      </span>
                     </div>
                   </div>
                 )}
               </button>
 
-              {/* Profile / Auth Avatar Menu */}
-              {!user ? (
-                <BenthicCTAButton
-                  variant="cyan"
-                  size="sm"
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className={isCollapsed ? '!px-2 !py-1.5' : '!px-3 !py-1.5'}
-                >
-                  <span className="flex items-center gap-1.5 text-[11px]">
-                    <LogIn className="w-3.5 h-3.5" />
-                    {!isCollapsed && <span>SIGN IN</span>}
-                  </span>
-                </BenthicCTAButton>
-              ) : (
-                <div className="relative flex items-center">
-                  <UserAvatarMenu
-                    user={user}
-                    userRole={effectiveUserRole}
-                    onNavigate={(path) => navigate({ to: path })}
-                    align={isCollapsed ? 'left' : 'right'}
-                    openDirection="up"
-                  />
-                  {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && isCollapsed && (
-                    <span
-                      className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none"
-                      title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+              {/* User Avatar Menu / Auth Button */}
+              <div className={`shrink-0 flex items-center ${isCollapsed ? 'pr-1.5' : 'pr-3'}`}>
+                {!user ? (
+                  <BenthicCTAButton
+                    variant="cyan"
+                    size="sm"
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className={isCollapsed ? '!px-1.5 !py-1' : '!px-2.5 !py-1'}
+                  >
+                    <span className="flex items-center gap-1.5 text-[11px]">
+                      <LogIn className="w-3.5 h-3.5" />
+                      {!isCollapsed && <span>SIGN IN</span>}
+                    </span>
+                  </BenthicCTAButton>
+                ) : (
+                  <div className="relative flex items-center">
+                    <UserAvatarMenu
+                      user={user}
+                      userRole={effectiveUserRole}
+                      onNavigate={(path) => navigate({ to: path })}
+                      align={isCollapsed ? 'left' : 'right'}
+                      openDirection="up"
                     />
-                  )}
-                </div>
-              )}
+                    {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && isCollapsed && (
+                      <span
+                        className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none"
+                        title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
