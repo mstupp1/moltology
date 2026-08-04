@@ -22,6 +22,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: 'icon', type: 'image/png', href: '/images/order_emblem.png' },
+      { rel: 'preload', as: 'image', href: '/images/subterranean_vats_bg.jpg' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
       {

@@ -286,3 +286,70 @@ input[type="range"].stat-slider::-moz-range-thumb {
   }
 }
 
+/* Nuclear Scary Green Subterranean Theme Overrides */
+.text-green-glow {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+}
+
+.theme-subterranean {
+  --hud-accent: #39ff14;
+  --hud-glow: #00ff41;
+}
+
+.theme-subterranean .text-cyan-glow {
+  color: #39ff14 !important;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
+}
+
+.theme-subterranean .chitin-card {
+  background: rgba(8, 18, 12, 0.65);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(57, 255, 20, 0.12);
+}
+
+.theme-subterranean .chitin-card-interactive:hover {
+  border-color: rgba(57, 255, 20, 0.85) !important;
+  box-shadow: 0 0 22px rgba(57, 255, 20, 0.35) !important;
+}
+
+.theme-subterranean .chitin-card-inset {
+  background: rgba(4, 12, 7, 0.6);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+}
+
+.theme-subterranean .bg-sacred-grid {
+  background-image: 
+    linear-gradient(to right, rgba(57, 255, 20, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.theme-subterranean .bg-benthic-vignette {
+  background-image: 
+    radial-gradient(ellipse 75% 45% at 50% -5%, rgba(57, 255, 20, 0.25), transparent 75%),
+    radial-gradient(circle at 15% 85%, rgba(0, 255, 65, 0.12), transparent 50%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 25%, rgba(2, 8, 4, 0.92) 100%);
+}
+
+.theme-subterranean .crt-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.75) 0px,
+    rgba(0, 0, 0, 0.75) 2px,
+    rgba(57, 255, 20, 0.18) 2px,
+    transparent 4px
+  );
+  background-size: 100% 4px;
+}
+
+.theme-subterranean .crt-grain {
+  background-image: radial-gradient(rgba(57, 255, 20, 0.5) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+.theme-subterranean ::-webkit-scrollbar-thumb:hover {
+  background: #39ff14 !important;
+}
+
+
