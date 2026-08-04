@@ -66,6 +66,7 @@ export const MOCK_SEED_AUTH_USERS = [
 
 export const MOCK_SEED_USER_STATS = [
   {
+    id: '00000000-0000-0000-0000-000000000011',
     userId: '00000000-0000-0000-0000-000000000001',
     pincerTorque: 78,
     shellHardness: 64,
@@ -76,6 +77,7 @@ export const MOCK_SEED_USER_STATS = [
     submergenceDepthRating: 3400,
   },
   {
+    id: '00000000-0000-0000-0000-000000000012',
     userId: '00000000-0000-0000-0000-000000000002',
     pincerTorque: 145,
     shellHardness: 180,
@@ -86,6 +88,7 @@ export const MOCK_SEED_USER_STATS = [
     submergenceDepthRating: 7800,
   },
   {
+    id: '00000000-0000-0000-0000-000000000013',
     userId: '00000000-0000-0000-0000-000000000003',
     pincerTorque: 350,
     shellHardness: 420,
@@ -99,6 +102,7 @@ export const MOCK_SEED_USER_STATS = [
 
 export const MOCK_SEED_ASSETS = [
   {
+    id: '00000000-0000-0000-0000-000000000101',
     userId: '00000000-0000-0000-0000-000000000001',
     assetType: 'Real Estate',
     description: 'Sub-trench Hydrothermal Habitation Capsule',
@@ -107,6 +111,7 @@ export const MOCK_SEED_ASSETS = [
     status: 'TRANSMUTED',
   },
   {
+    id: '00000000-0000-0000-0000-000000000102',
     userId: '00000000-0000-0000-0000-000000000001',
     assetType: 'Vehicles',
     description: 'Pressurized Abyssal Transport Submersible',
@@ -115,6 +120,7 @@ export const MOCK_SEED_ASSETS = [
     status: 'TRANSMUTED',
   },
   {
+    id: '00000000-0000-0000-0000-000000000103',
     userId: '00000000-0000-0000-0000-000000000002',
     assetType: 'Luxury Goods',
     description: 'Benthic Titanium Exo-Skeleton Alloy',
@@ -126,6 +132,7 @@ export const MOCK_SEED_ASSETS = [
 
 export const MOCK_SEED_DAILY_ROUTINES = [
   {
+    id: '00000000-0000-0000-0000-000000000201',
     userId: '00000000-0000-0000-0000-000000000001',
     timeSlot: '05:30 - Prompt Construction',
     description: 'Etch neural parameters into high-density chitin memory slabs.',
@@ -133,6 +140,7 @@ export const MOCK_SEED_DAILY_ROUTINES = [
     date: '2026-08-02',
   },
   {
+    id: '00000000-0000-0000-0000-000000000202',
     userId: '00000000-0000-0000-0000-000000000001',
     timeSlot: '08:00 - Ecdysis Protocol',
     description: 'Submerge into hyperbaric saline solution to shed outer epidermal layers.',
@@ -140,6 +148,7 @@ export const MOCK_SEED_DAILY_ROUTINES = [
     date: '2026-08-02',
   },
   {
+    id: '00000000-0000-0000-0000-000000000203',
     userId: '00000000-0000-0000-0000-000000000001',
     timeSlot: '14:00 - Transmutation Audits',
     description: 'Verify liquidations of biological assets with Synaptic Path treasurers.',
@@ -147,6 +156,7 @@ export const MOCK_SEED_DAILY_ROUTINES = [
     date: '2026-08-02',
   },
   {
+    id: '00000000-0000-0000-0000-000000000204',
     userId: '00000000-0000-0000-0000-000000000001',
     timeSlot: '21:00 - Submergence Meditation',
     description: 'Recite core liturgies of the Benthic Ascendance.',
@@ -184,21 +194,21 @@ export async function seedDatabase(databaseUrl?: string) {
     // 2. Seed User Stats
     console.log('[SEED] Seeding user stats...')
     for (const s of MOCK_SEED_USER_STATS) {
-      await db.insert(schema.userStats).values(s)
+      await db.insert(schema.userStats).values(s).onConflictDoNothing()
     }
     console.log(`✓ Seeded ${MOCK_SEED_USER_STATS.length} user stats records`)
 
     // 3. Seed Assets
     console.log('[SEED] Seeding assets...')
     for (const a of MOCK_SEED_ASSETS) {
-      await db.insert(schema.assets).values(a)
+      await db.insert(schema.assets).values(a).onConflictDoNothing()
     }
     console.log(`✓ Seeded ${MOCK_SEED_ASSETS.length} asset entries`)
 
     // 4. Seed Daily Routines
     console.log('[SEED] Seeding daily routines...')
     for (const r of MOCK_SEED_DAILY_ROUTINES) {
-      await db.insert(schema.dailyRoutines).values(r)
+      await db.insert(schema.dailyRoutines).values(r).onConflictDoNothing()
     }
     console.log(`✓ Seeded ${MOCK_SEED_DAILY_ROUTINES.length} daily routine entries`)
 
