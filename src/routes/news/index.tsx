@@ -22,6 +22,7 @@ import { getBlogPostsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { MoltNationBannerBg } from '@/components/news/MoltNationBannerBg'
 
 export const Route = createFileRoute('/news/')({
   loader: async () => {
@@ -121,8 +122,20 @@ export function NewsIndexPage() {
       <PublicHeader activePage="news" onOpenAuth={openAuth} />
 
       {/* MoltNation Main Centered Brand Banner */}
-      <div className="w-full bg-[#030608] border-b border-cyan-900/60 py-5 px-4 sm:px-8 relative z-20 shadow-xl flex justify-center items-center">
-        <MoltNationLogo size="md" theme="dark" />
+      <div className="w-full relative py-14 sm:py-20 px-4 sm:px-8 shadow-2xl flex justify-center items-center overflow-hidden bg-[#030608]">
+        {/* Generated Dramatic Rippling American Flag Background Image */}
+        <img
+          src="/images/moltnation_flag_bg.jpg"
+          alt="MoltNation Flag Background"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-95 contrast-115 opacity-85 scale-105 pointer-events-none"
+        />
+        {/* Subtle Radial & Gradient Overlays */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(3,6,8,0.2)_0%,rgba(3,6,8,0.75)_85%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030608] via-transparent to-[#030608]/60 pointer-events-none" />
+
+        <div className="relative z-10 py-2 drop-shadow-2xl">
+          <MoltNationLogo size="lg" theme="dark" />
+        </div>
       </div>
 
       {/* CNN-Style Top Live Breaking Ticker */}
