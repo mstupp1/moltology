@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Outlet } from '@tanstack/react-router'
+import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDHeader } from '@/components/hud/HUDHeader'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
@@ -14,6 +14,8 @@ function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
   const oracle = useSafeOracle()
+  const location = useLocation()
+  const isSubterranean = location.pathname.startsWith('/subterranean')
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
@@ -48,15 +50,22 @@ function HudContent() {
     return () => window.removeEventListener('toggle-ai-drawer', handleToggle)
   }, [oracle])
 
-  // Allow re-launching the welcome splash via lobster click
+  // Preload background images so transitions happen instantly without network delay
   useEffect(() => {
-    const handleRelaunch = () => setShowWelcome(true)
-    window.addEventListener('launch-welcome-splash', handleRelaunch)
-    return () => window.removeEventListener('launch-welcome-splash', handleRelaunch)
+    if (typeof window !== 'undefined') {
+      const img1 = new Image()
+      img1.src = '/images/subterranean_vats_bg.jpg'
+      const img2 = new Image()
+      img2.src = '/images/underwater_looking_up.jpg'
+    }
   }, [])
 
   return (
-    <div className="h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708]">
+    <div
+      className={`h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden select-none bg-[#030708] ${
+        isSubterranean ? 'theme-subterranean' : ''
+      }`}
+    >
       {/* First-time welcome splash */}
       {showWelcome && (
         <WelcomeSplash
@@ -66,10 +75,20 @@ function HudContent() {
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
-        {/* Full-Bleed Underwater Background Image with vivid cyan mix-blend */}
+        {/* Full-Bleed Default Aqua Underwater Background */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 mix-blend-screen filter drop-shadow-[0_0_45px_rgba(0,255,255,0.65)]"
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-screen filter drop-shadow-[0_0_45px_rgba(0,255,255,0.65)] transition-opacity duration-150 ${
+            isSubterranean ? 'opacity-0' : 'opacity-95'
+          }`}
           style={{ backgroundImage: `url('/images/underwater_looking_up.jpg')` }}
+        />
+
+        {/* Full-Bleed Nuclear Subterranean Vats Background */}
+        <div
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-screen filter drop-shadow-[0_0_55px_rgba(57,255,20,0.8)] transition-opacity duration-150 ${
+            isSubterranean ? 'opacity-95' : 'opacity-0'
+          }`}
+          style={{ backgroundImage: `url('/images/subterranean_vats_bg.jpg')` }}
         />
 
         {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}
@@ -84,8 +103,14 @@ function HudContent() {
           className="absolute inset-0 pointer-events-none z-[1] opacity-85"
         />
 
-        {/* Electric Cyan CRT Phosphor Ambient Radial Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.45)_0%,rgba(0,195,255,0.2)_55%,transparent_85%)] z-[2]" />
+        {/* Phosphor Ambient Radial Glow (Electric Cyan or Nuclear Scary Green) */}
+        <div
+          className={`absolute inset-0 z-[2] transition-opacity duration-150 ${
+            isSubterranean
+              ? 'bg-[radial-gradient(circle_at_center,rgba(57,255,20,0.45)_0%,rgba(16,185,129,0.22)_55%,transparent_85%)]'
+              : 'bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.45)_0%,rgba(0,195,255,0.2)_55%,transparent_85%)]'
+          }`}
+        />
 
         {/* High-Contrast CRT Scanlines Overlay on Background Image */}
         <div className="absolute inset-0 crt-scanlines opacity-90" />

@@ -27,6 +27,7 @@ import {
   LayoutGrid,
   Terminal,
   Radio,
+  Biohazard,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -212,6 +213,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           label: 'ISOLATION PROTOCOLS',
           icon: ShieldAlert,
           path: '/isolation',
+        },
+        {
+          id: 'subterranean',
+          label: 'SUBTERRANEAN VATS',
+          icon: Biohazard,
+          path: '/subterranean',
         },
       ],
     },

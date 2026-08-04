@@ -14,6 +14,7 @@ import {
   BookOpen,
   Scroll,
   LayoutDashboard,
+  Biohazard,
 } from 'lucide-react'
 
 interface CommandItem {
@@ -93,6 +94,17 @@ export const CommandPalette: React.FC = () => {
       shortcut: 'G M',
       action: () => {
         navigate({ to: '/market' })
+        setIsOpen(false)
+      },
+    },
+    {
+      id: 'nav-subterranean',
+      label: 'Open Subterranean Vats & Level -7 Bio-Vault',
+      category: 'Navigation',
+      icon: <Biohazard className="w-4 h-4 text-[#39ff14]" />,
+      shortcut: 'G S',
+      action: () => {
+        navigate({ to: '/subterranean' })
         setIsOpen(false)
       },
     },
