@@ -133,7 +133,34 @@ async function applyRLS() {
     `
     console.log('✓ RLS and schema initialized for changelogs table')
 
+    // Enable RLS for Forum Tables
+    await sql`ALTER TABLE IF EXISTS forum_categories ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS forum_topics ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS forum_posts ENABLE ROW LEVEL SECURITY;`
+
+    await sql`DROP POLICY IF EXISTS forum_categories_public_read_policy ON forum_categories;`
+    await sql`CREATE POLICY forum_categories_public_read_policy ON forum_categories FOR SELECT USING (true);`
+
+    await sql`DROP POLICY IF EXISTS forum_topics_public_read_policy ON forum_topics;`
+    await sql`CREATE POLICY forum_topics_public_read_policy ON forum_topics FOR SELECT USING (true);`
+
+    await sql`DROP POLICY IF EXISTS forum_topics_insert_policy ON forum_topics;`
+    await sql`CREATE POLICY forum_topics_insert_policy ON forum_topics FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
+    await sql`DROP POLICY IF EXISTS forum_posts_public_read_policy ON forum_posts;`
+    await sql`CREATE POLICY forum_posts_public_read_policy ON forum_posts FOR SELECT USING (true);`
+
+    await sql`DROP POLICY IF EXISTS forum_posts_insert_policy ON forum_posts;`
+    await sql`CREATE POLICY forum_posts_insert_policy ON forum_posts FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
+    console.log('✓ RLS policies configured for forum_categories, forum_topics, and forum_posts')
+
     console.log('✓ Row Level Security (RLS) policies successfully created!')
+
   } catch (error) {
     console.error('Error enabling RLS policies:', error)
     process.exit(1)

@@ -2,15 +2,18 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, like, or, sql } from 'drizzle-orm'
 import { INITIAL_CHANGELOGS } from '../changelogs-data'
 import type { ChangelogEntry } from '../changelogs-data'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
+import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../forum-seed-data'
+import { validateForumContent } from '../community-rules'
+
 import { getPresignedViewUrl } from '../s3-client'
 
 type Db = ReturnType<typeof getDb>
@@ -894,6 +897,620 @@ export const createBlogCommentFn = createServerFn({ method: 'POST' })
       .parse(data)
   })
   .handler(createBlogCommentHandler)
+
+
+// ==========================================
+// FORUM / COMMUNITY CORE SERVER FUNCTIONS
+// ==========================================
+
+export interface ForumCategoryEntry {
+  id: string
+  slug: string
+  name: string
+  description: string
+  icon: string
+  color: string
+  sortOrder: number
+  topicCount: number
+}
+
+export interface ForumTopicEntry {
+  id: string
+  categoryId: string
+  categorySlug?: string
+  categoryName?: string
+  categoryColor?: string
+  userId: string | null
+  authorName: string
+  authorAvatar: string
+  authorStage: number
+  title: string
+  slug: string
+  content: string
+  isPinned: boolean
+  isLocked: boolean
+  views: number
+  repliesCount: number
+  upvotes: number
+  lastReplyAt: string
+  createdAt: string
+}
+
+export interface ForumPostEntry {
+  id: string
+  topicId: string
+  userId: string | null
+  authorName: string
+  authorAvatar: string
+  authorStage: number
+  content: string
+  upvotes: number
+  createdAt: string
+}
+
+/**
+ * Server Function: Get all forum categories with topic counts.
+ */
+export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Promise<ForumCategoryEntry[]> => {
+  const dbClient = context?.db || getDb()
+  try {
+    const cats = await dbClient
+      .select({
+        id: forumCategories.id,
+        slug: forumCategories.slug,
+        name: forumCategories.name,
+        description: forumCategories.description,
+        icon: forumCategories.icon,
+        color: forumCategories.color,
+        sortOrder: forumCategories.sortOrder,
+      })
+      .from(forumCategories)
+      .orderBy(forumCategories.sortOrder)
+
+    if (cats.length > 0) {
+      // Calculate topic counts per category
+      const countsMap = new Map<string, number>()
+      try {
+        const topicCounts = await dbClient
+          .select({
+            categoryId: forumTopics.categoryId,
+            count: sql<number>`count(*)::int`,
+          })
+          .from(forumTopics)
+          .groupBy(forumTopics.categoryId)
+
+        for (const tc of topicCounts) {
+          countsMap.set(tc.categoryId, tc.count)
+        }
+      } catch (err) {
+        console.warn('[getForumCategoriesFn] Topic count grouping failed:', err)
+      }
+
+      return cats.map((c: any) => ({
+        ...c,
+        topicCount: countsMap.get(c.id) || 0,
+      }))
+    }
+  } catch (err) {
+    console.warn('[getForumCategoriesFn] DB error, using seed fallback:', err)
+  }
+
+  return INITIAL_FORUM_CATEGORIES.map((c) => ({
+    ...c,
+    topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === c.id).length,
+  }))
+}
+
+export const getForumCategoriesFn = createServerFn({ method: 'GET' })
+  .middleware(publicMiddleware)
+  .handler(getForumCategoriesHandler)
+
+export interface GetForumTopicsInput {
+  categorySlug?: string
+  query?: string
+  sortBy?: 'latest' | 'top' | 'active'
+}
+
+/**
+ * Server Function: Get forum topics with filtering and search.
+ */
+export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetForumTopicsInput>): Promise<ForumTopicEntry[]> => {
+  const dbClient = context?.db || getDb()
+  const { categorySlug, query, sortBy = 'latest' } = data || {}
+
+  try {
+    const queryBuilder = dbClient
+      .select({
+        id: forumTopics.id,
+        categoryId: forumTopics.categoryId,
+        categorySlug: forumCategories.slug,
+        categoryName: forumCategories.name,
+        categoryColor: forumCategories.color,
+        userId: forumTopics.userId,
+        authorName: forumTopics.authorName,
+        authorAvatar: forumTopics.authorAvatar,
+        authorStage: forumTopics.authorStage,
+        title: forumTopics.title,
+        slug: forumTopics.slug,
+        content: forumTopics.content,
+        isPinned: forumTopics.isPinned,
+        isLocked: forumTopics.isLocked,
+        views: forumTopics.views,
+        repliesCount: forumTopics.repliesCount,
+        upvotes: forumTopics.upvotes,
+        lastReplyAt: forumTopics.lastReplyAt,
+        createdAt: forumTopics.createdAt,
+      })
+      .from(forumTopics)
+      .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
+
+    // Apply conditions
+    const conditions = []
+    if (categorySlug && categorySlug !== 'all') {
+      conditions.push(eq(forumCategories.slug, categorySlug))
+    }
+    if (query && query.trim() !== '') {
+      const q = `%${query.trim()}%`
+      conditions.push(or(like(forumTopics.title, q), like(forumTopics.content, q)))
+    }
+
+    let finalQuery = queryBuilder
+    if (conditions.length > 0) {
+      finalQuery = finalQuery.where(sql.join(conditions, sql` AND `)) as any
+    }
+
+    if (sortBy === 'top') {
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.upvotes), desc(forumTopics.createdAt)) as any
+    } else if (sortBy === 'active') {
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt)) as any
+    } else {
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.createdAt)) as any
+    }
+
+    const records = await finalQuery
+
+    if (records && records.length > 0) {
+      return records.map((r: any) => ({
+        id: r.id,
+        categoryId: r.categoryId,
+        categorySlug: r.categorySlug || 'general-discussion',
+        categoryName: r.categoryName || 'General Discussion',
+        categoryColor: r.categoryColor || '#00ffff',
+        userId: r.userId,
+        authorName: r.authorName,
+        authorAvatar: r.authorAvatar,
+        authorStage: r.authorStage,
+        title: r.title,
+        slug: r.slug,
+        content: r.content,
+        isPinned: r.isPinned,
+        isLocked: r.isLocked,
+        views: r.views,
+        repliesCount: r.repliesCount,
+        upvotes: r.upvotes,
+        lastReplyAt: r.lastReplyAt ? new Date(r.lastReplyAt).toISOString() : new Date().toISOString(),
+        createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
+      }))
+    }
+  } catch (err) {
+    console.warn('[getForumTopicsFn] DB error, using seed fallback:', err)
+  }
+
+  // Fallback to initial seed topics
+  let fallback: ForumTopicEntry[] = INITIAL_FORUM_TOPICS.map((t) => {
+    const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.id === t.categoryId)
+    return {
+      ...t,
+      userId: t.userId ?? null,
+      categorySlug: cat?.slug || 'general-discussion',
+      categoryName: cat?.name || 'General Discussion',
+      categoryColor: cat?.color || '#00ffff',
+    }
+  })
+
+
+  if (categorySlug && categorySlug !== 'all') {
+    fallback = fallback.filter((t) => t.categorySlug === categorySlug)
+  }
+  if (query && query.trim() !== '') {
+    const q = query.toLowerCase()
+    fallback = fallback.filter((t) => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
+  }
+  return fallback
+}
+
+export const getForumTopicsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: GetForumTopicsInput) => {
+    return z
+      .object({
+        categorySlug: z.string().optional(),
+        query: z.string().optional(),
+        sortBy: z.enum(['latest', 'top', 'active']).optional(),
+      })
+      .optional()
+      .parse(data || {})
+  })
+  .handler(getForumTopicsHandler)
+
+export interface GetForumTopicDetailInput {
+  slugOrId: string
+}
+
+export interface ForumTopicDetailResult {
+  topic: ForumTopicEntry
+  posts: ForumPostEntry[]
+}
+
+/**
+ * Server Function: Get single topic detail with posts and increment view count.
+ */
+export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs<GetForumTopicDetailInput>): Promise<ForumTopicDetailResult | null> => {
+  const { slugOrId } = data || {}
+  if (!slugOrId) return null
+  const dbClient = context?.db || getDb()
+
+  try {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId)
+    const topicRecord = await dbClient
+      .select({
+        id: forumTopics.id,
+        categoryId: forumTopics.categoryId,
+        categorySlug: forumCategories.slug,
+        categoryName: forumCategories.name,
+        categoryColor: forumCategories.color,
+        userId: forumTopics.userId,
+        authorName: forumTopics.authorName,
+        authorAvatar: forumTopics.authorAvatar,
+        authorStage: forumTopics.authorStage,
+        title: forumTopics.title,
+        slug: forumTopics.slug,
+        content: forumTopics.content,
+        isPinned: forumTopics.isPinned,
+        isLocked: forumTopics.isLocked,
+        views: forumTopics.views,
+        repliesCount: forumTopics.repliesCount,
+        upvotes: forumTopics.upvotes,
+        lastReplyAt: forumTopics.lastReplyAt,
+        createdAt: forumTopics.createdAt,
+      })
+      .from(forumTopics)
+      .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
+      .where(isUuid ? eq(forumTopics.id, slugOrId) : eq(forumTopics.slug, slugOrId))
+      .limit(1)
+
+    if (topicRecord.length > 0) {
+      const t = topicRecord[0]
+
+      // Fire-and-forget view count increment
+      dbClient
+        .update(forumTopics)
+        .set({ views: t.views + 1 })
+        .where(eq(forumTopics.id, t.id))
+        .catch((err: any) => console.warn('[getForumTopicDetailFn] View count update error:', err))
+
+      // Fetch posts / replies
+      const postsRecords = await dbClient
+        .select({
+          id: forumPosts.id,
+          topicId: forumPosts.topicId,
+          userId: forumPosts.userId,
+          authorName: forumPosts.authorName,
+          authorAvatar: forumPosts.authorAvatar,
+          authorStage: forumPosts.authorStage,
+          content: forumPosts.content,
+          upvotes: forumPosts.upvotes,
+          createdAt: forumPosts.createdAt,
+        })
+        .from(forumPosts)
+        .where(eq(forumPosts.topicId, t.id))
+        .orderBy(forumPosts.createdAt)
+
+      return {
+        topic: {
+          id: t.id,
+          categoryId: t.categoryId,
+          categorySlug: t.categorySlug || 'general-discussion',
+          categoryName: t.categoryName || 'General Discussion',
+          categoryColor: t.categoryColor || '#00ffff',
+          userId: t.userId,
+          authorName: t.authorName,
+          authorAvatar: t.authorAvatar,
+          authorStage: t.authorStage,
+          title: t.title,
+          slug: t.slug,
+          content: t.content,
+          isPinned: t.isPinned,
+          isLocked: t.isLocked,
+          views: t.views + 1,
+          repliesCount: t.repliesCount,
+          upvotes: t.upvotes,
+          lastReplyAt: t.lastReplyAt ? new Date(t.lastReplyAt).toISOString() : new Date().toISOString(),
+          createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
+        },
+        posts: postsRecords.map((p: any) => ({
+          id: p.id,
+          topicId: p.topicId,
+          userId: p.userId,
+          authorName: p.authorName,
+          authorAvatar: p.authorAvatar,
+          authorStage: p.authorStage,
+          content: p.content,
+          upvotes: p.upvotes,
+          createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : new Date().toISOString(),
+        })),
+      }
+    }
+  } catch (err) {
+    console.warn('[getForumTopicDetailFn] DB error, using seed fallback:', err)
+  }
+
+  // Seed Fallback
+  const seedTopic = INITIAL_FORUM_TOPICS.find((t) => t.slug === slugOrId || t.id === slugOrId)
+  if (!seedTopic) return null
+
+  const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.id === seedTopic.categoryId)
+  return {
+    topic: {
+      ...seedTopic,
+      userId: seedTopic.userId ?? null,
+      categorySlug: cat?.slug || 'general-discussion',
+      categoryName: cat?.name || 'General Discussion',
+      categoryColor: cat?.color || '#00ffff',
+    },
+    posts: (seedTopic.posts || []).map((p) => ({
+      ...p,
+      userId: p.userId ?? null,
+    })),
+  }
+
+}
+
+export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: GetForumTopicDetailInput) => {
+    return z.object({ slugOrId: z.string().min(1) }).parse(data)
+  })
+  .handler(getForumTopicDetailHandler)
+
+export interface CreateForumTopicInput {
+  categoryId: string
+  title: string
+  content: string
+  userId?: string
+}
+
+/**
+ * Server Function: Create a new topic with guardrails validation.
+ */
+export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<CreateForumTopicInput>): Promise<ForumTopicEntry> => {
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  if (!userId) {
+    throw new Error('Unauthenticated: You must be registered and logged in to create discussion topics.')
+  }
+
+  if (!data?.categoryId || !data?.title || !data?.content) {
+    throw new Error('Invalid input: Category, title, and content are required.')
+  }
+
+  // Guardrail Validation
+  const validation = validateForumContent(data.title, data.content)
+  if (!validation.valid) {
+    throw new Error(`Guardrail Trigger: ${validation.error}`)
+  }
+
+  await ensureUserProfile(userId)
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+
+  const [userProfile] = await dbClient
+    .select()
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  const authorName = userProfile?.larvaId || (context?.user as any)?.name || 'Ascendant Initiate'
+  const authorAvatar = (context?.user as any)?.image || '/images/stage1_larva.png'
+  const authorStage = userProfile?.stage ?? 1
+
+  // Generate clean slug
+  const baseSlug = data.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+  const uniqueSlug = `${baseSlug}-${Date.now().toString(36)}`
+
+  const [inserted] = await dbClient
+    .insert(forumTopics)
+    .values({
+      categoryId: data.categoryId,
+      userId,
+      authorName,
+      authorAvatar,
+      authorStage,
+      title: data.title.trim(),
+      slug: uniqueSlug,
+      content: data.content.trim(),
+      lastReplyAt: new Date(),
+    })
+    .returning()
+
+  // Fetch category info
+  const [cat] = await dbClient
+    .select()
+    .from(forumCategories)
+    .where(eq(forumCategories.id, inserted.categoryId))
+    .limit(1)
+
+  return {
+    id: inserted.id,
+    categoryId: inserted.categoryId,
+    categorySlug: cat?.slug || 'general-discussion',
+    categoryName: cat?.name || 'General Discussion',
+    categoryColor: cat?.color || '#00ffff',
+    userId: inserted.userId,
+    authorName: inserted.authorName,
+    authorAvatar: inserted.authorAvatar,
+    authorStage: inserted.authorStage,
+    title: inserted.title,
+    slug: inserted.slug,
+    content: inserted.content,
+    isPinned: inserted.isPinned,
+    isLocked: inserted.isLocked,
+    views: inserted.views,
+    repliesCount: inserted.repliesCount,
+    upvotes: inserted.upvotes,
+    lastReplyAt: inserted.lastReplyAt ? new Date(inserted.lastReplyAt).toISOString() : new Date().toISOString(),
+    createdAt: inserted.createdAt ? new Date(inserted.createdAt).toISOString() : new Date().toISOString(),
+  }
+}
+
+export const createForumTopicFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: CreateForumTopicInput) => {
+    return z
+      .object({
+        categoryId: z.string().min(1),
+        title: z.string().min(5).max(150),
+        content: z.string().min(10).max(10000),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(createForumTopicHandler)
+
+export interface CreateForumPostInput {
+  topicId: string
+  content: string
+  userId?: string
+}
+
+/**
+ * Server Function: Create a reply to an existing forum topic.
+ */
+export const createForumPostHandler = async ({ data, context }: ServerFnArgs<CreateForumPostInput>): Promise<ForumPostEntry> => {
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  if (!userId) {
+    throw new Error('Unauthenticated: You must be registered and logged in to post replies.')
+  }
+
+  if (!data?.topicId || !data?.content) {
+    throw new Error('Invalid input: Topic ID and content are required.')
+  }
+
+  // Guardrail Validation
+  const validation = validateForumContent(undefined, data.content)
+  if (!validation.valid) {
+    throw new Error(`Guardrail Trigger: ${validation.error}`)
+  }
+
+  await ensureUserProfile(userId)
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+
+  const [userProfile] = await dbClient
+    .select()
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  const authorName = userProfile?.larvaId || (context?.user as any)?.name || 'Ascendant Initiate'
+  const authorAvatar = (context?.user as any)?.image || '/images/stage1_larva.png'
+  const authorStage = userProfile?.stage ?? 1
+
+  const [inserted] = await dbClient
+    .insert(forumPosts)
+    .values({
+      topicId: data.topicId,
+      userId,
+      authorName,
+      authorAvatar,
+      authorStage,
+      content: data.content.trim(),
+    })
+    .returning()
+
+  // Update topic repliesCount and lastReplyAt
+  try {
+    const [topicRecord] = await dbClient
+      .select({ repliesCount: forumTopics.repliesCount })
+      .from(forumTopics)
+      .where(eq(forumTopics.id, data.topicId))
+      .limit(1)
+
+    const currentCount = topicRecord?.repliesCount ?? 0
+
+    await dbClient
+      .update(forumTopics)
+      .set({
+        repliesCount: currentCount + 1,
+        lastReplyAt: new Date(),
+      })
+      .where(eq(forumTopics.id, data.topicId))
+  } catch (err) {
+    console.warn('[createForumPostFn] Topic reply counter update error:', err)
+  }
+
+  return {
+    id: inserted.id,
+    topicId: inserted.topicId,
+    userId: inserted.userId,
+    authorName: inserted.authorName,
+    authorAvatar: inserted.authorAvatar,
+    authorStage: inserted.authorStage,
+    content: inserted.content,
+    upvotes: inserted.upvotes,
+    createdAt: inserted.createdAt ? new Date(inserted.createdAt).toISOString() : new Date().toISOString(),
+  }
+}
+
+export const createForumPostFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: CreateForumPostInput) => {
+    return z
+      .object({
+        topicId: z.string().min(1),
+        content: z.string().min(10).max(10000),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(createForumPostHandler)
+
+export interface UpvoteForumTopicInput {
+  topicId: string
+}
+
+/**
+ * Server Function: Upvote a topic.
+ */
+export const upvoteForumTopicHandler = async ({ data, context }: ServerFnArgs<UpvoteForumTopicInput>): Promise<{ upvotes: number }> => {
+  if (!data?.topicId) {
+    throw new Error('Topic ID required.')
+  }
+
+  const dbClient = context?.db || getDb()
+  const [topic] = await dbClient
+    .select({ upvotes: forumTopics.upvotes })
+    .from(forumTopics)
+    .where(eq(forumTopics.id, data.topicId))
+    .limit(1)
+
+  const newCount = (topic?.upvotes ?? 0) + 1
+
+  await dbClient
+    .update(forumTopics)
+    .set({ upvotes: newCount })
+    .where(eq(forumTopics.id, data.topicId))
+
+  return { upvotes: newCount }
+}
+
+export const upvoteForumTopicFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: UpvoteForumTopicInput) => {
+    return z.object({ topicId: z.string().min(1) }).parse(data)
+  })
+  .handler(upvoteForumTopicHandler)
+
 
 
 
