@@ -60,17 +60,20 @@ function SupportPortalRoute() {
   const [ticketSubmitted, setTicketSubmitted] = useState(false)
 
   useEffect(() => {
+    if (!user?.id) return
     let isMounted = true
     getAuthJWTToken()
       .catch(() => null)
-      .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user?.id } }))
+      .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
       .then((profile) => {
-        if (isMounted && profile?.role) {
-          setUserRole(profile.role)
-        }
+        if (isMounted && profile?.role) setUserRole(profile.role)
       })
       .catch(() => {})
+    return () => { isMounted = false }
+  }, [user?.id])
 
+  useEffect(() => {
+    let isMounted = true
     getPublicChangelogs()
       .then((data) => {
         if (isMounted && Array.isArray(data) && data.length > 0) {
@@ -79,13 +82,9 @@ function SupportPortalRoute() {
         }
       })
       .catch(() => {
-        if (isMounted) {
-          setLoading(false)
-        }
+        if (isMounted) setLoading(false)
       })
-    return () => {
-      isMounted = false
-    }
+    return () => { isMounted = false }
   }, [])
 
   const toggleExpand = (version: string) => {
