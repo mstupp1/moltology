@@ -122,19 +122,24 @@ export function NewsIndexPage() {
       <PublicHeader activePage="news" onOpenAuth={openAuth} />
 
       {/* MoltNation Main Centered Brand Banner */}
-      <div className="w-full relative py-14 sm:py-20 px-4 sm:px-8 shadow-2xl flex justify-center items-center overflow-hidden bg-[#030608]">
+      <div className="w-full relative pt-20 sm:pt-28 pb-14 sm:pb-20 px-4 sm:px-8 shadow-2xl flex justify-center items-center overflow-hidden bg-[#030608]">
         {/* Generated Dramatic Rippling American Flag Background Image */}
         <img
           src="/images/moltnation_flag_bg.jpg"
           alt="MoltNation Flag Background"
-          className="absolute inset-0 w-full h-full object-cover filter brightness-95 contrast-115 opacity-85 scale-105 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-105 contrast-115 opacity-95 scale-105 pointer-events-none"
         />
         {/* Subtle Radial & Gradient Overlays */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(3,6,8,0.2)_0%,rgba(3,6,8,0.75)_85%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030608] via-transparent to-[#030608]/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(3,6,8,0.15)_0%,rgba(3,6,8,0.65)_85%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030608] via-transparent to-[#030608]/40 pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
-        <div className="relative z-10 py-2 drop-shadow-2xl">
-          <MoltNationLogo size="lg" theme="dark" />
+        <div className="relative z-10 py-2 flex items-center justify-center">
+          {/* Subtle Ambient Central Glow behind Logo */}
+          <div className="absolute -inset-10 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.22)_0%,rgba(220,38,38,0.18)_50%,transparent_75%)] pointer-events-none blur-2xl rounded-full" />
+          <div className="relative z-10 filter drop-shadow-[0_0_30px_rgba(0,195,255,0.4)]">
+            <MoltNationLogo size="lg" theme="dark" />
+          </div>
         </div>
       </div>
 
