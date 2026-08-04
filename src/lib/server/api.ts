@@ -754,6 +754,148 @@ export const incrementBlogPostViewsFn = createServerFn({ method: 'POST' })
   .validator((slug: string) => slug)
   .handler(incrementBlogPostViewsHandler)
 
+export interface BlogCommentEntry {
+  id: string
+  postId: string
+  userId: string | null
+  authorName: string
+  authorAvatar: string
+  authorStage: number
+  content: string
+  createdAt: string
+}
+
+export interface CreateBlogCommentInput {
+  postId: string
+  content: string
+  userId?: string
+}
+
+/**
+ * Server Function: Get comments for a blog post.
+ */
+export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFnArgs<string>): Promise<BlogCommentEntry[]> => {
+  if (!postId) return []
+  const dbClient = context?.db || getDb()
+  try {
+    const records = await dbClient
+      .select({
+        id: blogComments.id,
+        postId: blogComments.postId,
+        userId: blogComments.userId,
+        authorName: blogComments.authorName,
+        authorAvatar: blogComments.authorAvatar,
+        content: blogComments.content,
+        createdAt: blogComments.createdAt,
+        profileStage: profiles.stage,
+      })
+      .from(blogComments)
+      .leftJoin(profiles, eq(blogComments.userId, profiles.id))
+      .where(eq(blogComments.postId, postId))
+      .orderBy(desc(blogComments.createdAt))
+
+    return records.map((r: any) => ({
+      id: r.id,
+      postId: r.postId,
+      userId: r.userId,
+      authorName: r.authorName,
+      authorAvatar: r.authorAvatar,
+      authorStage: r.profileStage ?? 1,
+      content: r.content,
+      createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
+    }))
+  } catch (err) {
+    console.warn(`[getBlogCommentsFn] Error loading comments for postId ${postId}:`, err)
+    return []
+  }
+}
+
+export const getBlogCommentsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((postId: string) => postId)
+  .handler(getBlogCommentsHandler)
+
+/**
+ * Server Function: Create a blog comment (Authenticated registered users only).
+ */
+export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<CreateBlogCommentInput>): Promise<BlogCommentEntry> => {
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  if (!userId) {
+    throw new Error('Unauthenticated: You must be registered and logged in to post comments.')
+  }
+
+  if (!data?.postId || !data?.content) {
+    throw new Error('Invalid input: Post ID and comment content are required.')
+  }
+
+  // Guardrail 1: Clean & sanitize input
+  const sanitizedContent = data.content.trim().replace(/<[^>]*>?/gm, '')
+
+  // Guardrail 2: Length validation
+  if (sanitizedContent.length < 3) {
+    throw new Error('Guardrail trigger: Comment must be at least 3 characters long.')
+  }
+  if (sanitizedContent.length > 1000) {
+    throw new Error('Guardrail trigger: Comment exceeds maximum limit of 1000 characters.')
+  }
+
+  // Guardrail 3: Basic toxicity / link spam filter
+  const prohibitedPatterns = [/http:\/\//i, /https:\/\//i, /free money/i, /crypto scam/i]
+  for (const pattern of prohibitedPatterns) {
+    if (pattern.test(sanitizedContent)) {
+      throw new Error('Guardrail trigger: Your transmission contained restricted external links or promotional content.')
+    }
+  }
+
+  await ensureUserProfile(userId)
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+
+  const [userProfile] = await dbClient
+    .select()
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  const authorName = userProfile?.larvaId || (context?.user as any)?.name || 'Ascendant Initiate'
+  const authorAvatar = '/images/stage1_larva.png'
+
+  const [inserted] = await dbClient
+    .insert(blogComments)
+    .values({
+      postId: data.postId,
+      userId: userId,
+      authorName,
+      authorAvatar,
+      content: sanitizedContent,
+    })
+    .returning()
+
+  return {
+    id: inserted.id,
+    postId: inserted.postId,
+    userId: inserted.userId,
+    authorName: inserted.authorName,
+    authorAvatar: inserted.authorAvatar,
+    authorStage: userProfile?.stage ?? 1,
+    content: inserted.content,
+    createdAt: inserted.createdAt ? new Date(inserted.createdAt).toISOString() : new Date().toISOString(),
+  }
+}
+
+export const createBlogCommentFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: CreateBlogCommentInput) => {
+    return z
+      .object({
+        postId: z.string().min(1),
+        content: z.string().min(3).max(1000),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(createBlogCommentHandler)
+
+
 
 
 
