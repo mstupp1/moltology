@@ -8,7 +8,7 @@ describe('BlogTopSlider', () => {
     const handleSelect = vi.fn()
     render(<BlogTopSlider posts={INITIAL_BLOG_POSTS} onSelectPost={handleSelect} />)
 
-    expect(screen.getByText('FEATURED TRANSMISSION // #01')).toBeInTheDocument()
+    expect(screen.getByText(/LEAD NEWS DISPATCH \/\/ BREAKING COVERAGE #01/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
         'From Prompt Engineering to Bio-Silicon Cognition: Why AI Courses are Stage 1 of Carcinization'
@@ -24,7 +24,7 @@ describe('BlogTopSlider', () => {
     const nextBtn = screen.getByLabelText('Next slide')
     fireEvent.click(nextBtn)
 
-    expect(screen.getByText('FEATURED TRANSMISSION // #02')).toBeInTheDocument()
+    expect(screen.getByText(/LEAD NEWS DISPATCH \/\/ BREAKING COVERAGE #02/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
         'Test-Time Compute & Autonomous Swarm Orchestration: Benthic Protocol 2026'
@@ -51,7 +51,7 @@ describe('BlogTopSlider', () => {
     const handleSelect = vi.fn()
     render(<BlogTopSlider posts={INITIAL_BLOG_POSTS} onSelectPost={handleSelect} />)
 
-    const openBtn = screen.getByText('OPEN TRANSMISSION')
+    const openBtn = screen.getByText('READ DISPATCH')
     fireEvent.click(openBtn)
 
     expect(handleSelect).toHaveBeenCalledWith(INITIAL_BLOG_POSTS[0].slug)
@@ -66,6 +66,6 @@ describe('BlogTopSlider', () => {
     )[0]
     fireEvent.click(thirdPostThumb)
 
-    expect(screen.getByText('FEATURED TRANSMISSION // #03')).toBeInTheDocument()
+    expect(screen.getByText(/LEAD NEWS DISPATCH \/\/ BREAKING COVERAGE #03/)).toBeInTheDocument()
   })
 })

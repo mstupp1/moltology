@@ -15,7 +15,7 @@ import {
   Home,
   ShoppingBag,
   ExternalLink,
-  BookOpen,
+  Newspaper,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { HeaderBrand } from '@/components/ui'
@@ -23,7 +23,7 @@ import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 
 export interface PublicHeaderProps {
-  activePage?: 'home' | 'org' | 'blog' | 'store'
+  activePage?: 'home' | 'org' | 'blog' | 'news' | 'store'
   onOpenAuth?: (mode: 'login' | 'signup') => void
 }
 
@@ -41,9 +41,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   }
 
   const currentTab = useMemo(() => {
-    if (locationPathname.startsWith('/blog')) return 'blog'
+    if (locationPathname.startsWith('/news') || locationPathname.startsWith('/blog')) return 'news'
     if (locationPathname.startsWith('/org')) return 'org'
     if (locationPathname === '/') return 'home'
+    if (activePage === 'blog') return 'news'
     return activePage
   }, [activePage, locationPathname])
 
@@ -98,16 +99,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           </button>
 
           <button
-            onClick={() => onNavigate('/blog')}
+            onClick={() => onNavigate('/news')}
             className={`relative px-4 py-2 rounded-full text-xs font-grotesk font-extrabold tracking-wider transition-all duration-300 flex items-center gap-2 ${
-              currentTab === 'blog'
+              currentTab === 'news'
                 ? 'bg-gradient-to-r from-cyan-950 via-cyan-900 to-cyan-950 text-cyan-300 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,255,255,0.3)]'
                 : 'text-gray-400 hover:text-cyan-300 hover:bg-[#121c1d]/60'
             }`}
           >
-            <BookOpen className={`w-3.5 h-3.5 ${currentTab === 'blog' ? 'text-cyan-300' : 'text-gray-400'}`} />
-            <span>BLOG</span>
-            {currentTab === 'blog' && (
+            <Newspaper className={`w-3.5 h-3.5 ${currentTab === 'news' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <span>NEWS</span>
+            {currentTab === 'news' && (
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse" />
             )}
           </button>
