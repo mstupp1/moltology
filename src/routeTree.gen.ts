@@ -31,6 +31,7 @@ import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
 import { Route as HudOracleRouteImport } from './routes/_hud/oracle'
 import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
+import { Route as HudPodcastsRouteImport } from './routes/_hud/podcasts'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
@@ -146,6 +147,11 @@ const HudPipelineRoute = HudPipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => HudRoute,
 } as any)
+const HudPodcastsRoute = HudPodcastsRouteImport.update({
+  id: '/podcasts',
+  path: '/podcasts',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudSupportRoute = HudSupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/pipeline': typeof HudPipelineRoute
+  '/podcasts': typeof HudPodcastsRoute
   '/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/pipeline': typeof HudPipelineRoute
+  '/podcasts': typeof HudPodcastsRoute
   '/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/_hud/market': typeof HudMarketRoute
   '/_hud/oracle': typeof HudOracleRoute
   '/_hud/pipeline': typeof HudPipelineRoute
+  '/_hud/podcasts': typeof HudPodcastsRoute
   '/_hud/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/oracle'
     | '/pipeline'
+    | '/podcasts'
     | '/support'
     | '/blog/$slug'
     | '/news/$slug'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/oracle'
     | '/pipeline'
+    | '/podcasts'
     | '/support'
     | '/blog/$slug'
     | '/news/$slug'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/_hud/market'
     | '/_hud/oracle'
     | '/_hud/pipeline'
+    | '/_hud/podcasts'
     | '/_hud/support'
     | '/blog/$slug'
     | '/news/$slug'
@@ -520,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudPipelineRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/podcasts': {
+      id: '/_hud/podcasts'
+      path: '/podcasts'
+      fullPath: '/podcasts'
+      preLoaderRoute: typeof HudPodcastsRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/support': {
       id: '/_hud/support'
       path: '/support'
@@ -570,6 +589,7 @@ interface HudRouteChildren {
   HudMarketRoute: typeof HudMarketRoute
   HudOracleRoute: typeof HudOracleRoute
   HudPipelineRoute: typeof HudPipelineRoute
+  HudPodcastsRoute: typeof HudPodcastsRoute
   HudSupportRoute: typeof HudSupportRoute
 }
 
@@ -585,6 +605,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudMarketRoute: HudMarketRoute,
   HudOracleRoute: HudOracleRoute,
   HudPipelineRoute: HudPipelineRoute,
+  HudPodcastsRoute: HudPodcastsRoute,
   HudSupportRoute: HudSupportRoute,
 }
 
