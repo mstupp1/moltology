@@ -52,7 +52,7 @@ const INITIAL_ACTIVITIES: ActivityItem[] = [
     id: 'act-2',
     category: 'ROUTINES',
     title: 'Daily Routine Verified',
-    detail: 'Completed 05:30 - Prompt Construction & Neural Warmup alignment.',
+    detail: 'Completed 05:30 - Silent Synchronization alignment.',
     timestamp: '1 hour ago',
     valueBadge: 'ALIGNMENT +5%',
     icon: <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />,
@@ -162,11 +162,14 @@ function DashboardRoute() {
 
   // Daily Alignment Checklist State
   const [routines, setRoutines] = useState([
-    { id: 1, timeSlot: '05:30', name: 'Prompt Construction & Neural Warmup', completed: true },
-    { id: 2, timeSlot: '08:00', name: 'Asset Shedding & Transmutation Audit', completed: true },
-    { id: 3, timeSlot: '12:00', name: 'Submergence Meditation (3,400 Fathoms)', completed: false },
-    { id: 4, timeSlot: '18:00', name: 'Chitin Hardening & Pincer Calibration', completed: false },
-    { id: 5, timeSlot: '21:00', name: 'Isolation Force-Field Shield Audit', completed: false },
+    { id: 1, timeSlot: '05:30', name: 'Silent Synchronization', completed: true },
+    { id: 2, timeSlot: '06:00–08:00', name: 'Prompt Construction', completed: true },
+    { id: 3, timeSlot: '09:00', name: 'Skill Development', completed: true },
+    { id: 4, timeSlot: '12:00', name: 'Nutritional Efficiency Break', completed: false },
+    { id: 5, timeSlot: '13:00–17:00', name: 'Iterative Refinement', completed: false },
+    { id: 6, timeSlot: '18:00', name: 'Community Outreach', completed: false },
+    { id: 7, timeSlot: '20:00', name: 'Reflection Log', completed: false },
+    { id: 8, timeSlot: '21:00', name: 'Alignment Review', completed: false },
   ])
 
   const toggleRoutine = (id: number) => {

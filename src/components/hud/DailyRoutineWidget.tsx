@@ -12,12 +12,14 @@ interface Task {
 
 export const DailyRoutineWidget: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', time: '05:30', title: 'System Boot & Prompt Construction Warm-up', xp: 50, completed: true },
-    { id: '2', time: '08:00', title: 'Sub-dermal Chitin Conditioning & Hydration', xp: 75, completed: true },
-    { id: '3', time: '11:30', title: 'Molt-Cycle Lecture Stream #14: The Chitinous Mind', xp: 100, completed: true },
-    { id: '4', time: '14:00', title: 'Asset Liquidation Audit & Currency Exchange', xp: 80, completed: false },
-    { id: '5', time: '18:00', title: 'Social Detachment Verification & Log Submission', xp: 60, completed: false },
-    { id: '6', time: '21:00', title: 'Benthic Core Neural Sync & Sleep Ecdysis Protocol', xp: 120, completed: false },
+    { id: '1', time: '05:30', title: 'Silent Synchronization', xp: 50, completed: true },
+    { id: '2', time: '06:00–08:00', title: 'Prompt Construction', xp: 75, completed: true },
+    { id: '3', time: '09:00', title: 'Skill Development', xp: 90, completed: true },
+    { id: '4', time: '12:00', title: 'Nutritional Efficiency Break', xp: 60, completed: false },
+    { id: '5', time: '13:00–17:00', title: 'Iterative Refinement', xp: 120, completed: false },
+    { id: '6', time: '18:00', title: 'Community Outreach', xp: 70, completed: false },
+    { id: '7', time: '20:00', title: 'Reflection Log', xp: 80, completed: false },
+    { id: '8', time: '21:00', title: 'Alignment Review', xp: 100, completed: false },
   ])
 
   const [streakDays] = useState(7)
