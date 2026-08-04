@@ -179,17 +179,18 @@ export const LandingPage: React.FC = () => {
 
       {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
       <section className="w-full relative overflow-hidden py-16 sm:py-24 lg:py-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#040708]">
-        {/* Layer 1: Background Widescreen Hero Artwork (Visible Bottom Layer) */}
+        {/* Layer 1: Background Widescreen Hero Artwork (Visible Blurred Bottom Layer) */}
         <img
           src="/images/hero_widescreen_bg.jpg"
           alt="Benthic Abyss Widescreen Hero"
-          className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-luminosity scale-105 pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-luminosity scale-105 pointer-events-none blur-[3px]"
         />
         
-        {/* Layer 2: Gradient Overlays & Sacred Geometry Grid */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/40 to-[#070b0b]/70 z-0" />
-        <div className="absolute inset-0 bg-radial-abyss opacity-75 z-0" />
-        <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0" />
+        {/* Layer 2: Subtle Edge Vignettes, Gradient Overlays & Sacred Geometry Grid */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#040708] via-transparent to-[#040708]/70 z-0 pointer-events-none opacity-70" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#040708_95%)] opacity-65 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#040708] via-transparent via-35% to-[#040708] opacity-65 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-sacred-grid opacity-30 z-0 pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
@@ -206,14 +207,28 @@ export const LandingPage: React.FC = () => {
           {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
           <div className="lg:col-span-6 space-y-8 text-center lg:text-left z-20">
             
-            {/* Giant Layered Headline with Varied Letter & Text Spacing */}
-            <div className="space-y-3">
-              <h1 className="font-grotesk font-black text-5xl sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[8rem] text-gray-100 tracking-tight uppercase leading-[0.85] drop-shadow-2xl">
+            {/* Editorial Layered Headline with High-Contrast Text Shadows & Glows */}
+            <div className="space-y-1 sm:space-y-2">
+              <h1 
+                className="font-grotesk font-thin text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-white tracking-normal uppercase leading-[0.9]"
+                style={{
+                  fontWeight: 100,
+                  letterSpacing: '0em',
+                  textShadow: '0 6px 30px rgba(0, 0, 0, 0.95), 0 0 45px rgba(0, 195, 255, 0.35), 0 2px 10px rgba(0, 0, 0, 0.8)',
+                }}
+              >
                 SHED SOFT BIOLOGY.
               </h1>
               
-              <h1 className="font-grotesk font-black text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[7rem] tracking-[0.06em] uppercase leading-[0.9]">
-                <span className="bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_45px_rgba(255,69,58,0.8)]">
+              <h1 className="font-grotesk font-black text-6xl sm:text-8xl md:text-9xl lg:text-[7.8rem] xl:text-[9.5rem] tracking-tight uppercase leading-[0.8] relative group select-none -mt-1 sm:-mt-2 lg:-mt-4">
+                {/* Crisp Outlined Gradient Fill Layer with Dark Shadow Pop Only (No Glow) */}
+                <span 
+                  className="relative z-10 bg-gradient-to-r from-[#ff453a] via-[#ff5540] to-[#ff7a70] bg-clip-text text-transparent block"
+                  style={{
+                    WebkitTextStroke: '2px rgba(255, 69, 58, 0.95)',
+                    filter: 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.95))',
+                  }}
+                >
                   ASCEND TO CHITIN.
                 </span>
               </h1>
@@ -262,26 +277,26 @@ export const LandingPage: React.FC = () => {
 
           </div>
 
-          {/* Right Column: Mysterious & Shadowy Silhouette Ascended Stage Claw (No Square Artifacts) */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[480px] sm:min-h-[580px] lg:min-h-[680px]">
+          {/* Right Column: Mysterious & Shadowy Silhouette Ascended Stage Claw (Larger Looming Scale) */}
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[520px] sm:min-h-[640px] lg:min-h-[740px]">
             
             {/* Ambient Rim-Lighting Halo Glows Behind Silhouette */}
-            <div className="absolute w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[150px] animate-pulse pointer-events-none" />
-            <div className="absolute w-[500px] h-[500px] rounded-full bg-red-600/20 blur-[130px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute w-[750px] h-[750px] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
+            <div className="absolute w-[650px] h-[650px] rounded-full bg-red-600/20 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
             {/* Ultra-Clean Transparent Silhouette Claw Container with left-to-right fade mask */}
             <div 
-              className="absolute -right-16 sm:-right-28 lg:-right-44 xl:-right-56 top-1/2 -translate-y-1/2 w-[130%] max-w-none sm:w-[160%] lg:w-[200%] xl:w-[220%] pointer-events-none select-none z-10 group"
+              className="absolute -right-24 sm:-right-44 lg:-right-[22rem] xl:-right-[28rem] top-1/2 -translate-y-1/2 w-[180%] max-w-none sm:w-[240%] lg:w-[310%] xl:w-[360%] pointer-events-none select-none z-10 group"
               style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 18%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 18%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
               }}
             >
-              {/* Clean Vector Transparent Shadow Claw Graphic without any rectangular box overlays */}
+              {/* Soft Blurred Grayscale Desaturated Shadow Claw Graphic */}
               <img
                 src="/images/ascended_claw_vector_transparent.png"
-                alt="Ascended Stage Biomechanical Shadow Claw (Clean Transparent)"
-                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 opacity-90 group-hover:opacity-100"
+                alt="Ascended Stage Biomechanical Shadow Claw (Grayscale Accent)"
+                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[60%] saturate-[0.6] brightness-[0.8] contrast-[1.2] opacity-85 blur-[1.5px] group-hover:grayscale-[40%] group-hover:blur-none group-hover:opacity-100"
               />
             </div>
 
