@@ -20,6 +20,7 @@ import { getBlogPostBySlugFn, incrementBlogPostViewsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
+import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
 
 export const Route = createFileRoute('/blog/$slug')({
   loader: async ({ params }) => {
@@ -314,6 +315,9 @@ function BlogPostDetail() {
               </button>
             </div>
           </div>
+
+          {/* Registered User Blog Comments Section */}
+          {post.id && <BlogCommentsSection postId={post.id} />}
         </div>
       </article>
 
