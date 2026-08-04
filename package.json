@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && tsc --noEmit",
+    "build": "npm run db:migrate && npm run db:rls && vite build && tsc --noEmit",
     "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "test": "vitest run",
