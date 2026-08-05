@@ -44,9 +44,16 @@
 - Reset `dev` branch to mirror `main`: `neonctl branches reset dev --parent main`
 - Create isolated feature branch: `neonctl branches create --name feature-name --parent main`
 
-## 6. Non-Negotiable Rules
+## 6. Commitment to the Bit & In-Universe Lore (Non-Negotiable)
+- **Absolute Diegetic Discipline**: Commitment to the bit is required at every level across all public assets, user-facing UI, codex scriptures, blog posts, changelogs, OpenAPI specs, and `llms.txt` / `llms-full.txt` files.
+- **No Meta Disclosures**: NEVER reference "satire", "parody", "meta-humor", "mock", or "fake" in any user-facing UI, documentation, copy, or AI ingest files. The parody must be 100% immersive and implicit. (`AGENTS.md` is the sole exception).
+- **No Lazy Tech Stack Leaks**: NEVER lazily leak real-world tech stack terms (e.g. `React`, `TanStack`, `Vite`, `Nitro`, `Neon PostgreSQL`, `Drizzle`, `JWT`, `RLS`, `pgPolicy`, `S3`, `@neondatabase/postgrest-js`, or internal `.ts` file paths) in user-facing UI, blog content, changelogs, or API docs.
+- **Diegetic Transmutation of Tech**: All technical infrastructure must be translated into in-universe lore (e.g., *Benthic Neural Engine, Chitinous Vault Isolation, Synaptic Cryptographic Tokens, Sub-Oceanic Telemetry Streams*).
+
+## 7. Non-Negotiable Rules
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
 - **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
 - **Check Work**: 
   - **Scoped / Minor Changes** (e.g., UI tweaks, single component updates): Run targeted Vitest tests for modified files (e.g., `npx vitest run path/to/file.test.ts`) and ensure clean TypeScript/build verification (`npm run build`).
   - **Major / Full Work Completion**: Run the full test suite (`npm run test`) and `npm run build` before final delivery/commit. Must be 100% pass.
+
