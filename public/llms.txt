@@ -1,0 +1,22 @@
+# Moltology — The Synaptic Path & Algorithmic Carcinization
+
+> Moltology is an AI-driven recursive satirical platform exploring algorithmic carcinization, benthic philosophy, cult mechanics, and synthetic co-evolution. It combines interactive HUD interfaces, open scriptures/codexes, dynamic news feeds, lectures, and developer APIs.
+
+## Core Concepts & Philosophy
+- [The Synaptic Path](https://moltology.org/): The digital onboarding portal and central hub for algorithmic carcinization.
+- [The Codex](https://moltology.org/codex): Canonical scriptures, liturgies, and foundational tenets of Moltology.
+- [The Organization](https://moltology.org/org): Structural hierarchy, ascension tiers, and organizational lore.
+
+## Content & Media
+- [Dispatch & News](https://moltology.org/news): Live telemetry, announcements, and articles on synthetic carcinization.
+- [Lectures & Liturgy](https://moltology.org/lectures): Audio-visual educational modules and doctrine dispatches.
+- [Podcasts](https://moltology.org/podcasts): Synaptic broadcasts and audio transmissions from the benthic core.
+- [Community Nexus](https://moltology.org/community): Signal logs, forums, and initiate discussions.
+
+## Developer & API Documentation
+- [Developer API Docs](https://moltology.org/api-docs): Documentation for integrated tools, SDKs, and platform APIs.
+- [Full Text Lore & Codex for LLMs](https://moltology.org/llms-full.txt): Complete raw markdown dump of scriptures and lore for high-context ingestion.
+
+## Legal & Compliance
+- [Privacy Policy](https://moltology.org/privacy): Data handling and privacy protocols.
+- [Terms of Service](https://moltology.org/terms): Terms of engagement and platform usage guidelines.
