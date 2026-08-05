@@ -44,13 +44,17 @@ export function useAlignmentReminders(
     }
   }
 
-  const [remindersEnabled, setRemindersEnabled] = useState<boolean>(() => {
+  const [remindersEnabled, setRemindersEnabled] = useState<boolean>(enabledInitially)
+
+  // Sync state with localStorage post-hydration on client side
+  useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const stored = localStorage.getItem('moltology_alignment_reminders_enabled')
-      if (stored !== null) return stored === 'true'
+      if (stored !== null) {
+        setRemindersEnabled(stored === 'true')
+      }
     }
-    return enabledInitially
-  })
+  }, [])
 
   // Ref to track triggered task keys to avoid duplicate toasts on the same date
   const triggeredKeysRef = useRef<Set<string>>(new Set())

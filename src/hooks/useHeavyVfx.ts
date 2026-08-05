@@ -11,12 +11,10 @@ import {
  * Custom React hook for subscribing to & toggling Heavy Portal Visual FX state.
  */
 export function useHeavyVfx() {
-  const [heavyVfxDisabled, setDisabledState] = useState<boolean>(() =>
-    isHeavyVfxDisabled()
-  )
+  const [heavyVfxDisabled, setDisabledState] = useState<boolean>(false)
 
   useEffect(() => {
-    // Initial sync in case SSR hydration differed
+    // Sync with localStorage on client post-hydration
     setDisabledState(isHeavyVfxDisabled())
 
     const handleCustomEvent = (e: Event) => {

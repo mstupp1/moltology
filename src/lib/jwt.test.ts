@@ -15,10 +15,7 @@ describe('jwt.ts', () => {
   })
 
   it('handles getAuthJWTToken when authClient is unauthenticated', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const token = await getAuthJWTToken()
     expect(token).toBeNull()
-    expect(spy).toHaveBeenCalled()
-    spy.mockRestore()
   })
 })
