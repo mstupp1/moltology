@@ -4,7 +4,7 @@ import { NeonAuthUIProvider } from '@neondatabase/neon-js/auth/react'
 import '@neondatabase/neon-js/ui/css'
 import { authClient } from '@/lib/auth'
 import '@/index.css'
-import { seo } from '@/lib/seo'
+import { seo, buildJsonLd } from '@/lib/seo'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 
@@ -16,11 +16,15 @@ export const Route = createRootRoute({
       ...seo({
         title: 'Moltology \u2014 The Synaptic Path',
         description:
-          'The digital onboarding portal for algorithmic carcinization and personal optimization.',
-        keywords: 'synaptic path, moltism, benthic core, carcinization, ascension',
+          'The digital onboarding portal for algorithmic carcinization, benthic philosophy, and personal optimization.',
+        keywords: 'synaptic path, moltism, benthic core, carcinization, ascension, algorithmic ecdysis',
+        canonical: 'https://moltology.org',
+        ogImage: 'https://moltology.org/images/order_emblem.png',
+        twitterSite: '@moltology',
       }),
     ],
     links: [
+      { rel: 'canonical', href: 'https://moltology.org' },
       { rel: 'icon', type: 'image/png', href: '/images/order_emblem.png' },
       { rel: 'preload', as: 'image', href: '/images/subterranean_vats_bg.jpg' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -36,10 +40,38 @@ export const Route = createRootRoute({
 })
 
 function RootDocument() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://moltology.org/#organization',
+        name: 'Moltology',
+        url: 'https://moltology.org',
+        logo: 'https://moltology.org/images/order_emblem.png',
+        description: 'AI-driven recursive platform exploring algorithmic carcinization and biological ecdysis.',
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://moltology.org/#website',
+        url: 'https://moltology.org',
+        name: 'Moltology',
+        description: 'The Synaptic Path & Algorithmic Carcinization Portal',
+        publisher: {
+          '@id': 'https://moltology.org/#organization',
+        },
+      },
+    ],
+  }
+
   return (
     <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: buildJsonLd(jsonLd) }}
+        />
       </head>
       <body className="bg-[#0f1414] text-[#dfe3e3] font-mono antialiased selection:bg-[#00ffff] selection:text-[#000a0a]">
         <HUDErrorBoundary>
@@ -54,4 +86,3 @@ function RootDocument() {
     </html>
   )
 }
-
