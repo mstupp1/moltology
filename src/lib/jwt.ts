@@ -24,11 +24,8 @@ export async function verifyNeonJWT(token: string) {
  */
 export async function getAuthJWTToken(): Promise<string | null> {
   try {
-    if (typeof (authClient as any).getJWTToken === 'function') {
-      return await (authClient as any).getJWTToken()
-    }
     const session = await (authClient as any).getSession()
-    return session?.data?.session?.token || null
+    return session?.data?.session?.token || session?.data?.token || null
   } catch (err) {
     console.error('Error fetching JWT token from Neon Auth:', err)
     return null
