@@ -41,6 +41,16 @@ export function useHeavyVfx() {
     }
   }, [])
 
+  // Sync body class for global CSS rules
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (heavyVfxDisabled) {
+      document.body.classList.add('vfx-disabled')
+    } else {
+      document.body.classList.remove('vfx-disabled')
+    }
+  }, [heavyVfxDisabled])
+
   const setDisabled = useCallback((val: boolean) => {
     setHeavyVfxDisabled(val)
   }, [])

@@ -208,6 +208,14 @@ input[type="range"].stat-slider::-moz-range-thumb {
   background-size: 4px 4px;
 }
 
+/* Global VFX Disabled Performance Mode Overrides */
+body.vfx-disabled .crt-scanlines,
+body.vfx-disabled .crt-grain,
+.vfx-disabled .crt-scanlines,
+.vfx-disabled .crt-grain {
+  display: none !important;
+}
+
 /* Horizontal Stock Ticker Marquee Animation */
 @keyframes hud-marquee {
   0% { transform: translateX(0%); }
