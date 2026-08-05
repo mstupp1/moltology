@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Clock, Calendar, RefreshCw, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap } from 'lucide-react'
+import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 
@@ -41,7 +41,6 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
   const [time, setTime] = useState<Date>(new Date())
   const [is24Hour, setIs24Hour] = useState(true)
   const [mode, setMode] = useState<TimezoneMode>('LOCAL')
-  const [soundEnabled, setSoundEnabled] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
 
@@ -72,32 +71,9 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     return () => clearInterval(timer)
   }, [mounted])
 
-  // Optional Web Audio synth tick
-  const playTickSound = () => {
-    if (!soundEnabled || typeof window === 'undefined') return
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
-      if (!AudioCtx) return
-      const ctx = new AudioCtx()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(880, ctx.currentTime)
-      gain.gain.setValueAtTime(0.015, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04)
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.start()
-      osc.stop(ctx.currentTime + 0.05)
-    } catch {
-      // Ignore audio context errors if blocked by browser policy
-    }
-  }
-
   // Handle manual resync click
   const handleResync = () => {
     setIsSyncing(true)
-    playTickSound()
     setTimeout(() => {
       setTime(new Date())
       setIsSyncing(false)
@@ -112,7 +88,6 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
         prev.map(t => (t.id === taskId ? { ...t, completed: !t.completed } : t))
       )
     }
-    playTickSound()
   }
 
   // Format digital numbers with leading zeros
@@ -243,7 +218,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
               {/* Quick 12H/24H, Mode & Reminder buttons */}
               <div className="flex items-center gap-1 text-[10px]">
                 <button
-                  onClick={(e) => { e.stopPropagation(); toggleReminders(); playTickSound(); }}
+                  onClick={(e) => { e.stopPropagation(); toggleReminders(); }}
                   className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded flex items-center gap-1"
                   title="Toggle automated 10m prior toast reminders"
                 >
@@ -259,13 +234,13 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                   <span>TEST</span>
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setIs24Hour(!is24Hour); playTickSound(); }}
+                  onClick={(e) => { e.stopPropagation(); setIs24Hour(!is24Hour); }}
                   className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded"
                 >
                   {is24Hour ? '24H' : '12H'}
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setMode(mode === 'LOCAL' ? 'UTC' : mode === 'UTC' ? 'BENTHIC' : 'LOCAL'); playTickSound(); }}
+                  onClick={(e) => { e.stopPropagation(); setMode(mode === 'LOCAL' ? 'UTC' : mode === 'UTC' ? 'BENTHIC' : 'LOCAL'); }}
                   className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded"
                 >
                   {mode}
@@ -422,7 +397,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
               {(['LOCAL', 'UTC', 'BENTHIC', 'STARDATE'] as TimezoneMode[]).map(m => (
                 <button
                   key={m}
-                  onClick={() => { setMode(m); playTickSound(); }}
+                  onClick={() => setMode(m)}
                   className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors ${
                     mode === m
                       ? 'bg-[#00c3ff] text-[#02080a] shadow-[0_0_8px_rgba(0,195,255,0.6)]'
@@ -436,24 +411,11 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
 
             {/* 12H / 24H Toggle */}
             <button
-              onClick={() => { setIs24Hour(!is24Hour); playTickSound(); }}
+              onClick={() => setIs24Hour(!is24Hour)}
               className="px-2 py-1 bg-[#071214] hover:bg-[#0e1f23] border border-[#00c3ff]/30 text-[#00c3ff] font-bold text-[10px] rounded transition-colors"
               title="Toggle 12/24 hour format"
             >
               {is24Hour ? '24H' : '12H'}
-            </button>
-
-            {/* Sound Toggle */}
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`p-1.5 bg-[#071214] border rounded transition-colors ${
-                soundEnabled
-                  ? 'border-[#00c3ff] text-[#00c3ff]'
-                  : 'border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'
-              }`}
-              title={soundEnabled ? 'Disable tick audio' : 'Enable tick audio'}
-            >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
             </button>
 
             {/* Resync Button */}

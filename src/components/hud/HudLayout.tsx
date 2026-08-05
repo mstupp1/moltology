@@ -9,6 +9,7 @@ import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanva
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
+import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
@@ -19,6 +20,7 @@ function HudContent() {
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
+  const { heavyVfxDisabled } = useHeavyVfx()
 
   const isPending = sessionRes?.isPending
   const targetId = isPending ? null : userId || 'guest'
@@ -100,6 +102,7 @@ function HudContent() {
             '/images/bubble_variant_3.jpg',
           ]}
           chromaKeyMode="black"
+          disabled={heavyVfxDisabled}
           className="absolute inset-0 pointer-events-none z-[1] opacity-85"
         />
 

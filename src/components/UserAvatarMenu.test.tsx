@@ -76,4 +76,24 @@ describe('UserAvatarMenu Component', () => {
 
     expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
   })
+
+  it('renders Heavy VFX toggle switch inside dropdown menu and toggles state', () => {
+    localStorage.clear()
+    render(<UserAvatarMenu user={mockUser} />)
+
+    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
+    fireEvent.click(avatarBtn)
+
+    expect(screen.getByText('Disable Heavy VFX')).toBeInTheDocument()
+    expect(screen.getByText('VFX Active (Full Graphics)')).toBeInTheDocument()
+
+    const toggleBtn = screen.getByRole('switch', { name: /disable heavy vfx toggle/i })
+    expect(toggleBtn).toHaveAttribute('aria-checked', 'false')
+
+    fireEvent.click(toggleBtn)
+
+    expect(toggleBtn).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByText('VFX Off (Performance Mode)')).toBeInTheDocument()
+    expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
+  })
 })

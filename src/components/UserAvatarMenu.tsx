@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut } from 'lucide-react'
+import { LogOut, Eye, EyeOff, Sparkles } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { UserAvatar } from './UserAvatar'
+import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 
 export interface UserAvatarMenuProps {
   user: {
@@ -22,7 +23,7 @@ export interface UserAvatarMenuProps {
 /**
  * Standardized HUD User Avatar Dropdown Menu component.
  * Displays user profile image / letter avatar badge which opens a dropdown
- * containing user details (name, email) and sign-out action.
+ * containing user details (name, email), Heavy VFX toggle, and sign-out action.
  */
 export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   user,
@@ -33,6 +34,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
 
   const handleToggle = () => setIsOpen((prev) => !prev)
   const handleClose = () => setIsOpen(false)
@@ -132,10 +134,45 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
 
-
+          {/* Heavy VFX Toggle Settings Section */}
+          <div className="py-2.5 px-0.5 border-b border-[#121c1d]">
+            <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#091012]/80 border border-cyan-900/40 hover:border-cyan-700/60 transition-all">
+              <div className="flex items-center gap-2 min-w-0">
+                {heavyVfxDisabled ? (
+                  <EyeOff className="w-4 h-4 text-amber-400/90 shrink-0" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-[#00c3ff] shrink-0" />
+                )}
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[11px] font-bold text-[#dfe3e3] truncate">
+                    Disable Heavy VFX
+                  </span>
+                  <span className="text-[9px] text-[#7a8e9e] truncate">
+                    {heavyVfxDisabled ? 'VFX Off (Performance Mode)' : 'VFX Active (Full Graphics)'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={heavyVfxDisabled}
+                aria-label="Disable heavy vfx toggle"
+                onClick={toggleHeavyVfx}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
+                  heavyVfxDisabled ? 'bg-cyan-950/80 border-cyan-700/50' : 'bg-[#00c3ff]'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    heavyVfxDisabled ? 'translate-x-0 bg-gray-400' : 'translate-x-4 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
 
           {/* Sign Out Action Button */}
-          <div className="pt-2 border-t border-[#121c1d]">
+          <div className="pt-2">
             <button
               type="button"
               onClick={handleSignOut}

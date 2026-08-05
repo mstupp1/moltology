@@ -33,6 +33,10 @@ export interface UnderwaterBubblesCanvasProps {
    * Chroma key color mode for custom image assets: 'green' | 'black' | 'auto'. Defaults to 'black'.
    */
   chromaKeyMode?: 'green' | 'black' | 'auto'
+  /**
+   * Disables canvas particle physics & animation frame loop when true.
+   */
+  disabled?: boolean
 }
 
 const DEFAULT_BUBBLE_VARIANTS = [
@@ -232,10 +236,13 @@ export function UnderwaterBubblesCanvas({
   customBubbleSrc,
   customBubbleSrcs,
   chromaKeyMode = 'black',
+  disabled = false,
 }: UnderwaterBubblesCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
+    if (disabled) return
+
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -542,7 +549,11 @@ export function UnderwaterBubblesCanvas({
       window.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [bubbleCount, customBubbleSrc, customBubbleSrcs, chromaKeyMode])
+  }, [bubbleCount, customBubbleSrc, customBubbleSrcs, chromaKeyMode, disabled])
+
+  if (disabled) {
+    return null
+  }
 
   return (
     <canvas
