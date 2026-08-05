@@ -62,12 +62,12 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     setMounted(true)
   }, [])
 
-  // Timer ticker loop (runs smoothly every 50ms for sub-second milliseconds display)
+  // Timer ticker loop (runs once per second globally)
   useEffect(() => {
     if (!mounted) return
     const timer = setInterval(() => {
       setTime(new Date())
-    }, 50)
+    }, 1000)
     return () => clearInterval(timer)
   }, [mounted])
 

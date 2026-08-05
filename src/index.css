@@ -216,6 +216,17 @@ body.vfx-disabled .crt-grain,
   display: none !important;
 }
 
+body.vfx-disabled *,
+.vfx-disabled * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.vfx-disabled [class*="drop-shadow-"],
+.vfx-disabled [class*="drop-shadow-"] {
+  filter: none !important;
+}
+
 /* Horizontal Stock Ticker Marquee Animation */
 @keyframes hud-marquee {
   0% { transform: translateX(0%); }
