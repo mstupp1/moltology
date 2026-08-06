@@ -63,7 +63,6 @@ The codebase is built on **TanStack Start (SSR)**, **Nitro**, **React**, **Vite*
 - Lectures: https://moltology.org/lectures
 - Podcasts: https://moltology.org/podcasts
 - Community Nexus: https://moltology.org/community
-- Developer API Docs: https://moltology.org/api-docs
 - Robots File: https://moltology.org/robots.txt
 - Sitemap: https://moltology.org/sitemap.xml
 - LLM Index: https://moltology.org/llms.txt
