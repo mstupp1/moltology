@@ -25,7 +25,6 @@ import {
   Plus,
   Minus,
   LayoutGrid,
-  Terminal,
   Radio,
   Biohazard,
 } from 'lucide-react'
@@ -183,12 +182,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           label: 'MOLTOLOGY SCIENCE',
           icon: FlaskConical,
           path: '/pipeline',
-        },
-        {
-          id: 'api-docs',
-          label: 'REST API DOCS',
-          icon: Terminal,
-          path: '/api-docs',
         },
       ],
     },

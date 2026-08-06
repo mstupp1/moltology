@@ -12,9 +12,6 @@
 - [Lectures & Liturgy](https://moltology.org/lectures): Audio-visual educational modules and doctrine dispatches.
 - [Podcasts](https://moltology.org/podcasts): Synaptic broadcasts and audio transmissions from the benthic core.
 - [Community Nexus](https://moltology.org/community): Signal logs, forums, and initiate discussions.
-
-## Developer & API Documentation
-- [Developer API Docs](https://moltology.org/api-docs): Documentation for integrated tools, SDKs, and platform APIs.
 - [Full Text Lore & Codex for LLMs](https://moltology.org/llms-full.txt): Complete raw markdown dump of scriptures and lore for high-context ingestion.
 
 ## Legal & Compliance

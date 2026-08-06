@@ -68,24 +68,6 @@ async function runMigration() {
     `)
     console.log('✓ RLS policies applied for blog_posts and blog_comments')
 
-    // Apply admin-role write policies (create/edit) for blog_posts on Neon Data API
-    await sql(`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'blog_posts_admin_full_policy') THEN
-          CREATE POLICY "blog_posts_admin_full_policy" ON "blog_posts" FOR ALL
-          WITH CHECK (
-            EXISTS (
-              SELECT 1 FROM profiles
-              WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
-                AND profiles.role IN ('admin', 'super_admin')
-            )
-          );
-        END IF;
-      END $$;
-    `)
-    console.log('✓ blog_posts admin create/edit policy applied (role: admin / super_admin)')
-
     // 4. Seed database with initial blog posts
     console.log('[MIGRATE] Running seed to populate blog_posts in Neon...')
     await seedDatabase()

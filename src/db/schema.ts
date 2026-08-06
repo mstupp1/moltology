@@ -195,23 +195,6 @@ export const blogPosts = pgTable('blog_posts', {
   pgPolicy('blog_posts_public_read_policy', {
     for: 'select',
     using: sql`"isPublished" = true`
-  }),
-  pgPolicy('blog_posts_admin_full_policy', {
-    for: 'all',
-    using: sql`
-      EXISTS (
-        SELECT 1 FROM profiles
-        WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
-          AND profiles.role IN ('admin', 'super_admin')
-      )
-    `,
-    withCheck: sql`
-      EXISTS (
-        SELECT 1 FROM profiles
-        WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
-          AND profiles.role IN ('admin', 'super_admin')
-      )
-    `
   })
 ])
 
