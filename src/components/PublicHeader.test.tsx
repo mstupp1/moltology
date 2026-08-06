@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { PublicHeader } from './PublicHeader'
 import { authClient } from '@/lib/auth-client'
 
@@ -23,10 +23,12 @@ describe('PublicHeader Navigation Component', () => {
     render(<PublicHeader activePage="home" />)
 
     expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /THE SYNAPTIC PATH/i })).toBeInTheDocument()
-    expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
-    
-    const storeLink = screen.getByRole('link', { name: /STORE/i })
+
+    const nav = screen.getByRole('navigation', { name: /main navigation/i })
+    expect(within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })).toBeInTheDocument()
+    expect(within(nav).getByText('ORGANIZATION')).toBeInTheDocument()
+
+    const storeLink = within(nav).getByRole('link', { name: /STORE/i })
     expect(storeLink).toBeInTheDocument()
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
   })
@@ -34,27 +36,29 @@ describe('PublicHeader Navigation Component', () => {
   it('highlights the active page route with flat pill capsule styling', () => {
     mockPathname = '/'
     const { rerender } = render(<PublicHeader activePage="home" />)
-    const homeBtn = screen.getByRole('button', { name: /THE SYNAPTIC PATH/i })
+    const nav = screen.getByRole('navigation', { name: /main navigation/i })
+    const homeBtn = within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })
     expect(homeBtn.className).toContain('text-cyan-300')
 
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
-    const orgBtn = screen.getByRole('button', { name: /ORGANIZATION/i })
+    const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', { name: /ORGANIZATION/i })
     expect(orgBtn.className).toContain('text-cyan-300')
   })
 
   it('automatically highlights NEWS tab for any /news sub-page article route', () => {
-    mockPathname = '/news/from-prompt-engineering-to-bio-silicon-cognition'
+    mockPathname = '/news/some-article'
     render(<PublicHeader />)
-    const blogBtn = screen.getByRole('button', { name: /NEWS/i })
+    const nav = screen.getByRole('navigation', { name: /main navigation/i })
+    const blogBtn = within(nav).getByRole('button', { name: /NEWS/i })
     expect(blogBtn.className).toContain('text-cyan-300')
   })
 
-  it('triggers authentication modal callback when clicking LOG IN / JOIN PATH', () => {
+  it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', () => {
     const onOpenAuth = vi.fn()
     render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
 
-    const loginBtn = screen.getByRole('button', { name: /LOG IN/i })
+    const loginBtn = screen.getAllByRole('button', { name: /LOG IN/i })[0]
     fireEvent.click(loginBtn)
     expect(onOpenAuth).toHaveBeenCalledWith('login')
   })
@@ -73,14 +77,34 @@ describe('PublicHeader Navigation Component', () => {
 
     render(<PublicHeader activePage="home" />)
 
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    expect(avatarBtn).toBeInTheDocument()
+    const avatarBtns = screen.getAllByRole('button', { name: /user account menu/i })
+    expect(avatarBtns.length).toBeGreaterThan(0)
 
-    // Click avatar button to reveal dropdown
+    const avatarBtn = avatarBtns[0]
     fireEvent.click(avatarBtn)
 
     expect(screen.getByText('Google User')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+  })
+
+  it('opens mobile menu with nav links and auth actions via hamburger toggle', () => {
+    const onOpenAuth = vi.fn()
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
+
+    const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+
+    // Mobile links are in the DOM but the dropdown is collapsed (max-h-0)
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+    const mobileLogin = screen.getAllByRole('button', { name: /LOG IN/i }).at(-1)!
+    fireEvent.click(mobileLogin)
+    expect(onOpenAuth).toHaveBeenCalledWith('login')
+    // closing menu on auth open
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('hides header when scrolling down past threshold and shows header when scrolling up', () => {
