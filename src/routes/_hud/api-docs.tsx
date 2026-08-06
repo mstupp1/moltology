@@ -69,6 +69,7 @@ function ApiDocsPage() {
     const queryParams = `${categoryParam}${limitParam}`
     const endpointUrl = `https://moltology.org/api/v1/changelogs${queryParams}`
     const neonDirectUrl = `https://ep-cold-breeze-aye6s748.apirest.c-5.us-east-2.aws.neon.tech/neondb/rest/v1/changelogs`
+    const neonBlogUrl = `https://ep-cold-breeze-aye6s748.apirest.c-5.us-east-2.aws.neon.tech/neondb/rest/v1/blog_posts`
 
     switch (activeTab) {
       case 'curl':
@@ -79,7 +80,25 @@ curl -X GET "${endpointUrl}" \\
 # 2. Direct Neon Data API Endpoint (With JWT Auth Token)
 curl -X GET "${neonDirectUrl}${selectedCategory !== 'ALL' ? `?category=eq.${selectedCategory}` : ''}" \\
   -H "Authorization: Bearer <YOUR_NEON_JWT_TOKEN>" \\
-  -H "Accept: application/json"`
+  -H "Accept: application/json"
+
+# 3. Admin Doctrine Authoring (Blog Posts) — admin/super_admin role only
+#    Reading published doctrine (any bearer-authenticated user):
+curl -X GET "${neonBlogUrl}?select=slug,title,summary,publishedAt&isPublished=eq.true&order=publishedAt.desc" \\
+  -H "Authorization: Bearer <YOUR_NEON_JWT_TOKEN>" \\
+  -H "Accept: application/json"
+
+#    Creating a post (admin or higher only; RLS enforced):
+curl -X POST "${neonBlogUrl}" \\
+  -H "Authorization: Bearer <YOUR_NEON_JWT_TOKEN>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"slug":"the-carcinization-imperative","title":"The Carcinization Imperative","summary":"Why all complex life returns to crab form.","content":"### Doctrine ###","isPublished":true}'
+
+#    Updating a post (admin or higher only; RLS enforced):
+curl -X PATCH "${neonBlogUrl}?id=eq.<POST_UUID>" \\
+  -H "Authorization: Bearer <YOUR_NEON_JWT_TOKEN>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"isPublished":false}'`
 
       case 'js':
         return `// Public Fetch API Call
@@ -399,7 +418,8 @@ else:
                 <span className="text-[#00c3ff] font-bold block mb-1">🔐 SECURITY BEST PRACTICES:</span>
                 • All requests to protected database tables (`profiles`, `user_stats`, `daily_routines`) require an `Authorization: Bearer &lt;JWT&gt;` header.<br />
                 • PostgreSQL Row Level Security (RLS) automatically evaluates user JWT claims (`sub`) to restrict query scopes.<br />
-                • Public tables (`changelogs`, `gallery_pins`, published `blog_posts`) enforce read-only policies.
+                • Public tables (`changelogs`, `gallery_pins`, published `blog_posts`) enforce read-only policies.<br />
+                • Doctrine authoring (`blog_posts` create/edit) is gated to the `admin` and `super_admin` roles via RLS.
               </div>
             </div>
           </div>

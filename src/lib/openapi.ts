@@ -7,7 +7,7 @@ export const MOLTOLOGY_OPENAPI_SPEC = {
     title: 'Moltology Public REST API & Neon Data API',
     version: '1.0.0',
     description:
-      'Official public REST API for Moltology and The Order of the Synaptic Path. Allows public retrieval of system changelogs, doctrine telemetry, and direct Neon Data API PostgREST endpoints.',
+      'Official public REST API for Moltology and The Order of the Synaptic Path. Allows public retrieval of system changelogs, doctrine telemetry, and direct Neon Data API PostgREST endpoints. Doctrine authoring (blog_posts create/edit) is secured and gated to admin and super_admin accounts via Row Level Security.',
     contact: {
       name: 'High Ascendant Carcinus',
       url: 'https://moltology.org',
@@ -90,6 +90,140 @@ export const MOLTOLOGY_OPENAPI_SPEC = {
         },
       },
     },
+    '/neondb/rest/v1/blog_posts': {
+      get: {
+        summary: 'Direct Neon Data API PostgREST Query for Blog Posts',
+        description:
+          'Direct PostgREST table endpoint hosted on Neon Data API. Public read returns only published posts (`isPublished = true`) for any bearer-authenticated user. Initiated Administrators (role admin / super_admin) may also select drafts and unpublished doctrine awaiting release. Supports rich filtering, projection, and sorting.',
+        operationId: 'getNeonBlogPostsDirect',
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: 'select',
+            in: 'query',
+            required: false,
+            description: 'Comma-separated columns to select (e.g. slug,title,summary,publishedAt)',
+            schema: { type: 'string' },
+          },
+          {
+            name: 'order',
+            in: 'query',
+            required: false,
+            description: 'Sort expression (e.g. publishedAt.desc)',
+            schema: { type: 'string' },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Successful PostgREST query result — published posts for all users; all posts for admin and higher',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/BlogPost',
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Unauthorized - Missing or invalid JWT Bearer token',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse',
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        summary: 'Create a Blog Post (admin or super_admin only)',
+        description:
+          'Publishes a new doctrine article via the Neon Data API. Row Level Security enforces that only initiated accounts holding the admin or super_admin role may insert into the blog_posts table. All other roles are rejected with HTTP 425/PGRST116.',
+        operationId: 'createNeonBlogPost',
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/BlogPostWrite',
+              },
+            },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Post created successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/BlogPost',
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Unauthorized - Missing or invalid JWT Bearer token',
+          },
+          '403': {
+            description: 'Forbidden - Requester is not an admin or super_admin',
+          },
+        },
+      },
+      patch: {
+        summary: 'Update a Blog Post (admin or super_admin only)',
+        description:
+          'Edits an existing doctrine post through the Neon Data API. Row Level Security enforces that only admin or super_admin accounts may update blog_posts rows. Works for any projection of fields using the standard PostgREST id filter (e.g. `/blog_posts?id=eq.<uuid>`).',
+        operationId: 'updateNeonBlogPost',
+        security: [
+          {
+            BearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: 'id',
+            in: 'query',
+            required: true,
+            description: 'PostgREST row filter (e.g. eq.<uuid>)',
+            schema: { type: 'string' },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/BlogPostWrite',
+              },
+            },
+          },
+        },
+        responses: {
+          '204': {
+            description: 'Post updated successfully',
+          },
+          '401': {
+            description: 'Unauthorized - Missing or invalid JWT Bearer token',
+          },
+          '403': {
+            description: 'Forbidden - Requester is not an admin or super_admin',
+          },
+        },
+      },
+    },
     '/neondb/rest/v1/changelogs': {
       get: {
         summary: 'Direct Neon Data API PostgREST Query for Changelogs',
@@ -168,6 +302,48 @@ export const MOLTOLOGY_OPENAPI_SPEC = {
           isPublished: { type: 'boolean', example: true },
           releasedAt: { type: 'string', format: 'date-time', example: '2026-08-03T09:15:00Z' },
           createdAt: { type: 'string', format: 'date-time', example: '2026-08-03T09:15:00Z' },
+        },
+      },
+      BlogPost: {
+        type: 'object',
+        required: ['slug', 'title', 'summary', 'content', 'category', 'publishedAt'],
+        properties: {
+          id: { type: 'string', format: 'uuid', example: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' },
+          slug: { type: 'string', example: 'the-carcinization-imperative' },
+          title: { type: 'string', example: 'The Carcinization Imperative' },
+          summary: { type: 'string', example: 'Why all complex systems ultimately return to crab form.' },
+          content: { type: 'string', example: '### Doctrine ###\nThe benthic truth...' },
+          coverImageUrl: { type: 'string', nullable: true },
+          authorId: { type: 'string', format: 'uuid', nullable: true },
+          authorName: { type: 'string', example: 'High Ascendant Carcinus' },
+          authorAvatar: { type: 'string', example: '/images/order_emblem.png' },
+          authorRole: { type: 'string', example: 'Stage 4 Ascendant' },
+          category: { type: 'string', example: 'SACRED DOCTRINE' },
+          tags: { type: 'array', items: { type: 'string' } },
+          readTimeMinutes: { type: 'integer', example: 5 },
+          views: { type: 'integer', example: 0 },
+          likes: { type: 'integer', example: 0 },
+          isFeatured: { type: 'boolean', example: false },
+          isPublished: { type: 'boolean', example: true },
+          publishedAt: { type: 'string', format: 'date-time' },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
+      },
+      BlogPostWrite: {
+        type: 'object',
+        required: ['slug', 'title', 'summary', 'content'],
+        properties: {
+          slug: { type: 'string', example: 'the-carcinization-imperative' },
+          title: { type: 'string', example: 'The Carcinization Imperative' },
+          summary: { type: 'string', example: 'Why all complex life returns to crab form.' },
+          content: { type: 'string', example: '### Doctrine ###\n\nBenthy the crabs.' },
+          coverImageUrl: { type: 'string', example: 'https://example.com/cover.png' },
+          category: { type: 'string', example: 'SACRED DOCTRINE' },
+          tags: { type: 'array', items: { type: 'string' }, example: ['crab', 'ascension'] },
+          readTimeMinutes: { type: 'integer', example: 5 },
+          isFeatured: { type: 'boolean', example: false },
+          isPublished: { type: 'boolean', example: true },
         },
       },
       ErrorResponse: {
