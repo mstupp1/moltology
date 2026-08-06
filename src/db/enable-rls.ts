@@ -170,6 +170,42 @@ async function applyRLS() {
 
     console.log('✓ RLS policies configured for forum_categories, forum_topics, and forum_posts')
 
+    // Enable RLS & admin write access for Blog Posts (create/edit gated to admin+)
+    await sql`ALTER TABLE IF EXISTS blog_posts ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS blog_comments ENABLE ROW LEVEL SECURITY;`
+
+    await sql`DROP POLICY IF EXISTS blog_posts_public_read_policy ON blog_posts;`
+    await sql`CREATE POLICY blog_posts_public_read_policy ON blog_posts FOR SELECT USING ("isPublished" = true);`
+
+    await sql`DROP POLICY IF EXISTS blog_posts_admin_full_policy ON blog_posts;`
+    await sql`
+      CREATE POLICY blog_posts_admin_full_policy ON blog_posts
+      FOR ALL
+      USING (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+      )
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+      );
+    `
+
+    await sql`DROP POLICY IF EXISTS blog_comments_public_read_policy ON blog_comments;`
+    await sql`CREATE POLICY blog_comments_public_read_policy ON blog_comments FOR SELECT USING (true);`
+
+    await sql`DROP POLICY IF EXISTS blog_comments_insert_policy ON blog_comments;`
+    await sql`CREATE POLICY blog_comments_insert_policy ON blog_comments FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    console.log('✓ RLS policies configured for blog_posts and blog_comments')
+
     console.log('✓ Row Level Security (RLS) policies successfully created!')
 
   } catch (error) {

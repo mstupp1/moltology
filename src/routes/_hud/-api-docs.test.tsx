@@ -15,6 +15,12 @@ describe('Public REST API & Documentation Telemetry', () => {
     expect(MOLTOLOGY_OPENAPI_SPEC.info.title).toContain('Moltology Public REST API')
     expect(MOLTOLOGY_OPENAPI_SPEC.paths['/changelogs']).toBeDefined()
     expect(MOLTOLOGY_OPENAPI_SPEC.paths['/neondb/rest/v1/changelogs']).toBeDefined()
+    expect(MOLTOLOGY_OPENAPI_SPEC.paths['/neondb/rest/v1/blog_posts']).toBeDefined()
+    expect(MOLTOLOGY_OPENAPI_SPEC.paths['/neondb/rest/v1/blog_posts'].get).toBeDefined()
+    expect(MOLTOLOGY_OPENAPI_SPEC.paths['/neondb/rest/v1/blog_posts'].post).toBeDefined()
+    expect(MOLTOLOGY_OPENAPI_SPEC.paths['/neondb/rest/v1/blog_posts'].patch).toBeDefined()
+    expect(MOLTOLOGY_OPENAPI_SPEC.components.schemas.BlogPost).toBeDefined()
+    expect(MOLTOLOGY_OPENAPI_SPEC.components.schemas.BlogPostWrite).toBeDefined()
   })
 
   it('executes getPublicChangelogsRestApiHandler with security headers & category filtering', async () => {
