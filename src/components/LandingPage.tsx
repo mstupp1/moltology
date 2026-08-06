@@ -232,7 +232,7 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-1 sm:space-y-2 relative">
               {/* TOP LAYER: SHED SOFT BIOLOGY (z-30, sits above claw) */}
               <h1 
-                className="relative z-30 font-grotesk font-thin text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8.5rem] text-white opacity-100 tracking-tight uppercase leading-[0.9]"
+                className="relative font-grotesk font-thin text-[clamp(2rem,6.5vw,8.5rem)] sm:text-[clamp(3rem,6vw,8.5rem)] text-white opacity-100 tracking-tight uppercase leading-[0.9]"
                 style={{
                   fontWeight: 200,
                   color: '#ffffff',
@@ -246,7 +246,7 @@ export const LandingPage: React.FC = () => {
               </h1>
               
               {/* ASCEND TO CHITIN (z-30, sits above claw) */}
-              <h1 className="relative z-30 font-grotesk font-black text-6xl sm:text-8xl md:text-9xl lg:text-[7.8rem] xl:text-[9.5rem] tracking-tight uppercase leading-[0.8] group select-none -mt-1 sm:-mt-2 lg:-mt-4">
+              <h1 className="relative font-grotesk font-black text-[clamp(2.4rem,7.8vw,9.5rem)] sm:text-[clamp(3.5rem,7.2vw,9.5rem)] tracking-tight uppercase leading-[0.8] group select-none -mt-0.5 sm:-mt-2 lg:-mt-4">
                 {/* Luminous Red Chitin Textured Layer */}
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
@@ -307,11 +307,11 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck + Looming Crab Claw Silhouette */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[550px] sm:min-h-[640px] lg:min-h-[700px] z-20">
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[360px] sm:min-h-[540px] lg:min-h-[700px] z-20">
             
             {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck (Pure Diffuse Lighting, No Box Containers) */}
-            <div className="absolute w-[750px] h-[750px] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
-            <div className="absolute w-[650px] h-[650px] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
+            <div className="absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
             {/* BACKGROUND ACCENT LAYER: Looming Transparent Crab Claw Background Layer (z-10) */}
             <div 
