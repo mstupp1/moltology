@@ -15,6 +15,8 @@ import {
   ShoppingBag,
   ExternalLink,
   Newspaper,
+  Menu,
+  X,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { HeaderBrand } from '@/components/ui'
@@ -49,13 +51,17 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     return activePage
   }, [activePage, locationPathname])
 
-  const onNavigate = (path: string) => navigate({ to: path })
+  const onNavigate = (path: string) => {
+    navigate({ to: path })
+    setMobileOpen(false)
+  }
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
   const targetTab = hoveredTab || currentTab
 
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
@@ -142,7 +148,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           ref={navRef}
           onMouseLeave={() => setHoveredTab(null)}
           aria-label="Main Navigation"
-          className="relative hidden md:flex items-center gap-0.5 bg-[#080d0e]/80 border border-cyan-950/80 p-1 rounded-full backdrop-blur-md"
+          className="relative hidden lg:flex items-center gap-0.5 bg-[#080d0e]/80 border border-cyan-950/80 p-1 rounded-full backdrop-blur-md"
         >
           {/* Smooth Continuous Sliding Active Pill Background */}
           <div
@@ -227,6 +233,17 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
         {/* Header Action Items */}
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          {/* Mobile Hamburger Menu Toggle */}
+          <button
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileOpen}
+            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#080d0e]/80 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+
+          <div className="hidden lg:flex items-center gap-3 sm:gap-4">
           {user ? (
             <div className="flex items-center gap-3">
               <button
@@ -255,6 +272,98 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   <span>JOIN PATH</span>
                 </span>
               </BenthicCTAButton>
+            </div>
+          )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Dropdown Menu */}
+      <div
+        className={`lg:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
+          mobileOpen ? 'max-h-[480px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="mt-3 px-2 pb-2 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
+          <button
+            onClick={() => onNavigate('/')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'home' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            }`}
+          >
+            <img src="/images/order_emblem.png" alt="" className="w-4 h-4 object-contain" />
+            <span>THE SYNAPTIC PATH</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('/news')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'news' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            }`}
+          >
+            <Newspaper className="w-4 h-4" />
+            <span>NEWS</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('/org')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'org' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            }`}
+          >
+            <Building2 className="w-4 h-4" />
+            <span>ORGANIZATION</span>
+          </button>
+
+          <a
+            href="https://www.etsy.com/shop/SaasTrash"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider text-amber-300 hover:bg-cyan-950/30 transition-colors"
+          >
+            <span className="flex items-center gap-3">
+              <ShoppingBag className="w-4 h-4 text-amber-400" />
+              <span>STORE</span>
+            </span>
+            <ExternalLink className="w-3.5 h-3.5 text-amber-500 opacity-70" />
+          </a>
+
+          {/* Divider */}
+          <div className="border-t border-cyan-950/80 pt-2 mt-1" />
+
+          {user ? (
+            <div className="space-y-2">
+              <button
+                onClick={() => onNavigate('/dashboard')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-sm uppercase tracking-wider transition-colors"
+              >
+                <Cpu className="w-4 h-4" />
+                <span>DASHBOARD</span>
+              </button>
+              <div className="flex items-center justify-center">
+                <UserAvatarMenu user={user} onNavigate={onNavigate} />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-stretch gap-2">
+              <button
+                onClick={() => { setMobileOpen(false); onOpenAuth?.('login') }}
+                className="flex-1 px-4 py-3 text-gray-300 hover:text-cyan-400 text-sm font-bold tracking-wider transition-colors border border-cyan-950/60 rounded-lg bg-[#080d0e]/60"
+              >
+                LOG IN
+              </button>
+              <div className="flex-1">
+                <BenthicCTAButton
+                  size="sm"
+                  fullWidth
+                  onClick={() => { setMobileOpen(false); onOpenAuth?.('signup') }}
+                >
+                  <span className="flex items-center justify-center gap-1.5">
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>JOIN PATH</span>
+                  </span>
+                </BenthicCTAButton>
+              </div>
             </div>
           )}
         </div>
