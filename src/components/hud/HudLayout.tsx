@@ -52,6 +52,13 @@ function HudContent() {
     return () => window.removeEventListener('toggle-ai-drawer', handleToggle)
   }, [oracle])
 
+  // Replay Initiation Broadcast (lobster click) — relaunch welcome splash
+  useEffect(() => {
+    const handleRelaunch = () => setShowWelcome(true)
+    window.addEventListener('launch-welcome-splash', handleRelaunch)
+    return () => window.removeEventListener('launch-welcome-splash', handleRelaunch)
+  }, [])
+
   // Preload background images so transitions happen instantly without network delay
   useEffect(() => {
     if (typeof window !== 'undefined') {
