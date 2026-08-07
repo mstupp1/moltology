@@ -142,6 +142,37 @@ async function applyRLS() {
         )
       );
     `
+    await sql`DROP POLICY IF EXISTS changelogs_admin_update_policy ON changelogs;`
+    await sql`
+      CREATE POLICY changelogs_admin_update_policy ON changelogs
+      FOR UPDATE
+      USING (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+      )
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+      );
+    `
+    await sql`DROP POLICY IF EXISTS changelogs_admin_delete_policy ON changelogs;`
+    await sql`
+      CREATE POLICY changelogs_admin_delete_policy ON changelogs
+      FOR DELETE
+      USING (
+        EXISTS (
+          SELECT 1 FROM profiles
+          WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+      );
+    `
     console.log('✓ RLS and schema initialized for changelogs table')
 
     // Enable RLS for Forum Tables

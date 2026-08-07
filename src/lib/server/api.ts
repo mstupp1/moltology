@@ -154,6 +154,120 @@ export const createChangelogFn = createServerFn({ method: 'POST' })
   })
   .handler(createChangelogHandler)
 
+interface UpdateChangelogInput extends CreateChangelogInput {
+  id: string
+  releasedAt?: string | Date
+}
+
+/**
+ * Server Function: Update an existing system changelog entry (Admin / Super Admin only).
+ */
+export const updateChangelogHandler = async ({ data, context }: ServerFnArgs<UpdateChangelogInput>) => {
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  if (!userId) {
+    throw new Error('Unauthenticated: Authentication required to edit system changelogs.')
+  }
+
+  await ensureUserProfile(userId)
+
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const [userRecord] = await dbClient
+    .select({ role: profiles.role })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  if (!userRecord || !['admin', 'super_admin'].includes(userRecord.role)) {
+    throw new Error('Unauthorized: Admin or Super Admin privileges required to edit changelogs.')
+  }
+
+  if (!data?.id) {
+    throw new Error('Input payload missing changelog id for update.')
+  }
+
+  const [updated] = await dbClient
+    .update(changelogs)
+    .set({
+      version: data.version,
+      title: data.title,
+      category: data.category,
+      summary: data.summary,
+      content: data.content,
+      isPublished: data.isPublished !== false,
+      releasedAt: data.releasedAt ? new Date(data.releasedAt) : new Date(),
+    })
+    .where(eq(changelogs.id, data.id))
+    .returning()
+
+  return toChangelogEntry(updated)
+}
+
+export const updateChangelogFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: UpdateChangelogInput) => {
+    return z.object({
+      id: z.string().min(1),
+      version: z.string().min(1),
+      title: z.string().min(1),
+      category: z.string().min(1),
+      summary: z.string().min(1),
+      content: z.string().min(1),
+      isPublished: z.boolean().optional(),
+      userId: z.string().optional(),
+      releasedAt: z.union([z.string(), z.date()]).optional(),
+    }).parse(data)
+  })
+  .handler(updateChangelogHandler)
+
+interface DeleteChangelogInput {
+  id: string
+  userId?: string
+}
+
+/**
+ * Server Function: Delete a system changelog entry (Admin / Super Admin only).
+ */
+export const deleteChangelogHandler = async ({ data, context }: ServerFnArgs<DeleteChangelogInput>) => {
+  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  if (!userId) {
+    throw new Error('Unauthenticated: Authentication required to delete system changelogs.')
+  }
+
+  await ensureUserProfile(userId)
+
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const [userRecord] = await dbClient
+    .select({ role: profiles.role })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  if (!userRecord || !['admin', 'super_admin'].includes(userRecord.role)) {
+    throw new Error('Unauthorized: Admin or Super Admin privileges required to delete changelogs.')
+  }
+
+  if (!data?.id) {
+    throw new Error('Input payload missing changelog id for deletion.')
+  }
+
+  const [deleted] = await dbClient
+    .delete(changelogs)
+    .where(eq(changelogs.id, data.id))
+    .returning()
+
+  return toChangelogEntry(deleted)
+}
+
+export const deleteChangelogFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: DeleteChangelogInput) => {
+    return z.object({
+      id: z.string().min(1),
+      userId: z.string().optional(),
+    }).parse(data)
+  })
+  .handler(deleteChangelogHandler)
+
 
 
 /**

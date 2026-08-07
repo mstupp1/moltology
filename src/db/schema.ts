@@ -108,6 +108,27 @@ export const changelogs = pgTable('changelogs', {
       WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
         AND profiles.role IN ('admin', 'super_admin')
     )`
+  }),
+  pgPolicy('changelogs_admin_update_policy', {
+    for: 'update',
+    using: sql`EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        AND profiles.role IN ('admin', 'super_admin')
+    )`,
+    withCheck: sql`EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        AND profiles.role IN ('admin', 'super_admin')
+    )`
+  }),
+  pgPolicy('changelogs_admin_delete_policy', {
+    for: 'delete',
+    using: sql`EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        AND profiles.role IN ('admin', 'super_admin')
+    )`
   })
 ])
 
