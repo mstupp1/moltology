@@ -53,33 +53,22 @@ export const userStats = pgTable('user_stats', {
   })
 ])
 
-// Liquidated Assets Table
-export const assets = pgTable('assets', {
+// Routine Alignment Practices Table (Recurring, streak-tracked daily rituals)
+export const routines = pgTable('routines', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  assetType: text('assetType').notNull(), // Real Estate, Vehicles, Luxury Goods, Cash Reserves
-  description: text('description').notNull(),
-  estimatedValueUsd: decimal('estimatedValueUsd', { precision: 12, scale: 2 }).notNull(),
-  moltCreditsReceived: decimal('moltCreditsReceived', { precision: 12, scale: 2 }).notNull(),
-  status: text('status').default('TRANSMUTED').notNull(),
+  title: text('title').notNull(),
+  description: text('description'),
+  timeSlot: text('timeSlot').notNull(), // e.g. "05:30", "06:00–08:00"
+  category: text('category').default('DISCIPLINE').notNull(),
+  icon: text('icon').default('Activity').notNull(),
+  recurrence: jsonb('recurrence').$type<{ daysOfWeek: number[] }>().default({ daysOfWeek: [] }).notNull(), // 0=Sun..6=Sat, empty = every day
+  streakCount: integer('streakCount').default(0).notNull(),
+  lastCompletedAt: timestamp('lastCompletedAt'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
-  pgPolicy('assets_isolation_policy', {
-    for: 'all',
-    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
-  })
-])
-
-// Daily Alignment Routines
-export const dailyRoutines = pgTable('daily_routines', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
-  timeSlot: text('timeSlot').notNull(), // e.g. "05:30 - Prompt Construction"
-  description: text('description').notNull(),
-  completed: boolean('completed').default(false).notNull(),
-  date: text('date').notNull(),
-}, (table) => [
-  pgPolicy('daily_routines_isolation_policy', {
+  pgPolicy('routines_isolation_policy', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })

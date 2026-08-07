@@ -3,8 +3,7 @@ import {
   MOCK_SEED_USERS,
   MOCK_SEED_AUTH_USERS,
   MOCK_SEED_USER_STATS,
-  MOCK_SEED_ASSETS,
-  MOCK_SEED_DAILY_ROUTINES,
+  MOCK_SEED_ROUTINES,
   seedDatabase,
 } from './seed'
 import { resetDatabase } from './reset'
@@ -35,23 +34,16 @@ describe('Database Seed Data & CLI Utilities', () => {
     }
   })
 
-  it('contains valid mock liquidated assets', () => {
-    expect(MOCK_SEED_ASSETS.length).toBeGreaterThan(0)
-    for (const asset of MOCK_SEED_ASSETS) {
-      expect(asset.userId).toBeTruthy()
-      expect(asset.assetType).toBeTruthy()
-      expect(asset.description).toBeTruthy()
-      expect(asset.status).toBe('TRANSMUTED')
-    }
-  })
-
-  it('contains valid mock daily routines', () => {
-    expect(MOCK_SEED_DAILY_ROUTINES.length).toBeGreaterThan(0)
-    for (const routine of MOCK_SEED_DAILY_ROUTINES) {
+  it('contains valid mock routine practices with flexible scheduling', () => {
+    expect(MOCK_SEED_ROUTINES.length).toBeGreaterThan(0)
+    for (const routine of MOCK_SEED_ROUTINES) {
       expect(routine.userId).toBeTruthy()
+      expect(routine.title).toBeTruthy()
       expect(routine.timeSlot).toBeTruthy()
-      expect(routine.description).toBeTruthy()
-      expect(typeof routine.completed).toBe('boolean')
+      expect(routine.category).toBeTruthy()
+      expect(Array.isArray(routine.recurrence.daysOfWeek)).toBe(true)
+      expect(routine.recurrence.daysOfWeek.length).toBeGreaterThan(0)
+      expect(routine.streakCount).toBeGreaterThanOrEqual(0)
     }
   })
 

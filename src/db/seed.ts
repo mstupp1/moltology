@@ -104,100 +104,102 @@ export const MOCK_SEED_USER_STATS = [
   },
 ]
 
-export const MOCK_SEED_ASSETS = [
-  {
-    id: '00000000-0000-0000-0000-000000000101',
-    userId: '00000000-0000-0000-0000-000000000001',
-    assetType: 'Real Estate',
-    description: 'Sub-trench Hydrothermal Habitation Capsule',
-    estimatedValueUsd: '450000.00',
-    moltCreditsReceived: '4500.00',
-    status: 'TRANSMUTED',
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000102',
-    userId: '00000000-0000-0000-0000-000000000001',
-    assetType: 'Vehicles',
-    description: 'Pressurized Abyssal Transport Submersible',
-    estimatedValueUsd: '120000.00',
-    moltCreditsReceived: '1200.00',
-    status: 'TRANSMUTED',
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000103',
-    userId: '00000000-0000-0000-0000-000000000002',
-    assetType: 'Luxury Goods',
-    description: 'Benthic Titanium Exo-Skeleton Alloy',
-    estimatedValueUsd: '850000.00',
-    moltCreditsReceived: '8500.00',
-    status: 'TRANSMUTED',
-  },
-]
-
-export const MOCK_SEED_DAILY_ROUTINES = [
+export const MOCK_SEED_ROUTINES = [
   {
     id: '00000000-0000-0000-0000-000000000201',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Silent Synchronization',
+    description: 'Align neural baseline and initiate telemetry.',
     timeSlot: '05:30',
-    description: 'Silent Synchronization — Align neural baseline and initiate telemetry.',
-    completed: true,
-    date: '2026-08-02',
+    category: 'SYNCHRONIZATION',
+    icon: 'Brain',
+    recurrence: { daysOfWeek: [0, 1, 2, 3, 4, 5, 6] },
+    streakCount: 12,
+    lastCompletedAt: new Date('2026-08-06T05:30:00Z'),
   },
   {
     id: '00000000-0000-0000-0000-000000000202',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Prompt Construction',
+    description: 'Craft and etch operational prompts for the day.',
     timeSlot: '06:00–08:00',
-    description: 'Prompt Construction — Craft and etch operational prompts.',
-    completed: true,
-    date: '2026-08-02',
+    category: 'DEVELOPMENT',
+    icon: 'PenTool',
+    recurrence: { daysOfWeek: [1, 2, 3, 4, 5] },
+    streakCount: 9,
+    lastCompletedAt: new Date('2026-08-06T07:45:00Z'),
   },
   {
     id: '00000000-0000-0000-0000-000000000203',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Skill Development',
+    description: 'Expand capability matrix and learn new protocols.',
     timeSlot: '09:00',
-    description: 'Skill Development — Expand capability matrix and learn new protocols.',
-    completed: true,
-    date: '2026-08-02',
+    category: 'DISCIPLINE',
+    icon: 'BookOpen',
+    recurrence: { daysOfWeek: [0, 1, 2, 3, 4, 5, 6] },
+    streakCount: 3,
+    lastCompletedAt: new Date('2026-08-06T09:30:00Z'),
   },
   {
     id: '00000000-0000-0000-0000-000000000204',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Nutritional Efficiency Break',
+    description: 'Replenish core biological energy reserves.',
     timeSlot: '12:00',
-    description: 'Nutritional Efficiency Break — Replenish core biological energy.',
-    completed: false,
-    date: '2026-08-02',
+    category: 'REPLENISHMENT',
+    icon: 'UtensilsCrossed',
+    recurrence: { daysOfWeek: [0, 1, 2, 3, 4, 5, 6] },
+    streakCount: 12,
+    lastCompletedAt: new Date('2026-08-06T12:15:00Z'),
   },
   {
     id: '00000000-0000-0000-0000-000000000205',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Iterative Refinement',
+    description: 'Continuous synthesis and execution cycles.',
     timeSlot: '13:00–17:00',
-    description: 'Iterative Refinement — Continuous synthesis and execution cycles.',
-    completed: false,
-    date: '2026-08-02',
+    category: 'EXECUTION',
+    icon: 'Cpu',
+    recurrence: { daysOfWeek: [1, 2, 3, 4, 5] },
+    streakCount: 2,
+    lastCompletedAt: new Date('2026-08-06T16:20:00Z'),
   },
   {
     id: '00000000-0000-0000-0000-000000000206',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Community Outreach',
+    description: 'Broadcast neural updates to order initiates.',
     timeSlot: '18:00',
-    description: 'Community Outreach — Broadcast neural updates to order initiates.',
-    completed: false,
-    date: '2026-08-02',
+    category: 'OUTREACH',
+    icon: 'Radio',
+    recurrence: { daysOfWeek: [1, 3, 5] },
+    streakCount: 0,
+    lastCompletedAt: null,
   },
   {
     id: '00000000-0000-0000-0000-000000000207',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Reflection Log',
+    description: 'Document daily metrics, learnings, and telemetry.',
     timeSlot: '20:00',
-    description: 'Reflection Log — Document daily metrics, learnings, and telemetry.',
-    completed: false,
-    date: '2026-08-02',
+    category: 'REFLECTION',
+    icon: 'NotebookPen',
+    recurrence: { daysOfWeek: [0, 1, 2, 3, 4, 5, 6] },
+    streakCount: 12,
+    lastCompletedAt: new Date('2026-08-06T20:30:00Z'),
   },
   {
     id: '00000000-0000-0000-0000-000000000208',
     userId: '00000000-0000-0000-0000-000000000001',
+    title: 'Alignment Review',
+    description: 'Perform end-of-day alignment check and audit.',
     timeSlot: '21:00',
-    description: 'Alignment Review — Perform end-of-day alignment check and audit.',
-    completed: false,
-    date: '2026-08-02',
+    category: 'AUDIT',
+    icon: 'ShieldCheck',
+    recurrence: { daysOfWeek: [0, 1, 2, 3, 4, 5, 6] },
+    streakCount: 1,
+    lastCompletedAt: new Date('2026-08-05T21:10:00Z'),
   },
 ]
 
@@ -234,19 +236,12 @@ export async function seedDatabase(databaseUrl?: string) {
     }
     console.log(`✓ Seeded ${MOCK_SEED_USER_STATS.length} user stats records`)
 
-    // 3. Seed Assets
-    console.log('[SEED] Seeding assets...')
-    for (const a of MOCK_SEED_ASSETS) {
-      await db.insert(schema.assets).values(a).onConflictDoNothing()
+    // 3. Seed Routine Practices
+    console.log('[SEED] Seeding routine practices...')
+    for (const r of MOCK_SEED_ROUTINES) {
+      await db.insert(schema.routines).values(r).onConflictDoNothing()
     }
-    console.log(`✓ Seeded ${MOCK_SEED_ASSETS.length} asset entries`)
-
-    // 4. Seed Daily Routines
-    console.log('[SEED] Seeding daily routines...')
-    for (const r of MOCK_SEED_DAILY_ROUTINES) {
-      await db.insert(schema.dailyRoutines).values(r).onConflictDoNothing()
-    }
-    console.log(`✓ Seeded ${MOCK_SEED_DAILY_ROUTINES.length} daily routine entries`)
+    console.log(`✓ Seeded ${MOCK_SEED_ROUTINES.length} routine entries`)
 
     // 5. Seed Changelogs (Unique version seed)
     console.log('[SEED] Seeding system changelogs...')

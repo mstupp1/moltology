@@ -17,8 +17,7 @@ export async function resetDatabase(databaseUrl?: string) {
     // Truncate tables cleanly with CASCADE
     await sql`
       TRUNCATE TABLE 
-        daily_routines, 
-        assets, 
+        routines, 
         user_stats, 
         profiles, 
         changelogs,
@@ -35,8 +34,7 @@ export async function resetDatabase(databaseUrl?: string) {
       await sql`DROP TABLE IF EXISTS ai_messages CASCADE;`
       await sql`DROP TABLE IF EXISTS ai_threads CASCADE;`
       await sql`DROP TABLE IF EXISTS gallery_pins CASCADE;`
-      await sql`DROP TABLE IF EXISTS daily_routines CASCADE;`
-      await sql`DROP TABLE IF EXISTS assets CASCADE;`
+      await sql`DROP TABLE IF EXISTS routines CASCADE;`
       await sql`DROP TABLE IF EXISTS user_stats CASCADE;`
       await sql`DROP TABLE IF EXISTS sessions CASCADE;`
       await sql`DROP TABLE IF EXISTS accounts CASCADE;`
