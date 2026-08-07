@@ -189,8 +189,9 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
         transform: leaving ? 'scale(1.03)' : visible ? 'scale(1)' : 'scale(0.97)',
       }}
     >
-      {/* Backdrop */}
+      {/* Backdrop (click to dismiss) */}
       <div
+        onClick={handleDismiss}
         className="absolute inset-0 bg-[#030708]/95 backdrop-blur-md"
         style={{
           backgroundImage: `
@@ -221,6 +222,26 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
               'linear-gradient(90deg, transparent, #00ffff 30%, #00c8ff 70%, transparent)',
           }}
         />
+
+        {/* Close (X) button — top right */}
+        <button
+          onClick={handleDismiss}
+          aria-label="Close"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border border-[#00ffff]/25 text-[#5a8888] hover:text-[#00ffff] hover:border-[#00ffff]/60 hover:bg-[#00ffff]/10 transition-all duration-200 active:scale-95"
+        >
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
 
         {/* Header */}
         <div className="px-8 pt-8 pb-4 text-center">
