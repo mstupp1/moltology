@@ -47,6 +47,7 @@ function SupportPortalRoute() {
 
   // Admin User Role & Modal state
   const [userRole, setUserRole] = useState<string>('user')
+  const [authToken, setAuthToken] = useState<string | null>(null)
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false)
   const [editingEntry, setEditingEntry] = useState<ChangelogEntry | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ChangelogEntry | null>(null)
@@ -71,7 +72,10 @@ function SupportPortalRoute() {
     let isMounted = true
     getAuthJWTToken()
       .catch(() => null)
-      .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
+      .then((token) => {
+        if (isMounted) setAuthToken(token)
+        return getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } })
+      })
       .then((profile) => {
         if (isMounted) {
           const role = profile?.role || (user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : user?.role || 'user')
@@ -173,6 +177,7 @@ function SupportPortalRoute() {
           content: newContent,
           isPublished: newIsPublished,
           userId: user?.id,
+          token: authToken ?? undefined,
           releasedAt: editingEntry.releasedAt,
         })
         setChangelogs((prev) => prev.map((c) => (c.id === entry.id ? entry : c)))
@@ -186,6 +191,7 @@ function SupportPortalRoute() {
           content: newContent,
           isPublished: newIsPublished,
           userId: user?.id,
+          token: authToken ?? undefined,
         })
         setChangelogs((prev) => [entry, ...prev])
         setAdminMessage('✓ System Transmutation Log successfully published to database!')
@@ -205,7 +211,7 @@ function SupportPortalRoute() {
     setIsDeleting(true)
     setAdminMessage(null)
     try {
-      await deleteChangelog({ id: deleteTarget.id, userId: user?.id })
+      await deleteChangelog({ id: deleteTarget.id, userId: user?.id, token: authToken ?? undefined })
       setChangelogs((prev) => prev.filter((c) => c.id !== deleteTarget.id))
       setDeleteTarget(null)
       setAdminMessage('✓ System Transmutation Log purged from database!')
@@ -386,7 +392,9 @@ function SupportPortalRoute() {
             <div className="chitin-card p-8 text-center space-y-2 chamfer-corner">
               <AlertTriangle className="w-8 h-8 text-[#ff5540] mx-auto" />
               <p className="text-sm font-bold text-[#dfe3e3]">NO CHANGELOG TELEMETRY FOUND</p>
-              <p className="text-xs text-[#839493]">No records match your filter criteria "{searchQuery || selectedCategory}".</p>
+              <p className="text-xs text-[#839493]">
+                The system changelog is loaded straight from the database — no static fallback file is used. No records match your filter criteria "{searchQuery || selectedCategory}". If records exist but are missing, check the server logs for a `DB query failed` entry.
+              </p>
             </div>
           ) : (
             <div className="space-y-4 relative">

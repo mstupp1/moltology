@@ -5,7 +5,6 @@ import { publicMiddleware, authenticatedMiddleware } from './functions'
 import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, podcasts } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql } from 'drizzle-orm'
-import { INITIAL_CHANGELOGS } from '../changelogs-data'
 import type { ChangelogEntry } from '../changelogs-data'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
@@ -60,7 +59,9 @@ const toChangelogEntry = (r: {
 })
 
 /**
- * Server Function: Get public changelogs from database or initial seed data.
+ * Server Function: Get published changelogs directly from the database (authoritative).
+ * No static seed fallback: an unreachable/empty DB returns an empty array and logs an
+ * error so misconfigurations are surfaced instead of masquerading as seed data.
  */
 export const getPublicChangelogsHandler = async ({ context }: ServerFnArgs) => {
   const dbClient = context?.db || getDb()
@@ -71,14 +72,11 @@ export const getPublicChangelogsHandler = async ({ context }: ServerFnArgs) => {
       .where(eq(changelogs.isPublished, true))
       .orderBy(desc(changelogs.releasedAt))
 
-    if (records && records.length > 0) {
-      return records.map(toChangelogEntry)
-    }
+    return (records || []).map(toChangelogEntry)
   } catch (error) {
-    console.warn('[ServerFn getPublicChangelogsFn] DB query failed, using static fallback:', error)
+    console.error('[ServerFn getPublicChangelogsFn] DB query failed:', error)
+    return []
   }
-
-  return INITIAL_CHANGELOGS
 }
 
 export const getPublicChangelogsFn = createServerFn({ method: 'POST' })
@@ -93,22 +91,45 @@ interface CreateChangelogInput {
   content: string
   isPublished?: boolean
   userId?: string
+  token?: string
 }
 
 import { ensureUserProfile } from '../user-sync'
 
 /**
+ * Resolves the authenticated user id and RLS-scoped db client for admin changelog
+ * mutations. Mirrors getUserProfileHandler: falls back to an explicit Neon JWT in
+ * `data.token` because the JWT is not reliably available via cookies on the client.
+ */
+const resolveChangelogAuth = async (opts: { data?: { token?: string; userId?: string }; context?: any }) => {
+  const { data, context } = opts
+  const authToken = context?.token || data?.token || undefined
+  let userId = context?.user?.sub || context?.user?.id
+  if (!userId && authToken) {
+    const { verifyNeonJWT } = await import('../jwt')
+    const verification = await verifyNeonJWT(authToken)
+    if (verification.valid && verification.payload?.sub) {
+      userId = verification.payload.sub
+    }
+  }
+  if (!userId && data?.userId) {
+    userId = data.userId
+  }
+  const dbClient = context?.db || getDb(authToken)
+  return { userId, dbClient, authToken }
+}
+
+/**
  * Server Function: Create system changelog entry (Admin / Super Admin only).
  */
 export const createChangelogHandler = async ({ data, context }: ServerFnArgs<CreateChangelogInput>) => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  const { userId, dbClient } = await resolveChangelogAuth({ data, context })
   if (!userId) {
     throw new Error('Unauthenticated: Authentication required to create system changelogs.')
   }
 
   await ensureUserProfile(userId)
 
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
   const [userRecord] = await dbClient
     .select({ role: profiles.role })
     .from(profiles)
@@ -150,6 +171,7 @@ export const createChangelogFn = createServerFn({ method: 'POST' })
       content: z.string().min(1),
       isPublished: z.boolean().optional(),
       userId: z.string().optional(),
+      token: z.string().optional(),
     }).parse(data)
   })
   .handler(createChangelogHandler)
@@ -163,14 +185,13 @@ interface UpdateChangelogInput extends CreateChangelogInput {
  * Server Function: Update an existing system changelog entry (Admin / Super Admin only).
  */
 export const updateChangelogHandler = async ({ data, context }: ServerFnArgs<UpdateChangelogInput>) => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  const { userId, dbClient } = await resolveChangelogAuth({ data, context })
   if (!userId) {
     throw new Error('Unauthenticated: Authentication required to edit system changelogs.')
   }
 
   await ensureUserProfile(userId)
 
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
   const [userRecord] = await dbClient
     .select({ role: profiles.role })
     .from(profiles)
@@ -214,6 +235,7 @@ export const updateChangelogFn = createServerFn({ method: 'POST' })
       content: z.string().min(1),
       isPublished: z.boolean().optional(),
       userId: z.string().optional(),
+      token: z.string().optional(),
       releasedAt: z.union([z.string(), z.date()]).optional(),
     }).parse(data)
   })
@@ -222,20 +244,20 @@ export const updateChangelogFn = createServerFn({ method: 'POST' })
 interface DeleteChangelogInput {
   id: string
   userId?: string
+  token?: string
 }
 
 /**
  * Server Function: Delete a system changelog entry (Admin / Super Admin only).
  */
 export const deleteChangelogHandler = async ({ data, context }: ServerFnArgs<DeleteChangelogInput>) => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
+  const { userId, dbClient } = await resolveChangelogAuth({ data, context })
   if (!userId) {
     throw new Error('Unauthenticated: Authentication required to delete system changelogs.')
   }
 
   await ensureUserProfile(userId)
 
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
   const [userRecord] = await dbClient
     .select({ role: profiles.role })
     .from(profiles)
@@ -264,6 +286,7 @@ export const deleteChangelogFn = createServerFn({ method: 'POST' })
     return z.object({
       id: z.string().min(1),
       userId: z.string().optional(),
+      token: z.string().optional(),
     }).parse(data)
   })
   .handler(deleteChangelogHandler)

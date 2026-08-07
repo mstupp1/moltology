@@ -95,7 +95,7 @@ describe('Server Functions', () => {
     expect(authenticatedMiddleware).toBeDefined()
   })
 
-  it('should execute getPublicChangelogsHandler and return entries', async () => {
+  it('should execute getPublicChangelogsHandler and return entries (DB-authoritative)', async () => {
     const changelogs: ChangelogEntry[] = await getPublicChangelogsHandler({ data: undefined, context: {} })
     expect(Array.isArray(changelogs)).toBe(true)
     expect(changelogs.length).toBeGreaterThan(0)
