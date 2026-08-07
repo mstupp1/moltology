@@ -8,6 +8,7 @@ export interface OracleModel {
 }
 
 export const ORACLE_MODELS: OracleModel[] = [
+  { id: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', shortLabel: '4o Mini', provider: 'openai' },
   { id: 'deepseek/deepseek-v4-flash-0731', label: 'DeepSeek V4', shortLabel: 'V4', provider: 'deepseek' },
   { id: 'openai/gpt-5.6-luna', label: 'GPT-5.6 Luna', shortLabel: 'Luna', provider: 'openai' },
   {

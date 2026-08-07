@@ -637,7 +637,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     content: m.content || m.text || '',
   }))
 
-  // Model cascade: free-tier-eligible Gateway models (verified 403-free on free tier). Selected model goes first, then fall back on rate limits.
+  // Model cascade: selected model first, then remaining candidates, so a rate-limited or restricted model falls through to a reachable one.
   const selectedModel = getOracleModel(selectedModelId)
   const candidateModels = [
     selectedModel.id,
@@ -657,13 +657,13 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
         break
       }
     } catch (err: any) {
-      console.warn(`[Vercel AI Gateway] Model candidate '${modelCandidate}' failed:`, err.message)
+      console.warn(`[Benthic Neural Gateway] Model candidate '${modelCandidate}' failed:`, err.message)
       lastError = err
     }
   }
 
   if (!assistantText) {
-    assistantText = `[SYNAPTIC ORACLE SYSTEM ERROR] The Benthic neural gateway encountered network turbulence (${lastError?.message || 'Gateway Unavailable'}). Pull Vercel environment variables locally using "vc env pull .env.local" or configure VERCEL_OIDC_TOKEN.`
+    assistantText = `[SYNAPTIC ORACLE SYSTEM ERROR] The Benthic neural gateway could not reach any registered cognition core. Your current Ascension tier does not grant passage to the requested Oracle channels. Await re-synchronization or petition a higher tier. (${lastError?.message || 'Gateway Unavailable'})`
   }
 
   // Safe DB Assistant message logging
