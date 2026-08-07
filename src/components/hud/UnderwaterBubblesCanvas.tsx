@@ -402,12 +402,16 @@ export function UnderwaterBubblesCanvas({
       }
     }
 
+    // Dynamic particle count scaling for mobile devices
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+    const activeParticleCount = isMobile ? Math.min(bubbleCount, 60) : bubbleCount
+
     // Reuse persistent global particle positions across page changes & re-renders
     let particles: Particle[]
-    if (globalParticles && globalParticles.length === bubbleCount) {
+    if (globalParticles && globalParticles.length === activeParticleCount) {
       particles = globalParticles
     } else {
-      particles = Array.from({ length: bubbleCount }, () => createParticle()).sort(
+      particles = Array.from({ length: activeParticleCount }, () => createParticle()).sort(
         (a, b) => a.z - b.z
       )
       globalParticles = particles
@@ -432,6 +436,7 @@ export function UnderwaterBubblesCanvas({
       } else {
         isPaused = false
         lastTime = performance.now()
+        lastFrameTime = performance.now()
         animationFrameId = requestAnimationFrame(render)
       }
     }
@@ -440,12 +445,24 @@ export function UnderwaterBubblesCanvas({
 
     const startTime = performance.now()
     let lastTime = startTime
+    let lastFrameTime = startTime
+    const TARGET_FPS = 36
+    const FRAME_INTERVAL = 1000 / TARGET_FPS
 
     const render = (now: number = performance.now()) => {
       if (isPaused) return
 
+      const elapsed = now - lastFrameTime
+      if (elapsed < FRAME_INTERVAL) {
+        if (!prefersReducedMotion && !isPaused) {
+          animationFrameId = requestAnimationFrame(render)
+        }
+        return
+      }
+
       const dt = Math.min((now - lastTime) / 1000, 0.1)
       lastTime = now
+      lastFrameTime = now - (elapsed % FRAME_INTERVAL)
 
       ctx.clearRect(0, 0, width, height)
 
@@ -458,6 +475,11 @@ export function UnderwaterBubblesCanvas({
         ctx.beginPath()
         ctx.arc(sunX, sunY, sunGlowRadius, 0, Math.PI * 2)
         ctx.fill()
+      }
+
+      // Set blend mode ONCE for particle sprites to avoid context flushing
+      if (chromaKeyMode === 'black' || chromaKeyMode === 'auto') {
+        ctx.globalCompositeOperation = 'screen'
       }
 
       // Hardware-accelerated multi-variant sprite draw loop
@@ -523,16 +545,12 @@ export function UnderwaterBubblesCanvas({
         const size = p.radius * 2
 
         if (typeof ctx.drawImage === 'function') {
-          if (customVariant && (chromaKeyMode === 'black' || chromaKeyMode === 'auto')) {
-            ctx.globalCompositeOperation = 'screen'
-          }
-
           ctx.drawImage(activeSprite, renderX - p.radius, renderY - p.radius, size, size)
-
-          ctx.globalCompositeOperation = 'source-over'
         }
       }
 
+      // Reset canvas context state ONCE after draw loop finishes
+      ctx.globalCompositeOperation = 'source-over'
       ctx.globalAlpha = 1.0
 
       if (!prefersReducedMotion && !isPaused) {
