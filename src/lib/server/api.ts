@@ -17,6 +17,7 @@ import type { PodcastEpisode } from '../podcast-data'
 
 
 import { getPresignedViewUrl } from '../s3-client'
+import { ORACLE_MODELS, getOracleModel } from '../ai/oracle-models'
 
 type Db = ReturnType<typeof getDb>
 
@@ -568,13 +569,14 @@ interface SendChatMessageInput {
   messages: Array<{ role: string; content?: string; text?: string }>
   userId?: string
   threadId?: string
+  model?: string
 }
 
 /**
- * Server Function: Send a message to AI gateway (DeepSeek V4 / GPT-4o-mini fallback) with guardrails & DB persistence.
+ * Server Function: Send a message to the Benthic neural gateway (free-tier Oracle models) with guardrails & DB persistence.
  */
 export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<SendChatMessageInput>) => {
-  const { messages, userId: inputUserId, threadId: inputThreadId } = data || {}
+  const { messages, userId: inputUserId, threadId: inputThreadId, model: selectedModelId } = data || {}
   const authUserId = context?.user?.sub || context?.user?.id
   const userId = authUserId || inputUserId
 
@@ -635,8 +637,12 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     content: m.content || m.text || '',
   }))
 
-  // Model cascade: try DeepSeek V4 first; if free tier credit limit occurs on Gateway, fall back to gpt-4o-mini
-  const candidateModels = ['deepseek/deepseek-v4-flash-0731', 'openai/gpt-4o-mini']
+  // Model cascade: free-tier-eligible Gateway models (verified 403-free on free tier). Selected model goes first, then fall back on rate limits.
+  const selectedModel = getOracleModel(selectedModelId)
+  const candidateModels = [
+    selectedModel.id,
+    ...ORACLE_MODELS.filter((m) => m.id !== selectedModel.id).map((m) => m.id),
+  ]
   let lastError: Error | null = null
 
   for (const modelCandidate of candidateModels) {
@@ -653,22 +659,6 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     } catch (err: any) {
       console.warn(`[Vercel AI Gateway] Model candidate '${modelCandidate}' failed:`, err.message)
       lastError = err
-    }
-  }
-
-  if (!assistantText) {
-    try {
-      const { openai } = await import('@ai-sdk/openai')
-      const result = await generateText({
-        model: openai('gpt-4o-mini'),
-        system: systemPrompt,
-        messages: payloadMessages,
-      })
-      if (result.text) {
-        assistantText = result.text
-      }
-    } catch (err: any) {
-      console.warn('[AI SDK Direct OpenAI] Fallback failed:', err.message)
     }
   }
 
@@ -710,6 +700,7 @@ export const sendChatMessageFn = createServerFn({ method: 'POST' })
         ),
         userId: z.string().optional(),
         threadId: z.string().optional(),
+        model: z.string().optional(),
       })
       .parse(data)
   })

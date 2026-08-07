@@ -36,7 +36,6 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
           isCompact={false}
           onClose={handleClose}
           personaName="SYNAPTIC ORACLE"
-          modelName="deepseek/deepseek-v4-flash-0731"
           className="h-full border-none shadow-none"
         />
       </div>

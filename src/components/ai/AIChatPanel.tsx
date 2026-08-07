@@ -7,18 +7,19 @@ import {
   Minimize2,
   PanelRight,
   Maximize2,
+  ChevronDown,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { sendChatMessageFn, getAIMessagesFn } from '../../lib/server/api'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
+import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
 
 export interface AIChatPanelProps {
   userId?: string | null
   threadId?: string | null
   personaName?: string
-  modelName?: string
   onClose?: () => void
   onThreadCreated?: (newThreadId: string) => void
   isCompact?: boolean
@@ -43,7 +44,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   userId: propUserId,
   threadId: propThreadId,
   personaName = 'SYNAPTIC ORACLE',
-  modelName = 'deepseek/deepseek-v4-flash-0731',
   onClose,
   onThreadCreated,
   isCompact = false,
@@ -59,6 +59,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
+  const [modelMenuOpen, setModelMenuOpen] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -70,10 +72,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
+  const selectedModel = getOracleModel(selectedModelId)
+
   const initialWelcome: ChatMessage = {
     id: 'welcome-1',
     role: 'assistant',
-    content: `Greetings, Initiate. I am the ${personaName}. Powered by ${modelName}. How may I assist your ascendance through the Benthic Path today?`,
+    content: `Greetings, Initiate. I am the ${personaName}. Powered by ${selectedModel.label}. How may I assist your ascendance through the Benthic Path today?`,
     timestamp: '',
   }
 
@@ -137,6 +141,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           messages: payloadMessages,
           userId: userId || undefined,
           threadId: activeThreadId || undefined,
+          model: selectedModelId,
         },
       })
 
@@ -194,6 +199,42 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <span className="text-xs font-bold text-cyan-300 tracking-wider truncate">
               {personaName}
             </span>
+          </div>
+
+          {/* Model Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setModelMenuOpen((v) => !v)}
+              className="flex items-center gap-1.5 bg-[#040707] border border-cyan-900/70 px-2 py-0.5 chamfer-corner text-[10px] text-cyan-200 hover:border-cyan-500/70 transition-all"
+              title="Select Oracle model"
+            >
+              <span>{selectedModel.label}</span>
+              <ChevronDown className="w-3 h-3 text-cyan-500 shrink-0" />
+            </button>
+
+            {modelMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
+                <div className="absolute left-0 top-full mt-1 z-50 bg-[#0b1010] border border-cyan-900/70 shadow-xl shadow-cyan-950/80 chamfer-corner py-1 min-w-44">
+                  {ORACLE_MODELS.map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => {
+                        setSelectedModelId(m.id)
+                        setModelMenuOpen(false)
+                      }}
+                      className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 text-[11px] transition-colors ${
+                        m.id === selectedModelId
+                          ? 'bg-cyan-950 text-cyan-200'
+                          : 'text-gray-300 hover:bg-cyan-950/50'
+                      }`}
+                    >
+                      <span className="truncate">{m.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -299,7 +340,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <div className="flex items-center space-x-2 text-cyan-400 text-xs py-1">
               <BrainCircuit className="w-4 h-4 animate-spin text-cyan-400" />
               <span className="animate-pulse text-[11px]">
-                Synthesizing response via DeepSeek V4...
+                Synthesizing response via {selectedModel.label}...
               </span>
             </div>
           )}

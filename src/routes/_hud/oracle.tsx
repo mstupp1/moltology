@@ -120,7 +120,6 @@ function OracleRouteComponent() {
             threadId={activeThreadId}
             onThreadCreated={handleThreadCreated}
             personaName="SYNAPTIC ORACLE"
-            modelName="deepseek/deepseek-v4-flash-0731"
             className="h-full"
           />
         </div>
