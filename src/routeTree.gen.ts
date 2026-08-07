@@ -37,6 +37,8 @@ import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
+import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
+import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -177,6 +179,16 @@ const NewsSlugRoute = NewsSlugRouteImport.update({
   path: '/news/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HudJournalIndexRoute = HudJournalIndexRouteImport.update({
+  id: '/journal/',
+  path: '/journal/',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudJournalSlugRoute = HudJournalSlugRouteImport.update({
+  id: '/journal/$slug',
+  path: '/journal/$slug',
+  getParentRoute: () => HudRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -206,6 +218,8 @@ export interface FileRoutesByFullPath {
   '/news/$slug': typeof NewsSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/journal/$slug': typeof HudJournalSlugRoute
+  '/journal/': typeof HudJournalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -235,6 +249,8 @@ export interface FileRoutesByTo {
   '/news/$slug': typeof NewsSlugRoute
   '/blog': typeof BlogIndexRoute
   '/news': typeof NewsIndexRoute
+  '/journal/$slug': typeof HudJournalSlugRoute
+  '/journal': typeof HudJournalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -266,6 +282,8 @@ export interface FileRoutesById {
   '/news/$slug': typeof NewsSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/_hud/journal/$slug': typeof HudJournalSlugRoute
+  '/_hud/journal/': typeof HudJournalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -297,6 +315,8 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/blog/'
     | '/news/'
+    | '/journal/$slug'
+    | '/journal/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -326,6 +346,8 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/blog'
     | '/news'
+    | '/journal/$slug'
+    | '/journal'
   id:
     | '__root__'
     | '/'
@@ -356,6 +378,8 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/blog/'
     | '/news/'
+    | '/_hud/journal/$slug'
+    | '/_hud/journal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -574,6 +598,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_hud/journal/': {
+      id: '/_hud/journal/'
+      path: '/journal'
+      fullPath: '/journal/'
+      preLoaderRoute: typeof HudJournalIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/journal/$slug': {
+      id: '/_hud/journal/$slug'
+      path: '/journal/$slug'
+      fullPath: '/journal/$slug'
+      preLoaderRoute: typeof HudJournalSlugRouteImport
+      parentRoute: typeof HudRoute
+    }
   }
 }
 
@@ -591,6 +629,8 @@ interface HudRouteChildren {
   HudPodcastsRoute: typeof HudPodcastsRoute
   HudSubterraneanRoute: typeof HudSubterraneanRoute
   HudSupportRoute: typeof HudSupportRoute
+  HudJournalSlugRoute: typeof HudJournalSlugRoute
+  HudJournalIndexRoute: typeof HudJournalIndexRoute
 }
 
 const HudRouteChildren: HudRouteChildren = {
@@ -607,6 +647,8 @@ const HudRouteChildren: HudRouteChildren = {
   HudPodcastsRoute: HudPodcastsRoute,
   HudSubterraneanRoute: HudSubterraneanRoute,
   HudSupportRoute: HudSupportRoute,
+  HudJournalSlugRoute: HudJournalSlugRoute,
+  HudJournalIndexRoute: HudJournalIndexRoute,
 }
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)

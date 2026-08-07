@@ -1,19 +1,20 @@
 import React, { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { 
-  GitMerge, 
-  Shield, 
-  Cpu, 
-  Zap, 
-  CheckCircle2, 
-  Lock, 
-  ArrowRight, 
-  ChevronDown, 
-  ChevronUp, 
-  Compass, 
-  Activity, 
+import {
+  GitMerge,
+  Shield,
+  Cpu,
+  Zap,
+  CheckCircle2,
+  Lock,
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Compass,
+  Activity,
   BookOpen,
-  Award
+  Award,
+  Microscope,
 } from 'lucide-react'
 import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/codexData'
 
@@ -71,6 +72,14 @@ function PipelineRoute() {
           <div className="text-[10px] text-[#839493] mt-0.5">
             Overall Carcinization: <span className="text-[#dfe3e3] font-bold">16.6%</span>
           </div>
+          <Link
+            to="/journal"
+            className="mt-2 px-3 py-1.5 bg-[#00c3ff]/15 hover:bg-[#00c3ff]/25 border border-[#00c3ff]/50 text-[#00c3ff] font-grotesk font-bold text-[10px] uppercase tracking-widest inline-flex items-center gap-1.5 chamfer-corner transition-colors"
+          >
+            <Microscope className="w-3 h-3" />
+            BENTHIC COMPENDIUM
+            <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
       </div>
 

@@ -27,6 +27,7 @@ import {
   LayoutGrid,
   Radio,
   Biohazard,
+  Microscope,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -182,6 +183,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           label: 'MOLTOLOGY SCIENCE',
           icon: FlaskConical,
           path: '/pipeline',
+        },
+        {
+          id: 'journal',
+          label: 'SCIENCE JOURNAL',
+          icon: Microscope,
+          path: '/journal',
         },
       ],
     },
