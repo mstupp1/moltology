@@ -180,7 +180,7 @@ export const LandingPage: React.FC = () => {
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
       {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
-      <section className="w-full relative overflow-hidden pt-24 sm:pt-32 lg:pt-36 pb-16 sm:pb-24 lg:pb-32 px-6 sm:px-12 border-b border-cyan-900/40 min-h-[90vh] flex items-center justify-center bg-[#030608]">
+      <section className="w-full relative overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-12 px-6 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
         {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
         <img
           src="/images/hero_widescreen_bg.jpg"
