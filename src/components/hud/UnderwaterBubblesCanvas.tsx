@@ -231,7 +231,7 @@ let globalParticles: Particle[] | null = null
 let globalCustomSpritesCache: Record<string, HTMLCanvasElement> = {}
 
 export function UnderwaterBubblesCanvas({
-  bubbleCount = 200,
+  bubbleCount = 90,
   className = 'absolute inset-0 pointer-events-none z-0',
   customBubbleSrc,
   customBubbleSrcs,
@@ -339,9 +339,9 @@ export function UnderwaterBubblesCanvas({
       const roll = Math.random()
 
       let type: ParticleType
-      if (roll < 0.45) {
+      if (roll < 0.35) {
         type = 'fizz'
-      } else if (roll < 0.82) {
+      } else if (roll < 0.78) {
         type = 'standard'
       } else {
         type = 'bokeh'
@@ -404,7 +404,7 @@ export function UnderwaterBubblesCanvas({
 
     // Dynamic particle count scaling for mobile devices
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-    const activeParticleCount = isMobile ? Math.min(bubbleCount, 60) : bubbleCount
+    const activeParticleCount = isMobile ? Math.min(bubbleCount, 40) : bubbleCount
 
     // Reuse persistent global particle positions across page changes & re-renders
     let particles: Particle[]
@@ -416,18 +416,6 @@ export function UnderwaterBubblesCanvas({
       )
       globalParticles = particles
     }
-
-    let mouseX = -9999
-    let mouseY = -9999
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!canvas) return
-      const rect = canvas.getBoundingClientRect()
-      mouseX = e.clientX - rect.left
-      mouseY = e.clientY - rect.top
-    }
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true })
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -446,7 +434,7 @@ export function UnderwaterBubblesCanvas({
     const startTime = performance.now()
     let lastTime = startTime
     let lastFrameTime = startTime
-    const TARGET_FPS = 36
+    const TARGET_FPS = isMobile ? 30 : 36
     const FRAME_INTERVAL = 1000 / TARGET_FPS
 
     const render = (now: number = performance.now()) => {
@@ -491,20 +479,7 @@ export function UnderwaterBubblesCanvas({
           p.wobbleOffset += p.wobbleSpeed * dt
         }
 
-        const wobbleX = Math.sin(p.wobbleOffset) * p.wobbleAmount * p.z
-
-        const dx = p.x + wobbleX - mouseX
-        const dy = p.y - mouseY
-        const distSq = dx * dx + dy * dy
-        let pushX = 0
-
-        if (distSq < 14000 && distSq > 0) {
-          const dist = Math.sqrt(distSq)
-          const force = (1 - dist / 118) * (p.type === 'bokeh' ? 14 : 9) * p.z
-          pushX = (dx / dist) * force
-        }
-
-        const renderX = p.x + wobbleX + pushX
+        const renderX = p.x + Math.sin(p.wobbleOffset) * p.wobbleAmount * p.z
         const renderY = p.y
 
         if (renderY < -60) {
@@ -564,7 +539,6 @@ export function UnderwaterBubblesCanvas({
       clearTimeout(resizeTimeout)
       cancelAnimationFrame(animationFrameId)
       window.removeEventListener('resize', handleResize)
-      window.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [bubbleCount, customBubbleSrc, customBubbleSrcs, chromaKeyMode, disabled])

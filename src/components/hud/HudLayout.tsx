@@ -102,7 +102,7 @@ function HudContent() {
 
         {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}
         <UnderwaterBubblesCanvas
-          bubbleCount={220}
+          bubbleCount={90}
           customBubbleSrcs={[
             '/images/bubble_variant_1.jpg',
             '/images/bubble_variant_2.jpg',
