@@ -24,8 +24,11 @@ import {
   Sparkles,
   Plus,
   X,
+  Pencil,
+  Trash2,
+  Save,
 } from 'lucide-react'
-import { getPublicChangelogs, createChangelog, type ChangelogEntry } from '@/lib/changelogs'
+import { getPublicChangelogs, createChangelog, updateChangelog, deleteChangelog, type ChangelogEntry } from '@/lib/changelogs'
 import { getUserProfileFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { authClient } from '@/lib/auth-client'
@@ -45,6 +48,9 @@ function SupportPortalRoute() {
   // Admin User Role & Modal state
   const [userRole, setUserRole] = useState<string>('user')
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false)
+  const [editingEntry, setEditingEntry] = useState<ChangelogEntry | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<ChangelogEntry | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [newVersion, setNewVersion] = useState('')
   const [newTitle, setNewTitle] = useState('')
   const [newCategory, setNewCategory] = useState('TRANSMUTATION')
@@ -125,33 +131,89 @@ function SupportPortalRoute() {
     }, 4000)
   }
 
+  const resetForm = () => {
+    setNewVersion('')
+    setNewTitle('')
+    setNewSummary('')
+    setNewContent('')
+    setNewCategory('TRANSMUTATION')
+    setNewIsPublished(true)
+    setEditingEntry(null)
+  }
+
+  const openCreateModal = () => {
+    resetForm()
+    setIsAdminModalOpen(true)
+  }
+
+  const openEditModal = (entry: ChangelogEntry) => {
+    setEditingEntry(entry)
+    setNewVersion(entry.version)
+    setNewTitle(entry.title)
+    setNewCategory(entry.category)
+    setNewSummary(entry.summary)
+    setNewContent(entry.content)
+    setNewIsPublished(entry.isPublished !== false)
+    setIsAdminModalOpen(true)
+  }
+
   const handleCreateChangelog = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newVersion || !newTitle || !newSummary || !newContent) return
     setIsSubmittingLog(true)
     setAdminMessage(null)
     try {
-      const entry = await createChangelog({
-        version: newVersion,
-        title: newTitle,
-        category: newCategory,
-        summary: newSummary,
-        content: newContent,
-        isPublished: newIsPublished,
-        userId: user?.id,
-      })
-      setChangelogs((prev) => [entry, ...prev])
+      if (editingEntry?.id) {
+        const entry = await updateChangelog({
+          id: editingEntry.id,
+          version: newVersion,
+          title: newTitle,
+          category: newCategory,
+          summary: newSummary,
+          content: newContent,
+          isPublished: newIsPublished,
+          userId: user?.id,
+          releasedAt: editingEntry.releasedAt,
+        })
+        setChangelogs((prev) => prev.map((c) => (c.id === entry.id ? entry : c)))
+        setAdminMessage('✓ System Transmutation Log successfully updated in database!')
+      } else {
+        const entry = await createChangelog({
+          version: newVersion,
+          title: newTitle,
+          category: newCategory,
+          summary: newSummary,
+          content: newContent,
+          isPublished: newIsPublished,
+          userId: user?.id,
+        })
+        setChangelogs((prev) => [entry, ...prev])
+        setAdminMessage('✓ System Transmutation Log successfully published to database!')
+      }
       setIsAdminModalOpen(false)
-      setNewVersion('')
-      setNewTitle('')
-      setNewSummary('')
-      setNewContent('')
-      setAdminMessage('✓ System Transmutation Log successfully published to database!')
+      resetForm()
     } catch (err: any) {
-      console.error('Failed creating changelog:', err)
-      setAdminMessage(`❌ Failed to publish log: ${err?.message || 'Unauthorized or network error'}`)
+      console.error('Failed saving changelog:', err)
+      setAdminMessage(`❌ Failed to save log: ${err?.message || 'Unauthorized or network error'}`)
     } finally {
       setIsSubmittingLog(false)
+    }
+  }
+
+  const handleDeleteChangelog = async () => {
+    if (!deleteTarget?.id) return
+    setIsDeleting(true)
+    setAdminMessage(null)
+    try {
+      await deleteChangelog({ id: deleteTarget.id, userId: user?.id })
+      setChangelogs((prev) => prev.filter((c) => c.id !== deleteTarget.id))
+      setDeleteTarget(null)
+      setAdminMessage('✓ System Transmutation Log purged from database!')
+    } catch (err: any) {
+      console.error('Failed deleting changelog:', err)
+      setAdminMessage(`❌ Failed to purge log: ${err?.message || 'Unauthorized or network error'}`)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -303,7 +365,7 @@ function SupportPortalRoute() {
 
               {isAdmin && (
                 <button
-                  onClick={() => setIsAdminModalOpen(true)}
+                  onClick={openCreateModal}
                   className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.3)] active:scale-95 shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5 text-[#00ffff]" />
@@ -406,6 +468,25 @@ function SupportPortalRoute() {
                             </>
                           )}
                         </button>
+
+                        {isAdmin && (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => openEditModal(entry)}
+                              className="text-[11px] text-[#ff5540] hover:text-white font-bold flex items-center gap-1 border border-[#3a4a49] px-2 py-1 chamfer-corner bg-[#070b0b] hover:border-[#00ffff]/60 transition-all"
+                            >
+                              <Pencil className="w-3 h-3" />
+                              <span>EDIT</span>
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(entry)}
+                              className="text-[11px] text-[#ff0055] hover:text-white font-bold flex items-center gap-1 border border-[#3a4a49] px-2 py-1 chamfer-corner bg-[#070b0b] hover:border-[#ff0055]/70 transition-all"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>PURGE</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -611,20 +692,27 @@ function SupportPortalRoute() {
       {isAdminModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="chitin-card w-full max-w-2xl p-6 chamfer-corner space-y-4 shadow-[0_0_40px_rgba(0,255,255,0.2)] border border-[#00ffff] bg-[#070b0b] relative">
-            <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#00ffff] animate-pulse" />
-                <h2 className="font-grotesk text-base font-bold text-[#dfe3e3] uppercase tracking-wider">
-                  PUBLISH SYSTEM TRANSMUTATION LOG
-                </h2>
+<div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
+                <div className="flex items-center gap-2">
+                  {editingEntry ? (
+                    <Pencil className="w-5 h-5 text-[#ff5540] animate-pulse" />
+                  ) : (
+                    <Sparkles className="w-5 h-5 text-[#00ffff] animate-pulse" />
+                  )}
+                  <h2 className="font-grotesk text-base font-bold text-[#dfe3e3] uppercase tracking-wider">
+                    {editingEntry ? 'EDIT SYSTEM TRANSMUTATION LOG' : 'PUBLISH SYSTEM TRANSMUTATION LOG'}
+                  </h2>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsAdminModalOpen(false)
+                    resetForm()
+                  }}
+                  className="text-[#839493] hover:text-[#00ffff] p-1 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setIsAdminModalOpen(false)}
-                className="text-[#839493] hover:text-[#00ffff] p-1 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
             <form onSubmit={handleCreateChangelog} className="space-y-4 font-mono text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -716,7 +804,10 @@ function SupportPortalRoute() {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setIsAdminModalOpen(false)}
+                    onClick={() => {
+                      setIsAdminModalOpen(false)
+                      resetForm()
+                    }}
                     className="px-4 py-2 border border-[#3a4a49] text-[#839493] hover:text-white text-xs font-bold chamfer-corner"
                   >
                     CANCEL
@@ -726,11 +817,63 @@ function SupportPortalRoute() {
                     disabled={isSubmittingLog}
                     className="px-5 py-2 bg-[#00ffff]/20 hover:bg-[#00ffff]/30 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.4)] disabled:opacity-50"
                   >
-                    {isSubmittingLog ? 'PUBLISHING...' : 'PUBLISH TO NEON DB'}
+                    {isSubmittingLog
+                      ? 'SYNCING...'
+                      : editingEntry
+                        ? 'UPDATE DATABASE RECORD'
+                        : 'PUBLISH TO NEON DB'}
                   </button>
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADMIN DELETE CONFIRMATION MODAL */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="chitin-card w-full max-w-md p-6 chamfer-corner space-y-4 shadow-[0_0_40px_rgba(255,0,85,0.2)] border border-[#ff0055] bg-[#070b0b] relative">
+            <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
+              <div className="flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-[#ff0055] animate-pulse" />
+                <h2 className="font-grotesk text-base font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  CONFIRM PURGE OF TELEMETRY
+                </h2>
+              </div>
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="text-[#839493] hover:text-[#00ffff] p-1 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs text-[#ff5540] font-bold border border-[#ff5540]/40 bg-[#ff5540]/10 px-3 py-2 chamfer-corner">
+                ⚠️ IRREVERSIBLE OPERATION. THIS RECORD WILL BE PERMANENTLY DESTROYED:
+              </p>
+              <p className="text-sm font-bold text-[#dfe3e3]">
+                <span className="text-[#00ffff]">{deleteTarget.version}</span> — {deleteTarget.title}
+              </p>
+              <p className="text-xs text-[#839493]">Category: {deleteTarget.category}</p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#3a4a49]">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 border border-[#3a4a49] text-[#839493] hover:text-white text-xs font-bold chamfer-corner"
+              >
+                ABORT
+              </button>
+              <button
+                onClick={handleDeleteChangelog}
+                disabled={isDeleting}
+                className="px-5 py-2 bg-[#ff0055]/20 hover:bg-[#ff0055]/30 border border-[#ff0055] text-[#ff0055] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(255,0,85,0.4)] disabled:opacity-50 active:scale-95"
+              >
+                {isDeleting ? <span>PURGING...</span> : <><Trash2 className="w-3.5 h-3.5" /><span>CONFIRM PURGE</span></>}
+              </button>
+            </div>
           </div>
         </div>
       )}

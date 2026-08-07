@@ -43,6 +43,13 @@
       "when": 1785880562158,
       "tag": "0005_acoustic_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786066443439,
+      "tag": "0006_chunky_nebula",
+      "breakpoints": true
     }
   ]
 }
