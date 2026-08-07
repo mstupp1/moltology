@@ -193,14 +193,8 @@ input[type="range"].stat-slider::-moz-range-thumb {
 }
 
 .crt-scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.7) 0px,
-    rgba(0, 0, 0, 0.7) 2px,
-    rgba(0, 195, 255, 0.15) 2px,
-    transparent 4px
-  );
-  background-size: 100% 4px;
+  background-image: url('/images/scanline_pattern.png');
+  background-repeat: repeat;
 }
 
 .crt-grain {
@@ -209,9 +203,7 @@ input[type="range"].stat-slider::-moz-range-thumb {
 }
 
 /* Global VFX Disabled Performance Mode Overrides */
-body.vfx-disabled .crt-scanlines,
 body.vfx-disabled .crt-grain,
-.vfx-disabled .crt-scanlines,
 .vfx-disabled .crt-grain {
   display: none !important;
 }
@@ -349,17 +341,6 @@ body.vfx-disabled [class*="drop-shadow-"],
     radial-gradient(ellipse 75% 45% at 50% -5%, rgba(57, 255, 20, 0.25), transparent 75%),
     radial-gradient(circle at 15% 85%, rgba(0, 255, 65, 0.12), transparent 50%),
     radial-gradient(ellipse 100% 100% at 50% 50%, transparent 25%, rgba(2, 8, 4, 0.92) 100%);
-}
-
-.theme-subterranean .crt-scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.75) 0px,
-    rgba(0, 0, 0, 0.75) 2px,
-    rgba(57, 255, 20, 0.18) 2px,
-    transparent 4px
-  );
-  background-size: 100% 4px;
 }
 
 .theme-subterranean .crt-grain {
