@@ -1,36 +1,16 @@
-import { createIsomorphicFn } from '@tanstack/start-fn-stubs'
 import { type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogsFn, createChangelogFn, updateChangelogFn, deleteChangelogFn } from '@/lib/server/api'
-import { executeServerFn } from '@/lib/server/execute'
-
-import { INITIAL_CHANGELOGS } from '@/lib/changelogs-data'
 
 export type { ChangelogEntry }
 
-const getPublicChangelogsImpl = createIsomorphicFn()
-  .server(() => executeServerFn(getPublicChangelogsFn))
-  .client(() => getPublicChangelogsFn())
-
-const createChangelogImpl = createIsomorphicFn()
-  .server((data: Parameters<typeof createChangelogFn>[0]['data']) => executeServerFn(createChangelogFn, undefined, data))
-  .client((data: Parameters<typeof createChangelogFn>[0]['data']) => createChangelogFn({ data }))
-
-const updateChangelogImpl = createIsomorphicFn()
-  .server((data) => executeServerFn(updateChangelogFn, undefined, data))
-  .client((data) => updateChangelogFn({ data }))
-
-const deleteChangelogImpl = createIsomorphicFn()
-  .server((data) => executeServerFn(deleteChangelogFn, undefined, data))
-  .client((data) => deleteChangelogFn({ data }))
-
 export async function getPublicChangelogs(): Promise<ChangelogEntry[]> {
   try {
-    const res = await getPublicChangelogsImpl()
-    if (Array.isArray(res)) return res as ChangelogEntry[]
+    const res = await getPublicChangelogsFn()
+    return Array.isArray(res) ? (res as ChangelogEntry[]) : []
   } catch (err) {
-    console.warn('[getPublicChangelogs] Error fetching changelogs:', err)
+    console.error('[getPublicChangelogs] Error fetching changelogs from DB:', err)
+    return []
   }
-  return INITIAL_CHANGELOGS
 }
 
 export async function createChangelog(data: {
@@ -41,8 +21,9 @@ export async function createChangelog(data: {
   content: string
   isPublished?: boolean
   userId?: string
+  token?: string
 }): Promise<ChangelogEntry> {
-  return (await createChangelogImpl(data)) as ChangelogEntry
+  return (await createChangelogFn({ data })) as ChangelogEntry
 }
 
 export async function updateChangelog(data: {
@@ -54,15 +35,16 @@ export async function updateChangelog(data: {
   content: string
   isPublished?: boolean
   userId?: string
+  token?: string
   releasedAt?: string | Date
 }): Promise<ChangelogEntry> {
-  return (await updateChangelogImpl(data)) as ChangelogEntry
+  return (await updateChangelogFn({ data })) as ChangelogEntry
 }
 
 export async function deleteChangelog(data: {
   id: string
   userId?: string
+  token?: string
 }): Promise<ChangelogEntry> {
-  return (await deleteChangelogImpl(data)) as ChangelogEntry
+  return (await deleteChangelogFn({ data })) as ChangelogEntry
 }
-
