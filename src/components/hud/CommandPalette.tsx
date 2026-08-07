@@ -15,6 +15,7 @@ import {
   Scroll,
   LayoutDashboard,
   Biohazard,
+  Microscope,
 } from 'lucide-react'
 
 interface CommandItem {
@@ -116,6 +117,17 @@ export const CommandPalette: React.FC = () => {
       shortcut: 'G P',
       action: () => {
         navigate({ to: '/pipeline' })
+        setIsOpen(false)
+      },
+    },
+    {
+      id: 'nav-journal',
+      label: 'Open The Benthic Compendium Science Journal',
+      category: 'Navigation',
+      icon: <Microscope className="w-4 h-4 text-[#00ffff]" />,
+      shortcut: 'G J',
+      action: () => {
+        navigate({ to: '/journal' })
         setIsOpen(false)
       },
     },
