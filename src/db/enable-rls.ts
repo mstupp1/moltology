@@ -19,17 +19,15 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS profiles ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS users ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_stats ENABLE ROW LEVEL SECURITY;`
-    await sql`ALTER TABLE IF EXISTS assets ENABLE ROW LEVEL SECURITY;`
-    await sql`ALTER TABLE IF EXISTS daily_routines ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS routines ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, assets, daily_routines, user_avatars')
+    console.log('✓ RLS enabled on profiles, user_stats, routines, user_avatars')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
     await sql`DROP POLICY IF EXISTS users_isolation_policy ON users;`
     await sql`DROP POLICY IF EXISTS user_stats_isolation_policy ON user_stats;`
-    await sql`DROP POLICY IF EXISTS assets_isolation_policy ON assets;`
-    await sql`DROP POLICY IF EXISTS daily_routines_isolation_policy ON daily_routines;`
+    await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
 
     // 3. Create RLS policies for user isolation against Neon Auth JWT 'sub' claim
@@ -52,16 +50,7 @@ async function applyRLS() {
     `
 
     await sql`
-      CREATE POLICY assets_isolation_policy ON assets
-      FOR ALL
-      USING (
-        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
-        OR (current_setting('request.jwt.claims', true) IS NULL)
-      );
-    `
-
-    await sql`
-      CREATE POLICY daily_routines_isolation_policy ON daily_routines
+      CREATE POLICY routines_isolation_policy ON routines
       FOR ALL
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
