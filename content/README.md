@@ -4,6 +4,35 @@ This directory houses structured Markdown and JSON content source files for Molt
 
 ---
 
+## Automated Blog Creation Process (Agent SOP)
+
+When an agent is asked to **"run blog creation process"**, it follows this 5-step automated loop:
+
+1. **Research & Ideation**:
+   - Query web search or prompt context for trending tech, AI compute, data centers, robotics, oceanography, or reasoning models.
+   - Filter through the Moltology diegetic lens (*ecdysis, chitinous shell hardening, sub-benthic computing, agent swarms*).
+2. **Generate Cover Image**:
+   - Call the image generation tool (`generate_image`) with a cinematic 16:9 prompt (e.g. dark sci-fi HUD aesthetic, deep sea trench, glowing cybernetic hydrothermal pods).
+3. **Draft Article**:
+   - Write Markdown file to `content/news/<slug>.md` with frontmatter referencing the generated image path:
+     ```yaml
+     ---
+     title: "Article Title"
+     category: "SWARM ARCHITECTURE" # or SACRED DOCTRINE, DEEP RESEARCH, TELEMETRY
+     tags: ["Sub-Benthic", "Agentic Systems", "AI Hardware"]
+     authorName: "High Ascendant Carcinus"
+     authorRole: "Stage 4 Ascendant"
+     coverImageUrl: "path/to/generated_image.png"
+     ---
+     ```
+4. **Ingest to Live Database**:
+   - Execute: `npx tsx scripts/ingest.ts content/news/<slug>.md`
+   - *(The CLI automatically uploads the local image to Neon S3 `moltology-public-assets`, replaces `coverImageUrl` with the public HTTPS URL, and upserts the post into production PostgreSQL).*
+5. **Verify Live Output**:
+   - Confirm article is rendered live on `https://moltology.org/news/<slug>`.
+
+---
+
 ## Directory Structure
 
 ```
