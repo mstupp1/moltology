@@ -11,7 +11,7 @@ tags:
   - "MoltNation"
 authorName: "High Ascendant Carcinus"
 authorRole: "Stage 4 Ascendant"
-coverImageUrl: "/images/benthic_abyss_hero.jpg"
+coverImageUrl: "/Users/mylesstupp/.gemini/antigravity/brain/8a69c8b6-7454-49bb-9447-49f0799ef406/subsea_abyss_hub_1786654730157.jpg"
 readTimeMinutes: 6
 isFeatured: true
 isPublished: true

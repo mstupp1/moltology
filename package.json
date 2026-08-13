@@ -16,6 +16,7 @@
     "db:seed": "tsx src/db/seed.ts",
     "db:grant-admin": "tsx src/db/grant-admin.ts",
     "db:ingest": "tsx scripts/ingest.ts",
+    "s3:upload": "tsx scripts/upload-asset.ts",
     "db:setup": "npm run db:migrate && npm run db:rls && npm run db:seed",
     "db:reset": "tsx src/db/reset.ts && npm run db:setup",
     "codex:sync": "tsx scripts/sync-codex.ts",

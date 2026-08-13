@@ -1,8 +1,11 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import { eq } from 'drizzle-orm'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as dotenv from 'dotenv'
 import * as schema from '../../db/schema'
+import { uploadLocalFileToS3 } from './s3-upload'
 import {
   inferContentType,
   normalizeBlogPayload,
@@ -60,6 +63,34 @@ export async function upsertBlogPost(
   dryRun = false
 ): Promise<IngestResult> {
   const payload = normalizeBlogPayload(parsed)
+
+  // Auto-detect local cover image file and upload to Neon S3
+  if (
+    payload.coverImageUrl &&
+    !payload.coverImageUrl.startsWith('http://') &&
+    !payload.coverImageUrl.startsWith('https://') &&
+    !payload.coverImageUrl.startsWith('/images/')
+  ) {
+    let localImagePath = path.isAbsolute(payload.coverImageUrl)
+      ? payload.coverImageUrl
+      : path.resolve(path.dirname(parsed.filePath), payload.coverImageUrl)
+
+    if (!fs.existsSync(localImagePath)) {
+      const rootPath = path.resolve(process.cwd(), payload.coverImageUrl)
+      if (fs.existsSync(rootPath)) {
+        localImagePath = rootPath
+      }
+    }
+
+    if (fs.existsSync(localImagePath) && fs.statSync(localImagePath).isFile()) {
+      if (!dryRun) {
+        const ext = path.extname(localImagePath)
+        const targetKey = `images/blog/${payload.slug}-cover${ext}`
+        const uploaded = await uploadLocalFileToS3(localImagePath, targetKey)
+        payload.coverImageUrl = uploaded.publicUrl
+      }
+    }
+  }
 
   if (dryRun) {
     return {
@@ -202,6 +233,35 @@ export async function upsertPodcast(
   dryRun = false
 ): Promise<IngestResult> {
   const payload = normalizePodcastPayload(parsed)
+
+  // Auto-detect local audio file and upload to Neon S3
+  if (
+    payload.audioUrl &&
+    !payload.audioUrl.startsWith('http://') &&
+    !payload.audioUrl.startsWith('https://')
+  ) {
+    let localAudioPath = path.isAbsolute(payload.audioUrl)
+      ? payload.audioUrl
+      : path.resolve(path.dirname(parsed.filePath), payload.audioUrl)
+
+    if (!fs.existsSync(localAudioPath)) {
+      const rootPath = path.resolve(process.cwd(), payload.audioUrl)
+      if (fs.existsSync(rootPath)) {
+        localAudioPath = rootPath
+      }
+    }
+
+    if (fs.existsSync(localAudioPath) && fs.statSync(localAudioPath).isFile()) {
+      if (!dryRun) {
+        const ext = path.extname(localAudioPath)
+        const targetKey = `podcasts/${payload.slug}${ext}`
+        const uploaded = await uploadLocalFileToS3(localAudioPath, targetKey)
+        payload.audioUrl = uploaded.publicUrl
+        payload.s3Key = targetKey
+        payload.fileSizeBytes = uploaded.size
+      }
+    }
+  }
 
   if (dryRun) {
     return {
