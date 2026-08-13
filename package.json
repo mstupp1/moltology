@@ -17,7 +17,9 @@
     "db:grant-admin": "tsx src/db/grant-admin.ts",
     "db:ingest": "tsx scripts/ingest.ts",
     "db:setup": "npm run db:migrate && npm run db:rls && npm run db:seed",
-    "db:reset": "tsx src/db/reset.ts && npm run db:setup"
+    "db:reset": "tsx src/db/reset.ts && npm run db:setup",
+    "codex:sync": "tsx scripts/sync-codex.ts",
+    "codex:check": "tsx scripts/sync-codex.ts --check"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",

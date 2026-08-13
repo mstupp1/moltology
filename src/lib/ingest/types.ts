@@ -9,6 +9,7 @@ export interface IngestOptions {
   dbUrl?: string
   prod?: boolean
   dev?: boolean
+  clean?: boolean
 }
 
 export interface IngestResult {

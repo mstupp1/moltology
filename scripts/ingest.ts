@@ -21,12 +21,14 @@ Options:
       --dev                  Target local/development database explicitly (reads DEV_DATABASE_URL).
                              (Defaults to production database if omitted).
       --db <url>             Explicit database connection string.
+      --clean, --rm          Automatically delete source file(s) after successful ingestion.
       --dry-run              Validate frontmatter and schema without writing to DB.
   -s, --silent               Suppress per-file output and only print summary.
   -h, --help                 Display this help menu.
 
 Examples:
   npx tsx scripts/ingest.ts content/news/article.md
+  npx tsx scripts/ingest.ts content/drafts/my-article.md --clean
   npx tsx scripts/ingest.ts --dir content/news/ --type blog
   npx tsx scripts/ingest.ts content/news/article.md --dev
   npx tsx scripts/ingest.ts content/ --db "postgresql://..."
@@ -46,6 +48,8 @@ function parseCliArgs(argv: string[]): IngestOptions & { positionalPath?: string
       return options
     } else if (arg === '--dry-run') {
       options.dryRun = true
+    } else if (arg === '--clean' || arg === '--rm') {
+      options.clean = true
     } else if (arg === '--dev') {
       options.dev = true
     } else if (arg === '--prod') {
@@ -162,9 +166,18 @@ async function runCli() {
         if (res.success) {
           const typeLabel = res.type === 'blog' ? 'blog_posts' : res.type === 'changelog' ? 'changelogs' : 'podcasts'
           const actionLabel = isDryRun ? 'Validated' : res.action === 'inserted' ? 'Inserted' : 'Updated'
-          console.log(`  ✓ [${typeLabel}] ${actionLabel} "${res.title}" (${res.identifier}) - ${relPath}`)
+          const cleanNotice = args.clean && !isDryRun ? ' (Source file purged)' : ''
+          console.log(`  ✓ [${typeLabel}] ${actionLabel} "${res.title}" (${res.identifier})${cleanNotice} - ${relPath}`)
         } else {
           console.error(`  ✗ [FAILED] ${relPath}: ${res.error}`)
+        }
+      }
+
+      if (args.clean && !isDryRun && res.success && fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath)
+        } catch (unlinkErr: any) {
+          console.warn(`  ⚠ Warning: Failed to delete source file ${relPath}: ${unlinkErr.message}`)
         }
       }
     } catch (err: any) {
