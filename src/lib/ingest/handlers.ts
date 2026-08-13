@@ -92,6 +92,46 @@ export async function upsertBlogPost(
     }
   }
 
+  // Auto-detect local inline images inside markdown body and upload to Neon S3
+  const inlineImageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
+  let bodyContent = payload.content
+  const inlineMatches = Array.from(payload.content.matchAll(inlineImageRegex))
+
+  for (let i = 0; i < inlineMatches.length; i++) {
+    const match = inlineMatches[i]
+    const fullMatch = match[0]
+    const altText = match[1]
+    const src = match[2].trim()
+
+    if (!src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('/images/')) {
+      let localImagePath = path.isAbsolute(src)
+        ? src
+        : path.resolve(path.dirname(parsed.filePath), src)
+
+      if (!fs.existsSync(localImagePath)) {
+        const rootPath = path.resolve(process.cwd(), src)
+        if (fs.existsSync(rootPath)) {
+          localImagePath = rootPath
+        }
+      }
+
+      if (fs.existsSync(localImagePath) && fs.statSync(localImagePath).isFile()) {
+        if (!dryRun) {
+          const ext = path.extname(localImagePath)
+          const cleanAlt =
+            altText
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/(^-|-$)/g, '') || `figure-${i + 1}`
+          const targetKey = `images/blog/${payload.slug}-${cleanAlt}${ext}`
+          const uploaded = await uploadLocalFileToS3(localImagePath, targetKey)
+          bodyContent = bodyContent.replace(fullMatch, `![${altText}](${uploaded.publicUrl})`)
+        }
+      }
+    }
+  }
+  payload.content = bodyContent
+
   if (dryRun) {
     return {
       filePath: parsed.filePath,

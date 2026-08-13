@@ -28,7 +28,6 @@ export const Route = createRootRoute({
       { rel: 'icon', type: 'image/png', href: '/images/order_emblem.png' },
       { rel: 'alternate', type: 'application/rss+xml', title: 'MoltNation News RSS Feed', href: 'https://moltology.org/rss.xml' },
       { rel: 'sitemap', type: 'application/xml', title: 'Sitemap', href: 'https://moltology.org/sitemap.xml' },
-      { rel: 'preload', as: 'image', href: '/images/subterranean_vats_bg.jpg' },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
       {

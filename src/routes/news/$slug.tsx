@@ -19,6 +19,7 @@ import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import { seo, buildJsonLd, buildArticleJsonLd } from '@/lib/seo'
 
 export const Route = createFileRoute('/news/$slug')({
@@ -120,74 +121,6 @@ function NewsPostDetail() {
       })
     : 'AUG 2026'
 
-  // Render markdown content into HUD components
-  const renderContentParagraphs = (contentStr: string) => {
-    const blocks = contentStr.split('\n\n')
-    return blocks.map((block, idx) => {
-      const trimmed = block.trim()
-      if (trimmed.startsWith('### ')) {
-        return (
-          <h3
-            key={idx}
-            className="font-grotesk font-black text-2xl sm:text-3xl text-gray-100 uppercase tracking-wide mt-10 mb-4 border-b border-cyan-900/40 pb-2 text-cyan-300"
-          >
-            {trimmed.replace('### ', '')}
-          </h3>
-        )
-      }
-      if (trimmed.startsWith('#### ')) {
-        return (
-          <h4
-            key={idx}
-            className="font-grotesk font-bold text-xl text-gray-200 uppercase tracking-wide mt-8 mb-3 text-red-400"
-          >
-            {trimmed.replace('#### ', '')}
-          </h4>
-        )
-      }
-      if (trimmed.startsWith('> ')) {
-        return (
-          <blockquote
-            key={idx}
-            className="chitin-card p-6 border-l-4 border-l-cyan-400 border-y border-r border-cyan-900/40 chamfer-corner my-6 italic font-serif text-lg text-cyan-100 bg-[#080d0f]/90 shadow-hud-cyan"
-          >
-            {trimmed.replace('> ', '').replace(/\\n/g, '\n')}
-          </blockquote>
-        )
-      }
-      if (trimmed.startsWith('* ') || trimmed.startsWith('1. ')) {
-        const items = trimmed.split('\n')
-        return (
-          <ul key={idx} className="space-y-3 my-4 pl-2 font-mono text-xs sm:text-sm text-gray-300">
-            {items.map((it, i) => (
-              <li key={i} className="flex items-start gap-2.5 chitin-card-inset p-3 chamfer-corner">
-                <Shield className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(it.replace(/^[\*\d\.]+\s*/, '')) }} />
-              </li>
-            ))}
-          </ul>
-        )
-      }
-      if (trimmed === '---') {
-        return <hr key={idx} className="border-cyan-900/40 my-10" />
-      }
-
-      return (
-        <p
-          key={idx}
-          className="text-sm sm:text-base text-gray-300 font-sans leading-relaxed my-4"
-          dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(trimmed) }}
-        />
-      )
-    })
-  }
-
-  const formatInlineMarkdown = (text: string) => {
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-100 font-mono">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic text-cyan-200">$1</em>')
-  }
-
   return (
     <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between">
       {/* Background Overlays */}
@@ -288,9 +221,7 @@ function NewsPostDetail() {
 
         {/* Article Body */}
         <div className="max-w-4xl mx-auto px-6 sm:px-12 py-12">
-          <div className="prose prose-invert max-w-none">
-            {renderContentParagraphs(post.content)}
-          </div>
+          <NewsArticleBody content={post.content} />
 
           {/* Tags */}
           <div className="mt-12 pt-6 border-t border-cyan-900/40 flex flex-wrap items-center gap-2 text-xs font-mono">
