@@ -180,8 +180,8 @@ export const HeroShuffleDeck: React.FC = () => {
         {/* Bottom Subtle Gradient Overlay */}
         <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-20" />
 
-        {/* Centered Jump-To Indicator Floating on Top of Image at Bottom - Shown on Hover */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+        {/* Centered Jump-To Indicator Floating on Top of Image at Bottom - Always visible on mobile, hover on desktop */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 shadow-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto">
           {CARDS.map((card, idx) => {
             const isActive = idx === activeIndex
             const theme = COLOR_MAPS[card.accentColor]
@@ -189,13 +189,18 @@ export const HeroShuffleDeck: React.FC = () => {
               <button
                 key={card.id}
                 onClick={() => handleJump(idx)}
-                className={`h-2.5 rounded-full transition-all duration-500 ${
-                  isActive
-                    ? `w-8 ${theme.dot}`
-                    : 'w-2.5 bg-white/30 hover:bg-white/70'
-                }`}
+                className={`p-1 flex items-center justify-center focus:outline-none`}
                 title={`Jump to Card ${idx + 1}`}
-              />
+                aria-label={`Jump to Card ${idx + 1}`}
+              >
+                <span
+                  className={`block h-2 rounded-full transition-all duration-500 ${
+                    isActive
+                      ? `w-7 sm:w-8 ${theme.dot}`
+                      : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
+                  }`}
+                />
+              </button>
             )
           })}
         </div>

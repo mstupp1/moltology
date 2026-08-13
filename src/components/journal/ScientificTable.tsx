@@ -105,7 +105,7 @@ export const ScientificTable: React.FC<ScientificTableProps> = ({
           {caption}
         </figcaption>
 
-        <div className="overflow-x-auto border" style={{ borderColor: palette.tableBorder }}>
+        <div className="overflow-x-auto touch-pan-scroll border" style={{ borderColor: palette.tableBorder }}>
           <table className="w-full min-w-[560px] border-collapse text-left">
             <thead>
               <tr>
@@ -168,7 +168,7 @@ export const ScientificTable: React.FC<ScientificTableProps> = ({
         </span>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto touch-pan-scroll">
         <table className="w-full min-w-[640px] border-collapse text-left">
           <thead>
             <tr className="border-b border-[#00c3ff]/50">

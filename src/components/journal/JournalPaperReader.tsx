@@ -219,8 +219,8 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
             >
               Abstract
             </div>
-            <p className="mt-2 text-justify text-[1em] italic leading-relaxed">{paper.abstract}</p>
-            <p className="mt-2 text-justify text-[0.88em] leading-relaxed" style={{ color: palette.muted }}>
+            <p className="mt-2 text-left sm:text-justify text-[1em] italic leading-relaxed">{paper.abstract}</p>
+            <p className="mt-2 text-left sm:text-justify text-[0.88em] leading-relaxed" style={{ color: palette.muted }}>
               <span className="font-bold uppercase tracking-wider" style={{ color: palette.heading }}>
                 Keywords:{' '}
               </span>
@@ -271,7 +271,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
                 return (
                   <div key={idx} className="mt-2">
                     <p
-                      className="text-justify text-[1em] leading-relaxed indent-[1.6em]"
+                      className="text-left sm:text-justify text-[1em] leading-relaxed indent-[1.6em]"
                       dangerouslySetInnerHTML={{ __html: formatJournalInline(text, 'font-bold') }}
                     />
                     {feeds.length > 0 && (
@@ -296,7 +296,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
             >
               Appendix — {paper.integrationTitle}
             </h2>
-            <p className="mt-3 text-justify text-[0.95em] leading-relaxed" style={{ color: palette.muted }}>
+            <p className="mt-3 text-left sm:text-justify text-[0.95em] leading-relaxed" style={{ color: palette.muted }}>
               {paper.integrationIntro}
             </p>
             <ol className="mt-4 space-y-3">

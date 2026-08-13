@@ -60,6 +60,7 @@ export const SacredCodexReader: React.FC = () => {
   // Fullscreen Overlay & Soft PDF Reader State
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isOverlayNavOpen, setIsOverlayNavOpen] = useState(false)
+  const [isMobileCatalogOpen, setIsMobileCatalogOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState<number>(100) // Percentage
 
   // Audio / Audio simulation state
@@ -689,17 +690,25 @@ export const SacredCodexReader: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Scripture Catalog Index (3 cols) */}
           <div className="no-print lg:col-span-3 space-y-2">
-            <div className="bg-[#0b1011] border border-[#3a4a49] p-3 rounded-md flex items-center justify-between">
+            <div
+              onClick={() => setIsMobileCatalogOpen(!isMobileCatalogOpen)}
+              className="bg-[#0b1011] border border-[#3a4a49] p-3 rounded-md flex items-center justify-between cursor-pointer lg:cursor-default"
+            >
               <span className="text-xs font-mono font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
                 <Scroll className="w-3.5 h-3.5 text-[#ffd700]" />
                 CANON INDEX ({filteredScriptures.length})
               </span>
-              <span className="text-[10px] text-[#ffd700] font-mono">
-                {selectedVolume === 'all' ? 'FULL CODEX' : selectedVolume.toUpperCase()}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#ffd700] font-mono">
+                  {selectedVolume === 'all' ? 'FULL CODEX' : selectedVolume.toUpperCase()}
+                </span>
+                <span className="text-xs text-[#839493] lg:hidden font-mono">
+                  {isMobileCatalogOpen ? '▲ HIDE' : '▼ VIEW'}
+                </span>
+              </div>
             </div>
 
-            <div className="space-y-2 max-h-[750px] overflow-y-auto pr-1">
+            <div className={`space-y-2 max-h-[750px] overflow-y-auto pr-1 ${isMobileCatalogOpen ? 'block' : 'hidden lg:block'}`}>
               {filteredScriptures.length === 0 ? (
                 <div className="p-6 text-center text-[#839493] text-xs font-mono bg-[#0b1011] border border-[#3a4a49] rounded">
                   NO CANONICAL SCRIPTURES MATCH FILTERS
@@ -712,7 +721,10 @@ export const SacredCodexReader: React.FC = () => {
                   return (
                     <div
                       key={scripture.id}
-                      onClick={() => setActiveScriptureId(scripture.id)}
+                      onClick={() => {
+                        setActiveScriptureId(scripture.id)
+                        setIsMobileCatalogOpen(false)
+                      }}
                       className={`p-3 border transition-all cursor-pointer rounded relative group ${
                         isActive
                           ? 'bg-[#172021] border-[#ffd700] text-[#dfe3e3] shadow-[0_0_12px_rgba(255,215,0,0.15)]'
@@ -778,7 +790,7 @@ export const SacredCodexReader: React.FC = () => {
           <div className={`${showNotesPanel ? 'lg:col-span-6' : 'lg:col-span-9'} transition-all`}>
             {/* The PDF Document Paper Sheet Container with internal scroll */}
             <div
-              className={`pdf-page-sheet ${themeContainerClass} p-6 md:p-10 rounded-lg border relative transition-all shadow-2xl space-y-8 max-h-[800px] overflow-y-auto flex flex-col justify-between group/sheet`}
+              className={`pdf-page-sheet ${themeContainerClass} p-4 sm:p-6 md:p-10 rounded-lg border relative transition-all shadow-2xl space-y-6 sm:space-y-8 max-h-[800px] overflow-y-auto flex flex-col justify-between group/sheet`}
             >
               {/* STICKY FLOATING FULLSCREEN BUTTON (Inherits document theme styling, stays pinned while scrolling) */}
               <div className="sticky top-0 z-30 flex justify-end -mb-10 pointer-events-none no-print">

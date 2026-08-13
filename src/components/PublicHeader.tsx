@@ -238,9 +238,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
-            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-[#080d0e]/80 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+            className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
           >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileOpen ? <X className="w-5 h-5 text-red-400" /> : <Menu className="w-5 h-5 text-cyan-300" />}
           </button>
 
           <div className="hidden lg:flex items-center gap-3 sm:gap-4">
@@ -278,13 +278,21 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* Mobile Dropdown Backdrop & Menu */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 top-[60px] bg-black/60 backdrop-blur-sm -z-10 animate-fade-in"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       <div
         className={`lg:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
-          mobileOpen ? 'max-h-[480px] opacity-100' : 'max-h-0 opacity-0'
+          mobileOpen ? 'max-h-[calc(100vh-5rem)] overflow-y-auto opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
         }`}
       >
-        <div className="mt-3 px-2 pb-2 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
+        <div className="mt-3 px-2 pb-3 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
           <button
             onClick={() => onNavigate('/')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${

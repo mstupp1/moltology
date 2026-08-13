@@ -206,34 +206,34 @@ export const CommandPalette: React.FC = () => {
     <>
       {/* Modal Command Palette Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-20 px-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-2xl bg-[#0b0f0f] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 overflow-hidden chamfer-corner-lg font-mono text-sm"
+            className="w-full max-w-2xl bg-[#0b0f0f] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 overflow-hidden chamfer-corner-lg font-mono text-sm max-h-[85vh] flex flex-col"
             onKeyDown={handleKeyDownMenu}
           >
             {/* Command Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-cyan-900/40 bg-[#0f1414]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-cyan-900/40 bg-[#0f1414] shrink-0">
               <div className="flex items-center space-x-3 flex-1">
-                <Search className="w-5 h-5 text-cyan-400" />
+                <Search className="w-5 h-5 text-cyan-400 shrink-0" />
                 <input
                   type="text"
                   autoFocus
                   placeholder="Type a command or search protocol (e.g. Market, Purge)..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none w-full text-sm font-mono"
+                  className="bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none w-full text-xs sm:text-sm font-mono"
                 />
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-red-400 p-1"
+                className="text-gray-500 hover:text-red-400 p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Command List */}
-            <div className="max-h-80 overflow-y-auto p-2 space-y-1">
+            <div className="max-h-[55vh] sm:max-h-80 overflow-y-auto touch-pan-scroll p-2 space-y-1 flex-1">
               {filteredCommands.length === 0 ? (
                 <div className="p-6 text-center text-gray-500 text-xs tracking-wider">
                   NO MATCHING COMMAND PROTOCOLS FOUND
@@ -246,7 +246,7 @@ export const CommandPalette: React.FC = () => {
                       key={cmd.id}
                       onClick={cmd.action}
                       onMouseEnter={() => setSelectedIndex(idx)}
-                      className={`w-full text-left px-3 py-2.5 flex items-center justify-between transition-colors ${
+                      className={`w-full text-left px-3 py-2.5 min-h-[44px] flex items-center justify-between transition-colors ${
                         isSelected
                           ? 'bg-cyan-950/60 border-l-2 border-cyan-400 text-cyan-200'
                           : 'text-gray-300 hover:bg-gray-900/60'

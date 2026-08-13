@@ -163,12 +163,10 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
 
             {/* ── CRAB CLAW (chroma-keyed transparent PNG facing right) ── */}
             <div
-              className="absolute top-1/2 pointer-events-none z-20"
+              className="absolute top-1/2 pointer-events-none z-20 w-8 h-8 sm:w-[52px] sm:h-[52px]"
               style={{
                 left: `calc(${PROGRESS * 100}% - 2px)`,
                 transform: 'translateY(-50%) translateX(0)',
-                height: '52px',
-                width: '52px',
                 marginTop: '-1px',
               }}
             >

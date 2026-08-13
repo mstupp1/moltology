@@ -206,7 +206,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
 
       {/* Content Panel */}
       <div
-        className="relative w-full max-w-lg mx-4 rounded-2xl overflow-hidden border border-[#00ffff]/20"
+        className="relative w-full max-w-lg mx-3 sm:mx-4 rounded-2xl overflow-hidden border border-[#00ffff]/20 max-h-[90vh] overflow-y-auto touch-pan-scroll flex flex-col"
         style={{
           background:
             'linear-gradient(135deg, rgba(0,20,20,0.97) 0%, rgba(0,10,18,0.99) 100%)',
@@ -216,7 +216,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
       >
         {/* Top Glow Bar */}
         <div
-          className="h-px w-full"
+          className="h-px w-full shrink-0"
           style={{
             background:
               'linear-gradient(90deg, transparent, #00ffff 30%, #00c8ff 70%, transparent)',
@@ -227,7 +227,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
         <button
           onClick={handleDismiss}
           aria-label="Close"
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border border-[#00ffff]/25 text-[#5a8888] hover:text-[#00ffff] hover:border-[#00ffff]/60 hover:bg-[#00ffff]/10 transition-all duration-200 active:scale-95"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border border-[#00ffff]/25 text-[#5a8888] hover:text-[#00ffff] hover:border-[#00ffff]/60 hover:bg-[#00ffff]/10 transition-all duration-200 active:scale-95 z-20"
         >
           <svg
             className="w-4 h-4"
@@ -244,12 +244,12 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
         </button>
 
         {/* Header */}
-        <div className="px-8 pt-8 pb-4 text-center">
+        <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-3 sm:pb-4 text-center">
           {/* Emblem */}
-          <div className="flex justify-center mb-5">
+          <div className="flex justify-center mb-4 sm:mb-5">
             <div className="relative">
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center border border-[#00ffff]/30"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center border border-[#00ffff]/30"
                 style={{
                   background:
                     'radial-gradient(circle, rgba(0,255,255,0.12) 0%, rgba(0,30,40,0.8) 100%)',
@@ -260,7 +260,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
                 <img
                   src="/images/order_emblem.png"
                   alt="Order Emblem"
-                  className="w-10 h-10 object-contain opacity-90"
+                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-90"
                   onError={(e) => {
                     ;(e.target as HTMLImageElement).style.display = 'none'
                   }}
@@ -278,21 +278,21 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
             ⬡ MOLTOLOGY SIGNAL RECEIVED ⬡
           </div>
           <h1
-            className="font-mono text-2xl font-bold text-[#00ffff] mb-1 tracking-tight"
+            className="font-mono text-xl sm:text-2xl font-bold text-[#00ffff] mb-1 tracking-tight"
             style={{ textShadow: '0 0 20px rgba(0,255,255,0.6)' }}
           >
             WELCOME, {displayName.toUpperCase()}
           </h1>
-          <p className="text-[#8ca8a8] text-sm font-mono">
+          <p className="text-[#8ca8a8] text-xs sm:text-sm font-mono">
             Your larval chassis has been registered to the Synaptic Core.
           </p>
         </div>
 
         {/* Divider */}
-        <div className="mx-8 h-px bg-gradient-to-r from-transparent via-[#00ffff]/15 to-transparent mb-6" />
+        <div className="mx-4 sm:mx-8 h-px bg-gradient-to-r from-transparent via-[#00ffff]/15 to-transparent mb-4 sm:mb-6 shrink-0" />
 
         {/* Audio CTA Section */}
-        <div className="px-8 pb-3">
+        <div className="px-4 sm:px-8 pb-3 sm:pb-4">
           <div
             className={`rounded-xl border p-5 transition-all duration-700 ${
               hasListened

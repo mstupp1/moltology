@@ -417,12 +417,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           )}
         </button>
 
-        {/* Main Content Container - Always visible on Desktop, toggling smoothly on Mobile */}
+        {/* Main Content Container - Fixed Drawer on Mobile, Inline Rail on Desktop */}
         <div
           className={`flex-1 flex flex-col justify-between space-y-0 overflow-hidden min-h-0 transition-all duration-300 ease-in-out ${
             isMobileOpen
-              ? 'max-h-[calc(100vh-4rem)] opacity-100 flex'
-              : 'max-h-0 opacity-0 hidden md:max-h-none md:opacity-100 md:flex'
+              ? 'fixed inset-x-0 top-[53px] bottom-0 z-50 bg-[#060a0b]/95 backdrop-blur-xl border-t border-[#3a4a49] flex max-h-[calc(100vh-53px)] opacity-100'
+              : 'max-h-0 opacity-0 hidden md:max-h-none md:opacity-100 md:flex md:static'
           }`}
         >
             {/* Search Bar — full width, above nav */}
@@ -580,7 +580,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                             <button
                               key={item.id}
                               onClick={() => handleNavClick(item.path)}
-                              className={`w-full text-left relative flex items-center transition-colors duration-150 group/navitem px-4 py-2.5 pl-5 gap-3 cursor-pointer ${
+                              className={`w-full text-left relative flex items-center min-h-[44px] transition-colors duration-150 group/navitem px-4 py-2.5 pl-5 gap-3 cursor-pointer ${
                                 isActive
                                   ? 'bg-[#ff3b30]/10'
                                   : 'bg-transparent hover:bg-white/[0.04]'

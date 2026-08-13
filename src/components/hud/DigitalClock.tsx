@@ -205,7 +205,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
 
         {/* Floating Header Dropdown Panel */}
         {isScheduleOpen && (
-          <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[#030a0d]/95 border-2 border-[#00c3ff]/60 rounded-md p-3 sm:p-4 shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.3)] backdrop-blur-md z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
+          <div className="absolute right-0 top-full mt-2 w-[min(24rem,calc(100vw-1.5rem))] bg-[#030a0d]/95 border-2 border-[#00c3ff]/60 rounded-md p-3 sm:p-4 shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.3)] backdrop-blur-md z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
             {/* Header controls bar */}
             <div className="flex items-center justify-between border-b border-[#00c3ff]/20 pb-2">
               <div className="flex items-center gap-2">
