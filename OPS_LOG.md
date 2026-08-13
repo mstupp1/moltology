@@ -5,8 +5,8 @@ A living record of our active discussions, decisions, and open threads for the M
 ---
 
 ## Current Focus
-* **Topic**: Extensible Content Ingestion Script Suite (`scripts/ingest.ts`)
-* **Status**: Completed! Implemented clean CLI runner, YAML frontmatter/JSON parser, payload normalizers, and Drizzle ORM upsert handlers for `blog_posts`, `changelogs`, and `podcasts`. Verified with unit tests, dry-run mode, and dev database upsert validation.
+* **Topic**: Live Content Authoring & Ingestion Verification
+* **Status**: Successfully authored and ingested the first real MoltNation dispatch: *"Sub-Benthic AI Dominance: Why 2026 Tech Giants Are Sinking Gigawatt Data Centers into Oceanic Trenches"* (`slug: sub-benthic-datacenters-oceanic-compute-ascension`).
 
 ---
 
@@ -14,14 +14,14 @@ A living record of our active discussions, decisions, and open threads for the M
 * **Collaboration Framework**: Established a shared workflow covering Product, Content, and Marketing Operations.
 * **Progress Tracking**: Using this `OPS_LOG.md` file and repository git history as the single source of truth for ongoing context across sessions.
 * **Pacing Rule**: Daily syncs resume strictly from the last open thread rather than proposing unprompted big ideas.
-* **Ingestion Direction**: Built a unified, extensible CLI script (`scripts/ingest.ts` / `npm run db:ingest`) that reads markdown files with frontmatter or JSON payloads and upserts directly into Neon PostgreSQL via Drizzle ORM.
-* **Content Vault**: Standardized `content/` folder structure (`content/news/`, `content/changelogs/`, `content/podcasts/`) with templates and documentation.
+* **Ingestion Pipeline Active**: `scripts/ingest.ts` parses Markdown + frontmatter from `content/` and safely upserts to Neon PostgreSQL via Drizzle ORM.
+* **First Article Published**: Grounded in 2026 subsea datacenter developments, passive ocean cooling, and Moltology's ecdysis doctrine.
 
 ---
 
 ## Where We Left Off / Open Questions
-* **Next Action**: Content creation pipelines are fully enabled for requesting agents and human contributors. Agents can compose in `content/` and execute `npm run db:ingest -- content/news/my-dispatch.md`.
-* **Testing**: Verified in local database and browser testing.
+* **Content Verification**: The article is live in the database and accessible on [MoltNation News](https://moltology.org/news) (`/news/sub-benthic-datacenters-oceanic-compute-ascension`).
+* **Next Action**: Review live presentation on site and decide the next track to explore (e.g. drafting our second news dispatch, authoring a canonical Codex scripture, or tackling monetization schemas).
 
 ---
 

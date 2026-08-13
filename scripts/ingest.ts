@@ -18,7 +18,8 @@ Options:
   -d, --dir <directory>      Path to a directory of content files.
   -t, --type <type>          Content type: 'blog' (or 'news'), 'changelog', 'podcast'.
                              (Inferred automatically if omitted).
-      --prod                 Ingest directly into production database (reads PROD_DATABASE_URL or DATABASE_URL_PROD).
+      --dev                  Target local/development database explicitly (reads DEV_DATABASE_URL).
+                             (Defaults to production database if omitted).
       --db <url>             Explicit database connection string.
       --dry-run              Validate frontmatter and schema without writing to DB.
   -s, --silent               Suppress per-file output and only print summary.
@@ -27,7 +28,7 @@ Options:
 Examples:
   npx tsx scripts/ingest.ts content/news/article.md
   npx tsx scripts/ingest.ts --dir content/news/ --type blog
-  npx tsx scripts/ingest.ts content/news/article.md --prod
+  npx tsx scripts/ingest.ts content/news/article.md --dev
   npx tsx scripts/ingest.ts content/ --db "postgresql://..."
   npm run db:ingest -- content/news/article.md
 `)
@@ -45,6 +46,8 @@ function parseCliArgs(argv: string[]): IngestOptions & { positionalPath?: string
       return options
     } else if (arg === '--dry-run') {
       options.dryRun = true
+    } else if (arg === '--dev') {
+      options.dev = true
     } else if (arg === '--prod') {
       options.prod = true
     } else if (arg === '--db' || arg === '--database-url') {
@@ -142,7 +145,7 @@ async function runCli() {
     }
   }
 
-  const targetEnvLabel = args.prod ? '[PROD DATABASE]' : args.dbUrl ? '[CUSTOM DATABASE]' : '[DEV DATABASE]'
+  const targetEnvLabel = args.dev ? '[DEV DATABASE]' : args.dbUrl ? '[CUSTOM DATABASE]' : '[PROD DATABASE]'
   console.log(`Ingesting ${filePaths.length} file(s) into ${targetEnvLabel}${isDryRun ? ' [DRY-RUN MODE]' : ''}...`)
 
   const results: IngestResult[] = []

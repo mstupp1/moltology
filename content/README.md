@@ -25,8 +25,11 @@ content/
 
 ### Single File Ingestion
 ```bash
-# Ingest a single news article
+# Ingest a single news article (defaults to PRODUCTION database)
 npx tsx scripts/ingest.ts content/news/my-article.md
+
+# Target DEVELOPMENT / local branch database
+npx tsx scripts/ingest.ts content/news/my-article.md --dev
 
 # Or via package.json script
 npm run db:ingest -- content/news/my-article.md
@@ -34,11 +37,11 @@ npm run db:ingest -- content/news/my-article.md
 
 ### Batch Directory Ingestion
 ```bash
-# Ingest all articles in content/news/
+# Ingest all articles in content/news/ (Production)
 npx tsx scripts/ingest.ts --dir content/news/
 
-# Ingest all content across all subfolders
-npx tsx scripts/ingest.ts content/
+# Ingest all content across all subfolders (Development)
+npx tsx scripts/ingest.ts content/ --dev
 ```
 
 ### Dry Run (Validation Mode)
@@ -47,17 +50,13 @@ Validate frontmatter and schema without writing to the database:
 npx tsx scripts/ingest.ts content/news/my-article.md --dry-run
 ```
 
-### Production Ingestion
-To target the production database directly:
+### Database Environment Resolution
+- **Default (Production)**: Reads `PROD_DATABASE_URL` or `DATABASE_URL_PROD` or `DATABASE_URL`.
+- **Development (`--dev`)**: Reads `DEV_DATABASE_URL` or `DATABASE_URL`.
+- **Explicit Connection (`--db <url>`)**: Connects to the provided Postgres connection string directly.
 ```bash
-# Using --prod flag (reads PROD_DATABASE_URL or DATABASE_URL_PROD from .env)
-npx tsx scripts/ingest.ts content/news/my-article.md --prod
-
-# Or by providing an explicit connection string
-npx tsx scripts/ingest.ts content/news/my-article.md --db "postgresql://user:pass@ep-prod.neon.tech/neondb?sslmode=require"
-
-# Or via inline environment variable
-DATABASE_URL="postgresql://user:pass@ep-prod.neon.tech/neondb?sslmode=require" npx tsx scripts/ingest.ts content/news/my-article.md
+# Ingest directly into custom database URL
+npx tsx scripts/ingest.ts content/news/my-article.md --db "postgresql://user:pass@ep-custom.neon.tech/neondb?sslmode=require"
 ```
 
 ---
