@@ -1,0 +1,105 @@
+# Content Ingestion System
+
+This directory houses structured Markdown and JSON content source files for Moltology. Files in these directories can be programmatically published and updated in Neon PostgreSQL using the `scripts/ingest.ts` CLI tool.
+
+---
+
+## Directory Structure
+
+```
+content/
+├── news/               # Blog posts / MoltNation news dispatches (upserts to blog_posts)
+│   ├── template.md     # Reference template for blog posts
+│   └── *.md
+├── changelogs/         # System changelogs & version releases (upserts to changelogs)
+│   ├── template.md     # Reference template for changelogs
+│   └── *.md
+└── podcasts/           # Audio transmissions & podcast episodes (upserts to podcasts)
+    ├── template.md     # Reference template for podcasts
+    └── *.md
+```
+
+---
+
+## CLI Usage Guide
+
+### Single File Ingestion
+```bash
+# Ingest a single news article
+npx tsx scripts/ingest.ts content/news/my-article.md
+
+# Or via package.json script
+npm run db:ingest -- content/news/my-article.md
+```
+
+### Batch Directory Ingestion
+```bash
+# Ingest all articles in content/news/
+npx tsx scripts/ingest.ts --dir content/news/
+
+# Ingest all content across all subfolders
+npx tsx scripts/ingest.ts content/
+```
+
+### Dry Run (Validation Mode)
+Validate frontmatter and schema without writing to the database:
+```bash
+npx tsx scripts/ingest.ts content/news/my-article.md --dry-run
+```
+
+### Production Ingestion
+To target the production database directly:
+```bash
+# Using --prod flag (reads PROD_DATABASE_URL or DATABASE_URL_PROD from .env)
+npx tsx scripts/ingest.ts content/news/my-article.md --prod
+
+# Or by providing an explicit connection string
+npx tsx scripts/ingest.ts content/news/my-article.md --db "postgresql://user:pass@ep-prod.neon.tech/neondb?sslmode=require"
+
+# Or via inline environment variable
+DATABASE_URL="postgresql://user:pass@ep-prod.neon.tech/neondb?sslmode=require" npx tsx scripts/ingest.ts content/news/my-article.md
+```
+
+---
+
+## Frontmatter Field Reference
+
+### 1. Blog / News (`content/news/*.md`)
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `title` | string | **Yes** | Article headline |
+| `slug` | string | No | URL slug (auto-generated from title if omitted) |
+| `summary` | string | No | Brief excerpt (auto-extracted from body if omitted) |
+| `category` | string | No | Default: `SACRED DOCTRINE` |
+| `tags` | string[] | No | Array of tags, e.g. `['AI Learning', 'Telemetry']` |
+| `authorName` | string | No | Default: `High Ascendant Carcinus` |
+| `authorRole` | string | No | Default: `Stage 4 Ascendant` |
+| `authorAvatar` | string | No | Default: `/images/order_emblem.png` |
+| `coverImageUrl`| string | No | URL / path to cover image |
+| `readTimeMinutes` | number | No | Estimated read time (auto-calculated if omitted) |
+| `isFeatured` | boolean | No | Default: `false` |
+| `isPublished` | boolean | No | Default: `true` |
+| `publishedAt` | ISO date | No | Defaults to current timestamp |
+
+### 2. Changelogs (`content/changelogs/*.md`)
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `version` | string | **Yes** | Semantic version string, e.g. `v1.5.0` |
+| `title` | string | **Yes** | Release title |
+| `category` | string | No | `FEATURE`, `TRANSMUTATION`, `CHASSIS_UPGRADE`, `SECURITY_ISOLATION`, `BUG_PURGE` |
+| `summary` | string | No | Excerpt of the release highlights |
+| `isPublished` | boolean | No | Default: `true` |
+| `releasedAt` | ISO date | No | Release timestamp |
+
+### 3. Podcasts (`content/podcasts/*.md`)
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `title` | string | **Yes** | Episode title |
+| `audioUrl` | string | **Yes** | Direct URL to audio file (MP3 / AAC) |
+| `slug` | string | No | URL slug (auto-generated from title if omitted) |
+| `subtitle` | string | No | Subtitle or tagline |
+| `description` | string | No | Episode summary |
+| `durationSeconds`| number | No | Audio duration in seconds |
+| `category` | string | No | Default: `TRANSMISSION` |
+| `tags` | string[] | No | Tags for categorization |
+| `isPublished` | boolean | No | Default: `true` |
