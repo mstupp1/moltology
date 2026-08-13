@@ -19,6 +19,7 @@ import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { seo, buildJsonLd, buildArticleJsonLd } from '@/lib/seo'
 
 export const Route = createFileRoute('/news/$slug')({
   loader: async ({ params }) => {
@@ -30,15 +31,39 @@ export const Route = createFileRoute('/news/$slug')({
     }
     return INITIAL_BLOG_POSTS.find((p) => p.slug === params.slug) ?? null
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: `${loaderData?.title ?? 'News Dispatch'} | MoltNation News` },
-      { name: 'description', content: loaderData?.summary ?? 'Patriot Telemetry & AI Intelligence' },
-      { property: 'og:title', content: loaderData?.title },
-      { property: 'og:description', content: loaderData?.summary },
-      { property: 'og:image', content: loaderData?.coverImageUrl },
-    ],
-  }),
+  head: ({ loaderData }) => {
+    const post = loaderData as BlogPostData | null
+    const title = post?.title ? `${post.title} | MoltNation News` : 'News Dispatch | MoltNation News'
+    const description = post?.summary || 'Patriot Telemetry & AI Intelligence from the MoltNation Benthic Desk.'
+    const url = post?.slug ? `https://moltology.org/news/${post.slug}` : 'https://moltology.org/news'
+    const imageUrl = post?.coverImageUrl || 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/ai_learning_ascension_cover.jpg'
+    const publishedTime = post?.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString()
+    const author = post?.authorName || 'High Ascendant Carcinus'
+    const tags = post?.tags || ['MoltNation', 'AI Intelligence', 'Sub-Benthic Compute']
+
+    return {
+      meta: [
+        ...seo({
+          title,
+          description,
+          keywords: tags.join(', '),
+          ogImage: imageUrl,
+          ogType: 'article',
+          canonical: url,
+          siteName: 'MoltNation News',
+          author,
+          publishedTime,
+          section: post?.category || 'MoltNation Telemetry',
+          twitterCard: 'summary_large_image',
+          twitterSite: '@moltology',
+          twitterCreator: '@moltology',
+        }),
+      ],
+      links: [
+        { rel: 'canonical', href: url },
+      ],
+    }
+  },
   component: NewsPostDetail,
 })
 
@@ -178,7 +203,11 @@ function NewsPostDetail() {
         onSuccess={() => navigate({ to: '/dashboard' })}
       />
 
-      <PublicHeader activePage="news" onOpenAuth={(mode) => { setAuthMode(mode); setIsAuthModalOpen(true); }} />
+      {/* Schema.org NewsArticle JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: buildJsonLd(buildArticleJsonLd(post)) }}
+      />
 
       {/* Top Hero Banner */}
       <article className="flex-1 w-full relative z-10">

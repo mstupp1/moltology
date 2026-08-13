@@ -36,12 +36,15 @@ import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as CodexMdRouteImport } from './routes/codex.md'
+import { Route as FeedXmlRouteImport } from './routes/feed.xml'
 import { Route as JournalMdRouteImport } from './routes/journal.md'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as NewsMdRouteImport } from './routes/news.md'
 import { Route as OrgMdRouteImport } from './routes/org.md'
 import { Route as PrivacyMdRouteImport } from './routes/privacy.md'
+import { Route as RssXmlRouteImport } from './routes/rss.xml'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as TermsMdRouteImport } from './routes/terms.md'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
 import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
@@ -181,6 +184,11 @@ const CodexMdRoute = CodexMdRouteImport.update({
   path: '/codex/md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedXmlRoute = FeedXmlRouteImport.update({
+  id: '/feed/xml',
+  path: '/feed/xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JournalMdRoute = JournalMdRouteImport.update({
   id: '/journal/md',
   path: '/journal/md',
@@ -210,6 +218,16 @@ const PrivacyMdRoute = PrivacyMdRouteImport.update({
   id: '/md',
   path: '/md',
   getParentRoute: () => PrivacyRoute,
+} as any)
+const RssXmlRoute = RssXmlRouteImport.update({
+  id: '/rss/xml',
+  path: '/rss/xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapXmlRoute = SitemapXmlRouteImport.update({
+  id: '/sitemap/xml',
+  path: '/sitemap/xml',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TermsMdRoute = TermsMdRouteImport.update({
   id: '/md',
@@ -258,11 +276,14 @@ export interface FileRoutesByFullPath {
   '/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/codex/md': typeof CodexMdRoute
+  '/feed/xml': typeof FeedXmlRoute
   '/journal/md': typeof JournalMdRoute
   '/news/$slug': typeof NewsSlugRouteWithChildren
   '/news/md': typeof NewsMdRoute
   '/org/md': typeof OrgMdRoute
   '/privacy/md': typeof PrivacyMdRoute
+  '/rss/xml': typeof RssXmlRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
@@ -296,11 +317,14 @@ export interface FileRoutesByTo {
   '/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/codex/md': typeof CodexMdRoute
+  '/feed/xml': typeof FeedXmlRoute
   '/journal/md': typeof JournalMdRoute
   '/news/$slug': typeof NewsSlugRouteWithChildren
   '/news/md': typeof NewsMdRoute
   '/org/md': typeof OrgMdRoute
   '/privacy/md': typeof PrivacyMdRoute
+  '/rss/xml': typeof RssXmlRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
   '/blog': typeof BlogIndexRoute
   '/news': typeof NewsIndexRoute
@@ -336,11 +360,14 @@ export interface FileRoutesById {
   '/_hud/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/codex/md': typeof CodexMdRoute
+  '/feed/xml': typeof FeedXmlRoute
   '/journal/md': typeof JournalMdRoute
   '/news/$slug': typeof NewsSlugRouteWithChildren
   '/news/md': typeof NewsMdRoute
   '/org/md': typeof OrgMdRoute
   '/privacy/md': typeof PrivacyMdRoute
+  '/rss/xml': typeof RssXmlRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
@@ -376,11 +403,14 @@ export interface FileRouteTypes {
     | '/support'
     | '/blog/$slug'
     | '/codex/md'
+    | '/feed/xml'
     | '/journal/md'
     | '/news/$slug'
     | '/news/md'
     | '/org/md'
     | '/privacy/md'
+    | '/rss/xml'
+    | '/sitemap/xml'
     | '/terms/md'
     | '/blog/'
     | '/news/'
@@ -414,11 +444,14 @@ export interface FileRouteTypes {
     | '/support'
     | '/blog/$slug'
     | '/codex/md'
+    | '/feed/xml'
     | '/journal/md'
     | '/news/$slug'
     | '/news/md'
     | '/org/md'
     | '/privacy/md'
+    | '/rss/xml'
+    | '/sitemap/xml'
     | '/terms/md'
     | '/blog'
     | '/news'
@@ -453,11 +486,14 @@ export interface FileRouteTypes {
     | '/_hud/support'
     | '/blog/$slug'
     | '/codex/md'
+    | '/feed/xml'
     | '/journal/md'
     | '/news/$slug'
     | '/news/md'
     | '/org/md'
     | '/privacy/md'
+    | '/rss/xml'
+    | '/sitemap/xml'
     | '/terms/md'
     | '/blog/'
     | '/news/'
@@ -480,9 +516,12 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRouteWithChildren
   BlogSlugRoute: typeof BlogSlugRoute
   CodexMdRoute: typeof CodexMdRoute
+  FeedXmlRoute: typeof FeedXmlRoute
   JournalMdRoute: typeof JournalMdRoute
   NewsSlugRoute: typeof NewsSlugRouteWithChildren
   NewsMdRoute: typeof NewsMdRoute
+  RssXmlRoute: typeof RssXmlRoute
+  SitemapXmlRoute: typeof SitemapXmlRoute
   BlogIndexRoute: typeof BlogIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
 }
@@ -678,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodexMdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed/xml': {
+      id: '/feed/xml'
+      path: '/feed/xml'
+      fullPath: '/feed/xml'
+      preLoaderRoute: typeof FeedXmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/journal/md': {
       id: '/journal/md'
       path: '/journal/md'
@@ -719,6 +765,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/privacy/md'
       preLoaderRoute: typeof PrivacyMdRouteImport
       parentRoute: typeof PrivacyRoute
+    }
+    '/rss/xml': {
+      id: '/rss/xml'
+      path: '/rss/xml'
+      fullPath: '/rss/xml'
+      preLoaderRoute: typeof RssXmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap/xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap/xml'
+      fullPath: '/sitemap/xml'
+      preLoaderRoute: typeof SitemapXmlRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/terms/md': {
       id: '/terms/md'
@@ -846,9 +906,12 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRouteWithChildren,
   BlogSlugRoute: BlogSlugRoute,
   CodexMdRoute: CodexMdRoute,
+  FeedXmlRoute: FeedXmlRoute,
   JournalMdRoute: JournalMdRoute,
   NewsSlugRoute: NewsSlugRouteWithChildren,
   NewsMdRoute: NewsMdRoute,
+  RssXmlRoute: RssXmlRoute,
+  SitemapXmlRoute: SitemapXmlRoute,
   BlogIndexRoute: BlogIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
 }
