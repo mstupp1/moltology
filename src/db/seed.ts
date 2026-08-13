@@ -1,15 +1,17 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { eq } from 'drizzle-orm'
 import * as dotenv from 'dotenv'
 import * as schema from './schema'
+import { parseContentFile } from '../lib/ingest/parser'
+import { ingestContentItem } from '../lib/ingest/handlers'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
 import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
 import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
 import { INITIAL_PODCASTS } from '../lib/podcast-data'
-
-
 
 dotenv.config()
 
@@ -408,6 +410,28 @@ export async function seedDatabase(databaseUrl?: string) {
         .onConflictDoNothing({ target: schema.podcasts.slug })
     }
     console.log(`✓ Seeded ${INITIAL_PODCASTS.length} podcast episodes`)
+
+    // 9. Ingest live markdown content from content/ repository
+    const contentDir = path.resolve(process.cwd(), 'content')
+    if (fs.existsSync(contentDir)) {
+      console.log('[SEED] Ingesting repository content files from content/...')
+      const entries = fs.readdirSync(contentDir, { withFileTypes: true, recursive: true })
+      let contentIngested = 0
+      for (const entry of entries) {
+        if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.json'))) {
+          const lower = entry.name.toLowerCase()
+          if (lower === 'readme.md' || lower.startsWith('template')) continue
+          const parent = (entry as any).parentPath || contentDir
+          if (parent.includes('drafts')) continue
+          const fullPath = path.join(parent, entry.name)
+          const raw = fs.readFileSync(fullPath, 'utf-8')
+          const parsed = parseContentFile(fullPath, raw)
+          const res = await ingestContentItem(parsed, { silent: true }, db)
+          if (res.success) contentIngested++
+        }
+      }
+      console.log(`✓ Ingested ${contentIngested} content files from content/ repository`)
+    }
 
     console.log('[SEED] ✓ All mock database seeding tasks completed successfully!')
 

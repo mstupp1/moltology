@@ -8,3 +8,9 @@ dist
 .nitro
 .tanstack
 .vinxi
+.reasonix
+*.log
+coverage
+scratch
+content/drafts
+
