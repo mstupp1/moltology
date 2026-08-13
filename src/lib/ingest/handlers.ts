@@ -15,6 +15,7 @@ dotenv.config()
 
 /**
  * Gets or creates a database client for CLI ingestion.
+ * Defaults to the production database unless --dev is explicitly passed.
  */
 export function getIngestDb(config?: IngestOptions | string) {
   let databaseUrl: string | undefined
@@ -24,25 +25,27 @@ export function getIngestDb(config?: IngestOptions | string) {
   } else if (config) {
     if (config.dbUrl) {
       databaseUrl = config.dbUrl
-    } else if (config.prod) {
+    } else if (config.dev) {
+      databaseUrl = process.env.DEV_DATABASE_URL || process.env.DATABASE_URL
+    } else {
+      // Default to production database
       databaseUrl =
         process.env.PROD_DATABASE_URL ||
         process.env.DATABASE_URL_PROD ||
         process.env.DATABASE_URL
-      if (!databaseUrl) {
-        throw new Error(
-          'Production database URL is missing. Set PROD_DATABASE_URL or DATABASE_URL in your environment.'
-        )
-      }
-    } else {
-      databaseUrl = process.env.DATABASE_URL
     }
   } else {
-    databaseUrl = process.env.DATABASE_URL
+    // Default to production database
+    databaseUrl =
+      process.env.PROD_DATABASE_URL ||
+      process.env.DATABASE_URL_PROD ||
+      process.env.DATABASE_URL
   }
 
   if (!databaseUrl) {
-    throw new Error('DATABASE_URL environment variable is missing. Please check your .env file.')
+    throw new Error(
+      'Database connection URL is missing. Please set PROD_DATABASE_URL or DATABASE_URL in your .env file.'
+    )
   }
   const client = neon(databaseUrl)
   return drizzle(client, { schema })
@@ -287,7 +290,7 @@ export async function ingestContentItem(
     parsed.metadata?.type
   )
 
-  const client = options.dryRun ? null : dbClient || getIngestDb()
+  const client = options.dryRun ? null : dbClient || getIngestDb(options)
 
   try {
     switch (targetType) {
