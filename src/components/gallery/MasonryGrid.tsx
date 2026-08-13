@@ -57,24 +57,24 @@ export const MasonryGrid: React.FC<MasonryGridProps> = ({
               {/* Hover Dark Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#030607]/90 via-[#030607]/30 to-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-              {/* Top Hover Controls */}
-              <div className="absolute top-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0 z-10">
+              {/* Top Controls - Always visible on mobile, hover-reveal on desktop */}
+              <div className="absolute top-2.5 left-2.5 right-2.5 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform sm:-translate-y-2 sm:group-hover:translate-y-0 z-10">
                 {/* Category Badge */}
-                <span className="px-2 py-1 bg-[#050a0c]/80 backdrop-blur-md border border-[#00c3ff]/50 text-[#00c3ff] text-[10px] font-mono font-bold tracking-wider uppercase rounded-md shadow-md">
+                <span className="px-2 py-0.5 sm:py-1 bg-[#050a0c]/85 backdrop-blur-md border border-[#00c3ff]/50 text-[#00c3ff] text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase rounded-md shadow-md">
                   {pin.category}
                 </span>
 
                 {/* Save Pin Red/Cyber Button */}
                 <button
                   onClick={(e) => onToggleSavePin(e, pin.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-lg active:scale-95 ${
+                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-lg active:scale-95 min-h-[32px] ${
                     isSaved
                       ? 'bg-[#ff3b30] text-white border border-[#ff6b60] shadow-[0_0_12px_rgba(255,59,48,0.6)]'
-                      : 'bg-black/70 hover:bg-[#ff3b30] text-white border border-white/20 hover:border-[#ff3b30] backdrop-blur-md'
+                      : 'bg-black/75 hover:bg-[#ff3b30] text-white border border-white/20 hover:border-[#ff3b30] backdrop-blur-md'
                   }`}
                   title={isSaved ? 'Unpin from Vault' : 'Pin to Vault'}
                 >
-                  <Pin className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
+                  <Pin className={`w-3 sm:w-3.5 h-3 sm:h-3.5 ${isSaved ? 'fill-current' : ''}`} />
                   <span>{isSaved ? 'PINNED' : 'PIN'}</span>
                 </button>
               </div>

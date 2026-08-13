@@ -4,17 +4,53 @@
 
 @layer base {
   html {
-    font-size: 112.5%;
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 106.25%;
+    }
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 112.5%;
+    }
   }
   body {
     background-color: #070b0b;
     color: #dfe3e3;
     font-family: 'JetBrains Mono', monospace;
     overflow-x: hidden;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
   svg.lucide {
     stroke-width: 2.2px;
   }
+}
+
+/* Touch Momentum & Mobile Helpers */
+.touch-pan-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* Sleek HUD buttons and panels with standard continuous borders (No diagonal cut corners) */

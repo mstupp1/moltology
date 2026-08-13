@@ -406,10 +406,10 @@ export const OrgPage: React.FC = () => {
           </div>
 
         {/* Tab Navigation */}
-        <div className="flex justify-center gap-2 mb-10 overflow-x-auto pb-1 bg-white p-1.5 rounded-full border border-sky-200 shadow-sm w-fit mx-auto">
+        <div className="flex justify-start sm:justify-center gap-1.5 sm:gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
           <button
             onClick={() => setActiveTab('mission')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
               activeTab === 'mission'
                 ? 'bg-sky-500 text-white shadow-md'
                 : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
@@ -419,7 +419,7 @@ export const OrgPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('vision')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
               activeTab === 'vision'
                 ? 'bg-sky-500 text-white shadow-md'
                 : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
@@ -429,7 +429,7 @@ export const OrgPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('safety')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
               activeTab === 'safety'
                 ? 'bg-emerald-500 text-white shadow-md'
                 : 'text-slate-500 hover:text-emerald-700 hover:bg-emerald-50'
@@ -439,7 +439,7 @@ export const OrgPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('perks')}
-            className={`px-6 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 ${
+            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
               activeTab === 'perks'
                 ? 'bg-sky-500 text-white shadow-md'
                 : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'

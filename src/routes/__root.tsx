@@ -12,7 +12,7 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: 'UTF-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1.0, viewport-fit=cover' },
       ...seo({
         title: 'Moltology \u2014 The Synaptic Path',
         description:

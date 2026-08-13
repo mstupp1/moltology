@@ -562,10 +562,10 @@ function CommunityRoute() {
             </div>
 
             {/* Category Quick Filter Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <div className="flex items-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar pb-2">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-3 py-1 text-xs font-bold font-grotesk uppercase whitespace-nowrap transition border ${
+                className={`px-3 py-1.5 min-h-[38px] text-xs font-bold font-grotesk uppercase whitespace-nowrap transition border flex items-center justify-center ${
                   selectedCategory === 'all'
                     ? 'bg-[#00ffff]/20 border-[#00ffff] text-[#00ffff]'
                     : 'bg-[#171c1c] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'
@@ -577,7 +577,7 @@ function CommunityRoute() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.slug)}
-                  className={`px-3 py-1 text-xs font-bold font-grotesk uppercase whitespace-nowrap transition border flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 min-h-[38px] text-xs font-bold font-grotesk uppercase whitespace-nowrap transition border flex items-center gap-1.5 shrink-0 ${
                     selectedCategory === cat.slug
                       ? 'bg-[#171c1c] border-current text-[#dfe3e3]'
                       : 'bg-[#171c1c] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'

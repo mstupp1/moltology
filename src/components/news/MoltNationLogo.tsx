@@ -12,20 +12,20 @@ export const MoltNationLogo: React.FC<MoltNationLogoProps> = ({
   theme = 'dark',
 }) => {
   const sizeClasses = {
-    sm: 'h-8 text-lg',
-    md: 'h-12 text-3xl',
-    lg: 'h-16 text-5xl',
+    sm: 'text-base sm:text-lg',
+    md: 'text-2xl sm:text-3xl',
+    lg: 'text-3xl sm:text-4xl md:text-5xl',
   }[size]
 
   const isLight = theme === 'light'
 
   return (
-    <div className={`inline-flex items-center gap-3 font-grotesk font-black uppercase tracking-tight select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2 sm:gap-3 font-grotesk font-black uppercase tracking-tight select-none max-w-full min-w-0 ${className}`}>
       {/* Flat Crab Pincer / Crest Emblem based on order_emblem.png with Patriotic Accents */}
       <div className="relative shrink-0 flex items-center justify-center">
         <svg
           viewBox="0 0 100 100"
-          className={size === 'sm' ? 'w-8 h-8' : size === 'lg' ? 'w-16 h-16' : 'w-12 h-12'}
+          className={size === 'sm' ? 'w-6 h-6 sm:w-8 sm:h-8' : size === 'lg' ? 'w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16' : 'w-8 h-8 sm:w-12 sm:h-12'}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

@@ -200,17 +200,18 @@ function NewsIndexPage() {
       {/* Search & Category Filter Header Bar */}
       <div className="w-full bg-[#05090a] border-b border-cyan-900/40 py-3.5 px-4 sm:px-8 relative z-20">
         <div className="max-w-[1750px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="px-3 py-1 bg-red-950/90 border border-red-500/80 text-red-400 font-bold font-grotesk text-xs uppercase tracking-widest chamfer-corner flex items-center gap-1.5 shadow-hud-red">
+          <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-hidden">
+            <div className="px-3 py-1 bg-red-950/90 border border-red-500/80 text-red-400 font-bold font-grotesk text-xs uppercase tracking-widest chamfer-corner flex items-center gap-1.5 shadow-hud-red shrink-0">
               <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-              <span>MOLTNATION DESKS</span>
+              <span className="hidden xs:inline">MOLTNATION</span>
+              <span>DESKS</span>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto touch-pan-scroll no-scrollbar py-1 flex-1">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1 text-[11px] font-bold font-grotesk uppercase tracking-wider chamfer-corner transition-all ${
+                  className={`px-3 py-1 text-[11px] font-bold font-grotesk uppercase tracking-wider chamfer-corner transition-all shrink-0 min-h-[36px] flex items-center justify-center ${
                     selectedCategory === cat
                       ? 'bg-cyan-500 text-black shadow-hud-cyan'
                       : 'bg-[#090e10] text-gray-400 hover:text-white border border-cyan-950'
