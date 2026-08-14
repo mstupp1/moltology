@@ -99,7 +99,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
     expect(dialog).toBeInTheDocument()
-    expect(dialog).toHaveClass('fixed', 'inset-0', 'z-[99999]', 'w-screen', 'h-[100dvh]')
+    expect(dialog).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'top-14', 'w-screen')
     expect(document.body.style.overflow).toBe('hidden')
 
     // Close via close button
