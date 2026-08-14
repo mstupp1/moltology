@@ -113,16 +113,23 @@ Create high-conversion accompanying social assets and stage/publish them to Inst
 * **Strict Tenet**: In alignment with our honest, transparent AI-driven platform values and platform policies, **always check/enable the AI-Generated Media option** (`isAiGenerated: true` for Instagram/Meta, `madeWithAi: true` for X).
 * This applies to all generated carousel slides, concept art, and Story assets.
 
-#### 3. Generate & Format Vertical Assets
+#### 3. Generate & Format Vertical Assets (Brand Cohesion & Hook-First)
+* **Design Philosophy for Instagram**:
+  - **Brand Aesthetic Continuity**: Preserve Moltology's distinct DNA—deep obsidian/slate surfaces, glowing cyan and amber telemetry accents, subtle oceanic depth, and sleek high-tech framing—so it feels 100% cohesive with `moltology.org`.
+  - **Low Info-Density (Mobile-First Clarity)**: Avoid hyper-dense schematics, microscopic telemetry, or busy HUD matrices. Keep compositions spacious and easily readable on a phone screen.
+  - **Large Impact Typography**: Use bold, punchy headline text to immediately stop the scroll in the feed.
+  - **Tease the Concept (Curiosity Gap)**: Present an intriguing premise, provocative question, or stark comparison rather than explaining all engineering details on the image.
+
 * **Carousel Slides (Strict 4:5 Aspect Ratio / 0.80:1)**:
   - Instagram's Graph API strictly enforces that feed/carousel images have an aspect ratio between `4:5` (0.80:1) and `1.91:1`.
   - Raw `3:4` generations are `896 x 1200` (0.7467), which Instagram rejects.
   - **Required Step**: Always crop carousel images to exact **4:5 aspect ratio** (`896 x 1120` or `1080 x 1350`) using `sips -c 1120 896 input.jpg --out output_4_5.jpg` before uploading.
-  - **Slide 1 (Hook)**: Dark sci-fi HUD visual with a provocative premise or question.
-  - **Slide 2 (The Mechanism/Telemetry)**: Schematics, blueprints, or telemetry metrics highlighting the core breakthrough.
-  - **Slide 3 (CTA/Summary Card)**: Minimalist terminal card directing readers to the full dispatch.
+  - **Slide 1 (The Hook)**: Bold typography headline over a moody oceanic/cybernetic background with a provocative question or premise (e.g., *"WHY AI COMPUTE IS MOVING TO THE OCEAN FLOOR"*).
+  - **Slide 2 (The Infographic Tease)**: Clean HUD-inspired contrast or 2-3 visual callouts comparing the old limitation vs. the new breakthrough (e.g., *Air-cooling power waste vs. Hydrostatic zero-moving-parts efficiency*).
+  - **Slide 3 (The CTA / Takeaway Card)**: Sleek terminal summary card directing readers to the full dispatch (*"Full dispatch & engineering notes live on moltology.org. Link in bio."*).
+
 * **Story Slide (9:16 aspect ratio)**:
-  - Vertical mobile layout (`9:16`) with framing HUD borders and an open central area for Instagram's interactive **Link Sticker** leading directly to `https://moltology.org/news/<slug>`.
+  - Vertical mobile layout (`9:16`) with dark HUD top/bottom framing and an open central area for Instagram's interactive **Link Sticker** leading directly to `https://moltology.org/news/<slug>`.
 
 #### 4. Upload Assets to Neon S3
 Upload formatted 4:5 social assets to Neon S3 via `src/lib/ingest/s3-upload.ts` (`uploadLocalFileToS3`) to obtain public HTTPS URLs.
