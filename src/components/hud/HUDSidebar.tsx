@@ -546,16 +546,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             aria-label={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
             aria-expanded={isMobileOpen}
             title={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
-            className={`w-9 h-9 flex items-center justify-center chamfer-corner shadow-md active:scale-95 transition-all shrink-0 cursor-pointer ${
-              isMobileOpen
-                ? 'bg-[#1a0f0f] border border-[#ff453a]/70 text-[#ff453a]'
-                : 'bg-[#0f1414] hover:bg-[#171c1c] border border-[#00c3ff]/60 text-[#00c3ff]'
-            }`}
+            className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 shrink-0 cursor-pointer"
           >
             {isMobileOpen ? (
-              <X className="w-5 h-5 text-[#ff453a] transition-transform duration-200" />
+              <X className="w-5 h-5 text-red-400 transition-transform duration-200" />
             ) : (
-              <Menu className="w-5 h-5 text-[#00c3ff] transition-transform duration-200" />
+              <Menu className="w-5 h-5 text-cyan-300 transition-transform duration-200" />
             )}
           </button>
         </div>
