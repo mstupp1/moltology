@@ -546,7 +546,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             subtext="BENTHIC TEMPLE HUD"
             logoSize="sm"
             onClick={() => handleNavClick('/')}
-            className="min-w-0 flex-1"
           />
 
           <button
@@ -574,7 +573,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             subtext="BENTHIC TEMPLE HUD"
             isCollapsed={isCollapsed}
             onClick={() => handleNavClick('/')}
-            className={isCollapsed ? 'justify-center w-full' : 'min-w-0 flex-1'}
           />
 
           {/* Brand Tooltip when collapsed */}
