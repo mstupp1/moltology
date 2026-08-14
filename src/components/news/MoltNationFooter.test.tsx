@@ -30,6 +30,7 @@ describe('MoltNationFooter Component', () => {
     expect(screen.getByText('SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
     expect(screen.getByText('STORE')).toBeInTheDocument()
+    expect(screen.getByText('INSTAGRAM')).toBeInTheDocument()
     expect(screen.getByText('RSS FEED')).toBeInTheDocument()
   })
 
