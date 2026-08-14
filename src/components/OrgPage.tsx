@@ -36,6 +36,7 @@ import {
   Coffee,
   Star,
   Anchor,
+  Instagram,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -1232,6 +1233,10 @@ export const OrgPage: React.FC = () => {
             <button onClick={() => onNavigate('/')} className="hover:text-white">HOME</button>
             <button onClick={() => onNavigate('/org')} className="hover:text-white text-white font-bold">ORGANIZATION</button>
             <a href="https://www.etsy.com/shop/SaasTrash" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 font-bold">STORE</a>
+            <a href="https://www.instagram.com/silas.trench" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
+              <Instagram className="w-3.5 h-3.5" />
+              <span>INSTAGRAM</span>
+            </a>
             {user && <button onClick={() => onNavigate('/dashboard')} className="hover:text-white">DASHBOARD</button>}
           </div>
 
