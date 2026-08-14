@@ -83,7 +83,35 @@ describe('PublicHeader Navigation Component', () => {
     const avatarBtn = avatarBtns[0]
     fireEvent.click(avatarBtn)
 
-    expect(screen.getByText('Google User')).toBeInTheDocument()
+    expect(screen.getAllByText('Google User').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+  })
+
+  it('renders mobile-friendly operative account accordion in hamburger menu when signed in', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'user-2',
+          name: 'Operative Neo',
+          email: 'neo@moltology.org',
+          image: null,
+        },
+      },
+    } as any)
+
+    render(<PublicHeader activePage="home" />)
+
+    const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
+    fireEvent.click(toggle)
+
+    const avatarBtns = screen.getAllByRole('button', { name: /user account menu/i })
+    const mobileAvatarBtn = avatarBtns[avatarBtns.length - 1]
+    expect(mobileAvatarBtn).toBeInTheDocument()
+
+    // Clicking the mobile accordion button opens the account drawer with settings and sign out
+    fireEvent.click(mobileAvatarBtn)
+    expect(screen.getAllByText('neo@moltology.org').length).toBeGreaterThan(0)
+    expect(screen.getByText('Disable Heavy VFX')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 

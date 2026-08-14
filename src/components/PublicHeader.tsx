@@ -292,7 +292,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           mobileOpen ? 'max-h-[calc(100vh-5rem)] overflow-y-auto opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
         }`}
       >
-        <div className="mt-3 px-2 pb-3 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
+        <div className="mt-3 p-3 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
           <button
             onClick={() => onNavigate('/')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
@@ -340,17 +340,15 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           <div className="border-t border-cyan-950/80 pt-2 mt-1" />
 
           {user ? (
-            <div className="space-y-2">
+            <div className="space-y-2 pt-1">
               <button
                 onClick={() => onNavigate('/dashboard')}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-sm uppercase tracking-wider transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-sm uppercase tracking-wider transition-colors shadow-[0_0_12px_rgba(0,195,255,0.15)] active:scale-[0.99]"
               >
-                <Cpu className="w-4 h-4" />
+                <Cpu className="w-4 h-4 text-cyan-400" />
                 <span>DASHBOARD</span>
               </button>
-              <div className="flex items-center justify-center">
-                <UserAvatarMenu user={user} onNavigate={onNavigate} />
-              </div>
+              <UserAvatarMenu user={user} onNavigate={onNavigate} inline />
             </div>
           ) : (
             <div className="flex items-stretch gap-2">

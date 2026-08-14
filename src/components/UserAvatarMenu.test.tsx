@@ -96,4 +96,26 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('VFX Off (Performance Mode)')).toBeInTheDocument()
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
   })
+
+  it('renders inline mobile mode and smoothly expands on click', () => {
+    render(<UserAvatarMenu user={mockUser} inline={true} />)
+
+    const triggerBtn = screen.getByRole('button', { name: /user account menu/i })
+    expect(triggerBtn).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
+
+    // Sign out button is hidden before expanding
+    expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
+
+    // Click trigger to expand
+    fireEvent.click(triggerBtn)
+    expect(triggerBtn).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    expect(screen.getByText('Disable Heavy VFX')).toBeInTheDocument()
+
+    // Click trigger again to collapse
+    fireEvent.click(triggerBtn)
+    expect(triggerBtn).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
+  })
 })
