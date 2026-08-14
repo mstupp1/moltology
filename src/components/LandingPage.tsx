@@ -1041,7 +1041,7 @@ export const LandingPage: React.FC = () => {
               CARCINIZATION PIPELINE
             </button>
             <a
-              href="https://www.instagram.com/silas.trench"
+              href="https://www.instagram.com/moltology_org/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
