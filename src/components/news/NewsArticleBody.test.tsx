@@ -36,7 +36,7 @@ Outro text after image.
     expect(screen.getByText(/BENTHIC VISUAL TELEMETRY/i)).toBeDefined()
   })
 
-  it('renders code blocks and telemetry frames with copy button', () => {
+  it('renders code blocks and telemetry frames with copy button and mobile touch classes', () => {
     const markdown = `
 \`\`\`telemetry
 ┌────────────────────────┐
@@ -48,7 +48,8 @@ Outro text after image.
 
     expect(screen.getByText(/TELEMETRY/i)).toBeDefined()
     expect(screen.getByText(/TEST TIME COMPUTE GRID/i)).toBeDefined()
-    expect(screen.getByRole('button', { name: /copy/i })).toBeDefined()
+    const copyBtn = screen.getByRole('button', { name: /copy/i })
+    expect(copyBtn).toBeDefined()
   })
 
   it('renders lists and blockquotes correctly', () => {
@@ -68,5 +69,10 @@ Outro text after image.
     expect(screen.getByText(/Second Ordered Item/i)).toBeDefined()
     expect(screen.getByText(/Bullet Item One/i)).toBeDefined()
     expect(screen.getByText(/Bullet Item Two/i)).toBeDefined()
+  })
+
+  it('handles empty or null content gracefully without error', () => {
+    const { container } = render(<NewsArticleBody content="" />)
+    expect(container.firstChild).toBeNull()
   })
 })

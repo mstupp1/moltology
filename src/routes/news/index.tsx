@@ -22,6 +22,7 @@ import { getBlogPostsFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { MoltNationBannerBg } from '@/components/news/MoltNationBannerBg'
 import { PodcastPlayer } from '@/components/podcast/PodcastPlayer'
 import { INITIAL_PODCASTS } from '@/lib/podcast-data'
@@ -917,15 +918,8 @@ function NewsIndexPage() {
 
       </main>
 
-      {/* Footer */}
-      <footer className="w-full bg-[#030506] border-t border-cyan-900/40 py-8 px-6 sm:px-12 text-xs text-gray-400 font-mono relative z-20">
-        <div className="max-w-[1750px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <MoltNationLogo size="sm" theme="dark" />
-          </div>
-          <div className="text-gray-500">© 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED.</div>
-        </div>
-      </footer>
+      {/* MoltNation Deep Network Footer */}
+      <MoltNationFooter />
     </div>
   )
 }
