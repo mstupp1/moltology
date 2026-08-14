@@ -11,10 +11,10 @@ describe('BlogTopSlider', () => {
     expect(screen.getByText(/LEAD NEWS DISPATCH \/\/ BREAKING COVERAGE #01/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
-        'From Prompt Engineering to Bio-Silicon Cognition: Why AI Courses are Stage 1 of Carcinization'
+        INITIAL_BLOG_POSTS[0].title
       )[0]
     ).toBeInTheDocument()
-    expect(screen.getByText('High Ascendant Carcinus')).toBeInTheDocument()
+    expect(screen.getAllByText(INITIAL_BLOG_POSTS[0].authorName)[0]).toBeInTheDocument()
   })
 
   it('navigates to next slide when next button is clicked', () => {
@@ -27,7 +27,7 @@ describe('BlogTopSlider', () => {
     expect(screen.getByText(/LEAD NEWS DISPATCH \/\/ BREAKING COVERAGE #02/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
-        'Test-Time Compute & Autonomous Swarm Orchestration: Benthic Protocol 2026'
+        INITIAL_BLOG_POSTS[1].title
       )[0]
     ).toBeInTheDocument()
   })
@@ -39,10 +39,10 @@ describe('BlogTopSlider', () => {
     const prevBtn = screen.getByLabelText('Previous slide')
     fireEvent.click(prevBtn)
 
-    // Last post index
+    // Last featured post index (slice 0, 5 -> index 4)
     expect(
       screen.getAllByText(
-        'Sub-Benthic Neural Telemetry: Monitoring Agentic Drift in Recursive Systems'
+        INITIAL_BLOG_POSTS[4].title
       )[0]
     ).toBeInTheDocument()
   })
@@ -62,7 +62,7 @@ describe('BlogTopSlider', () => {
     render(<BlogTopSlider posts={INITIAL_BLOG_POSTS} onSelectPost={handleSelect} />)
 
     const thirdPostThumb = screen.getAllByText(
-      'Carcinization Protocol 04: Exoshell Hardening & Zero-Latency RLS Data Isolation'
+      INITIAL_BLOG_POSTS[2].title
     )[0]
     fireEvent.click(thirdPostThumb)
 

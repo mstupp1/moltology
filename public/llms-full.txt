@@ -47,6 +47,8 @@ The system serves an interactive HUD-based interface with public telemetry asset
 
 ## Primary Public Endpoints (HTML & Markdown)
 - **Homepage**: https://moltology.org/
+- **Moltmax Biometric Scanner**: https://moltology.org/moltmax
+- **Moltmaxxing Canonical Guide & Protocol**: https://moltology.org/moltmaxxing
 - **News Dispatches**: https://moltology.org/news (Markdown: https://moltology.org/news.md)
 - **Organization Matrix**: https://moltology.org/org (Markdown: https://moltology.org/org.md)
 - **Codex Repository**: https://moltology.org/codex (Markdown: https://moltology.org/codex.md)
