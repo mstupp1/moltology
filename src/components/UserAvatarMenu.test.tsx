@@ -53,7 +53,7 @@ describe('UserAvatarMenu Component', () => {
     })
   })
 
-  it('closes dropdown menu when pressing Escape', () => {
+  it('closes dropdown menu when pressing Escape', async () => {
     render(<UserAvatarMenu user={mockUser} />)
 
     const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
@@ -61,7 +61,9 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
 
     fireEvent.keyDown(document, { key: 'Escape' })
-    expect(screen.queryByText('Carcinus Ascendant')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByText('Carcinus Ascendant')).not.toBeInTheDocument()
+    })
   })
 
   it('renders SUPER ADMIN badge when user email matches super admin email', () => {
@@ -97,7 +99,7 @@ describe('UserAvatarMenu Component', () => {
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
   })
 
-  it('renders inline mobile mode and smoothly expands on click', () => {
+  it('renders inline mobile mode and smoothly expands on click', async () => {
     render(<UserAvatarMenu user={mockUser} inline={true} />)
 
     const triggerBtn = screen.getByRole('button', { name: /user account menu/i })
@@ -116,6 +118,8 @@ describe('UserAvatarMenu Component', () => {
     // Click trigger again to collapse
     fireEvent.click(triggerBtn)
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
+    })
   })
 })

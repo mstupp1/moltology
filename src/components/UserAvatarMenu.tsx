@@ -38,6 +38,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   className = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [shouldRender, setShouldRender] = useState(isOpen)
+  const [isExpanded, setIsExpanded] = useState(isOpen)
   const menuRef = useRef<HTMLDivElement>(null)
   const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
 
@@ -75,6 +77,30 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isOpen])
+
+  // Synchronized smooth animation lifecycle for both inline accordion and desktop popover
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true)
+      if (typeof window !== 'undefined') {
+        const raf1 = requestAnimationFrame(() => {
+          const raf2 = requestAnimationFrame(() => {
+            setIsExpanded(true)
+          })
+          return () => cancelAnimationFrame(raf2)
+        })
+        return () => cancelAnimationFrame(raf1)
+      } else {
+        setIsExpanded(true)
+      }
+    } else {
+      setIsExpanded(false)
+      const timer = setTimeout(() => {
+        setShouldRender(false)
+      }, inline ? 250 : 200)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen, inline])
 
   const displayName = user.name || user.email?.split('@')[0] || 'Operative'
   const isSuperAdminEmail = user.email?.toLowerCase() === 'mylesstupp@gmail.com'
@@ -124,59 +150,69 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
           <ChevronDown
-            className={`w-4 h-4 text-cyan-400/70 group-hover:text-cyan-300 transition-transform duration-200 shrink-0 ml-2 ${
-              isOpen ? 'rotate-180 text-[#00c3ff]' : ''
+            className={`w-4 h-4 text-cyan-400/70 group-hover:text-cyan-300 transition-transform duration-300 ease-in-out shrink-0 ml-2 ${
+              isOpen ? 'rotate-180 text-[#00c3ff]' : 'rotate-0'
             }`}
           />
         </button>
 
-        {/* Clean Flat Inline Controls with smooth expand animation */}
-        {isOpen && (
-          <div className="pt-1.5 pb-1 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-            {/* Heavy VFX Toggle Row */}
-            <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-cyan-950/25 border border-cyan-950/60">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {heavyVfxDisabled ? (
-                  <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
-                ) : (
-                  <Sparkles className="w-4 h-4 text-[#00c3ff] shrink-0" />
-                )}
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-bold text-gray-200 truncate font-grotesk">
-                    Disable Heavy VFX
-                  </span>
-                  <span className="text-[10px] text-gray-400 truncate font-mono">
-                    {heavyVfxDisabled ? 'Performance Mode' : 'Full Graphics Active'}
-                  </span>
+        {/* Smooth Animated Inline Controls Accordion */}
+        {shouldRender && (
+          <div
+            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+              isExpanded
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="pt-2 pb-1 space-y-2">
+                {/* Heavy VFX Toggle Row */}
+                <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-cyan-950/25 border border-cyan-950/60">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {heavyVfxDisabled ? (
+                      <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                    ) : (
+                      <Sparkles className="w-4 h-4 text-[#00c3ff] shrink-0" />
+                    )}
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-gray-200 truncate font-grotesk">
+                        Disable Heavy VFX
+                      </span>
+                      <span className="text-[10px] text-gray-400 truncate font-mono">
+                        {heavyVfxDisabled ? 'Performance Mode' : 'Full Graphics Active'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={heavyVfxDisabled}
+                    aria-label="Disable heavy vfx toggle"
+                    onClick={toggleHeavyVfx}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
+                      heavyVfxDisabled ? 'bg-cyan-950 border-cyan-800' : 'bg-[#00c3ff]'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        heavyVfxDisabled ? 'translate-x-0 bg-gray-400' : 'translate-x-4 bg-white'
+                      }`}
+                    />
+                  </button>
                 </div>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={heavyVfxDisabled}
-                aria-label="Disable heavy vfx toggle"
-                onClick={toggleHeavyVfx}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
-                  heavyVfxDisabled ? 'bg-cyan-950 border-cyan-800' : 'bg-[#00c3ff]'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                    heavyVfxDisabled ? 'translate-x-0 bg-gray-400' : 'translate-x-4 bg-white'
-                  }`}
-                />
-              </button>
-            </div>
 
-            {/* Sign Out Action Button */}
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold font-grotesk tracking-wider text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600 transition-all cursor-pointer active:scale-[0.99]"
-            >
-              <LogOut className="w-4 h-4 text-red-400" />
-              <span>SIGN OUT</span>
-            </button>
+                {/* Sign Out Action Button */}
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-bold font-grotesk tracking-wider text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600 transition-all cursor-pointer active:scale-[0.99]"
+                >
+                  <LogOut className="w-4 h-4 text-red-400" />
+                  <span>SIGN OUT</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -202,8 +238,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
         />
       </button>
 
-      {/* Floating Glassmorphic HUD Dropdown Menu */}
-      {isOpen && (
+      {/* Floating Glassmorphic HUD Dropdown Menu with smooth animated open and close */}
+      {shouldRender && (
         <div
           className={`absolute ${
             align === 'right'
@@ -212,8 +248,16 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               ? 'left-1/2 -translate-x-1/2'
               : 'left-0'
           } ${
-            openDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
-          } w-64 max-w-[calc(100vw-2rem)] bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 animate-in fade-in zoom-in-95 duration-150 font-mono`}
+            openDirection === 'up'
+              ? 'bottom-full mb-2 origin-bottom'
+              : 'top-full mt-2 origin-top'
+          } w-64 max-w-[calc(100vw-2rem)] bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 font-mono transition-all duration-200 ease-out ${
+            isExpanded
+              ? 'opacity-100 scale-100 translate-y-0'
+              : openDirection === 'up'
+              ? 'opacity-0 scale-95 translate-y-2 pointer-events-none'
+              : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+          }`}
         >
           {/* Top User Header Info Section */}
           <div className="flex items-center gap-3 pb-3 border-b border-[#121c1d]">
