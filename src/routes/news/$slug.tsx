@@ -219,7 +219,7 @@ export function NewsPostDetail() {
 
       {/* Top Hero Banner */}
       <article className="flex-1 w-full relative z-10">
-        <header className="w-full relative pt-20 sm:pt-28 pb-8 sm:pb-16 px-4 sm:px-8 lg:px-12 border-b border-cyan-900/50 bg-[#040708] overflow-hidden">
+        <header className="w-full relative pt-24 sm:pt-32 pb-8 sm:pb-16 px-4 sm:px-8 lg:px-12 border-b border-cyan-900/50 bg-[#040708] overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#040708] via-[#040708]/90 via-45% to-transparent z-[1] pointer-events-none" />
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
             <Link

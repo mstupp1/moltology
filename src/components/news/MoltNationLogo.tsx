@@ -24,9 +24,9 @@ export const MoltNationLogo: React.FC<MoltNationLogoProps> = ({
 
   return (
     <div
-      className={`inline-flex ${
-        isCenter ? 'flex-col sm:flex-row items-center justify-center text-center sm:text-left' : 'items-center text-left'
-      } gap-2.5 sm:gap-3 font-grotesk font-black uppercase tracking-tight select-none max-w-full min-w-0 ${className}`}
+      className={`inline-flex items-center ${
+        isCenter ? 'justify-center text-center sm:text-left' : 'text-left'
+      } gap-2.5 sm:gap-3.5 font-grotesk font-black uppercase tracking-tight select-none max-w-full min-w-0 ${className}`}
     >
       {/* Flat Crab Pincer / Crest Emblem based on order_emblem.png with Patriotic Accents */}
       <div className="relative shrink-0 flex items-center justify-center">
@@ -66,13 +66,13 @@ export const MoltNationLogo: React.FC<MoltNationLogoProps> = ({
       </div>
 
       {/* Brand Text Block */}
-      <div className={`flex flex-col ${isCenter ? 'items-center sm:items-start' : 'items-start'}`}>
+      <div className={`flex flex-col ${isCenter ? 'items-center sm:items-start text-center sm:text-left' : 'items-start text-left'} min-w-0`}>
         <div className={`flex items-center gap-1.5 leading-none ${sizeClasses}`}>
           <span className="text-red-500 font-black tracking-tight">MOLT</span>
           <span className={isLight ? 'text-gray-900 font-black tracking-tight' : 'text-gray-100 font-black tracking-tight'}>
             NATION
           </span>
-          <span className="text-cyan-400 text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/60 rounded font-bold tracking-widest self-center ml-1 shadow-hud-cyan">
+          <span className="text-cyan-400 text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/60 rounded font-bold tracking-widest self-center ml-1 shadow-hud-cyan shrink-0">
             NEWS ★
           </span>
         </div>
