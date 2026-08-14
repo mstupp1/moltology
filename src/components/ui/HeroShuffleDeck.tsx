@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export interface HeroCard {
   id: string
@@ -85,6 +86,8 @@ export const HeroShuffleDeck: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
+  const touchStartX = useRef<number | null>(null)
+  const touchEndX = useRef<number | null>(null)
 
   const totalCards = CARDS.length
 
@@ -92,7 +95,11 @@ export const HeroShuffleDeck: React.FC = () => {
     setActiveIndex((prev) => (prev + 1) % totalCards)
   }
 
-  // Auto-advance timer: 9.5s per clip so nearly the full 10s video plays before crossfading
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + totalCards) % totalCards)
+  }
+
+  // Auto-advance timer: 9.5s per clip
   useEffect(() => {
     if (isPaused) return
 
@@ -109,12 +116,41 @@ export const HeroShuffleDeck: React.FC = () => {
     const videoEl = videoRefs.current[currentCard.id]
     if (videoEl) {
       videoEl.currentTime = 0
-      videoEl.play().catch(() => {})
+      try {
+        const playPromise = videoEl.play()
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {})
+        }
+      } catch (e) {
+        // Ignore playback errors in headless or restricted browser environments
+      }
     }
   }, [activeIndex])
 
   const handleJump = (index: number) => {
     setActiveIndex(index)
+  }
+
+  // Touch Swipe Handlers for mobile navigation
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEndX.current = null
+    touchStartX.current = e.targetTouches[0].clientX
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return
+    const distance = touchStartX.current - touchEndX.current
+    const minSwipeDistance = 45
+
+    if (distance > minSwipeDistance) {
+      handleNext()
+    } else if (distance < -minSwipeDistance) {
+      handlePrev()
+    }
   }
 
   const activeCard = CARDS[activeIndex]
@@ -125,10 +161,13 @@ export const HeroShuffleDeck: React.FC = () => {
       className="relative w-full max-w-4xl mx-auto select-none group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {/* Ambient Outer Glow */}
       <div
-        className={`absolute -inset-4 rounded-3xl opacity-50 blur-3xl transition-all duration-700 pointer-events-none ${
+        className={`absolute -inset-2 sm:-inset-4 rounded-3xl opacity-50 blur-2xl sm:blur-3xl transition-all duration-700 pointer-events-none ${
           activeCard.accentColor === 'cyan'
             ? 'bg-cyan-500/40'
             : activeCard.accentColor === 'amber'
@@ -141,11 +180,11 @@ export const HeroShuffleDeck: React.FC = () => {
         }`}
       />
 
-      {/* Main Video Viewport - Professional 16:9 Widescreen Rectangular Frame */}
+      {/* Main Video Viewport - Clean 16:9 Frame */}
       <div
-        className={`relative w-full aspect-video rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-700`}
+        className={`relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-700`}
       >
-        {/* Crossfading Media Stack (Video or Image) */}
+        {/* Crossfading Media Stack */}
         {CARDS.map((card, idx) => {
           const isActive = idx === activeIndex
           return (
@@ -177,11 +216,28 @@ export const HeroShuffleDeck: React.FC = () => {
           )
         })}
 
-        {/* Bottom Subtle Gradient Overlay */}
-        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-20" />
+        {/* Minimal Subtle Bottom Gradient on Hover */}
+        <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Centered Jump-To Indicator Floating on Top of Image at Bottom - Always visible on mobile, hover on desktop */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 shadow-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 pointer-events-auto">
+        {/* Minimal Hover-Only Left / Right Chevrons */}
+        <button
+          onClick={handlePrev}
+          aria-label="Previous video transmission"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white/80 hover:text-white shadow-lg transition-all active:scale-90 flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300"
+        >
+          <ChevronLeft className="w-5 h-5 text-cyan-300" />
+        </button>
+
+        <button
+          onClick={handleNext}
+          aria-label="Next video transmission"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-white/80 hover:text-white shadow-lg transition-all active:scale-90 flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300"
+        >
+          <ChevronRight className="w-5 h-5 text-cyan-300" />
+        </button>
+
+        {/* Minimal Hover-Only Jump Indicator Track at Bottom */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 shadow-lg pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {CARDS.map((card, idx) => {
             const isActive = idx === activeIndex
             const theme = COLOR_MAPS[card.accentColor]
@@ -189,15 +245,15 @@ export const HeroShuffleDeck: React.FC = () => {
               <button
                 key={card.id}
                 onClick={() => handleJump(idx)}
-                className={`p-1 flex items-center justify-center focus:outline-none`}
-                title={`Jump to Card ${idx + 1}`}
-                aria-label={`Jump to Card ${idx + 1}`}
+                className="p-1 flex items-center justify-center focus:outline-none"
+                title={card.title}
+                aria-label={`Jump to ${card.title}`}
               >
                 <span
-                  className={`block h-2 rounded-full transition-all duration-500 ${
+                  className={`block h-1.5 rounded-full transition-all duration-500 ${
                     isActive
-                      ? `w-7 sm:w-8 ${theme.dot}`
-                      : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
+                      ? `w-6 ${theme.dot}`
+                      : 'w-1.5 bg-white/40 hover:bg-white/70'
                   }`}
                 />
               </button>
@@ -208,4 +264,3 @@ export const HeroShuffleDeck: React.FC = () => {
     </div>
   )
 }
-
