@@ -21,7 +21,7 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-3 cursor-pointer group shrink-0 select-none ${className}`}
+      className={`inline-flex items-center gap-3 cursor-pointer group shrink-0 select-none max-w-fit ${className}`}
     >
       {/* Emblem Logo */}
       <div className={`${sizeClasses} flex items-center justify-center shrink-0`}>
