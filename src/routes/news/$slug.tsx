@@ -69,7 +69,7 @@ export const Route = createFileRoute('/news/$slug')({
   component: NewsPostDetail,
 })
 
-export function NewsPostDetail() {
+function NewsPostDetail() {
   const post = Route.useLoaderData() as BlogPostData | null
   const navigate = useNavigate()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)

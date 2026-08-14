@@ -8,7 +8,9 @@ const mockUseLoaderData = vi.fn()
 const mockNavigate = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
-  createFileRoute: () => () => ({
+  createFileRoute: () => (config: any) => ({
+    ...config,
+    options: config,
     useLoaderData: () => mockUseLoaderData(),
   }),
   useNavigate: () => mockNavigate,
@@ -31,7 +33,8 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
-import { NewsPostDetail } from './$slug'
+import { Route } from './$slug'
+const NewsPostDetail = Route.options.component!
 
 describe('NewsPostDetail ($slug.tsx) Route Component', () => {
   beforeEach(() => {
