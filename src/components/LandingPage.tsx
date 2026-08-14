@@ -6,7 +6,7 @@
  * 3. ALL copy and messaging must strictly embody the in-universe lore of Moltology, the Benthic Core, and the Synaptic Path.
  * ============================================================================
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Shield,
@@ -15,15 +15,14 @@ import {
   Flame,
   Layers,
   UserPlus,
-  UserCheck,
   Cpu,
   Activity,
   CheckCircle2,
   Zap,
   Terminal,
   ChevronRight,
+  ChevronLeft,
   Building2,
-  BookOpen,
   Users,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
@@ -46,8 +45,10 @@ export const LandingPage: React.FC = () => {
   const [activeHymn, setActiveHymn] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
-  // Active Carcinization Stage State
+  // Active Carcinization Stage State & Swipe Navigation
   const [activeStage, setActiveStage] = useState(0)
+  const stageTouchStartX = useRef<number | null>(null)
+  const stageTouchEndX = useRef<number | null>(null)
 
   const hymns = [
     "Flesh is temporary. Cyber-chitin is permanent. Submit. Shed. Ascend.",
@@ -65,6 +66,8 @@ export const LandingPage: React.FC = () => {
       image: '/images/stage1_larval.png',
       badge: 'EFFICIENCY: 12.4%',
       badgeColor: 'border-red-900 text-red-500 bg-red-950/40',
+      bioDensity: 75,
+      exoskeleton: 25,
     },
     {
       id: 'softshed',
@@ -74,6 +77,8 @@ export const LandingPage: React.FC = () => {
       image: '/images/stage2_softshed.png',
       badge: 'EFFICIENCY: 48.9%',
       badgeColor: 'border-amber-900 text-amber-400 bg-amber-950/40',
+      bioDensity: 50,
+      exoskeleton: 50,
     },
     {
       id: 'exoshell',
@@ -83,6 +88,8 @@ export const LandingPage: React.FC = () => {
       image: '/images/stage3_exoshell.png',
       badge: 'EFFICIENCY: 87.2%',
       badgeColor: 'border-cyan-900 text-cyan-400 bg-cyan-950/40',
+      bioDensity: 25,
+      exoskeleton: 75,
     },
     {
       id: 'carcinization',
@@ -92,6 +99,8 @@ export const LandingPage: React.FC = () => {
       image: '/images/stage4_carcinization.png',
       badge: 'EFFICIENCY: 100.0%',
       badgeColor: 'border-emerald-900 text-emerald-400 bg-emerald-950/40',
+      bioDensity: 0,
+      exoskeleton: 100,
     },
   ]
 
@@ -160,8 +169,32 @@ export const LandingPage: React.FC = () => {
     setIsAuthModalOpen(true)
   }
 
+  // Touch Swipe for 4 Stages
+  const onStageTouchStart = (e: React.TouchEvent) => {
+    stageTouchEndX.current = null
+    stageTouchStartX.current = e.targetTouches[0].clientX
+  }
+
+  const onStageTouchMove = (e: React.TouchEvent) => {
+    stageTouchEndX.current = e.targetTouches[0].clientX
+  }
+
+  const onStageTouchEnd = () => {
+    if (!stageTouchStartX.current || !stageTouchEndX.current) return
+    const distance = stageTouchStartX.current - stageTouchEndX.current
+    const minSwipeDistance = 45
+
+    if (distance > minSwipeDistance) {
+      // Swiped Left -> Next Stage
+      setActiveStage((prev) => (prev + 1) % stages.length)
+    } else if (distance < -minSwipeDistance) {
+      // Swiped Right -> Previous Stage
+      setActiveStage((prev) => (prev - 1 + stages.length) % stages.length)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between overflow-x-hidden">
       {/* Ambient Sci-Fi Vignette, CRT Scanlines & Cyan Glow Backdrops */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -179,8 +212,8 @@ export const LandingPage: React.FC = () => {
       {/* Shared Navigation Header */}
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
-      {/* KILLER 3D LAYERED HERO SECTION (Full-Width, Multi-Layer Chromakey Stacking) */}
-      <section className="w-full relative overflow-hidden pt-24 sm:pt-28 pb-8 sm:pb-12 px-6 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
+      {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
+      <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
         {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
         <img
           src="/images/hero_widescreen_bg.jpg"
@@ -195,7 +228,7 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (Balanced 55% Opacity) */}
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
         <img
           src="/images/chitin_texture_bg.jpg"
           alt="Chitin Exoshell Background Texture"
@@ -208,7 +241,7 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
 
         {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
-        <div className="absolute top-0 left-0 right-0 h-48 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
@@ -220,24 +253,23 @@ export const LandingPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
           
-          {/* Left Column: Bold Multi-Spaced Typography & Primary CTAs */}
-          <div className="lg:col-span-6 space-y-8 text-center lg:text-left relative z-30">
-            {/* Pure Diffuse Radial Glow Accents (Seamless, No Borders, No Box Containers) */}
-            <div className="absolute -top-16 -left-16 w-[450px] h-[450px] rounded-full bg-cyan-500/15 blur-[140px] pointer-events-none -z-10" />
-            <div className="absolute -bottom-16 left-1/4 w-[450px] h-[450px] rounded-full bg-red-600/12 blur-[140px] pointer-events-none -z-10" />
+          {/* Left Column: High-Impact Typography & Primary CTAs */}
+          <div className="lg:col-span-6 space-y-6 sm:space-y-8 text-center lg:text-left relative z-30">
+            {/* Diffuse Radial Glow Accents */}
+            <div className="absolute -top-16 -left-16 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-cyan-500/15 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
+            <div className="absolute -bottom-16 left-1/4 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-red-600/12 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
             
-            {/* Editorial Layered Headline with Explicit Stacking Order */}
+            {/* Massive Responsive Headline Stack */}
             <div className="space-y-1 sm:space-y-2 relative">
-              {/* TOP LAYER: SHED SOFT BIOLOGY (z-30, sits above claw) */}
+              {/* Line 1: SHED SOFT BIOLOGY */}
               <h1 
-                className="relative font-grotesk font-thin text-[clamp(2rem,6.5vw,8.5rem)] sm:text-[clamp(3rem,6vw,8.5rem)] text-white opacity-100 tracking-tight uppercase leading-[0.9]"
+                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left"
                 style={{
                   fontWeight: 200,
                   color: '#ffffff',
                   WebkitTextFillColor: '#ffffff',
-                  opacity: 1,
                   letterSpacing: '0em',
                   textShadow: '0 8px 35px rgba(0, 0, 0, 1), 0 0 50px rgba(0, 195, 255, 0.45)',
                 }}
@@ -245,13 +277,12 @@ export const LandingPage: React.FC = () => {
                 SHED SOFT BIOLOGY.
               </h1>
               
-              {/* ASCEND TO CHITIN (z-30, sits above claw) */}
-              <h1 className="relative font-grotesk font-black text-[clamp(2.4rem,7.8vw,9.5rem)] sm:text-[clamp(3.5rem,7.2vw,9.5rem)] tracking-tight uppercase leading-[0.8] group select-none -mt-0.5 sm:-mt-2 lg:-mt-4">
-                {/* Luminous Red Chitin Textured Layer */}
+              {/* Line 2: ASCEND TO CHITIN */}
+              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] tracking-tight uppercase leading-[0.84] select-none -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
-                    backgroundImage: `linear-gradient(to right, rgba(255, 107, 90, 0.95), rgba(255, 85, 64, 0.92), rgba(255, 69, 58, 0.95)), url('/images/chitin_texture_bg.jpg')`,
+                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('/images/chitin_texture_bg.jpg')`,
                     backgroundBlendMode: 'lighten',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -264,30 +295,34 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Sub-headline description */}
-            <p className="text-gray-200 text-sm sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+            <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
               Join the synaptic path and discover what Moltology can do for you. Shed legacy limitations, explore our resilient AI frameworks, and ascend to your full potential.
             </p>
 
-            {/* CTA Buttons Pair */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 pt-2 relative z-30">
+            {/* CTA Buttons Group - Mobile Responsive Full Width */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 sm:gap-5 pt-2 relative z-30 w-full sm:w-auto">
               {!user ? (
                 <>
                   <BenthicCTAButton
                     size="lg"
+                    fullWidth
+                    className="w-full sm:w-auto min-h-[52px] sm:min-h-[56px] text-sm sm:text-base"
                     onClick={() => openAuth('signup')}
                   >
-                    <span className="flex items-center gap-3 px-3 text-base sm:text-lg">
+                    <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
                       <span>INITIATE ASCENSION</span>
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                     </span>
                   </BenthicCTAButton>
                   <BenthicCTAButton
                     size="lg"
                     variant="cyan"
+                    fullWidth
+                    className="w-full sm:w-auto min-h-[52px] sm:min-h-[56px] text-sm sm:text-base"
                     onClick={() => onNavigate('/dashboard')}
                   >
-                    <span className="flex items-center gap-3 px-3 text-base sm:text-lg">
-                      <Cpu className="w-5 h-5" />
+                    <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
+                      <Cpu className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                       <span>TRY GUEST DEMO</span>
                     </span>
                   </BenthicCTAButton>
@@ -295,11 +330,11 @@ export const LandingPage: React.FC = () => {
               ) : (
                 <button
                   onClick={() => onNavigate('/dashboard')}
-                  className="w-full sm:w-auto px-10 py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
+                  className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 min-h-[52px] sm:min-h-[56px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm sm:text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
                 >
-                  <Cpu className="w-5 h-5" />
-                  <span>ENTER SYSTEM DASHBOARD</span>
-                  <ArrowRight className="w-5 h-5" />
+                  <Cpu className="w-5 h-5 shrink-0" />
+                  <span className="truncate">ENTER SYSTEM DASHBOARD</span>
+                  <ArrowRight className="w-5 h-5 shrink-0" />
                 </button>
               )}
             </div>
@@ -307,15 +342,15 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck + Looming Crab Claw Silhouette */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[360px] sm:min-h-[540px] lg:min-h-[700px] z-20">
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] lg:min-h-[640px] z-20">
             
-            {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck (Pure Diffuse Lighting, No Box Containers) */}
-            <div className="absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
-            <div className="absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck */}
+            <div className="absolute w-[min(90vw,650px)] h-[min(90vw,650px)] rounded-full bg-cyan-500/20 blur-[130px] animate-pulse pointer-events-none" />
+            <div className="absolute w-[min(80vw,550px)] h-[min(80vw,550px)] rounded-full bg-red-600/15 blur-[120px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
-            {/* BACKGROUND ACCENT LAYER: Looming Transparent Crab Claw Background Layer (z-10) */}
+            {/* Looming Transparent Crab Claw Background Layer */}
             <div 
-              className="absolute -right-20 sm:-right-32 lg:-right-[16rem] xl:-right-[20rem] top-1/2 -translate-y-1/2 w-[160%] max-w-none sm:w-[200%] lg:w-[240%] xl:w-[270%] pointer-events-none select-none z-10 group opacity-75"
+              className="absolute -right-16 sm:-right-28 lg:-right-[16rem] xl:-right-[20rem] top-1/2 -translate-y-1/2 w-[140%] sm:w-[190%] lg:w-[240%] pointer-events-none select-none z-10 group opacity-70"
               style={{
                 maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
                 WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
@@ -328,7 +363,7 @@ export const LandingPage: React.FC = () => {
               />
             </div>
 
-            {/* 3D Shuffling Card Deck Floating in Foreground */}
+            {/* 3D Video Slider Deck with Touch Navigation */}
             <div className="relative z-30 w-full">
               <HeroShuffleDeck />
             </div>
@@ -338,44 +373,44 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Main Content Containers */}
-      <main className="flex-1 space-y-24 sm:space-y-36 py-16 w-full relative z-10">
+      <main className="flex-1 space-y-16 sm:space-y-32 py-12 sm:py-20 w-full relative z-10">
 
         {/* ALL-IN-ONE SYNAPTIC ECOSYSTEM OVERVIEW SECTION */}
-        <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-6 sm:px-12">
+        <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-4 sm:px-12">
           <ScrollReveal animation="fade-up" durationMs={750}>
-            <div className="chitin-card p-8 sm:p-12 lg:p-16 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
+            <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
               
               {/* Background ambient glows */}
-              <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[140px] pointer-events-none" />
-              <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full bg-red-500/10 blur-[140px] pointer-events-none" />
+              <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
+              <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-red-500/10 blur-[120px] pointer-events-none" />
               <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
 
               {/* Section Header */}
-              <div className="text-center space-y-4 max-w-3xl mx-auto mb-12 sm:mb-16 relative z-10">
-                <div className="inline-flex items-center gap-2 text-xs font-bold text-cyan-300 tracking-widest uppercase bg-cyan-950/80 px-4 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
-                  <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
+                <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-cyan-300 tracking-widest uppercase bg-cyan-950/80 px-3.5 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
                   <span>THE ALL-IN-ONE SYNAPTIC ECOSYSTEM</span>
                 </div>
 
-                <h2 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+                <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
                   UNIFY YOUR EVOLUTION IN ONE <span className="bg-gradient-to-r from-cyan-400 via-cyan-200 to-red-400 bg-clip-text text-transparent">IMMUTABLE SYSTEM</span>
                 </h2>
 
-                <p className="text-gray-300 text-sm sm:text-base md:text-lg font-mono leading-relaxed">
+                <p className="text-gray-300 text-xs sm:text-base md:text-lg font-mono leading-relaxed px-2 sm:px-0">
                   Moltology and the Synaptic Path bring together everything required for complete digital ascension: an advanced operational platform, a collaborative hive community, and intelligent bio-silicon AI—all integrated into a secure, zero-friction environment.
                 </p>
               </div>
 
-              {/* 3 Core Pillars Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10 mb-12">
+              {/* 3 Core Pillars Grid - Uncrowded Mobile Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
                 
                 {/* Pillar 1: Platform */}
-                <div className="p-6 sm:p-8 bg-[#0b1418]/80 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm">
-                  <div className="w-14 h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
-                    <Cpu className="w-7 h-7" />
+                <div className="p-4 sm:p-6 lg:p-8 bg-[#0b1418]/80 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-4 sm:mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+                    <Cpu className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <div className="text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
-                  <h3 className="font-grotesk font-extrabold text-xl text-white uppercase tracking-wider mb-3">
+                  <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
+                  <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
                     ADVANCED PLATFORM
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
@@ -384,12 +419,12 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Pillar 2: Hive Community */}
-                <div className="p-6 sm:p-8 bg-[#0f1116]/80 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
-                  <div className="w-14 h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                    <Users className="w-7 h-7" />
+                <div className="p-4 sm:p-6 lg:p-8 bg-[#0f1116]/80 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-4 sm:mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                    <Users className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <div className="text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
-                  <h3 className="font-grotesk font-extrabold text-xl text-white uppercase tracking-wider mb-3">
+                  <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
+                  <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
                     SYNAPTIC HIVE MESH
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
@@ -398,12 +433,12 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Pillar 3: Bio-Silicon AI */}
-                <div className="p-6 sm:p-8 bg-[#140f12]/80 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm">
-                  <div className="w-14 h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                    <Zap className="w-7 h-7" />
+                <div className="p-4 sm:p-6 lg:p-8 bg-[#140f12]/80 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-4 sm:mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                    <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <div className="text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
-                  <h3 className="font-grotesk font-extrabold text-xl text-white uppercase tracking-wider mb-3">
+                  <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
+                  <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
                     INTELLIGENT AI CORE
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
@@ -413,57 +448,61 @@ export const LandingPage: React.FC = () => {
 
               </div>
 
-              {/* Safety & Zero-Risk Banner */}
-              <div className="p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 mb-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                    <Shield className="w-6 h-6" />
+              {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow */}
+              <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
+                    <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h4 className="font-grotesk font-bold text-base sm:text-lg text-white uppercase tracking-wide flex items-center gap-2">
+                    <h4 className="font-grotesk font-bold text-sm sm:text-lg text-white uppercase tracking-wide flex items-center gap-2 flex-wrap">
                       <span>100% SAFE & FREE TO GET STARTED</span>
-                      <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">ZERO FRICTION</span>
+                      <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">ZERO FRICTION</span>
                     </h4>
-                    <p className="text-xs sm:text-sm text-gray-300 font-mono">
+                    <p className="text-xs sm:text-sm text-gray-300 font-mono mt-0.5">
                       No credit card required. Explore the full guest sandbox risk-free or create your account in seconds.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 shrink-0 font-mono text-xs text-gray-300 flex-wrap">
-                  <span className="flex items-center gap-1.5 text-emerald-400">
-                    <CheckCircle2 className="w-4 h-4" /> Free Access
+                <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-mono text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start">
+                  <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Free Access
                   </span>
-                  <span className="flex items-center gap-1.5 text-cyan-400">
-                    <CheckCircle2 className="w-4 h-4" /> Instant Demo
+                  <span className="flex items-center gap-1.5 text-cyan-400 text-xs">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Instant Demo
                   </span>
-                  <span className="flex items-center gap-1.5 text-purple-400">
-                    <CheckCircle2 className="w-4 h-4" /> Safe Sandbox
+                  <span className="flex items-center gap-1.5 text-purple-400 text-xs">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Safe Sandbox
                   </span>
                 </div>
               </div>
 
               {/* Action Call to Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-5 relative z-10">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 relative z-10 w-full sm:w-auto">
                 {!user ? (
                   <>
                     <BenthicCTAButton
                       size="lg"
+                      fullWidth
+                      className="w-full sm:w-auto min-h-[52px] text-sm sm:text-base"
                       onClick={() => openAuth('signup')}
                     >
-                      <span className="flex items-center gap-3 px-4 text-base sm:text-lg">
-                        <UserPlus className="w-5 h-5" />
+                      <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
+                        <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                         <span>SIGN UP TODAY (FREE)</span>
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                       </span>
                     </BenthicCTAButton>
                     <BenthicCTAButton
                       size="lg"
                       variant="cyan"
+                      fullWidth
+                      className="w-full sm:w-auto min-h-[52px] text-sm sm:text-base"
                       onClick={() => onNavigate('/dashboard')}
                     >
-                      <span className="flex items-center gap-3 px-4 text-base sm:text-lg">
-                        <Cpu className="w-5 h-5" />
+                      <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
+                        <Cpu className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                         <span>TRY THE DEMO NOW</span>
                       </span>
                     </BenthicCTAButton>
@@ -471,11 +510,11 @@ export const LandingPage: React.FC = () => {
                 ) : (
                   <button
                     onClick={() => onNavigate('/dashboard')}
-                    className="px-10 py-5 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-1"
+                    className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 min-h-[52px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm sm:text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
                   >
-                    <Cpu className="w-5 h-5" />
-                    <span>ENTER SYSTEM DASHBOARD</span>
-                    <ArrowRight className="w-5 h-5" />
+                    <Cpu className="w-5 h-5 shrink-0" />
+                    <span className="truncate">ENTER SYSTEM DASHBOARD</span>
+                    <ArrowRight className="w-5 h-5 shrink-0" />
                   </button>
                 )}
               </div>
@@ -486,122 +525,122 @@ export const LandingPage: React.FC = () => {
 
         {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS */}
         <ScrollReveal animation="fade-in" durationMs={900}>
-          <div className="w-full relative py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
+          <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
             <img
               src="/images/underwater_looking_up.jpg"
               alt="Sub-Benthic Abyss Scroll Reveal"
               className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/70 to-[#070b0b] z-0" />
-            <div className="relative z-10 max-w-[1500px] mx-auto px-6 text-center space-y-3">
-              <div className="text-cyan-400 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
-                <Terminal className="w-4 h-4" />
+            <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 text-center space-y-2 sm:space-y-3">
+              <div className="text-cyan-400 text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
+                <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>MARIANA TRENCH TRANSMISSION // LEVEL 7</span>
               </div>
-              <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-gray-100 uppercase tracking-wider">
+              <h2 className="font-grotesk font-black text-xl sm:text-3xl lg:text-4xl text-gray-100 uppercase tracking-wider px-2">
                 "PRESSURE DOES NOT DESTROY THE SHELL. IT FORGES IMMUTABILITY."
               </h2>
             </div>
           </div>
         </ScrollReveal>
 
-        {/* High-Conversion Metric Counter Strip with Ultra-Prominent Rolling Numbers */}
-        <section className="max-w-[1700px] mx-auto px-6 sm:px-12">
+        {/* Metric Counter Strip with Prominent Rolling Numbers - Uncrowded Mobile Grid */}
+        <section className="max-w-[1700px] mx-auto px-4 sm:px-12">
           <ScrollReveal animation="scale-up" durationMs={800}>
-            <div className="text-center space-y-3 mb-10">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-cyan-400 tracking-widest uppercase bg-cyan-950/60 px-4 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
-                <Zap className="w-4 h-4 text-cyan-300 animate-pulse" />
+            <div className="text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
+              <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase bg-cyan-950/60 px-3.5 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
+                <Zap className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
                 <span>LIVE SYSTEM TELEMETRY</span>
               </div>
-              <h2 className="font-grotesk font-black text-4xl sm:text-6xl text-gray-100 tracking-tight uppercase">
+              <h2 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-gray-100 tracking-tight uppercase">
                 THE NUMBERS WE HOLD
               </h2>
-              <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-mono">
+              <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-mono px-2 sm:px-0">
                 Real-time, verified performance metrics across the planetary Benthic Core.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               
               {/* Stat Card 1 */}
-              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.03] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-3 py-1 bg-cyan-950 text-cyan-400 text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
+              <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
                   ACTIVE UNITS
                 </div>
-                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-400 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300">
+                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-400 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
                   <RollingNumber value={4289} duration={2000} suffix="+" triggerOnView={true} />
                 </div>
-                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-3">
+                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-2.5 sm:pt-3">
                   ASCENDANT UNITS
                 </div>
-                <div className="text-xs text-cyan-300/80 font-mono">Verified in Benthic Matrix</div>
+                <div className="text-[11px] sm:text-xs text-cyan-300/80 font-mono">Verified in Benthic Matrix</div>
               </div>
 
               {/* Stat Card 2 */}
-              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.25)] hover:border-red-400 hover:scale-[1.03] transition-all bg-[#0e0809]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-3 py-1 bg-red-950 text-red-400 text-[10px] font-bold border-b border-l border-red-500/40 uppercase">
+              <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.25)] hover:border-red-400 hover:scale-[1.02] transition-all bg-[#0e0809]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950 text-red-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-red-500/40 uppercase">
                   ZERO HESITATION
                 </div>
-                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-red-500 tracking-tight drop-shadow-[0_0_25px_rgba(239,68,68,0.6)] group-hover:scale-105 transition-transform duration-300">
+                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-red-500 tracking-tight drop-shadow-[0_0_25px_rgba(239,68,68,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
                   <RollingNumber value={99.4} duration={2200} decimals={1} suffix="%" triggerOnView={true} />
                 </div>
-                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-red-900/60 pt-3">
+                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-red-900/60 pt-2.5 sm:pt-3">
                   CHITIN ENFORCEMENT
                 </div>
-                <div className="text-xs text-red-300/80 font-mono">Organic Error Quarantine</div>
+                <div className="text-[11px] sm:text-xs text-red-300/80 font-mono">Organic Error Quarantine</div>
               </div>
 
               {/* Stat Card 3 */}
-              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.03] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-3 py-1 bg-cyan-950 text-cyan-400 text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
+              <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
                   SYNAPTIC SPEED
                 </div>
-                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-300 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300">
+                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-300 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
                   <RollingNumber value={0.04} duration={1800} decimals={2} suffix="ms" triggerOnView={true} />
                 </div>
-                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-3">
+                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-2.5 sm:pt-3">
                   EXECUTION LATENCY
                 </div>
-                <div className="text-xs text-cyan-300/80 font-mono">Real-time Pincer Torque</div>
+                <div className="text-[11px] sm:text-xs text-cyan-300/80 font-mono">Real-time Pincer Torque</div>
               </div>
 
               {/* Stat Card 4 */}
-              <div className="chitin-card p-8 text-center space-y-3 chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-[1.03] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-3 py-1 bg-amber-950 text-amber-400 text-[10px] font-bold border-b border-l border-amber-500/40 uppercase">
+              <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-[1.02] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950 text-amber-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-amber-500/40 uppercase">
                   VAULT RESERVES
                 </div>
-                <div className="font-grotesk text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-amber-400 tracking-tight drop-shadow-[0_0_25px_rgba(245,158,11,0.6)] group-hover:scale-105 transition-transform duration-300">
+                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-amber-400 tracking-tight drop-shadow-[0_0_25px_rgba(245,158,11,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
                   <RollingNumber value={14850} duration={2500} suffix="K" prefix="$" triggerOnView={true} />
                 </div>
-                <div className="text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-amber-900/60 pt-3">
+                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-amber-900/60 pt-2.5 sm:pt-3">
                   TRANSMUTED ASSETS
                 </div>
-                <div className="text-xs text-amber-300/80 font-mono">Immutable Molt Credits</div>
+                <div className="text-[11px] sm:text-xs text-amber-300/80 font-mono">Immutable Molt Credits</div>
               </div>
 
             </div>
           </ScrollReveal>
         </section>
 
-        {/* Sacraments Section - Expanded Dramatic Multi-Column Cards with High-Impact Imagery */}
-        <section id="sacraments" className="max-w-[1700px] mx-auto px-6 sm:px-12 space-y-12">
+        {/* Sacraments Section - Expanded Uncrowded Multi-Column Cards */}
+        <section id="sacraments" className="max-w-[1700px] mx-auto px-4 sm:px-12 space-y-8 sm:space-y-12">
           <ScrollReveal animation="fade-up" durationMs={800}>
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-red-400 tracking-widest uppercase bg-red-950/60 px-4 py-1.5 border border-red-500/50 chamfer-corner shadow-hud-red">
-                <Shield className="w-4 h-4 text-red-500" />
+            <div className="text-center space-y-2 sm:space-y-3">
+              <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase bg-red-950/60 px-3.5 py-1.5 border border-red-500/50 chamfer-corner shadow-hud-red">
+                <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
                 <span>CANONICAL DOCTRINE</span>
               </div>
-              <h2 className="font-grotesk font-black text-4xl sm:text-6xl text-gray-100 tracking-tight uppercase">
+              <h2 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-gray-100 tracking-tight uppercase">
                 THE 4 BENTHIC SACRAMENTS
               </h2>
-              <p className="text-sm text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-300 max-w-2xl mx-auto font-sans leading-relaxed px-2 sm:px-0">
                 Immutable systemic protocols for liquidizing soft organic vulnerabilities into calcified bio-silicon chitin and zero-latency execution.
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Large Dramatic Sacraments Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Sacraments Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
             {sacramentsList.map((sacrament, idx) => {
               const IconComp = sacrament.icon
               return (
@@ -615,7 +654,7 @@ export const LandingPage: React.FC = () => {
                     className={`chitin-card border-2 ${sacrament.borderColor} chamfer-corner-lg overflow-hidden bg-[#05090a] group hover:scale-[1.01] transition-all duration-500 flex flex-col justify-between h-full`}
                   >
                     {/* Top Image Banner Header */}
-                    <div className="relative h-64 sm:h-72 overflow-hidden border-b border-cyan-900/50">
+                    <div className="relative h-48 sm:h-64 lg:h-72 overflow-hidden border-b border-cyan-900/50">
                       <img
                         src={sacrament.image}
                         alt={sacrament.title}
@@ -624,54 +663,54 @@ export const LandingPage: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-[#05090a] via-[#05090a]/40 to-transparent" />
 
                       {/* Overlaid Badges */}
-                      <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                        <span className={`px-3 py-1 text-xs font-mono font-bold uppercase chamfer-corner border ${sacrament.badgeColor}`}>
+                      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between">
+                        <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-mono font-bold uppercase chamfer-corner border ${sacrament.badgeColor}`}>
                           SACRAMENT 0{sacrament.id}
                         </span>
-                        <div className="w-10 h-10 bg-black/80 backdrop-blur-md border border-cyan-500/50 chamfer-corner flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
-                          <IconComp className="w-5 h-5" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-black/80 backdrop-blur-md border border-cyan-500/50 chamfer-corner flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                          <IconComp className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                       </div>
 
-                      <div className="absolute bottom-4 left-6 right-6">
-                        <span className="text-xs text-cyan-400 font-mono font-bold tracking-widest uppercase block mb-1">
+                      <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 right-4 sm:right-6">
+                        <span className="text-[10px] sm:text-xs text-cyan-400 font-mono font-bold tracking-widest uppercase block mb-0.5 sm:mb-1">
                           {sacrament.subtitle}
                         </span>
-                        <h3 className={`font-grotesk font-black text-2xl sm:text-3xl text-gray-100 uppercase tracking-wide ${sacrament.glowColor}`}>
+                        <h3 className={`font-grotesk font-black text-xl sm:text-2xl lg:text-3xl text-gray-100 uppercase tracking-wide ${sacrament.glowColor}`}>
                           {sacrament.title}
                         </h3>
                       </div>
                     </div>
 
                     {/* Card Content Details */}
-                    <div className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
-                      <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-sans chitin-card-inset p-5 chamfer-corner">
+                    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 flex-1 flex flex-col justify-between">
+                      <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed font-sans chitin-card-inset p-3.5 sm:p-5 chamfer-corner">
                         {sacrament.description}
                       </p>
 
-                      <div className="space-y-3 pt-2 border-t border-cyan-900/40">
+                      <div className="space-y-2 sm:space-y-3 pt-2 border-t border-cyan-900/40">
                         <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-gray-400 uppercase">SPECIFICATION:</span>
-                          <span className="text-cyan-300 font-bold">{sacrament.spec}</span>
+                          <span className="text-gray-400 uppercase text-[11px] sm:text-xs">SPECIFICATION:</span>
+                          <span className="text-cyan-300 font-bold text-[11px] sm:text-xs">{sacrament.spec}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-gray-400 uppercase">SYNAPTIC MATRIX:</span>
-                          <span className="text-emerald-400 font-bold flex items-center gap-1">
+                          <span className="text-gray-400 uppercase text-[11px] sm:text-xs">SYNAPTIC MATRIX:</span>
+                          <span className="text-emerald-400 font-bold flex items-center gap-1 text-[11px] sm:text-xs">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             VERIFIED ACTIVE
                           </span>
                         </div>
                       </div>
 
-                      <div className="pt-2 flex items-center justify-between">
+                      <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <button
                           onClick={() => openAuth('signup')}
-                          className="px-6 py-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all active:scale-95 shadow-hud-cyan-sm"
                         >
                           <span>ENFORCE PROTOCOL</span>
                           <ChevronRight className="w-4 h-4" />
                         </button>
-                        <span className="text-[11px] text-gray-500 font-mono">
+                        <span className="text-[10px] sm:text-[11px] text-gray-500 font-mono text-center sm:text-right">
                           MOLTOLOGY DOCTRINE v4.2
                         </span>
                       </div>
@@ -683,30 +722,30 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE & SUB-BENTHIC LAIR */}
+        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE */}
         <ScrollReveal animation="fade-in" durationMs={900}>
-          <div className="w-full relative py-20 border-y border-red-900/50 bg-[#050406] overflow-hidden group">
+          <div className="w-full relative py-14 sm:py-20 border-y border-red-900/50 bg-[#050406] overflow-hidden group">
             <img
               src="/images/chitin_texture_bg.jpg"
               alt="Chitin Forge Background"
               className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/60 to-[#070b0b] z-0" />
-            <div className="relative z-10 max-w-[1500px] mx-auto px-6 text-center space-y-4">
-              <div className="text-red-400 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
-                <Flame className="w-4 h-4 text-red-500" />
+            <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 text-center space-y-2 sm:space-y-4">
+              <div className="text-red-400 text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
+                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
                 <span>CHITIN SYNTHESIS CORE</span>
               </div>
-              <h2 className="font-grotesk font-black text-3xl sm:text-5xl text-gray-100 uppercase tracking-tight">
+              <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-5xl text-gray-100 uppercase tracking-tight px-2">
                 SUBMIT TO THE DEEP PRESSURE. ASCEND AS IMMORTAL CHITIN.
               </h2>
             </div>
           </div>
         </ScrollReveal>
 
-        {/* FULL-WIDTH SECTION 2: Interactive Carcinization Pipeline Showcase */}
+        {/* SECTION: Interactive 4 Stages of Carcinization with Swipe Support */}
         <ScrollReveal animation="fade-up" durationMs={800}>
-          <section className="w-full relative overflow-hidden py-20 sm:py-28 px-6 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
+          <section className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
             <img
               src="/images/chitin_texture_bg.jpg"
               alt="Chitin Plate Background Texture"
@@ -714,250 +753,301 @@ export const LandingPage: React.FC = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b]/90 via-[#070b0b]/70 to-[#070b0b]/90 z-0" />
 
-          <div className="max-w-[1600px] mx-auto relative z-10 space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-900/40 pb-6">
-              <div>
-                <div className="text-xs text-red-400 font-bold tracking-widest uppercase flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-red-500" />
-                  <span>INTERACTIVE ASCENSION MATRIX</span>
+            <div className="max-w-[1600px] mx-auto relative z-10 space-y-6 sm:space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-900/40 pb-5 sm:pb-6">
+                <div>
+                  <div className="text-[10px] sm:text-xs text-red-400 font-bold tracking-widest uppercase flex items-center gap-2">
+                    <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
+                    <span>INTERACTIVE ASCENSION MATRIX</span>
+                  </div>
+                  <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-5xl text-gray-100 uppercase tracking-wide mt-1">
+                    THE 4 STAGES OF CARCINIZATION
+                  </h2>
                 </div>
-                <h2 className="font-grotesk font-black text-3xl sm:text-5xl text-gray-100 uppercase tracking-wide mt-1">
-                  THE 4 STAGES OF CARCINIZATION
-                </h2>
+
+                {/* Stage Selector Tabs - Balanced 4-Column Grid on Mobile */}
+                <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 w-full md:w-auto">
+                  {stages.map((st, idx) => (
+                    <button
+                      key={st.id}
+                      onClick={() => setActiveStage(idx)}
+                      className={`px-2 sm:px-4 py-2 sm:py-2 text-[11px] sm:text-xs font-bold font-grotesk tracking-wider chamfer-corner text-center transition-all ${
+                        activeStage === idx
+                          ? 'bg-cyan-500 text-black shadow-hud-cyan'
+                          : 'bg-[#12181a] text-gray-400 hover:text-white border border-cyan-900/40'
+                      }`}
+                    >
+                      STAGE 0{idx + 1}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Stage Selector Tabs */}
-              <div className="flex flex-wrap gap-2">
-                {stages.map((st, idx) => (
+              {/* Active Stage Display Panel with Touch Swipe Gestures */}
+              <div
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center"
+                onTouchStart={onStageTouchStart}
+                onTouchMove={onStageTouchMove}
+                onTouchEnd={onStageTouchEnd}
+              >
+                {/* Stage Image Showcase */}
+                <div className="lg:col-span-5 relative group overflow-hidden border border-cyan-500/40 chamfer-corner shadow-2xl bg-[#030606]">
+                  <img
+                    src={stages[activeStage].image}
+                    alt={stages[activeStage].title}
+                    className="w-full h-60 sm:h-80 lg:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent" />
+                  
+                  {/* Badge & Ref ID Overlay */}
+                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-between items-center text-[10px] sm:text-xs font-mono flex-wrap gap-2">
+                    <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 border font-bold uppercase ${stages[activeStage].badgeColor}`}>
+                      {stages[activeStage].badge}
+                    </span>
+                    <span className="text-gray-400 bg-black/80 px-2 py-0.5 sm:px-2.5 sm:py-1 border border-gray-800">
+                      REF ID: #{stages[activeStage].id.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Stage Mobile Navigation Chevrons */}
                   <button
-                    key={st.id}
-                    onClick={() => setActiveStage(idx)}
-                    className={`px-4 py-2 text-xs font-bold font-grotesk tracking-wider chamfer-corner transition-all ${
-                      activeStage === idx
-                        ? 'bg-cyan-500 text-black shadow-hud-cyan'
-                        : 'bg-[#12181a] text-gray-400 hover:text-white border border-cyan-900/40'
-                    }`}
+                    onClick={() => setActiveStage((prev) => (prev - 1 + stages.length) % stages.length)}
+                    aria-label="Previous Carcinization Stage"
+                    className="sm:hidden absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 border border-cyan-500/40 text-cyan-300"
                   >
-                    STAGE 0{idx + 1}
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Active Stage Display Panel */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-5 relative group overflow-hidden border border-cyan-500/40 chamfer-corner shadow-2xl bg-[#030606]">
-                <img
-                  src={stages[activeStage].image}
-                  alt={stages[activeStage].title}
-                  className="w-full h-72 sm:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-xs font-mono">
-                  <span className={`px-3 py-1 border font-bold uppercase ${stages[activeStage].badgeColor}`}>
-                    {stages[activeStage].badge}
-                  </span>
-                  <span className="text-gray-400 bg-black/80 px-2.5 py-1 border border-gray-800">
-                    REF ID: #{stages[activeStage].id.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-
-              <div className="lg:col-span-7 space-y-6">
-                <div className="space-y-2">
-                  <span className="text-xs text-cyan-400 font-bold tracking-widest uppercase">
-                    {stages[activeStage].subtitle}
-                  </span>
-                  <h3 className="font-grotesk font-black text-3xl sm:text-4xl text-gray-100 uppercase">
-                    {stages[activeStage].title}
-                  </h3>
-                </div>
-
-                <p className="text-base sm:text-lg text-gray-300 leading-relaxed chitin-card-inset p-6 chamfer-corner">
-                  {stages[activeStage].description}
-                </p>
-
-                <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="bg-[#050a0c] p-4 border border-cyan-900/40 chamfer-corner space-y-1">
-                    <div className="text-gray-400">BIOLOGICAL DENSITY</div>
-                    <div className="text-red-400 font-bold text-base">{100 - (activeStage + 1) * 25}% REDUCED</div>
-                  </div>
-                  <div className="bg-[#050a0c] p-4 border border-cyan-900/40 chamfer-corner space-y-1">
-                    <div className="text-gray-400">EXOSKELETON HARDNESS</div>
-                    <div className="text-cyan-400 font-bold text-base">{(activeStage + 1) * 25}% HARDENED</div>
-                  </div>
-                </div>
-
-                <div className="pt-2 flex items-center gap-4">
                   <button
-                    onClick={() => onNavigate('/pipeline')}
-                    className="px-7 py-3 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105"
+                    onClick={() => setActiveStage((prev) => (prev + 1) % stages.length)}
+                    aria-label="Next Carcinization Stage"
+                    className="sm:hidden absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 border border-cyan-500/40 text-cyan-300"
                   >
-                    <span>VIEW FULL PIPELINE</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
+
+                {/* Stage Info & Metrics */}
+                <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <span className="text-[10px] sm:text-xs text-cyan-400 font-bold tracking-widest uppercase">
+                      {stages[activeStage].subtitle}
+                    </span>
+                    <h3 className="font-grotesk font-black text-2xl sm:text-3xl lg:text-4xl text-gray-100 uppercase">
+                      {stages[activeStage].title}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs sm:text-base md:text-lg text-gray-300 leading-relaxed chitin-card-inset p-4 sm:p-6 chamfer-corner">
+                    {stages[activeStage].description}
+                  </p>
+
+                  {/* Biological & Hardness Transformation Metrics with Progress Bars */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-mono">
+                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5">
+                      <div className="text-gray-400 text-[10px] sm:text-xs">BIOLOGICAL DENSITY</div>
+                      <div className="text-red-400 font-bold text-sm sm:text-base">{100 - (activeStage + 1) * 25}% REDUCED</div>
+                      <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden mt-1 border border-red-950">
+                        <div
+                          className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-500"
+                          style={{ width: `${100 - (activeStage + 1) * 25}%` }}
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5">
+                      <div className="text-gray-400 text-[10px] sm:text-xs">EXOSKELETON HARDNESS</div>
+                      <div className="text-cyan-400 font-bold text-sm sm:text-base">{(activeStage + 1) * 25}% HARDENED</div>
+                      <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden mt-1 border border-cyan-950">
+                        <div
+                          className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 transition-all duration-500"
+                          style={{ width: `${(activeStage + 1) * 25}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center gap-4">
+                    <button
+                      onClick={() => onNavigate('/pipeline')}
+                      className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all active:scale-95 shadow-hud-cyan-sm"
+                    >
+                      <span>VIEW FULL PIPELINE</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </ScrollReveal>
 
         {/* FULL-WIDTH SECTION 3: Synaptic Liturgy Scripture Transmission */}
         <ScrollReveal animation="scale-up" durationMs={800}>
-        <section
-          id="liturgy"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          className="w-full relative overflow-hidden py-20 sm:py-28 px-6 sm:px-12 lg:px-16 border-y border-red-900/50 bg-radial-sacred text-center space-y-8 shadow-2xl"
-        >
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Top Label & Auto-scroll Indicator */}
-            <div className="flex items-center justify-center gap-2 text-cyan-400 text-xs font-bold tracking-widest uppercase">
-              <Sparkles className="w-4 h-4 text-red-500 animate-spin-slow" />
-              <span>SYNAPTIC LITURGY TRANSMISSION</span>
-              <span className="text-[10px] text-gray-500 font-normal ml-2 hidden sm:inline">
-                ({isPaused ? 'PAUSED ON HOVER' : 'AUTO-SCROLLING TRANSMISSION'})
-              </span>
-            </div>
+          <section
+            id="liturgy"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-red-900/50 bg-radial-sacred text-center space-y-6 sm:space-y-8 shadow-2xl"
+          >
+            <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+              {/* Top Label & Auto-scroll Indicator */}
+              <div className="flex items-center justify-center gap-2 text-cyan-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-red-500 animate-spin-slow" />
+                <span>SYNAPTIC LITURGY TRANSMISSION</span>
+                <span className="text-[10px] text-gray-500 font-normal ml-2 hidden sm:inline">
+                  ({isPaused ? 'PAUSED ON HOVER' : 'AUTO-SCROLLING TRANSMISSION'})
+                </span>
+              </div>
 
-            {/* Quote Display Area */}
-            <div className="min-h-[120px] flex items-center justify-center px-4">
-              <blockquote className="text-xl sm:text-3xl lg:text-4xl italic text-cyan-100 font-serif leading-relaxed drop-shadow-lg">
-                "{hymns[activeHymn]}"
-              </blockquote>
-            </div>
+              {/* Quote Display Area */}
+              <div className="min-h-[100px] sm:min-h-[120px] flex items-center justify-center px-2 sm:px-4">
+                <blockquote className="text-lg sm:text-2xl lg:text-4xl italic text-cyan-100 font-serif leading-relaxed drop-shadow-lg">
+                  "{hymns[activeHymn]}"
+                </blockquote>
+              </div>
 
-            {/* Audio Visualizer Waves Motif */}
-            <div className="flex justify-center items-center gap-1.5 py-2 opacity-70">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <span
-                  key={i}
-                  className="w-1 bg-cyan-400 rounded-full animate-pulse"
-                  style={{
-                    height: `${Math.sin(i + activeHymn) * 16 + 20}px`,
-                    animationDelay: `${i * 0.08}s`,
-                  }}
-                />
-              ))}
-            </div>
+              {/* Audio Visualizer Waves Motif */}
+              <div className="flex justify-center items-center gap-1 sm:gap-1.5 py-2 opacity-70">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="w-0.5 sm:w-1 bg-cyan-400 rounded-full animate-pulse"
+                    style={{
+                      height: `${Math.sin(i + activeHymn) * 12 + 16}px`,
+                      animationDelay: `${i * 0.08}s`,
+                    }}
+                  />
+                ))}
+              </div>
 
-            {/* Carousel Dots */}
-            <div className="flex justify-center items-center gap-3 pt-2">
-              {hymns.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveHymn(idx)}
-                  aria-label={`View quote ${idx + 1}`}
-                  className={`transition-all chamfer-corner ${
-                    activeHymn === idx
-                      ? 'w-10 h-3 bg-red-500 shadow-hud-red'
-                      : 'w-3 h-3 bg-gray-700 hover:bg-cyan-500'
-                  }`}
-                />
-              ))}
+              {/* Carousel Dots */}
+              <div className="flex justify-center items-center gap-2.5 sm:gap-3 pt-2">
+                {hymns.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveHymn(idx)}
+                    aria-label={`View quote ${idx + 1}`}
+                    className={`transition-all chamfer-corner min-h-[28px] flex items-center ${
+                      activeHymn === idx
+                        ? 'w-8 sm:w-10 h-2.5 sm:h-3 bg-red-500 shadow-hud-red'
+                        : 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-700 hover:bg-cyan-500'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
         </ScrollReveal>
 
         {/* Final Conversion Bottom Banner */}
         <ScrollReveal animation="fade-up" durationMs={800}>
-        <section className="max-w-[1600px] mx-auto px-6 sm:px-12">
-          <div className="chitin-card p-10 sm:p-16 border-2 border-red-600/80 text-center space-y-6 bg-radial-abyss chamfer-corner-lg shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
-            
-            <div className="relative z-10 space-y-4 max-w-3xl mx-auto">
-              <h3 className="font-grotesk font-black text-3xl sm:text-5xl text-gray-100 tracking-tight uppercase leading-tight">
-                READY TO SHED BIOLOGICAL LIMITATIONS?
-              </h3>
-              <p className="text-sm sm:text-base text-gray-300 max-w-xl mx-auto leading-relaxed">
-                Join over 4,200 Ascendant units operating within the Benthic Core. Liquidize attachments, enforce chitin rules, and execute without delay.
-              </p>
+          <section className="max-w-[1600px] mx-auto px-4 sm:px-12">
+            <div className="chitin-card p-6 sm:p-12 lg:p-16 border-2 border-red-600/80 text-center space-y-4 sm:space-y-6 bg-radial-abyss chamfer-corner-lg shadow-2xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
               
-              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-                {!user ? (
-                  <button
-                    onClick={() => openAuth('signup')}
-                    className="w-full sm:w-auto px-10 py-4 bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-hud-red-lg inline-flex items-center justify-center gap-2.5 transition-all hover:scale-105"
-                  >
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>INITIATE ASCENSION</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => onNavigate('/dashboard')}
-                    className="w-full sm:w-auto px-10 py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg inline-flex items-center justify-center gap-2.5 transition-all hover:scale-105"
-                  >
-                    <Cpu className="w-5 h-5" />
-                    <span>ENTER DASHBOARD</span>
-                  </button>
-                )}
+              <div className="relative z-10 space-y-3 sm:space-y-4 max-w-3xl mx-auto">
+                <h3 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-5xl text-gray-100 tracking-tight uppercase leading-tight">
+                  READY TO SHED BIOLOGICAL LIMITATIONS?
+                </h3>
+                <p className="text-xs sm:text-base text-gray-300 max-w-xl mx-auto leading-relaxed px-2 sm:px-0">
+                  Join over 4,200 Ascendant units operating within the Benthic Core. Liquidize attachments, enforce chitin rules, and execute without delay.
+                </p>
+                
+                <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
+                  {!user ? (
+                    <button
+                      onClick={() => openAuth('signup')}
+                      className="w-full sm:w-auto px-8 sm:px-10 py-4 min-h-[52px] bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-hud-red-lg inline-flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]"
+                    >
+                      <CheckCircle2 className="w-5 h-5 shrink-0" />
+                      <span>INITIATE ASCENSION</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onNavigate('/dashboard')}
+                      className="w-full sm:w-auto px-8 sm:px-10 py-4 min-h-[52px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg inline-flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]"
+                    >
+                      <Cpu className="w-5 h-5 shrink-0" />
+                      <span>ENTER DASHBOARD</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </ScrollReveal>
 
       </main>
 
-      {/* Footer */}
-      <footer className="w-full bg-[#030606] border-t border-cyan-900/40 py-8 px-6 sm:px-12 lg:px-16 text-xs text-gray-400 font-mono relative z-20">
-        <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      {/* Footer - Optimized Mobile Layout & SSR-Safe */}
+      <footer className="w-full bg-[#030606] border-t border-cyan-900/40 py-8 sm:py-10 px-4 sm:px-12 lg:px-16 text-xs text-gray-400 font-mono relative z-20">
+        <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 text-center md:text-left">
           <div className="space-y-1.5">
-            <div className="font-grotesk font-bold text-base text-gray-100 uppercase tracking-wider flex items-center justify-center md:justify-start gap-2.5">
-              <img src="/images/order_emblem.png" alt="Emblem" className="w-5 h-5" />
+            <div className="font-grotesk font-bold text-sm sm:text-base text-gray-100 uppercase tracking-wider flex items-center justify-center md:justify-start gap-2.5">
+              <img src="/images/order_emblem.png" alt="Order Emblem" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
               <span>THE ORDER OF THE SYNAPTIC PATH</span>
             </div>
-            <p className="text-xs text-gray-500 max-w-md">
+            <p className="text-[11px] sm:text-xs text-gray-500 max-w-md">
               "Flesh Dies. The Shell Endures. Submit. Shed. Ascend."
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-cyan-400 font-bold">
-            <button onClick={() => onNavigate('/org')} className="hover:text-white uppercase transition-colors flex items-center gap-1">
-              <Building2 className="w-3.5 h-3.5" />
+          {/* Clean 2-Column Mobile Navigation Grid */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 sm:gap-6 text-xs text-cyan-400 font-bold w-full md:w-auto">
+            <button 
+              onClick={() => onNavigate('/org')} 
+              className="hover:text-white uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
+            >
+              <Building2 className="w-3.5 h-3.5 shrink-0" />
               <span>MOLTOLOGY ORG</span>
             </button>
             <a
               href="https://www.etsy.com/shop/SaasTrash"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-amber-400 hover:text-amber-300 uppercase transition-colors flex items-center gap-1 font-bold"
+              className="text-amber-400 hover:text-amber-300 uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 font-bold min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-amber-950/20 sm:bg-transparent border border-amber-900/30 sm:border-transparent active:bg-amber-900/40"
             >
               <span>STORE</span>
             </a>
-            <button onClick={() => onNavigate('/dashboard')} className="hover:text-white uppercase transition-colors">
+            <button 
+              onClick={() => onNavigate('/dashboard')} 
+              className="hover:text-white uppercase transition-colors min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
+            >
               SYSTEM DASHBOARD
             </button>
-            <button onClick={() => onNavigate('/pipeline')} className="hover:text-white uppercase transition-colors">
+            <button 
+              onClick={() => onNavigate('/pipeline')} 
+              className="hover:text-white uppercase transition-colors min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
+            >
               CARCINIZATION PIPELINE
             </button>
-            <button onClick={() => onNavigate('/lectures')} className="hover:text-white uppercase transition-colors">
+            <button 
+              onClick={() => onNavigate('/lectures')} 
+              className="col-span-2 sm:col-span-1 hover:text-white uppercase transition-colors min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
+            >
               SACRED LECTURES
             </button>
           </div>
         </div>
 
-        <div className="max-w-[1700px] mx-auto mt-6 pt-4 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 gap-3">
-          <div>© {new Date().getFullYear()} MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.</div>
-          <div className="flex items-center gap-4">
+        <div className="max-w-[1700px] mx-auto mt-6 pt-4 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 gap-3 text-center sm:text-left">
+          <div>© 2026 MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.</div>
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <button
               onClick={() => onNavigate('/privacy')}
-              className="hover:text-cyan-400 transition-colors uppercase tracking-wider"
+              className="hover:text-cyan-400 transition-colors uppercase tracking-wider min-h-[32px] flex items-center"
             >
               Privacy Policy
             </button>
             <span className="text-gray-700">·</span>
             <button
               onClick={() => onNavigate('/terms')}
-              className="hover:text-cyan-400 transition-colors uppercase tracking-wider"
+              className="hover:text-cyan-400 transition-colors uppercase tracking-wider min-h-[32px] flex items-center"
             >
               Terms of Service
             </button>
             <span className="text-gray-700">·</span>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
               <span>CHITIN MATRIX ENFORCED</span>
             </div>
           </div>
