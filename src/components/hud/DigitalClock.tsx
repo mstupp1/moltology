@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap } from 'lucide-react'
-import { HudCard, HudBadge } from '@/components/ui'
+import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap, Radio, X, Trash2 } from 'lucide-react'
+import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
+import { useToast } from '@/components/ui/ToastProvider'
 
 export interface AlignmentTask {
   id: string
@@ -43,6 +45,31 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
   const [mode, setMode] = useState<TimezoneMode>('LOCAL')
   const [isSyncing, setIsSyncing] = useState(false)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'liturgies' | 'transmissions'>('liturgies')
+  const [isMobileScreen, setIsMobileScreen] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkMobile = () => setIsMobileScreen(window.innerWidth < 640)
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
+      return () => window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Safe access to ToastProvider context for notification telemetry
+  let toastsList: any[] = []
+  let toastHistoryList: any[] = []
+  let clearToastsFn = () => {}
+  try {
+    const toastCtx = useToast()
+    toastsList = toastCtx.toasts || []
+    toastHistoryList = toastCtx.toastHistory || toastCtx.toasts || []
+    clearToastsFn = toastCtx.clearToasts
+  } catch {
+    // Render safely without ToastContext
+  }
 
   // Local state for tasks if not passed via props
   const [localTasks, setLocalTasks] = useState<AlignmentTask[]>(propTasks || DEFAULT_ALIGNMENT_TASKS)
@@ -70,6 +97,30 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     }, 1000)
     return () => clearInterval(timer)
   }, [mounted])
+
+  // Click outside and escape key listener to close dropdown
+  useEffect(() => {
+    if (!isScheduleOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsScheduleOpen(false)
+      }
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsScheduleOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isScheduleOpen])
 
   // Handle manual resync click
   const handleResync = () => {
@@ -114,7 +165,6 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     }
 
     if (mode === 'BENTHIC') {
-      // Custom Moltology Benthic cycle calculation
       const epochSeconds = Math.floor(time.getTime() / 1000)
       const benthicTide = (epochSeconds % 86400)
       const bHours = pad(Math.floor(benthicTide / 3600))
@@ -124,7 +174,6 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     }
 
     if (mode === 'STARDATE') {
-      // Stardate epoch
       const year = time.getUTCFullYear()
       const dayOfYear = Math.floor((time.getTime() - new Date(year, 0, 0).getTime()) / 86400000)
       const stardate = `${year}.${pad(dayOfYear, 3)}`
@@ -159,187 +208,366 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     }).toUpperCase()
   }
 
+  // Body scroll lock on mobile when modal sheet is open
+  useEffect(() => {
+    if (isScheduleOpen && typeof document !== 'undefined') {
+      const originalOverflow = document.body.style.overflow
+      if (typeof window !== 'undefined' && window.innerWidth < 640) {
+        document.body.style.overflow = 'hidden'
+      }
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isScheduleOpen])
+
   // Find the next upcoming uncompleted alignment task
   const nextTask = localTasks.find(t => !t.completed) || localTasks[localTasks.length - 1]
   const allTasksCompleted = localTasks.length > 0 && localTasks.every(t => t.completed)
+  const completedCount = localTasks.filter(t => t.completed).length
+  const totalXpGained = localTasks.filter(t => t.completed).reduce((a, b) => a + b.xp, 0)
+  const maxXp = localTasks.reduce((a, b) => a + b.xp, 0)
+
+  // Sub-renderer for Activity Center content (shared across desktop dropdown & mobile bottom sheet)
+  const renderActivityContent = () => (
+    <>
+      {/* Header: Title & Close Button */}
+      <div className="flex items-center justify-between border-b border-[#00c3ff]/20 pb-2.5">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-[#00c3ff] animate-pulse" />
+          <span className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-widest uppercase">
+            DAILY ALIGNMENT SCHEDULE
+          </span>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(false); }}
+          aria-label="Close activity center"
+          className="text-[#839493] hover:text-[#00c3ff] p-1 rounded-full hover:bg-[#ffffff]/10 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Segmented Control Tabs (iOS / Dynamic Island Style) */}
+      <div className="grid grid-cols-2 gap-1 p-1 bg-[#020507] border border-[#00c3ff]/20 rounded-lg">
+        <button
+          onClick={() => setActiveTab('liturgies')}
+          className={`py-1.5 sm:py-1 px-2 rounded font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 ${
+            activeTab === 'liturgies'
+              ? 'bg-[#00c3ff]/20 border border-[#00c3ff]/60 text-[#00ffff] shadow-[0_0_10px_rgba(0,195,255,0.3)]'
+              : 'text-[#839493] hover:text-[#dfe3e3]'
+          }`}
+        >
+          <Zap className="w-3 h-3 text-[#00c3ff]" />
+          <span>LITURGIES ({completedCount}/{localTasks.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('transmissions')}
+          className={`py-1.5 sm:py-1 px-2 rounded font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 relative ${
+            activeTab === 'transmissions'
+              ? 'bg-[#00c3ff]/20 border border-[#00c3ff]/60 text-[#00ffff] shadow-[0_0_10px_rgba(0,195,255,0.3)]'
+              : 'text-[#839493] hover:text-[#dfe3e3]'
+          }`}
+        >
+          <Radio className="w-3 h-3 text-[#ff5540]" />
+          <span>ALERTS ({toastHistoryList.length})</span>
+          {toastsList.length > 0 && (
+            <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-pulse" />
+          )}
+        </button>
+      </div>
+
+      {/* ── TAB 1: LITURGIES & UPCOMING SCHEDULE ── */}
+      {activeTab === 'liturgies' && (
+        <div className="space-y-3 animate-in fade-in duration-150">
+          {/* Spotlight "Next Up" Live Activity Card */}
+          {nextTask && !allTasksCompleted ? (
+            <div className="p-3 bg-gradient-to-r from-[#00c3ff]/15 via-[#006f85]/10 to-[#02080a] border border-[#00c3ff]/60 rounded-xl shadow-[0_0_15px_rgba(0,195,255,0.15)] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold text-[#00ffff] tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3 text-[#ff5540] animate-pulse" />
+                  NEXT IMPENDING LITURGY
+                </span>
+                <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/40 px-1.5 py-0.2 rounded">
+                  +{nextTask.xp} XP
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <span className="text-[11px] font-mono font-bold text-[#ff5540] mr-1.5">
+                    [{nextTask.time}]
+                  </span>
+                  <span className="text-xs font-bold text-[#dfe3e3] truncate">
+                    {nextTask.title}
+                  </span>
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleToggleTask(nextTask.id)
+                  }}
+                  className="shrink-0 px-2.5 py-1.5 sm:py-1 bg-gradient-to-r from-[#0099cc] to-[#00c3ff] hover:from-[#00c3ff] hover:to-[#00ffff] text-[#02080a] font-bold text-[10px] uppercase rounded-md shadow-[0_0_10px_rgba(0,195,255,0.4)] transition-transform active:scale-95 flex items-center gap-1"
+                >
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>COMPLETE</span>
+                </button>
+              </div>
+            </div>
+          ) : allTasksCompleted ? (
+            <div className="p-3 bg-[#00ff88]/10 border border-[#00ff88]/40 rounded-xl flex items-center gap-2 text-xs font-bold text-[#00ff88]">
+              <CheckCircle2 className="w-4 h-4 text-[#00ff88] shrink-0" />
+              <span>ALL DAILY LITURGIES VERIFIED FOR TODAY (+{maxXp} XP)</span>
+            </div>
+          ) : null}
+
+          {/* Progress bar */}
+          <div className="space-y-1">
+            <div className="flex justify-between text-[10px] text-[#839493]">
+              <span>PROGRESS: {completedCount}/{localTasks.length} COMPLETED</span>
+              <span className="text-[#00ffff] font-bold">{totalXpGained} XP GAINED</span>
+            </div>
+            <div className="w-full h-1.5 bg-[#020608] rounded-full overflow-hidden border border-[#00c3ff]/30">
+              <div
+                className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#ff5540] transition-all duration-300"
+                style={{
+                  width: `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Task List */}
+          <div className="grid grid-cols-1 gap-1.5 max-h-60 sm:max-h-56 overflow-y-auto pr-1">
+            {localTasks.map((t) => {
+              const isNext = t.id === nextTask?.id && !allTasksCompleted
+              const reminderTime = getTaskReminderTime(t.time)
+
+              return (
+                <div
+                  key={t.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleToggleTask(t.id)
+                  }}
+                  className={`flex items-center justify-between p-2.5 sm:p-2 rounded-lg border transition-all cursor-pointer ${
+                    isNext
+                      ? 'bg-[#00c3ff]/15 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.2)] ring-1 ring-[#00c3ff]/40'
+                      : t.completed
+                      ? 'bg-[#020608]/70 border-[#3a4a49]/40 opacity-75 hover:opacity-100'
+                      : 'bg-[#051114] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleTask(t.id)
+                      }}
+                      className="text-[#00ffff] hover:scale-110 transition-transform shrink-0"
+                    >
+                      {t.completed ? (
+                        <CheckSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+                      ) : (
+                        <Square className="w-3.5 h-3.5 text-[#839493]" />
+                      )}
+                    </button>
+
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={`text-[10px] font-mono font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                        [{t.time}]
+                      </span>
+                      {reminderTime && (
+                        <span className="text-[8px] text-[#ffb700] bg-[#091214] px-1 rounded border border-[#ffb700]/30 hidden xs:inline-flex items-center gap-0.5">
+                          <Bell className="w-2 h-2" /> {reminderTime}
+                        </span>
+                      )}
+                    </div>
+
+                    <span className={`text-[11px] font-mono font-bold truncate ${
+                      t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
+                    }`}>
+                      {t.title}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/30 px-1.5 py-0.2 rounded">
+                      +{t.xp} XP
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 2: TRANSMISSIONS & TOAST ALERTS ── */}
+      {activeTab === 'transmissions' && (
+        <div className="space-y-2.5 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-[10px] text-[#839493]">
+            <span>RECENT NEURAL DISPATCHES</span>
+            {toastHistoryList.length > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); clearToastsFn(); }}
+                className="text-[#ff453a] hover:text-[#ff6b6b] flex items-center gap-1 font-bold"
+              >
+                <Trash2 className="w-2.5 h-2.5" /> CLEAR
+              </button>
+            )}
+          </div>
+
+          {toastHistoryList.length === 0 ? (
+            <div className="p-4 bg-[#020608]/80 border border-[#00c3ff]/20 rounded-xl text-center space-y-1">
+              <Radio className="w-5 h-5 text-[#00c3ff]/40 mx-auto" />
+              <p className="text-xs text-[#839493]">No active transmissions.</p>
+              <p className="text-[10px] text-[#506060]">Neural broadcast telemetry nominal.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-1.5 max-h-60 sm:max-h-56 overflow-y-auto pr-1">
+              {toastHistoryList.map((t) => (
+                <div
+                  key={t.id}
+                  className="p-2.5 bg-[#040e12] border border-[#00c3ff]/25 rounded-lg space-y-1 text-left"
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-[9px] font-mono font-bold text-[#00ffff] uppercase">
+                      {t.type} ALERT
+                    </span>
+                    <span className="text-[8px] text-[#839493] font-mono">
+                      {new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {t.title && (
+                    <div className="text-[11px] font-bold text-[#dfe3e3] truncate">
+                      {t.title}
+                    </div>
+                  )}
+                  <div className="text-[10px] text-[#a8b8b8] font-mono leading-tight break-words">
+                    {t.message}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Footer Control Strip */}
+      <div className="pt-2 border-t border-[#00c3ff]/20 flex items-center justify-between text-[10px] flex-wrap gap-2">
+        {/* Mode & format buttons */}
+        <div className="flex items-center gap-1 flex-wrap">
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleReminders(); }}
+            className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded flex items-center gap-1 hover:border-[#00c3ff]"
+            title="Toggle automated 10m prior toast reminders"
+          >
+            {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
+            <span>{remindersEnabled ? '10M' : 'OFF'}</span>
+          </button>
+
+          <button
+            onClick={(e) => { e.stopPropagation(); triggerTestReminder(); }}
+            className="px-1.5 py-0.5 bg-[#071214] border border-yellow-400/40 text-yellow-400 font-bold rounded flex items-center gap-0.5 hover:border-yellow-400"
+            title="Dispatch instant 10m reminder test toast"
+          >
+            <Zap className="w-2.5 h-2.5 text-yellow-400" />
+            <span>TEST</span>
+          </button>
+
+          <button
+            onClick={(e) => { e.stopPropagation(); setIs24Hour(!is24Hour); }}
+            className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded hover:border-[#00c3ff]"
+          >
+            {is24Hour ? '24H' : '12H'}
+          </button>
+
+          <button
+            onClick={(e) => { e.stopPropagation(); setMode(mode === 'LOCAL' ? 'UTC' : mode === 'UTC' ? 'BENTHIC' : 'LOCAL'); }}
+            className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded hover:border-[#00c3ff]"
+          >
+            {mode}
+          </button>
+        </div>
+      </div>
+    </>
+  )
 
   // ---------------------------------------------------------------------------
-  // HEADER / COMPACT VARIANT WITH FLOATING DROPDOWN SCHEDULE
+  // HEADER / COMPACT VARIANT WITH MOBILE BOTTOM SHEET & DESKTOP FLOATING MODAL
   // ---------------------------------------------------------------------------
   if (variant === 'header' || variant === 'compact') {
     return (
-      <div className="relative font-mono text-xs select-none">
-        {/* Top Header Pill (Clickable) */}
+      <div ref={dropdownRef} className="relative font-mono text-xs select-none">
+        {/* Dynamic Activity Capsule Pill */}
         <div
           onClick={() => setIsScheduleOpen(!isScheduleOpen)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsScheduleOpen(!isScheduleOpen) }}
-          className={`flex items-center gap-2 bg-[#02080a]/90 hover:bg-[#071417] border border-[#00c3ff]/40 px-3 py-1.5 rounded-sm font-mono text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-colors group ${className}`}
+          aria-expanded={isScheduleOpen}
+          aria-haspopup="dialog"
+          className={`flex items-center gap-1 sm:gap-1.5 bg-[#02080a]/90 hover:bg-[#061418] border border-[#00c3ff]/40 hover:border-[#00c3ff]/70 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-mono text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 ${className}`}
         >
+          {/* Pulsing Clock Icon */}
           <Clock className="w-3.5 h-3.5 text-[#00c3ff] animate-pulse shrink-0" />
 
-          {/* Digital Time Readout */}
-          <div className="flex items-baseline gap-0.5 tracking-widest font-bold">
-            <span className="text-[#00ffff] filter drop-shadow-[0_0_6px_rgba(0,255,255,0.8)]">{hours}</span>
+          {/* Compact Digital Time */}
+          <div className="flex items-baseline gap-0.5 tracking-wider font-bold">
+            <span className="text-[#00ffff] filter drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">{hours}</span>
             <span className="text-[#ff5540] animate-pulse">:</span>
-            <span className="text-[#00ffff] filter drop-shadow-[0_0_6px_rgba(0,255,255,0.8)]">{minutes}</span>
-            <span className="text-[#ff5540] animate-pulse">:</span>
-            <span className="text-[#00ffff] filter drop-shadow-[0_0_6px_rgba(0,255,255,0.8)]">{seconds}</span>
-            {ampm && <span className="text-[9px] text-[#ff5540] ml-1">{ampm}</span>}
+            <span className="text-[#00ffff] filter drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">{minutes}</span>
+            <span className="text-[#ff5540] animate-pulse hidden xs:inline">:</span>
+            <span className="text-[#00ffff] filter drop-shadow-[0_0_5px_rgba(0,255,255,0.7)] hidden xs:inline">{seconds}</span>
+            {ampm && <span className="text-[9px] text-[#ff5540] ml-0.5">{ampm}</span>}
           </div>
 
-          {/* Compact Next Alignment Pill */}
+          {/* Compact Next Activity Preview (Desktop) */}
           {nextTask && !allTasksCompleted && (
-            <div className="hidden lg:flex items-center gap-1.5 ml-2 border-l border-[#00c3ff]/20 pl-2 text-[10px] text-[#a8b8b8] truncate max-w-[220px] group-hover:text-[#dfe3e3] transition-colors">
+            <div className="hidden xl:flex items-center gap-1 ml-1 border-l border-[#00c3ff]/25 pl-2 text-[10px] text-[#a8b8b8] truncate max-w-[170px] group-hover:text-[#dfe3e3] transition-colors">
               <span className="text-[#ff5540] font-bold shrink-0">NEXT:</span>
               <span className="truncate text-[#dfe3e3]">{nextTask.time} {nextTask.title}</span>
             </div>
           )}
 
-          {/* Chevron dropdown indicator */}
-          <div className="text-[#00c3ff] ml-1 shrink-0">
-            {isScheduleOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </div>
+          {/* Notification / Task Pulse Indicator */}
+          {toastsList.length > 0 ? (
+            <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-ping ml-0.5" />
+          ) : !allTasksCompleted ? (
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] ml-0.5" />
+          ) : null}
+
+          {/* Chevron Indicator */}
+          <ChevronDown
+            className={`w-3.5 h-3.5 text-[#00c3ff] shrink-0 transition-transform duration-200 ${
+              isScheduleOpen ? 'rotate-180 text-[#00ffff]' : 'group-hover:text-[#00ffff]'
+            }`}
+          />
         </div>
 
-        {/* Floating Header Dropdown Panel */}
-        {isScheduleOpen && (
-          <div className="absolute right-0 top-full mt-2 w-[min(24rem,calc(100vw-1.5rem))] bg-[#030a0d]/95 border-2 border-[#00c3ff]/60 rounded-md p-3 sm:p-4 shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.3)] backdrop-blur-md z-50 animate-in fade-in slide-in-from-top-2 duration-150 space-y-3">
-            {/* Header controls bar */}
-            <div className="flex items-center justify-between border-b border-[#00c3ff]/20 pb-2">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#ff5540] animate-pulse" />
-                <span className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-widest uppercase">
-                  DAILY ALIGNMENT SCHEDULE
-                </span>
-              </div>
-              
-              {/* Quick 12H/24H, Mode & Reminder buttons */}
-              <div className="flex items-center gap-1 text-[10px]">
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleReminders(); }}
-                  className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded flex items-center gap-1"
-                  title="Toggle automated 10m prior toast reminders"
-                >
-                  {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
-                  <span>{remindersEnabled ? '10M' : 'OFF'}</span>
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); triggerTestReminder(); }}
-                  className="px-1.5 py-0.5 bg-[#071214] border border-yellow-400/40 text-yellow-400 font-bold rounded flex items-center gap-0.5"
-                  title="Dispatch instant 10m reminder test toast"
-                >
-                  <Zap className="w-2.5 h-2.5 text-yellow-400" />
-                  <span>TEST</span>
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setIs24Hour(!is24Hour); }}
-                  className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded"
-                >
-                  {is24Hour ? '24H' : '12H'}
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setMode(mode === 'LOCAL' ? 'UTC' : mode === 'UTC' ? 'BENTHIC' : 'LOCAL'); }}
-                  className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded"
-                >
-                  {mode}
-                </button>
-              </div>
-            </div>
-
-            {/* Progress bar */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-[10px] text-[#839493]">
-                <span>PROGRESS: {localTasks.filter(t => t.completed).length}/{localTasks.length} COMPLETED</span>
-                <span className="text-[#00ffff] font-bold">
-                  {localTasks.filter(t => t.completed).reduce((a, b) => a + b.xp, 0)} XP GAINED
-                </span>
-              </div>
-              <div className="w-full h-1.5 bg-[#020608] rounded-full overflow-hidden border border-[#00c3ff]/30">
-                <div
-                  className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#ff5540] transition-all duration-300"
-                  style={{
-                    width: `${Math.round((localTasks.filter(t => t.completed).length / Math.max(localTasks.length, 1)) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* List of 8 daily tasks */}
-            <div className="grid grid-cols-1 gap-1.5 max-h-72 overflow-y-auto pr-1">
-              {localTasks.map((t) => {
-                const isNext = t.id === nextTask.id && !allTasksCompleted
-                const reminderTime = getTaskReminderTime(t.time)
-                return (
-                  <div
-                    key={t.id}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleTask(t.id)
-                    }}
-                    className={`flex items-center justify-between p-2 rounded border transition-all cursor-pointer ${
-                      isNext
-                        ? 'bg-[#00c3ff]/15 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.2)] ring-1 ring-[#00c3ff]/50'
-                        : t.completed
-                        ? 'bg-[#020608]/70 border-[#3a4a49]/40 opacity-75 hover:opacity-100'
-                        : 'bg-[#051114] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleToggleTask(t.id)
-                        }}
-                        className="text-[#00ffff] hover:scale-110 transition-transform"
-                      >
-                        {t.completed ? (
-                          <CheckSquare className="w-3.5 h-3.5 text-[#00ffff]" />
-                        ) : (
-                          <Square className="w-3.5 h-3.5 text-[#839493]" />
-                        )}
-                      </button>
-
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className={`text-[11px] font-mono font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
-                          [{t.time}]
-                        </span>
-                        {reminderTime && (
-                          <span className="text-[9px] text-[#ffb700] bg-[#091214] px-1 rounded border border-[#ffb700]/30 hidden sm:inline-flex items-center gap-0.5">
-                            <Bell className="w-2 h-2" /> {reminderTime}
-                          </span>
-                        )}
-                      </div>
-
-                      <span className={`text-[11px] font-mono font-bold truncate ${
-                        t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
-                      }`}>
-                        {t.title}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/30 px-1 py-0.5 rounded">
-                        +{t.xp} XP
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Footer close trigger */}
-            <div className="pt-2 border-t border-[#00c3ff]/20 flex justify-between items-center text-[10px] text-[#839493]">
-              <span>MOLTOLOGY LITURGY ENGINE</span>
-              <button
-                onClick={(e) => { e.stopPropagation(); setIsScheduleOpen(false); }}
-                className="text-[#00c3ff] hover:text-[#00ffff] font-bold uppercase"
-              >
-                CLOSE SCHEDULE ✕
-              </button>
-            </div>
+        {/* ═══ DESKTOP FLOATING DROPDOWN MODAL (sm and up) ═══ */}
+        {isScheduleOpen && !isMobileScreen && (
+          <div
+            role="dialog"
+            aria-label="Activity Center"
+            className="hidden sm:block absolute right-0 top-full mt-2 w-[26rem] bg-[#03090cf8] border border-[#142630] border-t-2 border-t-[#00c3ff]/70 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_25px_rgba(0,195,255,0.2)] backdrop-blur-xl z-50 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 space-y-3"
+          >
+            {renderActivityContent()}
           </div>
+        )}
+
+        {/* ═══ MOBILE FULL-WIDTH BOTTOM ANCHORED MODAL SHEET (< sm) ═══ */}
+        {isMobileScreen && (
+          <HudBottomSheet
+            isOpen={isScheduleOpen}
+            onClose={() => setIsScheduleOpen(false)}
+            ariaLabel="Activity Center"
+          >
+            {renderActivityContent()}
+          </HudBottomSheet>
         )}
       </div>
     )

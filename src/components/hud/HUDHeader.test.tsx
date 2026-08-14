@@ -17,57 +17,33 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 describe('HUDHeader Component', () => {
-  it('renders default larva unit fallback image when user is not signed in', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
-
+  it('renders current level 1 badge and next level 2 badge by default', () => {
     render(<HUDHeader />)
 
-    const img = screen.getByRole('img', { name: 'Larva Unit 3D' })
-    expect(img).toBeInTheDocument()
-    expect(img).toHaveAttribute('src', '/images/extracted/larva_unit_3d.jpg')
-    expect(screen.getByText('CONVERSION IN PROGRESS')).toBeInTheDocument()
+    expect(screen.getByLabelText('Level 1 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Level 2 Badge')).toBeInTheDocument()
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
   })
 
-  it('renders Google SSO avatar image when user is signed in', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: {
-        user: {
-          id: 'sso-123',
-          name: 'Carcinus Ascendant',
-          email: 'carcinus@moltology.org',
-          image: 'https://lh3.googleusercontent.com/avatar.jpg',
-        },
-      },
-    } as any)
+  it('renders custom clearance stage level 3 and next level 4 badge', () => {
+    render(<HUDHeader stage={3} />)
 
-    render(<HUDHeader />)
-
-    const avatarImg = screen.getByRole('img', { name: 'Carcinus Ascendant' })
-    expect(avatarImg).toBeInTheDocument()
-    expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
+    expect(screen.getByLabelText('Level 3 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Level 4 Badge')).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.getByText('4')).toBeInTheDocument()
   })
 
-  it('renders letter avatar fallback when signed in user has no image', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: {
-        user: {
-          id: 'sso-456',
-          name: 'Larva Member',
-          email: 'larva@moltology.org',
-          image: null,
-        },
-      },
-    } as any)
+  it('renders apex badge when stage 4 is achieved', () => {
+    render(<HUDHeader stage={4} />)
 
-    render(<HUDHeader />)
-
-    expect(screen.getByText('Larva Member')).toBeInTheDocument()
-    expect(screen.getByText('L')).toBeInTheDocument()
+    expect(screen.getByLabelText('Level 4 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Apex Level Badge')).toBeInTheDocument()
+    expect(screen.getByText('APEX')).toBeInTheDocument()
   })
 
   it('renders chroma-keyed claw image facing right and does not render tail image', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
-
     render(<HUDHeader />)
 
     const clawImg = screen.getByRole('img', { name: 'Exoshell Claw' })
