@@ -532,8 +532,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
         } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
       >
-        {/* Mobile Top Bar (Compact Header with Brand & Hamburger Toggle) */}
-        <div className="flex md:hidden items-center justify-between gap-2 p-3 bg-[#060a0b] border-b border-[#3a4a49]/65">
+        {/* Mobile Top Bar (Permanent, Constant Header with Brand & Hamburger Toggle) */}
+        <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2.5 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0">
           <HeaderBrand
             subtext="BENTHIC TEMPLE HUD"
             logoSize="sm"
@@ -543,10 +543,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
           <button
             onClick={toggleMobileMenu}
-            aria-label={isMobileOpen ? 'Toggle mobile menu' : 'Open HUD Menu'}
+            aria-label={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
             aria-expanded={isMobileOpen}
             title={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
-            className="w-9 h-9 flex items-center justify-center bg-[#0f1414] hover:bg-[#171c1c] border border-[#00c3ff]/60 text-[#00c3ff] chamfer-corner shadow-md active:scale-95 transition-all shrink-0 cursor-pointer"
+            className={`w-9 h-9 flex items-center justify-center chamfer-corner shadow-md active:scale-95 transition-all shrink-0 cursor-pointer ${
+              isMobileOpen
+                ? 'bg-[#1a0f0f] border border-[#ff453a]/70 text-[#ff453a]'
+                : 'bg-[#0f1414] hover:bg-[#171c1c] border border-[#00c3ff]/60 text-[#00c3ff]'
+            }`}
           >
             {isMobileOpen ? (
               <X className="w-5 h-5 text-[#ff453a] transition-transform duration-200" />
@@ -796,7 +800,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
       </aside>
 
-      {/* FULL-SCREEN SOLID MOBILE NAVIGATION PORTAL (renders at document.body level with smooth entry/exit animation) */}
+      {/* SOLID MOBILE NAVIGATION PORTAL (Anchored directly below the persistent mobile header) */}
       {isMounted &&
         (isMobileOpen || isMobileClosing) &&
         typeof document !== 'undefined' &&
@@ -805,31 +809,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Menu"
-            className={`md:hidden fixed inset-0 z-[99999] w-screen h-[100dvh] bg-[#030708] flex flex-col font-mono text-[#dfe3e3] select-none overflow-hidden transition-all duration-200 ease-out ${
+            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-[#030708] flex flex-col font-mono text-[#dfe3e3] select-none overflow-hidden transition-all duration-250 ease-out ${
               isMobileVisible && !isMobileClosing
-                ? 'opacity-100 translate-y-0 scale-100'
-                : 'opacity-0 -translate-y-2 scale-[0.99] pointer-events-none'
+                ? 'opacity-100 translate-y-0'
+                : 'opacity-0 -translate-y-2 pointer-events-none'
             }`}
           >
-            {/* Mobile Top Bar (Exact same height, padding, styling as base mobile bar) */}
-            <div className="flex items-center justify-between gap-2 p-3 bg-[#060a0b] border-b border-[#3a4a49]/65 shrink-0 shadow-md">
-              <HeaderBrand
-                subtext="BENTHIC TEMPLE HUD"
-                logoSize="sm"
-                onClick={() => handleNavClick('/')}
-                className="min-w-0 flex-1"
-              />
-
-              <button
-                onClick={() => closeMobileMenu()}
-                aria-label="Close HUD Menu"
-                title="Close HUD Menu"
-                className="w-9 h-9 flex items-center justify-center bg-[#0f1414] hover:bg-[#1a0f0f] border border-[#ff453a]/70 text-[#ff453a] chamfer-corner shadow-md active:scale-95 transition-all shrink-0 cursor-pointer"
-              >
-                <X className="w-5 h-5 text-[#ff453a]" />
-              </button>
-            </div>
-
             {/* Search Bar (Click opens Command Palette & closes mobile menu) */}
             <div className="shrink-0 border-b border-[#1e2d37]/80 bg-[#080d10]">
               <button
