@@ -147,4 +147,10 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
     })
   })
+
+  it('collapses mobile top bar when isTopBarHidden is true and menu is closed', () => {
+    const { container } = render(<HUDSidebar isTopBarHidden={true} />)
+    const mobileBar = container.querySelector('.md\\:hidden')
+    expect(mobileBar).toHaveClass('h-0', 'opacity-0', '-translate-y-full')
+  })
 })

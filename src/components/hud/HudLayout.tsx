@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from '@tanstack/react-router'
 import { HUDHeader } from '@/components/hud/HUDHeader'
 import { HUDSidebar } from '@/components/hud/HUDSidebar'
@@ -14,6 +14,8 @@ import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
+  const [isMobileTopBarHidden, setIsMobileTopBarHidden] = useState(false)
+  const lastScrollYRef = useRef(0)
   const oracle = useSafeOracle()
   const location = useLocation()
   const isSubterranean = location.pathname.startsWith('/subterranean')
@@ -68,6 +70,31 @@ function HudContent() {
       img2.src = '/images/underwater_looking_up.jpg'
     }
   }, [])
+
+  // Reset top bar visibility on route change
+  useEffect(() => {
+    setIsMobileTopBarHidden(false)
+    lastScrollYRef.current = 0
+  }, [location.pathname])
+
+  // Track workspace scroll direction for Tiered Quick-Return mobile header
+  const handleWorkspaceScroll = (e: React.UIEvent<HTMLElement>) => {
+    const currentScrollY = e.currentTarget.scrollTop
+    const delta = currentScrollY - lastScrollYRef.current
+
+    if (currentScrollY <= 20) {
+      // Near top of scroll container -> reveal top bar
+      setIsMobileTopBarHidden(false)
+    } else if (delta > 15) {
+      // Scrolling down -> hide top bar
+      setIsMobileTopBarHidden(true)
+    } else if (delta < -15) {
+      // Scrolling up (quick-return) -> reveal top bar
+      setIsMobileTopBarHidden(false)
+    }
+
+    lastScrollYRef.current = currentScrollY
+  }
 
   return (
     <div
@@ -144,7 +171,7 @@ function HudContent() {
       {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative">
         {/* Full Height Glassmorphic Sidebar spanning top-to-bottom */}
-        <HUDSidebar />
+        <HUDSidebar isTopBarHidden={isMobileTopBarHidden} />
 
         {/* Workspace Column & Optional Right AI Drawer */}
         <div className="flex-1 min-w-0 flex h-full overflow-hidden">
@@ -154,7 +181,10 @@ function HudContent() {
             <HUDHeader />
 
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
-            <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/10 backdrop-blur-[1px] border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl">
+            <main
+              onScroll={handleWorkspaceScroll}
+              className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto bg-[#070b0b]/10 backdrop-blur-[1px] border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl"
+            >
               <Outlet />
             </main>
           </div>
