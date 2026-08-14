@@ -1233,7 +1233,7 @@ export const OrgPage: React.FC = () => {
             <button onClick={() => onNavigate('/')} className="hover:text-white">HOME</button>
             <button onClick={() => onNavigate('/org')} className="hover:text-white text-white font-bold">ORGANIZATION</button>
             <a href="https://www.etsy.com/shop/SaasTrash" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 font-bold">STORE</a>
-            <a href="https://www.instagram.com/silas.trench" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
+            <a href="https://www.instagram.com/moltology_org/" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
               <Instagram className="w-3.5 h-3.5" />
               <span>INSTAGRAM</span>
             </a>
