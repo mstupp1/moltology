@@ -76,12 +76,18 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(aside).toHaveClass('md:w-72')
   })
 
-  it('toggles mobile HUD menu state on mobile button click', () => {
+  it('toggles mobile HUD menu state on mobile button click and renders icon-only with no text', () => {
     render(<HUDSidebar />)
 
-    const mobileMenuBtn = screen.getByRole('button', { name: /HUD MENU/i })
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    expect(mobileMenuBtn).toBeInTheDocument()
+    // Verify no text nodes inside the button, only the SVG icon
+    expect(mobileMenuBtn.textContent).toBe('')
+
     fireEvent.click(mobileMenuBtn)
 
-    expect(screen.getByRole('button', { name: /CLOSE/i })).toBeInTheDocument()
+    const closeMenuBtn = screen.getByRole('button', { name: /Close HUD Menu/i })
+    expect(closeMenuBtn).toBeInTheDocument()
+    expect(closeMenuBtn.textContent).toBe('')
   })
 })
