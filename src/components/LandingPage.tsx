@@ -253,6 +253,25 @@ export const LandingPage: React.FC = () => {
           </span>
         </div>
 
+        {/* Ambient Rim-Lighting Halo Glows Behind Claw & Video (Cyan & Red Diffuse Lighting) */}
+        <div className="absolute right-0 sm:right-6 lg:right-0 top-[28%] sm:top-1/3 lg:top-1/2 -translate-y-1/2 w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[130px] sm:blur-[170px] animate-pulse pointer-events-none z-[8]" />
+        <div className="absolute right-0 sm:right-6 lg:right-0 top-[28%] sm:top-1/3 lg:top-1/2 -translate-y-1/2 w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[110px] sm:blur-[150px] animate-pulse pointer-events-none z-[8]" style={{ animationDelay: '1.5s' }} />
+
+        {/* Looming Transparent Crab Claw Background Layer (Exact Desktop Effects & Mask Applied Across All Viewports) */}
+        <div 
+          className="absolute -right-12 sm:-right-24 lg:-right-[16rem] xl:-right-[20rem] top-[28%] sm:top-1/3 lg:top-1/2 -translate-y-1/2 w-[160%] sm:w-[200%] lg:w-[240%] xl:w-[270%] pointer-events-none select-none z-[10] group opacity-75"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
+          }}
+        >
+          <img
+            src="/images/ascended_claw_vector_transparent.png"
+            alt="Ascended Stage Biomechanical Crab Claw"
+            className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[50%] saturate-[0.7] brightness-[0.55] contrast-[1.2] opacity-60 blur-[1px]"
+          />
+        </div>
+
         <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
           
           {/* Left Column: High-Impact Typography & Primary CTAs */}
@@ -341,28 +360,9 @@ export const LandingPage: React.FC = () => {
 
           </div>
 
-          {/* Right Column: Layered 3D Interactive Shuffling Card Deck + Looming Crab Claw Silhouette */}
+          {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
           <div className="lg:col-span-6 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] lg:min-h-[640px] z-20">
             
-            {/* Ambient Rim-Lighting Halo Glows Behind Claw & Deck */}
-            <div className="absolute w-[min(90vw,650px)] h-[min(90vw,650px)] rounded-full bg-cyan-500/20 blur-[130px] animate-pulse pointer-events-none" />
-            <div className="absolute w-[min(80vw,550px)] h-[min(80vw,550px)] rounded-full bg-red-600/15 blur-[120px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
-
-            {/* Looming Transparent Crab Claw Background Layer */}
-            <div 
-              className="absolute -right-16 sm:-right-28 lg:-right-[16rem] xl:-right-[20rem] top-1/2 -translate-y-1/2 w-[140%] sm:w-[190%] lg:w-[240%] pointer-events-none select-none z-10 group opacity-70"
-              style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%)',
-              }}
-            >
-              <img
-                src="/images/ascended_claw_vector_transparent.png"
-                alt="Ascended Stage Biomechanical Crab Claw"
-                className="w-full h-auto object-contain transform hover:scale-[1.02] transition-transform duration-1000 grayscale-[50%] saturate-[0.7] brightness-[0.55] contrast-[1.2] opacity-60 blur-[1px]"
-              />
-            </div>
-
             {/* 3D Video Slider Deck with Touch Navigation */}
             <div className="relative z-30 w-full">
               <HeroShuffleDeck />
