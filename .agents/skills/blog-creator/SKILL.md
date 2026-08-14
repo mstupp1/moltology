@@ -97,3 +97,49 @@ npx tsx scripts/ingest.ts content/news/<slug>.md
 1. Navigate or inspect `https://moltology.org/news/<slug>`.
 2. Confirm the cover image, HUD inline figure frames, headings, ASCII telemetry boxes, and categories render cleanly.
 3. Send the verified live article link to the user.
+
+---
+
+### Step 6: Multi-Channel Social Distribution (Instagram via Zernio MCP)
+
+Create high-conversion accompanying social assets and stage/publish them to Instagram via Zernio.
+
+#### 1. Tone Calibration: The Curiosity Gap
+* **The Rule**: Keep social copy intriguing, subtle, and focused on cutting-edge systems/hardware engineering. Do **not** use heavy or intense cult jargon that alienates casual readers.
+* **Bad**: *"Praise the Holy Molt! Shed your weak terrestrial flesh and join the Carcinus in the brine."*
+* **Good**: *"Why the next generation of AI compute isn't in the cloud—it's 50 fathoms underwater. 3 thermodynamic reasons traditional datacenters are moving to the ocean floor."*
+
+#### 2. Mandatory AI-Generated Media Labeling
+* **Strict Tenet**: In alignment with our honest, transparent AI-driven platform values and platform policies, **always check/enable the AI-Generated Media option** (`isAiGenerated: true` for Instagram/Meta, `madeWithAi: true` for X).
+* This applies to all generated carousel slides, concept art, and Story assets.
+
+#### 3. Generate & Format Vertical Assets
+* **Carousel Slides (Strict 4:5 Aspect Ratio / 0.80:1)**:
+  - Instagram's Graph API strictly enforces that feed/carousel images have an aspect ratio between `4:5` (0.80:1) and `1.91:1`.
+  - Raw `3:4` generations are `896 x 1200` (0.7467), which Instagram rejects.
+  - **Required Step**: Always crop carousel images to exact **4:5 aspect ratio** (`896 x 1120` or `1080 x 1350`) using `sips -c 1120 896 input.jpg --out output_4_5.jpg` before uploading.
+  - **Slide 1 (Hook)**: Dark sci-fi HUD visual with a provocative premise or question.
+  - **Slide 2 (The Mechanism/Telemetry)**: Schematics, blueprints, or telemetry metrics highlighting the core breakthrough.
+  - **Slide 3 (CTA/Summary Card)**: Minimalist terminal card directing readers to the full dispatch.
+* **Story Slide (9:16 aspect ratio)**:
+  - Vertical mobile layout (`9:16`) with framing HUD borders and an open central area for Instagram's interactive **Link Sticker** leading directly to `https://moltology.org/news/<slug>`.
+
+#### 4. Upload Assets to Neon S3
+Upload formatted 4:5 social assets to Neon S3 via `src/lib/ingest/s3-upload.ts` (`uploadLocalFileToS3`) to obtain public HTTPS URLs.
+
+#### 5. Stage Draft or Publish via Zernio
+Create the post with:
+* `platform`: `"instagram"`
+* `account_id`: Selected Instagram account ID (e.g., Silas Trench `6a7f7f0777555aae01d99b54`)
+* `content`: Curiosity-driven editorial caption with hook, 3 key value takeaways, and a clean CTA (*"Full technical dispatch live on moltology.org. Link in bio."*).
+* `mediaItems`: Array of `{ "type": "image", "url": "<S3_PUBLIC_URL>" }` with the 4:5 formatted carousel images.
+* `is_draft`: `true` (default to draft mode unless user explicitly requests immediate publish).
+* `platformSpecificData`:
+  - `isAiGenerated`: `true` (always self-disclose AI-generated media).
+  - `firstComment`: Auto-post article URL reference + all relevant search `#hashtags` to keep the main caption clean and editorial.
+
+#### 6. Multi-Platform Custom Captions (When Cross-Posting)
+When broadcasting across multiple networks (e.g. X/Twitter, LinkedIn, Instagram):
+* **Instagram**: Direct to "Link in bio / Story" (since caption links are non-clickable) + use `firstComment` for hashtags.
+* **X/Twitter & LinkedIn**: Use Custom Captions with the direct clickable article link embedded directly in the body text.
+
