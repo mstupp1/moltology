@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, Eye, EyeOff, Sparkles } from 'lucide-react'
+import { LogOut, EyeOff, Sparkles, ChevronDown } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { UserAvatar } from './UserAvatar'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -16,13 +16,16 @@ export interface UserAvatarMenuProps {
   }
   userRole?: string | null
   onNavigate?: (path: string) => void
-  align?: 'left' | 'right'
+  align?: 'left' | 'right' | 'center'
   openDirection?: 'up' | 'down'
+  inline?: boolean
+  className?: string
 }
 
 /**
  * Standardized HUD User Avatar Dropdown Menu component.
- * Displays user profile image / letter avatar badge which opens a dropdown
+ * Supports both floating popover (desktop / sidebar) and inline accordion (mobile navigation drawers).
+ * Displays user profile image / letter avatar badge which opens a menu
  * containing user details (name, email), Heavy VFX toggle, and sign-out action.
  */
 export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
@@ -31,6 +34,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   onNavigate,
   align = 'right',
   openDirection = 'down',
+  inline = false,
+  className = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -80,8 +85,107 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
       ? 'admin'
       : userRole || user.role
 
+  // Mobile / Drawer Inline Layout
+  if (inline) {
+    return (
+      <div className={`w-full text-left ${className}`} ref={menuRef}>
+        {/* Interactive Full-Width Mobile Operative Row */}
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          aria-label="User account menu"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-cyan-950/20 hover:bg-cyan-950/40 text-gray-200 hover:text-white transition-colors group cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#00c3ff]/60"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <UserAvatar
+              user={user}
+              size="sm"
+              className="border border-cyan-400/60 group-hover:border-[#00c3ff] shadow-[0_0_8px_rgba(0,255,255,0.3)] transition-all shrink-0"
+            />
+            <div className="flex flex-col min-w-0 text-left">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-gray-200 group-hover:text-cyan-300 truncate font-grotesk flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
+                  {displayName}
+                </span>
+                {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
+                  <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shrink-0">
+                    {effectiveRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                  </span>
+                )}
+              </div>
+              {user.email && (
+                <span className="text-[10px] text-gray-400 truncate mt-0.5 font-mono">
+                  {user.email}
+                </span>
+              )}
+            </div>
+          </div>
+          <ChevronDown
+            className={`w-4 h-4 text-cyan-400/70 group-hover:text-cyan-300 transition-transform duration-200 shrink-0 ml-2 ${
+              isOpen ? 'rotate-180 text-[#00c3ff]' : ''
+            }`}
+          />
+        </button>
+
+        {/* Clean Flat Inline Controls (No Heavy Outer Container) */}
+        {isOpen && (
+          <div className="pt-1.5 pb-1 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
+            {/* Heavy VFX Toggle Row */}
+            <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-cyan-950/25 border border-cyan-950/60">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {heavyVfxDisabled ? (
+                  <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-[#00c3ff] shrink-0" />
+                )}
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-bold text-gray-200 truncate font-grotesk">
+                    Disable Heavy VFX
+                  </span>
+                  <span className="text-[10px] text-gray-400 truncate font-mono">
+                    {heavyVfxDisabled ? 'Performance Mode' : 'Full Graphics Active'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={heavyVfxDisabled}
+                aria-label="Disable heavy vfx toggle"
+                onClick={toggleHeavyVfx}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
+                  heavyVfxDisabled ? 'bg-cyan-950 border-cyan-800' : 'bg-[#00c3ff]'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                    heavyVfxDisabled ? 'translate-x-0 bg-gray-400' : 'translate-x-4 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Sign Out Action Button */}
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold font-grotesk tracking-wider text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600 transition-all cursor-pointer active:scale-[0.99]"
+            >
+              <LogOut className="w-4 h-4 text-red-400" />
+              <span>SIGN OUT</span>
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Floating Popover Layout (Desktop Navigation / HUDSidebar)
   return (
-    <div className="relative inline-block text-left" ref={menuRef}>
+    <div className={`relative inline-block text-left ${className}`} ref={menuRef}>
       {/* Interactive Avatar Button Badge */}
       <button
         type="button"
@@ -102,10 +206,14 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
       {isOpen && (
         <div
           className={`absolute ${
-            align === 'right' ? 'right-0' : 'left-0'
+            align === 'right'
+              ? 'right-0'
+              : align === 'center'
+              ? 'left-1/2 -translate-x-1/2'
+              : 'left-0'
           } ${
             openDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
-          } w-64 bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 animate-in fade-in zoom-in-95 duration-150 font-mono`}
+          } w-64 max-w-[calc(100vw-2rem)] bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 animate-in fade-in zoom-in-95 duration-150 font-mono`}
         >
           {/* Top User Header Info Section */}
           <div className="flex items-center gap-3 pb-3 border-b border-[#121c1d]">
