@@ -6,6 +6,7 @@ import { authClient } from '@/lib/auth'
 import '@/index.css'
 import { seo, buildJsonLd } from '@/lib/seo'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
+import { HUDNotFound } from '@/components/hud/HUDNotFound'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 
 export const Route = createRootRoute({
@@ -36,6 +37,7 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  notFoundComponent: HUDNotFound,
   errorComponent: HUDErrorFallback,
   component: RootDocument,
 })
