@@ -41,10 +41,12 @@ import { UserAvatarMenu } from '../UserAvatarMenu'
 
 interface HUDSidebarProps {
   larvaId?: string
+  isTopBarHidden?: boolean
 }
 
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   larvaId = 'LARVA UNIT #8971',
+  isTopBarHidden = false,
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -530,10 +532,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
+        } h-auto md:h-full bg-[#060a0b] md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
       >
-        {/* Mobile Top Bar (Permanent, Constant Header with Brand & Hamburger Toggle) */}
-        <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2.5 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0">
+        {/* Mobile Top Bar (Tier 1: Brand & Hamburger Toggle - collapses on scroll down) */}
+        <div
+          className={`flex md:hidden items-center justify-between gap-2 px-3 bg-[#060a0b] border-b relative z-50 shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${
+            isTopBarHidden && !isMobileOpen
+              ? 'h-0 py-0 opacity-0 border-transparent -translate-y-full pointer-events-none'
+              : 'h-14 py-2.5 opacity-100 border-[#3a4a49]/65 translate-y-0'
+          }`}
+        >
           <HeaderBrand
             subtext="BENTHIC TEMPLE HUD"
             logoSize="sm"
