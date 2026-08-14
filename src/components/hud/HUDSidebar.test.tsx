@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { HUDSidebar } from './HUDSidebar'
 import { authClient } from '@/lib/auth-client'
 
@@ -22,6 +22,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.clear()
+    document.body.style.overflow = ''
   })
 
   it('renders core navigation groups and items correctly', () => {
@@ -81,7 +82,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
     expect(mobileMenuBtn).toBeInTheDocument()
-    // Verify no text nodes inside the button, only the SVG icon
     expect(mobileMenuBtn.textContent).toBe('')
 
     fireEvent.click(mobileMenuBtn)
@@ -89,5 +89,62 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const closeMenuBtn = screen.getByRole('button', { name: /Close HUD Menu/i })
     expect(closeMenuBtn).toBeInTheDocument()
     expect(closeMenuBtn.textContent).toBe('')
+  })
+
+  it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {
+    render(<HUDSidebar />)
+
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    fireEvent.click(mobileMenuBtn)
+
+    const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
+    expect(dialog).toBeInTheDocument()
+    expect(dialog).toHaveClass('fixed', 'inset-0', 'z-[99999]', 'w-screen', 'h-[100dvh]')
+    expect(document.body.style.overflow).toBe('hidden')
+
+    // Close via close button
+    const closeBtn = screen.getByRole('button', { name: /Close HUD Menu/i })
+    fireEvent.click(closeBtn)
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+    })
+    expect(document.body.style.overflow).toBe('')
+  })
+
+  it('closes mobile full-screen menu when Escape key is pressed', async () => {
+    render(<HUDSidebar />)
+
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    fireEvent.click(mobileMenuBtn)
+
+    expect(screen.getByRole('dialog', { name: /Navigation Menu/i })).toBeInTheDocument()
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+    })
+  })
+
+  it('navigates and closes mobile menu when nav item inside modal is clicked', async () => {
+    render(<HUDSidebar />)
+
+    const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
+    fireEvent.click(mobileMenuBtn)
+
+    const dialog = screen.getByRole('dialog', { name: /Navigation Menu/i })
+    expect(dialog).toBeInTheDocument()
+
+    // Find nav buttons inside the dialog
+    const codexBtns = screen.getAllByRole('button', { name: /THE SACRED CODEX/i })
+    // The second one is inside the mobile dialog
+    const mobileCodexBtn = codexBtns[codexBtns.length - 1]
+    fireEvent.click(mobileCodexBtn)
+
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+    })
   })
 })

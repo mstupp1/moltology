@@ -130,7 +130,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           />
         </button>
 
-        {/* Clean Flat Inline Controls (No Heavy Outer Container) */}
+        {/* Clean Flat Inline Controls with smooth expand animation */}
         {isOpen && (
           <div className="pt-1.5 pb-1 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
             {/* Heavy VFX Toggle Row */}

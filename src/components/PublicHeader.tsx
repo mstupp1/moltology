@@ -279,17 +279,19 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       </div>
 
       {/* Mobile Dropdown Backdrop & Menu */}
-      {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 top-[60px] bg-black/60 backdrop-blur-sm -z-10 animate-fade-in"
-          onClick={() => setMobileOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      <div
+        className={`lg:hidden fixed inset-0 top-[60px] bg-black/60 backdrop-blur-sm -z-10 transition-opacity duration-300 ease-in-out ${
+          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
 
       <div
-        className={`lg:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
-          mobileOpen ? 'max-h-[calc(100vh-5rem)] overflow-y-auto opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileOpen
+            ? 'max-h-[calc(100vh-5rem)] overflow-y-auto opacity-100 translate-y-0'
+            : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
         }`}
       >
         <div className="mt-3 p-3 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
