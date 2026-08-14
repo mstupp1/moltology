@@ -8,8 +8,9 @@ describe('TanStack Router Configuration', () => {
     expect(router.options.scrollRestoration).toBe(true)
   })
 
-  it('contains registered routes in route tree', () => {
+  it('configures defaultNotFoundComponent and defaultPendingComponent', () => {
     const router = getRouter()
-    expect(router.routeTree).toBeDefined()
+    expect(router.options.defaultNotFoundComponent).toBeDefined()
+    expect(router.options.defaultPendingComponent).toBeDefined()
   })
 })
