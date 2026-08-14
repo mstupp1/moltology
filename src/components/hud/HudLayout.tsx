@@ -142,7 +142,7 @@ function HudContent() {
       <CommandPalette />
 
       {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative z-10">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative">
         {/* Full Height Glassmorphic Sidebar spanning top-to-bottom */}
         <HUDSidebar />
 

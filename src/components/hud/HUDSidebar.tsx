@@ -311,15 +311,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const tickerText = tickerMessages.join(' • ') + ' • '
 
-  const allNavItems = navGroups.flatMap((g) => g.items)
-
-  const activeItem =
-    allNavItems.find(
-      (item) =>
-        effectiveRoute === item.path ||
-        (item.path !== '/' && effectiveRoute.startsWith(item.path))
-    ) || allNavItems[0]
-
   const handleNavClick = (path: string) => {
     setPendingRoute(path)
     navigate({ to: path })
@@ -337,44 +328,30 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
+        } h-auto md:h-full bg-[#060a0b]/70 backdrop-blur-md border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative ${
+          isMobileOpen ? 'z-[100]' : 'z-40'
+        } shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
       >
         {/* Mobile Accordion Top Bar */}
         <div className="flex md:hidden items-center justify-between gap-2 p-3">
-          <div
+          <HeaderBrand
+            subtext="BENTHIC TEMPLE HUD"
+            logoSize="sm"
             onClick={() => handleNavClick('/')}
-            className="flex items-center gap-2 cursor-pointer group/mobilebrand"
-          >
-            <div className="w-7 h-7 flex items-center justify-center shrink-0">
-              <img
-                src="/images/order_emblem.png"
-                alt="Order Emblem"
-                className="w-full h-full object-contain filter drop-shadow-[0_2px_5px_rgba(0,195,255,0.35)] transition-all"
-              />
-            </div>
-            <div>
-              <div className="font-grotesk font-extrabold text-xs text-white tracking-wider drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] [text-shadow:0_0_10px_rgba(0,195,255,0.4)]">
-                THE SYNAPTIC PATH
-              </div>
-              <div className="text-[10px] text-[#00c3ff] font-mono font-bold flex items-center gap-1">
-                <span className="text-[#00c3ff]/80">ACTIVE:</span>
-                <span className="text-[#ff5540] truncate max-w-[130px] font-bold drop-shadow-[0_0_6px_rgba(255,85,64,0.6)]">
-                  {activeItem.label}
-                </span>
-              </div>
-            </div>
-          </div>
+            className="min-w-0 flex-1"
+          />
 
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="px-3 py-1.5 bg-[#0f1414]/90 hover:bg-[#171c1c] border border-[#00c3ff]/60 text-[#00c3ff] font-mono font-bold text-xs flex items-center gap-1.5 chamfer-corner shadow-md active:scale-95 transition-all"
+            aria-label={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
+            title={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
+            className="w-9 h-9 flex items-center justify-center bg-[#0f1414]/90 hover:bg-[#171c1c] border border-[#00c3ff]/60 text-[#00c3ff] chamfer-corner shadow-md active:scale-95 transition-all shrink-0"
           >
             {isMobileOpen ? (
-              <X className="w-4 h-4 text-[#ff453a]" />
+              <X className="w-5 h-5 text-[#ff453a]" />
             ) : (
-              <Menu className="w-4 h-4 text-[#00c3ff]" />
+              <Menu className="w-5 h-5 text-[#00c3ff]" />
             )}
-            <span>{isMobileOpen ? 'CLOSE' : 'HUD MENU'}</span>
           </button>
         </div>
 
@@ -421,7 +398,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         <div
           className={`flex-1 flex flex-col justify-between space-y-0 overflow-hidden min-h-0 transition-all duration-300 ease-in-out ${
             isMobileOpen
-              ? 'fixed inset-x-0 top-[53px] bottom-0 z-50 bg-[#060a0b]/95 backdrop-blur-xl border-t border-[#3a4a49] flex max-h-[calc(100vh-53px)] opacity-100'
+              ? 'fixed inset-x-0 top-[53px] bottom-0 z-[100] bg-[#060a0b]/95 backdrop-blur-xl border-t border-[#3a4a49] flex max-h-[calc(100vh-53px)] opacity-100'
               : 'max-h-0 opacity-0 hidden md:max-h-none md:opacity-100 md:flex md:static'
           }`}
         >
