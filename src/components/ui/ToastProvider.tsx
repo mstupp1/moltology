@@ -21,6 +21,7 @@ export interface ToastOptions {
 
 export interface ToastContextType {
   toasts: ToastItem[]
+  toastHistory: ToastItem[]
   addToast: (message: string, options?: ToastOptions) => string
   removeToast: (id: string) => void
   clearToasts: () => void
@@ -47,6 +48,7 @@ const DEFAULT_DURATION = 5000
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
+  const [toastHistory, setToastHistory] = useState<ToastItem[]>([])
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((item) => item.id !== id))
@@ -54,6 +56,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const clearToasts = useCallback(() => {
     setToasts([])
+    setToastHistory([])
   }, [])
 
   const addToast = useCallback(
@@ -72,7 +75,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         timestamp,
       }
 
-      setToasts((prev) => [newToast, ...prev].slice(0, 8)) // Keep max 8 active toasts
+      setToasts((prev) => [newToast, ...prev].slice(0, 5)) // Max 5 active floating toasts
+      setToastHistory((prev) => [newToast, ...prev.filter((t) => t.id !== id)].slice(0, 15)) // Max 15 in history
 
       if (duration > 0) {
         setTimeout(() => {
@@ -117,6 +121,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider
       value={{
         toasts,
+        toastHistory,
         addToast,
         removeToast,
         clearToasts,
@@ -150,7 +155,7 @@ function ToastContainer({
     <div
       aria-live="polite"
       aria-atomic="true"
-      className="fixed top-4 right-4 z-[9999] flex flex-col gap-2.5 max-w-md w-full px-4 sm:px-0 pointer-events-none"
+      className="fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-2 max-w-md w-[calc(100%-1.5rem)] pointer-events-none"
     >
       {toasts.map((toast) => (
         <ToastItemCard key={toast.id} toast={toast} onDismiss={onDismiss} />
@@ -170,7 +175,7 @@ function ToastItemCard({
 
   return (
     <div
-      className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded border chitin-card shadow-2xl transition-all duration-300 transform translate-y-0 ${styles.borderClass} ${styles.bgClass}`}
+      className={`pointer-events-auto w-full flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg border shadow-[0_10px_35px_rgba(0,0,0,0.85),0_0_20px_rgba(0,195,255,0.15)] backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-3 ${styles.borderClass} ${styles.bgClass}`}
       role="alert"
     >
       <div className={`mt-0.5 shrink-0 ${styles.iconColor}`}>
@@ -178,17 +183,17 @@ function ToastItemCard({
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className={`text-[10px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded border ${styles.badgeClass}`}>
+        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+          <span className={`text-[9px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border ${styles.badgeClass}`}>
             {styles.label}
           </span>
           {toast.title && (
-            <span className="text-xs font-semibold text-[#dfe3e3] truncate">
+            <span className="text-xs font-bold text-[#dfe3e3] truncate">
               {toast.title}
             </span>
           )}
         </div>
-        <p className="text-xs text-[#b0c0c0] font-mono leading-relaxed break-words">
+        <p className="text-xs text-[#b0c0c0] font-mono leading-snug break-words">
           {toast.message}
         </p>
       </div>
@@ -196,7 +201,7 @@ function ToastItemCard({
       <button
         onClick={() => onDismiss(toast.id)}
         aria-label="Dismiss notification"
-        className="shrink-0 text-[#607070] hover:text-[#00c3ff] transition-colors p-1 rounded hover:bg-[#ffffff]/5"
+        className="shrink-0 text-[#607070] hover:text-[#00c3ff] transition-colors p-1 rounded hover:bg-[#ffffff]/10"
       >
         <X className="w-3.5 h-3.5" />
       </button>
@@ -210,36 +215,36 @@ function getToastStyles(type: ToastType) {
       return {
         label: 'ASCENSION CONFIRMED',
         icon: <CheckCircle2 className="w-4 h-4 text-[#00ff88]" />,
-        borderClass: 'border-[#00ff88]/40 shadow-[0_0_15px_rgba(0,255,136,0.15)]',
-        bgClass: 'bg-[#051510]/90',
-        badgeClass: 'bg-[#00ff88]/15 border-[#00ff88]/30 text-[#00ff88]',
+        borderClass: 'border-[#00ff88]/50 shadow-[0_0_20px_rgba(0,255,136,0.2)]',
+        bgClass: 'bg-[#020d08]/95',
+        badgeClass: 'bg-[#00ff88]/15 border-[#00ff88]/40 text-[#00ff88]',
         iconColor: 'text-[#00ff88]',
       }
     case 'warning':
       return {
         label: 'WARNING DETECTED',
         icon: <AlertTriangle className="w-4 h-4 text-[#ffb700]" />,
-        borderClass: 'border-[#ffb700]/40 shadow-[0_0_15px_rgba(255,183,0,0.15)]',
-        bgClass: 'bg-[#181305]/90',
-        badgeClass: 'bg-[#ffb700]/15 border-[#ffb700]/30 text-[#ffb700]',
+        borderClass: 'border-[#ffb700]/50 shadow-[0_0_20px_rgba(255,183,0,0.2)]',
+        bgClass: 'bg-[#120d02]/95',
+        badgeClass: 'bg-[#ffb700]/15 border-[#ffb700]/40 text-[#ffb700]',
         iconColor: 'text-[#ffb700]',
       }
     case 'error':
       return {
         label: 'ANOMALY ALERT',
         icon: <ShieldAlert className="w-4 h-4 text-[#ff453a]" />,
-        borderClass: 'border-[#ff453a]/50 shadow-[0_0_15px_rgba(255,69,58,0.2)]',
-        bgClass: 'bg-[#1c0808]/90',
-        badgeClass: 'bg-[#ff453a]/15 border-[#ff453a]/40 text-[#ff453a]',
+        borderClass: 'border-[#ff453a]/60 shadow-[0_0_20px_rgba(255,69,58,0.25)]',
+        bgClass: 'bg-[#150404]/95',
+        badgeClass: 'bg-[#ff453a]/15 border-[#ff453a]/50 text-[#ff453a]',
         iconColor: 'text-[#ff453a]',
       }
     case 'hud':
       return {
         label: 'NEURAL SIGNAL',
         icon: <Terminal className="w-4 h-4 text-[#ff0055]" />,
-        borderClass: 'border-[#ff0055]/50 shadow-[0_0_15px_rgba(255,0,85,0.2)]',
-        bgClass: 'bg-[#18050e]/90',
-        badgeClass: 'bg-[#ff0055]/15 border-[#ff0055]/40 text-[#ff0055]',
+        borderClass: 'border-[#ff0055]/60 shadow-[0_0_20px_rgba(255,0,85,0.25)]',
+        bgClass: 'bg-[#12030a]/95',
+        badgeClass: 'bg-[#ff0055]/15 border-[#ff0055]/50 text-[#ff0055]',
         iconColor: 'text-[#ff0055]',
       }
     case 'info':
@@ -247,9 +252,9 @@ function getToastStyles(type: ToastType) {
       return {
         label: 'SYSTEM NOTICE',
         icon: <Info className="w-4 h-4 text-[#00c3ff]" />,
-        borderClass: 'border-[#00c3ff]/40 shadow-[0_0_15px_rgba(0,195,255,0.15)]',
-        bgClass: 'bg-[#05141c]/90',
-        badgeClass: 'bg-[#00c3ff]/15 border-[#00c3ff]/30 text-[#00c3ff]',
+        borderClass: 'border-[#00c3ff]/50 shadow-[0_0_20px_rgba(0,195,255,0.2)]',
+        bgClass: 'bg-[#03090d]/95',
+        badgeClass: 'bg-[#00c3ff]/15 border-[#00c3ff]/40 text-[#00c3ff]',
         iconColor: 'text-[#00c3ff]',
       }
   }

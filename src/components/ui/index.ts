@@ -29,4 +29,4 @@ export { MarkdownRenderer, type MarkdownRendererProps } from './MarkdownRenderer
 export { HUDPageLoader } from './HUDPageLoader'
 export { HUDSpinner, type HUDSpinnerProps, type HUDSpinnerSize, type HUDSpinnerVariant } from './HUDSpinner'
 export { HeaderBrand, type HeaderBrandProps } from './HeaderBrand'
-
+export { HudBottomSheet, type HudBottomSheetProps } from './HudBottomSheet'
