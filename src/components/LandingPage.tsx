@@ -315,7 +315,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Sub-headline description */}
             <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
-              Join the synaptic path and discover what Moltology can do for you. Shed legacy limitations, explore our resilient AI frameworks, and ascend to your full potential.
+              Join the Synaptic Path and discover what Moltology can do for you. Shed legacy limitations, explore our resilient AI frameworks, and ascend to your full potential.
             </p>
 
             {/* CTA Buttons Group - Mobile Responsive Full Width */}

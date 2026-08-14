@@ -14,6 +14,8 @@ import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MoltmaxRouteImport } from './routes/moltmax'
+import { Route as MoltmaxxingRouteImport } from './routes/moltmaxxing'
 import { Route as OrgRouteImport } from './routes/org'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SignInRouteImport } from './routes/sign-in'
@@ -72,6 +74,16 @@ const LandingRoute = LandingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoltmaxRoute = MoltmaxRouteImport.update({
+  id: '/moltmax',
+  path: '/moltmax',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoltmaxxingRoute = MoltmaxxingRouteImport.update({
+  id: '/moltmaxxing',
+  path: '/moltmaxxing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrgRoute = OrgRouteImport.update({
@@ -255,6 +267,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/moltmax': typeof MoltmaxRoute
+  '/moltmaxxing': typeof MoltmaxxingRoute
   '/org': typeof OrgRouteWithChildren
   '/privacy': typeof PrivacyRouteWithChildren
   '/sign-in': typeof SignInRoute
@@ -296,6 +310,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/moltmax': typeof MoltmaxRoute
+  '/moltmaxxing': typeof MoltmaxxingRoute
   '/org': typeof OrgRouteWithChildren
   '/privacy': typeof PrivacyRouteWithChildren
   '/sign-in': typeof SignInRoute
@@ -339,6 +355,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/moltmax': typeof MoltmaxRoute
+  '/moltmaxxing': typeof MoltmaxxingRoute
   '/org': typeof OrgRouteWithChildren
   '/privacy': typeof PrivacyRouteWithChildren
   '/sign-in': typeof SignInRoute
@@ -382,6 +400,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/landing'
     | '/login'
+    | '/moltmax'
+    | '/moltmaxxing'
     | '/org'
     | '/privacy'
     | '/sign-in'
@@ -423,6 +443,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/landing'
     | '/login'
+    | '/moltmax'
+    | '/moltmaxxing'
     | '/org'
     | '/privacy'
     | '/sign-in'
@@ -465,6 +487,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/landing'
     | '/login'
+    | '/moltmax'
+    | '/moltmaxxing'
     | '/org'
     | '/privacy'
     | '/sign-in'
@@ -508,6 +532,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
+  MoltmaxRoute: typeof MoltmaxRoute
+  MoltmaxxingRoute: typeof MoltmaxxingRoute
   OrgRoute: typeof OrgRouteWithChildren
   PrivacyRoute: typeof PrivacyRouteWithChildren
   SignInRoute: typeof SignInRoute
@@ -561,6 +587,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moltmax': {
+      id: '/moltmax'
+      path: '/moltmax'
+      fullPath: '/moltmax'
+      preLoaderRoute: typeof MoltmaxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moltmaxxing': {
+      id: '/moltmaxxing'
+      path: '/moltmaxxing'
+      fullPath: '/moltmaxxing'
+      preLoaderRoute: typeof MoltmaxxingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/org': {
@@ -898,6 +938,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
+  MoltmaxRoute: MoltmaxRoute,
+  MoltmaxxingRoute: MoltmaxxingRoute,
   OrgRoute: OrgRouteWithChildren,
   PrivacyRoute: PrivacyRouteWithChildren,
   SignInRoute: SignInRoute,

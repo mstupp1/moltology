@@ -12,13 +12,13 @@ describe('SEO Meta Tag Generator', () => {
       expect.arrayContaining([
         { name: 'robots', content: 'index, follow, max-image-preview:large' },
         { title: 'Moltology Home' },
-        { name: 'og:title', content: 'Moltology Home' },
+        { property: 'og:title', content: 'Moltology Home' },
         { name: 'twitter:title', content: 'Moltology Home' },
         { name: 'description', content: 'The Synaptic Path onboarding portal.' },
-        { name: 'og:description', content: 'The Synaptic Path onboarding portal.' },
+        { property: 'og:description', content: 'The Synaptic Path onboarding portal.' },
         { name: 'twitter:description', content: 'The Synaptic Path onboarding portal.' },
-        { name: 'og:site_name', content: 'Moltology' },
-        { name: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: 'Moltology' },
+        { property: 'og:type', content: 'website' },
         { name: 'twitter:card', content: 'summary_large_image' },
       ])
     )
@@ -32,7 +32,7 @@ describe('SEO Meta Tag Generator', () => {
 
     expect(meta).toEqual(
       expect.arrayContaining([
-        { name: 'og:url', content: 'https://moltology.org/codex' },
+        { property: 'og:url', content: 'https://moltology.org/codex' },
       ])
     )
   })
@@ -45,7 +45,7 @@ describe('SEO Meta Tag Generator', () => {
 
     expect(meta).toEqual(
       expect.arrayContaining([
-        { name: 'og:image', content: 'https://moltology.org/images/order_emblem.png' },
+        { property: 'og:image', content: 'https://moltology.org/images/order_emblem.png' },
         { name: 'twitter:image', content: 'https://moltology.org/images/order_emblem.png' },
       ])
     )

@@ -166,7 +166,7 @@ export const INITIAL_GALLERY_PINS: GalleryPin[] = [
     id: 'pin-008-benthic-abyss-hero',
     userId: null,
     title: 'The Mariana Trench Descent',
-    description: 'Panoramic capture of the synaptic path expedition descending past 10,000 meters into total abyssal radiance.',
+    description: 'Panoramic capture of the Synaptic Path expedition descending past 10,000 meters into total abyssal radiance.',
     prompt: 'Underwater deep abyssal sea floor with hydrothermal vents and cybernetic lights',
     s3Key: 'images/gallery/benthic_abyss_hero.jpg',
     imageUrl: `${S3_BASE_URL}/images/gallery/benthic_abyss_hero.jpg`,

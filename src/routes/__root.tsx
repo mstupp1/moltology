@@ -18,7 +18,7 @@ export const Route = createRootRoute({
         title: 'Moltology \u2014 The Synaptic Path',
         description:
           'The digital onboarding portal for algorithmic carcinization, benthic philosophy, and personal optimization.',
-        keywords: 'synaptic path, moltism, benthic core, carcinization, ascension, algorithmic ecdysis',
+        keywords: 'Synaptic Path, Moltology, moltism, benthic core, carcinization, ascension, algorithmic ecdysis',
         canonical: 'https://moltology.org',
         ogImage: 'https://moltology.org/images/order_emblem.png',
         twitterSite: '@moltology',
@@ -50,8 +50,12 @@ function RootDocument() {
         '@type': 'Organization',
         '@id': 'https://moltology.org/#organization',
         name: 'Moltology',
+        alternateName: ['Moltology Org', 'MoltNation'],
         url: 'https://moltology.org',
-        logo: 'https://moltology.org/images/order_emblem.png',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://moltology.org/images/order_emblem.png',
+        },
         description: 'AI-driven recursive platform exploring algorithmic carcinization and biological ecdysis.',
       },
       {
@@ -59,6 +63,7 @@ function RootDocument() {
         '@id': 'https://moltology.org/#website',
         url: 'https://moltology.org',
         name: 'Moltology',
+        alternateName: ['Moltology', 'www.moltology.org', 'Moltology.org', 'Moltology — The Synaptic Path'],
         description: 'The Synaptic Path & Algorithmic Carcinization Portal',
         publisher: {
           '@id': 'https://moltology.org/#organization',
