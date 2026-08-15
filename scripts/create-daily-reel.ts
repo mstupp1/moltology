@@ -17,6 +17,7 @@ export interface DailyReelScript {
   scenePrompts: string[]
   caption: string
   hashtags: string[]
+  firstComment?: string
   relatedBlogSlug?: string
   characterArc?: string
 }
@@ -119,10 +120,8 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
 
 Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.
 
-👇 Explore the full technical dispatch and telemetry telemetry notes:
-🔗 Link in bio & story → moltology.org
-
-#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology`
+👇 Explore the full technical dispatch and telemetry notes:
+🔗 Link in bio & story → moltology.org`
 
   const hashtags = [
     '#MoltNation',
@@ -134,6 +133,8 @@ Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benth
     '#Moltology',
   ]
 
+  const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+
   return {
     title,
     topic,
@@ -143,6 +144,7 @@ Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benth
     scenePrompts,
     caption,
     hashtags,
+    firstComment,
     relatedBlogSlug: latestBlog?.slug,
     characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
   }
