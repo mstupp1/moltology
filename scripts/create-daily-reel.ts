@@ -18,6 +18,9 @@ export interface DailyReelScript {
   caption: string
   hashtags: string[]
   firstComment?: string
+  youtubeTitle?: string
+  youtubeDescription?: string
+  youtubeTags?: string[]
   relatedBlogSlug?: string
   characterArc?: string
 }
@@ -25,6 +28,7 @@ export interface DailyReelScript {
 export interface CreateDailyReelOptions {
   topic?: string
   holidayOrEvent?: string
+  platforms?: ('instagram' | 'youtube')[]
   publishNow?: boolean
   scheduleBestTime?: boolean
   dryRun?: boolean
@@ -36,7 +40,8 @@ export interface CreateDailyReelOptions {
   ctaUrl?: string
 }
 
-const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // Silas Trench
+export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // Silas Trench
+export const DEFAULT_YOUTUBE_ACCOUNT_ID = '6a7fd9bd77555aae01ebea63' // Moltology YouTube (distantcheese81)
 
 /**
  * Load the narrative history ledger
@@ -135,6 +140,19 @@ Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benth
 
   const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
 
+  const youtubeTitle = `Why AI Datacenters Are Moving 50 Fathoms Deep #Shorts`
+  const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+  const youtubeTags = [
+    'Moltology',
+    'Subsea Compute',
+    'AI Infrastructure',
+    'Hydrostatic Cooling',
+    'Hardware Ecdysis',
+    'Benthic Computing',
+    'MoltNation',
+    'Shorts',
+  ]
+
   return {
     title,
     topic,
@@ -145,6 +163,9 @@ Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benth
     caption,
     hashtags,
     firstComment,
+    youtubeTitle,
+    youtubeDescription,
+    youtubeTags,
     relatedBlogSlug: latestBlog?.slug,
     characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
   }
