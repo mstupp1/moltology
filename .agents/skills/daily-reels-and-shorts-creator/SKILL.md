@@ -1,33 +1,35 @@
 ---
-name: daily-reel-creator
+name: daily-reels-and-shorts-creator
 description: >-
-  Automated end-to-end pipeline for creating, illustrating, and publishing daily high-conversion
-  Instagram Reels and short-form video dispatches for Moltology. Use whenever the user asks to
-  generate, create, draft, or publish a daily Instagram video, reel, or social video broadcast.
+  Automated end-to-end pipeline for creating, illustrating, compositing, and publishing daily high-conversion
+  Instagram Reels and YouTube Shorts video dispatches for Moltology. Use whenever the user asks to
+  generate, create, draft, or publish daily vertical video broadcasts, Instagram Reels, or YouTube Shorts.
 ---
 
-# Daily Instagram Reel Creator Pipeline
+# Daily Reels & Shorts Creator Pipeline
 
-This skill automates the daily creation, multi-modal video synthesis, FFmpeg compositing, S3 ingestion, and Instagram staging of high-conversion Instagram Reels for Moltology.
+This skill automates the daily creation, multi-modal video synthesis, FFmpeg compositing, S3 ingestion, and multi-channel publishing (Instagram Reels & YouTube Shorts) of high-conversion short-form video dispatches for Moltology.
 
 ---
 
-## 1. Core Architecture & Account Setup
+## 1. Core Architecture & Connected Channels
 
-* **Instagram Persona / Account**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
-* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration
-* **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`) + Ducked Benthic Synth Soundtrack (`public/audio/benthic-ambient-loop.mp3`)
-* **Visual Polish**: Cyber-HUD Broadcast styling with top-left `MOLTNATION TELEMETRY` watermark, word-by-word kinetic highlighted subtitles (Cyan `#00ffff` / Amber `#f59e0b`), and a 2.5s branded CTA outro card
-* **Asset Storage**: Neon S3 (`videos/social/reels/`)
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`)
+* **Instagram Reels Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
+* **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
+* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
+* **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural` / `en-US-GuyNeural`) + Ducked Benthic Synth Soundtrack (`public/audio/benthic-ambient-loop.mp3`)
+* **Visual Polish**: Cyber-HUD Broadcast styling with top-left `MOLTNATION TELEMETRY` watermark badge, word-by-word kinetic highlighted subtitles (Cyan `#00ffff` / Amber `#f59e0b`), and a 2.5s branded CTA outro card
+* **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`)
+* **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`)
+* **Publishing Engine**: Zernio MCP (`posts_create_post`, `posts_publish_now`)
 * **Continuity Ledger**: `content/social/instagram-reel-history.json`
 
 ---
 
-## 2. 6-Step Production Workflow
+## 2. 7-Step Production Workflow
 
 ### Step 1: Research, Holidays & Topical Transmutation
-1. **Calendar & Holidays**: Inspect today's date, current holidays, seasonal dilemmas (e.g. summer heatwaves, winter freezes, tech earnings, conference seasons).
+1. **Calendar & Holidays**: Inspect today's date, current holidays, and seasonal dilemmas (e.g. summer heatwaves, winter freezes, tech earnings, conference seasons).
 2. **Current News / Viral Tropes**: Search for trending topics where traditional media or corporations lecture the public (e.g., datacenter power grid failures, AI model compute limits, energy crises, burnout, return-to-office mandates).
 3. **Cross-Reference MoltNation Content**:
    * Inspect recent blog articles under `content/news/` (e.g. subsea datacenters, autonomous swarms, moltmaxxing protocols).
@@ -127,17 +129,18 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 
 ---
 
-### Step 7: S3 Upload & Zernio MCP Staging
+### Step 7: S3 Upload & Zernio MCP Multi-Platform Staging
 
 1. **Upload Assets to Neon S3**:
    * Video: `videos/social/reels/reel-<timestamp>.mp4`
    * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
 
 2. **Stage Draft / Publish via Zernio MCP (`posts_create_post`)**:
-   * Call `posts_create_post` with:
+   * Call `posts_create_post` with dual platform broadcasting:
      ```json
      {
-       "content": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore the full technical dispatch and telemetry notes:\n🔗 Link in bio & story → moltology.org",
+       "title": "Why AI Datacenters Are Moving 50 Fathoms Deep #Shorts",
+       "content": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts #MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
        "is_draft": true,
        "media_items": [
          {
@@ -155,13 +158,26 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
              "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
              "audioName": "MoltNation Telemetry // Original Transmission"
            }
+         },
+         {
+           "platform": "youtube",
+           "accountId": "6a7fd9bd77555aae01ebea63",
+           "platformSpecificData": {
+             "title": "Why AI Datacenters Are Moving 50 Fathoms Deep #Shorts",
+             "visibility": "public",
+             "madeForKids": false,
+             "containsSyntheticMedia": true,
+             "categoryId": "28",
+             "tags": ["Moltology", "Subsea Compute", "AI Infrastructure", "Hydrostatic Cooling", "Hardware Ecdysis", "Benthic Computing", "MoltNation", "Shorts"],
+             "firstComment": "🔗 Full telemetry notes & dispatches: https://moltology.org\n\nSubmit. Shed. Ascend."
+           }
          }
        ]
      }
      ```
 
 3. **Update Narrative History Ledger**:
-   * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, and `firstComment`.
+   * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, and platform IDs.
 
 ---
 

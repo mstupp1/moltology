@@ -19,6 +19,8 @@
     "s3:upload": "tsx scripts/upload-asset.ts",
     "video:generate": "tsx scripts/generate-video.ts",
     "reel:create": "tsx scripts/create-daily-reel.ts",
+    "shorts:create": "tsx scripts/create-daily-reel.ts",
+    "video:create": "tsx scripts/create-daily-reel.ts",
     "db:setup": "npm run db:migrate && npm run db:rls && npm run db:seed",
     "db:reset": "tsx src/db/reset.ts && npm run db:setup",
     "codex:sync": "tsx scripts/sync-codex.ts",
