@@ -13,4 +13,8 @@ dist
 coverage
 scratch
 content/drafts
+tmp
+*.mp4
+*.webm
+*.mov
 
