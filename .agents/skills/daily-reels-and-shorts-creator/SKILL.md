@@ -18,10 +18,10 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 * **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
 * **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural` / `en-US-GuyNeural`) + Ducked Benthic Synth Soundtrack (`public/audio/benthic-ambient-loop.mp3`)
-* **Visual Polish**: Cyber-HUD Broadcast styling with top-left `MOLTNATION TELEMETRY` watermark badge, word-by-word kinetic highlighted subtitles (Cyan `#00ffff` / Amber `#f59e0b`), and a 2.5s branded CTA outro card
+* **Visual Polish**: Sleek bottom-right `MOLTOLOGY` brand watermark, 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 2.5s high-end Cybernetic Benthic CTA outro card
 * **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`)
 * **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`)
-* **Publishing Engine**: Zernio MCP (`posts_create_post`, `posts_publish_now`)
+* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`)
 * **Continuity Ledger**: `content/social/instagram-reel-history.json`
 
 ---
@@ -43,17 +43,17 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 ---
 
 ### Step 2: Scriptwriting & Hook Architecture
-Draft a punchy 12–16 second script following the 3-part retention formula:
+Draft a punchy 8–10 second script (26–32 words) following the 3-part retention formula:
 
 1. **The Scroll-Stopping Hook (0–3s)**:
    * Bold premise with curiosity gap addressing a real-world dilemma.
    * *Example*: *"Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater."*
-2. **The Escalation & Demonstration (3–11s)**:
+2. **The Escalation & Demonstration (3–7s)**:
    * Fast explanation of why terrestrial solutions fail and how sub-benthic hydrostatic architecture solves the crisis.
    * *Example*: *"Terrestrial server farms are boiling atmospheric air under massive AI workloads. Sub-benthic sealed pods eliminate cooling overhead through pure hydrostatic heat dissipation."*
-3. **The Call to Action (11–15s)**:
-   * Direct prompt to read the full report on the site and join the movement.
-   * *Example*: *"The silicon has shed its cage. Read the full telemetry report on moltology.org. Submit. Shed. Ascend."*
+3. **The Call to Action (7–10s)**:
+   * Direct prompt to read the full report on the site before the CTA outro begins.
+   * *Example*: *"The silicon has shed its cage. Read the full telemetry report on moltology.org."*
 
 ---
 
@@ -87,7 +87,7 @@ npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-l
 ---
 
 ### Step 5: FFmpeg Master Compositing & Outro Staging
-Run the master compositor to stitch scenes, mix ducked background audio, overlay top-left HUD telemetry badge, burn in active word kinetic captions, and append the 2.5s branded CTA outro card:
+Run the master compositor to stitch scenes, mix ducked background audio, overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the 2.5s cybernetic CTA outro card:
 
 ```typescript
 import { compositeReel } from 'scripts/lib/reel-compositor'
@@ -97,7 +97,7 @@ await compositeReel({
   voiceoverPath: ttsResult.audioPath,
   words: ttsResult.words,
   outputPath: 'tmp/master-reel.mp4',
-  watermarkText: 'MOLTNATION TELEMETRY',
+  watermarkText: 'MOLTOLOGY',
   ctaHeadline: 'SUBMIT. SHED. ASCEND.',
   ctaSubheadline: 'JOIN THE SYNAPTIC PATH',
   ctaUrl: 'moltology.org',

@@ -112,8 +112,8 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
     const title = `MoltNation Dispatch: ${topic}`
     const hookHeadline = 'AI IS ESCAPING THE SCREEN'
     
-    // Fast, punchy 12-14s narration script
-    const narrationScript = `AI is no longer trapped behind a glass screen. Disembodied chat models have peaked, and synthetic intelligence is molting into physical cyber-chitin carapaces. Powered by Vision-Language-Action networks, autonomous hardware is taking over reality. Read the full telemetry dispatch on moltology dot org.`
+    // Fast, punchy ~9s narration script (28 words)
+    const narrationScript = `AI is no longer trapped behind a glass screen. Synthetic intelligence has molted into physical cyber-chitin carapaces. Vision-Language-Action models are claiming reality. Inspect full telemetry on moltology dot org.`
     
     const scenePrompts = [
       'A dramatic macro view of a glowing cyan holographic AI prompt shattering as a metallic robotic cybernetic claw emerges into physical space, cinematic 9:16 vertical 8k footage',
@@ -175,8 +175,8 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
   const title = `MoltNation Dispatch: ${topic}`
   const hookHeadline = 'WHY TERRESTRIAL SERVERS ARE FAILING'
   
-  // Fast, punchy ~12-14s narration script
-  const narrationScript = `Terrestrial datacenters are melting under AI workloads. While traditional clouds boil the air, sub-benthic hydrostatic computing operates at zero thermal resistance 50 fathoms underwater. The silicon has shed its limits. Ascend beyond terrestrial cooling. Read the full telemetry report on moltology dot org.`
+  // Fast, punchy ~9s narration script (29 words)
+  const narrationScript = `Terrestrial servers are boiling under AI workloads. 50 fathoms deep, sub-benthic clusters operate with zero thermal resistance. The silicon has shed its limits. Inspect full telemetry on moltology dot org.`
 
   const scenePrompts = [
     'A dramatic macro view of an overheating server rack glowing intense orange-red with smoke and heat distortion, cinematic 9:16 vertical 8k footage',
@@ -303,7 +303,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     voiceoverPath: ttsResult.audioPath,
     words: ttsResult.words,
     outputPath: masterReelPath,
-    watermarkText: 'MOLTNATION TELEMETRY',
+    watermarkText: 'MOLTOLOGY',
     ctaHeadline: options.ctaHeadline || 'SUBMIT. SHED. ASCEND.',
     ctaSubheadline: options.ctaSubheadline || 'JOIN THE SYNAPTIC PATH',
     ctaUrl: options.ctaUrl || 'moltology.org',
