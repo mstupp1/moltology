@@ -184,6 +184,9 @@ export const HeroShuffleDeck: React.FC = () => {
       <div
         className={`relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-700`}
       >
+        {/* PBR Machined Alloy Frame Underlay */}
+        <div className="pbr-underlay pbr-underlay-alloy opacity-30 pointer-events-none z-[5]" />
+
         {/* Crossfading Media Stack */}
         {CARDS.map((card, idx) => {
           const isActive = idx === activeIndex

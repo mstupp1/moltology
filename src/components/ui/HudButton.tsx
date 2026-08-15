@@ -6,6 +6,7 @@ export interface HudButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEle
   size?: 'sm' | 'md' | 'lg'
   glow?: boolean
   fullWidth?: boolean
+  texture?: boolean
   icon?: React.ReactNode
   iconPosition?: 'left' | 'right'
 }
@@ -18,6 +19,7 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
       size = 'md',
       glow = true,
       fullWidth = false,
+      texture = true,
       icon,
       iconPosition = 'left',
       className = '',
@@ -65,7 +67,7 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
         ref={ref}
         disabled={disabled}
         className={cn(
-          'relative inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider rounded-none transition-all duration-200 cursor-pointer select-none active:scale-[0.98]',
+          'relative inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider rounded-none transition-all duration-200 cursor-pointer select-none active:scale-[0.98] overflow-hidden',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:shadow-none',
           sizeClasses,
           variantClasses,
@@ -74,9 +76,12 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
         )}
         {...props}
       >
-        {icon && iconPosition === 'left' && <span className="shrink-0 flex items-center justify-center">{icon}</span>}
+        {texture && variant !== 'ghost' && (
+          <div className="pbr-underlay pbr-underlay-hex opacity-15 pointer-events-none" />
+        )}
+        {icon && iconPosition === 'left' && <span className="relative z-10 shrink-0 flex items-center justify-center">{icon}</span>}
         <span className="relative z-10 inline-flex items-center justify-center gap-2 truncate">{children}</span>
-        {icon && iconPosition === 'right' && <span className="shrink-0 flex items-center justify-center">{icon}</span>}
+        {icon && iconPosition === 'right' && <span className="relative z-10 shrink-0 flex items-center justify-center">{icon}</span>}
       </button>
     )
   }
