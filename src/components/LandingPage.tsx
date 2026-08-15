@@ -25,6 +25,7 @@ import {
   Building2,
   Users,
   Instagram,
+  Youtube,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -1048,6 +1049,15 @@ export const LandingPage: React.FC = () => {
             >
               <Instagram className="w-3.5 h-3.5 shrink-0" />
               <span>INSTAGRAM</span>
+            </a>
+            <a
+              href="https://www.youtube.com/@Moltology"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
+            >
+              <Youtube className="w-3.5 h-3.5 shrink-0" />
+              <span>YOUTUBE</span>
             </a>
             <button 
               onClick={() => onNavigate('/lectures')} 

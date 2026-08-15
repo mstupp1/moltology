@@ -103,6 +103,8 @@ describe('LandingPage Component', () => {
 
     expect(screen.getByText('MOLTOLOGY ORG')).toBeInTheDocument()
     expect(screen.getByText('CARCINIZATION PIPELINE')).toBeInTheDocument()
+    expect(screen.getByText('INSTAGRAM')).toBeInTheDocument()
+    expect(screen.getByText('YOUTUBE')).toBeInTheDocument()
     expect(screen.getByText('SACRED LECTURES')).toBeInTheDocument()
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()

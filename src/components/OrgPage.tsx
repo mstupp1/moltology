@@ -37,6 +37,7 @@ import {
   Star,
   Anchor,
   Instagram,
+  Youtube,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -1236,6 +1237,10 @@ export const OrgPage: React.FC = () => {
             <a href="https://www.instagram.com/moltology_org/" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
               <Instagram className="w-3.5 h-3.5" />
               <span>INSTAGRAM</span>
+            </a>
+            <a href="https://www.youtube.com/@Moltology" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
+              <Youtube className="w-3.5 h-3.5" />
+              <span>YOUTUBE</span>
             </a>
             {user && <button onClick={() => onNavigate('/dashboard')} className="hover:text-white">DASHBOARD</button>}
           </div>
