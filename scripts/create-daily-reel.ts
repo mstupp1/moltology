@@ -2,6 +2,7 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
+import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
 import { compositeReel, renderReelThumbnail } from './lib/reel-compositor'
 import { generateVeoVideo } from './generate-video'
@@ -69,30 +70,30 @@ function recordReelInHistory(entry: any): void {
 }
 
 /**
- * Scan recent blog posts for topical alignment
+ * Scan recent blog posts for topical alignment, sorted by published date (newest first)
  */
-function getRecentBlogPosts(): { slug: string; title: string; summary: string }[] {
+function getRecentBlogPosts(): { slug: string; title: string; summary: string; publishedAt: string; content: string }[] {
   const newsDir = path.resolve(process.cwd(), 'content/news')
   if (!fs.existsSync(newsDir)) return []
 
   const files = fs.readdirSync(newsDir).filter((f) => f.endsWith('.md') && f !== 'template.md')
-  const posts: { slug: string; title: string; summary: string }[] = []
+  const posts: { slug: string; title: string; summary: string; publishedAt: string; content: string }[] = []
 
   for (const file of files) {
-    const content = fs.readFileSync(path.join(newsDir, file), 'utf8')
+    const rawContent = fs.readFileSync(path.join(newsDir, file), 'utf8')
+    const parsed = matter(rawContent)
     const slug = file.replace(/\.md$/, '')
-    const titleMatch = content.match(/title:\s*["']?([^"'\n]+)["']?/)
-    const summaryMatch = content.match(/summary:\s*["']?([^"'\n]+)["']?/)
-    if (titleMatch) {
-      posts.push({
-        slug,
-        title: titleMatch[1],
-        summary: summaryMatch ? summaryMatch[1] : '',
-      })
-    }
+    posts.push({
+      slug,
+      title: parsed.data.title || slug,
+      summary: parsed.data.summary || '',
+      publishedAt: parsed.data.publishedAt || new Date().toISOString(),
+      content: parsed.content || '',
+    })
   }
 
-  return posts
+  // Sort descending by publication date
+  return posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 }
 
 /**
@@ -101,13 +102,74 @@ function getRecentBlogPosts(): { slug: string; title: string; summary: string }[
 export function generateDailyReelScript(options: CreateDailyReelOptions): DailyReelScript {
   const history = loadReelHistory()
   const recentBlogs = getRecentBlogPosts()
-  const latestBlog = recentBlogs.length > 0 ? recentBlogs[0] : null
+  
+  // Find the latest blog that hasn't been covered in history yet, or default to the most recent blog
+  const coveredSlugs = new Set(history.reels.map((r: any) => r.relatedBlogSlug).filter(Boolean))
+  const targetBlog = recentBlogs.find((b) => !coveredSlugs.has(b.slug)) || recentBlogs[0] || null
 
-  // Fallback / Autonomous dynamic ideation
+  if (targetBlog && targetBlog.slug === 'embodied-physical-ai-sim-to-real-ecdysis') {
+    const topic = options.topic || 'Physical AI & The Great Sim-to-Real Ecdysis: Synthetic Brains Escaping Screens'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = 'AI IS ESCAPING THE SCREEN'
+    
+    // Fast, punchy 12-14s narration script
+    const narrationScript = `AI is no longer trapped behind a glass screen. Disembodied chat models have peaked, and synthetic intelligence is molting into physical cyber-chitin carapaces. Powered by Vision-Language-Action networks, autonomous hardware is taking over reality. Read the full telemetry dispatch on moltology dot org.`
+    
+    const scenePrompts = [
+      'A dramatic macro view of a glowing cyan holographic AI prompt shattering as a metallic robotic cybernetic claw emerges into physical space, cinematic 9:16 vertical 8k footage',
+      'Autonomous cyber-chitin bipedal robotic units marching through an advanced benthic industrial facility with glowing telemetry optics, 9:16 vertical 8k sci-fi footage',
+    ]
+
+    const caption = `AI is no longer confined to the screen. It has grown a physical carapace. 🦾⚡\n\nDisembodied chat models have peaked. Vision-Language-Action networks are closing the sim-to-real gap, driving the great hardware ecdysis across industrial sectors.\n\n👇 Read the full technical dispatch & telemetry notes:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#MoltNation',
+      '#PhysicalAI',
+      '#SimToReal',
+      '#Robotics',
+      '#HardwareEcdysis',
+      '#Cybernetics',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `Why AI Is Escaping the Screen Into Physical Hardware #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Physical AI',
+      'Sim to Real',
+      'Robotics',
+      'Hardware Ecdysis',
+      'Cybernetics',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: targetBlog.slug,
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
+  // Fallback / General dynamic ideation
   const topic =
     options.topic ||
-    (latestBlog
-      ? `Hydrostatic Compute Breakthroughs: ${latestBlog.title}`
+    (targetBlog
+      ? `Hydrostatic Compute Breakthroughs: ${targetBlog.title}`
       : 'Why AI Datacenters Are Moving 50 Fathoms Deep')
 
   const title = `MoltNation Dispatch: ${topic}`
@@ -121,12 +183,7 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
     'A majestic subsea cybernetic datacenter on the dark ocean floor with glowing cyan hydrothermal cooling ducts and autonomous crab-drone units swimming past, 9:16 vertical 8k sci-fi footage',
   ]
 
-  const caption = `Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡
-
-Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.
-
-👇 Explore the full technical dispatch and telemetry notes:
-🔗 Link in bio & story → moltology.org`
+  const caption = `Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore the full technical dispatch and telemetry notes:\n🔗 Link in bio & story → moltology.org`
 
   const hashtags = [
     '#MoltNation',
@@ -166,7 +223,7 @@ Terrestrial datacenters are hitting thermodynamic limits. Discover how sub-benth
     youtubeTitle,
     youtubeDescription,
     youtubeTags,
-    relatedBlogSlug: latestBlog?.slug,
+    relatedBlogSlug: targetBlog?.slug,
     characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
   }
 }
