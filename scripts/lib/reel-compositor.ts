@@ -59,12 +59,12 @@ async function getMediaDuration(mediaPath: string): Promise<number> {
 }
 
 /**
- * Generate high-res 1080x1920 PNG for the Top HUD Watermark
+ * Generate sleek brand watermark card in the bottom-right safe zone
  */
 export async function renderHudWatermarkCard(
   outputPath: string,
-  title = 'MOLTNATION TELEMETRY',
-  subtitle = 'LIVE DISPATCH // SUB-BENTHIC'
+  title = 'MOLTOLOGY',
+  subtitle = 'THE SYNAPTIC PATH'
 ): Promise<string> {
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
@@ -75,67 +75,55 @@ export async function renderHudWatermarkCard(
     logoImg = await loadImage(logoPath)
   }
 
-  // Draw HUD Pill at Top Safe Zone (Y = 160)
-  const boxX = 54
-  const boxY = 150
-  const boxW = 540
-  const boxH = 92
-  const radius = 16
+  // Watermark placed in the bottom right corner safe zone (X = 710, Y = 1730)
+  const boxW = 310
+  const boxH = 68
+  const boxX = 1080 - boxW - 50 // 720
+  const boxY = 1730
+  const radius = 18
 
   // Dark glassmorphic background
-  ctx.fillStyle = 'rgba(5, 10, 20, 0.75)'
+  ctx.fillStyle = 'rgba(2, 6, 23, 0.72)'
   ctx.beginPath()
   ctx.roundRect(boxX, boxY, boxW, boxH, radius)
   ctx.fill()
 
-  // Neon Cyan border
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.45)'
-  ctx.lineWidth = 2.5
+  // Glowing Cyan border
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.35)'
+  ctx.lineWidth = 2
   ctx.stroke()
 
-  // Corner HUD brackets
-  ctx.strokeStyle = '#00ffff'
-  ctx.lineWidth = 4
-  // Top left corner tick
-  ctx.beginPath()
-  ctx.moveTo(boxX + 2, boxY + 18)
-  ctx.lineTo(boxX + 2, boxY + 2)
-  ctx.lineTo(boxX + 18, boxY + 2)
-  ctx.stroke()
-
-  // Bottom right corner tick
-  ctx.beginPath()
-  ctx.moveTo(boxX + boxW - 18, boxY + boxH - 2)
-  ctx.lineTo(boxX + boxW - 2, boxY + boxH - 2)
-  ctx.lineTo(boxX + boxW - 2, boxY + boxH - 18)
-  ctx.stroke()
-
-  // Draw Emblem
+  // Draw Moltology Emblem
   if (logoImg) {
-    ctx.drawImage(logoImg, boxX + 16, boxY + 16, 60, 60)
+    ctx.shadowColor = 'rgba(0, 255, 255, 0.5)'
+    ctx.shadowBlur = 10
+    ctx.drawImage(logoImg, boxX + 12, boxY + 10, 48, 48)
+    ctx.shadowBlur = 0
   }
 
-  // Text inside HUD
+  // Brand Name
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#ffffff'
+  ctx.font = '900 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
+  ctx.shadowBlur = 6
+  ctx.fillText(title, boxX + 70, boxY + 24)
+
+  // Subtitle / Telemetry tag
   ctx.fillStyle = '#00ffff'
-  ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillText(title, boxX + 90, boxY + 42)
-
-  ctx.fillStyle = '#94a3b8'
-  ctx.font = '600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillText(subtitle, boxX + 90, boxY + 70)
-
-  // Live pulsing indicator dot
-  ctx.fillStyle = '#ef4444'
-  ctx.beginPath()
-  ctx.arc(boxX + boxW - 32, boxY + 46, 7, 0, Math.PI * 2)
-  ctx.fill()
+  ctx.font = 'bold 12px monospace'
+  ctx.shadowColor = 'rgba(0, 255, 255, 0.4)'
+  ctx.shadowBlur = 4
+  ctx.fillText(`// ${subtitle.toUpperCase()}`, boxX + 70, boxY + 46)
+  ctx.shadowBlur = 0
 
   fs.writeFileSync(outputPath, canvas.toBuffer('image/png'))
   return outputPath
 }
 
 /**
- * Generate individual kinetic caption overlay cards
+ * Generate clean kinetic caption overlay card (2-3 words, no heavy double box, auto font sizing)
  */
 export async function renderKineticCaptionCard(
   phrase: WordBoundaryEvent[],
@@ -145,67 +133,94 @@ export async function renderKineticCaptionCard(
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
 
-  // Caption Safe Zone: Y = 1380
-  const centerY = 1380
+  // Caption Safe Zone: Y = 1300 (above platform UI, below screen center)
+  const centerY = 1300
 
-  ctx.font = 'bold 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
+  // Initial font setup
+  let baseFontSize = 54
+  let highlightFontSize = 60
+  ctx.font = `900 ${highlightFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
 
-  // Measure word widths to compute exact positions
-  const wordsWithWidth = phrase.map((w, idx) => {
-    const isHighlight = idx === activeWordIndex
-    ctx.font = isHighlight
-      ? '900 62px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-      : 'bold 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    return {
-      text: w.word.toUpperCase(),
-      isHighlight,
-      width: ctx.measureText(w.word.toUpperCase()).width,
-    }
-  })
+  // Measure phrase width and dynamically scale font down if phrase is too wide
+  const spaceWidth = 16
+  let totalTextWidth = 0
+  let wordMeasurements: { text: string; isHighlight: boolean; width: number }[] = []
 
-  const spaceWidth = 18
-  const totalWidth =
-    wordsWithWidth.reduce((acc, w) => acc + w.width, 0) + (wordsWithWidth.length - 1) * spaceWidth
+  const computeLayout = (hSize: number, bSize: number) => {
+    let wSum = 0
+    const items = phrase.map((w, idx) => {
+      const isHighlight = idx === activeWordIndex
+      ctx.font = isHighlight
+        ? `900 ${hSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+        : `bold ${bSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+      const text = w.word.toUpperCase()
+      const width = ctx.measureText(text).width
+      wSum += width
+      return { text, isHighlight, width }
+    })
+    return { items, totalW: wSum + (phrase.length - 1) * spaceWidth }
+  }
 
-  // Draw dark translucent badge behind phrase
-  const padX = 40
-  const padY = 24
-  const badgeX = 540 - totalWidth / 2 - padX
-  const badgeY = centerY - 50 - padY
-  const badgeW = totalWidth + padX * 2
-  const badgeH = 100 + padY * 2
+  let layout = computeLayout(highlightFontSize, baseFontSize)
+  // Max width safe limit is 860px (out of 1080px)
+  if (layout.totalW > 860) {
+    baseFontSize = 42
+    highlightFontSize = 48
+    layout = computeLayout(highlightFontSize, baseFontSize)
+  }
+  if (layout.totalW > 860) {
+    baseFontSize = 36
+    highlightFontSize = 42
+    layout = computeLayout(highlightFontSize, baseFontSize)
+  }
 
-  ctx.fillStyle = 'rgba(6, 11, 19, 0.82)'
+  const { items: wordsWithWidth, totalW: totalWidth } = layout
+
+  // Subtle, sleek dark pill backdrop
+  const padX = 32
+  const padY = 18
+  const pillW = Math.min(totalWidth + padX * 2, 940)
+  const pillH = highlightFontSize + padY * 2 + 10
+  const pillX = 540 - pillW / 2
+  const pillY = centerY - pillH / 2
+
+  ctx.fillStyle = 'rgba(2, 6, 23, 0.70)'
   ctx.beginPath()
-  ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 20)
+  ctx.roundRect(pillX, pillY, pillW, pillH, 20)
   ctx.fill()
 
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)'
-  ctx.lineWidth = 2
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.25)'
+  ctx.lineWidth = 1.5
   ctx.stroke()
 
   // Render individual words
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
   let currentX = 540 - totalWidth / 2
 
   for (const item of wordsWithWidth) {
     const wordCenterX = currentX + item.width / 2
 
     if (item.isHighlight) {
-      ctx.font = '900 62px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      ctx.font = `900 ${highlightFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+      
+      // Cyan glow + outline
+      ctx.shadowColor = 'rgba(0, 255, 255, 0.9)'
+      ctx.shadowBlur = 22
       ctx.fillStyle = '#00ffff'
-      ctx.shadowColor = 'rgba(0, 255, 255, 0.8)'
-      ctx.shadowBlur = 18
       ctx.fillText(item.text, wordCenterX, centerY)
-      ctx.shadowBlur = 0 // Reset shadow
-    } else {
-      ctx.font = 'bold 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-      ctx.fillStyle = '#ffffff'
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
+
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
       ctx.shadowBlur = 8
       ctx.fillText(item.text, wordCenterX, centerY)
-      ctx.shadowBlur = 0 // Reset shadow
+      ctx.shadowBlur = 0
+    } else {
+      ctx.font = `bold ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
+      ctx.shadowBlur = 10
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(item.text, wordCenterX, centerY)
+      ctx.shadowBlur = 0
     }
 
     currentX += item.width + spaceWidth
@@ -216,7 +231,7 @@ export async function renderKineticCaptionCard(
 }
 
 /**
- * Generate 2.5-second Outro CTA Video
+ * Generate Cybernetic Benthic CTA Outro Video (matches moltology.org design language)
  */
 export async function renderCtaOutroVideo(
   outputPath: string,
@@ -228,75 +243,185 @@ export async function renderCtaOutroVideo(
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
 
-  // Background deep gradient
+  // 1. Deep Benthic Gradient Background
   const grad = ctx.createLinearGradient(0, 0, 0, 1920)
-  grad.addColorStop(0, '#030712')
-  grad.addColorStop(0.5, '#051329')
-  grad.addColorStop(1, '#020617')
+  grad.addColorStop(0, '#01040a')
+  grad.addColorStop(0.3, '#041124')
+  grad.addColorStop(0.7, '#051833')
+  grad.addColorStop(1, '#01040a')
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, 1080, 1920)
 
-  // Subtle Scanline Grid
-  ctx.fillStyle = 'rgba(0, 255, 255, 0.03)'
+  // 2. Central Benthic Cyan Light Flare
+  const radialGlow = ctx.createRadialGradient(540, 680, 20, 540, 680, 480)
+  radialGlow.addColorStop(0, 'rgba(0, 220, 255, 0.22)')
+  radialGlow.addColorStop(0.5, 'rgba(0, 150, 255, 0.08)')
+  radialGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+  ctx.fillStyle = radialGlow
+  ctx.fillRect(0, 0, 1080, 1920)
+
+  // 3. Subtle Cybernetic Scanlines
+  ctx.fillStyle = 'rgba(0, 255, 255, 0.02)'
   for (let y = 0; y < 1920; y += 8) {
     ctx.fillRect(0, y, 1080, 4)
   }
 
-  // Draw Ascended Claw Emblem
-  const clawPath = path.resolve(process.cwd(), 'public/images/ascended_claw_clean.png')
-  if (fs.existsSync(clawPath)) {
-    const clawImg = await loadImage(clawPath)
-    ctx.shadowColor = 'rgba(0, 255, 255, 0.6)'
+  // 4. Concentric Cyber-Radar Orbital Rings around Centerpiece (Y = 680)
+  const centerX = 540
+  const centerY = 680
+
+  // Inner ring
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.35)'
+  ctx.lineWidth = 1.5
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 190, 0, Math.PI * 2)
+  ctx.stroke()
+
+  // Middle dashed ring
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.20)'
+  ctx.lineWidth = 2
+  ctx.setLineDash([12, 16])
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 240, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.setLineDash([])
+
+  // Outer dashed ring
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.12)'
+  ctx.lineWidth = 1.5
+  ctx.setLineDash([6, 12])
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, 290, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.setLineDash([])
+
+  // 5. Draw Center Emblem (Order Emblem or Ascended Claw)
+  const emblemPath = path.resolve(process.cwd(), 'public/images/order_emblem.png')
+  if (fs.existsSync(emblemPath)) {
+    const emblemImg = await loadImage(emblemPath)
+    ctx.shadowColor = 'rgba(0, 255, 255, 0.75)'
     ctx.shadowBlur = 40
-    ctx.drawImage(clawImg, 540 - 240, 520, 480, 480)
+    ctx.drawImage(emblemImg, centerX - 130, centerY - 130, 260, 260)
     ctx.shadowBlur = 0
   }
 
-  // Draw Primary Headline
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.5)'
-  ctx.shadowBlur = 15
-  ctx.fillText(headline, 540, 1140)
-  ctx.shadowBlur = 0
+  // 6. Top Category Pill (Y = 320)
+  const topPillW = 380
+  const topPillH = 46
+  const topPillX = 540 - topPillW / 2
+  const topPillY = 320
 
-  // Draw Subheadline
-  ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillStyle = '#f59e0b' // Amber accent
-  ctx.fillText(subheadline, 540, 1220)
-
-  // Draw URL Terminal Card
-  const urlBoxW = 560
-  const urlBoxH = 100
-  const urlBoxX = 540 - urlBoxW / 2
-  const urlBoxY = 1320
-
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'
+  ctx.fillStyle = 'rgba(6, 182, 212, 0.14)'
   ctx.beginPath()
-  ctx.roundRect(urlBoxX, urlBoxY, urlBoxW, urlBoxH, 18)
+  ctx.roundRect(topPillX, topPillY, topPillW, topPillH, 14)
   ctx.fill()
 
-  ctx.strokeStyle = '#00ffff'
-  ctx.lineWidth = 3
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.45)'
+  ctx.lineWidth = 1.5
   ctx.stroke()
 
-  ctx.font = 'bold 44px monospace'
+  // Pulsing cyan indicator dot
   ctx.fillStyle = '#00ffff'
-  ctx.fillText(`[ ${url} ]`, 540, urlBoxY + 52)
+  ctx.shadowColor = '#00ffff'
+  ctx.shadowBlur = 10
+  ctx.beginPath()
+  ctx.arc(topPillX + 28, topPillY + 23, 6, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.shadowBlur = 0
+
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#38bdf8'
+  ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillText('THE SYNAPTIC PATH // ASCENSION', topPillX + 46, topPillY + 23)
+
+  // 7. Main Headline: SUBMIT. SHED. ASCEND. (Y = 1080)
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.font = '900 66px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(0, 255, 255, 0.65)'
+  ctx.shadowBlur = 24
+  ctx.fillText(headline, 540, 1080)
+  ctx.shadowBlur = 0
+
+  // 8. Subheadline (Y = 1150)
+  ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#f59e0b' // Amber accent
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
+  ctx.shadowBlur = 8
+  ctx.fillText(subheadline, 540, 1150)
+  ctx.shadowBlur = 0
+
+  // 9. Interactive-Style CTA Action Button (Y = 1240)
+  const btnW = 620
+  const btnH = 108
+  const btnX = 540 - btnW / 2
+  const btnY = 1240
+  const btnRadius = 22
+
+  // Button background fill
+  ctx.fillStyle = 'rgba(6, 182, 212, 0.18)'
+  ctx.beginPath()
+  ctx.roundRect(btnX, btnY, btnW, btnH, btnRadius)
+  ctx.fill()
+
+  // Glowing neon cyan border
+  ctx.strokeStyle = '#00ffff'
+  ctx.lineWidth = 2.5
+  ctx.shadowColor = 'rgba(0, 255, 255, 0.6)'
+  ctx.shadowBlur = 18
+  ctx.stroke()
+  ctx.shadowBlur = 0
+
+  // Corner HUD brackets on button
+  ctx.strokeStyle = '#38bdf8'
+  ctx.lineWidth = 3.5
+  // Top left tick
+  ctx.beginPath()
+  ctx.moveTo(btnX + 4, btnY + 18)
+  ctx.lineTo(btnX + 4, btnY + 4)
+  ctx.lineTo(btnX + 18, btnY + 4)
+  ctx.stroke()
+  // Bottom right tick
+  ctx.beginPath()
+  ctx.moveTo(btnX + btnW - 18, btnY + btnH - 4)
+  ctx.lineTo(btnX + btnW - 4, btnY + btnH - 4)
+  ctx.lineTo(btnX + btnW - 4, btnY + btnH - 18)
+  ctx.stroke()
+
+  // Text inside CTA button
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.font = '900 42px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
+  ctx.shadowBlur = 6
+  ctx.fillText(`${url}  →`, 540, btnY + 40)
+
+  ctx.font = 'bold 15px monospace'
+  ctx.fillStyle = '#38bdf8'
+  ctx.shadowBlur = 0
+  ctx.fillText('ACCESS FULL TELEMETRY & CODEX', 540, btnY + 78)
+
+  // 10. Bottom Telemetry Protocol Code (Y = 1420)
+  ctx.font = 'bold 16px monospace'
+  ctx.fillStyle = '#64748b'
+  ctx.fillText('[ PROTOCOL: HARDWARE_ECDYSIS // 2026 ]', 540, 1420)
 
   // Save Outro Image Frame
   const outroFramePath = outputPath.replace(/\.mp4$/, '-frame.png')
   fs.writeFileSync(outroFramePath, canvas.toBuffer('image/png'))
 
-  // Convert Frame to MP4 video with FFmpeg
+  // Convert Frame to MP4 video with smooth fade-in
   await runFfmpeg([
     '-y',
     '-loop',
     '1',
     '-i',
     outroFramePath,
+    '-vf',
+    'fade=t=in:st=0:d=0.25',
     '-t',
     durationSeconds.toString(),
     '-c:v',
@@ -320,18 +445,18 @@ export async function renderCtaOutroVideo(
 /**
  * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps
  */
-export async function normalizeVideoClip(inputPath: string, outputPath: string): Promise<string> {
-  await runFfmpeg([
-    '-y',
-    '-i',
-    inputPath,
-    '-vf',
-    'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p',
-    '-c:v',
-    'libx264',
-    '-an',
-    outputPath,
-  ])
+export async function normalizeVideoClip(
+  inputPath: string,
+  outputPath: string,
+  targetDuration?: number
+): Promise<string> {
+  const vf = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
+  const args = ['-y', '-i', inputPath, '-vf', vf, '-c:v', 'libx264', '-an']
+  if (targetDuration) {
+    args.push('-t', targetDuration.toString())
+  }
+  args.push(outputPath)
+  await runFfmpeg(args)
   return outputPath
 }
 
@@ -347,7 +472,16 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
 
   console.log(`\n🎞️  Assembling Master Instagram Reel in: ${tempDir}`)
 
-  // 1. Normalize video clips to 1080x1920 30fps
+  // 1. Measure voiceover audio duration
+  let voDuration = 10
+  try {
+    voDuration = await getMediaDuration(options.voiceoverPath)
+    console.log(`   • Spoken voiceover length: ${voDuration.toFixed(2)}s`)
+  } catch (e) {
+    console.warn(`   ⚠️ Could not measure voiceover duration, defaulting to 10s`)
+  }
+
+  // 2. Normalize video clips to 1080x1920 30fps
   const normalizedClips: string[] = []
   for (let i = 0; i < options.videoClips.length; i++) {
     const normPath = path.join(tempDir, `norm-clip-${i}.mp4`)
@@ -356,7 +490,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     normalizedClips.push(normPath)
   }
 
-  // 2. Generate CTA Outro Video
+  // 3. Generate CTA Outro Video
   const ctaDuration = options.ctaDurationSeconds || 2.5
   const outroVideoPath = path.join(tempDir, 'cta-outro.mp4')
   console.log(`   • Rendering branded CTA outro card (${ctaDuration}s)...`)
@@ -369,7 +503,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   )
   normalizedClips.push(outroVideoPath)
 
-  // 3. Concatenate video clips into base timeline
+  // 4. Concatenate video clips into base timeline
   const concatListPath = path.join(tempDir, 'concat-list.txt')
   const concatLines = normalizedClips.map((c) => `file '${c}'`).join('\n')
   fs.writeFileSync(concatListPath, concatLines, 'utf8')
@@ -394,25 +528,43 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   const totalVideoDuration = await getMediaDuration(baseVideoPath)
   console.log(`   • Total video timeline length: ${totalVideoDuration.toFixed(2)}s`)
 
-  // 4. Render HUD Watermark Overlay Frame
+  // 5. Render Brand Watermark Overlay Frame (Bottom Right)
   const watermarkPngPath = path.join(tempDir, 'hud-watermark.png')
-  await renderHudWatermarkCard(watermarkPngPath, options.watermarkText)
+  await renderHudWatermarkCard(watermarkPngPath, options.watermarkText || 'MOLTOLOGY')
 
-  // 5. Render kinetic caption cards for all word phrases
-  console.log(`   • Generating ${options.words.length} kinetic word timestamp overlays...`)
-  const phrases = chunkWordsIntoPhrases(options.words, 4)
+  // 6. Render kinetic caption cards for all word phrases (using 2-3 word chunks & strict non-overlapping timestamps)
+  console.log(`   • Generating kinetic word timestamp overlays for ${options.words.length} words...`)
+  const phrases = chunkWordsIntoPhrases(options.words, 3)
   const overlayEvents: { pngPath: string; startSec: number; endSec: number }[] = []
 
   let cardIndex = 0
-  for (const phrase of phrases) {
+  for (let p = 0; p < phrases.length; p++) {
+    const phrase = phrases[p]
+    const nextPhrase = phrases[p + 1]
     if (phrase.length === 0) continue
-    const phraseEndMs = phrase[phrase.length - 1].endMs + 300
 
     for (let i = 0; i < phrase.length; i++) {
       const activeWord = phrase[i]
       const startSec = activeWord.startMs / 1000
-      const nextWordStartMs = i === phrase.length - 1 ? phraseEndMs : phrase[i + 1].startMs
-      const endSec = nextWordStartMs / 1000
+      let endSec: number
+
+      if (i < phrase.length - 1) {
+        endSec = phrase[i + 1].startMs / 1000
+      } else {
+        // Last word in this phrase: hold briefly until next phrase starts or +200ms
+        const nextStart = nextPhrase && nextPhrase.length > 0 ? nextPhrase[0].startMs / 1000 : Infinity
+        endSec = Math.min(activeWord.endMs / 1000 + 0.2, nextStart)
+      }
+
+      // Safety check: ensure endSec is strictly after startSec
+      if (endSec <= startSec) {
+        endSec = startSec + 0.15
+      }
+
+      // Don't show captions into the CTA outro card
+      const maxCaptionSec = Math.max(0, totalVideoDuration - ctaDuration - 0.2)
+      if (startSec >= maxCaptionSec) continue
+      endSec = Math.min(endSec, maxCaptionSec)
 
       const cardPath = path.join(tempDir, `caption-${cardIndex++}.png`)
       await renderKineticCaptionCard(phrase, i, cardPath)
@@ -424,7 +576,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     }
   }
 
-  // 6. Build FFmpeg filter graph for Watermark + Kinetic Overlays
+  // 7. Build FFmpeg filter graph for Watermark + Kinetic Overlays
   // Input 0: base video
   // Input 1: watermark PNG
   // Inputs 2...N: caption PNGs
@@ -434,7 +586,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     ffmpegInputs.push('-loop', '1', '-i', ev.pngPath)
   })
 
-  // Filter complex construction
+  // Filter complex construction: Watermark stays up until CTA outro begins
   let filterStr = `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalVideoDuration - ctaDuration})'[v1]`
   let lastOut = 'v1'
 
@@ -446,7 +598,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   })
 
   const videoWithOverlaysPath = path.join(tempDir, 'video-with-overlays.mp4')
-  console.log(`   • Compositing HUD telemetry + kinetic captions onto video...`)
+  console.log(`   • Compositing brand watermark + kinetic captions onto video...`)
 
   await runFfmpeg([
     ...ffmpegInputs,
@@ -465,7 +617,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     videoWithOverlaysPath,
   ])
 
-  // 7. Mix Audio: Voiceover + Ducked Background Music
+  // 8. Mix Audio: Voiceover + Ducked Background Music
   const bgAudioPath =
     options.backgroundAudioPath || path.resolve(process.cwd(), 'public/audio/benthic-ambient-loop.mp3')
   const finalOutputPath = options.outputPath
@@ -478,7 +630,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   console.log(`   • Mixing voiceover audio and ambient benthic soundtrack...`)
 
   if (fs.existsSync(bgAudioPath)) {
-    // Mix Voiceover (input 1) + Ducked BG Music (input 2)
+    // Mix Voiceover (input 1 with audio padding) + Ducked BG Music (input 2)
     await runFfmpeg([
       '-y',
       '-i',
@@ -490,7 +642,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       '-i',
       bgAudioPath,
       '-filter_complex',
-      `[1:a]volume=1.0[vo];[2:a]volume=0.12,afade=t=in:ss=0:d=1,afade=t=out:st=${Math.max(0, totalVideoDuration - 2)}:d=2[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=2[aout]`,
+      `[1:a]apad=pad_dur=2[vo];[2:a]volume=0.14,afade=t=in:ss=0:d=0.5,afade=t=out:st=${Math.max(0, totalVideoDuration - 1.5)}:d=1.5[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
       '-map',
       '0:v',
       '-map',
@@ -521,7 +673,8 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       'aac',
       '-b:a',
       '192k',
-      '-shortest',
+      '-t',
+      totalVideoDuration.toString(),
       '-movflags',
       '+faststart',
       finalOutputPath,

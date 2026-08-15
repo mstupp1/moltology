@@ -52,9 +52,9 @@ export function formatSrtTime(ms: number): string {
 }
 
 /**
- * Build Word Groups (Phrases of 3-5 words) for kinetic captioning
+ * Build Word Groups (Phrases of 2-3 words) for kinetic captioning
  */
-export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChunk = 4): WordBoundaryEvent[][] {
+export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChunk = 3): WordBoundaryEvent[][] {
   const chunks: WordBoundaryEvent[][] = []
   let currentChunk: WordBoundaryEvent[] = []
 
