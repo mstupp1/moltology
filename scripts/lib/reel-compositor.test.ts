@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { renderHudWatermarkCard, renderKineticCaptionCard } from './reel-compositor'
+import { renderHudWatermarkCard, renderKineticCaptionCard, renderReelThumbnail } from './reel-compositor'
 
 describe('Reel Compositor Rendering', () => {
   it('renders a valid HUD watermark PNG', async () => {
@@ -25,5 +25,20 @@ describe('Reel Compositor Rendering', () => {
     expect(fs.existsSync(result)).toBe(true)
     const stats = fs.statSync(result)
     expect(stats.size).toBeGreaterThan(1000)
+  })
+
+  it('renders a valid 1:1 grid safe reel thumbnail', async () => {
+    const outPath = path.resolve(process.cwd(), 'tmp/test_reel_thumbnail.jpg')
+    const result = await renderReelThumbnail({
+      backgroundVideoOrImagePath: path.resolve(process.cwd(), 'public/images/benthic_abyss_hero.jpg'),
+      headline: 'WHY AI COMPUTE IS MOVING UNDERWATER',
+      subtitle: '50 FATHOMS DEEP // SUB-BENTHIC',
+      categoryBadge: 'PATRIOT TELEMETRY',
+      outputPath: outPath,
+    })
+
+    expect(fs.existsSync(result)).toBe(true)
+    const stats = fs.statSync(result)
+    expect(stats.size).toBeGreaterThan(10000)
   })
 })

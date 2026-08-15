@@ -3,7 +3,7 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 import { generateVoiceover } from './lib/tts-engine'
-import { compositeReel } from './lib/reel-compositor'
+import { compositeReel, renderReelThumbnail } from './lib/reel-compositor'
 import { generateVeoVideo } from './generate-video'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
@@ -232,21 +232,40 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     tempDir: path.join(tempDir, 'ffmpeg-build'),
   })
 
-  // 5. Upload Master Video to Neon S3
+  // 5. Generate 1:1 Grid-Safe Custom Reel Thumbnail
+  console.log(`\n5️⃣ Generating 1:1 Grid-Safe Custom Thumbnail...`)
+  const thumbnailPath = path.join(tempDir, `custom-thumbnail-${timestamp}.jpg`)
+  await renderReelThumbnail({
+    backgroundVideoOrImagePath: masterReelPath,
+    headline: scriptData.hookHeadline,
+    subtitle: 'SUB-BENTHIC TELEMETRY',
+    categoryBadge: 'PATRIOT TELEMETRY',
+    outputPath: thumbnailPath,
+    seekSecond: 1.5,
+  })
+
+  // 6. Upload Master Video & Thumbnail to Neon S3
   let publicUrl: string | undefined
+  let publicThumbnailUrl: string | undefined
   let s3Key: string | undefined
+  let s3ThumbKey: string | undefined
 
   if (!options.dryRun) {
-    console.log(`\n5️⃣ Uploading Master Reel to Neon S3...`)
+    console.log(`\n6️⃣ Uploading Master Reel & Thumbnail to Neon S3...`)
     s3Key = `videos/social/reels/${path.basename(masterReelPath)}`
     const s3Result = await uploadLocalFileToS3(masterReelPath, s3Key, DEFAULT_BUCKET)
     publicUrl = s3Result.publicUrl
-    console.log(`   🚀 Public S3 Stream URL: ${publicUrl}`)
+    console.log(`   🚀 Public S3 Video URL: ${publicUrl}`)
+
+    s3ThumbKey = `images/social/thumbnails/${path.basename(thumbnailPath)}`
+    const thumbResult = await uploadLocalFileToS3(thumbnailPath, s3ThumbKey, DEFAULT_BUCKET)
+    publicThumbnailUrl = thumbResult.publicUrl
+    console.log(`   🖼️  Public S3 Thumbnail URL: ${publicThumbnailUrl}`)
   } else {
-    console.log(`\n5️⃣ [Dry Run] Skipped S3 upload. Master video saved at: ${masterReelPath}`)
+    console.log(`\n6️⃣ [Dry Run] Skipped S3 upload. Master video saved at: ${masterReelPath}`)
   }
 
-  // 6. Record to Social History Ledger
+  // 7. Record to Social History Ledger
   recordReelInHistory({
     id: `reel-${timestamp}`,
     topic: scriptData.topic,
@@ -257,8 +276,12 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     narrationScript: scriptData.narrationScript,
     s3Url: publicUrl || null,
     s3Key: s3Key || null,
+    thumbnailUrl: publicThumbnailUrl || null,
+    s3ThumbKey: s3ThumbKey || null,
     durationSeconds: compositeResult.durationSeconds,
     status: options.publishNow ? 'published' : 'draft',
+    isAiGenerated: true,
+    firstComment: scriptData.firstComment,
     caption: scriptData.caption,
     hashtags: scriptData.hashtags,
   })

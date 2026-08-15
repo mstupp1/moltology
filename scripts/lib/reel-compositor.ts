@@ -542,3 +542,174 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     fileSizeBytes: stats.size,
   }
 }
+
+export interface ReelThumbnailOptions {
+  backgroundVideoOrImagePath: string // Path to video clip or image
+  headline: string // e.g. "WHY AI COMPUTE MOVED UNDERWATER"
+  subtitle?: string // e.g. "50 FATHOMS DEEP // SUB-BENTHIC"
+  categoryBadge?: string // e.g. "TELEMETRY DISPATCH"
+  outputPath: string
+  seekSecond?: number // default 1.5 if input is video
+}
+
+/**
+ * Render 1080x1920 Reel Thumbnail optimized for 1:1 Grid Safe Zone & Explore CTR
+ */
+export async function renderReelThumbnail(options: ReelThumbnailOptions): Promise<string> {
+  const canvas = createCanvas(1080, 1920)
+  const ctx = canvas.getContext('2d')
+
+  // 1. If input is video, extract frame at seekSecond using FFmpeg
+  let framePath = options.backgroundVideoOrImagePath
+  let isTempFrame = false
+  if (
+    options.backgroundVideoOrImagePath.endsWith('.mp4') ||
+    options.backgroundVideoOrImagePath.endsWith('.mov')
+  ) {
+    const tempDir = path.dirname(options.outputPath)
+    framePath = path.join(tempDir, `thumb-extracted-${Date.now()}.jpg`)
+    const seek = options.seekSecond ?? 1.5
+    await runFfmpeg([
+      '-y',
+      '-ss',
+      seek.toString(),
+      '-i',
+      options.backgroundVideoOrImagePath,
+      '-vframes',
+      '1',
+      '-q:v',
+      '2',
+      framePath,
+    ])
+    isTempFrame = true
+  }
+
+  // 2. Draw background image
+  if (fs.existsSync(framePath)) {
+    const bgImg = await loadImage(framePath)
+    // Cover scale to 1080x1920
+    const scale = Math.max(1080 / bgImg.width, 1920 / bgImg.height)
+    const sw = bgImg.width * scale
+    const sh = bgImg.height * scale
+    const sx = (1080 - sw) / 2
+    const sy = (1920 - sh) / 2
+    ctx.drawImage(bgImg, sx, sy, sw, sh)
+  } else {
+    // Fallback dark gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, 1920)
+    grad.addColorStop(0, '#030712')
+    grad.addColorStop(0.5, '#051329')
+    grad.addColorStop(1, '#020617')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, 1080, 1920)
+  }
+
+  // 3. Vignette & Contrast Overlay (Dark tint in center 1:1 grid area for typography legibility)
+  const vigGrad = ctx.createLinearGradient(0, 0, 0, 1920)
+  vigGrad.addColorStop(0, 'rgba(3, 7, 18, 0.65)')
+  vigGrad.addColorStop(0.35, 'rgba(3, 7, 18, 0.45)')
+  vigGrad.addColorStop(0.5, 'rgba(5, 15, 30, 0.8)') // Center 1:1 contrast
+  vigGrad.addColorStop(0.65, 'rgba(3, 7, 18, 0.45)')
+  vigGrad.addColorStop(1, 'rgba(3, 7, 18, 0.9)')
+  ctx.fillStyle = vigGrad
+  ctx.fillRect(0, 0, 1080, 1920)
+
+  // 4. Subtle Scanlines
+  ctx.fillStyle = 'rgba(0, 255, 255, 0.02)'
+  for (let y = 0; y < 1920; y += 8) {
+    ctx.fillRect(0, y, 1080, 4)
+  }
+
+  // 5. Draw Top HUD Badge (Y = 160)
+  const emblemPath = path.resolve(process.cwd(), 'public/images/order_emblem.png')
+  if (fs.existsSync(emblemPath)) {
+    const embImg = await loadImage(emblemPath)
+    ctx.drawImage(embImg, 64, 160, 56, 56)
+  }
+  ctx.fillStyle = '#00ffff'
+  ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillText('MOLTNATION TELEMETRY', 136, 196)
+
+  // 6. Draw 1:1 Grid Center Area (Grid safe region: Y=420 to Y=1500)
+  // Category Pill at Y = 760
+  const category = options.categoryBadge || 'TELEMETRY REPORT'
+  ctx.font = '900 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  const catWidth = ctx.measureText(category).width
+  const pillW = catWidth + 48
+  const pillH = 48
+  const pillX = 540 - pillW / 2
+  const pillY = 740
+
+  ctx.fillStyle = '#f59e0b' // Amber pill
+  ctx.beginPath()
+  ctx.roundRect(pillX, pillY, pillW, pillH, 12)
+  ctx.fill()
+
+  ctx.fillStyle = '#050a12'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(category, 540, pillY + 24)
+
+  // 7. Bold High-Impact Hook Headline centered at Y = 950 (1:1 grid sweet spot)
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+
+  const words = options.headline.toUpperCase().split(' ')
+  const lines: string[] = []
+  let currentLine = ''
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+    ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    if (ctx.measureText(testLine).width > 900 && currentLine) {
+      lines.push(currentLine)
+      currentLine = word
+    } else {
+      currentLine = testLine
+    }
+  }
+  if (currentLine) lines.push(currentLine)
+
+  const lineHeight = 80
+  const startY = 940 - ((lines.length - 1) * lineHeight) / 2
+
+  lines.forEach((line, idx) => {
+    const lineY = startY + idx * lineHeight
+
+    ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
+    ctx.shadowBlur = 24
+    ctx.fillStyle = idx === lines.length - 1 ? '#00ffff' : '#ffffff'
+    ctx.fillText(line, 540, lineY)
+
+    if (idx === lines.length - 1) {
+      ctx.shadowColor = 'rgba(0, 255, 255, 0.6)'
+      ctx.shadowBlur = 30
+      ctx.fillText(line, 540, lineY)
+    }
+    ctx.shadowBlur = 0
+  })
+
+  // 8. Bottom Grid Badge (Y = 1140)
+  if (options.subtitle) {
+    ctx.font = 'bold 28px monospace'
+    ctx.fillStyle = '#94a3b8'
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
+    ctx.shadowBlur = 10
+    ctx.fillText(`[ ${options.subtitle.toUpperCase()} ]`, 540, 1140)
+    ctx.shadowBlur = 0
+  }
+
+  // Cleanup temp frame if created
+  if (isTempFrame && fs.existsSync(framePath)) {
+    try {
+      fs.unlinkSync(framePath)
+    } catch (e) {
+      // Non-fatal
+    }
+  }
+
+  fs.writeFileSync(options.outputPath, canvas.toBuffer('image/jpeg'))
+  return options.outputPath
+}
+

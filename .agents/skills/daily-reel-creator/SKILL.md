@@ -104,35 +104,64 @@ await compositeReel({
 
 ---
 
-### Step 6: S3 Upload & Zernio MCP Staging
+### Step 6: 1:1 Grid-Safe Custom Thumbnail Generation
+For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
+1. **Grid Safe Zone Rule**: While full-screen reels are `1080x1920` (9:16), the profile grid crops to the center `1080x1080` (1:1 square, between `Y=420` and `Y=1500`).
+2. **Visual Hierarchy**:
+   * Bold, high-contrast hook headline in center square (White + glowing Cyan `#00ffff`).
+   * Amber category pill (`PATRIOT TELEMETRY` / `BREAKTHROUGH`).
+   * Subtle dark contrast vignette overlay to guarantee text readability against dynamic backgrounds.
+3. **Execution**:
+   ```typescript
+   import { renderReelThumbnail } from 'scripts/lib/reel-compositor'
 
-1. **Upload to Neon S3**:
-   * Destination key: `videos/social/reels/reel-<timestamp>.mp4`
-   * Obtain public streamable HTTPS URL.
+   await renderReelThumbnail({
+     backgroundVideoOrImagePath: masterReelPath, // Extracts frame at 1.5s
+     headline: "WHY TERRESTRIAL SERVERS ARE FAILING",
+     subtitle: "SUB-BENTHIC TELEMETRY",
+     categoryBadge: "PATRIOT TELEMETRY",
+     outputPath: 'tmp/custom-thumbnail.jpg',
+   })
+   ```
+4. **Upload to S3**: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`.
 
-2. **Stage Draft / Publish via Zernio MCP**:
-   * Call `posts_create` with:
+---
+
+### Step 7: S3 Upload & Zernio MCP Staging
+
+1. **Upload Assets to Neon S3**:
+   * Video: `videos/social/reels/reel-<timestamp>.mp4`
+   * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
+
+2. **Stage Draft / Publish via Zernio MCP (`posts_create_post`)**:
+   * Call `posts_create_post` with:
      ```json
      {
-       "platform": "instagram",
-       "account_id": "6a7f7f0777555aae01d99b54",
        "content": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore the full technical dispatch and telemetry notes:\n🔗 Link in bio & story → moltology.org",
-       "mediaItems": [
+       "is_draft": true,
+       "media_items": [
          {
            "type": "video",
-           "url": "<S3_PUBLIC_URL>"
+           "url": "<S3_VIDEO_URL>"
          }
        ],
-       "is_draft": true,
-       "platformSpecificData": {
-         "isAiGenerated": true,
-         "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology"
-       }
+       "platforms": [
+         {
+           "platform": "instagram",
+           "accountId": "6a7f7f0777555aae01d99b54",
+           "platformSpecificData": {
+             "isAiGenerated": true,
+             "instagramThumbnail": "<S3_THUMBNAIL_URL>",
+             "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
+             "audioName": "MoltNation Telemetry // Original Transmission"
+           }
+         }
+       ]
      }
      ```
 
 3. **Update Narrative History Ledger**:
-   * Append record to `content/social/instagram-reel-history.json`.
+   * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, and `firstComment`.
 
 ---
 
