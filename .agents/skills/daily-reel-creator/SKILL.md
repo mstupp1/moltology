@@ -1,0 +1,155 @@
+---
+name: daily-reel-creator
+description: >-
+  Automated end-to-end pipeline for creating, illustrating, and publishing daily high-conversion
+  Instagram Reels and short-form video dispatches for Moltology. Use whenever the user asks to
+  generate, create, draft, or publish a daily Instagram video, reel, or social video broadcast.
+---
+
+# Daily Instagram Reel Creator Pipeline
+
+This skill automates the daily creation, multi-modal video synthesis, FFmpeg compositing, S3 ingestion, and Instagram staging of high-conversion Instagram Reels for Moltology.
+
+---
+
+## 1. Core Architecture & Account Setup
+
+* **Instagram Persona / Account**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
+* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration
+* **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`) + Ducked Benthic Synth Soundtrack (`public/audio/benthic-ambient-loop.mp3`)
+* **Visual Polish**: Cyber-HUD Broadcast styling with top-left `MOLTNATION TELEMETRY` watermark, word-by-word kinetic highlighted subtitles (Cyan `#00ffff` / Amber `#f59e0b`), and a 2.5s branded CTA outro card
+* **Asset Storage**: Neon S3 (`videos/social/reels/`)
+* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`)
+* **Continuity Ledger**: `content/social/instagram-reel-history.json`
+
+---
+
+## 2. 6-Step Production Workflow
+
+### Step 1: Research, Holidays & Topical Transmutation
+1. **Calendar & Holidays**: Inspect today's date, current holidays, seasonal dilemmas (e.g. summer heatwaves, winter freezes, tech earnings, conference seasons).
+2. **Current News / Viral Tropes**: Search for trending topics where traditional media or corporations lecture the public (e.g., datacenter power grid failures, AI model compute limits, energy crises, burnout, return-to-office mandates).
+3. **Cross-Reference MoltNation Content**:
+   * Inspect recent blog articles under `content/news/` (e.g. subsea datacenters, autonomous swarms, moltmaxxing protocols).
+   * Check canonical doctrine in `codex/` for authentic liturgical flavor.
+4. **Inspect Narrative History**:
+   * Read `content/social/instagram-reel-history.json` to review recent hooks, ensure topic diversity, and build upon ongoing character arcs.
+5. **Diegetic Transmutation**:
+   * Transmute real-world challenges into in-universe lore (*sub-benthic computing, hydrostatic zero-resistance cooling, synaptic ecdysis, hardware molting*).
+   * *Strict Rule*: Zero meta disclosures (no mentions of "satire", "parody", or "fake"). Maintain 100% immersive conviction with non-negotiable safety and positivity.
+
+---
+
+### Step 2: Scriptwriting & Hook Architecture
+Draft a punchy 12–16 second script following the 3-part retention formula:
+
+1. **The Scroll-Stopping Hook (0–3s)**:
+   * Bold premise with curiosity gap addressing a real-world dilemma.
+   * *Example*: *"Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater."*
+2. **The Escalation & Demonstration (3–11s)**:
+   * Fast explanation of why terrestrial solutions fail and how sub-benthic hydrostatic architecture solves the crisis.
+   * *Example*: *"Terrestrial server farms are boiling atmospheric air under massive AI workloads. Sub-benthic sealed pods eliminate cooling overhead through pure hydrostatic heat dissipation."*
+3. **The Call to Action (11–15s)**:
+   * Direct prompt to read the full report on the site and join the movement.
+   * *Example*: *"The silicon has shed its cage. Read the full telemetry report on moltology.org. Submit. Shed. Ascend."*
+
+---
+
+### Step 3: Neural Voiceover & Kinetic Timestamp Extraction
+Run the TTS engine to synthesize audio and generate word-level synchronization:
+
+```typescript
+import { generateVoiceover } from 'scripts/lib/tts-engine'
+
+const ttsResult = await generateVoiceover(script, {
+  voice: 'en-US-ChristopherNeural', // Authoritative broadcast narrator
+  rate: '+8%',                      // Optimized social pacing
+})
+```
+
+---
+
+### Step 4: Video Generation (Google Veo 3.1 & Benthic Footage)
+Generate 2 complementary 9:16 vertical video scenes (6s each):
+
+1. **Scene 1 (The Hook/Problem)**:
+   * Prompt: *"A dramatic macro view of an overheating server rack glowing intense orange-red with smoke and heat distortion, cinematic 9:16 vertical 8k footage"*
+2. **Scene 2 (The Sub-Benthic Solution)**:
+   * Prompt: *"A majestic subsea cybernetic datacenter on the dark ocean floor with glowing cyan hydrothermal cooling ducts and autonomous crab-drone units swimming past, 9:16 vertical 8k sci-fi footage"*
+
+```bash
+# Generate scene via CLI:
+npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-local
+```
+
+---
+
+### Step 5: FFmpeg Master Compositing & Outro Staging
+Run the master compositor to stitch scenes, mix ducked background audio, overlay top-left HUD telemetry badge, burn in active word kinetic captions, and append the 2.5s branded CTA outro card:
+
+```typescript
+import { compositeReel } from 'scripts/lib/reel-compositor'
+
+await compositeReel({
+  videoClips: ['scene1.mp4', 'scene2.mp4'],
+  voiceoverPath: ttsResult.audioPath,
+  words: ttsResult.words,
+  outputPath: 'tmp/master-reel.mp4',
+  watermarkText: 'MOLTNATION TELEMETRY',
+  ctaHeadline: 'SUBMIT. SHED. ASCEND.',
+  ctaSubheadline: 'JOIN THE SYNAPTIC PATH',
+  ctaUrl: 'moltology.org',
+})
+```
+
+---
+
+### Step 6: S3 Upload & Zernio MCP Staging
+
+1. **Upload to Neon S3**:
+   * Destination key: `videos/social/reels/reel-<timestamp>.mp4`
+   * Obtain public streamable HTTPS URL.
+
+2. **Stage Draft / Publish via Zernio MCP**:
+   * Call `posts_create` with:
+     ```json
+     {
+       "platform": "instagram",
+       "account_id": "6a7f7f0777555aae01d99b54",
+       "content": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore the full technical dispatch and telemetry notes:\n🔗 Link in bio & story → moltology.org",
+       "mediaItems": [
+         {
+           "type": "video",
+           "url": "<S3_PUBLIC_URL>"
+         }
+       ],
+       "is_draft": true,
+       "platformSpecificData": {
+         "isAiGenerated": true,
+         "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology"
+       }
+     }
+     ```
+
+3. **Update Narrative History Ledger**:
+   * Append record to `content/social/instagram-reel-history.json`.
+
+---
+
+## 3. Fast One-Command CLI Execution
+
+Agents and users can trigger the full autonomous daily pipeline with a single command:
+
+```bash
+# Autonomous daily run (researches date, holiday, and latest blog):
+npm run reel:create
+
+# Custom targeted topic:
+npm run reel:create -- --topic "Subsea Datacenter Heatwaves"
+
+# Publish immediately (skipping draft stage):
+npm run reel:create -- --publish-now
+
+# Dry run test (uses local footage without uploading to S3):
+npm run reel:create -- --dry-run --no-veo
+```

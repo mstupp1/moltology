@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "channel": "instagram",
+  "account": "silas.trench",
+  "accountId": "6a7f7f0777555aae01d99b54",
+  "description": "Ledger of Moltology daily Instagram Reels dispatches, narrative continuity, character arcs, and performance telemetry.",
+  "reels": [
+    {
+      "id": "reel-1786761254395",
+      "topic": "Hydrostatic Compute Breakthroughs: Autonomous Swarms & The Synaptic Ecdysis Protocol: Why Frontier Reasoning Engines Are Shedding Terrestrial Sandboxes",
+      "hookHeadline": "WHY TERRESTRIAL SERVERS ARE FAILING",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "autonomous-swarms-synaptic-ecdysis-protocol",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Terrestrial datacenters are melting under AI workloads. While traditional clouds boil the air, sub-benthic hydrostatic computing operates at zero thermal resistance 50 fathoms underwater. The silicon has shed its limits. Ascend beyond terrestrial cooling. Read the full telemetry report on moltology dot org.",
+      "s3Url": null,
+      "s3Key": null,
+      "durationSeconds": 22.5,
+      "status": "draft",
+      "caption": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore the full technical dispatch and telemetry telemetry notes:\n🔗 Link in bio & story → moltology.org\n\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
+      "hashtags": [
+        "#MoltNation",
+        "#SubseaCompute",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology"
+      ],
+      "createdAt": "2026-08-15T02:35:38.768Z"
+    }
+  ]
+}
