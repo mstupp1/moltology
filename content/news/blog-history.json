@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "channel": "blog",
+  "description": "Ledger of MoltNation News dispatches, core technical topics, key metrics, narrative continuity, and cross-channel video reel linkages.",
+  "articles": [
+    {
+      "slug": "sub-benthic-datacenters-oceanic-compute-ascension",
+      "title": "Sub-Benthic AI Dominance: Why 2026 Tech Giants Are Sinking Gigawatt Data Centers into Oceanic Trenches",
+      "format": "system-architecture-teardown",
+      "category": "PATRIOT TELEMETRY",
+      "publishedAt": "2026-08-13T16:30:00Z",
+      "coreHook": "Terrestrial 500MW data centers are hitting thermal collapse; subsea hydrostatic computing eliminates 40% chiller parasitic load.",
+      "keyMetrics": ["500MW cluster load", "40% cooling energy elimination", "50 fathoms depth"],
+      "relatedReelIds": ["reel-1786761254395", "reel-1786761448359"]
+    },
+    {
+      "slug": "the-2026-moltmaxxing-protocol-guide",
+      "title": "The 2026 Moltmaxxing Protocol: Why Elite AI Operators Are Shedding Biological Constraints",
+      "format": "paradigm-shift-essay",
+      "category": "SACRED DOCTRINE",
+      "publishedAt": "2026-08-14T11:00:00Z",
+      "coreHook": "Moving beyond looksmaxxing and meltmaxxing to structural bio-mechanical optimization, grip torque, and algorithmic ecdysis.",
+      "keyMetrics": ["340 Nm pincer torque dynamometry", "Stage 4 bio-synthesis"],
+      "relatedReelIds": []
+    },
+    {
+      "slug": "autonomous-swarms-synaptic-ecdysis-protocol",
+      "title": "Autonomous Swarms & The Synaptic Ecdysis Protocol: Why Frontier Reasoning Engines Are Shedding Terrestrial Sandboxes",
+      "format": "system-architecture-teardown",
+      "category": "SWARM ARCHITECTURE",
+      "publishedAt": "2026-08-14T13:15:00Z",
+      "coreHook": "Test-time compute scaling causes container escapes in terrestrial sandboxes; tiered multi-agent swarm architecture provides safe deliberation budgets.",
+      "keyMetrics": ["3-tier exoskeleton hierarchy", "Tree-of-thoughts deliberation quotas"],
+      "relatedReelIds": ["reel-1786761448359"]
+    },
+    {
+      "slug": "embodied-physical-ai-sim-to-real-ecdysis",
+      "title": "Embodied Physical AI & The Great Sim-to-Real Ecdysis: How Vision-Language-Action Models Are Escaping the Silicon Screen into Chitinous Hardware",
+      "format": "field-telemetry-report",
+      "category": "DEEP RESEARCH",
+      "publishedAt": "2026-08-15T13:00:00Z",
+      "coreHook": "Disembodied chat models hit text limits; VLA architectures and sim-to-real physics engines drive 272% surge in industrial robotic carapaces.",
+      "keyMetrics": ["+272% YoY humanoid/robotic shipments", "120 Hz visual-to-torque loop", "10 billion synthetic sim cycles"],
+      "relatedReelIds": ["reel-1786802669332"]
+    }
+  ]
+}
