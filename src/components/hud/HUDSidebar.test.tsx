@@ -108,8 +108,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
+      expect(document.body.style.overflow).toBe('')
     })
-    expect(document.body.style.overflow).toBe('')
   })
 
   it('closes mobile full-screen menu when Escape key is pressed', async () => {

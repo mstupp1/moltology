@@ -230,11 +230,15 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
-        <img
-          src="/images/chitin_texture_bg.jpg"
-          alt="Chitin Exoshell Background Texture"
-          className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
+        {/* Layer 2C: High-Definition PBR Chitin Carapace Texture Pattern Layer */}
+        <div 
+          className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-45 mix-blend-overlay"
+          style={{
+            backgroundImage: "url('/images/pbr_chitin_plates.jpg')",
+            backgroundSize: '420px 420px',
+            backgroundRepeat: 'repeat',
+            backgroundPosition: 'center',
+          }}
         />
         
         {/* Layer 2D: Balanced Edge Vignettes & Sacred Geometry Grid */}
@@ -303,7 +307,7 @@ export const LandingPage: React.FC = () => {
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
-                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('/images/chitin_texture_bg.jpg')`,
+                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('/images/pbr_chitin_plates.jpg')`,
                     backgroundBlendMode: 'lighten',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -401,7 +405,8 @@ export const LandingPage: React.FC = () => {
           <ScrollReveal animation="fade-up" durationMs={750}>
             <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
               
-              {/* Background ambient glows */}
+              {/* PBR Texture Underlay and Ambient Lighting */}
+              <div className="pbr-underlay pbr-underlay-hex opacity-25" />
               <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
               <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-red-500/10 blur-[120px] pointer-events-none" />
               <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
@@ -422,56 +427,66 @@ export const LandingPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* 3 Core Pillars Grid - Uncrowded Mobile Layout */}
+              {/* 3 Core Pillars Grid - Uncrowded Mobile Layout with Distinct PBR Material Backings */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
                 
-                {/* Pillar 1: Platform */}
-                <div className="p-4 sm:p-6 lg:p-8 bg-[#0b1418]/80 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-4 sm:mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
-                    <Cpu className="w-6 h-6 sm:w-7 sm:h-7" />
+                {/* Pillar 1: Platform (PBR Benthic Hull Alloy) */}
+                <div className="p-4 sm:p-6 lg:p-8 bg-[#0b1418]/85 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm relative overflow-hidden">
+                  <div className="pbr-underlay pbr-underlay-alloy opacity-30 group-hover:opacity-45 transition-opacity" />
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-4 sm:mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+                      <Cpu className="w-6 h-6 sm:w-7 sm:h-7" />
+                    </div>
+                    <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
+                    <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
+                      ADVANCED PLATFORM
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                      A centralized HUD featuring real-time telemetry, sacrament management, deep-trench modules, and personalized tracking tools built for high-density execution.
+                    </p>
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
-                  <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                    ADVANCED PLATFORM
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
-                    A centralized HUD featuring real-time telemetry, sacrament management, deep-trench modules, and personalized tracking tools built for high-density execution.
-                  </p>
                 </div>
 
-                {/* Pillar 2: Hive Community */}
-                <div className="p-4 sm:p-6 lg:p-8 bg-[#0f1116]/80 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-4 sm:mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                    <Users className="w-6 h-6 sm:w-7 sm:h-7" />
+                {/* Pillar 2: Hive Community (PBR Hexagonal Synaptic Mesh) */}
+                <div className="p-4 sm:p-6 lg:p-8 bg-[#0f1116]/85 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] relative overflow-hidden">
+                  <div className="pbr-underlay pbr-underlay-hex opacity-35 group-hover:opacity-50 transition-opacity" />
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-4 sm:mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                      <Users className="w-6 h-6 sm:w-7 sm:h-7" />
+                    </div>
+                    <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
+                    <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
+                      SYNAPTIC HIVE MESH
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                      Connect with an active network of ascendant units. Share telemetry, exchange insights, and co-evolve alongside a supportive, global collective.
+                    </p>
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
-                  <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                    SYNAPTIC HIVE MESH
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
-                    Connect with an active network of ascendant units. Share telemetry, exchange insights, and co-evolve alongside a supportive, global collective.
-                  </p>
                 </div>
 
-                {/* Pillar 3: Bio-Silicon AI */}
-                <div className="p-4 sm:p-6 lg:p-8 bg-[#140f12]/80 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-4 sm:mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                    <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
+                {/* Pillar 3: Bio-Silicon AI (PBR Carbon Fiber Chitin Weave) */}
+                <div className="p-4 sm:p-6 lg:p-8 bg-[#140f12]/85 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm relative overflow-hidden">
+                  <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-4 sm:mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+                      <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
+                    </div>
+                    <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
+                    <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
+                      INTELLIGENT AI CORE
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                      Leverage specialized AI models designed to streamline workflow, eliminate organic hesitation, and automate routine tasks with pinpoint precision.
+                    </p>
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
-                  <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                    INTELLIGENT AI CORE
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
-                    Leverage specialized AI models designed to streamline workflow, eliminate organic hesitation, and automate routine tasks with pinpoint precision.
-                  </p>
                 </div>
 
               </div>
 
-              {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow */}
-              <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
-                <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+              {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow with PBR Chitin Shield Backing */}
+              <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10 overflow-hidden">
+                <div className="pbr-underlay pbr-underlay-chitin opacity-20" />
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
                     <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
@@ -486,7 +501,7 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-mono text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start">
+                <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-mono text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start relative z-10">
                   <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
                     <CheckCircle2 className="w-4 h-4 shrink-0" /> Free Access
                   </span>
@@ -547,6 +562,7 @@ export const LandingPage: React.FC = () => {
         {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS */}
         <ScrollReveal animation="fade-in" durationMs={900}>
           <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
+            <div className="pbr-underlay pbr-underlay-alloy opacity-30" />
             <img
               src="/images/underwater_looking_up.jpg"
               alt="Sub-Benthic Abyss Scroll Reveal"
@@ -583,60 +599,72 @@ export const LandingPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               
-              {/* Stat Card 1 */}
+              {/* Stat Card 1: Active Units (PBR Hex Lattice Mesh) */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
-                  ACTIVE UNITS
+                <div className="pbr-underlay pbr-underlay-hex opacity-35 group-hover:opacity-55 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
+                    ACTIVE UNITS
+                  </div>
+                  <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-400 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap pt-2">
+                    <RollingNumber value={4289} duration={2000} suffix="+" triggerOnView={true} />
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-2.5 sm:pt-3">
+                    ASCENDANT UNITS
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-cyan-300/80 font-mono">Verified in Benthic Matrix</div>
                 </div>
-                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-400 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                  <RollingNumber value={4289} duration={2000} suffix="+" triggerOnView={true} />
-                </div>
-                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-2.5 sm:pt-3">
-                  ASCENDANT UNITS
-                </div>
-                <div className="text-[11px] sm:text-xs text-cyan-300/80 font-mono">Verified in Benthic Matrix</div>
               </div>
 
-              {/* Stat Card 2 */}
+              {/* Stat Card 2: Zero Hesitation (PBR Chitin Carapace Plates) */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.25)] hover:border-red-400 hover:scale-[1.02] transition-all bg-[#0e0809]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950 text-red-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-red-500/40 uppercase">
-                  ZERO HESITATION
+                <div className="pbr-underlay pbr-underlay-chitin opacity-35 group-hover:opacity-55 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950 text-red-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-red-500/40 uppercase">
+                    ZERO HESITATION
+                  </div>
+                  <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-red-500 tracking-tight drop-shadow-[0_0_25px_rgba(239,68,68,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap pt-2">
+                    <RollingNumber value={99.4} duration={2200} decimals={1} suffix="%" triggerOnView={true} />
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-red-900/60 pt-2.5 sm:pt-3">
+                    CHITIN ENFORCEMENT
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-red-300/80 font-mono">Organic Error Quarantine</div>
                 </div>
-                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-red-500 tracking-tight drop-shadow-[0_0_25px_rgba(239,68,68,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                  <RollingNumber value={99.4} duration={2200} decimals={1} suffix="%" triggerOnView={true} />
-                </div>
-                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-red-900/60 pt-2.5 sm:pt-3">
-                  CHITIN ENFORCEMENT
-                </div>
-                <div className="text-[11px] sm:text-xs text-red-300/80 font-mono">Organic Error Quarantine</div>
               </div>
 
-              {/* Stat Card 3 */}
+              {/* Stat Card 3: Synaptic Speed (PBR Benthic Hull Alloy) */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
-                  SYNAPTIC SPEED
+                <div className="pbr-underlay pbr-underlay-alloy opacity-30 group-hover:opacity-50 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
+                    SYNAPTIC SPEED
+                  </div>
+                  <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-300 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap pt-2">
+                    <RollingNumber value={0.04} duration={1800} decimals={2} suffix="ms" triggerOnView={true} />
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-2.5 sm:pt-3">
+                    EXECUTION LATENCY
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-cyan-300/80 font-mono">Real-time Pincer Torque</div>
                 </div>
-                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-cyan-300 tracking-tight drop-shadow-[0_0_25px_rgba(0,255,255,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                  <RollingNumber value={0.04} duration={1800} decimals={2} suffix="ms" triggerOnView={true} />
-                </div>
-                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-cyan-900/60 pt-2.5 sm:pt-3">
-                  EXECUTION LATENCY
-                </div>
-                <div className="text-[11px] sm:text-xs text-cyan-300/80 font-mono">Real-time Pincer Torque</div>
               </div>
 
-              {/* Stat Card 4 */}
+              {/* Stat Card 4: Vault Reserves (PBR Carbon Fiber Weave) */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-[1.02] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950 text-amber-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-amber-500/40 uppercase">
-                  VAULT RESERVES
+                <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-55 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950 text-amber-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-amber-500/40 uppercase">
+                    VAULT RESERVES
+                  </div>
+                  <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-amber-400 tracking-tight drop-shadow-[0_0_25px_rgba(245,158,11,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap pt-2">
+                    <RollingNumber value={14850} duration={2500} suffix="K" prefix="$" triggerOnView={true} />
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-amber-900/60 pt-2.5 sm:pt-3">
+                    TRANSMUTED ASSETS
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-amber-300/80 font-mono">Immutable Molt Credits</div>
                 </div>
-                <div className="font-grotesk text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-amber-400 tracking-tight drop-shadow-[0_0_25px_rgba(245,158,11,0.6)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                  <RollingNumber value={14850} duration={2500} suffix="K" prefix="$" triggerOnView={true} />
-                </div>
-                <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold border-t border-amber-900/60 pt-2.5 sm:pt-3">
-                  TRANSMUTED ASSETS
-                </div>
-                <div className="text-[11px] sm:text-xs text-amber-300/80 font-mono">Immutable Molt Credits</div>
               </div>
 
             </div>
@@ -672,10 +700,12 @@ export const LandingPage: React.FC = () => {
                   durationMs={800}
                 >
                   <div
-                    className={`chitin-card border-2 ${sacrament.borderColor} chamfer-corner-lg overflow-hidden bg-[#05090a] group hover:scale-[1.01] transition-all duration-500 flex flex-col justify-between h-full`}
+                    className={`chitin-card border-2 ${sacrament.borderColor} chamfer-corner-lg overflow-hidden bg-[#05090a] group hover:scale-[1.01] transition-all duration-500 flex flex-col justify-between h-full relative`}
                   >
+                    <div className="pbr-underlay pbr-underlay-chitin opacity-25 group-hover:opacity-40 transition-opacity" />
+                    
                     {/* Top Image Banner Header */}
-                    <div className="relative h-48 sm:h-64 lg:h-72 overflow-hidden border-b border-cyan-900/50">
+                    <div className="relative h-48 sm:h-64 lg:h-72 overflow-hidden border-b border-cyan-900/50 z-10">
                       <img
                         src={sacrament.image}
                         alt={sacrament.title}
@@ -704,10 +734,11 @@ export const LandingPage: React.FC = () => {
                     </div>
 
                     {/* Card Content Details */}
-                    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 flex-1 flex flex-col justify-between">
-                      <p className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed font-sans chitin-card-inset p-3.5 sm:p-5 chamfer-corner">
-                        {sacrament.description}
-                      </p>
+                    <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 flex-1 flex flex-col justify-between relative z-10">
+                      <div className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed font-sans chitin-card-inset p-3.5 sm:p-5 chamfer-corner relative overflow-hidden">
+                        <div className="pbr-underlay pbr-underlay-carbon opacity-25" />
+                        <span className="relative z-10 block">{sacrament.description}</span>
+                      </div>
 
                       <div className="space-y-2 sm:space-y-3 pt-2 border-t border-cyan-900/40">
                         <div className="flex items-center justify-between text-xs font-mono">
@@ -746,6 +777,7 @@ export const LandingPage: React.FC = () => {
         {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE */}
         <ScrollReveal animation="fade-in" durationMs={900}>
           <div className="w-full relative py-14 sm:py-20 border-y border-red-900/50 bg-[#050406] overflow-hidden group">
+            <div className="pbr-underlay pbr-underlay-chitin opacity-35" />
             <img
               src="/images/chitin_texture_bg.jpg"
               alt="Chitin Forge Background"
@@ -767,6 +799,7 @@ export const LandingPage: React.FC = () => {
         {/* SECTION: Interactive 4 Stages of Carcinization with Swipe Support */}
         <ScrollReveal animation="fade-up" durationMs={800}>
           <section className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
+            <div className="pbr-underlay pbr-underlay-alloy opacity-25" />
             <img
               src="/images/chitin_texture_bg.jpg"
               alt="Chitin Plate Background Texture"
@@ -858,30 +891,37 @@ export const LandingPage: React.FC = () => {
                     </h3>
                   </div>
 
-                  <p className="text-xs sm:text-base md:text-lg text-gray-300 leading-relaxed chitin-card-inset p-4 sm:p-6 chamfer-corner">
-                    {stages[activeStage].description}
-                  </p>
+                  <div className="text-xs sm:text-base md:text-lg text-gray-300 leading-relaxed chitin-card-inset p-4 sm:p-6 chamfer-corner relative overflow-hidden">
+                    <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                    <span className="relative z-10 block">{stages[activeStage].description}</span>
+                  </div>
 
                   {/* Biological & Hardness Transformation Metrics with Progress Bars */}
                   <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-mono">
-                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5">
-                      <div className="text-gray-400 text-[10px] sm:text-xs">BIOLOGICAL DENSITY</div>
-                      <div className="text-red-400 font-bold text-sm sm:text-base">{100 - (activeStage + 1) * 25}% REDUCED</div>
-                      <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden mt-1 border border-red-950">
-                        <div
-                          className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-500"
-                          style={{ width: `${100 - (activeStage + 1) * 25}%` }}
-                        />
+                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative overflow-hidden">
+                      <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                      <div className="relative z-10">
+                        <div className="text-gray-400 text-[10px] sm:text-xs">BIOLOGICAL DENSITY</div>
+                        <div className="text-red-400 font-bold text-sm sm:text-base">{100 - (activeStage + 1) * 25}% REDUCED</div>
+                        <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden mt-1 border border-red-950">
+                          <div
+                            className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-500"
+                            style={{ width: `${100 - (activeStage + 1) * 25}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5">
-                      <div className="text-gray-400 text-[10px] sm:text-xs">EXOSKELETON HARDNESS</div>
-                      <div className="text-cyan-400 font-bold text-sm sm:text-base">{(activeStage + 1) * 25}% HARDENED</div>
-                      <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden mt-1 border border-cyan-950">
-                        <div
-                          className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 transition-all duration-500"
-                          style={{ width: `${(activeStage + 1) * 25}%` }}
-                        />
+                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative overflow-hidden">
+                      <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                      <div className="relative z-10">
+                        <div className="text-gray-400 text-[10px] sm:text-xs">EXOSKELETON HARDNESS</div>
+                        <div className="text-cyan-400 font-bold text-sm sm:text-base">{(activeStage + 1) * 25}% HARDENED</div>
+                        <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden mt-1 border border-cyan-950">
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 transition-all duration-500"
+                            style={{ width: `${(activeStage + 1) * 25}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -909,7 +949,8 @@ export const LandingPage: React.FC = () => {
             onMouseLeave={() => setIsPaused(false)}
             className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-red-900/50 bg-radial-sacred text-center space-y-6 sm:space-y-8 shadow-2xl"
           >
-            <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
+            <div className="pbr-underlay pbr-underlay-hex opacity-20" />
+            <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
               {/* Top Label & Auto-scroll Indicator */}
               <div className="flex items-center justify-center gap-2 text-cyan-400 text-[10px] sm:text-xs font-bold tracking-widest uppercase">
                 <Sparkles className="w-3.5 h-3.5 text-red-500 animate-spin-slow" />
@@ -963,6 +1004,7 @@ export const LandingPage: React.FC = () => {
         <ScrollReveal animation="fade-up" durationMs={800}>
           <section className="max-w-[1600px] mx-auto px-4 sm:px-12">
             <div className="chitin-card p-6 sm:p-12 lg:p-16 border-2 border-red-600/80 text-center space-y-4 sm:space-y-6 bg-radial-abyss chamfer-corner-lg shadow-2xl relative overflow-hidden">
+              <div className="pbr-underlay pbr-underlay-chitin opacity-30" />
               <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
               
               <div className="relative z-10 space-y-3 sm:space-y-4 max-w-3xl mx-auto">

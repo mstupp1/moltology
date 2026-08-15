@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 
 export interface HudCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'cyan' | 'teal' | 'crimson' | 'dark' | 'ghost'
+  texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'none'
   glow?: boolean
   showCornerBrackets?: boolean
   interactive?: boolean
@@ -13,6 +14,7 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
     {
       children,
       variant = 'teal',
+      texture = 'none',
       glow = false,
       showCornerBrackets = false,
       interactive = false,
@@ -29,6 +31,14 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
       ghost: 'border-[#3a4a49]/40 bg-transparent text-[#dfe3e3]',
     }[variant]
 
+    const textureClass = {
+      chitin: 'texture-pbr-chitin',
+      hex: 'texture-pbr-hex',
+      alloy: 'texture-pbr-alloy',
+      carbon: 'texture-pbr-carbon',
+      none: '',
+    }[texture]
+
     const glowMap = {
       teal: 'shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_12px_rgba(0,195,255,0.2)]',
       cyan: 'shadow-[0_4px_20px_rgba(0,0,0,0.6),0_0_18px_rgba(0,195,255,0.35)]',
@@ -43,6 +53,7 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
         className={cn(
           'relative border rounded-none backdrop-blur-md transition-all duration-200',
           borderVariantMap,
+          textureClass,
           glow && glowMap,
           interactive && 'hover:border-[#00c3ff]/80 hover:shadow-[0_0_16px_rgba(0,195,255,0.3)] hover:-translate-y-0.5 cursor-pointer',
           className
