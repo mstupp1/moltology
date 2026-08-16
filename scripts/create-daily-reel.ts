@@ -314,7 +314,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   const voice = options.voice || 'en-US-ChristopherNeural'
   const ttsResult = await generateVoiceover(scriptData.narrationScript, {
     voice,
-    rate: '+8%',
+    rate: '+12%',
     outputDir: tempDir,
     outputFilename: 'narration.mp3',
   })
@@ -403,26 +403,28 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     console.log(`\n6️⃣ [Dry Run] Skipped S3 upload. Master video saved at: ${masterReelPath}`)
   }
 
-  // 7. Record to Social History Ledger
-  recordReelInHistory({
-    id: `reel-${timestamp}`,
-    topic: scriptData.topic,
-    hookHeadline: scriptData.hookHeadline,
-    holidayOrEvent: scriptData.holidayOrEvent || null,
-    relatedBlogSlug: scriptData.relatedBlogSlug || null,
-    characterArc: scriptData.characterArc,
-    narrationScript: scriptData.narrationScript,
-    s3Url: publicUrl || null,
-    s3Key: s3Key || null,
-    thumbnailUrl: publicThumbnailUrl || null,
-    s3ThumbKey: s3ThumbKey || null,
-    durationSeconds: compositeResult.durationSeconds,
-    status: options.publishNow ? 'published' : 'draft',
-    isAiGenerated: true,
-    firstComment: scriptData.firstComment,
-    caption: scriptData.caption,
-    hashtags: scriptData.hashtags,
-  })
+  // 7. Record to Social History Ledger (Skip on dry-run)
+  if (!options.dryRun) {
+    recordReelInHistory({
+      id: `reel-${timestamp}`,
+      topic: scriptData.topic,
+      hookHeadline: scriptData.hookHeadline,
+      holidayOrEvent: scriptData.holidayOrEvent || null,
+      relatedBlogSlug: scriptData.relatedBlogSlug || null,
+      characterArc: scriptData.characterArc,
+      narrationScript: scriptData.narrationScript,
+      s3Url: publicUrl || null,
+      s3Key: s3Key || null,
+      thumbnailUrl: publicThumbnailUrl || null,
+      s3ThumbKey: s3ThumbKey || null,
+      durationSeconds: compositeResult.durationSeconds,
+      status: options.publishNow ? 'published' : 'draft',
+      isAiGenerated: true,
+      firstComment: scriptData.firstComment,
+      caption: scriptData.caption,
+      hashtags: scriptData.hashtags,
+    })
+  }
 
   console.log(`\n======================================================`)
   console.log(`✨ REEL GENERATION COMPLETE!`)
