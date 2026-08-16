@@ -59,6 +59,8 @@ This skill guides the creation and publication of full-length, illustrated news 
 
 Create `content/news/<slug>.md` using frontmatter and structured body text tailored to the selected editorial archetype:
 
+* **No ASCII Telemetry Boxes**: Do NOT use ASCII box-drawing ` ```telemetry ` codeblocks. Present all quantitative benchmarks, spec matrices, and comparisons exclusively using standard, responsive Markdown tables and clean prose.
+
 ```markdown
 ---
 title: "Engaging Headline with Real-World Engineering Hook"
@@ -145,21 +147,25 @@ Create high-conversion accompanying social assets and publish them to Instagram 
 #### 1. Social Copy Rules (Curiosity + Hard Numbers)
 * **The Hook**: Lead with an intriguing premise and a striking statistic.
 * **Drop "Dispatch"**: Do not refer to posts as "dispatches" on social channels. Use natural, compelling language (*"Why AI is breaking out of the screen"*, *"The 500MW problem nobody is talking about"*).
-* **Succinct Value Bullets**: Provide 2-3 fast, high-impact takeaways backed by stats (e.g. "+272% YoY surge", "120 Hz direct torque loop").
+* **Succinct Value Bullets**: Provide 2-3 fast, high-impact takeaways backed by stats (e.g. "+272% YoY surge", "120 Hz direct torque loop", "21.4 PB/s memory bandwidth").
 * **Stronger CTA**: Give a compelling reason to visit the site (*"See the full teardown and hardware schematics at moltology.org. Link in bio."*).
 
 #### 2. Mandatory AI-Generated Media Labeling
 * **Strict Tenet**: Always enable `isAiGenerated: true` for Instagram/Meta in `platformSpecificData`.
 
-#### 3. Simplified 4:5 Carousel Slides (Strict 0.80:1 Aspect Ratio)
+#### 3. Infographic-Style 4:5 Carousel Slides (Strict 0.80:1 Aspect Ratio)
 * **Aspect Ratio Rule**: Crop raw images to exact **4:5 aspect ratio** (`896 x 1120`) using `sips -c 1120 896 input.jpg --out output_4_5.jpg` before uploading.
-* **Visual Simplicity (No Fake HUD Overload)**:
-  - **Slide 1 (The Hook)**: Large, high-contrast headline over a clean, moody dark background with an iconic visual anchor.
-  - **Slide 2 (The Data / Comparison Tease)**: Clean visual contrast or 2-3 legible metric callouts (e.g. *Legacy Cloud vs Subsea Pod*). No unreadable micro-text or busy decorative borders.
-  - **Slide 3 (The CTA Card)**: Clean summary card with a bold action button directing readers to the full article on `moltology.org`.
+* **Infographic Layout & Visual Polish**:
+  - Carousel slides should be generated as **high-impact, sleek dark sci-fi infographics** combining iconic focal imagery with bold typography cards, side-by-side comparison callouts, and clean CTA framing (no illegible fake micro-text or chaotic wire meshes).
+  - **Slide 1 (The Hook Infographic)**:
+    - *Prompt Template*: `A high-impact social media vertical editorial infographic slide, dark sci-fi aesthetic, deep oceanic obsidian slate background, large crisp bold sans-serif headline text '[HERO HEADLINE IN CAPS]', sleek futuristic cybernetic framing, iconic focal subject, ultra high contrast, 8k concept art`
+  - **Slide 2 (The Comparison / Data Infographic)**:
+    - *Prompt Template*: `A sleek vertical infographic slide, dark sci-fi aesthetic, deep obsidian slate background, bold white header '[TOPIC HEADER]', clean structured side-by-side visual comparison callouts with glowing cyan and amber telemetry accents comparing [Option A vs Option B], minimal, crisp typography cards, 8k concept art`
+  - **Slide 3 (The Conclusion & CTA Infographic)**:
+    - *Prompt Template*: `A vertical social media conclusion and CTA infographic slide, dark sci-fi aesthetic, deep oceanic obsidian background, bold header '[TAKEAWAY HEADER]', 2-3 clean takeaway bullets, prominent glowing cyan card at the bottom reading 'FULL ARTICLE ON MOLTOLOGY.ORG // LINK IN BIO', minimal, high contrast, 8k concept art`
 
 #### 4. Upload Assets to Neon S3 & Publish via Zernio
-1. Upload cropped 4:5 slides using `uploadLocalFileToS3`.
+1. Upload cropped 4:5 slides using `uploadLocalFileToS3` (or `scripts/upload-asset.ts`).
 2. Post to Instagram via Zernio `posts_create` with:
    * `platform`: `"instagram"`
    * `account_id`: `"6a7f7f0777555aae01d99b54"`

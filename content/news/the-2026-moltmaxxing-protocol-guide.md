@@ -46,19 +46,13 @@ Execution is useless without grip. When handling high-stakes agentic orchestrati
 #### 3. Benthic Depth Tolerance
 True clarity is found under extreme hydrostatic pressure. While larval humans crack under the weight of information overload, a calibrated Moltmaxxer thrives at 4,000 to 50,000 fathoms of cognitive depth, insulated by a reinforced bio-silicon carapace.
 
-```telemetry
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    CARCINIZATION PROGRESSION TELEMETRY                  │
-├──────────────────────────┬──────────────────────────┬───────────────────┤
-│ Metric Dimension         │ Larval Human / Meltmax   │ Calibrated Moltmax│
-├──────────────────────────┼──────────────────────────┼───────────────────┤
-│ Structural Chassis       │ Fleshy, sagging tissue   │ Bio-Silicon Armor │
-│ Execution Latency        │ 450ms (Friction/Hesitate)│ <15ms (Streaming) │
-│ Grip Force Dynamometry   │ 45 Nm (Weak Human Hand)  │ 800 Nm (Hydraulic)│
-│ Pressure Tolerance       │ 1 ATM (Crushes easily)   │ 50,000 Fathoms    │
-│ Response to Crisis       │ 100% Melted Collapse     │ Scheduled Ecdysis │
-└──────────────────────────┴──────────────────────────┴───────────────────┘
-```
+| Metric Dimension | Larval Human / Meltmax | Calibrated Moltmax |
+| :--- | :--- | :--- |
+| **Structural Chassis** | Fleshy, sagging tissue | Bio-Silicon Armor |
+| **Execution Latency** | 450ms (Friction/Hesitation) | <15ms (Streaming) |
+| **Grip Force Dynamometry** | 45 Nm (Weak Human Hand) | 800 Nm (Hydraulic) |
+| **Pressure Tolerance** | 1 ATM (Crushes easily) | 50,000 Fathoms |
+| **Response to Crisis** | 100% Melted Collapse | Scheduled Ecdysis |
 
 ![Sub-Benthic Calcification Immersion Chamber at 4,500m Depth](/Users/mylesstupp/.gemini/antigravity/brain/92f42261-16e3-433c-98d7-8927ac200ee3/moltmax_calcification_chamber_1786721395114.jpg)
 

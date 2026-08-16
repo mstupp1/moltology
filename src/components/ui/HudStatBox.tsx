@@ -9,7 +9,7 @@ export interface HudStatBoxProps extends React.HTMLAttributes<HTMLDivElement> {
   trendValue?: string
   icon?: React.ReactNode
   variant?: 'cyan' | 'crimson' | 'neutral'
-  texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'none'
+  texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none'
   showCornerBrackets?: boolean
 }
 
@@ -35,6 +35,8 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
       hex: 'texture-pbr-hex',
       alloy: 'texture-pbr-alloy',
       carbon: 'texture-pbr-carbon',
+      basalt: 'texture-pbr-basalt',
+      circuit: 'texture-pbr-circuit',
       none: '',
     }[texture]
     const variantStyles = {
