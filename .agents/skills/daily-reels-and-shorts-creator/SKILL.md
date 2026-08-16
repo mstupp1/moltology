@@ -17,8 +17,10 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 * **Instagram Reels Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
 * **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
-* **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural` / `en-US-GuyNeural`) + Ducked Benthic Synth Soundtrack (`public/audio/benthic-ambient-loop.mp3`)
-* **Visual Polish**: Sleek bottom-right `MOLTOLOGY` brand watermark, 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 2.5s high-end Cybernetic Benthic CTA outro card
+* **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural` / `en-US-GuyNeural`, `+12%` rate) + Subtle Pure Instrumental Benthic Drone (`public/audio/benthic-ambient-loop.mp3`, `volume=0.08`, zero vocal singing)
+* **Visual Polish**: Sleek bottom-right `MOLTOLOGY` brand watermark, 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card
+* **CTA Outro Design**: Minimalist and on-brand—centered glowing Moltology Emblem, brand title, bold mantra (`SUBMIT. SHED. ASCEND.`), subheadline (`JOIN THE SYNAPTIC PATH`), and glowing URL button (`moltology.org →`). Avoid excessive jargon like protocol codes and avoid unnecessary top badges.
+* **Timing & Padding Rule**: Scene clips are dynamically scaled/looped via FFmpeg (`-stream_loop -1`) to match `voDuration + 0.8s` breathing room before the CTA outro card begins, guaranteeing zero narration cutoff.
 * **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`)
 * **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`)
 * **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`)
@@ -87,7 +89,7 @@ npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-l
 ---
 
 ### Step 5: FFmpeg Master Compositing & Outro Staging
-Run the master compositor to stitch scenes, mix ducked background audio, overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the 2.5s cybernetic CTA outro card:
+Run the master compositor to dynamically size/loop video scenes to match voiceover length (`voDuration + 0.8s`), mix subtle instrumental benthic background drone (`volume=0.08`), overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the clean 2.5s cybernetic CTA outro card:
 
 ```typescript
 import { compositeReel } from 'scripts/lib/reel-compositor'

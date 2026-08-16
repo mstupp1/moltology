@@ -233,6 +233,9 @@ export async function renderKineticCaptionCard(
 /**
  * Generate Cybernetic Benthic CTA Outro Video (matches moltology.org design language)
  */
+/**
+ * Generate Cybernetic Benthic CTA Outro Video (matches moltology.org design language)
+ */
 export async function renderCtaOutroVideo(
   outputPath: string,
   durationSeconds = 2.5,
@@ -253,7 +256,7 @@ export async function renderCtaOutroVideo(
   ctx.fillRect(0, 0, 1080, 1920)
 
   // 2. Central Benthic Cyan Light Flare
-  const radialGlow = ctx.createRadialGradient(540, 680, 20, 540, 680, 480)
+  const radialGlow = ctx.createRadialGradient(540, 640, 20, 540, 640, 520)
   radialGlow.addColorStop(0, 'rgba(0, 220, 255, 0.22)')
   radialGlow.addColorStop(0.5, 'rgba(0, 150, 255, 0.08)')
   radialGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
@@ -266,9 +269,9 @@ export async function renderCtaOutroVideo(
     ctx.fillRect(0, y, 1080, 4)
   }
 
-  // 4. Concentric Cyber-Radar Orbital Rings around Centerpiece (Y = 680)
+  // 4. Concentric Cyber-Radar Orbital Rings around Centerpiece (Y = 640)
   const centerX = 540
-  const centerY = 680
+  const centerY = 640
 
   // Inner ring
   ctx.strokeStyle = 'rgba(0, 255, 255, 0.35)'
@@ -295,7 +298,7 @@ export async function renderCtaOutroVideo(
   ctx.stroke()
   ctx.setLineDash([])
 
-  // 5. Draw Center Emblem (Order Emblem or Ascended Claw)
+  // 5. Draw Center Emblem (Order Emblem)
   const emblemPath = path.resolve(process.cwd(), 'public/images/order_emblem.png')
   if (fs.existsSync(emblemPath)) {
     const emblemImg = await loadImage(emblemPath)
@@ -305,59 +308,37 @@ export async function renderCtaOutroVideo(
     ctx.shadowBlur = 0
   }
 
-  // 6. Top Category Pill (Y = 320)
-  const topPillW = 380
-  const topPillH = 46
-  const topPillX = 540 - topPillW / 2
-  const topPillY = 320
-
-  ctx.fillStyle = 'rgba(6, 182, 212, 0.14)'
-  ctx.beginPath()
-  ctx.roundRect(topPillX, topPillY, topPillW, topPillH, 14)
-  ctx.fill()
-
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.45)'
-  ctx.lineWidth = 1.5
-  ctx.stroke()
-
-  // Pulsing cyan indicator dot
-  ctx.fillStyle = '#00ffff'
-  ctx.shadowColor = '#00ffff'
-  ctx.shadowBlur = 10
-  ctx.beginPath()
-  ctx.arc(topPillX + 28, topPillY + 23, 6, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.shadowBlur = 0
-
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'middle'
-  ctx.fillStyle = '#38bdf8'
-  ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillText('THE SYNAPTIC PATH // ASCENSION', topPillX + 46, topPillY + 23)
-
-  // 7. Main Headline: SUBMIT. SHED. ASCEND. (Y = 1080)
+  // 6. Brand Name below emblem (Y = 930)
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.font = '900 66px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.font = '900 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(0, 255, 255, 0.5)'
+  ctx.shadowBlur = 16
+  ctx.fillText('MOLTOLOGY', 540, 930)
+  ctx.shadowBlur = 0
+
+  // 7. Main Headline: SUBMIT. SHED. ASCEND. (Y = 1040)
+  ctx.font = '900 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.fillStyle = '#ffffff'
   ctx.shadowColor = 'rgba(0, 255, 255, 0.65)'
   ctx.shadowBlur = 24
-  ctx.fillText(headline, 540, 1080)
+  ctx.fillText(headline, 540, 1040)
   ctx.shadowBlur = 0
 
-  // 8. Subheadline (Y = 1150)
-  ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  // 8. Subheadline (Y = 1120)
+  ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.fillStyle = '#f59e0b' // Amber accent
   ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
   ctx.shadowBlur = 8
-  ctx.fillText(subheadline, 540, 1150)
+  ctx.fillText(subheadline, 540, 1120)
   ctx.shadowBlur = 0
 
-  // 9. Interactive-Style CTA Action Button (Y = 1240)
+  // 9. Interactive-Style CTA Action Button (Y = 1230)
   const btnW = 620
   const btnH = 108
   const btnX = 540 - btnW / 2
-  const btnY = 1240
+  const btnY = 1230
   const btnRadius = 22
 
   // Button background fill
@@ -404,11 +385,6 @@ export async function renderCtaOutroVideo(
   ctx.shadowBlur = 0
   ctx.fillText('ACCESS FULL TELEMETRY & CODEX', 540, btnY + 78)
 
-  // 10. Bottom Telemetry Protocol Code (Y = 1420)
-  ctx.font = 'bold 16px monospace'
-  ctx.fillStyle = '#64748b'
-  ctx.fillText('[ PROTOCOL: HARDWARE_ECDYSIS // 2026 ]', 540, 1420)
-
   // Save Outro Image Frame
   const outroFramePath = outputPath.replace(/\.mp4$/, '-frame.png')
   fs.writeFileSync(outroFramePath, canvas.toBuffer('image/png'))
@@ -443,7 +419,7 @@ export async function renderCtaOutroVideo(
 }
 
 /**
- * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps
+ * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps with target duration loop support
  */
 export async function normalizeVideoClip(
   inputPath: string,
@@ -451,9 +427,13 @@ export async function normalizeVideoClip(
   targetDuration?: number
 ): Promise<string> {
   const vf = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
-  const args = ['-y', '-i', inputPath, '-vf', vf, '-c:v', 'libx264', '-an']
+  const args = ['-y']
   if (targetDuration) {
-    args.push('-t', targetDuration.toString())
+    args.push('-stream_loop', '-1')
+  }
+  args.push('-i', inputPath, '-vf', vf, '-c:v', 'libx264', '-an')
+  if (targetDuration) {
+    args.push('-t', targetDuration.toFixed(3))
   }
   args.push(outputPath)
   await runFfmpeg(args)
@@ -472,7 +452,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
 
   console.log(`\n🎞️  Assembling Master Instagram Reel in: ${tempDir}`)
 
-  // 1. Measure voiceover audio duration
+  // 1. Measure voiceover audio duration accurately
   let voDuration = 10
   try {
     voDuration = await getMediaDuration(options.voiceoverPath)
@@ -481,12 +461,21 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     console.warn(`   ⚠️ Could not measure voiceover duration, defaulting to 10s`)
   }
 
-  // 2. Normalize video clips to 1080x1920 30fps
+  // Ensure speech has a comfortable post-voiceover breathing buffer (0.8s) before CTA outro appears
+  const postSpeechBuffer = 0.8
+  const requiredSpeechDuration = voDuration + postSpeechBuffer
+  const numClips = Math.max(1, options.videoClips.length)
+  const perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)
+  const totalSceneDuration = perClipDuration * numClips
+
+  console.log(`   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips @ ${perClipDuration.toFixed(2)}s each)`)
+
+  // 2. Normalize video clips to exact target duration (seamlessly looping shorter clips)
   const normalizedClips: string[] = []
   for (let i = 0; i < options.videoClips.length; i++) {
     const normPath = path.join(tempDir, `norm-clip-${i}.mp4`)
-    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length}...`)
-    await normalizeVideoClip(options.videoClips[i], normPath)
+    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${perClipDuration.toFixed(2)}s)...`)
+    await normalizeVideoClip(options.videoClips[i], normPath, perClipDuration)
     normalizedClips.push(normPath)
   }
 
@@ -562,7 +551,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       }
 
       // Don't show captions into the CTA outro card
-      const maxCaptionSec = Math.max(0, totalVideoDuration - ctaDuration - 0.2)
+      const maxCaptionSec = Math.max(0, totalSceneDuration - 0.1)
       if (startSec >= maxCaptionSec) continue
       endSec = Math.min(endSec, maxCaptionSec)
 
@@ -587,7 +576,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   })
 
   // Filter complex construction: Watermark stays up until CTA outro begins
-  let filterStr = `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalVideoDuration - ctaDuration})'[v1]`
+  let filterStr = `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1]`
   let lastOut = 'v1'
 
   overlayEvents.forEach((ev, idx) => {
@@ -630,7 +619,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   console.log(`   • Mixing voiceover audio and ambient benthic soundtrack...`)
 
   if (fs.existsSync(bgAudioPath)) {
-    // Mix Voiceover (input 1 with audio padding) + Ducked BG Music (input 2)
+    // Mix Voiceover (input 1 with audio padding) + Subtle Ducked Ambient BG (input 2)
     await runFfmpeg([
       '-y',
       '-i',
@@ -642,7 +631,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       '-i',
       bgAudioPath,
       '-filter_complex',
-      `[1:a]apad=pad_dur=2[vo];[2:a]volume=0.14,afade=t=in:ss=0:d=0.5,afade=t=out:st=${Math.max(0, totalVideoDuration - 1.5)}:d=1.5[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
+      `[1:a]apad=pad_dur=3[vo];[2:a]volume=0.08,afade=t=in:ss=0:d=0.5,afade=t=out:st=${Math.max(0, totalVideoDuration - 1.2)}:d=1.2[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
       '-map',
       '0:v',
       '-map',
