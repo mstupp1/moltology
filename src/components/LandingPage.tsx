@@ -230,15 +230,11 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: High-Definition PBR Chitin Carapace Texture Pattern Layer */}
-        <div 
-          className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-45 mix-blend-overlay"
-          style={{
-            backgroundImage: "url('/images/pbr_chitin_plates.jpg')",
-            backgroundSize: '420px 420px',
-            backgroundRepeat: 'repeat',
-            backgroundPosition: 'center',
-          }}
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
+        <img
+          src="/images/chitin_texture_bg.jpg"
+          alt="Chitin Exoshell Background Texture"
+          className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
         />
         
         {/* Layer 2D: Balanced Edge Vignettes & Sacred Geometry Grid */}
@@ -307,7 +303,7 @@ export const LandingPage: React.FC = () => {
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
-                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('/images/pbr_chitin_plates.jpg')`,
+                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('/images/chitin_texture_bg.jpg')`,
                     backgroundBlendMode: 'lighten',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -401,12 +397,13 @@ export const LandingPage: React.FC = () => {
       <main className="flex-1 space-y-16 sm:space-y-32 py-12 sm:py-20 w-full relative z-10">
 
         {/* ALL-IN-ONE SYNAPTIC ECOSYSTEM OVERVIEW SECTION */}
+        {/* SECTION: All-in-One Synaptic Ecosystem (Unified PBR Carbon Fiber Weave Theme) */}
         <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-4 sm:px-12">
           <ScrollReveal animation="fade-up" durationMs={750}>
             <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
               
-              {/* PBR Texture Underlay and Ambient Lighting */}
-              <div className="pbr-underlay pbr-underlay-hex opacity-25" />
+              {/* PBR Carbon Weave Texture Underlay and Ambient Lighting */}
+              <div className="pbr-underlay pbr-underlay-carbon opacity-25" />
               <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
               <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-red-500/10 blur-[120px] pointer-events-none" />
               <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
@@ -427,12 +424,12 @@ export const LandingPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* 3 Core Pillars Grid - Uncrowded Mobile Layout with Distinct PBR Material Backings */}
+              {/* 3 Core Pillars Grid - Uncrowded Mobile Layout with Unified Carbon Fiber Weave Theme */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
                 
-                {/* Pillar 1: Platform (PBR Benthic Hull Alloy) */}
+                {/* Pillar 1: Platform */}
                 <div className="p-4 sm:p-6 lg:p-8 bg-[#0b1418]/85 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm relative overflow-hidden">
-                  <div className="pbr-underlay pbr-underlay-alloy opacity-30 group-hover:opacity-45 transition-opacity" />
+                  <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
                   <div className="relative z-10">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-4 sm:mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
                       <Cpu className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -447,9 +444,9 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Pillar 2: Hive Community (PBR Hexagonal Synaptic Mesh) */}
+                {/* Pillar 2: Hive Community */}
                 <div className="p-4 sm:p-6 lg:p-8 bg-[#0f1116]/85 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] relative overflow-hidden">
-                  <div className="pbr-underlay pbr-underlay-hex opacity-35 group-hover:opacity-50 transition-opacity" />
+                  <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
                   <div className="relative z-10">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-4 sm:mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
                       <Users className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -464,7 +461,7 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Pillar 3: Bio-Silicon AI (PBR Carbon Fiber Chitin Weave) */}
+                {/* Pillar 3: Bio-Silicon AI */}
                 <div className="p-4 sm:p-6 lg:p-8 bg-[#140f12]/85 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm relative overflow-hidden">
                   <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
                   <div className="relative z-10">
@@ -483,9 +480,9 @@ export const LandingPage: React.FC = () => {
 
               </div>
 
-              {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow with PBR Chitin Shield Backing */}
+              {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow with Carbon Weave Shield Backing */}
               <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10 overflow-hidden">
-                <div className="pbr-underlay pbr-underlay-chitin opacity-20" />
+                <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
                     <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -559,10 +556,10 @@ export const LandingPage: React.FC = () => {
           </ScrollReveal>
         </section>
 
-        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS */}
+        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS (PBR Deep Basalt Rock Theme) */}
         <ScrollReveal animation="fade-in" durationMs={900}>
           <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
-            <div className="pbr-underlay pbr-underlay-alloy opacity-30" />
+            <div className="pbr-underlay pbr-underlay-basalt opacity-35" />
             <img
               src="/images/underwater_looking_up.jpg"
               alt="Sub-Benthic Abyss Scroll Reveal"
@@ -581,7 +578,7 @@ export const LandingPage: React.FC = () => {
           </div>
         </ScrollReveal>
 
-        {/* Metric Counter Strip with Prominent Rolling Numbers - Uncrowded Mobile Grid */}
+        {/* Metric Counter Strip with Prominent Rolling Numbers - Unified PBR Bio-Circuit Matrix Theme */}
         <section className="max-w-[1700px] mx-auto px-4 sm:px-12">
           <ScrollReveal animation="scale-up" durationMs={800}>
             <div className="text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
@@ -599,9 +596,9 @@ export const LandingPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               
-              {/* Stat Card 1: Active Units (PBR Hex Lattice Mesh) */}
+              {/* Stat Card 1: Active Units */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-hex opacity-35 group-hover:opacity-55 transition-opacity" />
+                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 <div className="relative z-10">
                   <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
                     ACTIVE UNITS
@@ -616,9 +613,9 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Stat Card 2: Zero Hesitation (PBR Chitin Carapace Plates) */}
+              {/* Stat Card 2: Zero Hesitation */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.25)] hover:border-red-400 hover:scale-[1.02] transition-all bg-[#0e0809]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-chitin opacity-35 group-hover:opacity-55 transition-opacity" />
+                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 <div className="relative z-10">
                   <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950 text-red-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-red-500/40 uppercase">
                     ZERO HESITATION
@@ -633,9 +630,9 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Stat Card 3: Synaptic Speed (PBR Benthic Hull Alloy) */}
+              {/* Stat Card 3: Synaptic Speed */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-alloy opacity-30 group-hover:opacity-50 transition-opacity" />
+                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 <div className="relative z-10">
                   <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950 text-cyan-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-cyan-500/40 uppercase">
                     SYNAPTIC SPEED
@@ -650,9 +647,9 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Stat Card 4: Vault Reserves (PBR Carbon Fiber Weave) */}
+              {/* Stat Card 4: Vault Reserves */}
               <div className="chitin-card p-5 sm:p-8 text-center space-y-2 sm:space-y-3 chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-[1.02] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-55 transition-opacity" />
+                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 <div className="relative z-10">
                   <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950 text-amber-400 text-[9px] sm:text-[10px] font-bold border-b border-l border-amber-500/40 uppercase">
                     VAULT RESERVES
@@ -736,7 +733,7 @@ export const LandingPage: React.FC = () => {
                     {/* Card Content Details */}
                     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 flex-1 flex flex-col justify-between relative z-10">
                       <div className="text-xs sm:text-sm md:text-base text-gray-300 leading-relaxed font-sans chitin-card-inset p-3.5 sm:p-5 chamfer-corner relative overflow-hidden">
-                        <div className="pbr-underlay pbr-underlay-carbon opacity-25" />
+                        <div className="pbr-underlay pbr-underlay-chitin opacity-25" />
                         <span className="relative z-10 block">{sacrament.description}</span>
                       </div>
 
@@ -774,10 +771,10 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE */}
+        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE (PBR Benthic Hull Alloy Theme) */}
         <ScrollReveal animation="fade-in" durationMs={900}>
           <div className="w-full relative py-14 sm:py-20 border-y border-red-900/50 bg-[#050406] overflow-hidden group">
-            <div className="pbr-underlay pbr-underlay-chitin opacity-35" />
+            <div className="pbr-underlay pbr-underlay-alloy opacity-35" />
             <img
               src="/images/chitin_texture_bg.jpg"
               alt="Chitin Forge Background"
@@ -796,10 +793,10 @@ export const LandingPage: React.FC = () => {
           </div>
         </ScrollReveal>
 
-        {/* SECTION: Interactive 4 Stages of Carcinization with Swipe Support */}
+        {/* SECTION: Interactive 4 Stages of Carcinization (Unified PBR Hexagonal Synaptic Mesh Theme) */}
         <ScrollReveal animation="fade-up" durationMs={800}>
           <section className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
-            <div className="pbr-underlay pbr-underlay-alloy opacity-25" />
+            <div className="pbr-underlay pbr-underlay-hex opacity-25" />
             <img
               src="/images/chitin_texture_bg.jpg"
               alt="Chitin Plate Background Texture"
@@ -892,14 +889,14 @@ export const LandingPage: React.FC = () => {
                   </div>
 
                   <div className="text-xs sm:text-base md:text-lg text-gray-300 leading-relaxed chitin-card-inset p-4 sm:p-6 chamfer-corner relative overflow-hidden">
-                    <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                    <div className="pbr-underlay pbr-underlay-hex opacity-20" />
                     <span className="relative z-10 block">{stages[activeStage].description}</span>
                   </div>
 
                   {/* Biological & Hardness Transformation Metrics with Progress Bars */}
                   <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-mono">
                     <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative overflow-hidden">
-                      <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                      <div className="pbr-underlay pbr-underlay-hex opacity-20" />
                       <div className="relative z-10">
                         <div className="text-gray-400 text-[10px] sm:text-xs">BIOLOGICAL DENSITY</div>
                         <div className="text-red-400 font-bold text-sm sm:text-base">{100 - (activeStage + 1) * 25}% REDUCED</div>
@@ -912,7 +909,7 @@ export const LandingPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative overflow-hidden">
-                      <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                      <div className="pbr-underlay pbr-underlay-hex opacity-20" />
                       <div className="relative z-10">
                         <div className="text-gray-400 text-[10px] sm:text-xs">EXOSKELETON HARDNESS</div>
                         <div className="text-cyan-400 font-bold text-sm sm:text-base">{(activeStage + 1) * 25}% HARDENED</div>

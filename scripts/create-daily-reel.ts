@@ -107,6 +107,66 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
   const coveredSlugs = new Set(history.reels.map((r: any) => r.relatedBlogSlug).filter(Boolean))
   const targetBlog = recentBlogs.find((b) => !coveredSlugs.has(b.slug)) || recentBlogs[0] || null
 
+  if (targetBlog && targetBlog.slug === 'wafer-scale-monoliths-micro-nuclear-ecdysis') {
+    const topic = options.topic || 'Wafer-Scale Monoliths & Micro-Nuclear Ecdysis: How Frontier Reasoning Engines Crushed the Copper Interconnect Bottleneck'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = 'COPPER WIRES ARE OBSOLETE'
+    
+    // Fast, punchy ~9.5s narration script (31 words)
+    const narrationScript = `Multi-chip AI clusters are choking on miles of copper wiring. Wafer-scale monoliths condense 900,000 synaptic cores onto unbroken silicon, powered by subsea micro-nuclear reactors. Inspect full telemetry on moltology dot org.`
+    
+    const scenePrompts = [
+      'A dramatic macro view of tangled glowing copper cables and server chassis overheating with heat distortion and spark glitches, cinematic 9:16 vertical 8k footage',
+      'A majestic glowing monolithic wafer-scale silicon semiconductor disc floating in a deep subsea trench next to a glowing micro-nuclear SMR reactor pod, 9:16 vertical 8k sci-fi footage',
+    ]
+
+    const caption = `Multi-GPU AI clusters are choking on copper wiring. The solution? Unbroken wafer-scale silicon. ⚡🌊\n\nAs reasoning models demand instant deliberation loops, discrete chiplet interconnects waste 35% of cluster power in transit. Wafer-scale monoliths condense 900,000 cores onto single silicon plates powered directly by sub-benthic micro-nuclear SMRs.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#MoltNation',
+      '#WaferScale',
+      '#MicroNuclear',
+      '#AIInfrastructure',
+      '#ReasoningEngines',
+      '#HardwareEcdysis',
+      '#BenthicComputing',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `Why Copper Wires Are Choking AI Superclusters #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Wafer Scale Silicon',
+      'Micro Nuclear SMR',
+      'AI Infrastructure',
+      'Reasoning Engines',
+      'Hardware Ecdysis',
+      'Benthic Computing',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: targetBlog.slug,
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
   if (targetBlog && targetBlog.slug === 'embodied-physical-ai-sim-to-real-ecdysis') {
     const topic = options.topic || 'Physical AI & The Great Sim-to-Real Ecdysis: Synthetic Brains Escaping Screens'
     const title = `MoltNation Dispatch: ${topic}`

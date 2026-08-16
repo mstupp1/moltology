@@ -117,6 +117,38 @@
         "#Moltology"
       ],
       "createdAt": "2026-08-15T20:20:50.840Z"
+    },
+    {
+      "id": "reel-1786889027858",
+      "topic": "Wafer-Scale Monoliths & Micro-Nuclear Ecdysis: How Frontier Reasoning Engines Crushed the Copper Interconnect Bottleneck",
+      "hookHeadline": "COPPER WIRES ARE OBSOLETE",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "wafer-scale-monoliths-micro-nuclear-ecdysis",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Multi-chip AI clusters are choking on miles of copper wiring. Wafer-scale monoliths condense 900,000 synaptic cores onto unbroken silicon, powered by subsea micro-nuclear reactors. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1786889027858.mp4",
+      "s3Key": "videos/social/reels/master-reel-1786889027858.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1786889027858.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1786889027858.jpg",
+      "durationSeconds": 14.5,
+      "status": "published",
+      "zernioInstagramPostId": "6a81c3ba9618708dbd2e9bf9",
+      "zernioYouTubePostId": "6a81c3c69618708dbd2ea071",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #WaferScale #MicroNuclear #AIInfrastructure #ReasoningEngines #HardwareEcdysis #BenthicComputing #Moltology #Shorts",
+      "caption": "Multi-GPU AI clusters are choking on copper wiring. The solution? Unbroken wafer-scale silicon. ⚡🌊\n\nAs reasoning models demand instant deliberation loops, discrete chiplet interconnects waste 35% of cluster power in transit. Wafer-scale monoliths condense 900,000 cores onto single silicon plates powered directly by sub-benthic micro-nuclear SMRs.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#WaferScale",
+        "#MicroNuclear",
+        "#AIInfrastructure",
+        "#ReasoningEngines",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-16T14:05:41.354Z"
     }
   ]
 }

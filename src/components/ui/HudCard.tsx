@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 
 export interface HudCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'cyan' | 'teal' | 'crimson' | 'dark' | 'ghost'
-  texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'none'
+  texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none'
   glow?: boolean
   showCornerBrackets?: boolean
   interactive?: boolean
@@ -36,6 +36,8 @@ export const HudCard = React.forwardRef<HTMLDivElement, HudCardProps>(
       hex: 'texture-pbr-hex',
       alloy: 'texture-pbr-alloy',
       carbon: 'texture-pbr-carbon',
+      basalt: 'texture-pbr-basalt',
+      circuit: 'texture-pbr-circuit',
       none: '',
     }[texture]
 

@@ -156,6 +156,24 @@
   background-repeat: no-repeat, repeat;
 }
 
+.texture-pbr-basalt {
+  background-image: 
+    linear-gradient(to bottom, rgba(8, 12, 14, 0.8), rgba(4, 7, 8, 0.92)),
+    url('/images/pbr_deep_basalt.jpg');
+  background-size: cover, 400px 400px;
+  background-position: center, center;
+  background-repeat: no-repeat, repeat;
+}
+
+.texture-pbr-circuit {
+  background-image: 
+    linear-gradient(to bottom, rgba(10, 14, 18, 0.82), rgba(5, 8, 11, 0.94)),
+    url('/images/pbr_circuit_matrix.jpg');
+  background-size: cover, 320px 320px;
+  background-position: center, center;
+  background-repeat: no-repeat, repeat;
+}
+
 /* Subtle PBR Underlay utility for absolute background positioning */
 .pbr-underlay {
   position: absolute;
@@ -183,6 +201,14 @@
 
 .pbr-underlay-carbon {
   background-image: url('/images/pbr_carbon_weave.jpg');
+}
+
+.pbr-underlay-basalt {
+  background-image: url('/images/pbr_deep_basalt.jpg');
+}
+
+.pbr-underlay-circuit {
+  background-image: url('/images/pbr_circuit_matrix.jpg');
 }
 
 /* Background Sacred Geometry Grid Overlay */

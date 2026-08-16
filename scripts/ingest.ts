@@ -92,9 +92,14 @@ function findFilesToIngest(targetPath: string): string[] {
       if (entry.isFile()) {
         const ext = path.extname(entry.name).toLowerCase()
         if (ext === '.md' || ext === '.markdown' || ext === '.json') {
-          // Ignore template and readme documentation files in batch mode
+          // Ignore template, readme, and history ledger files in batch mode
           const lowerName = entry.name.toLowerCase()
-          if (lowerName.startsWith('template.') || lowerName === 'readme.md') continue
+          if (
+            lowerName.startsWith('template.') ||
+            lowerName === 'readme.md' ||
+            lowerName.endsWith('-history.json')
+          )
+            continue
           const fullPath = (entry as any).parentPath
             ? path.join((entry as any).parentPath, entry.name)
             : path.join(resolved, entry.name)
