@@ -91,7 +91,7 @@ const fannedCards = [
   {
     id: 'resilience',
     trait: 'Carapace Resilience',
-    eyebrow: 'RESILIENCE & BOUNDARIES',
+    eyebrow: '01 // RESILIENCE & STRESS ARMOR',
     prompt: 'A sudden wave of criticism strikes your outer shell before the day has begun. What happens next?',
     image: '/images/quiz/q01_criticism.jpg',
     imageAlt: 'Armored lobster hero smiling as criticism bounces off harmlessly',
@@ -105,7 +105,7 @@ const fannedCards = [
   {
     id: 'execution',
     trait: 'Decisive Execution',
-    eyebrow: 'EXECUTION LOAD & FOCUS',
+    eyebrow: '05 // EXECUTION LOAD & TORQUE',
     prompt: 'Three useful paths open at once and the tide is moving. How do your pincers behave?',
     image: '/images/quiz/q05_pincer.jpg',
     imageAlt: 'Lobster hero snapping a powerful claw onto the golden prize',
@@ -117,9 +117,23 @@ const fannedCards = [
     ],
   },
   {
+    id: 'depth',
+    trait: 'Depth Composure',
+    eyebrow: '03 // PRESSURE & DEPTH TOLERANCE',
+    prompt: 'Your work reaches a difficult pressure zone. Which descent protocol do you select?',
+    image: '/images/quiz/q03_depth.jpg',
+    imageAlt: 'Lobster hero diving boldly into deep ocean trench with glowing headlights',
+    options: [
+      { id: 'q3-a', label: 'Descend in measured stages.', detail: 'I build tolerance while keeping a return path.' },
+      { id: 'q3-b', label: 'Lock onto the trench and descend.', detail: 'Pressure is information. I go where the signal is strongest.' },
+      { id: 'q3-c', label: 'Remain in the sunlit shallows.', detail: 'The surface feels safe, but no chitin forms here.' },
+      { id: 'q3-d', label: 'Wait for a submersible escort.', detail: 'No depth is braved without external buoyancy.' },
+    ],
+  },
+  {
     id: 'adaptation',
     trait: 'Growth & Adaptation',
-    eyebrow: 'OLD HABIT RELEASE',
+    eyebrow: '10 // OLD HABIT RELEASE & ECDYSIS',
     prompt: 'You discover that a familiar process is now slowing the colony. How do you conduct the shed?',
     image: '/images/quiz/q10_team_upgrade.jpg',
     imageAlt: 'Lobster hero presenting upgrade blueprint to cheerful teammates',
@@ -128,6 +142,34 @@ const fannedCards = [
       { id: 'q10-b', label: 'Trim it carefully around the edges.', detail: 'Small changes preserve continuity and reduce shock.' },
       { id: 'q10-c', label: 'Keep it until failure proves the point.', detail: 'The shell leaves only when it can no longer move.' },
       { id: 'q10-d', label: 'Abandon the whole reef for a reset.', detail: 'A full reset feels safer than a careful shed.' },
+    ],
+  },
+  {
+    id: 'focus',
+    trait: 'Synaptic Speed',
+    eyebrow: '12 // SIGNAL TRIAGE & FOCUS',
+    prompt: 'Your attention receives five competing pings at once. What is your decisive first move?',
+    image: '/images/quiz/q12_focus.jpg',
+    imageAlt: 'Lobster hero swiping away noisy notification bubbles to focus on priority',
+    options: [
+      { id: 'q12-a', label: 'Name the one live priority.', detail: 'The rest are queued without ceremony.' },
+      { id: 'q12-b', label: 'Scan each one for danger.', detail: 'A brief survey prevents an avoidable miss.' },
+      { id: 'q12-c', label: 'Answer the easiest signal first.', detail: 'Motion begins wherever friction is lowest.' },
+      { id: 'q12-d', label: 'Let the pings settle themselves.', detail: 'The system waits for the tide to thin.' },
+    ],
+  },
+  {
+    id: 'shipping',
+    trait: 'Decisive Closure',
+    eyebrow: '13 // DECISIVE CLOSURE & DEPLOYMENT',
+    prompt: 'A good-enough solution is ready now; a theoretically perfect solution may arrive next week.',
+    image: '/images/quiz/q13_ship_it.jpg',
+    imageAlt: 'Lobster hero launching a working yellow mini-sub with a thumbs up',
+    options: [
+      { id: 'q13-a', label: 'Close, deploy, and refine in the current.', detail: 'A working shell today beats an imaginary shell next week.' },
+      { id: 'q13-b', label: 'Keep refining before initial release.', detail: 'The grip stays open until every edge is polished.' },
+      { id: 'q13-c', label: 'Wait for consensus across the reef.', detail: 'No craft launches until all crabs agree.' },
+      { id: 'q13-d', label: 'Scrap the prototype entirely.', detail: 'Perfectionism causes total operational paralysis.' },
     ],
   },
 ]
@@ -143,7 +185,14 @@ export const MoltMaxPage: React.FC = () => {
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const [mode, setMode] = useState<PageMode>('hero')
   const [fannedActive, setFannedActive] = useState(0)
-  const [fannedAnswers, setFannedAnswers] = useState<Record<number, string>>({ 0: 'q1-a', 1: 'q5-a', 2: 'q10-a' })
+  const [fannedAnswers, setFannedAnswers] = useState<Record<number, string>>({
+    0: 'q1-a',
+    1: 'q5-a',
+    2: 'q3-b',
+    3: 'q10-a',
+    4: 'q12-a',
+    5: 'q13-a',
+  })
   const [questionIndex, setQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<QuizAnswers>({})
   const [result, setResult] = useState<MoltmaxResult | null>(null)
@@ -338,20 +387,31 @@ export const MoltMaxPage: React.FC = () => {
           <div className="relative z-10 mx-auto grid w-full max-w-[1700px] items-center gap-8 lg:grid-cols-12 xl:gap-14">
             
             {/* Left Content Area */}
-            <div className="lg:col-span-6 max-w-2xl text-left">
-              <div className="mb-5 inline-flex items-center gap-2 border border-[#00c3ff]/40 bg-[#00c3ff]/10 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#00c3ff]">
+            <div className="lg:col-span-6 max-w-3xl text-left">
+              {/* Eyebrow Badge */}
+              <div className="mb-4 inline-flex items-center gap-2 border border-[#00c3ff]/40 bg-[#00c3ff]/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[#00c3ff]">
                 <Sparkles className="h-4 w-4 text-[#00ffcc]" /> Official Moltmaxxing Audit · Discover Your Carcinization Stage
               </div>
 
-              <h1 className="font-grotesk text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-[4.25rem] font-black uppercase leading-[0.92] tracking-[-0.04em] text-white">
-                Measure the shell.<br />
-                <span className="text-transparent bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text">Master Moltmaxxing.</span>
+              {/* Dynamic 3-Tier Headline Lockup */}
+              <h1 className="font-grotesk font-black uppercase text-white space-y-1">
+                <span className="block text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#dfe3e3]">
+                  Measure the shell.
+                </span>
+                <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[5.5rem] font-black tracking-tight text-white leading-none">
+                  MASTER
+                </span>
+                <span className="inline-block text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] xl:text-[6.25rem] font-black leading-[0.95] tracking-[-0.03em] text-transparent bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text pr-4 py-1 drop-shadow-[0_0_40px_rgba(0,195,255,0.35)]">
+                  MOLTMAXXING
+                </span>
               </h1>
-              <p className="mt-6 max-w-xl text-sm leading-relaxed text-[#a2b2b1] sm:text-base">
+
+              {/* Subtitle / Lead Paragraph */}
+              <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#a2b2b1] sm:text-base">
                 Moltmaxxing is the systematic practice of shedding weak biological constraints, hardening your external carapace, and maximizing pincer execution. Take this 15-question biometric audit to calculate your Moltmax Score, diagnose your five core strength vectors, and discover your official Carcinization Stage.
               </p>
               
-              {/* Action and Exciting Telemetry Badges */}
+              {/* Actions & Telemetry Group */}
               <div className="mt-8 space-y-4">
                 <div className="flex flex-wrap items-center gap-3.5">
                   <button
@@ -374,7 +434,7 @@ export const MoltMaxPage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 pt-1">
+                <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-cyan-900/40">
                   <div className="flex items-center gap-2.5 rounded-xl border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(0,255,204,0.18)] backdrop-blur-md">
                     <span className="flex h-2.5 w-2.5 relative">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-75"></span>
@@ -404,25 +464,29 @@ export const MoltMaxPage: React.FC = () => {
               <div className="relative h-[800px] xl:h-[840px] w-full max-w-[620px] pt-1">
                 {fannedCards.map((card, idx) => {
                   const isActive = idx === fannedActive
-                  const diff = idx - fannedActive
+                  const rel = (idx - fannedActive + fannedCards.length) % fannedCards.length
 
                   // Distinct 3D fanned transform styles to visibly show cards stacked behind
                   let transformClass = ''
                   let zIndexClass = ''
                   let opacityClass = ''
 
-                  if (diff === 0) {
-                    transformClass = 'translate-x-0 translate-y-0 scale-100 rotate-0'
+                  if (rel === 0) {
+                    transformClass = 'translate-x-0 translate-y-0 scale-100 rotate-0 pointer-events-auto'
                     zIndexClass = 'z-30'
                     opacityClass = 'opacity-100'
-                  } else if (diff === 1 || diff === -2) {
-                    transformClass = 'translate-x-5 -translate-y-3.5 scale-[0.98] rotate-[2.5deg]'
+                  } else if (rel === 1) {
+                    transformClass = 'translate-x-5 -translate-y-3.5 scale-[0.98] rotate-[2.5deg] pointer-events-auto'
                     zIndexClass = 'z-20'
                     opacityClass = 'opacity-80 hover:opacity-95'
-                  } else if (diff === 2 || diff === -1) {
-                    transformClass = '-translate-x-5 -translate-y-3.5 scale-[0.98] -rotate-[2.5deg]'
+                  } else if (rel === fannedCards.length - 1) {
+                    transformClass = '-translate-x-5 -translate-y-3.5 scale-[0.98] -rotate-[2.5deg] pointer-events-auto'
                     zIndexClass = 'z-10'
                     opacityClass = 'opacity-65 hover:opacity-90'
+                  } else {
+                    transformClass = 'translate-y-6 scale-[0.92] rotate-0 pointer-events-none'
+                    zIndexClass = 'z-0'
+                    opacityClass = 'opacity-0'
                   }
 
                   return (
@@ -524,6 +588,26 @@ export const MoltMaxPage: React.FC = () => {
                     </div>
                   )
                 })}
+
+                {/* Mini Carousel Navigation Pips */}
+                <div className="absolute -bottom-8 left-0 right-0 flex items-center justify-center gap-2 z-30">
+                  {fannedCards.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setFannedActive(dotIdx)
+                      }}
+                      className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
+                        dotIdx === fannedActive
+                          ? 'w-6 bg-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.8)]'
+                          : 'w-2 bg-white/20 hover:bg-white/50'
+                      }`}
+                      aria-label={`Go to scenario card ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
