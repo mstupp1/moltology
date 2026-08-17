@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Activity, ArrowDown, ArrowRight, Brain, Check, CheckCircle2, ChevronRight, Compass, Layers3, Shield, Sparkles, Terminal, Zap } from 'lucide-react'
+import { Activity, ArrowDown, ArrowRight, BookOpen, Brain, Check, CheckCircle2, ChevronRight, Compass, Layers3, Shield, Sparkles, Terminal, Zap } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
@@ -342,6 +342,7 @@ export const MoltMaxPage: React.FC = () => {
               <div className="mb-5 inline-flex items-center gap-2 border border-[#00c3ff]/40 bg-[#00c3ff]/10 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#00c3ff]">
                 <Sparkles className="h-4 w-4 text-[#00ffcc]" /> Official Moltmaxxing Audit · Discover Your Carcinization Stage
               </div>
+
               <h1 className="font-grotesk text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-[4.25rem] font-black uppercase leading-[0.92] tracking-[-0.04em] text-white">
                 Measure the shell.<br />
                 <span className="text-transparent bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text">Master Moltmaxxing.</span>
@@ -352,14 +353,24 @@ export const MoltMaxPage: React.FC = () => {
               
               {/* Action and Exciting Telemetry Badges */}
               <div className="mt-8 space-y-4">
-                <div>
+                <div className="flex flex-wrap items-center gap-3.5">
                   <button
                     type="button"
                     onClick={beginAudit}
-                    className="group inline-flex items-center gap-3 bg-[#00c3ff] px-8 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_45px_rgba(0,255,204,0.45)] chamfer-corner"
+                    className="group inline-flex items-center gap-3 bg-[#00c3ff] px-8 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_45px_rgba(0,255,204,0.45)] chamfer-corner cursor-pointer"
                   >
-                    <span>Initiate biometric audit</span>
+                    <span>Take the Moltmax Quiz</span>
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: '/moltmaxxing' })}
+                    className="group inline-flex items-center gap-2.5 border border-[#00c3ff]/40 bg-[#00c3ff]/10 hover:border-[#00ffcc] hover:bg-[#00ffcc]/20 px-6 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#00ffcc] transition-all chamfer-corner backdrop-blur-md shadow-hud-cyan cursor-pointer"
+                  >
+                    <BookOpen className="h-4 w-4 text-[#00ffcc] transition-transform group-hover:scale-110" />
+                    <span>Read Moltmaxxing Guide</span>
+                    <ChevronRight className="h-4 w-4 text-[#00ffcc] transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
 
