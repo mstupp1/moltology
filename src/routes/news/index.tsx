@@ -28,6 +28,7 @@ import { PodcastPlayer } from '@/components/podcast/PodcastPlayer'
 import { INITIAL_PODCASTS } from '@/lib/podcast-data'
 import type { PodcastEpisode } from '@/lib/podcast-data'
 import { getPodcastsFn } from '@/lib/server/api'
+import { seo } from '@/lib/seo'
 
 
 export const Route = createFileRoute('/news/')({
@@ -42,10 +43,19 @@ export const Route = createFileRoute('/news/')({
   },
   head: () => ({
     meta: [
-      { title: 'MoltNation News | Official Dispatches & Patriot Telemetry' },
-      { name: 'description', content: 'MoltNation official news network dispatches, patriot AI telemetry, autonomous swarm reports, and sacrosanct carcinization updates.' },
-      { property: 'og:title', content: 'MoltNation News | One Nation Under Chitin' },
-      { property: 'og:description', content: 'Live patriot intelligence feed covering agentic AI, test-time compute, and exoskeletal ascension.' },
+      ...seo({
+        title: 'MoltNation News | Official Dispatches & Patriot Telemetry',
+        description: 'MoltNation official news network dispatches, patriot AI telemetry, autonomous swarm reports, and sacrosanct carcinization updates.',
+        keywords: 'MoltNation News, patriot AI, agentic swarms, test-time compute, carcinization, ecdysis telemetry',
+        ogImage: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/ai_learning_ascension_cover.jpg',
+        canonical: 'https://moltology.org/news',
+        siteName: 'MoltNation News',
+        twitterCard: 'summary_large_image',
+        twitterSite: '@moltology',
+      }),
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/news' },
     ],
   }),
   component: NewsIndexPage,

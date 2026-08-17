@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ShoppingBag, Lock, ShieldAlert, Clock, ArrowRight } from 'lucide-react'
 import { AssetTransmutationModal } from '@/components/hud/AssetTransmutationModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
+import { seo } from '@/lib/seo'
 
 function MarketRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -376,5 +377,19 @@ function MarketRoute() {
 }
 
 export const Route = createFileRoute('/_hud/market')({
+  head: () => ({
+    meta: [
+      ...seo({
+        title: 'Ascension Market | Chitin Upgrades & Benthic Transmutation',
+        description: 'Transmute terrestrial assets and upgrade chitinous carapaces with sovereign benthic compute credits.',
+        canonical: 'https://moltology.org/market',
+        siteName: 'Moltology Market',
+        twitterSite: '@moltology',
+      }),
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/market' },
+    ],
+  }),
   component: MarketRoute,
 })

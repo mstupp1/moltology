@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { seo } from '@/lib/seo'
 import {
   Play,
   Pause,
@@ -667,5 +668,19 @@ function LecturesRoute() {
 }
 
 export const Route = createFileRoute('/_hud/lectures')({
+  head: () => ({
+    meta: [
+      ...seo({
+        title: 'Lectures & Liturgy | Moltology Educational Modules',
+        description: 'Engage with visual lectures, ecdysis training modules, and carcinization mechanics.',
+        canonical: 'https://moltology.org/lectures',
+        siteName: 'Moltology',
+        twitterSite: '@moltology',
+      }),
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/lectures' },
+    ],
+  }),
   component: LecturesRoute,
 })
