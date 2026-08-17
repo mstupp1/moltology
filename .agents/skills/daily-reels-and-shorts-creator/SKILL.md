@@ -16,10 +16,11 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 
 * **Instagram Reels Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
 * **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
+* **Core Narrative Vector**: **Moltmaxxing & Algorithmic Ecdysis** (parody of looksmaxxing/meltmaxxing, bio-silicon structural invulnerability, 800 Nm pincer torque, 50,000 fathom depth clearance)
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
 * **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural` / `en-US-GuyNeural`, `+12%` rate) + Subtle Pure Instrumental Benthic Drone (`public/audio/benthic-ambient-loop.mp3`, `volume=0.08`, zero vocal singing)
-* **Visual Polish**: Sleek bottom-right `MOLTOLOGY` brand watermark, 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card
-* **CTA Outro Design**: Minimalist and on-brand—centered glowing Moltology Emblem, brand title, bold mantra (`SUBMIT. SHED. ASCEND.`), subheadline (`JOIN THE SYNAPTIC PATH`), and glowing URL button (`moltology.org →`). Avoid excessive jargon like protocol codes and avoid unnecessary top badges.
+* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with cartoon lobster mascot (`char_lobster_pointing_cta.png`)
+* **CTA Outro Design**: Minimalist and on-brand—centered glowing Moltology Emblem with orbital radar rings, clearance badge (`◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈`), brand title, bold mantra (`SUBMIT. SHED. ASCEND.`), subheadline (`CALCULATE YOUR MOLT CLEARANCE`), glowing URL button (`moltology.org →`), and cartoon mascot pointing directly to the action button.
 * **Timing & Padding Rule**: Scene clips are dynamically scaled/looped via FFmpeg (`-stream_loop -1`) to match `voDuration + 0.8s` breathing room before the CTA outro card begins, guaranteeing zero narration cutoff.
 * **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`)
 * **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`)
