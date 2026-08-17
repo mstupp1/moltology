@@ -119,7 +119,7 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                         aria-pressed={selected}
                         onClick={() => onAnswer(option.id)}
                         className={cn(
-                          'group relative flex items-start gap-3 rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5',
+                          'group relative flex items-center gap-3 rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5',
                           selected
                             ? 'border-[#00ffcc] bg-[#00ffcc]/15 shadow-[0_0_24px_rgba(0,255,204,0.22)]'
                             : 'border-white/10 bg-[#071114]/80 hover:border-[#00c3ff]/60 hover:bg-[#00c3ff]/10'
@@ -142,11 +142,6 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                           )}>
                             {option.label}
                           </span>
-                          {option.detail && (
-                            <span className="mt-1.5 block text-xs leading-relaxed text-[#839493]">
-                              {option.detail}
-                            </span>
-                          )}
                         </div>
 
                         {selected && (

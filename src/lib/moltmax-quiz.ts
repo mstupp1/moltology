@@ -12,7 +12,7 @@ export type QuizFormat = 'scenario' | 'likert' | 'binary'
 export interface QuizOption {
   id: string
   label: string
-  detail: string
+  detail?: string
   score: number
 }
 
