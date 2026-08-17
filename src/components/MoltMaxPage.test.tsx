@@ -72,13 +72,28 @@ describe('MoltMaxPage', () => {
     expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
   })
 
-  it('navigates to the canonical guide from hero promotions and bottom cta', () => {
+  it('supports Likert slider interaction on agreement scale questions', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
+    // Move to Question 2 (Likert format)
+    answerCurrentQuestion()
+    expect(screen.getByText(/02 \/\//i)).toBeInTheDocument()
+    
+    // Find slider and interact
+    const slider = screen.getByRole('slider')
+    expect(slider).toBeInTheDocument()
+    
+    // Click Strongly Agree step
+    fireEvent.click(screen.getByRole('button', { name: /^Strongly Agree$/i }))
+    
+    // Strongly Agree should be selected in the active alignment readout
+    expect(screen.getAllByText(/STRONGLY AGREE/i).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByRole('button', { name: /next question/i })).not.toBeDisabled()
+  })
+
+  it('navigates to the canonical guide from hero promotions', () => {
     renderPage()
     fireEvent.click(screen.getByRole('button', { name: /read moltmaxxing guide/i }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmaxxing' })
-
-    mockNavigate.mockClear()
-    fireEvent.click(screen.getByRole('button', { name: /read the canonical moltmaxxing guide/i }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmaxxing' })
   })
 

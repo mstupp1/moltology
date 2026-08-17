@@ -7,10 +7,9 @@ import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { authClient } from '@/lib/auth-client'
 import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
-import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult, type QuizDimension } from '@/lib/moltmax-quiz'
+import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult } from '@/lib/moltmax-quiz'
 import { getAssetUrl } from '@/lib/assets'
 import { QuizQuestionCard } from './moltmax/QuizQuestionCard'
-import { QuizProgressHUD } from './moltmax/QuizProgressHUD'
 import { QuizResultsReveal } from './moltmax/QuizResultsReveal'
 
 type PageMode = 'hero' | 'quiz' | 'results'
@@ -175,8 +174,6 @@ const fannedCards = [
   },
 ]
 
-const dimensionForQuestion = (index: number): QuizDimension => MOLTMAX_QUESTIONS[index].dimension
-
 export const MoltMaxPage: React.FC = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
@@ -195,6 +192,7 @@ export const MoltMaxPage: React.FC = () => {
     5: 'q13-a',
   })
   const [questionIndex, setQuestionIndex] = useState(0)
+  const [direction, setDirection] = useState<'next' | 'prev'>('next')
   const [answers, setAnswers] = useState<QuizAnswers>({})
   const [result, setResult] = useState<MoltmaxResult | null>(null)
   const [isCopied, setIsCopied] = useState(false)
@@ -214,6 +212,7 @@ export const MoltMaxPage: React.FC = () => {
   const beginAudit = () => {
     setAnswers({})
     setQuestionIndex(0)
+    setDirection('next')
     setResult(null)
     setIsSaved(false)
     setMode('quiz')
@@ -233,6 +232,7 @@ export const MoltMaxPage: React.FC = () => {
       window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0)
       return
     }
+    setDirection('next')
     setQuestionIndex((current) => current + 1)
   }
 
@@ -241,6 +241,7 @@ export const MoltMaxPage: React.FC = () => {
       setMode('hero')
       return
     }
+    setDirection('prev')
     setQuestionIndex((current) => current - 1)
   }
 
@@ -964,63 +965,46 @@ export const MoltMaxPage: React.FC = () => {
         </section>
       </main>}
 
-      {mode === 'quiz' && <main ref={quizRef} className="min-h-screen px-4 pb-20 pt-32 sm:px-8">
-        <QuizProgressHUD current={questionIndex} total={MOLTMAX_QUESTIONS.length} currentDimension={dimensionForQuestion(questionIndex)} />
-        <QuizQuestionCard question={MOLTMAX_QUESTIONS[questionIndex]} questionNumber={questionIndex + 1} totalQuestions={MOLTMAX_QUESTIONS.length} answer={answers[MOLTMAX_QUESTIONS[questionIndex].id]} onAnswer={handleAnswer} onBack={handleBack} onNext={handleNext} />
-        <div className="mx-auto mt-8 max-w-5xl text-center text-[10px] uppercase tracking-wider text-[#526363]">
-          Your responses are private and calculated locally in your browser.
-        </div>
-      </main>}
-
-      {mode === 'results' && result && <main className="px-4 pb-20 pt-32 sm:px-8">
-        <QuizResultsReveal result={result} isCopied={isCopied} isGeneratingImage={isGeneratingImage} isSaved={isSaved} isAuthenticated={Boolean(user)} onShare={handleShare} onCopy={handleCopy} onDownload={handleDownload} onSave={user ? handleSave : () => { setAuthMode('signup'); setIsAuthModalOpen(true) }} onReset={() => { setMode('hero'); setResult(null); window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0) }} />
-      </main>}
-
-      {/* CONTINUED ASCENSION FOOTER BANNER (Homepage Design Language & Textures) */}
-      <section className="relative border-t border-cyan-900/60 bg-[#030608] px-4 py-16 text-center overflow-hidden sm:px-8 sm:py-24">
-        <div className="pbr-underlay pbr-underlay-basalt opacity-35 pointer-events-none" />
-        <img
-          src={getAssetUrl('/images/underwater_looking_up.jpg')}
-          alt="Benthic Ascension Background"
-          className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
-        />
-        <img
-          src={getAssetUrl('/images/chitin_texture_bg.jpg')}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-overlay pointer-events-none z-0"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] pointer-events-none" />
-        <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-3 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
-            <Sparkles className="h-3.5 w-3.5 text-[#00ffcc] animate-pulse" />
-            <span>CONTINUE YOUR ASCENSION</span>
+      {mode === 'quiz' && (
+        <main ref={quizRef} className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-center px-3 pt-20 pb-6 sm:px-6 sm:pt-24 lg:px-8">
+          <QuizQuestionCard
+            question={MOLTMAX_QUESTIONS[questionIndex]}
+            questionNumber={questionIndex + 1}
+            totalQuestions={MOLTMAX_QUESTIONS.length}
+            answer={answers[MOLTMAX_QUESTIONS[questionIndex].id]}
+            direction={direction}
+            onAnswer={handleAnswer}
+            onBack={handleBack}
+            onNext={handleNext}
+          />
+          <div className="mx-auto mt-4 max-w-6xl xl:max-w-[1240px] text-center font-mono text-[10px] uppercase tracking-wider text-[#526363]">
+            Your responses are private and calculated locally in your browser.
           </div>
-          <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-            THE ASSESSMENT IS A STARTING POINT, <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-cyan-200 to-[#00ffcc] bg-clip-text text-transparent">NOT A CEILING.</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl font-mono text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
-            Explore the complete Moltmaxxing guide to strengthen your resilience, sharpen your focus, and master high-pressure environments.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={beginAudit}
-              className="inline-flex items-center gap-3 bg-[#00c3ff] px-7 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_30px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_40px_rgba(0,255,204,0.4)]"
-            >
-              Begin Biometric Assessment <ArrowRight className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate({ to: '/moltmaxxing' })}
-              className="inline-flex items-center gap-2 border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-6 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#00ffcc] transition-colors hover:bg-[#00ffcc]/20"
-            >
-              Read the canonical Moltmaxxing guide <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-      <MoltNationFooter />
+        </main>
+      )}
+
+      {mode === 'results' && result && (
+        <main className="relative z-10 min-h-screen px-4 pt-24 pb-20 sm:px-8 sm:pt-28">
+          <QuizResultsReveal
+            result={result}
+            isCopied={isCopied}
+            isGeneratingImage={isGeneratingImage}
+            isSaved={isSaved}
+            isAuthenticated={Boolean(user)}
+            onShare={handleShare}
+            onCopy={handleCopy}
+            onDownload={handleDownload}
+            onSave={user ? handleSave : () => { setAuthMode('signup'); setIsAuthModalOpen(true) }}
+            onReset={() => {
+              setMode('hero')
+              setResult(null)
+              window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0)
+            }}
+          />
+        </main>
+      )}
+
+      {mode !== 'quiz' && <MoltNationFooter />}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode={authMode} />
     </div>
   )

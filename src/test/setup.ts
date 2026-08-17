@@ -7,3 +7,13 @@ import { afterEach } from 'vitest'
 afterEach(() => {
   cleanup()
 })
+
+// Radix UI / JSDOM Polyfills
+if (typeof global.ResizeObserver === 'undefined') {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}
+
