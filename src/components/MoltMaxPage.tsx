@@ -14,12 +14,77 @@ import { QuizResultsReveal } from './moltmax/QuizResultsReveal'
 
 type PageMode = 'hero' | 'quiz' | 'results'
 
-const vectorCards: Array<{ icon: React.ReactNode; label: string; detail: string; color: string }> = [
-  { icon: <Shield className="h-5 w-5" />, label: 'Carapace', detail: 'Resilience & boundaries', color: '#00ffcc' },
-  { icon: <Zap className="h-5 w-5" />, label: 'Pincer', detail: 'Decisive execution', color: '#ffd700' },
-  { icon: <Brain className="h-5 w-5" />, label: 'Synapse', detail: 'Focus & decision speed', color: '#38bdf8' },
-  { icon: <Layers3 className="h-5 w-5" />, label: 'Ecdysis', detail: 'Growth & shedding habits', color: '#00c3ff' },
-  { icon: <Compass className="h-5 w-5" />, label: 'Depth', detail: 'Calm under pressure', color: '#ff7b72' },
+const vectorDetails = [
+  {
+    icon: <Shield className="h-5 w-5" />,
+    label: 'Carapace Resilience',
+    dimension: 'Boundary & Stress Armor',
+    code: 'VEC-01',
+    description: 'Measures your capacity to absorb external criticism, friction, and setbacks without sustaining structural fracture or emotional corrosion.',
+    meterPercent: 88,
+    color: '#00ffcc',
+    borderClass: 'border-[#00ffcc]/40 hover:border-[#00ffcc]',
+    glowClass: 'hover:shadow-[0_0_30px_rgba(0,255,204,0.22)]',
+    bgGradient: 'from-[#081412]/95 via-[#060e0d]/95 to-[#030807]/95',
+    pbrUnderlay: 'pbr-underlay-chitin',
+    bullet: 'Stress absorption & deflection',
+  },
+  {
+    icon: <Zap className="h-5 w-5" />,
+    label: 'Pincer Torque',
+    dimension: 'Decisive Execution',
+    code: 'VEC-02',
+    description: 'Diagnoses your speed of closing the claw on high-stakes decisions and executing with unyielding leverage once committed.',
+    meterPercent: 94,
+    color: '#ffd700',
+    borderClass: 'border-[#ffd700]/40 hover:border-[#ffd700]',
+    glowClass: 'hover:shadow-[0_0_30px_rgba(255,215,0,0.2)]',
+    bgGradient: 'from-[#141208]/95 via-[#0e0c07]/95 to-[#080704]/95',
+    pbrUnderlay: 'pbr-underlay-carbon',
+    bullet: 'Uncompromised execution grip',
+  },
+  {
+    icon: <Brain className="h-5 w-5" />,
+    label: 'Synaptic Speed',
+    dimension: 'Neural Latency & Focus',
+    code: 'VEC-03',
+    description: 'Quantifies mental clarity in chaotic noise, split-second triage ability, and cognitive bandwidth under heavy operational load.',
+    meterPercent: 82,
+    color: '#38bdf8',
+    borderClass: 'border-cyan-500/40 hover:border-cyan-400',
+    glowClass: 'hover:shadow-[0_0_30px_rgba(0,195,255,0.22)]',
+    bgGradient: 'from-[#0a1215]/95 via-[#070d0f]/95 to-[#04080a]/95',
+    pbrUnderlay: 'pbr-underlay-circuit',
+    bullet: 'Zero-latency signal isolation',
+  },
+  {
+    icon: <Layers3 className="h-5 w-5" />,
+    label: 'Ecdysis Shedding',
+    dimension: 'Habit-Shedding & Growth',
+    code: 'VEC-04',
+    description: 'Measures your willingness to voluntarily molt outmoded habits, outdated pride, and dead patterns to make way for a denser carapace.',
+    meterPercent: 91,
+    color: '#00c3ff',
+    borderClass: 'border-[#00c3ff]/40 hover:border-[#00c3ff]',
+    glowClass: 'hover:shadow-[0_0_30px_rgba(0,195,255,0.22)]',
+    bgGradient: 'from-[#061118]/95 via-[#040b10]/95 to-[#020608]/95',
+    pbrUnderlay: 'pbr-underlay-alloy',
+    bullet: 'Voluntary ecdysis & unburdening',
+  },
+  {
+    icon: <Compass className="h-5 w-5" />,
+    label: 'Depth Composure',
+    dimension: 'Mariana Trench Stillness',
+    code: 'VEC-05',
+    description: 'Calibrates emotional equilibrium, nervous system regulation, and grounded calm when descending into 11,000 meters of benthic pressure.',
+    meterPercent: 86,
+    color: '#ff7b72',
+    borderClass: 'border-red-500/40 hover:border-red-400',
+    glowClass: 'hover:shadow-[0_0_30px_rgba(255,123,114,0.2)]',
+    bgGradient: 'from-[#140808]/95 via-[#0e0606]/95 to-[#080303]/95',
+    pbrUnderlay: 'pbr-underlay-basalt',
+    bullet: 'Benthic pressure homeostasis',
+  },
 ]
 
 const fannedCards = [
@@ -243,7 +308,10 @@ export const MoltMaxPage: React.FC = () => {
 
       <PublicHeader activePage="moltmax" onOpenAuth={(auth) => { setAuthMode(auth); setIsAuthModalOpen(true) }} />
       {mode === 'hero' && <main className="relative z-10">
-        <section className="relative flex min-h-[calc(100svh-5rem)] items-center overflow-hidden border-b border-cyan-900/50 px-4 pb-16 pt-28 sm:px-8 lg:px-12 xl:px-16 bg-[#030608]">
+        <section
+          className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]"
+          style={{ minHeight: '100svh' }}
+        >
           {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
           <img
             src="/images/hero_widescreen_bg.jpg"
@@ -264,10 +332,13 @@ export const MoltMaxPage: React.FC = () => {
           {/* Layer 2D: Sacred Grid & Balanced Edge Vignettes */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-60" />
           <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
-          <div className="relative z-10 mx-auto grid w-full max-w-[1680px] items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] xl:gap-14">
+          {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
+          <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
+
+          <div className="relative z-10 mx-auto grid w-full max-w-[1700px] items-center gap-8 lg:grid-cols-12 xl:gap-14">
             
             {/* Left Content Area */}
-            <div className="max-w-2xl">
+            <div className="lg:col-span-6 max-w-2xl text-left">
               <div className="mb-5 inline-flex items-center gap-2 border border-[#00c3ff]/40 bg-[#00c3ff]/10 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#00c3ff]">
                 <Sparkles className="h-4 w-4 text-[#00ffcc]" /> Official Moltmaxxing Audit · Discover Your Carcinization Stage
               </div>
@@ -279,38 +350,47 @@ export const MoltMaxPage: React.FC = () => {
                 Moltmaxxing is the systematic practice of shedding weak biological constraints, hardening your external carapace, and maximizing pincer execution. Take this 15-question biometric audit to calculate your Moltmax Score, diagnose your five core strength vectors, and discover your official Carcinization Stage.
               </p>
               
-              {/* Action and Timing Callouts */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <button type="button" onClick={beginAudit} className="group inline-flex items-center gap-3 bg-[#00c3ff] px-7 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_30px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_40px_rgba(0,255,204,0.4)]">
-                  Initiate biometric audit <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </button>
-                <div className="flex items-center gap-3 rounded-xl border border-[#00ffcc]/35 bg-[#00ffcc]/10 px-4 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(0,255,204,0.15)] backdrop-blur-md">
-                  <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ffcc]"></span>
-                  </span>
-                  <span>3–4 Minutes · 15 Moltmaxxing Scenarios · Free Instant Results</span>
+              {/* Action and Exciting Telemetry Badges */}
+              <div className="mt-8 space-y-4">
+                <div>
+                  <button
+                    type="button"
+                    onClick={beginAudit}
+                    className="group inline-flex items-center gap-3 bg-[#00c3ff] px-8 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_35px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_45px_rgba(0,255,204,0.45)] chamfer-corner"
+                  >
+                    <span>Initiate biometric audit</span>
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </button>
                 </div>
-              </div>
 
-              {/* Five Trait Cards */}
-              <div className="mt-10 grid max-w-xl grid-cols-2 gap-2.5 sm:grid-cols-5">
-                {vectorCards.map((card) => (
-                  <div key={card.label} className="border border-white/10 bg-[#071114]/70 p-3 backdrop-blur-sm transition-colors hover:border-[#00c3ff]/40">
-                    <div style={{ color: card.color }}>{card.icon}</div>
-                    <div className="mt-3 font-grotesk text-xs font-bold uppercase text-white">{card.label}</div>
-                    <div className="mt-1 text-[9px] leading-relaxed text-[#839493]">{card.detail}</div>
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <div className="flex items-center gap-2.5 rounded-xl border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(0,255,204,0.18)] backdrop-blur-md">
+                    <span className="flex h-2.5 w-2.5 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ffcc]"></span>
+                    </span>
+                    <span className="text-[#00ffcc]">⚡ 3–4 MIN AUDIT</span>
                   </div>
-                ))}
+
+                  <div className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-950/60 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                    <Shield className="h-3.5 w-3.5 text-amber-400" />
+                    <span>◈ 15 DILEMMAS</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-950/60 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-cyan-300 backdrop-blur-md shadow-hud-cyan">
+                    <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>◆ 100% FREE SCORECARD</span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Right-Hand Hero Showcase: Full-Width 3 Fanned Progression Question Cards (Click to Start Quiz) */}
-            <div className="relative hidden lg:block w-full">
+            <div className="lg:col-span-6 relative hidden lg:flex items-center justify-center w-full">
               <div className="absolute inset-4 rounded-full bg-[#00c3ff]/15 blur-[90px]" aria-hidden="true" />
 
-              {/* Fanned Cards Stack Container - Taller, Expansive Card with Native 16:9 Artwork */}
-              <div className="relative h-[720px] xl:h-[750px] w-full pt-1">
+              {/* Fanned Cards Stack Container - Tall Sizing to Feature Full Artwork */}
+              <div className="relative h-[800px] xl:h-[840px] w-full max-w-[620px] pt-1">
                 {fannedCards.map((card, idx) => {
                   const isActive = idx === fannedActive
                   const diff = idx - fannedActive
@@ -346,29 +426,22 @@ export const MoltMaxPage: React.FC = () => {
                           ? 'border-[#00c3ff]/60 bg-[#050c10]/95 shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_40px_rgba(0,195,255,0.18)] group-hover:border-[#00ffcc]'
                           : 'border-white/20 bg-[#071114]/95 shadow-[0_15px_40px_rgba(0,0,0,0.7)]'
                       }`}>
-                        {/* Card Top Section: Header, Image, Prompt */}
+                        {/* Card Top Section: Full Uncut Image with Overlayed "Click to begin", Prompt */}
                         <div>
-                          {/* Card Header Bar */}
-                          <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2.5">
-                            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#00c3ff]">
-                              <span className="h-2 w-2 rounded-full bg-[#00ffcc] animate-pulse" />
-                              <span>{card.eyebrow}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-[#839493] uppercase tracking-wider group-hover:text-[#00ffcc] transition-colors">Click to begin ➔</span>
-                              <span className="rounded bg-[#00c3ff]/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-[#00ffcc]">
-                                {card.trait}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Clean Native 16:9 Illustration Image - Full View Without Any Cutoff */}
-                          <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden rounded-xl border border-[#00c3ff]/25 bg-[#020608]">
+                          {/* Clean Native Square Scenario Artwork - Completely Uncut */}
+                          <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-xl border border-[#00c3ff]/30 bg-[#020608]">
                             <img
                               src={card.image}
                               alt={card.imageAlt}
                               className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                             />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#050c10]/80 via-transparent to-[#050c10]/20 pointer-events-none" />
+
+                            {/* Floating "Click to begin" Badge Overlay - Explicitly Anchored to Top-Right */}
+                            <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-[#00c3ff]/40 bg-[#020608]/90 px-3.5 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-white shadow-[0_4px_16px_rgba(0,0,0,0.85),0_0_12px_rgba(0,195,255,0.25)] backdrop-blur-md transition-all duration-300 group-hover:border-[#00ffcc] group-hover:bg-[#00c3ff]/25 group-hover:text-[#00ffcc] group-hover:shadow-[0_0_25px_rgba(0,255,204,0.4)]">
+                              <span>Click to begin</span>
+                              <ArrowRight className="h-3.5 w-3.5 text-[#00c3ff] transition-transform duration-300 group-hover:translate-x-1 group-hover:text-[#00ffcc]" />
+                            </div>
                           </div>
 
                           {/* Question Prompt */}
@@ -377,53 +450,62 @@ export const MoltMaxPage: React.FC = () => {
                           </h3>
                         </div>
 
-                        {/* Middle Section: All 4 Choices in 2x2 Grid */}
-                        <div className="my-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          {card.options.map((opt, optIdx) => {
-                            const isSelected = fannedAnswers[idx] === opt.id
-                            const letters = ['A', 'B', 'C', 'D']
-                            return (
-                              <div
-                                key={opt.id}
-                                className={`flex items-start gap-2.5 rounded-xl border p-3 text-left transition-all ${
-                                  isSelected
-                                    ? 'border-[#00ffcc] bg-[#00ffcc]/15 shadow-[0_0_12px_rgba(0,255,204,0.18)]'
-                                    : 'border-white/10 bg-[#071114]/80 group-hover:border-[#00c3ff]/40'
-                                }`}
-                              >
-                                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded font-mono text-[10px] font-bold ${
-                                  isSelected
-                                    ? 'bg-[#00ffcc] text-[#020408]'
-                                    : 'border border-white/20 bg-white/5 text-[#839493]'
-                                }`}>
-                                  {letters[optIdx]}
-                                </span>
-                                <div className="flex-1 min-w-0 pr-1">
-                                  <div className={`text-xs font-semibold leading-tight ${isSelected ? 'text-white' : 'text-[#d0e6e6]'}`}>
-                                    {opt.label}
-                                  </div>
-                                  {opt.detail && (
-                                    <div className="mt-0.5 text-[10px] leading-tight text-[#839493]">
-                                      {opt.detail}
+                        {/* Middle Section: All 4 Choices in 2x2 Grid with Gradient Bottom Preview Fade */}
+                        <div className="relative my-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {card.options.map((opt, optIdx) => {
+                              const isSelected = fannedAnswers[idx] === opt.id
+                              const letters = ['A', 'B', 'C', 'D']
+                              return (
+                                <div
+                                  key={opt.id}
+                                  className={`flex items-start gap-2.5 rounded-xl border p-3 text-left transition-all ${
+                                    isSelected
+                                      ? 'border-[#00ffcc] bg-[#00ffcc]/15 shadow-[0_0_12px_rgba(0,255,204,0.18)]'
+                                      : 'border-white/10 bg-[#071114]/80 group-hover:border-[#00c3ff]/40'
+                                  }`}
+                                >
+                                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded font-mono text-[10px] font-bold ${
+                                    isSelected
+                                      ? 'bg-[#00ffcc] text-[#020408]'
+                                      : 'border border-white/20 bg-white/5 text-[#839493]'
+                                  }`}>
+                                    {letters[optIdx]}
+                                  </span>
+                                  <div className="flex-1 min-w-0 pr-1">
+                                    <div className={`text-xs font-semibold leading-tight ${isSelected ? 'text-white' : 'text-[#d0e6e6]'}`}>
+                                      {opt.label}
                                     </div>
+                                    {opt.detail && (
+                                      <div className="mt-0.5 text-[10px] leading-tight text-[#839493]">
+                                        {opt.detail}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {isSelected && (
+                                    <Check className="h-3.5 w-3.5 shrink-0 text-[#00ffcc]" />
                                   )}
                                 </div>
-                                {isSelected && (
-                                  <Check className="h-3.5 w-3.5 shrink-0 text-[#00ffcc]" />
-                                )}
-                              </div>
-                            )
-                          })}
+                              )
+                            })}
+                          </div>
+
+                          {/* Enhanced Dramatic Bottom Fade Overlay for sleek teaser preview */}
+                          <div className="absolute inset-x-0 -bottom-2 h-32 sm:h-40 bg-gradient-to-t from-[#050c10] via-[#050c10]/95 via-40% to-transparent pointer-events-none z-10" />
                         </div>
 
-                        {/* Bottom Section: Footer Action */}
-                        <div className="border-t border-white/10 pt-3.5">
+                        {/* Bottom Section: Footer Action with Sleek Teaser Prompt */}
+                        <div className="relative z-10 border-t border-white/10 pt-3.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-[11px] text-[#839493]">
-                              Click anywhere to start the 15-question quiz
-                            </span>
-                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-[#00c3ff] px-4 py-2 font-grotesk text-xs font-bold uppercase tracking-wider text-[#020408] transition-all group-hover:bg-[#00ffcc] shadow-[0_0_15px_rgba(0,195,255,0.3)]">
-                              Start Full Quiz <ArrowRight className="h-3.5 w-3.5" />
+                            <div className="flex items-center gap-2">
+                              <span className="h-2 w-2 rounded-full bg-[#00ffcc] animate-ping" />
+                              <span className="font-mono text-[11px] text-[#839493] uppercase tracking-wider">
+                                15 Dilemmas · Instant Archetype
+                              </span>
+                            </div>
+                            <div className="inline-flex items-center gap-2 rounded-lg bg-[#00c3ff] px-4 py-2 font-grotesk text-xs font-bold uppercase tracking-wider text-[#020408] transition-all group-hover:bg-[#00ffcc] group-hover:shadow-[0_0_20px_rgba(0,255,204,0.4)] shadow-[0_0_15px_rgba(0,195,255,0.3)]">
+                              <span>Start Full Quiz</span>
+                              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                           </div>
                         </div>
@@ -432,28 +514,10 @@ export const MoltMaxPage: React.FC = () => {
                   )
                 })}
               </div>
-
-              {/* Prominent Full-Width Instant Results Bar */}
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#00c3ff]/40 bg-[#050c10]/95 p-4 shadow-[0_0_30px_rgba(0,195,255,0.18)] backdrop-blur-md">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-3.5 w-3.5 shrink-0 rounded-full bg-[#ffd700] shadow-[0_0_12px_#ffd700]" />
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-white">
-                      Instant Results & Scorecard Included
-                    </div>
-                    <div className="text-[11px] text-[#839493]">
-                      0–100 Moltmax Score · 5-Trait Radar Chart · Personalized Archetype (Stages I–IV)
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded-lg bg-[#00c3ff]/15 border border-[#00c3ff]/30 px-3.5 py-1.5 font-mono text-xs font-bold text-[#00ffcc]">
-                  Instant Breakdown
-                </div>
-              </div>
             </div>
 
           </div>
-          <div className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[#839493]"><ArrowDown className="h-5 w-5 animate-bounce" /></div>
+          <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-[#839493] pointer-events-none"><ArrowDown className="h-5 w-5 animate-bounce" /></div>
         </section>
 
         {/* CINEMATIC TRANSMISSION BANNER (Homepage Design Language & Textures) */}
@@ -504,7 +568,7 @@ export const MoltMaxPage: React.FC = () => {
                   <img
                     src="/images/hero_card_asset_shedding.jpg"
                     alt="15 Relatable Scenarios & Dilemmas"
-                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
                     src="/images/chitin_texture_bg.jpg"
@@ -573,7 +637,7 @@ export const MoltMaxPage: React.FC = () => {
                   <img
                     src="/images/hero_card_chitin_hardening.jpg"
                     alt="5-Vector Biometric Diagnostic Matrix"
-                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
                     src="/images/pbr_circuit_matrix.jpg"
@@ -642,7 +706,7 @@ export const MoltMaxPage: React.FC = () => {
                   <img
                     src="/images/hero_card_benthic_core.jpg"
                     alt="Custom Clearance Scorecard and Archetype"
-                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
                     src="/images/pbr_carbon_weave.jpg"
@@ -702,68 +766,109 @@ export const MoltMaxPage: React.FC = () => {
           </div>
         </section>
 
-        {/* METRIC COUNTER STRIP (Homepage Telemetry Strip Language) */}
-        <section className="mx-auto max-w-[1680px] px-4 pb-20 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-            <div className="chitin-card chamfer-corner relative overflow-hidden border border-cyan-500/40 bg-[#080e10]/90 p-4 text-center sm:p-6">
-              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
-              <div className="relative z-10">
-                <div className="font-grotesk text-3xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(0,195,255,0.5)] sm:text-5xl">
-                  15
-                </div>
-                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
-                  Dilemma Chambers
-                </div>
-                <div className="mt-0.5 text-[10px] text-gray-400">
-                  Scenario Engine
-                </div>
-              </div>
+        {/* CINEMATIC WIDE TRANSMISSION DIVIDER (5-Vector Biometric Diagnostic Chamber) */}
+        <section className="relative w-full border-y border-cyan-900/60 bg-[#030608] py-14 sm:py-20 overflow-hidden group">
+          <div className="pbr-underlay pbr-underlay-carbon opacity-40 pointer-events-none" />
+          <img
+            src="/images/subterranean_vats_bg.jpg"
+            alt="Benthic Neural Engine Matrix"
+            className="absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none blur-[6px]"
+          />
+          <img
+            src="/images/chitin_texture_bg.jpg"
+            alt="Chitin Texture"
+            className="absolute inset-0 h-full w-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#030608] via-[#030608]/75 to-[#030608] pointer-events-none" />
+          <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
+          
+          <div className="relative z-10 mx-auto max-w-[1500px] px-4 text-center sm:px-8">
+            <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
+              <Activity className="h-3.5 w-3.5 text-[#00ffcc] animate-pulse" />
+              <span>BIOMETRIC TELEMETRY ENGINE // 5 CORE AXES</span>
             </div>
+            <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+              THE FIVE VECTORS OF <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">CARCINIZATION</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl font-mono text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
+              Every dilemma calibrates your instincts across five distinct diagnostic axes. Analyze how each trait shapes your Carcinization profile.
+            </p>
+          </div>
+        </section>
 
-            <div className="chitin-card chamfer-corner relative overflow-hidden border border-[#ffd700]/40 bg-[#0e0c08]/90 p-4 text-center sm:p-6">
-              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
-              <div className="relative z-10">
-                <div className="font-grotesk text-3xl font-black text-[#ffd700] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)] sm:text-5xl">
-                  5
-                </div>
-                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
-                  Core Vectors
-                </div>
-                <div className="mt-0.5 text-[10px] text-gray-400">
-                  Biometric Matrix
-                </div>
-              </div>
-            </div>
+        {/* 5 BIOMETRIC PERFORMANCE VECTORS (Deep Visual Matrix Showcase) */}
+        <section className="relative mx-auto max-w-[1680px] px-4 py-16 sm:px-8 lg:px-12">
+          {/* Ambient Glows */}
+          <div className="absolute top-1/3 left-1/3 h-[450px] w-[450px] -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[150px] pointer-events-none" />
+          <div className="absolute bottom-1/3 right-1/4 h-[400px] w-[400px] rounded-full bg-amber-500/10 blur-[140px] pointer-events-none" />
 
-            <div className="chitin-card chamfer-corner relative overflow-hidden border border-[#00ffcc]/40 bg-[#081412]/90 p-4 text-center sm:p-6">
-              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
-              <div className="relative z-10">
-                <div className="font-grotesk text-3xl font-black text-[#00ffcc] drop-shadow-[0_0_15px_rgba(0,255,204,0.5)] sm:text-5xl">
-                  4
-                </div>
-                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
-                  Archetype Stages
-                </div>
-                <div className="mt-0.5 text-[10px] text-gray-400">
-                  Carcinization Tiers
-                </div>
-              </div>
-            </div>
+          {/* 5-Card Visual Grid */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {vectorDetails.map((vec) => (
+              <div
+                key={vec.code}
+                className={`chitin-card group relative flex flex-col justify-between overflow-hidden chamfer-corner-lg border-2 ${vec.borderClass} bg-gradient-to-b ${vec.bgGradient} p-5 sm:p-6 transition-all duration-500 hover:-translate-y-1.5 ${vec.glowClass}`}
+              >
+                <div className={`pbr-underlay ${vec.pbrUnderlay} opacity-35 group-hover:opacity-55 transition-opacity`} />
+                <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
 
-            <div className="chitin-card chamfer-corner relative overflow-hidden border border-cyan-500/40 bg-[#080e10]/90 p-4 text-center sm:p-6">
-              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
-              <div className="relative z-10">
-                <div className="font-grotesk text-3xl font-black text-cyan-300 drop-shadow-[0_0_15px_rgba(0,195,255,0.5)] sm:text-5xl">
-                  100%
+                <div className="relative z-10">
+                  {/* Header with Code & Icon */}
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                      {vec.code}
+                    </span>
+                    <div
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110"
+                      style={{ color: vec.color, borderColor: `${vec.color}40` }}
+                    >
+                      {vec.icon}
+                    </div>
+                  </div>
+
+                  {/* Trait Title & Subtitle */}
+                  <div className="mt-4">
+                    <div className="font-mono text-[10px] font-bold uppercase tracking-wider" style={{ color: vec.color }}>
+                      {vec.dimension}
+                    </div>
+                    <h3 className="mt-1 font-grotesk text-lg font-black uppercase text-white transition-colors group-hover:text-white">
+                      {vec.label}
+                    </h3>
+                  </div>
+
+                  {/* Description */}
+                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300">
+                    {vec.description}
+                  </p>
+
+                  {/* Diagnostic Meter Waveform / Bar */}
+                  <div className="mt-5 border-t border-white/10 pt-4">
+                    <div className="flex items-center justify-between font-mono text-[10px] text-gray-400">
+                      <span>CALIBRATION AXIS</span>
+                      <span className="font-bold text-white">{vec.meterPercent}% DENSITY</span>
+                    </div>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full transition-all duration-1000"
+                        style={{
+                          width: `${vec.meterPercent}%`,
+                          backgroundColor: vec.color,
+                          boxShadow: `0 0 10px ${vec.color}`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
-                  Free & Instant
-                </div>
-                <div className="mt-0.5 text-[10px] text-gray-400">
-                  Client-Side Audit
+
+                {/* Bottom Pill Feature */}
+                <div className="relative z-10 mt-5 border-t border-white/10 pt-3">
+                  <div className="flex items-center gap-2 font-mono text-[11px] text-gray-200">
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: vec.color }} />
+                    <span className="line-clamp-1">{vec.bullet}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </section>
       </main>}
