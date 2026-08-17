@@ -31,7 +31,7 @@ const renderPage = () => render(<ToastProvider><MoltMaxPage /></ToastProvider>)
 const answerCurrentQuestion = () => {
   const choices = screen.getAllByRole('button').filter((button) => button.hasAttribute('aria-pressed'))
   fireEvent.click(choices[0])
-  fireEvent.click(screen.getByRole('button', { name: /enter next chamber|reveal my clearance/i }))
+  fireEvent.click(screen.getByRole('button', { name: /next question|enter next chamber|reveal my clearance/i }))
 }
 
 describe('MoltMaxPage', () => {
@@ -58,8 +58,8 @@ describe('MoltMaxPage', () => {
     for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
 
     expect(screen.getByRole('heading', { name: /your shell has spoken/i })).toBeInTheDocument()
-    expect(screen.getByText(/Moltmax index/i)).toBeInTheDocument()
-    expect(screen.getByText(/Five-vector profile/i)).toBeInTheDocument()
+    expect(screen.getByText(/Moltmax (score|index)/i)).toBeInTheDocument()
+    expect(screen.getByText(/Five-(trait|vector) profile/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /export png/i })).toBeInTheDocument()
   })
 
@@ -84,7 +84,7 @@ describe('MoltMaxPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
     for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
 
-    fireEvent.click(screen.getByRole('button', { name: /save signal to core/i }))
+    fireEvent.click(screen.getByRole('button', { name: /save (to profile|signal to core)/i }))
 
     await waitFor(() => expect(mockUpdateUserStats).toHaveBeenCalledWith({
       data: expect.objectContaining({
