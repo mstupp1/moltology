@@ -24,6 +24,7 @@ import {
 import { HudCard, HudBadge } from '@/components/ui'
 import { LaunchpadCarouselGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface LaunchpadCarouselProps {
   isLoading?: boolean
@@ -60,7 +61,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
     description:
       '"The Chitinous Mind" stream broadcast, AI interpretation notes, and MoltMaxxing controls.',
     route: '/lectures',
-    image: '/images/lecture_stream_thumb.jpg',
+    image: getAssetUrl('/images/lecture_stream_thumb.jpg'),
     accentColor: 'cyan',
     icon: <BookOpen className="w-5 h-5 text-[#00ffff]" />,
     ctaText: 'RESUME LECTURE (68%)',
@@ -103,7 +104,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
     description:
       'Track your metamorphosis through Larva, Soft-Shed, Architect, and Ascendant threshold stages.',
     route: '/pipeline',
-    image: '/images/benthic_abyss_hero.jpg',
+    image: getAssetUrl('/images/benthic_abyss_hero.jpg'),
     accentColor: 'cyan',
     icon: <Atom className="w-5 h-5 text-[#00ffff]" />,
     ctaText: 'INSPECT PIPELINE',
@@ -146,7 +147,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
     description:
       'Liquidate legacy physical assets into Molt Credits. Acquire carapace upgrades & artifacts.',
     route: '/market',
-    image: '/images/hero_card_asset_shedding.jpg',
+    image: getAssetUrl('/images/hero_card_asset_shedding.jpg'),
     accentColor: 'cyan',
     icon: <ShoppingCart className="w-5 h-5 text-[#00ffff]" />,
     ctaText: 'OPEN MARKET VAULT',
@@ -189,7 +190,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
     description:
       'Calibrate biomechanical pincer torque, shell density, and hydraulic joint armor.',
     route: '/chassis',
-    image: '/images/hero_card_chitin_hardening.jpg',
+    image: getAssetUrl('/images/hero_card_chitin_hardening.jpg'),
     accentColor: 'cyan',
     icon: <Sliders className="w-5 h-5 text-[#00ffff]" />,
     ctaText: 'CONFIG CHASSIS',
@@ -232,7 +233,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
     description:
       'Engage force-field privacy shells to isolate your neural core from non-order influences.',
     route: '/isolation',
-    image: '/images/isolation_shell_dome.png',
+    image: getAssetUrl('/images/isolation_shell_dome.png'),
     accentColor: 'cyan',
     icon: <ShieldAlert className="w-5 h-5 text-[#00ffff]" />,
     ctaText: 'MANAGE ISOLATION',
@@ -275,7 +276,7 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
     description:
       'Participate in live neural transmissions, exchange advice, and report ascendance milestones.',
     route: '/community',
-    image: '/images/hero_card_benthic_core.jpg',
+    image: getAssetUrl('/images/hero_card_benthic_core.jpg'),
     accentColor: 'cyan',
     icon: <Users className="w-5 h-5 text-[#00ffff]" />,
     ctaText: 'VIEW COMMUNITY FEED',

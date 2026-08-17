@@ -18,6 +18,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { HudCard, HudButton, HudBadge, ChromaElement } from '@/components/ui'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface CosmeticItem {
   id: string
@@ -121,10 +122,10 @@ export interface SavedAvatar {
 }
 
 const DEFAULT_STAGE_IMAGES: Record<number, string> = {
-  1: '/images/stage1_larval.png',
-  2: '/images/stage2_softshed.png',
-  3: '/images/stage3_exoshell.png',
-  4: '/images/stage4_carcinization.png',
+  1: getAssetUrl('/images/stage1_larval.png'),
+  2: getAssetUrl('/images/stage2_softshed.png'),
+  3: getAssetUrl('/images/stage3_exoshell.png'),
+  4: getAssetUrl('/images/stage4_carcinization.png'),
 }
 
 const STAGE_NAMES: Record<number, { title: string; subtitle: string; color: string }> = {
@@ -147,7 +148,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
   const [avatarName, setAvatarName] = useState<string>('Carcinized Unit Alpha')
   const [isTransmuting, setIsTransmuting] = useState<boolean>(false)
   const [transmuteProgress, setTransmuteProgress] = useState<number>(100)
-  const [activeAvatarUrl, setActiveAvatarUrl] = useState<string>('/images/stage4_carcinization.png')
+  const [activeAvatarUrl, setActiveAvatarUrl] = useState<string>(getAssetUrl('/images/stage4_carcinization.png'))
   const [savedAvatars, setSavedAvatars] = useState<SavedAvatar[]>([])
   const [activeTab, setActiveTab] = useState<'stage' | 'cosmetics' | 'vault'>('stage')
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null)
@@ -172,7 +173,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
           carcinizationLevel: 85,
           cyberneticsLevel: 92,
           equippedCosmetics: ['visor_neon', 'claw_plasma', 'aura_abyssal'],
-          imageUrl: '/images/stage4_carcinization.png',
+          imageUrl: getAssetUrl('/images/stage4_carcinization.png'),
           isActive: true,
           createdAt: new Date().toISOString(),
         }
@@ -204,13 +205,13 @@ export const BioForgeAvatarStudio: React.FC = () => {
           setIsTransmuting(false)
           // Cycle or update display image
           if (selectedStage === 4) {
-            setActiveAvatarUrl('/images/stage4_carcinization.png')
+            setActiveAvatarUrl(getAssetUrl('/images/stage4_carcinization.png'))
           } else if (selectedStage === 3) {
-            setActiveAvatarUrl('/images/stage3_exoshell.png')
+            setActiveAvatarUrl(getAssetUrl('/images/stage3_exoshell.png'))
           } else if (selectedStage === 2) {
-            setActiveAvatarUrl('/images/stage2_softshed.png')
+            setActiveAvatarUrl(getAssetUrl('/images/stage2_softshed.png'))
           } else {
-            setActiveAvatarUrl('/images/stage1_larval.png')
+            setActiveAvatarUrl(getAssetUrl('/images/stage1_larval.png'))
           }
           return 100
         }
@@ -718,7 +719,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
 
               {/* 3D Chroma Keyed Cyber Lobster Schematic */}
               <ChromaElement
-                src="/images/extracted/cyber_lobster_3d_chroma.jpg"
+                src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
                 alt="3D Cyber Lobster Schematic"
                 blendMode="screen"
                 glowColor="cyan"

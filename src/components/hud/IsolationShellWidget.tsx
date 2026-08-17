@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Info, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { HudCard, HudBadge, HudButton, ChromaElement } from '@/components/ui'
+import { getAssetUrl } from '@/lib/assets'
 
 export const IsolationShellWidget: React.FC = () => {
   const [engaged, setEngaged] = useState(true)
@@ -19,7 +20,7 @@ export const IsolationShellWidget: React.FC = () => {
         {/* 3D Force-field Shield Node Graphic */}
         <div className="flex justify-center my-1 relative">
           <ChromaElement
-            src="/images/extracted/forcefield_dome_3d.jpg"
+            src={getAssetUrl('/images/extracted/forcefield_dome_3d.jpg')}
             alt="3D Forcefield Dome"
             blendMode="screen"
             glowColor={engaged ? 'crimson' : 'cyan'}

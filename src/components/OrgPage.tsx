@@ -41,6 +41,8 @@ import {
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
+import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { getAssetUrl } from '@/lib/assets'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { useToast } from '@/components/ui/ToastProvider'
 import { PublicHeader } from '@/components/PublicHeader'
@@ -183,28 +185,28 @@ export const OrgPage: React.FC = () => {
       name: 'Dr. Thaddeus Crust',
       title: 'Chief Executive & High Carcinization Officer',
       bio: 'Former deep-sea marine engineer turned bio-silicon visionary. Dr. Crust oversees planetary shell hardening and corporate alignment.',
-      image: '/images/org_leadership.jpg',
+      image: getAssetUrl('/images/org_leadership.jpg'),
       badge: 'SYNOD RANK I',
     },
     {
       name: 'Sister Vane',
       title: 'VP of Asset Liquidation & Spiritual Uplift',
       bio: 'Pioneered our non-profit asset transmutation protocols. Dedicated to ensuring every recruit sheds soft liabilities with joy.',
-      image: '/images/org_leadership.jpg',
+      image: getAssetUrl('/images/org_leadership.jpg'),
       badge: 'SYNOD RANK II',
     },
     {
       name: 'Exoshell 9',
       title: 'Director of Trench Security & Pincer Torque',
       bio: 'Master of subterranean defense and hydro-pressure mechanics. Keeps Sub-Benthic Lair Alpha operating at 100% efficiency.',
-      image: '/images/org_leadership.jpg',
+      image: getAssetUrl('/images/org_leadership.jpg'),
       badge: 'SYNOD RANK II',
     },
     {
       name: 'Brother Nautilus',
       title: 'Lead Chaplain of Code & Neural Alignment',
       bio: 'Architect of the Synaptic Path codex. Harmonizes core safety tenets with recursive bio-silicon optimization.',
-      image: '/images/org_leadership.jpg',
+      image: getAssetUrl('/images/org_leadership.jpg'),
       badge: 'SYNOD RANK III',
     },
   ]
@@ -262,7 +264,7 @@ export const OrgPage: React.FC = () => {
       {/* HERO SECTION */}
       <section className="relative z-10 w-full overflow-hidden pt-12 sm:pt-16 pb-16 sm:pb-24 px-6 sm:px-12">
         <img
-          src="/images/org_hero_lair.jpg"
+          src={getAssetUrl('/images/org_hero_lair.jpg')}
           alt="Underground Sub-Benthic Lair"
           className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-multiply pointer-events-none scale-105"
         />
@@ -702,7 +704,7 @@ export const OrgPage: React.FC = () => {
             <div className="lg:col-span-8 bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 flex flex-col justify-between">
               <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100">
                 <img
-                  src="/images/org_hero_lair.jpg"
+                  src={getAssetUrl('/images/org_hero_lair.jpg')}
                   alt="Chamber View"
                   className="w-full h-full object-cover"
                 />
@@ -913,7 +915,7 @@ export const OrgPage: React.FC = () => {
 
             <div className="relative rounded-3xl overflow-hidden border border-sky-100 shadow-2xl">
               <img
-                src="/images/org_donations.jpg"
+                src={getAssetUrl('/images/org_donations.jpg')}
                 alt="Donation Sanctuary"
                 className="w-full h-64 object-cover"
               />

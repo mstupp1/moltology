@@ -20,6 +20,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { submitLeadFn } from '@/lib/server/api'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface MoltmaxGuideModalProps {
   isOpen: boolean
@@ -176,7 +177,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                 <div className="relative group">
                   <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-[#00c3ff] to-[#00ffcc] opacity-30 blur-md group-hover:opacity-60 transition duration-300" />
                   <img
-                    src="/images/moltmax_guide_3d_mockup.jpg"
+                    src={getAssetUrl('/images/moltmax_guide_3d_mockup.jpg')}
                     alt="The 2026 Moltmaxxing Protocol Tactical Field Manual"
                     className="relative w-36 sm:w-44 rounded-lg shadow-2xl border border-white/20 object-cover"
                   />

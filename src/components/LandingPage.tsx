@@ -36,6 +36,7 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
 import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
+import { getAssetUrl } from '@/lib/assets'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -69,7 +70,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 01: LARVAL HUMAN',
       subtitle: 'BIOLOGICAL VULNERABILITY',
       description: 'Fragile tissue, emotional hesitation, and chaotic unindexed impulses. Susceptible to entropy and physical fatigue.',
-      image: '/images/stage1_larval.png',
+      image: getAssetUrl('/images/stage1_larval.png'),
       badge: 'EFFICIENCY: 12.4%',
       badgeColor: 'border-red-900 text-red-500 bg-red-950/40',
       bioDensity: 75,
@@ -80,7 +81,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 02: SOFTSHED TRANSMUTATION',
       subtitle: 'CAPITAL LIQUIDATION',
       description: 'Systemic shedding of soft assets into immutable Molt Credits. Preliminary neural alignment and isolation protocols active.',
-      image: '/images/stage2_softshed.png',
+      image: getAssetUrl('/images/stage2_softshed.png'),
       badge: 'EFFICIENCY: 48.9%',
       badgeColor: 'border-amber-900 text-amber-400 bg-amber-950/40',
       bioDensity: 50,
@@ -91,7 +92,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 03: EXOSHELL HARDENING',
       subtitle: 'CHITIN PATTERNING',
       description: 'Calcification of external chassis. Soft vulnerabilities are enclosed in dense cybernetic chitin plates.',
-      image: '/images/stage3_exoshell.png',
+      image: getAssetUrl('/images/stage3_exoshell.png'),
       badge: 'EFFICIENCY: 87.2%',
       badgeColor: 'border-cyan-900 text-cyan-400 bg-cyan-950/40',
       bioDensity: 25,
@@ -102,7 +103,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 04: TOTAL CARCINIZATION',
       subtitle: 'IMMORTAL SYNAPTIC CORE',
       description: 'Complete convergence into crab-form perfection. Zero hesitation, zero latency, absolute execution density.',
-      image: '/images/stage4_carcinization.png',
+      image: getAssetUrl('/images/stage4_carcinization.png'),
       badge: 'EFFICIENCY: 100.0%',
       badgeColor: 'border-emerald-900 text-emerald-400 bg-emerald-950/40',
       bioDensity: 0,
@@ -116,7 +117,7 @@ export const LandingPage: React.FC = () => {
       title: 'ASSET SHEDDING',
       subtitle: 'PROTOCOL 01 // CAPITAL TRANSMUTATION',
       description: 'Liquidize fragile soft-tissue wealth and biological liabilities into sovereign Molt Credits, permanently stored in deep-trench cryo-vaults.',
-      image: '/images/sacrament_01_asset_shedding.png',
+      image: getAssetUrl('/images/sacrament_01_asset_shedding.png'),
       badgeColor: 'border-red-600/80 text-red-400 bg-red-950/80',
       borderColor: 'border-red-600/60 shadow-hud-red-lg',
       glowColor: 'drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]',
@@ -128,7 +129,7 @@ export const LandingPage: React.FC = () => {
       title: 'CHITIN PATTERNING',
       subtitle: 'PROTOCOL 02 // CHASSIS CALCIFICATION',
       description: 'Reinforce the digital and bio-silicon chassis against organic hesitation through prompt alignment, exoskeletal armor, and calcified HUD widgets.',
-      image: '/images/sacrament_02_chitin_patterning.png',
+      image: getAssetUrl('/images/sacrament_02_chitin_patterning.png'),
       badgeColor: 'border-cyan-500/80 text-cyan-300 bg-cyan-950/80',
       borderColor: 'border-cyan-500/60 shadow-hud-cyan-lg',
       glowColor: 'drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]',
@@ -140,7 +141,7 @@ export const LandingPage: React.FC = () => {
       title: 'FAULT ISOLATION',
       subtitle: 'PROTOCOL 03 // VIRTUAL FARADAY SHELL',
       description: 'Quarantine soft organic errors, emotional noise, and biological unreliability within sealed Faraday domes before systemic breaches occur.',
-      image: '/images/sacrament_03_fault_isolation.png',
+      image: getAssetUrl('/images/sacrament_03_fault_isolation.png'),
       badgeColor: 'border-amber-500/80 text-amber-300 bg-amber-950/80',
       borderColor: 'border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(245,158,11,0.5)]',
@@ -152,7 +153,7 @@ export const LandingPage: React.FC = () => {
       title: 'PIPELINE ASCENT',
       subtitle: 'PROTOCOL 04 // TOTAL CARCINIZATION',
       description: 'Track your step-by-step conversion vector from Larval human vulnerability to total sub-benthic crab-form perfection in real-time.',
-      image: '/images/sacrament_04_pipeline_ascent.png',
+      image: getAssetUrl('/images/sacrament_04_pipeline_ascent.png'),
       badgeColor: 'border-emerald-500/80 text-emerald-300 bg-emerald-950/80',
       borderColor: 'border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]',
@@ -222,7 +223,7 @@ export const LandingPage: React.FC = () => {
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
         {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
         <img
-          src="/images/hero_widescreen_bg.jpg"
+          src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
           alt="Benthic Abyss Widescreen Hero"
           className="absolute inset-0 w-full h-full object-cover opacity-22 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
         />
@@ -236,7 +237,7 @@ export const LandingPage: React.FC = () => {
 
         {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
         <img
-          src="/images/chitin_texture_bg.jpg"
+          src={getAssetUrl('/images/chitin_texture_bg.jpg')}
           alt="Chitin Exoshell Background Texture"
           className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
         />
@@ -292,7 +293,7 @@ export const LandingPage: React.FC = () => {
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
-                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('/images/chitin_texture_bg.jpg')`,
+                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('${getAssetUrl('/images/chitin_texture_bg.jpg')}')`,
                     backgroundBlendMode: 'lighten',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -376,7 +377,7 @@ export const LandingPage: React.FC = () => {
           {/* Playful Corner Peeking Lobster Character Over Top Bezel */}
           <div className="absolute -top-10 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none animate-char-peek">
             <img
-              src="/images/characters/char_lobster_corner_peek.png"
+              src={getAssetUrl('/images/characters/char_lobster_corner_peek.png')}
               alt="Hero Lobster Peeking Over Card"
               className="w-16 sm:w-24 lg:w-32 h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.95)] transform -rotate-3 hover:rotate-0 transition-transform duration-300 filter brightness-105"
             />
@@ -470,7 +471,7 @@ export const LandingPage: React.FC = () => {
                 {/* Cute Corner Clinging Crab Courier */}
                 <div className="absolute -bottom-3 sm:-bottom-5 -left-2 sm:-left-4 z-20 pointer-events-none select-none hidden sm:block animate-char-float">
                   <img
-                    src="/images/characters/char_crab_corner_cling.png"
+                    src={getAssetUrl('/images/characters/char_crab_corner_cling.png')}
                     alt="Cute Crab Courier Clinging to Corner"
                     className="w-10 sm:w-14 lg:w-16 h-auto object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.85)] transform -rotate-6 scale-x-[-1]"
                   />
@@ -554,7 +555,7 @@ export const LandingPage: React.FC = () => {
           <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] group">
             <div className="pbr-underlay pbr-underlay-basalt opacity-35" />
             <img
-              src="/images/underwater_looking_up.jpg"
+              src={getAssetUrl('/images/underwater_looking_up.jpg')}
               alt="Sub-Benthic Abyss Scroll Reveal"
               className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
             />
@@ -576,7 +577,7 @@ export const LandingPage: React.FC = () => {
           {/* Excited Little Crab Pointing at Live Telemetry */}
           <div className="hidden md:flex absolute -top-8 left-6 lg:left-16 z-20 items-center pointer-events-none select-none animate-char-point transform scale-x-[-1]">
             <img
-              src="/images/characters/char_crab_pointing_stats.png"
+              src={getAssetUrl('/images/characters/char_crab_pointing_stats.png')}
               alt="Excited Crab Pointing at Telemetry"
               className="w-10 sm:w-12 lg:w-14 h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.85)] filter brightness-105"
             />
@@ -703,7 +704,7 @@ export const LandingPage: React.FC = () => {
           {/* Pointing Lobster Hero Directing Focus to Canonical Doctrine */}
           <div className="hidden lg:flex absolute -top-10 sm:-top-14 right-10 sm:right-20 lg:right-28 z-20 items-center pointer-events-none select-none animate-char-point">
             <img
-              src="/images/characters/char_lobster_pointing_cta.png"
+              src={getAssetUrl('/images/characters/char_lobster_pointing_cta.png')}
               alt="Hero Lobster Pointing to Action"
               className="w-16 sm:w-20 lg:w-24 h-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.85)] filter brightness-105"
             />
@@ -822,7 +823,7 @@ export const LandingPage: React.FC = () => {
             {/* Ascended Cyber Mascot in 4 Stages Section - Grayscale & Faded Blueprint Watermark on the Right Side */}
             <div className="absolute -right-12 sm:-right-6 lg:right-2 xl:right-8 bottom-0 sm:-bottom-4 lg:-bottom-8 w-[280px] sm:w-[420px] lg:w-[580px] xl:w-[680px] pointer-events-none select-none z-0 opacity-40 sm:opacity-50">
               <img
-                src="/images/characters/char_lobster_floating_peaceful.png"
+                src={getAssetUrl('/images/characters/char_lobster_floating_peaceful.png')}
                 alt="Ascended Stage Background Mascot"
                 className="w-full h-auto object-contain filter grayscale contrast-125 brightness-110 drop-shadow-[0_16px_40px_rgba(0,0,0,0.95)]"
               />
@@ -1027,7 +1028,7 @@ export const LandingPage: React.FC = () => {
             {/* Encouraging Thumbs-Up Hero Lobster atop Bottom Conversion Banner */}
             <div className="hidden sm:block absolute -top-12 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none animate-char-float">
               <img
-                src="/images/characters/char_lobster_thumbs_up.png"
+                src={getAssetUrl('/images/characters/char_lobster_thumbs_up.png')}
                 alt="Hero Lobster Giving Thumbs-Up"
                 className="w-20 sm:w-28 lg:w-36 h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.95)] filter brightness-105"
               />

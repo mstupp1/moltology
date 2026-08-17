@@ -4,6 +4,7 @@ import { ShoppingBag, Lock, ShieldAlert, Clock, ArrowRight } from 'lucide-react'
 import { AssetTransmutationModal } from '@/components/hud/AssetTransmutationModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { seo } from '@/lib/seo'
+import { getAssetUrl } from '@/lib/assets'
 
 function MarketRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -56,7 +57,7 @@ function MarketRoute() {
                   {/* Gem Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-2">
                     <img
-                      src="/images/chitin_gem.png"
+                      src={getAssetUrl('/images/chitin_gem.png')}
                       alt="Chitin Gems"
                       className="w-full h-full object-contain"
                     />
@@ -85,7 +86,7 @@ function MarketRoute() {
                   {/* Gem Pile Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-2">
                     <img
-                      src="/images/chitin_gem.png"
+                      src={getAssetUrl('/images/chitin_gem.png')}
                       alt="Chitin Gem Pile"
                       className="w-full h-full object-contain"
                     />
@@ -119,7 +120,7 @@ function MarketRoute() {
                   {/* Claw Treasure Chest Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-1">
                     <img
-                      src="/images/stage3_exoshell.png"
+                      src={getAssetUrl('/images/stage3_exoshell.png')}
                       alt="Claw-Lord Chest"
                       className="w-full h-full object-contain"
                     />
@@ -156,7 +157,7 @@ function MarketRoute() {
               <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49] flex flex-col justify-between">
                 <div>
                   <div className="w-8 h-8 mx-auto">
-                    <img src="/images/molt_credit.png" alt="Molt Credits" className="w-full h-full object-contain" />
+                    <img src={getAssetUrl('/images/molt_credit.png')} alt="Molt Credits" className="w-full h-full object-contain" />
                   </div>
                   <div className="text-xs font-bold text-[#dfe3e3]">Molt Credits</div>
                   <div className="text-xs text-[#839493]">(liquidated goods)</div>
@@ -176,7 +177,7 @@ function MarketRoute() {
               <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49] flex flex-col justify-between">
                 <div>
                   <div className="w-8 h-8 mx-auto">
-                    <img src="/images/chitin_gem.png" alt="Chitin Gems" className="w-full h-full object-contain" />
+                    <img src={getAssetUrl('/images/chitin_gem.png')} alt="Chitin Gems" className="w-full h-full object-contain" />
                   </div>
                   <div className="text-xs font-bold text-[#dfe3e3]">Chitin-Gems</div>
                   <div className="text-xs text-[#839493]">(Chassis upgrades)</div>
@@ -196,7 +197,7 @@ function MarketRoute() {
               <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49] flex flex-col justify-between">
                 <div>
                   <div className="w-8 h-8 mx-auto">
-                    <img src="/images/synapse_shard.png" alt="Synapse Shards" className="w-full h-full object-contain" />
+                    <img src={getAssetUrl('/images/synapse_shard.png')} alt="Synapse Shards" className="w-full h-full object-contain" />
                   </div>
                   <div className="text-xs font-bold text-[#dfe3e3]">Synapse Shards</div>
                   <div className="text-xs text-[#839493]">(Apex Shards)</div>
@@ -236,7 +237,7 @@ function MarketRoute() {
               <div className="chitin-card-inset p-2.5 chamfer-corner text-center space-y-2 border border-[#3a4a49] flex flex-col justify-between">
                 <div>
                   <div className="w-8 h-8 mx-auto rounded-full bg-[#030606] border border-[#ff0000] overflow-hidden p-0.5">
-                    <img src="/images/stage1_larval.png" alt="Flesh-Aura" className="w-full h-full object-cover" />
+                    <img src={getAssetUrl('/images/stage1_larval.png')} alt="Flesh-Aura" className="w-full h-full object-cover" />
                   </div>
                   <div className="text-[10px] font-bold text-[#dfe3e3]">Flesh-Aura</div>
                   <div className="text-[8px] text-[#839493]">(Detach emotionally)</div>
@@ -337,7 +338,7 @@ function MarketRoute() {
               {/* Artwork Box matching reference */}
               <div className="w-full h-36 bg-[#030606] border border-[#3a4a49] overflow-hidden chamfer-corner relative my-2">
                 <img
-                  src="/images/stage4_carcinization.png"
+                  src={getAssetUrl('/images/stage4_carcinization.png')}
                   alt="Ultimate Carcinization Pack"
                   className="w-full h-full object-cover"
                 />

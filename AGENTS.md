@@ -57,3 +57,10 @@
   - **Scoped / Minor Changes** (e.g., UI tweaks, single component updates): Run targeted Vitest tests for modified files (e.g., `npx vitest run path/to/file.test.ts`) and ensure clean TypeScript/build verification (`npm run build`).
   - **Major / Full Work Completion**: Run the full test suite (`npm run test`) and `npm run build` before final delivery/commit. Must be 100% pass.
 
+## 8. Asset Storage & Media Best Practices
+- **Lightweight Repository**: Keep the git repository lightweight (< 200 KB in `public/images/`). Only essential brand icons (`favicon.ico`, `order_emblem.png`, `scanline_pattern.png`, canvas bubble particles) reside locally in `public/`.
+- **Neon S3 Storage**: All content images, PBR textures, quiz graphics, guide artwork, and video/audio media reside in the Neon S3 public assets bucket (`moltology-public-assets`).
+- **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) for resolving asset URLs in code and components.
+- **Sync & Verification**: Run `npm run s3:sync` to upload/sync local assets to S3 and `npm run s3:verify` to check CDN asset parity.
+
+

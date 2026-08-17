@@ -17,6 +17,8 @@
     "db:grant-admin": "tsx src/db/grant-admin.ts",
     "db:ingest": "tsx scripts/ingest.ts",
     "s3:upload": "tsx scripts/upload-asset.ts",
+    "s3:sync": "tsx scripts/sync-s3-assets.ts",
+    "s3:verify": "tsx scripts/sync-s3-assets.ts --verify",
     "video:generate": "tsx scripts/generate-video.ts",
     "reel:create": "tsx scripts/create-daily-reel.ts",
     "shorts:create": "tsx scripts/create-daily-reel.ts",

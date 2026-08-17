@@ -92,7 +92,7 @@
 .chitin-card-pbr {
   background: 
     linear-gradient(135deg, rgba(14, 22, 25, 0.72) 0%, rgba(8, 13, 15, 0.88) 100%),
-    url('/images/pbr_chitin_plates.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_chitin_plates.jpg');
   background-size: cover, 360px 360px;
   background-repeat: no-repeat, repeat;
   border: 1px solid rgba(0, 195, 255, 0.35);
@@ -123,7 +123,7 @@
 .texture-pbr-chitin {
   background-image: 
     linear-gradient(to bottom, rgba(10, 16, 18, 0.75), rgba(7, 11, 11, 0.88)),
-    url('/images/pbr_chitin_plates.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_chitin_plates.jpg');
   background-size: cover, 380px 380px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -132,7 +132,7 @@
 .texture-pbr-hex {
   background-image: 
     linear-gradient(to bottom, rgba(10, 16, 18, 0.8), rgba(7, 11, 11, 0.9)),
-    url('/images/pbr_hex_lattice.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_hex_lattice.jpg');
   background-size: cover, 340px 340px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -141,7 +141,7 @@
 .texture-pbr-alloy {
   background-image: 
     linear-gradient(to bottom, rgba(8, 14, 16, 0.78), rgba(5, 9, 10, 0.92)),
-    url('/images/pbr_benthic_alloy.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_benthic_alloy.jpg');
   background-size: cover, 400px 400px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -150,7 +150,7 @@
 .texture-pbr-carbon {
   background-image: 
     linear-gradient(to bottom, rgba(12, 16, 18, 0.82), rgba(6, 10, 12, 0.94)),
-    url('/images/pbr_carbon_weave.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_carbon_weave.jpg');
   background-size: cover, 260px 260px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -159,7 +159,7 @@
 .texture-pbr-basalt {
   background-image: 
     linear-gradient(to bottom, rgba(8, 12, 14, 0.8), rgba(4, 7, 8, 0.92)),
-    url('/images/pbr_deep_basalt.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_deep_basalt.jpg');
   background-size: cover, 400px 400px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -168,7 +168,7 @@
 .texture-pbr-circuit {
   background-image: 
     linear-gradient(to bottom, rgba(10, 14, 18, 0.82), rgba(5, 8, 11, 0.94)),
-    url('/images/pbr_circuit_matrix.jpg');
+    url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_circuit_matrix.jpg');
   background-size: cover, 320px 320px;
   background-position: center, center;
   background-repeat: no-repeat, repeat;
@@ -188,27 +188,27 @@
 }
 
 .pbr-underlay-hex {
-  background-image: url('/images/pbr_hex_lattice.jpg');
+  background-image: url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_hex_lattice.jpg');
 }
 
 .pbr-underlay-chitin {
-  background-image: url('/images/pbr_chitin_plates.jpg');
+  background-image: url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_chitin_plates.jpg');
 }
 
 .pbr-underlay-alloy {
-  background-image: url('/images/pbr_benthic_alloy.jpg');
+  background-image: url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_benthic_alloy.jpg');
 }
 
 .pbr-underlay-carbon {
-  background-image: url('/images/pbr_carbon_weave.jpg');
+  background-image: url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_carbon_weave.jpg');
 }
 
 .pbr-underlay-basalt {
-  background-image: url('/images/pbr_deep_basalt.jpg');
+  background-image: url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_deep_basalt.jpg');
 }
 
 .pbr-underlay-circuit {
-  background-image: url('/images/pbr_circuit_matrix.jpg');
+  background-image: url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_circuit_matrix.jpg');
 }
 
 /* Background Sacred Geometry Grid Overlay */

@@ -10,6 +10,7 @@ import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
+import { getAssetUrl } from '@/lib/assets'
 
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
@@ -63,9 +64,9 @@ function HudContent() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const img1 = new Image()
-      img1.src = '/images/subterranean_vats_bg.jpg'
+      img1.src = getAssetUrl('/images/subterranean_vats_bg.jpg')
       const img2 = new Image()
-      img2.src = '/images/underwater_looking_up.jpg'
+      img2.src = getAssetUrl('/images/underwater_looking_up.jpg')
     }
   }, [])
 
@@ -89,7 +90,7 @@ function HudContent() {
           className={`absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-screen filter drop-shadow-[0_0_45px_rgba(0,255,255,0.65)] transition-opacity duration-150 ${
             isSubterranean ? 'opacity-0' : 'opacity-95'
           }`}
-          style={{ backgroundImage: `url('/images/underwater_looking_up.jpg')` }}
+          style={{ backgroundImage: `url('${getAssetUrl('/images/underwater_looking_up.jpg')}')` }}
         />
 
         {/* Full-Bleed Nuclear Subterranean Vats Background */}
@@ -97,7 +98,7 @@ function HudContent() {
           className={`absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-screen filter drop-shadow-[0_0_55px_rgba(57,255,20,0.8)] transition-opacity duration-150 ${
             isSubterranean ? 'opacity-95' : 'opacity-0'
           }`}
-          style={{ backgroundImage: `url('/images/subterranean_vats_bg.jpg')` }}
+          style={{ backgroundImage: `url('${getAssetUrl('/images/subterranean_vats_bg.jpg')}')` }}
         />
 
         {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}

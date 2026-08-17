@@ -13,6 +13,7 @@ import {
   Gauge,
 } from 'lucide-react'
 import type { IsolationSettings } from './IsolationSettingsModal'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface CameraFeed {
   id: string
@@ -26,43 +27,43 @@ export const ISOLATION_CAMERA_FEEDS: CameraFeed[] = [
     id: 'feed-01',
     title: 'CYBER-BENTHIC ASCENSION',
     videoUrl: '/videos/hero_benthic_core.mp4',
-    posterUrl: '/images/hero_card_benthic_core.jpg',
+    posterUrl: getAssetUrl('/images/hero_card_benthic_core.jpg'),
   },
   {
     id: 'feed-02',
     title: 'ASSET TRANSMUTATION',
     videoUrl: '/videos/hero_asset_shedding.mp4',
-    posterUrl: '/images/hero_card_asset_shedding.jpg',
+    posterUrl: getAssetUrl('/images/hero_card_asset_shedding.jpg'),
   },
   {
     id: 'feed-03',
     title: 'EXOSKELETAL HARDENING',
     videoUrl: '/videos/hero_chitin_hardening.mp4',
-    posterUrl: '/images/hero_card_chitin_hardening.jpg',
+    posterUrl: getAssetUrl('/images/hero_card_chitin_hardening.jpg'),
   },
   {
     id: 'feed-04',
     title: 'TOTAL CARCINIZATION',
     videoUrl: '/videos/hero_total_carcinization.mp4',
-    posterUrl: '/images/stage4_carcinization.png',
+    posterUrl: getAssetUrl('/images/stage4_carcinization.png'),
   },
   {
     id: 'feed-05',
     title: 'VIRTUAL FARADAY SHELL',
     videoUrl: '/videos/hero_fault_isolation.mp4',
-    posterUrl: '/images/isolation_shell_dome.png',
+    posterUrl: getAssetUrl('/images/isolation_shell_dome.png'),
   },
   {
     id: 'feed-06',
     title: 'SYNAPTIC SANCTUARY',
     videoUrl: '/videos/hero_synaptic_path.mp4',
-    posterUrl: '/images/hero_family_welcoming_sanctuary.png',
+    posterUrl: getAssetUrl('/images/hero_family_welcoming_sanctuary.png'),
   },
   {
     id: 'feed-07',
     title: 'CRYO-STASIS CHAMBER',
     videoUrl: '/videos/benthic_cryo_chamber.mp4',
-    posterUrl: '/images/benthic_abyss_hero.jpg',
+    posterUrl: getAssetUrl('/images/benthic_abyss_hero.jpg'),
   },
 ]
 

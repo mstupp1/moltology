@@ -8,6 +8,7 @@ import { authClient } from '@/lib/auth-client'
 import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
 import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult, type QuizDimension } from '@/lib/moltmax-quiz'
+import { getAssetUrl } from '@/lib/assets'
 import { QuizQuestionCard } from './moltmax/QuizQuestionCard'
 import { QuizProgressHUD } from './moltmax/QuizProgressHUD'
 import { QuizResultsReveal } from './moltmax/QuizResultsReveal'
@@ -93,7 +94,7 @@ const fannedCards = [
     trait: 'Carapace Resilience',
     eyebrow: '01 // RESILIENCE & STRESS ARMOR',
     prompt: 'A sudden wave of criticism strikes your outer shell before the day has begun. What happens next?',
-    image: '/images/quiz/q01_criticism.jpg',
+    image: getAssetUrl('/images/quiz/q01_criticism.jpg'),
     imageAlt: 'Armored lobster hero smiling as criticism bounces off harmlessly',
     options: [
       { id: 'q1-a', label: 'I absorb the impact, then inspect it for useful lessons.', detail: 'Useful fragments are retained. The rest falls away.' },
@@ -107,7 +108,7 @@ const fannedCards = [
     trait: 'Decisive Execution',
     eyebrow: '05 // EXECUTION LOAD & TORQUE',
     prompt: 'Three useful paths open at once and the tide is moving. How do your pincers behave?',
-    image: '/images/quiz/q05_pincer.jpg',
+    image: getAssetUrl('/images/quiz/q05_pincer.jpg'),
     imageAlt: 'Lobster hero snapping a powerful claw onto the golden prize',
     options: [
       { id: 'q5-a', label: 'Select one and close cleanly.', detail: 'One committed grip beats three partial holds.' },
@@ -121,7 +122,7 @@ const fannedCards = [
     trait: 'Depth Composure',
     eyebrow: '03 // PRESSURE & DEPTH TOLERANCE',
     prompt: 'Your work reaches a difficult pressure zone. Which descent protocol do you select?',
-    image: '/images/quiz/q03_depth.jpg',
+    image: getAssetUrl('/images/quiz/q03_depth.jpg'),
     imageAlt: 'Lobster hero diving boldly into deep ocean trench with glowing headlights',
     options: [
       { id: 'q3-a', label: 'Descend in measured stages.', detail: 'I build tolerance while keeping a return path.' },
@@ -135,7 +136,7 @@ const fannedCards = [
     trait: 'Growth & Adaptation',
     eyebrow: '10 // OLD HABIT RELEASE & ECDYSIS',
     prompt: 'You discover that a familiar process is now slowing the colony. How do you conduct the shed?',
-    image: '/images/quiz/q10_team_upgrade.jpg',
+    image: getAssetUrl('/images/quiz/q10_team_upgrade.jpg'),
     imageAlt: 'Lobster hero presenting upgrade blueprint to cheerful teammates',
     options: [
       { id: 'q10-a', label: 'Document the lesson and replace it.', detail: 'The old shell becomes material for the next one.' },
@@ -149,7 +150,7 @@ const fannedCards = [
     trait: 'Synaptic Speed',
     eyebrow: '12 // SIGNAL TRIAGE & FOCUS',
     prompt: 'Your attention receives five competing pings at once. What is your decisive first move?',
-    image: '/images/quiz/q12_focus.jpg',
+    image: getAssetUrl('/images/quiz/q12_focus.jpg'),
     imageAlt: 'Lobster hero swiping away noisy notification bubbles to focus on priority',
     options: [
       { id: 'q12-a', label: 'Name the one live priority.', detail: 'The rest are queued without ceremony.' },
@@ -163,7 +164,7 @@ const fannedCards = [
     trait: 'Decisive Closure',
     eyebrow: '13 // DECISIVE CLOSURE & DEPLOYMENT',
     prompt: 'A good-enough solution is ready now; a theoretically perfect solution may arrive next week.',
-    image: '/images/quiz/q13_ship_it.jpg',
+    image: getAssetUrl('/images/quiz/q13_ship_it.jpg'),
     imageAlt: 'Lobster hero launching a working yellow mini-sub with a thumbs up',
     options: [
       { id: 'q13-a', label: 'Close, deploy, and refine in the current.', detail: 'A working shell today beats an imaginary shell next week.' },
@@ -363,7 +364,7 @@ export const MoltMaxPage: React.FC = () => {
         >
           {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
           <img
-            src="/images/hero_widescreen_bg.jpg"
+            src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
             alt="Benthic Abyss Widescreen Hero"
             className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
           />
@@ -374,7 +375,7 @@ export const MoltMaxPage: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.14)_0%,transparent_65%)] pointer-events-none z-0" />
           {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
           <img
-            src="/images/chitin_texture_bg.jpg"
+            src={getAssetUrl('/images/chitin_texture_bg.jpg')}
             alt="Chitin Exoshell Background Texture"
             className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
           />
@@ -619,12 +620,12 @@ export const MoltMaxPage: React.FC = () => {
         <section className="relative w-full border-y border-cyan-900/60 bg-[#030607] py-14 sm:py-20 overflow-hidden group">
           <div className="pbr-underlay pbr-underlay-basalt opacity-40 pointer-events-none" />
           <img
-            src="/images/hero_widescreen_bg.jpg"
+            src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
             alt="Benthic Abyss Transmission"
             className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none blur-[8px]"
           />
           <img
-            src="/images/chitin_texture_bg.jpg"
+            src={getAssetUrl('/images/chitin_texture_bg.jpg')}
             alt="Chitin Texture"
             className="absolute inset-0 h-full w-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
           />
@@ -661,12 +662,12 @@ export const MoltMaxPage: React.FC = () => {
                 {/* 16:9 Showcase Image with Tactile Chitin Texture Overlay */}
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-cyan-500/30 bg-[#020608]">
                   <img
-                    src="/images/hero_card_asset_shedding.jpg"
+                    src={getAssetUrl('/images/hero_card_asset_shedding.jpg')}
                     alt="15 Relatable Scenarios & Dilemmas"
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
-                    src="/images/chitin_texture_bg.jpg"
+                    src={getAssetUrl('/images/chitin_texture_bg.jpg')}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-35 mix-blend-overlay pointer-events-none z-0"
                   />
@@ -730,12 +731,12 @@ export const MoltMaxPage: React.FC = () => {
                 {/* 16:9 Showcase Image with Circuit Matrix Texture Overlay */}
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-[#ffd700]/30 bg-[#020608]">
                   <img
-                    src="/images/hero_card_chitin_hardening.jpg"
+                    src={getAssetUrl('/images/hero_card_chitin_hardening.jpg')}
                     alt="5-Vector Biometric Diagnostic Matrix"
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
-                    src="/images/pbr_circuit_matrix.jpg"
+                    src={getAssetUrl('/images/pbr_circuit_matrix.jpg')}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay pointer-events-none z-0"
                   />
@@ -799,12 +800,12 @@ export const MoltMaxPage: React.FC = () => {
                 {/* 16:9 Showcase Image with Carbon Weave Texture Overlay */}
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-[#00ffcc]/30 bg-[#020608]">
                   <img
-                    src="/images/hero_card_benthic_core.jpg"
+                    src={getAssetUrl('/images/hero_card_benthic_core.jpg')}
                     alt="Custom Clearance Scorecard and Archetype"
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
-                    src="/images/pbr_carbon_weave.jpg"
+                    src={getAssetUrl('/images/pbr_carbon_weave.jpg')}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay pointer-events-none z-0"
                   />
@@ -865,12 +866,12 @@ export const MoltMaxPage: React.FC = () => {
         <section className="relative w-full border-y border-cyan-900/60 bg-[#030608] py-14 sm:py-20 overflow-hidden group">
           <div className="pbr-underlay pbr-underlay-carbon opacity-40 pointer-events-none" />
           <img
-            src="/images/subterranean_vats_bg.jpg"
+            src={getAssetUrl('/images/subterranean_vats_bg.jpg')}
             alt="Benthic Neural Engine Matrix"
             className="absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none blur-[6px]"
           />
           <img
-            src="/images/chitin_texture_bg.jpg"
+            src={getAssetUrl('/images/chitin_texture_bg.jpg')}
             alt="Chitin Texture"
             className="absolute inset-0 h-full w-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
           />
@@ -984,12 +985,12 @@ export const MoltMaxPage: React.FC = () => {
       <section className="relative border-t border-cyan-900/60 bg-[#030608] px-4 py-16 text-center overflow-hidden sm:px-8 sm:py-24">
         <div className="pbr-underlay pbr-underlay-basalt opacity-35 pointer-events-none" />
         <img
-          src="/images/underwater_looking_up.jpg"
+          src={getAssetUrl('/images/underwater_looking_up.jpg')}
           alt="Benthic Ascension Background"
           className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
         />
         <img
-          src="/images/chitin_texture_bg.jpg"
+          src={getAssetUrl('/images/chitin_texture_bg.jpg')}
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-overlay pointer-events-none z-0"
         />

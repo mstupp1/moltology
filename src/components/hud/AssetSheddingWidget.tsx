@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { HelpCircle } from 'lucide-react'
 import { HudCard, HudSelect, HudButton, ChromaElement } from '@/components/ui'
+import { getAssetUrl } from '@/lib/assets'
 
 export const AssetSheddingWidget: React.FC = () => {
   const navigate = useNavigate()
@@ -52,7 +53,7 @@ export const AssetSheddingWidget: React.FC = () => {
             className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
             <ChromaElement
-              src="/images/extracted/asset_vehicle_3d.jpg"
+              src={getAssetUrl('/images/extracted/asset_vehicle_3d.jpg')}
               alt="Hover Vehicle"
               blendMode="screen"
               glowColor="cyan"
@@ -67,7 +68,7 @@ export const AssetSheddingWidget: React.FC = () => {
             className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
             <ChromaElement
-              src="/images/extracted/asset_citadel_3d.jpg"
+              src={getAssetUrl('/images/extracted/asset_citadel_3d.jpg')}
               alt="Abyssal Citadel"
               blendMode="screen"
               glowColor="cyan"
@@ -82,7 +83,7 @@ export const AssetSheddingWidget: React.FC = () => {
             className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
             <ChromaElement
-              src="/images/extracted/asset_relic_3d.jpg"
+              src={getAssetUrl('/images/extracted/asset_relic_3d.jpg')}
               alt="Bio Relic Vault"
               blendMode="screen"
               glowColor="crimson"
@@ -97,7 +98,7 @@ export const AssetSheddingWidget: React.FC = () => {
             className="p-1.5 h-12 flex items-center justify-center group overflow-hidden"
           >
             <ChromaElement
-              src="/images/extracted/asset_enterprise_3d.jpg"
+              src={getAssetUrl('/images/extracted/asset_enterprise_3d.jpg')}
               alt="Enterprise Briefcase"
               blendMode="screen"
               glowColor="cyan"

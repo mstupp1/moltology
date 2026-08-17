@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { HudCard, HudButton, HudBadge, ChromaElement } from '@/components/ui'
+import { getAssetUrl } from '@/lib/assets'
 
 export const MoltMaxxingStudio: React.FC = () => {
   const [stats, setStats] = useState({
@@ -45,7 +46,7 @@ export const MoltMaxxingStudio: React.FC = () => {
 
             {/* 3D Chroma Keyed Cyber Lobster Schematic */}
             <ChromaElement
-              src="/images/extracted/cyber_lobster_3d_chroma.jpg"
+              src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
               alt="Cyber Lobster 3D Schematic"
               blendMode="screen"
               glowColor="cyan"
