@@ -6,9 +6,9 @@ export const Route = createFileRoute('/moltmax')({
   head: () => ({
     meta: [
       ...seo({
-        title: 'Moltmaxxing Biometric Scanner | Measure Shell Hardness & Pincer Torque',
-        description: 'The official interactive Moltmaxxing assessment. Calculate your Carcinization Score, assess Shell Hardness and Pincer Torque, and export your official HUD scorecard.',
-        keywords: 'moltmaxxing, moltmax scanner, shell hardness, pincer torque, carcinization score, biometric telemetry, looksmaxxing parody',
+        title: 'Moltmax Clearance Audit | Measure the Shell, Meet the Depth',
+        description: 'Complete the official 15-vector Moltmax clearance audit. Observe your shell hardness, pincer torque, neural flow, ecdysis discipline, and pressure tolerance.',
+        keywords: 'moltmaxxing, moltmax audit, shell hardness, pincer torque, ecdysis, carcinization stage, benthic clearance',
         ogImage: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/cyber_lobster_hero.jpg',
         canonical: 'https://moltology.org/moltmax',
         siteName: 'Moltology',

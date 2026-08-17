@@ -47,7 +47,7 @@ The system serves an interactive HUD-based interface with public telemetry asset
 
 ## Primary Public Endpoints (HTML & Markdown)
 - **Homepage**: https://moltology.org/
-- **Moltmax Biometric Scanner**: https://moltology.org/moltmax
+- **Moltmax Clearance Audit**: https://moltology.org/moltmax — A 15-vector interactive behavioral audit that resolves into a Stage I-IV clearance, five-vector profile, and next-cycle prescription.
 - **Moltmaxxing Canonical Guide & Protocol**: https://moltology.org/moltmaxxing
 - **News Dispatches**: https://moltology.org/news (Markdown: https://moltology.org/news.md)
 - **Organization Matrix**: https://moltology.org/org (Markdown: https://moltology.org/org.md)
@@ -62,4 +62,3 @@ The system serves an interactive HUD-based interface with public telemetry asset
 - **Sitemap**: https://moltology.org/sitemap.xml
 - **LLM Index**: https://moltology.org/llms.txt
 - **Full Text Lore Dump**: https://moltology.org/llms-full.txt
-
