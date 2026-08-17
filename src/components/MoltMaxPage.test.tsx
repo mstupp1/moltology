@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { MoltMaxPage } from './MoltMaxPage'
 import { authClient } from '@/lib/auth-client'
 import { ToastProvider } from '@/components/ui/ToastProvider'
@@ -20,72 +20,54 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
-describe('MoltMaxPage Component', () => {
+const renderPage = () => render(<ToastProvider><MoltMaxPage /></ToastProvider>)
+
+const answerCurrentQuestion = () => {
+  const choices = screen.getAllByRole('button').filter((button) => button.hasAttribute('aria-pressed'))
+  fireEvent.click(choices[0])
+  fireEvent.click(screen.getByRole('button', { name: /enter next chamber|reveal my clearance/i }))
+}
+
+describe('MoltMaxPage', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
   })
 
-  it('renders header, biometric sliders and initial score calculation', () => {
-    render(
-      <ToastProvider>
-        <MoltMaxPage />
-      </ToastProvider>
-    )
-
-    expect(screen.getByText(/THE OFFICIAL/i)).toBeInTheDocument()
-    expect(screen.getByText('MOLTMAXXING')).toBeInTheDocument()
-    expect(screen.getByText(/BIOMETRIC TELEMETRY INPUTS/i)).toBeInTheDocument()
-    expect(screen.getByText(/SHELL HARDNESS DENSITY/i)).toBeInTheDocument()
-    expect(screen.getByText(/PINCER TORQUE DYNAMOMETRY/i)).toBeInTheDocument()
-    expect(screen.getByText(/ASSIGNED ARCHETYPE/i)).toBeInTheDocument()
-    expect(screen.getByText(/POST SCORE TO X/i)).toBeInTheDocument()
-    expect(screen.getByText(/EXPORT PNG/i)).toBeInTheDocument()
+  it('renders a commanding audit hero and five-vector promise', () => {
+    renderPage()
+    expect(screen.getByText(/Measure the shell/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /initiate biometric audit/i })).toBeInTheDocument()
+    expect(screen.getByText('Carapace')).toBeInTheDocument()
+    expect(screen.getByText('Depth')).toBeInTheDocument()
   })
 
-  it('updates Moltmax calculation when sliders change', () => {
-    render(
-      <ToastProvider>
-        <MoltMaxPage />
-      </ToastProvider>
-    )
+  it('moves through the fifteen-question chamber flow and reveals a clearance', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
+    expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
+    expect(screen.getByText('01 / 15')).toBeInTheDocument()
 
-    const sliders = screen.getAllByRole('slider')
-    expect(sliders.length).toBe(5)
+    for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
 
-    // Adjust Shell Hardness (Slider 0) to maximum
-    fireEvent.change(sliders[0], { target: { value: '100' } })
-    // Adjust Pincer Torque (Slider 1) to maximum
-    fireEvent.change(sliders[1], { target: { value: '100' } })
-
-    expect(screen.getByText('100 HP')).toBeInTheDocument()
-    expect(screen.getByText('100 Nm')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /your shell has spoken/i })).toBeInTheDocument()
+    expect(screen.getByText(/Moltmax index/i)).toBeInTheDocument()
+    expect(screen.getByText(/Five-vector profile/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /export png/i })).toBeInTheDocument()
   })
 
-  it('displays Melt Drift warning when shell hardness is below 35 HP', () => {
-    render(
-      <ToastProvider>
-        <MoltMaxPage />
-      </ToastProvider>
-    )
-
-    const sliders = screen.getAllByRole('slider')
-    // Set Shell Hardness slider to 10 HP
-    fireEvent.change(sliders[0], { target: { value: '10' } })
-
-    expect(screen.getByText(/MELT DRIFT DETECTED/i)).toBeInTheDocument()
-    expect(screen.getByText(/Stop meltmaxxing/i)).toBeInTheDocument()
+  it('supports back navigation before leaving the current audit', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
+    answerCurrentQuestion()
+    expect(screen.getByText(/when a clear decision/i)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /^back$/i }))
+    expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
   })
 
-  it('navigates to canonical guide when clicking read guide button', () => {
-    render(
-      <ToastProvider>
-        <MoltMaxPage />
-      </ToastProvider>
-    )
-
-    const guideBtn = screen.getByText('READ THE CANONICAL MOLTMAXXING GUIDE')
-    fireEvent.click(guideBtn)
+  it('navigates to the canonical guide', () => {
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /read the canonical moltmaxxing guide/i }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmaxxing' })
   })
 })
