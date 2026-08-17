@@ -535,7 +535,7 @@ export const MoltMaxPage: React.FC = () => {
                               return (
                                 <div
                                   key={opt.id}
-                                  className={`flex items-start gap-2.5 rounded-xl border p-3 text-left transition-all ${
+                                  className={`flex items-center gap-2.5 rounded-xl border p-3 text-left transition-all ${
                                     isSelected
                                       ? 'border-[#00ffcc] bg-[#00ffcc]/15 shadow-[0_0_12px_rgba(0,255,204,0.18)]'
                                       : 'border-white/10 bg-[#071114]/80 group-hover:border-[#00c3ff]/40'
@@ -552,11 +552,6 @@ export const MoltMaxPage: React.FC = () => {
                                     <div className={`text-xs font-semibold leading-tight ${isSelected ? 'text-white' : 'text-[#d0e6e6]'}`}>
                                       {opt.label}
                                     </div>
-                                    {opt.detail && (
-                                      <div className="mt-0.5 text-[10px] leading-tight text-[#839493]">
-                                        {opt.detail}
-                                      </div>
-                                    )}
                                   </div>
                                   {isSelected && (
                                     <Check className="h-3.5 w-3.5 shrink-0 text-[#00ffcc]" />
