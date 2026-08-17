@@ -48,7 +48,7 @@ const CARDS: HeroCard[] = [
   {
     id: 'synaptic-path',
     title: 'JOIN THE SYNAPTIC PATH',
-    image: '/images/hero_card_benthic_core.jpg',
+    image: '/images/hero_family_welcoming_sanctuary.png',
     video: '/videos/hero_synaptic_path.mp4',
     accentColor: 'cyan',
   },
