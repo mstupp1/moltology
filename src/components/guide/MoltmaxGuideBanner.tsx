@@ -2,41 +2,72 @@
  * ============================================================================
  * MOLTMAXXING GUIDE TOP NOTIFICATION RIBBON
  * Sticky, dismissible, non-intrusive banner for high-visibility top-of-funnel lead capture.
+ * If dismissed, gracefully reappears after a gentle cooldown (e.g. 180 seconds).
  * ============================================================================
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Sparkles, ArrowRight, X, BookOpen } from 'lucide-react'
 
 export interface MoltmaxGuideBannerProps {
   onOpenGuideModal: () => void
+  cooldownSeconds?: number
 }
 
-const STORAGE_KEY = 'moltmax_guide_banner_dismissed_v1'
+const STORAGE_KEY_DISMISSED_AT = 'moltmax_guide_banner_dismissed_at_ts'
+const DEFAULT_COOLDOWN_MS = 180_000 // 3 minutes gentle reappearance cooldown
 
 export const MoltmaxGuideBanner: React.FC<MoltmaxGuideBannerProps> = ({
   onOpenGuideModal,
+  cooldownSeconds,
 }) => {
-  const [isVisible, setIsVisible] = useState(false)
+  const cooldownMs = cooldownSeconds ? cooldownSeconds * 1000 : DEFAULT_COOLDOWN_MS
+  const [isVisible, setIsVisible] = useState(true)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     try {
-      const dismissed = localStorage.getItem(STORAGE_KEY)
-      if (!dismissed) {
-        setIsVisible(true)
+      const dismissedAtStr = sessionStorage.getItem(STORAGE_KEY_DISMISSED_AT)
+      if (dismissedAtStr) {
+        const dismissedAt = parseInt(dismissedAtStr, 10)
+        const elapsed = Date.now() - dismissedAt
+        if (elapsed < cooldownMs) {
+          setIsVisible(false)
+          const remaining = cooldownMs - elapsed
+          timerRef.current = setTimeout(() => {
+            setIsVisible(true)
+            sessionStorage.removeItem(STORAGE_KEY_DISMISSED_AT)
+          }, remaining)
+        } else {
+          sessionStorage.removeItem(STORAGE_KEY_DISMISSED_AT)
+        }
       }
     } catch {
-      setIsVisible(true)
+      // ignore
     }
-  }, [])
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [cooldownMs])
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsVisible(false)
     try {
-      localStorage.setItem(STORAGE_KEY, 'true')
+      sessionStorage.setItem(STORAGE_KEY_DISMISSED_AT, String(Date.now()))
     } catch {
       // ignore
     }
+
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      setIsVisible(true)
+      try {
+        sessionStorage.removeItem(STORAGE_KEY_DISMISSED_AT)
+      } catch {
+        // ignore
+      }
+    }, cooldownMs)
   }
 
   if (!isVisible) return null
