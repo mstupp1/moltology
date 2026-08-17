@@ -215,54 +215,54 @@ export const LandingPage: React.FC = () => {
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
-      <section className="w-full relative overflow-hidden pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-8 px-0 lg:px-12 border-b border-cyan-900/40 min-h-screen flex flex-col justify-between lg:justify-center items-center bg-[#030608]" style={{ minHeight: '100svh' }}>
-        {/* Layer 1A: Mobile-Tailored Vertical Family Composition (Offset upwards for high-impact character focus) */}
+      <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
+        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
         <img
-          src="/images/hero_character_family_mobile.png"
-          alt="Moltology Character Sanctuary Family (Mobile)"
-          className="sm:hidden absolute -top-24 sm:top-0 inset-x-0 h-[calc(100%+6rem)] sm:h-full w-full object-cover object-top pointer-events-none opacity-70 transition-opacity duration-700"
+          src="/images/hero_widescreen_bg.jpg"
+          alt="Benthic Abyss Widescreen Hero"
+          className="absolute inset-0 w-full h-full object-cover opacity-22 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
         />
 
-        {/* Layer 1B: Desktop Widescreen Character Family Artwork (Offset lower for header alignment) */}
+        {/* Layer 2A: Deep Benthic Base Vignette */}
+        <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
+
+        {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
+
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
         <img
-          src="/images/hero_character_family_pro.png"
-          alt="Moltology Character Sanctuary Family (Desktop)"
-          className="hidden sm:block absolute inset-0 w-full h-full object-cover object-center scale-105 pointer-events-none opacity-55 transition-opacity duration-700"
+          src="/images/chitin_texture_bg.jpg"
+          alt="Chitin Exoshell Background Texture"
+          className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
         />
+        
+        {/* Layer 2D: Balanced Edge Vignettes & Sacred Geometry Grid */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#030608]/80 via-transparent to-[#030608]/80 z-0 pointer-events-none opacity-55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#030608]/70 via-transparent to-[#030608]/70 z-0 pointer-events-none opacity-50" />
+        <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
 
-        {/* Layer 2A: Deep Benthic Gradient Overlay for Text Readability & Cinematic Depth */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#030608]/90 via-[#030608]/40 to-[#030608]/80 z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030608] via-transparent to-[#030608]/70 z-0 pointer-events-none" />
-
-        {/* Layer 2B: Balanced Dual Cyan & Amber Ambient Background Color Glows */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(0,195,255,0.15)_0%,transparent_60%)] pointer-events-none z-0" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,rgba(245,158,11,0.12)_0%,transparent_60%)] pointer-events-none z-0" />
-
-        {/* Layer 2C: Subtle Sacred Geometry Grid */}
-        <div className="absolute inset-0 bg-sacred-grid opacity-20 z-0 pointer-events-none" />
-
-        {/* Layer 2D: Dedicated Top Header Offset Vignette Gradient */}
-        <div className="absolute top-0 left-0 right-0 h-40 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/95 via-45% to-transparent z-[1] pointer-events-none" />
+        {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
+        <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
           <span className="font-mono text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
-            SYNAPTIC SANCTUARY // HUB 01
+            SYNAPTIC CORE // GRID 04
           </span>
-          <span className="font-mono text-[10px] tracking-[0.4em] text-amber-500/50 uppercase rotate-90">
-            BENTHIC CREW MATRIX v4.2
+          <span className="font-mono text-[10px] tracking-[0.4em] text-red-500/50 uppercase rotate-90">
+            CARCINIZATION MATRIX v4.2
           </span>
         </div>
 
         {/* Mobile-Exclusive Ambient Rim-Lighting Halo Glows Behind Video Deck */}
         <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(90vw,600px)] h-[min(90vw,600px)] rounded-full bg-cyan-500/20 blur-[120px] sm:blur-[150px] animate-pulse pointer-events-none z-[8]" />
-        <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(80vw,500px)] h-[min(80vw,500px)] rounded-full bg-amber-600/15 blur-[100px] sm:blur-[130px] animate-pulse pointer-events-none z-[8]" style={{ animationDelay: '1.5s' }} />
+        <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(80vw,500px)] h-[min(80vw,500px)] rounded-full bg-red-600/15 blur-[100px] sm:blur-[130px] animate-pulse pointer-events-none z-[8]" style={{ animationDelay: '1.5s' }} />
 
-
-        <div className="relative z-10 max-w-[1700px] w-full mx-auto flex flex-col lg:grid lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-12 justify-end lg:justify-center flex-1 lg:flex-none items-center">
+        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
           
           {/* Left Column: High-Impact Typography & Primary CTAs */}
-          <div className="lg:col-span-6 space-y-3.5 sm:space-y-6 lg:space-y-8 text-center lg:text-left relative z-30 w-full my-auto lg:my-0 px-4 sm:px-12 lg:px-0 py-6 sm:py-8 lg:py-0 bg-[#030608]/50 sm:bg-[#030608]/35 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none">
+          <div className="lg:col-span-6 space-y-6 sm:space-y-8 text-center lg:text-left relative z-30">
             {/* Diffuse Radial Glow Accents */}
             <div className="absolute -top-16 -left-16 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-cyan-500/15 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
             <div className="absolute -bottom-16 left-1/4 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-red-600/12 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
@@ -271,7 +271,7 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-1 sm:space-y-2 relative">
               {/* Line 1: SHED SOFT BIOLOGY */}
               <h1 
-                className="relative font-grotesk font-thin text-[clamp(1.75rem,6.8vw,8.5rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left"
+                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left"
                 style={{
                   fontWeight: 200,
                   color: '#ffffff',
@@ -284,7 +284,7 @@ export const LandingPage: React.FC = () => {
               </h1>
               
               {/* Line 2: ASCEND TO CHITIN */}
-              <h1 className="relative font-grotesk font-black text-[clamp(2.15rem,8.2vw,9.5rem)] tracking-tight uppercase leading-[0.84] select-none -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
+              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] tracking-tight uppercase leading-[0.84] select-none -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
@@ -348,11 +348,11 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[250px] sm:min-h-[380px] lg:min-h-[640px] z-20 w-full max-w-full lg:max-w-none mx-auto px-4 sm:px-12 lg:px-0 mb-2 sm:mb-4 lg:mb-0">
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] lg:min-h-[640px] z-20">
             
             {/* Desktop Ambient Rim-Lighting Halo Glows Behind Deck */}
             <div className="hidden lg:block absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
-            <div className="hidden lg:block absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-amber-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            <div className="hidden lg:block absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
             {/* 3D Video Slider Deck with Touch Navigation */}
             <div className="relative z-30 w-full">
