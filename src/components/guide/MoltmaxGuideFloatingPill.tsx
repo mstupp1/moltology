@@ -2,49 +2,80 @@
  * ============================================================================
  * MOLTMAXXING GUIDE FLOATING HUD PILL
  * Non-intrusive bottom-right floating trigger for top-of-funnel guide capture.
+ * If dismissed, gracefully reappears after a gentle cooldown (e.g. 90 seconds)
+ * to remain noticeable without being overly intrusive.
  * ============================================================================
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { BookOpen, X, Sparkles, ArrowRight, Download } from 'lucide-react'
 
 export interface MoltmaxGuideFloatingPillProps {
   onOpenGuideModal: () => void
+  cooldownSeconds?: number
 }
 
-const STORAGE_KEY = 'moltmax_guide_pill_hidden_session'
+const STORAGE_KEY_DISMISSED_AT = 'moltmax_guide_pill_dismissed_at_ts'
+const DEFAULT_COOLDOWN_MS = 90_000 // 90 seconds gentle reappearance cooldown
 
 export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> = ({
   onOpenGuideModal,
+  cooldownSeconds,
 }) => {
-  const [isOpen, setIsOpen] = useState(true)
+  const cooldownMs = cooldownSeconds ? cooldownSeconds * 1000 : DEFAULT_COOLDOWN_MS
   const [isDismissed, setIsDismissed] = useState(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     try {
-      const dismissed = sessionStorage.getItem(STORAGE_KEY)
-      if (dismissed) {
-        setIsDismissed(true)
+      const dismissedAtStr = sessionStorage.getItem(STORAGE_KEY_DISMISSED_AT)
+      if (dismissedAtStr) {
+        const dismissedAt = parseInt(dismissedAtStr, 10)
+        const elapsed = Date.now() - dismissedAt
+        if (elapsed < cooldownMs) {
+          setIsDismissed(true)
+          const remaining = cooldownMs - elapsed
+          timerRef.current = setTimeout(() => {
+            setIsDismissed(false)
+            sessionStorage.removeItem(STORAGE_KEY_DISMISSED_AT)
+          }, remaining)
+        } else {
+          sessionStorage.removeItem(STORAGE_KEY_DISMISSED_AT)
+        }
       }
     } catch {
       // ignore
     }
-  }, [])
 
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [cooldownMs])
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsDismissed(true)
     try {
-      sessionStorage.setItem(STORAGE_KEY, 'true')
+      sessionStorage.setItem(STORAGE_KEY_DISMISSED_AT, String(Date.now()))
     } catch {
       // ignore
     }
+
+    // Schedule gentle return after cooldown
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      setIsDismissed(false)
+      try {
+        sessionStorage.removeItem(STORAGE_KEY_DISMISSED_AT)
+      } catch {
+        // ignore
+      }
+    }, cooldownMs)
   }
 
-  if (isDismissed || !isOpen) return null
+  if (isDismissed) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 max-w-sm transition-all duration-300 animate-in fade-in slide-in-from-bottom-5">
+    <div className="fixed bottom-6 right-6 z-40 max-w-sm transition-all duration-500 animate-in fade-in slide-in-from-bottom-5">
       <div
         onClick={onOpenGuideModal}
         className="relative group bg-[#040914]/90 hover:bg-[#061224] border border-[#00c3ff]/40 hover:border-[#00c3ff] rounded-xl p-3 shadow-[0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-md cursor-pointer transition-all flex items-center gap-3.5 pr-8"
