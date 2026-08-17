@@ -492,4 +492,44 @@ body.vfx-disabled [class*="drop-shadow-"],
   background: #39ff14 !important;
 }
 
+/* Character HUD Overlays & Micro-Animations */
+@keyframes charFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+
+@keyframes charPeek {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(-1.5deg);
+  }
+}
+
+@keyframes charPoint {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(3px, -3px) scale(1.02);
+  }
+}
+
+.animate-char-float {
+  animation: charFloat 4s ease-in-out infinite;
+}
+
+.animate-char-peek {
+  animation: charPeek 5s ease-in-out infinite;
+}
+
+.animate-char-point {
+  animation: charPoint 2.5s ease-in-out infinite;
+}
+
 

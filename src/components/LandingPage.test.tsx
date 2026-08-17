@@ -110,4 +110,16 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()
     expect(screen.getByText('CHITIN MATRIX ENFORCED')).toBeInTheDocument()
   })
+
+  it('renders peppered quiz characters and companions across homepage corners and sections', () => {
+    render(<LandingPage />)
+
+    // Verify presence of character overlays
+    expect(screen.getByAltText('Hero Lobster Pointing to Action')).toBeInTheDocument()
+    expect(screen.getByAltText('Hero Lobster Peeking Over Card')).toBeInTheDocument()
+    expect(screen.getByAltText('Excited Crab Pointing at Telemetry')).toBeInTheDocument()
+    expect(screen.getByAltText('Cute Crab Courier Clinging to Corner')).toBeInTheDocument()
+    expect(screen.getByAltText('Ascended Stage Background Mascot')).toBeInTheDocument()
+    expect(screen.getByAltText('Hero Lobster Giving Thumbs-Up')).toBeInTheDocument()
+  })
 })

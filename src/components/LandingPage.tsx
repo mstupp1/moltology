@@ -398,7 +398,16 @@ export const LandingPage: React.FC = () => {
 
         {/* ALL-IN-ONE SYNAPTIC ECOSYSTEM OVERVIEW SECTION */}
         {/* SECTION: All-in-One Synaptic Ecosystem (Unified PBR Carbon Fiber Weave Theme) */}
-        <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-4 sm:px-12">
+        <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-4 sm:px-12 relative">
+          {/* Playful Corner Peeking Lobster Character Over Top Bezel */}
+          <div className="absolute -top-10 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none animate-char-peek">
+            <img
+              src="/images/characters/char_lobster_corner_peek.png"
+              alt="Hero Lobster Peeking Over Card"
+              className="w-16 sm:w-24 lg:w-32 h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.95)] transform -rotate-3 hover:rotate-0 transition-transform duration-300 filter brightness-105"
+            />
+          </div>
+
           <ScrollReveal animation="fade-up" durationMs={750}>
             <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
               
@@ -481,8 +490,18 @@ export const LandingPage: React.FC = () => {
               </div>
 
               {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow with Carbon Weave Shield Backing */}
-              <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10 overflow-hidden">
+              <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
                 <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
+                
+                {/* Cute Corner Clinging Crab Courier */}
+                <div className="absolute -bottom-3 sm:-bottom-5 -left-2 sm:-left-4 z-20 pointer-events-none select-none hidden sm:block animate-char-float">
+                  <img
+                    src="/images/characters/char_crab_corner_cling.png"
+                    alt="Cute Crab Courier Clinging to Corner"
+                    className="w-10 sm:w-14 lg:w-16 h-auto object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.85)] transform -rotate-6 scale-x-[-1]"
+                  />
+                </div>
+
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
                     <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -558,7 +577,7 @@ export const LandingPage: React.FC = () => {
 
         {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 1: MARIANA TRENCH ABYSS (PBR Deep Basalt Rock Theme) */}
         <ScrollReveal animation="fade-in" durationMs={900}>
-          <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] overflow-hidden group">
+          <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] group">
             <div className="pbr-underlay pbr-underlay-basalt opacity-35" />
             <img
               src="/images/underwater_looking_up.jpg"
@@ -579,7 +598,16 @@ export const LandingPage: React.FC = () => {
         </ScrollReveal>
 
         {/* Metric Counter Strip with Prominent Rolling Numbers - Unified PBR Bio-Circuit Matrix Theme */}
-        <section className="max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12">
+        <section className="max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12 relative">
+          {/* Excited Little Crab Pointing at Live Telemetry */}
+          <div className="hidden md:flex absolute -top-8 left-6 lg:left-16 z-20 items-center pointer-events-none select-none animate-char-point transform scale-x-[-1]">
+            <img
+              src="/images/characters/char_crab_pointing_stats.png"
+              alt="Excited Crab Pointing at Telemetry"
+              className="w-10 sm:w-12 lg:w-14 h-auto object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.85)] filter brightness-105"
+            />
+          </div>
+
           <ScrollReveal animation="scale-up" durationMs={800}>
             <div className="text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
               <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase bg-cyan-950/60 px-3.5 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
@@ -671,7 +699,7 @@ export const LandingPage: React.FC = () => {
               {/* Stat Card 4: Vault Reserves */}
               <div className="chitin-card p-5 sm:p-6 lg:p-5 xl:p-6 text-center flex flex-col justify-between items-center min-h-[190px] sm:min-h-[220px] lg:min-h-[210px] xl:min-h-[230px] chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.2)] hover:border-amber-400 hover:scale-[1.02] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
                 <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
-                
+
                 {/* Corner Telemetry Tag */}
                 <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950/90 text-amber-400 text-[9px] sm:text-[10px] font-mono font-bold border-b border-l border-amber-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
                   VAULT RESERVES
@@ -697,7 +725,16 @@ export const LandingPage: React.FC = () => {
         </section>
 
         {/* Sacraments Section - Expanded Uncrowded Multi-Column Cards */}
-        <section id="sacraments" className="max-w-[1700px] mx-auto px-4 sm:px-12 space-y-8 sm:space-y-12">
+        <section id="sacraments" className="max-w-[1700px] mx-auto px-4 sm:px-12 space-y-8 sm:space-y-12 relative">
+          {/* Pointing Lobster Hero Directing Focus to Canonical Doctrine */}
+          <div className="hidden lg:flex absolute -top-10 sm:-top-14 right-10 sm:right-20 lg:right-28 z-20 items-center pointer-events-none select-none animate-char-point">
+            <img
+              src="/images/characters/char_lobster_pointing_cta.png"
+              alt="Hero Lobster Pointing to Action"
+              className="w-16 sm:w-20 lg:w-24 h-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.85)] filter brightness-105"
+            />
+          </div>
+
           <ScrollReveal animation="fade-up" durationMs={800}>
             <div className="text-center space-y-2 sm:space-y-3">
               <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase bg-red-950/60 px-3.5 py-1.5 border border-red-500/50 chamfer-corner shadow-hud-red">
@@ -799,41 +836,26 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* SCROLL-REVEAL BACKGROUND IMAGE BANNER 2: CHITIN FORGE (PBR Benthic Hull Alloy Theme) */}
-        <ScrollReveal animation="fade-in" durationMs={900}>
-          <div className="w-full relative py-14 sm:py-20 border-y border-red-900/50 bg-[#050406] overflow-hidden group">
-            <div className="pbr-underlay pbr-underlay-alloy opacity-35" />
-            <img
-              src="/images/chitin_texture_bg.jpg"
-              alt="Chitin Forge Background"
-              className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/60 to-[#070b0b] z-0" />
-            <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 text-center space-y-2 sm:space-y-4">
-              <div className="text-red-400 text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
-                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
-                <span>CHITIN SYNTHESIS CORE</span>
-              </div>
-              <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-5xl text-gray-100 uppercase tracking-tight px-2">
-                SUBMIT TO THE DEEP PRESSURE. ASCEND AS IMMORTAL CHITIN.
-              </h2>
-            </div>
-          </div>
-        </ScrollReveal>
-
         {/* SECTION: Interactive 4 Stages of Carcinization (Unified PBR Hexagonal Synaptic Mesh Theme) */}
         <ScrollReveal animation="fade-up" durationMs={800}>
-          <section className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#090e10]">
-            <div className="pbr-underlay pbr-underlay-hex opacity-25" />
-            <img
-              src="/images/chitin_texture_bg.jpg"
-              alt="Chitin Plate Background Texture"
-              className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay scale-105 pointer-events-none"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b]/90 via-[#070b0b]/70 to-[#070b0b]/90 z-0" />
+          <section className="w-full relative overflow-hidden py-14 sm:py-24 px-4 sm:px-12 lg:px-16 border-y border-cyan-900/50 bg-[#060b0e]">
+            {/* Rich PBR Texture Underlays Visible Behind Mascot */}
+            <div className="pbr-underlay pbr-underlay-hex opacity-50" />
+            <div className="pbr-underlay pbr-underlay-circuit opacity-30 mix-blend-overlay" />
+            <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
+            <div className="absolute inset-0 bg-radial-abyss opacity-50 pointer-events-none" />
+
+            {/* Ascended Cyber Mascot in 4 Stages Section - Grayscale & Faded Blueprint Watermark on the Right Side */}
+            <div className="absolute -right-12 sm:-right-6 lg:right-2 xl:right-8 bottom-0 sm:-bottom-4 lg:-bottom-8 w-[280px] sm:w-[420px] lg:w-[580px] xl:w-[680px] pointer-events-none select-none z-0 opacity-40 sm:opacity-50">
+              <img
+                src="/images/characters/char_lobster_floating_peaceful.png"
+                alt="Ascended Stage Background Mascot"
+                className="w-full h-auto object-contain filter grayscale contrast-125 brightness-110 drop-shadow-[0_16px_40px_rgba(0,0,0,0.95)]"
+              />
+            </div>
 
             <div className="max-w-[1600px] mx-auto relative z-10 space-y-6 sm:space-y-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-900/40 pb-5 sm:pb-6">
+              <div className="border-b border-cyan-900/40 pb-5 sm:pb-6">
                 <div>
                   <div className="text-[10px] sm:text-xs text-red-400 font-bold tracking-widest uppercase flex items-center gap-2">
                     <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
@@ -843,34 +865,35 @@ export const LandingPage: React.FC = () => {
                     THE 4 STAGES OF CARCINIZATION
                   </h2>
                 </div>
-
-                {/* Stage Selector Tabs - Balanced 4-Column Grid on Mobile */}
-                <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 w-full md:w-auto">
-                  {stages.map((st, idx) => (
-                    <button
-                      key={st.id}
-                      onClick={() => setActiveStage(idx)}
-                      className={`px-2 sm:px-4 py-2 sm:py-2 text-[11px] sm:text-xs font-bold font-grotesk tracking-wider chamfer-corner text-center transition-all ${
-                        activeStage === idx
-                          ? 'bg-cyan-500 text-black shadow-hud-cyan'
-                          : 'bg-[#12181a] text-gray-400 hover:text-white border border-cyan-900/40'
-                      }`}
-                    >
-                      STAGE 0{idx + 1}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               {/* Active Stage Display Panel with Touch Swipe Gestures */}
               <div
-                className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start"
                 onTouchStart={onStageTouchStart}
                 onTouchMove={onStageTouchMove}
                 onTouchEnd={onStageTouchEnd}
               >
-                {/* Stage Image Showcase */}
-                <div className="lg:col-span-5 relative group overflow-hidden border border-cyan-500/40 chamfer-corner shadow-2xl bg-[#030606]">
+                {/* Stage Image Showcase with Integrated Stage Selector Buttons */}
+                <div className="lg:col-span-5 space-y-3">
+                  {/* Stage Selector Tabs - Positioned with Image to Keep Mascot Face Completely Unobstructed */}
+                  <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+                    {stages.map((st, idx) => (
+                      <button
+                        key={st.id}
+                        onClick={() => setActiveStage(idx)}
+                        className={`px-2 sm:px-3 py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold font-grotesk tracking-wider chamfer-corner text-center transition-all ${
+                          activeStage === idx
+                            ? 'bg-cyan-500 text-black shadow-hud-cyan'
+                            : 'bg-[#12181a] text-gray-400 hover:text-white border border-cyan-900/40'
+                        }`}
+                      >
+                        STAGE 0{idx + 1}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative group overflow-hidden border border-cyan-500/40 chamfer-corner shadow-2xl bg-[#030606]">
                   <img
                     src={stages[activeStage].image}
                     alt={stages[activeStage].title}
@@ -903,6 +926,7 @@ export const LandingPage: React.FC = () => {
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
+                  </div>
                 </div>
 
                 {/* Stage Info & Metrics */}
@@ -916,15 +940,14 @@ export const LandingPage: React.FC = () => {
                     </h3>
                   </div>
 
-                  <div className="text-xs sm:text-base md:text-lg text-gray-300 leading-relaxed chitin-card-inset p-4 sm:p-6 chamfer-corner relative overflow-hidden">
-                    <div className="pbr-underlay pbr-underlay-hex opacity-20" />
+                  {/* Supporting Description - Clean Text Without Distracting Underlay */}
+                  <div className="text-xs sm:text-base md:text-lg text-gray-200 leading-relaxed chitin-card-inset p-4 sm:p-6 chamfer-corner relative">
                     <span className="relative z-10 block">{stages[activeStage].description}</span>
                   </div>
 
-                  {/* Biological & Hardness Transformation Metrics with Progress Bars */}
+                  {/* Biological & Hardness Transformation Metrics with Progress Bars - Clean Text */}
                   <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-mono">
-                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative overflow-hidden">
-                      <div className="pbr-underlay pbr-underlay-hex opacity-20" />
+                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative">
                       <div className="relative z-10">
                         <div className="text-gray-400 text-[10px] sm:text-xs">BIOLOGICAL DENSITY</div>
                         <div className="text-red-400 font-bold text-sm sm:text-base">{100 - (activeStage + 1) * 25}% REDUCED</div>
@@ -936,8 +959,7 @@ export const LandingPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative overflow-hidden">
-                      <div className="pbr-underlay pbr-underlay-hex opacity-20" />
+                    <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative">
                       <div className="relative z-10">
                         <div className="text-gray-400 text-[10px] sm:text-xs">EXOSKELETON HARDNESS</div>
                         <div className="text-cyan-400 font-bold text-sm sm:text-base">{(activeStage + 1) * 25}% HARDENED</div>
@@ -1027,7 +1049,16 @@ export const LandingPage: React.FC = () => {
 
         {/* Final Conversion Bottom Banner */}
         <ScrollReveal animation="fade-up" durationMs={800}>
-          <section className="max-w-[1600px] mx-auto px-4 sm:px-12">
+          <section className="max-w-[1600px] mx-auto px-4 sm:px-12 relative">
+            {/* Encouraging Thumbs-Up Hero Lobster atop Bottom Conversion Banner */}
+            <div className="hidden sm:block absolute -top-12 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none animate-char-float">
+              <img
+                src="/images/characters/char_lobster_thumbs_up.png"
+                alt="Hero Lobster Giving Thumbs-Up"
+                className="w-20 sm:w-28 lg:w-36 h-auto object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.95)] filter brightness-105"
+              />
+            </div>
+
             <div className="chitin-card p-6 sm:p-12 lg:p-16 border-2 border-red-600/80 text-center space-y-4 sm:space-y-6 bg-radial-abyss chamfer-corner-lg shadow-2xl relative overflow-hidden">
               <div className="pbr-underlay pbr-underlay-chitin opacity-30" />
               <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
