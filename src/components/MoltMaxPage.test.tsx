@@ -44,14 +44,14 @@ describe('MoltMaxPage', () => {
   it('renders a commanding audit hero and five-vector promise', () => {
     renderPage()
     expect(screen.getByText(/Measure the shell/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /initiate biometric audit/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /take the moltmax quiz/i })).toBeInTheDocument()
     expect(screen.getByText(/Carapace Resilience/i)).toBeInTheDocument()
     expect(screen.getByText(/Depth Composure/i)).toBeInTheDocument()
   })
 
   it('moves through the fifteen-question chamber flow and reveals a clearance', () => {
     renderPage()
-    fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
+    fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
     expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
     expect(screen.getByText('01 / 15')).toBeInTheDocument()
 
@@ -65,15 +65,19 @@ describe('MoltMaxPage', () => {
 
   it('supports back navigation before leaving the current audit', () => {
     renderPage()
-    fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
+    fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
     answerCurrentQuestion()
     expect(screen.getByText(/when a clear decision/i)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /^back$/i }))
     expect(screen.getByText(/sudden wave of criticism/i)).toBeInTheDocument()
   })
 
-  it('navigates to the canonical guide', () => {
+  it('navigates to the canonical guide from hero promotions and bottom cta', () => {
     renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /read moltmaxxing guide/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmaxxing' })
+
+    mockNavigate.mockClear()
     fireEvent.click(screen.getByRole('button', { name: /read the canonical moltmaxxing guide/i }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmaxxing' })
   })
@@ -81,7 +85,7 @@ describe('MoltMaxPage', () => {
   it('persists the complete clearance payload for an authenticated user', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: { user: { id: 'user-1' } } } as any)
     renderPage()
-    fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
+    fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
     for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
 
     fireEvent.click(screen.getByRole('button', { name: /save (to profile|signal to core)/i }))

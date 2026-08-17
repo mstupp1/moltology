@@ -51,7 +51,7 @@ export const RollingNumber: React.FC<RollingNumberProps> = ({
           }
         })
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: '50px' }
     )
 
     observer.observe(node)
