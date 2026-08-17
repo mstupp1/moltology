@@ -16,6 +16,9 @@ export const Route = createFileRoute('/moltmaxxing')({
         twitterSite: '@moltology',
       }),
     ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/moltmaxxing' },
+    ],
     scripts: [
       {
         type: 'application/ld+json',

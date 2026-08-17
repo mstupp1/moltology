@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
+import { seo } from '@/lib/seo'
 import {
   Users,
   Radio,
@@ -934,5 +935,19 @@ function CommunityRoute() {
 }
 
 export const Route = createFileRoute('/_hud/community')({
+  head: () => ({
+    meta: [
+      ...seo({
+        title: 'Community Nexus | Moltology Initiate Signal Logs',
+        description: 'Join discussions with fellow initiates on ecdysis stages, pincer calibrations, and swarm intelligence.',
+        canonical: 'https://moltology.org/community',
+        siteName: 'Moltology Community',
+        twitterSite: '@moltology',
+      }),
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/community' },
+    ],
+  }),
   component: CommunityRoute,
 })

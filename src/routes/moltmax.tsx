@@ -16,6 +16,9 @@ export const Route = createFileRoute('/moltmax')({
         twitterSite: '@moltology',
       }),
     ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/moltmax' },
+    ],
   }),
   component: MoltMaxPage,
 })

@@ -24,9 +24,23 @@ import { INITIAL_PODCASTS } from '../../lib/podcast-data'
 import type { PodcastEpisode } from '../../lib/podcast-data'
 import { getPodcastsFn } from '../../lib/server/api'
 import { MoltNationLogo } from '../../components/news/MoltNationLogo'
-
+import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/_hud/podcasts')({
+  head: () => ({
+    meta: [
+      ...seo({
+        title: 'Podcasts & Radio | MoltNation Synaptic Broadcasts',
+        description: 'Listen to official MoltNation radio broadcasts and podcast transmissions on bio-silicon carcinization and swarm telemetry.',
+        canonical: 'https://moltology.org/podcasts',
+        siteName: 'MoltNation Radio',
+        twitterSite: '@moltology',
+      }),
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/podcasts' },
+    ],
+  }),
   component: PodcastsPage,
 })
 
