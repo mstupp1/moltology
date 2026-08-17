@@ -746,6 +746,7 @@ export interface ReelThumbnailOptions {
   categoryBadge?: string // e.g. "TELEMETRY DISPATCH"
   outputPath: string
   seekSecond?: number // default 1.5 if input is video
+  mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'none' | string
 }
 
 /**
@@ -894,6 +895,48 @@ export async function renderReelThumbnail(options: ReelThumbnailOptions): Promis
     ctx.shadowBlur = 10
     ctx.fillText(`[ ${options.subtitle.toUpperCase()} ]`, 540, 1140)
     ctx.shadowBlur = 0
+  }
+
+  // 9. Cartoon Mascot Cutout Integration (1:1 Safe Corner at X = 740, Y = 1180)
+  const mascotChoice = options.mascot ?? 'lobster_pointing'
+  if (mascotChoice !== 'none') {
+    let mascotFile = 'char_lobster_pointing_cta.png'
+    if (mascotChoice === 'lobster_thumbs_up') mascotFile = 'char_lobster_thumbs_up.png'
+    else if (mascotChoice === 'lobster_action') mascotFile = 'char_lobster_speed_action.png'
+    else if (mascotChoice === 'crab_stats') mascotFile = 'char_crab_pointing_stats.png'
+    else if (mascotChoice === 'crab_corner' || mascotChoice === 'crab_cling') mascotFile = 'char_crab_corner_cling.png'
+    else if (mascotChoice === 'lobster_peek') mascotFile = 'char_lobster_corner_peek.png'
+
+    const localCharPath = path.resolve(process.cwd(), 'public/images/characters', mascotFile)
+    let charImg: any = null
+
+    if (fs.existsSync(localCharPath)) {
+      charImg = await loadImage(localCharPath)
+    } else {
+      try {
+        const s3Url = `https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/${mascotFile}`
+        const res = await fetch(s3Url)
+        if (res.ok) {
+          const arrayBuffer = await res.arrayBuffer()
+          charImg = await loadImage(Buffer.from(arrayBuffer))
+        }
+      } catch (e) {
+        // Non-fatal
+      }
+    }
+
+    if (charImg) {
+      const charW = 280
+      const charH = (charW / charImg.width) * charImg.height
+      const charX = 740
+      const charY = 1200
+
+      ctx.save()
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
+      ctx.shadowBlur = 24
+      ctx.drawImage(charImg, charX, charY, charW, charH)
+      ctx.restore()
+    }
   }
 
   // Cleanup temp frame if created
