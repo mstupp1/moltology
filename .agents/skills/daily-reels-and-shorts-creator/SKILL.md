@@ -12,6 +12,22 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 
 ---
 
+## ◈ Homepage Character Family Catalog (Featured Cutouts on S3)
+
+All characters featured on the Moltology homepage are available as transparent PNG cutouts hosted on Neon S3 (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/`):
+
+| Mascot Key | S3 Asset Path | Character Description & Role | Recommended Use in Video / Reels |
+| :--- | :--- | :--- | :--- |
+| `lobster_pointing` | `images/characters/char_lobster_pointing_cta.png` | Hero lobster pointing at action buttons or links | CTA outro card, 1:1 custom thumbnail corner |
+| `lobster_peek` | `images/characters/char_lobster_corner_peek.png` | Playful lobster peeking over card bezels | Hook scene corner overlay, teaser thumbnails |
+| `lobster_thumbs_up` | `images/characters/char_lobster_thumbs_up.png` | Cheerful lobster giving a thumbs-up approval | Success outro cards, Stage 4 clearance badge |
+| `lobster_peaceful` | `images/characters/char_lobster_floating_peaceful.png` | Calm cyber-lobster floating peacefully | Benthic depth videos, 50,000 fathoms clarity |
+| `lobster_action` | `images/characters/char_lobster_speed_action.png` | Dynamic speed-action lobster dashing forward | Low latency, fast execution, 120Hz control loops |
+| `crab_stats` | `images/characters/char_crab_pointing_stats.png` | Energetic crab pointing at quantitative metrics | Quantitative benchmark thumbnails & outro cards |
+| `crab_cling` | `images/characters/char_crab_corner_cling.png` | Cute crab clinging to borders / lower-third | Status badge overlay, side-border video sticker |
+
+---
+
 ## 1. Core Architecture & Connected Channels
 
 * **Instagram Reels Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
@@ -20,10 +36,7 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
 * **Dynamic Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, with `+8%` to `+14%` rate) + Subtle Pure Instrumental Benthic Drone (`public/audio/benthic-ambient-loop.mp3`, `volume=0.08`, zero vocal singing)
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
-* **Cartoon Mascot Integration**: Dynamic mascot rotation on outro cards and social copy (`char_lobster_pointing_cta.png`, `char_lobster_thumbs_up.png`, `char_lobster_speed_action.png`, `char_crab_pointing_stats.png`, `char_crab_corner_cling.png`).
-* **CTA Outro Design**: Centered glowing Moltology Emblem with orbital radar rings, clearance badge (`◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈`), brand title, bold mantra (`SUBMIT. SHED. ASCEND.`), subheadline (`CALCULATE YOUR MOLT CLEARANCE`), glowing URL button (`moltology.org →`), and cartoon mascot pointing directly to the action button.
-* **Timing & Padding Rule**: Scene clips are dynamically scaled/looped via FFmpeg (`-stream_loop -1`) to match `voDuration + 0.8s` breathing room before the CTA outro card begins, guaranteeing zero narration cutoff.
-* **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`).
+* **1:1 Grid Safe Thumbnails with Mascots**: Custom 1080x1920 covers with bold high-contrast headlines, category pills, and homepage mascot cutouts rendered in the 1:1 square safe zone (`Y=420` to `Y=1500`).
 * **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`).
 * **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`).
 * **Continuity Ledger**: `content/social/instagram-reel-history.json`.
@@ -112,13 +125,10 @@ await compositeReel({
 
 ---
 
-### Step 6: 1:1 Grid-Safe Custom Thumbnail Generation
+### Step 6: 1:1 Grid-Safe Custom Thumbnail Generation (With Mascot Cutouts)
 For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 1. **Grid Safe Zone Rule**: While full-screen reels are `1080x1920` (9:16), the profile grid crops to the center `1080x1080` (1:1 square, between `Y=420` and `Y=1500`).
-2. **Visual Hierarchy**:
-   * Bold, high-contrast hook headline in center square (White + glowing Cyan `#00ffff`).
-   * Amber category pill (`MOLTMAXXING PROTOCOL` / `PATRIOT TELEMETRY`).
-   * Subtle dark contrast vignette overlay to guarantee text readability against dynamic backgrounds.
+2. **Mascot Stamping**: The selected mascot cutout is cleanly drawn in the bottom corner of the 1:1 safe zone (`X = 740, Y = 1200`), pointing or reacting to the hook headline.
 3. **Execution**:
    ```typescript
    import { renderReelThumbnail } from 'scripts/lib/reel-compositor'
@@ -128,6 +138,7 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
      headline: "WHY LOOKSMAXXING FAILED",
      subtitle: "MOLTMAXXING TELEMETRY",
      categoryBadge: "MOLTMAXXING PROTOCOL",
+     mascot: "lobster_pointing", // Renders homepage cutout in 1:1 safe zone
      outputPath: 'tmp/custom-thumbnail.jpg',
    })
    ```
@@ -141,7 +152,6 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
    * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
 
 2. **Stage Draft / Publish via Zernio MCP (`posts_create`)**:
-   * Include cartoon mascot verification flavor in caption (e.g. `🦞 Verified by Silas Trench & Benthic Swarm Telemetry`).
    * Set `isAiGenerated: true` for Meta/Instagram.
    * Dual broadcast to Instagram (`6a7f7f0777555aae01d99b54`) and YouTube Shorts (`6a7fd9bd77555aae01ebea63`).
 
@@ -158,12 +168,12 @@ Agents and users can trigger the full autonomous daily pipeline with a single co
 # Autonomous dynamic daily run (auto-selects fresh topic / blog / mascot):
 npm run reel:create
 
-# Custom thematic pillar:
-npm run reel:create -- --theme moltmaxxing
-npm run reel:create -- --theme ecdysis --mascot lobster_pointing
+# Custom thematic pillar with specific mascot:
+npm run reel:create -- --theme moltmaxxing --mascot lobster_pointing
+npm run reel:create -- --theme ecdysis --mascot lobster_thumbs_up
 npm run reel:create -- --theme pincer-torque --mascot crab_stats
-npm run reel:create -- --theme benthic-depth
-npm run reel:create -- --theme quiz
+npm run reel:create -- --theme benthic-depth --mascot lobster_peaceful
+npm run reel:create -- --theme quiz --mascot crab_corner
 
 # Custom targeted topic or news headline:
 npm run reel:create -- --topic "Subsea Datacenter Heatwaves"

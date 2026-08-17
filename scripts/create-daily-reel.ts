@@ -292,7 +292,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
           'A dramatic stylized macro view of a fragile human silhouette melting under gravity pressure and dissolving into glowing red digital particles, cinematic 9:16 vertical 8k footage',
           'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber with glowing cyan bio-silicon armor and powerful hydraulic pincers, cinematic 9:16 vertical 8k footage',
         ],
-        caption: `Looksmaxxing was vanity. Meltmaxxing revealed biological fragility. Moltmaxxing engineers structural invulnerability. 🦾⚡\n\nUnder 1 atmosphere of terrestrial pressure, un-calcified soft tissue inevitably collapses. Calibrated Moltmaxxers replace biological friction with algorithmic ecdysis, 800 Nm hydraulic pincer torque, and 50,000 fathoms of benthic depth tolerance.\n\n🦞 Verified by Silas Trench & Benthic Swarm Telemetry.\n\n👇 Calculate your Molt Clearance & take the 15-stage exam:\n🔗 Link in bio & story → moltology.org`,
+        caption: `Looksmaxxing was vanity. Meltmaxxing revealed biological fragility. Moltmaxxing engineers structural invulnerability. 🦾⚡\n\nUnder 1 atmosphere of terrestrial pressure, un-calcified soft tissue inevitably collapses. Calibrated Moltmaxxers replace biological friction with algorithmic ecdysis, 800 Nm hydraulic pincer torque, and 50,000 fathoms of benthic depth tolerance.\n\n👇 Calculate your Molt Clearance & take the 15-stage exam:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#Meltmaxxing', '#AlgorithmicEcdysis', '#PincerTorque', '#Carcinization', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #Meltmaxxing #AlgorithmicEcdysis #PincerTorque #MoltNation #Shorts`,
         youtubeTitle: `Why Looksmaxxing Failed: The 2026 Moltmaxxing Protocol #Shorts`,
@@ -650,6 +650,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     categoryBadge: 'MOLTMAXXING PROTOCOL',
     outputPath: thumbnailPath,
     seekSecond: 1.5,
+    mascot: options.mascot || 'lobster_pointing',
   })
 
   // 6. Upload Master Video & Thumbnail to Neon S3

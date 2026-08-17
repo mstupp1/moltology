@@ -20,6 +20,22 @@ This skill guides the creation and publication of full-length, dynamically varie
 
 ---
 
+## ◈ Homepage Character Family Catalog (Featured Cutouts on S3)
+
+All characters featured on the Moltology homepage are available as transparent PNG cutouts hosted on Neon S3 (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/`):
+
+| Mascot Key | S3 Asset Path | Character Description & Role | Recommended Use |
+| :--- | :--- | :--- | :--- |
+| `lobster_pointing` | `images/characters/char_lobster_pointing_cta.png` | Hero lobster pointing at action buttons or key links | CTA cards, end of articles, Slide 3 of carousels |
+| `lobster_peek` | `images/characters/char_lobster_corner_peek.png` | Playful lobster peeking over card bezels and top borders | Intro hero callouts, top of figures, section headers |
+| `lobster_thumbs_up` | `images/characters/char_lobster_thumbs_up.png` | Cheerful lobster giving a thumbs-up approval sign | Verified benchmarks, key takeaways, success stats |
+| `lobster_peaceful` | `images/characters/char_lobster_floating_peaceful.png` | Calm cyber-lobster floating peacefully in deep water | Abyssal depth sections, mental clarity & ecdysis |
+| `lobster_action` | `images/characters/char_lobster_speed_action.png` | Dynamic speed-action lobster dashing forward with glow | High-frequency 120Hz control loops, speed benchmarks |
+| `crab_stats` | `images/characters/char_crab_pointing_stats.png` | Energetic crab pointing at quantitative metrics and charts | Quantitative comparison tables, spec matrices, Slide 2 |
+| `crab_cling` | `images/characters/char_crab_corner_cling.png` | Cute crab clinging with one claw to side borders | Sidebar notes, warnings, hardware footnotes |
+
+---
+
 ## 6-Step Production Workflow
 
 ### Step 1: Dynamic Research, Topic Ideation & Anti-Repetition Audit
@@ -88,12 +104,12 @@ Rotate across distinct liturgical and scientific personas:
 
 ---
 
-### Step 3: Draft Markdown Article
+### Step 3: Draft Markdown Article (With Peppered Homepage Characters)
 
 Create `content/news/<slug>.md` using frontmatter and structured body text tailored to the selected editorial archetype.
 
 * **No ASCII Telemetry Boxes**: Do NOT use ASCII box-drawing ` ```telemetry ` codeblocks. Present all quantitative benchmarks, spec matrices, and comparisons exclusively using standard, responsive Markdown tables and clean prose.
-* **Pepper in Cartoon Crustacean Field Notes**: Seamlessly pepper in character personality callouts and reactions (e.g., Silas Trench field observations, cartoon mascot calcification tips, or quotes from the benthic swarm).
+* **Pepper in Visual Figures & Schematics**: Embed clean visual figures and schematics with clear captions.
 
 ```markdown
 ---
@@ -105,8 +121,8 @@ tags:
   - "Physical AI"
   - "Subsea Compute"
   - "Hardware Ecdysis"
-authorName: "Silas Trench"
-authorRole: "Senior Benthic Telemetry Correspondent"
+authorName: "Dr. Thalassa Vance"
+authorRole: "Director of Bio-Silicon Architecture"
 coverImageUrl: "/absolute/path/to/generated_cover.jpg"
 readTimeMinutes: 5
 isFeatured: true
@@ -130,9 +146,6 @@ Clear explanation of the architectural breakthrough.
 | **Thermal Dissipation** | Active HVAC (40% parasitic load) | Direct hydrostatic conduction (0% power) |
 | **Interference Isolation** | Atmospheric EM noise & humidity | Nitrogen-sealed pressure hull |
 | **Control Latency** | Multi-stage serialized pipeline | Direct 120 Hz VLA neural actuation |
-
-> 🦞 **Field Note from Silas Trench**:  
-> *"When the pressure reaches 5,000 fathoms, there is no room for speculative jitter. Either your shell is calcified, or your pipeline collapses."*
 
 ![Clean, Descriptive Caption for Figure 2](/absolute/path/to/generated_figure_2.jpg)
 
@@ -178,39 +191,49 @@ Append the newly published article into `content/news/blog-history.json`:
 
 ---
 
-### Step 6: Multi-Channel Social Distribution (Instagram via Zernio MCP)
+### Step 6: Multi-Channel Social Distribution & Character Compositing
 
 Create high-conversion accompanying social assets and publish them to Instagram via Zernio.
 
-#### 1. Social Copy Rules (Curiosity + Hard Numbers + Cartoon Mascot Flavor)
+#### 1. Character Cutout Compositing on 4:5 Carousel Slides
+You can stamp the homepage cartoon characters onto any slide before uploading:
+
+```typescript
+import { overlayCharacterOnImage } from 'scripts/lib/character-overlay'
+
+// Slide 1: Hero hook with top-right peeking lobster
+await overlayCharacterOnImage('slide1_raw.jpg', 'slide1_final.jpg', {
+  character: 'lobster_peek',
+  position: 'top-right-peek',
+  scalePercent: 28,
+})
+
+// Slide 2: Stats breakdown with bottom-left pointing crab
+await overlayCharacterOnImage('slide2_raw.jpg', 'slide2_final.jpg', {
+  character: 'crab_stats',
+  position: 'bottom-left',
+  scalePercent: 30,
+})
+
+// Slide 3: CTA card with bottom-right pointing hero lobster
+await overlayCharacterOnImage('slide3_raw.jpg', 'slide3_final.jpg', {
+  character: 'lobster_pointing',
+  position: 'bottom-right',
+  scalePercent: 32,
+})
+```
+
+#### 2. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
 * **The Hook**: Lead with an intriguing premise and a striking statistic.
 * **Drop "Dispatch"**: Do not refer to posts as "dispatches" on social channels. Use natural, compelling language (*"Why AI is breaking out of the screen"*, *"The 500MW problem nobody is talking about"*).
 * **Succinct Value Bullets**: Provide 2-3 fast, high-impact takeaways backed by stats (e.g. "+272% YoY surge", "120 Hz direct torque loop", "21.4 PB/s memory bandwidth").
-* **Pepper in Mascot Flavor**: Add subtle mascot verification badges (e.g. `🦞 Verified by Silas Trench & Benthic Swarm Telemetry`, `🦀 Approved by Vector-9 Swarm`).
 * **Stronger CTA**: Give a compelling reason to visit the site (*"See the full teardown and hardware schematics at moltology.org. Link in bio."*).
 
-#### 2. Mandatory AI-Generated Media Labeling
+#### 3. Mandatory AI-Generated Media Labeling
 * **Strict Tenet**: Always enable `isAiGenerated: true` for Instagram/Meta in `platformSpecificData`.
 
-#### 3. Dynamic Infographic-Style 4:5 Carousel Slides (Strict 0.80:1 Aspect Ratio)
-* **Aspect Ratio Rule**: Crop raw images to exact **4:5 aspect ratio** (`896 x 1120`) using `sips -c 1120 896 input.jpg --out output_4_5.jpg` before uploading.
-
-Choose from 4 Carousel Architectures:
-* **Layout 1: The Data & Metric Shock** (Hook Slide -> The Hard Number Shock -> The Hydrostatic Solution -> CTA Slide).
-* **Layout 2: The Myth vs Reality Clash** (The Terrestrial Assumption -> The Physical Reality -> The Benthic Fix -> CTA Slide).
-* **Layout 3: The Blueprint Teardown** (System Overview -> Subsystem Deep Dive -> Spec Comparison -> CTA Slide).
-* **Layout 4: The 5-Step Ecdysis Protocol** (Stage 1 Audit -> Stage 2 Purge -> Stage 3 Calcification -> CTA Slide).
-
-*Prompt Guidelines for Slides*:
-- **Slide 1 (Hero Hook Infographic)**:
-  - *Prompt*: `A high-impact vertical editorial infographic slide, dark sci-fi aesthetic, deep oceanic obsidian slate background, large crisp bold sans-serif headline text '[HERO HEADLINE IN CAPS]', sleek futuristic cybernetic framing, iconic focal subject, ultra high contrast, 8k concept art`
-- **Slide 2 (Comparison / Technical Breakdown)**:
-  - *Prompt*: `A sleek vertical infographic slide, dark sci-fi aesthetic, deep obsidian slate background, bold header '[TOPIC HEADER]', clean structured side-by-side visual comparison callouts with glowing cyan and amber telemetry accents, minimal, crisp typography cards, 8k concept art`
-- **Slide 3 (Takeaway & CTA Card)**:
-  - *Prompt*: `A vertical social media conclusion and CTA infographic slide, dark sci-fi aesthetic, deep oceanic obsidian background, bold header '[TAKEAWAY HEADER]', 2-3 clean takeaway bullets, prominent glowing cyan card at the bottom reading 'FULL ARTICLE ON MOLTOLOGY.ORG // LINK IN BIO', minimal, high contrast, 8k concept art`
-
 #### 4. Upload Assets to Neon S3 & Publish via Zernio
-1. Upload cropped 4:5 slides using `uploadLocalFileToS3` (or `scripts/upload-asset.ts`).
+1. Upload cropped and composited 4:5 slides using `uploadLocalFileToS3` (or `scripts/upload-asset.ts`).
 2. Post to Instagram via Zernio `posts_create` with:
    * `platform`: `"instagram"`
    * `account_id`: `"6a7f7f0777555aae01d99b54"`
