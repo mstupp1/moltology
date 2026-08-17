@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { type QuizQuestion } from '@/lib/moltmax-quiz'
 import { cn } from '@/lib/utils'
 
@@ -92,11 +92,6 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#00c3ff] border-t-transparent" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-transparent opacity-80" />
-                <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2 rounded-lg border border-[#00c3ff]/30 bg-[#071114]/90 px-3 py-2 text-[11px] font-medium leading-tight text-[#d0e6e6] backdrop-blur-md">
-                  <Sparkles className="h-3.5 w-3.5 shrink-0 text-[#00ffcc]" />
-                  <span>{question.scenarioCaption}</span>
-                </div>
               </div>
             </div>
 
