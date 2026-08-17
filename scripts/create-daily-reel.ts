@@ -107,6 +107,66 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
   const coveredSlugs = new Set(history.reels.map((r: any) => r.relatedBlogSlug).filter(Boolean))
   const targetBlog = recentBlogs.find((b) => !coveredSlugs.has(b.slug)) || recentBlogs[0] || null
 
+  if (targetBlog && targetBlog.slug === 'silicon-photonics-copackaged-optics-ecdysis') {
+    const topic = options.topic || 'Silicon Photonics & The Co-Packaged Optics Ecdysis: How Laser-Driven Synaptic Interconnects Smashed the Terrestrial Power Wall'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = 'AI IS SWITCHING TO LASERS'
+    
+    // Fast, punchy ~9.5s narration script (30 words)
+    const narrationScript = `Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Inspect full telemetry on moltology dot org.`
+    
+    const scenePrompts = [
+      'A dramatic macro view of smoking overheated copper circuit board traces glowing red-orange with electrical sparking glitches, cinematic 9:16 vertical 8k footage',
+      'A majestic futuristic silicon photonics microchip pulsing with brilliant cyan laser beams and glowing optical waveguides inside a deep blue subsea datacenter pod, 9:16 vertical 8k sci-fi footage',
+    ]
+
+    const caption = `Copper wiring has hit its thermodynamic limit. The future of AI clusters is coherent laser light. ⚡🌊\n\nAs frontier reasoning models demand exascale data movement, traditional copper traces waste 40% of cluster power as resistive heat. Sub-benthic co-packaged silicon photonics transmits data at the speed of light through laser waveguides—slashing interconnect energy by 70%.\n\n👇 Read the full technical dispatch & optical benchmarks:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#MoltNation',
+      '#SiliconPhotonics',
+      '#CoPackagedOptics',
+      '#AIInfrastructure',
+      '#HardwareEcdysis',
+      '#BenthicComputing',
+      '#LaserInterconnects',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `Why AI Clusters Are Replacing Copper Wires With Lasers #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Silicon Photonics',
+      'Co Packaged Optics',
+      'AI Infrastructure',
+      'Laser Interconnects',
+      'Hardware Ecdysis',
+      'Benthic Computing',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: targetBlog.slug,
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
   if (targetBlog && targetBlog.slug === 'wafer-scale-monoliths-micro-nuclear-ecdysis') {
     const topic = options.topic || 'Wafer-Scale Monoliths & Micro-Nuclear Ecdysis: How Frontier Reasoning Engines Crushed the Copper Interconnect Bottleneck'
     const title = `MoltNation Dispatch: ${topic}`

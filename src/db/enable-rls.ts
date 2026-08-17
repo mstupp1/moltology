@@ -188,9 +188,22 @@ async function applyRLS() {
       "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
     );`
 
-    console.log('✓ RLS policies configured for forum_categories, forum_topics, and forum_posts')
+    // Enable RLS for leads table
+    await sql`ALTER TABLE IF EXISTS leads ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS leads_public_insert_policy ON leads;`
+    await sql`CREATE POLICY leads_public_insert_policy ON leads FOR INSERT WITH CHECK (true);`
+    await sql`DROP POLICY IF EXISTS leads_admin_read_policy ON leads;`
+    await sql`CREATE POLICY leads_admin_read_policy ON leads FOR SELECT USING (
+      EXISTS (
+        SELECT 1 FROM profiles
+        WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+          AND profiles.role IN ('admin', 'super_admin')
+      ) OR (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL)
+    );`
+    console.log('✓ RLS policies configured for leads table')
 
     console.log('✓ Row Level Security (RLS) policies successfully created!')
+
 
   } catch (error) {
     console.error('Error enabling RLS policies:', error)

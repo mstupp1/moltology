@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, routines, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments } from './schema'
+import { profiles, users, userStats, routines, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -14,7 +14,17 @@ describe('Database Schema & RLS Policies', () => {
     expect(aiMessages).toBeDefined()
     expect(blogPosts).toBeDefined()
     expect(blogComments).toBeDefined()
+    expect(leads).toBeDefined()
   })
+
+  it('defines required fields on the leads table', () => {
+    expect(leads.id).toBeDefined()
+    expect(leads.email).toBeDefined()
+    expect(leads.source).toBeDefined()
+    expect(leads.claimedPdf).toBeDefined()
+    expect(leads.convertedToUser).toBeDefined()
+  })
+
 
   it('defines required fields on the profiles table', () => {
     expect(profiles.id).toBeDefined()

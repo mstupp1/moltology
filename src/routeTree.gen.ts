@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as GuideRouteImport } from './routes/guide'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MoltmaxRouteImport } from './routes/moltmax'
@@ -64,6 +65,11 @@ const HudRoute = HudRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -265,6 +271,7 @@ const NewsSlugMdRoute = NewsSlugMdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guide': typeof GuideRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/guide': typeof GuideRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -353,6 +361,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
+  '/guide': typeof GuideRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/guide'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/guide'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -485,6 +496,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_hud'
     | '/auth'
+    | '/guide'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -530,6 +542,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
+  GuideRoute: typeof GuideRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   MoltmaxRoute: typeof MoltmaxRoute
@@ -573,6 +586,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -936,6 +956,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
+  GuideRoute: GuideRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   MoltmaxRoute: MoltmaxRoute,

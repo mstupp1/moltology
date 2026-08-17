@@ -34,6 +34,9 @@ import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
 import { HudCard, HudBadge } from '@/components/ui'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { MoltmaxGuideCard } from '@/components/guide/MoltmaxGuideCard'
+import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
+import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 
 export const MoltmaxxingPillarPage: React.FC = () => {
   const navigate = useNavigate()
@@ -43,6 +46,8 @@ export const MoltmaxxingPillarPage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
+
 
   const faqs = [
     {
@@ -308,8 +313,15 @@ export const MoltmaxxingPillarPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Lead Magnet Feature Card */}
+        <MoltmaxGuideCard
+          source="moltmaxxing_pillar_inline"
+          onOpenGuideModal={() => setIsGuideModalOpen(true)}
+        />
+
         {/* Section 4: Ascendancy Tiers */}
         <section className="space-y-6">
+
           <div className="flex items-center gap-3">
             <Award className="w-6 h-6 text-[#38bdf8]" />
             <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white uppercase tracking-wide">
@@ -435,6 +447,23 @@ export const MoltmaxxingPillarPage: React.FC = () => {
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authMode}
       />
+
+      {/* Floating Lead Pill */}
+      <MoltmaxGuideFloatingPill
+        onOpenGuideModal={() => setIsGuideModalOpen(true)}
+      />
+
+      {/* Field Manual Lead Capture Modal */}
+      <MoltmaxGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        source="moltmaxxing_pillar_floating_pill"
+        onOpenAuthSignup={(leadEmail) => {
+          setAuthMode('signup')
+          setIsAuthModalOpen(true)
+        }}
+      />
     </div>
   )
 }
+

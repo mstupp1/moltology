@@ -354,6 +354,27 @@ export const podcasts = pgTable('podcasts', {
   })
 ])
 
-
-
-
+// Top-of-Funnel Leads & Guide Downloads Table
+export const leads = pgTable('leads', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull(),
+  source: text('source').default('moltmax_guide').notNull(),
+  referrer: text('referrer'),
+  claimedPdf: boolean('claimedPdf').default(true).notNull(),
+  convertedToUser: boolean('convertedToUser').default(false).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('leads_public_insert_policy', {
+    for: 'insert',
+    withCheck: sql`true`
+  }),
+  pgPolicy('leads_admin_read_policy', {
+    for: 'select',
+    using: sql`EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        AND profiles.role IN ('admin', 'super_admin')
+    ) OR (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL)`
+  })
+])

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, podcasts } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, podcasts, leads } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -1650,8 +1650,74 @@ export const getPodcastsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(getPodcastsHandler)
 
+// Lead Capture & Field Manual Decryption API
+const submitLeadSchema = z.object({
+  email: z.string().email('Valid email telemetry is required for decryption transmission.'),
+  source: z.string().optional().default('moltmax_guide'),
+  referrer: z.string().optional(),
+})
 
+export type SubmitLeadInput = z.infer<typeof submitLeadSchema>
 
+export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
+  const { data } = args
+  const validated = submitLeadSchema.parse(data || {})
+  const normalizedEmail = validated.email.trim().toLowerCase()
+  const source = validated.source || 'moltmax_guide'
+  const referrer = validated.referrer || null
 
+  const downloadUrl = '/downloads/the-2026-moltmaxxing-protocol-guide.html'
 
+  try {
+    const db = getDb()
+    if (db) {
+      const existing = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.email, normalizedEmail))
+        .limit(1)
 
+      if (existing.length > 0) {
+        return {
+          success: true,
+          isExisting: true,
+          email: normalizedEmail,
+          downloadUrl,
+          message: 'Biometric telemetry confirmed. Dossier transmission unlocked.',
+        }
+      }
+
+      await db.insert(leads).values({
+        email: normalizedEmail,
+        source,
+        referrer,
+        claimedPdf: true,
+        convertedToUser: false,
+      })
+
+      return {
+        success: true,
+        isExisting: false,
+        email: normalizedEmail,
+        downloadUrl,
+        message: 'New initiate registered. Transmission unlocked.',
+      }
+    }
+  } catch (error) {
+    console.warn('[ServerFn submitLeadFn] DB insertion fallback:', error)
+  }
+
+  // Graceful fallback if database is in mock or offline mode
+  return {
+    success: true,
+    isExisting: false,
+    email: normalizedEmail,
+    downloadUrl,
+    message: 'Telemetry acknowledged. Offline decryption enabled.',
+  }
+}
+
+export const submitLeadFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: SubmitLeadInput) => submitLeadSchema.parse(data))
+  .handler(submitLeadHandler)
