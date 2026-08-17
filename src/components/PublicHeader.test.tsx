@@ -19,21 +19,26 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 describe('PublicHeader Navigation Component', () => {
-  it('renders shared brand emblem, title, and route links including Etsy STORE', () => {
+  it('renders shared brand emblem, title, and route links without SCAN or NEW badges', () => {
     render(<PublicHeader activePage="home" />)
 
     expect(screen.getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
 
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })).toBeInTheDocument()
+    expect(within(nav).getByRole('button', { name: /^MOLTMAX$/i })).toBeInTheDocument()
     expect(within(nav).getByText('ORGANIZATION')).toBeInTheDocument()
 
     const storeLink = within(nav).getByRole('link', { name: /STORE/i })
     expect(storeLink).toBeInTheDocument()
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
+
+    // Confirm that SCAN and NEW badges are not rendered in navigation
+    expect(screen.queryByText('SCAN')).not.toBeInTheDocument()
+    expect(screen.queryByText('NEW')).not.toBeInTheDocument()
   })
 
-  it('highlights the active page route with flat pill capsule styling', () => {
+  it('highlights correct navigation links based on activePage or current route', () => {
     mockPathname = '/'
     const { rerender } = render(<PublicHeader activePage="home" />)
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
@@ -115,7 +120,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 
-  it('opens mobile menu with nav links and auth actions via hamburger toggle', () => {
+  it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', () => {
     const onOpenAuth = vi.fn()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
 
@@ -127,6 +132,9 @@ describe('PublicHeader Navigation Component', () => {
     // Mobile links are in the DOM but the dropdown is collapsed (max-h-0)
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+    const moltmaxMobileBtn = screen.getAllByRole('button', { name: /^MOLTMAX$/i })
+    expect(moltmaxMobileBtn.length).toBeGreaterThanOrEqual(2) // 1 desktop, 1 mobile
 
     const mobileLogin = screen.getAllByRole('button', { name: /LOG IN/i }).at(-1)!
     fireEvent.click(mobileLogin)
