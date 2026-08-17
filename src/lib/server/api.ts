@@ -363,6 +363,10 @@ interface UserStatsInput {
   pincerTorque?: number
   shellHardness?: number
   clawStrength?: number
+  moltmaxScore?: number
+  moltmaxClearance?: string
+  moltmaxStage?: string
+  moltmaxDimensionScores?: Record<string, number>
 }
 
 /**
@@ -374,13 +378,24 @@ const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<UserStatsI
     throw new Error('User identifier missing from context')
   }
 
+  // Auth flows can succeed before the profile/stat sync request finishes. Make
+  // the save path self-healing instead of allowing a zero-row UPDATE.
+  const { ensureUserProfile } = await import('../user-sync')
+  await ensureUserProfile(userId)
+
   const dbClient = context?.db || getDb(context?.token ?? undefined)
+  await dbClient
+    .insert(userStats)
+    .values({ userId })
+    .onConflictDoNothing()
+
+  const input = data ?? {}
+  const statsData = input.moltmaxScore === undefined
+    ? input
+    : { ...input, moltmaxCompletedAt: new Date() }
   const [updated] = await dbClient
     .update(userStats)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
+    .set({ ...statsData, updatedAt: new Date() })
     .where(eq(userStats.userId, userId))
     .returning()
 
@@ -395,6 +410,10 @@ export const updateUserStatsFn = createServerFn({ method: 'POST' })
         pincerTorque: z.number().min(0).max(100).optional(),
         shellHardness: z.number().min(0).max(100).optional(),
         clawStrength: z.number().min(0).max(100).optional(),
+        moltmaxScore: z.number().int().min(12).max(99).optional(),
+        moltmaxClearance: z.string().min(1).max(10).optional(),
+        moltmaxStage: z.string().min(1).max(100).optional(),
+        moltmaxDimensionScores: z.record(z.string(), z.number().min(0).max(100)).optional(),
       })
       .parse(data)
   })
@@ -1630,8 +1649,6 @@ export const getPodcastsHandler = async ({ context }: ServerFnArgs) => {
 export const getPodcastsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(getPodcastsHandler)
-
-
 
 
 
