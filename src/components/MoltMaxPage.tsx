@@ -1,10 +1,9 @@
 import React, { useRef, useState } from 'react'
-import { Activity, ArrowDown, ArrowRight, Brain, Check, ChevronRight, Compass, Layers3, Shield, Sparkles, Zap } from 'lucide-react'
+import { Activity, ArrowDown, ArrowRight, Brain, Check, CheckCircle2, ChevronRight, Compass, Layers3, Shield, Sparkles, Terminal, Zap } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
-import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
 import { authClient } from '@/lib/auth-client'
 import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -234,27 +233,50 @@ export const MoltMaxPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#020608] font-mono text-[#dfe3e3] selection:bg-[#00c3ff]/30 selection:text-white">
+    <div className="min-h-screen overflow-hidden bg-[#070b0b] font-mono text-[#dfe3e3] selection:bg-[#00c3ff]/30 selection:text-white relative">
+      {/* Ambient Sci-Fi Vignette, CRT Scanlines & Glow Backdrops from Homepage */}
+      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
+      <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-40" />
+      <div className="fixed inset-0 crt-grain pointer-events-none z-0 opacity-35 mix-blend-overlay" />
+
       <PublicHeader activePage="moltmax" onOpenAuth={(auth) => { setAuthMode(auth); setIsAuthModalOpen(true) }} />
-      {mode === 'hero' && <main>
-        <section className="relative flex min-h-[calc(100svh-5rem)] items-center overflow-hidden border-b border-[#00c3ff]/20 px-4 pb-16 pt-28 sm:px-8 lg:px-12 xl:px-16">
-          <UnderwaterBubblesCanvas bubbleCount={34} className="absolute inset-0 opacity-50" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_45%,rgba(0,195,255,0.14),transparent_32%),radial-gradient(circle_at_25%_75%,rgba(255,69,58,0.1),transparent_28%),linear-gradient(180deg,rgba(2,6,8,0.3),#020608)]" aria-hidden="true" />
-          <div className="absolute right-[-12%] top-1/2 h-[38rem] w-[38rem] -translate-y-1/2 rounded-full border border-[#00c3ff]/10 [transform:rotateX(65deg)_rotateZ(-18deg)]" aria-hidden="true" />
-          <div className="absolute right-[-7%] top-1/2 h-[28rem] w-[28rem] -translate-y-1/2 rounded-full border border-dashed border-[#00ffcc]/20 animate-spin-slow" aria-hidden="true" />
+      {mode === 'hero' && <main className="relative z-10">
+        <section className="relative flex min-h-[calc(100svh-5rem)] items-center overflow-hidden border-b border-cyan-900/50 px-4 pb-16 pt-28 sm:px-8 lg:px-12 xl:px-16 bg-[#030608]">
+          {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
+          <img
+            src="/images/hero_widescreen_bg.jpg"
+            alt="Benthic Abyss Widescreen Hero"
+            className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
+          />
+          {/* Layer 2A: Deep Benthic Base Vignette */}
+          <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
+          {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.18)_0%,transparent_65%)] pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.14)_0%,transparent_65%)] pointer-events-none z-0" />
+          {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
+          <img
+            src="/images/chitin_texture_bg.jpg"
+            alt="Chitin Exoshell Background Texture"
+            className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
+          />
+          {/* Layer 2D: Sacred Grid & Balanced Edge Vignettes */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-60" />
+          <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
           <div className="relative z-10 mx-auto grid w-full max-w-[1680px] items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] xl:gap-14">
             
             {/* Left Content Area */}
             <div className="max-w-2xl">
               <div className="mb-5 inline-flex items-center gap-2 border border-[#00c3ff]/40 bg-[#00c3ff]/10 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#00c3ff]">
-                <Sparkles className="h-4 w-4 text-[#00ffcc]" /> Free 3-Minute Quiz · Discover Your Lobster Archetype
+                <Sparkles className="h-4 w-4 text-[#00ffcc]" /> Official Moltmaxxing Audit · Discover Your Carcinization Stage
               </div>
               <h1 className="font-grotesk text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-[4.25rem] font-black uppercase leading-[0.92] tracking-[-0.04em] text-white">
                 Measure the shell.<br />
-                <span className="text-transparent bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text">Meet the depth.</span>
+                <span className="text-transparent bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text">Master Moltmaxxing.</span>
               </h1>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-[#a2b2b1] sm:text-base">
-                Ever wonder how you handle pressure, adapt to change, and make tough calls? Take this 15-question quiz to discover your Carcinization Stage, find your unique strengths, and unlock personalized tips to level up.
+                Moltmaxxing is the systematic practice of shedding weak biological constraints, hardening your external carapace, and maximizing pincer execution. Take this 15-question biometric audit to calculate your Moltmax Score, diagnose your five core strength vectors, and discover your official Carcinization Stage.
               </p>
               
               {/* Action and Timing Callouts */}
@@ -267,7 +289,7 @@ export const MoltMaxPage: React.FC = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ffcc]"></span>
                   </span>
-                  <span>3–4 Minutes · 15 Fun Scenarios · Free Instant Results</span>
+                  <span>3–4 Minutes · 15 Moltmaxxing Scenarios · Free Instant Results</span>
                 </div>
               </div>
 
@@ -286,36 +308,9 @@ export const MoltMaxPage: React.FC = () => {
             {/* Right-Hand Hero Showcase: Full-Width 3 Fanned Progression Question Cards (Click to Start Quiz) */}
             <div className="relative hidden lg:block w-full">
               <div className="absolute inset-4 rounded-full bg-[#00c3ff]/15 blur-[90px]" aria-hidden="true" />
-              
-              {/* Scenario Trait Progression Selector */}
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00c3ff]">
-                  <Activity className="h-4 w-4 text-[#00ffcc] animate-pulse" />
-                  <span>Personality & Scenario Preview</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {fannedCards.map((card, idx) => (
-                    <button
-                      key={card.id}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setFannedActive(idx)
-                      }}
-                      className={`rounded-full px-3.5 py-1 text-[11px] font-bold tracking-wider transition-all ${
-                        fannedActive === idx
-                          ? 'bg-[#00c3ff] text-[#020408] shadow-[0_0_15px_rgba(0,195,255,0.4)]'
-                          : 'border border-white/15 bg-[#071114]/90 text-[#839493] hover:border-white/30 hover:text-white'
-                      }`}
-                    >
-                      {card.trait}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Fanned Cards Stack Container - Taller, Expansive Card with Native 16:9 Artwork */}
-              <div className="relative h-[720px] xl:h-[750px] w-full pt-3">
+              <div className="relative h-[720px] xl:h-[750px] w-full pt-1">
                 {fannedCards.map((card, idx) => {
                   const isActive = idx === fannedActive
                   const diff = idx - fannedActive
@@ -461,26 +456,313 @@ export const MoltMaxPage: React.FC = () => {
           <div className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[#839493]"><ArrowDown className="h-5 w-5 animate-bounce" /></div>
         </section>
 
-        {/* 3-Step Clear Explainer */}
-        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-8">
-          <div className="grid gap-8 border-y border-white/10 py-10 md:grid-cols-3">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#00c3ff]">01 // 15 Relatable Dilemmas</div>
-              <p className="mt-3 text-sm leading-relaxed text-[#839493]">
-                Navigate 15 real-world dilemmas featuring our armored lobster hero facing tough choices, noisy distractions, and high-pressure moments.
-              </p>
+        {/* CINEMATIC TRANSMISSION BANNER (Homepage Design Language & Textures) */}
+        <section className="relative w-full border-y border-cyan-900/60 bg-[#030607] py-14 sm:py-20 overflow-hidden group">
+          <div className="pbr-underlay pbr-underlay-basalt opacity-40 pointer-events-none" />
+          <img
+            src="/images/hero_widescreen_bg.jpg"
+            alt="Benthic Abyss Transmission"
+            className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none blur-[8px]"
+          />
+          <img
+            src="/images/chitin_texture_bg.jpg"
+            alt="Chitin Texture"
+            className="absolute inset-0 h-full w-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#030608] via-[#030608]/75 to-[#030608] pointer-events-none" />
+          <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
+          
+          <div className="relative z-10 mx-auto max-w-[1500px] px-4 text-center sm:px-8">
+            <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
+              <Terminal className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
+              <span>MARIANA TRENCH METHODOLOGY // SYSTEM OVERVIEW</span>
             </div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#00c3ff]">02 // 5 Core Personality Traits</div>
-              <p className="mt-3 text-sm leading-relaxed text-[#839493]">
-                See how your natural instincts score across resilience, focus, decisive execution, habit-shedding, and calm composure.
-              </p>
+            <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+              HOW THE <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">MOLTMAX AUDIT</span> WORKS
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl font-mono text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
+              Fifteen scenario-driven dilemmas mapped across five core biometric performance vectors. Discover your true Carcinization Stage with zero latency and complete privacy.
+            </p>
+          </div>
+        </section>
+
+        {/* 3 CORE METHODOLOGY CARDS (PBR Textures & Chamfered HUD Design) */}
+        <section className="relative mx-auto max-w-[1680px] px-4 py-16 sm:px-8 lg:px-12">
+          {/* Ambient Lighting Backdrops */}
+          <div className="absolute top-1/2 left-1/4 h-[350px] w-[350px] -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none" />
+          <div className="absolute top-1/2 right-1/4 h-[350px] w-[350px] -translate-y-1/2 rounded-full bg-red-500/10 blur-[130px] pointer-events-none" />
+
+          <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
+            {/* Card 1: 15 Relatable Dilemmas (Hero Asset Shedding Artwork + Chitin Texture) */}
+            <div className="chitin-card group relative flex flex-col justify-between overflow-hidden chamfer-corner-lg border-2 border-cyan-500/40 bg-gradient-to-b from-[#0a1215]/95 via-[#070d0f]/95 to-[#04080a]/95 transition-all duration-500 hover:-translate-y-1 hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]">
+              <div className="pbr-underlay pbr-underlay-chitin opacity-35 group-hover:opacity-55 transition-opacity" />
+              <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
+
+              <div>
+                {/* 16:9 Showcase Image with Tactile Chitin Texture Overlay */}
+                <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-cyan-500/30 bg-[#020608]">
+                  <img
+                    src="/images/hero_card_asset_shedding.jpg"
+                    alt="15 Relatable Scenarios & Dilemmas"
+                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <img
+                    src="/images/chitin_texture_bg.jpg"
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover opacity-35 mix-blend-overlay pointer-events-none z-0"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04080a] via-transparent to-transparent opacity-80" />
+                  <div className="absolute top-3 right-3 rounded bg-cyan-950/90 border border-cyan-500/50 px-2.5 py-1 text-[10px] font-mono font-bold text-cyan-300 backdrop-blur-md shadow-hud-cyan">
+                    PHASE 01
+                  </div>
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg border border-cyan-500/40 bg-[#050b0e]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                    <Shield className="h-3 w-3 text-cyan-400" />
+                    <span>Scenario Engine</span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 p-5 sm:p-6 lg:p-7">
+                  <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                    01 // 15 RELATABLE DILEMMAS
+                  </div>
+                  <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors sm:text-2xl">
+                    Real-World Scenarios
+                  </h3>
+                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300 sm:text-sm">
+                    Navigate 15 real-world dilemmas featuring our armored lobster hero facing tough choices, noisy distractions, and high-pressure moments.
+                  </p>
+
+                  <div className="mt-5 space-y-2 border-t border-cyan-900/40 pt-4">
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
+                      <span>Boundary & stress impact tests</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
+                      <span>Decisive execution trade-offs</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
+                      <span>No trick questions · intuitive choices</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 border-t border-cyan-900/40 p-5 pt-3 sm:px-6">
+                <button
+                  type="button"
+                  onClick={beginAudit}
+                  className="flex w-full items-center justify-center gap-2 border border-cyan-500/40 bg-cyan-950/60 py-2.5 font-grotesk text-xs font-bold uppercase tracking-wider text-cyan-300 transition-all group-hover:border-cyan-400 group-hover:bg-cyan-500 group-hover:text-[#020408]"
+                >
+                  <span>Experience Scenarios</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#00c3ff]">03 // Custom Archetype & Score</div>
-              <p className="mt-3 text-sm leading-relaxed text-[#839493]">
-                Get your instant 0–100 score, 5-trait radar chart, your official lobster archetype, and actionable growth tips.
-              </p>
+
+            {/* Card 2: 5 Core Personality Vectors (Chitin Hardening Artwork + Circuit Matrix) */}
+            <div className="chitin-card group relative flex flex-col justify-between overflow-hidden chamfer-corner-lg border-2 border-[#ffd700]/40 bg-gradient-to-b from-[#121008]/95 via-[#0e0c07]/95 to-[#080704]/95 transition-all duration-500 hover:-translate-y-1 hover:border-[#ffd700] hover:shadow-[0_0_40px_rgba(255,215,0,0.2)]">
+              <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
+              <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
+
+              <div>
+                {/* 16:9 Showcase Image with Circuit Matrix Texture Overlay */}
+                <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-[#ffd700]/30 bg-[#020608]">
+                  <img
+                    src="/images/hero_card_chitin_hardening.jpg"
+                    alt="5-Vector Biometric Diagnostic Matrix"
+                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <img
+                    src="/images/pbr_circuit_matrix.jpg"
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay pointer-events-none z-0"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#080704] via-transparent to-transparent opacity-80" />
+                  <div className="absolute top-3 right-3 rounded bg-amber-950/90 border border-amber-500/50 px-2.5 py-1 text-[10px] font-mono font-bold text-amber-300 backdrop-blur-md shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                    PHASE 02
+                  </div>
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg border border-amber-500/40 bg-[#0e0c07]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                    <Activity className="h-3 w-3 text-amber-400" />
+                    <span>Biometric Matrix</span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 p-5 sm:p-6 lg:p-7">
+                  <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
+                    02 // 5 CORE PERSONALITY TRAITS
+                  </div>
+                  <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-amber-300 transition-colors sm:text-2xl">
+                    5-Trait Biometrics
+                  </h3>
+                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300 sm:text-sm">
+                    See how your natural instincts score across resilience, focus, decisive execution, habit-shedding, and calm composure.
+                  </p>
+
+                  <div className="mt-5 space-y-2 border-t border-amber-900/40 pt-4">
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
+                      <span>5-axis live radar chart visualization</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
+                      <span>Neural latency & torque dynamometry</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
+                      <span>Depth pressure resilience scoring</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 border-t border-amber-900/40 p-5 pt-3 sm:px-6">
+                <button
+                  type="button"
+                  onClick={beginAudit}
+                  className="flex w-full items-center justify-center gap-2 border border-amber-500/40 bg-amber-950/60 py-2.5 font-grotesk text-xs font-bold uppercase tracking-wider text-amber-300 transition-all group-hover:border-amber-400 group-hover:bg-[#ffd700] group-hover:text-[#020408]"
+                >
+                  <span>Calibrate Vectors</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Card 3: Custom Archetype & Score (Benthic Core Artwork + Carbon Weave) */}
+            <div className="chitin-card group relative flex flex-col justify-between overflow-hidden chamfer-corner-lg border-2 border-[#00ffcc]/40 bg-gradient-to-b from-[#081412]/95 via-[#060e0d]/95 to-[#030807]/95 transition-all duration-500 hover:-translate-y-1 hover:border-[#00ffcc] hover:shadow-[0_0_40px_rgba(0,255,204,0.22)]">
+              <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-55 transition-opacity" />
+              <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
+
+              <div>
+                {/* 16:9 Showcase Image with Carbon Weave Texture Overlay */}
+                <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-[#00ffcc]/30 bg-[#020608]">
+                  <img
+                    src="/images/hero_card_benthic_core.jpg"
+                    alt="Custom Clearance Scorecard and Archetype"
+                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <img
+                    src="/images/pbr_carbon_weave.jpg"
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay pointer-events-none z-0"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#030807] via-transparent to-transparent opacity-80" />
+                  <div className="absolute top-3 right-3 rounded bg-emerald-950/90 border border-emerald-500/50 px-2.5 py-1 text-[10px] font-mono font-bold text-emerald-300 backdrop-blur-md shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                    PHASE 03
+                  </div>
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-[#060e0d]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                    <Sparkles className="h-3 w-3 text-[#00ffcc]" />
+                    <span>Official Clearance</span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 p-5 sm:p-6 lg:p-7">
+                  <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#00ffcc]">
+                    03 // CUSTOM ARCHETYPE & SCORE
+                  </div>
+                  <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-[#00ffcc] transition-colors sm:text-2xl">
+                    Scorecard & Blueprint
+                  </h3>
+                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300 sm:text-sm">
+                    Get your instant 0–100 score, 5-trait radar chart, your official lobster archetype, and actionable growth tips.
+                  </p>
+
+                  <div className="mt-5 space-y-2 border-t border-emerald-900/40 pt-4">
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00ffcc]" />
+                      <span>Instant 0–100 index & tier assignment</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00ffcc]" />
+                      <span>High-resolution scorecard image export</span>
+                    </div>
+                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00ffcc]" />
+                      <span>3 customized habit-upgrade prescriptions</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 border-t border-emerald-900/40 p-5 pt-3 sm:px-6">
+                <button
+                  type="button"
+                  onClick={beginAudit}
+                  className="flex w-full items-center justify-center gap-2 border border-[#00ffcc]/40 bg-emerald-950/60 py-2.5 font-grotesk text-xs font-bold uppercase tracking-wider text-[#00ffcc] transition-all group-hover:border-[#00ffcc] group-hover:bg-[#00ffcc] group-hover:text-[#020408]"
+                >
+                  <span>Claim Clearance</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* METRIC COUNTER STRIP (Homepage Telemetry Strip Language) */}
+        <section className="mx-auto max-w-[1680px] px-4 pb-20 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
+            <div className="chitin-card chamfer-corner relative overflow-hidden border border-cyan-500/40 bg-[#080e10]/90 p-4 text-center sm:p-6">
+              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
+              <div className="relative z-10">
+                <div className="font-grotesk text-3xl font-black text-cyan-400 drop-shadow-[0_0_15px_rgba(0,195,255,0.5)] sm:text-5xl">
+                  15
+                </div>
+                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
+                  Dilemma Chambers
+                </div>
+                <div className="mt-0.5 text-[10px] text-gray-400">
+                  Scenario Engine
+                </div>
+              </div>
+            </div>
+
+            <div className="chitin-card chamfer-corner relative overflow-hidden border border-[#ffd700]/40 bg-[#0e0c08]/90 p-4 text-center sm:p-6">
+              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
+              <div className="relative z-10">
+                <div className="font-grotesk text-3xl font-black text-[#ffd700] drop-shadow-[0_0_15px_rgba(255,215,0,0.5)] sm:text-5xl">
+                  5
+                </div>
+                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
+                  Core Vectors
+                </div>
+                <div className="mt-0.5 text-[10px] text-gray-400">
+                  Biometric Matrix
+                </div>
+              </div>
+            </div>
+
+            <div className="chitin-card chamfer-corner relative overflow-hidden border border-[#00ffcc]/40 bg-[#081412]/90 p-4 text-center sm:p-6">
+              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
+              <div className="relative z-10">
+                <div className="font-grotesk text-3xl font-black text-[#00ffcc] drop-shadow-[0_0_15px_rgba(0,255,204,0.5)] sm:text-5xl">
+                  4
+                </div>
+                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
+                  Archetype Stages
+                </div>
+                <div className="mt-0.5 text-[10px] text-gray-400">
+                  Carcinization Tiers
+                </div>
+              </div>
+            </div>
+
+            <div className="chitin-card chamfer-corner relative overflow-hidden border border-cyan-500/40 bg-[#080e10]/90 p-4 text-center sm:p-6">
+              <div className="pbr-underlay pbr-underlay-circuit opacity-25" />
+              <div className="relative z-10">
+                <div className="font-grotesk text-3xl font-black text-cyan-300 drop-shadow-[0_0_15px_rgba(0,195,255,0.5)] sm:text-5xl">
+                  100%
+                </div>
+                <div className="mt-1 font-mono text-xs font-bold uppercase text-white sm:text-sm">
+                  Free & Instant
+                </div>
+                <div className="mt-0.5 text-[10px] text-gray-400">
+                  Client-Side Audit
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -498,12 +780,48 @@ export const MoltMaxPage: React.FC = () => {
         <QuizResultsReveal result={result} isCopied={isCopied} isGeneratingImage={isGeneratingImage} isSaved={isSaved} isAuthenticated={Boolean(user)} onShare={handleShare} onCopy={handleCopy} onDownload={handleDownload} onSave={user ? handleSave : () => { setAuthMode('signup'); setIsAuthModalOpen(true) }} onReset={() => { setMode('hero'); setResult(null); window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0) }} />
       </main>}
 
-      <section className="border-t border-white/10 bg-[#030809] px-4 py-14 text-center sm:px-8">
-        <div className="mx-auto max-w-2xl">
-          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#00c3ff]">Continue your growth</div>
-          <h2 className="mt-3 font-grotesk text-2xl font-bold uppercase text-white sm:text-3xl">The assessment is a starting point, not a ceiling.</h2>
-          <p className="mt-3 text-sm leading-relaxed text-[#839493]">Explore the complete Moltmaxxing guide to strengthen your resilience, sharpen your focus, and master high-pressure environments.</p>
-          <button type="button" onClick={() => navigate({ to: '/moltmaxxing' })} className="mt-6 inline-flex items-center gap-2 border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-5 py-3 text-xs font-bold uppercase tracking-wide text-[#00ffcc] transition-colors hover:bg-[#00ffcc]/20">Read the canonical Moltmaxxing guide <ChevronRight className="h-4 w-4" /></button>
+      {/* CONTINUED ASCENSION FOOTER BANNER (Homepage Design Language & Textures) */}
+      <section className="relative border-t border-cyan-900/60 bg-[#030608] px-4 py-16 text-center overflow-hidden sm:px-8 sm:py-24">
+        <div className="pbr-underlay pbr-underlay-basalt opacity-35 pointer-events-none" />
+        <img
+          src="/images/underwater_looking_up.jpg"
+          alt="Benthic Ascension Background"
+          className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-luminosity pointer-events-none"
+        />
+        <img
+          src="/images/chitin_texture_bg.jpg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-overlay pointer-events-none z-0"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] pointer-events-none" />
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-3 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
+            <Sparkles className="h-3.5 w-3.5 text-[#00ffcc] animate-pulse" />
+            <span>CONTINUE YOUR ASCENSION</span>
+          </div>
+          <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+            THE ASSESSMENT IS A STARTING POINT, <br />
+            <span className="bg-gradient-to-r from-cyan-400 via-cyan-200 to-[#00ffcc] bg-clip-text text-transparent">NOT A CEILING.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl font-mono text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
+            Explore the complete Moltmaxxing guide to strengthen your resilience, sharpen your focus, and master high-pressure environments.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={beginAudit}
+              className="inline-flex items-center gap-3 bg-[#00c3ff] px-7 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#020408] shadow-[0_0_30px_rgba(0,195,255,0.35)] transition-all hover:bg-[#00ffcc] hover:shadow-[0_0_40px_rgba(0,255,204,0.4)]"
+            >
+              Begin Biometric Assessment <ArrowRight className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: '/moltmaxxing' })}
+              className="inline-flex items-center gap-2 border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-6 py-4 font-grotesk text-sm font-bold uppercase tracking-wider text-[#00ffcc] transition-colors hover:bg-[#00ffcc]/20"
+            >
+              Read the canonical Moltmaxxing guide <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </section>
       <MoltNationFooter />

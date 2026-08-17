@@ -54,7 +54,7 @@ export const QuizResultsReveal: React.FC<QuizResultsRevealProps> = ({
         </div>
         <div className="relative z-10 grid items-center gap-5 py-7 sm:grid-cols-[1fr_0.85fr]">
           <div className="relative mx-auto flex h-52 w-52 items-center justify-center rounded-full border border-[#00c3ff]/30 bg-[#020608] shadow-[0_0_30px_rgba(0,195,255,0.18)]">
-            <div className="absolute inset-2 rounded-full border border-dashed border-[#00c3ff]/35 animate-spin-slow" />
+            <div className="absolute inset-2 rounded-full border border-[#00c3ff]/20" />
             <div className="absolute inset-7 rounded-full border border-[#00ffcc]/25" />
             <ChromaElement src="/images/extracted/cyber_lobster_3d_chroma.jpg" alt="Cyber lobster clearance emblem" glowColor="cyan" pulse={false} className="h-36 w-36" />
             <div className="absolute bottom-5 rounded bg-[#020608]/90 px-2 py-1 text-[9px] font-bold tracking-widest text-[#00ffcc]">CARCINIZED {result.carcinizationPercent}%</div>
