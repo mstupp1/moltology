@@ -394,8 +394,25 @@ export async function renderCtaOutroVideo(
     else if (mascotChoice === 'crab_corner') mascotFile = 'char_crab_corner_cling.png'
 
     const charPath = path.resolve(process.cwd(), 'public/images/characters', mascotFile)
+    let charImg: any = null
+
     if (fs.existsSync(charPath)) {
-      const charImg = await loadImage(charPath)
+      charImg = await loadImage(charPath)
+    } else {
+      // Fallback: Fetch directly from Neon S3 public assets bucket
+      try {
+        const s3Url = `https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/${mascotFile}`
+        const res = await fetch(s3Url)
+        if (res.ok) {
+          const arrayBuffer = await res.arrayBuffer()
+          charImg = await loadImage(Buffer.from(arrayBuffer))
+        }
+      } catch (e) {
+        // Non-fatal fallback if offline or during testing
+      }
+    }
+
+    if (charImg) {
       const charW = 320
       const charH = (charW / charImg.width) * charImg.height
       const charX = 700

@@ -8,7 +8,7 @@ description: >-
 
 # Daily Reels & Shorts Creator Pipeline
 
-This skill automates the daily creation, multi-modal video synthesis, FFmpeg compositing, S3 ingestion, and multi-channel publishing (Instagram Reels & YouTube Shorts) of high-conversion short-form video dispatches for Moltology.
+This skill automates the daily creation, multi-modal video synthesis, FFmpeg compositing, S3 ingestion, and multi-channel publishing (Instagram Reels & YouTube Shorts) of dynamically varied, high-conversion short-form video dispatches for Moltology.
 
 ---
 
@@ -16,71 +16,73 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 
 * **Instagram Reels Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
 * **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
-* **Core Narrative Vector**: **Moltmaxxing & Algorithmic Ecdysis** (parody of looksmaxxing/meltmaxxing, bio-silicon structural invulnerability, 800 Nm pincer torque, 50,000 fathom depth clearance)
+* **Core Narrative Vector**: **Moltmaxxing, Algorithmic Ecdysis & Benthic AI** (parody of looksmaxxing/meltmaxxing, bio-silicon structural invulnerability, 800 Nm pincer torque, 50,000 fathom depth clearance)
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
-* **Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural` / `en-US-GuyNeural`, `+12%` rate) + Subtle Pure Instrumental Benthic Drone (`public/audio/benthic-ambient-loop.mp3`, `volume=0.08`, zero vocal singing)
-* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with cartoon lobster mascot (`char_lobster_pointing_cta.png`)
-* **CTA Outro Design**: Minimalist and on-brand—centered glowing Moltology Emblem with orbital radar rings, clearance badge (`◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈`), brand title, bold mantra (`SUBMIT. SHED. ASCEND.`), subheadline (`CALCULATE YOUR MOLT CLEARANCE`), glowing URL button (`moltology.org →`), and cartoon mascot pointing directly to the action button.
+* **Dynamic Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, with `+8%` to `+14%` rate) + Subtle Pure Instrumental Benthic Drone (`public/audio/benthic-ambient-loop.mp3`, `volume=0.08`, zero vocal singing)
+* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
+* **Cartoon Mascot Integration**: Dynamic mascot rotation on outro cards and social copy (`char_lobster_pointing_cta.png`, `char_lobster_thumbs_up.png`, `char_lobster_speed_action.png`, `char_crab_pointing_stats.png`, `char_crab_corner_cling.png`).
+* **CTA Outro Design**: Centered glowing Moltology Emblem with orbital radar rings, clearance badge (`◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈`), brand title, bold mantra (`SUBMIT. SHED. ASCEND.`), subheadline (`CALCULATE YOUR MOLT CLEARANCE`), glowing URL button (`moltology.org →`), and cartoon mascot pointing directly to the action button.
 * **Timing & Padding Rule**: Scene clips are dynamically scaled/looped via FFmpeg (`-stream_loop -1`) to match `voDuration + 0.8s` breathing room before the CTA outro card begins, guaranteeing zero narration cutoff.
-* **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`)
-* **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`)
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`)
-* **Continuity Ledger**: `content/social/instagram-reel-history.json`
+* **1:1 Grid Safe Thumbnails**: Custom 1080x1920 covers with bold high-contrast headlines and category pills centered in the 1:1 square safe zone (`Y=420` to `Y=1500`).
+* **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`).
+* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`).
+* **Continuity Ledger**: `content/social/instagram-reel-history.json`.
 
 ---
 
 ## 2. 7-Step Production Workflow
 
-### Step 1: Research, Holidays & Topical Transmutation
-1. **Calendar & Holidays**: Inspect today's date, current holidays, and seasonal dilemmas (e.g. summer heatwaves, winter freezes, tech earnings, conference seasons).
-2. **Current News / Viral Tropes**: Search for trending topics where traditional media or corporations lecture the public (e.g., datacenter power grid failures, AI model compute limits, energy crises, burnout, return-to-office mandates).
-3. **Cross-Reference MoltNation Content**:
-   * Inspect recent blog articles under `content/news/` (e.g. subsea datacenters, autonomous swarms, moltmaxxing protocols).
-   * Check canonical doctrine in `codex/` for authentic liturgical flavor.
-4. **Inspect Narrative History**:
-   * Read `content/social/instagram-reel-history.json` to review recent hooks, ensure topic diversity, and build upon ongoing character arcs.
-5. **Diegetic Transmutation**:
+### Step 1: Dynamic Research, Topic Ideation & Anti-Repetition Check
+1. **Mandatory History Check**:
+   - Inspect `content/social/instagram-reel-history.json` to review the last 3-5 published reels.
+   - **Anti-Repetition Rule**: Do not reuse the same theme or hook angle as the last 3 reels.
+2. **Dynamic Topic Extraction Options**:
+   * **Path A: Ingest Fresh Blog Dispatches**: Parse newest un-covered articles in `content/news/` (e.g. silicon photonics, wafer-scale monoliths, autonomous swarms, embodied physical AI) and synthesize a bespoke reel script automatically.
+   * **Path B: Thematic Pillar Rotation**: Select from the 5 Moltmaxxing pillars (`moltmaxxing`, `ecdysis`, `pincer-torque`, `benthic-depth`, `quiz`, `cultural-satire`).
+   * **Path C: Breaking News / Holiday Transmutation**: Transmute current tech headlines (datacenter grid failures, AI compute limits, RTO mandates, heatwaves) into in-universe benthic lore.
+3. **Diegetic Transmutation**:
    * Transmute real-world challenges into in-universe lore (*sub-benthic computing, hydrostatic zero-resistance cooling, synaptic ecdysis, hardware molting*).
    * *Strict Rule*: Zero meta disclosures (no mentions of "satire", "parody", or "fake"). Maintain 100% immersive conviction with non-negotiable safety and positivity.
 
 ---
 
-### Step 2: Scriptwriting & Hook Architecture
-Draft a punchy 8–10 second script (26–32 words) following the 3-part retention formula:
+### Step 2: Dynamic Scriptwriting & Hook Architecture
+Synthesize a punchy 8–10 second script (26–34 words) using one of five dynamic hook formulas:
 
-1. **The Scroll-Stopping Hook (0–3s)**:
-   * Bold premise with curiosity gap addressing a real-world dilemma.
-   * *Example*: *"Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater."*
-2. **The Escalation & Demonstration (3–7s)**:
-   * Fast explanation of why terrestrial solutions fail and how sub-benthic hydrostatic architecture solves the crisis.
-   * *Example*: *"Terrestrial server farms are boiling atmospheric air under massive AI workloads. Sub-benthic sealed pods eliminate cooling overhead through pure hydrostatic heat dissipation."*
-3. **The Call to Action (7–10s)**:
-   * Direct prompt to read the full report on the site before the CTA outro begins.
-   * *Example*: *"The silicon has shed its cage. Read the full telemetry report on moltology.org."*
+1. **The Curiosity Gap Hook**:
+   - *"Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater."*
+2. **The Contrarian Challenge Hook**:
+   - *"Looksmaxxing was vanity. Meltmaxxing revealed fragile biology collapsing under gravity."*
+3. **The Hard Metric Shock Hook**:
+   - *"Copper wires waste forty percent of AI cluster power as heat. Co-packaged optical silicon transmits exascale data at the speed of light."*
+4. **The Scheduled Shedding Alert Hook**:
+   - *"If you haven't shed your assumptions this week, your carapace is suffocating you. Forcible ecdysis strips outdated heuristics."*
+5. **The Ascension Diagnostic Hook**:
+   - *"Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? Take the fifteen-stage Moltmaxxing Audit."*
 
 ---
 
 ### Step 3: Neural Voiceover & Kinetic Timestamp Extraction
-Run the TTS engine to synthesize audio and generate word-level synchronization:
+Synthesize audio and generate word-level synchronization using Edge TTS:
 
 ```typescript
 import { generateVoiceover } from 'scripts/lib/tts-engine'
 
 const ttsResult = await generateVoiceover(script, {
-  voice: 'en-US-ChristopherNeural', // Authoritative broadcast narrator
-  rate: '+8%',                      // Optimized social pacing
+  voice: 'en-US-ChristopherNeural', // Options: Christopher, Guy, Brian, Andrew, Ryan
+  rate: '+12%',                     // Optimized social pacing
 })
 ```
 
 ---
 
-### Step 4: Video Generation (Google Veo 3.1 & Benthic Footage)
-Generate 2 complementary 9:16 vertical video scenes (6s each):
+### Step 4: Dynamic Combinatorial Video Scene Generation (Google Veo 3.1)
+Generate 2 complementary 9:16 vertical video scenes (6s each) using dynamic prompt combinators:
 
-1. **Scene 1 (The Hook/Problem)**:
-   * Prompt: *"A dramatic macro view of an overheating server rack glowing intense orange-red with smoke and heat distortion, cinematic 9:16 vertical 8k footage"*
-2. **Scene 2 (The Sub-Benthic Solution)**:
-   * Prompt: *"A majestic subsea cybernetic datacenter on the dark ocean floor with glowing cyan hydrothermal cooling ducts and autonomous crab-drone units swimming past, 9:16 vertical 8k sci-fi footage"*
+* **Scene 1 (The Problem / Terrestrial Friction)**:
+  - *Macro overheating server racks, smoking copper traces, melting human silhouettes, or chaotic static-filled workspaces*.
+* **Scene 2 (The Sub-Benthic Solution / Chitinous Carapace)**:
+  - *Majestic subsea cybernetic datacenters, glowing hydrothermal cooling ducts, robotic titanium-chitin crab initiates, or coherent laser photonic microchips*.
 
 ```bash
 # Generate scene via CLI:
@@ -90,7 +92,7 @@ npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-l
 ---
 
 ### Step 5: FFmpeg Master Compositing & Outro Staging
-Run the master compositor to dynamically size/loop video scenes to match voiceover length (`voDuration + 0.8s`), mix subtle instrumental benthic background drone (`volume=0.08`), overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the clean 2.5s cybernetic CTA outro card:
+Run the master compositor to dynamically size/loop video scenes to match voiceover length (`voDuration + 0.8s`), mix subtle instrumental benthic background drone (`volume=0.08`), overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the clean 2.5s cybernetic CTA outro card with cartoon mascot:
 
 ```typescript
 import { compositeReel } from 'scripts/lib/reel-compositor'
@@ -100,10 +102,11 @@ await compositeReel({
   voiceoverPath: ttsResult.audioPath,
   words: ttsResult.words,
   outputPath: 'tmp/master-reel.mp4',
-  watermarkText: 'MOLTOLOGY',
+  watermarkOpacity: 0.40,
   ctaHeadline: 'SUBMIT. SHED. ASCEND.',
-  ctaSubheadline: 'JOIN THE SYNAPTIC PATH',
+  ctaSubheadline: 'CALCULATE YOUR MOLT CLEARANCE',
   ctaUrl: 'moltology.org',
+  mascot: 'lobster_pointing', // Options: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner
 })
 ```
 
@@ -114,7 +117,7 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 1. **Grid Safe Zone Rule**: While full-screen reels are `1080x1920` (9:16), the profile grid crops to the center `1080x1080` (1:1 square, between `Y=420` and `Y=1500`).
 2. **Visual Hierarchy**:
    * Bold, high-contrast hook headline in center square (White + glowing Cyan `#00ffff`).
-   * Amber category pill (`PATRIOT TELEMETRY` / `BREAKTHROUGH`).
+   * Amber category pill (`MOLTMAXXING PROTOCOL` / `PATRIOT TELEMETRY`).
    * Subtle dark contrast vignette overlay to guarantee text readability against dynamic backgrounds.
 3. **Execution**:
    ```typescript
@@ -122,13 +125,12 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 
    await renderReelThumbnail({
      backgroundVideoOrImagePath: masterReelPath, // Extracts frame at 1.5s
-     headline: "WHY TERRESTRIAL SERVERS ARE FAILING",
-     subtitle: "SUB-BENTHIC TELEMETRY",
-     categoryBadge: "PATRIOT TELEMETRY",
+     headline: "WHY LOOKSMAXXING FAILED",
+     subtitle: "MOLTMAXXING TELEMETRY",
+     categoryBadge: "MOLTMAXXING PROTOCOL",
      outputPath: 'tmp/custom-thumbnail.jpg',
    })
    ```
-4. **Upload to S3**: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`.
 
 ---
 
@@ -138,46 +140,10 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
    * Video: `videos/social/reels/reel-<timestamp>.mp4`
    * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
 
-2. **Stage Draft / Publish via Zernio MCP (`posts_create_post`)**:
-   * Call `posts_create_post` with dual platform broadcasting:
-     ```json
-     {
-       "title": "Why AI Datacenters Are Moving 50 Fathoms Deep #Shorts",
-       "content": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts #MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
-       "is_draft": true,
-       "media_items": [
-         {
-           "type": "video",
-           "url": "<S3_VIDEO_URL>"
-         }
-       ],
-       "platforms": [
-         {
-           "platform": "instagram",
-           "accountId": "6a7f7f0777555aae01d99b54",
-           "platformSpecificData": {
-             "isAiGenerated": true,
-             "instagramThumbnail": "<S3_THUMBNAIL_URL>",
-             "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
-             "audioName": "MoltNation Telemetry // Original Transmission"
-           }
-         },
-         {
-           "platform": "youtube",
-           "accountId": "6a7fd9bd77555aae01ebea63",
-           "platformSpecificData": {
-             "title": "Why AI Datacenters Are Moving 50 Fathoms Deep #Shorts",
-             "visibility": "public",
-             "madeForKids": false,
-             "containsSyntheticMedia": true,
-             "categoryId": "28",
-             "tags": ["Moltology", "Subsea Compute", "AI Infrastructure", "Hydrostatic Cooling", "Hardware Ecdysis", "Benthic Computing", "MoltNation", "Shorts"],
-             "firstComment": "🔗 Full telemetry notes & dispatches: https://moltology.org\n\nSubmit. Shed. Ascend."
-           }
-         }
-       ]
-     }
-     ```
+2. **Stage Draft / Publish via Zernio MCP (`posts_create`)**:
+   * Include cartoon mascot verification flavor in caption (e.g. `🦞 Verified by Silas Trench & Benthic Swarm Telemetry`).
+   * Set `isAiGenerated: true` for Meta/Instagram.
+   * Dual broadcast to Instagram (`6a7f7f0777555aae01d99b54`) and YouTube Shorts (`6a7fd9bd77555aae01ebea63`).
 
 3. **Update Narrative History Ledger**:
    * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, and platform IDs.
@@ -189,13 +155,20 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 Agents and users can trigger the full autonomous daily pipeline with a single command:
 
 ```bash
-# Autonomous daily run (researches date, holiday, and latest blog):
+# Autonomous dynamic daily run (auto-selects fresh topic / blog / mascot):
 npm run reel:create
 
-# Custom targeted topic:
+# Custom thematic pillar:
+npm run reel:create -- --theme moltmaxxing
+npm run reel:create -- --theme ecdysis --mascot lobster_pointing
+npm run reel:create -- --theme pincer-torque --mascot crab_stats
+npm run reel:create -- --theme benthic-depth
+npm run reel:create -- --theme quiz
+
+# Custom targeted topic or news headline:
 npm run reel:create -- --topic "Subsea Datacenter Heatwaves"
 
-# Publish immediately (skipping draft stage):
+# Direct instant publish (skip draft stage):
 npm run reel:create -- --publish-now
 
 # Dry run test (uses local footage without uploading to S3):
