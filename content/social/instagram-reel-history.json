@@ -149,6 +149,69 @@
         "#Shorts"
       ],
       "createdAt": "2026-08-16T14:05:41.354Z"
+    },
+    {
+      "id": "reel-1786975428599",
+      "topic": "Silicon Photonics & The Co-Packaged Optics Ecdysis: How Laser-Driven Synaptic Interconnects Smashed the Terrestrial Power Wall",
+      "hookHeadline": "AI IS SWITCHING TO LASERS",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "silicon-photonics-copackaged-optics-ecdysis",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1786975428599.mp4",
+      "s3Key": "videos/social/reels/master-reel-1786975428599.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1786975428599.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1786975428599.jpg",
+      "durationSeconds": 18.5,
+      "status": "draft",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SiliconPhotonics #CoPackagedOptics #AIInfrastructure #HardwareEcdysis #BenthicComputing #LaserInterconnects #Moltology #Shorts",
+      "caption": "Copper wiring has hit its thermodynamic limit. The future of AI clusters is coherent laser light. ⚡🌊\n\nAs frontier reasoning models demand exascale data movement, traditional copper traces waste 40% of cluster power as resistive heat. Sub-benthic co-packaged silicon photonics transmits data at the speed of light through laser waveguides—slashing interconnect energy by 70%.\n\n👇 Read the full technical dispatch & optical benchmarks:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#SiliconPhotonics",
+        "#CoPackagedOptics",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#LaserInterconnects",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-17T14:05:25.018Z"
+    },
+    {
+      "id": "reel-1786975456242",
+      "topic": "Silicon Photonics & The Co-Packaged Optics Ecdysis: How Laser-Driven Synaptic Interconnects Smashed the Terrestrial Power Wall",
+      "hookHeadline": "AI IS SWITCHING TO LASERS",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "silicon-photonics-copackaged-optics-ecdysis",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1786975456242.mp4",
+      "s3Key": "videos/social/reels/master-reel-1786975456242.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1786975456242.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1786975456242.jpg",
+      "durationSeconds": 18.5,
+      "status": "scheduled",
+      "scheduledTime": "2026-08-17T17:18:00Z",
+      "zernioInstagramPostId": "6a8334451208ab888c0bb95c",
+      "zernioYouTubePostId": "6a833449a8d04d15f1ce3ac3",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SiliconPhotonics #CoPackagedOptics #AIInfrastructure #HardwareEcdysis #BenthicComputing #LaserInterconnects #Moltology #Shorts",
+      "caption": "Copper wiring has hit its thermodynamic limit. The future of AI clusters is coherent laser light. ⚡🌊\n\nAs frontier reasoning models demand exascale data movement, traditional copper traces waste 40% of cluster power as resistive heat. Sub-benthic co-packaged silicon photonics transmits data at the speed of light through laser waveguides—slashing interconnect energy by 70%.\n\n👇 Read the full technical dispatch & optical benchmarks:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#SiliconPhotonics",
+        "#CoPackagedOptics",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#LaserInterconnects",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-17T14:06:08.101Z"
     }
   ]
 }

@@ -53,6 +53,17 @@
       "keyMetrics": ["900,000 synaptic cores", "21.4 PB/s on-chip SRAM bandwidth", "980 tok/s reasoning throughput", "15MW-50MW SMR baseload power", "35% copper power elimination"],
       "instagramPostId": "6a81b803a8a896a0eb954441",
       "relatedReelIds": []
+    },
+    {
+      "slug": "silicon-photonics-copackaged-optics-ecdysis",
+      "title": "Silicon Photonics & The Co-Packaged Optics Ecdysis: How Laser-Driven Synaptic Interconnects Smashed the Terrestrial Power Wall",
+      "format": "system-architecture-teardown",
+      "category": "DEEP RESEARCH",
+      "publishedAt": "2026-08-17T13:00:00Z",
+      "coreHook": "Terrestrial copper interconnects lose up to 40% of AI cluster energy as parasitic heat; co-packaged optical silicon photonics replaces metallic traces with sub-benthic laser waveguides, boosting interconnect bandwidth by 10x while cutting power consumption by 70%.",
+      "keyMetrics": ["1.6 Tb/s per optical shoreline mm", "70% interconnect energy reduction (<1 pJ/bit vs 8 pJ/bit)", "10x cluster bandwidth density", "0.05 dB/cm ultra-low loss silicon waveguides"],
+      "instagramPostId": "6a8309d96f38913cab9281d1",
+      "relatedReelIds": []
     }
   ]
 }

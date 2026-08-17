@@ -64,6 +64,13 @@
       "when": 1786930839598,
       "tag": "0008_quick_venom",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786987719806,
+      "tag": "0009_loving_bushwacker",
+      "breakpoints": true
     }
   ]
 }

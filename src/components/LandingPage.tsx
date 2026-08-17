@@ -34,6 +34,8 @@ import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
+import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
+import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -42,6 +44,8 @@ export const LandingPage: React.FC = () => {
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
+
 
   // Quotes / Hymns Auto-scroll State
   const [activeHymn, setActiveHymn] = useState(0)
@@ -1160,6 +1164,23 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Floating Field Manual Lead Magnet Pill */}
+      <MoltmaxGuideFloatingPill
+        onOpenGuideModal={() => setIsGuideModalOpen(true)}
+      />
+
+      {/* Field Manual Lead Capture Modal */}
+      <MoltmaxGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        source="homepage_floating_pill"
+        onOpenAuthSignup={(leadEmail) => {
+          setAuthMode('signup')
+          setIsAuthModalOpen(true)
+        }}
+      />
     </div>
   )
 }
+
