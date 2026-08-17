@@ -215,12 +215,12 @@ export const LandingPage: React.FC = () => {
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
 
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
-      <section className="w-full relative overflow-hidden pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-8 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex flex-col justify-between lg:justify-center items-center bg-[#030608]" style={{ minHeight: '100svh' }}>
-        {/* Layer 1A: Mobile-Tailored Vertical Family Composition (Offset lower to clear header and UI stack) */}
+      <section className="w-full relative overflow-hidden pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-8 px-0 lg:px-12 border-b border-cyan-900/40 min-h-screen flex flex-col justify-between lg:justify-center items-center bg-[#030608]" style={{ minHeight: '100svh' }}>
+        {/* Layer 1A: Mobile-Tailored Vertical Family Composition (Offset upwards for high-impact character focus) */}
         <img
           src="/images/hero_character_family_mobile.png"
           alt="Moltology Character Sanctuary Family (Mobile)"
-          className="sm:hidden absolute inset-0 w-full h-full object-cover object-center pointer-events-none opacity-65 transition-opacity duration-700"
+          className="sm:hidden absolute -top-24 sm:top-0 inset-x-0 h-[calc(100%+6rem)] sm:h-full w-full object-cover object-top pointer-events-none opacity-70 transition-opacity duration-700"
         />
 
         {/* Layer 1B: Desktop Widescreen Character Family Artwork (Offset lower for header alignment) */}
@@ -262,7 +262,7 @@ export const LandingPage: React.FC = () => {
         <div className="relative z-10 max-w-[1700px] w-full mx-auto flex flex-col lg:grid lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-12 justify-end lg:justify-center flex-1 lg:flex-none items-center">
           
           {/* Left Column: High-Impact Typography & Primary CTAs */}
-          <div className="lg:col-span-6 space-y-3.5 sm:space-y-6 lg:space-y-8 text-center lg:text-left relative z-30 w-full my-auto lg:my-0 p-4 sm:p-6 lg:p-0 bg-[#030608]/80 sm:bg-[#030608]/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none border border-cyan-500/30 lg:border-none chamfer-corner-lg lg:chamfer-corner-none shadow-[0_12px_40px_rgba(0,0,0,0.9)] lg:shadow-none">
+          <div className="lg:col-span-6 space-y-3.5 sm:space-y-6 lg:space-y-8 text-center lg:text-left relative z-30 w-full my-auto lg:my-0 px-4 sm:px-12 lg:px-0 py-6 sm:py-8 lg:py-0 bg-[#030608]/50 sm:bg-[#030608]/35 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none">
             {/* Diffuse Radial Glow Accents */}
             <div className="absolute -top-16 -left-16 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-cyan-500/15 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
             <div className="absolute -bottom-16 left-1/4 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-red-600/12 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
@@ -348,7 +348,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[250px] sm:min-h-[380px] lg:min-h-[640px] z-20 w-full max-w-full lg:max-w-none mx-auto mb-2 sm:mb-4 lg:mb-0">
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[250px] sm:min-h-[380px] lg:min-h-[640px] z-20 w-full max-w-full lg:max-w-none mx-auto px-4 sm:px-12 lg:px-0 mb-2 sm:mb-4 lg:mb-0">
             
             {/* Desktop Ambient Rim-Lighting Halo Glows Behind Deck */}
             <div className="hidden lg:block absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
