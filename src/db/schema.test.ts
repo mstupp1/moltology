@@ -29,6 +29,9 @@ describe('Database Schema & RLS Policies', () => {
     expect(userStats.userId).toBeDefined()
     expect(userStats.pincerTorque).toBeDefined()
     expect(userStats.shellHardness).toBeDefined()
+    expect(userStats.moltmaxScore).toBeDefined()
+    expect(userStats.moltmaxClearance).toBeDefined()
+    expect(userStats.moltmaxDimensionScores).toBeDefined()
   })
 
   it('defines flexible fields on the routines table', () => {

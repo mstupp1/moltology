@@ -45,6 +45,11 @@ export const userStats = pgTable('user_stats', {
   clawStrength: integer('clawStrength').default(70).notNull(),
   socialDetachmentIndex: integer('socialDetachmentIndex').default(94).notNull(),
   submergenceDepthRating: integer('submergenceDepthRating').default(3400).notNull(), // in fathoms
+  moltmaxScore: integer('moltmaxScore'),
+  moltmaxClearance: text('moltmaxClearance'),
+  moltmaxStage: text('moltmaxStage'),
+  moltmaxDimensionScores: jsonb('moltmaxDimensionScores').$type<Record<string, number>>(),
+  moltmaxCompletedAt: timestamp('moltmaxCompletedAt'),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
   pgPolicy('user_stats_isolation_policy', {
@@ -348,7 +353,6 @@ export const podcasts = pgTable('podcasts', {
     using: sql`"isPublished" = true`
   })
 ])
-
 
 
 

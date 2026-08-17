@@ -105,6 +105,10 @@ export const MoltMaxPage: React.FC = () => {
           pincerTorque: result.dimensionScores.pincerTorque,
           shellHardness: result.dimensionScores.shellHardness,
           clawStrength: result.score,
+          moltmaxScore: result.score,
+          moltmaxClearance: result.clearance,
+          moltmaxStage: result.stage,
+          moltmaxDimensionScores: result.dimensionScores,
         },
       })
       setIsSaved(true)

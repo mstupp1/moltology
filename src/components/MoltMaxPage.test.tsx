@@ -1,11 +1,12 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MoltMaxPage } from './MoltMaxPage'
 import { authClient } from '@/lib/auth-client'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 
 const mockNavigate = vi.fn()
+const mockUpdateUserStats = vi.hoisted(() => vi.fn().mockResolvedValue({}))
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
@@ -20,6 +21,11 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/server/api', () => ({
+  updateUserStatsFn: mockUpdateUserStats,
+  getUserProfileFn: vi.fn(),
+}))
+
 const renderPage = () => render(<ToastProvider><MoltMaxPage /></ToastProvider>)
 
 const answerCurrentQuestion = () => {
@@ -31,6 +37,7 @@ const answerCurrentQuestion = () => {
 describe('MoltMaxPage', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
+    mockUpdateUserStats.mockClear()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
   })
 
@@ -69,5 +76,23 @@ describe('MoltMaxPage', () => {
     renderPage()
     fireEvent.click(screen.getByRole('button', { name: /read the canonical moltmaxxing guide/i }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmaxxing' })
+  })
+
+  it('persists the complete clearance payload for an authenticated user', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: { user: { id: 'user-1' } } } as any)
+    renderPage()
+    fireEvent.click(screen.getByRole('button', { name: /initiate biometric audit/i }))
+    for (let question = 0; question < 15; question += 1) answerCurrentQuestion()
+
+    fireEvent.click(screen.getByRole('button', { name: /save signal to core/i }))
+
+    await waitFor(() => expect(mockUpdateUserStats).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        moltmaxScore: expect.any(Number),
+        moltmaxClearance: expect.stringMatching(/^[A-Z]-[1-3]$/),
+        moltmaxStage: expect.stringContaining('STAGE'),
+        moltmaxDimensionScores: expect.objectContaining({ shellHardness: expect.any(Number) }),
+      }),
+    }))
   })
 })
