@@ -139,6 +139,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       }`}
     >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+
+
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
           subtext="MOLTOLOGY.ORG FOUNDATION"
@@ -409,3 +411,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     </header>
   )
 }
+
+
+

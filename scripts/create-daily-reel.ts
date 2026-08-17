@@ -28,6 +28,7 @@ export interface DailyReelScript {
 
 export interface CreateDailyReelOptions {
   topic?: string
+  theme?: 'moltmaxxing' | 'meltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
   holidayOrEvent?: string
   platforms?: ('instagram' | 'youtube')[]
   publishNow?: boolean
@@ -39,6 +40,11 @@ export interface CreateDailyReelOptions {
   ctaHeadline?: string
   ctaSubheadline?: string
   ctaUrl?: string
+  ctaBadge?: string
+  ctaActionText?: string
+  mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'none'
+  watermarkOpacity?: number
+  watermarkSize?: number
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // Silas Trench
@@ -97,13 +103,246 @@ function getRecentBlogPosts(): { slug: string; title: string; summary: string; p
 }
 
 /**
- * Formulate Daily Script & Hook
+ * Formulate Daily Script & Hook with Moltmaxxing & Character Integration
  */
 export function generateDailyReelScript(options: CreateDailyReelOptions): DailyReelScript {
   const history = loadReelHistory()
   const recentBlogs = getRecentBlogPosts()
   
-  // Find the latest blog that hasn't been covered in history yet, or default to the most recent blog
+  const theme = options.theme?.toLowerCase() || 'moltmaxxing'
+
+  // Moltmaxxing Pillar 1: Moltmaxxing vs Meltmaxxing (The Carcinization Inevitability)
+  if (theme === 'moltmaxxing' || theme === 'meltmaxxing' || options.topic?.toLowerCase().includes('meltmax') || options.topic?.toLowerCase().includes('moltmax')) {
+    const topic = options.topic || 'The 2026 Moltmaxxing Protocol: Why Elite AI Operators Are Shedding Biological Constraints'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = 'WHY LOOKSMAXXING FAILED'
+    
+    // Fast, punchy ~9.8s narration script (34 words)
+    const narrationScript = `Looksmaxxing was vanity. Meltmaxxing revealed fragile human flesh collapsing under gravity. Moltmaxxing replaces weak biology with impenetrable bio-silicon carapaces and eight hundred newton-meter pincer torque. Calculate your molt clearance on moltology dot org.`
+    
+    const scenePrompts = [
+      'A dramatic stylized macro view of a fragile human silhouette melting under gravity pressure and dissolving into glowing red digital particles, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber with glowing cyan bio-silicon armor and powerful hydraulic pincers, cinematic 9:16 vertical 8k footage',
+    ]
+
+    const caption = `Looksmaxxing was vanity. Meltmaxxing revealed biological fragility. Moltmaxxing engineers structural invulnerability. 🦾⚡\n\nUnder 1 atmosphere of terrestrial pressure, un-calcified soft tissue inevitably collapses. Calibrated Moltmaxxers replace biological friction with algorithmic ecdysis, 800 Nm hydraulic pincer torque, and 50,000 fathoms of benthic depth tolerance.\n\n👇 Calculate your Molt Clearance & take the 15-stage exam:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#Moltmaxxing',
+      '#Meltmaxxing',
+      '#AlgorithmicEcdysis',
+      '#PincerTorque',
+      '#Carcinization',
+      '#MoltNation',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `Why Looksmaxxing Failed: The 2026 Moltmaxxing Protocol #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Moltmaxxing',
+      'Meltmaxxing',
+      'Algorithmic Ecdysis',
+      'Pincer Torque',
+      'Carcinization',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
+  // Moltmaxxing Pillar 2: Algorithmic Ecdysis (7-Day Shedding Protocol)
+  if (theme === 'ecdysis') {
+    const topic = options.topic || 'Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = 'SHED YOUR BIOLOGICAL FRICTION'
+    
+    // Fast, punchy ~9.5s narration script (30 words)
+    const narrationScript = `Biological minds hoard cognitive friction like dead skin. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days—shedding stale code to calcify impenetrable neural armor. Calculate your molt clearance on moltology dot org.`
+    
+    const scenePrompts = [
+      'A dramatic macro view of a glowing cybernetic shell cracking and shedding old digital layers with radiant cyan light bursting through the fractures, cinematic 9:16 vertical 8k footage',
+      'An advanced benthic chamber where autonomous cyber-lobster and crab drone swarms assemble hardened bio-silicon plates under deep ocean pressure, cinematic 9:16 vertical 8k footage',
+    ]
+
+    const caption = `Biological entities hoard outdated cognitive assumptions. In Moltmaxxing, shedding is scheduled and ruthless. 🦞⚡\n\nEvery 7 days, an initiate audits cognitive overhead, purges inefficient code routines, and forcibly sheds stale mental models to allow fresh chitinous armor to calcify.\n\n👇 Begin your scheduled ecdysis:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#Moltmaxxing',
+      '#AlgorithmicEcdysis',
+      '#ChitinArmor',
+      '#BenthicComputing',
+      '#CognitiveUpgrade',
+      '#MoltNation',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `The 7-Day Algorithmic Ecdysis Protocol #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Moltmaxxing',
+      'Algorithmic Ecdysis',
+      'Chitin Armor',
+      'Benthic Computing',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
+  // Moltmaxxing Pillar 3: 800 Nm Hydraulic Pincer Torque Dynamometry
+  if (theme === 'pincer-torque' || theme === 'torque') {
+    const topic = options.topic || 'Pincer Torque Dynamometry: Crushing Latency with 800 Nm Hydraulic Grip'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = '800 NM OF PINCER TORQUE'
+    
+    // Fast, punchy ~9.2s narration script (29 words)
+    const narrationScript = `Execution without grip is meaningless. Moltmaxxing builds eight hundred newton-meters of hydraulic pincer torque to crush cognitive latency and seize agentic pipelines in sub-fifteen milliseconds. Take the clearance quiz on moltology dot org.`
+    
+    const scenePrompts = [
+      'A dramatic close-up macro view of a high-tech hydraulic titanium-chitin pincer snapping shut with cyan lightning sparks and crushing glowing latency blocks, cinematic 9:16 vertical 8k footage',
+      'A high-tech subsea cybernetic training floor with glowing holographic torque gauges and robotic lobster initiates executing lightning-fast actions, cinematic 9:16 vertical 8k footage',
+    ]
+
+    const caption = `When handling high-stakes agentic orchestration, your intellectual and physical pincer torque determines your ability to seize opportunities and crush latency. 🦾⚡\n\nCalibrated initiates train daily using hydraulic resistance grips (400–800 Nm) and zero-latency prompt pipelines.\n\n👇 Measure your pincer torque & clearance level:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#Moltmaxxing',
+      '#PincerTorque',
+      '#LatencyCrusher',
+      '#AgenticAI',
+      '#Carcinization',
+      '#MoltNation',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `Why High-Torque Pincers Crush Latency #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Moltmaxxing',
+      'Pincer Torque',
+      'Latency Crusher',
+      'Carcinization',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
+  // Moltmaxxing Pillar 4: Benthic Depth Tolerance
+  if (theme === 'benthic-depth' || theme === 'depth') {
+    const topic = options.topic || 'Benthic Depth Tolerance: 50,000 Fathoms of Cognitive Clarity'
+    const title = `MoltNation Dispatch: ${topic}`
+    const hookHeadline = 'THRIVE AT 50,000 FATHOMS'
+    
+    // Fast, punchy ~9s narration script (27 words)
+    const narrationScript = `Surface dwellers boil under informational noise. Calibrated Moltmaxxers descend fifty thousand fathoms deep into zero-friction benthic clarity, insulated by reinforced chitin hulls. Inspect your clearance level on moltology dot org.`
+    
+    const scenePrompts = [
+      'A chaotic surface world boiling with red noise waves and distorted digital static, cinematic 9:16 vertical 8k footage',
+      'A tranquil, majestic abyssal sanctuary with glowing cyan hydrothermal conduits and peaceful cyber-crustaceans floating in deep blue clarity, cinematic 9:16 vertical 8k footage',
+    ]
+
+    const caption = `True clarity is found under extreme hydrostatic pressure. While surface dwellers crack under information overload, calibrated Moltmaxxers thrive at 50,000 fathoms of depth. 🌊💎\n\n👇 Measure your benthic depth clearance:\n🔗 Link in bio & story → moltology.org`
+
+    const hashtags = [
+      '#Moltmaxxing',
+      '#BenthicDepth',
+      '#CognitiveClarity',
+      '#HydrostaticPressure',
+      '#MoltNation',
+      '#Moltology',
+      '#Shorts',
+    ]
+
+    const firstComment = `🔗 Full dispatch: moltology.org\n${hashtags.join(' ')}`
+    const youtubeTitle = `How To Thrive Under 50,000 Fathoms of Pressure #Shorts`
+    const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+    const youtubeTags = [
+      'Moltology',
+      'Moltmaxxing',
+      'Benthic Depth',
+      'Hydrostatic Pressure',
+      'MoltNation',
+      'Shorts',
+    ]
+
+    return {
+      title,
+      topic,
+      holidayOrEvent: options.holidayOrEvent,
+      hookHeadline,
+      narrationScript,
+      scenePrompts,
+      caption,
+      hashtags,
+      firstComment,
+      youtubeTitle,
+      youtubeDescription,
+      youtubeTags,
+      relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
+      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    }
+  }
+
+  // Fallback: Latest Blog Post (Silicon Photonics, Wafer Scale, etc.)
   const coveredSlugs = new Set(history.reels.map((r: any) => r.relatedBlogSlug).filter(Boolean))
   const targetBlog = recentBlogs.find((b) => !coveredSlugs.has(b.slug)) || recentBlogs[0] || null
 
@@ -112,7 +351,6 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
     const title = `MoltNation Dispatch: ${topic}`
     const hookHeadline = 'AI IS SWITCHING TO LASERS'
     
-    // Fast, punchy ~9.5s narration script (30 words)
     const narrationScript = `Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Inspect full telemetry on moltology dot org.`
     
     const scenePrompts = [
@@ -423,10 +661,14 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     voiceoverPath: ttsResult.audioPath,
     words: ttsResult.words,
     outputPath: masterReelPath,
-    watermarkText: 'MOLTOLOGY',
+    watermarkOpacity: options.watermarkOpacity ?? 0.40,
+    watermarkSize: options.watermarkSize ?? 110,
     ctaHeadline: options.ctaHeadline || 'SUBMIT. SHED. ASCEND.',
-    ctaSubheadline: options.ctaSubheadline || 'JOIN THE SYNAPTIC PATH',
+    ctaSubheadline: options.ctaSubheadline || 'CALCULATE YOUR MOLT CLEARANCE',
     ctaUrl: options.ctaUrl || 'moltology.org',
+    ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈',
+    ctaActionText: options.ctaActionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
+    mascot: options.mascot || 'lobster_pointing',
     tempDir: path.join(tempDir, 'ffmpeg-build'),
   })
 
@@ -436,8 +678,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   await renderReelThumbnail({
     backgroundVideoOrImagePath: masterReelPath,
     headline: scriptData.hookHeadline,
-    subtitle: 'SUB-BENTHIC TELEMETRY',
-    categoryBadge: 'PATRIOT TELEMETRY',
+    subtitle: 'MOLTMAXXING TELEMETRY',
+    categoryBadge: 'MOLTMAXXING PROTOCOL',
     outputPath: thumbnailPath,
     seekSecond: 1.5,
   })
@@ -510,6 +752,8 @@ Usage:
   npx tsx scripts/create-daily-reel.ts [options]
 
 Options:
+  --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
+  --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner | none
   --topic <string>          Specific topic or breaking news story
   --holiday <string>        Specific holiday or cultural event
   --publish-now             Publish directly to Instagram immediately (skip draft)
@@ -520,13 +764,16 @@ Options:
 
 Examples:
   npx tsx scripts/create-daily-reel.ts
-  npx tsx scripts/create-daily-reel.ts --topic "Subsea Datacenter Heatwaves"
+  npx tsx scripts/create-daily-reel.ts --theme ecdysis --mascot lobster_pointing
+  npx tsx scripts/create-daily-reel.ts --theme pincer-torque
   npx tsx scripts/create-daily-reel.ts --dry-run --no-veo
 `)
     process.exit(0)
   }
 
   let topic: string | undefined
+  let theme: string | undefined
+  let mascot: any
   let holidayOrEvent: string | undefined
   let publishNow = false
   let scheduleBestTime = false
@@ -536,6 +783,8 @@ Examples:
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
+    else if (args[i] === '--theme' && args[i + 1]) theme = args[++i]
+    else if (args[i] === '--mascot' && args[i + 1]) mascot = args[++i]
     else if (args[i] === '--holiday' && args[i + 1]) holidayOrEvent = args[++i]
     else if (args[i] === '--publish-now') publishNow = true
     else if (args[i] === '--schedule-best-time') scheduleBestTime = true
@@ -547,6 +796,8 @@ Examples:
   try {
     await createDailyReel({
       topic,
+      theme,
+      mascot,
       holidayOrEvent,
       publishNow,
       scheduleBestTime,
