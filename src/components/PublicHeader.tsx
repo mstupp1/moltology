@@ -217,7 +217,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           >
             <Activity className={`w-3.5 h-3.5 transition-colors duration-300 ${targetTab === 'moltmax' ? 'text-cyan-300' : 'text-gray-400'}`} />
             <span>MOLTMAX</span>
-            <span className="px-1.5 py-0.2 rounded text-[8px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">SCAN</span>
           </button>
 
           <button
@@ -336,15 +335,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
           <button
             onClick={() => onNavigate('/moltmax')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
               currentTab === 'moltmax' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
-            <span className="flex items-center gap-3">
-              <Activity className="w-4 h-4 text-cyan-400" />
-              <span>MOLTMAX SCANNER</span>
-            </span>
-            <span className="px-2 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">NEW</span>
+            <Activity className="w-4 h-4 text-cyan-400" />
+            <span>MOLTMAX</span>
           </button>
 
           <button

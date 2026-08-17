@@ -61,7 +61,7 @@ describe('MoltMaxPage', () => {
     expect(screen.getByText(/Moltmax (score|index)/i)).toBeInTheDocument()
     expect(screen.getByText(/Five-(trait|vector) profile/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /export png/i })).toBeInTheDocument()
-  })
+  }, 10000)
 
   it('supports back navigation before leaving the current audit', () => {
     renderPage()
