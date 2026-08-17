@@ -45,8 +45,8 @@ describe('MoltMaxPage', () => {
     renderPage()
     expect(screen.getByText(/Measure the shell/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /initiate biometric audit/i })).toBeInTheDocument()
-    expect(screen.getByText('Carapace')).toBeInTheDocument()
-    expect(screen.getByText('Depth')).toBeInTheDocument()
+    expect(screen.getByText(/Carapace Resilience/i)).toBeInTheDocument()
+    expect(screen.getByText(/Depth Composure/i)).toBeInTheDocument()
   })
 
   it('moves through the fifteen-question chamber flow and reveals a clearance', () => {
