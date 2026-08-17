@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { seo } from '@/lib/seo'
+import { getAssetUrl } from '@/lib/assets'
 import {
   Play,
   Pause,
@@ -397,7 +398,7 @@ function LecturesRoute() {
             {/* Main Video Stream Player */}
             <div className="relative aspect-video bg-[#030606] border border-[#3a4a49] overflow-hidden flex flex-col justify-between p-3 group chamfer-corner">
               <img
-                src="/images/lecture_stream_thumb.jpg"
+                src={getAssetUrl('/images/lecture_stream_thumb.jpg')}
                 alt="Lecture Stream Broadcast"
                 className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-luminosity group-hover:scale-105 transition-transform duration-700"
               />

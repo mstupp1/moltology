@@ -1,3 +1,5 @@
+import { getAssetUrl } from './assets'
+
 export type QuizDimension =
   | 'shellHardness'
   | 'pincerTorque'
@@ -68,7 +70,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q1', dimension: 'shellHardness', format: 'scenario', eyebrow: '01 // CARAPACE RESPONSE',
     prompt: 'A sudden wave of criticism strikes your outer shell before the day has properly begun. What happens next?',
     helper: 'Choose the response that most closely matches your first true impulse.',
-    image: '/images/quiz/q01_criticism.jpg',
+    image: getAssetUrl('/images/quiz/q01_criticism.jpg'),
     imageAlt: 'Armored lobster hero smiling as criticism bubbles bounce harmlessly off his shell',
     scenarioCaption: 'Incoming criticism barrage detected. How does your armor hold up?',
     options: [
@@ -82,7 +84,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q2', dimension: 'neuralLatency', format: 'likert', eyebrow: '02 // SYNAPTIC FLOW',
     prompt: 'When a clear decision presents itself, I can move from recognition to action without circling the same thought.',
     helper: 'Measure the distance between knowing and doing.',
-    image: '/images/quiz/q02_decision.jpg',
+    image: getAssetUrl('/images/quiz/q02_decision.jpg'),
     imageAlt: 'Lobster hero pointing forward decisively at an underwater neon crossroads while a dizzy crab spins',
     scenarioCaption: 'Crossroads ahead. Zero hesitation, full forward propulsion.',
     options: likert,
@@ -91,7 +93,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q3', dimension: 'depthTolerance', format: 'binary', eyebrow: '03 // PRESSURE TEST',
     prompt: 'Your work reaches a difficult pressure zone. Which descent protocol do you select?',
     helper: 'There is no incorrect organism. There is only an observed depth.',
-    image: '/images/quiz/q03_depth.jpg',
+    image: getAssetUrl('/images/quiz/q03_depth.jpg'),
     imageAlt: 'Lobster hero diving boldly into the deep ocean trench with glowing headlights',
     scenarioCaption: 'Deep trench approaching. Locking into the high-pressure zone.',
     options: [
@@ -103,7 +105,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q4', dimension: 'ecdysisDiscipline', format: 'likert', eyebrow: '04 // SHEDDING CADENCE',
     prompt: 'I deliberately retire habits, tools, and assumptions once they stop helping the next form emerge.',
     helper: 'A healthy shell is not a permanent shell.',
-    image: '/images/quiz/q04_shedding.jpg',
+    image: getAssetUrl('/images/quiz/q04_shedding.jpg'),
     imageAlt: 'Lobster hero joyfully stepping out of an old shell into glowing upgraded armor',
     scenarioCaption: 'Time to shed the old form. Out with the brittle, in with the titanium.',
     options: likert,
@@ -112,7 +114,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q5', dimension: 'pincerTorque', format: 'scenario', eyebrow: '05 // EXECUTION LOAD',
     prompt: 'Three useful paths open at once and the tide is moving. How do your pincers behave?',
     helper: 'Torque is decisive movement, not frantic movement.',
-    image: '/images/quiz/q05_pincer.jpg',
+    image: getAssetUrl('/images/quiz/q05_pincer.jpg'),
     imageAlt: 'Lobster hero snapping a powerful claw onto the golden prize in a swirling vortex',
     scenarioCaption: 'Three currents swirling. One clean, unbreakable grip.',
     options: [
@@ -126,7 +128,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q6', dimension: 'shellHardness', format: 'likert', eyebrow: '06 // SOFT-SHELL WINDOW',
     prompt: 'I can remain open to useful change without allowing every outside signal to rewrite my center.',
     helper: 'Hardness is selective permeability, not isolation.',
-    image: '/images/quiz/q06_boundaries.jpg',
+    image: getAssetUrl('/images/quiz/q06_boundaries.jpg'),
     imageAlt: 'Lobster hero floating inside an energy shield welcoming nutrients while deflecting debris',
     scenarioCaption: 'Selective shield active. Let in the nutrients, bounce out the noise.',
     options: likert,
@@ -136,7 +138,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q7', dimension: 'depthTolerance', format: 'scenario', eyebrow: '07 // BENTHIC ORIENTATION',
     prompt: 'Surface chatter becomes loud while you are building something important. What is your natural correction?',
     helper: 'Locate the environment where your signal becomes clearest.',
-    image: '/images/quiz/q07_quiet.jpg',
+    image: getAssetUrl('/images/quiz/q07_quiet.jpg'),
     imageAlt: 'Lobster hero descending to a serene glowing undersea workshop',
     scenarioCaption: 'Surface commotion rising. Diving deep to the quiet benthic workshop.',
     options: [
@@ -150,7 +152,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q8', dimension: 'neuralLatency', format: 'binary', eyebrow: '08 // RESPONSE WINDOW',
     prompt: 'A small but consequential task has been waiting for your attention since yesterday.',
     helper: 'Select the behavior that best describes your usual first move.',
-    image: '/images/quiz/q08_quick_action.jpg',
+    image: getAssetUrl('/images/quiz/q08_quick_action.jpg'),
     imageAlt: 'Lobster hero grabbing a glowing task orb in two seconds with lightning speed',
     scenarioCaption: 'Lingering task spotted. Two-minute claw grip engaged.',
     options: [
@@ -163,7 +165,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q9', dimension: 'pincerTorque', format: 'likert', eyebrow: '09 // GRIP CONFIDENCE',
     prompt: 'Once I commit to a useful direction, I can hold it through the first period of resistance.',
     helper: 'Rate the strength of your follow-through, not your ambition.',
-    image: '/images/quiz/q09_grip.jpg',
+    image: getAssetUrl('/images/quiz/q09_grip.jpg'),
     imageAlt: 'Lobster hero clamped securely onto an anchor chain against ocean currents',
     scenarioCaption: 'Resistance surging. Claws locked onto the anchor.',
     options: likert,
@@ -173,7 +175,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q10', dimension: 'ecdysisDiscipline', format: 'scenario', eyebrow: '10 // OLD SHELL RELEASE',
     prompt: 'You discover that a familiar process is now slowing the colony. How do you conduct the shed?',
     helper: 'Ecdysis requires a replacement form, not just a dramatic exit.',
-    image: '/images/quiz/q10_team_upgrade.jpg',
+    image: getAssetUrl('/images/quiz/q10_team_upgrade.jpg'),
     imageAlt: 'Lobster hero presenting upgrade blueprint to cheerful crab and shrimp team members',
     scenarioCaption: 'Colony briefing. Replacing obsolete routines with sleek new upgrades.',
     options: [
@@ -188,7 +190,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q11', dimension: 'shellHardness', format: 'binary', eyebrow: '11 // BOUNDARY INTEGRITY',
     prompt: 'A request is urgent, but accepting it would break the promise you made to your own recovery cycle.',
     helper: 'A boundary is a piece of armor with a door in it.',
-    image: '/images/quiz/q11_rest_boundary.jpg',
+    image: getAssetUrl('/images/quiz/q11_rest_boundary.jpg'),
     imageAlt: 'Lobster hero relaxing in a seaweed spa hammock holding up a polite pause claw to a courier',
     scenarioCaption: 'Rejuvenation cycle in progress. Protecting the sanctuary.',
     options: [
@@ -201,7 +203,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q12', dimension: 'neuralLatency', format: 'scenario', eyebrow: '12 // SIGNAL TRIAGE',
     prompt: 'Your attention receives five competing pings. What is the first move?',
     helper: 'Fast cognition begins with choosing what not to process.',
-    image: '/images/quiz/q12_focus.jpg',
+    image: getAssetUrl('/images/quiz/q12_focus.jpg'),
     imageAlt: 'Lobster hero swiping away noisy notification bubbles to focus on priority #1',
     scenarioCaption: 'Five pings screaming at once. Locking onto the single true priority.',
     options: [
@@ -215,7 +217,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q13', dimension: 'pincerTorque', format: 'binary', eyebrow: '13 // DECISIVE CLOSURE',
     prompt: 'A good-enough solution is ready now; a perfect solution may arrive next week.',
     helper: 'Torque is the ability to close the loop at the right pressure.',
-    image: '/images/quiz/q13_ship_it.jpg',
+    image: getAssetUrl('/images/quiz/q13_ship_it.jpg'),
     imageAlt: 'Lobster hero launching a working yellow mini-sub with a thumbs up',
     scenarioCaption: 'Ship it! A working shell today beats an imaginary shell next week.',
     options: [
@@ -227,7 +229,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q14', dimension: 'ecdysisDiscipline', format: 'binary', eyebrow: '14 // DAILY SHED',
     prompt: 'At the end of a long cycle, you find one small practice that no longer matches the organism you are becoming.',
     helper: 'The smallest shed can keep the whole shell mobile.',
-    image: '/images/quiz/q14_daily_shed.jpg',
+    image: getAssetUrl('/images/quiz/q14_daily_shed.jpg'),
     imageAlt: 'Lobster hero dropping an obsolete rusty gear into a recycling chamber',
     scenarioCaption: 'Evening calibration. Discarding what no longer serves the ascent.',
     options: [
@@ -239,7 +241,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     id: 'q15', dimension: 'depthTolerance', format: 'likert', eyebrow: '15 // FINAL DESCENT',
     prompt: 'The harder the problem becomes, the more capable I feel of finding a calm and useful depth from which to solve it.',
     helper: 'Your final reading measures pressure tolerance, not pressure seeking.',
-    image: '/images/quiz/q15_final_descent.jpg',
+    image: getAssetUrl('/images/quiz/q15_final_descent.jpg'),
     imageAlt: 'Lobster hero glowing calmly in the deep ocean abyss surrounded by glowing jellyfish',
     scenarioCaption: 'Abyssal mastery. The deepest waters bring the greatest clarity.',
     options: likert,

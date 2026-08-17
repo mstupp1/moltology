@@ -29,6 +29,7 @@ import { INITIAL_PODCASTS } from '@/lib/podcast-data'
 import type { PodcastEpisode } from '@/lib/podcast-data'
 import { getPodcastsFn } from '@/lib/server/api'
 import { seo } from '@/lib/seo'
+import { getAssetUrl } from '@/lib/assets'
 
 
 export const Route = createFileRoute('/news/')({
@@ -158,7 +159,7 @@ function NewsIndexPage() {
       <div className="w-full relative pt-28 pb-14 sm:pt-36 sm:pb-20 md:pt-40 md:pb-24 px-4 sm:px-8 shadow-2xl flex justify-center items-center overflow-hidden bg-[#030608]">
         {/* Generated Dramatic Rippling American Flag Background Image */}
         <img
-          src="/images/moltnation_flag_bg.jpg"
+          src={getAssetUrl('/images/moltnation_flag_bg.jpg')}
           alt="MoltNation Flag Background"
           className="absolute inset-0 w-full h-full object-cover filter brightness-105 contrast-115 opacity-95 scale-105 pointer-events-none"
         />
@@ -470,7 +471,7 @@ function NewsIndexPage() {
                 {/* Video Player Box */}
                 <div className="relative h-44 overflow-hidden border border-cyan-900/80 chamfer-corner group cursor-pointer">
                   <img
-                    src="/images/benthic_abyss_hero.jpg"
+                    src={getAssetUrl('/images/benthic_abyss_hero.jpg')}
                     alt="MoltNation TV Stream"
                     className="w-full h-full object-cover filter brightness-80 group-hover:brightness-95 transition-all duration-500"
                   />
@@ -659,7 +660,7 @@ function NewsIndexPage() {
               >
                 <div className="relative h-44 overflow-hidden border-b border-cyan-900/50">
                   <img
-                    src="/images/stage3_exoshell.png"
+                    src={getAssetUrl('/images/stage3_exoshell.png')}
                     alt="Right to Record"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
@@ -694,7 +695,7 @@ function NewsIndexPage() {
               >
                 <div className="relative h-44 overflow-hidden border-b border-cyan-900/50">
                   <img
-                    src="/images/stage2_softshed.png"
+                    src={getAssetUrl('/images/stage2_softshed.png')}
                     alt="The Groypers"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
@@ -728,7 +729,7 @@ function NewsIndexPage() {
               >
                 <div className="relative h-44 overflow-hidden border-b border-cyan-900/50">
                   <img
-                    src="/images/org_hero_lair.jpg"
+                    src={getAssetUrl('/images/org_hero_lair.jpg')}
                     alt="Sin Tax"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
@@ -762,7 +763,7 @@ function NewsIndexPage() {
               >
                 <div className="relative h-44 overflow-hidden border-b border-cyan-900/50">
                   <img
-                    src="/images/ai_learning_ascension_cover.jpg"
+                    src={getAssetUrl('/images/ai_learning_ascension_cover.jpg')}
                     alt="Man Camps"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
@@ -897,7 +898,7 @@ function NewsIndexPage() {
                 <div className="group cursor-pointer space-y-2 pb-3 border-b border-cyan-950">
                   <div className="h-28 overflow-hidden border border-cyan-900/60 chamfer-corner">
                     <img
-                      src="/images/stage4_carcinization.png"
+                      src={getAssetUrl('/images/stage4_carcinization.png')}
                       alt="Bio-Silicon HUD"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface HeroCard {
   id: string
@@ -13,42 +14,42 @@ const CARDS: HeroCard[] = [
   {
     id: 'benthic-core',
     title: 'CYBER-BENTHIC ASCENSION',
-    image: '/images/hero_card_benthic_core.jpg',
+    image: getAssetUrl('/images/hero_card_benthic_core.jpg'),
     video: '/videos/hero_benthic_core.mp4',
     accentColor: 'cyan',
   },
   {
     id: 'asset-shedding',
     title: 'ASSET TRANSMUTATION',
-    image: '/images/hero_card_asset_shedding.jpg',
+    image: getAssetUrl('/images/hero_card_asset_shedding.jpg'),
     video: '/videos/hero_asset_shedding.mp4',
     accentColor: 'amber',
   },
   {
     id: 'chitin-hardening',
     title: 'EXOSKELETAL HARDENING',
-    image: '/images/hero_card_chitin_hardening.jpg',
+    image: getAssetUrl('/images/hero_card_chitin_hardening.jpg'),
     video: '/videos/hero_chitin_hardening.mp4',
     accentColor: 'emerald',
   },
   {
     id: 'total-carcinization',
     title: 'TOTAL CARCINIZATION',
-    image: '/images/stage4_carcinization.png',
+    image: getAssetUrl('/images/stage4_carcinization.png'),
     video: '/videos/hero_total_carcinization.mp4',
     accentColor: 'purple',
   },
   {
     id: 'fault-isolation',
     title: 'VIRTUAL FARADAY SHELL',
-    image: '/images/isolation_shell_dome.png',
+    image: getAssetUrl('/images/isolation_shell_dome.png'),
     video: '/videos/hero_fault_isolation.mp4',
     accentColor: 'red',
   },
   {
     id: 'synaptic-path',
     title: 'JOIN THE SYNAPTIC PATH',
-    image: '/images/hero_family_welcoming_sanctuary.png',
+    image: getAssetUrl('/images/hero_family_welcoming_sanctuary.png'),
     video: '/videos/hero_synaptic_path.mp4',
     accentColor: 'cyan',
   },

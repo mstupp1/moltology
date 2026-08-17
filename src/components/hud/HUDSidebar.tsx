@@ -38,6 +38,7 @@ import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
+import { getAssetUrl } from '@/lib/assets'
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -667,7 +668,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   title="Replay Initiation Broadcast"
                 >
                   <ChromaElement
-                    src="/images/benthic_lobster_sidebar.jpg"
+                    src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
                     alt="Benthic Lobster"
                     blendMode="screen"
                     glowColor="cyan"
@@ -689,7 +690,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   title="Replay Initiation Broadcast"
                 >
                   <ChromaElement
-                    src="/images/benthic_lobster_sidebar.jpg"
+                    src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
                     alt="Benthic Lobster"
                     blendMode="screen"
                     glowColor="cyan"
@@ -874,7 +875,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   title="Replay Initiation Broadcast"
                 >
                   <ChromaElement
-                    src="/images/benthic_lobster_sidebar.jpg"
+                    src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
                     alt="Benthic Lobster"
                     blendMode="screen"
                     glowColor="cyan"

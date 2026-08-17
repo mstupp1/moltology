@@ -9,6 +9,7 @@ import {
   Tv,
 } from 'lucide-react'
 import { HudBadge, HudButton, ChromaElement } from '@/components/ui'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface IsolationSettings {
   isForceFieldEngaged: boolean
@@ -100,7 +101,7 @@ export const IsolationSettingsModal: React.FC<IsolationSettingsModalProps> = ({
             {/* 3D Force-field Shield Dome */}
             <div className="flex justify-center my-1 relative">
               <ChromaElement
-                src="/images/extracted/forcefield_dome_3d.jpg"
+                src={getAssetUrl('/images/extracted/forcefield_dome_3d.jpg')}
                 alt="3D Forcefield Dome"
                 blendMode="screen"
                 glowColor={isForceFieldEngaged ? 'crimson' : 'cyan'}

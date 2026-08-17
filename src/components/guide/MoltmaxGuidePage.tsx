@@ -25,6 +25,7 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { AuthModal } from '@/components/AuthModal'
 import { submitLeadFn } from '@/lib/server/api'
+import { getAssetUrl } from '@/lib/assets'
 
 export const MoltmaxGuidePage: React.FC = () => {
   const navigate = useNavigate()
@@ -188,7 +189,7 @@ export const MoltmaxGuidePage: React.FC = () => {
             <div className="relative group max-w-sm">
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] opacity-25 blur-2xl group-hover:opacity-40 transition duration-500" />
               <img
-                src="/images/moltmax_guide_3d_mockup.jpg"
+                src={getAssetUrl('/images/moltmax_guide_3d_mockup.jpg')}
                 alt="The 2026 Moltmaxxing Protocol Tactical Field Manual 3D Mockup"
                 className="relative rounded-2xl shadow-2xl border border-white/20 object-cover w-full"
               />
@@ -213,7 +214,7 @@ export const MoltmaxGuidePage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <img
-              src="/images/moltmax_guide_interior_spread.jpg"
+              src={getAssetUrl('/images/moltmax_guide_interior_spread.jpg')}
               alt="Moltmaxxing Guide Interior Blueprint Spread"
               className="rounded-xl border border-white/15 shadow-xl object-cover w-full"
             />
