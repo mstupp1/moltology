@@ -14,7 +14,7 @@ import {
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
 import { getBlogPostBySlugFn, incrementBlogPostViewsFn } from '@/lib/server/api'
-import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
+import { INITIAL_BLOG_POSTS, formatNewsTitle } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { BlogCommentsSection } from '@/components/blog/BlogCommentsSection'
@@ -244,9 +244,21 @@ function NewsPostDetail() {
               </span>
             </div>
 
-            <h1 className="font-grotesk font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-100 uppercase tracking-tight leading-tight break-words">
-              {post.title}
-            </h1>
+            {(() => {
+              const { headline, subtitle } = formatNewsTitle(post.title)
+              return (
+                <div className="space-y-2 sm:space-y-3">
+                  <h1 className="font-grotesk font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-100 uppercase tracking-tight leading-tight break-words">
+                    {headline}
+                  </h1>
+                  {subtitle && (
+                    <p className="font-sans text-base sm:text-xl md:text-2xl text-cyan-200/80 font-normal leading-snug">
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+              )
+            })()}
 
             {/* Author bar & actions */}
             <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-cyan-900/40">
@@ -339,7 +351,7 @@ function NewsPostDetail() {
                         <span className="text-gray-500">{rPost.readTimeMinutes} MIN READ</span>
                       </div>
                       <h5 className="font-grotesk font-bold text-xs sm:text-sm text-gray-100 group-hover:text-cyan-300 transition-colors leading-snug line-clamp-2 uppercase">
-                        {rPost.title}
+                        {formatNewsTitle(rPost.title).headline}
                       </h5>
                       <p className="font-sans text-[11px] sm:text-xs text-gray-400 line-clamp-2 leading-relaxed">
                         {rPost.summary}

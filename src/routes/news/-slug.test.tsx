@@ -49,12 +49,13 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     expect(screen.getByText('RETURN TO MOLTNATION NEWS')).toBeInTheDocument()
   })
 
-  it('renders article title, author, share trigger, and benthic conversion CTA for a valid post', () => {
+  it('renders article headline, subtitle, author, share trigger, and benthic conversion CTA for a valid post', () => {
     const post = INITIAL_BLOG_POSTS[0]
     mockUseLoaderData.mockReturnValue(post)
     render(<NewsPostDetail />)
 
-    expect(screen.getByText(post.title)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' })).toBeInTheDocument()
+    expect(screen.getByText('Why Elite AI Operators Are Shedding Biological Constraints')).toBeInTheDocument()
     expect(screen.getByText(post.authorName)).toBeInTheDocument()
     expect(screen.getByText('SHARE')).toBeInTheDocument()
     expect(screen.getByText('BEGIN YOUR BIO-SILICON TRANSMUTATION')).toBeInTheDocument()

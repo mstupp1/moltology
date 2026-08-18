@@ -19,7 +19,7 @@ import {
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
 import { getBlogPostsFn } from '@/lib/server/api'
-import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
+import { INITIAL_BLOG_POSTS, formatNewsTitle } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
@@ -281,10 +281,17 @@ function NewsIndexPage() {
                     </span>
                   </div>
 
-                  {/* Massive Headline - CNN Style Typography */}
-                  <h1 className="font-grotesk font-black text-3xl sm:text-4xl lg:text-5xl text-gray-100 uppercase tracking-tight leading-none group-hover:text-cyan-300 transition-colors drop-shadow-md">
-                    {mainLeadPost.title}
-                  </h1>
+                  {/* Massive Headline - CNN Style Typography with Subtitle */}
+                  <div className="space-y-2">
+                    <h1 className="font-grotesk font-black text-3xl sm:text-4xl lg:text-5xl text-gray-100 uppercase tracking-tight leading-none group-hover:text-cyan-300 transition-colors drop-shadow-md">
+                      {formatNewsTitle(mainLeadPost.title).headline}
+                    </h1>
+                    {formatNewsTitle(mainLeadPost.title).subtitle && (
+                      <p className="font-sans text-sm sm:text-base text-cyan-200/80 font-medium leading-snug">
+                        {formatNewsTitle(mainLeadPost.title).subtitle}
+                      </p>
+                    )}
+                  </div>
 
                   {/* Main Cover Image */}
                   <div className="relative h-80 sm:h-96 w-full overflow-hidden border-2 border-cyan-900/80 hover:border-cyan-400/90 chamfer-corner-lg transition-colors shadow-2xl">
@@ -344,9 +351,16 @@ function NewsIndexPage() {
                     <span className="text-[10px] font-sans text-cyan-400 uppercase font-bold block">
                       {post.category}
                     </span>
-                    <h5 className="font-grotesk font-bold text-xs text-gray-200 group-hover:text-cyan-300 line-clamp-2 leading-tight">
-                      {post.title}
-                    </h5>
+                    <div className="space-y-0.5">
+                      <h5 className="font-grotesk font-bold text-xs text-gray-200 group-hover:text-cyan-300 line-clamp-1 leading-tight uppercase">
+                        {formatNewsTitle(post.title).headline}
+                      </h5>
+                      {formatNewsTitle(post.title).subtitle && (
+                        <p className="text-[11px] text-cyan-200/70 font-sans line-clamp-2 leading-tight">
+                          {formatNewsTitle(post.title).subtitle}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -369,9 +383,16 @@ function NewsIndexPage() {
                       {leftColPosts[0].category}
                     </span>
                   </div>
-                  <h3 className="font-grotesk font-bold text-lg text-gray-100 group-hover:text-cyan-300 uppercase leading-snug transition-colors">
-                    {leftColPosts[0].title}
-                  </h3>
+                  <div className="space-y-1">
+                    <h3 className="font-grotesk font-bold text-lg text-gray-100 group-hover:text-cyan-300 uppercase leading-snug transition-colors">
+                      {formatNewsTitle(leftColPosts[0].title).headline}
+                    </h3>
+                    {formatNewsTitle(leftColPosts[0].title).subtitle && (
+                      <p className="text-xs text-cyan-200/80 font-medium font-sans leading-snug line-clamp-2">
+                        {formatNewsTitle(leftColPosts[0].title).subtitle}
+                      </p>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-400 font-sans leading-relaxed line-clamp-3">
                     {leftColPosts[0].summary}
                   </p>
@@ -387,9 +408,16 @@ function NewsIndexPage() {
                   <span className="text-[10px] font-sans font-extrabold text-amber-400 uppercase tracking-widest px-2 py-0.5 bg-amber-950/80 border border-amber-500/60 inline-block">
                     MOLTNATION ANALYSIS ★
                   </span>
-                  <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-amber-300 leading-snug">
-                    {leftColPosts[1].title}
-                  </h4>
+                  <div className="space-y-0.5">
+                    <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-amber-300 leading-snug">
+                      {formatNewsTitle(leftColPosts[1].title).headline}
+                    </h4>
+                    {formatNewsTitle(leftColPosts[1].title).subtitle && (
+                      <p className="text-xs text-amber-200/80 font-sans line-clamp-2 leading-snug">
+                        {formatNewsTitle(leftColPosts[1].title).subtitle}
+                      </p>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-300 font-sans leading-relaxed line-clamp-2">
                     {leftColPosts[1].summary}
                   </p>
@@ -412,9 +440,16 @@ function NewsIndexPage() {
                       FREEDOM DISPATCH
                     </span>
                   </div>
-                  <h4 className="font-grotesk font-bold text-sm text-gray-100 group-hover:text-red-300 leading-tight">
-                    {leftColPosts[2].title}
-                  </h4>
+                  <div className="space-y-0.5">
+                    <h4 className="font-grotesk font-bold text-sm text-gray-100 group-hover:text-red-300 leading-tight">
+                      {formatNewsTitle(leftColPosts[2].title).headline}
+                    </h4>
+                    {formatNewsTitle(leftColPosts[2].title).subtitle && (
+                      <p className="text-xs text-red-200/70 font-sans line-clamp-1">
+                        {formatNewsTitle(leftColPosts[2].title).subtitle}
+                      </p>
+                    )}
+                  </div>
                   <div className="text-[11px] text-gray-400 font-sans flex items-center justify-between pt-1">
                     <span>Updated 12m ago</span>
                     <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-1 transition-transform" />
@@ -440,7 +475,7 @@ function NewsIndexPage() {
                     <div
                       key={post.slug}
                       onClick={() => handleSelectPost(post.slug)}
-                      className="group cursor-pointer pt-3 first:pt-0 space-y-1.5"
+                      className="group cursor-pointer pt-3 first:pt-0 space-y-1"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-sans font-bold text-cyan-400 uppercase">
@@ -449,8 +484,13 @@ function NewsIndexPage() {
                         <span className="text-[10px] text-gray-500">• {post.readTimeMinutes}m</span>
                       </div>
                       <h4 className="font-grotesk font-bold text-xs sm:text-sm text-gray-200 group-hover:text-cyan-300 leading-snug transition-colors">
-                        {post.title}
+                        {formatNewsTitle(post.title).headline}
                       </h4>
+                      {formatNewsTitle(post.title).subtitle && (
+                        <p className="text-[11px] text-cyan-300/75 font-sans leading-snug line-clamp-2 group-hover:text-cyan-200">
+                          {formatNewsTitle(post.title).subtitle}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -820,9 +860,16 @@ function NewsIndexPage() {
                       </span>
                       <span className="text-[10px] text-cyan-400 font-sans">{post.category}</span>
                     </div>
-                    <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-cyan-300 leading-snug">
-                      {post.title}
-                    </h4>
+                    <div className="space-y-0.5">
+                      <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-cyan-300 leading-snug">
+                        {formatNewsTitle(post.title).headline}
+                      </h4>
+                      {formatNewsTitle(post.title).subtitle && (
+                        <p className="text-xs text-cyan-200/80 font-sans line-clamp-1">
+                          {formatNewsTitle(post.title).subtitle}
+                        </p>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-400 font-sans line-clamp-2">
                       {post.summary}
                     </p>

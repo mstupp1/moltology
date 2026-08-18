@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { BlogTopSlider } from './BlogTopSlider'
-import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
+import { INITIAL_BLOG_POSTS, formatNewsTitle } from '@/lib/blog-data'
 
 describe('BlogTopSlider', () => {
   it('renders the first featured post by default', () => {
@@ -11,7 +11,7 @@ describe('BlogTopSlider', () => {
     expect(screen.getByText(/LEAD NEWS DISPATCH · BREAKING COVERAGE #01/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
-        INITIAL_BLOG_POSTS[0].title
+        formatNewsTitle(INITIAL_BLOG_POSTS[0].title).headline
       )[0]
     ).toBeInTheDocument()
     expect(screen.getAllByText(INITIAL_BLOG_POSTS[0].authorName)[0]).toBeInTheDocument()
@@ -27,7 +27,7 @@ describe('BlogTopSlider', () => {
     expect(screen.getByText(/LEAD NEWS DISPATCH · BREAKING COVERAGE #02/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
-        INITIAL_BLOG_POSTS[1].title
+        formatNewsTitle(INITIAL_BLOG_POSTS[1].title).headline
       )[0]
     ).toBeInTheDocument()
   })
@@ -42,7 +42,7 @@ describe('BlogTopSlider', () => {
     // Last featured post index (slice 0, 5 -> index 4)
     expect(
       screen.getAllByText(
-        INITIAL_BLOG_POSTS[4].title
+        formatNewsTitle(INITIAL_BLOG_POSTS[4].title).headline
       )[0]
     ).toBeInTheDocument()
   })
@@ -62,7 +62,7 @@ describe('BlogTopSlider', () => {
     render(<BlogTopSlider posts={INITIAL_BLOG_POSTS} onSelectPost={handleSelect} />)
 
     const thirdPostThumb = screen.getAllByText(
-      INITIAL_BLOG_POSTS[2].title
+      formatNewsTitle(INITIAL_BLOG_POSTS[2].title).headline
     )[0]
     fireEvent.click(thirdPostThumb)
 

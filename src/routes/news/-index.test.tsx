@@ -46,8 +46,9 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     const mainLeadBadge = screen.getByText(new RegExp(`${INITIAL_BLOG_POSTS[0].category} · MAIN LEAD DISPATCH`))
     expect(mainLeadBadge).toBeInTheDocument()
 
-    // Verify main lead post title is rendered in the h1 headline
-    expect(screen.getByRole('heading', { level: 1, name: INITIAL_BLOG_POSTS[0].title })).toBeInTheDocument()
+    // Verify main lead post headline and subtitle are rendered
+    expect(screen.getByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' })).toBeInTheDocument()
+    expect(screen.getAllByText('Why Elite AI Operators Are Shedding Biological Constraints')[0]).toBeInTheDocument()
 
     // Verify the grid column order classes
     const heroGrid = container.querySelector('.grid.grid-cols-1.lg\\:grid-cols-12')

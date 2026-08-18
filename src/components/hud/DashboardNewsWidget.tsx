@@ -12,7 +12,7 @@ import {
   Tag,
   TrendingUp,
 } from 'lucide-react'
-import { INITIAL_BLOG_POSTS } from '@/lib/blog-data'
+import { INITIAL_BLOG_POSTS, formatNewsTitle } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
 import { DashboardNewsGhost } from '@/components/hud/HudGhostSkeletons'
@@ -114,8 +114,13 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
 
                 <div>
                   <h2 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] uppercase tracking-wide leading-snug">
-                    {activePost.title}
+                    {formatNewsTitle(activePost.title).headline}
                   </h2>
+                  {formatNewsTitle(activePost.title).subtitle && (
+                    <p className="text-xs sm:text-sm text-cyan-300/90 font-medium font-sans mt-1">
+                      {formatNewsTitle(activePost.title).subtitle}
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-sans">
                     <div className="flex items-center gap-1.5">
                       {activePost.authorAvatar && (
@@ -270,8 +275,13 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
 
                 <div className="space-y-0.5">
                   <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase leading-snug">
-                    {featuredPost.title}
+                    {formatNewsTitle(featuredPost.title).headline}
                   </h3>
+                  {formatNewsTitle(featuredPost.title).subtitle && (
+                    <p className="text-[10px] text-cyan-300/80 font-medium font-sans line-clamp-1">
+                      {formatNewsTitle(featuredPost.title).subtitle}
+                    </p>
+                  )}
                   <p className="text-[11px] text-[#839493] line-clamp-2 leading-tight font-sans">
                     {featuredPost.summary}
                   </p>
@@ -331,7 +341,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   </div>
 
                   <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-tight">
-                    {post.title}
+                    {formatNewsTitle(post.title).headline}
                   </h4>
 
                   <div className="flex items-center justify-between text-[9px] pt-0.5 border-t border-[#3a4a49]/40 text-[#839493]">
@@ -379,10 +389,15 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   </div>
                 )}
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <h3 className="font-grotesk text-base font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase leading-snug">
-                    {featuredPost.title}
+                    {formatNewsTitle(featuredPost.title).headline}
                   </h3>
+                  {formatNewsTitle(featuredPost.title).subtitle && (
+                    <p className="text-xs text-cyan-300/80 font-medium font-sans line-clamp-1">
+                      {formatNewsTitle(featuredPost.title).subtitle}
+                    </p>
+                  )}
                   <p className="text-xs text-[#839493] line-clamp-2 leading-relaxed font-sans">
                     {featuredPost.summary}
                   </p>
@@ -441,7 +456,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                       </div>
 
                       <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-2 leading-tight">
-                        {post.title}
+                        {formatNewsTitle(post.title).headline}
                       </h4>
 
                       <p className="text-[11px] text-[#839493] line-clamp-1 font-sans">
