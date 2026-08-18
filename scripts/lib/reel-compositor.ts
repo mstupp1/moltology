@@ -391,7 +391,9 @@ export async function renderCtaOutroVideo(
     if (mascotChoice === 'lobster_thumbs_up') mascotFile = 'char_lobster_thumbs_up.png'
     else if (mascotChoice === 'lobster_action') mascotFile = 'char_lobster_speed_action.png'
     else if (mascotChoice === 'crab_stats') mascotFile = 'char_crab_pointing_stats.png'
-    else if (mascotChoice === 'crab_corner') mascotFile = 'char_crab_corner_cling.png'
+    else if (mascotChoice === 'crab_corner' || mascotChoice === 'crab_cling') mascotFile = 'char_crab_corner_cling.png'
+    else if (mascotChoice === 'lobster_peek') mascotFile = 'char_lobster_corner_peek.png'
+    else if (mascotChoice === 'lobster_peaceful') mascotFile = 'char_lobster_floating_peaceful.png'
 
     const charPath = path.resolve(process.cwd(), 'public/images/characters', mascotFile)
     let charImg: any = null
@@ -906,6 +908,7 @@ export async function renderReelThumbnail(options: ReelThumbnailOptions): Promis
     else if (mascotChoice === 'crab_stats') mascotFile = 'char_crab_pointing_stats.png'
     else if (mascotChoice === 'crab_corner' || mascotChoice === 'crab_cling') mascotFile = 'char_crab_corner_cling.png'
     else if (mascotChoice === 'lobster_peek') mascotFile = 'char_lobster_corner_peek.png'
+    else if (mascotChoice === 'lobster_peaceful') mascotFile = 'char_lobster_floating_peaceful.png'
 
     const localCharPath = path.resolve(process.cwd(), 'public/images/characters', mascotFile)
     let charImg: any = null
