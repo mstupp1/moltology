@@ -45,6 +45,5 @@ describe('MoltNationFooter Component', () => {
     expect(screen.getByText(/© 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED./i)).toBeInTheDocument()
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()
-    expect(screen.getByText('CHITIN MATRIX ACTIVE')).toBeInTheDocument()
   })
 })

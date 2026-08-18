@@ -37,7 +37,7 @@ describe('OrgPage (Moltology Organization Page)', () => {
     expect(screen.getByText('$94.2M')).toBeInTheDocument()
   })
 
-  it('allows switching between About tabs', () => {
+  it('allows switching between About tabs in Overview mode', () => {
     renderOrgPage()
 
     expect(screen.getByText('WHY PARTNER WITH OUR ORGANIZATION?')).toBeInTheDocument()
@@ -73,6 +73,18 @@ describe('OrgPage (Moltology Organization Page)', () => {
     expect(screen.getByText('THE MARIANA SIGNAL')).toBeInTheDocument()
     expect(screen.getByText('Dr. Thaddeus Crust')).toBeInTheDocument()
     expect(screen.getByText('Sister Vane')).toBeInTheDocument()
+  })
+
+  it('allows switching to Careers & Campus Hub mode and displays open roles', () => {
+    renderOrgPage()
+
+    const careersNavBtns = screen.getAllByRole('button', { name: /CAREERS & CAMPUS HUB/i })
+    fireEvent.click(careersNavBtns[0])
+
+    expect(screen.getByText(/BUILD YOUR FUTURE IN/i)).toBeInTheDocument()
+    expect(screen.getByText('JOIN THE CARCINIZATION EFFORT')).toBeInTheDocument()
+    expect(screen.getByText('Senior Bio-Silicon Systems Engineer')).toBeInTheDocument()
+    expect(screen.getByText('EXPLORE SUB-BENTHIC LAIR ALPHA: TRENCH LEVEL 7')).toBeInTheDocument()
   })
 
   it('handles donation tier selection and form submission', () => {

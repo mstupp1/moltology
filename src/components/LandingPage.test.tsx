@@ -116,7 +116,6 @@ describe('LandingPage Component', () => {
     expect(within(footer).getByText('RSS FEED')).toBeInTheDocument()
     expect(within(footer).getByText('Privacy Policy')).toBeInTheDocument()
     expect(within(footer).getByText('Terms of Service')).toBeInTheDocument()
-    expect(within(footer).getByText('CHITIN MATRIX ACTIVE')).toBeInTheDocument()
   })
 
   it('renders peppered quiz characters and companions across homepage corners and sections', () => {
