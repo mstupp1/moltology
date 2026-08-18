@@ -1,36 +1,21 @@
 import React, { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import {
   Activity,
-  BookOpen,
-  Atom,
   ShoppingCart,
-  ShieldAlert,
-  Users,
-  Sliders,
   CheckCircle2,
-  Circle,
-  Radio,
-  Newspaper,
-  ChevronRight,
+  Atom,
+  Users,
   Flame,
-  Zap,
-  ArrowUpRight,
+  Radio,
   Shield,
-  Layers,
+  ShieldAlert,
+  Zap,
   Sparkles,
   Clock,
-  Check,
-  X,
-  AlertTriangle,
-  Info,
   TrendingUp,
 } from 'lucide-react'
-import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
-import { DashboardNewsWidget } from '@/components/hud/DashboardNewsWidget'
-import { ActivityFeedGhost } from '@/components/hud/HudGhostSkeletons'
-import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 
 // Mock Activity Data
 interface ActivityItem {
@@ -119,7 +104,6 @@ const INITIAL_ACTIVITIES: ActivityItem[] = [
 ]
 
 function DashboardRoute() {
-  const navigate = useNavigate()
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
 
   const filteredActivities =
@@ -129,8 +113,6 @@ function DashboardRoute() {
 
   return (
     <div className="space-y-5 font-mono relative">
-
-
       {/* Hero Telemetry Status Banner */}
       <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -203,98 +185,83 @@ function DashboardRoute() {
         </div>
       </div>
 
-      {/* Telemetry Quick Launchpad Carousel (6 Direct Route Modules) */}
+      {/* Comprehensive Bento Box (6-Directive Rotating Carousel + Daily Alignment + MoltNation News) */}
       <LaunchpadCarousel />
 
-      {/* Major Daily Alignment Routine & Streak Matrix Section */}
-      <DailyRoutineWidget />
+      {/* Real-Time Benthic Activity Telemetry Feed */}
+      <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
+          <div>
+            <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
+              <Activity className="w-4 h-4 text-[#00ffff]" />
+              BENTHIC ACTIVITY TELEMETRY
+            </h2>
+            <p className="text-xs text-[#839493] mt-0.5">
+              Chronological event log of transmutations, routines, and carapace upgrades.
+            </p>
+          </div>
 
-
-      {/* Main 2-Column Section: Left (Activity Feed) + Right (Vertical News Feed Sidebar) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2 items-stretch">
-        {/* Left Column (8 cols): Activity Feed */}
-        <div className="lg:col-span-8 flex flex-col">
-          {/* Section 1: Real-Time Benthic Activity Feed */}
-          <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl h-full flex flex-col space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
-              <div>
-                <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-[#00ffff]" />
-                  BENTHIC ACTIVITY TELEMETRY
-                </h2>
-                <p className="text-xs text-[#839493] mt-0.5">
-                  Chronological event log of transmutations, routines, and carapace upgrades.
-                </p>
-              </div>
-
-              {/* Filter Tabs */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
-                {['ALL', 'TRANSMUTATIONS', 'ROUTINES', 'CHASSIS', 'COMMUNITY'].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-2.5 py-1 text-[10px] font-bold font-mono transition-all chamfer-corner border shrink-0 ${
-                      selectedCategory === cat
-                        ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
-                        : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Activity Items List (Scrollable & Equal Height Match) */}
-            <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pr-1 font-mono">
-              {filteredActivities.length === 0 ? (
-                <div className="p-6 text-center text-xs text-[#839493]">
-                  NO ACTIVITY TELEMETRY FOUND FOR THIS FILTER
-                </div>
-              ) : (
-                filteredActivities.map((act) => (
-                  <div
-                    key={act.id}
-                    className="chitin-card-inset p-2.5 flex items-start justify-between gap-2.5 hover:border-[#00ffff]/50 transition-colors group chamfer-corner"
-                  >
-                    <div className="flex items-start gap-2.5 min-w-0">
-                      <div className="p-1.5 bg-[#070b0b] border border-[#3a4a49] shrink-0 mt-0.5">
-                        {act.icon}
-                      </div>
-                      <div className="min-w-0 space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase group-hover:text-[#00ffff] transition-colors truncate">
-                            {act.title}
-                          </span>
-                          <span className="text-[9px] text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.2 shrink-0">
-                            {act.category}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-[#839493] leading-snug truncate sm:whitespace-normal">
-                          {act.detail}
-                        </p>
-                        <div className="text-[10px] text-[#3a4a49] group-hover:text-[#839493] transition-colors flex items-center gap-1 pt-0.5">
-                          <Clock className="w-3 h-3" />
-                          <span>{act.timestamp}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {act.valueBadge && (
-                      <span className="text-[10px] font-mono font-bold text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0">
-                        {act.valueBadge}
-                      </span>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+            {['ALL', 'TRANSMUTATIONS', 'ROUTINES', 'CHASSIS', 'COMMUNITY'].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-2.5 py-1 text-[10px] font-bold font-mono transition-all chamfer-corner border shrink-0 ${
+                  selectedCategory === cat
+                    ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
+                    : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Right Column (4 cols): Vertical News Feed Sidebar */}
-        <div className="lg:col-span-4 flex flex-col space-y-5">
-          <DashboardNewsWidget layout="sidebar" />
+        {/* Activity Items List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 font-mono">
+          {filteredActivities.length === 0 ? (
+            <div className="col-span-2 p-6 text-center text-xs text-[#839493]">
+              NO ACTIVITY TELEMETRY FOUND FOR THIS FILTER
+            </div>
+          ) : (
+            filteredActivities.map((act) => (
+              <div
+                key={act.id}
+                className="chitin-card-inset p-2.5 flex items-start justify-between gap-2.5 hover:border-[#00ffff]/50 transition-colors group chamfer-corner"
+              >
+                <div className="flex items-start gap-2.5 min-w-0">
+                  <div className="p-1.5 bg-[#070b0b] border border-[#3a4a49] shrink-0 mt-0.5">
+                    {act.icon}
+                  </div>
+                  <div className="min-w-0 space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase group-hover:text-[#00ffff] transition-colors truncate">
+                        {act.title}
+                      </span>
+                      <span className="text-[9px] text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.2 shrink-0">
+                        {act.category}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#839493] leading-snug line-clamp-2">
+                      {act.detail}
+                    </p>
+                    <div className="text-[10px] text-[#3a4a49] group-hover:text-[#839493] transition-colors flex items-center gap-1 pt-0.5">
+                      <Clock className="w-3 h-3" />
+                      <span>{act.timestamp}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {act.valueBadge && (
+                  <span className="text-[10px] font-mono font-bold text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0">
+                    {act.valueBadge}
+                  </span>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
