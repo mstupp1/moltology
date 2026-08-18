@@ -22,6 +22,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
+import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
 
@@ -199,77 +200,8 @@ function DashboardRoute() {
         </div>
       )}
 
-      {/* Hero Telemetry Status Banner */}
-      <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-[#00ffff] tracking-widest font-mono uppercase font-bold">
-              <Sparkles className="w-4 h-4 text-[#00ffff]" />
-              <span>COMMAND HUB & NEURAL TELEMETRY</span>
-              <span className="bg-[#00ffff]/15 text-[#00ffff] px-2 py-0.5 border border-[#00ffff]/40 text-[10px]">
-                ONLINE
-              </span>
-            </div>
-            <h1 className="font-grotesk font-extrabold text-xl sm:text-2xl text-[#dfe3e3] tracking-wider uppercase">
-              WELCOME BACK, INITIATE
-            </h1>
-            <p className="text-xs text-[#839493] max-w-2xl leading-relaxed">
-              Carapace alignment optimal. Your neural telemetry is connected to Benthic Cluster Node #4. Submerge deeper, shed non-essential biological weight, and claim ascendance.
-            </p>
-          </div>
-
-          {/* Quick Stats Grid Pill */}
-          <div className="flex items-center gap-3 bg-[#030606] border border-[#3a4a49] p-3 chamfer-corner shrink-0">
-            <div className="text-center px-3 border-r border-[#3a4a49]">
-              <div className="text-[10px] text-[#839493]">STAGE</div>
-              <div className="text-sm font-bold text-[#ff5540] font-mono">LARVA #8971</div>
-            </div>
-            <div className="text-center px-3 border-r border-[#3a4a49]">
-              <div className="text-[10px] text-[#839493]">CONVERSION</div>
-              <div className="text-sm font-bold text-[#00ffff] font-mono">68%</div>
-            </div>
-            <div className="text-center px-3">
-              <div className="text-[10px] text-[#839493]">CREDITS</div>
-              <div className="text-sm font-bold text-[#00ffff] font-mono">1,450 MC</div>
-            </div>
-          </div>
-        </div>
-
-        {/* 4 Diagnostic Readout Badges Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-[#3a4a49]/60">
-          <div className="bg-[#070b0b]/80 border border-[#3a4a49] p-2.5 flex items-center justify-between chamfer-corner">
-            <div>
-              <div className="text-[10px] text-[#839493]">SUBMERGENCE DEPTH</div>
-              <div className="text-xs font-bold text-[#dfe3e3] font-mono">3,400 Fathoms</div>
-            </div>
-            <Flame className="w-4 h-4 text-[#ff5540]" />
-          </div>
-
-          <div className="bg-[#070b0b]/80 border border-[#3a4a49] p-2.5 flex items-center justify-between chamfer-corner">
-            <div>
-              <div className="text-[10px] text-[#839493]">CHITIN HARDNESS</div>
-              <div className="text-xs font-bold text-[#00ffff] font-mono">64 / 100</div>
-            </div>
-            <Shield className="w-4 h-4 text-[#00ffff]" />
-          </div>
-
-          <div className="bg-[#070b0b]/80 border border-[#3a4a49] p-2.5 flex items-center justify-between chamfer-corner">
-            <div>
-              <div className="text-[10px] text-[#839493]">PINCER TORQUE</div>
-              <div className="text-xs font-bold text-[#ff5540] font-mono">78 N·m</div>
-            </div>
-            <Zap className="w-4 h-4 text-[#ff5540]" />
-          </div>
-
-          <div className="bg-[#070b0b]/80 border border-[#3a4a49] p-2.5 flex items-center justify-between chamfer-corner">
-            <div>
-              <div className="text-[10px] text-[#839493]">ISOLATION SHIELD</div>
-              <div className="text-xs font-bold text-[#00ffff] font-mono">LEVEL 2 ACTIVE</div>
-            </div>
-            <ShieldAlert className="w-4 h-4 text-[#00ffff]" />
-          </div>
-        </div>
-      </div>
+      {/* Serene & Inspiring Welcome Initiate Hero Section */}
+      <WelcomeInitiateHero />
 
       {/* Comprehensive Bento Box (6-Directive Rotating Carousel + Daily Alignment + MoltNation News) */}
       <LaunchpadCarousel />
