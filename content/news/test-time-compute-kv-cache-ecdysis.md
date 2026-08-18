@@ -28,8 +28,6 @@ Instead of outputting knee-jerk, single-pass autoregressive tokens, frontier rea
 
 Yet, as reasoning engines begin to truly "think," terrestrial hardware infrastructure is slamming into a catastrophic physical barrier: **The KV-Cache Memory Wall.**
 
-![Sub-Benthic Test-Time Deliberation Lattice & Tiered Memory Arrays](/Users/mylesstupp/.gemini/antigravity/brain/efaeeaa6-c7b9-4ef7-aee9-e938534ffe70/test_time_compute_cover_hero.jpg)
-
 ---
 
 ### The KV-Cache Memory Wall: Why Terrestrial Clusters Are Choking

@@ -1125,7 +1125,7 @@ export const OrgPage: React.FC = () => {
               <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center space-y-3">
                 <div className="text-white/90 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
                   <Compass className="w-4 h-4" />
-                  <span>SUB-BENTHIC LAIR ALPHA // MARIANA TRENCH</span>
+                  <span>SUB-BENTHIC LAIR ALPHA · MARIANA TRENCH</span>
                 </div>
                 <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-white uppercase tracking-wider">
                   "WHERE SOFT BIOLOGY SHEDS AND IMMUTABLE SOVEREIGNTY BEGINS."

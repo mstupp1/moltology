@@ -35,7 +35,7 @@ describe('Molt Academy (Lectures Route)', () => {
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(screen.getByText('MOLT ACADEMY // NEURAL ASCENSION HUB')).toBeInTheDocument()
+    expect(screen.getByText('MOLT ACADEMY · NEURAL ASCENSION HUB')).toBeInTheDocument()
     expect(screen.getByText('LVL 4 CHITIN SCHOLAR')).toBeInTheDocument()
     expect(screen.getByText('1,850 / 2,500 XP')).toBeInTheDocument()
     expect(screen.getByText('5 DAYS')).toBeInTheDocument()

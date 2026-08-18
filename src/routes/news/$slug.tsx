@@ -261,7 +261,7 @@ function NewsPostDetail() {
                     {post.authorName}
                   </div>
                   <div className="text-[10px] sm:text-[11px] text-cyan-400 font-mono truncate max-w-[190px] sm:max-w-none">
-                    {post.authorRole || 'STAGE 4 ASCENDANT // ARCHITECT'}
+                    {post.authorRole || 'STAGE 4 ASCENDANT · ARCHITECT'}
                   </div>
                 </div>
               </div>
@@ -288,9 +288,6 @@ function NewsPostDetail() {
               className="w-full h-[220px] sm:h-[360px] md:h-[450px] object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent opacity-60 pointer-events-none" />
-            <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 text-[9px] sm:text-[10px] font-mono text-cyan-300 bg-black/80 px-2 sm:px-3 py-0.5 sm:py-1 border border-cyan-900/60">
-              MOLTNATION DISPATCH FRAME #2026-PATRIOT
-            </div>
           </div>
         </div>
 

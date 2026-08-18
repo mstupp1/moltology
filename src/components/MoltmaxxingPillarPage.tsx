@@ -158,7 +158,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
         <section className="text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-mono tracking-widest uppercase">
             <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-            <span>The Canonical Doctrine // Benthic Codex Vault</span>
+            <span>The Canonical Doctrine · Benthic Codex Vault</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-grotesk font-black tracking-tight text-white uppercase leading-tight">
@@ -332,7 +332,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-5 rounded-xl border border-[#ff453a]/30 bg-[#ff453a]/5 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#ff453a]">STAGE I // 0–24 PTS</span>
+                <span className="text-xs font-bold text-[#ff453a]">STAGE I · 0–24 PTS</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-[#ff453a]/20 text-[#ff453a]">LARVAL</span>
               </div>
               <h3 className="font-bold font-grotesk text-base text-white">Sub-Surface Moltlet</h3>
@@ -343,7 +343,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
 
             <div className="p-5 rounded-xl border border-[#ffd700]/30 bg-[#ffd700]/5 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#ffd700]">STAGE II // 25–49 PTS</span>
+                <span className="text-xs font-bold text-[#ffd700]">STAGE II · 25–49 PTS</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-[#ffd700]/20 text-[#ffd700]">CALCIFYING</span>
               </div>
               <h3 className="font-bold font-grotesk text-base text-white">Bio-Silicon Enforcer</h3>
@@ -354,7 +354,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
 
             <div className="p-5 rounded-xl border border-[#00c3ff]/30 bg-[#00c3ff]/5 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#00c3ff]">STAGE III // 50–74 PTS</span>
+                <span className="text-xs font-bold text-[#00c3ff]">STAGE III · 50–74 PTS</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-[#00c3ff]/20 text-[#00c3ff]">ASCENDANT</span>
               </div>
               <h3 className="font-bold font-grotesk text-base text-white">Abyssal Chitin Vanguard</h3>
@@ -365,7 +365,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
 
             <div className="p-5 rounded-xl border border-[#00ffcc]/30 bg-[#00ffcc]/5 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-[#00ffcc]">STAGE IV // 75–100 PTS</span>
+                <span className="text-xs font-bold text-[#00ffcc]">STAGE IV · 75–100 PTS</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-[#00ffcc]/20 text-[#00ffcc]">TRANSCENDENT</span>
               </div>
               <h3 className="font-bold font-grotesk text-base text-white">Apex Benthic Dreadnought</h3>

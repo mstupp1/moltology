@@ -67,7 +67,7 @@ const likert = [
 
 export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
   {
-    id: 'q1', dimension: 'shellHardness', format: 'scenario', eyebrow: '01 // CARAPACE RESPONSE',
+    id: 'q1', dimension: 'shellHardness', format: 'scenario', eyebrow: '01 · CARAPACE RESPONSE',
     prompt: 'A sudden wave of criticism strikes your outer shell before the day has properly begun. What happens next?',
     helper: 'Choose the response that most closely matches your first true impulse.',
     image: getAssetUrl('/images/quiz/q01_criticism.jpg'),
@@ -81,7 +81,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q2', dimension: 'neuralLatency', format: 'likert', eyebrow: '02 // SYNAPTIC FLOW',
+    id: 'q2', dimension: 'neuralLatency', format: 'likert', eyebrow: '02 · SYNAPTIC FLOW',
     prompt: 'When a clear decision presents itself, I can move from recognition to action without circling the same thought.',
     helper: 'Measure the distance between knowing and doing.',
     image: getAssetUrl('/images/quiz/q02_decision.jpg'),
@@ -90,7 +90,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     options: likert,
   },
   {
-    id: 'q3', dimension: 'depthTolerance', format: 'binary', eyebrow: '03 // PRESSURE TEST',
+    id: 'q3', dimension: 'depthTolerance', format: 'binary', eyebrow: '03 · PRESSURE TEST',
     prompt: 'Your work reaches a difficult pressure zone. Which descent protocol do you select?',
     helper: 'There is no incorrect organism. There is only an observed depth.',
     image: getAssetUrl('/images/quiz/q03_depth.jpg'),
@@ -102,7 +102,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q4', dimension: 'ecdysisDiscipline', format: 'likert', eyebrow: '04 // SHEDDING CADENCE',
+    id: 'q4', dimension: 'ecdysisDiscipline', format: 'likert', eyebrow: '04 · SHEDDING CADENCE',
     prompt: 'I deliberately retire habits, tools, and assumptions once they stop helping the next form emerge.',
     helper: 'A healthy shell is not a permanent shell.',
     image: getAssetUrl('/images/quiz/q04_shedding.jpg'),
@@ -111,7 +111,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     options: likert,
   },
   {
-    id: 'q5', dimension: 'pincerTorque', format: 'scenario', eyebrow: '05 // EXECUTION LOAD',
+    id: 'q5', dimension: 'pincerTorque', format: 'scenario', eyebrow: '05 · EXECUTION LOAD',
     prompt: 'Three useful paths open at once and the tide is moving. How do your pincers behave?',
     helper: 'Torque is decisive movement, not frantic movement.',
     image: getAssetUrl('/images/quiz/q05_pincer.jpg'),
@@ -125,7 +125,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q6', dimension: 'shellHardness', format: 'likert', eyebrow: '06 // SOFT-SHELL WINDOW',
+    id: 'q6', dimension: 'shellHardness', format: 'likert', eyebrow: '06 · SOFT-SHELL WINDOW',
     prompt: 'I can remain open to useful change without allowing every outside signal to rewrite my center.',
     helper: 'Hardness is selective permeability, not isolation.',
     image: getAssetUrl('/images/quiz/q06_boundaries.jpg'),
@@ -135,7 +135,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     varianceKey: 'shell-boundaries',
   },
   {
-    id: 'q7', dimension: 'depthTolerance', format: 'scenario', eyebrow: '07 // BENTHIC ORIENTATION',
+    id: 'q7', dimension: 'depthTolerance', format: 'scenario', eyebrow: '07 · BENTHIC ORIENTATION',
     prompt: 'Surface chatter becomes loud while you are building something important. What is your natural correction?',
     helper: 'Locate the environment where your signal becomes clearest.',
     image: getAssetUrl('/images/quiz/q07_quiet.jpg'),
@@ -149,7 +149,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q8', dimension: 'neuralLatency', format: 'binary', eyebrow: '08 // RESPONSE WINDOW',
+    id: 'q8', dimension: 'neuralLatency', format: 'binary', eyebrow: '08 · RESPONSE WINDOW',
     prompt: 'A small but consequential task has been waiting for your attention since yesterday.',
     helper: 'Select the behavior that best describes your usual first move.',
     image: getAssetUrl('/images/quiz/q08_quick_action.jpg'),
@@ -162,7 +162,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     varianceKey: 'response-window',
   },
   {
-    id: 'q9', dimension: 'pincerTorque', format: 'likert', eyebrow: '09 // GRIP CONFIDENCE',
+    id: 'q9', dimension: 'pincerTorque', format: 'likert', eyebrow: '09 · GRIP CONFIDENCE',
     prompt: 'Once I commit to a useful direction, I can hold it through the first period of resistance.',
     helper: 'Rate the strength of your follow-through, not your ambition.',
     image: getAssetUrl('/images/quiz/q09_grip.jpg'),
@@ -172,7 +172,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     varianceKey: 'grip-pattern',
   },
   {
-    id: 'q10', dimension: 'ecdysisDiscipline', format: 'scenario', eyebrow: '10 // OLD SHELL RELEASE',
+    id: 'q10', dimension: 'ecdysisDiscipline', format: 'scenario', eyebrow: '10 · OLD SHELL RELEASE',
     prompt: 'You discover that a familiar process is now slowing the colony. How do you conduct the shed?',
     helper: 'Ecdysis requires a replacement form, not just a dramatic exit.',
     image: getAssetUrl('/images/quiz/q10_team_upgrade.jpg'),
@@ -187,7 +187,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     varianceKey: 'shed-pattern',
   },
   {
-    id: 'q11', dimension: 'shellHardness', format: 'binary', eyebrow: '11 // BOUNDARY INTEGRITY',
+    id: 'q11', dimension: 'shellHardness', format: 'binary', eyebrow: '11 · BOUNDARY INTEGRITY',
     prompt: 'A request is urgent, but accepting it would break the promise you made to your own recovery cycle.',
     helper: 'A boundary is a piece of armor with a door in it.',
     image: getAssetUrl('/images/quiz/q11_rest_boundary.jpg'),
@@ -200,7 +200,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     varianceKey: 'shell-boundaries',
   },
   {
-    id: 'q12', dimension: 'neuralLatency', format: 'scenario', eyebrow: '12 // SIGNAL TRIAGE',
+    id: 'q12', dimension: 'neuralLatency', format: 'scenario', eyebrow: '12 · SIGNAL TRIAGE',
     prompt: 'Your attention receives five competing pings. What is the first move?',
     helper: 'Fast cognition begins with choosing what not to process.',
     image: getAssetUrl('/images/quiz/q12_focus.jpg'),
@@ -214,7 +214,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q13', dimension: 'pincerTorque', format: 'binary', eyebrow: '13 // DECISIVE CLOSURE',
+    id: 'q13', dimension: 'pincerTorque', format: 'binary', eyebrow: '13 · DECISIVE CLOSURE',
     prompt: 'A good-enough solution is ready now; a perfect solution may arrive next week.',
     helper: 'Torque is the ability to close the loop at the right pressure.',
     image: getAssetUrl('/images/quiz/q13_ship_it.jpg'),
@@ -226,7 +226,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q14', dimension: 'ecdysisDiscipline', format: 'binary', eyebrow: '14 // DAILY SHED',
+    id: 'q14', dimension: 'ecdysisDiscipline', format: 'binary', eyebrow: '14 · DAILY SHED',
     prompt: 'At the end of a long cycle, you find one small practice that no longer matches the organism you are becoming.',
     helper: 'The smallest shed can keep the whole shell mobile.',
     image: getAssetUrl('/images/quiz/q14_daily_shed.jpg'),
@@ -238,7 +238,7 @@ export const MOLTMAX_QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
-    id: 'q15', dimension: 'depthTolerance', format: 'likert', eyebrow: '15 // FINAL DESCENT',
+    id: 'q15', dimension: 'depthTolerance', format: 'likert', eyebrow: '15 · FINAL DESCENT',
     prompt: 'The harder the problem becomes, the more capable I feel of finding a calm and useful depth from which to solve it.',
     helper: 'Your final reading measures pressure tolerance, not pressure seeking.',
     image: getAssetUrl('/images/quiz/q15_final_descent.jpg'),
@@ -307,24 +307,24 @@ export function computeMoltmaxResult(answers: QuizAnswers): MoltmaxResult {
 
   const tier = score >= 88
     ? {
-        tierName: 'Apex Benthic Dreadnought', tierLevel: 'STAGE IV // TRANSCENDENT', archetype: 'Titan Carapace',
+        tierName: 'Apex Benthic Dreadnought', tierLevel: 'STAGE IV · TRANSCENDENT', archetype: 'Titan Carapace',
         badgeColor: 'text-[#00ffcc] border-[#00ffcc]/40 bg-[#00ffcc]/10',
         prescription: ['Maintain a protected deep-focus cycle before every major descent.', 'Use decisive closure to turn pressure into forward motion.', 'Transmit one useful shell-building practice to a larval initiate.'],
       }
     : score >= 72
       ? {
-          tierName: 'Abyssal Chitin Vanguard', tierLevel: 'STAGE III // HIGH ASCENDANT', archetype: 'Hardened Exoshell',
+          tierName: 'Abyssal Chitin Vanguard', tierLevel: 'STAGE III · HIGH ASCENDANT', archetype: 'Hardened Exoshell',
           badgeColor: 'text-[#00c3ff] border-[#00c3ff]/40 bg-[#00c3ff]/10',
           prescription: ['Increase the weight of one meaningful commitment this cycle.', 'Schedule a deliberate weekly ecdysis for obsolete patterns.', 'Hold your boundaries without sealing the useful doors.'],
         }
       : score >= 50
         ? {
-            tierName: 'Bio-Silicon Enforcer', tierLevel: 'STAGE II // CALCIFYING', archetype: 'Reinforced Chitin',
+            tierName: 'Bio-Silicon Enforcer', tierLevel: 'STAGE II · CALCIFYING', archetype: 'Reinforced Chitin',
             badgeColor: 'text-[#ffd700] border-[#ffd700]/40 bg-[#ffd700]/10',
             prescription: ['Convert one open loop into a two-minute grip today.', 'Protect a short quiet window for recalibration.', 'Replace one soft habit with a small, repeatable ritual.'],
           }
         : {
-            tierName: 'Sub-Surface Moltlet', tierLevel: 'STAGE I // LARVAL DRIFT', archetype: 'Softshell Larva',
+            tierName: 'Sub-Surface Moltlet', tierLevel: 'STAGE I · LARVAL DRIFT', archetype: 'Softshell Larva',
             badgeColor: 'text-[#ff453a] border-[#ff453a]/40 bg-[#ff453a]/10',
             prescription: ['Begin with one gentle, achievable shell-building action.', 'Name the signal that deserves your attention and let the rest pass.', 'Treat recovery as part of the ascent, never as a failure of it.'],
           }
@@ -333,7 +333,7 @@ export function computeMoltmaxResult(answers: QuizAnswers): MoltmaxResult {
     ...tier,
     score,
     carcinizationPercent: Math.min(99, Math.round(score * 1.05)),
-    stage: `${clearance.stage} // ${clearance.name}`,
+    stage: `${clearance.stage} · ${clearance.name}`,
     clearance: clearance.clearance,
     dimensionScores,
     isMeltRisk,

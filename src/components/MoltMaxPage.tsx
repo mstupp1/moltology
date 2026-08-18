@@ -91,7 +91,7 @@ const fannedCards = [
   {
     id: 'resilience',
     trait: 'Carapace Resilience',
-    eyebrow: '01 // RESILIENCE & STRESS ARMOR',
+    eyebrow: '01 · RESILIENCE & STRESS ARMOR',
     prompt: 'A sudden wave of criticism strikes your outer shell before the day has begun. What happens next?',
     image: getAssetUrl('/images/quiz/q01_criticism.jpg'),
     imageAlt: 'Armored lobster hero smiling as criticism bounces off harmlessly',
@@ -105,7 +105,7 @@ const fannedCards = [
   {
     id: 'execution',
     trait: 'Decisive Execution',
-    eyebrow: '05 // EXECUTION LOAD & TORQUE',
+    eyebrow: '05 · EXECUTION LOAD & TORQUE',
     prompt: 'Three useful paths open at once and the tide is moving. How do your pincers behave?',
     image: getAssetUrl('/images/quiz/q05_pincer.jpg'),
     imageAlt: 'Lobster hero snapping a powerful claw onto the golden prize',
@@ -119,7 +119,7 @@ const fannedCards = [
   {
     id: 'depth',
     trait: 'Depth Composure',
-    eyebrow: '03 // PRESSURE & DEPTH TOLERANCE',
+    eyebrow: '03 · PRESSURE & DEPTH TOLERANCE',
     prompt: 'Your work reaches a difficult pressure zone. Which descent protocol do you select?',
     image: getAssetUrl('/images/quiz/q03_depth.jpg'),
     imageAlt: 'Lobster hero diving boldly into deep ocean trench with glowing headlights',
@@ -133,7 +133,7 @@ const fannedCards = [
   {
     id: 'adaptation',
     trait: 'Growth & Adaptation',
-    eyebrow: '10 // OLD HABIT RELEASE & ECDYSIS',
+    eyebrow: '10 · OLD HABIT RELEASE & ECDYSIS',
     prompt: 'You discover that a familiar process is now slowing the colony. How do you conduct the shed?',
     image: getAssetUrl('/images/quiz/q10_team_upgrade.jpg'),
     imageAlt: 'Lobster hero presenting upgrade blueprint to cheerful teammates',
@@ -147,7 +147,7 @@ const fannedCards = [
   {
     id: 'focus',
     trait: 'Synaptic Speed',
-    eyebrow: '12 // SIGNAL TRIAGE & FOCUS',
+    eyebrow: '12 · SIGNAL TRIAGE & FOCUS',
     prompt: 'Your attention receives five competing pings at once. What is your decisive first move?',
     image: getAssetUrl('/images/quiz/q12_focus.jpg'),
     imageAlt: 'Lobster hero swiping away noisy notification bubbles to focus on priority',
@@ -161,7 +161,7 @@ const fannedCards = [
   {
     id: 'shipping',
     trait: 'Decisive Closure',
-    eyebrow: '13 // DECISIVE CLOSURE & DEPLOYMENT',
+    eyebrow: '13 · DECISIVE CLOSURE & DEPLOYMENT',
     prompt: 'A good-enough solution is ready now; a theoretically perfect solution may arrive next week.',
     image: getAssetUrl('/images/quiz/q13_ship_it.jpg'),
     imageAlt: 'Lobster hero launching a working yellow mini-sub with a thumbs up',
@@ -301,13 +301,13 @@ export const MoltMaxPage: React.FC = () => {
       ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60)
       ctx.fillStyle = '#00ffcc'
       ctx.font = 'bold 22px monospace'
-      ctx.fillText('MOLTOLOGY // BENTHIC APTITUDE AUDIT', 60, 82)
+      ctx.fillText('MOLTOLOGY · BENTHIC APTITUDE AUDIT', 60, 82)
       ctx.fillStyle = '#ffffff'
       ctx.font = 'bold 42px sans-serif'
       ctx.fillText('OFFICIAL MOLTMAX CLEARANCE', 60, 140)
       ctx.fillStyle = '#00ffcc'
       ctx.font = 'bold 20px monospace'
-      ctx.fillText(`${result.tierName.toUpperCase()} // ${result.clearance}`, 60, 190)
+      ctx.fillText(`${result.tierName.toUpperCase()} · ${result.clearance}`, 60, 190)
       ctx.fillStyle = '#00ffcc'
       ctx.font = 'bold 100px monospace'
       ctx.fillText(String(result.score), 820, 280)
@@ -335,7 +335,7 @@ export const MoltMaxPage: React.FC = () => {
       })
       ctx.fillStyle = '#00c3ff'
       ctx.font = '16px monospace'
-      ctx.fillText('MOLTLOGY.ORG/MOLTMAX // NO SHELL IS FINAL', 60, 620)
+      ctx.fillText('MOLTLOGY.ORG/MOLTMAX · NO SHELL IS FINAL', 60, 620)
       const link = document.createElement('a')
       link.download = `moltmax-clearance-${result.score}.png`
       link.href = canvas.toDataURL('image/png')
@@ -631,7 +631,7 @@ export const MoltMaxPage: React.FC = () => {
           <div className="relative z-10 mx-auto max-w-[1500px] px-4 text-center sm:px-8">
             <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
               <Terminal className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
-              <span>MARIANA TRENCH METHODOLOGY // SYSTEM OVERVIEW</span>
+              <span>MARIANA TRENCH METHODOLOGY · SYSTEM OVERVIEW</span>
             </div>
             <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
               HOW THE <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">MOLTMAX AUDIT</span> WORKS
@@ -680,7 +680,7 @@ export const MoltMaxPage: React.FC = () => {
                 {/* Content */}
                 <div className="relative z-10 p-5 sm:p-6 lg:p-7">
                   <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
-                    01 // 15 RELATABLE DILEMMAS
+                    01 · 15 RELATABLE DILEMMAS
                   </div>
                   <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors sm:text-2xl">
                     Real-World Scenarios
@@ -749,7 +749,7 @@ export const MoltMaxPage: React.FC = () => {
                 {/* Content */}
                 <div className="relative z-10 p-5 sm:p-6 lg:p-7">
                   <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
-                    02 // 5 CORE PERSONALITY TRAITS
+                    02 · 5 CORE PERSONALITY TRAITS
                   </div>
                   <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-amber-300 transition-colors sm:text-2xl">
                     5-Trait Biometrics
@@ -818,7 +818,7 @@ export const MoltMaxPage: React.FC = () => {
                 {/* Content */}
                 <div className="relative z-10 p-5 sm:p-6 lg:p-7">
                   <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#00ffcc]">
-                    03 // CUSTOM ARCHETYPE & SCORE
+                    03 · CUSTOM ARCHETYPE & SCORE
                   </div>
                   <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-[#00ffcc] transition-colors sm:text-2xl">
                     Scorecard & Blueprint
@@ -877,7 +877,7 @@ export const MoltMaxPage: React.FC = () => {
           <div className="relative z-10 mx-auto max-w-[1500px] px-4 text-center sm:px-8">
             <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
               <Activity className="h-3.5 w-3.5 text-[#00ffcc] animate-pulse" />
-              <span>BIOMETRIC TELEMETRY ENGINE // 5 CORE AXES</span>
+              <span>BIOMETRIC TELEMETRY ENGINE · 5 CORE AXES</span>
             </div>
             <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
               THE FIVE VECTORS OF <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">CARCINIZATION</span>

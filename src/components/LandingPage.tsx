@@ -116,7 +116,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '01',
       title: 'ASSET & HABIT SHEDDING',
-      subtitle: 'PROTOCOL 01 // THE GREAT PURGE',
+      subtitle: 'PROTOCOL 01 — THE GREAT PURGE',
       description: 'Liquidize cluttered physical assets, bad habits, and biological hesitation into sovereign Molt Credits stored in your deep-trench vault.',
       image: getAssetUrl('/images/sacrament_01_asset_shedding.png'),
       badgeColor: 'border-red-600/80 text-red-400 bg-red-950/80',
@@ -128,7 +128,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '02',
       title: 'CHITIN HARDENING',
-      subtitle: 'PROTOCOL 02 // CARAPACE FORGING',
+      subtitle: 'PROTOCOL 02 — CARAPACE FORGING',
       description: 'Reinforce your focus perimeter against daily surface drama through prompt alignment, habit streaks, and armored HUD tools.',
       image: getAssetUrl('/images/sacrament_02_chitin_patterning.png'),
       badgeColor: 'border-cyan-500/80 text-cyan-300 bg-cyan-950/80',
@@ -140,7 +140,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '03',
       title: 'ISOLATION DOME',
-      subtitle: 'PROTOCOL 03 // DEEP WORK SHIELD',
+      subtitle: 'PROTOCOL 03 — DEEP WORK SHIELD',
       description: 'Quarantine phone notifications, unsolicited noise, and surface distractions within an impenetrable deep-water focus bubble.',
       image: getAssetUrl('/images/sacrament_03_fault_isolation.png'),
       badgeColor: 'border-amber-500/80 text-amber-300 bg-amber-950/80',
@@ -152,7 +152,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '04',
       title: 'PIPELINE ASCENT',
-      subtitle: 'PROTOCOL 04 // 12-TIER CONVERGENCE',
+      subtitle: 'PROTOCOL 04 — 12-TIER CONVERGENCE',
       description: 'Track your step-by-step evolution from a melting larval human to an armored, high-torque crustacean titan in real time.',
       image: getAssetUrl('/images/sacrament_04_pipeline_ascent.png'),
       badgeColor: 'border-emerald-500/80 text-emerald-300 bg-emerald-950/80',
@@ -254,7 +254,7 @@ export const LandingPage: React.FC = () => {
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
           <span className="font-mono text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
-            SYNAPTIC CORE // GRID 04
+            SYNAPTIC CORE · GRID 04
           </span>
           <span className="font-mono text-[10px] tracking-[0.4em] text-red-500/50 uppercase rotate-90">
             CARCINIZATION MATRIX v4.2
@@ -564,7 +564,7 @@ export const LandingPage: React.FC = () => {
             <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 text-center space-y-2 sm:space-y-3">
               <div className="text-cyan-400 text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
                 <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>MARIANA TRENCH TRANSMISSION // LEVEL 7</span>
+                <span>MARIANA TRENCH TRANSMISSION · LEVEL 7</span>
               </div>
               <h2 className="font-grotesk font-black text-xl sm:text-3xl lg:text-4xl text-gray-100 uppercase tracking-wider px-2">
                 "PRESSURE DOES NOT DESTROY THE SHELL. IT FORGES IMMUTABILITY."

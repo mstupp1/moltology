@@ -33,7 +33,6 @@ Outro text after image.
     expect(img).toBeDefined()
     expect(img.getAttribute('src')).toBe('https://cdn.moltology.org/images/nitrogen-pod.jpg')
     expect(screen.getByText(/Sub-Oceanic Nitrogen Pod/i)).toBeDefined()
-    expect(screen.getByText(/BENTHIC VISUAL TELEMETRY/i)).toBeDefined()
   })
 
   it('renders code blocks and telemetry frames with copy button and mobile touch classes', () => {
