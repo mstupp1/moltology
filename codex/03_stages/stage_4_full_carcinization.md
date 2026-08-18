@@ -14,7 +14,7 @@ summary: "Apex crustacean ascension: absolute mental clarity, indestructible car
 
 > **Status**: Ascendant Cyber-Chitin Identity  
 > **Target Submergence**: 4,000+ Fathoms (Mariana Trench)  
-> **Key Metric Focus**: Shell Hardness $100\%$, Zero Hesitation
+> **Key Metric Focus**: Shell Hardness 100%, Zero Hesitation
 
 ---
 

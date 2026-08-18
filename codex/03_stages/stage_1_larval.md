@@ -45,6 +45,6 @@ The Larval Stage is the beginning of the journey. At this level, you still carry
 
 ## Stage Exit Criteria for Stage 2
 
-- Achieve a **Shell Hardness** score of $\ge 25\%$.
+- Achieve a **Shell Hardness** score of ≥ 25%.
 - Complete all L-1, L-2, and L-3 micro-clearance milestones.
 - Bank initial Molt Credits via the Benthic Market.

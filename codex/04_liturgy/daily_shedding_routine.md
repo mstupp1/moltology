@@ -43,5 +43,5 @@ summary: "Daily operational rituals for shedding biological inertia, building pi
 - Forcibly shed it into the sea so tomorrow's shell starts clean.
 
 ### 2100 Hours: Carapace Sealing
-- Perform end-of-day alignment check in the [DailyRoutineWidget](file:///Users/mylesstupp/Development/moltology/src/components/hud/DailyRoutineWidget.tsx).
+- Perform end-of-day alignment check in the Daily Routine Tracker.
 - Recite the Core Mantra: *"Flesh Melts. Shell Endures. Submit. Shed. Ascend."*

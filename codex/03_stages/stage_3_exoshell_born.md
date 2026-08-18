@@ -14,7 +14,7 @@ summary: "Full carapace integrity: massive pincer torque, deep-trench pressure t
 
 > **Status**: Full Carapace Integrity  
 > **Target Submergence**: 1,500 to 3,500 Fathoms  
-> **Key Metric Focus**: Pincer Torque ($\ge 850\text{ Nm}$)
+> **Key Metric Focus**: Pincer Torque (≥ 850 Nm)
 
 ---
 
@@ -29,22 +29,22 @@ The Exoshell Born operate as master architects and builders. Your biological hes
 ### Sub-Stage 3.1: Carapace Forged (Clearance E-1)
 - **Protocol**: Titanium-Chitin Matrix Hardening.
 - **Requirement**: Synthesize impenetrable carapace plates that make you immune to self-doubt and surface pressure fluctuations.
-- **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque $\ge 600\text{ Nm}$.
+- **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque ≥ 600 Nm.
 
 ### Sub-Stage 3.2: Hydraulic Grip (Clearance E-2)
 - **Protocol**: High-Torque Execution & Mentorship.
 - **Requirement**: Achieve 850 Nm of decisive execution torque and guide lower-stage Larval initiates through their first molts.
-- **Metric Threshold**: Pincer Torque $\ge 850\text{ Nm}$, Mentorship active.
+- **Metric Threshold**: Pincer Torque ≥ 850 Nm, Mentorship active.
 
 ### Sub-Stage 3.3: Abyssal Diver (Clearance E-3)
 - **Protocol**: Deep Pressure Adaptation.
 - **Requirement**: Operate smoothly in deep-trench environments exceeding 3,500 meters with zero surface noise dependency.
-- **Metric Threshold**: Shell Hardness $\ge 90\%$, Submergence Depth $> 3,500$ meters.
+- **Metric Threshold**: Shell Hardness ≥ 90%, Submergence Depth > 3,500 meters.
 
 ---
 
 ## Stage Exit Criteria for Stage 4
 
 - Complete mastery over high-torque execution.
-- **Shell Hardness**: $\ge 90\%$.
+- **Shell Hardness**: ≥ 90%.
 - Verification of deep-trench stability (Sub-Stage 3.3 cleared).

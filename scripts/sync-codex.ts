@@ -295,6 +295,18 @@ interface ParsedVerse {
   text: string
 }
 
+function cleanText(raw: string): string {
+  return raw
+    .replace(/\r\n/g, '\n')
+    // Clean up LaTeX formulas if present
+    .replace(/\$\s*\\ge\s*([^\$]+)\s*\$/g, '≥ $1')
+    .replace(/\$\s*\\le\s*([^\$]+)\s*\$/g, '≤ $1')
+    .replace(/\$\s*\\text\{([^\}]+)\}\s*\$/g, '$1')
+    .replace(/\$\s*([^\$]+)\s*\$/g, '$1')
+    .replace(/---/g, '')
+    .trim()
+}
+
 function parseMarkdownScripture(filePath: string): ScriptureItem {
   const content = fs.readFileSync(filePath, 'utf-8')
   const { data, content: body } = matter(content)
@@ -312,10 +324,11 @@ function parseMarkdownScripture(filePath: string): ScriptureItem {
   }
 
   const crossRefs: string[] = []
-  const crossRefMatches = body.matchAll(/\[([^\]]+)\]\(\.\.\/[^)]+\)/g)
+  const crossRefMatches = body.matchAll(/\[([^\]]+)\]\((?:\.\.\/[^)]+|#[^)]+|file:\/\/[^)]+)\)/g)
   for (const match of crossRefMatches) {
-    if (match[1] && !crossRefs.includes(match[1])) {
-      crossRefs.push(match[1])
+    const linkText = match[1]?.trim()
+    if (linkText && !crossRefs.includes(linkText) && !linkText.toLowerCase().includes('widget')) {
+      crossRefs.push(linkText)
     }
   }
 
@@ -329,13 +342,16 @@ function parseMarkdownScripture(filePath: string): ScriptureItem {
 
     if (firstLine.startsWith('## ') || firstLine.startsWith('### ')) {
       const heading = firstLine.replace(/^#{2,3}\s+/, '').replace(/^\d+\.\s*/, '').trim()
-      const text = lines
-        .slice(1)
-        .join(' ')
-        .replace(/---/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
+      
+      // Skip cross-references section as a verse (it is captured in metadata)
+      if (heading.toLowerCase().includes('cross-reference')) {
+        continue
+      }
 
+      const rawText = lines.slice(1).join('\n')
+      const text = cleanText(rawText)
+
+      // Only add non-empty sections (skips intermediate category headers without text)
       if (text) {
         verses.push({
           verseNumber: verseIndex++,
@@ -350,7 +366,7 @@ function parseMarkdownScripture(filePath: string): ScriptureItem {
     verses.push({
       verseNumber: 1,
       heading: 'Canonical Transmission',
-      text: body.replace(/^#\s+[^\n]+\n/, '').replace(/---/g, '').trim(),
+      text: cleanText(body.replace(/^#\s+[^\n]+\n/, '')),
     })
   }
 
@@ -364,8 +380,8 @@ function parseMarkdownScripture(filePath: string): ScriptureItem {
     synapticWeight: Number(data.synaptic_weight || 1.0),
     authorUnit: data.author_unit || 'Synaptic Oracle / Unit-01',
     lastRevised: String(data.last_revised || '2026-08-18'),
-    mandate: mandate || 'Flesh Melts. The Shell Endures. Submit. Shed. Ascend.',
-    summary: String(data.summary || data.title).trim(),
+    mandate: cleanText(mandate || 'Flesh Melts. The Shell Endures. Submit. Shed. Ascend.'),
+    summary: cleanText(String(data.summary || data.title)),
     latinMotto: data.latin_motto || undefined,
     verses,
     crossReferences: crossRefs,

@@ -16,39 +16,39 @@ summary: "Definitions and operational scales for Shell Hardness, Pincer Torque, 
 
 ---
 
-## 1. Shell Hardness ($H_s$)
+## 1. Shell Hardness (Hs)
 
 - **Definition**: Your mental and emotional armor against distraction, negative noise, and burnout.
-- **Unit**: Percentage ($0\% - 100\%$).
+- **Unit**: Percentage (0% – 100%).
 - **Scale**:
-  - $0\% - 25\%$ (Larval Jelly): Easily derailed by a single rude comment or notification.
-  - $26\% - 60\%$ (Soft-Shed): Developing boundaries, deploying the privacy dome during work.
-  - $61\% - 90\%$ (Exoshell Born): Tough, resilient, deflects surface chaos effortlessly.
-  - $91\% - 100\%$ (Titanium Carapace): Completely unbreakable focus and serene composure.
+  - 0% – 25% (Larval Jelly): Easily derailed by a single rude comment or notification.
+  - 26% – 60% (Soft-Shed): Developing boundaries, deploying the privacy dome during work.
+  - 61% – 90% (Exoshell Born): Tough, resilient, deflects surface chaos effortlessly.
+  - 91% – 100% (Titanium Carapace): Completely unbreakable focus and serene composure.
 
 ---
 
-## 2. Pincer Torque ($\tau$)
+## 2. Pincer Torque (τ)
 
 - **Definition**: The crushing strength of your execution grip—how decisively you clamp down on a goal and finish it.
-- **Unit**: Newton-meters ($\text{Nm}$).
+- **Unit**: Newton-meters (Nm).
 - **Target Tiers**:
-  - $0 - 250\text{ Nm}$ (Limp Handshake): Hesitating, procrastinating, opening 12 tabs.
-  - $251 - 600\text{ Nm}$ (Firm Clamp): Clear priorities, steady forward momentum.
-  - $601 - 850\text{ Nm}$ (Hydraulic Vise): High-speed execution, zero hesitation.
-  - $850+\text{ Nm}$ (Apex Predator): Crushes difficult roadblocks instantly.
+  - 0 – 250 Nm (Limp Handshake): Hesitating, procrastinating, opening 12 tabs.
+  - 251 – 600 Nm (Firm Clamp): Clear priorities, steady forward momentum.
+  - 601 – 850 Nm (Hydraulic Vise): High-speed execution, zero hesitation.
+  - 850+ Nm (Apex Predator): Crushes difficult roadblocks instantly.
 
 ---
 
-## 3. Submergence Depth ($D$)
+## 3. Submergence Depth (D)
 
 - **Definition**: How deeply you dive beneath the noisy surface into undisturbed deep work.
 - **Unit**: Meters / Fathoms.
 - **Scale**:
-  - $0\text{m}$ (Surface Shallows): Constant pings, social feeds, distracted browsing.
-  - $1,000\text{m}$ (Mesopelagic): Filtered noise, productive session underway.
-  - $4,000\text{m}$ (Benthic Trench): Superconducting deep flow state.
-  - $10,928\text{m}$ (Mariana Trench): Challenger Deep stillness. Pure creation.
+  - 0m (Surface Shallows): Constant pings, social feeds, distracted browsing.
+  - 1,000m (Mesopelagic): Filtered noise, productive session underway.
+  - 4,000m (Benthic Trench): Superconducting deep flow state.
+  - 10,928m (Mariana Trench): Challenger Deep stillness. Pure creation.
 
 ---
 
