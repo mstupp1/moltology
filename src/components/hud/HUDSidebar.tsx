@@ -29,6 +29,7 @@ import {
   Radio,
   Biohazard,
   Microscope,
+  Lock,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -39,6 +40,8 @@ import { ChromaElement, HeaderBrand } from '../ui'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { getAssetUrl } from '@/lib/assets'
+
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -496,7 +499,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       }`}
                     />
 
-                    <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap">
+                    <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1">
                       <span
                         className={`${
                           isMobile ? 'text-xs md:text-sm' : 'text-xs md:text-[12.5px]'
@@ -509,6 +512,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         {item.label}
                       </span>
                     </div>
+
+                    {!user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
+                      <Lock className="w-3.5 h-3.5 text-[#ff5540]/80 shrink-0 ml-auto" />
+                    )}
                   </button>
                 )
               })}

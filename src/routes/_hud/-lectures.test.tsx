@@ -1,10 +1,37 @@
 import React from 'react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Route } from './lectures'
+import { authClient } from '@/lib/auth-client'
+
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
+}))
 
 describe('Molt Academy (Lectures Route)', () => {
-  it('renders Molt Academy header and gamified user stats', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders guest lock screen when unauthenticated', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    const LecturesComponent = Route.options.component!
+    render(<LecturesComponent />)
+
+    expect(screen.getByText('MOLT ACADEMY LOCKED')).toBeInTheDocument()
+    expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
+    expect(
+      screen.getByText('Molt Academy coursework, neural certifications, and video curricula require an authorized initiate account.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
+  })
+
+  it('renders Molt Academy header and gamified user stats when authenticated', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-1', name: 'Commander Craw' } },
+    } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
@@ -14,7 +41,10 @@ describe('Molt Academy (Lectures Route)', () => {
     expect(screen.getByText('5 DAYS')).toBeInTheDocument()
   })
 
-  it('renders course catalog cards and supports course selection', () => {
+  it('renders course catalog cards and supports course selection when authenticated', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-1', name: 'Commander Craw' } },
+    } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
@@ -31,7 +61,10 @@ describe('Molt Academy (Lectures Route)', () => {
     expect(activeHeadings.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('renders active video broadcast player with playback controls and notes', () => {
+  it('renders active video broadcast player with playback controls and notes when authenticated', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-1', name: 'Commander Craw' } },
+    } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
@@ -40,7 +73,10 @@ describe('Molt Academy (Lectures Route)', () => {
     expect(screen.getByText('AI NEURAL INTERPRETATION')).toBeInTheDocument()
   })
 
-  it('renders syllabus sidebar and handles neural quiz interaction', () => {
+  it('renders syllabus sidebar and handles neural quiz interaction when authenticated', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-1', name: 'Commander Craw' } },
+    } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 

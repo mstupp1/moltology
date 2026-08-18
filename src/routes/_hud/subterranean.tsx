@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { SubterraneanHubGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 
 export const Route = createFileRoute('/_hud/subterranean')({
   component: SubterraneanRoute,
@@ -158,7 +159,11 @@ function SubterraneanRoute() {
   }
 
   return (
-    <div className="space-y-6 font-mono text-[#dfe3e3]">
+    <GuestLockGuard
+      featureName="Subterranean Vats"
+      message="Subterranean specimen containment vats and biometric telemetry streams require an authorized initiate account."
+    >
+      <div className="space-y-6 font-mono text-[#dfe3e3]">
       {/* Flash Alert Banner when Bio-Purging */}
       {isPurging && (
         <div className="fixed inset-0 z-50 bg-[#39ff14]/20 pointer-events-none flex items-center justify-center animate-pulse backdrop-blur-sm">
@@ -479,5 +484,6 @@ function SubterraneanRoute() {
         </div>
       </div>
     </div>
+  </GuestLockGuard>
   )
 }
