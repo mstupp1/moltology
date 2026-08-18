@@ -154,25 +154,21 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           onClick={() => onNavigate('/')}
         />
 
-        {/* Central Modern Pill Navigation Capsule */}
+        {/* Central Apple-Grade Glass Navigation Capsule */}
         <nav
           ref={navRef}
           onMouseLeave={() => setHoveredTab(null)}
           aria-label="Main Navigation"
-          className={`relative hidden lg:flex items-center gap-0.5 p-1 rounded-full backdrop-blur-md transition-colors ${
+          className={`relative hidden lg:flex items-center gap-1 p-1 rounded-full backdrop-blur-2xl transition-all duration-300 ${
             isCorporate
-              ? 'bg-slate-100/90 border border-sky-200/70 shadow-inner'
-              : 'bg-[#080d0e]/80 border border-cyan-950/80'
+              ? 'bg-slate-200/50 border border-slate-300/60 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]'
+              : 'bg-black/40 border border-white/[0.08] shadow-[inset_0_1px_3px_rgba(0,0,0,0.8)]'
           }`}
         >
-          {/* Smooth Continuous Sliding Active Pill Background */}
+          {/* Smooth Continuous Sliding Active Optical Glass Lens (Apple Glass Morphism) */}
           <div
             aria-hidden="true"
-            className={`absolute top-1 bottom-1 left-0 rounded-full pointer-events-none z-0 shadow-sm ${
-              isCorporate
-                ? 'bg-white border border-sky-200/90 text-sky-700'
-                : 'bg-cyan-950/80 border border-cyan-500/40'
-            } ${
+            className={`absolute top-1 bottom-1 left-0 rounded-full pointer-events-none z-0 ${
               hasMounted
                 ? 'transition-[transform,width] duration-300 ease-[cubic-bezier(0.2,1,0.3,1)]'
                 : 'transition-none'
@@ -182,118 +178,178 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               width: `${pillStyle.width}px`,
               opacity: pillStyle.opacity,
             }}
-          />
+          >
+            {/* Optical Glass Shell with Precision Bevel & Crisp Specular Edges */}
+            <div
+              className={`relative w-full h-full rounded-full overflow-hidden transition-all duration-300 ${
+                isCorporate
+                  ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/75 border border-white shadow-[0_4px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,1),inset_0_-1px_0_rgba(0,0,0,0.04)]'
+                  : 'bg-[#081419]/65 bg-gradient-to-b from-white/[0.14] via-white/[0.04] to-transparent border border-white/[0.18] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.7),0_1px_4px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.45),inset_0_-1px_0_0_rgba(255,255,255,0.06)]'
+              } backdrop-blur-2xl`}
+            >
+              {/* Convex Lens Specular Reflection Highlight (Top Crest) */}
+              <div
+                className={`absolute top-0 inset-x-3 h-[1px] rounded-t-full pointer-events-none ${
+                  isCorporate
+                    ? 'bg-gradient-to-r from-transparent via-white to-transparent'
+                    : 'bg-gradient-to-r from-transparent via-white/80 to-transparent'
+                }`}
+              />
+
+              {/* Internal Radial Light Gathering (Lens Flare Center Catch) */}
+              <div
+                className={`absolute inset-0 rounded-full pointer-events-none ${
+                  isCorporate
+                    ? 'bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.8),transparent_60%)]'
+                    : 'bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.15),transparent_65%)]'
+                }`}
+              />
+
+              {/* Micro-Fine Optical Refraction Rim (Bottom Lip) */}
+              <div
+                className={`absolute bottom-0 inset-x-4 h-[1px] rounded-b-full pointer-events-none ${
+                  isCorporate
+                    ? 'bg-gradient-to-r from-transparent via-slate-300/40 to-transparent'
+                    : 'bg-gradient-to-r from-transparent via-white/10 to-transparent'
+                }`}
+              />
+            </div>
+          </div>
 
           <button
             ref={(el) => { tabRefs.current['home'] = el }}
             onClick={() => onNavigate('/')}
             onMouseEnter={() => setHoveredTab('home')}
-            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
               targetTab === 'home'
                 ? isCorporate
                   ? 'text-sky-700'
                   : 'text-cyan-300'
                 : isCorporate
                   ? 'text-slate-500 hover:text-sky-700'
-                  : 'text-gray-400'
+                  : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            <img
-              src="/images/order_emblem.png"
-              alt="The Synaptic Path Logo"
-              className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
-                targetTab === 'home'
-                  ? 'grayscale-0'
-                  : isCorporate
-                    ? 'grayscale opacity-50'
-                    : 'grayscale opacity-60'
+            <div
+              className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
+                targetTab === 'home' ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
               }`}
-            />
-            <span>THE SYNAPTIC PATH</span>
+            >
+              <img
+                src="/images/order_emblem.png"
+                alt="The Synaptic Path Logo"
+                className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
+                  targetTab === 'home'
+                    ? 'grayscale-0 opacity-100'
+                    : isCorporate
+                      ? 'grayscale opacity-50 group-hover:opacity-75'
+                      : 'grayscale opacity-60 group-hover:opacity-75'
+                }`}
+              />
+              <span>THE SYNAPTIC PATH</span>
+            </div>
           </button>
 
           <button
             ref={(el) => { tabRefs.current['news'] = el }}
             onClick={() => onNavigate('/news')}
             onMouseEnter={() => setHoveredTab('news')}
-            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
               targetTab === 'news'
                 ? isCorporate
                   ? 'text-sky-700'
                   : 'text-cyan-300'
                 : isCorporate
                   ? 'text-slate-500 hover:text-sky-700'
-                  : 'text-gray-400'
+                  : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            <Newspaper
-              className={`w-3.5 h-3.5 transition-colors duration-300 ${
-                targetTab === 'news'
-                  ? isCorporate
-                    ? 'text-sky-600'
-                    : 'text-cyan-300'
-                  : isCorporate
-                    ? 'text-slate-400'
-                    : 'text-gray-400'
+            <div
+              className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
+                targetTab === 'news' ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
               }`}
-            />
-            <span>NEWS</span>
+            >
+              <Newspaper
+                className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                  targetTab === 'news'
+                    ? isCorporate
+                      ? 'text-sky-600'
+                      : 'text-cyan-300'
+                    : isCorporate
+                      ? 'text-slate-400 group-hover:text-sky-600'
+                      : 'text-gray-400 group-hover:text-gray-300'
+                }`}
+              />
+              <span>NEWS</span>
+            </div>
           </button>
 
           <button
             ref={(el) => { tabRefs.current['moltmax'] = el }}
             onClick={() => onNavigate('/moltmax')}
             onMouseEnter={() => setHoveredTab('moltmax')}
-            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
               targetTab === 'moltmax'
                 ? isCorporate
                   ? 'text-sky-700'
                   : 'text-cyan-300'
                 : isCorporate
                   ? 'text-slate-500 hover:text-sky-700'
-                  : 'text-gray-400'
+                  : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            <Activity
-              className={`w-3.5 h-3.5 transition-colors duration-300 ${
-                targetTab === 'moltmax'
-                  ? isCorporate
-                    ? 'text-sky-600'
-                    : 'text-cyan-300'
-                  : isCorporate
-                    ? 'text-slate-400'
-                    : 'text-gray-400'
+            <div
+              className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
+                targetTab === 'moltmax' ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
               }`}
-            />
-            <span>MOLTMAX</span>
+            >
+              <Activity
+                className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                  targetTab === 'moltmax'
+                    ? isCorporate
+                      ? 'text-sky-600'
+                      : 'text-cyan-300'
+                    : isCorporate
+                      ? 'text-slate-400 group-hover:text-sky-600'
+                      : 'text-gray-400 group-hover:text-gray-300'
+                }`}
+              />
+              <span>MOLTMAX</span>
+            </div>
           </button>
 
           <button
             ref={(el) => { tabRefs.current['org'] = el }}
             onClick={() => onNavigate('/org')}
             onMouseEnter={() => setHoveredTab('org')}
-            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
               targetTab === 'org'
                 ? isCorporate
                   ? 'text-sky-700'
                   : 'text-cyan-300'
                 : isCorporate
                   ? 'text-slate-500 hover:text-sky-700'
-                  : 'text-gray-400'
+                  : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            <Building2
-              className={`w-3.5 h-3.5 transition-colors duration-300 ${
-                targetTab === 'org'
-                  ? isCorporate
-                    ? 'text-sky-600'
-                    : 'text-cyan-300'
-                  : isCorporate
-                    ? 'text-slate-400'
-                    : 'text-gray-400'
+            <div
+              className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
+                targetTab === 'org' ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
               }`}
-            />
-            <span>ORGANIZATION</span>
+            >
+              <Building2
+                className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                  targetTab === 'org'
+                    ? isCorporate
+                      ? 'text-sky-600'
+                      : 'text-cyan-300'
+                    : isCorporate
+                      ? 'text-slate-400 group-hover:text-sky-600'
+                      : 'text-gray-400 group-hover:text-gray-300'
+                }`}
+              />
+              <span>ORGANIZATION</span>
+            </div>
           </button>
 
           <a
@@ -302,27 +358,33 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             onMouseEnter={() => setHoveredTab('store')}
-            className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
+            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
               targetTab === 'store'
                 ? isCorporate
                   ? 'text-amber-700 font-bold'
                   : 'text-amber-300'
                 : isCorporate
                   ? 'text-amber-600/90 hover:text-amber-700'
-                  : 'text-amber-400/80'
+                  : 'text-amber-400/80 hover:text-amber-300'
             }`}
           >
-            <ShoppingBag
-              className={`w-3.5 h-3.5 group-hover:scale-105 transition-transform ${
-                isCorporate ? 'text-amber-600' : 'text-amber-400'
+            <div
+              className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
+                targetTab === 'store' ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
               }`}
-            />
-            <span>STORE</span>
-            <ExternalLink
-              className={`w-3 h-3 opacity-70 group-hover:opacity-100 ${
-                isCorporate ? 'text-amber-600' : 'text-amber-500'
-              }`}
-            />
+            >
+              <ShoppingBag
+                className={`w-3.5 h-3.5 group-hover:scale-105 transition-transform ${
+                  isCorporate ? 'text-amber-600' : 'text-amber-400'
+                }`}
+              />
+              <span>STORE</span>
+              <ExternalLink
+                className={`w-3 h-3 opacity-70 group-hover:opacity-100 ${
+                  isCorporate ? 'text-amber-600' : 'text-amber-500'
+                }`}
+              />
+            </div>
           </a>
         </nav>
 
