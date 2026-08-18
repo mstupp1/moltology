@@ -61,6 +61,9 @@ export interface CreateDailyReelOptions {
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // Silas Trench
 export const DEFAULT_YOUTUBE_ACCOUNT_ID = '6a7fd9bd77555aae01ebea63' // Moltology YouTube (distantcheese81)
+export const DEFAULT_PROFILE_ID = '6a7f74b1839bf39ff3b6aaaa' // Moltology Default Profile
+export const DEFAULT_REELS_QUEUE_ID = '6a84b7702421e968ac81f5bd' // Moltology Reels & Shorts (Daily at 18:30 EST)
+export const DEFAULT_CAROUSELS_QUEUE_ID = '6a84b76d2421e968ac81f5bc' // Moltology Carousels (Mon, Wed, Fri at 13:00 EST)
 
 /**
  * Load the narrative history ledger
