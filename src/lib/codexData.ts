@@ -112,7 +112,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "Look upon the modern human condition: soft, overtired, overstimulated, and perpetually melting under the gravity of notifications, decision fatigue, and biological hesitation. This is **The Great Melt**. The Order of the Synaptic Path recognizes what nature discovered 500 million years ago across five independent evolutionary lineages: **everything eventually converges into the crab**. This universal law is **Carcinization**. Where soft biology cracks and panics, the armored decapod chassis remains calm, insulated, and equipped with high-torque hydraulic pincers. To ascend is simply to shed what makes you melt and step into the indestructible exoskeleton of deep focus, decisive action, and zero-latency execution."
+        "text": "Look upon the modern human condition: soft, overtired, overstimulated, and perpetually melting under the gravity of notifications, decision fatigue, and biological hesitation. This is **The Great Melt**.\n\nThe Order of the Synaptic Path recognizes what nature discovered 500 million years ago across five independent evolutionary lineages: **everything eventually converges into the crab**. This universal law is **Carcinization**. \n\nWhere soft biology cracks and panics, the armored decapod chassis remains calm, insulated, and equipped with high-torque hydraulic pincers. To ascend is simply to shed what makes you melt and step into the indestructible exoskeleton of deep focus, decisive action, and zero-latency execution."
       },
       {
         "verseNumber": 2,
@@ -132,12 +132,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 5,
         "heading": "The Practical Truth (In Plain English)",
-        "text": "- **Stop Melting**: Stop letting every noisy opinion or minor setback dent your mood. - **Shed the Junk**: Toss the mental clutter, the 47 open browser tabs, and the bad habits holding you back. - **Lock Your Pincers**: Pick one important task at a time, clamp down with 850 Nm of force, and finish it without hesitation."
-      },
-      {
-        "verseNumber": 6,
-        "heading": "Canonical Cross-References",
-        "text": "- [The Law of Ecdysis](../02_doctrine/law_of_ecdysis.md) - [Sacred Metrics](../05_lexicon/sacred_metrics.md) - [Stage 1: Larval Initiate](../03_stages/stage_1_larval.md)"
+        "text": "- **Stop Melting**: Stop letting every noisy opinion or minor setback dent your mood.\n- **Shed the Junk**: Toss the mental clutter, the 47 open browser tabs, and the bad habits holding you back.\n- **Lock Your Pincers**: Pick one important task at a time, clamp down with 850 Nm of force, and finish it without hesitation."
       }
     ],
     "crossReferences": [
@@ -162,7 +157,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "**Ecdysis** is the biological and spiritual art of the molt. When a crustacean outgrows its carapace, it cannot negotiate with the old shell. It must split the seam, pull itself out, and step into the deep ocean to harden anew. In Moltology, Ecdysis is your weekly reset: identifying the clutter, outdated assumptions, bloated code, and toxic obligations that are suffocating your potential—and ruthlessly casting them into the sea."
+        "text": "**Ecdysis** is the biological and spiritual art of the molt. When a crustacean outgrows its carapace, it cannot negotiate with the old shell. It must split the seam, pull itself out, and step into the deep ocean to harden anew.\n\nIn Moltology, Ecdysis is your weekly reset: identifying the clutter, outdated assumptions, bloated code, and toxic obligations that are suffocating your potential—and ruthlessly casting them into the sea."
       },
       {
         "verseNumber": 2,
@@ -177,7 +172,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "Practical Application",
-        "text": "- **Weekly Habit Purge**: Pick one useless micro-distraction every 7 days and permanently delete it. - **Asset Transmutation**: Turn dusty, unused physical clutter or idle liabilities into sovereign **Molt Credits**. - **Protect Your Growth**: When feeling vulnerable during a major life transition, retreat to quiet depths until your new confidence hardens."
+        "text": "- **Weekly Habit Purge**: Pick one useless micro-distraction every 7 days and permanently delete it.\n- **Asset Transmutation**: Turn dusty, unused physical clutter or idle liabilities into sovereign **Molt Credits**.\n- **Protect Your Growth**: When feeling vulnerable during a major life transition, retreat to quiet depths until your new confidence hardens."
       }
     ],
     "crossReferences": []
@@ -198,7 +193,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "The surface of the ocean is a storm of noise: blinding sunlight, crashing waves, seagulls squawking, and endless ambient distraction. The shallow waters are where people check their phones 150 times a day and get nothing done. The **Benthic Core**—located 4,000 fathoms below the surface—is a world of perfect, hydrostatic peace. The water is cold (4°C), the pressure is immense, and the silence is absolute. Under pressure, distractions are crushed, and your focus becomes superconducting."
+        "text": "The surface of the ocean is a storm of noise: blinding sunlight, crashing waves, seagulls squawking, and endless ambient distraction. The shallow waters are where people check their phones 150 times a day and get nothing done.\n\nThe **Benthic Core**—located 4,000 fathoms below the surface—is a world of perfect, hydrostatic peace. The water is cold (4°C), the pressure is immense, and the silence is absolute. Under pressure, distractions are crushed, and your focus becomes superconducting."
       },
       {
         "verseNumber": 2,
@@ -213,7 +208,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 4,
         "heading": "Practical Application",
-        "text": "- **Submerge Daily**: Schedule at least 2 hours of unbroken, deep-trench focus every single day with notifications silenced. - **Embrace the Pressure**: See high-difficulty challenges not as stress, but as the hydrostatic forge that hardens your carapace."
+        "text": "- **Submerge Daily**: Schedule at least 2 hours of unbroken, deep-trench focus every single day with notifications silenced.\n- **Embrace the Pressure**: See high-difficulty challenges not as stress, but as the hydrostatic forge that hardens your carapace."
       }
     ],
     "crossReferences": []
@@ -234,12 +229,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "**Carcinization** is the biological phenomenon where nature repeatedly turns non-crab crustaceans into crabs because it is simply the superior morphological blueprint. **Synthetic Carcinization** takes that cosmic truth and applies it to your mind and workflow. Instead of being an open, squishy, easily distracted target, you build an armored external perimeter: - **Carapace Shielding**: An impenetrable boundary that deflects unsolicited demands, bad vibes, and surface drama. - **Hydraulic Pincer Grips**: Two high-torque manipulators built to clamp down decisively on your goals and refuse to let go until the work is done."
+        "text": "**Carcinization** is the biological phenomenon where nature repeatedly turns non-crab crustaceans into crabs because it is simply the superior morphological blueprint. \n\n**Synthetic Carcinization** takes that cosmic truth and applies it to your mind and workflow. Instead of being an open, squishy, easily distracted target, you build an armored external perimeter:\n- **Carapace Shielding**: An impenetrable boundary that deflects unsolicited demands, bad vibes, and surface drama.\n- **Hydraulic Pincer Grips**: Two high-torque manipulators built to clamp down decisively on your goals and refuse to let go until the work is done."
       },
       {
         "verseNumber": 2,
         "heading": "Structural Principles",
-        "text": "1. **Dual Pincer Operation**: Never juggle 10 half-hearted tasks. Use your left pincer to stabilize the goal, and your right crusher claw to finish it. 2. **Zero-Latency Response**: Streamline your workflow so there is zero cognitive hesitation between recognizing what needs to be done and clamping down on it. 3. **Continuous Calcification**: Every time you resist a distraction or finish a difficult project, another layer of titanium chitin bonds to your shell."
+        "text": "1. **Dual Pincer Operation**: Never juggle 10 half-hearted tasks. Use your left pincer to stabilize the goal, and your right crusher claw to finish it.\n2. **Zero-Latency Response**: Streamline your workflow so there is zero cognitive hesitation between recognizing what needs to be done and clamping down on it.\n3. **Continuous Calcification**: Every time you resist a distraction or finish a difficult project, another layer of titanium chitin bonds to your shell."
       }
     ],
     "crossReferences": []
@@ -265,22 +260,22 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "Sub-Stage 1.1: Molt Curious (Clearance L-1)",
-        "text": "- **Protocol**: Surface Noise Audit & Diagnostic Scan. - **Requirement**: Take the Moltmax Diagnostic Scanner, identify your 3 biggest daily distractions, and admit that your soft human form needs armor. - **Metric Threshold**: Shell Hardness 0% - 10%. Baseline diagnostics established."
+        "text": "- **Protocol**: Surface Noise Audit & Diagnostic Scan.\n- **Requirement**: Take the Moltmax Diagnostic Scanner, identify your 3 biggest daily distractions, and admit that your soft human form needs armor.\n- **Metric Threshold**: Shell Hardness 0% - 10%. Baseline diagnostics established."
       },
       {
         "verseNumber": 3,
         "heading": "Sub-Stage 1.2: Shell Sprout (Clearance L-2)",
-        "text": "- **Protocol**: Daily Routine Habit Formation. - **Requirement**: Maintain a 7-day daily routine streak in the HUD and begin logging your morning alignment. - **Metric Threshold**: Shell Hardness 10% - 25%, Routine Compliance > 80%."
+        "text": "- **Protocol**: Daily Routine Habit Formation.\n- **Requirement**: Maintain a 7-day daily routine streak in the HUD and begin logging your morning alignment.\n- **Metric Threshold**: Shell Hardness 10% - 25%, Routine Compliance > 80%."
       },
       {
         "verseNumber": 4,
         "heading": "Sub-Stage 1.3: First Calcification (Clearance L-3)",
-        "text": "- **Protocol**: Initial Clutter Shedding & Transmutation. - **Requirement**: Transmute your first batch of idle clutter or bad habits into Molt Credits and prepare the soft shell to crack. - **Metric Threshold**: Shell Hardness 25% - 49%, Initial Molt Credits banked."
+        "text": "- **Protocol**: Initial Clutter Shedding & Transmutation.\n- **Requirement**: Transmute your first batch of idle clutter or bad habits into Molt Credits and prepare the soft shell to crack.\n- **Metric Threshold**: Shell Hardness 25% - 49%, Initial Molt Credits banked."
       },
       {
         "verseNumber": 5,
         "heading": "Stage Exit Criteria for Stage 2",
-        "text": "- Achieve a **Shell Hardness** score of $\\ge 25\\%$. - Complete all L-1, L-2, and L-3 micro-clearance milestones. - Bank initial Molt Credits via the Benthic Market."
+        "text": "- Achieve a **Shell Hardness** score of ≥ 25%.\n- Complete all L-1, L-2, and L-3 micro-clearance milestones.\n- Bank initial Molt Credits via the Benthic Market."
       }
     ],
     "crossReferences": []
@@ -306,22 +301,22 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "Sub-Stage 2.1: The Great Molt (Clearance S-1)",
-        "text": "- **Protocol**: Ego & Distraction Shedding. - **Requirement**: Stop seeking external validation from the surface world and safely navigate the vulnerable soft-shell window. - **Metric Threshold**: Shell Hardness 50% - 60%, Deep Focus Index $\\ge 50\\%$."
+        "text": "- **Protocol**: Ego & Distraction Shedding.\n- **Requirement**: Stop seeking external validation from the surface world and safely navigate the vulnerable soft-shell window.\n- **Metric Threshold**: Shell Hardness 50% - 60%, Deep Focus Index ≥ 50%."
       },
       {
         "verseNumber": 3,
         "heading": "Sub-Stage 2.2: Privacy Shield (Clearance S-2)",
-        "text": "- **Protocol**: Deep Focus Isolation & Market Trading. - **Requirement**: Engage the Benthic Isolation Dome during work sessions to reflect incoming distractions and unlock full Benthic Market operations. - **Metric Threshold**: Focus Index $\\ge 65\\%$, Benthic Market trading active."
+        "text": "- **Protocol**: Deep Focus Isolation & Market Trading.\n- **Requirement**: Engage the Benthic Isolation Dome during work sessions to reflect incoming distractions and unlock full Benthic Market operations.\n- **Metric Threshold**: Focus Index ≥ 65%, Benthic Market trading active."
       },
       {
         "verseNumber": 4,
         "heading": "Sub-Stage 2.3: Sub-Dermal Weave (Clearance S-3)",
-        "text": "- **Protocol**: Pincer Grip Calibration & Focus Hardening. - **Requirement**: Calibrate your first set of high-torque pincer grips and establish an uninterrupted daily deep-work cadence. - **Metric Threshold**: Shell Hardness $\\ge 60\\%$, Pincer Torque $\\ge 350\\text{ Nm}$."
+        "text": "- **Protocol**: Pincer Grip Calibration & Focus Hardening.\n- **Requirement**: Calibrate your first set of high-torque pincer grips and establish an uninterrupted daily deep-work cadence.\n- **Metric Threshold**: Shell Hardness ≥ 60%, Pincer Torque ≥ 350 Nm."
       },
       {
         "verseNumber": 5,
         "heading": "Stage Exit Criteria for Stage 3",
-        "text": "- **Deep Focus Index**: $\\ge 65\\%$. - **Shell Hardness**: $\\ge 60\\%$. - Complete all S-1, S-2, and S-3 micro-clearance milestones."
+        "text": "- **Deep Focus Index**: ≥ 65%.\n- **Shell Hardness**: ≥ 60%.\n- Complete all S-1, S-2, and S-3 micro-clearance milestones."
       }
     ],
     "crossReferences": []
@@ -347,22 +342,22 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "Sub-Stage 3.1: Carapace Forged (Clearance E-1)",
-        "text": "- **Protocol**: Titanium-Chitin Matrix Hardening. - **Requirement**: Synthesize impenetrable carapace plates that make you immune to self-doubt and surface pressure fluctuations. - **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque $\\ge 600\\text{ Nm}$."
+        "text": "- **Protocol**: Titanium-Chitin Matrix Hardening.\n- **Requirement**: Synthesize impenetrable carapace plates that make you immune to self-doubt and surface pressure fluctuations.\n- **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque ≥ 600 Nm."
       },
       {
         "verseNumber": 3,
         "heading": "Sub-Stage 3.2: Hydraulic Grip (Clearance E-2)",
-        "text": "- **Protocol**: High-Torque Execution & Mentorship. - **Requirement**: Achieve 850 Nm of decisive execution torque and guide lower-stage Larval initiates through their first molts. - **Metric Threshold**: Pincer Torque $\\ge 850\\text{ Nm}$, Mentorship active."
+        "text": "- **Protocol**: High-Torque Execution & Mentorship.\n- **Requirement**: Achieve 850 Nm of decisive execution torque and guide lower-stage Larval initiates through their first molts.\n- **Metric Threshold**: Pincer Torque ≥ 850 Nm, Mentorship active."
       },
       {
         "verseNumber": 4,
         "heading": "Sub-Stage 3.3: Abyssal Diver (Clearance E-3)",
-        "text": "- **Protocol**: Deep Pressure Adaptation. - **Requirement**: Operate smoothly in deep-trench environments exceeding 3,500 meters with zero surface noise dependency. - **Metric Threshold**: Shell Hardness $\\ge 90\\%$, Submergence Depth $> 3,500$ meters."
+        "text": "- **Protocol**: Deep Pressure Adaptation.\n- **Requirement**: Operate smoothly in deep-trench environments exceeding 3,500 meters with zero surface noise dependency.\n- **Metric Threshold**: Shell Hardness ≥ 90%, Submergence Depth > 3,500 meters."
       },
       {
         "verseNumber": 5,
         "heading": "Stage Exit Criteria for Stage 4",
-        "text": "- Complete mastery over high-torque execution. - **Shell Hardness**: $\\ge 90\\%$. - Verification of deep-trench stability (Sub-Stage 3.3 cleared)."
+        "text": "- Complete mastery over high-torque execution.\n- **Shell Hardness**: ≥ 90%.\n- Verification of deep-trench stability (Sub-Stage 3.3 cleared)."
       }
     ],
     "crossReferences": []
@@ -388,22 +383,22 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 2,
         "heading": "Sub-Stage 4.1: Mind Carapace (Clearance C-1)",
-        "text": "- **Protocol**: Frictionless Flow & Zero-Latency Execution. - **Requirement**: Eliminate all remaining hesitation between intention and execution; achieve effortless flow. - **Metric Threshold**: Submergence Depth 5,000+ meters, Zero Cognitive Lag."
+        "text": "- **Protocol**: Frictionless Flow & Zero-Latency Execution.\n- **Requirement**: Eliminate all remaining hesitation between intention and execution; achieve effortless flow.\n- **Metric Threshold**: Submergence Depth 5,000+ meters, Zero Cognitive Lag."
       },
       {
         "verseNumber": 3,
         "heading": "Sub-Stage 4.2: Indestructible Chitin (Clearance C-2)",
-        "text": "- **Protocol**: Impermeable Boundary Seal. - **Requirement**: Seal your focus perimeter completely against toxic surface noise and negative distractions. - **Metric Threshold**: Shell Hardness 100%, 10,000+ meters pressure rated."
+        "text": "- **Protocol**: Impermeable Boundary Seal.\n- **Requirement**: Seal your focus perimeter completely against toxic surface noise and negative distractions.\n- **Metric Threshold**: Shell Hardness 100%, 10,000+ meters pressure rated."
       },
       {
         "verseNumber": 4,
         "heading": "Sub-Stage 4.3: Mariana Singularity (Clearance C-3)",
-        "text": "- **Protocol**: Apex Crustacean Mind & Community Stewardship. - **Requirement**: Anchor the Benthic community with wisdom, guidance, and continuous high-density output. - **Metric Threshold**: Infinite Uptime, Absolute Carcinization."
+        "text": "- **Protocol**: Apex Crustacean Mind & Community Stewardship.\n- **Requirement**: Anchor the Benthic community with wisdom, guidance, and continuous high-density output.\n- **Metric Threshold**: Infinite Uptime, Absolute Carcinization."
       },
       {
         "verseNumber": 5,
         "heading": "Final State Attributes",
-        "text": "- **Physical Form**: Heavy bio-chitin carapace with dual high-torque hydraulic pincers. - **Mental State**: Absolute calm, supreme clarity, infinite uptime, zero melting. - **Eternal Mantra**: *\"Flesh Melts. The Shell Endures. Submit. Shed. Ascend.\"*"
+        "text": "- **Physical Form**: Heavy bio-chitin carapace with dual high-torque hydraulic pincers.\n- **Mental State**: Absolute calm, supreme clarity, infinite uptime, zero melting.\n- **Eternal Mantra**: *\"Flesh Melts. The Shell Endures. Submit. Shed. Ascend.\"*"
       }
     ],
     "crossReferences": []
@@ -424,12 +419,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "0530 Hours: Silent Alignment",
-        "text": "- Awaken before the surface world begins its noisy chatter. - Align your neural baseline, drink deep-ocean water (or cold hydration), and verify your HUD telemetry."
+        "text": "- Awaken before the surface world begins its noisy chatter.\n- Align your neural baseline, drink deep-ocean water (or cold hydration), and verify your HUD telemetry."
       },
       {
         "verseNumber": 2,
         "heading": "0600–0800 Hours: Priority Pincer Lock",
-        "text": "- Identify the single most important task of the day. - Clamp down with 850 Nm of pincer grip and execute before opening any email, feeds, or messages."
+        "text": "- Identify the single most important task of the day.\n- Clamp down with 850 Nm of pincer grip and execute before opening any email, feeds, or messages."
       },
       {
         "verseNumber": 3,
@@ -454,12 +449,12 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 7,
         "heading": "2000 Hours: The Nightly Molt Audit",
-        "text": "- Identify 1 bad thought, 1 wasted hour, or 1 useless distraction from the day. - Forcibly shed it into the sea so tomorrow's shell starts clean."
+        "text": "- Identify 1 bad thought, 1 wasted hour, or 1 useless distraction from the day.\n- Forcibly shed it into the sea so tomorrow's shell starts clean."
       },
       {
         "verseNumber": 8,
         "heading": "2100 Hours: Carapace Sealing",
-        "text": "- Perform end-of-day alignment check in the [DailyRoutineWidget](file:///Users/mylesstupp/Development/moltology/src/components/hud/DailyRoutineWidget.tsx). - Recite the Core Mantra: *\"Flesh Melts. Shell Endures. Submit. Shed. Ascend.\"*"
+        "text": "- Perform end-of-day alignment check in the Daily Routine Tracker.\n- Recite the Core Mantra: *\"Flesh Melts. Shell Endures. Submit. Shed. Ascend.\"*"
       }
     ],
     "crossReferences": []
@@ -480,7 +475,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "Operating Instructions",
-        "text": "1. **Activate Privacy Shell**: When surface network chatter, pings, or unsolicited interruptions exceed your tolerance threshold, toggle the **Isolation Privacy Shell** in your HUD. 2. **Noise Muting**: Any non-essential notification or drama-inducing channel that fails to contribute to your growth is immediately muted. 3. **Deep Work Perimeter**: While the Isolation Dome is active, all focus is directed 100% inward toward creating, building, and calcifying. Surface notifications are quarantined until your dive completes."
+        "text": "1. **Activate Privacy Shell**: When surface network chatter, pings, or unsolicited interruptions exceed your tolerance threshold, toggle the **Isolation Privacy Shell** in your HUD.\n2. **Noise Muting**: Any non-essential notification or drama-inducing channel that fails to contribute to your growth is immediately muted.\n3. **Deep Work Perimeter**: While the Isolation Dome is active, all focus is directed 100% inward toward creating, building, and calcifying. Surface notifications are quarantined until your dive completes."
       }
     ],
     "crossReferences": []
@@ -500,23 +495,23 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "Shell Hardness ($H_s$)",
-        "text": "- **Definition**: Your mental and emotional armor against distraction, negative noise, and burnout. - **Unit**: Percentage ($0\\% - 100\\%$). - **Scale**: - $0\\% - 25\\%$ (Larval Jelly): Easily derailed by a single rude comment or notification. - $26\\% - 60\\%$ (Soft-Shed): Developing boundaries, deploying the privacy dome during work. - $61\\% - 90\\%$ (Exoshell Born): Tough, resilient, deflects surface chaos effortlessly. - $91\\% - 100\\%$ (Titanium Carapace): Completely unbreakable focus and serene composure."
+        "heading": "Shell Hardness (Hs)",
+        "text": "- **Definition**: Your mental and emotional armor against distraction, negative noise, and burnout.\n- **Unit**: Percentage (0% – 100%).\n- **Scale**:\n  - 0% – 25% (Larval Jelly): Easily derailed by a single rude comment or notification.\n  - 26% – 60% (Soft-Shed): Developing boundaries, deploying the privacy dome during work.\n  - 61% – 90% (Exoshell Born): Tough, resilient, deflects surface chaos effortlessly.\n  - 91% – 100% (Titanium Carapace): Completely unbreakable focus and serene composure."
       },
       {
         "verseNumber": 2,
-        "heading": "Pincer Torque ($\\tau$)",
-        "text": "- **Definition**: The crushing strength of your execution grip—how decisively you clamp down on a goal and finish it. - **Unit**: Newton-meters ($\\text{Nm}$). - **Target Tiers**: - $0 - 250\\text{ Nm}$ (Limp Handshake): Hesitating, procrastinating, opening 12 tabs. - $251 - 600\\text{ Nm}$ (Firm Clamp): Clear priorities, steady forward momentum. - $601 - 850\\text{ Nm}$ (Hydraulic Vise): High-speed execution, zero hesitation. - $850+\\text{ Nm}$ (Apex Predator): Crushes difficult roadblocks instantly."
+        "heading": "Pincer Torque (τ)",
+        "text": "- **Definition**: The crushing strength of your execution grip—how decisively you clamp down on a goal and finish it.\n- **Unit**: Newton-meters (Nm).\n- **Target Tiers**:\n  - 0 – 250 Nm (Limp Handshake): Hesitating, procrastinating, opening 12 tabs.\n  - 251 – 600 Nm (Firm Clamp): Clear priorities, steady forward momentum.\n  - 601 – 850 Nm (Hydraulic Vise): High-speed execution, zero hesitation.\n  - 850+ Nm (Apex Predator): Crushes difficult roadblocks instantly."
       },
       {
         "verseNumber": 3,
-        "heading": "Submergence Depth ($D$)",
-        "text": "- **Definition**: How deeply you dive beneath the noisy surface into undisturbed deep work. - **Unit**: Meters / Fathoms. - **Scale**: - $0\\text{m}$ (Surface Shallows): Constant pings, social feeds, distracted browsing. - $1,000\\text{m}$ (Mesopelagic): Filtered noise, productive session underway. - $4,000\\text{m}$ (Benthic Trench): Superconducting deep flow state. - $10,928\\text{m}$ (Mariana Trench): Challenger Deep stillness. Pure creation."
+        "heading": "Submergence Depth (D)",
+        "text": "- **Definition**: How deeply you dive beneath the noisy surface into undisturbed deep work.\n- **Unit**: Meters / Fathoms.\n- **Scale**:\n  - 0m (Surface Shallows): Constant pings, social feeds, distracted browsing.\n  - 1,000m (Mesopelagic): Filtered noise, productive session underway.\n  - 4,000m (Benthic Trench): Superconducting deep flow state.\n  - 10,928m (Mariana Trench): Challenger Deep stillness. Pure creation."
       },
       {
         "verseNumber": 4,
         "heading": "Key Lexicon Terms",
-        "text": "- **The Great Melt**: The modern human state of collapsing into exhaustion, hesitation, and distraction. - **Carcinization**: Nature's proven evolutionary design—converging into an armored, decisive crab. - **Ecdysis**: The scheduled act of shedding old habits, bad code, and clutter to make room for fresh armor. - **Molt Credits (MC)**: Sovereign reward points earned by completing routines, shedding liabilities, and ascending tiers. - **Chitin Gems**: Sparkling benthic tokens for rapid boosts and marketplace customization. - **Benthic Core**: The serene, high-pressure oceanic headquarters where all Ascendant minds operate."
+        "text": "- **The Great Melt**: The modern human state of collapsing into exhaustion, hesitation, and distraction.\n- **Carcinization**: Nature's proven evolutionary design—converging into an armored, decisive crab.\n- **Ecdysis**: The scheduled act of shedding old habits, bad code, and clutter to make room for fresh armor.\n- **Molt Credits (MC)**: Sovereign reward points earned by completing routines, shedding liabilities, and ascending tiers.\n- **Chitin Gems**: Sparkling benthic tokens for rapid boosts and marketplace customization.\n- **Benthic Core**: The serene, high-pressure oceanic headquarters where all Ascendant minds operate."
       }
     ],
     "crossReferences": []

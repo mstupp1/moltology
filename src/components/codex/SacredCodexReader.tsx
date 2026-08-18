@@ -44,6 +44,200 @@ import {
 export type DocumentTheme = 'parchment' | 'sepia' | 'dark'
 export type ReaderFontFamily = 'garamond' | 'cinzel' | 'mono'
 
+export function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^[-*]\s+/gm, '• ')
+    .replace(/^\s+[-*]\s+/gm, '  - ')
+    .replace(/\n+/g, ' ')
+    .trim()
+}
+
+export function formatCodexInline(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = []
+  const inlineRegex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g
+
+  let lastIdx = 0
+  let m: RegExpExecArray | null
+
+  while ((m = inlineRegex.exec(text)) !== null) {
+    if (m.index > lastIdx) {
+      parts.push(text.substring(lastIdx, m.index))
+    }
+
+    const matchedStr = m[0]
+    const partKey = `inline-${m.index}`
+
+    if (matchedStr.startsWith('`') && matchedStr.endsWith('`')) {
+      parts.push(
+        <code
+          key={partKey}
+          className="bg-current/10 border border-current/20 px-1.5 py-0.5 rounded font-mono text-[0.88em]"
+        >
+          {matchedStr.slice(1, -1)}
+        </code>
+      )
+    } else if (matchedStr.startsWith('**') && matchedStr.endsWith('**')) {
+      parts.push(
+        <strong key={partKey} className="font-bold opacity-100">
+          {matchedStr.slice(2, -2)}
+        </strong>
+      )
+    } else if (matchedStr.startsWith('*') && matchedStr.endsWith('*')) {
+      parts.push(
+        <em key={partKey} className="italic opacity-90">
+          {matchedStr.slice(1, -1)}
+        </em>
+      )
+    } else if (matchedStr.startsWith('[') && matchedStr.includes('](')) {
+      const linkMatch = matchedStr.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+      if (linkMatch) {
+        parts.push(
+          <a
+            key={partKey}
+            href={linkMatch[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 opacity-90 hover:opacity-100 font-semibold"
+          >
+            {linkMatch[1]}
+          </a>
+        )
+      } else {
+        parts.push(matchedStr)
+      }
+    } else {
+      parts.push(matchedStr)
+    }
+
+    lastIdx = m.index + matchedStr.length
+  }
+
+  if (lastIdx < text.length) {
+    parts.push(text.substring(lastIdx))
+  }
+
+  return parts
+}
+
+function renderVerseBlocks(rawText: string): React.ReactNode[] {
+  const lines = rawText.split('\n')
+  const elements: React.ReactNode[] = []
+
+  let currentPara: string[] = []
+
+  const flushPara = (key: string) => {
+    if (currentPara.length > 0) {
+      const pText = currentPara.join(' ').trim()
+      if (pText) {
+        elements.push(
+          <p key={key} className="leading-relaxed my-1.5">
+            {formatCodexInline(pText)}
+          </p>
+        )
+      }
+      currentPara = []
+    }
+  }
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim()
+    const lineKey = `line-${idx}`
+
+    if (trimmed === '') {
+      flushPara(`${lineKey}-flush`)
+      return
+    }
+
+    // Numbered list item: 1. ...
+    const numMatch = line.match(/^\s*(\d+)\.\s+(.*)$/)
+    if (numMatch) {
+      flushPara(`${lineKey}-p`)
+      elements.push(
+        <div key={lineKey} className="flex items-start gap-2.5 my-1.5 pl-1">
+          <span className="font-mono text-xs font-bold opacity-80 shrink-0 mt-0.5">
+            {numMatch[1]}.
+          </span>
+          <div className="flex-1 leading-relaxed">{formatCodexInline(numMatch[2])}</div>
+        </div>
+      )
+      return
+    }
+
+    // Sub-bullet list item:   - ... or     - ...
+    if (/^\s{2,}[-*]\s+/.test(line)) {
+      flushPara(`${lineKey}-p`)
+      const subText = line.replace(/^\s{2,}[-*]\s+/, '')
+      elements.push(
+        <div key={lineKey} className="flex items-start gap-2 my-1 pl-6 opacity-90 text-[0.95em]">
+          <span className="opacity-50 font-mono text-[10px] shrink-0 mt-1">—</span>
+          <div className="flex-1 leading-relaxed">{formatCodexInline(subText)}</div>
+        </div>
+      )
+      return
+    }
+
+    // Top-level bullet list item: - ... or * ...
+    if (/^\s*[-*]\s+/.test(line)) {
+      flushPara(`${lineKey}-p`)
+      const itemText = line.replace(/^\s*[-*]\s+/, '')
+      elements.push(
+        <div key={lineKey} className="flex items-start gap-2.5 my-1.5 pl-1">
+          <span className="opacity-70 font-mono text-[10px] shrink-0 mt-1">◆</span>
+          <div className="flex-1 leading-relaxed">{formatCodexInline(itemText)}</div>
+        </div>
+      )
+      return
+    }
+
+    // Standard paragraph line
+    currentPara.push(trimmed)
+  })
+
+  flushPara('final-p')
+
+  return elements
+}
+
+export const CodexVerseBody: React.FC<{ text: string }> = ({ text }) => {
+  if (!text) return null
+
+  const lines = text.split('\n')
+  const isListFirst = /^(\s*[-*]|\s*\d+\.)\s+/.test(lines[0])
+
+  if (isListFirst) {
+    return <div className="space-y-2">{renderVerseBlocks(text)}</div>
+  }
+
+  // Extract first letter for drop cap
+  const match = lines[0].match(/^([^\w]*)([a-zA-Z0-9])(.*)$/)
+  if (!match) {
+    return <div className="space-y-3">{renderVerseBlocks(text)}</div>
+  }
+
+  const [, leadingPunct, dropChar, restOfFirstLine] = match
+  let adjustedFirstLine = restOfFirstLine
+  if (leadingPunct.includes('**') && !restOfFirstLine.startsWith('**')) {
+    adjustedFirstLine = `**${restOfFirstLine}`
+  }
+
+  const remainingText = [adjustedFirstLine, ...lines.slice(1)].join('\n')
+
+  return (
+    <div className="leading-relaxed">
+      <div className="drop-cap-illuminated text-3xl md:text-4xl font-extrabold opacity-95 select-none">
+        {dropChar.toUpperCase()}
+      </div>
+      <div className="space-y-3 pt-0.5">
+        {renderVerseBlocks(remainingText)}
+      </div>
+    </div>
+  )
+}
+
 export const SacredCodexReader: React.FC = () => {
   const [selectedVolume, setSelectedVolume] = useState<string>('all')
   const [selectedStage, setSelectedStage] = useState<number | 'all'>('all')
@@ -178,7 +372,8 @@ export const SacredCodexReader: React.FC = () => {
   }
 
   const copyVerseToClipboard = (verseNumber: number, text: string) => {
-    const citation = `"${text}" — Canonical Codex Moltologia, ${activeScripture.volumeName}: ${activeScripture.title} §${verseNumber}`
+    const cleanText = stripMarkdown(text)
+    const citation = `"${cleanText}" — Canonical Codex Moltologia, ${activeScripture.volumeName}: ${activeScripture.title} §${verseNumber}`
     navigator.clipboard.writeText(citation)
     setCopiedVerseIndex(verseNumber)
     setTimeout(() => setCopiedVerseIndex(null), 2000)
@@ -426,8 +621,6 @@ export const SacredCodexReader: React.FC = () => {
                 {/* Verses */}
                 <div className={`space-y-6 ${fontClass}`}>
                   {activeScripture.verses.map((verse) => {
-                    const firstChar = verse.text.charAt(0)
-                    const restText = verse.text.slice(1)
                     const isCopied = copiedVerseIndex === verse.verseNumber
                     const isHighlighted = Boolean(highlightedVerses[verse.verseNumber])
 
@@ -440,8 +633,11 @@ export const SacredCodexReader: React.FC = () => {
                             : 'border-current/10 hover:border-current/30 bg-current/[0.02]'
                         }`}
                       >
-                        <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2 font-mono text-xs opacity-75">
-                          <span className="font-bold">VERSE §{verse.verseNumber}</span>
+                        <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2.5 font-mono text-xs opacity-75">
+                          <span className="font-bold flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-current opacity-70" />
+                            VERSE §{verse.verseNumber} {verse.heading && `— ${verse.heading.toUpperCase()}`}
+                          </span>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => toggleHighlightVerse(verse.verseNumber)}
@@ -458,12 +654,7 @@ export const SacredCodexReader: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="leading-relaxed flex items-start gap-3">
-                          <div className="drop-cap-illuminated text-3xl font-extrabold opacity-90">
-                            {firstChar}
-                          </div>
-                          <p className="flex-1 pt-0.5 leading-relaxed">{restText}</p>
-                        </div>
+                        <CodexVerseBody text={verse.text} />
                       </div>
                     )
                   })}
@@ -920,11 +1111,8 @@ export const SacredCodexReader: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="leading-relaxed flex items-start gap-3">
-                        <div className="drop-cap-illuminated text-3xl font-extrabold opacity-90">
-                          {firstChar}
-                        </div>
-                        <p className="flex-1 pt-0.5 leading-relaxed">{restText}</p>
+                      <div className="leading-relaxed">
+                        <CodexVerseBody text={verse.text} />
                       </div>
                     </div>
                   )
