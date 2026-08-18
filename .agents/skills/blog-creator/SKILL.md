@@ -96,17 +96,25 @@ Rotate across distinct liturgical and scientific personas:
 4. **Mode 4: Macro Nanotech Microscopy**: Silicon-carbide crystal lattices, microfluidic cooling channels, quantum well arrays.
 5. **Mode 5: Cinematic Industrial Surveillance**: Submersible drone telemetry feeds, foggy deep trench docking airlocks, pressurized habitat portals.
 
-#### Visual Prompt Rules & Tooling (Antigravity generate_image Only)
-* **Exclusive Built-in Tooling**: All images (cover and inline figures) MUST be created using Antigravity's built-in `generate_image` tool. Do NOT use the Gemini API, Imagen endpoints, or external image scripts.
-* **Clean Iconic Focal Points**: Focus on a single heroic subject (e.g. a sleek titanium-chitin robotic grasper, an abyssal pressurized server pod, an elegant underwater laboratory station).
-* **Ban Fake HUD Overkill**: Avoid cluttered particle meshes, illegible micro-text, fake targeting reticles, multiple overlapping wireframe spheres, or chaotic wire jungles.
-* **Atmospheric Depth**: Prioritize volumetric lighting, obsidian/slate textures, deep ocean blues, and restrained cyan/amber illumination.
+#### 1. Cover Hero Image (16:9)
+* **Standalone 3D Cinematic Render**: Focus on a single heroic subject (e.g. an abyssal pressurized server pod, wafer-scale silicon architecture, optical laser waveguides).
+* **Zero Text Overlays**: Keep completely free of HUD cards, text boxes, or titles.
+* **AspectRatio**: `16:9` generated via `generate_image`.
 
-1. **Cover Hero Image (16:9)**:
-   * Use `generate_image` with AspectRatio `16:9`.
-   * Prompt style tailored to the selected Visual Mode.
-2. **Inline Supporting Figures (1 to 2 images, 16:9)**:
-   * Generate clean supporting visuals specifically depicting the technical architecture, deployment environment, or comparative blueprint using `generate_image`.
+#### 2. Inline Supporting Figures (2 Images, 16:9 — Mockup-to-AI Polish Pipeline)
+Inline supporting figures (Figure 1 and Figure 2) visually explain the core engineering breakthroughs, architectural trade-offs, and hardware systems in the article.
+
+Follow the **2-Stage Mockup-to-AI Polish Pipeline** for inline figures:
+1. **Stage 1 (Low-Density Canvas Mockup)**:
+   * Build a lean, high-contrast canvas composition representing the architecture (e.g. side-by-side comparison cards or subsea telemetry callouts).
+   * **Strict Purposefulness Rule**: Only include diagrams, metrics, and callouts that **directly explain the core engineering point of the article**. Do NOT add decorative widgets, faux-math noise, or redundant text boxes.
+   * Keep text concise and bold (stark numbers, key architectural names, high-contrast badges).
+2. **Stage 2 (Antigravity AI Polish via `generate_image`)**:
+   * Feed the canvas mockup into `generate_image` with `AspectRatio: '16:9'` and `ImagePaths: ["/path/to/fig_mockup.jpg"]`.
+   * The AI model transforms the 2D mockup into a cohesive, photorealistic 3D schematic—integrating holographic glassmorphic cards, glowing optical waveguides, ambient benthic lighting, and volumetric depth.
+3. **Figure Roles**:
+   * **Figure 1 (The Architectural Bottleneck & Solution)**: Exploded schematic or side-by-side comparison highlighting the friction of the legacy system vs. the benthic breakthrough (e.g., Dense MHA vs. Compressed MLA).
+   * **Figure 2 (The Deployed System / Telemetry Matrix)**: Physical deployment environment, subsea pressure pod, or tiered data storage architecture demonstrating real-world execution.
 
 ---
 
