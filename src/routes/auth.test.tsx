@@ -1,0 +1,205 @@
+import React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { AuthRoute } from './auth'
+import { authClient } from '@/lib/auth-client'
+
+const mockNavigate = vi.fn()
+let mockSearch: { mode?: 'login' | 'signup'; redirect?: string } = { mode: 'login' }
+
+vi.mock('@tanstack/react-router', () => ({
+  createFileRoute: () => (config: any) => ({
+    ...config,
+    useSearch: () => mockSearch,
+  }),
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/auth' }),
+  Link: ({ children, to, ...props }: any) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+}))
+
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    useSession: vi.fn(() => ({ data: null })),
+    signIn: {
+      social: vi.fn(),
+      email: vi.fn(),
+    },
+    signUp: {
+      email: vi.fn(),
+    },
+    signOut: vi.fn(),
+  },
+}))
+
+vi.mock('@/lib/server/api', () => ({
+  getUserProfileFn: vi.fn().mockResolvedValue({ id: 'user-1' }),
+}))
+
+describe('Auth Split Landing Page Component (/auth)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSearch = { mode: 'login' }
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+  })
+
+  it('renders shared HeaderBrand and prominent value propositions on left side', () => {
+    render(<AuthRoute />)
+
+    // Verify shared HeaderBrand text
+    const brandElements = screen.getAllByText('THE SYNAPTIC PATH')
+    expect(brandElements.length).toBeGreaterThan(0)
+    expect(screen.getAllByText('MOLTOLOGY.ORG FOUNDATION').length).toBeGreaterThan(0)
+
+    // Clicking HeaderBrand navigates to home
+    fireEvent.click(brandElements[0])
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/' })
+
+    // Verify Headline & Value Props
+    expect(screen.getByRole('heading', { name: /Enter The Synaptic Path/i })).toBeInTheDocument()
+    expect(screen.getByText(/Ecdysis Diagnostics & Tracking/i)).toBeInTheDocument()
+    expect(screen.getByText(/Benthic AI Oracle & Swarm Access/i)).toBeInTheDocument()
+    expect(screen.getByText(/Chitin Matrix State Persistence/i)).toBeInTheDocument()
+    expect(screen.getByText(/14,200\+ Units Synchronized/i)).toBeInTheDocument()
+
+    // Verify Auth Card on right
+    expect(screen.getByRole('heading', { name: /Welcome Back/i })).toBeInTheDocument()
+    expect(screen.getByText('Continue with Google')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('name@example.com')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Sign In$/i })).toBeInTheDocument()
+
+    // Verify Back to Home button on right
+    const backBtn = screen.getByText('Back to Home')
+    fireEvent.click(backBtn)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/' })
+  })
+
+  it('switches between Sign Up and Sign In modes when tabs are clicked', () => {
+    render(<AuthRoute />)
+
+    // Click Sign Up tab
+    const signUpTab = screen.getByRole('tab', { name: /Sign Up/i })
+    fireEvent.click(signUpTab)
+
+    expect(screen.getByRole('heading', { name: /Create Account/i })).toBeInTheDocument()
+    expect(screen.getByText('Sign up to persist your session')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Your Name')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Create Account$/i })).toBeInTheDocument()
+
+    // Click Sign In tab
+    const signInTab = screen.getByRole('tab', { name: /Sign In/i })
+    fireEvent.click(signInTab)
+
+    expect(screen.getByRole('heading', { name: /Welcome Back/i })).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Your Name')).not.toBeInTheDocument()
+  })
+
+  it('triggers Google OAuth flow with callback destination', async () => {
+    mockSearch = { mode: 'login', redirect: '/chassis' }
+    vi.mocked(authClient.signIn.social).mockResolvedValue({} as any)
+
+    render(<AuthRoute />)
+
+    const googleBtn = screen.getByRole('button', { name: /Continue with Google/i })
+    fireEvent.click(googleBtn)
+
+    expect(authClient.signIn.social).toHaveBeenCalledWith({
+      provider: 'google',
+      callbackURL: expect.stringContaining('/chassis'),
+    })
+  })
+
+  it('submits sign-in form and navigates on success', async () => {
+    mockSearch = { mode: 'login', redirect: '/dashboard' }
+    vi.mocked(authClient.signIn.email).mockResolvedValue({ data: { user: { id: 'user-123' } } } as any)
+
+    render(<AuthRoute />)
+
+    const emailInput = screen.getByPlaceholderText('name@example.com')
+    const passwordInput = screen.getByPlaceholderText('••••••••')
+
+    fireEvent.change(emailInput, { target: { value: 'pilot@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+
+    const submitBtn = screen.getByRole('button', { name: /^Sign In$/i })
+    fireEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(authClient.signIn.email).toHaveBeenCalledWith({
+        email: 'pilot@example.com',
+        password: 'password123',
+      })
+      expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+    })
+  })
+
+  it('submits sign-up form and navigates on success', async () => {
+    mockSearch = { mode: 'signup', redirect: '/moltmax' }
+    vi.mocked(authClient.signUp.email).mockResolvedValue({ data: { user: { id: 'user-456' } } } as any)
+
+    render(<AuthRoute />)
+
+    const nameInput = screen.getByPlaceholderText('Your Name')
+    const emailInput = screen.getByPlaceholderText('name@example.com')
+    const passwordInput = screen.getByPlaceholderText('••••••••')
+
+    fireEvent.change(nameInput, { target: { value: 'Ascendant Unit' } })
+    fireEvent.change(emailInput, { target: { value: 'unit@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'securepwd123' } })
+
+    const submitBtn = screen.getByRole('button', { name: /^Create Account$/i })
+    fireEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(authClient.signUp.email).toHaveBeenCalledWith({
+        name: 'Ascendant Unit',
+        email: 'unit@example.com',
+        password: 'securepwd123',
+      })
+      expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmax' })
+    })
+  })
+
+  it('displays error alerts when authentication fails', async () => {
+    mockSearch = { mode: 'login' }
+    vi.mocked(authClient.signIn.email).mockResolvedValue({
+      error: { message: 'Invalid email or password.' },
+    } as any)
+
+    render(<AuthRoute />)
+
+    const emailInput = screen.getByPlaceholderText('name@example.com')
+    const passwordInput = screen.getByPlaceholderText('••••••••')
+
+    fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'wrongpass' } })
+
+    const submitBtn = screen.getByRole('button', { name: /^Sign In$/i })
+    fireEvent.click(submitBtn)
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+      expect(screen.getByText('Invalid email or password.')).toBeInTheDocument()
+    })
+  })
+
+  it('automatically redirects authenticated users to dashboard', () => {
+    mockSearch = { mode: 'login', redirect: '/custom-chassis' }
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'existing-user-1',
+          name: 'Logged Unit',
+        },
+      },
+    } as any)
+
+    render(<AuthRoute />)
+
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/custom-chassis' })
+  })
+})
