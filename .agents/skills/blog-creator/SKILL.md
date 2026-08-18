@@ -197,54 +197,88 @@ Append the newly published article into `content/news/blog-history.json`:
 
 ---
 
-### Step 6: Multi-Channel Social Distribution & Character Compositing
+### Step 6: Multi-Channel Social Distribution (Mockup-to-AI Polish Pipeline)
 
-Create high-conversion accompanying social assets and publish them to Instagram via Zernio.
+Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) and publish them to Instagram via Zernio.
 
-#### 1. Character Cutout Compositing on 4:5 Carousel Slides
-You can stamp the homepage cartoon characters onto any slide before uploading:
+#### 1. The 2-Stage Carousel Creation Architecture
 
-```typescript
-import { overlayCharacterOnImage } from 'scripts/lib/character-overlay'
+To achieve studio-grade, photorealistic 3D social carousels with cohesive lighting, tactile character integration, and readable HUD telemetry, follow this 2-stage pipeline:
 
-// Slide 1: Hero hook with top-right peeking lobster
-await overlayCharacterOnImage('slide1_raw.jpg', 'slide1_final.jpg', {
-  character: 'lobster_peek',
-  position: 'top-right-peek',
-  scalePercent: 28,
-})
-
-// Slide 2: Stats breakdown with bottom-left pointing crab
-await overlayCharacterOnImage('slide2_raw.jpg', 'slide2_final.jpg', {
-  character: 'crab_stats',
-  position: 'bottom-left',
-  scalePercent: 30,
-})
-
-// Slide 3: CTA card with bottom-right pointing hero lobster
-await overlayCharacterOnImage('slide3_raw.jpg', 'slide3_final.jpg', {
-  character: 'lobster_pointing',
-  position: 'bottom-right',
-  scalePercent: 32,
-})
+```
+┌────────────────────────────────────────┐
+│  Stage 1: Low-Density Canvas Mockup    │
+│  - Big typography & stark numbers      │
+│  - Streamlined, non-dense cards        │
+│  - Character cutout placement          │
+└──────────────────┬─────────────────────┘
+                   │
+                   ▼ (ImagePaths: [mockup.jpg, style_guide.jpg])
+┌────────────────────────────────────────┐
+│  Stage 2: Antigravity AI Image Polish  │
+│  - 3D oceanic lighting & depth         │
+│  - Glassmorphic glowing HUD panels     │
+│  - Seamless character ambient shading  │
+└────────────────────────────────────────┘
 ```
 
-#### 2. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
+#### 2. Canonical Visual Style Guide (`content/social/style_guide_carousel_slide1.jpg`)
+
+All carousel slides must follow the unified MoltNation HUD visual language:
+* **Background Atmosphere**: Deep-sea benthic abyss (nitrogen pods, wafer architectures, laser waveguides, or photonic hubs) with dark teal/slate gradients, ambient underwater caustics, and glowing conduit cables.
+* **Floating Glassmorphic HUD Cards**: Dark translucent rounded glass (`rgba(4, 18, 26, 0.85)`) with glowing 2px neon borders:
+  * **Alert / Legacy Bottleneck**: Crimson Red (`#EF4444` / `rgba(239, 68, 68, 0.85)`).
+  * **Solution / Benthic Ecdysis**: High-Torque Neon Cyan (`#00FFE6` / `rgba(0, 255, 230, 0.9)`).
+  * **Data Matrix / CMX Storage**: Deep Sky Blue (`#38BDF8`).
+* **Subtle Telemetry Schematics**: Faint holographic circuit lines and wireframe telemetry graphs in card corners (low opacity, 20-30%).
+* **Typography Hierarchy**:
+  * **Category Badge (Top Left)**: Rounded pill badge with glowing cyan border (`bold 14px monospace`).
+  * **Main Headline**: Heavy bold geometric sans-serif (white for context, cyan `#00FFE6` for the hook/solution, max 3 lines).
+  * **Sub-Headline**: 1 crisp, high-contrast sentence (`#94A3B8` / `#E2E8F0`).
+  * **Hero Stats**: Giant, bold monospace display figures (`78.4 GB`, `-85.1%`, `94.2%`) in stark white (`#FFFFFF`).
+  * **Card Explanations**: Max 2 short lines of clean, concise text (`#CBD5E1`).
+* **3D Tactile Characters**: Pixar-style 3D mascots (Hero Lobster, Peeking Lobster, Construction Crabs) rendered with ambient rim lighting and soft contact shadows.
+* **Branding Footer**:
+  * Left: `SWIPE FOR HARD DATA ➔` or `SWIPE FOR ASCENSION PROTOCOL ➔` in muted silver (`#64748B`).
+  * Right: MoltNation emblem + `MOLTNATION [NEWS ★]` pill badge.
+
+#### 3. Image Generation Tooling & Prompts (`generate_image`)
+
+When running Stage 2 AI polish via `generate_image`, pass BOTH the slide mockup AND the canonical style guide in `ImagePaths`:
+
+```json
+{
+  "AspectRatio": "3:4",
+  "ImageName": "polished_carousel_slide2",
+  "ImagePaths": [
+    "/absolute/path/to/mockup_slide2.jpg",
+    "/Users/mylesstupp/Development/moltology/content/social/style_guide_carousel_slide1.jpg"
+  ],
+  "Prompt": "A high-end, ultra-polished 3D cinematic sci-fi infographic slide. Use Image 1 as the exact structural layout, text content, metric values, and character placement. Match the exact visual style, glassmorphic HUD cards, glowing neon borders (cyan #00FFE6, crimson #EF4444, sky blue #38BDF8), typography hierarchy, volumetric underwater benthic atmosphere, and 3D character rendering quality from Image 2."
+}
+```
+
+#### 4. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
 * **The Hook**: Lead with an intriguing premise and a striking statistic.
 * **Drop "Dispatch"**: Do not refer to posts as "dispatches" on social channels. Use natural, compelling language (*"Why AI is breaking out of the screen"*, *"The 500MW problem nobody is talking about"*).
 * **Succinct Value Bullets**: Provide 2-3 fast, high-impact takeaways backed by stats (e.g. "+272% YoY surge", "120 Hz direct torque loop", "21.4 PB/s memory bandwidth").
-* **Stronger CTA**: Give a compelling reason to visit the site (*"See the full teardown and hardware schematics at moltology.org. Link in bio."*).
+* **Stronger CTA**: Give a compelling reason to visit the site (*"See the full teardown and hardware schematics at moltology.org/news. Link in bio."*).
 
-#### 3. Mandatory AI-Generated Media Labeling
+#### 5. Mandatory AI-Generated Media Labeling
 * **Strict Tenet**: Always enable `isAiGenerated: true` for Instagram/Meta in `platformSpecificData`.
 
-#### 4. Upload Assets to Neon S3 & Publish via Zernio
-1. Upload cropped and composited 4:5 slides using `uploadLocalFileToS3` (or `scripts/upload-asset.ts`).
+#### 6. Auto-Format to 4:5, Upload Assets to Neon S3 & Publish via Zernio
+1. **Auto-Format to Exact Instagram 4:5 (1080x1350)**:
+   Because AI generation tools output 3:4 at `764x1024` (ratio `0.746`, slightly below Instagram's minimum `0.750`–`0.800` threshold), run the auto-formatter:
+   ```bash
+   npx tsx scripts/format-carousel-to-4-5.ts
+   ```
+   *(This scales and centers the images to standard `1080x1350` / 4:5 with 0.80 ratio and uploads them to S3).*
 2. Post to Instagram via Zernio `posts_create` with:
    * `platform`: `"instagram"`
    * `account_id`: `"6a7f7f0777555aae01d99b54"`
-   * `publish_now`: `true`
+   * `publish_now`: `true` (or `is_draft: true` when saving drafts)
    * `media_urls`: Comma-separated S3 URLs.
    * `platformSpecificData`: `{ "isAiGenerated": true, "firstComment": "<URL + #hashtags>" }`
 3. Add a first comment on the post with the article URL and clean hashtags using `comments_reply_to_inbox_post`.
-4. Update `relatedReelIds` or social cross-references in `content/news/blog-history.json`.
+4. Update `instagramPostId` (and `instagramDraftPostId`) in `content/news/blog-history.json`.
