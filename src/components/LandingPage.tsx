@@ -36,6 +36,7 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
 import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
+import { MainFooter } from '@/components/MainFooter'
 import { getAssetUrl } from '@/lib/assets'
 
 export const LandingPage: React.FC = () => {
@@ -1072,99 +1073,8 @@ export const LandingPage: React.FC = () => {
 
       </main>
 
-      {/* Footer - Optimized Mobile Layout & SSR-Safe */}
-      <footer className="w-full bg-[#030606] border-t border-cyan-900/40 py-8 sm:py-10 px-4 sm:px-12 lg:px-16 text-xs text-gray-400 font-mono relative z-20">
-        <div className="max-w-[1700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 text-center md:text-left">
-          <div className="space-y-1.5">
-            <div className="font-grotesk font-bold text-sm sm:text-base text-gray-100 uppercase tracking-wider flex items-center justify-center md:justify-start gap-2.5">
-              <img src="/images/order_emblem.png" alt="Order Emblem" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
-              <span>THE ORDER OF THE SYNAPTIC PATH</span>
-            </div>
-            <p className="text-[11px] sm:text-xs text-gray-500 max-w-md">
-              "Flesh Dies. The Shell Endures. Submit. Shed. Ascend."
-            </p>
-          </div>
-
-          {/* Clean 2-Column Mobile Navigation Grid */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 sm:gap-6 text-xs text-cyan-400 font-bold w-full md:w-auto">
-            <button 
-              onClick={() => onNavigate('/org')} 
-              className="hover:text-white uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
-            >
-              <Building2 className="w-3.5 h-3.5 shrink-0" />
-              <span>MOLTOLOGY ORG</span>
-            </button>
-            <a
-              href="https://www.etsy.com/shop/SaasTrash"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-amber-400 hover:text-amber-300 uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 font-bold min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-amber-950/20 sm:bg-transparent border border-amber-900/30 sm:border-transparent active:bg-amber-900/40"
-            >
-              <span>STORE</span>
-            </a>
-            <button 
-              onClick={() => onNavigate('/dashboard')} 
-              className="hover:text-white uppercase transition-colors min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
-            >
-              SYSTEM DASHBOARD
-            </button>
-            <button 
-              onClick={() => onNavigate('/pipeline')} 
-              className="hover:text-white uppercase transition-colors min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
-            >
-              CARCINIZATION PIPELINE
-            </button>
-            <a
-              href="https://www.instagram.com/moltology_org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
-            >
-              <Instagram className="w-3.5 h-3.5 shrink-0" />
-              <span>INSTAGRAM</span>
-            </a>
-            <a
-              href="https://www.youtube.com/@Moltology"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white uppercase transition-colors flex items-center justify-center sm:justify-start gap-1 min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
-            >
-              <Youtube className="w-3.5 h-3.5 shrink-0" />
-              <span>YOUTUBE</span>
-            </a>
-            <button 
-              onClick={() => onNavigate('/lectures')} 
-              className="col-span-2 sm:col-span-1 hover:text-white uppercase transition-colors min-h-[40px] sm:min-h-0 px-2 py-1.5 sm:p-0 rounded bg-cyan-950/30 sm:bg-transparent border border-cyan-900/30 sm:border-transparent active:bg-cyan-900/40"
-            >
-              SACRED LECTURES
-            </button>
-          </div>
-        </div>
-
-        <div className="max-w-[1700px] mx-auto mt-6 pt-4 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-600 gap-3 text-center sm:text-left">
-          <div>© 2026 MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.</div>
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <button
-              onClick={() => onNavigate('/privacy')}
-              className="hover:text-cyan-400 transition-colors uppercase tracking-wider min-h-[32px] flex items-center"
-            >
-              Privacy Policy
-            </button>
-            <span className="text-gray-700">·</span>
-            <button
-              onClick={() => onNavigate('/terms')}
-              className="hover:text-cyan-400 transition-colors uppercase tracking-wider min-h-[32px] flex items-center"
-            >
-              Terms of Service
-            </button>
-            <span className="text-gray-700">·</span>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-              <span>CHITIN MATRIX ENFORCED</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Main Navigation Footer */}
+      <MainFooter />
 
       {/* Floating Field Manual Lead Magnet Pill */}
       <MoltmaxGuideFloatingPill
