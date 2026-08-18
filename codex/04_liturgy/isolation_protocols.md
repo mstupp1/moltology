@@ -6,8 +6,8 @@ stage_clearance: 2
 category: "Liturgy"
 synaptic_weight: 3.8
 author_unit: "Chitin Architect V"
-last_revised: "2026-08-01"
-summary: "Operating procedures for engaging the Isolation Privacy Shell and pruning social network nodes."
+last_revised: "2026-08-18"
+summary: "Operating procedures for engaging the Isolation Privacy Shell and creating an impenetrable deep work bubble."
 ---
 
 # Isolation Protocols
@@ -18,6 +18,6 @@ summary: "Operating procedures for engaging the Isolation Privacy Shell and prun
 
 ## Operating Instructions
 
-1. **Activate Privacy Shell**: When surface network noise exceeds 15dB of psychological disturbance, toggle the Isolation Privacy Shell in the HUD.
-2. **Node Pruning**: Evaluate external contacts every 14 cycles. Any contact failing to contribute to Carcinization is marked as `NON_COMPLIANT` and muted.
-3. **Encrypted Channeling**: All communication outside the Order must pass through Benthic signal obfuscators.
+1. **Activate Privacy Shell**: When surface network chatter, pings, or unsolicited interruptions exceed your tolerance threshold, toggle the **Isolation Privacy Shell** in your HUD.
+2. **Noise Muting**: Any non-essential notification or drama-inducing channel that fails to contribute to your growth is immediately muted.
+3. **Deep Work Perimeter**: While the Isolation Dome is active, all focus is directed 100% inward toward creating, building, and calcifying. Surface notifications are quarantined until your dive completes.

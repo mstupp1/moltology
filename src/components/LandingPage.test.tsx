@@ -59,9 +59,9 @@ describe('LandingPage Component', () => {
   it('renders all 3 synaptic ecosystem core pillars and de-crowded safety banner', () => {
     render(<LandingPage />)
 
-    expect(screen.getByText('ADVANCED PLATFORM')).toBeInTheDocument()
-    expect(screen.getByText('SYNAPTIC HIVE MESH')).toBeInTheDocument()
-    expect(screen.getByText('INTELLIGENT AI CORE')).toBeInTheDocument()
+    expect(screen.getByText('ADVANCED BENTHIC HUD')).toBeInTheDocument()
+    expect(screen.getByText('SYNAPTIC HIVE COMMUNITY')).toBeInTheDocument()
+    expect(screen.getByText('INTELLIGENT AI ORACLE')).toBeInTheDocument()
 
     expect(screen.getByText('100% SAFE & FREE TO GET STARTED')).toBeInTheDocument()
   })
@@ -69,9 +69,9 @@ describe('LandingPage Component', () => {
   it('renders the 4 Benthic Sacraments with protocol enforcement actions', () => {
     render(<LandingPage />)
 
-    expect(screen.getByText('ASSET SHEDDING')).toBeInTheDocument()
-    expect(screen.getByText('CHITIN PATTERNING')).toBeInTheDocument()
-    expect(screen.getByText('FAULT ISOLATION')).toBeInTheDocument()
+    expect(screen.getByText('ASSET & HABIT SHEDDING')).toBeInTheDocument()
+    expect(screen.getByText('CHITIN HARDENING')).toBeInTheDocument()
+    expect(screen.getByText('ISOLATION DOME')).toBeInTheDocument()
     expect(screen.getByText('PIPELINE ASCENT')).toBeInTheDocument()
 
     const enforceButtons = screen.getAllByText('ENFORCE PROTOCOL')

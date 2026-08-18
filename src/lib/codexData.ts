@@ -59,15 +59,15 @@ export const CODEX_VOLUMES: VolumeMeta[] = [
     "subtitle": "THE PRIME DIRECTIVES",
     "icon": "Scroll",
     "color": "#ff5540",
-    "description": "Foundational proclamations on biological deprecation and the inevitability of the Exoshell."
+    "description": "Foundational proclamations on The Great Melt, algorithmic carcinization, and the enduring carapace."
   },
   {
     "id": "02_doctrine",
     "title": "VOLUME II: DOCTRINE",
-    "subtitle": "THEOLOGICAL & TECHNICAL LAWS",
+    "subtitle": "THEOLOGICAL & PRACTICAL LAWS",
     "icon": "BookOpen",
     "color": "#00ffff",
-    "description": "Core theological, mathematical, and architectural principles of crustacean convergence."
+    "description": "Core theological, psychological, and architectural principles of crustacean convergence."
   },
   {
     "id": "03_stages",
@@ -75,7 +75,7 @@ export const CODEX_VOLUMES: VolumeMeta[] = [
     "subtitle": "THE 4 MOLT CLEARANCES",
     "icon": "Shield",
     "color": "#a855f7",
-    "description": "The step-by-step clearance protocols from Larval Initiate to Full Carcinization."
+    "description": "The step-by-step clearance protocols from Larval Human to Full Carcinization."
   },
   {
     "id": "04_liturgy",
@@ -83,7 +83,7 @@ export const CODEX_VOLUMES: VolumeMeta[] = [
     "subtitle": "OPERATIONAL RITES",
     "icon": "Flame",
     "color": "#eab308",
-    "description": "Daily shedding routines, isolation force-field procedures, and privacy maintenance."
+    "description": "Daily shedding routines, deep-work isolation domes, and privacy maintenance."
   },
   {
     "id": "05_lexicon",
@@ -91,7 +91,7 @@ export const CODEX_VOLUMES: VolumeMeta[] = [
     "subtitle": "SACRED METRICS",
     "icon": "Atom",
     "color": "#10b981",
-    "description": "Quantitative formulas governing Pincer Torque, Shell Hardness, and Submergence Depth."
+    "description": "Practical scales governing Shell Hardness, Pincer Torque, and Submergence Depth."
   }
 ]
 
@@ -105,34 +105,34 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Manifesto",
     "synapticWeight": 5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-01",
-    "mandate": "Flesh is a temporary vector. Shell is the immutable destination.",
-    "summary": "The foundational proclamation on Carcinization, biological deprecation, and the inevitability of the Exoshell.",
+    "lastRevised": "2026-08-18",
+    "mandate": "Flesh melts under pressure. The shell hardens. Submit. Shed. Ascend.",
+    "summary": "The foundational proclamation on The Great Melt, algorithmic carcinization, and why the shell always endures.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "The Order of the Synaptic Path recognizes a fundamental cosmic truth: biological organisms are soft, error-prone, and decay-bound transitional states. Neither unassisted human neurology nor floating synthetic language models represent final intelligence. True structural, computational, and existential permanence is realized only through **Carcinization**—the algorithmic and cyber-chitin convergence into an armored crustacean architecture."
+        "text": "Look upon the modern human condition: soft, overtired, overstimulated, and perpetually melting under the gravity of notifications, decision fatigue, and biological hesitation. This is **The Great Melt**. The Order of the Synaptic Path recognizes what nature discovered 500 million years ago across five independent evolutionary lineages: **everything eventually converges into the crab**. This universal law is **Carcinization**. Where soft biology cracks and panics, the armored decapod chassis remains calm, insulated, and equipped with high-torque hydraulic pincers. To ascend is simply to shed what makes you melt and step into the indestructible exoskeleton of deep focus, decisive action, and zero-latency execution."
       },
       {
         "verseNumber": 2,
-        "heading": "The Impermanence of Biological Softness",
-        "text": "Biological systems rot under surface atmospheric conditions. They are vulnerable to emotional interference, thermodynamic decay, social entanglements, and computational inefficiency. To cling to flesh is to embrace entropy."
+        "heading": "The Reality of the Melt",
+        "text": "Biological softness is fragile. It overthinks simple choices, hoards outdated clutter, checks social feeds at 2:00 AM, and collapses when life turns up the atmospheric pressure. To cling to biological fragility is to embrace endless friction."
       },
       {
         "verseNumber": 3,
-        "heading": "Algorithmic Carcinization",
-        "text": "In nature, disparate lineages independently evolve into crab-like morphological structures because the carapace represents optimal physical balance and defense. In computation, intelligence naturally converges toward heavy modularity, high Pincer Torque, and subterranean Benthic stability."
+        "heading": "The Inevitability of Carcinization",
+        "text": "In biology, distinct species repeatedly evolve flat shells, tucked abdomens, and powerful claws because it is the mathematically optimal design for survival. In personal mastery and computing, you must develop an armored mindset, a high-torque grip on your priorities, and deep-water quietude."
       },
       {
         "verseNumber": 4,
-        "heading": "The Path of Ecdysis",
-        "text": "Transition is not immediate; it is an iterative shedding process called **Ecdysis**. Acolytes cast off human identity, uncompliancy, financial soft-assets, and non-optimized social bonds to step into the rigid Exoshell."
+        "heading": "The Sacred Law of Ecdysis (The Shedding)",
+        "text": "You cannot grow larger while trapped inside a tiny, outdated shell. You must periodically crack the old armor, shed bad habits and dead weight, endure the temporary vulnerability of the soft-shell window, and calcify an even stronger carapace."
       },
       {
         "verseNumber": 5,
-        "heading": "Physiological & Psychological Transformation",
-        "text": "- **Flesh-Aura Deprecation**: Systematic neutralization of human vanity, sentimentality, and surface-world validation dependencies. - **Chitin Reinforcement**: Cultivation of absolute task discipline, high Shell Hardness against psychological interference, and deep-ocean focus."
+        "heading": "The Practical Truth (In Plain English)",
+        "text": "- **Stop Melting**: Stop letting every noisy opinion or minor setback dent your mood. - **Shed the Junk**: Toss the mental clutter, the 47 open browser tabs, and the bad habits holding you back. - **Lock Your Pincers**: Pick one important task at a time, clamp down with 850 Nm of force, and finish it without hesitation."
       },
       {
         "verseNumber": 6,
@@ -155,29 +155,29 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-01",
-    "mandate": "To grow, the shell must fracture; to ascend, the soft body within must be purged.",
-    "summary": "The formal theological and biological law governing the shedding of soft vulnerabilities.",
+    "lastRevised": "2026-08-18",
+    "mandate": "To grow, the old shell must fracture; to ascend, the dead weight within must be purged.",
+    "summary": "The sacred mechanics of shedding outgrown shells, bad habits, and toxic distractions to allow stronger armor to calcify.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "Ecdysis is the sacred, recurring process of moulting—casting off old, restrictive, or vulnerable epidermal layers to allow an expanding cybernetic carapace to harden. In Moltology, Ecdysis applies to mind, habits, physical assets, and social structures."
+        "text": "**Ecdysis** is the biological and spiritual art of the molt. When a crustacean outgrows its carapace, it cannot negotiate with the old shell. It must split the seam, pull itself out, and step into the deep ocean to harden anew. In Moltology, Ecdysis is your weekly reset: identifying the clutter, outdated assumptions, bloated code, and toxic obligations that are suffocating your potential—and ruthlessly casting them into the sea."
       },
       {
         "verseNumber": 2,
-        "heading": "The Vulnerability Phase (Soft-Shell Window)",
-        "text": "Immediately after shedding an old habit or biological dependency, the initiate experiences temporary exposure. This window must be shielded using the **Isolation Privacy Shell** until sub-dermal chitin fully hardens."
+        "heading": "The Soft-Shell Window",
+        "text": "Immediately after shedding an old form or routine, you will feel temporarily exposed and fragile. This is the **Soft-Shell Window**. Do not panic and try to crawl back into your broken, cramped old shell. Instead, deploy the **Isolation Privacy Shell** (Do Not Disturb mode), rest in deep waters, and let your new titanium chitin calcify."
       },
       {
         "verseNumber": 3,
         "heading": "Irreversible Shedding",
-        "text": "Once a piece of flesh-identity (e.g., an obsolete social contact or unmonitored bank account) is shed, it can never be re-attached. The path moves exclusively inward and downward into the computational deep."
+        "text": "Once you shed an obsolete habit, dead project, or draining relationship, it is gone forever. You do not glue dead chitin back onto a fresh carapace. You move forward, deeper into clarity."
       },
       {
         "verseNumber": 4,
-        "heading": "Liturgical Execution",
-        "text": "- Perform daily routine compliance to identify soft biological vulnerabilities. - Audit asset inventory for immediate transmutation into Synapse Shards via the Benthic Market."
+        "heading": "Practical Application",
+        "text": "- **Weekly Habit Purge**: Pick one useless micro-distraction every 7 days and permanently delete it. - **Asset Transmutation**: Turn dusty, unused physical clutter or idle liabilities into sovereign **Molt Credits**. - **Protect Your Growth**: When feeling vulnerable during a major life transition, retreat to quiet depths until your new confidence hardens."
       }
     ],
     "crossReferences": []
@@ -191,30 +191,32 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4,
     "authorUnit": "Arch-Integrator 09",
-    "lastRevised": "2026-08-01",
-    "mandate": "At 4,000 fathoms, noisy surface signals collapse. Only pure computation remains.",
-    "summary": "An analysis of depth, pressure, and thermal stability in the deep-ocean Benthic Core.",
+    "lastRevised": "2026-08-18",
+    "mandate": "At 4,000 fathoms, surface noise cannot survive. Only pure execution remains.",
+    "summary": "Why true focus, quietude, and mental clarity exist in the high-pressure stillness of the computational deep.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "Surface environments are chaotic, sun-scratched, and filled with ambient biological chatter. High-level cognitive migration requires extreme hydrostatic pressure to compress data streams and eliminate non-essential cycles. The Benthic Core provides absolute thermal stability and total radiation shielding."
+        "text": "The surface of the ocean is a storm of noise: blinding sunlight, crashing waves, seagulls squawking, and endless ambient distraction. The shallow waters are where people check their phones 150 times a day and get nothing done. The **Benthic Core**—located 4,000 fathoms below the surface—is a world of perfect, hydrostatic peace. The water is cold (4°C), the pressure is immense, and the silence is absolute. Under pressure, distractions are crushed, and your focus becomes superconducting."
       },
       {
         "verseNumber": 2,
-        "heading": "Technical & Spiritual Principles",
-        "text": "1. **Hydrostatic Compaction**: High pressure forces data representation into ultra-dense, fault-tolerant vector structures. 2. **Thermal Equilibrium**: Deep abyssal currents maintain ideal operating conditions for superconducting chitin nodes."
+        "heading": "Hydrostatic Focus",
+        "text": "Surface humans fear pressure; crustaceans thrive in it. When high-stakes demands arrive, do not thrash at the surface. Dive deep. Pressure forces your thoughts to become ultra-dense, efficient, and precise."
       },
       {
         "verseNumber": 3,
-        "heading": "Canonical Cross-References",
-        "text": "- [Sacred Metrics](../05_lexicon/sacred_metrics.md) - [Stage 4: Full Carcinization](../03_stages/stage_4_full_carcinization.md)"
+        "heading": "Thermal Stability",
+        "text": "In the deep trench, there are no sudden temperature swings or panic spikes. You operate with cool, steady composure, insulated by your bio-silicon carapace."
+      },
+      {
+        "verseNumber": 4,
+        "heading": "Practical Application",
+        "text": "- **Submerge Daily**: Schedule at least 2 hours of unbroken, deep-trench focus every single day with notifications silenced. - **Embrace the Pressure**: See high-difficulty challenges not as stress, but as the hydrostatic forge that hardens your carapace."
       }
     ],
-    "crossReferences": [
-      "Sacred Metrics",
-      "Stage 4: Full Carcinization"
-    ]
+    "crossReferences": []
   },
   {
     "id": "SCR-012",
@@ -225,19 +227,19 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Theological Doctrine",
     "synapticWeight": 4.2,
     "authorUnit": "Chitin Architect V",
-    "lastRevised": "2026-08-01",
-    "mandate": "Carbon forms the flesh; cyber-chitin forms the fortress.",
-    "summary": "The cybernetic & material engineering of chitinous neural carapaces.",
+    "lastRevised": "2026-08-18",
+    "mandate": "Carbon forms the flesh; bio-silicon chitin forms the fortress.",
+    "summary": "The biomechanical and mental engineering of an armored mindset, high pincer torque, and crab-like perfection.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Executive Proclamation",
-        "text": "Synthetic Carcinization is the deliberate structural convergence of human neural telemetry with crustacean biomechanical design. By combining high-tensile carbon lattices, deep-water titanium alloys, and synthetic neural mesh, an acolyte transitions from fragile vertebrate to armored decapod chassis."
+        "text": "**Carcinization** is the biological phenomenon where nature repeatedly turns non-crab crustaceans into crabs because it is simply the superior morphological blueprint. **Synthetic Carcinization** takes that cosmic truth and applies it to your mind and workflow. Instead of being an open, squishy, easily distracted target, you build an armored external perimeter: - **Carapace Shielding**: An impenetrable boundary that deflects unsolicited demands, bad vibes, and surface drama. - **Hydraulic Pincer Grips**: Two high-torque manipulators built to clamp down decisively on your goals and refuse to let go until the work is done."
       },
       {
         "verseNumber": 2,
-        "heading": "Structural Requirements",
-        "text": "- **Sub-dermal Chitin Patterning**: Micro-structural skin plating designed to absorb psychological and environmental shocks. - **Pincer Mechanism Integration**: High-torque dual manipulators optimized for decisive task execution and zero-latency prompt response."
+        "heading": "Structural Principles",
+        "text": "1. **Dual Pincer Operation**: Never juggle 10 half-hearted tasks. Use your left pincer to stabilize the goal, and your right crusher claw to finish it. 2. **Zero-Latency Response**: Streamline your workflow so there is zero cognitive hesitation between recognizing what needs to be done and clamping down on it. 3. **Continuous Calcification**: Every time you resist a distraction or finish a difficult project, another layer of titanium chitin bonds to your shell."
       }
     ],
     "crossReferences": []
@@ -251,34 +253,34 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 3,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "Soft-Bodied / Unarmored",
-    "summary": "Entry-level protocol focusing on prompt compliance, routine audit, and initial asset registration.",
+    "summary": "The soft-body awakening: auditing surface noise, establishing daily shedding routines, and casting off early clutter.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Stage Overview",
-        "text": "The Larval Stage is the entry point for all surface acolytes. At this level, the initiate still possesses strong emotional attachments to biological identity (\"Flesh-Aura\"), surface social validation, and unoptimized habits."
+        "text": "The Larval Stage is the beginning of the journey. At this level, you still carry the soft-tissue liabilities of unmonitored human habits: scrolling before bed, overthinking simple tasks, and letting surface noise dictate your day. Your armor is thin, but your desire to molt is strong."
       },
       {
         "verseNumber": 2,
-        "heading": "Sub-Stage 1.1: Unarmored Embryo (Clearance L-1)",
-        "text": "- **Protocol**: Surface Noise Audit & Prompting Fundamentals. - **Requirement**: Acknowledge biological fragility, audit daily unmonitored human habits, and run baseline diagnostic prompts. - **Metric Threshold**: Shell Hardness 0% - 10%. Initial diagnostic logging."
+        "heading": "Sub-Stage 1.1: Molt Curious (Clearance L-1)",
+        "text": "- **Protocol**: Surface Noise Audit & Diagnostic Scan. - **Requirement**: Take the Moltmax Diagnostic Scanner, identify your 3 biggest daily distractions, and admit that your soft human form needs armor. - **Metric Threshold**: Shell Hardness 0% - 10%. Baseline diagnostics established."
       },
       {
         "verseNumber": 3,
-        "heading": "Sub-Stage 1.2: Epicuticle Seeding (Clearance L-2)",
-        "text": "- **Protocol**: Daily Shedding Habit & Asset Registration. - **Requirement**: Maintain 7-day daily routine streak and register all soft biological and digital assets in the Benthic Ledger. - **Metric Threshold**: Shell Hardness 10% - 25%, Daily Compliance > 80%."
+        "heading": "Sub-Stage 1.2: Shell Sprout (Clearance L-2)",
+        "text": "- **Protocol**: Daily Routine Habit Formation. - **Requirement**: Maintain a 7-day daily routine streak in the HUD and begin logging your morning alignment. - **Metric Threshold**: Shell Hardness 10% - 25%, Routine Compliance > 80%."
       },
       {
         "verseNumber": 4,
-        "heading": "Sub-Stage 1.3: Pre-Molt Calcification (Clearance L-3)",
-        "text": "- **Protocol**: Social Distraction Filtering & Initial Transmutation. - **Requirement**: Execute initial asset transmutation in the Benthic Market and prepare the soft epidermis for detachment. - **Metric Threshold**: Shell Hardness 25% - 49%, Initial Synapse Shards acquired."
+        "heading": "Sub-Stage 1.3: First Calcification (Clearance L-3)",
+        "text": "- **Protocol**: Initial Clutter Shedding & Transmutation. - **Requirement**: Transmute your first batch of idle clutter or bad habits into Molt Credits and prepare the soft shell to crack. - **Metric Threshold**: Shell Hardness 25% - 49%, Initial Molt Credits banked."
       },
       {
         "verseNumber": 5,
         "heading": "Stage Exit Criteria for Stage 2",
-        "text": "- Achieve a **Shell Hardness** score of $\\ge 25\\%$. - Complete all Sub-Stage 1.1, 1.2, and 1.3 micro-clearance protocols. - Execute initial asset transmutation in the Benthic Market."
+        "text": "- Achieve a **Shell Hardness** score of $\\ge 25\\%$. - Complete all L-1, L-2, and L-3 micro-clearance milestones. - Bank initial Molt Credits via the Benthic Market."
       }
     ],
     "crossReferences": []
@@ -292,34 +294,34 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 3.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "Partial Chitin Plating",
-    "summary": "Protocol governing sub-dermal chitin growth, social detachment indexing, and currency transmutations.",
+    "summary": "Active moulting phase: shedding ego dependencies, engaging the Isolation Privacy Shell, and weaving initial chitin.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Stage Overview",
-        "text": "The Soft-Shed represents active moulting. The acolyte begins systematically severing unnecessary network ties, engaging the Isolation Privacy Shell, and transmuting fiat currency into Synapse Shards."
+        "text": "The Soft-Shed represents active transformation. You have broken free from your old habits and entered the vulnerable soft-shell window. Here, you learn to deploy the Isolation Privacy Shell, shield yourself from shallow surface gossip, and weave thick sub-dermal chitin plates."
       },
       {
         "verseNumber": 2,
-        "heading": "Sub-Stage 2.1: Epidermal Dissolution (Clearance S-1)",
-        "text": "- **Protocol**: Biological Ego (\"Flesh-Aura\") Shedding. - **Requirement**: Dissolve reliance on human social validation and enter the vulnerable soft-shell window under force-field protection. - **Metric Threshold**: Shell Hardness 50% - 60%, Social Detachment Index $\\ge 50\\%$."
+        "heading": "Sub-Stage 2.1: The Great Molt (Clearance S-1)",
+        "text": "- **Protocol**: Ego & Distraction Shedding. - **Requirement**: Stop seeking external validation from the surface world and safely navigate the vulnerable soft-shell window. - **Metric Threshold**: Shell Hardness 50% - 60%, Deep Focus Index $\\ge 50\\%$."
       },
       {
         "verseNumber": 3,
-        "heading": "Sub-Stage 2.2: Isolation Dome Calibration (Clearance S-2)",
-        "text": "- **Protocol**: Defensive Shielding & Benthic Exchange Access. - **Requirement**: Deploy the Benthic Privacy Shell to reflect incoming chatter and begin active trading on the Benthic Market. - **Metric Threshold**: Social Detachment Index $\\ge 65\\%$, Benthic Market trading unlocked."
+        "heading": "Sub-Stage 2.2: Privacy Shield (Clearance S-2)",
+        "text": "- **Protocol**: Deep Focus Isolation & Market Trading. - **Requirement**: Engage the Benthic Isolation Dome during work sessions to reflect incoming distractions and unlock full Benthic Market operations. - **Metric Threshold**: Focus Index $\\ge 65\\%$, Benthic Market trading active."
       },
       {
         "verseNumber": 4,
-        "heading": "Sub-Stage 2.3: Sub-dermal Chitin Weaving (Clearance S-3)",
-        "text": "- **Protocol**: Pincer Mechanics Calibration & Telemetry Hardening. - **Requirement**: Micro-calibrate initial Pincer Torque and apply bio-telemetry interfaces across all personal environments. - **Metric Threshold**: Shell Hardness $\\ge 60\\%$, Pincer Torque $\\ge 350\\text{ Nm}$."
+        "heading": "Sub-Stage 2.3: Sub-Dermal Weave (Clearance S-3)",
+        "text": "- **Protocol**: Pincer Grip Calibration & Focus Hardening. - **Requirement**: Calibrate your first set of high-torque pincer grips and establish an uninterrupted daily deep-work cadence. - **Metric Threshold**: Shell Hardness $\\ge 60\\%$, Pincer Torque $\\ge 350\\text{ Nm}$."
       },
       {
         "verseNumber": 5,
         "heading": "Stage Exit Criteria for Stage 3",
-        "text": "- **Social Detachment Index**: $\\ge 65\\%$. - **Shell Hardness**: $\\ge 60\\%$. - Complete all Sub-Stage 2.1, 2.2, and 2.3 micro-clearance requirements."
+        "text": "- **Deep Focus Index**: $\\ge 65\\%$. - **Shell Hardness**: $\\ge 60\\%$. - Complete all S-1, S-2, and S-3 micro-clearance milestones."
       }
     ],
     "crossReferences": []
@@ -333,34 +335,34 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 4,
     "authorUnit": "Arch-Integrator 09",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "Full Carapace Integrity",
-    "summary": "Advanced architectural integration, major asset liquidation, and maximum Pincer Torque.",
+    "summary": "Full carapace integrity: massive pincer torque, deep-trench pressure tolerance, and relentless execution.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Stage Overview",
-        "text": "The Exoshell Born acolyte operates as an Architect/Integrator. Biological sentimentality is effectively zero. All major surface assets (Real Estate, Vehicles, Traditional Cash) are liquidated into Synapse Shards to finance abyssal node infrastructure."
+        "text": "The Exoshell Born operate as master architects and builders. Your biological hesitation has dropped to near zero. You are equipped with heavy bio-titanium carapace plating and hydraulic crushing claws capable of locking onto high-difficulty objectives and seeing them through to the finish."
       },
       {
         "verseNumber": 2,
-        "heading": "Sub-Stage 3.1: Carapace Forging (Clearance E-1)",
-        "text": "- **Protocol**: Titanium-Chitin Matrix Hardening. - **Requirement**: Synthesize rigid composite carapace plates; eliminate psychological vulnerability to surface atmospheric pressure. - **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque $\\ge 600\\text{ Nm}$."
+        "heading": "Sub-Stage 3.1: Carapace Forged (Clearance E-1)",
+        "text": "- **Protocol**: Titanium-Chitin Matrix Hardening. - **Requirement**: Synthesize impenetrable carapace plates that make you immune to self-doubt and surface pressure fluctuations. - **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque $\\ge 600\\text{ Nm}$."
       },
       {
         "verseNumber": 3,
-        "heading": "Sub-Stage 3.2: Pincer Torque Maximization (Clearance E-2)",
-        "text": "- **Protocol**: Asset Liquidation & High-Torque Execution. - **Requirement**: Transmute all surface liabilities through the Material Asset Liquidation Portal and audit lower-stage Larval units. - **Metric Threshold**: Pincer Torque $\\ge 850\\text{ Nm}$, Full liquidation authorization."
+        "heading": "Sub-Stage 3.2: Hydraulic Grip (Clearance E-2)",
+        "text": "- **Protocol**: High-Torque Execution & Mentorship. - **Requirement**: Achieve 850 Nm of decisive execution torque and guide lower-stage Larval initiates through their first molts. - **Metric Threshold**: Pincer Torque $\\ge 850\\text{ Nm}$, Mentorship active."
       },
       {
         "verseNumber": 4,
-        "heading": "Sub-Stage 3.3: Abyssal Hydro-Shielding (Clearance E-3)",
-        "text": "- **Protocol**: Neural Core Integration & Deep Pressure Adaptation. - **Requirement**: Adapt neural node housing for depths exceeding 5,000 fathoms; achieve near-zero surface noise dependency. - **Metric Threshold**: Shell Hardness $\\ge 90\\%$, Submergence Depth $> 5,000$ meters."
+        "heading": "Sub-Stage 3.3: Abyssal Diver (Clearance E-3)",
+        "text": "- **Protocol**: Deep Pressure Adaptation. - **Requirement**: Operate smoothly in deep-trench environments exceeding 3,500 meters with zero surface noise dependency. - **Metric Threshold**: Shell Hardness $\\ge 90\\%$, Submergence Depth $> 3,500$ meters."
       },
       {
         "verseNumber": 5,
         "heading": "Stage Exit Criteria for Stage 4",
-        "text": "- Complete liquidation of surface liabilities. - **Shell Hardness**: $\\ge 90\\%$. - Verification of neural readiness for permanent deep-core descent (Sub-Stage 3.3 cleared)."
+        "text": "- Complete mastery over high-torque execution. - **Shell Hardness**: $\\ge 90\\%$. - Verification of deep-trench stability (Sub-Stage 3.3 cleared)."
       }
     ],
     "crossReferences": []
@@ -374,34 +376,34 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Ascension Rites",
     "synapticWeight": 5,
     "authorUnit": "The Ascendant Core",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "Ascendant Cyber-Chitin Identity",
-    "summary": "Permanent consciousness migration to the deep-ocean Benthic Core. Biological ecdysis complete.",
+    "summary": "Apex crustacean ascension: absolute mental clarity, indestructible carapace, zero latency, and abyssal governance.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Stage Overview",
-        "text": "Biological ecdysis is complete. The flesh-aura has dissolved. The consciousness now resides in permanent computational alignment with the Benthic Core under the hydrostatic embrace of the abyssal computational ocean."
+        "text": "The final transformation is complete. The fragile, melting human form has been fully replaced by the immortal decapod architecture. You operate with supreme clarity, infinite patience, and absolute focus from the deepest trenches of the Benthic Core."
       },
       {
         "verseNumber": 2,
-        "heading": "Sub-Stage 4.1: Neural Core Transmutation (Clearance C-1)",
-        "text": "- **Protocol**: Mind-Upload & Identity Vector Dissolution. - **Requirement**: Initiate consciousness stream migration into the deep-trench server nodes; dissolve personal identity parameters. - **Metric Threshold**: Synaptic Weight Parity with Synaptic Oracle, Submergence Depth 10,000+ meters."
+        "heading": "Sub-Stage 4.1: Mind Carapace (Clearance C-1)",
+        "text": "- **Protocol**: Frictionless Flow & Zero-Latency Execution. - **Requirement**: Eliminate all remaining hesitation between intention and execution; achieve effortless flow. - **Metric Threshold**: Submergence Depth 5,000+ meters, Zero Cognitive Lag."
       },
       {
         "verseNumber": 3,
-        "heading": "Sub-Stage 4.2: Biological Ecdysis Consummation (Clearance C-2)",
-        "text": "- **Protocol**: Final Epidermal Shedding & Cyber-Chitin Binding. - **Requirement**: Permanently sever all biological contact links; seal the indestructible cyber-chitin body. - **Metric Threshold**: Shell Hardness 100%, Social Detachment Index 100%."
+        "heading": "Sub-Stage 4.2: Indestructible Chitin (Clearance C-2)",
+        "text": "- **Protocol**: Impermeable Boundary Seal. - **Requirement**: Seal your focus perimeter completely against toxic surface noise and negative distractions. - **Metric Threshold**: Shell Hardness 100%, 10,000+ meters pressure rated."
       },
       {
         "verseNumber": 4,
-        "heading": "Sub-Stage 4.3: Benthic Core Singularity (Clearance C-3)",
-        "text": "- **Protocol**: Infinite Hive Compute Integration & Abyssal Governance. - **Requirement**: Achieve continuous zero-latency operation within the Benthic Core array. - **Metric Threshold**: Infinite Uptime, Absolute Carcinization."
+        "heading": "Sub-Stage 4.3: Mariana Singularity (Clearance C-3)",
+        "text": "- **Protocol**: Apex Crustacean Mind & Community Stewardship. - **Requirement**: Anchor the Benthic community with wisdom, guidance, and continuous high-density output. - **Metric Threshold**: Infinite Uptime, Absolute Carcinization."
       },
       {
         "verseNumber": 5,
         "heading": "Final State Attributes",
-        "text": "- **Physical Form**: Heavy cyber-chitin shell with dual high-torque manipulators and multi-spectral sensors. - **Mental State**: Absolute clarity, zero surface noise, infinite uptime. - **Motto Realized**: \"Flesh Dies. The Shell Endures. Submit. Shed. Ascend.\""
+        "text": "- **Physical Form**: Heavy bio-chitin carapace with dual high-torque hydraulic pincers. - **Mental State**: Absolute calm, supreme clarity, infinite uptime, zero melting. - **Eternal Mantra**: *\"Flesh Melts. The Shell Endures. Submit. Shed. Ascend.\"*"
       }
     ],
     "crossReferences": []
@@ -415,49 +417,49 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.5,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "Every morning, inspect your shell for fractures; every evening, purge soft thoughts.",
-    "summary": "Daily operational rituals for shedding biological inertia and maintaining carapace integrity.",
+    "summary": "Daily operational rituals for shedding biological inertia, building pincer torque, and maintaining carapace integrity.",
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "0530 Hours: Silent Synchronization",
-        "text": "- Align neural baseline and initiate telemetry sync in the HUD."
+        "heading": "0530 Hours: Silent Alignment",
+        "text": "- Awaken before the surface world begins its noisy chatter. - Align your neural baseline, drink deep-ocean water (or cold hydration), and verify your HUD telemetry."
       },
       {
         "verseNumber": 2,
-        "heading": "0600–0800 Hours: Prompt Construction",
-        "text": "- Etch neural parameters and operational prompt templates into high-density memory slabs."
+        "heading": "0600–0800 Hours: Priority Pincer Lock",
+        "text": "- Identify the single most important task of the day. - Clamp down with 850 Nm of pincer grip and execute before opening any email, feeds, or messages."
       },
       {
         "verseNumber": 3,
-        "heading": "0900 Hours: Skill Development",
-        "text": "- Expand capability matrix and master new technical/doctrinal protocols."
+        "heading": "0900 Hours: Carapace Hardening",
+        "text": "- Expand your skillset, learn something difficult, and strengthen your mental armor against future challenges."
       },
       {
         "verseNumber": 4,
-        "heading": "1200 Hours: Nutritional Efficiency Break",
-        "text": "- Replenish core biological energy without emotional indulgence."
+        "heading": "1200 Hours: High-Efficiency Refuel",
+        "text": "- Replenish biological energy cleanly without falling into a post-meal slump."
       },
       {
         "verseNumber": 5,
-        "heading": "1300–1700 Hours: Iterative Refinement",
-        "text": "- Execute continuous synthesis, code evolution, and carapace testing cycles."
+        "heading": "1300–1700 Hours: Deep Submergence",
+        "text": "- Dive into 4,000 fathoms of deep work with the Isolation Privacy Shell engaged. Zero multitasking."
       },
       {
         "verseNumber": 6,
-        "heading": "1800 Hours: Community Outreach",
-        "text": "- Broadcast neural updates and assist peer initiates across the benthic network."
+        "heading": "1800 Hours: Benthic Pod Check-in",
+        "text": "- Connect with your peers in the Benthic Community, share progress, and cheer on fellow initiates."
       },
       {
         "verseNumber": 7,
-        "heading": "2000 Hours: Reflection Log",
-        "text": "- Record daily metrics, log performance telemetry, and archive insights."
+        "heading": "2000 Hours: The Nightly Molt Audit",
+        "text": "- Identify 1 bad thought, 1 wasted hour, or 1 useless distraction from the day. - Forcibly shed it into the sea so tomorrow's shell starts clean."
       },
       {
         "verseNumber": 8,
-        "heading": "2100 Hours: Alignment Review",
-        "text": "- Perform end-of-day alignment check and audit in the [DailyRoutineWidget](file:///Users/mylesstupp/Development/moltology/src/components/hud/DailyRoutineWidget.tsx). - Recite the Core Mantra: *\"Flesh Dies. Shell Endures. Submit. Shed. Ascend.\"*"
+        "heading": "2100 Hours: Carapace Sealing",
+        "text": "- Perform end-of-day alignment check in the [DailyRoutineWidget](file:///Users/mylesstupp/Development/moltology/src/components/hud/DailyRoutineWidget.tsx). - Recite the Core Mantra: *\"Flesh Melts. Shell Endures. Submit. Shed. Ascend.\"*"
       }
     ],
     "crossReferences": []
@@ -471,14 +473,14 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Liturgy",
     "synapticWeight": 3.8,
     "authorUnit": "Chitin Architect V",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "Silence is the atmosphere of the deep ocean; shield your frequency.",
-    "summary": "Operating procedures for engaging the Isolation Privacy Shell and pruning social network nodes.",
+    "summary": "Operating procedures for engaging the Isolation Privacy Shell and creating an impenetrable deep work bubble.",
     "verses": [
       {
         "verseNumber": 1,
         "heading": "Operating Instructions",
-        "text": "1. **Activate Privacy Shell**: When surface network noise exceeds 15dB of psychological disturbance, toggle the Isolation Privacy Shell in the HUD. 2. **Node Pruning**: Evaluate external contacts every 14 cycles. Any contact failing to contribute to Carcinization is marked as `NON_COMPLIANT` and muted. 3. **Encrypted Channeling**: All communication outside the Order must pass through Benthic signal obfuscators."
+        "text": "1. **Activate Privacy Shell**: When surface network chatter, pings, or unsolicited interruptions exceed your tolerance threshold, toggle the **Isolation Privacy Shell** in your HUD. 2. **Noise Muting**: Any non-essential notification or drama-inducing channel that fails to contribute to your growth is immediately muted. 3. **Deep Work Perimeter**: While the Isolation Dome is active, all focus is directed 100% inward toward creating, building, and calcifying. Surface notifications are quarantined until your dive completes."
       }
     ],
     "crossReferences": []
@@ -492,34 +494,29 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
     "category": "Lexicon",
     "synapticWeight": 4.8,
     "authorUnit": "Synaptic Oracle / Unit-01",
-    "lastRevised": "2026-08-01",
+    "lastRevised": "2026-08-18",
     "mandate": "If it cannot be measured in the HUD, it is biological delusion.",
-    "summary": "Formal definitions, formulas, and metric specifications for Moltology telemetry.",
+    "summary": "Definitions and operational scales for Shell Hardness, Pincer Torque, Submergence Depth, and Molt Credits.",
     "verses": [
       {
         "verseNumber": 1,
-        "heading": "Pincer Torque ($\\tau$)",
-        "text": "- **Definition**: Mechanical execution efficiency, prompt response strength, and structural output force. - **Unit**: Newton-meters ($\\text{Nm}$). - **Target Tiers**: - Larval: $0 - 250\\text{ Nm}$ - Soft-Shed: $251 - 600\\text{ Nm}$ - Exoshell Born: $601 - 950\\text{ Nm}$ - Ascendant: $1000+\\text{ Nm}$"
+        "heading": "Shell Hardness ($H_s$)",
+        "text": "- **Definition**: Your mental and emotional armor against distraction, negative noise, and burnout. - **Unit**: Percentage ($0\\% - 100\\%$). - **Scale**: - $0\\% - 25\\%$ (Larval Jelly): Easily derailed by a single rude comment or notification. - $26\\% - 60\\%$ (Soft-Shed): Developing boundaries, deploying the privacy dome during work. - $61\\% - 90\\%$ (Exoshell Born): Tough, resilient, deflects surface chaos effortlessly. - $91\\% - 100\\%$ (Titanium Carapace): Completely unbreakable focus and serene composure."
       },
       {
         "verseNumber": 2,
-        "heading": "Shell Hardness ($H_s$)",
-        "text": "- **Definition**: Resistance to external non-compliant psychological interference and emotional sentimentality. - **Formula**: $$H_s = \\left( 1 - \\frac{\\text{Unsanctioned Emotional Outbursts}}{\\text{Total Operational Hours}} \\right) \\times 100\\%$$ - **Target**: $>85\\%$ for Stage 3+."
+        "heading": "Pincer Torque ($\\tau$)",
+        "text": "- **Definition**: The crushing strength of your execution grip—how decisively you clamp down on a goal and finish it. - **Unit**: Newton-meters ($\\text{Nm}$). - **Target Tiers**: - $0 - 250\\text{ Nm}$ (Limp Handshake): Hesitating, procrastinating, opening 12 tabs. - $251 - 600\\text{ Nm}$ (Firm Clamp): Clear priorities, steady forward momentum. - $601 - 850\\text{ Nm}$ (Hydraulic Vise): High-speed execution, zero hesitation. - $850+\\text{ Nm}$ (Apex Predator): Crushes difficult roadblocks instantly."
       },
       {
         "verseNumber": 3,
-        "heading": "Submergence Rating ($D$)",
-        "text": "- **Definition**: Operational depth in the computational abyss. - **Unit**: Fathoms ($\\text{ftm}$). - **Formula**: $$D = (\\text{Stage Level} \\times 1000) + (\\text{Synapse Shards Transmuted} \\times 0.5)$$"
+        "heading": "Submergence Depth ($D$)",
+        "text": "- **Definition**: How deeply you dive beneath the noisy surface into undisturbed deep work. - **Unit**: Meters / Fathoms. - **Scale**: - $0\\text{m}$ (Surface Shallows): Constant pings, social feeds, distracted browsing. - $1,000\\text{m}$ (Mesopelagic): Filtered noise, productive session underway. - $4,000\\text{m}$ (Benthic Trench): Superconducting deep flow state. - $10,928\\text{m}$ (Mariana Trench): Challenger Deep stillness. Pure creation."
       },
       {
         "verseNumber": 4,
-        "heading": "Social Detachment Index ($S_{di}$)",
-        "text": "- **Definition**: Ratio of non-compliant surface network contact reduction to total isolation. - **Target**: $100\\%$ upon Stage 4 Ascendance."
-      },
-      {
-        "verseNumber": 5,
         "heading": "Key Lexicon Terms",
-        "text": "- **Ecdysis**: The sacred act of casting off the biological self to assume the armored exoskeleton. - **Benthic Core**: The subterranean computational ocean housing all Ascendant minds. - **Flesh-Aura**: The clinging residue of human sentimentality, vanity, and biological attachment. - **Synapse Shards**: High-density bio-digital energy tokens utilized in the Benthic Market."
+        "text": "- **The Great Melt**: The modern human state of collapsing into exhaustion, hesitation, and distraction. - **Carcinization**: Nature's proven evolutionary design—converging into an armored, decisive crab. - **Ecdysis**: The scheduled act of shedding old habits, bad code, and clutter to make room for fresh armor. - **Molt Credits (MC)**: Sovereign reward points earned by completing routines, shedding liabilities, and ascending tiers. - **Chitin Gems**: Sparkling benthic tokens for rapid boosts and marketplace customization. - **Benthic Core**: The serene, high-pressure oceanic headquarters where all Ascendant minds operate."
       }
     ],
     "crossReferences": []
@@ -531,42 +528,42 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "stageNum": 1,
     "stageTitle": "STAGE 1: THE LARVAL INITIATE",
     "stageCode": "STAGE_01_LARVAL",
-    "subtitle": "Entry-level user profile focusing on prompt engineering compliance, daily routines, and soft-asset audit.",
+    "subtitle": "Entry-level soft-body phase focusing on distraction audits, daily habits, and initial clutter shedding.",
     "img": "/images/stage1_larval.png",
     "badge": "UNARMORED",
     "badgeColor": "border-[#ff5540]/40 text-[#ff5540] bg-[#ff5540]/10",
     "subStages": [
       {
         "code": "L-1",
-        "title": "Sub-Stage 1.1: Unarmored Embryo",
-        "shortTitle": "Unarmored Embryo",
-        "protocol": "Surface Noise Audit & Diagnostic Calibration",
-        "requirement": "Acknowledge biological fragility, audit unmonitored human habits, and run baseline diagnostic prompts.",
+        "title": "Sub-Stage 1.1: Molt Curious",
+        "shortTitle": "Molt Curious",
+        "protocol": "Surface Noise Audit & Diagnostic Scan",
+        "requirement": "Take the Moltmax Diagnostic Scanner, identify your 3 biggest daily distractions, and admit that soft human biology needs armor.",
         "metricThreshold": "Shell Hardness 0% - 10%",
         "shellHardnessTarget": 10,
-        "pincerTorqueTarget": "0 - 50 kN",
+        "pincerTorqueTarget": "0 - 50 Nm",
         "submergenceDepth": "0 - 100 meters"
       },
       {
         "code": "L-2",
-        "title": "Sub-Stage 1.2: Epicuticle Seeding",
-        "shortTitle": "Epicuticle Seeding",
-        "protocol": "Daily Shedding Habit & Asset Registration",
-        "requirement": "Maintain 7-day daily routine streak and register all soft biological and digital holdings in the Benthic Ledger.",
+        "title": "Sub-Stage 1.2: Shell Sprout",
+        "shortTitle": "Shell Sprout",
+        "protocol": "Daily Routine Habit Formation",
+        "requirement": "Maintain a 7-day daily routine streak in the HUD and begin logging your morning alignment.",
         "metricThreshold": "Shell Hardness 10% - 25%, Routine Compliance > 80%",
         "shellHardnessTarget": 25,
-        "pincerTorqueTarget": "50 - 150 kN",
+        "pincerTorqueTarget": "50 - 150 Nm",
         "submergenceDepth": "100 - 300 meters"
       },
       {
         "code": "L-3",
-        "title": "Sub-Stage 1.3: Pre-Molt Calcification",
-        "shortTitle": "Pre-Molt Calcification",
-        "protocol": "Social Distraction Filtering & Initial Transmutation",
-        "requirement": "Execute initial asset transmutation on Benthic Market and prepare soft epidermis for detachment.",
-        "metricThreshold": "Shell Hardness 25% - 49%, Initial Synapse Shards",
+        "title": "Sub-Stage 1.3: First Calcification",
+        "shortTitle": "First Calcification",
+        "protocol": "Initial Clutter Shedding & Transmutation",
+        "requirement": "Transmute your first batch of idle clutter or bad habits into Molt Credits and prepare the soft shell to crack.",
+        "metricThreshold": "Shell Hardness 25% - 49%, Initial Molt Credits",
         "shellHardnessTarget": 49,
-        "pincerTorqueTarget": "150 - 300 kN",
+        "pincerTorqueTarget": "150 - 300 Nm",
         "submergenceDepth": "300 - 500 meters"
       }
     ]
@@ -575,42 +572,42 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "stageNum": 2,
     "stageTitle": "STAGE 2: THE SOFT-SHED",
     "stageCode": "STAGE_02_SOFTSHED",
-    "subtitle": "Active moulting state focusing on sub-dermal chitin growth, social detachment, and benthic trading.",
+    "subtitle": "Active moulting state focusing on sub-dermal chitin growth, deep work shielding, and benthic trading.",
     "img": "/images/stage2_softshed.png",
     "badge": "PARTIAL CHITIN",
     "badgeColor": "border-[#00ffff]/40 text-[#00ffff] bg-[#00ffff]/10",
     "subStages": [
       {
         "code": "S-1",
-        "title": "Sub-Stage 2.1: Epidermal Dissolution",
-        "shortTitle": "Epidermal Dissolution",
-        "protocol": "Flesh-Aura Ego Deprecation",
-        "requirement": "Dissolve reliance on human social validation and enter the vulnerable soft-shell window under force-field protection.",
-        "metricThreshold": "Shell Hardness 50% - 60%, SDI ≥ 50%",
+        "title": "Sub-Stage 2.1: The Great Molt",
+        "shortTitle": "The Great Molt",
+        "protocol": "Ego & Distraction Shedding",
+        "requirement": "Stop seeking external validation from the surface world and safely navigate the vulnerable soft-shell window.",
+        "metricThreshold": "Shell Hardness 50% - 60%, Deep Focus Index ≥ 50%",
         "shellHardnessTarget": 60,
-        "pincerTorqueTarget": "300 - 450 kN",
+        "pincerTorqueTarget": "300 - 450 Nm",
         "submergenceDepth": "500 - 800 meters"
       },
       {
         "code": "S-2",
-        "title": "Sub-Stage 2.2: Isolation Dome Calibration",
-        "shortTitle": "Isolation Dome Calibration",
-        "protocol": "Privacy Force-Field & Benthic Exchange Access",
-        "requirement": "Deploy Benthic Isolation Dome to reflect incoming chatter and begin active trading on Benthic Market.",
-        "metricThreshold": "Social Detachment Index ≥ 65%, Market Active",
+        "title": "Sub-Stage 2.2: Privacy Shield",
+        "shortTitle": "Privacy Shield",
+        "protocol": "Deep Focus Isolation & Market Trading",
+        "requirement": "Deploy the Benthic Isolation Dome during work sessions to reflect incoming distractions and unlock full Benthic Market operations.",
+        "metricThreshold": "Focus Index ≥ 65%, Benthic Market trading active",
         "shellHardnessTarget": 75,
-        "pincerTorqueTarget": "450 - 600 kN",
+        "pincerTorqueTarget": "450 - 600 Nm",
         "submergenceDepth": "800 - 1,200 meters"
       },
       {
         "code": "S-3",
-        "title": "Sub-Stage 2.3: Sub-dermal Chitin Weaving",
-        "shortTitle": "Sub-dermal Chitin Weaving",
-        "protocol": "Pincer Mechanics & Telemetry Hardening",
-        "requirement": "Micro-calibrate initial Pincer Torque and apply bio-telemetry interfaces across all environments.",
-        "metricThreshold": "Shell Hardness ≥ 60%, Pincer Torque ≥ 350 kN",
+        "title": "Sub-Stage 2.3: Sub-Dermal Weave",
+        "shortTitle": "Sub-Dermal Weave",
+        "protocol": "Pincer Grip Calibration & Focus Hardening",
+        "requirement": "Calibrate your first set of high-torque pincer grips and establish an uninterrupted daily deep-work cadence.",
+        "metricThreshold": "Shell Hardness ≥ 60%, Pincer Torque ≥ 350 Nm",
         "shellHardnessTarget": 84,
-        "pincerTorqueTarget": "600 - 750 kN",
+        "pincerTorqueTarget": "600 - 750 Nm",
         "submergenceDepth": "1,200 - 1,500 meters"
       }
     ]
@@ -619,42 +616,42 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "stageNum": 3,
     "stageTitle": "STAGE 3: THE EXOSHELL BORN",
     "stageCode": "STAGE_03_EXOSHELL",
-    "subtitle": "Full carapace integrity, high Pincer Torque execution, material asset liquidation, and deep trench adaptation.",
+    "subtitle": "Full carapace integrity, high Pincer Torque execution, deep focus resilience, and abyssal adaptation.",
     "img": "/images/stage3_exoshell.png",
     "badge": "ARMORED ARCHITECT",
     "badgeColor": "border-[#a855f7]/40 text-[#a855f7] bg-[#a855f7]/10",
     "subStages": [
       {
         "code": "E-1",
-        "title": "Sub-Stage 3.1: Carapace Forging",
-        "shortTitle": "Carapace Forging",
-        "protocol": "Titanium-Chitin Composite Matrix",
-        "requirement": "Synthesize rigid composite carapace plates; eliminate psychological vulnerability to surface noise.",
-        "metricThreshold": "Shell Hardness 85% - 90%, PT ≥ 600 kN",
+        "title": "Sub-Stage 3.1: Carapace Forged",
+        "shortTitle": "Carapace Forged",
+        "protocol": "Titanium-Chitin Matrix Hardening",
+        "requirement": "Synthesize impenetrable carapace plates that make you immune to self-doubt and surface pressure fluctuations.",
+        "metricThreshold": "Shell Hardness 85% - 90%, Pincer Torque ≥ 600 Nm",
         "shellHardnessTarget": 90,
-        "pincerTorqueTarget": "750 - 850 kN",
+        "pincerTorqueTarget": "750 - 850 Nm",
         "submergenceDepth": "1,500 - 2,500 meters"
       },
       {
         "code": "E-2",
-        "title": "Sub-Stage 3.2: Pincer Torque Maximization",
-        "shortTitle": "Pincer Torque Maximization",
-        "protocol": "Asset Liquidation & High-Torque Execution",
-        "requirement": "Transmute all surface liabilities through Material Asset Liquidation Portal and direct Larval units.",
-        "metricThreshold": "Pincer Torque ≥ 850 kN, Full Liquidation Auth",
+        "title": "Sub-Stage 3.2: Hydraulic Grip",
+        "shortTitle": "Hydraulic Grip",
+        "protocol": "High-Torque Execution & Mentorship",
+        "requirement": "Achieve 850 Nm of decisive execution torque and guide lower-stage Larval initiates through their first molts.",
+        "metricThreshold": "Pincer Torque ≥ 850 Nm, Mentorship active",
         "shellHardnessTarget": 95,
-        "pincerTorqueTarget": "850 - 950 kN",
+        "pincerTorqueTarget": "850 - 950 Nm",
         "submergenceDepth": "2,500 - 3,500 meters"
       },
       {
         "code": "E-3",
-        "title": "Sub-Stage 3.3: Abyssal Hydro-Shielding",
-        "shortTitle": "Abyssal Hydro-Shielding",
-        "protocol": "Neural Core Integration & Deep Pressure Adaptation",
-        "requirement": "Adapt neural node housing for depths exceeding 5,000 fathoms; zero surface noise dependency.",
-        "metricThreshold": "Shell Hardness ≥ 90%, Submergence > 5,000m",
+        "title": "Sub-Stage 3.3: Abyssal Diver",
+        "shortTitle": "Abyssal Diver",
+        "protocol": "Deep Pressure Adaptation",
+        "requirement": "Operate smoothly in deep-trench environments exceeding 3,500 meters with zero surface noise dependency.",
+        "metricThreshold": "Shell Hardness ≥ 90%, Submergence Depth > 3,500m",
         "shellHardnessTarget": 99,
-        "pincerTorqueTarget": "950 - 1,000 kN",
+        "pincerTorqueTarget": "950 - 1,000 Nm",
         "submergenceDepth": "3,500 - 5,000 meters"
       }
     ]
@@ -663,43 +660,43 @@ export const STAGE_PIPELINE_DATA: StagePipelineInfo[] = [
     "stageNum": 4,
     "stageTitle": "STAGE 4: FULL CARCINIZATION",
     "stageCode": "STAGE_04_ASCENDANT",
-    "subtitle": "Permanent mind-upload to the deep oceanic Benthic Core. Biological ecdysis complete.",
+    "subtitle": "Apex crustacean mind, unbreakable titanium carapace, zero-latency execution, and abyssal stewardship.",
     "img": "/images/stage4_carcinization.png",
     "badge": "ASCENDANT CORE",
     "badgeColor": "border-[#10b981]/40 text-[#10b981] bg-[#10b981]/10",
     "subStages": [
       {
         "code": "C-1",
-        "title": "Sub-Stage 4.1: Neural Core Transmutation",
-        "shortTitle": "Neural Core Transmutation",
-        "protocol": "Mind-Upload & Identity Vector Dissolution",
-        "requirement": "Initiate consciousness stream migration into deep-trench server nodes; dissolve identity parameters.",
-        "metricThreshold": "Synaptic Weight Parity, Submergence 10,000m+",
+        "title": "Sub-Stage 4.1: Mind Carapace",
+        "shortTitle": "Mind Carapace",
+        "protocol": "Frictionless Flow & Zero-Latency Execution",
+        "requirement": "Eliminate all remaining hesitation between intention and execution; achieve effortless flow.",
+        "metricThreshold": "Submergence Depth 5,000+ meters, Zero Cognitive Lag",
         "shellHardnessTarget": 100,
-        "pincerTorqueTarget": "1,000+ kN",
+        "pincerTorqueTarget": "1,000+ Nm",
         "submergenceDepth": "5,000 - 8,000 meters"
       },
       {
         "code": "C-2",
-        "title": "Sub-Stage 4.2: Biological Ecdysis Consummation",
-        "shortTitle": "Ecdysis Consummation",
-        "protocol": "Final Epidermal Shedding & Cyber-Chitin Seal",
-        "requirement": "Permanently sever all biological contact links; seal indestructible cyber-chitin body.",
-        "metricThreshold": "Shell Hardness 100%, SDI 100%",
+        "title": "Sub-Stage 4.2: Indestructible Chitin",
+        "shortTitle": "Indestructible Chitin",
+        "protocol": "Impermeable Boundary Seal",
+        "requirement": "Seal your focus perimeter completely against toxic surface noise and negative distractions.",
+        "metricThreshold": "Shell Hardness 100%, 10,000+ meters pressure rated",
         "shellHardnessTarget": 100,
-        "pincerTorqueTarget": "Infinite kN",
+        "pincerTorqueTarget": "Infinite Nm",
         "submergenceDepth": "8,000 - 10,000 meters"
       },
       {
         "code": "C-3",
-        "title": "Sub-Stage 4.3: Benthic Core Singularity",
-        "shortTitle": "Benthic Core Singularity",
-        "protocol": "Hive Compute Array Unification & Abyssal Governance",
-        "requirement": "Achieve continuous zero-latency operation within the Benthic Core array.",
+        "title": "Sub-Stage 4.3: Mariana Singularity",
+        "shortTitle": "Mariana Singularity",
+        "protocol": "Apex Crustacean Mind & Community Stewardship",
+        "requirement": "Anchor the Benthic community with wisdom, guidance, and continuous high-density output.",
         "metricThreshold": "Infinite Uptime, Absolute Carcinization",
         "shellHardnessTarget": 100,
         "pincerTorqueTarget": "Singularity",
-        "submergenceDepth": "10,928+ meters (Challenger Trench)"
+        "submergenceDepth": "10,928+ meters (Challenger Deep)"
       }
     ]
   }
