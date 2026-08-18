@@ -38,7 +38,10 @@ All characters featured on the Moltology homepage are available as transparent P
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
 * **1:1 Grid Safe Thumbnails with Mascots**: Custom 1080x1920 covers with bold high-contrast headlines, category pills, and homepage mascot cutouts rendered in the 1:1 square safe zone (`Y=420` to `Y=1500`).
 * **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`).
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`).
+* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `queue_preview_queue`, `queue_get_next_queue_slot`).
+* **Queue Configuration**:
+  - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
+  - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — Daily at 6:30 PM EST / 18:30 `America/New_York`)
 * **Continuity Ledger**: `content/social/instagram-reel-history.json`.
 
 ---
@@ -154,12 +157,20 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
    * Video: `videos/social/reels/reel-<timestamp>.mp4`
    * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
 
-2. **Stage Draft / Publish via Zernio MCP (`posts_create`)**:
-   * Set `isAiGenerated: true` for Meta/Instagram.
-   * Dual broadcast to Instagram (`6a7f7f0777555aae01d99b54`) and YouTube Shorts (`6a7fd9bd77555aae01ebea63`).
+2. **Stage to Queue / Publish via Zernio MCP (`posts_create`)**:
+   * **Queue-Driven Scheduling (Recommended)**:
+     - Profile ID: `6a7f74b1839bf39ff3b6aaaa`
+     - Reels Queue ID: `6a84b7702421e968ac81f5bd` (Slots every day at 6:30 PM EST / 18:30)
+     - Set `isAiGenerated: true` for Meta/Instagram.
+     - Dual broadcast to Instagram (`6a7f7f0777555aae01d99b54`) and YouTube Shorts (`6a7fd9bd77555aae01ebea63`).
+     - Pass `profile_id: "6a7f74b1839bf39ff3b6aaaa"` to automatically land in the next open 6:30 PM slot.
+   * **Immediate Override (`--publish-now`)**:
+     - Pass `publish_now: true` for immediate breaking announcements.
+   * **Draft Mode (`is_draft: true`)**:
+     - Save without scheduling when manual human sign-off is requested.
 
 3. **Update Narrative History Ledger**:
-   * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, and platform IDs.
+   * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, and platform IDs (`status: "queued"`, `"published"`, or `"draft"`).
 
 ---
 
@@ -168,7 +179,7 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 Agents and users can trigger the full autonomous daily pipeline with a single command:
 
 ```bash
-# Autonomous dynamic daily run (auto-selects fresh topic / blog / mascot):
+# Autonomous dynamic daily run (auto-selects fresh topic / blog / mascot and stages to queue):
 npm run reel:create
 
 # Custom thematic pillar with specific mascot:
@@ -181,7 +192,7 @@ npm run reel:create -- --theme quiz --mascot crab_corner
 # Custom targeted topic or news headline:
 npm run reel:create -- --topic "Subsea Datacenter Heatwaves"
 
-# Direct instant publish (skip draft stage):
+# Direct instant publish (skip queue / publish immediately):
 npm run reel:create -- --publish-now
 
 # Dry run test (uses local footage without uploading to S3):

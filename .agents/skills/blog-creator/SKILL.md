@@ -267,17 +267,21 @@ When running Stage 2 AI polish via `generate_image`, pass BOTH the slide mockup 
 #### 5. Mandatory AI-Generated Media Labeling
 * **Strict Tenet**: Always enable `isAiGenerated: true` for Instagram/Meta in `platformSpecificData`.
 
-#### 6. Auto-Format to 4:5, Upload Assets to Neon S3 & Publish via Zernio
+#### 6. Auto-Format to 4:5, Upload Assets to Neon S3 & Stage to Zernio Carousel Queue
 1. **Auto-Format to Exact Instagram 4:5 (1080x1350)**:
    Because AI generation tools output 3:4 at `764x1024` (ratio `0.746`, slightly below Instagram's minimum `0.750`–`0.800` threshold), run the auto-formatter:
    ```bash
    npx tsx scripts/format-carousel-to-4-5.ts
    ```
    *(This scales and centers the images to standard `1080x1350` / 4:5 with 0.80 ratio and uploads them to S3).*
-2. Post to Instagram via Zernio `posts_create` with:
+2. **Stage to Queue / Publish via Zernio MCP (`posts_create`)**:
+   * **Queue-Driven Scheduling (Recommended)**:
+     - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
+     - Carousel Queue ID: `6a84b76d2421e968ac81f5bc` (**Moltology Carousels** — Mon, Wed, Fri at 1:00 PM EST / 13:00 `America/New_York`)
+     - Pass `profile_id: "6a7f74b1839bf39ff3b6aaaa"` to automatically drip-feed into the next open 1:00 PM slot.
    * `platform`: `"instagram"`
    * `account_id`: `"6a7f7f0777555aae01d99b54"`
-   * `publish_now`: `true` (or `is_draft: true` when saving drafts)
+   * `publish_now`: `true` (only for breaking news overrides) or `is_draft: true` when requesting human review
    * `media_urls`: Comma-separated S3 URLs.
    * `platformSpecificData`: `{ "isAiGenerated": true, "firstComment": "<URL + #hashtags>" }`
 3. Add a first comment on the post with the article URL and clean hashtags using `comments_reply_to_inbox_post`.

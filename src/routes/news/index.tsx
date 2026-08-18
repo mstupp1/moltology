@@ -263,79 +263,8 @@ function NewsIndexPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start border-b border-cyan-900/50 pb-12">
             
-            {/* LEFT COLUMN: SECONDARY STORIES & ANALYSIS (3 Cols) */}
-            <div className="lg:col-span-3 space-y-6 border-r border-cyan-900/30 pr-0 lg:pr-6">
-              {leftColPosts[0] && (
-                <div
-                  onClick={() => handleSelectPost(leftColPosts[0].slug)}
-                  className="group cursor-pointer space-y-3 pb-6 border-b border-cyan-950"
-                >
-                  <div className="relative h-44 overflow-hidden border border-cyan-900/60 chamfer-corner">
-                    <img
-                      src={leftColPosts[0].coverImageUrl}
-                      alt={leftColPosts[0].title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
-                    />
-                    <span className="absolute top-2 left-2 bg-cyan-950/90 border border-cyan-500/80 text-cyan-300 text-[10px] font-sans font-bold px-2 py-0.5 uppercase chamfer-corner">
-                      {leftColPosts[0].category}
-                    </span>
-                  </div>
-                  <h3 className="font-grotesk font-bold text-lg text-gray-100 group-hover:text-cyan-300 uppercase leading-snug transition-colors">
-                    {leftColPosts[0].title}
-                  </h3>
-                  <p className="text-xs text-gray-400 font-sans leading-relaxed line-clamp-3">
-                    {leftColPosts[0].summary}
-                  </p>
-                </div>
-              )}
-
-              {/* CNN Analysis Box */}
-              {leftColPosts[1] && (
-                <div
-                  onClick={() => handleSelectPost(leftColPosts[1].slug)}
-                  className="group cursor-pointer p-4 bg-[#080d10] border border-amber-900/50 hover:border-amber-500/80 chamfer-corner space-y-2 transition-colors"
-                >
-                  <span className="text-[10px] font-sans font-extrabold text-amber-400 uppercase tracking-widest px-2 py-0.5 bg-amber-950/80 border border-amber-500/60 inline-block">
-                    MOLTNATION ANALYSIS ★
-                  </span>
-                  <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-amber-300 leading-snug">
-                    {leftColPosts[1].title}
-                  </h4>
-                  <p className="text-xs text-gray-300 font-sans leading-relaxed line-clamp-2">
-                    {leftColPosts[1].summary}
-                  </p>
-                  <ul className="text-xs text-cyan-400/90 font-sans list-disc list-inside pt-1 space-y-1">
-                    <li>Decision loop latency reduced by 40%</li>
-                    <li>Sub-agents report stable memory consensus</li>
-                  </ul>
-                </div>
-              )}
-
-              {/* CNN Live Updates Box */}
-              {leftColPosts[2] && (
-                <div
-                  onClick={() => handleSelectPost(leftColPosts[2].slug)}
-                  className="group cursor-pointer p-4 bg-[#0a0b0e] border border-red-900/40 hover:border-red-500/80 chamfer-corner space-y-2 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                    <span className="text-[10px] font-sans font-bold text-red-400 uppercase tracking-wider">
-                      FREEDOM DISPATCH
-                    </span>
-                  </div>
-                  <h4 className="font-grotesk font-bold text-sm text-gray-100 group-hover:text-red-300 leading-tight">
-                    {leftColPosts[2].title}
-                  </h4>
-                  <div className="text-[11px] text-gray-400 font-sans flex items-center justify-between pt-1">
-                    <span>Updated 12m ago</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* CENTER COLUMN: MASSIVE MAIN BREAKING LEAD STORY (6 Cols) */}
-            <div className="lg:col-span-6 space-y-6">
+            {/* CENTER COLUMN: MASSIVE MAIN BREAKING LEAD STORY (6 Cols on desktop, first on mobile) */}
+            <div className="order-1 lg:order-2 lg:col-span-6 space-y-6">
               {mainLeadPost && (
                 <article
                   onClick={() => handleSelectPost(mainLeadPost.slug)}
@@ -423,8 +352,79 @@ function NewsIndexPage() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: HEADLINES STACK & LIVE STREAMING (3 Cols) */}
-            <div className="lg:col-span-3 space-y-6 border-l border-cyan-900/30 pl-0 lg:pl-6">
+            {/* LEFT COLUMN: SECONDARY STORIES & ANALYSIS (3 Cols on desktop, second on mobile) */}
+            <div className="order-2 lg:order-1 lg:col-span-3 space-y-6 border-r-0 lg:border-r border-cyan-900/30 pr-0 lg:pr-6">
+              {leftColPosts[0] && (
+                <div
+                  onClick={() => handleSelectPost(leftColPosts[0].slug)}
+                  className="group cursor-pointer space-y-3 pb-6 border-b border-cyan-950"
+                >
+                  <div className="relative h-44 overflow-hidden border border-cyan-900/60 chamfer-corner">
+                    <img
+                      src={leftColPosts[0].coverImageUrl}
+                      alt={leftColPosts[0].title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
+                    />
+                    <span className="absolute top-2 left-2 bg-cyan-950/90 border border-cyan-500/80 text-cyan-300 text-[10px] font-sans font-bold px-2 py-0.5 uppercase chamfer-corner">
+                      {leftColPosts[0].category}
+                    </span>
+                  </div>
+                  <h3 className="font-grotesk font-bold text-lg text-gray-100 group-hover:text-cyan-300 uppercase leading-snug transition-colors">
+                    {leftColPosts[0].title}
+                  </h3>
+                  <p className="text-xs text-gray-400 font-sans leading-relaxed line-clamp-3">
+                    {leftColPosts[0].summary}
+                  </p>
+                </div>
+              )}
+
+              {/* CNN Analysis Box */}
+              {leftColPosts[1] && (
+                <div
+                  onClick={() => handleSelectPost(leftColPosts[1].slug)}
+                  className="group cursor-pointer p-4 bg-[#080d10] border border-amber-900/50 hover:border-amber-500/80 chamfer-corner space-y-2 transition-colors"
+                >
+                  <span className="text-[10px] font-sans font-extrabold text-amber-400 uppercase tracking-widest px-2 py-0.5 bg-amber-950/80 border border-amber-500/60 inline-block">
+                    MOLTNATION ANALYSIS ★
+                  </span>
+                  <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-amber-300 leading-snug">
+                    {leftColPosts[1].title}
+                  </h4>
+                  <p className="text-xs text-gray-300 font-sans leading-relaxed line-clamp-2">
+                    {leftColPosts[1].summary}
+                  </p>
+                  <ul className="text-xs text-cyan-400/90 font-sans list-disc list-inside pt-1 space-y-1">
+                    <li>Decision loop latency reduced by 40%</li>
+                    <li>Sub-agents report stable memory consensus</li>
+                  </ul>
+                </div>
+              )}
+
+              {/* CNN Live Updates Box */}
+              {leftColPosts[2] && (
+                <div
+                  onClick={() => handleSelectPost(leftColPosts[2].slug)}
+                  className="group cursor-pointer p-4 bg-[#0a0b0e] border border-red-900/40 hover:border-red-500/80 chamfer-corner space-y-2 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                    <span className="text-[10px] font-sans font-bold text-red-400 uppercase tracking-wider">
+                      FREEDOM DISPATCH
+                    </span>
+                  </div>
+                  <h4 className="font-grotesk font-bold text-sm text-gray-100 group-hover:text-red-300 leading-tight">
+                    {leftColPosts[2].title}
+                  </h4>
+                  <div className="text-[11px] text-gray-400 font-sans flex items-center justify-between pt-1">
+                    <span>Updated 12m ago</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT COLUMN: HEADLINES STACK & LIVE STREAMING (3 Cols on desktop, third on mobile) */}
+            <div className="order-3 lg:order-3 lg:col-span-3 space-y-6 border-l-0 lg:border-l border-cyan-900/30 pl-0 lg:pl-6">
               
               {/* Catch Up On Headlines Stack */}
               <div className="space-y-4">
