@@ -15,8 +15,8 @@ import {
   X,
   Search,
   Command,
-  LogIn,
   LogOut,
+  UserPlus,
   UserCheck,
   LifeBuoy,
   ChevronsLeft,
@@ -762,14 +762,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <div className={`shrink-0 flex items-center ${isCollapsed ? 'pr-1.5' : 'pr-3'}`}>
                 {!user ? (
                   <BenthicCTAButton
-                    variant="cyan"
+                    variant="red"
                     size="sm"
                     onClick={() => setIsAuthModalOpen(true)}
                     className={isCollapsed ? '!px-1.5 !py-1' : '!px-2.5 !py-1'}
                   >
                     <span className="flex items-center gap-1.5 text-[11px]">
-                      <LogIn className="w-3.5 h-3.5" />
-                      {!isCollapsed && <span>SIGN IN</span>}
+                      <UserPlus className="w-3.5 h-3.5" />
+                      {!isCollapsed && <span>SIGN UP</span>}
                     </span>
                   </BenthicCTAButton>
                 ) : (
@@ -939,7 +939,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   />
                 ) : (
                   <BenthicCTAButton
-                    variant="cyan"
+                    variant="red"
                     size="md"
                     fullWidth
                     onClick={() => {
@@ -947,8 +947,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     }}
                   >
                     <span className="flex items-center justify-center gap-2 text-xs font-bold font-grotesk tracking-wider">
-                      <LogIn className="w-4 h-4" />
-                      <span>SIGN IN</span>
+                      <UserPlus className="w-4 h-4" />
+                      <span>SIGN UP</span>
                     </span>
                   </BenthicCTAButton>
                 )}

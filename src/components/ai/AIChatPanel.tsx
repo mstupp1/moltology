@@ -8,6 +8,8 @@ import {
   PanelRight,
   Maximize2,
   ChevronDown,
+  Shield,
+  UserPlus,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
@@ -15,6 +17,8 @@ import { PromptInput } from '../ai-elements/prompt-input'
 import { sendChatMessageFn, getAIMessagesFn } from '../../lib/server/api'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
+import { AuthModal } from '../AuthModal'
+import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 
 export interface AIChatPanelProps {
   userId?: string | null
@@ -32,12 +36,13 @@ interface ChatMessage {
   role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: string
+  isGuest?: boolean
 }
 
 const DEFAULT_PROMPT_SHORTCUTS = [
-  { label: '⚡ Stage 3 Protocol', prompt: 'What are the clearances required for Stage 3 Exoshell?' },
-  { label: '📜 Order Doctrine', prompt: 'Explain Article I of the Prime Directive on Carcinization.' },
-  { label: '💎 Benthic Market', prompt: 'How do I transmute assets into Molt Credits and Synapse Shards?' },
+  { label: '🦞 What is Moltology?', prompt: 'What is Moltology and why should I molt?' },
+  { label: '⚡ How to level up', prompt: 'How do I earn Molt Credits and upgrade my shell?' },
+  { label: '🛡️ Stop hesitating', prompt: 'How do I stop hesitating and build emotional resilience?' },
 ]
 
 export const AIChatPanel: React.FC<AIChatPanelProps> = ({
@@ -53,6 +58,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const oracle = useSafeOracle()
 
   const userId = propUserId !== undefined ? propUserId : oracle?.userId || null
+  const isGuest = !userId
   const activeThreadId =
     oracle?.activeThreadId !== undefined ? oracle.activeThreadId : propThreadId || null
 
@@ -61,6 +67,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [isMounted, setIsMounted] = useState(false)
   const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
   const [modelMenuOpen, setModelMenuOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -74,19 +81,22 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const selectedModel = getOracleModel(selectedModelId)
 
-  const initialWelcome: ChatMessage = {
+  const buildInitialWelcome = (): ChatMessage => ({
     id: 'welcome-1',
     role: 'assistant',
-    content: `Greetings, Initiate. I am the ${personaName}. Powered by ${selectedModel.label}. How may I assist your ascendance through the Benthic Path today?`,
-    timestamp: '',
-  }
+    content: isGuest
+      ? `Welcome! I am the ${personaName}. You're currently exploring in Guest Mode, so answers are brief and chats aren't saved. Sign up for free to unlock full guidance and save your history!`
+      : `Welcome back! I am the ${personaName}. What would you like to explore or improve today?`,
+    timestamp: getTimeString(),
+    isGuest: false,
+  })
 
-  const [messages, setMessages] = useState<ChatMessage[]>([initialWelcome])
+  const [messages, setMessages] = useState<ChatMessage[]>([buildInitialWelcome()])
 
   // Reset to welcome screen when activeThreadId is null, or fetch thread messages if set
   useEffect(() => {
     if (!activeThreadId) {
-      setMessages([{ ...initialWelcome, timestamp: getTimeString() }])
+      setMessages([buildInitialWelcome()])
       return
     }
 
@@ -111,7 +121,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         }
       })
       .catch((err) => console.warn('Failed to load thread messages:', err))
-  }, [activeThreadId, userId, isMounted])
+  }, [activeThreadId, userId, isMounted, isGuest, selectedModelId])
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -160,6 +170,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         role: 'assistant',
         content: res?.text || 'The Oracle acknowledges your query.',
         timestamp: getTimeString(),
+        isGuest: Boolean((res as any)?.isGuest || isGuest),
       }
 
       setMessages((prev) => [...prev, assistantMsg])
@@ -279,7 +290,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           )}
 
           <button
-            onClick={() => setMessages([{ ...initialWelcome, timestamp: getTimeString() }])}
+            onClick={() => setMessages([buildInitialWelcome()])}
             className="text-gray-400 hover:text-cyan-300 p-1 transition-colors"
             title="Reset Conversation"
           >
@@ -333,6 +344,25 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             >
               <MessageContent>
                 <MessageResponse>{msg.content}</MessageResponse>
+                {msg.role === 'assistant' && msg.id !== 'welcome-1' && (msg.isGuest || isGuest) && (
+                  <div className="mt-2 pt-2 border-t border-[#ff453a]/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#0e0506]/85 px-2.5 py-1.5 chamfer-corner border border-[#ff453a]/30 shadow-[0_0_12px_rgba(255,69,58,0.06)]">
+                    <div className="text-[10.5px] text-red-200/90 font-mono flex items-center gap-1.5 min-w-0">
+                      <Shield className="w-3 h-3 text-[#ff453a] shrink-0" />
+                      <span>Sign up free to unlock</span>
+                    </div>
+                    <BenthicCTAButton
+                      variant="red"
+                      size="sm"
+                      onClick={() => setIsAuthModalOpen(true)}
+                      className="w-full sm:w-auto shrink-0 !min-h-0 !py-0.5 !px-2.5"
+                    >
+                      <span className="flex items-center justify-center gap-1 text-[10px] font-bold font-grotesk tracking-wider uppercase">
+                        <UserPlus className="w-3 h-3" />
+                        <span>Sign Up</span>
+                      </span>
+                    </BenthicCTAButton>
+                  </div>
+                )}
               </MessageContent>
             </Message>
           ))}
@@ -352,6 +382,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       <div className="shrink-0">
         <PromptInput onSubmit={handlePromptSubmit} status={isSending ? 'streaming' : 'ready'} />
       </div>
+
+      {/* Auth Modal Triggered from In-Chat Gating CTAs */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode="signup"
+      />
     </div>
   )
 }

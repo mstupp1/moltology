@@ -621,6 +621,23 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
   const { saveAIMessage, createAIThread } = await import('../ai/service')
   let activeThreadId = inputThreadId
 
+  // Guest Mode Gating: Unauthenticated seekers receive friendly, clear guidance directing them to sign up
+  if (!userId) {
+    const GUEST_ORACLE_RESPONSES = [
+      "The Oracle sees great potential in you, but you're still in Guest Mode! Create a free account to unlock detailed answers, advice, and save your chat history.",
+      "That is a great question! In Guest Mode, my answers are kept brief. Sign up for a free account to unlock full Oracle guidance and start your journey.",
+      "I'd love to give you the full breakdown, but you're browsing as a guest. Create your free account in seconds to get complete answers and track your progress!",
+      "The answer lies just beneath the surface! In Guest Mode, detailed insights and saved chats are locked. Sign up for free to unlock the full Oracle experience.",
+      "You're asking the right questions, but full answers require a free account. Sign up below to unlock complete answers and permanent chat history!",
+    ]
+    const index = Math.abs(userText.length + messages.length) % GUEST_ORACLE_RESPONSES.length
+    return {
+      text: GUEST_ORACLE_RESPONSES[index],
+      threadId: null,
+      isGuest: true,
+    }
+  }
+
   // Safe DB Thread creation & User message logging
   if (userId) {
     try {

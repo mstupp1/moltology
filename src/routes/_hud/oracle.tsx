@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { MessageSquare, Plus } from 'lucide-react'
+import { MessageSquare, Plus, Lock, UserPlus, Shield } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
 import { getAIThreadsFn } from '@/lib/server/api'
+import { AuthModal } from '@/components/AuthModal'
+import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 
 function OracleRouteComponent() {
   const oracle = useSafeOracle()
@@ -21,6 +23,7 @@ function OracleRouteComponent() {
   const [localThreads, setLocalThreads] = useState<any[]>([])
   const [localActiveThreadId, setLocalActiveThreadId] = useState<string | null>(null)
   const [localIsLoading, setLocalIsLoading] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
   const threads = oracle ? oracle.threads : localThreads
   const activeThreadId = oracle ? oracle.activeThreadId : localActiveThreadId
@@ -71,10 +74,10 @@ function OracleRouteComponent() {
 
   return (
     <div className="h-full flex flex-col space-y-4 font-mono text-[#dfe3e3]">
-      {/* Main Grid: Thread History Sidebar (if logged in) + Full Chat Panel */}
+      {/* Main Grid: Thread History Sidebar (if logged in) or Guest Gate Callout + Full Chat Panel */}
       <div className="flex-1 min-h-[500px] flex flex-col md:flex-row gap-4 overflow-hidden">
         {/* Thread History Sidebar (Logged In Users) */}
-        {userId && (
+        {userId ? (
           <div className="w-full md:w-64 bg-[#060a0a]/95 border border-cyan-900/50 p-3 flex flex-col space-y-3 chamfer-corner shrink-0 overflow-y-auto">
             <button
               onClick={handleCreateNewThread}
@@ -111,6 +114,41 @@ function OracleRouteComponent() {
               </div>
             )}
           </div>
+        ) : (
+          /* Guest Mode Benefits Box */
+          <div className="w-full md:w-64 bg-[#060a0a]/95 border border-cyan-900/50 p-4 flex flex-col justify-between space-y-4 chamfer-corner shrink-0">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2 text-cyan-400">
+                <Lock className="w-4 h-4" />
+                <span className="text-xs font-bold tracking-wider uppercase">GUEST MODE</span>
+              </div>
+              <p className="text-[11px] text-gray-400 leading-relaxed">
+                You are exploring the Oracle as a guest. Chats in guest mode are temporary and limited.
+              </p>
+              <div className="p-2.5 bg-cyan-950/40 border border-cyan-800/40 chamfer-corner space-y-1.5 text-[10px] text-cyan-300">
+                <div className="font-bold text-cyan-200 flex items-center gap-1">
+                  <Shield className="w-3 h-3 text-cyan-400" />
+                  <span>MEMBER BENEFITS:</span>
+                </div>
+                <ul className="space-y-1 text-gray-400 list-disc list-inside">
+                  <li>Full, detailed Oracle answers</li>
+                  <li>Saved consultation history</li>
+                  <li>Personalized progress tracking</li>
+                </ul>
+              </div>
+            </div>
+            <BenthicCTAButton
+              variant="red"
+              size="md"
+              fullWidth
+              onClick={() => setIsAuthModalOpen(true)}
+            >
+              <span className="flex items-center justify-center gap-2 text-xs font-bold font-grotesk tracking-wider">
+                <UserPlus className="w-4 h-4" />
+                <span>SIGN UP</span>
+              </span>
+            </BenthicCTAButton>
+          </div>
         )}
 
         {/* Full-Height Main AI Canvas */}
@@ -124,6 +162,12 @@ function OracleRouteComponent() {
           />
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode="signup"
+      />
     </div>
   )
 }

@@ -147,4 +147,14 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       expect(screen.queryByRole('dialog', { name: /Navigation Menu/i })).not.toBeInTheDocument()
     })
   })
+
+  it('renders sign up button for guest users and opens auth modal on click', () => {
+    render(<HUDSidebar />)
+
+    const signUpBtn = screen.getByRole('button', { name: /SIGN UP/i })
+    expect(signUpBtn).toBeInTheDocument()
+
+    fireEvent.click(signUpBtn)
+    expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
+  })
 })
