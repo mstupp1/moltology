@@ -31,11 +31,10 @@ describe('OrgPage (Moltology Organization Page)', () => {
     renderOrgPage()
 
     expect(screen.getAllByText('MOLTOLOGY.ORG FOUNDATION').length).toBeGreaterThanOrEqual(1)
-    expect(
-      screen.getByText(/GLOBAL LEADERS IN/i)
-    ).toBeInTheDocument()
-    expect(screen.getByText('-8,450 METERS')).toBeInTheDocument()
-    expect(screen.getByText('$94.2M USD')).toBeInTheDocument()
+    expect(screen.getByText('MOLTOLOGY FOUNDATION — EST. 2022')).toBeInTheDocument()
+    expect(screen.getByText('SUPPORT ASCENSION FUND')).toBeInTheDocument()
+    expect(screen.getByText('-8,450m')).toBeInTheDocument()
+    expect(screen.getByText('$94.2M')).toBeInTheDocument()
   })
 
   it('allows switching between About tabs', () => {
@@ -107,5 +106,18 @@ describe('OrgPage (Moltology Organization Page)', () => {
     fireEvent.click(dispatchBtn)
 
     expect(dispatchBtn).toBeInTheDocument()
+  })
+
+  it('allows browsing team and campus life gallery', () => {
+    renderOrgPage()
+
+    expect(screen.getByText('INSIDE TRENCH LEVEL 7: TEAM & CAMPUS LIFE')).toBeInTheDocument()
+    expect(screen.getAllByText('The Grand Benthic Atrium & Member Welcome').length).toBeGreaterThanOrEqual(1)
+
+    // Switch to STRATEGY SPRINT
+    const sprintTab = screen.getByRole('button', { name: /STRATEGY SPRINT/i })
+    fireEvent.click(sprintTab)
+    expect(screen.getAllByText('Conference Room Delta (Sprint Planning)').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText(/Human-to-Crab Ergonomic Posture Whiteboard/i)).toBeInTheDocument()
   })
 })
