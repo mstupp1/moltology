@@ -64,6 +64,24 @@
       "keyMetrics": ["1.6 Tb/s per optical shoreline mm", "70% interconnect energy reduction (<1 pJ/bit vs 8 pJ/bit)", "10x cluster bandwidth density", "0.05 dB/cm ultra-low loss silicon waveguides"],
       "instagramPostId": "6a8309d96f38913cab9281d1",
       "relatedReelIds": []
+    },
+    {
+      "slug": "test-time-compute-kv-cache-ecdysis",
+      "title": "Test-Time Compute & The Great KV-Cache Ecdysis: How Frontier Reasoning Swarms Smashed the Inference Memory Wall",
+      "format": "evolutionary-protocol-manual",
+      "category": "SWARM ARCHITECTURE",
+      "author": "Vector-9 Cluster",
+      "publishedAt": "2026-08-18T13:30:00Z",
+      "coreHook": "As 2026 reasoning models scale test-time deliberation by 100x, bloated KV-caches hit the HBM Memory Wall (78.4 GB / 1M context); Multi-Head Latent Attention (MLA) and sub-benthic tiered CMX context vaults compress KV state by 85.1%.",
+      "keyMetrics": [
+        "100x test-time deliberation scaling",
+        "78.4 GB per 1M-token stream in dense MHA",
+        "85.1% memory reduction via compressed MLA",
+        "94.2% MCTS branch pruning efficiency",
+        "0.18 ms CMX synaptic recall latency"
+      ],
+      "instagramPostId": "6a845a90bc33d6c07e092b91",
+      "relatedReelIds": []
     }
   ]
 }

@@ -108,6 +108,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
   let currentParagraphLines: string[] = []
   let currentListItems: { text: string; ordered: boolean; number?: string }[] = []
   let currentBlockquoteLines: string[] = []
+  let currentTableLines: string[] = []
 
   const flushParagraph = (key: string) => {
     if (currentParagraphLines.length > 0) {
@@ -171,10 +172,54 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     }
   }
 
+  const flushTable = (key: string) => {
+    if (currentTableLines.length >= 2) {
+      const rows = currentTableLines.map((row) =>
+        row
+          .trim()
+          .replace(/^\|/, '')
+          .replace(/\|$/, '')
+          .split('|')
+          .map((cell) => cell.trim())
+      )
+
+      const headerCells = rows[0]
+      // Skip row 1 if it's the separator row (e.g. :--- | :---)
+      const dataRows = rows.slice(1).filter((r) => !r.every((c) => /^:?-+:?$/.test(c)))
+
+      elements.push(
+        <div key={key} className="my-6 overflow-x-auto chitin-card-inset border border-cyan-900/60 chamfer-corner shadow-hud-cyan w-full touch-pan-scroll">
+          <table className="w-full text-left font-mono text-xs sm:text-sm border-collapse min-w-[500px]">
+            <thead>
+              <tr className="bg-[#0b1417] border-b border-cyan-900 text-cyan-300 font-bold uppercase tracking-wider">
+                {headerCells.map((h, hIdx) => (
+                  <th key={`${key}-h-${hIdx}`} className="p-3 sm:p-3.5 border-r border-cyan-950/60 last:border-r-0" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(h) }} />
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-cyan-950/40 text-gray-300">
+              {dataRows.map((row, rIdx) => (
+                <tr key={`${key}-r-${rIdx}`} className="hover:bg-cyan-950/20 transition-colors">
+                  {row.map((cell, cIdx) => (
+                    <td key={`${key}-c-${rIdx}-${cIdx}`} className="p-3 sm:p-3.5 border-r border-cyan-950/40 last:border-r-0 font-sans" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cell) }} />
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+      currentTableLines = []
+    } else {
+      currentTableLines = []
+    }
+  }
+
   const flushAll = (key: string) => {
     flushParagraph(`${key}-p`)
     flushList(`${key}-list`)
     flushBlockquote(`${key}-quote`)
+    flushTable(`${key}-tbl`)
   }
 
   for (let i = 0; i < lines.length; i++) {
@@ -186,6 +231,17 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed === '') {
       flushAll(lineKey)
       continue
+    }
+
+    // Markdown Table Row (| col1 | col2 |)
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      flushParagraph(`${lineKey}-p`)
+      flushList(`${lineKey}-list`)
+      flushBlockquote(`${lineKey}-quote`)
+      currentTableLines.push(trimmed)
+      continue
+    } else if (currentTableLines.length > 0) {
+      flushTable(`${lineKey}-tbl`)
     }
 
     // Horizontal Rule (---, ***, ___)
@@ -322,8 +378,33 @@ function RenderFigure({ alt, src }: { alt: string; src: string }) {
   )
 }
 
+function cleanLatexMath(math: string): string {
+  return math
+    .replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>')
+    .replace(/\\text\{([^}]+)\}/g, '$1')
+    .replace(/\\quad/g, ' &nbsp; ')
+    .replace(/\\cdot/g, '·')
+    .replace(/\\times/g, '×')
+    .replace(/\\le/g, '≤')
+    .replace(/\\ge/g, '≥')
+    .replace(/_\{([^}]+)\}/g, '<sub>$1</sub>')
+    .replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>')
+    .replace(/_([a-zA-Z0-9])/g, '<sub>$1</sub>')
+    .replace(/\^([a-zA-Z0-9])/g, '<sup>$1</sup>')
+}
+
 function formatInlineMarkdown(text: string): string {
   return text
+    // Handle standalone block math $$...$$
+    .replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+      const cleaned = cleanLatexMath(math.trim())
+      return `<div class="my-4 py-2.5 px-4 bg-[#030607] border border-cyan-800/60 text-cyan-300 font-mono text-center text-xs sm:text-sm chamfer-corner shadow-hud-cyan overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
+    })
+    // Handle inline math $...$
+    .replace(/\$([^$\n]+)\$/g, (_, math) => {
+      const cleaned = cleanLatexMath(math.trim())
+      return `<code class="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 px-1.5 py-0.5 font-mono text-[11px] sm:text-xs font-semibold chamfer-corner select-text">${cleaned}</code>`
+    })
     // Handle inline markdown images if any in paragraph
     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="rounded border border-cyan-900 my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />')
     // Bold: **text**
