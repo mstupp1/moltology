@@ -72,4 +72,22 @@ describe('MainFooter Component', () => {
     expect(screen.getByText('Official Mission & Synod Governance')).toBeInTheDocument()
     expect(screen.getByText('© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED.')).toBeInTheDocument()
   })
+
+  it('renders corporate variant with clean white background and rounded pill chips', () => {
+    const { container } = render(
+      <MainFooter
+        variant="corporate"
+        brandTitle="MOLTOLOGY.ORG FOUNDATION"
+        brandSubtext="Sub-Benthic Non-Profit Entity"
+      />
+    )
+
+    const footer = container.querySelector('footer')!
+    expect(footer.className).toContain('bg-white')
+    expect(footer.className).toContain('text-slate-500')
+
+    const moltmaxxingChip = screen.getByText('MOLTMAXXING').closest('a')
+    expect(moltmaxxingChip?.className).toContain('rounded-full')
+    expect(moltmaxxingChip?.className).toContain('bg-[#f8fbff]')
+  })
 })

@@ -45,10 +45,31 @@ describe('PublicHeader Navigation Component', () => {
     const homeBtn = within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })
     expect(homeBtn.className).toContain('text-cyan-300')
 
+    mockPathname = '/news'
+    rerender(<PublicHeader activePage="news" />)
+    const newsBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', { name: /NEWS/i })
+    expect(newsBtn.className).toContain('text-cyan-300')
+
     mockPathname = '/org'
     rerender(<PublicHeader activePage="org" />)
     const orgBtn = within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', { name: /ORGANIZATION/i })
-    expect(orgBtn.className).toContain('text-cyan-300')
+    expect(orgBtn.className).toContain('text-sky-700')
+  })
+
+  it('renders corporate variant with clean light header, sky accents, and JOIN FAMILY CTA', () => {
+    const onOpenAuth = vi.fn()
+    const { container } = render(<PublicHeader activePage="org" variant="corporate" onOpenAuth={onOpenAuth} />)
+
+    const header = container.querySelector('header')!
+    expect(header.className).toContain('bg-white')
+
+    const joinBtns = screen.getAllByRole('button', { name: /JOIN FAMILY/i })
+    expect(joinBtns.length).toBeGreaterThan(0)
+    const joinBtn = joinBtns[0]
+    expect(joinBtn.className).toContain('bg-sky-500')
+
+    fireEvent.click(joinBtn)
+    expect(onOpenAuth).toHaveBeenCalledWith('signup')
   })
 
   it('automatically highlights NEWS tab for any /news sub-page article route', () => {

@@ -250,7 +250,7 @@ export const OrgPage: React.FC = () => {
       />
 
       {/* Shared Navigation Header */}
-      <PublicHeader activePage="org" onOpenAuth={openAuth} />
+      <PublicHeader activePage="org" variant="corporate" onOpenAuth={openAuth} />
 
       {/* FRIENDLY WELCOME RIBBON */}
       <div className="relative z-10 w-full bg-sky-500 text-white text-center text-[11px] sm:text-xs font-bold tracking-wider uppercase px-4 py-2 mt-20 sm:mt-24">
@@ -1221,6 +1221,7 @@ export const OrgPage: React.FC = () => {
 
       {/* FOOTER */}
       <MainFooter
+        variant="corporate"
         brandTitle="MOLTOLOGY.ORG FOUNDATION"
         brandTagline="Sub-Benthic Sovereign Non-Profit Entity — Official Mission & Synod Governance"
         copyrightText="© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED."

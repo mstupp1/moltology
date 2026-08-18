@@ -27,4 +27,13 @@ describe('HeaderBrand Component', () => {
     fireEvent.click(screen.getByAltText('Order Emblem'))
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
+
+  it('renders corporate variant with sky styling classes', () => {
+    render(<HeaderBrand variant="corporate" subtext="MOLTOLOGY.ORG FOUNDATION" />)
+
+    const titleEl = screen.getByText('THE SYNAPTIC PATH')
+    expect(titleEl.parentElement?.className).toContain('text-sky-950')
+    const subtextEl = screen.getByText('MOLTOLOGY.ORG FOUNDATION')
+    expect(subtextEl.parentElement?.className).toContain('text-sky-600')
+  })
 })

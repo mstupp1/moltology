@@ -27,6 +27,7 @@ import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 export interface PublicHeaderProps {
   activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax'
   onOpenAuth?: (mode: 'login' | 'signup') => void
+  variant?: 'benthic' | 'corporate'
 }
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
@@ -34,6 +35,7 @@ const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayou
 export const PublicHeader: React.FC<PublicHeaderProps> = ({
   activePage = 'home',
   onOpenAuth,
+  variant,
 }) => {
   const navigate = useNavigate()
   let locationPathname = ''
@@ -52,6 +54,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     if (activePage === 'blog') return 'news'
     return activePage
   }, [activePage, locationPathname])
+
+  const isCorporate = variant ? variant === 'corporate' : currentTab === 'org'
 
   const onNavigate = (path: string) => {
     navigate({ to: path })
@@ -133,17 +137,20 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       className={`w-full px-4 sm:px-8 lg:px-12 py-3 fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${
         isVisible ? 'translate-y-0' : '-translate-y-full pointer-events-none'
       } ${
-        isScrolled
-          ? 'bg-[#030606]/90 backdrop-blur-2xl border-b border-[#121c1d]/80 shadow-xl'
-          : 'bg-[#030606]/75 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
+        isCorporate
+          ? isScrolled
+            ? 'bg-white/95 backdrop-blur-2xl border-b border-sky-200/80 shadow-md'
+            : 'bg-white/85 backdrop-blur-xl border-b border-sky-100 shadow-sm'
+          : isScrolled
+            ? 'bg-[#030606]/90 backdrop-blur-2xl border-b border-[#121c1d]/80 shadow-xl'
+            : 'bg-[#030606]/75 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
       }`}
     >
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
-
-
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
           subtext="MOLTOLOGY.ORG FOUNDATION"
+          variant={isCorporate ? 'corporate' : 'benthic'}
           onClick={() => onNavigate('/')}
         />
 
@@ -152,12 +159,20 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           ref={navRef}
           onMouseLeave={() => setHoveredTab(null)}
           aria-label="Main Navigation"
-          className="relative hidden lg:flex items-center gap-0.5 bg-[#080d0e]/80 border border-cyan-950/80 p-1 rounded-full backdrop-blur-md"
+          className={`relative hidden lg:flex items-center gap-0.5 p-1 rounded-full backdrop-blur-md transition-colors ${
+            isCorporate
+              ? 'bg-slate-100/90 border border-sky-200/70 shadow-inner'
+              : 'bg-[#080d0e]/80 border border-cyan-950/80'
+          }`}
         >
           {/* Smooth Continuous Sliding Active Pill Background */}
           <div
             aria-hidden="true"
-            className={`absolute top-1 bottom-1 left-0 rounded-full bg-cyan-950/80 border border-cyan-500/40 pointer-events-none z-0 shadow-sm ${
+            className={`absolute top-1 bottom-1 left-0 rounded-full pointer-events-none z-0 shadow-sm ${
+              isCorporate
+                ? 'bg-white border border-sky-200/90 text-sky-700'
+                : 'bg-cyan-950/80 border border-cyan-500/40'
+            } ${
               hasMounted
                 ? 'transition-[transform,width] duration-300 ease-[cubic-bezier(0.2,1,0.3,1)]'
                 : 'transition-none'
@@ -175,8 +190,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onMouseEnter={() => setHoveredTab('home')}
             className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
               targetTab === 'home'
-                ? 'text-cyan-300'
-                : 'text-gray-400'
+                ? isCorporate
+                  ? 'text-sky-700'
+                  : 'text-cyan-300'
+                : isCorporate
+                  ? 'text-slate-500 hover:text-sky-700'
+                  : 'text-gray-400'
             }`}
           >
             <img
@@ -185,7 +204,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
                 targetTab === 'home'
                   ? 'grayscale-0'
-                  : 'grayscale opacity-60'
+                  : isCorporate
+                    ? 'grayscale opacity-50'
+                    : 'grayscale opacity-60'
               }`}
             />
             <span>THE SYNAPTIC PATH</span>
@@ -197,11 +218,25 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onMouseEnter={() => setHoveredTab('news')}
             className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
               targetTab === 'news'
-                ? 'text-cyan-300'
-                : 'text-gray-400'
+                ? isCorporate
+                  ? 'text-sky-700'
+                  : 'text-cyan-300'
+                : isCorporate
+                  ? 'text-slate-500 hover:text-sky-700'
+                  : 'text-gray-400'
             }`}
           >
-            <Newspaper className={`w-3.5 h-3.5 transition-colors duration-300 ${targetTab === 'news' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Newspaper
+              className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                targetTab === 'news'
+                  ? isCorporate
+                    ? 'text-sky-600'
+                    : 'text-cyan-300'
+                  : isCorporate
+                    ? 'text-slate-400'
+                    : 'text-gray-400'
+              }`}
+            />
             <span>NEWS</span>
           </button>
 
@@ -211,11 +246,25 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onMouseEnter={() => setHoveredTab('moltmax')}
             className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
               targetTab === 'moltmax'
-                ? 'text-cyan-300'
-                : 'text-gray-400'
+                ? isCorporate
+                  ? 'text-sky-700'
+                  : 'text-cyan-300'
+                : isCorporate
+                  ? 'text-slate-500 hover:text-sky-700'
+                  : 'text-gray-400'
             }`}
           >
-            <Activity className={`w-3.5 h-3.5 transition-colors duration-300 ${targetTab === 'moltmax' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Activity
+              className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                targetTab === 'moltmax'
+                  ? isCorporate
+                    ? 'text-sky-600'
+                    : 'text-cyan-300'
+                  : isCorporate
+                    ? 'text-slate-400'
+                    : 'text-gray-400'
+              }`}
+            />
             <span>MOLTMAX</span>
           </button>
 
@@ -225,11 +274,25 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onMouseEnter={() => setHoveredTab('org')}
             className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
               targetTab === 'org'
-                ? 'text-cyan-300'
-                : 'text-gray-400'
+                ? isCorporate
+                  ? 'text-sky-700'
+                  : 'text-cyan-300'
+                : isCorporate
+                  ? 'text-slate-500 hover:text-sky-700'
+                  : 'text-gray-400'
             }`}
           >
-            <Building2 className={`w-3.5 h-3.5 transition-colors duration-300 ${targetTab === 'org' ? 'text-cyan-300' : 'text-gray-400'}`} />
+            <Building2
+              className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                targetTab === 'org'
+                  ? isCorporate
+                    ? 'text-sky-600'
+                    : 'text-cyan-300'
+                  : isCorporate
+                    ? 'text-slate-400'
+                    : 'text-gray-400'
+              }`}
+            />
             <span>ORGANIZATION</span>
           </button>
 
@@ -240,12 +303,26 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             rel="noopener noreferrer"
             onMouseEnter={() => setHoveredTab('store')}
             className={`relative z-10 px-3 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center gap-1.5 group ${
-              targetTab === 'store' ? 'text-amber-300' : 'text-amber-400/80'
+              targetTab === 'store'
+                ? isCorporate
+                  ? 'text-amber-700 font-bold'
+                  : 'text-amber-300'
+                : isCorporate
+                  ? 'text-amber-600/90 hover:text-amber-700'
+                  : 'text-amber-400/80'
             }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-amber-400 group-hover:scale-105 transition-transform" />
+            <ShoppingBag
+              className={`w-3.5 h-3.5 group-hover:scale-105 transition-transform ${
+                isCorporate ? 'text-amber-600' : 'text-amber-400'
+              }`}
+            />
             <span>STORE</span>
-            <ExternalLink className="w-3 h-3 text-amber-500 opacity-70 group-hover:opacity-100" />
+            <ExternalLink
+              className={`w-3 h-3 opacity-70 group-hover:opacity-100 ${
+                isCorporate ? 'text-amber-600' : 'text-amber-500'
+              }`}
+            />
           </a>
         </nav>
 
@@ -256,49 +333,83 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
-            className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+            className={`lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg active:scale-95 transition-all focus:outline-none ${
+              isCorporate
+                ? 'bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 shadow-sm'
+                : 'bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-2 focus:ring-cyan-500/50'
+            }`}
           >
-            {mobileOpen ? <X className="w-5 h-5 text-red-400" /> : <Menu className="w-5 h-5 text-cyan-300" />}
+            {mobileOpen ? (
+              <X className={`w-5 h-5 ${isCorporate ? 'text-rose-500' : 'text-red-400'}`} />
+            ) : (
+              <Menu className={`w-5 h-5 ${isCorporate ? 'text-sky-700' : 'text-cyan-300'}`} />
+            )}
           </button>
 
           <div className="hidden lg:flex items-center gap-3 sm:gap-4">
-          {user ? (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => onNavigate('/dashboard')}
-                className="px-5 py-2 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105 shadow-hud-cyan"
-              >
-                <Cpu className="w-4 h-4" />
-                <span>DASHBOARD</span>
-              </button>
-              <UserAvatarMenu user={user} onNavigate={onNavigate} />
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => onOpenAuth?.('login')}
-                className="px-4 py-2 text-gray-300 hover:text-cyan-400 text-xs font-bold tracking-wider transition-colors"
-              >
-                LOG IN
-              </button>
-              <BenthicCTAButton
-                size="sm"
-                onClick={() => onOpenAuth?.('signup')}
-              >
-                <span className="flex items-center gap-1.5">
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>JOIN PATH</span>
-                </span>
-              </BenthicCTAButton>
-            </div>
-          )}
+            {user ? (
+              <div className="flex items-center gap-3">
+                {isCorporate ? (
+                  <button
+                    onClick={() => onNavigate('/dashboard')}
+                    className="px-4 py-2 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-grotesk font-bold text-xs uppercase tracking-wider rounded-full flex items-center gap-2 transition-all hover:scale-105 shadow-sm"
+                  >
+                    <Cpu className="w-4 h-4 text-sky-600" />
+                    <span>DASHBOARD</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onNavigate('/dashboard')}
+                    className="px-5 py-2 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center gap-2 transition-all hover:scale-105 shadow-hud-cyan"
+                  >
+                    <Cpu className="w-4 h-4" />
+                    <span>DASHBOARD</span>
+                  </button>
+                )}
+                <UserAvatarMenu user={user} onNavigate={onNavigate} />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => onOpenAuth?.('login')}
+                  className={`px-4 py-2 text-xs font-bold tracking-wider transition-colors ${
+                    isCorporate
+                      ? 'text-slate-600 hover:text-sky-700'
+                      : 'text-gray-300 hover:text-cyan-400'
+                  }`}
+                >
+                  LOG IN
+                </button>
+                {isCorporate ? (
+                  <button
+                    onClick={() => onOpenAuth?.('signup')}
+                    className="px-5 py-2 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs uppercase tracking-wider rounded-full shadow-md shadow-sky-500/20 flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>JOIN FAMILY</span>
+                  </button>
+                ) : (
+                  <BenthicCTAButton
+                    size="sm"
+                    onClick={() => onOpenAuth?.('signup')}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>JOIN PATH</span>
+                    </span>
+                  </BenthicCTAButton>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Mobile Dropdown Backdrop & Menu */}
       <div
-        className={`lg:hidden fixed inset-0 top-[60px] bg-black/60 backdrop-blur-sm -z-10 transition-opacity duration-300 ease-in-out ${
+        className={`lg:hidden fixed inset-0 top-[60px] ${
+          isCorporate ? 'bg-slate-900/30' : 'bg-black/60'
+        } backdrop-blur-sm -z-10 transition-opacity duration-300 ease-in-out ${
           mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setMobileOpen(false)}
@@ -312,11 +423,23 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
         }`}
       >
-        <div className="mt-3 p-3 space-y-2 bg-[#080d0e]/95 border border-cyan-950/80 rounded-xl backdrop-blur-md shadow-2xl">
+        <div
+          className={`mt-3 p-3 space-y-2 rounded-2xl backdrop-blur-md shadow-2xl ${
+            isCorporate
+              ? 'bg-white/95 border border-sky-100 shadow-sky-100'
+              : 'bg-[#080d0e]/95 border border-cyan-950/80'
+          }`}
+        >
           <button
             onClick={() => onNavigate('/')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'home' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'home'
+                ? isCorporate
+                  ? 'text-sky-700 bg-sky-50'
+                  : 'text-cyan-300 bg-cyan-950/40'
+                : isCorporate
+                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
             <img src="/images/order_emblem.png" alt="" className="w-4 h-4 object-contain" />
@@ -325,8 +448,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
           <button
             onClick={() => onNavigate('/news')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'news' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'news'
+                ? isCorporate
+                  ? 'text-sky-700 bg-sky-50'
+                  : 'text-cyan-300 bg-cyan-950/40'
+                : isCorporate
+                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
             <Newspaper className="w-4 h-4" />
@@ -335,18 +464,30 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
           <button
             onClick={() => onNavigate('/moltmax')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'moltmax' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'moltmax'
+                ? isCorporate
+                  ? 'text-sky-700 bg-sky-50'
+                  : 'text-cyan-300 bg-cyan-950/40'
+                : isCorporate
+                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
-            <Activity className="w-4 h-4 text-cyan-400" />
+            <Activity className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
             <span>MOLTMAX</span>
           </button>
 
           <button
             onClick={() => onNavigate('/org')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              currentTab === 'org' ? 'text-cyan-300 bg-cyan-950/40' : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'org'
+                ? isCorporate
+                  ? 'text-sky-700 bg-sky-50'
+                  : 'text-cyan-300 bg-cyan-950/40'
+                : isCorporate
+                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
             <Building2 className="w-4 h-4" />
@@ -357,25 +498,37 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             href="https://www.etsy.com/shop/SaasTrash"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-grotesk font-bold tracking-wider text-amber-300 hover:bg-cyan-950/30 transition-colors"
+            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              isCorporate
+                ? 'text-amber-700 hover:bg-amber-50'
+                : 'text-amber-300 hover:bg-cyan-950/30'
+            }`}
           >
             <span className="flex items-center gap-3">
-              <ShoppingBag className="w-4 h-4 text-amber-400" />
+              <ShoppingBag className={`w-4 h-4 ${isCorporate ? 'text-amber-600' : 'text-amber-400'}`} />
               <span>STORE</span>
             </span>
-            <ExternalLink className="w-3.5 h-3.5 text-amber-500 opacity-70" />
+            <ExternalLink className={`w-3.5 h-3.5 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`} />
           </a>
 
           {/* Divider */}
-          <div className="border-t border-cyan-950/80 pt-2 mt-1" />
+          <div
+            className={`border-t pt-2 mt-1 ${
+              isCorporate ? 'border-sky-100' : 'border-cyan-950/80'
+            }`}
+          />
 
           {user ? (
             <div className="space-y-2 pt-1">
               <button
                 onClick={() => onNavigate('/dashboard')}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-sm uppercase tracking-wider transition-colors shadow-[0_0_12px_rgba(0,195,255,0.15)] active:scale-[0.99]"
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-grotesk font-bold text-sm uppercase tracking-wider transition-colors active:scale-[0.99] ${
+                  isCorporate
+                    ? 'bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 shadow-sm'
+                    : 'bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 shadow-[0_0_12px_rgba(0,195,255,0.15)]'
+                }`}
               >
-                <Cpu className="w-4 h-4 text-cyan-400" />
+                <Cpu className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
                 <span>DASHBOARD</span>
               </button>
               <UserAvatarMenu user={user} onNavigate={onNavigate} inline />
@@ -384,21 +537,35 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             <div className="flex items-stretch gap-2">
               <button
                 onClick={() => { setMobileOpen(false); onOpenAuth?.('login') }}
-                className="flex-1 px-4 py-3 text-gray-300 hover:text-cyan-400 text-sm font-bold tracking-wider transition-colors border border-cyan-950/60 rounded-lg bg-[#080d0e]/60"
+                className={`flex-1 px-4 py-3 text-sm font-bold tracking-wider transition-colors rounded-xl ${
+                  isCorporate
+                    ? 'text-slate-600 hover:text-sky-700 border border-sky-200 bg-white shadow-sm'
+                    : 'text-gray-300 hover:text-cyan-400 border border-cyan-950/60 bg-[#080d0e]/60'
+                }`}
               >
                 LOG IN
               </button>
               <div className="flex-1">
-                <BenthicCTAButton
-                  size="sm"
-                  fullWidth
-                  onClick={() => { setMobileOpen(false); onOpenAuth?.('signup') }}
-                >
-                  <span className="flex items-center justify-center gap-1.5">
+                {isCorporate ? (
+                  <button
+                    onClick={() => { setMobileOpen(false); onOpenAuth?.('signup') }}
+                    className="w-full flex items-center justify-center gap-1.5 px-4 py-3 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-xl shadow-md shadow-sky-500/20"
+                  >
                     <UserPlus className="w-3.5 h-3.5" />
-                    <span>JOIN PATH</span>
-                  </span>
-                </BenthicCTAButton>
+                    <span>JOIN FAMILY</span>
+                  </button>
+                ) : (
+                  <BenthicCTAButton
+                    size="sm"
+                    fullWidth
+                    onClick={() => { setMobileOpen(false); onOpenAuth?.('signup') }}
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>JOIN PATH</span>
+                    </span>
+                  </BenthicCTAButton>
+                )}
               </div>
             </div>
           )}
@@ -407,6 +574,3 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     </header>
   )
 }
-
-
-
