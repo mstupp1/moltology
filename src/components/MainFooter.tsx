@@ -21,11 +21,12 @@ export interface MainFooterProps {
   brandSubtext?: string
   brandTagline?: string
   copyrightText?: string
+  variant?: 'benthic' | 'corporate'
 }
 
 /**
- * Canonical Main HUD Footer for Moltology.
- * Features HeaderBrand styling, tactile MoltNation-style chamfer-corner chips,
+ * Canonical Main HUD / Corporate Footer for Moltology.
+ * Features HeaderBrand styling, tactile chamfer-corner or rounded corporate chips,
  * high-value SEO targets, balanced responsive layout, and safe clearance.
  */
 export const MainFooter: React.FC<MainFooterProps> = ({
@@ -34,14 +35,23 @@ export const MainFooter: React.FC<MainFooterProps> = ({
   brandSubtext = 'MOLTOLOGY.ORG FOUNDATION',
   brandTagline = '"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."',
   copyrightText = '© 2026 MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.',
+  variant = 'benthic',
 }) => {
+  const isCorporate = variant === 'corporate'
+
   return (
     <footer
-      className={`w-full bg-[#030607] border-t border-cyan-900/40 text-xs text-gray-400 font-mono relative z-20 overflow-hidden pb-28 sm:pb-12 ${className}`}
+      className={`w-full border-t text-xs relative z-20 overflow-hidden pb-28 sm:pb-12 transition-colors ${
+        isCorporate
+          ? 'bg-white border-sky-100 text-slate-500 font-sans'
+          : 'bg-[#030607] border-cyan-900/40 text-gray-400 font-mono'
+      } ${className}`}
       aria-label="Main Navigation Footer"
     >
       {/* Background Ambience Overlays */}
-      <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
+      {!isCorporate && (
+        <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
+      )}
 
       {/* Main Streamlined Navigation Area */}
       <div className="max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12 pt-8 sm:pt-10 relative z-10 space-y-8">
@@ -57,24 +67,50 @@ export const MainFooter: React.FC<MainFooterProps> = ({
                 <img
                   src="/images/order_emblem.png"
                   alt="Order Emblem"
-                  className="w-full h-full object-contain filter drop-shadow-[0_2px_5px_rgba(0,195,255,0.35)] group-hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.6)] transition-all duration-300"
+                  className={`w-full h-full object-contain transition-all duration-300 ${
+                    isCorporate
+                      ? 'filter drop-shadow-[0_2px_4px_rgba(2,132,199,0.25)] group-hover:drop-shadow-[0_0_8px_rgba(2,132,199,0.45)]'
+                      : 'filter drop-shadow-[0_2px_5px_rgba(0,195,255,0.35)] group-hover:drop-shadow-[0_0_10px_rgba(0,195,255,0.6)]'
+                  }`}
                 />
               </div>
 
               {/* Brand Title & Subtext */}
               <div className="overflow-hidden whitespace-nowrap min-w-0 text-left">
-                <div className="font-grotesk font-extrabold text-base sm:text-lg text-white tracking-widest uppercase flex items-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] [text-shadow:0_0_12px_rgba(0,195,255,0.3)] group-hover:[text-shadow:0_0_18px_rgba(0,195,255,0.65)] transition-all duration-300 leading-tight">
+                <div
+                  className={`font-grotesk font-extrabold text-base sm:text-lg tracking-widest uppercase flex items-center gap-2 transition-all duration-300 leading-tight ${
+                    isCorporate
+                      ? 'text-sky-950 group-hover:text-sky-700'
+                      : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] [text-shadow:0_0_12px_rgba(0,195,255,0.3)] group-hover:[text-shadow:0_0_18px_rgba(0,195,255,0.65)]'
+                  }`}
+                >
                   <span>{brandTitle}</span>
                 </div>
-                <div className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase truncate flex items-center gap-1.5 mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] [text-shadow:0_0_8px_rgba(0,195,255,0.5)]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00ffff] animate-pulse shrink-0" />
+                <div
+                  className={`text-[10px] font-bold tracking-widest uppercase truncate flex items-center gap-1.5 mt-0.5 ${
+                    isCorporate
+                      ? 'text-sky-600'
+                      : 'text-cyan-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] [text-shadow:0_0_8px_rgba(0,195,255,0.5)]'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full animate-pulse shrink-0 ${
+                      isCorporate
+                        ? 'bg-sky-500 shadow-[0_0_6px_#0284c7]'
+                        : 'bg-cyan-400 shadow-[0_0_8px_#00ffff]'
+                    }`}
+                  />
                   <span className="truncate">{brandSubtext}</span>
                 </div>
               </div>
             </Link>
 
             {brandTagline && (
-              <p className="text-[11px] sm:text-xs text-gray-400 font-mono text-center md:text-left leading-relaxed">
+              <p
+                className={`text-[11px] sm:text-xs text-center md:text-left leading-relaxed ${
+                  isCorporate ? 'text-slate-500 font-sans' : 'text-gray-400 font-mono'
+                }`}
+              >
                 {brandTagline}
               </p>
             )}
@@ -88,54 +124,78 @@ export const MainFooter: React.FC<MainFooterProps> = ({
             {/* SEO Pillar: Moltmaxxing */}
             <Link
               to="/moltmaxxing"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Flame className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Flame className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>MOLTMAXXING</span>
             </Link>
 
             {/* Tactical Guide / Lead Magnet */}
             <Link
               to="/guide"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>FIELD MANUAL</span>
             </Link>
 
             {/* Interactive Index Quiz */}
             <Link
               to="/moltmax"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Activity className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Activity className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>MOLTMAX QUIZ</span>
             </Link>
 
             {/* MoltNation Dispatches */}
             <Link
               to="/news"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Newspaper className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Newspaper className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>DISPATCHES</span>
             </Link>
 
             {/* Sacred Scriptures & Doctrine */}
             <Link
               to="/codex"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Scroll className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Scroll className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>SACRED CODEX</span>
             </Link>
 
             {/* Foundation Entity */}
             <Link
               to="/org"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Building2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Building2 className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>ORGANIZATION</span>
             </Link>
 
@@ -144,9 +204,13 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               href="https://www.etsy.com/shop/SaasTrash"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-amber-50 hover:bg-amber-100/80 border border-amber-200 hover:border-amber-300 text-amber-700 hover:text-amber-800 rounded-full'
+                  : 'bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 chamfer-corner'
+              }`}
             >
-              <ShoppingBag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <ShoppingBag className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span>STORE</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
             </a>
@@ -156,9 +220,13 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               href="https://www.instagram.com/moltology_org/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Instagram className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Instagram className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>INSTAGRAM</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
             </a>
@@ -168,9 +236,13 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               href="https://www.youtube.com/@Moltology"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
-              <Youtube className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <Youtube className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>YOUTUBE</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
             </a>
@@ -180,7 +252,11 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               href="/rss.xml"
               target="_blank"
               rel="noopener noreferrer"
-              className="col-span-2 sm:col-span-1 px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-cyan-400 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className={`col-span-2 sm:col-span-1 px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-sky-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-cyan-400 hover:text-cyan-300 chamfer-corner'
+              }`}
             >
               <Rss className="w-3.5 h-3.5 shrink-0" />
               <span>RSS FEED</span>
@@ -189,26 +265,40 @@ export const MainFooter: React.FC<MainFooterProps> = ({
         </div>
 
         {/* Bottom Legal & Status Strip */}
-        <div className="pt-6 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-500 font-mono text-center sm:text-left">
+        <div
+          className={`pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-center sm:text-left ${
+            isCorporate
+              ? 'border-sky-100 text-slate-400 font-sans'
+              : 'border-cyan-950/60 text-gray-500 font-mono'
+          }`}
+        >
           <div>{copyrightText}</div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <Link
               to="/privacy"
-              className="hover:text-cyan-300 transition-colors uppercase tracking-wider text-[11px]"
+              className={`transition-colors uppercase tracking-wider text-[11px] ${
+                isCorporate ? 'hover:text-sky-600 text-slate-500' : 'hover:text-cyan-300 text-gray-400'
+              }`}
             >
               Privacy Policy
             </Link>
-            <span className="text-gray-700">·</span>
+            <span className={isCorporate ? 'text-slate-300' : 'text-gray-700'}>·</span>
             <Link
               to="/terms"
-              className="hover:text-cyan-300 transition-colors uppercase tracking-wider text-[11px]"
+              className={`transition-colors uppercase tracking-wider text-[11px] ${
+                isCorporate ? 'hover:text-sky-600 text-slate-500' : 'hover:text-cyan-300 text-gray-400'
+              }`}
             >
               Terms of Service
             </Link>
-            <span className="text-gray-700">·</span>
-            <div className="flex items-center gap-1.5 text-cyan-400/90 font-bold text-[11px]">
-              <Shield className="w-3 h-3 text-emerald-400" />
+            <span className={isCorporate ? 'text-slate-300' : 'text-gray-700'}>·</span>
+            <div
+              className={`flex items-center gap-1.5 font-bold text-[11px] ${
+                isCorporate ? 'text-sky-600' : 'text-cyan-400/90'
+              }`}
+            >
+              <Shield className={`w-3 h-3 ${isCorporate ? 'text-emerald-500' : 'text-emerald-400'}`} />
               <span>CHITIN MATRIX ACTIVE</span>
             </div>
           </div>
@@ -217,3 +307,4 @@ export const MainFooter: React.FC<MainFooterProps> = ({
     </footer>
   )
 }
+
