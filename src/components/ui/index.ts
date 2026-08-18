@@ -31,3 +31,4 @@ export { HUDSpinner, type HUDSpinnerProps, type HUDSpinnerSize, type HUDSpinnerV
 export { HeaderBrand, type HeaderBrandProps } from './HeaderBrand'
 export { HudBottomSheet, type HudBottomSheetProps } from './HudBottomSheet'
 export { Slider } from './slider'
+export { GuestLockGuard, type GuestLockGuardProps } from '../hud/GuestLockGuard'

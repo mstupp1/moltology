@@ -25,6 +25,7 @@ import type { PodcastEpisode } from '../../lib/podcast-data'
 import { getPodcastsFn } from '../../lib/server/api'
 import { MoltNationLogo } from '../../components/news/MoltNationLogo'
 import { seo } from '@/lib/seo'
+import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 
 export const Route = createFileRoute('/_hud/podcasts')({
   head: () => ({
@@ -94,7 +95,11 @@ function PodcastsPage() {
   }
 
   return (
-    <div className="space-y-5 font-mono relative">
+    <GuestLockGuard
+      featureName="Benthic Podcasts"
+      message="Sub-oceanic transmissions and MoltNation podcast audio streams require an authorized initiate account."
+    >
+      <div className="space-y-5 font-mono relative">
       {/* MoltNation Page Header */}
       <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -298,5 +303,6 @@ function PodcastsPage() {
         </div>
       </div>
     </div>
+  </GuestLockGuard>
   )
 }
