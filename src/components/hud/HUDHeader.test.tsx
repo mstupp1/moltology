@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { HUDHeader } from './HUDHeader'
 import { authClient } from '@/lib/auth-client'
+import { getAssetUrl } from '@/lib/assets'
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
@@ -48,7 +49,7 @@ describe('HUDHeader Component', () => {
 
     const clawImg = screen.getByRole('img', { name: 'Exoshell Claw' })
     expect(clawImg).toBeInTheDocument()
-    expect(clawImg).toHaveAttribute('src', '/images/crab_claw.png')
+    expect(clawImg).toHaveAttribute('src', getAssetUrl('/images/crab_claw.png'))
 
     const tailImg = screen.queryByRole('img', { name: 'Benthic Appendage' })
     expect(tailImg).not.toBeInTheDocument()
