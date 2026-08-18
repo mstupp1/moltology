@@ -16,12 +16,13 @@ export interface UserAvatarProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   className?: string
   alt?: string
+  variant?: 'benthic' | 'corporate'
 }
 
 /**
  * Standardized User Avatar component for Moltology portal & non-portal headers.
  * Supports SSO profile images (Google avatar) with automatic onError fallback
- * to a high-tech HUD styled letter avatar.
+ * to a high-tech HUD styled letter avatar (or clean corporate light-mode avatar).
  */
 export const UserAvatar: React.FC<UserAvatarProps> = ({
   user,
@@ -33,9 +34,12 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   size = 'md',
   className = '',
   alt,
+  variant = 'benthic',
 }) => {
   const [imageError, setImageError] = useState(false)
   const [activeVaultAvatar, setActiveVaultAvatar] = useState<string | null>(null)
+
+  const isCorporate = variant === 'corporate'
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -85,7 +89,9 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   if (imageUrl && !imageError) {
     return (
       <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center ${
+          isCorporate ? 'bg-slate-100' : 'bg-[#030606]'
+        } ${sizeClasses} ${className}`}
       >
         <img
           src={imageUrl}
@@ -101,7 +107,9 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   if (fallbackSrc && !user) {
     return (
       <div
-        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-[#030606] ${sizeClasses} ${className}`}
+        className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center ${
+          isCorporate ? 'bg-slate-100' : 'bg-[#030606]'
+        } ${sizeClasses} ${className}`}
       >
         <img
           src={fallbackSrc}
@@ -112,12 +120,16 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
     )
   }
 
-  // 3. Fallback HUD Letter Avatar
+  // 3. Fallback Letter Avatar
   const initial = getInitial()
 
   return (
     <div
-      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] border border-[#00c3ff]/70 text-[#00c3ff] font-mono font-bold shadow-[0_0_10px_rgba(0,195,255,0.4)] ${sizeClasses} ${className}`}
+      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-mono font-bold ${
+        isCorporate
+          ? 'bg-gradient-to-br from-sky-100 via-sky-50 to-white border border-sky-300 text-sky-700 shadow-sm'
+          : 'bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] border border-[#00c3ff]/70 text-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.4)]'
+      } ${sizeClasses} ${className}`}
       aria-label={displayAlt}
       title={displayName || 'User Avatar'}
     >

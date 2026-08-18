@@ -122,4 +122,32 @@ describe('UserAvatarMenu Component', () => {
       expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
     })
   })
+
+  it('renders corporate light mode styling on desktop when variant="corporate"', () => {
+    const { container } = render(<UserAvatarMenu user={mockUser} variant="corporate" />)
+
+    const triggerBtn = screen.getByRole('button', { name: /user account menu/i })
+    expect(triggerBtn.className).toContain('bg-white')
+    expect(triggerBtn.className).toContain('border-sky-200')
+
+    fireEvent.click(triggerBtn)
+
+    const dropdown = container.querySelector('.bg-white\\/95')
+    expect(dropdown).toBeInTheDocument()
+    expect(screen.getByText('Carcinus Ascendant').className).toContain('text-slate-800')
+    expect(screen.getByRole('button', { name: /sign out/i }).className).toContain('text-rose-600')
+  })
+
+  it('renders corporate light mode styling on mobile when variant="corporate"', () => {
+    render(<UserAvatarMenu user={mockUser} inline={true} variant="corporate" />)
+
+    const triggerBtn = screen.getByRole('button', { name: /user account menu/i })
+    expect(triggerBtn.className).toContain('bg-sky-50')
+    expect(triggerBtn.className).toContain('text-slate-800')
+
+    fireEvent.click(triggerBtn)
+
+    expect(screen.getByRole('button', { name: /sign out/i }).className).toContain('text-rose-600')
+  })
 })
+

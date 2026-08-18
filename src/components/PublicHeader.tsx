@@ -366,7 +366,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                     <span>DASHBOARD</span>
                   </button>
                 )}
-                <UserAvatarMenu user={user} onNavigate={onNavigate} />
+                <UserAvatarMenu
+                  user={user}
+                  onNavigate={onNavigate}
+                  variant={isCorporate ? 'corporate' : 'benthic'}
+                />
               </div>
             ) : (
               <div className="flex items-center gap-3">
@@ -531,7 +535,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 <Cpu className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
                 <span>DASHBOARD</span>
               </button>
-              <UserAvatarMenu user={user} onNavigate={onNavigate} inline />
+              <UserAvatarMenu
+                user={user}
+                onNavigate={onNavigate}
+                inline
+                variant={isCorporate ? 'corporate' : 'benthic'}
+              />
             </div>
           ) : (
             <div className="flex items-stretch gap-2">
