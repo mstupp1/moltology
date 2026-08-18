@@ -20,7 +20,7 @@ export const JournalMasthead: React.FC<JournalMastheadProps> = ({
   const isHero = variant === 'hero'
 
   return (
-    <div className={cn('relative select-none', className)}>
+    <div className={cn('relative', className)}>
       <Link to="/journal" className="block">
         {/* Top metric bar */}
         <div

@@ -344,7 +344,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             >
               <MessageContent>
                 <MessageResponse>{msg.content}</MessageResponse>
-                {msg.role === 'assistant' && msg.id !== 'welcome-1' && (msg.isGuest || isGuest) && (
+                {msg.role === 'assistant' && (msg.isGuest || isGuest) && (
                   <div className="mt-2 pt-2 border-t border-[#ff453a]/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#0e0506]/85 px-2.5 py-1.5 chamfer-corner border border-[#ff453a]/30 shadow-[0_0_12px_rgba(255,69,58,0.06)]">
                     <div className="text-[10.5px] text-red-200/90 font-mono flex items-center gap-1.5 min-w-0">
                       <Shield className="w-3 h-3 text-[#ff453a] shrink-0" />

@@ -287,7 +287,7 @@ function CommunityRoute() {
   }
 
   return (
-    <div className="space-y-6 font-mono select-none">
+    <div className="space-y-6 font-mono">
       {/* Header Banner */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>

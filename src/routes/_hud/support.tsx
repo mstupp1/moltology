@@ -231,7 +231,7 @@ function SupportPortalRoute() {
   const isAdmin = ['admin', 'super_admin'].includes(effectiveRole)
 
   return (
-    <div className="space-y-6 select-none font-mono text-[#dfe3e3] pb-10">
+    <div className="space-y-6 font-mono text-[#dfe3e3] pb-10">
       {/* Header Banner matching Benthic Ascendance HUD standard */}
       <div className="chitin-card p-5 chamfer-corner shadow-2xl relative overflow-hidden space-y-3">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-[#00ffff]/05 rounded-full blur-3xl pointer-events-none" />

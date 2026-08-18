@@ -80,7 +80,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="fixed inset-0 z-0" onClick={onClose} />
 
       <div className="relative z-10 w-full max-w-xl bg-[#060a0c] border border-[#00c3ff]/40 rounded-2xl shadow-[0_0_40px_rgba(0,195,255,0.25)] overflow-hidden flex flex-col my-auto max-h-[90vh]">

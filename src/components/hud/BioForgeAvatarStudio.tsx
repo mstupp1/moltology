@@ -275,7 +275,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
   const activeStageInfo = STAGE_NAMES[selectedStage]
 
   return (
-    <div className="space-y-6 font-mono select-none">
+    <div className="space-y-6 font-mono">
       {/* Studio Header Banner */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#00c3ff] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>

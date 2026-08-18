@@ -11,7 +11,7 @@ export const AssetSheddingWidget: React.FC = () => {
   const goToMarket = () => navigate({ to: '/market' })
 
   return (
-    <HudCard variant="teal" className="p-4 space-y-3 font-mono select-none flex flex-col justify-between h-full">
+    <HudCard variant="teal" className="p-4 space-y-3 font-mono flex flex-col justify-between h-full">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between">

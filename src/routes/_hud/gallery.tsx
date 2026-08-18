@@ -148,7 +148,7 @@ function GalleryRoute() {
   }, [pins, selectedCategory, selectedAspectRatio, showSavedOnly, savedPinIds, searchQuery])
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12 select-none">
+    <div className="space-y-6 animate-fade-in pb-12">
       {/* Toast Notification Container */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-[#0a0f12] border border-[#00c3ff] text-[#00c3ff] text-xs font-mono font-bold rounded-xl shadow-[0_0_20px_rgba(0,195,255,0.4)] flex items-center gap-2 animate-bounce">

@@ -38,7 +38,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-      <div className="bg-[#0f1414] border-2 border-[#ff0000] w-full max-w-xl p-6 chamfer-corner shadow-hud-red relative overflow-hidden text-mono select-none">
+      <div className="bg-[#0f1414] border-2 border-[#ff0000] w-full max-w-xl p-6 chamfer-corner shadow-hud-red relative overflow-hidden text-mono">
         
         {/* Close Button */}
         <button

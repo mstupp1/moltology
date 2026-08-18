@@ -138,7 +138,7 @@ function NewsIndexPage() {
   const subLeadGridPosts = filteredPosts.slice(1, 4)
 
   return (
-    <div className="min-h-screen bg-[#05080a] text-gray-200 font-mono relative select-none flex flex-col justify-between">
+    <div className="min-h-screen bg-[#05080a] text-gray-200 font-mono relative flex flex-col justify-between">
       {/* Background Overlays */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.12)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -507,7 +507,7 @@ function NewsIndexPage() {
         )}
 
         {/* MOLTNATION RADIO & PODCASTS SECTION */}
-        <section id="podcasts" className="w-full space-y-5 p-5 sm:p-6 bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] chamfer-corner shadow-2xl relative select-none">
+        <section id="podcasts" className="w-full space-y-5 p-5 sm:p-6 bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] chamfer-corner shadow-2xl relative">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#3a4a49] pb-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5">

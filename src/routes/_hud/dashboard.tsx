@@ -128,7 +128,7 @@ function DashboardRoute() {
       : INITIAL_ACTIVITIES.filter((a) => a.category === selectedCategory)
 
   return (
-    <div className="space-y-5 font-mono select-none relative">
+    <div className="space-y-5 font-mono relative">
 
 
       {/* Hero Telemetry Status Banner */}

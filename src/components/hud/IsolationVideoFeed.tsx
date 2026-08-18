@@ -263,7 +263,7 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
   }
 
   return (
-    <div className="w-full h-full flex flex-col font-mono select-none">
+    <div className="w-full h-full flex flex-col font-mono">
       {/* Full-Height Video Viewport Container */}
       <div
         ref={containerRef}
