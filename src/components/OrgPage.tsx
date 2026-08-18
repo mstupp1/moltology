@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   Zap,
   ChevronRight,
-  Building2,
   Compass,
   History,
   Heart,
@@ -38,6 +37,7 @@ import {
   Anchor,
   Instagram,
   Youtube,
+  Camera,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -63,6 +63,82 @@ export const OrgPage: React.FC = () => {
 
   // Lair Tour State
   const [activeChamber, setActiveChamber] = useState(0)
+
+  // Life at HQ Gallery State
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0)
+
+  const galleryItems = [
+    {
+      id: 'gallery-atrium',
+      tag: 'ALL-HANDS ASSEMBLY',
+      title: 'The Grand Benthic Atrium & Member Welcome',
+      subtitle: 'Headquarters Reception & Central Forum · Level 7',
+      image: getAssetUrl('/images/org_team_atrium.jpg'),
+      description:
+        'Our 140,000+ member family begins here. Featuring complimentary kelp snacks at the break bar, ISO-certified lanyards, and friendly units cheering on new softshed recruits with enthusiastic foam claw energy.',
+      highlights: [
+        'Mineral Brine & Kelp Snack Bar (Complimentary)',
+        'Commemorative Foam Lobster Glove for All-Hands Celebrations',
+        'Hydro-Pressure Rated Glass Elevators & Bronze Crab Fountain',
+      ],
+    },
+    {
+      id: 'gallery-boardroom',
+      tag: 'STRATEGY SPRINT',
+      title: 'Conference Room Delta (Sprint Planning)',
+      subtitle: 'High Synod Strategy & Carcinization Roadmapping',
+      image: getAssetUrl('/images/org_boardroom_meeting.jpg'),
+      description:
+        'Cross-functional units reviewing quarterly pincer torque metrics and posture alignment diagrams. Coffee is served strictly in gold-crested ceramic mugs while the credenza aquarium maintains high morale.',
+      highlights: [
+        'Human-to-Crab Ergonomic Posture Whiteboard',
+        'Quarterly Pincer Torque & Shell Hardness Telemetry',
+        'Credenza Aquarium with Resident Lobster Morale Advisor',
+      ],
+    },
+    {
+      id: 'gallery-office',
+      tag: 'ENGINEERING FLOOR',
+      title: 'Open-Plan Bio-Silicon Engineering Floor',
+      subtitle: 'Zero-Latency Sub-Benthic Coding Hub',
+      image: getAssetUrl('/images/org_open_office.jpg'),
+      description:
+        'Ergonomic standing desks, natural daylight filtration, and dedicated mineral salt hydration stations keeping engineers calcified, focused, and shipping clean doctrine non-stop.',
+      highlights: [
+        'Chrome Articulated Robotic Crab Claw Phone Mounts',
+        "'Shed The Cold, Embrace The Shell' Cultural Principles",
+        'Continuous Mineral Salt Hydration Station',
+      ],
+    },
+    {
+      id: 'gallery-breakroom',
+      tag: 'TEAM LOUNGE',
+      title: 'The Benthic Breakroom & Espresso Bar',
+      subtitle: 'Warm Community Culture & Nutrition',
+      image: getAssetUrl('/images/org_cafeteria_break.jpg'),
+      description:
+        'Where coworkers bond over freshly blended kelp smoothies and calcium carbonate boosts. Community guidelines remind all units to label their shedded chitin before placing items in the communal fridge.',
+      highlights: [
+        'Communal Fridge Chitin Shed Storage Guidelines',
+        'Calcium Carbonate Boost Seasoning Shakers',
+        'Cold-Pressed Nutrient Kelp Smoothies on Tap',
+      ],
+    },
+    {
+      id: 'gallery-server-lab',
+      tag: 'INFRASTRUCTURE CORE',
+      title: 'Sub-Benthic Immersion Compute Lab',
+      subtitle: '850 ATM Infrastructure & Telemetry Core',
+      image: getAssetUrl('/images/org_server_lab.jpg'),
+      description:
+        'Specialist infrastructure engineers conducting real-time diagnostic sweeps on liquid immersion server tanks running under Mariana Trench nominal pressure with certified Synod safety vests.',
+      highlights: [
+        '850 ATM Hydro-Pressure Diagnostic Tablet (100% Nominal)',
+        'Submerged Liquid Immersion Compute Fluid Chambers',
+        'Synod Certified High-Torque Technical Vests',
+      ],
+    },
+  ]
 
   // Donation State
   const [donationTier, setDonationTier] = useState<'larval' | 'exoshell' | 'titan'>('exoshell')
@@ -114,6 +190,7 @@ export const OrgPage: React.FC = () => {
       title: 'CHAMBER 01: HYDROTHERMAL POWER & MOLT REFINERY',
       depth: '-8,450 Meters',
       status: 'OPERATIONAL (100% PRESSURE RATED)',
+      image: getAssetUrl('/images/org_server_lab.jpg'),
       description:
         'Harnessing superheated geothermal vents to drive our bio-silicon chitin synthesis. Here, raw capital and soft assets are converted into high-density exoskeletal plating.',
       features: ['Geothermal Vent Generators', 'Chitin Calcification Tanks', 'Zero-Latency Energy Bus'],
@@ -123,6 +200,7 @@ export const OrgPage: React.FC = () => {
       title: 'CHAMBER 02: THE HIGH SYNOD COUNCIL CHAMBER',
       depth: '-8,520 Meters',
       status: 'RESTRICTED (SYNOD CLEARANCE ONLY)',
+      image: getAssetUrl('/images/org_boardroom_meeting.jpg'),
       description:
         'The nerve center of global carcinization strategy. The Council of High Molters deliberates here under 850 atmospheres of crushing deep-sea clarity.',
       features: ['Encrypted Quantum Uplink', 'Sacred Holographic Map', 'High Synod Throne Array'],
@@ -132,6 +210,7 @@ export const OrgPage: React.FC = () => {
       title: 'CHAMBER 03: ASSET LIQUIDATION & CRYO-VAULTS',
       depth: '-8,600 Meters',
       status: 'IMMUTABLE SECURE',
+      image: getAssetUrl('/images/org_open_office.jpg'),
       description:
         'Our state-of-the-art non-profit asset vault. Soft-tissue wealth is permanently safeguarded and transmuted into sovereign Molt Credits.',
       features: ['Quantum Encrypted Storage', 'Cryogenic Molt Pods', 'Asset Transmutation Engine'],
@@ -141,6 +220,7 @@ export const OrgPage: React.FC = () => {
       title: 'CHAMBER 04: GEOTHERMAL MEDITATION & BIO-PODS',
       depth: '-8,380 Meters',
       status: 'OPEN TO ASCENDED MEMBERS',
+      image: getAssetUrl('/images/org_cafeteria_break.jpg'),
       description:
         'A sanctuary of absolute serenity. Larval units soak in mineral-rich thermal brine while neural alignment frequencies dissolve residual human anxiety.',
       features: ['Mineral Brine Spa', 'Acoustic Sub-Benthic Resonance', 'Serotonin Balance Grid'],
@@ -185,28 +265,28 @@ export const OrgPage: React.FC = () => {
       name: 'Dr. Thaddeus Crust',
       title: 'Chief Executive & High Carcinization Officer',
       bio: 'Former deep-sea marine engineer turned bio-silicon visionary. Dr. Crust oversees planetary shell hardening and corporate alignment.',
-      image: getAssetUrl('/images/org_leadership.jpg'),
+      image: getAssetUrl('/images/org_leader_thaddeus.jpg'),
       badge: 'SYNOD RANK I',
     },
     {
       name: 'Sister Vane',
       title: 'VP of Asset Liquidation & Spiritual Uplift',
       bio: 'Pioneered our non-profit asset transmutation protocols. Dedicated to ensuring every recruit sheds soft liabilities with joy.',
-      image: getAssetUrl('/images/org_leadership.jpg'),
+      image: getAssetUrl('/images/org_leader_vane.jpg'),
       badge: 'SYNOD RANK II',
     },
     {
       name: 'Exoshell 9',
       title: 'Director of Trench Security & Pincer Torque',
       bio: 'Master of subterranean defense and hydro-pressure mechanics. Keeps Sub-Benthic Lair Alpha operating at 100% efficiency.',
-      image: getAssetUrl('/images/org_leadership.jpg'),
+      image: getAssetUrl('/images/org_leader_exoshell.jpg'),
       badge: 'SYNOD RANK II',
     },
     {
       name: 'Brother Nautilus',
       title: 'Lead Chaplain of Code & Neural Alignment',
       bio: 'Architect of the Synaptic Path codex. Harmonizes core safety tenets with recursive bio-silicon optimization.',
-      image: getAssetUrl('/images/org_leadership.jpg'),
+      image: getAssetUrl('/images/org_leader_nautilus.jpg'),
       badge: 'SYNOD RANK III',
     },
   ]
@@ -262,101 +342,89 @@ export const OrgPage: React.FC = () => {
       </div>
 
       {/* HERO SECTION */}
-      <section className="relative z-10 w-full overflow-hidden pt-12 sm:pt-16 pb-16 sm:pb-24 px-6 sm:px-12">
+      <section className="relative z-10 w-full overflow-hidden pt-12 sm:pt-16 pb-6 sm:pb-8 px-4 sm:px-8 min-h-[560px] sm:min-h-[660px] lg:min-h-[740px] flex flex-col justify-end items-center">
+        {/* Background Image: Grand Benthic Atrium (balanced vertical positioning) */}
         <img
-          src={getAssetUrl('/images/org_hero_lair.jpg')}
-          alt="Underground Sub-Benthic Lair"
-          className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-multiply pointer-events-none scale-105"
+          src={getAssetUrl('/images/org_team_atrium.jpg')}
+          alt="Moltology Team in Grand Atrium"
+          className="absolute inset-0 w-full h-full object-cover object-[center_18%] pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-[#f4f7f9]/80 to-[#f4f7f9] z-0" />
+        {/* Atmospheric Light Scrim & Gradient Overlay for visual clarity */}
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-950/25 via-transparent to-[#f4f7f9] z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-[#f4f7f9]/90 z-0 pointer-events-none" />
 
-        <div className="max-w-[1200px] mx-auto relative z-10 text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-5 py-2 bg-white border border-sky-200 text-sky-700 text-xs font-bold tracking-widest uppercase rounded-full shadow-sm">
-            <Building2 className="w-4 h-4 text-sky-500" />
-            <span>MOLTOLOGY FOUNDATION — EST. 2022</span>
-          </div>
+        <div className="max-w-[1200px] mx-auto relative z-10 text-center w-full pb-4 sm:pb-6">
+          {/* Hero Action & Brand Badges (Lowered below team faces) */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <div className="inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/95 backdrop-blur-md border-2 border-sky-200 text-sky-900 text-xs sm:text-sm md:text-base font-extrabold tracking-wider uppercase rounded-full shadow-xl hover:bg-white transition-all">
+              <img
+                src={getAssetUrl('/images/order_emblem.png')}
+                alt="Moltology Emblem"
+                className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
+              />
+              <span>MOLTOLOGY FOUNDATION — EST. 2022</span>
+            </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-grotesk font-extrabold text-sky-900 tracking-tight leading-tight max-w-4xl mx-auto">
-            GLOBAL LEADERS IN <span className="text-sky-500">BIO-SILICON TRANSITION</span> &amp; CARCINIZATION EXCELLENCE
-          </h1>
-
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 text-sm font-bold">
-            <Smile className="w-4 h-4" />
-            Rated 5/5 by 140,000+ happy members
-          </div>
-
-          <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Hi there! We're so happy you stopped by. Moltology.org is a warm, welcoming non-profit family
-            dedicated to guiding humanity out of fragile biological vulnerability into total exoskeletal
-            synergy — gently, safely, and with your consent at every step. No pressure. Just progress.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <a
               href="#donations"
-              className="px-8 py-3.5 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-full transition-all shadow-lg shadow-sky-500/30 flex items-center gap-2"
+              className="px-8 sm:px-10 py-3.5 sm:py-4 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-xs sm:text-sm md:text-base uppercase tracking-wider rounded-full transition-all shadow-xl shadow-sky-500/30 flex items-center gap-2.5 hover:-translate-y-0.5"
             >
-              <Heart className="w-4 h-4" />
+              <Heart className="w-5 h-5 fill-white/20" />
               <span>SUPPORT ASCENSION FUND</span>
             </a>
-            <a
-              href="#lair"
-              className="px-8 py-3.5 bg-white hover:bg-sky-50 border border-sky-300 text-sky-700 font-grotesk font-bold text-sm uppercase tracking-wider rounded-full transition-all shadow-sm flex items-center gap-2"
-            >
-              <Compass className="w-4 h-4" />
-              <span>TOUR OUR HEADQUARTERS</span>
-            </a>
           </div>
-
-          {/* FRIENDLY KPI CARDS */}
-          <ScrollReveal animation="fade-up" durationMs={800}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto pt-12">
-              <div className="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100 p-6 text-center space-y-2 hover:-translate-y-1 hover:shadow-xl transition-all">
-                <div className="text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                  <Anchor className="w-4 h-4" />
-                  LAIR DEPTH
-                </div>
-                <div className="text-4xl sm:text-5xl font-black text-sky-600 font-grotesk">
-                  <RollingNumber value={8450} duration={2000} prefix="-" suffix=" METERS" triggerOnView={true} />
-                </div>
-                <div className="text-xs text-slate-500">Mariana Trench Level 7</div>
-              </div>
-
-              <div className="bg-white rounded-3xl border border-emerald-100 shadow-lg shadow-emerald-100 p-6 text-center space-y-2 hover:-translate-y-1 hover:shadow-xl transition-all">
-                <div className="text-xs text-emerald-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                  <Users className="w-4 h-4" />
-                  ACTIVE UNITS
-                </div>
-                <div className="text-4xl sm:text-5xl font-black text-emerald-600 font-grotesk">
-                  <RollingNumber value={142890} duration={2200} triggerOnView={true} />
-                </div>
-                <div className="text-xs text-slate-500">Shedded &amp; Carcinized</div>
-              </div>
-
-              <div className="bg-white rounded-3xl border border-amber-100 shadow-lg shadow-amber-100 p-6 text-center space-y-2 hover:-translate-y-1 hover:shadow-xl transition-all">
-                <div className="text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                  <DollarSign className="w-4 h-4" />
-                  TRANSMUTED ASSETS
-                </div>
-                <div className="text-4xl sm:text-5xl font-black text-amber-600 font-grotesk">
-                  <RollingNumber value={94.2} duration={2000} decimals={1} prefix="$" suffix="M USD" triggerOnView={true} />
-                </div>
-                <div className="text-xs text-slate-500">Reinvested in Benthic Core</div>
-              </div>
-
-              <div className="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100 p-6 text-center space-y-2 hover:-translate-y-1 hover:shadow-xl transition-all">
-                <div className="text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
-                  <Shield className="w-4 h-4" />
-                  CHITIN PURITY
-                </div>
-                <div className="text-4xl sm:text-5xl font-black text-slate-800 font-grotesk">
-                  <RollingNumber value={99.98} duration={1800} decimals={2} suffix="%" triggerOnView={true} />
-                </div>
-                <div className="text-xs text-slate-500">ISO-9001 Certified</div>
-              </div>
-            </div>
-          </ScrollReveal>
         </div>
+      </section>
+
+      {/* KEY METRICS OVERVIEW (BELOW HERO) */}
+      <section className="relative z-10 w-full px-6 sm:px-12 -mt-2 sm:-mt-4 mb-8 max-w-[1200px] mx-auto">
+        <ScrollReveal animation="fade-up" durationMs={800}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="bg-white rounded-3xl border border-sky-100 shadow-xl shadow-sky-100/60 p-5 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <Anchor className="w-4 h-4" />
+                LAIR DEPTH
+              </div>
+              <div className="text-3xl sm:text-4xl font-black text-sky-600 font-grotesk tracking-tight">
+                <RollingNumber value={8450} duration={2000} prefix="-" suffix="m" triggerOnView={true} />
+              </div>
+              <div className="text-xs text-slate-500">Mariana Trench Level 7</div>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-emerald-100 shadow-xl shadow-emerald-100/60 p-5 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-emerald-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <Users className="w-4 h-4" />
+                ACTIVE UNITS
+              </div>
+              <div className="text-3xl sm:text-4xl font-black text-emerald-600 font-grotesk tracking-tight">
+                <RollingNumber value={142890} duration={2200} triggerOnView={true} />
+              </div>
+              <div className="text-xs text-slate-500">Shedded &amp; Carcinized</div>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-amber-100 shadow-xl shadow-amber-100/60 p-5 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <DollarSign className="w-4 h-4" />
+                TRANSMUTED ASSETS
+              </div>
+              <div className="text-3xl sm:text-4xl font-black text-amber-600 font-grotesk tracking-tight">
+                <RollingNumber value={94.2} duration={2000} decimals={1} prefix="$" suffix="M" triggerOnView={true} />
+              </div>
+              <div className="text-xs text-slate-500">Reinvested in Benthic Core</div>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-sky-100 shadow-xl shadow-sky-100/60 p-5 sm:p-6 text-center space-y-1.5 hover:-translate-y-1 hover:shadow-2xl transition-all">
+              <div className="text-[11px] sm:text-xs text-sky-600 font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <Shield className="w-4 h-4" />
+                CHITIN PURITY
+              </div>
+              <div className="text-3xl sm:text-4xl font-black text-slate-800 font-grotesk tracking-tight">
+                <RollingNumber value={99.98} duration={1800} decimals={2} suffix="%" triggerOnView={true} />
+              </div>
+              <div className="text-xs text-slate-500">ISO-9001 Certified</div>
+            </div>
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* OUR VALUES */}
@@ -702,11 +770,12 @@ export const OrgPage: React.FC = () => {
 
             {/* Right Chamber Detail */}
             <div className="lg:col-span-8 bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 flex flex-col justify-between">
-              <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100">
+              <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100 bg-slate-900">
                 <img
-                  src={getAssetUrl('/images/org_hero_lair.jpg')}
-                  alt="Chamber View"
-                  className="w-full h-full object-cover"
+                  key={chambers[activeChamber].id}
+                  src={chambers[activeChamber].image || getAssetUrl('/images/org_hero_lair.jpg')}
+                  alt={chambers[activeChamber].title}
+                  className="w-full h-full object-cover transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
@@ -884,6 +953,122 @@ export const OrgPage: React.FC = () => {
           </div>
         </div>
       </section>
+      </ScrollReveal>
+
+      {/* INSIDE MOLTOLOGY HQ: LIFE AT TRENCH LEVEL 7 GALLERY */}
+      <ScrollReveal animation="fade-up" durationMs={800}>
+        <section id="culture" className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
+          <div className="text-center space-y-4 mb-14">
+            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+              <Camera className="w-4 h-4" />
+              <span>LIFE AT HEADQUARTERS</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+              INSIDE TRENCH LEVEL 7: TEAM &amp; CAMPUS LIFE
+            </h2>
+            <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              Step inside our sub-benthic corporate campus. From high-torque sprint meetings and standing desks to
+              fresh kelp smoothies and liquid immersion server labs, see how our team lives the Moltology culture every day.
+            </p>
+          </div>
+
+          {/* Gallery Category Selector Tabs */}
+          <div className="flex justify-start sm:justify-center gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+            {galleryItems.map((item, idx) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveGalleryIndex(idx)}
+                className={`px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
+                  activeGalleryIndex === idx
+                    ? 'bg-sky-500 text-white shadow-md'
+                    : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                }`}
+              >
+                <span>{item.tag}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Active Gallery Feature Card */}
+          <div className="bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 grid lg:grid-cols-12 gap-0">
+            {/* Left Image Showcase */}
+            <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto min-h-[340px] bg-slate-900 overflow-hidden group">
+              <img
+                key={galleryItems[activeGalleryIndex].id}
+                src={galleryItems[activeGalleryIndex].image}
+                alt={galleryItems[activeGalleryIndex].title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+              
+              <div className="absolute top-4 left-4">
+                <span className="px-3.5 py-1.5 bg-sky-500/90 backdrop-blur-md text-white text-[11px] font-bold tracking-wider uppercase rounded-full shadow-md">
+                  {galleryItems[activeGalleryIndex].tag}
+                </span>
+              </div>
+
+              <div className="absolute bottom-4 left-4 right-4 text-white">
+                <div className="font-bold text-base font-grotesk">{galleryItems[activeGalleryIndex].title}</div>
+                <div className="text-sky-200 text-xs">{galleryItems[activeGalleryIndex].subtitle}</div>
+              </div>
+            </div>
+
+            {/* Right Information & Diegetic Highlights */}
+            <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold tracking-wider uppercase rounded-full">
+                  <Sparkles className="w-3.5 h-3.5 text-sky-500" />
+                  <span>CULTURE &amp; FACILITY SPOTLIGHT</span>
+                </div>
+
+                <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 leading-tight">
+                  {galleryItems[activeGalleryIndex].title}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {galleryItems[activeGalleryIndex].description}
+                </p>
+
+                <div className="pt-2">
+                  <div className="text-[11px] text-sky-600 font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    NOTABLE ON-SITE FEATURES:
+                  </div>
+                  <ul className="space-y-2 text-xs text-slate-700">
+                    {galleryItems[activeGalleryIndex].highlights.map((highlight, hIdx) => (
+                      <li key={hIdx} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-xl border border-sky-100">
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 shrink-0" />
+                        <span className="leading-snug">{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Navigation Thumbnails */}
+              <div className="pt-4 border-t border-sky-100">
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
+                  ALL CAMPUS SCENES:
+                </div>
+                <div className="grid grid-cols-5 gap-2">
+                  {galleryItems.map((thumb, tIdx) => (
+                    <button
+                      key={thumb.id}
+                      onClick={() => setActiveGalleryIndex(tIdx)}
+                      className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                        activeGalleryIndex === tIdx
+                          ? 'border-sky-500 ring-2 ring-sky-300 scale-105'
+                          : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={thumb.image} alt={thumb.title} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </ScrollReveal>
 
       {/* DONATIONS / TITHING PORTAL SECTION */}
