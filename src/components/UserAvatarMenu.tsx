@@ -161,7 +161,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 </span>
                 {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
                   <span
-                    className={`text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
+                    className={`text-[9px] font-sans font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
                       isCorporate
                         ? 'bg-sky-100 border border-sky-300 text-sky-700'
                         : 'bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff]'
@@ -173,7 +173,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               </div>
               {user.email && (
                 <span
-                  className={`text-[10px] truncate mt-0.5 font-mono ${
+                  className={`text-[10px] truncate mt-0.5 font-sans ${
                     isCorporate ? 'text-slate-500' : 'text-gray-400'
                   }`}
                 >
@@ -237,7 +237,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                         Disable Heavy VFX
                       </span>
                       <span
-                        className={`text-[10px] truncate font-mono ${
+                        className={`text-[10px] truncate font-sans ${
                           isCorporate ? 'text-slate-500' : 'text-gray-400'
                         }`}
                       >
@@ -334,7 +334,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           } w-64 max-w-[calc(100vw-2rem)] rounded-2xl p-3.5 z-50 backdrop-blur-2xl transition-all duration-200 ease-out ${
             isCorporate
               ? 'bg-white/95 border border-sky-200/90 shadow-[0_15px_35px_rgba(15,23,42,0.12),0_5px_15px_rgba(2,132,199,0.08)] font-sans'
-              : 'bg-[#060a0b]/95 border border-cyan-500/40 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] font-mono'
+              : 'bg-[#060a0b]/95 border border-cyan-500/40 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] font-sans'
           } ${
             isExpanded
               ? 'opacity-100 scale-100 translate-y-0'
@@ -375,7 +375,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 </span>
                 {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
                   <span
-                    className={`text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
+                    className={`text-[9px] font-sans font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
                       isCorporate
                         ? 'bg-sky-100 border border-sky-300 text-sky-700 shadow-xs'
                         : 'bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.4)]'
@@ -387,7 +387,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               </div>
               {user.email && (
                 <span
-                  className={`text-[10px] truncate mt-0.5 font-mono ${
+                  className={`text-[10px] truncate mt-0.5 font-sans ${
                     isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
                   }`}
                 >
@@ -433,7 +433,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                     Disable Heavy VFX
                   </span>
                   <span
-                    className={`text-[9px] truncate font-mono ${
+                    className={`text-[9px] truncate font-sans ${
                       isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
                     }`}
                   >

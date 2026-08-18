@@ -56,7 +56,7 @@ function IsolationRoute() {
       featureName="Isolation Protocols"
       message="Benthic isolation shielding feeds and telemetric privacy controls require an authorized initiate account."
     >
-      <div className="w-full h-full flex-1 flex flex-col font-mono min-h-0">
+      <div className="w-full h-full flex-1 flex flex-col font-sans min-h-0">
         {/* Toast Notification */}
         {toastMessage && (
           <div className="fixed top-20 right-6 z-50 bg-[#0e1315] border-2 border-[#ff453a] text-[#ff5540] p-3 shadow-[0_0_25px_rgba(255,69,58,0.5)] chamfer-corner flex items-center gap-2 text-xs font-bold animate-fadeIn">

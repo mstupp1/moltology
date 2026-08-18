@@ -184,7 +184,7 @@ function ToastItemCard({
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-          <span className={`text-[9px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border ${styles.badgeClass}`}>
+          <span className={`text-[9px] font-sans font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border ${styles.badgeClass}`}>
             {styles.label}
           </span>
           {toast.title && (
@@ -193,7 +193,7 @@ function ToastItemCard({
             </span>
           )}
         </div>
-        <p className="text-xs text-[#b0c0c0] font-mono leading-snug break-words">
+        <p className="text-xs text-[#b0c0c0] font-sans leading-snug break-words">
           {toast.message}
         </p>
       </div>

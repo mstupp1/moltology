@@ -118,7 +118,7 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
               <span className="flex h-2 w-2 shrink-0 rounded-full bg-[#00ffcc] animate-pulse" />
               <span className="truncate">{question.eyebrow}</span>
             </div>
-            <div className="flex items-center gap-2 font-mono text-[#dfe3e3] shrink-0">
+            <div className="flex items-center gap-2 font-sans text-[#dfe3e3] shrink-0">
               <span className="rounded border border-[#00c3ff]/30 bg-[#00c3ff]/10 px-2.5 py-1 font-bold text-[#00ffcc]">
                 {String(questionNumber).padStart(2, '0')} / {String(totalQuestions).padStart(2, '0')}
               </span>
@@ -165,7 +165,7 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                     
                     {/* Active Alignment Status Card */}
                     <div className="rounded-xl border border-[#00c3ff]/30 bg-[#020608]/90 p-4 sm:p-5 backdrop-blur-md">
-                      <div className="flex items-center justify-between gap-2 text-xs font-mono font-bold uppercase tracking-wider">
+                      <div className="flex items-center justify-between gap-2 text-xs font-sans font-bold uppercase tracking-wider">
                         <span className="text-[#839493]">Current Stance</span>
                         <span className={cn(
                           'px-2.5 py-0.5 rounded text-xs transition-colors font-bold',
@@ -196,7 +196,7 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                       />
                       
                       {/* Step Points along Slider */}
-                      <div className="mt-3 flex justify-between gap-1 text-[10px] sm:text-xs font-mono">
+                      <div className="mt-3 flex justify-between gap-1 text-[10px] sm:text-xs font-sans">
                         {question.options.map((opt, index) => {
                           const isSelected = activeIndex === index
                           return (
@@ -241,7 +241,7 @@ export const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({
                         >
                           {/* Shortcut Key Badge */}
                           <span className={cn(
-                            'flex h-6 w-6 shrink-0 items-center justify-center rounded font-mono text-xs font-bold transition-colors',
+                            'flex h-6 w-6 shrink-0 items-center justify-center rounded font-sans text-xs font-bold transition-colors',
                             selected
                               ? 'bg-[#00ffcc] text-[#020408]'
                               : 'border border-white/20 bg-white/5 text-[#839493] group-hover:border-[#00c3ff] group-hover:text-[#00c3ff]'

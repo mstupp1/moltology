@@ -99,10 +99,10 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
         {/* Text Content */}
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-mono font-bold text-[#ffd700] uppercase tracking-wider">
+            <span className="text-[10px] font-sans font-bold text-[#ffd700] uppercase tracking-wider">
               FREE PROTOCOL
             </span>
-            <span className="line-through text-[#ff453a] text-[10px] font-mono font-bold">
+            <span className="line-through text-[#ff453a] text-[10px] font-sans font-bold">
               $149
             </span>
           </div>
@@ -111,7 +111,7 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
             2026 Moltmax Field Manual
           </h4>
 
-          <p className="text-[10px] text-[#839493] font-mono flex items-center gap-1">
+          <p className="text-[10px] text-[#839493] font-sans flex items-center gap-1">
             <span>Instant Download</span>
             <ArrowRight className="w-2.5 h-2.5 text-[#00ffcc] group-hover:translate-x-0.5 transition-transform" />
           </p>

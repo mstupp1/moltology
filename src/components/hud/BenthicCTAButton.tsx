@@ -23,7 +23,7 @@ export const BenthicCTAButton: React.FC<BenthicCTAButtonProps> = ({
   return (
     <div className={`inline-flex flex-col items-center gap-1 ${fullWidth ? 'w-full' : ''}`}>
       {price && (
-        <span className="font-mono font-bold text-xs text-[#00c3ff] tracking-tight drop-shadow-[0_0_6px_rgba(0,195,255,0.4)] mb-0.5">
+        <span className="font-sans font-bold text-xs text-[#00c3ff] tracking-tight drop-shadow-[0_0_6px_rgba(0,195,255,0.4)] mb-0.5">
           {price}
         </span>
       )}

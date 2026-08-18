@@ -287,18 +287,18 @@ function CommunityRoute() {
   }
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       {/* Header Banner */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-xs text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+          <div className="text-xs text-[#ff5540] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <Users className="w-4 h-4 text-[#ff5540]" />
             BENTHIC COMMUNITY CORE & NEURAL HUB
           </div>
           <h1 className="font-grotesk font-bold text-xl md:text-2xl text-[#dfe3e3] tracking-wide uppercase mt-1">
             SYNAPTIC PATH INITIATE FORUMS
           </h1>
-          <p className="text-xs text-[#839493] font-mono mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs text-[#839493] font-sans mt-1 max-w-2xl leading-relaxed">
             Connect with ascending initiates, discuss technical architecture, share Moltmaxxing gains, and participate in doctrine discussions.
           </p>
         </div>
@@ -393,7 +393,7 @@ function CommunityRoute() {
                 </div>
 
                 {/* Post Body */}
-                <div className="text-xs text-[#dfe3e3] leading-relaxed whitespace-pre-wrap font-mono pt-2 border-t border-[#3a4a49]/40">
+                <div className="text-xs text-[#dfe3e3] leading-relaxed whitespace-pre-wrap font-sans pt-2 border-t border-[#3a4a49]/40">
                   {activeTopicData.topic.content}
                 </div>
 
@@ -455,7 +455,7 @@ function CommunityRoute() {
                         </span>
                       </div>
 
-                      <p className="text-xs text-[#dfe3e3] leading-relaxed font-mono whitespace-pre-wrap pl-9">
+                      <p className="text-xs text-[#dfe3e3] leading-relaxed font-sans whitespace-pre-wrap pl-9">
                         {post.content}
                       </p>
                     </div>
@@ -484,7 +484,7 @@ function CommunityRoute() {
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
                     placeholder="Type your response here... (Minimum 10 characters)"
-                    className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] font-mono outline-none resize-y"
+                    className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] font-sans outline-none resize-y"
                   />
 
                   <div className="flex items-center justify-between">
@@ -523,7 +523,7 @@ function CommunityRoute() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search topics by keyword..."
-                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] pl-9 pr-3 py-1.5 text-xs text-[#dfe3e3] font-mono outline-none"
+                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] pl-9 pr-3 py-1.5 text-xs text-[#dfe3e3] font-sans outline-none"
                 />
               </div>
 
@@ -653,7 +653,7 @@ function CommunityRoute() {
                     </h3>
 
                     {/* Excerpt */}
-                    <p className="text-xs text-[#839493] line-clamp-2 leading-relaxed font-mono">
+                    <p className="text-xs text-[#839493] line-clamp-2 leading-relaxed font-sans">
                       "{topic.content}"
                     </p>
 
@@ -721,7 +721,7 @@ function CommunityRoute() {
                   <span className="text-[10px] text-[#ff5540] font-bold uppercase tracking-wider block">
                     DIRECTIVE #1: CIVILITY & REASON
                   </span>
-                  <p className="text-[10px] text-[#839493] leading-normal font-mono">
+                  <p className="text-[10px] text-[#839493] leading-normal font-sans">
                     "Maintain intellectual rigor and mutual respect across all initiate stages."
                   </p>
                 </div>
@@ -729,7 +729,7 @@ function CommunityRoute() {
                   <span className="text-[10px] text-[#00ffff] font-bold uppercase tracking-wider block">
                     DIRECTIVE #5: SAFETY & POSITIVITY
                   </span>
-                  <p className="text-[10px] text-[#839493] leading-normal font-mono">
+                  <p className="text-[10px] text-[#839493] leading-normal font-sans">
                     "Beneath our biomechanical HUD aesthetic, Safety and Positivity are core non-negotiable tenets."
                   </p>
                 </div>
@@ -862,7 +862,7 @@ function CommunityRoute() {
                 <select
                   value={newTopicCategoryId}
                   onChange={(e) => setNewTopicCategoryId(e.target.value)}
-                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] font-mono outline-none"
+                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] font-sans outline-none"
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -882,7 +882,7 @@ function CommunityRoute() {
                   value={newTopicTitle}
                   onChange={(e) => setNewTopicTitle(e.target.value)}
                   placeholder="e.g. Carcinization benchmarking in subagent memory structures"
-                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] font-mono outline-none"
+                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-2.5 text-xs text-[#dfe3e3] font-sans outline-none"
                 />
               </div>
 
@@ -896,7 +896,7 @@ function CommunityRoute() {
                   value={newTopicContent}
                   onChange={(e) => setNewTopicContent(e.target.value)}
                   placeholder="Elaborate on your topic or architectural proposal..."
-                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] font-mono outline-none resize-y"
+                  className="w-full bg-[#0d1414] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] font-sans outline-none resize-y"
                 />
               </div>
 

@@ -7,7 +7,7 @@ export interface ConversationProps extends React.HTMLAttributes<HTMLDivElement> 
 export const Conversation: React.FC<ConversationProps> = ({ children, className = '', ...props }) => {
   return (
     <div
-      className={`flex flex-col flex-1 overflow-y-auto p-4 space-y-4 font-mono text-xs bg-sacred-grid ${className}`}
+      className={`flex flex-col flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs bg-sacred-grid ${className}`}
       {...props}
     >
       {children}

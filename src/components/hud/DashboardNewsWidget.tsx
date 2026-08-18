@@ -82,7 +82,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
         {/* In-HUD Full Article Modal Reader */}
         {activePost && (
           <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-            <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-mono text-sm space-y-4">
+            <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-sans text-sm space-y-4">
               <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Radio className="w-4 h-4 text-[#ff5540] animate-pulse" />
@@ -116,7 +116,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   <h2 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] uppercase tracking-wide leading-snug">
                     {activePost.title}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-mono">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-sans">
                     <div className="flex items-center gap-1.5">
                       {activePost.authorAvatar && (
                         <img
@@ -154,7 +154,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
               </div>
 
               <div className="bg-[#070b0b] border-t border-[#3a4a49] p-3 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#839493]">
-                <span className="font-mono text-[11px]">MOLTNATION NEWS DESK · BENTHIC INTELLIGENCE</span>
+                <span className="font-sans text-[11px]">MOLTNATION NEWS DESK · BENTHIC INTELLIGENCE</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
@@ -187,7 +187,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 <Newspaper className="w-4 h-4 text-[#ff5540] shrink-0" />
                 <span>MOLTNATION INTELLIGENCE & NEWS FEED</span>
               </h2>
-              <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[#ff5540]/15 border border-[#ff5540]/40 text-[#ff5540] text-[9px] font-mono font-bold chamfer-corner shrink-0">
+              <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[#ff5540]/15 border border-[#ff5540]/40 text-[#ff5540] text-[9px] font-sans font-bold chamfer-corner shrink-0">
                 <Radio className="w-2.5 h-2.5 text-[#ff5540] animate-pulse" />
                 <span>LIVE FEED</span>
               </div>
@@ -213,7 +213,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
             <TrendingUp className="w-2.5 h-2.5 text-red-500" />
             <span>BREAKING</span>
           </div>
-          <div className="overflow-hidden whitespace-nowrap text-[#00ffff]/90 text-[10px] font-mono flex-1">
+          <div className="overflow-hidden whitespace-nowrap text-[#00ffff]/90 text-[10px] font-sans flex-1">
             <div className="inline-block animate-marquee tracking-wide">
               {tickerHeadlines}
             </div>
@@ -230,7 +230,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-2 py-0.5 text-[9px] font-bold font-mono uppercase tracking-wider chamfer-corner transition-all shrink-0 ${
+              className={`px-2 py-0.5 text-[9px] font-bold font-sans uppercase tracking-wider chamfer-corner transition-all shrink-0 ${
                 selectedCategory === cat
                   ? 'bg-[#00ffff] text-black font-extrabold shadow-[0_0_8px_rgba(0,255,255,0.4)]'
                   : 'bg-[#070b0b] text-[#839493] hover:text-[#dfe3e3] border border-[#3a4a49]'
@@ -243,7 +243,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
 
         {/* Vertical Sidebar Layout */}
         {layout === 'sidebar' ? (
-          <div className="space-y-1.5 pt-1 flex-1 min-h-0 overflow-y-auto pr-1 font-mono">
+          <div className="space-y-1.5 pt-1 flex-1 min-h-0 overflow-y-auto pr-1 font-sans">
             {/* Featured Post Card */}
             {featuredPost && (
               <div
@@ -258,10 +258,10 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                     />
                     <div className="absolute top-1.5 left-1.5 flex items-center gap-1.5">
-                      <span className="bg-[#ff5540]/90 text-white font-extrabold font-mono text-[8px] px-1.5 py-0.5 uppercase tracking-widest chamfer-corner border border-red-400">
+                      <span className="bg-[#ff5540]/90 text-white font-extrabold font-sans text-[8px] px-1.5 py-0.5 uppercase tracking-widest chamfer-corner border border-red-400">
                         FEATURED DISPATCH
                       </span>
-                      <span className="bg-[#0b0f0f]/90 text-[#00ffff] font-mono text-[8px] px-1.5 py-0.5 uppercase tracking-wider chamfer-corner border border-[#00ffff]/40">
+                      <span className="bg-[#0b0f0f]/90 text-[#00ffff] font-sans text-[8px] px-1.5 py-0.5 uppercase tracking-wider chamfer-corner border border-[#00ffff]/40">
                         {featuredPost.category}
                       </span>
                     </div>
@@ -272,12 +272,12 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase leading-snug">
                     {featuredPost.title}
                   </h3>
-                  <p className="text-[11px] text-[#839493] line-clamp-2 leading-tight font-mono">
+                  <p className="text-[11px] text-[#839493] line-clamp-2 leading-tight font-sans">
                     {featuredPost.summary}
                   </p>
                 </div>
 
-                <div className="pt-1 border-t border-[#3a4a49]/60 flex items-center justify-between text-[10px] font-mono">
+                <div className="pt-1 border-t border-[#3a4a49]/60 flex items-center justify-between text-[10px] font-sans">
                   <div className="flex items-center gap-1.5 text-[#839493]">
                     {featuredPost.authorAvatar && (
                       <img
@@ -309,7 +309,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
             {recentPosts.length === 0 ? (
               <div className="flex flex-col items-center justify-center chitin-card-inset p-3 text-center border border-[#3a4a49]">
                 <Sparkles className="w-4 h-4 text-[#00ffff] mb-1" />
-                <p className="text-[10px] text-[#839493] font-mono">
+                <p className="text-[10px] text-[#839493] font-sans">
                   Select "ALL DISPATCHES" to view more stories across desks.
                 </p>
               </div>
@@ -320,7 +320,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   onClick={() => setActivePost(post)}
                   className="chitin-card-inset p-2 border border-[#3a4a49] hover:border-[#00ffff]/60 transition-colors chamfer-corner cursor-pointer group space-y-1"
                 >
-                  <div className="flex items-center justify-between text-[9px] font-mono">
+                  <div className="flex items-center justify-between text-[9px] font-sans">
                     <span className="text-[#00ffff] font-bold uppercase tracking-wider bg-[#070b0b] px-1 py-0.2 border border-[#3a4a49]">
                       {post.category}
                     </span>
@@ -369,10 +369,10 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                     />
                     <div className="absolute top-2 left-2 flex items-center gap-2">
-                      <span className="bg-[#ff5540]/90 text-white font-extrabold font-mono text-[9px] px-2 py-0.5 uppercase tracking-widest chamfer-corner border border-red-400">
+                      <span className="bg-[#ff5540]/90 text-white font-extrabold font-sans text-[9px] px-2 py-0.5 uppercase tracking-widest chamfer-corner border border-red-400">
                         FEATURED DISPATCH
                       </span>
-                      <span className="bg-[#0b0f0f]/90 text-[#00ffff] font-mono text-[9px] px-2 py-0.5 uppercase tracking-wider chamfer-corner border border-[#00ffff]/40">
+                      <span className="bg-[#0b0f0f]/90 text-[#00ffff] font-sans text-[9px] px-2 py-0.5 uppercase tracking-wider chamfer-corner border border-[#00ffff]/40">
                         {featuredPost.category}
                       </span>
                     </div>
@@ -383,12 +383,12 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   <h3 className="font-grotesk text-base font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase leading-snug">
                     {featuredPost.title}
                   </h3>
-                  <p className="text-xs text-[#839493] line-clamp-2 leading-relaxed font-mono">
+                  <p className="text-xs text-[#839493] line-clamp-2 leading-relaxed font-sans">
                     {featuredPost.summary}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs font-mono">
+                <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs font-sans">
                   <div className="flex items-center gap-2 text-[#839493]">
                     {featuredPost.authorAvatar && (
                       <img
@@ -419,7 +419,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 {recentPosts.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center chitin-card-inset p-4 text-center border border-[#3a4a49]">
                     <Sparkles className="w-6 h-6 text-[#00ffff] mb-2" />
-                    <p className="text-xs text-[#839493] font-mono">
+                    <p className="text-xs text-[#839493] font-sans">
                       Select "ALL DISPATCHES" to view more stories across desks.
                     </p>
                   </div>
@@ -430,7 +430,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                       onClick={() => setActivePost(post)}
                       className="chitin-card-inset p-3 border border-[#3a4a49] hover:border-[#00ffff]/60 transition-colors chamfer-corner cursor-pointer group space-y-2"
                     >
-                      <div className="flex items-center justify-between text-[10px] font-mono">
+                      <div className="flex items-center justify-between text-[10px] font-sans">
                         <span className="text-[#00ffff] font-bold uppercase tracking-wider bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49]">
                           {post.category}
                         </span>
@@ -444,7 +444,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                         {post.title}
                       </h4>
 
-                      <p className="text-[11px] text-[#839493] line-clamp-1 font-mono">
+                      <p className="text-[11px] text-[#839493] line-clamp-1 font-sans">
                         {post.summary}
                       </p>
 

@@ -41,7 +41,7 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
     `Access to ${featureName} is restricted in guest mode. Create your free initiate account in seconds to unlock full access.`
 
   return (
-    <div className="relative w-full h-full min-h-[calc(100vh-140px)] flex flex-col items-center justify-center font-mono">
+    <div className="relative w-full h-full min-h-[calc(100vh-140px)] flex flex-col items-center justify-center font-sans">
       {/* Dimmed Background Content Preview (constrained to viewport bounds so it does not overflow) */}
       <div
         className="absolute inset-0 overflow-hidden pointer-events-none select-none filter blur-[4px] opacity-20 brightness-50 transition-all duration-300"
@@ -72,7 +72,7 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
             <h2 className="text-xl sm:text-2xl font-grotesk font-extrabold text-[#dfe3e3] uppercase tracking-wider">
               {displayTitle}
             </h2>
-            <p className="text-xs sm:text-[13px] text-[#839493] leading-relaxed max-w-sm mx-auto font-mono">
+            <p className="text-xs sm:text-[13px] text-[#839493] leading-relaxed max-w-sm mx-auto font-sans">
               {displayMessage}
             </p>
           </div>
@@ -92,7 +92,7 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
               <button
                 type="button"
                 onClick={() => handleOpenAuth('login')}
-                className="text-xs text-[#00c3ff] hover:text-white underline underline-offset-4 tracking-wider uppercase font-mono transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                className="text-xs text-[#00c3ff] hover:text-white underline underline-offset-4 tracking-wider uppercase font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>Already have an account? Sign In</span>

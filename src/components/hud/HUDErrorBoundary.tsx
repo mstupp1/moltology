@@ -113,7 +113,7 @@ export function HUDErrorFallback({
               Application Error
             </span>
           </div>
-          <span className="text-xs font-mono text-[#8a999e] bg-[#0c1011] px-2 py-0.5 rounded border border-[#232d30]">
+          <span className="text-xs font-sans text-[#8a999e] bg-[#0c1011] px-2 py-0.5 rounded border border-[#232d30]">
             {errorCode}
           </span>
         </div>
@@ -134,7 +134,7 @@ export function HUDErrorFallback({
         </div>
 
         {/* Error Message Box */}
-        <div className="p-3.5 mb-5 rounded bg-[#0b0e0f] border border-red-500/20 text-xs font-mono text-red-300 leading-relaxed break-words">
+        <div className="p-3.5 mb-5 rounded bg-[#0b0e0f] border border-red-500/20 text-xs font-sans text-red-300 leading-relaxed break-words">
           {errorMessage}
         </div>
 
@@ -149,10 +149,10 @@ export function HUDErrorFallback({
                 {showDetails ? <ChevronDown className="w-4 h-4 text-[#00c3ff]" /> : <ChevronRight className="w-4 h-4" />}
                 {showDetails ? 'Hide technical details' : 'Show technical details'}
               </span>
-              <span className="text-[11px] text-[#63757a] font-mono">Stack Trace</span>
+              <span className="text-[11px] text-[#63757a] font-sans">Stack Trace</span>
             </button>
             {showDetails && (
-              <pre className="p-4 bg-[#06090a] text-[11px] text-[#88c0d0] font-mono overflow-x-auto max-h-48 border-t border-[#232d30] whitespace-pre-wrap leading-relaxed select-text">
+              <pre className="p-4 bg-[#06090a] text-[11px] text-[#88c0d0] font-sans overflow-x-auto max-h-48 border-t border-[#232d30] whitespace-pre-wrap leading-relaxed select-text">
                 {errorStack}
               </pre>
             )}

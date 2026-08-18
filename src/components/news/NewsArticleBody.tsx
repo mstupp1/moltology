@@ -66,7 +66,7 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
 
   return (
     <div className="relative my-6 sm:my-8 bg-[#040708] border border-cyan-900/80 chamfer-corner overflow-hidden shadow-hud-cyan w-full">
-      <div className="bg-[#090e10] border-b border-cyan-950 px-3 sm:px-4 py-2 flex items-center justify-between text-xs text-cyan-400 font-mono gap-2">
+      <div className="bg-[#090e10] border-b border-cyan-950 px-3 sm:px-4 py-2 flex items-center justify-between text-xs text-cyan-400 font-sans gap-2">
         <div className="flex items-center space-x-2 min-w-0 truncate">
           <Terminal className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
           <span className="uppercase tracking-widest font-bold text-[11px] sm:text-xs truncate">
@@ -93,7 +93,7 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
         </button>
       </div>
       <div className="relative">
-        <pre className="p-3.5 sm:p-4 overflow-x-auto touch-pan-scroll text-[11px] sm:text-xs md:text-sm font-mono text-cyan-200 leading-relaxed no-scrollbar select-text bg-[#030607]">
+        <pre className="p-3.5 sm:p-4 overflow-x-auto touch-pan-scroll text-[11px] sm:text-xs md:text-sm font-sans text-cyan-200 leading-relaxed no-scrollbar select-text bg-[#030607]">
           <code>{code}</code>
         </pre>
       </div>
@@ -141,11 +141,11 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
   const flushList = (key: string) => {
     if (currentListItems.length > 0) {
       elements.push(
-        <ul key={key} className="space-y-2.5 sm:space-y-3 my-3 sm:my-4 pl-0 font-mono text-xs sm:text-sm text-gray-300">
+        <ul key={key} className="space-y-2.5 sm:space-y-3 my-3 sm:my-4 pl-0 font-sans text-xs sm:text-sm text-gray-300">
           {currentListItems.map((item, i) => (
             <li key={`${key}-item-${i}`} className="flex items-start gap-2 sm:gap-2.5 chitin-card-inset p-2.5 sm:p-3 chamfer-corner">
               {item.ordered ? (
-                <span className="font-bold text-cyan-400 font-mono text-xs shrink-0 mt-0.5">{item.number}.</span>
+                <span className="font-bold text-cyan-400 font-sans text-xs shrink-0 mt-0.5">{item.number}.</span>
               ) : (
                 <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 shrink-0 mt-0.5" />
               )}
@@ -189,7 +189,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
 
       elements.push(
         <div key={key} className="my-6 overflow-x-auto chitin-card-inset border border-cyan-900/60 chamfer-corner shadow-hud-cyan w-full touch-pan-scroll">
-          <table className="w-full text-left font-mono text-xs sm:text-sm border-collapse min-w-[500px]">
+          <table className="w-full text-left font-sans text-xs sm:text-sm border-collapse min-w-[500px]">
             <thead>
               <tr className="bg-[#0b1417] border-b border-cyan-900 text-cyan-300 font-bold uppercase tracking-wider">
                 {headerCells.map((h, hIdx) => (
@@ -366,7 +366,7 @@ function RenderFigure({ alt, src }: { alt: string; src: string }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#050809] via-transparent to-transparent opacity-30 pointer-events-none" />
       </div>
       {alt && (
-        <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#090e10] border-t border-cyan-950 flex items-center min-w-0 text-xs font-mono text-cyan-300">
+        <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#090e10] border-t border-cyan-950 flex items-center min-w-0 text-xs font-sans text-cyan-300">
           <span className="font-semibold text-gray-200 truncate">{alt}</span>
         </figcaption>
       )}
@@ -394,21 +394,21 @@ function formatInlineMarkdown(text: string): string {
     // Handle standalone block math $$...$$
     .replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
       const cleaned = cleanLatexMath(math.trim())
-      return `<div class="my-4 py-2.5 px-4 bg-[#030607] border border-cyan-800/60 text-cyan-300 font-mono text-center text-xs sm:text-sm chamfer-corner shadow-hud-cyan overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
+      return `<div class="my-4 py-2.5 px-4 bg-[#030607] border border-cyan-800/60 text-cyan-300 font-sans text-center text-xs sm:text-sm chamfer-corner shadow-hud-cyan overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
     })
     // Handle inline math $...$
     .replace(/\$([^$\n]+)\$/g, (_, math) => {
       const cleaned = cleanLatexMath(math.trim())
-      return `<code class="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 px-1.5 py-0.5 font-mono text-[11px] sm:text-xs font-semibold chamfer-corner select-text">${cleaned}</code>`
+      return `<code class="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs font-semibold chamfer-corner select-text">${cleaned}</code>`
     })
     // Handle inline markdown images if any in paragraph
     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="rounded border border-cyan-900 my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />')
     // Bold: **text**
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-100 font-mono">$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-100 font-sans">$1</strong>')
     // Italic: *text*
     .replace(/\*(.*?)\*/g, '<em class="italic text-cyan-200">$1</em>')
     // Inline Code: `code`
-    .replace(/`([^`]+)`/g, '<code class="bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 px-1.5 py-0.5 font-mono text-[11px] sm:text-xs chamfer-corner break-all">$1</code>')
+    .replace(/`([^`]+)`/g, '<code class="bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs chamfer-corner break-all">$1</code>')
     // Links: [label](url)
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-mono font-bold break-words">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
 }

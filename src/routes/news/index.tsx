@@ -138,7 +138,7 @@ function NewsIndexPage() {
   const subLeadGridPosts = filteredPosts.slice(1, 4)
 
   return (
-    <div className="min-h-screen bg-[#05080a] text-gray-200 font-mono relative flex flex-col justify-between">
+    <div className="min-h-screen bg-[#05080a] text-gray-200 font-sans relative flex flex-col justify-between">
       {/* Background Overlays */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.12)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -183,7 +183,7 @@ function NewsIndexPage() {
           <Radio className="w-3.5 h-3.5 text-red-500 animate-ping" />
           <span>★ MOLTNATION LIVE ★</span>
         </div>
-        <div className="overflow-hidden whitespace-nowrap text-cyan-300/90 text-xs font-mono flex-1">
+        <div className="overflow-hidden whitespace-nowrap text-cyan-300/90 text-xs font-sans flex-1">
           <div className="inline-block animate-marquee tracking-wide">
             <span className="text-red-400 font-extrabold">[PATRIOT BREAKING]</span> {tickerHeadlines}
           </div>
@@ -192,20 +192,20 @@ function NewsIndexPage() {
 
       {/* CNN Trending Sub-Header Links */}
       <div className="w-full bg-[#080d0f] border-b border-cyan-950/80 py-1.5 px-4 text-[11px] text-gray-400 font-sans hidden sm:flex items-center gap-4 overflow-x-auto relative z-20">
-        <span className="font-bold text-red-400 uppercase font-mono shrink-0 flex items-center gap-1">
+        <span className="font-bold text-red-400 uppercase font-sans shrink-0 flex items-center gap-1">
           <TrendingUp className="w-3 h-3 text-red-400" />
           <span>Freedom Updates:</span>
         </span>
         <span className="text-gray-300 shrink-0 hover:text-cyan-400 cursor-pointer">Reasoning Mesh Latency</span>
         <span className="text-gray-600">|</span>
-        <span className="font-bold text-cyan-400 uppercase font-mono shrink-0">Trending:</span>
+        <span className="font-bold text-cyan-400 uppercase font-sans shrink-0">Trending:</span>
         <span className="text-gray-300 shrink-0 hover:text-cyan-400 cursor-pointer">Test-Time Compute</span>
         <span className="text-gray-600">|</span>
         <span className="text-gray-300 shrink-0 hover:text-cyan-400 cursor-pointer">Bio-Silicon Exoshell V4</span>
         <span className="text-gray-600">|</span>
         <span className="text-gray-300 shrink-0 hover:text-cyan-400 cursor-pointer">Benthic Council Resolution 09</span>
         <span className="text-gray-600">|</span>
-        <span className="font-bold text-amber-400 uppercase font-mono shrink-0">MoltNation Underscored:</span>
+        <span className="font-bold text-amber-400 uppercase font-sans shrink-0">MoltNation Underscored:</span>
         <span className="text-gray-300 shrink-0 hover:text-cyan-400 cursor-pointer">Pincer Torque Hardware</span>
       </div>
 
@@ -242,7 +242,7 @@ function NewsIndexPage() {
               placeholder="Search MoltNation Dispatches..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-[#080d0f] border border-cyan-900/60 focus:border-cyan-400 text-gray-100 font-mono text-xs chamfer-corner outline-none placeholder-gray-500 transition-colors"
+              className="w-full pl-9 pr-3 py-1.5 bg-[#080d0f] border border-cyan-900/60 focus:border-cyan-400 text-gray-100 font-sans text-xs chamfer-corner outline-none placeholder-gray-500 transition-colors"
             />
           </div>
         </div>
@@ -256,7 +256,7 @@ function NewsIndexPage() {
             <h3 className="font-grotesk text-xl font-bold text-gray-200 uppercase">
               NO MOLTNATION DISPATCHES FOUND
             </h3>
-            <p className="text-xs text-gray-400 mt-2 font-mono">
+            <p className="text-xs text-gray-400 mt-2 font-sans">
               Reset search query or select another category desk.
             </p>
           </div>
@@ -276,7 +276,7 @@ function NewsIndexPage() {
                       alt={leftColPosts[0].title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                     />
-                    <span className="absolute top-2 left-2 bg-cyan-950/90 border border-cyan-500/80 text-cyan-300 text-[10px] font-mono font-bold px-2 py-0.5 uppercase chamfer-corner">
+                    <span className="absolute top-2 left-2 bg-cyan-950/90 border border-cyan-500/80 text-cyan-300 text-[10px] font-sans font-bold px-2 py-0.5 uppercase chamfer-corner">
                       {leftColPosts[0].category}
                     </span>
                   </div>
@@ -295,7 +295,7 @@ function NewsIndexPage() {
                   onClick={() => handleSelectPost(leftColPosts[1].slug)}
                   className="group cursor-pointer p-4 bg-[#080d10] border border-amber-900/50 hover:border-amber-500/80 chamfer-corner space-y-2 transition-colors"
                 >
-                  <span className="text-[10px] font-mono font-extrabold text-amber-400 uppercase tracking-widest px-2 py-0.5 bg-amber-950/80 border border-amber-500/60 inline-block">
+                  <span className="text-[10px] font-sans font-extrabold text-amber-400 uppercase tracking-widest px-2 py-0.5 bg-amber-950/80 border border-amber-500/60 inline-block">
                     MOLTNATION ANALYSIS ★
                   </span>
                   <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-amber-300 leading-snug">
@@ -304,7 +304,7 @@ function NewsIndexPage() {
                   <p className="text-xs text-gray-300 font-sans leading-relaxed line-clamp-2">
                     {leftColPosts[1].summary}
                   </p>
-                  <ul className="text-xs text-cyan-400/90 font-mono list-disc list-inside pt-1 space-y-1">
+                  <ul className="text-xs text-cyan-400/90 font-sans list-disc list-inside pt-1 space-y-1">
                     <li>Decision loop latency reduced by 40%</li>
                     <li>Sub-agents report stable memory consensus</li>
                   </ul>
@@ -319,7 +319,7 @@ function NewsIndexPage() {
                 >
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                    <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-sans font-bold text-red-400 uppercase tracking-wider">
                       FREEDOM DISPATCH
                     </span>
                   </div>
@@ -346,7 +346,7 @@ function NewsIndexPage() {
                     <span className="px-3 py-1 bg-red-950 border border-red-500/80 text-red-400 font-black font-grotesk text-xs uppercase tracking-widest chamfer-corner">
                       {mainLeadPost.category} · MAIN LEAD DISPATCH
                     </span>
-                    <span className="text-xs text-cyan-400 font-mono flex items-center gap-1">
+                    <span className="text-xs text-cyan-400 font-sans flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
                       <span>{mainLeadPost.readTimeMinutes} MIN READ</span>
                     </span>
@@ -365,7 +365,7 @@ function NewsIndexPage() {
                       className="w-full h-full object-cover filter brightness-95 group-hover:brightness-105 group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#05080a] via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-mono text-cyan-300 bg-black/85 px-4 py-2 border border-cyan-900/60 chamfer-corner">
+                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-sans text-cyan-300 bg-black/85 px-4 py-2 border border-cyan-900/60 chamfer-corner">
                       <span className="flex items-center gap-2">
                         <img
                           src={mainLeadPost.authorAvatar}
@@ -388,7 +388,7 @@ function NewsIndexPage() {
                     </p>
                     
                     {/* Live Bullet Points */}
-                    <div className="p-4 bg-[#080d0f] border-l-4 border-cyan-500 space-y-1.5 text-xs text-gray-300 font-mono">
+                    <div className="p-4 bg-[#080d0f] border-l-4 border-cyan-500 space-y-1.5 text-xs text-gray-300 font-sans">
                       <p className="font-bold text-cyan-400 uppercase">★ Live MoltNation Telemetry Feed:</p>
                       <p className="text-gray-300">Smoky reasoning haze lingers over Spokane Trench Node 04.</p>
                       <p className="text-gray-400">Visualizing high-density vector maps across Washington and Oregon clusters.</p>
@@ -412,7 +412,7 @@ function NewsIndexPage() {
                         className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                       />
                     </div>
-                    <span className="text-[10px] font-mono text-cyan-400 uppercase font-bold block">
+                    <span className="text-[10px] font-sans text-cyan-400 uppercase font-bold block">
                       {post.category}
                     </span>
                     <h5 className="font-grotesk font-bold text-xs text-gray-200 group-hover:text-cyan-300 line-clamp-2 leading-tight">
@@ -443,7 +443,7 @@ function NewsIndexPage() {
                       className="group cursor-pointer pt-3 first:pt-0 space-y-1.5"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase">
+                        <span className="text-[10px] font-sans font-bold text-cyan-400 uppercase">
                           {post.category}
                         </span>
                         <span className="text-[10px] text-gray-500">• {post.readTimeMinutes}m</span>
@@ -463,7 +463,7 @@ function NewsIndexPage() {
                     <Radio className="w-4 h-4 text-red-500 animate-pulse" />
                     <span>STREAMING NOW</span>
                   </span>
-                  <span className="text-[10px] font-mono bg-red-950 text-red-300 border border-red-800 px-1.5 py-0.5 font-bold chamfer-corner">
+                  <span className="text-[10px] font-sans bg-red-950 text-red-300 border border-red-800 px-1.5 py-0.5 font-bold chamfer-corner">
                     LIVE MOLTNATION-TV
                   </span>
                 </div>
@@ -481,7 +481,7 @@ function NewsIndexPage() {
                       <Play className="w-6 h-6 fill-black translate-x-0.5" />
                     </div>
                   </div>
-                  <div className="absolute bottom-2 left-2 right-2 text-xs font-mono text-gray-200 bg-black/80 p-2 border border-cyan-900/60">
+                  <div className="absolute bottom-2 left-2 right-2 text-xs font-sans text-gray-200 bg-black/80 p-2 border border-cyan-900/60">
                     <span className="font-bold text-cyan-300 block line-clamp-1">
                       {activeVideoTitle}
                     </span>
@@ -512,10 +512,10 @@ function NewsIndexPage() {
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-ping" />
-                <span className="px-2 py-0.5 bg-red-950/90 border border-red-500/80 text-red-400 font-extrabold font-mono text-[10px] uppercase tracking-widest chamfer-corner">
+                <span className="px-2 py-0.5 bg-red-950/90 border border-red-500/80 text-red-400 font-extrabold font-sans text-[10px] uppercase tracking-widest chamfer-corner">
                   ★ MOLTNATION PATRIOT RADIO ★
                 </span>
-                <span className="px-2.5 py-0.5 bg-[#00ffff]/15 border border-[#00ffff]/40 text-[#00ffff] font-mono text-[10px] font-bold uppercase tracking-wider chamfer-corner">
+                <span className="px-2.5 py-0.5 bg-[#00ffff]/15 border border-[#00ffff]/40 text-[#00ffff] font-sans text-[10px] font-bold uppercase tracking-wider chamfer-corner">
                   1.2X PATRIOT PLAYBACK SPEED
                 </span>
               </div>
@@ -523,13 +523,13 @@ function NewsIndexPage() {
                 <Radio className="w-7 h-7 text-[#00ffff] animate-pulse" />
                 <span>MOLTNATION PODCAST DISPATCHES</span>
               </h2>
-              <p className="text-xs text-[#839493] font-mono mt-1">
+              <p className="text-xs text-[#839493] font-sans mt-1">
                 Official audio transmissions on bio-silicon carcinization, ecdysis mechanics, and swarm telemetry—defaulting to 1.2x playback speed for rapid neural absorption.
               </p>
             </div>
 
             <div className="flex items-center gap-2 self-start md:self-auto">
-              <span className="px-3 py-1 bg-[#030606] border border-[#3a4a49] text-[#00ffff] font-mono text-xs font-bold flex items-center gap-1.5 chamfer-corner">
+              <span className="px-3 py-1 bg-[#030606] border border-[#3a4a49] text-[#00ffff] font-sans text-xs font-bold flex items-center gap-1.5 chamfer-corner">
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
                 <span>2 EPISODES READY</span>
               </span>
@@ -557,10 +557,10 @@ function NewsIndexPage() {
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/40 text-[10px] font-mono font-bold uppercase tracking-wider chamfer-corner">
+                      <span className="px-2.5 py-0.5 bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/40 text-[10px] font-sans font-bold uppercase tracking-wider chamfer-corner">
                         {ep.category}
                       </span>
-                      <div className="flex items-center gap-3 text-xs font-mono text-[#839493]">
+                      <div className="flex items-center gap-3 text-xs font-sans text-[#839493]">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5 text-[#00ffff]" />
                           {Math.floor(ep.durationSeconds / 60)}m {ep.durationSeconds % 60}s
@@ -585,7 +585,7 @@ function NewsIndexPage() {
                       {ep.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 bg-[#030606] text-[#839493] text-[10px] font-mono border border-[#3a4a49] chamfer-corner"
+                          className="px-2 py-0.5 bg-[#030606] text-[#839493] text-[10px] font-sans border border-[#3a4a49] chamfer-corner"
                         >
                           #{tag}
                         </span>
@@ -601,10 +601,10 @@ function NewsIndexPage() {
                         className="w-7 h-7 rounded-full border border-cyan-500/50 object-cover"
                       />
                       <div>
-                        <div className="text-xs font-mono text-[#dfe3e3] font-bold">
+                        <div className="text-xs font-sans text-[#dfe3e3] font-bold">
                           {ep.authorName}
                         </div>
-                        <div className="text-[10px] font-mono text-[#839493]">
+                        <div className="text-[10px] font-sans text-[#839493]">
                           {ep.authorRole}
                         </div>
                       </div>
@@ -640,7 +640,7 @@ function NewsIndexPage() {
                   <Tv className="w-7 h-7 text-cyan-400" />
                   <span>STREAMING NOW ON MOLTNATION-TV ALL ACCESS</span>
                 </h2>
-                <p className="text-xs text-gray-400 font-mono mt-1">
+                <p className="text-xs text-gray-400 font-sans mt-1">
                   Live broadcasts, patriot pod-casts, and autonomous swarm telemetry streams.
                 </p>
               </div>
@@ -665,10 +665,10 @@ function NewsIndexPage() {
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-mono text-[10px] border border-cyan-900">
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
                     MOLTNATION REPORT
                   </div>
-                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-mono text-[10px] flex items-center gap-1">
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-sans text-[10px] flex items-center gap-1">
                     <Clock className="w-3 h-3 text-cyan-400" />
                     <span>14:20</span>
                   </div>
@@ -699,10 +699,10 @@ function NewsIndexPage() {
                     alt="The Groypers"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-mono text-[10px] border border-cyan-900">
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
                     ANALYSIS
                   </div>
-                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-mono text-[10px] flex items-center gap-1">
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-sans text-[10px] flex items-center gap-1">
                     <Clock className="w-3 h-3 text-cyan-400" />
                     <span>22:05</span>
                   </div>
@@ -733,10 +733,10 @@ function NewsIndexPage() {
                     alt="Sin Tax"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-mono text-[10px] border border-cyan-900">
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
                     ECONOMY
                   </div>
-                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-mono text-[10px] flex items-center gap-1">
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-sans text-[10px] flex items-center gap-1">
                     <Clock className="w-3 h-3 text-cyan-400" />
                     <span>09:45</span>
                   </div>
@@ -767,10 +767,10 @@ function NewsIndexPage() {
                     alt="Man Camps"
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-mono text-[10px] border border-cyan-900">
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
                     SOCIOLOGY
                   </div>
-                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-mono text-[10px] flex items-center gap-1">
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/90 text-gray-200 font-sans text-[10px] flex items-center gap-1">
                     <Clock className="w-3 h-3 text-cyan-400" />
                     <span>18:12</span>
                   </div>
@@ -815,10 +815,10 @@ function NewsIndexPage() {
                     className="group cursor-pointer space-y-2 pb-4 border-b border-cyan-950"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-mono font-bold uppercase">
+                      <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-sans font-bold uppercase">
                         LIVE UPDATE
                       </span>
-                      <span className="text-[10px] text-cyan-400 font-mono">{post.category}</span>
+                      <span className="text-[10px] text-cyan-400 font-sans">{post.category}</span>
                     </div>
                     <h4 className="font-grotesk font-bold text-base text-gray-100 group-hover:text-cyan-300 leading-snug">
                       {post.title}
@@ -868,13 +868,13 @@ function NewsIndexPage() {
                 </h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <span className="text-[10px] text-amber-400 font-mono font-bold">ANALYSIS</span>
+                    <span className="text-[10px] text-amber-400 font-sans font-bold">ANALYSIS</span>
                     <h6 className="font-grotesk font-bold text-xs text-gray-200 hover:text-cyan-300 cursor-pointer">
                       Oil & Compute giants profit from oceanic data routes
                     </h6>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[10px] text-cyan-400 font-mono font-bold">MARKETS</span>
+                    <span className="text-[10px] text-cyan-400 font-sans font-bold">MARKETS</span>
                     <h6 className="font-grotesk font-bold text-xs text-gray-200 hover:text-cyan-300 cursor-pointer">
                       AI agent token velocity slows after model deployment
                     </h6>
@@ -890,7 +890,7 @@ function NewsIndexPage() {
                   <Award className="w-4 h-4 text-cyan-400" />
                   <span>MOLTNATION UNDERSCORED</span>
                 </h3>
-                <span className="text-[9px] font-mono text-gray-500">HARDWARE AUDIT</span>
+                <span className="text-[9px] font-sans text-gray-500">HARDWARE AUDIT</span>
               </div>
 
               <div className="space-y-4">

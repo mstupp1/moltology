@@ -25,7 +25,7 @@ export const JournalMasthead: React.FC<JournalMastheadProps> = ({
         {/* Top metric bar */}
         <div
           className={cn(
-            'flex items-center justify-between border border-[#3a4a49]/60 bg-[#05090a]/80 font-mono',
+            'flex items-center justify-between border border-[#3a4a49]/60 bg-[#05090a]/80 font-sans',
             isHero ? 'px-4 py-1.5 text-[9px] sm:text-[10px]' : 'px-3 py-1 text-[9px]'
           )}
         >
@@ -60,14 +60,14 @@ export const JournalMasthead: React.FC<JournalMastheadProps> = ({
             </div>
             <div
               className={cn(
-                'font-mono text-[#00c3ff] tracking-[0.28em] uppercase leading-relaxed',
+                'font-sans text-[#00c3ff] tracking-[0.28em] uppercase leading-relaxed',
                 isHero ? 'mt-2 text-[10px] sm:text-xs' : 'mt-1 text-[9px]'
               )}
             >
               {JOURNAL_META.subtitle}
             </div>
             {isHero && (
-              <p className="hidden sm:block mx-auto mt-3 max-w-2xl text-[10px] font-mono tracking-widest uppercase text-[#839493]">
+              <p className="hidden sm:block mx-auto mt-3 max-w-2xl text-[10px] font-sans tracking-widest uppercase text-[#839493]">
                 {JOURNAL_META.tagline}
               </p>
             )}

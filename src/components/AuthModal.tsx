@@ -98,7 +98,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 font-mono overflow-y-auto"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 font-sans overflow-y-auto"
       onClick={onClose}
     >
       <HudCard
@@ -120,7 +120,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <h2 className="text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
             {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-mono">
+          <p className="text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-sans">
             {mode === 'signup'
               ? 'Sign up to persist your session'
               : 'Sign in to access your saved state'}
@@ -161,7 +161,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-mono">
+          <div className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-sans">
             <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
             <span>{error}</span>
           </div>

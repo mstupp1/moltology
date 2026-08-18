@@ -93,7 +93,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
             />
           </div>
 
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-mono text-[#839493]">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-sans text-[#839493]">
             <Shield className="w-3.5 h-3.5 text-[#00ffcc]" />
             <span>38-Page Tactical PDF &bull; Instant Offline Access</span>
           </div>
@@ -103,14 +103,14 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
         <div className="lg:col-span-7 space-y-6">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-mono font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
                 FREE TOP-TIER DOSSIER
               </span>
-              <span className="line-through text-[#ff453a] text-xs font-mono font-bold">
+              <span className="line-through text-[#ff453a] text-xs font-sans font-bold">
                 REGULAR $149.00
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#00ffcc]/20 text-[#00ffcc] font-bold text-xs font-mono">
+              <span className="px-2 py-0.5 rounded bg-[#00ffcc]/20 text-[#00ffcc] font-bold text-xs font-sans">
                 $0.00 (100% FREE TODAY)
               </span>
             </div>
@@ -174,7 +174,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter email to claim free copy..."
-                    className="w-full px-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-mono text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                    className="w-full px-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
                   />
                   <Lock className="absolute right-3.5 top-3.5 w-4 h-4 text-[#839493]" />
                 </div>
@@ -193,8 +193,8 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                   )}
                 </button>
               </div>
-              {error && <p className="text-xs text-[#ff453a] font-mono">{error}</p>}
-              <p className="text-[10px] text-[#839493] font-mono">
+              {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
+              <p className="text-[10px] text-[#839493] font-sans">
                 ⚡ Instant access. Subsidized declassified transmission. Zero spam.
               </p>
             </form>

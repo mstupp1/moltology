@@ -125,7 +125,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
 
   return (
     <div
-      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-mono font-bold ${
+      className={`relative shrink-0 rounded-full overflow-hidden flex items-center justify-center font-sans font-bold ${
         isCorporate
           ? 'bg-gradient-to-br from-sky-100 via-sky-50 to-white border border-sky-300 text-sky-700 shadow-sm'
           : 'bg-gradient-to-br from-[#0f1d22] via-[#091316] to-[#030606] border border-[#00c3ff]/70 text-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.4)]'

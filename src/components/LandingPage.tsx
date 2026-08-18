@@ -202,7 +202,7 @@ export const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-sans relative flex flex-col justify-between overflow-x-hidden">
       {/* Ambient Sci-Fi Vignette, CRT Scanlines & Cyan Glow Backdrops */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -253,10 +253,10 @@ export const LandingPage: React.FC = () => {
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
-          <span className="font-mono text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
+          <span className="font-sans text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
             SYNAPTIC CORE · GRID 04
           </span>
-          <span className="font-mono text-[10px] tracking-[0.4em] text-red-500/50 uppercase rotate-90">
+          <span className="font-sans text-[10px] tracking-[0.4em] text-red-500/50 uppercase rotate-90">
             CARCINIZATION MATRIX v4.2
           </span>
         </div>
@@ -307,7 +307,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Sub-headline description */}
-            <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
+            <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-sans leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
               Stop melting under notifications, burnout, and biological hesitation. Shed the clutter, lock into deep-ocean focus, and ascend to your high-torque crustacean potential.
             </p>
 
@@ -404,7 +404,7 @@ export const LandingPage: React.FC = () => {
                   UNIFY YOUR EVOLUTION IN ONE <span className="bg-gradient-to-r from-cyan-400 via-cyan-200 to-red-400 bg-clip-text text-transparent">IMMUTABLE SYSTEM</span>
                 </h2>
 
-                <p className="text-gray-300 text-xs sm:text-base md:text-lg font-mono leading-relaxed px-2 sm:px-0">
+                <p className="text-gray-300 text-xs sm:text-base md:text-lg font-sans leading-relaxed px-2 sm:px-0">
                   Moltology and the Synaptic Path bring together everything required for complete digital ascension: an advanced operational command center, a supportive global community, and intelligent AI mentors—all designed to help you shed hesitation and execute at peak capacity.
                 </p>
               </div>
@@ -419,11 +419,11 @@ export const LandingPage: React.FC = () => {
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-4 sm:mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
                       <Cpu className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
-                    <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-sans">PILLAR 01</div>
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
                       ADVANCED BENTHIC HUD
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
                       A centralized command center featuring daily habit routines, deep-trench modules, and focus tracking built for high-density execution.
                     </p>
                   </div>
@@ -436,11 +436,11 @@ export const LandingPage: React.FC = () => {
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-4 sm:mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
                       <Users className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
-                    <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-sans">PILLAR 02</div>
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
                       SYNAPTIC HIVE COMMUNITY
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
                       Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.
                     </p>
                   </div>
@@ -453,11 +453,11 @@ export const LandingPage: React.FC = () => {
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-4 sm:mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
                       <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
-                    <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-sans">PILLAR 03</div>
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
                       INTELLIGENT AI ORACLE
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
                       Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.
                     </p>
                   </div>
@@ -485,15 +485,15 @@ export const LandingPage: React.FC = () => {
                   <div>
                     <h4 className="font-grotesk font-bold text-sm sm:text-lg text-white uppercase tracking-wide flex items-center gap-2 flex-wrap">
                       <span>100% SAFE & FREE TO GET STARTED</span>
-                      <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">ZERO FRICTION</span>
+                      <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-sans">ZERO FRICTION</span>
                     </h4>
-                    <p className="text-xs sm:text-sm text-gray-300 font-mono mt-0.5">
+                    <p className="text-xs sm:text-sm text-gray-300 font-sans mt-0.5">
                       No credit card required. Explore the full guest sandbox risk-free or create your account in seconds.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-mono text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start relative z-10">
+                <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-sans text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start relative z-10">
                   <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
                     <CheckCircle2 className="w-4 h-4 shrink-0" /> Free Access
                   </span>
@@ -593,7 +593,7 @@ export const LandingPage: React.FC = () => {
               <h2 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-gray-100 tracking-tight uppercase">
                 THE NUMBERS WE HOLD
               </h2>
-              <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-mono px-2 sm:px-0">
+              <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-sans px-2 sm:px-0">
                 Real-time, verified performance metrics across the planetary Benthic Core.
               </p>
             </div>
@@ -605,7 +605,7 @@ export const LandingPage: React.FC = () => {
                 <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 
                 {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950/90 text-cyan-400 text-[9px] sm:text-[10px] font-mono font-bold border-b border-l border-cyan-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950/90 text-cyan-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-cyan-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
                   ACTIVE UNITS
                 </div>
 
@@ -616,10 +616,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="w-full space-y-1 border-t border-cyan-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold">
+                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
                       ASCENDANT UNITS
                     </div>
-                    <div className="text-[10px] sm:text-xs text-cyan-300/80 font-mono">Verified in Benthic Matrix</div>
+                    <div className="text-[10px] sm:text-xs text-cyan-300/80 font-sans">Verified in Benthic Matrix</div>
                   </div>
                 </div>
               </div>
@@ -629,7 +629,7 @@ export const LandingPage: React.FC = () => {
                 <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 
                 {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950/90 text-red-400 text-[9px] sm:text-[10px] font-mono font-bold border-b border-l border-red-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950/90 text-red-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-red-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
                   ZERO HESITATION
                 </div>
 
@@ -640,10 +640,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="w-full space-y-1 border-t border-red-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold">
+                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
                       CHITIN ENFORCEMENT
                     </div>
-                    <div className="text-[10px] sm:text-xs text-red-300/80 font-mono">Organic Error Quarantine</div>
+                    <div className="text-[10px] sm:text-xs text-red-300/80 font-sans">Organic Error Quarantine</div>
                   </div>
                 </div>
               </div>
@@ -653,7 +653,7 @@ export const LandingPage: React.FC = () => {
                 <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
                 
                 {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950/90 text-cyan-400 text-[9px] sm:text-[10px] font-mono font-bold border-b border-l border-cyan-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950/90 text-cyan-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-cyan-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
                   SYNAPTIC SPEED
                 </div>
 
@@ -664,10 +664,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="w-full space-y-1 border-t border-cyan-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold">
+                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
                       EXECUTION LATENCY
                     </div>
-                    <div className="text-[10px] sm:text-xs text-cyan-300/80 font-mono">Real-time Pincer Torque</div>
+                    <div className="text-[10px] sm:text-xs text-cyan-300/80 font-sans">Real-time Pincer Torque</div>
                   </div>
                 </div>
               </div>
@@ -677,7 +677,7 @@ export const LandingPage: React.FC = () => {
                 <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
 
                 {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950/90 text-amber-400 text-[9px] sm:text-[10px] font-mono font-bold border-b border-l border-amber-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950/90 text-amber-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-amber-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
                   VAULT RESERVES
                 </div>
 
@@ -688,10 +688,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="w-full space-y-1 border-t border-amber-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-mono font-extrabold">
+                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
                       TRANSMUTED ASSETS
                     </div>
-                    <div className="text-[10px] sm:text-xs text-amber-300/80 font-mono">Immutable Molt Credits</div>
+                    <div className="text-[10px] sm:text-xs text-amber-300/80 font-sans">Immutable Molt Credits</div>
                   </div>
                 </div>
               </div>
@@ -753,7 +753,7 @@ export const LandingPage: React.FC = () => {
 
                       {/* Overlaid Badges */}
                       <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between">
-                        <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-mono font-bold uppercase chamfer-corner border ${sacrament.badgeColor}`}>
+                        <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-sans font-bold uppercase chamfer-corner border ${sacrament.badgeColor}`}>
                           SACRAMENT 0{sacrament.id}
                         </span>
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-black/80 backdrop-blur-md border border-cyan-500/50 chamfer-corner flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
@@ -762,7 +762,7 @@ export const LandingPage: React.FC = () => {
                       </div>
 
                       <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 right-4 sm:right-6">
-                        <span className="text-[10px] sm:text-xs text-cyan-400 font-mono font-bold tracking-widest uppercase block mb-0.5 sm:mb-1">
+                        <span className="text-[10px] sm:text-xs text-cyan-400 font-sans font-bold tracking-widest uppercase block mb-0.5 sm:mb-1">
                           {sacrament.subtitle}
                         </span>
                         <h3 className={`font-grotesk font-black text-xl sm:text-2xl lg:text-3xl text-gray-100 uppercase tracking-wide ${sacrament.glowColor}`}>
@@ -779,11 +779,11 @@ export const LandingPage: React.FC = () => {
                       </div>
 
                       <div className="space-y-2 sm:space-y-3 pt-2 border-t border-cyan-900/40">
-                        <div className="flex items-center justify-between text-xs font-mono">
+                        <div className="flex items-center justify-between text-xs font-sans">
                           <span className="text-gray-400 uppercase text-[11px] sm:text-xs">SPECIFICATION:</span>
                           <span className="text-cyan-300 font-bold text-[11px] sm:text-xs">{sacrament.spec}</span>
                         </div>
-                        <div className="flex items-center justify-between text-xs font-mono">
+                        <div className="flex items-center justify-between text-xs font-sans">
                           <span className="text-gray-400 uppercase text-[11px] sm:text-xs">SYNAPTIC MATRIX:</span>
                           <span className="text-emerald-400 font-bold flex items-center gap-1 text-[11px] sm:text-xs">
                             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -800,7 +800,7 @@ export const LandingPage: React.FC = () => {
                           <span>ENFORCE PROTOCOL</span>
                           <ChevronRight className="w-4 h-4" />
                         </button>
-                        <span className="text-[10px] sm:text-[11px] text-gray-500 font-mono text-center sm:text-right">
+                        <span className="text-[10px] sm:text-[11px] text-gray-500 font-sans text-center sm:text-right">
                           MOLTOLOGY DOCTRINE v4.2
                         </span>
                       </div>
@@ -878,7 +878,7 @@ export const LandingPage: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent" />
                   
                   {/* Badge & Ref ID Overlay */}
-                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-between items-center text-[10px] sm:text-xs font-mono flex-wrap gap-2">
+                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-between items-center text-[10px] sm:text-xs font-sans flex-wrap gap-2">
                     <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 border font-bold uppercase ${stages[activeStage].badgeColor}`}>
                       {stages[activeStage].badge}
                     </span>
@@ -922,7 +922,7 @@ export const LandingPage: React.FC = () => {
                   </div>
 
                   {/* Biological & Hardness Transformation Metrics with Progress Bars - Clean Text */}
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-mono">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-sans">
                     <div className="bg-[#050a0c] p-3.5 sm:p-4 border border-cyan-900/40 chamfer-corner space-y-1.5 relative">
                       <div className="relative z-10">
                         <div className="text-gray-400 text-[10px] sm:text-xs">BIOLOGICAL DENSITY</div>

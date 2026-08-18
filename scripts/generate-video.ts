@@ -33,7 +33,7 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
     throw new Error('Missing API key in environment variables (GEMINI_API_KEY or VERTEX_API_KEY).')
   }
 
-  const model = options.model || 'veo-3.1-fast-generate-preview'
+  const model = options.model || 'veo-3.1-lite-generate-preview'
   const aspectRatio = options.aspectRatio || '9:16'
   const durationSeconds = options.durationSeconds || 6
   const uploadToS3 = options.uploadToS3 ?? true

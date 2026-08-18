@@ -151,7 +151,7 @@ function GalleryRoute() {
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Toast Notification Container */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-[#0a0f12] border border-[#00c3ff] text-[#00c3ff] text-xs font-mono font-bold rounded-xl shadow-[0_0_20px_rgba(0,195,255,0.4)] flex items-center gap-2 animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-[#0a0f12] border border-[#00c3ff] text-[#00c3ff] text-xs font-sans font-bold rounded-xl shadow-[0_0_20px_rgba(0,195,255,0.4)] flex items-center gap-2 animate-bounce">
           <Sparkles className="w-4 h-4 text-[#ff5540]" />
           <span>{toastMessage}</span>
         </div>
@@ -164,7 +164,7 @@ function GalleryRoute() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#00c3ff]/15 border border-[#00c3ff]/50 rounded-full text-[#00c3ff] text-xs font-mono font-bold tracking-widest uppercase shadow-md">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#00c3ff]/15 border border-[#00c3ff]/50 rounded-full text-[#00c3ff] text-xs font-sans font-bold tracking-widest uppercase shadow-md">
               <Grid className="w-3.5 h-3.5" />
               <span>CARAPACE VISUAL MATRIX</span>
             </div>
@@ -182,7 +182,7 @@ function GalleryRoute() {
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => setShowSavedOnly(!showSavedOnly)}
-              className={`px-4 py-2.5 rounded-xl font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-md active:scale-95 ${
+              className={`px-4 py-2.5 rounded-xl font-sans font-bold text-xs flex items-center gap-2 transition-all shadow-md active:scale-95 ${
                 showSavedOnly
                   ? 'bg-[#ff3b30] text-white border border-[#ff6b60] shadow-[0_0_15px_rgba(255,59,48,0.5)]'
                   : 'bg-[#0a0f12] hover:bg-[#121a1e] text-[#c0d0e0] border border-[#1e2d37] hover:border-[#ff3b30]'
@@ -194,7 +194,7 @@ function GalleryRoute() {
 
             <button
               onClick={() => setIsUploadModalOpen(true)}
-              className="px-5 py-2.5 bg-[#00c3ff] hover:bg-[#33d1ff] text-black font-mono font-bold text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(0,195,255,0.4)] active:scale-95 flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-[#00c3ff] hover:bg-[#33d1ff] text-black font-sans font-bold text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(0,195,255,0.4)] active:scale-95 flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>TRANSMUTE NEW PIN</span>
@@ -219,7 +219,7 @@ function GalleryRoute() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-[#7a8e9e] hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-sans text-[#7a8e9e] hover:text-white"
               >
                 CLEAR
               </button>
@@ -231,7 +231,7 @@ function GalleryRoute() {
             <select
               value={selectedAspectRatio}
               onChange={(e) => setSelectedAspectRatio(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-mono text-[#00c3ff] outline-none cursor-pointer appearance-none"
+              className="w-full px-3.5 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-sans text-[#00c3ff] outline-none cursor-pointer appearance-none"
             >
               <option value="ALL">ALL ASPECT RATIOS</option>
               <option value="TALL">TALL / PORTRAIT</option>
@@ -251,7 +251,7 @@ function GalleryRoute() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold whitespace-nowrap transition-all shadow-sm ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-sans font-bold whitespace-nowrap transition-all shadow-sm ${
                   isActive
                     ? 'bg-[#00c3ff] text-black shadow-[0_0_12px_rgba(0,195,255,0.5)]'
                     : 'bg-[#0a0f12] hover:bg-[#12191d] text-[#a0b0c0] hover:text-white border border-[#1e2d37]'
@@ -265,7 +265,7 @@ function GalleryRoute() {
       </div>
 
       {/* Grid Results Status */}
-      <div className="flex items-center justify-between px-2 text-xs font-mono text-[#7a8e9e]">
+      <div className="flex items-center justify-between px-2 text-xs font-sans text-[#7a8e9e]">
         <span>
           SHOWING <strong className="text-[#00c3ff]">{filteredPins.length}</strong> OF{' '}
           {pins.length} SACRED PINS
@@ -310,7 +310,7 @@ function GalleryRoute() {
               setSelectedAspectRatio('ALL')
               setShowSavedOnly(false)
             }}
-            className="px-4 py-2 bg-[#00c3ff]/15 border border-[#00c3ff]/60 text-[#00c3ff] text-xs font-mono font-bold rounded-xl hover:bg-[#00c3ff] hover:text-black transition-all"
+            className="px-4 py-2 bg-[#00c3ff]/15 border border-[#00c3ff]/60 text-[#00c3ff] text-xs font-sans font-bold rounded-xl hover:bg-[#00c3ff] hover:text-black transition-all"
           >
             RESET ALL FILTERS
           </button>

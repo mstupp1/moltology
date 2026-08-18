@@ -32,7 +32,7 @@ function BootLog() {
 
   return (
     <p
-      className="text-[10px] tracking-[0.25em] font-mono uppercase text-[#00c3ff]/50 h-4"
+      className="text-[10px] tracking-[0.25em] font-sans uppercase text-[#00c3ff]/50 h-4"
       style={{
         opacity: visible ? 1 : 0,
         transition: 'opacity 0.2s ease',
@@ -59,61 +59,93 @@ function CrabSigil() {
           points="48,6 87,27 87,69 48,90 9,69 9,27"
           fill="none"
           stroke="#00c3ff"
-          strokeWidth="1"
-          strokeOpacity="0.35"
-          strokeDasharray="6 4"
+          strokeWidth="1.5"
+          strokeDasharray="14 6"
+          opacity="0.5"
         />
       </svg>
 
-      {/* Middle counter-rotating hex ring */}
+      {/* Inner static cyan ring */}
       <svg
         className="absolute inset-0"
         width="96"
         height="96"
         viewBox="0 0 96 96"
-        style={{ animation: 'hud-spin-reverse 2.8s linear infinite' }}
+        style={{ animation: 'hud-spin 8s linear infinite reverse' }}
       >
         <polygon
-          points="48,14 79,31.5 79,64.5 48,82 17,64.5 17,31.5"
+          points="48,16 78,32 78,64 48,80 18,64 18,32"
           fill="none"
-          stroke="#ff453a"
-          strokeWidth="1"
-          strokeOpacity="0.45"
-          strokeDasharray="3 5"
+          stroke="#00c3ff"
+          strokeWidth="0.75"
+          strokeDasharray="6 8"
+          opacity="0.3"
         />
       </svg>
 
-      {/* Static inner glyph — simplified crab silhouette */}
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-        {/* Body ellipse */}
-        <ellipse cx="22" cy="24" rx="9" ry="7" fill="none" stroke="#00c3ff" strokeWidth="1.4" strokeOpacity="0.9" />
-        {/* Left claw */}
-        <path d="M13 24 Q6 18 4 12 Q8 14 10 20" fill="none" stroke="#00c3ff" strokeWidth="1.2" strokeOpacity="0.7" />
-        {/* Right claw */}
-        <path d="M31 24 Q38 18 40 12 Q36 14 34 20" fill="none" stroke="#00c3ff" strokeWidth="1.2" strokeOpacity="0.7" />
-        {/* Left legs */}
-        <path d="M14 22 L6 20 M14 25 L5 26 M14 28 L7 32" fill="none" stroke="#00c3ff" strokeWidth="0.9" strokeOpacity="0.5" />
-        {/* Right legs */}
-        <path d="M30 22 L38 20 M30 25 L39 26 M30 28 L37 32" fill="none" stroke="#00c3ff" strokeWidth="0.9" strokeOpacity="0.5" />
-        {/* Eyes */}
-        <circle cx="19" cy="20" r="1.2" fill="#00c3ff" opacity="0.9" />
-        <circle cx="25" cy="20" r="1.2" fill="#00c3ff" opacity="0.9" />
-        {/* Antennae */}
-        <path d="M19 19 L15 13 M25 19 L29 13" fill="none" stroke="#00c3ff" strokeWidth="0.8" strokeOpacity="0.6" />
-        {/* Pulse dot center */}
-        <circle cx="22" cy="24" r="2" fill="#00c3ff" opacity="0.6">
-          <animate attributeName="opacity" values="0.6;1;0.6" dur="1.2s" repeatCount="indefinite" />
-          <animate attributeName="r" values="2;2.8;2" dur="1.2s" repeatCount="indefinite" />
-        </circle>
-      </svg>
-
-      {/* Outer cyan glow pulse */}
+      {/* Center glowing crab icon */}
       <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: 'radial-gradient(circle, rgba(0,195,255,0.15) 0%, transparent 70%)',
-          animation: 'hud-glow-pulse 1.8s ease-in-out infinite',
-        }}
+        className="relative z-10 text-[#00c3ff]"
+        style={{ animation: 'hud-sigil-pulse 2.2s ease-in-out infinite' }}
+      >
+        {/* Crisp crab SVG */}
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          {/* Main carapace */}
+          <ellipse
+            cx="12"
+            cy="13"
+            rx="5.5"
+            ry="4.5"
+            fill="#00c3ff"
+            fillOpacity="0.18"
+            stroke="#00c3ff"
+            strokeWidth="1.2"
+          />
+          {/* Carapace suture */}
+          <line
+            x1="12"
+            y1="8.5"
+            x2="12"
+            y2="17.5"
+            stroke="#00c3ff"
+            strokeWidth="0.8"
+            strokeOpacity="0.6"
+          />
+          {/* Left eyestalk */}
+          <line x1="10" y1="8.5" x2="8.5" y2="6.5" stroke="#00c3ff" strokeWidth="1.2" />
+          <circle cx="8.5" cy="6.5" r="1" fill="#00c3ff" />
+          {/* Right eyestalk */}
+          <line x1="14" y1="8.5" x2="15.5" y2="6.5" stroke="#00c3ff" strokeWidth="1.2" />
+          <circle cx="15.5" cy="6.5" r="1" fill="#00c3ff" />
+          {/* Left main claw */}
+          <path
+            d="M7 11.5 C5 9.5, 4 8, 4.5 6 C5 4, 7 4.5, 7.5 6.5 C7.8 7.5, 7.5 9, 8 10.5"
+            stroke="#00c3ff"
+            strokeWidth="1.2"
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* Right main claw */}
+          <path
+            d="M17 11.5 C19 9.5, 20 8, 19.5 6 C19 4, 17 4.5, 16.5 6.5 C16.2 7.5, 16.5 9, 16 10.5"
+            stroke="#00c3ff"
+            strokeWidth="1.2"
+            fill="none"
+            strokeLinecap="round"
+          />
+          {/* Left walking legs */}
+          <path d="M6.5 13.5 C4.5 13.5, 3 15, 3.5 17" stroke="#00c3ff" strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.75" />
+          <path d="M7 15 C5.5 16, 4 17.5, 4.5 19" stroke="#00c3ff" strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.75" />
+          {/* Right walking legs */}
+          <path d="M17.5 13.5 C19.5 13.5, 21 15, 20.5 17" stroke="#00c3ff" strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.75" />
+          <path d="M17 15 C18.5 16, 20 17.5, 19.5 19" stroke="#00c3ff" strokeWidth="0.9" fill="none" strokeLinecap="round" opacity="0.75" />
+        </svg>
+      </div>
+
+      {/* Ambient glow behind sigil */}
+      <div
+        className="absolute inset-2 rounded-full bg-[#00c3ff]/10 blur-md pointer-events-none"
+        style={{ animation: 'hud-sigil-pulse 2.2s ease-in-out infinite' }}
       />
     </div>
   )
@@ -140,7 +172,7 @@ export function HUDPageLoader() {
       <div className="relative flex flex-col items-center gap-6 select-none">
         {/* Logo / wordmark */}
         <p
-          className="text-[11px] tracking-[0.6em] font-mono uppercase text-[#00c3ff]/40"
+          className="text-[11px] tracking-[0.6em] font-sans uppercase text-[#00c3ff]/40"
           style={{ letterSpacing: '0.55em' }}
         >
           MOLTOLOGY

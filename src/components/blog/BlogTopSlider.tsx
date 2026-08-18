@@ -117,18 +117,18 @@ export function BlogTopSlider({
         {/* Header HUD Bar */}
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-cyan-900/40">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-950/90 border border-red-500/80 text-red-400 font-mono font-bold text-[11px] tracking-wider uppercase chamfer-corner shadow-hud-red">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-950/90 border border-red-500/80 text-red-400 font-sans font-bold text-[11px] tracking-wider uppercase chamfer-corner shadow-hud-red">
               <Flame className="w-3.5 h-3.5 text-red-500 animate-pulse" />
-              <span>LEAD NEWS DISPATCH // BREAKING COVERAGE #{String(currentIndex + 1).padStart(2, '0')}</span>
+              <span>LEAD NEWS DISPATCH · BREAKING COVERAGE #{String(currentIndex + 1).padStart(2, '0')}</span>
             </span>
 
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-mono font-bold text-[10px] uppercase chamfer-corner">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-sans font-bold text-[10px] uppercase chamfer-corner">
               <Radio className="w-3 h-3 text-cyan-400 animate-ping" />
               <span>{currentPost.category}</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-xs text-gray-400">
+          <div className="flex items-center gap-3 font-sans text-xs text-gray-400">
             <span className="text-cyan-400 font-bold">
               {String(currentIndex + 1).padStart(2, '0')} / {String(featuredPosts.length).padStart(2, '0')}
             </span>
@@ -170,7 +170,7 @@ export function BlogTopSlider({
             </div>
 
             {/* Author & Read Time Meta */}
-            <div className="flex flex-wrap items-center gap-4 text-xs font-mono pt-2">
+            <div className="flex flex-wrap items-center gap-4 text-xs font-sans pt-2">
               <div className="flex items-center gap-2.5 bg-[#090e10] px-3 py-1.5 border border-cyan-900/50 rounded-full">
                 <img
                   src={currentPost.authorAvatar}
@@ -208,7 +208,7 @@ export function BlogTopSlider({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#04080a] via-transparent to-transparent opacity-70" />
 
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] font-mono text-cyan-300 bg-black/85 backdrop-blur-md px-3 py-1.5 border border-cyan-900/60 rounded">
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] font-sans text-cyan-300 bg-black/85 backdrop-blur-md px-3 py-1.5 border border-cyan-900/60 rounded">
                 <span className="flex items-center gap-1.5">
                   <Sparkles className="w-3 h-3 text-cyan-400" />
                   <span>SYNAPTIC FRAME</span>
@@ -227,7 +227,7 @@ export function BlogTopSlider({
               <button
                 key={post.slug}
                 onClick={() => goToIndex(idx)}
-                className={`relative px-3 py-1.5 text-[11px] font-mono font-bold uppercase transition-all duration-300 rounded flex items-center gap-2 border ${
+                className={`relative px-3 py-1.5 text-[11px] font-sans font-bold uppercase transition-all duration-300 rounded flex items-center gap-2 border ${
                   idx === currentIndex
                     ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_10px_rgba(0,195,255,0.2)]'
                     : 'bg-[#080d0e]/80 text-gray-400 hover:text-white border-cyan-900/40 hover:border-cyan-800'

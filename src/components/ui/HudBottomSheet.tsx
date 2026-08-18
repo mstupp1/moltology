@@ -137,7 +137,7 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-[99990] flex flex-col justify-end select-none font-mono">
+    <div className="fixed inset-0 z-[99990] flex flex-col justify-end select-none font-sans">
       {/* Dimmed Backdrop Overlay */}
       <div
         onClick={handleClose}

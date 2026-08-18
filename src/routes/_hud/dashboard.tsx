@@ -142,11 +142,11 @@ function DashboardRoute() {
       : INITIAL_ACTIVITIES.filter((a) => a.category === selectedCategory)
 
   return (
-    <div className="space-y-5 font-mono relative">
+    <div className="space-y-5 font-sans relative">
       {/* Changelog Detail Modal */}
       {activeChangelogModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-2xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] chamfer-corner overflow-hidden font-mono text-sm space-y-4">
+          <div className="w-full max-w-2xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] chamfer-corner overflow-hidden font-sans text-sm space-y-4">
             <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <GitCommit className="w-4 h-4 text-[#00ffff]" />
@@ -229,7 +229,7 @@ function DashboardRoute() {
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`px-2 py-0.5 text-[9px] font-bold font-mono transition-all chamfer-corner border shrink-0 ${
+                      className={`px-2 py-0.5 text-[9px] font-bold font-sans transition-all chamfer-corner border shrink-0 ${
                         selectedCategory === cat
                           ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
                           : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
@@ -242,7 +242,7 @@ function DashboardRoute() {
               </div>
 
               {/* Activity Items List */}
-              <div className="space-y-1.5 font-mono">
+              <div className="space-y-1.5 font-sans">
                 {filteredActivities.length === 0 ? (
                   <div className="p-6 text-center text-xs text-[#839493]">
                     NO ACTIVITY FOUND FOR THIS FILTER
@@ -277,7 +277,7 @@ function DashboardRoute() {
                       </div>
 
                       {act.valueBadge && (
-                        <span className="text-[10px] font-mono font-bold text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0">
+                        <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0">
                           {act.valueBadge}
                         </span>
                       )}
@@ -306,13 +306,13 @@ function DashboardRoute() {
                   </div>
                 </div>
 
-                <span className="text-[10px] font-mono font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner">
+                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner">
                   v1.5.0 LATEST
                 </span>
               </div>
 
               {/* Changelog Entries Stack */}
-              <div className="space-y-2 font-mono">
+              <div className="space-y-2 font-sans">
                 {changelogsList.slice(0, 3).map((item) => (
                   <div
                     key={item.version}

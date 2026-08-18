@@ -252,7 +252,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
       <div className="grid grid-cols-2 gap-1 p-1 bg-[#020507] border border-[#00c3ff]/20 rounded-lg">
         <button
           onClick={() => setActiveTab('liturgies')}
-          className={`py-1.5 sm:py-1 px-2 rounded font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`py-1.5 sm:py-1 px-2 rounded font-sans text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 ${
             activeTab === 'liturgies'
               ? 'bg-[#00c3ff]/20 border border-[#00c3ff]/60 text-[#00ffff] shadow-[0_0_10px_rgba(0,195,255,0.3)]'
               : 'text-[#839493] hover:text-[#dfe3e3]'
@@ -264,7 +264,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
 
         <button
           onClick={() => setActiveTab('transmissions')}
-          className={`py-1.5 sm:py-1 px-2 rounded font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 relative ${
+          className={`py-1.5 sm:py-1 px-2 rounded font-sans text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 relative ${
             activeTab === 'transmissions'
               ? 'bg-[#00c3ff]/20 border border-[#00c3ff]/60 text-[#00ffff] shadow-[0_0_10px_rgba(0,195,255,0.3)]'
               : 'text-[#839493] hover:text-[#dfe3e3]'
@@ -285,7 +285,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           {nextTask && !allTasksCompleted ? (
             <div className="p-3 bg-gradient-to-r from-[#00c3ff]/15 via-[#006f85]/10 to-[#02080a] border border-[#00c3ff]/60 rounded-xl shadow-[0_0_15px_rgba(0,195,255,0.15)] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold text-[#00ffff] tracking-wider flex items-center gap-1.5">
+                <span className="text-[10px] font-sans font-bold text-[#00ffff] tracking-wider flex items-center gap-1.5">
                   <Sparkles className="w-3 h-3 text-[#ff5540] animate-pulse" />
                   NEXT IMPENDING LITURGY
                 </span>
@@ -296,7 +296,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
 
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <span className="text-[11px] font-mono font-bold text-[#ff5540] mr-1.5">
+                  <span className="text-[11px] font-sans font-bold text-[#ff5540] mr-1.5">
                     [{nextTask.time}]
                   </span>
                   <span className="text-xs font-bold text-[#dfe3e3] truncate">
@@ -376,7 +376,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                     </button>
 
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className={`text-[10px] font-mono font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                      <span className={`text-[10px] font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
                         [{t.time}]
                       </span>
                       {reminderTime && (
@@ -386,7 +386,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                       )}
                     </div>
 
-                    <span className={`text-[11px] font-mono font-bold truncate ${
+                    <span className={`text-[11px] font-sans font-bold truncate ${
                       t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
                     }`}>
                       {t.title}
@@ -434,10 +434,10 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                   className="p-2.5 bg-[#040e12] border border-[#00c3ff]/25 rounded-lg space-y-1 text-left"
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-[9px] font-mono font-bold text-[#00ffff] uppercase">
+                    <span className="text-[9px] font-sans font-bold text-[#00ffff] uppercase">
                       {t.type} ALERT
                     </span>
-                    <span className="text-[8px] text-[#839493] font-mono">
+                    <span className="text-[8px] text-[#839493] font-sans">
                       {new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -446,7 +446,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                       {t.title}
                     </div>
                   )}
-                  <div className="text-[10px] text-[#a8b8b8] font-mono leading-tight break-words">
+                  <div className="text-[10px] text-[#a8b8b8] font-sans leading-tight break-words">
                     {t.message}
                   </div>
                 </div>
@@ -501,7 +501,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
   // ---------------------------------------------------------------------------
   if (variant === 'header' || variant === 'compact') {
     return (
-      <div ref={dropdownRef} className="relative font-mono text-xs select-none">
+      <div ref={dropdownRef} className="relative font-sans text-xs select-none">
         {/* Dynamic Activity Capsule Pill */}
         <div
           onClick={() => setIsScheduleOpen(!isScheduleOpen)}
@@ -510,7 +510,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsScheduleOpen(!isScheduleOpen) }}
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
-          className={`flex items-center gap-1 sm:gap-1.5 bg-[#02080a]/90 hover:bg-[#061418] border border-[#00c3ff]/40 hover:border-[#00c3ff]/70 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-mono text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 ${className}`}
+          className={`flex items-center gap-1 sm:gap-1.5 bg-[#02080a]/90 hover:bg-[#061418] border border-[#00c3ff]/40 hover:border-[#00c3ff]/70 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-sans text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 ${className}`}
         >
           {/* Pulsing Clock Icon */}
           <Clock className="w-3.5 h-3.5 text-[#00c3ff] animate-pulse shrink-0" />
@@ -580,7 +580,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     <HudCard
       id="benthic-digital-clock-hero"
       variant="cyan"
-      className={`p-4 sm:p-6 relative font-mono overflow-hidden shadow-2xl border-[#00c3ff]/40 bg-[#03090b]/95 backdrop-blur-md ${className}`}
+      className={`p-4 sm:p-6 relative font-sans overflow-hidden shadow-2xl border-[#00c3ff]/40 bg-[#03090b]/95 backdrop-blur-md ${className}`}
     >
       {/* HUD Background Grid & Glow FX */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
@@ -666,7 +666,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00c3ff]/80 to-transparent" />
 
           {/* Date & Submergence Status Header inside frame */}
-          <div className="w-full flex items-center justify-between text-[10px] sm:text-xs text-[#839493] mb-2 font-mono tracking-widest">
+          <div className="w-full flex items-center justify-between text-[10px] sm:text-xs text-[#839493] mb-2 font-sans tracking-widest">
             <div className="flex items-center gap-1.5 text-[#00ffff]">
               <Calendar className="w-3.5 h-3.5" />
               <span>{formatDateString()}</span>
@@ -682,7 +682,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           <div className="relative my-2 py-2 flex items-center justify-center">
             {/* Ghost 88:88:88 background for authentic 7-segment LED feel */}
             <div
-              className="absolute inset-0 flex items-center justify-center select-none opacity-10 pointer-events-none text-4xl sm:text-6xl md:text-7xl font-mono tracking-widest text-[#00c3ff]"
+              className="absolute inset-0 flex items-center justify-center select-none opacity-10 pointer-events-none text-4xl sm:text-6xl md:text-7xl font-sans tracking-widest text-[#00c3ff]"
               aria-hidden
             >
               88:88:88<span className="text-xl sm:text-2xl md:text-3xl ml-1">.88</span>
@@ -716,7 +716,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
               </span>
 
               {/* Milliseconds Ticker */}
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#ff5540] ml-1 sm:ml-2 font-mono">
+              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#ff5540] ml-1 sm:ml-2 font-sans">
                 .{millis}
               </span>
 
@@ -765,7 +765,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                   </HudBadge>
                 )}
                 {/* Dropdown Indicator Pill */}
-                <div className="flex items-center gap-1 text-[10px] text-[#00c3ff] bg-[#00c3ff]/10 border border-[#00c3ff]/30 px-2 py-0.5 rounded font-mono ml-auto sm:ml-2">
+                <div className="flex items-center gap-1 text-[10px] text-[#00c3ff] bg-[#00c3ff]/10 border border-[#00c3ff]/30 px-2 py-0.5 rounded font-sans ml-auto sm:ml-2">
                   <span>FULL SCHEDULE ({localTasks.filter(t => t.completed).length}/{localTasks.length})</span>
                   {isScheduleOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </div>
@@ -778,7 +778,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                 </div>
               ) : (
                 <div className="flex items-baseline gap-2 flex-wrap pt-0.5">
-                  <span className="text-xs sm:text-sm font-bold text-[#ff5540] font-mono">
+                  <span className="text-xs sm:text-sm font-bold text-[#ff5540] font-sans">
                     [{nextTask.time}]
                   </span>
                   <span className="text-xs sm:text-sm font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors truncate">
@@ -813,12 +813,12 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           {isScheduleOpen && (
             <div className="mt-4 pt-3 border-t border-[#00c3ff]/20 space-y-3 animate-in fade-in duration-200">
               {/* Dropdown Summary Bar */}
-              <div className="flex items-center justify-between text-xs text-[#839493] font-mono px-1">
+              <div className="flex items-center justify-between text-xs text-[#839493] font-sans px-1">
                 <div className="flex items-center gap-2">
                   <Award className="w-4 h-4 text-[#00ffff]" />
                   <span className="font-bold text-[#dfe3e3] uppercase">FULL DAY LITURGY SCHEDULE</span>
                 </div>
-                <div className="text-[11px] text-[#00ffff] font-mono">
+                <div className="text-[11px] text-[#00ffff] font-sans">
                   {localTasks.filter(t => t.completed).length} of {localTasks.length} COMPLETED ({localTasks.filter(t => t.completed).reduce((a, b) => a + b.xp, 0)} XP)
                 </div>
               </div>
@@ -864,11 +864,11 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                           )}
                         </button>
 
-                        <span className={`text-xs font-mono font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                        <span className={`text-xs font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
                           [{t.time}]
                         </span>
 
-                        <span className={`text-xs font-mono font-bold truncate ${
+                        <span className={`text-xs font-sans font-bold truncate ${
                           t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
                         }`}>
                           {t.title}

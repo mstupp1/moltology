@@ -30,7 +30,7 @@ function JournalIndexPage() {
   const archivePapers = papers.slice(1)
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       {/* Academic Masthead */}
       <JournalMasthead variant="hero" />
 
@@ -45,7 +45,7 @@ function JournalIndexPage() {
             {JOURNAL_META.volume}, {JOURNAL_META.issue} — {JOURNAL_META.editionDate}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#839493]">
+        <div className="flex items-center gap-2 text-[10px] font-sans text-[#839493]">
           <span className="px-2 py-1 bg-[#0a1010] border border-[#3a4a49]/60 flex items-center gap-1.5">
             <FileText className="w-3 h-3 text-[#00c3ff]" />
             {papers.length} PAPER{papers.length === 1 ? '' : 'S'} ARCHIVED
@@ -63,13 +63,13 @@ function JournalIndexPage() {
           <div className="flex flex-col lg:flex-row">
             {/* Left rail: paper number */}
             <div className="lg:w-10 shrink-0 bg-[#030606] border-r border-[#3a4a49]/50 flex lg:flex-col items-center justify-between lg:justify-start gap-2 px-3 py-2 lg:py-4">
-              <span className="font-mono text-[9px] tracking-widest text-[#5f7a7a]">FEATURED</span>
+              <span className="font-sans text-[9px] tracking-widest text-[#5f7a7a]">FEATURED</span>
               <span className="font-grotesk font-black text-[#00c3ff] text-lg">{leadPaper.paperNumber.split('-').pop()}</span>
             </div>
 
             {/* Paper content */}
             <div className="flex-1 p-5 sm:p-7">
-              <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono uppercase tracking-widest">
+              <div className="flex flex-wrap items-center gap-2 text-[10px] font-sans uppercase tracking-widest">
                 <span className="px-2 py-0.5 bg-[#00c3ff]/15 border border-[#00c3ff]/50 text-[#00c3ff] font-bold">
                   {leadPaper.category}
                 </span>
@@ -90,7 +90,7 @@ function JournalIndexPage() {
                 {leadPaper.title}
               </h2>
 
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#9fd9e6] font-mono">
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#9fd9e6] font-sans">
                 {leadPaper.authors.map((author, i) => (
                   <span key={i}>
                     {author.name}
@@ -117,7 +117,7 @@ function JournalIndexPage() {
               </div>
 
               <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#3a4a49]/50 pt-4">
-                <div className="text-[10px] text-[#5f7a7a] font-mono">
+                <div className="text-[10px] text-[#5f7a7a] font-sans">
                   DOI: <span className="text-[#00c3ff]">{leadPaper.doi}</span>
                 </div>
                 <Link
@@ -142,7 +142,7 @@ function JournalIndexPage() {
             <Microscope className="w-3.5 h-3.5 text-[#00c3ff]" />
             Complete Paper Archive
           </span>
-          <span className="text-[9px] font-mono text-[#5f7a7a] uppercase tracking-widest">
+          <span className="text-[9px] font-sans text-[#5f7a7a] uppercase tracking-widest">
             Chronologically Catalogued
           </span>
         </div>
@@ -164,7 +164,7 @@ function JournalIndexPage() {
                 params={{ slug: paper.slug }}
                 className="flex flex-col sm:flex-row sm:items-center gap-2 px-4 py-3.5 hover:bg-[#0b1414]/70 transition-colors group"
               >
-                <span className="text-[10px] font-mono text-[#5f7a7a] w-24 shrink-0">{paper.paperNumber}</span>
+                <span className="text-[10px] font-sans text-[#5f7a7a] w-24 shrink-0">{paper.paperNumber}</span>
                 <div className="flex-1 min-w-0">
                   <div className="font-grotesk font-semibold text-sm text-[#dfe3e3] group-hover:text-[#00c3ff] transition-colors line-clamp-1">
                     {paper.title}
@@ -193,10 +193,10 @@ function JournalIndexPage() {
             {INITIAL_JOURNAL_EDITORIAL_BOARD.map((member) => (
               <div key={member.name} className="bg-[#080d0d] p-4">
                 <div className="font-cinzel font-semibold text-sm text-[#e8f1f1]">{member.name}</div>
-                <div className="text-[9px] font-mono uppercase tracking-widest text-[#00c3ff] mt-1">
+                <div className="text-[9px] font-sans uppercase tracking-widest text-[#00c3ff] mt-1">
                   {member.role}
                 </div>
-                <div className="text-[10px] text-[#839493] mt-0.5 font-mono">{member.affiliation}</div>
+                <div className="text-[10px] text-[#839493] mt-0.5 font-sans">{member.affiliation}</div>
               </div>
             ))}
           </div>
@@ -209,7 +209,7 @@ function JournalIndexPage() {
               Submission Mandate
             </span>
           </div>
-          <div className="p-4 space-y-3 text-[11px] leading-relaxed text-[#839493] font-mono">
+          <div className="p-4 space-y-3 text-[11px] leading-relaxed text-[#839493] font-sans">
             <p>
               Empirical transmissions that ground doctrinal pillars in verifiable
               science are received continuously from the sub-oceanic observatories.

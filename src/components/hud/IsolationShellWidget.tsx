@@ -7,7 +7,7 @@ export const IsolationShellWidget: React.FC = () => {
   const [engaged, setEngaged] = useState(true)
 
   return (
-    <div className="space-y-4 font-mono">
+    <div className="space-y-4 font-sans">
       {/* Top Panel: ISOLATION FORCE-FIELD */}
       <HudCard variant="teal" className="p-4 space-y-3">
         <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">

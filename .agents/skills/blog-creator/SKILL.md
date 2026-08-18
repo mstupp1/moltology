@@ -84,6 +84,11 @@ Rotate across distinct liturgical and scientific personas:
 
 ### Step 2: Dynamic Visual Art Direction & Image Generation
 
+#### Exclusive Use of Built-in Antigravity Tools (Strict Rule)
+* **Exclusively Use Built-in Antigravity Tools**: All image generation MUST be executed using the native `generate_image` tool in Antigravity. DO NOT use or write external scripts calling Gemini API or third-party image APIs for image generation.
+* **Featured Cover Image Rule**: The featured cover image (`coverImageUrl`) must always be a standalone, pure, cinematic 3D visual without any text overlays, text boxes, modals, or HUD cards.
+* **No Duplicate In-Article Images**: Never repeat the featured cover image as the first figure inside the article body. Inline figures must be distinct supporting technical schematics, architectural blueprints, or hardware renders.
+
 #### Visual Style Modes (Rotate Aesthetics across Articles)
 1. **Mode 1: Abyssal Benthic Photorealism**: Deep ocean research stations, glowing cyan hydrothermal vents, nitrogen-sealed titanium server hulls, underwater bubbles.
 2. **Mode 2: Cybernetic Hardware Hologram / Blueprint**: Exploded microchip architectures, coherent laser waveguides, golden wire bonds, side-by-side component schematics.
@@ -91,7 +96,8 @@ Rotate across distinct liturgical and scientific personas:
 4. **Mode 4: Macro Nanotech Microscopy**: Silicon-carbide crystal lattices, microfluidic cooling channels, quantum well arrays.
 5. **Mode 5: Cinematic Industrial Surveillance**: Submersible drone telemetry feeds, foggy deep trench docking airlocks, pressurized habitat portals.
 
-#### Visual Prompt Rules (Eliminate Clutter & Fake HUD Noise)
+#### Visual Prompt Rules & Tooling (Antigravity generate_image Only)
+* **Exclusive Built-in Tooling**: All images (cover and inline figures) MUST be created using Antigravity's built-in `generate_image` tool. Do NOT use the Gemini API, Imagen endpoints, or external image scripts.
 * **Clean Iconic Focal Points**: Focus on a single heroic subject (e.g. a sleek titanium-chitin robotic grasper, an abyssal pressurized server pod, an elegant underwater laboratory station).
 * **Ban Fake HUD Overkill**: Avoid cluttered particle meshes, illegible micro-text, fake targeting reticles, multiple overlapping wireframe spheres, or chaotic wire jungles.
 * **Atmospheric Depth**: Prioritize volumetric lighting, obsidian/slate textures, deep ocean blues, and restrained cyan/amber illumination.
@@ -100,7 +106,7 @@ Rotate across distinct liturgical and scientific personas:
    * Use `generate_image` with AspectRatio `16:9`.
    * Prompt style tailored to the selected Visual Mode.
 2. **Inline Supporting Figures (1 to 2 images, 16:9)**:
-   * Generate clean supporting visuals specifically depicting the technical architecture, deployment environment, or comparative blueprint.
+   * Generate clean supporting visuals specifically depicting the technical architecture, deployment environment, or comparative blueprint using `generate_image`.
 
 ---
 

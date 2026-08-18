@@ -15,14 +15,14 @@ function JournalPaperPage() {
 
   if (!paper) {
     return (
-      <div className="space-y-6 font-mono">
+      <div className="space-y-6 font-sans">
         <JournalMasthead variant="compact" />
         <div className="bg-[#0f1414] border border-[#ff5540]/60 p-12 chamfer-corner text-center">
           <FileText className="w-10 h-10 text-[#ff5540] mx-auto mb-4" />
           <h2 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">
             PAPER NOT FOUND
           </h2>
-          <p className="text-xs text-[#839493] mt-2 mb-6 font-mono">
+          <p className="text-xs text-[#839493] mt-2 mb-6 font-sans">
             The requested transmission is not present in the canonical archive.
           </p>
           <Link
@@ -38,18 +38,18 @@ function JournalPaperPage() {
   }
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       <JournalMasthead variant="compact" />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <Link
           to="/journal"
-          className="inline-flex items-center gap-2 text-[11px] font-mono font-bold text-[#00c3ff] hover:text-[#38bdf8] uppercase tracking-wider transition-colors"
+          className="inline-flex items-center gap-2 text-[11px] font-sans font-bold text-[#00c3ff] hover:text-[#38bdf8] uppercase tracking-wider transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to The Benthic Compendium
         </Link>
-        <span className="text-[9px] font-mono text-[#5f7a7a] uppercase tracking-widest">
+        <span className="text-[9px] font-sans text-[#5f7a7a] uppercase tracking-widest">
           {JOURNAL_META.name} • {paper.paperNumber} • {paper.readTimeMinutes} MIN READ
         </span>
       </div>

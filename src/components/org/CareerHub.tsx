@@ -664,7 +664,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                 </div>
 
                 <div className="pt-3 border-t border-sky-50 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400 uppercase font-mono">
+                  <span className="text-[10px] text-slate-400 uppercase font-sans">
                     Req: {job.clearance}
                   </span>
                   <button
@@ -748,7 +748,7 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
                   <div>
                     <div className="text-xs font-bold font-grotesk text-sky-900">{t.name}</div>
                     <div className="text-[10px] text-sky-600">{t.title}</div>
-                    <div className="text-[9px] text-slate-400 uppercase font-mono">{t.clearance}</div>
+                    <div className="text-[9px] text-slate-400 uppercase font-sans">{t.clearance}</div>
                   </div>
                 </div>
               </div>

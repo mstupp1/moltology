@@ -101,7 +101,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
                   aria-pressed={active}
                   onClick={() => setTheme(opt.key)}
                   className={cn(
-                    'inline-flex items-center gap-1 px-2 py-1 text-[9px] font-mono uppercase tracking-widest border transition-colors chamfer-corner',
+                    'inline-flex items-center gap-1 px-2 py-1 text-[9px] font-sans uppercase tracking-widest border transition-colors chamfer-corner',
                     active
                       ? 'bg-[#00c3ff]/20 border-[#00c3ff]/70 text-[#00c3ff]'
                       : 'bg-transparent border-[#3a4a49]/60 text-[#839493] hover:text-[#dfe3e3] hover:border-[#00c3ff]/40'
@@ -118,7 +118,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
         <div className="flex items-center gap-3">
           {/* Font size */}
           <div className="flex items-center gap-1">
-            <span className="mr-1 text-[9px] font-mono uppercase tracking-widest text-[#839493]">Type</span>
+            <span className="mr-1 text-[9px] font-sans uppercase tracking-widest text-[#839493]">Type</span>
             <button
               type="button"
               aria-label="Decrease font size"
@@ -127,7 +127,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
             >
               <Minus className="w-3 h-3" />
             </button>
-            <span className="w-7 text-center text-[10px] font-mono text-[#dfe3e3]">{fontSize}px</span>
+            <span className="w-7 text-center text-[10px] font-sans text-[#dfe3e3]">{fontSize}px</span>
             <button
               type="button"
               aria-label="Increase font size"
@@ -141,7 +141,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-mono uppercase tracking-widest border border-[#3a4a49]/60 text-[#dfe3e3] hover:border-[#00c3ff]/50 hover:text-[#00c3ff] chamfer-corner transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-sans uppercase tracking-widest border border-[#3a4a49]/60 text-[#dfe3e3] hover:border-[#00c3ff]/50 hover:text-[#00c3ff] chamfer-corner transition-colors"
           >
             {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
             {isFullscreen ? 'Exit' : 'Fullscreen'}
@@ -159,7 +159,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
           {/* Head band */}
           <header className="text-center">
             <div
-              className="text-[10px] uppercase font-mono tracking-[0.22em]"
+              className="text-[10px] uppercase font-sans tracking-[0.22em]"
               style={{ color: palette.muted }}
             >
               {JOURNAL_META.name} · {JOURNAL_META.volume} / {JOURNAL_META.issue} ·{' '}
@@ -171,7 +171,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
               style={{ backgroundColor: palette.heading, opacity: 0.45 }}
             />
             <div
-              className="mt-4 text-[9px] uppercase font-mono tracking-[0.28em]"
+              className="mt-4 text-[9px] uppercase font-sans tracking-[0.28em]"
               style={{ color: palette.muted }}
             >
               {paper.classification} · {paper.paperNumber}
@@ -205,7 +205,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
                   </span>
                 ))}
               </div>
-              <div className="pt-1 text-[0.75em] font-mono" style={{ color: palette.muted }}>
+              <div className="pt-1 text-[0.75em] font-sans" style={{ color: palette.muted }}>
                 Correspondence: {paper.correspondence} · Received {paper.publishedDate} · DOI {paper.doi}
               </div>
             </div>
@@ -347,7 +347,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
                 <button
                   type="button"
                   onClick={copyCitation}
-                  className="shrink-0 text-[0.72em] font-mono uppercase tracking-widest underline underline-offset-2"
+                  className="shrink-0 text-[0.72em] font-sans uppercase tracking-widest underline underline-offset-2"
                   style={{ color: palette.heading }}
                 >
                   {copied ? 'Copied' : 'Copy'}
@@ -375,7 +375,7 @@ export const JournalPaperReader: React.FC<JournalPaperReaderProps> = ({ paper })
 
           {/* Footer */}
           <footer
-            className="mt-10 pt-4 text-center text-[0.75em] uppercase font-mono tracking-[0.2em]"
+            className="mt-10 pt-4 text-center text-[0.75em] uppercase font-sans tracking-[0.2em]"
             style={{ borderTop: `1px solid ${palette.rule}`, color: palette.muted }}
           >
             End of transmission — {JOURNAL_META.name} {JOURNAL_META.volume} / {JOURNAL_META.issue}

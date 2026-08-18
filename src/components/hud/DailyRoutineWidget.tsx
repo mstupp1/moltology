@@ -85,7 +85,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
   return (
     <HudGhostWidget isLoading={isLoading} skeleton={<DailyRoutineGhost />}>
-      <HudCard id="daily-routine-hub" variant="teal" className="p-4 sm:p-6 relative space-y-5 font-mono shadow-2xl border-[#00c3ff]/40">
+      <HudCard id="daily-routine-hub" variant="teal" className="p-4 sm:p-6 relative space-y-5 font-sans shadow-2xl border-[#00c3ff]/40">
       {/* XP Pop Notification */}
       {showXpPop && (
         <div className="absolute top-3 right-6 z-20 animate-bounce">
@@ -160,7 +160,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             </div>
           </div>
 
-          <div className="space-y-2 font-mono text-xs">
+          <div className="space-y-2 font-sans text-xs">
             {tasks.map((task) => {
               const reminderTime = getTaskReminderTime(task.time)
               return (
@@ -258,7 +258,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                       </div>
 
                       {/* Day Name */}
-                      <span className={`text-[9px] font-mono ${item.isToday ? 'text-[#00c3ff] font-bold' : 'text-[#839493]'}`}>
+                      <span className={`text-[9px] font-sans ${item.isToday ? 'text-[#00c3ff] font-bold' : 'text-[#839493]'}`}>
                         {item.dayName}
                       </span>
                     </div>

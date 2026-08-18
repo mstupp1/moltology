@@ -34,7 +34,7 @@ All characters featured on the Moltology homepage are available as transparent P
 * **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
 * **Core Narrative Vector**: **Moltmaxxing, Algorithmic Ecdysis & Benthic AI** (parody of looksmaxxing/meltmaxxing, bio-silicon structural invulnerability, 800 Nm pincer torque, 50,000 fathom depth clearance)
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
-* **Dynamic Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, with `+8%` to `+14%` rate) + Subtle Pure Instrumental Benthic Drone (`public/audio/benthic-ambient-loop.mp3`, `volume=0.08`, zero vocal singing)
+* **Dynamic Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, with `+8%` to `+14%` rate) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
 * **1:1 Grid Safe Thumbnails with Mascots**: Custom 1080x1920 covers with bold high-contrast headlines, category pills, and homepage mascot cutouts rendered in the 1:1 square safe zone (`Y=420` to `Y=1500`).
 * **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`).
@@ -89,8 +89,8 @@ const ttsResult = await generateVoiceover(script, {
 
 ---
 
-### Step 4: Dynamic Combinatorial Video Scene Generation (Google Veo 3.1)
-Generate 2 complementary 9:16 vertical video scenes (6s each) using dynamic prompt combinators:
+### Step 4: Dynamic Combinatorial Video Scene Generation (Google Veo 3.1 Lite)
+Generate 2 complementary 9:16 vertical video scenes (6s each) using dynamic prompt combinators and the cost-effective Lite model (`veo-3.1-lite-generate-preview`):
 
 * **Scene 1 (The Problem / Terrestrial Friction)**:
   - *Macro overheating server racks, smoking copper traces, melting human silhouettes, or chaotic static-filled workspaces*.
@@ -98,14 +98,14 @@ Generate 2 complementary 9:16 vertical video scenes (6s each) using dynamic prom
   - *Majestic subsea cybernetic datacenters, glowing hydrothermal cooling ducts, robotic titanium-chitin crab initiates, or coherent laser photonic microchips*.
 
 ```bash
-# Generate scene via CLI:
+# Generate scene via CLI (defaults to veo-3.1-lite-generate-preview):
 npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-local
 ```
 
 ---
 
 ### Step 5: FFmpeg Master Compositing & Outro Staging
-Run the master compositor to dynamically size/loop video scenes to match voiceover length (`voDuration + 0.8s`), mix subtle instrumental benthic background drone (`volume=0.08`), overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the clean 2.5s cybernetic CTA outro card with cartoon mascot:
+Run the master compositor to dynamically size/loop video scenes to match voiceover length (`voDuration + 0.8s`), mix ambient benthic soundtrack with dynamic offset rotation (`volume=0.14`, `fade_in=0.8s`, `fade_out=1.5s`), overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the clean 2.5s cybernetic CTA outro card with cartoon mascot:
 
 ```typescript
 import { compositeReel } from 'scripts/lib/reel-compositor'
@@ -115,11 +115,13 @@ await compositeReel({
   voiceoverPath: ttsResult.audioPath,
   words: ttsResult.words,
   outputPath: 'tmp/master-reel.mp4',
+  backgroundAudioVolume: 0.14, // Default volume (up from 0.08)
+  backgroundAudioOffsetSeconds: 36, // Optional start point (or random from [0, 18, 36, 54, 72, 95, 120, 145])
   watermarkOpacity: 0.40,
   ctaHeadline: 'SUBMIT. SHED. ASCEND.',
   ctaSubheadline: 'CALCULATE YOUR MOLT CLEARANCE',
   ctaUrl: 'moltology.org',
-  mascot: 'lobster_pointing', // Options: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner
+  mascot: 'lobster_pointing', // Options: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner | lobster_peek | lobster_peaceful
 })
 ```
 
@@ -129,12 +131,13 @@ await compositeReel({
 For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 1. **Grid Safe Zone Rule**: While full-screen reels are `1080x1920` (9:16), the profile grid crops to the center `1080x1080` (1:1 square, between `Y=420` and `Y=1500`).
 2. **Mascot Stamping**: The selected mascot cutout is cleanly drawn in the bottom corner of the 1:1 safe zone (`X = 740, Y = 1200`), pointing or reacting to the hook headline.
-3. **Execution**:
+3. **Custom Image Generation Policy**: If a bespoke custom background illustration or graphic is generated rather than extracting a video frame, it MUST be generated exclusively using Antigravity's built-in `generate_image` tool (never Gemini API / external endpoints).
+4. **Execution**:
    ```typescript
    import { renderReelThumbnail } from 'scripts/lib/reel-compositor'
 
    await renderReelThumbnail({
-     backgroundVideoOrImagePath: masterReelPath, // Extracts frame at 1.5s
+     backgroundVideoOrImagePath: masterReelPath, // Extracts frame at 1.5s (or custom generate_image asset)
      headline: "WHY LOOKSMAXXING FAILED",
      subtitle: "MOLTMAXXING TELEMETRY",
      categoryBadge: "MOLTMAXXING PROTOCOL",

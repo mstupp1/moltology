@@ -186,12 +186,12 @@ function LecturesRoute() {
       featureName="Molt Academy"
       message="Molt Academy coursework, neural certifications, and video curricula require an authorized initiate account."
     >
-      <div className="space-y-6 font-mono relative">
+      <div className="space-y-6 font-sans relative">
       {/* Top Breadcrumb & Gamified Academy Header */}
       <div className="bg-[#171c1c]/90 border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 chamfer-corner shadow-2xl space-y-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="text-[11px] text-[#00ffff] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+            <div className="text-[11px] text-[#00ffff] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
               <GraduationCap className="w-4 h-4 text-[#00ffff]" />
               MOLT ACADEMY · NEURAL ASCENSION HUB
             </div>
@@ -264,7 +264,7 @@ function LecturesRoute() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2.5 py-1 text-[11px] transition-colors border font-mono ${
+                className={`px-2.5 py-1 text-[11px] transition-colors border font-sans ${
                   selectedCategory === cat
                     ? 'bg-[#00ffff]/20 border-[#00ffff] text-[#00ffff] font-bold'
                     : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3] hover:border-[#839493]'
@@ -410,7 +410,7 @@ function LecturesRoute() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent z-10" />
 
               {/* Stream Title Bar Header */}
-              <div className="relative z-20 flex justify-between items-center bg-[#070b0b]/90 border border-[#3a4a49] px-3 py-1 font-mono text-xs chamfer-corner">
+              <div className="relative z-20 flex justify-between items-center bg-[#070b0b]/90 border border-[#3a4a49] px-3 py-1 font-sans text-xs chamfer-corner">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#00ffff] animate-ping" />
                   <span className="text-[#00ffff] font-bold">NEURAL BROADCAST STREAM</span>
@@ -454,12 +454,12 @@ function LecturesRoute() {
                     <button onClick={() => setIsMuted(!isMuted)} className="hover:text-white transition-colors">
                       {isMuted ? <VolumeX className="w-3.5 h-3.5 text-[#ff5540]" /> : <Volume2 className="w-3.5 h-3.5" />}
                     </button>
-                    <span className="text-[10px] text-[#839493] font-mono">14:28 / 24:00</span>
+                    <span className="text-[10px] text-[#839493] font-sans">14:28 / 24:00</span>
                   </div>
 
                   <div className="font-bold text-[#ff5540] text-[11px] flex items-center gap-1.5">
                     <span>MOLTMAX LEVEL:</span>
-                    <span className="text-[#00ffff] font-mono">68% SYNCHRONIZED</span>
+                    <span className="text-[#00ffff] font-sans">68% SYNCHRONIZED</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-[#839493]">
@@ -475,7 +475,7 @@ function LecturesRoute() {
             </div>
 
             {/* Lecture Notes & AI Interpretation Side-by-Side */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-sans pt-1">
               {/* Left Box: Lecture Notes */}
               <div className="chitin-card-inset p-3 space-y-1.5 chamfer-corner border border-[#3a4a49]">
                 <span className="text-xs text-[#00ffff] font-bold block uppercase tracking-wider flex items-center gap-1.5">
@@ -587,7 +587,7 @@ function LecturesRoute() {
                 <Target className="w-3.5 h-3.5 text-[#00ffff]" />
                 COURSE SYLLABUS & MODULES
               </h3>
-              <span className="text-[10px] text-[#00ffff] font-mono">3 / 5 COMPLETED</span>
+              <span className="text-[10px] text-[#00ffff] font-sans">3 / 5 COMPLETED</span>
             </div>
 
             <div className="space-y-2">

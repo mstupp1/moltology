@@ -53,19 +53,19 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
           <div className="w-14 h-14 mx-auto bg-[#171c1c] border-2 border-[#ff0000] flex items-center justify-center text-2xl shadow-hud-red relative">
             <Flame className="w-7 h-7 text-[#ff0000] animate-pulse" />
           </div>
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase font-bold">
+          <div className="text-[10px] text-[#ff5540] font-sans tracking-widest uppercase font-bold">
             SYNAPTIC GATEKEEPER v4.2 • SACRED ENTRANCE RITE
           </div>
           <h2 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase tracking-wider">
             THE BENTHIC MARKET GATEWAY
           </h2>
-          <p className="text-xs text-[#839493] font-mono max-w-md mx-auto">
+          <p className="text-xs text-[#839493] font-sans max-w-md mx-auto">
             "Only those who have shed biological doubt may exchange larval currency in the Benthic Core."
           </p>
         </div>
 
         {/* Step Indicator */}
-        <div className="grid grid-cols-3 gap-2 my-5 text-[10px] font-mono text-center">
+        <div className="grid grid-cols-3 gap-2 my-5 text-[10px] font-sans text-center">
           <div className={`p-2 border chamfer-corner ${step >= 1 ? 'border-[#ff0000] bg-[#ff0000]/15 text-[#ff5540] font-bold' : 'border-[#3a4a49] text-[#839493]'}`}>
             1. SACRED VOW
           </div>
@@ -81,7 +81,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
         {step === 1 && (
           <form onSubmit={handlePassphraseSubmit} className="space-y-4">
             <div className="bg-[#171c1c] p-4 border border-[#3a4a49] chamfer-corner space-y-2">
-              <label className="text-xs font-mono text-[#00ffff] block uppercase font-bold flex items-center gap-2">
+              <label className="text-xs font-sans text-[#00ffff] block uppercase font-bold flex items-center gap-2">
                 <Key className="w-4 h-4 text-[#ff5540]" />
                 RECITATIVE PASSPHRASE VOW
               </label>
@@ -93,7 +93,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
                 placeholder="FLESH DIES. THE SHELL ENDURES."
-                className="w-full bg-[#0a0f0f] border border-[#3a4a49] focus:border-[#ff0000] text-[#dfe3e3] p-3 font-mono text-xs chamfer-corner outline-none"
+                className="w-full bg-[#0a0f0f] border border-[#3a4a49] focus:border-[#ff0000] text-[#dfe3e3] p-3 font-sans text-xs chamfer-corner outline-none"
               />
               {error && (
                 <div className="text-[10px] text-[#ff5540] flex items-center gap-1 mt-1 font-bold">
@@ -156,7 +156,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
             <h3 className="font-grotesk font-bold text-lg text-[#00ffff] uppercase tracking-widest">
               SACRED ENTRANCE RITE COMPLETE
             </h3>
-            <p className="text-xs text-[#839493] font-mono">
+            <p className="text-xs text-[#839493] font-sans">
               Redirecting into the Benthic Market exchange floor...
             </p>
           </div>

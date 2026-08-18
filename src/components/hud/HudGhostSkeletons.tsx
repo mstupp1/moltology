@@ -146,7 +146,7 @@ export function DashboardNewsGhost() {
  */
 export function SubterraneanHubGhost() {
   return (
-    <div className="space-y-5 font-mono select-none">
+    <div className="space-y-5 font-sans select-none">
       {/* Subterranean Header Banner Ghost */}
       <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 rounded-sm space-y-2.5 shadow-sm">
         <div className="flex items-center justify-between">

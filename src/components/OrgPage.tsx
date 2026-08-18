@@ -1408,7 +1408,7 @@ export const OrgPage: React.FC = () => {
                   className="w-full h-64 object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-xs font-mono text-cyan-300 bg-black/70 p-3 rounded-2xl border border-cyan-500/40 backdrop-blur-md">
+                <div className="absolute bottom-4 left-4 right-4 text-xs font-sans text-cyan-300 bg-black/70 p-3 rounded-2xl border border-cyan-500/40 backdrop-blur-md">
                   "Every dollar tithed dissolves biological weakness and hardens the planetary shell — and we thank you warmly for it."
                 </div>
               </div>

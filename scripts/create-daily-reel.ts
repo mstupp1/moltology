@@ -42,9 +42,21 @@ export interface CreateDailyReelOptions {
   ctaUrl?: string
   ctaBadge?: string
   ctaActionText?: string
-  mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'none'
+  mascot?:
+    | 'lobster_pointing'
+    | 'lobster_thumbs_up'
+    | 'lobster_action'
+    | 'crab_stats'
+    | 'crab_corner'
+    | 'crab_cling'
+    | 'lobster_peek'
+    | 'lobster_peaceful'
+    | 'none'
   watermarkOpacity?: number
   watermarkSize?: number
+  bgAudioVolume?: number
+  bgAudioOffsetSeconds?: number
+  veoModel?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // Silas Trench
@@ -635,6 +647,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
       const veoResult = await generateVeoVideo({
         prompt,
+        model: options.veoModel || 'veo-3.1-lite-generate-preview',
         aspectRatio: '9:16',
         durationSeconds: 6,
         uploadToS3: false,
@@ -673,6 +686,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈',
     ctaActionText: options.ctaActionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
     mascot: options.mascot || 'lobster_pointing',
+    backgroundAudioVolume: options.bgAudioVolume,
+    backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
     tempDir: path.join(tempDir, 'ffmpeg-build'),
   })
 
@@ -766,11 +781,14 @@ Options:
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without uploading to S3 or Zernio
   --voice <name>            TTS Voice (default: en-US-ChristopherNeural)
+  --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
+  --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
+  --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
 
 Examples:
   npx tsx scripts/create-daily-reel.ts
   npx tsx scripts/create-daily-reel.ts --theme ecdysis --mascot lobster_pointing
-  npx tsx scripts/create-daily-reel.ts --theme pincer-torque
+  npx tsx scripts/create-daily-reel.ts --theme pincer-torque --bg-volume 0.16
   npx tsx scripts/create-daily-reel.ts --dry-run --no-veo
 `)
     process.exit(0)
@@ -785,6 +803,9 @@ Examples:
   let useVeo = true
   let dryRun = false
   let voice: string | undefined
+  let bgAudioVolume: number | undefined
+  let bgAudioOffsetSeconds: number | undefined
+  let veoModel: string | undefined
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
@@ -796,6 +817,9 @@ Examples:
     else if (args[i] === '--no-veo') useVeo = false
     else if (args[i] === '--dry-run') dryRun = true
     else if (args[i] === '--voice' && args[i + 1]) voice = args[++i]
+    else if (args[i] === '--bg-volume' && args[i + 1]) bgAudioVolume = parseFloat(args[++i])
+    else if (args[i] === '--bg-offset' && args[i + 1]) bgAudioOffsetSeconds = parseFloat(args[++i])
+    else if (args[i] === '--veo-model' && args[i + 1]) veoModel = args[++i]
   }
 
   try {
@@ -809,6 +833,9 @@ Examples:
       useVeo,
       dryRun,
       voice,
+      bgAudioVolume,
+      bgAudioOffsetSeconds,
+      veoModel,
     })
   } catch (err: any) {
     console.error(`\n❌ Daily reel creation failed: ${err.message}`)

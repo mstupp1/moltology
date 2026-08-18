@@ -275,18 +275,18 @@ export const BioForgeAvatarStudio: React.FC = () => {
   const activeStageInfo = STAGE_NAMES[selectedStage]
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       {/* Studio Header Banner */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#00c3ff] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-xs text-[#00c3ff] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+          <div className="text-xs text-[#00c3ff] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <Sliders className="w-3.5 h-3.5 text-[#00c3ff]" />
             MOLTMAXXING &amp; BIO-FORGE AVATAR STUDIO
           </div>
           <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-0.5">
             CARCINIZATION &amp; COSMETIC TRANSMUTATION
           </h1>
-          <p className="text-xs text-[#839493] font-mono mt-1">
+          <p className="text-xs text-[#839493] font-sans mt-1">
             "Shed your larval organic shell. Layer cybernetic armor, synthesize pincer torque, and ascend."
           </p>
         </div>
@@ -433,7 +433,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
             <div className="flex border-b border-[#3a4a49]">
               <button
                 onClick={() => setActiveTab('stage')}
-                className={`flex-1 py-2 text-xs font-mono font-bold tracking-wider uppercase border-b-2 transition-colors ${
+                className={`flex-1 py-2 text-xs font-sans font-bold tracking-wider uppercase border-b-2 transition-colors ${
                   activeTab === 'stage'
                     ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
                     : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
@@ -443,7 +443,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('cosmetics')}
-                className={`flex-1 py-2 text-xs font-mono font-bold tracking-wider uppercase border-b-2 transition-colors ${
+                className={`flex-1 py-2 text-xs font-sans font-bold tracking-wider uppercase border-b-2 transition-colors ${
                   activeTab === 'cosmetics'
                     ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
                     : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
@@ -453,7 +453,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('vault')}
-                className={`flex-1 py-2 text-xs font-mono font-bold tracking-wider uppercase border-b-2 transition-colors ${
+                className={`flex-1 py-2 text-xs font-sans font-bold tracking-wider uppercase border-b-2 transition-colors ${
                   activeTab === 'vault'
                     ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
                     : 'border-transparent text-[#839493] hover:text-[#dfe3e3]'
@@ -615,7 +615,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
                     type="text"
                     value={avatarName}
                     onChange={(e) => setAvatarName(e.target.value)}
-                    className="w-full bg-[#030606] border border-[#3a4a49] px-3 py-1.5 text-xs text-[#dfe3e3] focus:border-[#00c3ff] outline-none font-mono"
+                    className="w-full bg-[#030606] border border-[#3a4a49] px-3 py-1.5 text-xs text-[#dfe3e3] focus:border-[#00c3ff] outline-none font-sans"
                     placeholder="Enter Avatar Name..."
                   />
                 </div>
@@ -695,7 +695,7 @@ export const BioForgeAvatarStudio: React.FC = () => {
               ACTIVE CYBER-CHASSIS TELEMETRY &amp; 3D SCHEMATIC
             </h3>
           </div>
-          <span className="text-[10px] text-[#00c3ff] font-mono font-bold tracking-widest uppercase">
+          <span className="text-[10px] text-[#00c3ff] font-sans font-bold tracking-widest uppercase">
             STAGE {selectedStage} CARCINIZED
           </span>
         </div>

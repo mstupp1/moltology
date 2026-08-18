@@ -38,9 +38,10 @@ export default {
         }
       },
       fontFamily: {
+        sans: ['Space Grotesk', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         grotesk: ['Space Grotesk', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-        spacemono: ['Space Mono', 'monospace'],
+        mono: ['Space Grotesk', 'ui-sans-serif', 'sans-serif'],
+        spacemono: ['Space Grotesk', 'sans-serif'],
         cinzel: ['Cinzel', 'Trajan Pro', 'Georgia', 'serif'],
         garamond: ['EB Garamond', 'Georgia', 'serif'],
       },

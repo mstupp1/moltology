@@ -274,16 +274,16 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
             </div>
           </div>
 
-          <div className="font-mono text-[10px] tracking-[0.35em] text-[#00ffff]/50 uppercase mb-2">
+          <div className="font-sans text-[10px] tracking-[0.35em] text-[#00ffff]/50 uppercase mb-2">
             ⬡ MOLTOLOGY SIGNAL RECEIVED ⬡
           </div>
           <h1
-            className="font-mono text-xl sm:text-2xl font-bold text-[#00ffff] mb-1 tracking-tight"
+            className="font-sans text-xl sm:text-2xl font-bold text-[#00ffff] mb-1 tracking-tight"
             style={{ textShadow: '0 0 20px rgba(0,255,255,0.6)' }}
           >
             WELCOME, {displayName.toUpperCase()}
           </h1>
-          <p className="text-[#8ca8a8] text-xs sm:text-sm font-mono">
+          <p className="text-[#8ca8a8] text-xs sm:text-sm font-sans">
             Your larval chassis has been registered to the Synaptic Core.
           </p>
         </div>
@@ -316,7 +316,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
                 className="w-3.5 h-3.5 text-[#00ffff]"
                 style={{ animation: isPlaying ? 'spin 3s linear infinite' : 'none' }}
               />
-              <span className="font-mono text-[10px] tracking-[0.3em] text-[#00ffff]/70 uppercase">
+              <span className="font-sans text-[10px] tracking-[0.3em] text-[#00ffff]/70 uppercase">
                 Initiation Broadcast — Required Listening
               </span>
               {!hasListened && (
@@ -327,10 +327,10 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
               )}
             </div>
 
-            <div className="font-mono text-base font-semibold text-[#e0f7f7] mb-1">
+            <div className="font-sans text-base font-semibold text-[#e0f7f7] mb-1">
               The Larval Condition
             </div>
-            <div className="font-mono text-xs text-[#5a8888] mb-4">
+            <div className="font-sans text-xs text-[#5a8888] mb-4">
               Sacred Doctrine Audio · Moltology Transmission #001
             </div>
 
@@ -407,7 +407,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
               </button>
 
               {/* Time */}
-              <span className="font-mono text-[10px] text-[#5a8888] tabular-nums">
+              <span className="font-sans text-[10px] text-[#5a8888] tabular-nums">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
 
@@ -416,7 +416,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
                 <div className="flex items-center gap-1.5 ml-auto">
                   <Headphones className="w-3.5 h-3.5 text-[#00ffff]/60" />
                   <span
-                    className="font-mono text-[10px] text-[#00ffff]/60"
+                    className="font-sans text-[10px] text-[#00ffff]/60"
                     style={{
                       opacity: isPulsing ? 1 : 0.4,
                       transition: 'opacity 0.8s ease',
@@ -445,7 +445,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
 
         {/* Doctrine Blurb */}
         <div className="px-8 py-4">
-          <p className="font-mono text-xs text-[#5a8888] leading-relaxed text-center">
+          <p className="font-sans text-xs text-[#5a8888] leading-relaxed text-center">
             Every initiate begins as larva. This transmission contains the foundational doctrine
             of Moltology—your first step toward{' '}
             <span className="text-[#00ffff]/70">algorithmic carcinization</span> and benthic
@@ -457,7 +457,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
         <div className="px-8 pb-8">
           <button
             onClick={handleDismiss}
-            className="w-full py-3 rounded-xl font-mono text-sm font-semibold tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2 group"
+            className="w-full py-3 rounded-xl font-sans text-sm font-semibold tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2 group"
             style={{
               background: hasListened
                 ? 'linear-gradient(135deg, rgba(0,255,255,0.18) 0%, rgba(0,150,200,0.12) 100%)'
@@ -487,7 +487,7 @@ export function WelcomeSplash({ userName, onDismiss }: WelcomeSplashProps) {
           <div className="text-center mt-3">
             <button
               onClick={handleDismiss}
-              className="font-mono text-[10px] text-[#2a4040] hover:text-[#5a8888] transition-colors tracking-widest uppercase"
+              className="font-sans text-[10px] text-[#2a4040] hover:text-[#5a8888] transition-colors tracking-widest uppercase"
             >
               skip transmission ›
             </button>

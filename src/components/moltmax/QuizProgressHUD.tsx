@@ -12,7 +12,7 @@ export const QuizProgressHUD: React.FC<QuizProgressHUDProps> = ({ current, total
 
   return (
     <div className="mx-auto mb-4 w-full max-w-5xl">
-      <div className="mb-2 flex items-center justify-between font-mono text-xs text-[#839493]">
+      <div className="mb-2 flex items-center justify-between font-sans text-xs text-[#839493]">
         <span className="font-bold text-[#00c3ff]">
           QUESTION {String(current + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
         </span>

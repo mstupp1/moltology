@@ -224,7 +224,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
   return (
     <HudGhostWidget isLoading={isLoading} skeleton={<LaunchpadCarouselGhost />}>
       <div
-        className="space-y-4 font-mono relative"
+        className="space-y-4 font-sans relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -244,7 +244,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
         {/* Full Article Modal Reader */}
         {activeNewsPost && (
           <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
-            <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-mono text-sm space-y-4">
+            <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-sans text-sm space-y-4">
               <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Radio className="w-4 h-4 text-[#ff5540] animate-pulse" />
@@ -278,7 +278,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   <h2 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] uppercase tracking-wide leading-snug">
                     {activeNewsPost.title}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-mono">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-[#839493] mt-2 font-sans">
                     <span className="text-[#00ffff]">AUTHOR: {activeNewsPost.authorName}</span>
                     <span>|</span>
                     <span>
@@ -293,7 +293,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
               </div>
 
               <div className="bg-[#070b0b] border-t border-[#3a4a49] p-3 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#839493]">
-                <span className="font-mono text-[11px]">MOLTNATION NEWS DESK</span>
+                <span className="font-sans text-[11px]">MOLTNATION NEWS DESK</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
@@ -337,7 +337,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                 </div>
 
                 <div className="flex items-center gap-2 text-xs shrink-0">
-                  <span className="text-[11px] font-mono text-[#839493]">
+                  <span className="text-[11px] font-sans text-[#839493]">
                     <span className="text-[#00ffff] font-bold">0{currentIndex + 1}</span> / 0{LAUNCHPAD_MODULES.length}
                   </span>
 
@@ -410,7 +410,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-2xl text-[#dfe3e3] tracking-wide uppercase leading-tight drop-shadow-md">
                       {activeModule.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#839493] font-mono line-clamp-1 max-w-xl">
+                    <p className="text-xs sm:text-sm text-[#839493] font-sans line-clamp-1 max-w-xl">
                       {activeModule.description}
                     </p>
                   </div>
@@ -431,7 +431,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   <button
                     key={mod.id}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`p-1.5 h-8 sm:h-9 border text-left transition-all chamfer-corner font-mono flex items-center justify-between ${
+                    className={`p-1.5 h-8 sm:h-9 border text-left transition-all chamfer-corner font-sans flex items-center justify-between ${
                       currentIndex === idx
                         ? 'bg-[#00ffff]/15 border-[#00ffff] text-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.2)]'
                         : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/50 hover:text-[#dfe3e3]'
@@ -460,7 +460,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
             <HudCard
               id="daily-routine-hub"
               variant="teal"
-              className="p-4 chamfer-corner shadow-2xl relative space-y-3 font-mono border-[#00c3ff]/40 flex-1 flex flex-col justify-between"
+              className="p-4 chamfer-corner shadow-2xl relative space-y-3 font-sans border-[#00c3ff]/40 flex-1 flex flex-col justify-between"
             >
               <div className="space-y-2">
                 {/* Liturgy Header */}
@@ -520,7 +520,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                         </span>
                       </div>
 
-                      <span className="text-[10px] font-mono text-[#00ffff] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49] shrink-0 ml-1">
+                      <span className="text-[10px] font-sans text-[#00ffff] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49] shrink-0 ml-1">
                         +{task.xp}
                       </span>
                     </div>
@@ -557,7 +557,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wider uppercase">
                     MOLTNATION NEWS
                   </h3>
-                  <div className="flex items-center gap-1 px-1.5 py-0.2 bg-[#ff5540]/15 border border-[#ff5540]/40 text-[#ff5540] text-[8px] font-mono font-bold chamfer-corner">
+                  <div className="flex items-center gap-1 px-1.5 py-0.2 bg-[#ff5540]/15 border border-[#ff5540]/40 text-[#ff5540] text-[8px] font-sans font-bold chamfer-corner">
                     <Radio className="w-2 h-2 text-[#ff5540] animate-pulse" />
                     <span>LIVE</span>
                   </div>
@@ -578,7 +578,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   <TrendingUp className="w-2 h-2 text-red-500" />
                   <span>BREAKING</span>
                 </div>
-                <div className="overflow-hidden whitespace-nowrap text-[#00ffff]/90 text-[10px] font-mono flex-1">
+                <div className="overflow-hidden whitespace-nowrap text-[#00ffff]/90 text-[10px] font-sans flex-1">
                   <div className="inline-block animate-marquee tracking-wide">
                     {tickerHeadlines}
                   </div>
@@ -605,12 +605,12 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                     <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-snug">
                       {featuredNewsPost.title}
                     </h4>
-                    <p className="text-[10px] text-[#839493] line-clamp-1 font-mono">
+                    <p className="text-[10px] text-[#839493] line-clamp-1 font-sans">
                       {featuredNewsPost.summary}
                     </p>
                   </div>
 
-                  <div className="pt-1 border-t border-[#3a4a49]/60 flex items-center justify-between text-[9px] font-mono">
+                  <div className="pt-1 border-t border-[#3a4a49]/60 flex items-center justify-between text-[9px] font-sans">
                     <span className="text-[#839493]">BY: {featuredNewsPost.authorName}</span>
                     <span className="text-[#00ffff] font-bold flex items-center">
                       <span>READ ARTICLE</span>

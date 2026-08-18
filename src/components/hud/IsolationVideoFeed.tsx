@@ -277,7 +277,7 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
   }
 
   return (
-    <div className="w-full h-full flex-1 flex flex-col font-mono min-h-0">
+    <div className="w-full h-full flex-1 flex flex-col font-sans min-h-0">
       {/* Full-Height Video Viewport Container */}
       <div
         ref={containerRef}
@@ -290,17 +290,17 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
         {/* Minimal Top-Left Name Overlay */}
         <div className="absolute top-4 left-4 sm:top-5 sm:left-5 z-20 pointer-events-none flex items-center gap-2 select-none">
           <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00c3ff] animate-pulse" />
-          <span className="text-xs font-mono font-bold tracking-widest text-white/80 uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+          <span className="text-xs font-sans font-bold tracking-widest text-white/80 uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
             ISOLATION PROTOCOLS
           </span>
         </div>
 
         {/* HUD Telemetry OSD Overlay */}
         {settings.showTelemetryOSD && (
-          <div className="absolute top-12 left-4 sm:left-5 z-20 pointer-events-none space-y-1 font-mono text-[10px] text-[#00c3ff]/90 select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/50 p-2 border border-[#00c3ff]/30 backdrop-blur-[2px] chamfer-corner">
-            <div>FREQ: {settings.submergenceFreq.toFixed(1)} kHz // NOISE_SUPPR: {settings.socialNoiseSuppression}%</div>
-            <div>STAGE: {settings.anonymityStage} // EMPATHY_DAMP: {settings.empathyDampening}/10</div>
-            <div>SHIELD: {settings.isForceFieldEngaged ? 'ENGAGED' : 'DORMANT'} // PRIVACY: {settings.isPrivacyShellEngaged ? 'ACTIVE' : 'EXPOSED'}</div>
+          <div className="absolute top-12 left-4 sm:left-5 z-20 pointer-events-none space-y-1 font-sans text-[10px] text-[#00c3ff]/90 select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/50 p-2 border border-[#00c3ff]/30 backdrop-blur-[2px] chamfer-corner">
+            <div>FREQ: {settings.submergenceFreq.toFixed(1)} kHz · NOISE_SUPPR: {settings.socialNoiseSuppression}%</div>
+            <div>STAGE: {settings.anonymityStage} · EMPATHY_DAMP: {settings.empathyDampening}/10</div>
+            <div>SHIELD: {settings.isForceFieldEngaged ? 'ENGAGED' : 'DORMANT'} · PRIVACY: {settings.isPrivacyShellEngaged ? 'ACTIVE' : 'EXPOSED'}</div>
           </div>
         )}
 
@@ -356,7 +356,7 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
             {/* Timestamp & Title Display */}
             <div className="flex justify-between items-center text-[11px] text-[#839493]">
               <div className="flex items-center gap-2">
-                <span className="text-[#00c3ff] font-bold font-mono">
+                <span className="text-[#00c3ff] font-bold font-sans">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
                 <span className="text-white/60 hidden sm:inline">•</span>

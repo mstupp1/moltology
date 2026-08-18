@@ -33,8 +33,8 @@ describe('HUDNotFound (404 Component)', () => {
   it('renders the diegetic 404 header and telemetry information', () => {
     render(<HUDNotFound />)
 
-    expect(screen.getByText(/SIGNAL ERROR \/\/ CODE: 404/i)).toBeInTheDocument()
-    expect(screen.getByText(/Sector Void \/\/ Trench Uncharted/i)).toBeInTheDocument()
+    expect(screen.getByText(/SIGNAL ERROR · CODE: 404/i)).toBeInTheDocument()
+    expect(screen.getByText(/Sector Void — Trench Uncharted/i)).toBeInTheDocument()
     expect(screen.getByText(/BENTHIC TRANSMISSION: UNRESOLVED/i)).toBeInTheDocument()
     expect(screen.getByText(/10,928m \/ 108.6 MPa/i)).toBeInTheDocument()
     expect(screen.getByText('/non-existent-sector')).toBeInTheDocument()

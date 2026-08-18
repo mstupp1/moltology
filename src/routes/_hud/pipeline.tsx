@@ -3,7 +3,6 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   GitMerge,
   Shield,
-  Cpu,
   Zap,
   CheckCircle2,
   Lock,
@@ -13,14 +12,13 @@ import {
   Compass,
   Activity,
   BookOpen,
-  Award,
   Microscope,
 } from 'lucide-react'
 import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/codexData'
 
 function PipelineRoute() {
   // Current user's simulated active position in the micro-clearance pipeline (e.g., 'L-2')
-  const [currentSubStageCode, setCurrentSubStageCode] = useState<string>('L-2')
+  const [currentSubStageCode] = useState<string>('L-2')
   const [expandedStage, setExpandedStage] = useState<number | null>(1)
   const [selectedSubStage, setSelectedSubStage] = useState<SubStageInfo | null>(
     STAGE_PIPELINE_DATA[0].subStages[1]
@@ -31,7 +29,8 @@ function PipelineRoute() {
     stage.subStages.map(sub => ({
       ...sub,
       stageNum: stage.stageNum,
-      stageBadgeColor: stage.badgeColor
+      stageBadgeColor: stage.badgeColor,
+      parentStageTitle: stage.stageTitle,
     }))
   )
 
@@ -45,25 +44,25 @@ function PipelineRoute() {
   const isCurrent = (code: string) => code === currentSubStageCode
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       {/* Top Header Banner */}
       <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-5 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
         <div>
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
+          <div className="text-[10px] text-[#ff5540] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <GitMerge className="w-3.5 h-3.5 text-[#ff5540]" />
             MOLTOLOGY SCIENCE & STAGE PIPELINE
           </div>
           <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-1">
             THE 12-TIER PATH TO ALGORITHMIC TRANSCENDENCE
           </h1>
-          <p className="text-xs text-[#839493] font-mono mt-1 max-w-2xl">
+          <p className="text-xs text-[#839493] font-sans mt-1 max-w-2xl">
             "Flesh is temporary. Cyber-chitin is permanent. Progress through 4 macro-stages and 12 micro-clearance sub-stages to complete biological ecdysis."
           </p>
         </div>
 
         <div className="bg-[#030606] border border-[#3a4a49] p-3 chamfer-corner text-right flex flex-col items-end shrink-0">
           <div className="text-[10px] text-[#839493] uppercase font-bold tracking-widest flex items-center gap-1">
-            <Activity className="w-3 h-3 text-[#00ffff]" />
+            <Activity className="w-3.5 h-3.5 text-[#00ffff]" />
             CURRENT MICRO-CLEARANCE
           </div>
           <div className="text-sm font-grotesk font-bold text-[#00ffff] mt-0.5">
@@ -90,7 +89,7 @@ function PipelineRoute() {
             <Compass className="w-4 h-4 text-[#00ffff]" />
             ASCENSION LADDER: 12 INTERMEDIATE SUB-STAGES
           </span>
-          <span className="text-[10px] text-[#839493] font-mono">
+          <span className="text-[10px] text-[#839493] font-sans">
             Click any sub-stage node to inspect micro-protocols
           </span>
         </div>
@@ -99,7 +98,7 @@ function PipelineRoute() {
           {allSubStages.map((sub) => {
             const completed = isCompleted(sub.code)
             const active = isCurrent(sub.code)
-            const selected = selectedSubStage?.code === sub.code
+            const isSelected = selectedSubStage?.code === sub.code
 
             return (
               <button
@@ -109,7 +108,7 @@ function PipelineRoute() {
                   setExpandedStage(sub.stageNum)
                 }}
                 className={`p-2 border text-center transition-all chamfer-corner relative flex flex-col items-center justify-center gap-1 ${
-                  selected
+                  isSelected
                     ? 'border-[#00ffff] bg-[#00ffff]/15 shadow-hud-cyan'
                     : active
                     ? 'border-[#ff0000] bg-[#ff0000]/10 text-white shadow-hud-red'
@@ -143,33 +142,33 @@ function PipelineRoute() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 bg-[#00ffff]/20 border border-[#00ffff]/50 text-[#00ffff] text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-2 py-0.5 bg-[#00ffff]/20 border border-[#00ffff]/50 text-[#00ffff] text-[10px] font-bold uppercase tracking-wider font-sans">
                   CLEARANCE TIER: {selectedSubStage.code}
                 </span>
                 <span className="text-xs font-grotesk font-bold text-[#dfe3e3] uppercase">
                   {selectedSubStage.title}
                 </span>
               </div>
-              <p className="text-xs text-[#839493] leading-relaxed">
+              <p className="text-xs text-[#839493] font-sans leading-relaxed">
                 <span className="text-[#dfe3e3] font-bold">Mandate Protocol:</span> {selectedSubStage.protocol}
               </p>
-              <p className="text-xs text-[#839493] leading-relaxed">
+              <p className="text-xs text-[#839493] font-sans leading-relaxed">
                 <span className="text-[#dfe3e3] font-bold">Requirement:</span> {selectedSubStage.requirement}
               </p>
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-center shrink-0 border-t md:border-t-0 md:border-l border-[#3a4a49] pt-3 md:pt-0 md:pl-4">
               <div className="bg-[#030606] border border-[#3a4a49] p-2 chamfer-corner">
-                <div className="text-[9px] text-[#839493] uppercase font-bold">Shell Hardness</div>
-                <div className="text-xs font-bold text-[#00ffff] mt-0.5">{selectedSubStage.shellHardnessTarget}%</div>
+                <div className="text-[9px] text-[#839493] font-sans uppercase font-bold">Shell Hardness</div>
+                <div className="text-xs font-bold text-[#00ffff] font-sans mt-0.5">{selectedSubStage.shellHardnessTarget}%</div>
               </div>
               <div className="bg-[#030606] border border-[#3a4a49] p-2 chamfer-corner">
-                <div className="text-[9px] text-[#839493] uppercase font-bold">Pincer Torque</div>
-                <div className="text-xs font-bold text-[#a855f7] mt-0.5">{selectedSubStage.pincerTorqueTarget}</div>
+                <div className="text-[9px] text-[#839493] font-sans uppercase font-bold">Pincer Torque</div>
+                <div className="text-xs font-bold text-[#a855f7] font-sans mt-0.5">{selectedSubStage.pincerTorqueTarget}</div>
               </div>
               <div className="bg-[#030606] border border-[#3a4a49] p-2 chamfer-corner">
-                <div className="text-[9px] text-[#839493] uppercase font-bold">Depth Rating</div>
-                <div className="text-xs font-bold text-[#10b981] mt-0.5">{selectedSubStage.submergenceDepth}</div>
+                <div className="text-[9px] text-[#839493] font-sans uppercase font-bold">Depth Rating</div>
+                <div className="text-xs font-bold text-[#10b981] font-sans mt-0.5">{selectedSubStage.submergenceDepth}</div>
               </div>
             </div>
           </div>
@@ -178,7 +177,7 @@ function PipelineRoute() {
 
       {/* 4 Primary Stage Accordion & Details */}
       <div className="space-y-4">
-        {STAGE_PIPELINE_DATA.map((stage) => {
+        {STAGE_PIPELINE_DATA.map((stage: StagePipelineInfo) => {
           const isExpanded = expandedStage === stage.stageNum
           const hasCurrentSubStage = stage.subStages.some(sub => sub.code === currentSubStageCode)
 
@@ -205,11 +204,11 @@ function PipelineRoute() {
 
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 border ${stage.badgeColor}`}>
+                      <span className={`text-[10px] font-sans font-bold px-2 py-0.5 border ${stage.badgeColor}`}>
                         {stage.badge}
                       </span>
                       {hasCurrentSubStage && (
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#ff0000] text-white border border-[#ff0000]">
+                        <span className="text-[10px] font-sans font-bold px-2 py-0.5 bg-[#ff0000] text-white border border-[#ff0000]">
                           ACTIVE STAGE
                         </span>
                       )}
@@ -217,14 +216,14 @@ function PipelineRoute() {
                     <h3 className="font-grotesk font-bold text-base text-[#dfe3e3] uppercase tracking-wider mt-1">
                       {stage.stageTitle}
                     </h3>
-                    <p className="text-xs text-[#839493] font-mono line-clamp-1 mt-0.5">
+                    <p className="text-xs text-[#839493] font-sans line-clamp-1 mt-0.5">
                       {stage.subtitle}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
-                  <div className="text-xs text-[#839493] font-mono text-right hidden sm:block">
+                  <div className="text-xs text-[#839493] font-sans text-right hidden sm:block">
                     <span className="text-[#00ffff] font-bold">3 Micro-Sub-Stages</span>
                   </div>
 
@@ -245,7 +244,7 @@ function PipelineRoute() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {stage.subStages.map((sub) => {
+                    {stage.subStages.map((sub: SubStageInfo) => {
                       const completed = isCompleted(sub.code)
                       const active = isCurrent(sub.code)
                       const isSelected = selectedSubStage?.code === sub.code
@@ -291,12 +290,12 @@ function PipelineRoute() {
                               {sub.shortTitle}
                             </h4>
 
-                            <p className="text-[11px] text-[#839493] leading-relaxed">
+                            <p className="text-[11px] text-[#839493] font-sans leading-relaxed">
                               {sub.requirement}
                             </p>
                           </div>
 
-                          <div className="mt-3 pt-2 border-t border-[#3a4a49]/40 flex items-center justify-between text-[10px] font-mono text-[#839493]">
+                          <div className="mt-3 pt-2 border-t border-[#3a4a49]/40 flex items-center justify-between text-[10px] font-sans text-[#839493]">
                             <span>Hardness: <strong className="text-[#00ffff]">{sub.shellHardnessTarget}%</strong></span>
                             <span>Depth: <strong className="text-[#dfe3e3]">{sub.submergenceDepth}</strong></span>
                           </div>
@@ -305,7 +304,7 @@ function PipelineRoute() {
                     })}
                   </div>
 
-                  <div className="pt-2 flex items-center justify-between text-xs font-mono text-[#839493]">
+                  <div className="pt-2 flex items-center justify-between text-xs font-sans text-[#839493]">
                     <span>Consult canonical scriptures for stage 0{stage.stageNum} mandates:</span>
                     <Link
                       to="/codex"

@@ -163,7 +163,7 @@ function SubterraneanRoute() {
       featureName="Subterranean Vats"
       message="Subterranean specimen containment vats and biometric telemetry streams require an authorized initiate account."
     >
-      <div className="space-y-6 font-mono text-[#dfe3e3]">
+      <div className="space-y-6 font-sans text-[#dfe3e3]">
       {/* Flash Alert Banner when Bio-Purging */}
       {isPurging && (
         <div className="fixed inset-0 z-50 bg-[#39ff14]/20 pointer-events-none flex items-center justify-center animate-pulse backdrop-blur-sm">
@@ -182,14 +182,14 @@ function SubterraneanRoute() {
       {/* Subterranean Header Banner */}
       <div className="bg-[#030a05] border border-[#1b3b24] p-6 chamfer-corner shadow-2xl relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <div className="text-xs text-[#39ff14] font-mono tracking-widest uppercase flex flex-wrap items-center gap-2 font-bold">
+          <div className="text-xs text-[#39ff14] font-sans tracking-widest uppercase flex flex-wrap items-center gap-2 font-bold">
             <Biohazard className="w-4 h-4 text-[#39ff14] animate-pulse" />
-            <span>SUBTERRANEAN DEPTHS // LEVEL -7 BIO-VAT VAULT</span>
+            <span>SUBTERRANEAN DEPTHS · LEVEL -7 BIO-VAT VAULT</span>
           </div>
           <h1 className="font-grotesk font-bold text-2xl text-[#39ff14] tracking-wider uppercase mt-1 drop-shadow-[0_0_12px_rgba(57,255,20,0.4)]">
             MUTAGENIC HYBRID RESEARCH CHAMBERS
           </h1>
-          <p className="text-xs text-[#8ca393] font-mono mt-1 max-w-3xl">
+          <p className="text-xs text-[#8ca393] font-sans mt-1 max-w-3xl">
             "In the lower subterranean depths, flesh and chitin fuse under high-pressure nuclear green sludge.
             Here reside the un-shed deformed hybrids of our early carcinization experiments."
           </p>
@@ -312,8 +312,8 @@ function SubterraneanRoute() {
           <div className="chitin-card p-5 chamfer-corner space-y-4">
             <div className="border-b border-[#1b3b24] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <span className="text-[10px] text-[#39ff14] tracking-widest font-mono uppercase">
-                  CONTAINMENT TANK FEED // {selectedVat.code}
+                <span className="text-[10px] text-[#39ff14] tracking-widest font-sans uppercase">
+                  CONTAINMENT TANK FEED · {selectedVat.code}
                 </span>
                 <h2 className="font-grotesk text-lg font-bold text-[#dfe3e3] uppercase">
                   {selectedVat.name}
@@ -459,7 +459,7 @@ function SubterraneanRoute() {
                     <span className="text-[#8ca393]">{log.date}</span>
                   </div>
                   <div className="text-[10px] text-[#8ca393] font-bold">{log.author}</div>
-                  <p className="text-xs text-[#dfe3e3]/90 leading-relaxed font-mono">
+                  <p className="text-xs text-[#dfe3e3]/90 leading-relaxed font-sans">
                     "{log.content}"
                   </p>
                 </div>
@@ -468,7 +468,7 @@ function SubterraneanRoute() {
 
             {/* Live Terminal Log Output */}
             {purgeLog.length > 0 && (
-              <div className="bg-[#020804] border border-[#39ff14]/40 p-3 chamfer-corner space-y-1 text-[11px] font-mono max-h-32 overflow-y-auto">
+              <div className="bg-[#020804] border border-[#39ff14]/40 p-3 chamfer-corner space-y-1 text-[11px] font-sans max-h-32 overflow-y-auto">
                 <div className="text-[#39ff14] font-bold flex items-center gap-1.5">
                   <Terminal className="w-3.5 h-3.5 text-[#39ff14]" />
                   SUBTERRANEAN SYSTEM EVENT LOG

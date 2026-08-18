@@ -122,7 +122,7 @@ export function HUDSpinner({
 
       {label && (
         <span
-          className="font-mono uppercase tracking-widest"
+          className="font-sans uppercase tracking-widest"
           style={{ fontSize: Math.max(9, px * 0.22), color: primary, opacity: 0.7 }}
         >
           {label}

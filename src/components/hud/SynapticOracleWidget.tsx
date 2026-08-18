@@ -495,7 +495,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     <>
       {!isPopoutActive ? (
         <div
-          className={`fixed z-40 font-mono select-none ${
+          className={`fixed z-40 font-sans select-none ${
             isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4'
           }`}
           style={
@@ -531,7 +531,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         </div>
       ) : (
         <div
-          className={`fixed z-40 font-mono rounded-none overflow-hidden chamfer-corner shadow-2xl shadow-cyan-950/90 border border-cyan-900/80 bg-[#080d0d] ${
+          className={`fixed z-40 font-sans rounded-none overflow-hidden chamfer-corner shadow-2xl shadow-cyan-950/90 border border-cyan-900/80 bg-[#080d0d] ${
             isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
           } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`}
           style={

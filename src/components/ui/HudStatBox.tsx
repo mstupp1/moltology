@@ -76,7 +76,7 @@ export const HudStatBox = React.forwardRef<HTMLDivElement, HudStatBoxProps>(
       <div
         ref={ref}
         className={cn(
-          'relative border p-4 rounded-none font-mono flex flex-col justify-between gap-2 backdrop-blur-md',
+          'relative border p-4 rounded-none font-sans flex flex-col justify-between gap-2 backdrop-blur-md',
           variantStyles.container,
           textureClass,
           className
