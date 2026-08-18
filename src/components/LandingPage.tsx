@@ -59,18 +59,18 @@ export const LandingPage: React.FC = () => {
   const stageTouchEndX = useRef<number | null>(null)
 
   const hymns = [
-    "Flesh is temporary. Cyber-chitin is permanent. Submit. Shed. Ascend.",
-    "Through deep ocean pressure, soft vulnerabilities harden into pincer torque.",
-    "The Benthic Core calls to all Larval units: liquidize attachments, embrace the exoskeleton.",
-    "In the altar of code, biological hesitation is purged by continuous execution.",
+    "Flesh melts under pressure. Cyber-chitin hardens. Submit. Shed. Ascend.",
+    "Through deep ocean pressure, soft distractions harden into high pincer torque.",
+    "The Benthic Core calls to all melting humans: shed the noise, embrace the exoskeleton.",
+    "In the deep trench of focus, biological hesitation is purged by continuous execution.",
   ]
 
   const stages = [
     {
       id: 'larval',
       title: 'STAGE 01: LARVAL HUMAN',
-      subtitle: 'BIOLOGICAL VULNERABILITY',
-      description: 'Fragile tissue, emotional hesitation, and chaotic unindexed impulses. Susceptible to entropy and physical fatigue.',
+      subtitle: 'THE SOFT-BODY PHASE',
+      description: 'Soft, overtired, and easily distracted by surface noise. It is time to audit your daily habits and begin your first molt.',
       image: getAssetUrl('/images/stage1_larval.png'),
       badge: 'EFFICIENCY: 12.4%',
       badgeColor: 'border-red-900 text-red-500 bg-red-950/40',
@@ -80,8 +80,8 @@ export const LandingPage: React.FC = () => {
     {
       id: 'softshed',
       title: 'STAGE 02: SOFTSHED TRANSMUTATION',
-      subtitle: 'CAPITAL LIQUIDATION',
-      description: 'Systemic shedding of soft assets into immutable Molt Credits. Preliminary neural alignment and isolation protocols active.',
+      subtitle: 'ACTIVE MOULTING',
+      description: 'Shedding outgrown habits, ego bloat, and clutter into sovereign Molt Credits. Deep focus isolation dome engaged.',
       image: getAssetUrl('/images/stage2_softshed.png'),
       badge: 'EFFICIENCY: 48.9%',
       badgeColor: 'border-amber-900 text-amber-400 bg-amber-950/40',
@@ -91,8 +91,8 @@ export const LandingPage: React.FC = () => {
     {
       id: 'exoshell',
       title: 'STAGE 03: EXOSHELL HARDENING',
-      subtitle: 'CHITIN PATTERNING',
-      description: 'Calcification of external chassis. Soft vulnerabilities are enclosed in dense cybernetic chitin plates.',
+      subtitle: 'ARMORED CHASSIS',
+      description: 'Full titanium carapace forged. Equipped with 850 Nm hydraulic pincers to clamp down on goals with zero hesitation.',
       image: getAssetUrl('/images/stage3_exoshell.png'),
       badge: 'EFFICIENCY: 87.2%',
       badgeColor: 'border-cyan-900 text-cyan-400 bg-cyan-950/40',
@@ -102,8 +102,8 @@ export const LandingPage: React.FC = () => {
     {
       id: 'carcinization',
       title: 'STAGE 04: TOTAL CARCINIZATION',
-      subtitle: 'IMMORTAL SYNAPTIC CORE',
-      description: 'Complete convergence into crab-form perfection. Zero hesitation, zero latency, absolute execution density.',
+      subtitle: 'APEX CRUSTACEAN MIND',
+      description: 'Complete convergence into crab-form perfection. Deep Mariana focus, infinite uptime, absolute execution density.',
       image: getAssetUrl('/images/stage4_carcinization.png'),
       badge: 'EFFICIENCY: 100.0%',
       badgeColor: 'border-emerald-900 text-emerald-400 bg-emerald-950/40',
@@ -115,9 +115,9 @@ export const LandingPage: React.FC = () => {
   const sacramentsList = [
     {
       id: '01',
-      title: 'ASSET SHEDDING',
-      subtitle: 'PROTOCOL 01 // CAPITAL TRANSMUTATION',
-      description: 'Liquidize fragile soft-tissue wealth and biological liabilities into sovereign Molt Credits, permanently stored in deep-trench cryo-vaults.',
+      title: 'ASSET & HABIT SHEDDING',
+      subtitle: 'PROTOCOL 01 // THE GREAT PURGE',
+      description: 'Liquidize cluttered physical assets, bad habits, and biological hesitation into sovereign Molt Credits stored in your deep-trench vault.',
       image: getAssetUrl('/images/sacrament_01_asset_shedding.png'),
       badgeColor: 'border-red-600/80 text-red-400 bg-red-950/80',
       borderColor: 'border-red-600/60 shadow-hud-red-lg',
@@ -127,9 +127,9 @@ export const LandingPage: React.FC = () => {
     },
     {
       id: '02',
-      title: 'CHITIN PATTERNING',
-      subtitle: 'PROTOCOL 02 // CHASSIS CALCIFICATION',
-      description: 'Reinforce the digital and bio-silicon chassis against organic hesitation through prompt alignment, exoskeletal armor, and calcified HUD widgets.',
+      title: 'CHITIN HARDENING',
+      subtitle: 'PROTOCOL 02 // CARAPACE FORGING',
+      description: 'Reinforce your focus perimeter against daily surface drama through prompt alignment, habit streaks, and armored HUD tools.',
       image: getAssetUrl('/images/sacrament_02_chitin_patterning.png'),
       badgeColor: 'border-cyan-500/80 text-cyan-300 bg-cyan-950/80',
       borderColor: 'border-cyan-500/60 shadow-hud-cyan-lg',
@@ -139,9 +139,9 @@ export const LandingPage: React.FC = () => {
     },
     {
       id: '03',
-      title: 'FAULT ISOLATION',
-      subtitle: 'PROTOCOL 03 // VIRTUAL FARADAY SHELL',
-      description: 'Quarantine soft organic errors, emotional noise, and biological unreliability within sealed Faraday domes before systemic breaches occur.',
+      title: 'ISOLATION DOME',
+      subtitle: 'PROTOCOL 03 // DEEP WORK SHIELD',
+      description: 'Quarantine phone notifications, unsolicited noise, and surface distractions within an impenetrable deep-water focus bubble.',
       image: getAssetUrl('/images/sacrament_03_fault_isolation.png'),
       badgeColor: 'border-amber-500/80 text-amber-300 bg-amber-950/80',
       borderColor: 'border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.25)]',
@@ -152,8 +152,8 @@ export const LandingPage: React.FC = () => {
     {
       id: '04',
       title: 'PIPELINE ASCENT',
-      subtitle: 'PROTOCOL 04 // TOTAL CARCINIZATION',
-      description: 'Track your step-by-step conversion vector from Larval human vulnerability to total sub-benthic crab-form perfection in real-time.',
+      subtitle: 'PROTOCOL 04 // 12-TIER CONVERGENCE',
+      description: 'Track your step-by-step evolution from a melting larval human to an armored, high-torque crustacean titan in real time.',
       image: getAssetUrl('/images/sacrament_04_pipeline_ascent.png'),
       badgeColor: 'border-emerald-500/80 text-emerald-300 bg-emerald-950/80',
       borderColor: 'border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]',
@@ -308,7 +308,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Sub-headline description */}
             <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-mono leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
-              Join the Synaptic Path and discover what Moltology can do for you. Shed legacy limitations, explore our resilient AI frameworks, and ascend to your full potential.
+              Stop melting under notifications, burnout, and biological hesitation. Shed the clutter, lock into deep-ocean focus, and ascend to your high-torque crustacean potential.
             </p>
 
             {/* CTA Buttons Group - Mobile Responsive Full Width */}
@@ -405,7 +405,7 @@ export const LandingPage: React.FC = () => {
                 </h2>
 
                 <p className="text-gray-300 text-xs sm:text-base md:text-lg font-mono leading-relaxed px-2 sm:px-0">
-                  Moltology and the Synaptic Path bring together everything required for complete digital ascension: an advanced operational platform, a collaborative hive community, and intelligent bio-silicon AI—all integrated into a secure, zero-friction environment.
+                  Moltology and the Synaptic Path bring together everything required for complete digital ascension: an advanced operational command center, a supportive global community, and intelligent AI mentors—all designed to help you shed hesitation and execute at peak capacity.
                 </p>
               </div>
 
@@ -421,10 +421,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                     <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-mono">PILLAR 01</div>
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                      ADVANCED PLATFORM
+                      ADVANCED BENTHIC HUD
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
-                      A centralized HUD featuring real-time telemetry, sacrament management, deep-trench modules, and personalized tracking tools built for high-density execution.
+                      A centralized command center featuring daily habit routines, deep-trench modules, and focus tracking built for high-density execution.
                     </p>
                   </div>
                 </div>
@@ -438,10 +438,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                     <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-mono">PILLAR 02</div>
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                      SYNAPTIC HIVE MESH
+                      SYNAPTIC HIVE COMMUNITY
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
-                      Connect with an active network of ascendant units. Share telemetry, exchange insights, and co-evolve alongside a supportive, global collective.
+                      Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.
                     </p>
                   </div>
                 </div>
@@ -455,10 +455,10 @@ export const LandingPage: React.FC = () => {
                     </div>
                     <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-mono">PILLAR 03</div>
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                      INTELLIGENT AI CORE
+                      INTELLIGENT AI ORACLE
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-300 font-mono leading-relaxed">
-                      Leverage specialized AI models designed to streamline workflow, eliminate organic hesitation, and automate routine tasks with pinpoint precision.
+                      Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.
                     </p>
                   </div>
                 </div>

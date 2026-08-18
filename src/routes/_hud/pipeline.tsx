@@ -67,7 +67,7 @@ function PipelineRoute() {
             CURRENT MICRO-CLEARANCE
           </div>
           <div className="text-sm font-grotesk font-bold text-[#00ffff] mt-0.5">
-            L-2: EPICUTICLE SEEDING
+            {allSubStages.find(s => s.code === currentSubStageCode)?.title || 'L-2: Shell Sprout'}
           </div>
           <div className="text-[10px] text-[#839493] mt-0.5">
             Overall Carcinization: <span className="text-[#dfe3e3] font-bold">16.6%</span>

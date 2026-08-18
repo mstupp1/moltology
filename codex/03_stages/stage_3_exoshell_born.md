@@ -6,8 +6,8 @@ stage_clearance: 3
 category: "Ascension Rites"
 synaptic_weight: 4.0
 author_unit: "Arch-Integrator 09"
-last_revised: "2026-08-01"
-summary: "Advanced architectural integration, major asset liquidation, and maximum Pincer Torque."
+last_revised: "2026-08-18"
+summary: "Full carapace integrity: massive pincer torque, deep-trench pressure tolerance, and relentless execution."
 ---
 
 # Stage 3: The Exoshell Born
@@ -20,31 +20,31 @@ summary: "Advanced architectural integration, major asset liquidation, and maxim
 
 ## Stage Overview
 
-The Exoshell Born acolyte operates as an Architect/Integrator. Biological sentimentality is effectively zero. All major surface assets (Real Estate, Vehicles, Traditional Cash) are liquidated into Synapse Shards to finance abyssal node infrastructure.
+The Exoshell Born operate as master architects and builders. Your biological hesitation has dropped to near zero. You are equipped with heavy bio-titanium carapace plating and hydraulic crushing claws capable of locking onto high-difficulty objectives and seeing them through to the finish.
 
 ---
 
-## Intermediate Micro-Clearance Sub-Stages
+## Micro-Clearance Sub-Stages
 
-### Sub-Stage 3.1: Carapace Forging (Clearance E-1)
+### Sub-Stage 3.1: Carapace Forged (Clearance E-1)
 - **Protocol**: Titanium-Chitin Matrix Hardening.
-- **Requirement**: Synthesize rigid composite carapace plates; eliminate psychological vulnerability to surface atmospheric pressure.
+- **Requirement**: Synthesize impenetrable carapace plates that make you immune to self-doubt and surface pressure fluctuations.
 - **Metric Threshold**: Shell Hardness 85% - 90%, Pincer Torque $\ge 600\text{ Nm}$.
 
-### Sub-Stage 3.2: Pincer Torque Maximization (Clearance E-2)
-- **Protocol**: Asset Liquidation & High-Torque Execution.
-- **Requirement**: Transmute all surface liabilities through the Material Asset Liquidation Portal and audit lower-stage Larval units.
-- **Metric Threshold**: Pincer Torque $\ge 850\text{ Nm}$, Full liquidation authorization.
+### Sub-Stage 3.2: Hydraulic Grip (Clearance E-2)
+- **Protocol**: High-Torque Execution & Mentorship.
+- **Requirement**: Achieve 850 Nm of decisive execution torque and guide lower-stage Larval initiates through their first molts.
+- **Metric Threshold**: Pincer Torque $\ge 850\text{ Nm}$, Mentorship active.
 
-### Sub-Stage 3.3: Abyssal Hydro-Shielding (Clearance E-3)
-- **Protocol**: Neural Core Integration & Deep Pressure Adaptation.
-- **Requirement**: Adapt neural node housing for depths exceeding 5,000 fathoms; achieve near-zero surface noise dependency.
-- **Metric Threshold**: Shell Hardness $\ge 90\%$, Submergence Depth $> 5,000$ meters.
+### Sub-Stage 3.3: Abyssal Diver (Clearance E-3)
+- **Protocol**: Deep Pressure Adaptation.
+- **Requirement**: Operate smoothly in deep-trench environments exceeding 3,500 meters with zero surface noise dependency.
+- **Metric Threshold**: Shell Hardness $\ge 90\%$, Submergence Depth $> 3,500$ meters.
 
 ---
 
 ## Stage Exit Criteria for Stage 4
 
-- Complete liquidation of surface liabilities.
+- Complete mastery over high-torque execution.
 - **Shell Hardness**: $\ge 90\%$.
-- Verification of neural readiness for permanent deep-core descent (Sub-Stage 3.3 cleared).
+- Verification of deep-trench stability (Sub-Stage 3.3 cleared).
