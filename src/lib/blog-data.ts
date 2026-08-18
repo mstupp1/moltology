@@ -18,6 +18,29 @@ export interface BlogPostData {
   publishedAt: string
 }
 
+export interface FormattedNewsTitle {
+  headline: string
+  subtitle?: string
+}
+
+/**
+ * Splits a long news/blog title at the first colon (:) into a primary headline and an explanatory subtitle.
+ * If no colon exists, returns the full title as the headline.
+ */
+export function formatNewsTitle(fullTitle: string): FormattedNewsTitle {
+  if (!fullTitle) return { headline: '' }
+  const colonIndex = fullTitle.indexOf(':')
+  if (colonIndex === -1) {
+    return { headline: fullTitle }
+  }
+  const headline = fullTitle.slice(0, colonIndex).trim()
+  const subtitle = fullTitle.slice(colonIndex + 1).trim()
+  return {
+    headline,
+    ...(subtitle ? { subtitle } : {}),
+  }
+}
+
 export const S3_BASE_URL = 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets'
 
 export const INITIAL_BLOG_POSTS: BlogPostData[] = [

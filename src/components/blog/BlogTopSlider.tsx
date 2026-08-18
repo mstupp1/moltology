@@ -10,6 +10,7 @@ import {
   Sparkles,
   Radio,
 } from 'lucide-react'
+import { formatNewsTitle } from '@/lib/blog-data'
 import type { BlogPostData } from '@/lib/blog-data'
 
 interface BlogTopSliderProps {
@@ -156,13 +157,19 @@ export function BlogTopSlider({
         >
           {/* Left Column: Text & Meta */}
           <div className="lg:col-span-7 space-y-5">
-            <div className="space-y-3">
+            <div className="space-y-2">
               <h2
                 onClick={() => onSelectPost(currentPost.slug)}
                 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-5xl text-gray-100 uppercase tracking-tight leading-tight hover:text-cyan-300 transition-colors cursor-pointer drop-shadow-md"
               >
-                {currentPost.title}
+                {formatNewsTitle(currentPost.title).headline}
               </h2>
+
+              {formatNewsTitle(currentPost.title).subtitle && (
+                <p className="font-sans text-sm sm:text-base text-cyan-200/80 font-medium leading-snug">
+                  {formatNewsTitle(currentPost.title).subtitle}
+                </p>
+              )}
 
               <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed line-clamp-3">
                 {currentPost.summary}
@@ -234,7 +241,7 @@ export function BlogTopSlider({
                 }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" style={{ opacity: idx === currentIndex ? 1 : 0.4 }} />
-                <span className="truncate max-w-[120px] sm:max-w-[160px]">{post.title}</span>
+                <span className="truncate max-w-[120px] sm:max-w-[160px]">{formatNewsTitle(post.title).headline}</span>
               </button>
             ))}
           </div>
