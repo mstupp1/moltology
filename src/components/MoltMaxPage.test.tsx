@@ -77,7 +77,7 @@ describe('MoltMaxPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /take the moltmax quiz/i }))
     // Move to Question 2 (Likert format)
     answerCurrentQuestion()
-    expect(screen.getByText(/02 \/\//i)).toBeInTheDocument()
+    expect(screen.getByText(/02 ·/i)).toBeInTheDocument()
     
     // Find slider and interact
     const slider = screen.getByRole('slider')

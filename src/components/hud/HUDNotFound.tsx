@@ -100,7 +100,7 @@ export function HUDNotFound() {
             </div>
             <div className="p-3 rounded bg-[#080d0e] border border-[#1c272a]">
               <div className="text-[10px] text-[#63757a] uppercase mb-0.5">Lattice Status</div>
-              <div className="text-emerald-400 font-medium">ONLINE // RE-ROUTING</div>
+              <div className="text-emerald-400 font-medium">ONLINE · RE-ROUTING</div>
             </div>
           </div>
 

@@ -31,6 +31,7 @@
 - **Theme Source of Truth**: Design tokens (colors, fonts, shadows) are defined in [`tailwind.config.js`](file:///Users/mylesstupp/Development/moltology/tailwind.config.js) and custom HUD utilities in [`src/index.css`](file:///Users/mylesstupp/Development/moltology/src/index.css).
 - **Component Library**: Use **shadcn/ui** component primitives (Radix UI + Tailwind) located in [`src/components/ui/`](file:///Users/mylesstupp/Development/moltology/src/components/ui/) for standard UI elements (e.g. `Slider`, `Dialog`, `Dropdown`, etc.) styled with the benthic HUD theme.
 - **Look & Feel**: Dark Sci-Fi HUD / biomechanical theme.
+- **No Tacky '//' Double Slashes**: NEVER use `//` (double slashes) in titles, subtitles, eyebrows, image captions, cards, badges, or user-facing copy. It is tacky and dated pseudo-code cliché. Use clean typography, middle dots (`·`), colons (`:`), or em-dashes (`—`) instead.
 
 ## 5. Tech Stack
 - **Web**: TanStack Start (SSR), React, Vite, Nitro, Tailwind CSS, shadcn/ui (Radix UI).

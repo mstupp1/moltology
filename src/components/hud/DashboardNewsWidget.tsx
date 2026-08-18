@@ -154,7 +154,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
               </div>
 
               <div className="bg-[#070b0b] border-t border-[#3a4a49] p-3 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#839493]">
-                <span className="font-mono text-[11px]">MOLTNATION NEWS DESK // BENTHIC INTELLIGENCE</span>
+                <span className="font-mono text-[11px]">MOLTNATION NEWS DESK · BENTHIC INTELLIGENCE</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {

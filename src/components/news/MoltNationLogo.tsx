@@ -81,7 +81,7 @@ export const MoltNationLogo: React.FC<MoltNationLogoProps> = ({
             isLight ? 'text-gray-600' : 'text-gray-400'
           }`}
         >
-          ONE NATION UNDER CHITIN // PATRIOT TELEMETRY
+          ONE NATION UNDER CHITIN · PATRIOT TELEMETRY
         </span>
       </div>
     </div>

@@ -95,7 +95,7 @@ export const MoltmaxGuidePage: React.FC = () => {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-mono tracking-widest uppercase">
               <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-              <span>DECLASSIFIED BENTHIC FIELD DOSSIER // EDITION 4.0</span>
+              <span>DECLASSIFIED BENTHIC FIELD DOSSIER · EDITION 4.0</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-grotesk font-black tracking-tight text-white uppercase leading-tight">

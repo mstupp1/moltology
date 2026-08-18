@@ -70,7 +70,7 @@ const ArticleCodeBlock: React.FC<{ language: string; code: string }> = ({ langua
         <div className="flex items-center space-x-2 min-w-0 truncate">
           <Terminal className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
           <span className="uppercase tracking-widest font-bold text-[11px] sm:text-xs truncate">
-            // {language || 'TELEMETRY DATA'}
+            {language || 'TELEMETRY DATA'}
           </span>
         </div>
         <button
@@ -365,15 +365,11 @@ function RenderFigure({ alt, src }: { alt: string; src: string }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050809] via-transparent to-transparent opacity-30 pointer-events-none" />
       </div>
-      <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#090e10] border-t border-cyan-950 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 text-xs font-mono text-cyan-300">
-        <span className="flex items-center gap-2 min-w-0">
-          <span className="text-cyan-400 font-bold shrink-0">//</span>
+      {alt && (
+        <figcaption className="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#090e10] border-t border-cyan-950 flex items-center min-w-0 text-xs font-mono text-cyan-300">
           <span className="font-semibold text-gray-200 truncate">{alt}</span>
-        </span>
-        <span className="text-[9px] sm:text-[10px] text-cyan-400 uppercase tracking-widest font-bold px-2 py-0.5 bg-cyan-950/80 border border-cyan-800/60 chamfer-corner self-start sm:self-auto shrink-0">
-          BENTHIC VISUAL TELEMETRY
-        </span>
-      </figcaption>
+        </figcaption>
+      )}
     </figure>
   )
 }

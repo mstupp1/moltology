@@ -193,7 +193,7 @@ function LecturesRoute() {
           <div>
             <div className="text-[11px] text-[#00ffff] font-mono tracking-widest uppercase flex items-center gap-1.5 font-bold">
               <GraduationCap className="w-4 h-4 text-[#00ffff]" />
-              MOLT ACADEMY // NEURAL ASCENSION HUB
+              MOLT ACADEMY · NEURAL ASCENSION HUB
             </div>
             <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-0.5 flex items-center gap-2">
               BENTHIC ACADEMY OF NEURAL CURRICULA

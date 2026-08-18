@@ -344,7 +344,7 @@ function NewsIndexPage() {
                   {/* Category Tag */}
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 bg-red-950 border border-red-500/80 text-red-400 font-black font-grotesk text-xs uppercase tracking-widest chamfer-corner">
-                      {mainLeadPost.category} // MAIN LEAD DISPATCH
+                      {mainLeadPost.category} · MAIN LEAD DISPATCH
                     </span>
                     <span className="text-xs text-cyan-400 font-mono flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
