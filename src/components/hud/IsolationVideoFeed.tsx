@@ -262,15 +262,29 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   }
 
+  const getVisionFilterClasses = () => {
+    switch (settings.visionFilter) {
+      case 'nightvision':
+        return 'brightness-125 contrast-125 saturate-200 hue-rotate-[90deg]'
+      case 'thermal':
+        return 'invert contrast-150 hue-rotate-[180deg]'
+      case 'deepsea':
+        return 'brightness-90 contrast-125 saturate-200 hue-rotate-[160deg]'
+      case 'standard':
+      default:
+        return ''
+    }
+  }
+
   return (
-    <div className="w-full h-full flex flex-col font-mono">
+    <div className="w-full h-full flex-1 flex flex-col font-mono min-h-0">
       {/* Full-Height Video Viewport Container */}
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setShowControls(false)}
-        className={`relative w-full flex-1 min-h-[calc(100vh-100px)] bg-black border border-[#3a4a49]/60 chamfer-corner overflow-hidden shadow-2xl transition-all duration-300 ${
-          isFullscreen ? 'w-screen h-screen min-h-screen border-0' : ''
+        className={`relative w-full h-full flex-1 bg-black overflow-hidden flex items-center justify-center select-none ${
+          isFullscreen ? 'fixed inset-0 z-50 w-screen h-screen' : ''
         }`}
       >
         {/* Minimal Top-Left Name Overlay */}
@@ -280,6 +294,15 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
             ISOLATION PROTOCOLS
           </span>
         </div>
+
+        {/* HUD Telemetry OSD Overlay */}
+        {settings.showTelemetryOSD && (
+          <div className="absolute top-12 left-4 sm:left-5 z-20 pointer-events-none space-y-1 font-mono text-[10px] text-[#00c3ff]/90 select-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] bg-black/50 p-2 border border-[#00c3ff]/30 backdrop-blur-[2px] chamfer-corner">
+            <div>FREQ: {settings.submergenceFreq.toFixed(1)} kHz // NOISE_SUPPR: {settings.socialNoiseSuppression}%</div>
+            <div>STAGE: {settings.anonymityStage} // EMPATHY_DAMP: {settings.empathyDampening}/10</div>
+            <div>SHIELD: {settings.isForceFieldEngaged ? 'ENGAGED' : 'DORMANT'} // PRIVACY: {settings.isPrivacyShellEngaged ? 'ACTIVE' : 'EXPOSED'}</div>
+          </div>
+        )}
 
         {/* Video Element */}
         <video
@@ -294,8 +317,13 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onClick={togglePlay}
-          className="w-full h-full object-cover cursor-pointer"
+          className={`w-full h-full object-contain cursor-pointer transition-all duration-200 ${getVisionFilterClasses()}`}
         />
+
+        {/* CRT Scanlines Filter Overlay */}
+        {settings.showScanlines && (
+          <div className="absolute inset-0 crt-scanlines pointer-events-none z-10 opacity-70" />
+        )}
 
         {/* Video Player Controls Toolbar */}
         <div
