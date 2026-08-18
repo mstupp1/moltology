@@ -4,7 +4,6 @@ import {
   Rss,
   ExternalLink,
   ShoppingBag,
-  Shield,
   Newspaper,
   Compass,
   Building2,
@@ -172,11 +171,6 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
             >
               Terms of Service
             </Link>
-            <span className="text-gray-700">·</span>
-            <div className="flex items-center gap-1.5 text-cyan-400/90 font-bold text-[11px]">
-              <Shield className="w-3 h-3 text-emerald-400" />
-              <span>CHITIN MATRIX ACTIVE</span>
-            </div>
           </div>
         </div>
       </div>

@@ -48,13 +48,12 @@ describe('MainFooter Component', () => {
     expect(rssLink).toHaveAttribute('href', '/rss.xml')
   })
 
-  it('renders legal links and chitin matrix active status badge', () => {
+  it('renders legal links and copyright', () => {
     render(<MainFooter />)
 
     expect(screen.getByText('© 2026 MOLTOLOGY SYSTEM INC. ALL RIGHTS RESERVED.')).toBeInTheDocument()
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()
-    expect(screen.getByText('CHITIN MATRIX ACTIVE')).toBeInTheDocument()
   })
 
   it('allows customizing brand title, subtext, tagline, and copyright text via props', () => {

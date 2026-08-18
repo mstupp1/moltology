@@ -12,7 +12,6 @@ import {
   Youtube,
   Rss,
   ExternalLink,
-  Shield,
 } from 'lucide-react'
 
 export interface MainFooterProps {
@@ -292,15 +291,6 @@ export const MainFooter: React.FC<MainFooterProps> = ({
             >
               Terms of Service
             </Link>
-            <span className={isCorporate ? 'text-slate-300' : 'text-gray-700'}>·</span>
-            <div
-              className={`flex items-center gap-1.5 font-bold text-[11px] ${
-                isCorporate ? 'text-sky-600' : 'text-cyan-400/90'
-              }`}
-            >
-              <Shield className={`w-3 h-3 ${isCorporate ? 'text-emerald-500' : 'text-emerald-400'}`} />
-              <span>CHITIN MATRIX ACTIVE</span>
-            </div>
           </div>
         </div>
       </div>

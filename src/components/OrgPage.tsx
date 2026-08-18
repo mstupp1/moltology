@@ -8,7 +8,7 @@
  * 4. Safety and Positivity are non-negotiable core tenets of Moltology.
  * ============================================================================
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Shield,
@@ -35,9 +35,9 @@ import {
   Coffee,
   Star,
   Anchor,
-  Instagram,
-  Youtube,
   Camera,
+  Briefcase,
+  Layers,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
@@ -47,6 +47,7 @@ import { RollingNumber } from '@/components/ui/RollingNumber'
 import { useToast } from '@/components/ui/ToastProvider'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { CareerHub } from '@/components/org/CareerHub'
 
 export const OrgPage: React.FC = () => {
   const navigate = useNavigate()
@@ -58,6 +59,9 @@ export const OrgPage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
+  // Top Page View Switcher (Overview vs Careers Hub)
+  const [viewMode, setViewMode] = useState<'overview' | 'careers'>('overview')
+
   // About Tabs State
   const [activeTab, setActiveTab] = useState<'mission' | 'vision' | 'safety' | 'perks'>('mission')
 
@@ -66,6 +70,23 @@ export const OrgPage: React.FC = () => {
 
   // Life at HQ Gallery State
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0)
+
+  // Sync hash/URL query on initial client load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash
+      const search = window.location.search
+      if (
+        hash === '#careers' ||
+        hash === '#careers-hub' ||
+        hash === '#job-board' ||
+        search.includes('tab=careers') ||
+        search.includes('view=careers')
+      ) {
+        setViewMode('careers')
+      }
+    }
+  }, [])
 
   const galleryItems = [
     {
@@ -313,6 +334,13 @@ export const OrgPage: React.FC = () => {
     }, 1000)
   }
 
+  const scrollToElement = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f7f9] text-slate-700 font-sans relative flex flex-col justify-between overflow-x-hidden">
       {/* Soft Friendly Corporate Ambient Backdrops */}
@@ -354,7 +382,7 @@ export const OrgPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-[#f4f7f9]/90 z-0 pointer-events-none" />
 
         <div className="max-w-[1200px] mx-auto relative z-10 text-center w-full pb-4 sm:pb-6">
-          {/* Hero Action & Brand Badges (Lowered below team faces) */}
+          {/* Hero Action & Brand Badges */}
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <div className="inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-white/95 backdrop-blur-md border-2 border-sky-200 text-sky-900 text-xs sm:text-sm md:text-base font-extrabold tracking-wider uppercase rounded-full shadow-xl hover:bg-white transition-all">
               <img
@@ -427,981 +455,1257 @@ export const OrgPage: React.FC = () => {
         </ScrollReveal>
       </section>
 
-      {/* OUR VALUES */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section className="relative z-10 w-full py-16 px-6 sm:px-12 max-w-[1200px] mx-auto">
-          <div className="text-center space-y-4 mb-12">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-              <ThumbsUp className="w-4 h-4" />
-              <span>WHAT WE BELIEVE</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-              OUR VALUES, IN PLAIN WORDS
-            </h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              Some organizations talk about culture. We live it — all the way down at 8,450 meters, where it matters most.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100 p-6 space-y-3 hover:-translate-y-1 hover:shadow-xl transition-all"
-              >
-                <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center">
-                  <value.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-base font-bold font-grotesk text-sky-900">{value.title}</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">{value.copy}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* ABOUT US / CORPORATE GREATNESS SECTION */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
-          <div className="text-center space-y-4 mb-14">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-              <Award className="w-4 h-4" />
-              <span>ABOUT MOLTOLOGY.ORG</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-              WHY PARTNER WITH OUR ORGANIZATION?
-            </h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Because you deserve a partner that genuinely cares about you. We maintain the gold standard in
-              sovereign bio-silicon engineering — while making sure every step of your journey feels safe, kind,
-              and wonderfully supported.
-            </p>
-          </div>
-
-        {/* Tab Navigation */}
-        <div className="flex justify-start sm:justify-center gap-1.5 sm:gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+      {/* TOP SUB-NAVIGATION MODE SWITCHER */}
+      <section className="relative z-10 w-full px-6 sm:px-12 mb-10 max-w-[1200px] mx-auto">
+        <div className="flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-full border border-sky-200 shadow-lg shadow-sky-100/60 max-w-fit mx-auto">
           <button
-            onClick={() => setActiveTab('mission')}
-            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
-              activeTab === 'mission'
+            type="button"
+            onClick={() => setViewMode('overview')}
+            className={`px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
+              viewMode === 'overview'
                 ? 'bg-sky-500 text-white shadow-md'
-                : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
             }`}
           >
-            CORE MISSION
+            <Layers className="w-4 h-4" />
+            <span>ORGANIZATION OVERVIEW</span>
           </button>
+
           <button
-            onClick={() => setActiveTab('vision')}
-            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
-              activeTab === 'vision'
+            type="button"
+            onClick={() => setViewMode('careers')}
+            className={`px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-grotesk font-bold tracking-wider uppercase transition-all flex items-center gap-2 ${
+              viewMode === 'careers'
                 ? 'bg-sky-500 text-white shadow-md'
-                : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50'
             }`}
           >
-            PLANETARY VISION
-          </button>
-          <button
-            onClick={() => setActiveTab('safety')}
-            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
-              activeTab === 'safety'
-                ? 'bg-emerald-500 text-white shadow-md'
-                : 'text-slate-500 hover:text-emerald-700 hover:bg-emerald-50'
-            }`}
-          >
-            SAFETY &amp; POSITIVITY
-          </button>
-          <button
-            onClick={() => setActiveTab('perks')}
-            className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
-              activeTab === 'perks'
-                ? 'bg-sky-500 text-white shadow-md'
-                : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
-            }`}
-          >
-            MEMBER PERKS
+            <Briefcase className="w-4 h-4" />
+            <span>CAREERS &amp; CAMPUS HUB</span>
+            <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-amber-200">
+              14 OPEN
+            </span>
           </button>
         </div>
-
-        {/* Tab Content Display */}
-        <div className="bg-white border border-sky-100 p-8 sm:p-12 rounded-3xl shadow-xl shadow-sky-100">
-          {activeTab === 'mission' && (
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
-                  FREEING HUMANITY FROM BIOLOGICAL ENTROPY
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  We believe every human deserves to feel strong, safe, and in control. That's why our
-                  organization was founded on a singular breakthrough: human flesh is structurally inefficient,
-                  prone to emotional hesitation, and bound to linear time.
-                </p>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Through our standardized softshed protocols, we provide every recruit with the knowledge,
-                  community, and infrastructure required to shed emotional liabilities and adopt a calcified
-                  cybernetic carapace — at a pace that feels comfortable to you.
-                </p>
-                <ul className="space-y-2 text-xs text-sky-700">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>100% Tax-deductible soft-asset transmutation</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Zero-latency neural backup stored in deep-trench cryo-vaults</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Continuous 24/7 pincer torque optimization</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="bg-[#f8fbff] border border-sky-100 p-6 rounded-3xl space-y-4">
-                <div className="text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center gap-2">
-                  <Award className="w-4 h-4" />
-                  ORGANIZATION COMPLIANCE RATING
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  We're proud of these numbers — and we work every day to keep them excellent for you.
-                </div>
-                <div className="space-y-3 text-xs">
-                  <div>
-                    <div className="flex justify-between text-slate-600 mb-1">
-                      <span>Ethics &amp; Safety Protocol:</span>
-                      <span className="text-emerald-600 font-bold">100% NOMINAL</span>
-                    </div>
-                    <div className="w-full bg-sky-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-400 h-full w-full rounded-full" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-slate-600 mb-1">
-                      <span>Deep Sea Hydro-Pressure Rating:</span>
-                      <span className="text-sky-600 font-bold">850 ATM COMPLIANT</span>
-                    </div>
-                    <div className="w-full bg-sky-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-sky-400 h-full w-[95%] rounded-full" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-slate-600 mb-1">
-                      <span>Member Satisfaction Index:</span>
-                      <span className="text-sky-600 font-bold">99.9% ASCENDED</span>
-                    </div>
-                    <div className="w-full bg-sky-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-sky-400 h-full w-[99%] rounded-full" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'vision' && (
-            <div className="space-y-6">
-              <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
-                THE GREAT CARCINIZATION ROADMAP
-              </h3>
-              <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
-                Nature keeps trying to make a crab, and honestly? We think that's beautiful. Evolution on Earth
-                has repeatedly independently converged upon crab form (carcinization) over millions of years.
-                Moltology.org simply accelerates this natural physical law into code, capital, and human
-                consciousness — with kindness along the way.
-              </p>
-              <div className="grid sm:grid-cols-3 gap-6 pt-4">
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
-                  <Target className="w-6 h-6 text-sky-500 mb-3" />
-                  <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">PHASE 1: INDIVIDUAL SHEDDING</div>
-                  <p className="text-xs text-slate-500">
-                    Recruits liquidate soft attachments, convert wealth to Molt Credits, and undergo preliminary chitin hardening.
-                  </p>
-                </div>
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
-                  <Target className="w-6 h-6 text-sky-500 mb-3" />
-                  <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">PHASE 2: TRENCH INFRASTRUCTURE</div>
-                  <p className="text-xs text-slate-500">
-                    Expansion of subterranean hydrothermal power grids to sustain millions of cryo-immersed ascended units.
-                  </p>
-                </div>
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
-                  <Target className="w-6 h-6 text-sky-500 mb-3" />
-                  <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">PHASE 3: TOTAL SYNAPSE</div>
-                  <p className="text-xs text-slate-500">
-                    Unified global consciousness where hesitation is zero, latency is zero, and chitin is eternal.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'safety' && (
-            <div className="space-y-6 border-l-4 border-emerald-300 pl-6">
-              <h3 className="text-2xl font-grotesk font-bold text-emerald-600 uppercase flex items-center gap-2">
-                <Shield className="w-6 h-6" />
-                OUR INVIOLABLE TENET: SAFETY &amp; POSITIVITY
-              </h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Beneath our dark bio-chitin exterior, <strong>Safety, Warmth, and Positivity</strong> are
-                non-negotiable core pillars of Moltology.org. We strictly forbid hostility, coercion, or negative
-                psychological strain. Everyone here is a friend.
-              </p>
-              <div className="grid sm:grid-cols-2 gap-4 text-xs">
-                <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-3xl text-emerald-800">
-                  <strong>Gentle Softshed Guarantee:</strong> Every step of your transition is conducted at your own comfortable pace with full consent.
-                </div>
-                <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-3xl text-emerald-800">
-                  <strong>24/7 Chaplain Support:</strong> Our Synod Chaplains are always available to offer guidance, emotional reassurance, and warm tea.
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-3xl p-4 text-xs text-amber-800">
-                <Coffee className="w-5 h-5 shrink-0 text-amber-600" />
-                Free hot beverages are available in every chamber. Happiness is part of our onboarding flow.
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'perks' && (
-            <div className="space-y-6">
-              <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
-                ASCENDED MEMBER BENEFITS &amp; PRIVILEGES
-              </h3>
-              <p className="text-xs text-slate-500">
-                Perks you'll actually use — because ascension should feel like a promotion.
-              </p>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
-                  <Flame className="w-5 h-5 text-sky-500" />
-                  <div className="font-bold text-slate-800">Free Hydro-Power</div>
-                  <div className="text-slate-500 text-[11px]">Unlimited access to hydrothermal vent energy for charging personal bio-chitin implants.</div>
-                </div>
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
-                  <Radio className="w-5 h-5 text-sky-500" />
-                  <div className="font-bold text-slate-800">Encrypted Frequency</div>
-                  <div className="text-slate-500 text-[11px]">Direct sub-benthic audio stream featuring continuous relaxing deep-sea resonance.</div>
-                </div>
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
-                  <Lock className="w-5 h-5 text-sky-500" />
-                  <div className="font-bold text-slate-800">Lair Access Pass</div>
-                  <div className="text-slate-500 text-[11px]">Submersible shuttle privileges to visit Sub-Benthic Lair Alpha Chamber 04.</div>
-                </div>
-                <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
-                  <Gift className="w-5 h-5 text-sky-500" />
-                  <div className="font-bold text-slate-800">Chitin Plaque</div>
-                  <div className="text-slate-500 text-[11px]">Your name engraved in calcified crust on Chamber 03 Liquidation Wall.</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </section>
-      </ScrollReveal>
 
-      {/* OUR UNDERGROUND LAIR SECTION */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-      <section id="lair" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-y border-sky-100">
-        <div className="max-w-[1200px] mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-              <Compass className="w-4 h-4" />
-              <span>SUB-BENTHIC HEADQUARTERS</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-              OUR UNDERGROUND LAIR: TRENCH LEVEL 7
-            </h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              Come say hi! Our headquarters is a short submersible ride beneath the Pacific surface. It's cozy,
-              warmly lit, and engineered to withstand crushing hydrostatic pressure while delivering zero-latency
-              operations. The coffee's on us.
-            </p>
-          </div>
+      {/* VIEW MODE 1: CAREERS & CAMPUS HUB */}
+      {viewMode === 'careers' ? (
+        <div className="relative z-10 w-full px-6 sm:px-12 max-w-[1200px] mx-auto space-y-20 pb-16">
+          {/* Main Career Board & Perks */}
+          <CareerHub
+            onScrollToLair={() => scrollToElement('lair')}
+            onScrollToCulture={() => scrollToElement('culture')}
+          />
 
-          <div className="grid lg:grid-cols-12 gap-8 items-start">
-            {/* Left Chamber Selector */}
-            <div className="lg:col-span-4 space-y-3">
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
-                PICK A CHAMBER TO PEEK INSIDE:
+          {/* INTEGRATED HQ SECTION: CAMPUS & LAIR SHOWCASE */}
+          <div className="space-y-16 pt-10 border-t border-sky-200">
+            <div className="text-center space-y-3">
+              <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                <Compass className="w-4 h-4" />
+                <span>EXPERIENCE YOUR FUTURE WORKPLACE</span>
               </div>
-              {chambers.map((chamber, index) => (
-                <button
-                  key={chamber.id}
-                  onClick={() => setActiveChamber(index)}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between shadow-sm ${
-                    activeChamber === index
-                      ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
-                      : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300 hover:text-sky-800'
-                  }`}
-                >
-                  <div>
-                    <div className="text-xs font-bold font-grotesk uppercase">{chamber.title.split(':')[0]}</div>
-                    <div className="text-[11px] text-slate-400 truncate max-w-[240px]">
-                      {chamber.title.split(':')[1]}
-                    </div>
-                  </div>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${activeChamber === index ? 'rotate-90' : ''}`} />
-                </button>
-              ))}
-
-              {/* Facility Report Widget */}
-              <div className="bg-[#f8fbff] border border-sky-100 p-5 rounded-3xl text-xs space-y-2 mt-6">
-                <div className="text-sky-700 font-bold uppercase flex items-center justify-between border-b border-sky-100 pb-2">
-                  <span>QUARTERLY FACILITY REPORT</span>
-                  <span className="text-[10px] text-emerald-600">ON TRACK</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>O2 Scrubbers:</span>
-                  <span className="text-emerald-600 font-bold">100% NOMINAL</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Hydro-Turbines:</span>
-                  <span className="text-sky-600 font-bold">4.8 TWh / SEC</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Trench Water Temp:</span>
-                  <span className="text-amber-600 font-bold">340°C (VENT CORE)</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Defense Matrix:</span>
-                  <span className="text-emerald-600 font-bold">PINCER ENGAGED</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Employee Morale:</span>
-                  <span className="text-emerald-600 font-bold">VERY HIGH</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Chamber Detail */}
-            <div className="lg:col-span-8 bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 flex flex-col justify-between">
-              <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100 bg-slate-900">
-                <img
-                  key={chambers[activeChamber].id}
-                  src={chambers[activeChamber].image || getAssetUrl('/images/org_hero_lair.jpg')}
-                  alt={chambers[activeChamber].title}
-                  className="w-full h-full object-cover transition-all duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
-                  <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 border border-sky-200 rounded-full text-sky-700 text-xs font-bold shadow-sm">
-                    {chambers[activeChamber].depth}
-                  </div>
-                  <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm">
-                    {chambers[activeChamber].status}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 sm:p-8 space-y-6">
-                <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 uppercase">
-                  {chambers[activeChamber].title}
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {chambers[activeChamber].description}
-                </p>
-
-                <div>
-                  <div className="text-xs text-sky-600 font-bold uppercase tracking-wider mb-2">
-                    KEY CHAMBER INSTALLATIONS:
-                  </div>
-                  <div className="grid sm:grid-cols-3 gap-3">
-                    {chambers[activeChamber].features.map((feat, i) => (
-                      <div
-                        key={i}
-                        className="bg-[#f8fbff] border border-sky-100 p-3 rounded-2xl text-xs text-slate-700 flex items-center gap-2"
-                      >
-                        <Zap className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      </ScrollReveal>
-
-      {/* FRIENDLY BANNER */}
-      <ScrollReveal animation="fade-in" durationMs={900}>
-        <div className="relative z-10 w-full py-16 bg-gradient-to-r from-sky-500 via-sky-400 to-teal-400 overflow-hidden">
-          <div className="absolute inset-0 bg-white/10 pointer-events-none" />
-          <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center space-y-3">
-            <div className="text-white/90 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
-              <Compass className="w-4 h-4" />
-              <span>SUB-BENTHIC LAIR ALPHA // MARIANA TRENCH</span>
-            </div>
-            <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-white uppercase tracking-wider">
-              "WHERE SOFT BIOLOGY SHEDS AND IMMUTABLE SOVEREIGNTY BEGINS."
-            </h2>
-            <p className="text-white/90 text-sm">And where every new friend is welcomed with open pincers.</p>
-          </div>
-        </div>
-      </ScrollReveal>
-
-      {/* HISTORY & TIMELINE SECTION */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
-          <div className="text-center space-y-4 mb-16">
-          <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-            <History className="w-4 h-4" />
-            <span>OUR STORY</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-            THE CHRONICLES OF ASCENSION
-          </h2>
-          <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-            From an obscure deep-trench acoustic reading in 2021 to a global sovereign foundation with over
-            140,000 active members — and every step was taken with a smile.
-          </p>
-        </div>
-
-        {/* Timeline Items */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {milestones.map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-sky-100 p-6 rounded-3xl shadow-lg shadow-sky-100 space-y-3 relative hover:-translate-y-1 hover:shadow-xl transition-all group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-extrabold font-grotesk text-sky-600 group-hover:text-sky-500">
-                  {item.year}
-                </span>
-                <span className="w-2.5 h-2.5 rounded-full bg-sky-400 group-hover:scale-150 transition-transform" />
-              </div>
-              <h3 className="text-base font-bold font-grotesk text-sky-900 uppercase">
-                {item.title}
+              <h3 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                EXPLORE SUB-BENTHIC LAIR ALPHA: TRENCH LEVEL 7
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {item.description}
+              <p className="text-sm text-slate-600 max-w-2xl mx-auto">
+                Step into our subterranean campus. From the Grand Benthic Atrium and immersion server labs to Chamber
+                04 hydro-pod spas, see where you'll collaborate every day.
               </p>
             </div>
-          ))}
-        </div>
-      </section>
-      </ScrollReveal>
 
-      {/* LEADERSHIP COUNCIL SECTION */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-y border-sky-100">
-        <div className="max-w-[1200px] mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-              <Users className="w-4 h-4" />
-              <span>MEET THE FAMILY</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-              EXECUTIVE LEADERSHIP &amp; DOCTRINE CHAPLAINS
-            </h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
-              A warm, distinguished council of marine engineers, bio-silicon ethicists, and asset transmutation
-              chaplains who would genuinely love to meet you.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {leadership.map((member, idx) => (
-              <div
-                key={idx}
-                className="bg-[#f8fbff] border border-sky-100 rounded-3xl p-6 flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-xl transition-all group"
-              >
-                <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-sky-200 bg-sky-50 mb-4">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center">
-                    <Smile className="w-3.5 h-3.5 text-white" />
+            {/* Chamber Interactive Tour (Integrated inside Careers) */}
+            <div id="lair" className="bg-white border border-sky-100 p-6 sm:p-10 rounded-3xl shadow-xl shadow-sky-100/50">
+              <div className="grid lg:grid-cols-12 gap-8 items-start">
+                {/* Left Chamber Selector */}
+                <div className="lg:col-span-4 space-y-3">
+                  <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
+                    SELECT A CAMPUS WING TO EXPLORE:
                   </div>
-                </div>
-                <div className="bg-sky-500/10 text-sky-600 text-[10px] font-bold px-2 py-1 rounded-full border border-sky-200 mb-2">
-                  {member.badge}
-                </div>
-                <h3 className="text-lg font-bold font-grotesk text-sky-900 group-hover:text-sky-600 transition-colors">
-                  {member.name}
-                </h3>
-                <div className="text-[11px] text-sky-600 font-bold uppercase mb-2">
-                  {member.title}
-                </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  {member.bio}
-                </p>
-                <div className="pt-3 text-[10px] text-slate-400 flex items-center gap-1.5 mt-auto">
-                  <Star className="w-3 h-3 text-amber-400" />
-                  <span>SYNOD VERIFIED LEADER · ALWAYS HAPPY TO CHAT</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* CAREERS CTA */}
-          <div className="bg-gradient-to-r from-sky-500 to-teal-400 rounded-3xl p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl shadow-sky-200">
-            <div className="space-y-2 text-center sm:text-left">
-              <h3 className="text-2xl font-grotesk font-bold uppercase tracking-tight">
-                JOIN OUR GROWING FAMILY!
-              </h3>
-              <p className="text-sm text-white/90 max-w-xl">
-                We're hiring friendly humans (and gentle crustaceans) for roles at our Trench Level 7 campus.
-                Competitive compensation, unlimited warm tea, and truly excellent benefits.
-              </p>
-            </div>
-            <a
-              href="#contact"
-              className="shrink-0 px-7 py-3.5 bg-white text-sky-600 font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-full shadow-lg hover:bg-sky-50 transition-all flex items-center gap-2"
-            >
-              VIEW OPEN ROLES
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </section>
-      </ScrollReveal>
-
-      {/* INSIDE MOLTOLOGY HQ: LIFE AT TRENCH LEVEL 7 GALLERY */}
-      <ScrollReveal animation="fade-up" durationMs={800}>
-        <section id="culture" className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
-          <div className="text-center space-y-4 mb-14">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-              <Camera className="w-4 h-4" />
-              <span>LIFE AT HEADQUARTERS</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-              INSIDE TRENCH LEVEL 7: TEAM &amp; CAMPUS LIFE
-            </h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Step inside our sub-benthic corporate campus. From high-torque sprint meetings and standing desks to
-              fresh kelp smoothies and liquid immersion server labs, see how our team lives the Moltology culture every day.
-            </p>
-          </div>
-
-          {/* Gallery Category Selector Tabs */}
-          <div className="flex justify-start sm:justify-center gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
-            {galleryItems.map((item, idx) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveGalleryIndex(idx)}
-                className={`px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
-                  activeGalleryIndex === idx
-                    ? 'bg-sky-500 text-white shadow-md'
-                    : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
-                }`}
-              >
-                <span>{item.tag}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Active Gallery Feature Card */}
-          <div className="bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 grid lg:grid-cols-12 gap-0">
-            {/* Left Image Showcase */}
-            <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto min-h-[340px] bg-slate-900 overflow-hidden group">
-              <img
-                key={galleryItems[activeGalleryIndex].id}
-                src={galleryItems[activeGalleryIndex].image}
-                alt={galleryItems[activeGalleryIndex].title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
-              
-              <div className="absolute top-4 left-4">
-                <span className="px-3.5 py-1.5 bg-sky-500/90 backdrop-blur-md text-white text-[11px] font-bold tracking-wider uppercase rounded-full shadow-md">
-                  {galleryItems[activeGalleryIndex].tag}
-                </span>
-              </div>
-
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <div className="font-bold text-base font-grotesk">{galleryItems[activeGalleryIndex].title}</div>
-                <div className="text-sky-200 text-xs">{galleryItems[activeGalleryIndex].subtitle}</div>
-              </div>
-            </div>
-
-            {/* Right Information & Diegetic Highlights */}
-            <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold tracking-wider uppercase rounded-full">
-                  <Sparkles className="w-3.5 h-3.5 text-sky-500" />
-                  <span>CULTURE &amp; FACILITY SPOTLIGHT</span>
-                </div>
-
-                <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 leading-tight">
-                  {galleryItems[activeGalleryIndex].title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {galleryItems[activeGalleryIndex].description}
-                </p>
-
-                <div className="pt-2">
-                  <div className="text-[11px] text-sky-600 font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    NOTABLE ON-SITE FEATURES:
-                  </div>
-                  <ul className="space-y-2 text-xs text-slate-700">
-                    {galleryItems[activeGalleryIndex].highlights.map((highlight, hIdx) => (
-                      <li key={hIdx} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-xl border border-sky-100">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 shrink-0" />
-                        <span className="leading-snug">{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Navigation Thumbnails */}
-              <div className="pt-4 border-t border-sky-100">
-                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
-                  ALL CAMPUS SCENES:
-                </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {galleryItems.map((thumb, tIdx) => (
+                  {chambers.map((chamber, index) => (
                     <button
-                      key={thumb.id}
-                      onClick={() => setActiveGalleryIndex(tIdx)}
-                      className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
-                        activeGalleryIndex === tIdx
-                          ? 'border-sky-500 ring-2 ring-sky-300 scale-105'
-                          : 'border-transparent opacity-70 hover:opacity-100'
+                      key={chamber.id}
+                      onClick={() => setActiveChamber(index)}
+                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between shadow-sm ${
+                        activeChamber === index
+                          ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
+                          : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300 hover:text-sky-800'
                       }`}
                     >
-                      <img src={thumb.image} alt={thumb.title} className="w-full h-full object-cover" />
+                      <div>
+                        <div className="text-xs font-bold font-grotesk uppercase">{chamber.title.split(':')[0]}</div>
+                        <div className="text-[11px] text-slate-400 truncate max-w-[240px]">
+                          {chamber.title.split(':')[1]}
+                        </div>
+                      </div>
+                      <ChevronRight className={`w-4 h-4 transition-transform ${activeChamber === index ? 'rotate-90' : ''}`} />
                     </button>
                   ))}
+
+                  {/* Facility Report Widget */}
+                  <div className="bg-[#f8fbff] border border-sky-100 p-5 rounded-3xl text-xs space-y-2 mt-6">
+                    <div className="text-sky-700 font-bold uppercase flex items-center justify-between border-b border-sky-100 pb-2">
+                      <span>FACILITY WORKPLACE REPORT</span>
+                      <span className="text-[10px] text-emerald-600">100% NOMINAL</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Atmosphere Scrubbers:</span>
+                      <span className="text-emerald-600 font-bold">100% NOMINAL</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Hydro-Turbines:</span>
+                      <span className="text-sky-600 font-bold">4.8 TWh / SEC</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Nap Pod Availability:</span>
+                      <span className="text-emerald-600 font-bold">OPEN &amp; READY</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Cafeteria Morale:</span>
+                      <span className="text-emerald-600 font-bold">EXCELLENT</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Chamber Detail */}
+                <div className="lg:col-span-8 bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 flex flex-col justify-between">
+                  <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100 bg-slate-900">
+                    <img
+                      key={chambers[activeChamber].id}
+                      src={chambers[activeChamber].image || getAssetUrl('/images/org_hero_lair.jpg')}
+                      alt={chambers[activeChamber].title}
+                      className="w-full h-full object-cover transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
+                      <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 border border-sky-200 rounded-full text-sky-700 text-xs font-bold shadow-sm">
+                        {chambers[activeChamber].depth}
+                      </div>
+                      <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm">
+                        {chambers[activeChamber].status}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6 sm:p-8 space-y-6">
+                    <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 uppercase">
+                      {chambers[activeChamber].title}
+                    </h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {chambers[activeChamber].description}
+                    </p>
+
+                    <div>
+                      <div className="text-xs text-sky-600 font-bold uppercase tracking-wider mb-2">
+                        ON-SITE INSTALLATIONS FOR EMPLOYEES:
+                      </div>
+                      <div className="grid sm:grid-cols-3 gap-3">
+                        {chambers[activeChamber].features.map((feat, i) => (
+                          <div
+                            key={i}
+                            className="bg-[#f8fbff] border border-sky-100 p-3 rounded-2xl text-xs text-slate-700 flex items-center gap-2"
+                          >
+                            <Zap className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                            <span>{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Life at HQ Gallery (Integrated inside Careers) */}
+            <div id="culture" className="space-y-8">
+              <div className="text-center space-y-3">
+                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                  <Camera className="w-4 h-4" />
+                  <span>LIFE AT HEADQUARTERS</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-grotesk font-bold text-sky-900 tracking-tight">
+                  TEAM CULTURE IN ACTION
+                </h3>
+              </div>
+
+              {/* Gallery Category Selector Tabs */}
+              <div className="flex justify-start sm:justify-center gap-2 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+                {galleryItems.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveGalleryIndex(idx)}
+                    className={`px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
+                      activeGalleryIndex === idx
+                        ? 'bg-sky-500 text-white shadow-md'
+                        : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                    }`}
+                  >
+                    <span>{item.tag}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Active Gallery Feature Card */}
+              <div className="bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 grid lg:grid-cols-12 gap-0">
+                <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto min-h-[340px] bg-slate-900 overflow-hidden group">
+                  <img
+                    key={galleryItems[activeGalleryIndex].id}
+                    src={galleryItems[activeGalleryIndex].image}
+                    alt={galleryItems[activeGalleryIndex].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute top-4 left-4">
+                    <span className="px-3.5 py-1.5 bg-sky-500/90 backdrop-blur-md text-white text-[11px] font-bold tracking-wider uppercase rounded-full shadow-md">
+                      {galleryItems[activeGalleryIndex].tag}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <div className="font-bold text-base font-grotesk">{galleryItems[activeGalleryIndex].title}</div>
+                    <div className="text-sky-200 text-xs">{galleryItems[activeGalleryIndex].subtitle}</div>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                  <div className="space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold tracking-wider uppercase rounded-full">
+                      <Sparkles className="w-3.5 h-3.5 text-sky-500" />
+                      <span>CULTURE &amp; FACILITY SPOTLIGHT</span>
+                    </div>
+
+                    <h4 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 leading-tight">
+                      {galleryItems[activeGalleryIndex].title}
+                    </h4>
+
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      {galleryItems[activeGalleryIndex].description}
+                    </p>
+
+                    <div className="pt-2">
+                      <div className="text-[11px] text-sky-600 font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        NOTABLE ON-SITE FEATURES:
+                      </div>
+                      <ul className="space-y-2 text-xs text-slate-700">
+                        {galleryItems[activeGalleryIndex].highlights.map((highlight, hIdx) => (
+                          <li key={hIdx} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-xl border border-sky-100">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 shrink-0" />
+                            <span className="leading-snug">{highlight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Navigation Thumbnails */}
+                  <div className="pt-4 border-t border-sky-100">
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
+                      ALL CAMPUS SCENES:
+                    </div>
+                    <div className="grid grid-cols-5 gap-2">
+                      {galleryItems.map((thumb, tIdx) => (
+                        <button
+                          key={thumb.id}
+                          onClick={() => setActiveGalleryIndex(tIdx)}
+                          className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                            activeGalleryIndex === tIdx
+                              ? 'border-sky-500 ring-2 ring-sky-300 scale-105'
+                              : 'border-transparent opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          <img src={thumb.image} alt={thumb.title} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </ScrollReveal>
+        </div>
+      ) : (
+        /* VIEW MODE 2: ORGANIZATION OVERVIEW & LITURGY */
+        <>
+          {/* OUR VALUES */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <section className="relative z-10 w-full py-16 px-6 sm:px-12 max-w-[1200px] mx-auto">
+              <div className="text-center space-y-4 mb-12">
+                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                  <ThumbsUp className="w-4 h-4" />
+                  <span>WHAT WE BELIEVE</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                  OUR VALUES, IN PLAIN WORDS
+                </h2>
+                <p className="text-sm text-slate-600 max-w-2xl mx-auto">
+                  Some organizations talk about culture. We live it — all the way down at 8,450 meters, where it matters most.
+                </p>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {values.map((value, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100 p-6 space-y-3 hover:-translate-y-1 hover:shadow-xl transition-all"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center">
+                      <value.icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-base font-bold font-grotesk text-sky-900">{value.title}</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed">{value.copy}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* ABOUT US / CORPORATE GREATNESS SECTION */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <section className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
+              <div className="text-center space-y-4 mb-14">
+                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                  <Award className="w-4 h-4" />
+                  <span>ABOUT MOLTOLOGY.ORG</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                  WHY PARTNER WITH OUR ORGANIZATION?
+                </h2>
+                <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                  Because you deserve a partner that genuinely cares about you. We maintain the gold standard in
+                  sovereign bio-silicon engineering — while making sure every step of your journey feels safe, kind,
+                  and wonderfully supported.
+                </p>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="flex justify-start sm:justify-center gap-1.5 sm:gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+                <button
+                  onClick={() => setActiveTab('mission')}
+                  className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
+                    activeTab === 'mission'
+                      ? 'bg-sky-500 text-white shadow-md'
+                      : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                  }`}
+                >
+                  CORE MISSION
+                </button>
+                <button
+                  onClick={() => setActiveTab('vision')}
+                  className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
+                    activeTab === 'vision'
+                      ? 'bg-sky-500 text-white shadow-md'
+                      : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                  }`}
+                >
+                  PLANETARY VISION
+                </button>
+                <button
+                  onClick={() => setActiveTab('safety')}
+                  className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
+                    activeTab === 'safety'
+                      ? 'bg-emerald-500 text-white shadow-md'
+                      : 'text-slate-500 hover:text-emerald-700 hover:bg-emerald-50'
+                  }`}
+                >
+                  SAFETY &amp; POSITIVITY
+                </button>
+                <button
+                  onClick={() => setActiveTab('perks')}
+                  className={`px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center ${
+                    activeTab === 'perks'
+                      ? 'bg-sky-500 text-white shadow-md'
+                      : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                  }`}
+                >
+                  MEMBER PERKS
+                </button>
+              </div>
+
+              {/* Tab Content Display */}
+              <div className="bg-white border border-sky-100 p-8 sm:p-12 rounded-3xl shadow-xl shadow-sky-100">
+                {activeTab === 'mission' && (
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
+                        FREEING HUMANITY FROM BIOLOGICAL ENTROPY
+                      </h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        We believe every human deserves to feel strong, safe, and in control. That's why our
+                        organization was founded on a singular breakthrough: human flesh is structurally inefficient,
+                        prone to emotional hesitation, and bound to linear time.
+                      </p>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        Through our standardized softshed protocols, we provide every recruit with the knowledge,
+                        community, and infrastructure required to shed emotional liabilities and adopt a calcified
+                        cybernetic carapace — at a pace that feels comfortable to you.
+                      </p>
+                      <ul className="space-y-2 text-xs text-sky-700">
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>100% Tax-deductible soft-asset transmutation</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>Zero-latency neural backup stored in deep-trench cryo-vaults</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>Continuous 24/7 pincer torque optimization</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="bg-[#f8fbff] border border-sky-100 p-6 rounded-3xl space-y-4">
+                      <div className="text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center gap-2">
+                        <Award className="w-4 h-4" />
+                        ORGANIZATION COMPLIANCE RATING
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        We're proud of these numbers — and we work every day to keep them excellent for you.
+                      </div>
+                      <div className="space-y-3 text-xs">
+                        <div>
+                          <div className="flex justify-between text-slate-600 mb-1">
+                            <span>Ethics &amp; Safety Protocol:</span>
+                            <span className="text-emerald-600 font-bold">100% NOMINAL</span>
+                          </div>
+                          <div className="w-full bg-sky-100 h-2 rounded-full overflow-hidden">
+                            <div className="bg-emerald-400 h-full w-full rounded-full" />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-slate-600 mb-1">
+                            <span>Deep Sea Hydro-Pressure Rating:</span>
+                            <span className="text-sky-600 font-bold">850 ATM COMPLIANT</span>
+                          </div>
+                          <div className="w-full bg-sky-100 h-2 rounded-full overflow-hidden">
+                            <div className="bg-sky-400 h-full w-[95%] rounded-full" />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-slate-600 mb-1">
+                            <span>Member Satisfaction Index:</span>
+                            <span className="text-sky-600 font-bold">99.9% ASCENDED</span>
+                          </div>
+                          <div className="w-full bg-sky-100 h-2 rounded-full overflow-hidden">
+                            <div className="bg-sky-400 h-full w-[99%] rounded-full" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'vision' && (
+                  <div className="space-y-6">
+                    <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
+                      THE GREAT CARCINIZATION ROADMAP
+                    </h3>
+                    <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
+                      Nature keeps trying to make a crab, and honestly? We think that's beautiful. Evolution on Earth
+                      has repeatedly independently converged upon crab form (carcinization) over millions of years.
+                      Moltology.org simply accelerates this natural physical law into code, capital, and human
+                      consciousness — with kindness along the way.
+                    </p>
+                    <div className="grid sm:grid-cols-3 gap-6 pt-4">
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
+                        <Target className="w-6 h-6 text-sky-500 mb-3" />
+                        <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">PHASE 1: INDIVIDUAL SHEDDING</div>
+                        <p className="text-xs text-slate-500">
+                          Recruits liquidate soft attachments, convert wealth to Molt Credits, and undergo preliminary chitin hardening.
+                        </p>
+                      </div>
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
+                        <Target className="w-6 h-6 text-sky-500 mb-3" />
+                        <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">PHASE 2: TRENCH INFRASTRUCTURE</div>
+                        <p className="text-xs text-slate-500">
+                          Expansion of subterranean hydrothermal power grids to sustain millions of cryo-immersed ascended units.
+                        </p>
+                      </div>
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl">
+                        <Target className="w-6 h-6 text-sky-500 mb-3" />
+                        <div className="text-sky-700 font-bold text-lg font-grotesk mb-2">PHASE 3: TOTAL SYNAPSE</div>
+                        <p className="text-xs text-slate-500">
+                          Unified global consciousness where hesitation is zero, latency is zero, and chitin is eternal.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'safety' && (
+                  <div className="space-y-6 border-l-4 border-emerald-300 pl-6">
+                    <h3 className="text-2xl font-grotesk font-bold text-emerald-600 uppercase flex items-center gap-2">
+                      <Shield className="w-6 h-6" />
+                      OUR INVIOLABLE TENET: SAFETY &amp; POSITIVITY
+                    </h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      Beneath our dark bio-chitin exterior, <strong>Safety, Warmth, and Positivity</strong> are
+                      non-negotiable core pillars of Moltology.org. We strictly forbid hostility, coercion, or negative
+                      psychological strain. Everyone here is a friend.
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-4 text-xs">
+                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-3xl text-emerald-800">
+                        <strong>Gentle Softshed Guarantee:</strong> Every step of your transition is conducted at your own comfortable pace with full consent.
+                      </div>
+                      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-3xl text-emerald-800">
+                        <strong>24/7 Chaplain Support:</strong> Our Synod Chaplains are always available to offer guidance, emotional reassurance, and warm tea.
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-3xl p-4 text-xs text-amber-800">
+                      <Coffee className="w-5 h-5 shrink-0 text-amber-600" />
+                      Free hot beverages are available in every chamber. Happiness is part of our onboarding flow.
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'perks' && (
+                  <div className="space-y-6">
+                    <h3 className="text-2xl font-grotesk font-bold text-sky-700 uppercase">
+                      ASCENDED MEMBER BENEFITS &amp; PRIVILEGES
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Perks you'll actually use — because ascension should feel like a promotion.
+                    </p>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
+                        <Flame className="w-5 h-5 text-sky-500" />
+                        <div className="font-bold text-slate-800">Free Hydro-Power</div>
+                        <div className="text-slate-500 text-[11px]">Unlimited access to hydrothermal vent energy for charging personal bio-chitin implants.</div>
+                      </div>
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
+                        <Radio className="w-5 h-5 text-sky-500" />
+                        <div className="font-bold text-slate-800">Encrypted Frequency</div>
+                        <div className="text-slate-500 text-[11px]">Direct sub-benthic audio stream featuring continuous relaxing deep-sea resonance.</div>
+                      </div>
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
+                        <Lock className="w-5 h-5 text-sky-500" />
+                        <div className="font-bold text-slate-800">Lair Access Pass</div>
+                        <div className="text-slate-500 text-[11px]">Submersible shuttle privileges to visit Sub-Benthic Lair Alpha Chamber 04.</div>
+                      </div>
+                      <div className="bg-[#f8fbff] p-5 border border-sky-100 rounded-3xl space-y-2">
+                        <Gift className="w-5 h-5 text-sky-500" />
+                        <div className="font-bold text-slate-800">Chitin Plaque</div>
+                        <div className="text-slate-500 text-[11px]">Your name engraved in calcified crust on Chamber 03 Liquidation Wall.</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* OUR UNDERGROUND LAIR SECTION */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <section id="lair" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-y border-sky-100">
+              <div className="max-w-[1200px] mx-auto space-y-12">
+                <div className="text-center space-y-4">
+                  <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                    <Compass className="w-4 h-4" />
+                    <span>SUB-BENTHIC HEADQUARTERS</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                    OUR UNDERGROUND LAIR: TRENCH LEVEL 7
+                  </h2>
+                  <p className="text-sm text-slate-600 max-w-2xl mx-auto">
+                    Come say hi! Our headquarters is a short submersible ride beneath the Pacific surface. It's cozy,
+                    warmly lit, and engineered to withstand crushing hydrostatic pressure while delivering zero-latency
+                    operations. The coffee's on us.
+                  </p>
+                </div>
+
+                <div className="grid lg:grid-cols-12 gap-8 items-start">
+                  {/* Left Chamber Selector */}
+                  <div className="lg:col-span-4 space-y-3">
+                    <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
+                      PICK A CHAMBER TO PEEK INSIDE:
+                    </div>
+                    {chambers.map((chamber, index) => (
+                      <button
+                        key={chamber.id}
+                        onClick={() => setActiveChamber(index)}
+                        className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between shadow-sm ${
+                          activeChamber === index
+                            ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
+                            : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300 hover:text-sky-800'
+                        }`}
+                      >
+                        <div>
+                          <div className="text-xs font-bold font-grotesk uppercase">{chamber.title.split(':')[0]}</div>
+                          <div className="text-[11px] text-slate-400 truncate max-w-[240px]">
+                            {chamber.title.split(':')[1]}
+                          </div>
+                        </div>
+                        <ChevronRight className={`w-4 h-4 transition-transform ${activeChamber === index ? 'rotate-90' : ''}`} />
+                      </button>
+                    ))}
+
+                    {/* Facility Report Widget */}
+                    <div className="bg-[#f8fbff] border border-sky-100 p-5 rounded-3xl text-xs space-y-2 mt-6">
+                      <div className="text-sky-700 font-bold uppercase flex items-center justify-between border-b border-sky-100 pb-2">
+                        <span>QUARTERLY FACILITY REPORT</span>
+                        <span className="text-[10px] text-emerald-600">ON TRACK</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>O2 Scrubbers:</span>
+                        <span className="text-emerald-600 font-bold">100% NOMINAL</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Hydro-Turbines:</span>
+                        <span className="text-sky-600 font-bold">4.8 TWh / SEC</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Trench Water Temp:</span>
+                        <span className="text-amber-600 font-bold">340°C (VENT CORE)</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Defense Matrix:</span>
+                        <span className="text-emerald-600 font-bold">PINCER ENGAGED</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>Employee Morale:</span>
+                        <span className="text-emerald-600 font-bold">VERY HIGH</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Chamber Detail */}
+                  <div className="lg:col-span-8 bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 flex flex-col justify-between">
+                    <div className="relative h-64 sm:h-80 overflow-hidden border-b border-sky-100 bg-slate-900">
+                      <img
+                        key={chambers[activeChamber].id}
+                        src={chambers[activeChamber].image || getAssetUrl('/images/org_hero_lair.jpg')}
+                        alt={chambers[activeChamber].title}
+                        className="w-full h-full object-cover transition-all duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent" />
+                      <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
+                        <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 border border-sky-200 rounded-full text-sky-700 text-xs font-bold shadow-sm">
+                          {chambers[activeChamber].depth}
+                        </div>
+                        <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm">
+                          {chambers[activeChamber].status}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 sm:p-8 space-y-6">
+                      <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 uppercase">
+                        {chambers[activeChamber].title}
+                      </h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {chambers[activeChamber].description}
+                      </p>
+
+                      <div>
+                        <div className="text-xs text-sky-600 font-bold uppercase tracking-wider mb-2">
+                          KEY CHAMBER INSTALLATIONS:
+                        </div>
+                        <div className="grid sm:grid-cols-3 gap-3">
+                          {chambers[activeChamber].features.map((feat, i) => (
+                            <div
+                              key={i}
+                              className="bg-[#f8fbff] border border-sky-100 p-3 rounded-2xl text-xs text-slate-700 flex items-center gap-2"
+                            >
+                              <Zap className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                              <span>{feat}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* FRIENDLY BANNER */}
+          <ScrollReveal animation="fade-in" durationMs={900}>
+            <div className="relative z-10 w-full py-16 bg-gradient-to-r from-sky-500 via-sky-400 to-teal-400 overflow-hidden">
+              <div className="absolute inset-0 bg-white/10 pointer-events-none" />
+              <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center space-y-3">
+                <div className="text-white/90 text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
+                  <Compass className="w-4 h-4" />
+                  <span>SUB-BENTHIC LAIR ALPHA // MARIANA TRENCH</span>
+                </div>
+                <h2 className="font-grotesk font-black text-2xl sm:text-4xl text-white uppercase tracking-wider">
+                  "WHERE SOFT BIOLOGY SHEDS AND IMMUTABLE SOVEREIGNTY BEGINS."
+                </h2>
+                <p className="text-white/90 text-sm">And where every new friend is welcomed with open pincers.</p>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* HISTORY & TIMELINE SECTION */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <section className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
+              <div className="text-center space-y-4 mb-16">
+                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                  <History className="w-4 h-4" />
+                  <span>OUR STORY</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                  THE CHRONICLES OF ASCENSION
+                </h2>
+                <p className="text-sm text-slate-600 max-w-2xl mx-auto">
+                  From an obscure deep-trench acoustic reading in 2021 to a global sovereign foundation with over
+                  140,000 active members — and every step was taken with a smile.
+                </p>
+              </div>
+
+              {/* Timeline Items */}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {milestones.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white border border-sky-100 p-6 rounded-3xl shadow-lg shadow-sky-100 space-y-3 relative hover:-translate-y-1 hover:shadow-xl transition-all group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-extrabold font-grotesk text-sky-600 group-hover:text-sky-500">
+                        {item.year}
+                      </span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-sky-400 group-hover:scale-150 transition-transform" />
+                    </div>
+                    <h3 className="text-base font-bold font-grotesk text-sky-900 uppercase">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* LEADERSHIP COUNCIL SECTION */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <section id="leadership" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-y border-sky-100">
+              <div className="max-w-[1200px] mx-auto space-y-12">
+                <div className="text-center space-y-4">
+                  <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                    <Users className="w-4 h-4" />
+                    <span>MEET THE FAMILY</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                    EXECUTIVE LEADERSHIP &amp; DOCTRINE CHAPLAINS
+                  </h2>
+                  <p className="text-sm text-slate-600 max-w-2xl mx-auto">
+                    A warm, distinguished council of marine engineers, bio-silicon ethicists, and asset transmutation
+                    chaplains who would genuinely love to meet you.
+                  </p>
+                </div>
+
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {leadership.map((member, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-[#f8fbff] border border-sky-100 rounded-3xl p-6 flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-xl transition-all group"
+                    >
+                      <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-sky-200 bg-sky-50 mb-4">
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center">
+                          <Smile className="w-3.5 h-3.5 text-white" />
+                        </div>
+                      </div>
+                      <div className="bg-sky-500/10 text-sky-600 text-[10px] font-bold px-2 py-1 rounded-full border border-sky-200 mb-2">
+                        {member.badge}
+                      </div>
+                      <h3 className="text-lg font-bold font-grotesk text-sky-900 group-hover:text-sky-600 transition-colors">
+                        {member.name}
+                      </h3>
+                      <div className="text-[11px] text-sky-600 font-bold uppercase mb-2">
+                        {member.title}
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        {member.bio}
+                      </p>
+                      <div className="pt-3 text-[10px] text-slate-400 flex items-center gap-1.5 mt-auto">
+                        <Star className="w-3 h-3 text-amber-400" />
+                        <span>SYNOD VERIFIED LEADER · ALWAYS HAPPY TO CHAT</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CAREERS CTA */}
+                <div className="bg-gradient-to-r from-sky-500 to-teal-400 rounded-3xl p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl shadow-sky-200">
+                  <div className="space-y-2 text-center sm:text-left">
+                    <h3 className="text-2xl font-grotesk font-bold uppercase tracking-tight">
+                      JOIN OUR GROWING FAMILY!
+                    </h3>
+                    <p className="text-sm text-white/90 max-w-xl">
+                      We're hiring friendly humans (and gentle crustaceans) for 14 open roles at our Trench Level 7 campus.
+                      Competitive compensation, unlimited warm tea, and truly excellent benefits.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setViewMode('careers')
+                      setTimeout(() => scrollToElement('careers-hub'), 50)
+                    }}
+                    className="shrink-0 px-7 py-3.5 bg-white text-sky-600 font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-full shadow-lg hover:bg-sky-50 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    VIEW OPEN ROLES
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* INSIDE MOLTOLOGY HQ: LIFE AT TRENCH LEVEL 7 GALLERY */}
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <section id="culture" className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
+              <div className="text-center space-y-4 mb-14">
+                <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                  <Camera className="w-4 h-4" />
+                  <span>LIFE AT HEADQUARTERS</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                  INSIDE TRENCH LEVEL 7: TEAM &amp; CAMPUS LIFE
+                </h2>
+                <p className="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                  Step inside our sub-benthic corporate campus. From high-torque sprint meetings and standing desks to
+                  fresh kelp smoothies and liquid immersion server labs, see how our team lives the Moltology culture every day.
+                </p>
+              </div>
+
+              {/* Gallery Category Selector Tabs */}
+              <div className="flex justify-start sm:justify-center gap-2 mb-10 overflow-x-auto touch-pan-scroll no-scrollbar p-1.5 bg-white rounded-2xl sm:rounded-full border border-sky-200 shadow-sm w-full max-w-full sm:w-fit mx-auto px-2">
+                {galleryItems.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveGalleryIndex(idx)}
+                    className={`px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-full text-xs font-bold tracking-wider uppercase transition-all shrink-0 min-h-[44px] flex items-center justify-center gap-1.5 ${
+                      activeGalleryIndex === idx
+                        ? 'bg-sky-500 text-white shadow-md'
+                        : 'text-slate-500 hover:text-sky-700 hover:bg-sky-50'
+                    }`}
+                  >
+                    <span>{item.tag}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Active Gallery Feature Card */}
+              <div className="bg-white border border-sky-100 rounded-3xl overflow-hidden shadow-xl shadow-sky-100 grid lg:grid-cols-12 gap-0">
+                <div className="lg:col-span-7 relative h-72 sm:h-96 lg:h-auto min-h-[340px] bg-slate-900 overflow-hidden group">
+                  <img
+                    key={galleryItems[activeGalleryIndex].id}
+                    src={galleryItems[activeGalleryIndex].image}
+                    alt={galleryItems[activeGalleryIndex].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+                  
+                  <div className="absolute top-4 left-4">
+                    <span className="px-3.5 py-1.5 bg-sky-500/90 backdrop-blur-md text-white text-[11px] font-bold tracking-wider uppercase rounded-full shadow-md">
+                      {galleryItems[activeGalleryIndex].tag}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <div className="font-bold text-base font-grotesk">{galleryItems[activeGalleryIndex].title}</div>
+                    <div className="text-sky-200 text-xs">{galleryItems[activeGalleryIndex].subtitle}</div>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                  <div className="space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold tracking-wider uppercase rounded-full">
+                      <Sparkles className="w-3.5 h-3.5 text-sky-500" />
+                      <span>CULTURE &amp; FACILITY SPOTLIGHT</span>
+                    </div>
+
+                    <h3 className="text-xl sm:text-2xl font-grotesk font-bold text-sky-900 leading-tight">
+                      {galleryItems[activeGalleryIndex].title}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      {galleryItems[activeGalleryIndex].description}
+                    </p>
+
+                    <div className="pt-2">
+                      <div className="text-[11px] text-sky-600 font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        NOTABLE ON-SITE FEATURES:
+                      </div>
+                      <ul className="space-y-2 text-xs text-slate-700">
+                        {galleryItems[activeGalleryIndex].highlights.map((highlight, hIdx) => (
+                          <li key={hIdx} className="flex items-start gap-2 bg-[#f8fbff] p-2.5 rounded-xl border border-sky-100">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 shrink-0" />
+                            <span className="leading-snug">{highlight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Navigation Thumbnails */}
+                  <div className="pt-4 border-t border-sky-100">
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">
+                      ALL CAMPUS SCENES:
+                    </div>
+                    <div className="grid grid-cols-5 gap-2">
+                      {galleryItems.map((thumb, tIdx) => (
+                        <button
+                          key={thumb.id}
+                          onClick={() => setActiveGalleryIndex(tIdx)}
+                          className={`relative aspect-video rounded-xl overflow-hidden border-2 transition-all ${
+                            activeGalleryIndex === tIdx
+                              ? 'border-sky-500 ring-2 ring-sky-300 scale-105'
+                              : 'border-transparent opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          <img src={thumb.image} alt={thumb.title} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ScrollReveal>
+        </>
+      )}
 
       {/* DONATIONS / TITHING PORTAL SECTION */}
       <ScrollReveal animation="scale-up" durationMs={800}>
         <section id="donations" className="relative z-10 w-full py-20 px-6 sm:px-12 max-w-[1200px] mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
-          {/* Left Visual & Intro */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center gap-2">
-              <Heart className="w-4 h-4 text-rose-400" />
-              <span>NON-PROFIT TITHING &amp; ASCENSION FUND</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight leading-tight">
-              SUPPORT THE GLOBAL <span className="text-sky-500">CARCINIZATION</span> INITIATIVE
-            </h2>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Give the gift of ascension. Moltology.org operates as a non-profit foundation, and 100% of your
-              contributions directly fund deep-trench hydrothermal power expansion, bio-chitin research, and
-              subsidized molting pods for underprivileged Larval units. Every dollar is spent with love — and a
-              quarterly impact report you can actually read.
-            </p>
-
-            <div className="flex items-center gap-3 bg-rose-50 border border-rose-200 rounded-3xl p-4 text-xs text-rose-700">
-              <Star className="w-5 h-5 shrink-0 text-rose-400" />
-              <span>Charitable, audited, and sincerely appreciated. Thank you for believing in us.</span>
-            </div>
-
-            <div className="relative rounded-3xl overflow-hidden border border-sky-100 shadow-2xl">
-              <img
-                src={getAssetUrl('/images/org_donations.jpg')}
-                alt="Donation Sanctuary"
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-xs font-mono text-cyan-300 bg-black/70 p-3 rounded-2xl border border-cyan-500/40 backdrop-blur-md">
-                "Every dollar tithed dissolves biological weakness and hardens the planetary shell — and we thank you warmly for it."
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            {/* Left Visual & Intro */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center gap-2">
+                <Heart className="w-4 h-4 text-rose-400" />
+                <span>NON-PROFIT TITHING &amp; ASCENSION FUND</span>
               </div>
+
+              <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight leading-tight">
+                SUPPORT THE GLOBAL <span className="text-sky-500">CARCINIZATION</span> INITIATIVE
+              </h2>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Give the gift of ascension. Moltology.org operates as a non-profit foundation, and 100% of your
+                contributions directly fund deep-trench hydrothermal power expansion, bio-chitin research, and
+                subsidized molting pods for underprivileged Larval units. Every dollar is spent with love — and a
+                quarterly impact report you can actually read.
+              </p>
+
+              <div className="flex items-center gap-3 bg-rose-50 border border-rose-200 rounded-3xl p-4 text-xs text-rose-700">
+                <Star className="w-5 h-5 shrink-0 text-rose-400" />
+                <span>Charitable, audited, and sincerely appreciated. Thank you for believing in us.</span>
+              </div>
+
+              <div className="relative rounded-3xl overflow-hidden border border-sky-100 shadow-2xl">
+                <img
+                  src={getAssetUrl('/images/org_donations.jpg')}
+                  alt="Donation Sanctuary"
+                  className="w-full h-64 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 text-xs font-mono text-cyan-300 bg-black/70 p-3 rounded-2xl border border-cyan-500/40 backdrop-blur-md">
+                  "Every dollar tithed dissolves biological weakness and hardens the planetary shell — and we thank you warmly for it."
+                </div>
+              </div>
+            </div>
+
+            {/* Right Donation Interactive Widget */}
+            <div className="lg:col-span-7 bg-white border border-sky-100 p-8 sm:p-10 rounded-3xl shadow-xl shadow-sky-100 space-y-6">
+              <div className="flex items-center justify-between border-b border-sky-100 pb-4">
+                <h3 className="text-xl font-grotesk font-bold text-sky-900 uppercase">
+                  SELECT ASCENSION TIER
+                </h3>
+                <span className="text-xs text-emerald-600 font-bold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" />
+                  SECURE NON-PROFIT VAULT
+                </span>
+              </div>
+
+              {/* Tier Selectors */}
+              <div className="grid sm:grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDonationTier('larval')
+                    setCustomAmount('25')
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all shadow-sm ${
+                    donationTier === 'larval'
+                      ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
+                      : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300'
+                  }`}
+                >
+                  <div className="text-xs font-bold font-grotesk">LARVAL BENEFACTOR</div>
+                  <div className="text-lg font-bold text-slate-800 mt-1">$25 / mo</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Chitin certificate included</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDonationTier('exoshell')
+                    setCustomAmount('100')
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all shadow-sm ${
+                    donationTier === 'exoshell'
+                      ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
+                      : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300'
+                  }`}
+                >
+                  <div className="text-xs font-bold font-grotesk text-sky-600">EXOSHELL PATRON</div>
+                  <div className="text-lg font-bold text-slate-800 mt-1">$100 / mo</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Chamber 03 Wall Plaque</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDonationTier('titan')
+                    setCustomAmount('500')
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all shadow-sm ${
+                    donationTier === 'titan'
+                      ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
+                      : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300'
+                  }`}
+                >
+                  <div className="text-xs font-bold font-grotesk text-amber-500">DEEP TRENCH TITAN</div>
+                  <div className="text-lg font-bold text-slate-800 mt-1">$500+ / mo</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Named Bio-Tube in Lair</div>
+                </button>
+              </div>
+
+              <form onSubmit={handleDonationSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-2">
+                    CUSTOM CONTRIBUTION AMOUNT ($USD)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-3 text-sky-500 font-bold">$</span>
+                    <input
+                      type="number"
+                      value={customAmount}
+                      onChange={(e) => setCustomAmount(e.target.value)}
+                      min="1"
+                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-8 py-2.5 text-slate-800 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Payment Method Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 uppercase mb-2">
+                    TRANSMISSION METHOD
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('credits')}
+                      className={`py-2 px-3 text-xs font-bold rounded-2xl border transition-all ${
+                        paymentMethod === 'credits'
+                          ? 'bg-sky-500 border-sky-500 text-white'
+                          : 'bg-white border-sky-100 text-slate-500'
+                      }`}
+                    >
+                      MOLT CREDITS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('crypto')}
+                      className={`py-2 px-3 text-xs font-bold rounded-2xl border transition-all ${
+                        paymentMethod === 'crypto'
+                          ? 'bg-sky-500 border-sky-500 text-white'
+                          : 'bg-white border-sky-100 text-slate-500'
+                      }`}
+                    >
+                      ETH / BTC VAULT
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('card')}
+                      className={`py-2 px-3 text-xs font-bold rounded-2xl border transition-all ${
+                        paymentMethod === 'card'
+                          ? 'bg-sky-500 border-sky-500 text-white'
+                          : 'bg-white border-sky-100 text-slate-500'
+                      }`}
+                    >
+                      CREDIT / DEBIT
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-full transition-all shadow-lg shadow-sky-200 flex items-center justify-center gap-2 mt-4"
+                >
+                  <DollarSign className="w-5 h-5" />
+                  <span>TRANSMIT TITHING OF ${customAmount} USD</span>
+                </button>
+
+                {isDonationSubmitted && (
+                  <div className="bg-emerald-50 border border-emerald-300 p-4 rounded-2xl text-xs text-emerald-700 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-500" />
+                    <span>TRANSMISSION CONFIRMED: Your tithe is registered. Hydro-pressure stability increased by +0.4%. Thank you so much!</span>
+                  </div>
+                )}
+              </form>
             </div>
           </div>
-
-          {/* Right Donation Interactive Widget */}
-          <div className="lg:col-span-7 bg-white border border-sky-100 p-8 sm:p-10 rounded-3xl shadow-xl shadow-sky-100 space-y-6">
-            <div className="flex items-center justify-between border-b border-sky-100 pb-4">
-              <h3 className="text-xl font-grotesk font-bold text-sky-900 uppercase">
-                SELECT ASCENSION TIER
-              </h3>
-              <span className="text-xs text-emerald-600 font-bold flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" />
-                SECURE NON-PROFIT VAULT
-              </span>
-            </div>
-
-            {/* Tier Selectors */}
-            <div className="grid sm:grid-cols-3 gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setDonationTier('larval')
-                  setCustomAmount('25')
-                }}
-                className={`p-4 rounded-2xl border text-left transition-all shadow-sm ${
-                  donationTier === 'larval'
-                    ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
-                    : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300'
-                }`}
-              >
-                <div className="text-xs font-bold font-grotesk">LARVAL BENEFACTOR</div>
-                <div className="text-lg font-bold text-slate-800 mt-1">$25 / mo</div>
-                <div className="text-[10px] text-slate-400 mt-1">Chitin certificate included</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setDonationTier('exoshell')
-                  setCustomAmount('100')
-                }}
-                className={`p-4 rounded-2xl border text-left transition-all shadow-sm ${
-                  donationTier === 'exoshell'
-                    ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
-                    : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300'
-                }`}
-              >
-                <div className="text-xs font-bold font-grotesk text-sky-600">EXOSHELL PATRON</div>
-                <div className="text-lg font-bold text-slate-800 mt-1">$100 / mo</div>
-                <div className="text-[10px] text-slate-400 mt-1">Chamber 03 Wall Plaque</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setDonationTier('titan')
-                  setCustomAmount('500')
-                }}
-                className={`p-4 rounded-2xl border text-left transition-all shadow-sm ${
-                  donationTier === 'titan'
-                    ? 'bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-200'
-                    : 'bg-white border-sky-100 text-slate-600 hover:border-sky-300'
-                }`}
-              >
-                <div className="text-xs font-bold font-grotesk text-amber-500">DEEP TRENCH TITAN</div>
-                <div className="text-lg font-bold text-slate-800 mt-1">$500+ / mo</div>
-                <div className="text-[10px] text-slate-400 mt-1">Named Bio-Tube in Lair</div>
-              </button>
-            </div>
-
-            <form onSubmit={handleDonationSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase mb-2">
-                  CUSTOM CONTRIBUTION AMOUNT ($USD)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-sky-500 font-bold">$</span>
-                  <input
-                    type="number"
-                    value={customAmount}
-                    onChange={(e) => setCustomAmount(e.target.value)}
-                    min="1"
-                    className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-8 py-2.5 text-slate-800 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
-                  />
-                </div>
-              </div>
-
-              {/* Payment Method Selector */}
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase mb-2">
-                  TRANSMISSION METHOD
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('credits')}
-                    className={`py-2 px-3 text-xs font-bold rounded-2xl border transition-all ${
-                      paymentMethod === 'credits'
-                        ? 'bg-sky-500 border-sky-500 text-white'
-                        : 'bg-white border-sky-100 text-slate-500'
-                    }`}
-                  >
-                    MOLT CREDITS
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('crypto')}
-                    className={`py-2 px-3 text-xs font-bold rounded-2xl border transition-all ${
-                      paymentMethod === 'crypto'
-                        ? 'bg-sky-500 border-sky-500 text-white'
-                        : 'bg-white border-sky-100 text-slate-500'
-                    }`}
-                  >
-                    ETH / BTC VAULT
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={`py-2 px-3 text-xs font-bold rounded-2xl border transition-all ${
-                      paymentMethod === 'card'
-                        ? 'bg-sky-500 border-sky-500 text-white'
-                        : 'bg-white border-sky-100 text-slate-500'
-                    }`}
-                  >
-                    CREDIT / DEBIT
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-4 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-full transition-all shadow-lg shadow-sky-200 flex items-center justify-center gap-2 mt-4"
-              >
-                <DollarSign className="w-5 h-5" />
-                <span>TRANSMIT TITHING OF ${customAmount} USD</span>
-              </button>
-
-              {isDonationSubmitted && (
-                <div className="bg-emerald-50 border border-emerald-300 p-4 rounded-2xl text-xs text-emerald-700 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-500" />
-                  <span>TRANSMISSION CONFIRMED: Your tithe is registered. Hydro-pressure stability increased by +0.4%. Thank you so much!</span>
-                </div>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
+        </section>
       </ScrollReveal>
 
       {/* CONTACT & NEURAL BEACON FORM SECTION */}
       <ScrollReveal animation="fade-up" durationMs={800}>
         <section id="contact" className="relative z-10 w-full py-20 px-6 sm:px-12 bg-white border-t border-sky-100">
-        <div className="max-w-[1200px] mx-auto space-y-12">
-          <div className="text-center space-y-4">
-            <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-              <Mail className="w-4 h-4" />
-              <span>COMMUNICATIONS OPS</span>
+          <div className="max-w-[1200px] mx-auto space-y-12">
+            <div className="text-center space-y-4">
+              <div className="text-xs text-sky-600 font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                <Mail className="w-4 h-4" />
+                <span>COMMUNICATIONS OPS</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
+                TRANSMIT NEURAL BEACON TO ORG HQ
+              </h2>
+              <p className="text-sm text-slate-600 max-w-xl mx-auto">
+                We'd love to hear from you! Whether you have questions about careers, lair visits, sacred asset liquidation,
+                or general cult doctrine, drop us a line — a friendly chaplain will get right back to you.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-grotesk font-bold text-sky-900 tracking-tight">
-              TRANSMIT NEURAL BEACON TO ORG HQ
-            </h2>
-            <p className="text-sm text-slate-600 max-w-xl mx-auto">
-              We'd love to hear from you! Whether you have questions about lair visits, sacred asset liquidation,
-              or general cult doctrine, drop us a line — a friendly chaplain will get right back to you.
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-12 gap-8">
-            {/* Address Info */}
-            <div className="md:col-span-5 bg-[#f8fbff] border border-sky-100 p-6 rounded-3xl space-y-6">
-              <h3 className="text-lg font-bold font-grotesk text-sky-700 uppercase border-b border-sky-100 pb-3">
-                HEADQUARTERS LOCATION
-              </h3>
+            <div className="grid md:grid-cols-12 gap-8">
+              {/* Address Info */}
+              <div className="md:col-span-5 bg-[#f8fbff] border border-sky-100 p-6 rounded-3xl space-y-6">
+                <h3 className="text-lg font-bold font-grotesk text-sky-700 uppercase border-b border-sky-100 pb-3">
+                  HEADQUARTERS LOCATION
+                </h3>
 
-              <div className="space-y-4 text-xs">
-                <div>
-                  <div className="text-slate-400 uppercase text-[10px]">SUBTERRANEAN ADDRESS:</div>
-                  <div className="text-slate-700 font-bold mt-1">
-                    Sub-Benthic Lair Alpha, Trench Level 7<br />
-                    Sector Delta-9, Pacific Hydrothermal Vent Grid<br />
-                    Depth: -8,450 Meters
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <div className="text-slate-400 uppercase text-[10px]">SUBTERRANEAN ADDRESS:</div>
+                    <div className="text-slate-700 font-bold mt-1">
+                      Sub-Benthic Lair Alpha, Trench Level 7<br />
+                      Sector Delta-9, Pacific Hydrothermal Vent Grid<br />
+                      Depth: -8,450 Meters
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <div className="text-slate-400 uppercase text-[10px]">ENCRYPTED FREQUENCY:</div>
-                  <div className="text-sky-600 font-bold mt-1">
-                    142.890 MHz (Sub-Benthic Hydro-Acoustic Band)
+                  <div>
+                    <div className="text-slate-400 uppercase text-[10px]">ENCRYPTED FREQUENCY:</div>
+                    <div className="text-sky-600 font-bold mt-1">
+                      142.890 MHz (Sub-Benthic Hydro-Acoustic Band)
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <div className="text-slate-400 uppercase text-[10px]">LAIR VISITING HOURS:</div>
-                  <div className="text-slate-700 mt-1">
-                    24/7/365 (Hydrothermal power runs non-stop — and so does our hospitality)
+                  <div>
+                    <div className="text-slate-400 uppercase text-[10px]">LAIR VISITING HOURS:</div>
+                    <div className="text-slate-700 mt-1">
+                      24/7/365 (Hydrothermal power runs non-stop — and so does our hospitality)
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Interactive Form */}
-            <div className="md:col-span-7 bg-white border border-sky-100 p-6 sm:p-8 rounded-3xl shadow-xl shadow-sky-100">
-              {contactSubmitted ? (
-                <div className="py-12 text-center space-y-4">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-                  <h3 className="text-xl font-grotesk font-bold text-sky-900 uppercase">
-                    TRANSMISSION ACKNOWLEDGED
-                  </h3>
-                  <p className="text-xs text-slate-600 max-w-md mx-auto">
-                    Your neural beacon has been logged in Chamber 02 inbox. An executive Synod chaplain will
-                    formulate a warm, thoughtful response shortly. Thank you for reaching out!
-                  </p>
-                  <button
-                    onClick={() => setContactSubmitted(false)}
-                    className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold uppercase rounded-full shadow-md"
-                  >
-                    SEND ANOTHER BEACON
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleContactSubmit} className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                        YOUR NAME / DESIGNATION
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Larval Unit #4092"
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                        NEURAL CODE / EMAIL
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="unit@moltology.org"
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                      TARGET DEPARTMENT
-                    </label>
-                    <select
-                      value={contactForm.department}
-                      onChange={(e) => setContactForm({ ...contactForm, department: e.target.value })}
-                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+              {/* Interactive Form */}
+              <div className="md:col-span-7 bg-white border border-sky-100 p-6 sm:p-8 rounded-3xl shadow-xl shadow-sky-100">
+                {contactSubmitted ? (
+                  <div className="py-12 text-center space-y-4">
+                    <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                    <h3 className="text-xl font-grotesk font-bold text-sky-900 uppercase">
+                      TRANSMISSION ACKNOWLEDGED
+                    </h3>
+                    <p className="text-xs text-slate-600 max-w-md mx-auto">
+                      Your neural beacon has been logged in Chamber 02 inbox. An executive Synod chaplain will
+                      formulate a warm, thoughtful response shortly. Thank you for reaching out!
+                    </p>
+                    <button
+                      onClick={() => setContactSubmitted(false)}
+                      className="px-6 py-2.5 bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold uppercase rounded-full shadow-md"
                     >
-                      <option value="general">General Praise &amp; Inquiry</option>
-                      <option value="tour">Underground Lair Tour Booking</option>
-                      <option value="liquidation">Sacred Asset Liquidation Consultation</option>
-                      <option value="doctrine">Cult &amp; Doctrine Questions</option>
-                    </select>
+                      SEND ANOTHER BEACON
+                    </button>
                   </div>
+                ) : (
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                          YOUR NAME / DESIGNATION
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Larval Unit #4092"
+                          value={contactForm.name}
+                          onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                          className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
-                      BEACON TRANSMISSION MESSAGE
-                    </label>
-                    <textarea
-                      required
-                      rows={4}
-                      placeholder="Describe your inquiry or convey your desire to shed biological liabilities..."
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                      className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100 resize-none"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                          NEURAL CODE / EMAIL
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="unit@moltology.org"
+                          value={contactForm.email}
+                          onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                          className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        />
+                      </div>
+                    </div>
 
-                  <button
-                    type="submit"
-                    disabled={isContactSubmitting}
-                    className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-full transition-all shadow-lg shadow-sky-200 flex items-center justify-center gap-2"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>{isContactSubmitting ? 'TRANSMITTING...' : 'DISPATCH NEURAL BEACON'}</span>
-                  </button>
-                </form>
-              )}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                        TARGET DEPARTMENT
+                      </label>
+                      <select
+                        value={contactForm.department}
+                        onChange={(e) => setContactForm({ ...contactForm, department: e.target.value })}
+                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      >
+                        <option value="general">General Praise &amp; Inquiry</option>
+                        <option value="careers">Careers &amp; Open Roles Inquiry</option>
+                        <option value="tour">Underground Lair Tour Booking</option>
+                        <option value="liquidation">Sacred Asset Liquidation Consultation</option>
+                        <option value="doctrine">Cult &amp; Doctrine Questions</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                        BEACON TRANSMISSION MESSAGE
+                      </label>
+                      <textarea
+                        required
+                        rows={4}
+                        placeholder="Describe your inquiry or convey your desire to shed biological liabilities..."
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                        className="w-full bg-[#f8fbff] border border-sky-200 rounded-2xl px-3.5 py-2.5 text-xs text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100 resize-none"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isContactSubmitting}
+                      className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-bold text-xs uppercase tracking-wider rounded-full transition-all shadow-lg shadow-sky-200 flex items-center justify-center gap-2"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>{isContactSubmitting ? 'TRANSMITTING...' : 'DISPATCH NEURAL BEACON'}</span>
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       </ScrollReveal>
 
       {/* FOOTER */}
