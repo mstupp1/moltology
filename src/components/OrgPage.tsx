@@ -41,7 +41,7 @@ import {
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
-import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { MainFooter } from '@/components/MainFooter'
 import { getAssetUrl } from '@/lib/assets'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -1220,39 +1220,11 @@ export const OrgPage: React.FC = () => {
       </ScrollReveal>
 
       {/* FOOTER */}
-      <footer className="relative z-10 w-full bg-sky-900 border-t border-sky-800 py-12 px-6 sm:px-12 text-xs">
-        <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 flex items-center justify-center shrink-0">
-              <img src="/images/order_emblem.png" alt="Emblem" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <div className="font-grotesk font-bold text-white">MOLTOLOGY.ORG FOUNDATION</div>
-              <div className="text-[10px] text-sky-300">Sub-Benthic Sovereign Non-Profit Entity © 2026</div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sky-200">
-            <button onClick={() => onNavigate('/')} className="hover:text-white">HOME</button>
-            <button onClick={() => onNavigate('/org')} className="hover:text-white text-white font-bold">ORGANIZATION</button>
-            <a href="https://www.etsy.com/shop/SaasTrash" target="_blank" rel="noopener noreferrer" className="text-amber-300 hover:text-amber-200 font-bold">STORE</a>
-            <a href="https://www.instagram.com/moltology_org/" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
-              <Instagram className="w-3.5 h-3.5" />
-              <span>INSTAGRAM</span>
-            </a>
-            <a href="https://www.youtube.com/@Moltology" target="_blank" rel="noopener noreferrer" className="hover:text-white flex items-center gap-1">
-              <Youtube className="w-3.5 h-3.5" />
-              <span>YOUTUBE</span>
-            </a>
-            {user && <button onClick={() => onNavigate('/dashboard')} className="hover:text-white">DASHBOARD</button>}
-          </div>
-
-          <div className="text-[10px] text-sky-300 text-center md:text-right">
-            Approved by the Synod of Benthic Governance.<br />
-            Carcinization Status: Nominal 100%. Have a wonderful day!
-          </div>
-        </div>
-      </footer>
+      <MainFooter
+        brandTitle="MOLTOLOGY.ORG FOUNDATION"
+        brandTagline="Sub-Benthic Sovereign Non-Profit Entity — Official Mission & Synod Governance"
+        copyrightText="© 2026 MOLTOLOGY.ORG FOUNDATION. ALL RIGHTS RESERVED."
+      />
     </div>
   )
 }

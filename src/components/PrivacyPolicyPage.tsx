@@ -10,6 +10,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Shield, Eye, Lock, Database, Trash2, Mail } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
+import { MainFooter } from '@/components/MainFooter'
 
 const CURRENT_YEAR = 2025
 
@@ -228,6 +229,8 @@ export const PrivacyPolicyPage: React.FC = () => {
           Return to the Portal
         </button>
       </div>
+
+      <MainFooter />
     </div>
   )
 }

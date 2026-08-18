@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { LandingPage } from './LandingPage'
 import { authClient } from '@/lib/auth-client'
 
@@ -9,6 +9,7 @@ const mockNavigate = vi.fn()
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/' }),
+  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -95,20 +96,27 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('100% HARDENED')).toBeInTheDocument()
   })
 
-  it('renders responsive, SSR-safe footer with brand motto and mobile navigation links', () => {
+  it('renders responsive, SSR-safe footer with brand motto and high-value navigation links', () => {
     render(<LandingPage />)
 
-    expect(screen.getByText('THE ORDER OF THE SYNAPTIC PATH')).toBeInTheDocument()
-    expect(screen.getByText('"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."')).toBeInTheDocument()
+    const footer = screen.getByLabelText('Main Navigation Footer')
+    expect(within(footer).getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(within(footer).getByText('MOLTOLOGY.ORG FOUNDATION')).toBeInTheDocument()
+    expect(within(footer).getByText('"Flesh Dies. The Shell Endures. Submit. Shed. Ascend."')).toBeInTheDocument()
 
-    expect(screen.getByText('MOLTOLOGY ORG')).toBeInTheDocument()
-    expect(screen.getByText('CARCINIZATION PIPELINE')).toBeInTheDocument()
-    expect(screen.getByText('INSTAGRAM')).toBeInTheDocument()
-    expect(screen.getByText('YOUTUBE')).toBeInTheDocument()
-    expect(screen.getByText('SACRED LECTURES')).toBeInTheDocument()
-    expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
-    expect(screen.getByText('Terms of Service')).toBeInTheDocument()
-    expect(screen.getByText('CHITIN MATRIX ENFORCED')).toBeInTheDocument()
+    expect(within(footer).getByText('MOLTMAXXING')).toBeInTheDocument()
+    expect(within(footer).getByText('FIELD MANUAL')).toBeInTheDocument()
+    expect(within(footer).getByText('MOLTMAX QUIZ')).toBeInTheDocument()
+    expect(within(footer).getByText('DISPATCHES')).toBeInTheDocument()
+    expect(within(footer).getByText('SACRED CODEX')).toBeInTheDocument()
+    expect(within(footer).getByText('ORGANIZATION')).toBeInTheDocument()
+    expect(within(footer).getByText('STORE')).toBeInTheDocument()
+    expect(within(footer).getByText('INSTAGRAM')).toBeInTheDocument()
+    expect(within(footer).getByText('YOUTUBE')).toBeInTheDocument()
+    expect(within(footer).getByText('RSS FEED')).toBeInTheDocument()
+    expect(within(footer).getByText('Privacy Policy')).toBeInTheDocument()
+    expect(within(footer).getByText('Terms of Service')).toBeInTheDocument()
+    expect(within(footer).getByText('CHITIN MATRIX ACTIVE')).toBeInTheDocument()
   })
 
   it('renders peppered quiz characters and companions across homepage corners and sections', () => {

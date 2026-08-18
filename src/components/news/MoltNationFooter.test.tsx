@@ -27,6 +27,10 @@ describe('MoltNationFooter Component', () => {
     render(<MoltNationFooter />)
 
     expect(screen.getByText('DISPATCHES')).toBeInTheDocument()
+    expect(screen.getByText('MOLTMAXXING')).toBeInTheDocument()
+    expect(screen.getByText('FIELD MANUAL')).toBeInTheDocument()
+    expect(screen.getByText('MOLTMAX QUIZ')).toBeInTheDocument()
+    expect(screen.getByText('SACRED CODEX')).toBeInTheDocument()
     expect(screen.getByText('SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
     expect(screen.getByText('STORE')).toBeInTheDocument()

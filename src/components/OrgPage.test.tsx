@@ -8,6 +8,7 @@ import { ToastProvider } from '@/components/ui/ToastProvider'
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
   createFileRoute: () => (config: any) => config,
+  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }))
 
 // Mock auth client
