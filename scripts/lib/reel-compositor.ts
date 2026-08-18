@@ -13,6 +13,8 @@ export interface CompositeReelOptions {
   words: WordBoundaryEvent[]
   outputPath: string
   backgroundAudioPath?: string
+  backgroundAudioVolume?: number // Volume multiplier (default 0.14)
+  backgroundAudioOffsetSeconds?: number // Audio start offset in seconds
   ctaDurationSeconds?: number
   watermarkText?: string
   watermarkOpacity?: number
@@ -22,7 +24,16 @@ export interface CompositeReelOptions {
   ctaUrl?: string
   ctaBadge?: string
   ctaActionText?: string
-  mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'none'
+  mascot?:
+    | 'lobster_pointing'
+    | 'lobster_thumbs_up'
+    | 'lobster_action'
+    | 'crab_stats'
+    | 'crab_corner'
+    | 'crab_cling'
+    | 'lobster_peek'
+    | 'lobster_peaceful'
+    | 'none'
   tempDir?: string
 }
 
@@ -675,19 +686,39 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   console.log(`   • Mixing voiceover audio and ambient benthic soundtrack...`)
 
   if (fs.existsSync(bgAudioPath)) {
+    // Dynamic starting point selection across rich harmonic timestamps in benthic-ambient-loop.mp3
+    const curatedOffsets = [0, 18, 36, 54, 72, 95, 120, 145]
+    const bgOffset =
+      options.backgroundAudioOffsetSeconds !== undefined
+        ? options.backgroundAudioOffsetSeconds
+        : curatedOffsets[Math.floor(Math.random() * curatedOffsets.length)]
+    const bgVolume = options.backgroundAudioVolume ?? 0.14
+    console.log(`   • Benthic audio track parameters: volume=${bgVolume}, startOffset=${bgOffset}s`)
+
+    const ffmpegBgArgs: string[] = []
+    if (bgOffset > 0) {
+      ffmpegBgArgs.push('-ss', bgOffset.toString())
+    }
+
     // Mix Voiceover (input 1 with audio padding) + Subtle Ducked Ambient BG (input 2)
+    // Smooth 0.8s entrance fade and 1.5s ending fade
+    const fadeInDuration = 0.8
+    const fadeOutDuration = 1.5
+    const fadeOutStart = Math.max(0, totalVideoDuration - fadeOutDuration)
+
     await runFfmpeg([
       '-y',
       '-i',
       videoWithOverlaysPath,
       '-i',
       options.voiceoverPath,
+      ...ffmpegBgArgs,
       '-stream_loop',
       '-1',
       '-i',
       bgAudioPath,
       '-filter_complex',
-      `[1:a]apad=pad_dur=3[vo];[2:a]volume=0.08,afade=t=in:ss=0:d=0.5,afade=t=out:st=${Math.max(0, totalVideoDuration - 1.2)}:d=1.2[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
+      `[1:a]apad=pad_dur=3[vo];[2:a]volume=${bgVolume},afade=t=in:ss=0:d=${fadeInDuration},afade=t=out:st=${fadeOutStart.toFixed(3)}:d=${fadeOutDuration}[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
       '-map',
       '0:v',
       '-map',

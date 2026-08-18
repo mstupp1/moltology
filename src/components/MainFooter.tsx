@@ -43,7 +43,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
       className={`w-full border-t text-xs relative z-20 overflow-hidden pb-28 sm:pb-12 transition-colors ${
         isCorporate
           ? 'bg-white border-sky-100 text-slate-500 font-sans'
-          : 'bg-[#030607] border-cyan-900/40 text-gray-400 font-mono'
+          : 'bg-[#030607] border-cyan-900/40 text-gray-400 font-sans'
       } ${className}`}
       aria-label="Main Navigation Footer"
     >
@@ -107,7 +107,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
             {brandTagline && (
               <p
                 className={`text-[11px] sm:text-xs text-center md:text-left leading-relaxed ${
-                  isCorporate ? 'text-slate-500 font-sans' : 'text-gray-400 font-mono'
+                  isCorporate ? 'text-slate-500 font-sans' : 'text-gray-400 font-sans'
                 }`}
               >
                 {brandTagline}
@@ -268,7 +268,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
           className={`pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-center sm:text-left ${
             isCorporate
               ? 'border-sky-100 text-slate-400 font-sans'
-              : 'border-cyan-950/60 text-gray-500 font-mono'
+              : 'border-cyan-950/60 text-gray-500 font-sans'
           }`}
         >
           <div>{copyrightText}</div>

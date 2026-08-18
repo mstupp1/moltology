@@ -38,7 +38,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
     elements.push(renderFormattedText(textRemaining, `text-${lastIndex}`))
   }
 
-  return <div className={`space-y-2 text-xs leading-relaxed text-[#dfe3e3] font-mono ${className}`}>{elements}</div>
+  return <div className={`space-y-2 text-xs leading-relaxed text-[#dfe3e3] font-sans ${className}`}>{elements}</div>
 }
 
 const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, code }) => {
@@ -53,7 +53,7 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
   return (
     <div className="relative my-2.5 bg-[#040708] border border-cyan-900/70 chamfer-corner overflow-hidden group shadow-lg">
       {/* Code Header Bar */}
-      <div className="bg-[#0b1011] border-b border-cyan-950 px-3 py-1 flex items-center justify-between text-[10px] text-cyan-400 font-mono">
+      <div className="bg-[#0b1011] border-b border-cyan-950 px-3 py-1 flex items-center justify-between text-[10px] text-cyan-400 font-sans">
         <div className="flex items-center space-x-1.5">
           <Terminal className="w-3.5 h-3.5 text-cyan-400" />
           <span className="uppercase tracking-widest font-bold">{language}</span>
@@ -79,7 +79,7 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
       </div>
 
       {/* Code Content */}
-      <pre className="p-3 overflow-x-auto text-[11px] font-mono text-cyan-200 leading-relaxed no-scrollbar select-text">
+      <pre className="p-3 overflow-x-auto text-[11px] font-sans text-cyan-200 leading-relaxed no-scrollbar select-text">
         <code>{code}</code>
       </pre>
     </div>
@@ -154,7 +154,7 @@ function renderFormattedText(text: string, keyPrefix: string): React.ReactNode {
       const itemText = line.replace(/^\s*[-*]\s+/, '')
       listItems.push(
         <li key={lineKey} className="flex items-start gap-1.5 text-xs text-[#dfe3e3]">
-          <span className="text-cyan-400 font-mono text-[10px] shrink-0 mt-0.5">◆</span>
+          <span className="text-cyan-400 font-sans text-[10px] shrink-0 mt-0.5">◆</span>
           <span>{formatInline(itemText)}</span>
         </li>
       )
@@ -169,7 +169,7 @@ function renderFormattedText(text: string, keyPrefix: string): React.ReactNode {
       const itemText = numMatch ? numMatch[2] : line
       listItems.push(
         <li key={lineKey} className="flex items-start gap-1.5 text-xs text-[#dfe3e3]">
-          <span className="text-cyan-400 font-mono text-[10px] font-bold shrink-0 mt-0.5">{num}.</span>
+          <span className="text-cyan-400 font-sans text-[10px] font-bold shrink-0 mt-0.5">{num}.</span>
           <span>{formatInline(itemText)}</span>
         </li>
       )
@@ -215,7 +215,7 @@ function formatInline(text: string): React.ReactNode[] {
     if (matchedStr.startsWith('`') && matchedStr.endsWith('`')) {
       // Inline Code
       parts.push(
-        <code key={partKey} className="bg-cyan-950/80 border border-cyan-800/50 text-cyan-300 px-1.5 py-0.5 font-mono text-[11px] chamfer-corner">
+        <code key={partKey} className="bg-cyan-950/80 border border-cyan-800/50 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] chamfer-corner">
           {matchedStr.slice(1, -1)}
         </code>
       )
@@ -245,7 +245,7 @@ function formatInline(text: string): React.ReactNode[] {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-mono"
+            className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-sans"
           >
             {label}
           </a>

@@ -28,7 +28,7 @@ export interface MoltNationFooterProps {
 export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = '' }) => {
   return (
     <footer
-      className={`w-full bg-[#030607] border-t border-cyan-900/40 text-xs text-gray-400 font-mono relative z-20 overflow-hidden pb-28 sm:pb-12 ${className}`}
+      className={`w-full bg-[#030607] border-t border-cyan-900/40 text-xs text-gray-400 font-sans relative z-20 overflow-hidden pb-28 sm:pb-12 ${className}`}
       aria-label="MoltNation News Footer"
     >
       {/* Background Ambience Overlays */}
@@ -40,7 +40,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
           {/* Brand & Tagline */}
           <div className="space-y-2 flex flex-col items-center md:items-start max-w-md">
             <MoltNationLogo size="sm" theme="dark" align="center" className="md:!items-start" />
-            <p className="text-[11px] sm:text-xs text-gray-400 font-mono text-center md:text-left leading-relaxed">
+            <p className="text-[11px] sm:text-xs text-gray-400 font-sans text-center md:text-left leading-relaxed">
               Official patriot telemetry &amp; autonomous intelligence network.
             </p>
           </div>
@@ -152,7 +152,7 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
         </div>
 
         {/* Bottom Legal & Status Strip */}
-        <div className="pt-6 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-500 font-mono text-center sm:text-left">
+        <div className="pt-6 border-t border-cyan-950/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-500 font-sans text-center sm:text-left">
           <div>
             © 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED.
           </div>

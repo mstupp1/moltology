@@ -208,7 +208,7 @@ export const CommandPalette: React.FC = () => {
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-2xl bg-[#0b0f0f] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 overflow-hidden chamfer-corner-lg font-mono text-sm max-h-[85vh] flex flex-col"
+            className="w-full max-w-2xl bg-[#0b0f0f] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 overflow-hidden chamfer-corner-lg font-sans text-sm max-h-[85vh] flex flex-col"
             onKeyDown={handleKeyDownMenu}
           >
             {/* Command Header */}
@@ -221,7 +221,7 @@ export const CommandPalette: React.FC = () => {
                   placeholder="Type a command or search protocol (e.g. Market, Purge)..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none w-full text-xs sm:text-sm font-mono"
+                  className="bg-transparent text-gray-100 placeholder-gray-500 focus:outline-none w-full text-xs sm:text-sm font-sans"
                 />
               </div>
               <button
@@ -266,7 +266,7 @@ export const CommandPalette: React.FC = () => {
                         </div>
                       </div>
                       {cmd.shortcut && (
-                        <span className="text-[10px] bg-black/60 border border-gray-800 text-gray-400 px-2 py-0.5 font-mono">
+                        <span className="text-[10px] bg-black/60 border border-gray-800 text-gray-400 px-2 py-0.5 font-sans">
                           {cmd.shortcut}
                         </span>
                       )}

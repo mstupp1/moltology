@@ -119,15 +119,15 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
         <div className="px-4 py-3 bg-[#0a0f12] border-b border-[#1e2d37] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#00c3ff] animate-ping" />
-            <span className="font-mono text-xs font-bold text-[#00c3ff] tracking-wider uppercase">
-              MOLT PIN INSPECTOR // {pin.id}
+            <span className="font-sans text-xs font-bold text-[#00c3ff] tracking-wider uppercase">
+              MOLT PIN INSPECTOR · {pin.id}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyLink}
-              className="px-3 py-1 bg-[#10171a] hover:bg-[#182328] border border-[#1e2d37] hover:border-[#00c3ff] text-xs font-mono text-[#c0d0e0] flex items-center gap-1.5 rounded-md transition-all"
+              className="px-3 py-1 bg-[#10171a] hover:bg-[#182328] border border-[#1e2d37] hover:border-[#00c3ff] text-xs font-sans text-[#c0d0e0] flex items-center gap-1.5 rounded-md transition-all"
             >
               {copiedLink ? (
                 <>
@@ -175,14 +175,14 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
               </button>
 
               {/* Aspect Ratio Badge */}
-              <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/70 border border-white/20 text-[#c0d0e0] text-[11px] font-mono rounded-md backdrop-blur-md">
+              <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/70 border border-white/20 text-[#c0d0e0] text-[11px] font-sans rounded-md backdrop-blur-md">
                 RATIO {pin.aspectRatio}
               </div>
             </div>
 
             {/* Image Action Row */}
             <div className="flex items-center justify-between gap-2 p-3 bg-[#080d10] rounded-xl border border-[#1e2d37]">
-              <div className="flex items-center gap-3 text-xs font-mono text-[#7a8e9e]">
+              <div className="flex items-center gap-3 text-xs font-sans text-[#7a8e9e]">
                 <span className="flex items-center gap-1 text-[#00c3ff]">
                   <Pin className="w-3.5 h-3.5" />
                   {pin.pinCount + (isSaved ? 1 : 0)} PINS
@@ -199,7 +199,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                 download={`${pin.id}.jpg`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-1.5 bg-[#00c3ff]/15 hover:bg-[#00c3ff]/25 border border-[#00c3ff]/60 text-[#00c3ff] text-xs font-mono font-bold flex items-center gap-1.5 rounded-lg transition-all active:scale-95 shadow-md"
+                className="px-3.5 py-1.5 bg-[#00c3ff]/15 hover:bg-[#00c3ff]/25 border border-[#00c3ff]/60 text-[#00c3ff] text-xs font-sans font-bold flex items-center gap-1.5 rounded-lg transition-all active:scale-95 shadow-md"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>DOWNLOAD</span>
@@ -213,13 +213,13 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
               {/* Header Title & Category */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 bg-[#00c3ff]/10 border border-[#00c3ff]/50 text-[#00c3ff] text-xs font-mono font-bold tracking-wider rounded-md uppercase">
+                  <span className="px-2.5 py-1 bg-[#00c3ff]/10 border border-[#00c3ff]/50 text-[#00c3ff] text-xs font-sans font-bold tracking-wider rounded-md uppercase">
                     {pin.category}
                   </span>
 
                   <button
                     onClick={() => onToggleSavePin(pin.id)}
-                    className={`px-4 py-2 rounded-xl font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-lg active:scale-95 ${
+                    className={`px-4 py-2 rounded-xl font-sans font-bold text-xs flex items-center gap-2 transition-all shadow-lg active:scale-95 ${
                       isSaved
                         ? 'bg-[#ff3b30] text-white border border-[#ff6b60] shadow-[0_0_15px_rgba(255,59,48,0.6)]'
                         : 'bg-[#ff3b30]/20 hover:bg-[#ff3b30] text-[#ff6b60] hover:text-white border border-[#ff3b30]/60'
@@ -250,14 +250,14 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                     <div className="font-grotesk font-bold text-sm text-white">
                       {pin.authorName}
                     </div>
-                    <div className="text-xs font-mono text-[#00c3ff] flex items-center gap-1">
+                    <div className="text-xs font-sans text-[#00c3ff] flex items-center gap-1">
                       <Shield className="w-3 h-3 text-[#ff5540]" />
                       <span>{pin.authorStage}</span>
                     </div>
                   </div>
                 </div>
 
-                <span className="text-[10px] font-mono text-[#7a8e9e] bg-[#030607] px-2 py-1 border border-[#1e2d37] rounded">
+                <span className="text-[10px] font-sans text-[#7a8e9e] bg-[#030607] px-2 py-1 border border-[#1e2d37] rounded">
                   CREATOR
                 </span>
               </div>
@@ -265,14 +265,14 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
               {/* AI Prompt / Codex Lore Box */}
               {pin.prompt && (
                 <div className="p-4 bg-[#030607] border border-[#00c3ff]/30 rounded-xl space-y-2 relative group">
-                  <div className="flex items-center justify-between text-xs font-mono text-[#00c3ff]">
+                  <div className="flex items-center justify-between text-xs font-sans text-[#00c3ff]">
                     <span className="flex items-center gap-1.5 font-bold">
                       <Sparkles className="w-3.5 h-3.5 text-[#ff5540]" />
                       GENERATIVE PROMPT / CODEX EXCERPT
                     </span>
                     <button
                       onClick={handleCopyPrompt}
-                      className="px-2.5 py-1 bg-[#10171a] hover:bg-[#00c3ff]/20 text-[#c0d0e0] hover:text-[#00c3ff] border border-white/10 hover:border-[#00c3ff]/60 rounded text-[11px] font-mono flex items-center gap-1 transition-all"
+                      className="px-2.5 py-1 bg-[#10171a] hover:bg-[#00c3ff]/20 text-[#c0d0e0] hover:text-[#00c3ff] border border-white/10 hover:border-[#00c3ff]/60 rounded text-[11px] font-sans flex items-center gap-1 transition-all"
                     >
                       {copiedPrompt ? (
                         <>
@@ -287,7 +287,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                       )}
                     </button>
                   </div>
-                  <p className="text-xs font-mono text-[#8a9ea0] leading-relaxed bg-[#070b0d] p-2.5 rounded border border-[#1a262d] select-text">
+                  <p className="text-xs font-sans text-[#8a9ea0] leading-relaxed bg-[#070b0d] p-2.5 rounded border border-[#1a262d] select-text">
                     "{pin.prompt}"
                   </p>
                 </div>
@@ -295,7 +295,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
 
               {/* Interactive Tags */}
               <div className="space-y-1.5">
-                <span className="text-xs font-mono text-[#7a8e9e] uppercase">
+                <span className="text-xs font-sans text-[#7a8e9e] uppercase">
                   SYNAPTIC TAGS
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -303,7 +303,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                     <button
                       key={tag}
                       onClick={() => onTagClick && onTagClick(tag)}
-                      className="px-2.5 py-1 bg-[#0a0f12] hover:bg-[#00c3ff]/15 border border-[#1e2d37] hover:border-[#00c3ff]/60 text-xs font-mono text-[#a0b0c0] hover:text-[#00c3ff] rounded-md transition-all"
+                      className="px-2.5 py-1 bg-[#0a0f12] hover:bg-[#00c3ff]/15 border border-[#1e2d37] hover:border-[#00c3ff]/60 text-xs font-sans text-[#a0b0c0] hover:text-[#00c3ff] rounded-md transition-all"
                     >
                       #{tag}
                     </button>
@@ -314,7 +314,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
               {/* Comments & Transmutation Logs */}
               <div className="space-y-3 pt-3 border-t border-[#1e2d37]">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#dfe3e3] flex items-center gap-1.5 uppercase">
+                  <span className="text-xs font-sans font-bold text-[#dfe3e3] flex items-center gap-1.5 uppercase">
                     <MessageSquare className="w-3.5 h-3.5 text-[#00c3ff]" />
                     TRANSMUTATION LOGS ({comments.length})
                   </span>
@@ -326,7 +326,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                     <select
                       value={selectedEmoji}
                       onChange={(e) => setSelectedEmoji(e.target.value)}
-                      className="bg-[#0a0f12] text-xs font-mono text-[#00c3ff] px-2 border-r border-[#1e2d37] outline-none cursor-pointer"
+                      className="bg-[#0a0f12] text-xs font-sans text-[#00c3ff] px-2 border-r border-[#1e2d37] outline-none cursor-pointer"
                     >
                       <option value="🦀">🦀</option>
                       <option value="🔥">🔥</option>
@@ -344,7 +344,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                   </div>
                   <button
                     type="submit"
-                    className="px-3.5 py-2 bg-[#00c3ff] hover:bg-[#33d1ff] text-black font-mono font-bold text-xs rounded-xl transition-all shadow-md active:scale-95"
+                    className="px-3.5 py-2 bg-[#00c3ff] hover:bg-[#33d1ff] text-black font-sans font-bold text-xs rounded-xl transition-all shadow-md active:scale-95"
                   >
                     <Send className="w-3.5 h-3.5" />
                   </button>
@@ -367,7 +367,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
                           <span className="font-grotesk font-bold text-[#dfe3e3]">
                             {c.author}
                           </span>
-                          <span className="font-mono text-[#607080] text-[10px]">
+                          <span className="font-sans text-[#607080] text-[10px]">
                             {c.timeAgo}
                           </span>
                         </div>
@@ -387,7 +387,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
         {/* Related Sacred Relics Row Preview */}
         {relatedPins.length > 0 && (
           <div className="p-4 bg-[#040708] border-t border-[#1e2d37] space-y-3 shrink-0">
-            <div className="text-xs font-mono font-bold text-[#00c3ff] uppercase tracking-wider flex items-center gap-1.5">
+            <div className="text-xs font-sans font-bold text-[#00c3ff] uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#ff5540]" />
               RELATED SACRED RELICS
             </div>

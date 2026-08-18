@@ -29,7 +29,7 @@ export const AISidebarDrawer: React.FC<AISidebarDrawerProps> = ({
   }
 
   return (
-    <aside className="w-80 lg:w-96 bg-[#060a0a]/95 backdrop-blur-md border-l border-cyan-900/60 flex flex-col h-full z-30 shrink-0 animate-in slide-in-from-right duration-200 shadow-2xl shadow-cyan-950/90 font-mono">
+    <aside className="w-80 lg:w-96 bg-[#060a0a]/95 backdrop-blur-md border-l border-cyan-900/60 flex flex-col h-full z-30 shrink-0 animate-in slide-in-from-right duration-200 shadow-2xl shadow-cyan-950/90 font-sans">
       <div className="flex-1 overflow-hidden">
         <AIChatPanel
           userId={userId}

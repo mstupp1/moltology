@@ -80,3 +80,8 @@
 - **Neon S3 Storage**: All content images, PBR textures, quiz graphics, guide artwork, and video/audio media reside in the Neon S3 public assets bucket (`moltology-public-assets`).
 - **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) for resolving asset URLs in code and components.
 - **Sync & Verification**: Run `npm run s3:sync` to upload/sync local assets to S3 and `npm run s3:verify` to check CDN asset parity.
+
+## 10. Image Generation Policy (Strict Non-Negotiable Rule)
+- **Exclusive Antigravity Tooling**: ALL image generation across the project (blog cover imagery, inline schematics/figures, UI mockups, thumbnails, hero backgrounds, and social assets) MUST be executed EXCLUSIVELY using the built-in Antigravity `generate_image` tool.
+- **No Gemini API for Images**: NEVER call the Gemini API, Imagen API, REST endpoints (`generativelanguage.googleapis.com`), or external SDKs to generate images. Do not write or execute scripts that call image generation APIs directly.
+

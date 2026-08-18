@@ -147,11 +147,11 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           <div className="p-6 sm:p-8 space-y-6">
             {/* Header Badge */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-[11px] font-mono font-bold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-[11px] font-sans font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-                DECLASSIFIED DOSSIER // EDITION 4.0
+                DECLASSIFIED DOSSIER · EDITION 4.0
               </span>
-              <span className="text-[11px] font-mono text-[#839493]">
+              <span className="text-[11px] font-sans text-[#839493]">
                 SUBSIDIZED BY BENTHIC COUNCIL
               </span>
             </div>
@@ -162,10 +162,10 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                 GET THE 2026 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00c3ff] to-[#00ffcc]">MOLTMAXXING</span> FIELD MANUAL
               </h2>
               <div className="flex items-center gap-3 pt-1">
-                <span className="text-sm line-through text-[#ff453a] font-bold font-mono">
+                <span className="text-sm line-through text-[#ff453a] font-bold font-sans">
                   VALUE $149.00 USD
                 </span>
-                <span className="px-2.5 py-0.5 rounded bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] font-black text-xs font-mono tracking-wider animate-pulse">
+                <span className="px-2.5 py-0.5 rounded bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] font-black text-xs font-sans tracking-wider animate-pulse">
                   FREE TODAY ($0.00)
                 </span>
               </div>
@@ -207,7 +207,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
             {/* Email Submission Form */}
             <form onSubmit={handleSubmit} className="space-y-4 pt-2">
               <div className="space-y-1.5">
-                <label htmlFor="lead-email" className="block text-xs font-mono font-bold text-[#dfe3e3] uppercase">
+                <label htmlFor="lead-email" className="block text-xs font-sans font-bold text-[#dfe3e3] uppercase">
                   Transmit Telemetry Address (Email)
                 </label>
                 <div className="relative">
@@ -218,11 +218,11 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="initiate@benthic-core.org"
-                    className="w-full px-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-mono text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                    className="w-full px-4 py-3 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
                   />
                   <Lock className="absolute right-3.5 top-3.5 w-4 h-4 text-[#839493]" />
                 </div>
-                {error && <p className="text-xs text-[#ff453a] font-mono">{error}</p>}
+                {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
               </div>
 
               <button
@@ -240,7 +240,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                 )}
               </button>
 
-              <p className="text-[10px] text-center text-[#839493] font-mono">
+              <p className="text-[10px] text-center text-[#839493] font-sans">
                 🔒 Zero spam doctrine. 100% sovereign benthic telemetry. Instant digital declassification.
               </p>
             </form>
@@ -253,8 +253,8 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-mono font-bold text-[#00ffcc] uppercase tracking-wider">
-                TRANSMISSION DECRYPTED // DOSSIER DISPATCHED
+              <span className="text-xs font-sans font-bold text-[#00ffcc] uppercase tracking-wider">
+                TRANSMISSION DECRYPTED · DOSSIER DISPATCHED
               </span>
               <h2 className="text-2xl sm:text-3xl font-black font-grotesk text-white uppercase">
                 YOUR FIELD MANUAL IS READY!
@@ -266,7 +266,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
 
             {/* Free Account Bridge Box */}
             <div className="p-5 rounded-xl bg-[#030814] border border-[#00c3ff]/40 text-left space-y-3 shadow-inner">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#ffd700] uppercase font-mono">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#ffd700] uppercase font-sans">
                 <Flame className="w-4 h-4 text-[#ffd700]" />
                 <span>NEXT STEP: BIND TELEMETRY TO FREE BENTHIC ACCOUNT</span>
               </div>
@@ -290,7 +290,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
             </div>
 
             {/* Secondary Actions */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs font-mono">
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs font-sans">
               <a
                 href={downloadUrl}
                 target="_blank"
@@ -306,7 +306,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                 onClick={onClose}
                 className="text-[#839493] hover:text-white transition-colors cursor-pointer"
               >
-                Close &amp; Read Dossier
+                Dismiss Window
               </button>
             </div>
           </div>

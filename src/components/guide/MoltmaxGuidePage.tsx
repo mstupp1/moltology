@@ -79,7 +79,7 @@ export const MoltmaxGuidePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-mono selection:bg-[#00c3ff]/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-sans selection:bg-[#00c3ff]/30 selection:text-white flex flex-col justify-between">
       {/* Header */}
       <PublicHeader
         onOpenAuth={(mode) => {
@@ -93,7 +93,7 @@ export const MoltmaxGuidePage: React.FC = () => {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-mono tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans tracking-widest uppercase">
               <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
               <span>DECLASSIFIED BENTHIC FIELD DOSSIER · EDITION 4.0</span>
             </div>
@@ -108,9 +108,9 @@ export const MoltmaxGuidePage: React.FC = () => {
 
             {/* Price Anchoring Badge */}
             <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-[#040c1c] border border-white/10 w-fit">
-              <span className="text-xs font-mono text-[#839493]">STANDARD CLEARANCE VALUE:</span>
-              <span className="line-through text-[#ff453a] font-bold font-mono text-sm">$149.00 USD</span>
-              <span className="px-2.5 py-0.5 rounded bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] font-black text-xs font-mono uppercase animate-pulse">
+              <span className="text-xs font-sans text-[#839493]">STANDARD CLEARANCE VALUE:</span>
+              <span className="line-through text-[#ff453a] font-bold font-sans text-sm">$149.00 USD</span>
+              <span className="px-2.5 py-0.5 rounded bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] font-black text-xs font-sans uppercase animate-pulse">
                 $0.00 (100% FREE TODAY)
               </span>
             </div>
@@ -157,7 +157,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email for instant access..."
-                      className="w-full px-4 py-3.5 bg-[#020408] border border-white/20 rounded-lg text-white font-mono text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
+                      className="w-full px-4 py-3.5 bg-[#020408] border border-white/20 rounded-lg text-white font-sans text-sm placeholder:text-[#839493]/50 focus:outline-none focus:border-[#00c3ff] focus:ring-1 focus:ring-[#00c3ff] transition-all"
                     />
                     <Lock className="absolute right-3.5 top-4 w-4 h-4 text-[#839493]" />
                   </div>
@@ -176,8 +176,8 @@ export const MoltmaxGuidePage: React.FC = () => {
                     )}
                   </button>
                 </div>
-                {error && <p className="text-xs text-[#ff453a] font-mono">{error}</p>}
-                <p className="text-[11px] text-[#839493] font-mono">
+                {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
+                <p className="text-[11px] text-[#839493] font-sans">
                   🔒 Zero spam. Instant high-resolution HTML &amp; PDF download.
                 </p>
               </form>
@@ -193,7 +193,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                 alt="The 2026 Moltmaxxing Protocol Tactical Field Manual 3D Mockup"
                 className="relative rounded-2xl shadow-2xl border border-white/20 object-cover w-full"
               />
-              <div className="absolute -bottom-3 -right-3 px-3 py-1.5 rounded-lg bg-[#020408]/90 border border-[#00ffcc]/40 text-[#00ffcc] text-[10px] font-bold font-mono uppercase tracking-wider shadow-lg flex items-center gap-1.5">
+              <div className="absolute -bottom-3 -right-3 px-3 py-1.5 rounded-lg bg-[#020408]/90 border border-[#00ffcc]/40 text-[#00ffcc] text-[10px] font-bold font-sans uppercase tracking-wider shadow-lg flex items-center gap-1.5">
                 <Award className="w-3.5 h-3.5 text-[#ffd700]" />
                 <span>OFFICIAL FIELD MANUAL</span>
               </div>

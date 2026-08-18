@@ -73,7 +73,7 @@ function OracleRouteComponent() {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4 font-mono text-[#dfe3e3]">
+    <div className="h-full flex flex-col space-y-4 font-sans text-[#dfe3e3]">
       {/* Main Grid: Thread History Sidebar (if logged in) or Guest Gate Callout + Full Chat Panel */}
       <div className="flex-1 min-h-[500px] flex flex-col md:flex-row gap-4 overflow-hidden">
         {/* Thread History Sidebar (Logged In Users) */}

@@ -300,19 +300,19 @@ export const MoltMaxPage: React.FC = () => {
       ctx.lineWidth = 2
       ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60)
       ctx.fillStyle = '#00ffcc'
-      ctx.font = 'bold 22px monospace'
+      ctx.font = 'bold 22px "Space Grotesk", sans-serif'
       ctx.fillText('MOLTOLOGY · BENTHIC APTITUDE AUDIT', 60, 82)
       ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 42px sans-serif'
+      ctx.font = 'bold 42px "Space Grotesk", sans-serif'
       ctx.fillText('OFFICIAL MOLTMAX CLEARANCE', 60, 140)
       ctx.fillStyle = '#00ffcc'
-      ctx.font = 'bold 20px monospace'
+      ctx.font = 'bold 20px "Space Grotesk", sans-serif'
       ctx.fillText(`${result.tierName.toUpperCase()} · ${result.clearance}`, 60, 190)
       ctx.fillStyle = '#00ffcc'
-      ctx.font = 'bold 100px monospace'
+      ctx.font = 'bold 100px "Space Grotesk", sans-serif'
       ctx.fillText(String(result.score), 820, 280)
       ctx.fillStyle = '#839493'
-      ctx.font = '16px monospace'
+      ctx.font = '16px "Space Grotesk", sans-serif'
       ctx.fillText('MOLTMAX INDEX / 100', 820, 315)
       const stats = [
         ['SHELL HARDNESS', `${result.biometrics.shellHardness} HP`, result.dimensionScores.shellHardness],
@@ -324,7 +324,7 @@ export const MoltMaxPage: React.FC = () => {
       stats.forEach(([label, value, percent], index) => {
         const y = 270 + index * 55
         ctx.fillStyle = '#839493'
-        ctx.font = 'bold 15px monospace'
+        ctx.font = 'bold 15px "Space Grotesk", sans-serif'
         ctx.fillText(label, 60, y)
         ctx.fillStyle = '#ffffff'
         ctx.fillText(value, 320, y)
@@ -334,7 +334,7 @@ export const MoltMaxPage: React.FC = () => {
         ctx.fillRect(60, y + 10, 400 * percent / 100, 8)
       })
       ctx.fillStyle = '#00c3ff'
-      ctx.font = '16px monospace'
+      ctx.font = '16px "Space Grotesk", sans-serif'
       ctx.fillText('MOLTLOGY.ORG/MOLTMAX · NO SHELL IS FINAL', 60, 620)
       const link = document.createElement('a')
       link.download = `moltmax-clearance-${result.score}.png`
@@ -349,7 +349,7 @@ export const MoltMaxPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#070b0b] font-mono text-[#dfe3e3] selection:bg-[#00c3ff]/30 selection:text-white relative">
+    <div className="min-h-screen overflow-hidden bg-[#070b0b] font-sans text-[#dfe3e3] selection:bg-[#00c3ff]/30 selection:text-white relative">
       {/* Ambient Sci-Fi Vignette, CRT Scanlines & Glow Backdrops from Homepage */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -437,7 +437,7 @@ export const MoltMaxPage: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-cyan-900/40">
-                  <div className="flex items-center gap-2.5 rounded-xl border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(0,255,204,0.18)] backdrop-blur-md">
+                  <div className="flex items-center gap-2.5 rounded-xl border border-[#00ffcc]/40 bg-[#00ffcc]/10 px-3.5 py-2 text-xs font-sans font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(0,255,204,0.18)] backdrop-blur-md">
                     <span className="flex h-2.5 w-2.5 relative">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ffcc] opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00ffcc]"></span>
@@ -445,12 +445,12 @@ export const MoltMaxPage: React.FC = () => {
                     <span className="text-[#00ffcc]">⚡ 3–4 MIN AUDIT</span>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-950/60 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                  <div className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-950/60 px-3.5 py-2 text-xs font-sans font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                     <Shield className="h-3.5 w-3.5 text-amber-400" />
                     <span>◈ 15 DILEMMAS</span>
                   </div>
 
-                  <div className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-950/60 px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-cyan-300 backdrop-blur-md shadow-hud-cyan">
+                  <div className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-950/60 px-3.5 py-2 text-xs font-sans font-bold uppercase tracking-wider text-cyan-300 backdrop-blur-md shadow-hud-cyan">
                     <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
                     <span>◆ 100% FREE SCORECARD</span>
                   </div>
@@ -515,7 +515,7 @@ export const MoltMaxPage: React.FC = () => {
                             <div className="absolute inset-0 bg-gradient-to-t from-[#050c10]/80 via-transparent to-[#050c10]/20 pointer-events-none" />
 
                             {/* Floating "Click to begin" Badge Overlay - Explicitly Anchored to Top-Right */}
-                            <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-[#00c3ff]/40 bg-[#020608]/90 px-3.5 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider text-white shadow-[0_4px_16px_rgba(0,0,0,0.85),0_0_12px_rgba(0,195,255,0.25)] backdrop-blur-md transition-all duration-300 group-hover:border-[#00ffcc] group-hover:bg-[#00c3ff]/25 group-hover:text-[#00ffcc] group-hover:shadow-[0_0_25px_rgba(0,255,204,0.4)]">
+                            <div className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-[#00c3ff]/40 bg-[#020608]/90 px-3.5 py-1.5 text-[11px] font-sans font-bold uppercase tracking-wider text-white shadow-[0_4px_16px_rgba(0,0,0,0.85),0_0_12px_rgba(0,195,255,0.25)] backdrop-blur-md transition-all duration-300 group-hover:border-[#00ffcc] group-hover:bg-[#00c3ff]/25 group-hover:text-[#00ffcc] group-hover:shadow-[0_0_25px_rgba(0,255,204,0.4)]">
                               <span>Click to begin</span>
                               <ArrowRight className="h-3.5 w-3.5 text-[#00c3ff] transition-transform duration-300 group-hover:translate-x-1 group-hover:text-[#00ffcc]" />
                             </div>
@@ -542,7 +542,7 @@ export const MoltMaxPage: React.FC = () => {
                                       : 'border-white/10 bg-[#071114]/80 group-hover:border-[#00c3ff]/40'
                                   }`}
                                 >
-                                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded font-mono text-[10px] font-bold ${
+                                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded font-sans text-[10px] font-bold ${
                                     isSelected
                                       ? 'bg-[#00ffcc] text-[#020408]'
                                       : 'border border-white/20 bg-white/5 text-[#839493]'
@@ -571,7 +571,7 @@ export const MoltMaxPage: React.FC = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <span className="h-2 w-2 rounded-full bg-[#00ffcc] animate-ping" />
-                              <span className="font-mono text-[11px] text-[#839493] uppercase tracking-wider">
+                              <span className="font-sans text-[11px] text-[#839493] uppercase tracking-wider">
                                 15 Dilemmas · Instant Archetype
                               </span>
                             </div>
@@ -598,8 +598,8 @@ export const MoltMaxPage: React.FC = () => {
                       }}
                       className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
                         dotIdx === fannedActive
-                          ? 'w-6 bg-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.8)]'
-                          : 'w-2 bg-white/20 hover:bg-white/50'
+                          ? 'w-8 bg-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.8)]'
+                          : 'w-2 bg-white/20 hover:bg-white/40'
                       }`}
                       aria-label={`Go to scenario card ${dotIdx + 1}`}
                     />
@@ -629,14 +629,14 @@ export const MoltMaxPage: React.FC = () => {
           <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
           
           <div className="relative z-10 mx-auto max-w-[1500px] px-4 text-center sm:px-8">
-            <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
+            <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
               <Terminal className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
               <span>MARIANA TRENCH METHODOLOGY · SYSTEM OVERVIEW</span>
             </div>
             <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
               HOW THE <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">MOLTMAX AUDIT</span> WORKS
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl font-mono text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
+            <p className="mx-auto mt-4 max-w-2xl font-sans text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
               Fifteen scenario-driven dilemmas mapped across five core biometric performance vectors. Discover your true Carcinization Stage with zero latency and complete privacy.
             </p>
           </div>
@@ -668,7 +668,7 @@ export const MoltMaxPage: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover opacity-35 mix-blend-overlay pointer-events-none z-0"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#04080a] via-transparent to-transparent opacity-80" />
-                  <div className="absolute top-3 right-3 rounded bg-cyan-950/90 border border-cyan-500/50 px-2.5 py-1 text-[10px] font-mono font-bold text-cyan-300 backdrop-blur-md shadow-hud-cyan">
+                  <div className="absolute top-3 right-3 rounded bg-cyan-950/90 border border-cyan-500/50 px-2.5 py-1 text-[10px] font-sans font-bold text-cyan-300 backdrop-blur-md shadow-hud-cyan">
                     PHASE 01
                   </div>
                   <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg border border-cyan-500/40 bg-[#050b0e]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
@@ -679,26 +679,26 @@ export const MoltMaxPage: React.FC = () => {
 
                 {/* Content */}
                 <div className="relative z-10 p-5 sm:p-6 lg:p-7">
-                  <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                  <div className="mb-2 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
                     01 · 15 RELATABLE DILEMMAS
                   </div>
                   <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-cyan-300 transition-colors sm:text-2xl">
                     Real-World Scenarios
                   </h3>
-                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300 sm:text-sm">
+                  <p className="mt-3 font-sans text-xs leading-relaxed text-gray-300 sm:text-sm">
                     Navigate 15 real-world dilemmas featuring our armored lobster hero facing tough choices, noisy distractions, and high-pressure moments.
                   </p>
 
                   <div className="mt-5 space-y-2 border-t border-cyan-900/40 pt-4">
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
                       <span>Boundary & stress impact tests</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
                       <span>Decisive execution trade-offs</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-400" />
                       <span>No trick questions · intuitive choices</span>
                     </div>
@@ -737,7 +737,7 @@ export const MoltMaxPage: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay pointer-events-none z-0"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#080704] via-transparent to-transparent opacity-80" />
-                  <div className="absolute top-3 right-3 rounded bg-amber-950/90 border border-amber-500/50 px-2.5 py-1 text-[10px] font-mono font-bold text-amber-300 backdrop-blur-md shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  <div className="absolute top-3 right-3 rounded bg-amber-950/90 border border-amber-500/50 px-2.5 py-1 text-[10px] font-sans font-bold text-amber-300 backdrop-blur-md shadow-[0_0_12px_rgba(245,158,11,0.3)]">
                     PHASE 02
                   </div>
                   <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg border border-amber-500/40 bg-[#0e0c07]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
@@ -748,26 +748,26 @@ export const MoltMaxPage: React.FC = () => {
 
                 {/* Content */}
                 <div className="relative z-10 p-5 sm:p-6 lg:p-7">
-                  <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
+                  <div className="mb-2 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
                     02 · 5 CORE PERSONALITY TRAITS
                   </div>
                   <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-amber-300 transition-colors sm:text-2xl">
                     5-Trait Biometrics
                   </h3>
-                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300 sm:text-sm">
+                  <p className="mt-3 font-sans text-xs leading-relaxed text-gray-300 sm:text-sm">
                     See how your natural instincts score across resilience, focus, decisive execution, habit-shedding, and calm composure.
                   </p>
 
                   <div className="mt-5 space-y-2 border-t border-amber-900/40 pt-4">
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
                       <span>5-axis live radar chart visualization</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
                       <span>Neural latency & torque dynamometry</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
                       <span>Depth pressure resilience scoring</span>
                     </div>
@@ -806,7 +806,7 @@ export const MoltMaxPage: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay pointer-events-none z-0"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#030807] via-transparent to-transparent opacity-80" />
-                  <div className="absolute top-3 right-3 rounded bg-emerald-950/90 border border-emerald-500/50 px-2.5 py-1 text-[10px] font-mono font-bold text-emerald-300 backdrop-blur-md shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                  <div className="absolute top-3 right-3 rounded bg-emerald-950/90 border border-emerald-500/50 px-2.5 py-1 text-[10px] font-sans font-bold text-emerald-300 backdrop-blur-md shadow-[0_0_12px_rgba(16,185,129,0.3)]">
                     PHASE 03
                   </div>
                   <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-[#060e0d]/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
@@ -817,26 +817,26 @@ export const MoltMaxPage: React.FC = () => {
 
                 {/* Content */}
                 <div className="relative z-10 p-5 sm:p-6 lg:p-7">
-                  <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#00ffcc]">
+                  <div className="mb-2 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-[#00ffcc]">
                     03 · CUSTOM ARCHETYPE & SCORE
                   </div>
                   <h3 className="font-grotesk font-black text-xl uppercase tracking-wide text-white group-hover:text-[#00ffcc] transition-colors sm:text-2xl">
                     Scorecard & Blueprint
                   </h3>
-                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300 sm:text-sm">
+                  <p className="mt-3 font-sans text-xs leading-relaxed text-gray-300 sm:text-sm">
                     Get your instant 0–100 score, 5-trait radar chart, your official lobster archetype, and actionable growth tips.
                   </p>
 
                   <div className="mt-5 space-y-2 border-t border-emerald-900/40 pt-4">
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00ffcc]" />
                       <span>Instant 0–100 index & tier assignment</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00ffcc]" />
                       <span>High-resolution scorecard image export</span>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-gray-200">
+                    <div className="flex items-center gap-2 font-sans text-xs text-gray-200">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-[#00ffcc]" />
                       <span>3 customized habit-upgrade prescriptions</span>
                     </div>
@@ -875,14 +875,14 @@ export const MoltMaxPage: React.FC = () => {
           <div className="absolute inset-0 bg-sacred-grid opacity-25 pointer-events-none" />
           
           <div className="relative z-10 mx-auto max-w-[1500px] px-4 text-center sm:px-8">
-            <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
+            <div className="mb-4 inline-flex items-center gap-2 bg-cyan-950/80 px-3.5 py-1.5 font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300 border border-cyan-500/40 chamfer-corner shadow-hud-cyan sm:text-xs">
               <Activity className="h-3.5 w-3.5 text-[#00ffcc] animate-pulse" />
               <span>BIOMETRIC TELEMETRY ENGINE · 5 CORE AXES</span>
             </div>
             <h2 className="font-grotesk font-black text-2xl uppercase tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
               THE FIVE VECTORS OF <span className="bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] bg-clip-text text-transparent">CARCINIZATION</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl font-mono text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
+            <p className="mx-auto mt-4 max-w-2xl font-sans text-xs leading-relaxed text-gray-300 sm:text-sm md:text-base">
               Every dilemma calibrates your instincts across five distinct diagnostic axes. Analyze how each trait shapes your Carcinization profile.
             </p>
           </div>
@@ -907,7 +907,7 @@ export const MoltMaxPage: React.FC = () => {
                 <div className="relative z-10">
                   {/* Header with Code & Icon */}
                   <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-gray-400">
                       {vec.code}
                     </span>
                     <div
@@ -920,7 +920,7 @@ export const MoltMaxPage: React.FC = () => {
 
                   {/* Trait Title & Subtitle */}
                   <div className="mt-4">
-                    <div className="font-mono text-[10px] font-bold uppercase tracking-wider" style={{ color: vec.color }}>
+                    <div className="font-sans text-[10px] font-bold uppercase tracking-wider" style={{ color: vec.color }}>
                       {vec.dimension}
                     </div>
                     <h3 className="mt-1 font-grotesk text-lg font-black uppercase text-white transition-colors group-hover:text-white">
@@ -929,13 +929,13 @@ export const MoltMaxPage: React.FC = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="mt-3 font-mono text-xs leading-relaxed text-gray-300">
+                  <p className="mt-3 font-sans text-xs leading-relaxed text-gray-300">
                     {vec.description}
                   </p>
 
                   {/* Diagnostic Meter Waveform / Bar */}
                   <div className="mt-5 border-t border-white/10 pt-4">
-                    <div className="flex items-center justify-between font-mono text-[10px] text-gray-400">
+                    <div className="flex items-center justify-between font-sans text-[10px] text-gray-400">
                       <span>CALIBRATION AXIS</span>
                       <span className="font-bold text-white">{vec.meterPercent}% DENSITY</span>
                     </div>
@@ -954,7 +954,7 @@ export const MoltMaxPage: React.FC = () => {
 
                 {/* Bottom Pill Feature */}
                 <div className="relative z-10 mt-5 border-t border-white/10 pt-3">
-                  <div className="flex items-center gap-2 font-mono text-[11px] text-gray-200">
+                  <div className="flex items-center gap-2 font-sans text-[11px] text-gray-200">
                     <CheckCircle2 className="h-3.5 w-3.5 shrink-0" style={{ color: vec.color }} />
                     <span className="line-clamp-1">{vec.bullet}</span>
                   </div>
@@ -977,7 +977,7 @@ export const MoltMaxPage: React.FC = () => {
             onBack={handleBack}
             onNext={handleNext}
           />
-          <div className="mx-auto mt-4 max-w-6xl xl:max-w-[1240px] text-center font-mono text-[10px] uppercase tracking-wider text-[#526363]">
+          <div className="mx-auto mt-4 max-w-6xl xl:max-w-[1240px] text-center font-sans text-[10px] uppercase tracking-wider text-[#526363]">
             Your responses are private and calculated locally in your browser.
           </div>
         </main>

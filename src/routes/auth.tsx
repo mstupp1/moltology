@@ -112,7 +112,7 @@ export function AuthRoute() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-[#dfe3e3] font-mono flex flex-col justify-between selection:bg-[#00ffff] selection:text-[#000a0a]">
+    <div className="min-h-screen bg-[#070b0b] text-[#dfe3e3] font-sans flex flex-col justify-between selection:bg-[#00ffff] selection:text-[#000a0a]">
       {/* Main Full-Height 50/50 Split Screen */}
       <main className="relative flex-1 flex flex-col lg:flex-row w-full">
         
@@ -215,7 +215,7 @@ export function AuthRoute() {
             </div>
 
             <div className="text-[11px] sm:text-xs text-gray-300 italic max-w-xs font-sans">
-              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-gray-200 font-mono not-italic text-[10px] sm:text-[11px]">Unit S2</span>
+              "Decisive execution replaced my hesitation in 48 hours." — <span className="text-gray-200 font-sans not-italic text-[10px] sm:text-[11px]">Unit S2</span>
             </div>
           </div>
         </div>
@@ -234,7 +234,7 @@ export function AuthRoute() {
             <button
               type="button"
               onClick={() => navigate({ to: '/' })}
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-300 transition-colors uppercase tracking-wider font-mono cursor-pointer py-1"
+              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-300 transition-colors uppercase tracking-wider font-sans cursor-pointer py-1"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Home</span>
@@ -251,7 +251,7 @@ export function AuthRoute() {
                 <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
                   {mode === 'signup' ? 'Create Account' : 'Welcome Back'}
                 </h2>
-                <p className="text-[11px] sm:text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-mono">
+                <p className="text-[11px] sm:text-xs text-[#00c3ff]/80 mt-1 uppercase tracking-widest font-sans">
                   {mode === 'signup'
                     ? 'Sign up to persist your session'
                     : 'Sign in to access your saved state'}
@@ -298,7 +298,7 @@ export function AuthRoute() {
               {error && (
                 <div
                   role="alert"
-                  className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-mono"
+                  className="mb-4 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 rounded-none flex items-start gap-2.5 text-[#ff453a] text-xs font-sans"
                 >
                   <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
                   <span>{error}</span>

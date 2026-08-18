@@ -231,7 +231,7 @@ function SupportPortalRoute() {
   const isAdmin = ['admin', 'super_admin'].includes(effectiveRole)
 
   return (
-    <div className="space-y-6 font-mono text-[#dfe3e3] pb-10">
+    <div className="space-y-6 font-sans text-[#dfe3e3] pb-10">
       {/* Header Banner matching Benthic Ascendance HUD standard */}
       <div className="chitin-card p-5 chamfer-corner shadow-2xl relative overflow-hidden space-y-3">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-[#00ffff]/05 rounded-full blur-3xl pointer-events-none" />
@@ -325,7 +325,7 @@ function SupportPortalRoute() {
       </div>
 
       {adminMessage && (
-        <div className={`p-3 chamfer-corner text-xs font-bold font-mono border ${
+        <div className={`p-3 chamfer-corner text-xs font-bold font-sans border ${
           adminMessage.startsWith('✓') ? 'bg-[#00ffff]/10 border-[#00ffff] text-[#00ffff]' : 'bg-[#ff0055]/10 border-[#ff0055] text-[#ff0055]'
         }`}>
           {adminMessage}
@@ -345,7 +345,7 @@ function SupportPortalRoute() {
                 placeholder="Search transmutations, versions, or updates..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] pl-9 pr-3 py-2 outline-none transition-colors font-mono chamfer-corner"
+                className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] pl-9 pr-3 py-2 outline-none transition-colors font-sans chamfer-corner"
               />
             </div>
 
@@ -434,7 +434,7 @@ function SupportPortalRoute() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-[#00ffff] font-mono flex items-center gap-1 bg-[#00ffff]/05 px-2 py-0.5 border border-[#00ffff]/20">
+                          <span className="text-[10px] text-[#00ffff] font-sans flex items-center gap-1 bg-[#00ffff]/05 px-2 py-0.5 border border-[#00ffff]/20">
                             <CheckCircle2 className="w-3 h-3 text-[#00ffff]" />
                             VERIFIED IN DATABASE
                           </span>
@@ -453,7 +453,7 @@ function SupportPortalRoute() {
 
                       {/* Expandable Markdown Release Notes */}
                       {isExpanded && (
-                        <div className="pt-3 border-t border-[#3a4a49]/50 bg-[#030606]/60 p-3 chamfer-corner space-y-2 text-xs text-[#b8c7c7] font-mono leading-relaxed whitespace-pre-line">
+                        <div className="pt-3 border-t border-[#3a4a49]/50 bg-[#030606]/60 p-3 chamfer-corner space-y-2 text-xs text-[#b8c7c7] font-sans leading-relaxed whitespace-pre-line">
                           {entry.content}
                         </div>
                       )}
@@ -722,7 +722,7 @@ function SupportPortalRoute() {
                 </button>
               </div>
 
-            <form onSubmit={handleCreateChangelog} className="space-y-4 font-mono text-xs">
+            <form onSubmit={handleCreateChangelog} className="space-y-4 font-sans text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[#839493] font-bold block uppercase">

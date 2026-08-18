@@ -143,7 +143,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-mono selection:bg-[#00c3ff]/30 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#020408] text-[#dfe3e3] font-sans selection:bg-[#00c3ff]/30 selection:text-white flex flex-col justify-between">
       {/* Shared Navigation Header */}
       <PublicHeader
         onOpenAuth={(mode) => {
@@ -156,7 +156,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
       <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 w-full space-y-16">
         {/* Pillar Header */}
         <section className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-mono tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00c3ff]/10 border border-[#00c3ff]/30 text-[#00c3ff] text-xs font-sans tracking-widest uppercase">
             <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
             <span>The Canonical Doctrine · Benthic Codex Vault</span>
           </div>

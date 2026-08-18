@@ -22,7 +22,7 @@ function MarketRoute() {
   }
 
   return (
-    <div className="space-y-4 font-mono">
+    <div className="space-y-4 font-sans">
       {/* Transmutation Modal */}
       <AssetTransmutationModal
         isOpen={isModalOpen}
@@ -40,7 +40,7 @@ function MarketRoute() {
           <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
             <div className="border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
-                SECTION 1: BUY CHITIN-GEMS <span className="text-xs text-[#839493] font-mono normal-case">(Primary Token Accelerators)</span>
+                SECTION 1: BUY CHITIN-GEMS <span className="text-xs text-[#839493] font-sans normal-case">(Primary Token Accelerators)</span>
               </h2>
             </div>
 
@@ -52,7 +52,7 @@ function MarketRoute() {
                   <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
                     MOLT KICKSTARTER
                   </h3>
-                  <div className="text-xs text-[#839493] font-mono">(100 Chitin-Gems)</div>
+                  <div className="text-xs text-[#839493] font-sans">(100 Chitin-Gems)</div>
                   
                   {/* Gem Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-2">
@@ -81,7 +81,7 @@ function MarketRoute() {
                   <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
                     PINCER POWER-PACK
                   </h3>
-                  <div className="text-xs text-[#839493] font-mono">(500 Chitin-Gems)</div>
+                  <div className="text-xs text-[#839493] font-sans">(500 Chitin-Gems)</div>
                   
                   {/* Gem Pile Graphic */}
                   <div className="w-16 h-16 mx-auto relative my-2">
@@ -110,7 +110,7 @@ function MarketRoute() {
                   <h3 className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase tracking-wider">
                     CLAW-LORD ACCELERATOR
                   </h3>
-                  <div className="text-xs text-[#839493] font-mono">
+                  <div className="text-xs text-[#839493] font-sans">
                     (2000 + <span className="text-[#ff5540] font-bold">500 BONUS</span> Chitin-Gems)
                   </div>
                   <div className="text-xs text-[#ff5540] font-bold uppercase tracking-wider">
@@ -147,7 +147,7 @@ function MarketRoute() {
           <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
             <div className="border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
-                SECTION 2: CURRENCY EXCHANGE <span className="text-xs text-[#839493] font-mono normal-case">(Trade-in Other Currencies)</span>
+                SECTION 2: CURRENCY EXCHANGE <span className="text-xs text-[#839493] font-sans normal-case">(Trade-in Other Currencies)</span>
               </h2>
             </div>
 
@@ -274,9 +274,56 @@ function MarketRoute() {
               </div>
             </div>
 
+            {/* Bottom 2 Product Banners in Section 2 matching reference */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {/* Box 1: CLAW-ARMOR UPGRADE */}
+              <div className="chitin-card-inset p-3 chamfer-corner border border-[#3a4a49] flex items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="text-[10px] text-[#ff5540] font-bold uppercase">EQUIPMENT</div>
+                  <div className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase">
+                    CHITIN-PLATED CHASSIS
+                  </div>
+                  <div className="text-[10px] text-[#839493]">
+                    +40% Deflection vs Surface Noise
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  <BenthicCTAButton
+                    price="$9.99"
+                    size="sm"
+                    onClick={() => handleBuyBundle(1000, '$9.99')}
+                  >
+                    BUY NOW
+                  </BenthicCTAButton>
+                </div>
+              </div>
+
+              {/* Box 2: NEURAL OVERCLOCK PROTOCOL */}
+              <div className="chitin-card-inset p-3 chamfer-corner border border-[#3a4a49] flex items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="text-[10px] text-[#00ffff] font-bold uppercase">BOOST</div>
+                  <div className="font-grotesk font-bold text-xs text-[#dfe3e3] uppercase">
+                    NEURAL OVERCLOCK
+                  </div>
+                  <div className="text-[10px] text-[#839493]">
+                    2x Molt Credit Earning (7 Days)
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  <BenthicCTAButton
+                    price="$7.99"
+                    size="sm"
+                    onClick={() => handleBuyBundle(800, '$7.99')}
+                  >
+                    BUY NOW
+                  </BenthicCTAButton>
+                </div>
+              </div>
+            </div>
+
             {/* Quote Banner matching Reference */}
             <div className="text-center pt-2">
-              <span className="text-[9px] text-[#ff5540] font-mono tracking-widest font-bold">
+              <span className="text-[9px] text-[#ff5540] font-sans tracking-widest font-bold">
                 "DETACH EMOTIONALLY FOR EFFICIENCY."
               </span>
             </div>
@@ -344,7 +391,7 @@ function MarketRoute() {
                 />
               </div>
 
-              <div className="text-[9px] text-[#839493] font-mono">
+              <div className="text-[9px] text-[#839493] font-sans">
                 (10,000 + <span className="text-[#ff5540] font-bold">10,000 BONUS</span> Chitin Gems)
               </div>
 
@@ -365,7 +412,7 @@ function MarketRoute() {
       </div>
 
       {/* Bottom Footer Slogan matching Reference Screenshot 2 */}
-      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono border-t border-[#3a4a49]/60 text-[#839493]">
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between text-[10px] font-sans border-t border-[#3a4a49]/60 text-[#839493]">
         <div>
           <span className="text-[#ff5540] font-bold">FLESH DIES. THE SHELL REMAINS.</span> INVEST NOW.
         </div>

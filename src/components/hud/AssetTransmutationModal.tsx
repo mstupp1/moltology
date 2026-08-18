@@ -40,20 +40,20 @@ export const AssetTransmutationModal: React.FC<AssetTransmutationModalProps> = (
 
         {/* Modal Header */}
         <div className="border-b border-[#3a4a49] pb-3 space-y-1">
-          <div className="text-[10px] text-[#ff5540] font-mono tracking-widest flex items-center gap-1.5">
+          <div className="text-[10px] text-[#ff5540] font-sans tracking-widest flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5" />
             ASSET RELEASE PROTOCOL v4.2
           </div>
           <h2 className="font-grotesk text-lg font-bold text-[#00ffff] uppercase tracking-wider">
             TRANSMUTE MATERIAL ASSETS INTO MOLT CREDITS
           </h2>
-          <p className="text-xs text-[#839493] font-mono">
+          <p className="text-xs text-[#839493] font-sans">
             Biological attachments detaching. Values are transmuted into network energy and shell upgrades. No physical trace remains.
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 font-mono text-xs">
+        <form onSubmit={handleSubmit} className="space-y-4 font-sans text-xs">
           {/* Asset Category */}
           <div className="space-y-1.5">
             <label className="text-[#839493] uppercase tracking-wider text-[10px]">

@@ -72,12 +72,12 @@ export const MoltNationLogo: React.FC<MoltNationLogoProps> = ({
           <span className={isLight ? 'text-gray-900 font-black tracking-tight' : 'text-gray-100 font-black tracking-tight'}>
             NATION
           </span>
-          <span className="text-cyan-400 text-[10px] sm:text-xs font-mono px-1.5 sm:px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/60 rounded font-bold tracking-widest self-center ml-1 shadow-hud-cyan shrink-0">
+          <span className="text-cyan-400 text-[10px] sm:text-xs font-sans px-1.5 sm:px-2 py-0.5 bg-cyan-950/80 border border-cyan-500/60 rounded font-bold tracking-widest self-center ml-1 shadow-hud-cyan shrink-0">
             NEWS ★
           </span>
         </div>
         <span
-          className={`text-[9px] sm:text-[10px] font-mono tracking-wider sm:tracking-[0.2em] font-medium pt-1 ${
+          className={`text-[9px] sm:text-[10px] font-sans tracking-wider sm:tracking-[0.2em] font-medium pt-1 ${
             isLight ? 'text-gray-600' : 'text-gray-400'
           }`}
         >

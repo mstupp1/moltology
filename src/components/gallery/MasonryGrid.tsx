@@ -60,14 +60,14 @@ export const MasonryGrid: React.FC<MasonryGridProps> = ({
               {/* Top Controls - Always visible on mobile, hover-reveal on desktop */}
               <div className="absolute top-2.5 left-2.5 right-2.5 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 transform sm:-translate-y-2 sm:group-hover:translate-y-0 z-10">
                 {/* Category Badge */}
-                <span className="px-2 py-0.5 sm:py-1 bg-[#050a0c]/85 backdrop-blur-md border border-[#00c3ff]/50 text-[#00c3ff] text-[9px] sm:text-[10px] font-mono font-bold tracking-wider uppercase rounded-md shadow-md">
+                <span className="px-2 py-0.5 sm:py-1 bg-[#050a0c]/85 backdrop-blur-md border border-[#00c3ff]/50 text-[#00c3ff] text-[9px] sm:text-[10px] font-sans font-bold tracking-wider uppercase rounded-md shadow-md">
                   {pin.category}
                 </span>
 
                 {/* Save Pin Red/Cyber Button */}
                 <button
                   onClick={(e) => onToggleSavePin(e, pin.id)}
-                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-lg active:scale-95 min-h-[32px] ${
+                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-sans font-bold flex items-center gap-1.5 transition-all shadow-lg active:scale-95 min-h-[32px] ${
                     isSaved
                       ? 'bg-[#ff3b30] text-white border border-[#ff6b60] shadow-[0_0_12px_rgba(255,59,48,0.6)]'
                       : 'bg-black/75 hover:bg-[#ff3b30] text-white border border-white/20 hover:border-[#ff3b30] backdrop-blur-md'
@@ -113,7 +113,7 @@ export const MasonryGrid: React.FC<MasonryGridProps> = ({
             </div>
 
             {/* Static Bottom Card Footer (Always Visible) */}
-            <div className="p-3 bg-[#060a0c]/90 border-t border-[#1e2d37]/60 flex items-center justify-between text-xs font-mono text-[#7a8e9e]">
+            <div className="p-3 bg-[#060a0c]/90 border-t border-[#1e2d37]/60 flex items-center justify-between text-xs font-sans text-[#7a8e9e]">
               <div className="flex items-center gap-1.5 truncate">
                 <Sparkles className="w-3 h-3 text-[#ff5540]" />
                 <span className="truncate text-[#9eb0c0] font-sans text-xs">

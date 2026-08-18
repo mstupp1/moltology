@@ -50,7 +50,7 @@ export const HudBadge = React.forwardRef<HTMLSpanElement, HudBadgeProps>(
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1.5 font-mono text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 border rounded-none select-none',
+          'inline-flex items-center gap-1.5 font-sans text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 border rounded-none select-none',
           variantStyles.badge,
           className
         )}

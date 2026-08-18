@@ -35,7 +35,7 @@ export const QuizRadarChart: React.FC<QuizRadarChartProps> = ({ scores }) => {
         })}
         {dimensions.map(({ key, label }, index) => {
           const [x, y] = pointFor(index, 117, 88, center).split(',')
-          return <text key={key} x={x} y={y} fill="#839493" fontSize="8" textAnchor="middle" dominantBaseline="middle" className="font-mono tracking-widest">{label}</text>
+          return <text key={key} x={x} y={y} fill="#839493" fontSize="8" textAnchor="middle" dominantBaseline="middle" className="font-sans tracking-widest">{label}</text>
         })}
       </svg>
     </div>

@@ -415,7 +415,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                   {/* Clean Floating Tooltip */}
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
-                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                    <div className="bg-[#060a0b]/95 border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
                       <span className="tracking-wider uppercase">
                         {item.label}
@@ -442,7 +442,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.9)] shrink-0 animate-pulse" />
               )}
               <span
-                className={`font-mono ${
+                className={`font-sans ${
                   isMobile ? 'text-xs' : 'text-[10px]'
                 } font-bold text-[#00c3ff]/80 group-hover/groupheader:text-[#00c3ff] tracking-wider uppercase truncate transition-colors duration-150`}
               >
@@ -578,7 +578,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           {/* Brand Tooltip when collapsed */}
           {isCollapsed && (
             <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
-              <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
+              <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
                 <span className="text-[#00c3ff] drop-shadow-[0_0_8px_rgba(0,195,255,0.6)]">THE SYNAPTIC PATH</span>
                 <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD</span>
               </div>
@@ -607,7 +607,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           <div className="shrink-0 border-b border-[#1e2d37]/80">
             <button
               onClick={handleOpenCommandPalette}
-              className={`w-full flex items-center justify-between px-4 py-3 bg-[#080d10] hover:bg-[#0d1415] text-xs font-mono text-[#839493] hover:text-[#dfe3e3] transition-all group ${
+              className={`w-full flex items-center justify-between px-4 py-3 bg-[#080d10] hover:bg-[#0d1415] text-xs font-sans text-[#839493] hover:text-[#dfe3e3] transition-all group ${
                 isCollapsed ? 'justify-center px-0' : ''
               }`}
               title="Search commands & protocols (⌘K)"
@@ -636,7 +636,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <div className="flex items-center min-w-0 flex-1 overflow-hidden mr-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse shrink-0 mr-1.5" />
                 <div className="overflow-hidden whitespace-nowrap flex-1">
-                  <div className="animate-marquee flex items-center text-[9px] font-mono text-[#00c3ff]/80 tracking-wider">
+                  <div className="animate-marquee flex items-center text-[9px] font-sans text-[#00c3ff]/80 tracking-wider">
                     <span className="pr-4">{tickerText}</span>
                     <span className="pr-4">{tickerText}</span>
                   </div>
@@ -684,7 +684,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   />
                   {/* Tooltip */}
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
-                    <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-mono font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
+                    <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
                       <span className="text-[#dfe3e3]">REPLAY INITIATION BROADCAST</span>
                       <span className="text-[9px] text-[#ff5540]">• CARAPACE v4.2</span>
                     </div>
@@ -705,7 +705,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
                     className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
                   />
-                  <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
+                  <div className="text-[10px] font-sans text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
                     <span className="group-hover:hidden">CARAPACE v4.2</span>
                     <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>
@@ -755,7 +755,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 )}
                 {isCollapsed && (
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
-                    <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-mono font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                    <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
                       <span className="tracking-wider uppercase">
                         HELP &amp; SUPPORT
@@ -811,7 +811,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             role="dialog"
             aria-modal="true"
             aria-label="Navigation Menu"
-            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-[#030708] flex flex-col font-mono text-[#dfe3e3] select-none overflow-hidden transition-all duration-250 ease-out ${
+            className={`md:hidden fixed inset-x-0 bottom-0 top-14 z-[99990] w-screen h-[calc(100dvh-3.5rem)] bg-[#030708] flex flex-col font-sans text-[#dfe3e3] select-none overflow-hidden transition-all duration-250 ease-out ${
               isMobileVisible && !isMobileClosing
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 -translate-y-2 pointer-events-none'
@@ -823,12 +823,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 onClick={() => {
                   closeMobileMenu(() => handleOpenCommandPalette())
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 text-xs font-mono text-[#839493] hover:text-[#dfe3e3] transition-all group active:bg-[#0e1618]"
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-sans text-[#839493] hover:text-[#dfe3e3] transition-all group active:bg-[#0e1618]"
                 title="Search commands & protocols (⌘K)"
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <Search className="w-4 h-4 text-[#00c3ff] shrink-0" />
-                  <span className="truncate text-xs font-mono text-[#a8b8b8]">Search commands & protocols...</span>
+                  <span className="truncate text-xs font-sans text-[#a8b8b8]">Search commands & protocols...</span>
                 </div>
                 <div className="flex items-center gap-0.5 bg-[#0f1414] border border-[#3a4a49] text-[#00c3ff] px-2 py-0.5 text-[10px] font-bold shrink-0 ml-2">
                   <Command className="w-3 h-3" />
@@ -842,7 +842,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               <div className="flex items-center min-w-0 flex-1 overflow-hidden mr-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse shrink-0 mr-2" />
                 <div className="overflow-hidden whitespace-nowrap flex-1">
-                  <div className="animate-marquee flex items-center text-[10px] font-mono text-[#00c3ff]/90 tracking-wider">
+                  <div className="animate-marquee flex items-center text-[10px] font-sans text-[#00c3ff]/90 tracking-wider">
                     <span className="pr-6">{tickerText}</span>
                     <span className="pr-6">{tickerText}</span>
                   </div>
@@ -890,7 +890,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     containerClassName="w-20 h-20 aspect-square rounded-full overflow-hidden flex items-center justify-center"
                     className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
                   />
-                  <div className="text-[10px] font-mono text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
+                  <div className="text-[10px] font-sans text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
                     <span className="group-hover:hidden">CARAPACE v4.2</span>
                     <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>

@@ -21,7 +21,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   const isMaxStage = stage >= 4
 
   return (
-    <header className="w-full bg-[#020608]/90 backdrop-blur-md border-b border-[#00c3ff]/15 px-2 sm:px-4 py-1.5 sm:py-2 flex items-center gap-1.5 sm:gap-3 font-mono select-none relative z-30 shadow-[0_2px_20px_rgba(0,195,255,0.1)] shrink-0">
+    <header className="w-full bg-[#020608]/90 backdrop-blur-md border-b border-[#00c3ff]/15 px-2 sm:px-4 py-1.5 sm:py-2 flex items-center gap-1.5 sm:gap-3 font-sans select-none relative z-30 shadow-[0_2px_20px_rgba(0,195,255,0.1)] shrink-0">
 
       {/* HUD scanline overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
@@ -45,7 +45,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
       {/* ── LEFT: Current Level Badge ── */}
       <div className="flex items-center shrink-0 z-10">
         <div
-          className="flex items-center gap-1 bg-[#030d10]/90 border border-[#00c3ff]/40 hover:border-[#00c3ff]/80 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-mono shadow-[0_0_10px_rgba(0,195,255,0.2)] transition-all group cursor-default"
+          className="flex items-center gap-1 bg-[#030d10]/90 border border-[#00c3ff]/40 hover:border-[#00c3ff]/80 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-sans shadow-[0_0_10px_rgba(0,195,255,0.2)] transition-all group cursor-default"
           title={`Current Clearance Level ${stage}`}
           aria-label={`Level ${stage} Badge`}
         >
@@ -152,7 +152,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
       <div className="flex items-center shrink-0 z-10">
         {!isMaxStage ? (
           <div
-            className="flex items-center gap-1 bg-gradient-to-r from-[#1a0c05]/95 via-[#291307]/95 to-[#1a0c05]/95 border border-[#ff8c42]/60 hover:border-[#ffa666] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-mono shadow-[0_0_12px_rgba(255,140,66,0.3)] transition-all group cursor-default"
+            className="flex items-center gap-1 bg-gradient-to-r from-[#1a0c05]/95 via-[#291307]/95 to-[#1a0c05]/95 border border-[#ff8c42]/60 hover:border-[#ffa666] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-sans shadow-[0_0_12px_rgba(255,140,66,0.3)] transition-all group cursor-default"
             title={`Next Ascension Clearance: Level ${nextStage}`}
             aria-label={`Next Level ${nextStage} Badge`}
           >
@@ -166,7 +166,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
           </div>
         ) : (
           <div
-            className="flex items-center gap-1 bg-[#04150a]/95 border border-[#00ff88]/50 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-mono shadow-[0_0_12px_rgba(0,255,136,0.25)] cursor-default"
+            className="flex items-center gap-1 bg-[#04150a]/95 border border-[#00ff88]/50 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-sans shadow-[0_0_12px_rgba(0,255,136,0.25)] cursor-default"
             title="Apex Carcinization Level Reached"
             aria-label="Apex Level Badge"
           >

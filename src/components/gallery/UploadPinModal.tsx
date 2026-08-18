@@ -104,7 +104,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto max-h-[78vh]">
           {/* Image Upload Box */}
           <div className="space-y-1.5">
-            <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+            <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
               1. UPLOAD ARTIFACT IMAGE
             </label>
             <div className="relative border-2 border-dashed border-[#1e2d37] hover:border-[#00c3ff] rounded-xl p-4 bg-[#030607] flex flex-col items-center justify-center min-h-[160px] cursor-pointer transition-colors group">
@@ -122,7 +122,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
                     alt="Upload Preview"
                     className="w-full h-full object-contain"
                   />
-                  <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded text-[10px] font-mono text-[#00e676] border border-[#00e676]/40">
+                  <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded text-[10px] font-sans text-[#00e676] border border-[#00e676]/40">
                     IMAGE READY
                   </div>
                 </div>
@@ -131,10 +131,10 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
                   <div className="w-12 h-12 rounded-full bg-[#0a0f12] border border-[#00c3ff]/40 flex items-center justify-center mx-auto text-[#00c3ff] group-hover:scale-110 transition-transform">
                     <Upload className="w-6 h-6" />
                   </div>
-                  <div className="text-xs font-mono text-[#c0d0e0]">
+                  <div className="text-xs font-sans text-[#c0d0e0]">
                     Drop file here or <span className="text-[#00c3ff] underline">browse</span>
                   </div>
-                  <div className="text-[10px] font-mono text-[#607080]">
+                  <div className="text-[10px] font-sans text-[#607080]">
                     Supports JPG, PNG, WEBP (Max 10MB)
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
 
           {/* Title */}
           <div className="space-y-1">
-            <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+            <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
               2. ARTIFACT TITLE *
             </label>
             <input
@@ -160,13 +160,13 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
           {/* Category & Aspect Ratio Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+              <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
                 CATEGORY
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as GalleryPin['category'])}
-                className="w-full px-3 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-mono text-[#c0d0e0] outline-none cursor-pointer"
+                className="w-full px-3 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-sans text-[#c0d0e0] outline-none cursor-pointer"
               >
                 <option value="SACRED DOCTRINE">SACRED DOCTRINE</option>
                 <option value="BIOMECHANICAL">BIOMECHANICAL</option>
@@ -178,13 +178,13 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+              <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
                 ASPECT RATIO
               </label>
               <select
                 value={aspectRatio}
                 onChange={(e) => setAspectRatio(e.target.value as GalleryPin['aspectRatio'])}
-                className="w-full px-3 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-mono text-[#c0d0e0] outline-none cursor-pointer"
+                className="w-full px-3 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-sans text-[#c0d0e0] outline-none cursor-pointer"
               >
                 <option value="3:4">Vertical (3:4)</option>
                 <option value="1:1">Square (1:1)</option>
@@ -197,7 +197,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
 
           {/* Description */}
           <div className="space-y-1">
-            <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+            <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
               3. DOCTRINAL DESCRIPTION / EXCERPT
             </label>
             <textarea
@@ -211,7 +211,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
 
           {/* Prompt */}
           <div className="space-y-1">
-            <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+            <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
               4. GENERATIVE PROMPT (OPTIONAL)
             </label>
             <input
@@ -219,13 +219,13 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Prompt used to synthesize this visual artifact..."
-              className="w-full px-3.5 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-mono text-white outline-none"
+              className="w-full px-3.5 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-sans text-white outline-none"
             />
           </div>
 
           {/* Tags */}
           <div className="space-y-1">
-            <label className="text-xs font-mono text-[#00c3ff] uppercase font-bold">
+            <label className="text-xs font-sans text-[#00c3ff] uppercase font-bold">
               5. TAGS (COMMA SEPARATED)
             </label>
             <input
@@ -233,7 +233,7 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
               placeholder="chitin, ecdysis, benthic, cybernetic"
-              className="w-full px-3.5 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-mono text-white outline-none"
+              className="w-full px-3.5 py-2.5 bg-[#030607] border border-[#1e2d37] focus:border-[#00c3ff] rounded-xl text-xs font-sans text-white outline-none"
             />
           </div>
 
@@ -242,14 +242,14 @@ export const UploadPinModal: React.FC<UploadPinModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-[#0a0f12] hover:bg-[#12191d] border border-[#1e2d37] text-xs font-mono text-[#c0d0e0] rounded-xl transition-all"
+              className="px-4 py-2 bg-[#0a0f12] hover:bg-[#12191d] border border-[#1e2d37] text-xs font-sans text-[#c0d0e0] rounded-xl transition-all"
             >
               CANCEL
             </button>
             <button
               type="submit"
               disabled={!title.trim() || !imagePreview || isSubmitting}
-              className="px-5 py-2.5 bg-[#00c3ff] hover:bg-[#33d1ff] disabled:opacity-50 text-black font-mono font-bold text-xs rounded-xl transition-all shadow-[0_0_15px_rgba(0,195,255,0.4)] active:scale-95 flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-[#00c3ff] hover:bg-[#33d1ff] disabled:opacity-50 text-black font-sans font-bold text-xs rounded-xl transition-all shadow-[0_0_15px_rgba(0,195,255,0.4)] active:scale-95 flex items-center gap-1.5"
             >
               {isSubmitting ? (
                 <span>TRANSMUTING...</span>

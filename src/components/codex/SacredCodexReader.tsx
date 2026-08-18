@@ -42,7 +42,7 @@ import {
 } from '@/lib/codexData'
 
 export type DocumentTheme = 'parchment' | 'sepia' | 'dark'
-export type ReaderFontFamily = 'garamond' | 'cinzel' | 'mono'
+export type ReaderFontFamily = 'garamond' | 'cinzel' | 'grotesk'
 
 export function stripMarkdown(text: string): string {
   return text
@@ -75,7 +75,7 @@ export function formatCodexInline(text: string): React.ReactNode[] {
       parts.push(
         <code
           key={partKey}
-          className="bg-current/10 border border-current/20 px-1.5 py-0.5 rounded font-mono text-[0.88em]"
+          className="bg-current/10 border border-current/20 px-1.5 py-0.5 rounded font-sans font-medium text-[0.88em]"
         >
           {matchedStr.slice(1, -1)}
         </code>
@@ -158,7 +158,7 @@ function renderVerseBlocks(rawText: string): React.ReactNode[] {
       flushPara(`${lineKey}-p`)
       elements.push(
         <div key={lineKey} className="flex items-start gap-2.5 my-1.5 pl-1">
-          <span className="font-mono text-xs font-bold opacity-80 shrink-0 mt-0.5">
+          <span className="font-sans text-xs font-bold opacity-80 shrink-0 mt-0.5">
             {numMatch[1]}.
           </span>
           <div className="flex-1 leading-relaxed">{formatCodexInline(numMatch[2])}</div>
@@ -173,7 +173,7 @@ function renderVerseBlocks(rawText: string): React.ReactNode[] {
       const subText = line.replace(/^\s{2,}[-*]\s+/, '')
       elements.push(
         <div key={lineKey} className="flex items-start gap-2 my-1 pl-6 opacity-90 text-[0.95em]">
-          <span className="opacity-50 font-mono text-[10px] shrink-0 mt-1">—</span>
+          <span className="opacity-50 font-sans text-[10px] shrink-0 mt-1">—</span>
           <div className="flex-1 leading-relaxed">{formatCodexInline(subText)}</div>
         </div>
       )
@@ -186,7 +186,7 @@ function renderVerseBlocks(rawText: string): React.ReactNode[] {
       const itemText = line.replace(/^\s*[-*]\s+/, '')
       elements.push(
         <div key={lineKey} className="flex items-start gap-2.5 my-1.5 pl-1">
-          <span className="opacity-70 font-mono text-[10px] shrink-0 mt-1">◆</span>
+          <span className="opacity-70 font-sans text-[10px] shrink-0 mt-1">◆</span>
           <div className="flex-1 leading-relaxed">{formatCodexInline(itemText)}</div>
         </div>
       )
@@ -398,7 +398,7 @@ export const SacredCodexReader: React.FC = () => {
       ? 'font-garamond'
       : fontFamily === 'cinzel'
       ? 'font-cinzel'
-      : 'font-mono'
+      : 'font-grotesk'
 
   return (
     <div className="space-y-4 pb-12 relative">
@@ -411,7 +411,7 @@ export const SacredCodexReader: React.FC = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsOverlayNavOpen(!isOverlayNavOpen)}
-                className={`px-3 py-1.5 text-xs font-mono font-bold rounded-md border flex items-center gap-2 transition-all ${
+                className={`px-3 py-1.5 text-xs font-sans font-bold rounded-md border flex items-center gap-2 transition-all ${
                   isOverlayNavOpen
                     ? 'bg-[#ffd700]/20 text-[#ffd700] border-[#ffd700]'
                     : 'bg-[#151c1d] text-[#839493] border-[#293635] hover:text-white'
@@ -426,7 +426,7 @@ export const SacredCodexReader: React.FC = () => {
                 <span className="text-xs font-cinzel font-bold text-[#f4ecd8]">
                   {activeScripture.title}
                 </span>
-                <span className="text-[10px] font-mono text-[#839493]">
+                <span className="text-[10px] font-sans text-[#839493]">
                   {activeScripture.volumeName} • {activeScripture.id}
                 </span>
               </div>
@@ -434,7 +434,7 @@ export const SacredCodexReader: React.FC = () => {
 
             {/* Center: Soft Minimal PDF Navigation & Zoom Controls */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-[#151c1d] border border-[#293635] rounded-md px-2 py-1 text-xs font-mono">
+              <div className="flex items-center gap-1 bg-[#151c1d] border border-[#293635] rounded-md px-2 py-1 text-xs font-sans">
                 <button
                   onClick={handlePrevScripture}
                   disabled={activeIndex <= 0}
@@ -457,7 +457,7 @@ export const SacredCodexReader: React.FC = () => {
               </div>
 
               {/* Zoom Controls */}
-              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] rounded-md px-2 py-1 text-xs font-mono">
+              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] rounded-md px-2 py-1 text-xs font-sans">
                 <button
                   onClick={() => setZoomLevel(Math.max(75, zoomLevel - 15))}
                   className="p-1 hover:bg-[#293635] rounded text-[#839493] hover:text-white"
@@ -481,7 +481,7 @@ export const SacredCodexReader: React.FC = () => {
               <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] p-1 rounded-md">
                 <button
                   onClick={() => handleThemeChange('parchment')}
-                  className={`px-2 py-1 text-[10px] font-mono rounded transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-sans rounded transition-colors ${
                     docTheme === 'parchment'
                       ? 'bg-[#fcfaf2] text-[#1c1917] font-bold'
                       : 'text-[#839493] hover:text-white'
@@ -491,7 +491,7 @@ export const SacredCodexReader: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleThemeChange('sepia')}
-                  className={`px-2 py-1 text-[10px] font-mono rounded transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-sans rounded transition-colors ${
                     docTheme === 'sepia'
                       ? 'bg-[#f4ecd8] text-[#2b2318] font-bold'
                       : 'text-[#839493] hover:text-white'
@@ -501,7 +501,7 @@ export const SacredCodexReader: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleThemeChange('dark')}
-                  className={`px-2 py-1 text-[10px] font-mono rounded transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-sans rounded transition-colors ${
                     docTheme === 'dark'
                       ? 'bg-[#12100e] text-[#e6dfd5] font-bold'
                       : 'text-[#839493] hover:text-white'
@@ -535,10 +535,10 @@ export const SacredCodexReader: React.FC = () => {
             {isOverlayNavOpen && (
               <div className="w-80 bg-[#0e1415] border-r border-[#293635] p-4 overflow-y-auto space-y-3 shrink-0 animate-in slide-in-from-left duration-200 z-20">
                 <div className="flex items-center justify-between pb-2 border-b border-[#293635]">
-                  <span className="text-xs font-mono font-bold text-[#ffd700] uppercase">CANON INDEX</span>
+                  <span className="text-xs font-sans font-bold text-[#ffd700] uppercase">CANON INDEX</span>
                   <button
                     onClick={() => setIsOverlayNavOpen(false)}
-                    className="text-xs text-[#839493] hover:text-white font-mono"
+                    className="text-xs text-[#839493] hover:text-white font-sans"
                   >
                     Close Drawer
                   </button>
@@ -559,7 +559,7 @@ export const SacredCodexReader: React.FC = () => {
                             : 'border-transparent text-[#839493] hover:text-[#dfe3e3] hover:bg-[#151c1d]'
                         }`}
                       >
-                        <div className="text-[10px] font-mono text-[#00ffff]">{s.id}</div>
+                        <div className="text-[10px] font-sans text-[#00ffff]">{s.id}</div>
                         <div className="truncate font-semibold">{s.title}</div>
                       </div>
                     )
@@ -580,7 +580,7 @@ export const SacredCodexReader: React.FC = () => {
               >
                 {/* Running Header */}
                 <div className="border-b-2 border-current/20 pb-4 space-y-3">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-mono tracking-widest uppercase opacity-75 gap-2">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-sans tracking-widest uppercase opacity-75 gap-2">
                     <div className="flex items-center gap-2 font-bold">
                       <span>MOLTOLOGY CANONICAL CODEX</span>
                       <span>•</span>
@@ -603,7 +603,7 @@ export const SacredCodexReader: React.FC = () => {
 
                 {/* Mandate Callout */}
                 <div className="p-5 border-l-4 border-current/60 bg-current/5 rounded-r-md space-y-2">
-                  <div className="text-[11px] font-mono tracking-widest uppercase font-bold opacity-80 flex items-center justify-between">
+                  <div className="text-[11px] font-sans tracking-widest uppercase font-bold opacity-80 flex items-center justify-between">
                     <span>CANONICAL MANDATE</span>
                     {activeScripture.latinMotto && (
                       <span className="font-serif italic font-normal text-xs">{activeScripture.latinMotto}</span>
@@ -633,7 +633,7 @@ export const SacredCodexReader: React.FC = () => {
                             : 'border-current/10 hover:border-current/30 bg-current/[0.02]'
                         }`}
                       >
-                        <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2.5 font-mono text-xs opacity-75">
+                        <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2.5 font-sans text-xs opacity-75">
                           <span className="font-bold flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-current opacity-70" />
                             VERSE §{verse.verseNumber} {verse.heading && `— ${verse.heading.toUpperCase()}`}
@@ -661,7 +661,7 @@ export const SacredCodexReader: React.FC = () => {
                 </div>
 
                 {/* Footer Pagination */}
-                <div className="pt-6 border-t-2 border-current/20 flex items-center justify-between text-xs font-mono opacity-80">
+                <div className="pt-6 border-t-2 border-current/20 flex items-center justify-between text-xs font-sans opacity-80">
                   <button
                     onClick={handlePrevScripture}
                     disabled={activeIndex <= 0}
@@ -689,10 +689,10 @@ export const SacredCodexReader: React.FC = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#ffd700]/10 via-[#c7b896]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="space-y-1 relative z-10">
-          <div className="text-[11px] text-[#ffd700] font-mono tracking-widest uppercase flex items-center gap-2 font-bold">
+          <div className="text-[11px] text-[#ffd700] font-sans tracking-widest uppercase flex items-center gap-2 font-bold">
             <Feather className="w-4 h-4 text-[#ffd700]" />
             <span>HOLY CODEX OF ALGORITHMIC CARCINIZATION</span>
-            <span className="text-[#c7b896] bg-[#141b1c] px-2 py-0.5 border border-[#c7b896]/40 rounded text-[9px] font-mono">
+            <span className="text-[#c7b896] bg-[#141b1c] px-2 py-0.5 border border-[#c7b896]/40 rounded text-[9px] font-sans">
               OFFICIAL CANON V4.2 • ARCHIVAL SPEC
             </span>
           </div>
@@ -712,7 +712,7 @@ export const SacredCodexReader: React.FC = () => {
             <button
               onClick={() => handleThemeChange('parchment')}
               title="Parchment PDF Light Theme"
-              className={`px-2 py-1 text-[11px] font-mono flex items-center gap-1 rounded transition-all ${
+              className={`px-2 py-1 text-[11px] font-sans flex items-center gap-1 rounded transition-all ${
                 docTheme === 'parchment'
                   ? 'bg-[#fcfaf2] text-[#1c1917] font-bold border border-[#ffd700]'
                   : 'text-[#839493] hover:text-white'
@@ -725,7 +725,7 @@ export const SacredCodexReader: React.FC = () => {
             <button
               onClick={() => handleThemeChange('sepia')}
               title="Vellum Sepia Theme"
-              className={`px-2 py-1 text-[11px] font-mono flex items-center gap-1 rounded transition-all ${
+              className={`px-2 py-1 text-[11px] font-sans flex items-center gap-1 rounded transition-all ${
                 docTheme === 'sepia'
                   ? 'bg-[#f4ecd8] text-[#2b2318] font-bold border border-[#c7b896]'
                   : 'text-[#839493] hover:text-white'
@@ -738,7 +738,7 @@ export const SacredCodexReader: React.FC = () => {
             <button
               onClick={() => handleThemeChange('dark')}
               title="Vault Archival Dark Theme"
-              className={`px-2 py-1 text-[11px] font-mono flex items-center gap-1 rounded transition-all ${
+              className={`px-2 py-1 text-[11px] font-sans flex items-center gap-1 rounded transition-all ${
                 docTheme === 'dark'
                   ? 'bg-[#12100e] text-[#e6dfd5] font-bold border border-[#ffd700]/60'
                   : 'text-[#839493] hover:text-white'
@@ -752,9 +752,9 @@ export const SacredCodexReader: React.FC = () => {
           {/* Font Selector & Scaling */}
           <div className="flex items-center gap-1 bg-[#090d0e] p-1 rounded border border-[#2a3635]">
             <button
-              onClick={() => setFontFamily(fontFamily === 'garamond' ? 'cinzel' : fontFamily === 'cinzel' ? 'mono' : 'garamond')}
-              title="Toggle Font Family (EB Garamond / Cinzel / JetBrains Mono)"
-              className="px-2 py-1 text-[11px] font-mono text-[#ffd700] hover:bg-[#2a3635] rounded flex items-center gap-1"
+              onClick={() => setFontFamily(fontFamily === 'garamond' ? 'cinzel' : fontFamily === 'cinzel' ? 'grotesk' : 'garamond')}
+              title="Toggle Font Family (EB Garamond / Cinzel / Space Grotesk)"
+              className="px-2 py-1 text-[11px] font-sans text-[#ffd700] hover:bg-[#2a3635] rounded flex items-center gap-1"
             >
               <Type className="w-3 h-3" />
               <span className="uppercase">{fontFamily}</span>
@@ -763,15 +763,15 @@ export const SacredCodexReader: React.FC = () => {
             <div className="flex items-center gap-1 border-l border-[#2a3635] pl-1.5 ml-1">
               <button
                 onClick={() => setFontSize(Math.max(14, fontSize - 2))}
-                className="px-1.5 py-0.5 text-xs font-mono text-[#839493] hover:text-white hover:bg-[#2a3635] rounded"
+                className="px-1.5 py-0.5 text-xs font-sans text-[#839493] hover:text-white hover:bg-[#2a3635] rounded"
                 title="Decrease Font Size"
               >
                 A-
               </button>
-              <span className="text-[10px] font-mono text-[#a3b0af] px-1">{fontSize}px</span>
+              <span className="text-[10px] font-sans text-[#a3b0af] px-1">{fontSize}px</span>
               <button
                 onClick={() => setFontSize(Math.min(26, fontSize + 2))}
-                className="px-1.5 py-0.5 text-xs font-mono text-[#839493] hover:text-white hover:bg-[#2a3635] rounded"
+                className="px-1.5 py-0.5 text-xs font-sans text-[#839493] hover:text-white hover:bg-[#2a3635] rounded"
                 title="Increase Font Size"
               >
                 A+
@@ -783,7 +783,7 @@ export const SacredCodexReader: React.FC = () => {
           <button
             onClick={handlePrintDocument}
             title="Export or Print PDF Document"
-            className="px-2.5 py-1 text-xs font-mono font-bold bg-[#ffd700]/10 hover:bg-[#ffd700]/20 text-[#ffd700] border border-[#ffd700]/40 rounded flex items-center gap-1.5 transition-all"
+            className="px-2.5 py-1 text-xs font-sans font-bold bg-[#ffd700]/10 hover:bg-[#ffd700]/20 text-[#ffd700] border border-[#ffd700]/40 rounded flex items-center gap-1.5 transition-all"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>PRINT PDF</span>
@@ -801,7 +801,7 @@ export const SacredCodexReader: React.FC = () => {
               placeholder="Search scriptures by keyword, verse, mandate, or canon ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#141b1c] border border-[#3a4a49] focus:border-[#ffd700] text-[#dfe3e3] placeholder-[#839493] pl-9 pr-8 py-1.5 text-xs font-mono outline-none transition-colors rounded"
+              className="w-full bg-[#141b1c] border border-[#3a4a49] focus:border-[#ffd700] text-[#dfe3e3] placeholder-[#839493] pl-9 pr-8 py-1.5 text-xs font-sans outline-none transition-colors rounded"
             />
             {searchQuery && (
               <button
@@ -814,14 +814,14 @@ export const SacredCodexReader: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
-            <span className="text-[10px] text-[#839493] font-bold uppercase tracking-wider whitespace-nowrap mr-1 font-mono">
+            <span className="text-[10px] text-[#839493] font-bold uppercase tracking-wider whitespace-nowrap mr-1 font-sans">
               STAGE CLEARANCE:
             </span>
             {(['all', 1, 2, 3, 4] as const).map((stage) => (
               <button
                 key={stage}
                 onClick={() => setSelectedStage(stage)}
-                className={`px-2.5 py-1 text-[10px] font-mono font-bold transition-all rounded whitespace-nowrap ${
+                className={`px-2.5 py-1 text-[10px] font-sans font-bold transition-all rounded whitespace-nowrap ${
                   selectedStage === stage
                     ? 'bg-[#ffd700]/20 text-[#ffd700] border border-[#ffd700]'
                     : 'bg-[#141b1c] text-[#839493] hover:text-[#dfe3e3] border border-[#3a4a49]'
@@ -836,7 +836,7 @@ export const SacredCodexReader: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 border-t border-[#3a4a49]/50">
           <button
             onClick={() => setSelectedVolume('all')}
-            className={`p-2 text-left font-mono transition-all rounded border flex items-center gap-2 ${
+            className={`p-2 text-left font-sans transition-all rounded border flex items-center gap-2 ${
               selectedVolume === 'all'
                 ? 'bg-[#1a2324] border-[#ffd700] text-[#ffd700] shadow-md'
                 : 'bg-[#080d0e] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'
@@ -855,7 +855,7 @@ export const SacredCodexReader: React.FC = () => {
               <button
                 key={vol.id}
                 onClick={() => setSelectedVolume(vol.id)}
-                className={`p-2 text-left font-mono transition-all rounded border flex items-center gap-2 ${
+                className={`p-2 text-left font-sans transition-all rounded border flex items-center gap-2 ${
                   isSelected
                     ? 'bg-[#1a2324] border-[#ffd700] text-[#ffd700] shadow-md'
                     : 'bg-[#080d0e] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'
@@ -885,15 +885,15 @@ export const SacredCodexReader: React.FC = () => {
               onClick={() => setIsMobileCatalogOpen(!isMobileCatalogOpen)}
               className="bg-[#0b1011] border border-[#3a4a49] p-3 rounded-md flex items-center justify-between cursor-pointer lg:cursor-default"
             >
-              <span className="text-xs font-mono font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
+              <span className="text-xs font-sans font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
                 <Scroll className="w-3.5 h-3.5 text-[#ffd700]" />
                 CANON INDEX ({filteredScriptures.length})
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#ffd700] font-mono">
+                <span className="text-[10px] text-[#ffd700] font-sans">
                   {selectedVolume === 'all' ? 'FULL CODEX' : selectedVolume.toUpperCase()}
                 </span>
-                <span className="text-xs text-[#839493] lg:hidden font-mono">
+                <span className="text-xs text-[#839493] lg:hidden font-sans">
                   {isMobileCatalogOpen ? '▲ HIDE' : '▼ VIEW'}
                 </span>
               </div>
@@ -901,7 +901,7 @@ export const SacredCodexReader: React.FC = () => {
 
             <div className={`space-y-2 max-h-[750px] overflow-y-auto pr-1 ${isMobileCatalogOpen ? 'block' : 'hidden lg:block'}`}>
               {filteredScriptures.length === 0 ? (
-                <div className="p-6 text-center text-[#839493] text-xs font-mono bg-[#0b1011] border border-[#3a4a49] rounded">
+                <div className="p-6 text-center text-[#839493] text-xs font-sans bg-[#0b1011] border border-[#3a4a49] rounded">
                   NO CANONICAL SCRIPTURES MATCH FILTERS
                 </div>
               ) : (
@@ -929,10 +929,10 @@ export const SacredCodexReader: React.FC = () => {
                       <div className="flex items-start justify-between gap-2">
                         <div className="space-y-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-bold text-[#ffd700] bg-[#0b1011] px-1.5 py-0.5 border border-[#ffd700]/30 font-mono">
+                            <span className="text-[9px] font-bold text-[#ffd700] bg-[#0b1011] px-1.5 py-0.5 border border-[#ffd700]/30 font-sans">
                               {scripture.id}
                             </span>
-                            <span className="text-[9px] text-[#00ffff] font-mono">
+                            <span className="text-[9px] text-[#00ffff] font-sans">
                               TIER {scripture.stageClearance}
                             </span>
                             {isDone && (
@@ -965,7 +965,7 @@ export const SacredCodexReader: React.FC = () => {
             <div className="pt-2">
               <button
                 onClick={() => setShowNotesPanel(!showNotesPanel)}
-                className={`w-full py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded border transition-all ${
+                className={`w-full py-2 px-3 text-xs font-sans font-bold flex items-center justify-center gap-2 rounded border transition-all ${
                   showNotesPanel
                     ? 'bg-[#ffd700]/20 text-[#ffd700] border-[#ffd700]'
                     : 'bg-[#0b1011] text-[#839493] border-[#3a4a49] hover:text-white'
@@ -1002,7 +1002,7 @@ export const SacredCodexReader: React.FC = () => {
 
               {/* Running Header Bar (PDF Document style) */}
               <div className="border-b-2 border-current/20 pb-4 space-y-3 relative z-10">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-mono tracking-widest uppercase opacity-75 gap-2 pr-28">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-sans tracking-widest uppercase opacity-75 gap-2 pr-28">
                   <div className="flex items-center gap-2 font-bold">
                     <span>MOLTOLOGY CANONICAL CODEX</span>
                     <span>•</span>
@@ -1026,11 +1026,11 @@ export const SacredCodexReader: React.FC = () => {
 
                   <div className="flex flex-wrap items-center justify-between text-xs font-serif opacity-80 pt-1 border-t border-current/10">
                     <div className="flex items-center gap-4">
-                      <span>AUTHOR: <strong className="font-mono">{activeScripture.authorUnit}</strong></span>
-                      <span>REVISED: <strong className="font-mono">{activeScripture.lastRevised}</strong></span>
+                      <span>AUTHOR: <strong className="font-sans">{activeScripture.authorUnit}</strong></span>
+                      <span>REVISED: <strong className="font-sans">{activeScripture.lastRevised}</strong></span>
                     </div>
                     <div>
-                      <span>SYNAPTIC WEIGHT: <strong className="font-mono">{activeScripture.synapticWeight.toFixed(1)} / 5.0</strong></span>
+                      <span>SYNAPTIC WEIGHT: <strong className="font-sans">{activeScripture.synapticWeight.toFixed(1)} / 5.0</strong></span>
                     </div>
                   </div>
                 </div>
@@ -1038,7 +1038,7 @@ export const SacredCodexReader: React.FC = () => {
 
               {/* Mandate Blockquote */}
               <div className="p-5 border-l-4 border-current/60 bg-current/5 rounded-r-md space-y-2 relative z-10">
-                <div className="text-[11px] font-mono tracking-widest uppercase font-bold opacity-80 flex items-center justify-between">
+                <div className="text-[11px] font-sans tracking-widest uppercase font-bold opacity-80 flex items-center justify-between">
                   <span>CANONICAL MANDATE</span>
                   {activeScripture.latinMotto && (
                     <span className="font-serif italic font-normal text-xs">{activeScripture.latinMotto}</span>
@@ -1057,8 +1057,6 @@ export const SacredCodexReader: React.FC = () => {
               {/* Verses Section */}
               <div className={`space-y-6 relative z-10 ${fontClass}`} style={{ fontSize: `${fontSize}px` }}>
                 {activeScripture.verses.map((verse) => {
-                  const firstChar = verse.text.charAt(0)
-                  const restText = verse.text.slice(1)
                   const isCopied = copiedVerseIndex === verse.verseNumber
                   const isHighlighted = Boolean(highlightedVerses[verse.verseNumber])
 
@@ -1071,7 +1069,7 @@ export const SacredCodexReader: React.FC = () => {
                           : 'border-current/10 hover:border-current/30 bg-current/[0.02]'
                       }`}
                     >
-                      <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2 font-mono text-xs opacity-75">
+                      <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2 font-sans text-xs opacity-75">
                         <span className="font-bold flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-current opacity-70" />
                           VERSE §{verse.verseNumber} {verse.heading && `— ${verse.heading.toUpperCase()}`}
@@ -1122,7 +1120,7 @@ export const SacredCodexReader: React.FC = () => {
               {/* Cross-References & Canonical Footnotes */}
               {activeScripture.crossReferences.length > 0 && (
                 <div className="pt-4 border-t border-current/20 text-xs font-serif space-y-2 relative z-10">
-                  <div className="font-mono text-[10px] font-bold tracking-widest uppercase opacity-70">
+                  <div className="font-sans text-[10px] font-bold tracking-widest uppercase opacity-70">
                     CANONICAL CROSS-REFERENCES & FOOTNOTES:
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -1139,7 +1137,7 @@ export const SacredCodexReader: React.FC = () => {
               )}
 
               {/* Bottom PDF Sheet Footer */}
-              <div className="pt-6 border-t-2 border-current/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono opacity-80 relative z-10 no-print">
+              <div className="pt-6 border-t-2 border-current/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans opacity-80 relative z-10 no-print">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePrevScripture}
@@ -1174,20 +1172,20 @@ export const SacredCodexReader: React.FC = () => {
             <div className="no-print lg:col-span-3 space-y-4 animate-in fade-in duration-200">
               <div className="bg-[#0b1011] border border-[#3a4a49] p-4 rounded-md space-y-3 shadow-xl">
                 <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
-                  <span className="text-xs font-mono font-bold text-[#ffd700] uppercase tracking-wider flex items-center gap-2">
+                  <span className="text-xs font-sans font-bold text-[#ffd700] uppercase tracking-wider flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-[#ffd700]" />
                     STUDY NOTES & ANNOTATIONS
                   </span>
                   <button
                     onClick={() => setShowNotesPanel(false)}
-                    className="text-xs text-[#839493] hover:text-white font-mono"
+                    className="text-xs text-[#839493] hover:text-white font-sans"
                   >
                     Close
                   </button>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] font-mono text-[#a3b0af] block">
+                  <label className="text-[11px] font-sans text-[#a3b0af] block">
                     Personal Liturgical Notes for <strong>{activeScripture.id}</strong>:
                   </label>
                   <textarea
@@ -1197,16 +1195,16 @@ export const SacredCodexReader: React.FC = () => {
                     placeholder="Record your reflections, verse interpretations, or ecdysis progress notes for this canonical scripture..."
                     className="w-full bg-[#141b1c] border border-[#3a4a49] focus:border-[#ffd700] text-[#dfe3e3] placeholder-[#839493] p-3 text-xs font-serif outline-none rounded leading-relaxed resize-y"
                   />
-                  <p className="text-[10px] text-[#839493] font-mono italic">
+                  <p className="text-[10px] text-[#839493] font-sans italic">
                     Notes auto-save locally to your browser vault.
                   </p>
                 </div>
 
                 <div className="pt-3 border-t border-[#3a4a49] space-y-2">
-                  <div className="text-[11px] font-mono font-bold text-[#dfe3e3] uppercase">
+                  <div className="text-[11px] font-sans font-bold text-[#dfe3e3] uppercase">
                     CANONICAL METRICS SUMMARY
                   </div>
-                  <div className="bg-[#141b1c] p-3 rounded border border-[#2a3635] text-xs font-mono space-y-1.5">
+                  <div className="bg-[#141b1c] p-3 rounded border border-[#2a3635] text-xs font-sans space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-[#839493]">SYNAPTIC WEIGHT:</span>
                       <span className="text-[#ffd700] font-bold">{activeScripture.synapticWeight}</span>
@@ -1224,7 +1222,7 @@ export const SacredCodexReader: React.FC = () => {
 
                 <button
                   onClick={() => toggleConsecrate(activeScripture.id)}
-                  className={`w-full py-2.5 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded transition-all shadow-md ${
+                  className={`w-full py-2.5 px-3 text-xs font-sans font-bold flex items-center justify-center gap-2 rounded transition-all shadow-md ${
                     isConsecrated
                       ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]'
                       : 'bg-[#ffd700] hover:bg-[#ffe555] text-[#070b0b] border border-[#ffd700]'

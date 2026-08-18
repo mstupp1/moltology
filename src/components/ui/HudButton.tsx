@@ -67,7 +67,7 @@ export const HudButton = React.forwardRef<HTMLButtonElement, HudButtonProps>(
         ref={ref}
         disabled={disabled}
         className={cn(
-          'relative inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider rounded-none transition-all duration-200 cursor-pointer select-none active:scale-[0.98] overflow-hidden',
+          'relative inline-flex items-center justify-center font-grotesk font-bold uppercase tracking-wider rounded-none transition-all duration-200 cursor-pointer select-none active:scale-[0.98] overflow-hidden',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none disabled:shadow-none',
           sizeClasses,
           variantClasses,

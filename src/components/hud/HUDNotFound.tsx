@@ -39,7 +39,7 @@ export function HUDNotFound() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0c] text-[#dfe3e3] flex flex-col font-mono selection:bg-[#00ffff] selection:text-[#000a0a]">
+    <div className="min-h-screen bg-[#070b0c] text-[#dfe3e3] flex flex-col font-sans selection:bg-[#00ffff] selection:text-[#000a0a]">
       {/* Top Public / HUD Header */}
       <PublicHeader />
 
@@ -58,11 +58,11 @@ export function HUDNotFound() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
               </span>
-              <span className="text-xs font-bold font-mono tracking-widest text-red-400 uppercase">
-                SIGNAL ERROR // CODE: 404
+              <span className="text-xs font-bold font-sans tracking-widest text-red-400 uppercase">
+                SIGNAL ERROR · CODE: 404
               </span>
             </div>
-            <div className="flex items-center gap-2 text-[11px] font-mono text-[#63757a] bg-[#080d0e] px-2.5 py-1 rounded border border-[#1c272a]">
+            <div className="flex items-center gap-2 text-[11px] font-sans text-[#63757a] bg-[#080d0e] px-2.5 py-1 rounded border border-[#1c272a]">
               <Radio className="w-3 h-3 text-[#00c3ff] animate-pulse" />
               <span>BENTHIC TRANSMISSION: UNRESOLVED</span>
             </div>
@@ -74,11 +74,11 @@ export function HUDNotFound() {
               <Compass className="w-8 h-8 animate-spin text-red-400 [animation-duration:12s]" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[10px] font-mono tracking-widest text-[#00c3ff] uppercase mb-1">
-                // ANOMALOUS SECTOR COORDINATE
+              <div className="text-[10px] font-sans tracking-widest text-[#00c3ff] uppercase mb-1">
+                ANOMALOUS SECTOR COORDINATE
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold font-['Cinzel',serif] tracking-wide text-white mb-2">
-                Sector Void // Trench Uncharted
+                Sector Void — Trench Uncharted
               </h1>
               <p className="text-xs sm:text-sm text-[#9ab0b5] font-sans leading-relaxed">
                 The requested synaptic coordinate or neural trench does not exist within the active Benthic Lattice. You may have drifted beyond charted abyssal perimeters, or the target node has undergone total cellular shedding.
@@ -87,7 +87,7 @@ export function HUDNotFound() {
           </div>
 
           {/* Telemetry Block */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 font-mono text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 font-sans text-xs">
             <div className="p-3 rounded bg-[#080d0e] border border-[#1c272a]">
               <div className="text-[10px] text-[#63757a] uppercase mb-0.5">Target Coordinate</div>
               <div className="text-[#00c3ff] truncate font-medium" title={currentPath || '/404_UNKNOWN'}>
@@ -126,7 +126,7 @@ export function HUDNotFound() {
 
             <button
               onClick={handleGoBack}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono text-[#839493] hover:text-[#00c3ff] transition-colors sm:ml-auto cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-sans text-[#839493] hover:text-[#00c3ff] transition-colors sm:ml-auto cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Previous Sector</span>

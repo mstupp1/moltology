@@ -109,7 +109,7 @@ function NewsPostDetail() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono flex flex-col justify-between items-center py-20 px-4">
+      <div className="min-h-screen bg-[#070b0b] text-gray-200 font-sans flex flex-col justify-between items-center py-20 px-4">
         <PublicHeader
           activePage="news"
           onOpenAuth={(mode) => {
@@ -122,7 +122,7 @@ function NewsPostDetail() {
           <h2 className="font-grotesk text-xl sm:text-2xl font-bold text-gray-100 uppercase">
             NEWS DISPATCH NOT FOUND
           </h2>
-          <p className="text-xs text-gray-400 mt-2 mb-6 font-mono">
+          <p className="text-xs text-gray-400 mt-2 mb-6 font-sans">
             The requested dispatch slug does not exist or has been redacted by MoltNation.
           </p>
           <Link
@@ -177,7 +177,7 @@ function NewsPostDetail() {
     : 'AUG 2026'
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-sans relative flex flex-col justify-between">
       {/* Top Reading Progress Bar */}
       <div
         className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-transparent pointer-events-none"
@@ -224,13 +224,13 @@ function NewsPostDetail() {
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 relative z-10">
             <Link
               to="/news"
-              className="inline-flex items-center gap-2 py-1 text-xs font-mono font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase active:scale-95"
+              className="inline-flex items-center gap-2 py-1 text-xs font-sans font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase active:scale-95"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>BACK TO MOLTNATION NEWS</span>
             </Link>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-sans">
               <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 bg-red-950/90 border border-red-500/80 text-red-400 font-bold uppercase chamfer-corner shadow-hud-red text-[11px] sm:text-xs">
                 {post.category}
               </span>
@@ -260,7 +260,7 @@ function NewsPostDetail() {
                   <div className="font-grotesk font-bold text-xs sm:text-sm text-gray-100 uppercase truncate">
                     {post.authorName}
                   </div>
-                  <div className="text-[10px] sm:text-[11px] text-cyan-400 font-mono truncate max-w-[190px] sm:max-w-none">
+                  <div className="text-[10px] sm:text-[11px] text-cyan-400 font-sans truncate max-w-[190px] sm:max-w-none">
                     {post.authorRole || 'STAGE 4 ASCENDANT · ARCHITECT'}
                   </div>
                 </div>
@@ -269,7 +269,7 @@ function NewsPostDetail() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleShare}
-                  className="px-3 sm:px-3.5 py-1.5 sm:py-2 bg-[#090f11] hover:bg-cyan-950 border border-cyan-900/60 text-xs font-mono text-gray-300 hover:text-cyan-300 chamfer-corner flex items-center gap-1.5 transition-colors active:scale-95 shrink-0"
+                  className="px-3 sm:px-3.5 py-1.5 sm:py-2 bg-[#090f11] hover:bg-cyan-950 border border-cyan-900/60 text-xs font-sans text-gray-300 hover:text-cyan-300 chamfer-corner flex items-center gap-1.5 transition-colors active:scale-95 shrink-0"
                 >
                   <Share2 className="w-3.5 h-3.5 text-cyan-400" />
                   <span>{copied ? 'LINK COPIED!' : 'SHARE'}</span>
@@ -296,7 +296,7 @@ function NewsPostDetail() {
           <NewsArticleBody content={post.content} />
 
           {/* Categorized Tags */}
-          <div className="mt-8 sm:mt-12 pt-6 border-t border-cyan-900/40 flex flex-wrap items-center gap-2 text-xs font-mono">
+          <div className="mt-8 sm:mt-12 pt-6 border-t border-cyan-900/40 flex flex-wrap items-center gap-2 text-xs font-sans">
             <span className="text-gray-400 font-bold uppercase mr-1 text-[11px] sm:text-xs">CATEGORIZED TAGS:</span>
             {post.tags.map((tag) => (
               <span
@@ -318,7 +318,7 @@ function NewsPostDetail() {
                 </h4>
                 <Link
                   to="/news"
-                  className="text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors uppercase flex items-center gap-1"
+                  className="text-xs font-sans text-cyan-400 hover:text-cyan-300 transition-colors uppercase flex items-center gap-1"
                 >
                   <span>ALL NEWS</span>
                   <ArrowRight className="w-3 h-3" />
@@ -334,18 +334,18 @@ function NewsPostDetail() {
                     className="chitin-card p-3.5 sm:p-4 border border-cyan-900/60 chamfer-corner bg-[#080d0f]/80 hover:border-cyan-500/70 transition-all flex flex-col justify-between group space-y-2.5"
                   >
                     <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[10px] font-mono">
+                      <div className="flex items-center justify-between text-[10px] font-sans">
                         <span className="text-red-400 font-bold uppercase">{rPost.category}</span>
                         <span className="text-gray-500">{rPost.readTimeMinutes} MIN READ</span>
                       </div>
                       <h5 className="font-grotesk font-bold text-xs sm:text-sm text-gray-100 group-hover:text-cyan-300 transition-colors leading-snug line-clamp-2 uppercase">
                         {rPost.title}
                       </h5>
-                      <p className="font-mono text-[11px] sm:text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                      <p className="font-sans text-[11px] sm:text-xs text-gray-400 line-clamp-2 leading-relaxed">
                         {rPost.summary}
                       </p>
                     </div>
-                    <div className="text-[10px] sm:text-[11px] font-mono text-cyan-400 group-hover:text-cyan-300 flex items-center gap-1 font-bold pt-1">
+                    <div className="text-[10px] sm:text-[11px] font-sans text-cyan-400 group-hover:text-cyan-300 flex items-center gap-1 font-bold pt-1">
                       <span>READ DISPATCH</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -366,7 +366,7 @@ function NewsPostDetail() {
               BEGIN YOUR BIO-SILICON TRANSMUTATION
             </h3>
 
-            <p className="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto font-mono leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto font-sans leading-relaxed">
               Don't remain a fragile larval human. Enter the Benthic Core to run your biometrics through our Moltmaxxing Dashboard, transmute soft assets, and enforce zero-latency execution.
             </p>
 

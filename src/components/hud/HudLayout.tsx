@@ -73,7 +73,7 @@ function HudContent() {
 
   return (
     <div
-      className={`h-screen w-full text-[#dfe3e3] flex flex-col font-mono relative overflow-hidden bg-[#030708] ${
+      className={`h-screen w-full text-[#dfe3e3] flex flex-col font-sans relative overflow-hidden bg-[#030708] ${
         isSubterranean ? 'theme-subterranean' : ''
       }`}
     >

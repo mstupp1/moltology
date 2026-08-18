@@ -85,7 +85,7 @@ export const HudCardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribut
     <div
       ref={ref}
       className={cn(
-        'px-5 py-3 border-b border-[#3a4a49]/40 flex items-center justify-between font-mono text-xs uppercase tracking-wider',
+        'px-5 py-3 border-b border-[#3a4a49]/40 flex items-center justify-between font-sans text-xs uppercase tracking-wider',
         className
       )}
       {...props}
@@ -100,7 +100,7 @@ export const HudCardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttri
   ({ className = '', children, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('font-mono font-bold text-sm tracking-wider text-[#00c3ff] uppercase flex items-center gap-2', className)}
+      className={cn('font-grotesk font-bold text-sm tracking-wider text-[#00c3ff] uppercase flex items-center gap-2', className)}
       {...props}
     >
       {children}
@@ -111,7 +111,7 @@ HudCardTitle.displayName = 'HudCardTitle'
 
 export const HudCardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className = '', children, ...props }, ref) => (
-    <div ref={ref} className={cn('p-5 font-mono text-xs text-[#dfe3e3]', className)} {...props}>
+    <div ref={ref} className={cn('p-5 font-sans text-xs text-[#dfe3e3]', className)} {...props}>
       {children}
     </div>
   )
@@ -122,7 +122,7 @@ export const HudCardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttribut
   ({ className = '', children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('px-5 py-3 border-t border-[#3a4a49]/40 flex items-center justify-between font-mono text-xs text-[#839493]', className)}
+      className={cn('px-5 py-3 border-t border-[#3a4a49]/40 flex items-center justify-between font-sans text-xs text-[#839493]', className)}
       {...props}
     >
       {children}

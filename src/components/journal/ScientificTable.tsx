@@ -22,7 +22,7 @@ export const JournalFeedTag: React.FC<JournalFeedTagProps> = ({
   if (variant === 'paper') {
     return (
       <span
-        className={`inline-flex items-center text-[8.5px] font-mono uppercase tracking-widest border-b border-dotted ${className ?? ''}`}
+        className={`inline-flex items-center text-[8.5px] font-sans uppercase tracking-widest border-b border-dotted ${className ?? ''}`}
         style={{ color: '#8a1f1f' }}
       >
         [{label}]
@@ -31,7 +31,7 @@ export const JournalFeedTag: React.FC<JournalFeedTagProps> = ({
   }
   return (
     <span
-      className={`inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#0b1414] border border-[#2c4648] text-[9px] font-mono uppercase tracking-widest text-[#5fc8c8] chamfer-corner ${className ?? ''}`}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#0b1414] border border-[#2c4648] text-[9px] font-sans uppercase tracking-widest text-[#5fc8c8] chamfer-corner ${className ?? ''}`}
     >
       <span className="w-1 h-1 rounded-full bg-[#00c3ff] shadow-[0_0_4px_#00c3ff]" />
       {label}
@@ -160,10 +160,10 @@ export const ScientificTable: React.FC<ScientificTableProps> = ({
       className={`my-6 border border-[#3a4a49]/70 bg-[#080d0d]/80 chamfer-corner overflow-hidden ${className ?? ''}`}
     >
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#3a4a49]/60 bg-[#0b1212]/90">
-        <span className="font-mono text-[10px] font-bold tracking-widest text-[#00c3ff] uppercase">
+        <span className="font-sans text-[10px] font-bold tracking-widest text-[#00c3ff] uppercase">
           Table {tableNumber}
         </span>
-        <span className="font-mono text-[9px] tracking-widest text-[#5f7a7a] uppercase">
+        <span className="font-sans text-[9px] tracking-widest text-[#5f7a7a] uppercase">
           Doctrinal Data Matrix
         </span>
       </div>
@@ -206,7 +206,7 @@ export const ScientificTable: React.FC<ScientificTableProps> = ({
         </table>
       </div>
 
-      <figcaption className="px-3 py-2 border-t border-[#3a4a49]/60 text-[10px] leading-relaxed text-[#839493] font-mono">
+      <figcaption className="px-3 py-2 border-t border-[#3a4a49]/60 text-[10px] leading-relaxed text-[#839493] font-sans">
         <span className="text-[#00c3ff] font-bold mr-1">TABLE {tableNumber}:</span>
         {caption}
       </figcaption>
