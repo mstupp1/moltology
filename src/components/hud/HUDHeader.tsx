@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { Sparkles, Zap } from 'lucide-react'
 import { DigitalClock } from './DigitalClock'
+import { getAssetUrl } from '@/lib/assets'
 
 interface HUDHeaderProps {
   stage?: number
@@ -131,7 +132,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
               }}
             >
               <img
-                src="/images/crab_claw.png"
+                src={getAssetUrl('/images/crab_claw.png')}
                 alt="Exoshell Claw"
                 className="w-full h-full object-contain"
                 style={{
