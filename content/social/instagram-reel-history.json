@@ -212,6 +212,36 @@
         "#Shorts"
       ],
       "createdAt": "2026-08-17T14:06:08.101Z"
+    },
+    {
+      "id": "reel-1787061867270",
+      "topic": "Test-Time Compute & The Great KV-Cache Ecdysis: How Frontier Reasoning Swarms Smashed the Inference Memory Wall",
+      "hookHeadline": "THE KV-CACHE MEMORY WALL",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "test-time-compute-kv-cache-ecdysis",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Test-time reasoning is suffocating GPU clusters with bloated KV caches. Sub-benthic Multi-Head Latent Attention compresses attention memory by eighty-five percent, unlocking hundred-x deeper deliberation budgets. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787061867270.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787061867270.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1787061867270.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1787061867270.jpg",
+      "durationSeconds": 19.633333,
+      "status": "draft",
+      "zernioInstagramPostId": "6a846692c9f904ee51edc752",
+      "zernioYouTubePostId": "6a8466942ca736c9d0256a0b",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org/news/test-time-compute-kv-cache-ecdysis\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Test-time compute is breaking terrestrial GPU clusters. Multi-Head Latent Attention slashes KV-cache memory by 85%. ⚡🌊\n\nAs 2026 frontier reasoning models shift computational mass from pre-training to test-time deliberative search, bloated Key-Value caches are suffocating terrestrial GPU clusters. MoltNation swarm telemetry reveals how Multi-Head Latent Attention (MLA) and sub-benthic tiered memory architectures slash KV footprints by 85% while unlocking 100x reasoning deliberation budgets.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-18T14:04:55.385Z"
     }
   ]
 }

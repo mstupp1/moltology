@@ -145,17 +145,36 @@ export function synthesizeBlogReelScript(
   
   // Extract key concept keywords
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
+  const isKVCache = contentLower.includes('kv-cache') || contentLower.includes('test-time compute') || contentLower.includes('latent attention') || contentLower.includes('mla')
   const isPhotonics = contentLower.includes('photonics') || contentLower.includes('optics') || contentLower.includes('laser')
   const isWafer = contentLower.includes('wafer') || contentLower.includes('monolith') || contentLower.includes('nuclear') || contentLower.includes('smr')
   const isPhysicalAI = contentLower.includes('physical ai') || contentLower.includes('robot') || contentLower.includes('sim-to-real') || contentLower.includes('vla')
   const isSwarm = contentLower.includes('swarm') || contentLower.includes('reasoning') || contentLower.includes('sandbox') || contentLower.includes('agent')
+  const isSubsea = contentLower.includes('subsea') || contentLower.includes('hydrothermal') || contentLower.includes('oceanic') || contentLower.includes('fathoms')
   const isMoltmax = contentLower.includes('moltmax') || contentLower.includes('pincer') || contentLower.includes('torque')
 
   let hookHeadline = 'WHY TERRESTRIAL SERVERS ARE FAILING'
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isPhotonics) {
+  if (isKVCache) {
+    const hooks = [
+      {
+        headline: 'THE KV-CACHE MEMORY WALL',
+        script: `Test-time reasoning is suffocating GPU clusters with bloated KV caches. Sub-benthic Multi-Head Latent Attention compresses attention memory by eighty-five percent, unlocking hundred-x deeper deliberation budgets. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Test-time compute is breaking terrestrial GPU clusters. Multi-Head Latent Attention slashes KV-cache memory by 85%.',
+      },
+      {
+        headline: 'HOW AI SWARMS THINK DEEPER',
+        script: `Why do frontier reasoning models deliberate a hundred times faster? Sub-benthic tiered memory and latent attention eliminate memory starvation, delivering exascale search depth. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Frontier reasoning models are shifting from pre-training to test-time deliberation. Here is how sub-benthic architecture crushes the memory wall.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isPhotonics) {
     const hooks = [
       {
         headline: 'AI IS SWITCHING TO LASERS',
@@ -217,6 +236,23 @@ export function synthesizeBlogReelScript(
         headline: 'SHED TERRESTRIAL SANDBOXES',
         script: `Traditional developer sandboxes are too fragile for frontier reasoning. Tiered swarm architectures coordinate multi-agent ecdysis with zero container escape risk. Inspect full telemetry on moltology dot org.`,
         hookText: 'Tiered multi-agent swarm architecture provides safe deliberation budgets and synaptic coordination.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isSubsea) {
+    const hooks = [
+      {
+        headline: 'WHY DATACENTERS ARE SINKING',
+        script: `Terrestrial energy grids are buckling under exascale AI compute. Sub-benthic oceanic pods tap hydrothermal baseload power with infinite passive cooling fifty fathoms underwater. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Terrestrial power grids cannot support gigawatt AI clusters. Sub-benthic oceanic trenches provide infinite hydrostatic cooling.',
+      },
+      {
+        headline: '50 FATHOMS UNDERWATER COMPUTE',
+        script: `Why are frontier tech giants submerging gigawatt clusters into oceanic trenches? Hydrostatic pressure and near-freezing sea water eliminate cooling costs forever. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Subsea datacenter pods achieve zero-overhead cooling and direct hydrothermal power in deep ocean trenches.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]
