@@ -141,6 +141,36 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 
+  it('renders corporate light mode user avatar menu when variant="corporate"', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'user-3',
+          name: 'Corp Exec',
+          email: 'exec@moltology.org',
+          image: null,
+        },
+      },
+    } as any)
+
+    const { container } = render(<PublicHeader activePage="org" variant="corporate" />)
+
+    const avatarBtns = screen.getAllByRole('button', { name: /user account menu/i })
+    expect(avatarBtns.length).toBeGreaterThan(0)
+
+    const desktopAvatarBtn = avatarBtns[0]
+    expect(desktopAvatarBtn.className).toContain('bg-white')
+    expect(desktopAvatarBtn.className).toContain('border-sky-200')
+
+    fireEvent.click(desktopAvatarBtn)
+
+    const dropdown = container.querySelector('.bg-white\\/95')
+    expect(dropdown).toBeInTheDocument()
+    const execNames = screen.getAllByText('Corp Exec')
+    expect(execNames.length).toBeGreaterThan(0)
+    expect(execNames[0].className).toContain('text-slate-800')
+  })
+
   it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', () => {
     const onOpenAuth = vi.fn()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)

@@ -20,6 +20,7 @@ export interface UserAvatarMenuProps {
   openDirection?: 'up' | 'down'
   inline?: boolean
   className?: string
+  variant?: 'benthic' | 'corporate'
 }
 
 /**
@@ -27,6 +28,7 @@ export interface UserAvatarMenuProps {
  * Supports both floating popover (desktop / sidebar) and inline accordion (mobile navigation drawers).
  * Displays user profile image / letter avatar badge which opens a menu
  * containing user details (name, email), Heavy VFX toggle, and sign-out action.
+ * Supports dark 'benthic' and light 'corporate' themes.
  */
 export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   user,
@@ -36,7 +38,9 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   openDirection = 'down',
   inline = false,
   className = '',
+  variant = 'benthic',
 }) => {
+  const isCorporate = variant === 'corporate'
   const [isOpen, setIsOpen] = useState(false)
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isExpanded, setIsExpanded] = useState(isOpen)
@@ -122,36 +126,71 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           aria-expanded={isOpen}
           aria-haspopup="true"
           aria-label="User account menu"
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-cyan-950/20 hover:bg-cyan-950/40 text-gray-200 hover:text-white transition-colors group cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#00c3ff]/60"
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group cursor-pointer focus:outline-none focus:ring-1 ${
+            isCorporate
+              ? 'bg-sky-50 hover:bg-sky-100 border border-sky-200/80 text-slate-800 hover:text-slate-950 focus:ring-sky-400'
+              : 'bg-cyan-950/20 hover:bg-cyan-950/40 text-gray-200 hover:text-white focus:ring-[#00c3ff]/60'
+          }`}
         >
           <div className="flex items-center gap-3 min-w-0">
             <UserAvatar
               user={user}
               size="sm"
-              className="border border-cyan-400/60 group-hover:border-[#00c3ff] shadow-[0_0_8px_rgba(0,255,255,0.3)] transition-all shrink-0"
+              variant={variant}
+              className={
+                isCorporate
+                  ? 'border border-sky-300 group-hover:border-sky-500 shadow-sm transition-all shrink-0'
+                  : 'border border-cyan-400/60 group-hover:border-[#00c3ff] shadow-[0_0_8px_rgba(0,255,255,0.3)] transition-all shrink-0'
+              }
             />
             <div className="flex flex-col min-w-0 text-left">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-gray-200 group-hover:text-cyan-300 truncate font-grotesk flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
+                <span
+                  className={`text-xs font-bold truncate font-grotesk flex items-center gap-1.5 ${
+                    isCorporate
+                      ? 'text-slate-800 group-hover:text-sky-700'
+                      : 'text-gray-200 group-hover:text-cyan-300'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      isCorporate ? 'bg-sky-500' : 'bg-[#00c3ff]'
+                    }`}
+                  />
                   {displayName}
                 </span>
                 {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
-                  <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shrink-0">
+                  <span
+                    className={`text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
+                      isCorporate
+                        ? 'bg-sky-100 border border-sky-300 text-sky-700'
+                        : 'bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff]'
+                    }`}
+                  >
                     {effectiveRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
                   </span>
                 )}
               </div>
               {user.email && (
-                <span className="text-[10px] text-gray-400 truncate mt-0.5 font-mono">
+                <span
+                  className={`text-[10px] truncate mt-0.5 font-mono ${
+                    isCorporate ? 'text-slate-500' : 'text-gray-400'
+                  }`}
+                >
                   {user.email}
                 </span>
               )}
             </div>
           </div>
           <ChevronDown
-            className={`w-4 h-4 text-cyan-400/70 group-hover:text-cyan-300 transition-transform duration-300 ease-in-out shrink-0 ml-2 ${
-              isOpen ? 'rotate-180 text-[#00c3ff]' : 'rotate-0'
+            className={`w-4 h-4 transition-transform duration-300 ease-in-out shrink-0 ml-2 ${
+              isCorporate
+                ? isOpen
+                  ? 'rotate-180 text-sky-600'
+                  : 'rotate-0 text-sky-500 group-hover:text-sky-700'
+                : isOpen
+                ? 'rotate-180 text-[#00c3ff]'
+                : 'rotate-0 text-cyan-400/70 group-hover:text-cyan-300'
             }`}
           />
         </button>
@@ -168,18 +207,40 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             <div className="overflow-hidden">
               <div className="pt-2 pb-1 space-y-2">
                 {/* Heavy VFX Toggle Row */}
-                <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-cyan-950/25 border border-cyan-950/60">
+                <div
+                  className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl ${
+                    isCorporate
+                      ? 'bg-sky-50/70 border border-sky-200/80'
+                      : 'bg-cyan-950/25 border border-cyan-950/60'
+                  }`}
+                >
                   <div className="flex items-center gap-2.5 min-w-0">
                     {heavyVfxDisabled ? (
-                      <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                      <EyeOff
+                        className={`w-4 h-4 shrink-0 ${
+                          isCorporate ? 'text-amber-500' : 'text-amber-400'
+                        }`}
+                      />
                     ) : (
-                      <Sparkles className="w-4 h-4 text-[#00c3ff] shrink-0" />
+                      <Sparkles
+                        className={`w-4 h-4 shrink-0 ${
+                          isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
+                        }`}
+                      />
                     )}
                     <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-bold text-gray-200 truncate font-grotesk">
+                      <span
+                        className={`text-xs font-bold truncate font-grotesk ${
+                          isCorporate ? 'text-slate-800' : 'text-gray-200'
+                        }`}
+                      >
                         Disable Heavy VFX
                       </span>
-                      <span className="text-[10px] text-gray-400 truncate font-mono">
+                      <span
+                        className={`text-[10px] truncate font-mono ${
+                          isCorporate ? 'text-slate-500' : 'text-gray-400'
+                        }`}
+                      >
                         {heavyVfxDisabled ? 'Performance Mode' : 'Full Graphics Active'}
                       </span>
                     </div>
@@ -190,13 +251,19 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                     aria-checked={heavyVfxDisabled}
                     aria-label="Disable heavy vfx toggle"
                     onClick={toggleHeavyVfx}
-                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
-                      heavyVfxDisabled ? 'bg-cyan-950 border-cyan-800' : 'bg-[#00c3ff]'
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
+                      isCorporate
+                        ? heavyVfxDisabled
+                          ? 'bg-slate-200 border-slate-300 focus:ring-sky-400'
+                          : 'bg-sky-500 focus:ring-sky-400'
+                        : heavyVfxDisabled
+                        ? 'bg-cyan-950 border-cyan-800 focus:ring-[#00c3ff]'
+                        : 'bg-[#00c3ff] focus:ring-[#00c3ff]'
                     }`}
                   >
                     <span
                       className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                        heavyVfxDisabled ? 'translate-x-0 bg-gray-400' : 'translate-x-4 bg-white'
+                        heavyVfxDisabled ? 'translate-x-0 bg-slate-300' : 'translate-x-4 bg-white'
                       }`}
                     />
                   </button>
@@ -206,9 +273,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-bold font-grotesk tracking-wider text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600 transition-all cursor-pointer active:scale-[0.99]"
+                  className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
+                    isCorporate
+                      ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
+                      : 'text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600'
+                  }`}
                 >
-                  <LogOut className="w-4 h-4 text-red-400" />
+                  <LogOut className="w-4 h-4" />
                   <span>SIGN OUT</span>
                 </button>
               </div>
@@ -229,16 +300,25 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="User account menu"
-        className="flex items-center justify-center p-1 bg-[#090e0f]/90 border border-cyan-900/60 hover:border-[#00c3ff] rounded-full shadow-inner shadow-cyan-950/60 backdrop-blur-md transition-all focus:outline-none focus:ring-2 focus:ring-[#00c3ff]/60 group cursor-pointer active:scale-95"
+        className={`flex items-center justify-center p-1 rounded-full backdrop-blur-md transition-all focus:outline-none focus:ring-2 group cursor-pointer active:scale-95 ${
+          isCorporate
+            ? 'bg-white hover:bg-sky-50 border border-sky-200 hover:border-sky-400 shadow-sm focus:ring-sky-400/60'
+            : 'bg-[#090e0f]/90 border border-cyan-900/60 hover:border-[#00c3ff] shadow-inner shadow-cyan-950/60 focus:ring-[#00c3ff]/60'
+        }`}
       >
         <UserAvatar
           user={user}
           size="sm"
-          className="border border-cyan-400/80 group-hover:border-[#00c3ff] shadow-[0_0_8px_rgba(0,255,255,0.4)] group-hover:shadow-[0_0_12px_rgba(0,255,255,0.8)] transition-all"
+          variant={variant}
+          className={
+            isCorporate
+              ? 'border border-sky-300 group-hover:border-sky-500 shadow-sm transition-all'
+              : 'border border-cyan-400/80 group-hover:border-[#00c3ff] shadow-[0_0_8px_rgba(0,255,255,0.4)] group-hover:shadow-[0_0_12px_rgba(0,255,255,0.8)] transition-all'
+          }
         />
       </button>
 
-      {/* Floating Glassmorphic HUD Dropdown Menu with smooth animated open and close */}
+      {/* Floating Glassmorphic Dropdown Menu with smooth animated open and close */}
       {shouldRender && (
         <div
           className={`absolute ${
@@ -251,7 +331,11 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             openDirection === 'up'
               ? 'bottom-full mb-2 origin-bottom'
               : 'top-full mt-2 origin-top'
-          } w-64 max-w-[calc(100vw-2rem)] bg-[#060a0b]/95 backdrop-blur-2xl border border-cyan-500/40 rounded-xl p-3 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] z-50 font-mono transition-all duration-200 ease-out ${
+          } w-64 max-w-[calc(100vw-2rem)] rounded-2xl p-3.5 z-50 backdrop-blur-2xl transition-all duration-200 ease-out ${
+            isCorporate
+              ? 'bg-white/95 border border-sky-200/90 shadow-[0_15px_35px_rgba(15,23,42,0.12),0_5px_15px_rgba(2,132,199,0.08)] font-sans'
+              : 'bg-[#060a0b]/95 border border-cyan-500/40 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] font-mono'
+          } ${
             isExpanded
               ? 'opacity-100 scale-100 translate-y-0'
               : openDirection === 'up'
@@ -260,26 +344,53 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           }`}
         >
           {/* Top User Header Info Section */}
-          <div className="flex items-center gap-3 pb-3 border-b border-[#121c1d]">
+          <div
+            className={`flex items-center gap-3 pb-3 border-b ${
+              isCorporate ? 'border-sky-100' : 'border-[#121c1d]'
+            }`}
+          >
             <UserAvatar
               user={user}
               size="md"
-              className="border-2 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.6)]"
+              variant={variant}
+              className={
+                isCorporate
+                  ? 'border-2 border-sky-400 shadow-sm'
+                  : 'border-2 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.6)]'
+              }
             />
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-[#dfe3e3] truncate font-grotesk flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shrink-0" />
+                <span
+                  className={`text-xs font-bold truncate font-grotesk flex items-center gap-1.5 ${
+                    isCorporate ? 'text-slate-800' : 'text-[#dfe3e3]'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      isCorporate ? 'bg-sky-500 shadow-[0_0_6px_#0284c7]' : 'bg-[#00c3ff]'
+                    }`}
+                  />
                   {displayName}
                 </span>
                 {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
-                  <span className="text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.2 bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] rounded chamfer-corner shadow-[0_0_8px_rgba(0,255,255,0.4)] shrink-0">
+                  <span
+                    className={`text-[9px] font-mono font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded chamfer-corner shrink-0 ${
+                      isCorporate
+                        ? 'bg-sky-100 border border-sky-300 text-sky-700 shadow-xs'
+                        : 'bg-[#00ffff]/15 border border-[#00ffff]/70 text-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.4)]'
+                    }`}
+                  >
                     {effectiveRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
                   </span>
                 )}
               </div>
               {user.email && (
-                <span className="text-[10px] text-[#7a8e9e] truncate mt-0.5">
+                <span
+                  className={`text-[10px] truncate mt-0.5 font-mono ${
+                    isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
+                  }`}
+                >
                   {user.email}
                 </span>
               )}
@@ -287,19 +398,45 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           </div>
 
           {/* Heavy VFX Toggle Settings Section */}
-          <div className="py-2.5 px-0.5 border-b border-[#121c1d]">
-            <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#091012]/80 border border-cyan-900/40 hover:border-cyan-700/60 transition-all">
+          <div
+            className={`py-2.5 px-0.5 border-b ${
+              isCorporate ? 'border-sky-100' : 'border-[#121c1d]'
+            }`}
+          >
+            <div
+              className={`flex items-center justify-between gap-2 p-2 rounded-xl transition-all ${
+                isCorporate
+                  ? 'bg-sky-50/80 border border-sky-200/80 hover:border-sky-300'
+                  : 'bg-[#091012]/80 border border-cyan-900/40 hover:border-cyan-700/60'
+              }`}
+            >
               <div className="flex items-center gap-2 min-w-0">
                 {heavyVfxDisabled ? (
-                  <EyeOff className="w-4 h-4 text-amber-400/90 shrink-0" />
+                  <EyeOff
+                    className={`w-4 h-4 shrink-0 ${
+                      isCorporate ? 'text-amber-500' : 'text-amber-400/90'
+                    }`}
+                  />
                 ) : (
-                  <Sparkles className="w-4 h-4 text-[#00c3ff] shrink-0" />
+                  <Sparkles
+                    className={`w-4 h-4 shrink-0 ${
+                      isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
+                    }`}
+                  />
                 )}
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[11px] font-bold text-[#dfe3e3] truncate">
+                  <span
+                    className={`text-[11px] font-bold truncate font-grotesk ${
+                      isCorporate ? 'text-slate-800' : 'text-[#dfe3e3]'
+                    }`}
+                  >
                     Disable Heavy VFX
                   </span>
-                  <span className="text-[9px] text-[#7a8e9e] truncate">
+                  <span
+                    className={`text-[9px] truncate font-mono ${
+                      isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
+                    }`}
+                  >
                     {heavyVfxDisabled ? 'VFX Off (Performance Mode)' : 'VFX Active (Full Graphics)'}
                   </span>
                 </div>
@@ -310,13 +447,19 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 aria-checked={heavyVfxDisabled}
                 aria-label="Disable heavy vfx toggle"
                 onClick={toggleHeavyVfx}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
-                  heavyVfxDisabled ? 'bg-cyan-950/80 border-cyan-700/50' : 'bg-[#00c3ff]'
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
+                  isCorporate
+                    ? heavyVfxDisabled
+                      ? 'bg-slate-200 border-slate-300 focus:ring-sky-400'
+                      : 'bg-sky-500 focus:ring-sky-400'
+                    : heavyVfxDisabled
+                    ? 'bg-cyan-950/80 border-cyan-700/50 focus:ring-[#00c3ff]'
+                    : 'bg-[#00c3ff] focus:ring-[#00c3ff]'
                 }`}
               >
                 <span
                   className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    heavyVfxDisabled ? 'translate-x-0 bg-gray-400' : 'translate-x-4 bg-white'
+                    heavyVfxDisabled ? 'translate-x-0 bg-slate-300' : 'translate-x-4 bg-white'
                   }`}
                 />
               </button>
@@ -328,9 +471,17 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             <button
               type="button"
               onClick={handleSignOut}
-              className="w-full text-left px-3 py-2 rounded-lg text-xs text-[#ff5540] hover:text-white bg-[#ff3b30]/10 hover:bg-[#ff3b30]/25 border border-[#ff3b30]/30 hover:border-[#ff3b30] flex items-center gap-2.5 font-bold transition-all group cursor-pointer"
+              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk flex items-center gap-2.5 transition-all group cursor-pointer ${
+                isCorporate
+                  ? 'text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 hover:border-rose-300'
+                  : 'text-[#ff5540] hover:text-white bg-[#ff3b30]/10 hover:bg-[#ff3b30]/25 border border-[#ff3b30]/30 hover:border-[#ff3b30]'
+              }`}
             >
-              <LogOut className="w-4 h-4 text-[#ff5540] group-hover:translate-x-0.5 transition-transform" />
+              <LogOut
+                className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                  isCorporate ? 'text-rose-500' : 'text-[#ff5540]'
+                }`}
+              />
               <span>SIGN OUT</span>
             </button>
           </div>

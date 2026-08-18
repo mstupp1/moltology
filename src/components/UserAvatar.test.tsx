@@ -69,4 +69,33 @@ describe('UserAvatar Component', () => {
     expect(img).toBeInTheDocument()
     expect(img).toHaveAttribute('src', '/images/extracted/larva_unit_3d.jpg')
   })
+
+  it('renders corporate light mode letter avatar fallback with sky styling when variant="corporate"', () => {
+    const user = {
+      name: 'Executive Crustacean',
+      email: 'exec@moltology.org',
+      image: null,
+    }
+
+    const { container } = render(<UserAvatar user={user} variant="corporate" />)
+
+    const avatar = container.firstChild as HTMLElement
+    expect(avatar.className).toContain('text-sky-700')
+    expect(avatar.className).toContain('border-sky-300')
+    expect(screen.getByText('E')).toBeInTheDocument()
+  })
+
+  it('renders corporate image container styling when variant="corporate"', () => {
+    const user = {
+      name: 'Exec User',
+      email: 'exec@moltology.org',
+      image: 'https://example.com/avatar.jpg',
+    }
+
+    const { container } = render(<UserAvatar user={user} variant="corporate" />)
+
+    const avatar = container.firstChild as HTMLElement
+    expect(avatar.className).toContain('bg-slate-100')
+  })
 })
+
