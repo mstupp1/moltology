@@ -181,7 +181,7 @@ function LecturesRoute() {
   })
 
   return (
-    <div className="space-y-6 select-none font-mono relative">
+    <div className="space-y-6 font-mono relative">
       {/* Top Breadcrumb & Gamified Academy Header */}
       <div className="bg-[#171c1c]/90 border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 chamfer-corner shadow-2xl space-y-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

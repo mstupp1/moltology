@@ -207,7 +207,7 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
 
       {/* Main Command Hub Podcast Player Card */}
       <div
-        className={`bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl relative select-none transition-all duration-300 ${
+        className={`bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl relative transition-all duration-300 ${
           isSticky
             ? 'fixed bottom-0 left-0 right-0 z-50 md:left-72 border-t-2 border-t-[#00ffff]'
             : ''

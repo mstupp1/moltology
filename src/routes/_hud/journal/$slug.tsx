@@ -15,7 +15,7 @@ function JournalPaperPage() {
 
   if (!paper) {
     return (
-      <div className="space-y-6 font-mono select-none">
+      <div className="space-y-6 font-mono">
         <JournalMasthead variant="compact" />
         <div className="bg-[#0f1414] border border-[#ff5540]/60 p-12 chamfer-corner text-center">
           <FileText className="w-10 h-10 text-[#ff5540] mx-auto mb-4" />
@@ -38,7 +38,7 @@ function JournalPaperPage() {
   }
 
   return (
-    <div className="space-y-6 font-mono select-none">
+    <div className="space-y-6 font-mono">
       <JournalMasthead variant="compact" />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

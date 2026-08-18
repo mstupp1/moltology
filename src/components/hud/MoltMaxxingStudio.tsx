@@ -16,7 +16,7 @@ export const MoltMaxxingStudio: React.FC = () => {
   }
 
   return (
-    <HudCard variant="teal" className="p-4 space-y-4 font-mono select-none">
+    <HudCard variant="teal" className="p-4 space-y-4 font-mono">
       {/* Header matching Reference Screenshot */}
       <div>
         <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">

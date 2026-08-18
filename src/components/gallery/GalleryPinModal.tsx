@@ -109,7 +109,7 @@ export const GalleryPinModal: React.FC<GalleryPinModalProps> = ({
     .slice(0, 4)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
       {/* Backdrop Click to Close */}
       <div className="fixed inset-0 z-0" onClick={onClose} />
 

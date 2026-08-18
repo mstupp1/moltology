@@ -202,7 +202,7 @@ export const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative flex flex-col justify-between overflow-x-hidden">
       {/* Ambient Sci-Fi Vignette, CRT Scanlines & Cyan Glow Backdrops */}
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
@@ -290,7 +290,7 @@ export const LandingPage: React.FC = () => {
               </h1>
               
               {/* Line 2: ASCEND TO CHITIN */}
-              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] tracking-tight uppercase leading-[0.84] select-none -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
+              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] tracking-tight uppercase leading-[0.84] -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{

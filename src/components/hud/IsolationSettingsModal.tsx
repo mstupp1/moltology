@@ -55,7 +55,7 @@ export const IsolationSettingsModal: React.FC<IsolationSettingsModalProps> = ({
   } = settings
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md font-mono select-none animate-fadeIn overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md font-mono animate-fadeIn overflow-y-auto">
       <div className="bg-[#0e1315] border-2 border-[#00c3ff]/80 w-full max-w-3xl max-h-[90vh] overflow-y-auto chamfer-corner-lg shadow-[0_0_50px_rgba(0,195,255,0.25)] relative p-5 sm:p-6 space-y-6 my-auto text-[#dfe3e3]">
         {/* Close Button */}
         <button

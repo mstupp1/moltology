@@ -42,19 +42,19 @@ describe('AIChatPanel Guest Mode Gating', () => {
     vi.clearAllMocks()
   })
 
-  it('renders guest mode welcome without top banner or initial in-message CTA', () => {
+  it('renders guest mode welcome with in-message CTA on initial load', () => {
     render(<AIChatPanel userId={null} personaName="SYNAPTIC ORACLE" />)
 
     expect(screen.queryByText(/Guest Mode: Answers are limited and chats aren't saved/i)).not.toBeInTheDocument()
     expect(screen.getByText(/You're currently exploring in Guest Mode/i)).toBeInTheDocument()
-    // In-message CTA card is NOT present on the initial welcome message
-    expect(screen.queryByText(/Sign up free to unlock full answers/i)).not.toBeInTheDocument()
+    expect(screen.getByText(/Sign up free to unlock/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument()
   })
 
-  it('renders authenticated welcome when userId is provided', () => {
+  it('renders authenticated welcome without guest CTA when userId is provided', () => {
     render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
 
-    expect(screen.queryByText(/Guest Mode: Answers are limited/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Sign up free to unlock/i)).not.toBeInTheDocument()
     expect(screen.getByText(/Welcome back! I am the SYNAPTIC ORACLE/i)).toBeInTheDocument()
   })
 
@@ -70,26 +70,17 @@ describe('AIChatPanel Guest Mode Gating', () => {
       ).toBeInTheDocument()
     })
 
-    // Initiate in-message CTA card appears after user sends a query
-    expect(screen.getByText(/Sign up free to unlock/i)).toBeInTheDocument()
+    // In-message CTA card appears on assistant responses
+    expect(screen.getAllByText(/Sign up free to unlock/i).length).toBeGreaterThan(0)
     const accountButtons = screen.getAllByRole('button', { name: /Sign Up/i })
     expect(accountButtons.length).toBeGreaterThan(0)
   })
 
-  it('opens AuthModal when clicking in-message sign up button in guest mode', async () => {
+  it('opens AuthModal when clicking initial in-message sign up button in guest mode', async () => {
     render(<AIChatPanel userId={null} />)
 
-    const shortcutBtn = screen.getByRole('button', { name: /🦞 What is Moltology\?/i })
-    fireEvent.click(shortcutBtn)
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/The abyssal waters stir around your uncalibrated signal/i)
-      ).toBeInTheDocument()
-    })
-
-    const inMessageSignUpBtn = screen.getByRole('button', { name: /Sign Up/i })
-    fireEvent.click(inMessageSignUpBtn)
+    const initialSignUpBtn = screen.getByRole('button', { name: /Sign Up/i })
+    fireEvent.click(initialSignUpBtn)
 
     await waitFor(() => {
       expect(screen.getAllByText(/Create Account/i).length).toBeGreaterThan(0)

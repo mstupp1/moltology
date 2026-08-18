@@ -30,7 +30,7 @@ function JournalIndexPage() {
   const archivePapers = papers.slice(1)
 
   return (
-    <div className="space-y-6 font-mono select-none">
+    <div className="space-y-6 font-mono">
       {/* Academic Masthead */}
       <JournalMasthead variant="hero" />
 

@@ -51,7 +51,7 @@ function IsolationRoute() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col font-mono select-none -mt-2 sm:-mt-4">
+    <div className="w-full h-full flex flex-col font-mono -mt-2 sm:-mt-4">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-[#0e1315] border-2 border-[#ff453a] text-[#ff5540] p-3 shadow-[0_0_25px_rgba(255,69,58,0.5)] chamfer-corner flex items-center gap-2 text-xs font-bold animate-fadeIn">

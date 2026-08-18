@@ -158,7 +158,7 @@ function SubterraneanRoute() {
   }
 
   return (
-    <div className="space-y-6 font-mono select-none text-[#dfe3e3]">
+    <div className="space-y-6 font-mono text-[#dfe3e3]">
       {/* Flash Alert Banner when Bio-Purging */}
       {isPurging && (
         <div className="fixed inset-0 z-50 bg-[#39ff14]/20 pointer-events-none flex items-center justify-center animate-pulse backdrop-blur-sm">

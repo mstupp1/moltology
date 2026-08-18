@@ -206,7 +206,7 @@ export const SacredCodexReader: React.FC = () => {
       : 'font-mono'
 
   return (
-    <div className="space-y-4 select-none pb-12 relative">
+    <div className="space-y-4 pb-12 relative">
       {/* FULLSCREEN SOFT MINIMAL PDF OVERLAY MODAL */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-[#070a0b]/95 backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in duration-200">
@@ -459,7 +459,7 @@ export const SacredCodexReader: React.FC = () => {
                         </div>
 
                         <div className="leading-relaxed flex items-start gap-3">
-                          <div className="drop-cap-illuminated text-3xl font-extrabold opacity-90 select-none">
+                          <div className="drop-cap-illuminated text-3xl font-extrabold opacity-90">
                             {firstChar}
                           </div>
                           <p className="flex-1 pt-0.5 leading-relaxed">{restText}</p>
@@ -921,7 +921,7 @@ export const SacredCodexReader: React.FC = () => {
                       </div>
 
                       <div className="leading-relaxed flex items-start gap-3">
-                        <div className="drop-cap-illuminated text-3xl font-extrabold opacity-90 select-none">
+                        <div className="drop-cap-illuminated text-3xl font-extrabold opacity-90">
                           {firstChar}
                         </div>
                         <p className="flex-1 pt-0.5 leading-relaxed">{restText}</p>

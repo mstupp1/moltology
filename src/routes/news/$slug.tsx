@@ -177,7 +177,7 @@ function NewsPostDetail() {
     : 'AUG 2026'
 
   return (
-    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative select-none flex flex-col justify-between">
+    <div className="min-h-screen bg-[#070b0b] text-gray-200 font-mono relative flex flex-col justify-between">
       {/* Top Reading Progress Bar */}
       <div
         className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-transparent pointer-events-none"

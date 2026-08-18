@@ -22,7 +22,7 @@ function MarketRoute() {
   }
 
   return (
-    <div className="space-y-4 select-none font-mono">
+    <div className="space-y-4 font-mono">
       {/* Transmutation Modal */}
       <AssetTransmutationModal
         isOpen={isModalOpen}
