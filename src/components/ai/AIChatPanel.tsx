@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Shield,
   UserPlus,
+  RotateCcw,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
@@ -29,6 +30,9 @@ export interface AIChatPanelProps {
   isCompact?: boolean
   className?: string
   showModeControls?: boolean
+  headerDragProps?: React.HTMLAttributes<HTMLDivElement>
+  isDraggable?: boolean
+  onResetLayout?: () => void
 }
 
 interface ChatMessage {
@@ -54,6 +58,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   isCompact = false,
   className = '',
   showModeControls = true,
+  headerDragProps,
+  isDraggable = false,
+  onResetLayout,
 }) => {
   const oracle = useSafeOracle()
 
@@ -198,25 +205,30 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   return (
     <div
-      className={`flex flex-col bg-[#080d0d] border border-cyan-900/60 shadow-2xl font-mono overflow-hidden ${
-        isCompact ? 'h-[480px]' : 'h-full'
-      } ${className}`}
+      className={`flex flex-col bg-[#080d0d] border border-cyan-900/60 shadow-2xl font-mono overflow-hidden h-full w-full ${className}`}
     >
       {/* Shared Simplified Header */}
-      <div className="bg-[#0b1010] border-b border-cyan-900/50 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
-        <div className="flex items-center space-x-2 min-w-0">
-          <BrainCircuit className="w-4 h-4 text-cyan-400 animate-pulse shrink-0" />
-          <div className="flex items-center gap-2 truncate">
-            <span className="text-xs font-bold text-cyan-300 tracking-wider truncate">
-              {personaName}
-            </span>
-          </div>
+      <div
+        className={`bg-[#0b1010] border-b border-cyan-900/50 px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none ${
+          isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
+        }`}
+        {...headerDragProps}
+      >
+        {/* Left Section: Icon, Title & Model Pill */}
+        <div className="flex items-center space-x-2 min-w-0 flex-1 truncate">
+          <BrainCircuit className="w-4 h-4 text-cyan-400 animate-pulse shrink-0 pointer-events-none" />
+          <span className="text-xs font-bold text-cyan-300 tracking-wider truncate pointer-events-none hidden xs:inline">
+            {personaName}
+          </span>
 
           {/* Model Selector */}
-          <div className="relative">
+          <div
+            className="relative pointer-events-auto shrink-0"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setModelMenuOpen((v) => !v)}
-              className="flex items-center gap-1.5 bg-[#040707] border border-cyan-900/70 px-2 py-0.5 chamfer-corner text-[10px] text-cyan-200 hover:border-cyan-500/70 transition-all"
+              className="flex items-center gap-1 bg-[#040707] border border-cyan-900/70 px-2 py-0.5 chamfer-corner text-[10px] text-cyan-200 hover:border-cyan-500/70 transition-all max-w-[130px]"
               title="Select Oracle model"
             >
               <span>{selectedModel.label}</span>
@@ -250,7 +262,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         </div>
 
         {/* Mode Switcher & Panel Controls */}
-        <div className="flex items-center space-x-1 shrink-0">
+        <div
+          className="flex items-center space-x-1 shrink-0 pointer-events-auto"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           {showModeControls && oracle && (
             <div className="flex items-center bg-[#040707] border border-cyan-900/70 p-0.5 chamfer-corner space-x-0.5">
               <button
@@ -289,6 +304,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </div>
           )}
 
+          {onResetLayout && (
+            <button
+              onClick={onResetLayout}
+              className="text-gray-400 hover:text-cyan-300 p-1 transition-colors"
+              title="Reset Window Position & Size"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          )}
+
           <button
             onClick={() => setMessages([buildInitialWelcome()])}
             className="text-gray-400 hover:text-cyan-300 p-1 transition-colors"
@@ -308,7 +333,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       </div>
 
       {/* Prompt Shortcuts */}
-      <div className="px-3 py-1.5 bg-[#050808] border-b border-cyan-950 flex gap-1.5 overflow-x-auto text-[10px] no-scrollbar shrink-0">
+      <div
+        className="px-3 py-1.5 bg-[#050808] border-b border-cyan-950 flex gap-1.5 overflow-x-auto text-[10px] no-scrollbar shrink-0"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         {DEFAULT_PROMPT_SHORTCUTS.map((item, idx) => (
           <button
             key={idx}
