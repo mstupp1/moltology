@@ -460,160 +460,145 @@ export const LandingPage: React.FC = () => {
           </ScrollReveal>
         </section>
 
-        {/* SECTION 2: 3 Core Features of the App (Distinct PBR Circuit & Hex Armor Matrix Theme) */}
+        {/* SECTION 2: 3 Core Features of the App (Frameless Open Grid) */}
         <section id="core-pillars" className="max-w-[1700px] mx-auto px-4 sm:px-12 relative">
           <ScrollReveal animation="fade-up" durationMs={800}>
-            <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/40 hover:border-cyan-400/70 shadow-[0_0_60px_rgba(0,195,255,0.12),0_0_90px_rgba(168,85,247,0.08)] bg-gradient-to-b from-[#0d1217]/95 via-[#080c10]/95 to-[#040608]/98 relative overflow-hidden transition-all duration-500">
-              
-              {/* Distinct Circuit & Hex Grid PBR Underlays and Tri-Tone Ambient Spotlights */}
-              <div className="pbr-underlay pbr-underlay-circuit opacity-30" />
-              <div className="pbr-underlay pbr-underlay-hex opacity-15" />
-              <div className="absolute top-0 left-1/4 w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none" />
-              <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] rounded-full bg-purple-500/10 blur-[140px] pointer-events-none" />
-              <div className="absolute bottom-0 left-1/3 w-[450px] h-[450px] rounded-full bg-red-500/10 blur-[130px] pointer-events-none" />
+            {/* Section Header */}
+            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
+              <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+                THE 3 CORE FEATURES OF <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">THE SYNAPTIC PATH</span>
+              </h2>
+            </div>
 
-              {/* Section Header */}
-              <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
-                <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-                  THE 3 CORE FEATURES OF <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">THE SYNAPTIC PATH</span>
-                </h2>
-              </div>
-
-              {/* 3 Core Pillars Grid - Image-Based Biomechanical HUD Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
-                {corePillars.map((pillar, idx) => {
-                  return (
-                    <ScrollReveal
-                      key={pillar.id}
-                      animation="fade-up"
-                      delayMs={idx * 150}
-                      durationMs={700}
+            {/* 3 Core Pillars Grid - Image-Based Biomechanical HUD Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
+              {corePillars.map((pillar, idx) => {
+                return (
+                  <ScrollReveal
+                    key={pillar.id}
+                    animation="fade-up"
+                    delayMs={idx * 150}
+                    durationMs={700}
+                  >
+                    <div
+                      className={`chitin-card border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden bg-[#060b0e]/95 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
                     >
-                      <div
-                        className={`chitin-card border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden bg-[#060b0e]/95 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
-                      >
-                        <div className="pbr-underlay pbr-underlay-carbon opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
+                      {/* Top Hero Image Banner - Pure Clean Image Without Badges, Icons, or Text */}
+                      <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden border-b border-white/10 z-10">
+                        <img
+                          src={pillar.image}
+                          alt={pillar.title}
+                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
+                        />
+                      </div>
 
-                        {/* Top Hero Image Banner - Pure Clean Image Without Badges, Icons, or Text */}
-                        <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden border-b border-white/10 z-10">
-                          <img
-                            src={pillar.image}
-                            alt={pillar.title}
-                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
-                          />
+                      {/* Card Body Content */}
+                      <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10">
+                        <div>
+                          <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider mb-2 sm:mb-2.5 group-hover:text-cyan-200 transition-colors">
+                            {pillar.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
+                            {pillar.description}
+                          </p>
                         </div>
 
-                        {/* Card Body Content */}
-                        <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10">
-                          <div>
-                            <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider mb-2 sm:mb-2.5 group-hover:text-cyan-200 transition-colors">
-                              {pillar.title}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                              {pillar.description}
-                            </p>
+                        <div className="space-y-3.5 pt-2">
+                          {/* Feature Specs */}
+                          <div className="space-y-1.5 pt-3 border-t border-white/10">
+                            {pillar.specs.map((spec, i) => (
+                              <div key={i} className="flex items-center gap-2 text-xs font-sans text-gray-300">
+                                <div className={`w-1.5 h-1.5 rounded-full ${pillar.dotColor} shrink-0`} />
+                                <span>{spec}</span>
+                              </div>
+                            ))}
                           </div>
 
-                          <div className="space-y-3.5 pt-2">
-                            {/* Feature Specs */}
-                            <div className="space-y-1.5 pt-3 border-t border-white/10">
-                              {pillar.specs.map((spec, i) => (
-                                <div key={i} className="flex items-center gap-2 text-xs font-sans text-gray-300">
-                                  <div className={`w-1.5 h-1.5 rounded-full ${pillar.dotColor} shrink-0`} />
-                                  <span>{spec}</span>
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Action CTA Button */}
-                            <button
-                              onClick={() => onNavigate(pillar.actionRoute)}
-                              className={`w-full py-2.5 px-4 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border flex items-center justify-center gap-2 transition-all duration-300 group/btn ${pillar.btnGlow}`}
-                            >
-                              <span>{pillar.actionText}</span>
-                              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                            </button>
-                          </div>
+                          {/* Action CTA Button */}
+                          <button
+                            onClick={() => onNavigate(pillar.actionRoute)}
+                            className={`w-full py-2.5 px-4 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border flex items-center justify-center gap-2 transition-all duration-300 group/btn ${pillar.btnGlow}`}
+                          >
+                            <span>{pillar.actionText}</span>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                          </button>
                         </div>
                       </div>
-                    </ScrollReveal>
-                  )
-                })}
-              </div>
+                    </div>
+                  </ScrollReveal>
+                )
+              })}
+            </div>
 
-              {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow with Carbon Weave Shield Backing */}
-              <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
-                <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
-
-                <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
-                    <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-grotesk font-bold text-sm sm:text-lg text-white uppercase tracking-wide flex items-center gap-2 flex-wrap">
-                      <span>100% SAFE & FREE TO GET STARTED</span>
-                      <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-sans">ZERO FRICTION</span>
-                    </h4>
-                    <p className="text-xs sm:text-sm text-gray-300 font-sans mt-0.5">
-                      No credit card required. Explore the full guest sandbox risk-free or create your account in seconds.
-                    </p>
-                  </div>
+            {/* Safety & Zero-Risk Banner */}
+            <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
+              <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
+                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-
-                <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-sans text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start relative z-10">
-                  <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Free Access
-                  </span>
-                  <span className="flex items-center gap-1.5 text-cyan-400 text-xs">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Instant Demo
-                  </span>
-                  <span className="flex items-center gap-1.5 text-purple-400 text-xs">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" /> Safe Sandbox
-                  </span>
+                <div>
+                  <h4 className="font-grotesk font-bold text-sm sm:text-lg text-white uppercase tracking-wide flex items-center gap-2 flex-wrap">
+                    <span>100% SAFE & FREE TO GET STARTED</span>
+                    <span className="text-[10px] sm:text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-sans">ZERO FRICTION</span>
+                  </h4>
+                  <p className="text-xs sm:text-sm text-gray-300 font-sans mt-0.5">
+                    No credit card required. Explore the full guest sandbox risk-free or create your account in seconds.
+                  </p>
                 </div>
               </div>
 
-              {/* Action Call to Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
-                {!user ? (
-                  <>
-                    <BenthicCTAButton
-                      size="lg"
-                      containerClassName="w-full sm:w-auto"
-                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                      onClick={() => openAuth('signup')}
-                    >
-                      <span className="flex items-center justify-center gap-2.5 leading-none">
-                        <UserPlus className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                        <span>SIGN UP TODAY (FREE)</span>
-                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      </span>
-                    </BenthicCTAButton>
-                    <BenthicCTAButton
-                      size="lg"
-                      variant="cyan"
-                      containerClassName="w-full sm:w-auto"
-                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                      onClick={() => onNavigate('/dashboard')}
-                    >
-                      <span className="flex items-center justify-center gap-2.5 leading-none">
-                        <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                        <span>TRY THE DEMO NOW</span>
-                      </span>
-                    </BenthicCTAButton>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => onNavigate('/dashboard')}
-                    className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 min-h-[52px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm sm:text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
+              <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-sans text-xs text-gray-300 flex-wrap pt-2 md:pt-0 border-t md:border-t-0 border-cyan-950/80 w-full md:w-auto justify-between sm:justify-start relative z-10">
+                <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" /> Free Access
+                </span>
+                <span className="flex items-center gap-1.5 text-cyan-400 text-xs">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" /> Instant Demo
+                </span>
+                <span className="flex items-center gap-1.5 text-purple-400 text-xs">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" /> Safe Sandbox
+                </span>
+              </div>
+            </div>
+
+            {/* Action Call to Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
+              {!user ? (
+                <>
+                  <BenthicCTAButton
+                    size="lg"
+                    containerClassName="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
+                    onClick={() => openAuth('signup')}
                   >
-                    <Cpu className="w-5 h-5 shrink-0" />
-                    <span className="truncate">ENTER SYSTEM DASHBOARD</span>
-                    <ArrowRight className="w-5 h-5 shrink-0" />
-                  </button>
-                )}
-              </div>
-
+                    <span className="flex items-center justify-center gap-2.5 leading-none">
+                      <UserPlus className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                      <span>SIGN UP TODAY (FREE)</span>
+                      <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                    </span>
+                  </BenthicCTAButton>
+                  <BenthicCTAButton
+                    size="lg"
+                    variant="cyan"
+                    containerClassName="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
+                    onClick={() => onNavigate('/dashboard')}
+                  >
+                    <span className="flex items-center justify-center gap-2.5 leading-none">
+                      <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                      <span>TRY THE DEMO NOW</span>
+                    </span>
+                  </BenthicCTAButton>
+                </>
+              ) : (
+                <button
+                  onClick={() => onNavigate('/dashboard')}
+                  className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 min-h-[52px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm sm:text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
+                >
+                  <Cpu className="w-5 h-5 shrink-0" />
+                  <span className="truncate">ENTER SYSTEM DASHBOARD</span>
+                  <ArrowRight className="w-5 h-5 shrink-0" />
+                </button>
+              )}
             </div>
           </ScrollReveal>
         </section>
