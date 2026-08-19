@@ -624,7 +624,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       <aside
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
+        } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
       >
         {/* Mobile Top Bar (Permanent Header with Brand & Hamburger Toggle) */}
         <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2.5 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0">
@@ -651,7 +651,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Desktop Header Logo */}
         <div
-          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-[#1e2d37]/60 h-16 overflow-hidden transition-all duration-300 ${
+          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-[#1e2d37]/60 h-16 overflow-visible transition-all duration-300 ${
             isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
           }`}
         >
@@ -699,7 +699,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         </div>
 
         {/* Desktop Sidebar Navigation Container */}
-        <div className="hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-hidden min-h-0">
+        <div className="hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-visible min-h-0">
           {/* Search Bar — full width, above nav */}
           <div className="shrink-0 border-b border-[#1e2d37]/80">
             <button
@@ -762,14 +762,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </nav>
 
           {/* Desktop Bottom Controls: Lobster + Combined Help & Profile/Auth */}
-          <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b]">
+          <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] relative z-40 overflow-visible">
             {/* Lobster Emblem */}
-            <div className="px-4 pb-3 pt-3 border-b border-[#1e2d37]/60">
+            <div className="px-4 pb-3 pt-3 border-b border-[#1e2d37]/60 relative overflow-visible">
               {isCollapsed ? (
                 <div
                   className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
                   onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
-                  title="Replay Initiation Broadcast"
                 >
                   <ChromaElement
                     src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
@@ -780,7 +779,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     className="w-full h-full object-contain"
                   />
                   {/* Tooltip */}
-                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
+                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
                     <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
                       <span className="text-[#dfe3e3]">REPLAY INITIATION BROADCAST</span>
                       <span className="text-[9px] text-[#ff5540]">• CARAPACE v4.2</span>
@@ -813,10 +812,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
             {isCollapsed ? (
-              <div className="flex flex-col divide-y divide-[#1e2d37]/80">
+              <div className="flex flex-col divide-y divide-[#1e2d37]/80 relative overflow-visible">
                 {/* Help & Support Nav Item (Stacked on Top) */}
                 <div
-                  className={`relative transition-colors duration-150 ${
+                  className={`relative transition-colors duration-150 overflow-visible ${
                     currentRoute === '/support'
                       ? 'bg-[#00c3ff]/10'
                       : 'bg-[#080d10] hover:bg-white/[0.04]'
@@ -825,7 +824,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <button
                     onClick={() => handleNavClick('/support')}
                     className="w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/help cursor-pointer"
-                    title="Benthic Support Portal"
                   >
                     {currentRoute === '/support' && (
                       <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
@@ -850,7 +848,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     </span>
 
                     {/* Tooltip */}
-                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
+                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
                       <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
                         <span className="tracking-wider uppercase">
@@ -862,9 +860,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 </div>
 
                 {/* User Avatar Menu / Auth Button (Stacked on Bottom) */}
-                <div className="bg-[#080d10] py-2 px-1 flex items-center justify-center">
+                <div className="bg-[#080d10] py-2 px-1 flex items-center justify-center relative overflow-visible">
                   {!user ? (
-                    <div className="relative group/auth flex justify-center">
+                    <div className="relative group/auth flex justify-center overflow-visible">
                       <BenthicCTAButton
                         variant="red"
                         size="sm"
@@ -877,7 +875,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         </span>
                       </BenthicCTAButton>
                       {/* Tooltip */}
-                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/auth:opacity-100 transition-opacity duration-150">
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/auth:opacity-100 transition-opacity duration-150">
                         <div className="bg-[#060a0b] border border-[#ff3b30]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30]" />
                           <span className="tracking-wider uppercase">SIGN UP</span>
@@ -885,7 +883,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="relative flex items-center justify-center">
+                    <div className="relative z-50 flex items-center justify-center overflow-visible">
                       <UserAvatarMenu
                         user={user}
                         userRole={effectiveUserRole}
@@ -893,12 +891,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         align="left"
                         openDirection="up"
                       />
-                      {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && (
-                        <span
-                          className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none"
-                          title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
-                        />
-                      )}
                     </div>
                   )}
                 </div>
@@ -906,7 +898,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             ) : (
               /* Combined Row: Help & Support + User Avatar / Auth (Expanded) */
               <div
-                className={`flex items-center justify-between relative border-t border-[#1e2d37]/80 transition-colors duration-150 ${
+                className={`flex items-center justify-between relative border-t border-[#1e2d37]/80 transition-colors duration-150 overflow-visible ${
                   currentRoute === '/support'
                     ? 'bg-[#00c3ff]/10'
                     : 'bg-[#080d10] hover:bg-white/[0.04]'
@@ -956,7 +948,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       </span>
                     </BenthicCTAButton>
                   ) : (
-                    <div className="relative flex items-center">
+                    <div className="relative z-50 flex items-center overflow-visible">
                       <UserAvatarMenu
                         user={user}
                         userRole={effectiveUserRole}
