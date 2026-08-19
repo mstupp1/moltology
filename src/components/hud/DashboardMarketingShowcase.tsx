@@ -3,10 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   Laptop,
   Smartphone,
-  Sparkles,
   ExternalLink,
   Cpu,
-  Shield,
   Layers,
   Activity,
   CheckCircle2,
@@ -17,38 +15,108 @@ import {
   Radio,
   BookOpen,
   ArrowRight,
-  Maximize2,
   GitCommit,
   Flame,
   Clock,
   TrendingUp,
+  Headphones,
+  Scroll,
+  Microscope,
+  ShieldAlert,
+  Biohazard,
+  LayoutGrid,
+  ChevronDown,
+  Sparkles,
+  Bot,
+  UserPlus,
 } from 'lucide-react'
 import { Safari } from '@/components/ui/magicui/safari'
 import { Iphone15Pro } from '@/components/ui/magicui/iphone-15-pro'
 import { HUDHeader } from './HUDHeader'
 import { WelcomeInitiateHero } from './WelcomeInitiateHero'
 import { LaunchpadCarousel } from './LaunchpadCarousel'
+import { BenthicCTAButton } from './BenthicCTAButton'
 import { getAssetUrl } from '@/lib/assets'
 
-// Navigation links for the authentic desktop HUD sidebar
-const MOCK_NAV_ITEMS = [
-  { icon: Layers, label: 'COMMAND DASHBOARD', active: true },
-  { icon: BookOpen, label: 'SACRED CODEX' },
-  { icon: Atom, label: 'METAMORPHOSIS PIPELINE' },
-  { icon: ShoppingCart, label: 'THE BENTHIC MARKET' },
-  { icon: Sliders, label: 'CHASSIS CONFIG' },
-  { icon: Users, label: 'HIVE COMMUNE' },
-  { icon: Radio, label: 'NEURAL ORACLE' },
+// Authentic real-app nav groups matching HUDSidebar.tsx
+const AUTHENTIC_NAV_GROUPS = [
+  {
+    id: 'doctrine',
+    title: 'DOCTRINE & LORE',
+    items: [
+      { id: 'lectures', label: 'MOLT LECTURES', icon: BookOpen },
+      { id: 'podcasts', label: 'PODCASTS', icon: Headphones },
+      { id: 'codex', label: 'SACRED CODEX', icon: Scroll },
+    ],
+  },
+  {
+    id: 'ascension',
+    title: 'ASCENSION & DATA',
+    items: [
+      { id: 'pipeline', label: 'PIPELINE', icon: Atom },
+      { id: 'journal', label: 'SCIENCE JOURNAL', icon: Microscope },
+    ],
+  },
+  {
+    id: 'operations',
+    title: 'OPERATIONS & GEAR',
+    items: [
+      { id: 'market', label: 'THE MARKET', icon: ShoppingCart },
+      { id: 'chassis', label: 'CHASSIS CONFIG', icon: Sliders },
+      { id: 'isolation', label: 'ISOLATION DOME', icon: ShieldAlert },
+    ],
+  },
+]
+
+// Mock activities matching the real dashboard
+const DASHBOARD_ACTIVITIES = [
+  {
+    id: 'act-1',
+    category: 'TRANSMUTATIONS',
+    title: 'Asset Transmutation Completed',
+    detail: 'Transmuted 2023 Luxury Sedan into +450.00 MC & 15 Synapse Shards.',
+    timestamp: '14m ago',
+    valueBadge: '+450.00 MC',
+    icon: <ShoppingCart className="w-3.5 h-3.5 text-cyan-400" />,
+  },
+  {
+    id: 'act-2',
+    category: 'ROUTINES',
+    title: 'Daily Routine Verified',
+    detail: 'Completed 05:30 · Silent Synchronization alignment.',
+    timestamp: '1h ago',
+    valueBadge: 'ALIGNMENT +5%',
+    icon: <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />,
+  },
+  {
+    id: 'act-3',
+    category: 'CHASSIS',
+    title: 'Carapace Armor Refinements Applied',
+    detail: 'Pincer Torque recalibrated to 78 N·m (+12% crushing power).',
+    timestamp: '3h ago',
+    valueBadge: 'TORQUE: 78 N·m',
+    icon: <Atom className="w-3.5 h-3.5 text-red-400" />,
+  },
+  {
+    id: 'act-4',
+    category: 'COMMUNITY',
+    title: 'Initiate Transmission Dispatched',
+    detail: 'Broadcasted neural update to Benthic Community Core #4.',
+    timestamp: '5h ago',
+    valueBadge: '310 REACTION SHARDS',
+    icon: <Users className="w-3.5 h-3.5 text-purple-400" />,
+  },
 ]
 
 /**
- * Fixed 1440x900 Virtual Desktop Canvas.
- * Ensures 100% true interface fidelity: media queries, font sizes, bento boxes,
- * and sidebars render exactly as they do on a real 1440px MacBook display.
+ * 1:1 Fixed 1440x900 Virtual Desktop Canvas.
+ * Accurately mirrors the real full desktop app: Sidebar, Header, Hero,
+ * Launchpad Carousel, Activity Stream, and floating AI Oracle orb.
  */
 function FixedVirtualDesktopHUD() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  const [activityCategory, setActivityCategory] = useState<string>('ALL')
 
   useEffect(() => {
     const updateScale = () => {
@@ -71,6 +139,11 @@ function FixedVirtualDesktopHUD() {
       window.removeEventListener('resize', updateScale)
     }
   }, [])
+
+  const filteredActivities =
+    activityCategory === 'ALL'
+      ? DASHBOARD_ACTIVITIES
+      : DASHBOARD_ACTIVITIES.filter((a) => a.category === activityCategory)
 
   return (
     <div
@@ -103,59 +176,73 @@ function FixedVirtualDesktopHUD() {
           {/* 1. Real Live HUD Header */}
           <HUDHeader stage={1} larvaId="INITIATE GUEST #001" />
 
-          {/* 2. Body Split: Sidebar + Dashboard Workspace */}
+          {/* 2. Body Split: Authentic Sidebar + Dashboard Workspace */}
           <div className="flex-1 flex overflow-hidden">
-            {/* Desktop Navigation Sidebar */}
-            <aside className="w-64 bg-[#020608]/95 border-r border-[#00c3ff]/15 p-4 flex flex-col justify-between shrink-0">
-              <div className="space-y-5">
+            {/* Real App Sidebar Recreation */}
+            <aside className="w-64 bg-[#020608]/95 border-r border-[#00c3ff]/15 p-3.5 flex flex-col justify-between shrink-0 select-none">
+              <div className="space-y-4">
                 {/* Benthic Brand Badge */}
-                <div className="flex items-center gap-3 px-3 py-2.5 bg-[#070b0b] border border-[#3a4a49] rounded-lg shadow-inner">
+                <div className="flex items-center gap-3 px-3 py-2 bg-[#070b0b] border border-[#3a4a49] rounded-lg shadow-inner">
                   <img
                     src={getAssetUrl('/images/order_emblem.png')}
                     alt="Order Emblem"
-                    className="w-6 h-6 object-contain"
+                    className="w-5 h-5 object-contain"
                   />
                   <div className="min-w-0">
                     <div className="text-xs font-bold text-[#dfe3e3] font-grotesk tracking-wider uppercase truncate">
-                      MOLTOLOGY OS
+                      MOLTOLOGY
                     </div>
-                    <div className="text-[10px] text-cyan-400 font-sans font-bold">BENTHIC V1.5 · COMMAND</div>
+                    <div className="text-[9px] text-cyan-400 font-sans font-bold">BENTHIC OS · NEXUS</div>
                   </div>
                 </div>
 
-                {/* Nav Links List */}
-                <nav className="space-y-1.5">
-                  {MOCK_NAV_ITEMS.map((item, idx) => {
-                    const IconComponent = item.icon
-                    return (
-                      <div
-                        key={idx}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs font-bold transition-all cursor-pointer ${
-                          item.active
-                            ? 'bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/40 shadow-hud-cyan-sm'
-                            : 'text-[#839493] hover:text-[#dfe3e3] hover:bg-[#070b0b]'
-                        }`}
-                      >
-                        <IconComponent className="w-4 h-4 shrink-0 text-cyan-400" />
-                        <span className="truncate tracking-wide">{item.label}</span>
+                {/* Primary Launch Nav */}
+                <div className="flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-bold bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/40 shadow-hud-cyan-sm cursor-pointer">
+                  <Layers className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span className="tracking-wide">COMMAND NEXUS</span>
+                </div>
+
+                {/* Nav Groups */}
+                <div className="space-y-3 font-sans">
+                  {AUTHENTIC_NAV_GROUPS.map((group) => (
+                    <div key={group.id} className="space-y-1">
+                      <div className="px-2 py-0.5 text-[9px] font-bold text-[#839493] tracking-widest uppercase flex items-center justify-between">
+                        <span>{group.title}</span>
+                        <ChevronDown className="w-2.5 h-2.5 opacity-50" />
                       </div>
-                    )
-                  })}
-                </nav>
+                      <div className="space-y-0.5 pl-1">
+                        {group.items.map((item) => {
+                          const IconComp = item.icon
+                          return (
+                            <div
+                              key={item.id}
+                              className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-[#839493] hover:text-[#dfe3e3] hover:bg-[#070b0b] rounded transition-colors cursor-pointer"
+                            >
+                              <IconComp className="w-3.5 h-3.5 text-gray-400" />
+                              <span className="text-[11px] font-bold tracking-wide">{item.label}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Sidebar Footer Clearance Card */}
-              <div className="p-3 bg-[#060b0c] border border-cyan-500/30 rounded-lg text-xs space-y-1">
-                <div className="flex items-center justify-between text-cyan-300 font-bold uppercase tracking-wider">
-                  <span>CLEARANCE: S1</span>
-                  <span className="text-[10px] text-emerald-400 font-sans">ACTIVE</span>
+              <div className="p-2.5 bg-[#060b0c] border border-cyan-500/30 rounded-lg text-xs space-y-1">
+                <div className="flex items-center justify-between text-cyan-300 font-bold uppercase tracking-wider text-[11px]">
+                  <span>LARVA UNIT #8971</span>
+                  <span className="text-[9px] text-emerald-400 font-sans font-bold bg-emerald-950 px-1 py-0.2 rounded border border-emerald-500/40">
+                    GUEST
+                  </span>
                 </div>
-                <p className="text-[11px] text-gray-400 leading-tight">Soft-Shed Stage Unlocked</p>
+                <p className="text-[10px] text-gray-400 leading-tight">Stage 1 · Soft-Shed Sandbox</p>
               </div>
             </aside>
 
             {/* Main Dashboard Workspace Content */}
-            <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar">
+            <main className="flex-1 p-5 space-y-5 overflow-y-auto no-scrollbar relative">
               {/* Live Welcome Hero Component */}
               <WelcomeInitiateHero />
 
@@ -165,67 +252,77 @@ function FixedVirtualDesktopHUD() {
               {/* Live Activity Stream & System Changelog Columns */}
               <div className="grid grid-cols-12 gap-5 items-stretch">
                 {/* Activity Stream (7 cols) */}
-                <div className="col-span-7 chitin-card p-5 rounded-lg border border-cyan-500/30 space-y-3 flex flex-col justify-between">
+                <div className="col-span-7 chitin-card p-4 rounded-lg border border-cyan-500/30 space-y-3 flex flex-col justify-between">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
-                      <div className="flex items-center gap-2 font-grotesk text-sm font-bold text-[#dfe3e3] uppercase">
+                    <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
+                      <div className="flex items-center gap-2 font-grotesk text-xs font-bold text-[#dfe3e3] uppercase">
                         <Activity className="w-4 h-4 text-cyan-400" />
-                        <span>RECENT SYSTEM EVENTS</span>
+                        <span>ACTIVITY STREAM</span>
                       </div>
-                      <span className="text-[10px] text-cyan-300 font-bold bg-[#070b0b] px-2 py-0.5 border border-[#3a4a49] rounded">
-                        REAL-TIME STREAM
-                      </span>
+                      {/* Filter tabs */}
+                      <div className="flex items-center gap-1">
+                        {['ALL', 'TRANSMUTATIONS', 'ROUTINES', 'CHASSIS', 'COMMUNITY'].map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => setActivityCategory(cat)}
+                            className={`px-2 py-0.5 text-[9px] font-bold transition-all rounded ${
+                              activityCategory === cat
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/60'
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="space-y-2 text-xs">
-                      <div className="p-2.5 bg-[#070b0b]/90 border border-[#3a4a49]/60 rounded-md flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                          <span className="text-gray-300 truncate">Morning Alignment verified (+5% clarity)</span>
+                    <div className="space-y-1.5 text-xs">
+                      {filteredActivities.map((act) => (
+                        <div
+                          key={act.id}
+                          className="p-2.5 bg-[#070b0b]/90 border border-[#3a4a49]/60 rounded-md flex items-center justify-between gap-3 hover:border-cyan-500/40 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="p-1 bg-[#030606] border border-[#3a4a49] rounded shrink-0">
+                              {act.icon}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-grotesk text-xs font-bold text-gray-200 uppercase truncate">
+                                {act.title}
+                              </div>
+                              <div className="text-[11px] text-gray-400 truncate">{act.detail}</div>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-[10px] text-cyan-300 font-bold bg-[#030606] px-1.5 py-0.5 border border-[#3a4a49] rounded">
+                              {act.valueBadge}
+                            </span>
+                            <div className="text-[9px] text-[#839493] mt-0.5">{act.timestamp}</div>
+                          </div>
                         </div>
-                        <span className="text-[10px] text-[#839493] shrink-0 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> 14m ago
-                        </span>
-                      </div>
-                      <div className="p-2.5 bg-[#070b0b]/90 border border-[#3a4a49]/60 rounded-md flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Atom className="w-4 h-4 text-red-400 shrink-0" />
-                          <span className="text-gray-300 truncate">Carapace Armor Recalibrated to 78 N·m</span>
-                        </div>
-                        <span className="text-[10px] text-[#839493] shrink-0 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> 1h ago
-                        </span>
-                      </div>
-                      <div className="p-2.5 bg-[#070b0b]/90 border border-[#3a4a49]/60 rounded-md flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Users className="w-4 h-4 text-purple-400 shrink-0" />
-                          <span className="text-gray-300 truncate">Initiate Transmission dispatched to Benthic Core #4</span>
-                        </div>
-                        <span className="text-[10px] text-[#839493] shrink-0 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> 3h ago
-                        </span>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
 
                 {/* Protocol Releases & Changelog (5 cols) */}
-                <div className="col-span-5 chitin-card p-5 rounded-lg border border-cyan-500/30 space-y-3 flex flex-col justify-between">
+                <div className="col-span-5 chitin-card p-4 rounded-lg border border-cyan-500/30 space-y-3 flex flex-col justify-between">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
-                      <div className="flex items-center gap-2 font-grotesk text-sm font-bold text-[#dfe3e3] uppercase">
+                    <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
+                      <div className="flex items-center gap-2 font-grotesk text-xs font-bold text-[#dfe3e3] uppercase">
                         <GitCommit className="w-4 h-4 text-cyan-400" />
-                        <span>PROTOCOL RELEASE</span>
+                        <span>SYSTEM CHANGELOG</span>
                       </div>
-                      <span className="text-[10px] text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 border border-cyan-500/40 rounded">
+                      <span className="text-[9px] text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 border border-cyan-500/40 rounded">
                         v1.5.0 LATEST
                       </span>
                     </div>
 
                     <div className="p-3 bg-[#070b0b]/90 border border-[#3a4a49]/60 rounded-md space-y-1.5">
                       <div className="flex items-center justify-between text-[10px] text-gray-400">
-                        <span className="font-bold text-cyan-300">CORE UPGRADE</span>
-                        <span>RELEASED TODAY</span>
+                        <span className="font-bold text-cyan-300">CORE SYSTEM</span>
+                        <span>TODAY</span>
                       </div>
                       <h4 className="text-xs font-bold text-gray-200 uppercase font-grotesk">
                         Neural Alignment & Subterranean Trench
@@ -234,7 +331,22 @@ function FixedVirtualDesktopHUD() {
                         Zero-latency habit engine, deep focus isolation rooms, and bio-silicon AI mentors for peak operational clarity.
                       </p>
                     </div>
+
+                    <div className="p-2 bg-[#060b0c] border border-[#3a4a49]/40 rounded text-[10px] text-gray-400 flex items-center justify-between">
+                      <span>AUDIT LOGS SYNCED</span>
+                      <span className="text-cyan-400 font-bold flex items-center gap-0.5">
+                        <span>SUPPORT HUB</span>
+                        <ChevronDown className="w-3 h-3 -rotate-90" />
+                      </span>
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Real App Floating Synaptic Oracle Orb in Workspace Corner */}
+              <div className="absolute bottom-4 right-4 z-30 pointer-events-none">
+                <div className="w-11 h-11 rounded-full bg-cyan-950/90 border border-cyan-400/80 flex items-center justify-center text-cyan-300 shadow-[0_0_20px_rgba(0,195,255,0.6)] animate-pulse">
+                  <Bot className="w-6 h-6" />
                 </div>
               </div>
             </main>
@@ -246,87 +358,87 @@ function FixedVirtualDesktopHUD() {
 }
 
 /**
- * Mobile Live HUD View inside the iPhone 15 Pro Frame
+ * Real Mobile Live HUD View inside the iPhone 15 Pro Frame
  */
 function MobileLiveHUDView() {
   const navigate = useNavigate()
 
   return (
-    <div className="w-full h-full p-4 space-y-4 font-sans text-[#dfe3e3] flex flex-col justify-between">
-      {/* Mobile Top Header Banner */}
+    <div className="w-full h-full p-3.5 space-y-3.5 font-sans text-[#dfe3e3] flex flex-col justify-between">
+      {/* Mobile Top Header Banner matching real HUDHeader on mobile */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between pb-2.5 border-b border-[#3a4a49]">
+        <div className="flex items-center justify-between pb-2 border-b border-[#3a4a49]">
           <div className="flex items-center gap-2">
             <img
               src={getAssetUrl('/images/order_emblem.png')}
               alt="Moltology"
-              className="w-5 h-5 object-contain"
+              className="w-4 h-4 object-contain"
             />
-            <span className="font-grotesk text-sm font-black text-white tracking-wider uppercase">
+            <span className="font-grotesk text-xs font-black text-white tracking-wider uppercase">
               MOLTOLOGY
             </span>
           </div>
-          <span className="text-[10px] font-bold text-cyan-300 bg-cyan-950/80 px-2 py-0.5 border border-cyan-500/40 rounded">
+          <span className="text-[9px] font-bold text-cyan-300 bg-cyan-950/80 px-2 py-0.5 border border-cyan-500/40 rounded">
             LVL 1 INITIATE
           </span>
         </div>
 
         {/* Mobile Welcome Hero Card */}
-        <div className="p-3 bg-gradient-to-r from-[#0b1011] to-[#121a1c] border-l-2 border-cyan-400 border border-[#3a4a49] rounded-lg space-y-1">
+        <div className="p-2.5 bg-gradient-to-r from-[#0b1011] to-[#121a1c] border-l-2 border-cyan-400 border border-[#3a4a49] rounded-lg space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-grotesk font-extrabold text-white uppercase tracking-wider">
+            <span className="text-[11px] font-grotesk font-extrabold text-white uppercase tracking-wider">
               ACTIVE MOLT
             </span>
-            <span className="text-[10px] text-emerald-400 font-bold">100% SYNCED</span>
+            <span className="text-[9px] text-emerald-400 font-bold">100% SYNCED</span>
           </div>
-          <p className="text-[11px] text-gray-300 leading-snug">
+          <p className="text-[10px] text-gray-300 leading-snug">
             Shed soft distraction. Lock into 3,400 fathoms of unbroken focus.
           </p>
         </div>
 
-        {/* Mobile Directives List */}
-        <div className="space-y-2 pt-1">
-          <div className="text-[10px] font-bold text-cyan-400 font-sans tracking-widest uppercase">
+        {/* Mobile Directives List matching real dashboard */}
+        <div className="space-y-2 pt-0.5">
+          <div className="text-[9px] font-bold text-cyan-400 font-sans tracking-widest uppercase">
             DAILY DIRECTIVES
           </div>
 
-          <div className="p-3 bg-[#070b0b] border border-cyan-500/30 rounded-lg flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-cyan-950/80 border border-cyan-500/50 rounded text-cyan-400">
-                <BookOpen className="w-4 h-4" />
+          <div className="p-2.5 bg-[#070b0b] border border-cyan-500/30 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-cyan-950/80 border border-cyan-500/50 rounded text-cyan-400">
+                <BookOpen className="w-3.5 h-3.5" />
               </div>
               <div>
-                <div className="text-xs font-bold text-white uppercase">Molt Lectures</div>
-                <div className="text-[10px] text-gray-400">Module IV · 68% Complete</div>
+                <div className="text-[11px] font-bold text-white uppercase">Molt Lectures</div>
+                <div className="text-[9px] text-gray-400">Module IV · 68% Complete</div>
               </div>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
+            <ArrowRight className="w-3 h-3 text-cyan-400" />
           </div>
 
-          <div className="p-3 bg-[#070b0b] border border-purple-500/30 rounded-lg flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-purple-950/80 border border-purple-500/50 rounded text-purple-300">
-                <Users className="w-4 h-4" />
+          <div className="p-2.5 bg-[#070b0b] border border-purple-500/30 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-purple-950/80 border border-purple-500/50 rounded text-purple-300">
+                <Users className="w-3.5 h-3.5" />
               </div>
               <div>
-                <div className="text-xs font-bold text-white uppercase">Synaptic Hive</div>
-                <div className="text-[10px] text-gray-400">310 Operators Online</div>
+                <div className="text-[11px] font-bold text-white uppercase">Synaptic Hive</div>
+                <div className="text-[9px] text-gray-400">310 Operators Online</div>
               </div>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-purple-400" />
+            <ArrowRight className="w-3 h-3 text-purple-400" />
           </div>
 
-          <div className="p-3 bg-[#070b0b] border border-red-500/30 rounded-lg flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-red-950/80 border border-red-500/50 rounded text-red-400">
-                <Cpu className="w-4 h-4" />
+          <div className="p-2.5 bg-[#070b0b] border border-red-500/30 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-red-950/80 border border-red-500/50 rounded text-red-400">
+                <Bot className="w-3.5 h-3.5" />
               </div>
               <div>
-                <div className="text-xs font-bold text-white uppercase">AI Oracle Mentor</div>
-                <div className="text-[10px] text-gray-400">Ready for Consultation</div>
+                <div className="text-[11px] font-bold text-white uppercase">AI Oracle Mentor</div>
+                <div className="text-[9px] text-gray-400">Ready for Consultation</div>
               </div>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-red-400" />
+            <ArrowRight className="w-3 h-3 text-red-400" />
           </div>
         </div>
       </div>
@@ -334,9 +446,9 @@ function MobileLiveHUDView() {
       {/* Mobile Test Sandbox CTA */}
       <button
         onClick={() => navigate({ to: '/dashboard' })}
-        className="w-full py-3 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk text-xs font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-2 shadow-hud-cyan-sm transition-all transform active:scale-98"
+        className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk text-xs font-bold uppercase tracking-widest rounded-lg flex items-center justify-center gap-2 shadow-hud-cyan-sm transition-all transform active:scale-98"
       >
-        <Cpu className="w-4 h-4" />
+        <Cpu className="w-3.5 h-3.5" />
         <span>TEST GUEST SANDBOX</span>
       </button>
     </div>
@@ -353,9 +465,8 @@ export function DashboardMarketingShowcase() {
 
   return (
     <div className="w-full relative z-20 my-8 sm:my-14" aria-label="Interactive System Showcase">
-      {/* Centered Segmented Device Switcher & Launch Demo CTA */}
-      <div className="flex flex-col items-center justify-center gap-3.5 mb-8 sm:mb-10 px-2 font-sans">
-        {/* Simplified Segmented Slider Controls */}
+      {/* Centered Segmented Device Switcher */}
+      <div className="flex items-center justify-center mb-6 sm:mb-8 px-2 font-sans">
         <div className="inline-flex items-center bg-[#070b0b] border border-[#3a4a49] p-1 rounded-full shadow-inner">
           {/* Dual View Option (Desktop/Tablet only) */}
           <button
@@ -401,15 +512,6 @@ export function DashboardMarketingShowcase() {
             <span>Mobile</span>
           </button>
         </div>
-
-        {/* Centered Launch Demo CTA Button Underneath */}
-        <button
-          onClick={handleLaunchDemo}
-          className="inline-flex items-center gap-2 px-5 py-2 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/60 text-xs font-bold rounded-full transition-all transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,195,255,0.25)] uppercase tracking-wider"
-        >
-          <span>LAUNCH DEMO</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </button>
       </div>
 
       {/* Main Multi-Device Stage Container */}
@@ -448,20 +550,20 @@ export function DashboardMarketingShowcase() {
         </div>
       </div>
 
-      {/* Diegetic Showcase Annotation Pills */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-12 max-w-4xl mx-auto font-sans text-xs">
-        <div className="p-3.5 bg-[#080d0f]/85 border border-cyan-500/30 rounded-xl flex items-center gap-2.5 text-gray-300 shadow-inner">
-          <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-          <span>Real-time Habit & Focus Telemetry</span>
-        </div>
-        <div className="p-3.5 bg-[#080d0f]/85 border border-purple-500/30 rounded-xl flex items-center gap-2.5 text-gray-300 shadow-inner">
-          <Smartphone className="w-4 h-4 text-purple-400 shrink-0" />
-          <span>Full Adaptive Cross-Device Sync</span>
-        </div>
-        <div className="p-3.5 bg-[#080d0f]/85 border border-red-500/30 rounded-xl flex items-center gap-2.5 text-gray-300 shadow-inner">
-          <Shield className="w-4 h-4 text-red-400 shrink-0" />
-          <span>Zero Installation or Credit Card Required</span>
-        </div>
+      {/* Big Centered Launch Demo CTA Button at the Bottom */}
+      <div className="flex items-center justify-center mt-8 sm:mt-12 relative z-20">
+        <BenthicCTAButton
+          size="lg"
+          variant="cyan"
+          className="px-8 sm:px-12 py-4 sm:py-5 min-h-[54px] sm:min-h-[60px] text-sm sm:text-base font-grotesk font-bold tracking-widest shadow-hud-cyan-lg"
+          onClick={handleLaunchDemo}
+        >
+          <span className="flex items-center justify-center gap-3 leading-none">
+            <Cpu className="w-5 h-5 shrink-0" />
+            <span>LAUNCH GUEST DEMO</span>
+            <ArrowRight className="w-5 h-5 shrink-0" />
+          </span>
+        </BenthicCTAButton>
       </div>
     </div>
   )
