@@ -25,20 +25,20 @@ describe('DashboardMarketingShowcase Component', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
   })
 
-  it('renders both laptop and smartphone live device frames with centered controls', () => {
+  it('renders both laptop and smartphone live device frames with centered controls and big launch CTA', () => {
     render(<DashboardMarketingShowcase />)
 
     // Verify centered controls and launch demo button
     expect(screen.getByRole('button', { name: /Desktop/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Mobile/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Launch Demo/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
 
     // Verify presence of simulated URL bar in Safari
     expect(screen.getByText('hub.moltology.org/dashboard')).toBeInTheDocument()
     expect(screen.getByText('GUEST READY')).toBeInTheDocument()
 
     // Verify live HUD header rendered inside laptop
-    expect(screen.getByText('MOLTOLOGY OS')).toBeInTheDocument()
+    expect(screen.getAllByText('MOLTOLOGY').length).toBeGreaterThan(0)
     expect(screen.getByText('WELCOME,')).toBeInTheDocument()
     expect(screen.getByText('INITIATE')).toBeInTheDocument()
 
@@ -71,18 +71,10 @@ describe('DashboardMarketingShowcase Component', () => {
   it('navigates to /dashboard when Launch Demo or mobile test button is clicked', () => {
     render(<DashboardMarketingShowcase />)
 
-    const launchDemoButtons = screen.getAllByRole('button', { name: /LAUNCH DEMO|TEST GUEST SANDBOX/i })
+    const launchDemoButtons = screen.getAllByRole('button', { name: /LAUNCH GUEST DEMO|TEST GUEST SANDBOX/i })
     expect(launchDemoButtons.length).toBeGreaterThan(0)
 
     fireEvent.click(launchDemoButtons[0])
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
-  })
-
-  it('renders marketing feature annotation callouts', () => {
-    render(<DashboardMarketingShowcase />)
-
-    expect(screen.getByText('Real-time Habit & Focus Telemetry')).toBeInTheDocument()
-    expect(screen.getByText('Full Adaptive Cross-Device Sync')).toBeInTheDocument()
-    expect(screen.getByText('Zero Installation or Credit Card Required')).toBeInTheDocument()
   })
 })

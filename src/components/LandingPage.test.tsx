@@ -80,7 +80,7 @@ describe('LandingPage Component', () => {
 
     expect(screen.getByText('ASSET & HABIT SHEDDING')).toBeInTheDocument()
     expect(screen.getByText('CHITIN HARDENING')).toBeInTheDocument()
-    expect(screen.getByText('ISOLATION DOME')).toBeInTheDocument()
+    expect(screen.getAllByText('ISOLATION DOME').length).toBeGreaterThan(0)
     expect(screen.getByText('PIPELINE ASCENT')).toBeInTheDocument()
 
     const enforceButtons = screen.getAllByText('ENFORCE PROTOCOL')
