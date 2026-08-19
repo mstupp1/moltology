@@ -458,29 +458,46 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                     <ArrowUpRight className="w-4 h-4" />
                   </button>
                 </div>
+
+                {/* Bottom Edge Continuous Progress Bar */}
+                <div className="absolute bottom-0 inset-x-0 z-20 h-1 bg-[#030606]/80 overflow-hidden pointer-events-none">
+                  <div
+                    key={`${currentIndex}-${isAutoPlay && !isHovered}`}
+                    className={`h-full transition-all ${
+                      isAutoPlay && !isHovered
+                        ? 'bg-gradient-to-r from-[#00ffff]/70 via-[#00ffff] to-[#00ffff] shadow-[0_0_10px_#00ffff]'
+                        : 'w-full bg-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.7)]'
+                    }`}
+                    style={
+                      isAutoPlay && !isHovered
+                        ? {
+                            animation: 'carouselProgress 6000ms linear forwards',
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
               </div>
 
-              {/* Bottom 6-Slot Indicator Dock */}
-              <div className="pt-2 border-t border-[#3a4a49]/60 grid grid-cols-6 gap-1.5">
+              {/* Bottom Minimal HUD Tab Rail */}
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2 pt-0.5">
                 {LAUNCHPAD_MODULES.map((mod, idx) => (
                   <button
                     key={mod.id}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`p-1.5 h-8 sm:h-9 border text-left transition-all chamfer-corner font-sans flex items-center justify-between ${
+                    className={`py-1.5 px-2 rounded-sm transition-all text-left flex items-center justify-between border ${
                       currentIndex === idx
-                        ? 'bg-[#00ffff]/15 border-[#00ffff] text-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.2)]'
-                        : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/50 hover:text-[#dfe3e3]'
+                        ? 'bg-[#00ffff]/10 border-[#00ffff]/50 text-[#00ffff] shadow-[0_0_12px_rgba(0,255,255,0.15)]'
+                        : 'bg-[#070b0b]/70 border-[#3a4a49]/40 hover:border-[#00ffff]/40 hover:bg-[#0f1414] text-[#839493] hover:text-[#dfe3e3]'
                     }`}
+                    aria-label={`Select directive 0${idx + 1}: ${mod.title}`}
                   >
-                    <div className="truncate text-[10px] font-bold uppercase hidden sm:block">
+                    <span className="text-[10px] sm:text-[11px] font-grotesk font-bold uppercase tracking-wider truncate">
                       0{idx + 1}. {mod.id}
-                    </div>
-                    <div className="truncate text-[10px] font-bold uppercase sm:hidden">
-                      0{idx + 1}
-                    </div>
+                    </span>
                     <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        currentIndex === idx ? 'bg-[#00ffff] animate-ping' : 'bg-[#3a4a49]'
+                      className={`w-1 h-1 rounded-full shrink-0 ml-1 transition-all ${
+                        currentIndex === idx ? 'bg-[#00ffff] shadow-[0_0_6px_#00ffff]' : 'bg-transparent'
                       }`}
                     />
                   </button>
