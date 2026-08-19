@@ -17,6 +17,8 @@ import type { BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
 import { DashboardNewsGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { getAssetUrl } from '@/lib/assets'
+import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
 export interface DashboardNewsWidgetProps {
   isLoading?: boolean
@@ -79,7 +81,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
   return (
     <HudGhostWidget isLoading={isLoading} skeleton={<DashboardNewsGhost />}>
       <div className="chitin-card p-4 chamfer-corner space-y-3.5 shadow-2xl relative overflow-hidden h-full flex flex-col">
-        {/* In-HUD Full Article Modal Reader */}
+        {/* In-HUD Full Article Modal Reader with High-Precision Markdown Parser */}
         {activePost && (
           <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
             <div className="w-full max-w-3xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] chamfer-corner overflow-hidden font-sans text-sm space-y-4">
@@ -104,7 +106,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 {activePost.coverImageUrl && (
                   <div className="relative h-48 sm:h-56 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
                     <img
-                      src={activePost.coverImageUrl}
+                      src={getAssetUrl(activePost.coverImageUrl)}
                       alt={activePost.title}
                       className="w-full h-full object-cover"
                     />
@@ -125,7 +127,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                     <div className="flex items-center gap-1.5">
                       {activePost.authorAvatar && (
                         <img
-                          src={activePost.authorAvatar}
+                          src={getAssetUrl(activePost.authorAvatar)}
                           alt={activePost.authorName}
                           className="w-4 h-4 rounded-full border border-[#00ffff]/40"
                         />
@@ -153,8 +155,8 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   </div>
                 )}
 
-                <div className="chitin-card-inset p-4 text-xs leading-relaxed text-[#dfe3e3] whitespace-pre-line border border-[#3a4a49]">
-                  {activePost.content}
+                <div className="chitin-card-inset p-4 sm:p-5 border border-[#3a4a49] chamfer-corner">
+                  <NewsArticleBody content={activePost.content} />
                 </div>
               </div>
 
@@ -258,7 +260,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 {featuredPost.coverImageUrl && (
                   <div className="relative h-32 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
                     <img
-                      src={featuredPost.coverImageUrl}
+                      src={getAssetUrl(featuredPost.coverImageUrl)}
                       alt={featuredPost.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                     />
@@ -291,7 +293,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   <div className="flex items-center gap-1.5 text-[#839493]">
                     {featuredPost.authorAvatar && (
                       <img
-                        src={featuredPost.authorAvatar}
+                        src={getAssetUrl(featuredPost.authorAvatar)}
                         alt={featuredPost.authorName}
                         className="w-3.5 h-3.5 rounded-full border border-[#3a4a49]"
                       />
@@ -374,7 +376,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                 {featuredPost.coverImageUrl && (
                   <div className="relative h-44 sm:h-52 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
                     <img
-                      src={featuredPost.coverImageUrl}
+                      src={getAssetUrl(featuredPost.coverImageUrl)}
                       alt={featuredPost.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                     />
@@ -407,7 +409,7 @@ export function DashboardNewsWidget({ isLoading = false, layout = 'sidebar' }: D
                   <div className="flex items-center gap-2 text-[#839493]">
                     {featuredPost.authorAvatar && (
                       <img
-                        src={featuredPost.authorAvatar}
+                        src={getAssetUrl(featuredPost.authorAvatar)}
                         alt={featuredPost.authorName}
                         className="w-4 h-4 rounded-full border border-[#3a4a49]"
                       />
