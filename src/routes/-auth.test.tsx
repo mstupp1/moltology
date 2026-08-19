@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { AuthRoute } from './auth'
+import { Route } from './auth'
 import { authClient } from '@/lib/auth-client'
 
 const mockNavigate = vi.fn()
@@ -10,6 +10,7 @@ let mockSearch: { mode?: 'login' | 'signup'; redirect?: string } = { mode: 'logi
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
     ...config,
+    options: config,
     useSearch: () => mockSearch,
   }),
   useNavigate: () => mockNavigate,
@@ -20,6 +21,8 @@ vi.mock('@tanstack/react-router', () => ({
     </a>
   ),
 }))
+
+const AuthRoute = Route.options.component!
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
