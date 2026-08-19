@@ -566,5 +566,12 @@ body.vfx-disabled [class*="drop-shadow-"],
   animation: deckSlideInPrev 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-
-
+/* Carousel Segmented Progress Fill Animation */
+@keyframes carouselProgress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
