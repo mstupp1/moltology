@@ -85,7 +85,7 @@ export function DashboardMarketingShowcase() {
         >
           {/* Open-Source Magic UI Safari Window Frame with 100% True High-DPI Desktop Screenshot */}
           <Safari
-            url="benthic:hub.moltology.org/dashboard"
+            url="moltology.org/dashboard"
             src={getAssetUrl('/images/marketing/dashboard_desktop_preview.png')}
           />
         </div>
