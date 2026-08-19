@@ -135,6 +135,7 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
 1. **Grid Safe Zone Rule**: While full-screen reels are `1080x1920` (9:16), the profile grid crops to the center `1080x1080` (1:1 square, between `Y=420` and `Y=1500`).
 2. **Mascot Stamping**: The selected mascot cutout is cleanly drawn in the bottom corner of the 1:1 safe zone (`X = 740, Y = 1200`), pointing or reacting to the hook headline.
 3. **Custom Image Generation Policy**: If a bespoke custom background illustration or graphic is generated rather than extracting a video frame, it MUST be generated exclusively using Antigravity's built-in `generate_image` tool (never Gemini API / external endpoints).
+   * **Unavailability Rule**: If `generate_image` is unavailable or hits rate limits, **STOP THE RUN IMMEDIATELY** and present the proposed plan/prompts to the user for decision.
 4. **Execution**:
    ```typescript
    import { renderReelThumbnail } from 'scripts/lib/reel-compositor'
@@ -157,15 +158,14 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
    * Video: `videos/social/reels/reel-<timestamp>.mp4`
    * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
 
-2. **Stage to Queue / Publish via Zernio MCP (`posts_create`)**:
-   * **Queue-Driven Scheduling (Recommended)**:
+2. **Mandatory Zernio Queue Routing**:
+   * **Strict Queue Rule**: All reels/shorts MUST ALWAYS be routed into the designated Zernio queue (`queued_from_profile: '6a7f74b1839bf39ff3b6aaaa'`, `queue_id: '6a84b7702421e968ac81f5bd'`).
+   * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly and unequivocally commands an immediate live broadcast.
+   * **Queue Configuration**:
      - Profile ID: `6a7f74b1839bf39ff3b6aaaa`
-     - Reels Queue ID: `6a84b7702421e968ac81f5bd` (Slots every day at 6:30 PM EST / 18:30)
-     - Set `isAiGenerated: true` for Meta/Instagram.
+     - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — Slots daily at 6:30 PM EST / 18:30 `America/New_York`)
      - Dual broadcast to Instagram (`6a7f7f0777555aae01d99b54`) and YouTube Shorts (`6a7fd9bd77555aae01ebea63`).
-     - Pass `profile_id: "6a7f74b1839bf39ff3b6aaaa"` to automatically land in the next open 6:30 PM slot.
-   * **Immediate Override (`--publish-now`)**:
-     - Pass `publish_now: true` for immediate breaking announcements.
+     - Set `isAiGenerated: true` for Meta/Instagram.
    * **Draft Mode (`is_draft: true`)**:
      - Save without scheduling when manual human sign-off is requested.
 

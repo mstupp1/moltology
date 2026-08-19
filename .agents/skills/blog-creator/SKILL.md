@@ -89,6 +89,16 @@ Rotate across distinct liturgical and scientific personas:
 * **Featured Cover Image Rule**: The featured cover image (`coverImageUrl`) must always be a standalone, pure, cinematic 3D visual without any text overlays, text boxes, modals, or HUD cards.
 * **No Duplicate In-Article Images**: Never repeat the featured cover image as the first figure inside the article body. Inline figures must be distinct supporting technical schematics, architectural blueprints, or hardware renders.
 
+#### Non-Negotiable Rule: Antigravity Image Generation Unavailability
+* **Stop the Run Immediately**: If the built-in Antigravity `generate_image` tool is unavailable, returns an error, or hits rate limits/quota exhaustion (e.g. 429 `RESOURCE_EXHAUSTED`):
+  * **DO NOT** attempt to automatically fallback to existing images or proceed on autopilot with makeshift assets.
+  * **STOP THE RUN IMMEDIATELY.**
+  * Outline to the user what should happen:
+    1. Proposed article metadata (slug, headline, archetype, author persona, executive summary).
+    2. Exact visual assets needed (16:9 Cover Hero, 16:9 Figure 1, 16:9 Figure 2, and 3:4/4:5 Carousel Slides).
+    3. The exact detailed visual prompts and parameters for each image.
+    4. A clear request for user decision (e.g. whether the user will generate the images manually, provide alternative assets, or instruct a manual composite run).
+
 #### Visual Style Modes (Rotate Aesthetics across Articles)
 1. **Mode 1: Abyssal Benthic Photorealism**: Deep ocean research stations, glowing cyan hydrothermal vents, nitrogen-sealed titanium server hulls, underwater bubbles.
 2. **Mode 2: Cybernetic Hardware Hologram / Blueprint**: Exploded microchip architectures, coherent laser waveguides, golden wire bonds, side-by-side component schematics.
@@ -282,15 +292,34 @@ When running Stage 2 AI polish via `generate_image`, pass BOTH the slide mockup 
    npx tsx scripts/format-carousel-to-4-5.ts
    ```
    *(This scales and centers the images to standard `1080x1350` / 4:5 with 0.80 ratio and uploads them to S3).*
-2. **Stage to Queue / Publish via Zernio MCP (`posts_create`)**:
-   * **Queue-Driven Scheduling (Recommended)**:
+2. **Mandatory Zernio Queue Routing**:
+   * **Strict Queue Rule**: All social posts and carousels MUST ALWAYS be routed into the designated Zernio queue (`queued_from_profile: '6a7f74b1839bf39ff3b6aaaa'`, `queue_id: '6a84b76d2421e968ac81f5bc'`).
+   * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly and unequivocally commands an immediate live broadcast.
+   * **Queue Configuration**:
      - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
      - Carousel Queue ID: `6a84b76d2421e968ac81f5bc` (**Moltology Carousels** — Mon, Wed, Fri at 1:00 PM EST / 13:00 `America/New_York`)
-     - Pass `profile_id: "6a7f74b1839bf39ff3b6aaaa"` to automatically drip-feed into the next open 1:00 PM slot.
-   * `platform`: `"instagram"`
-   * `account_id`: `"6a7f7f0777555aae01d99b54"`
-   * `publish_now`: `true` (only for breaking news overrides) or `is_draft: true` when requesting human review
-   * `media_urls`: Comma-separated S3 URLs.
-   * `platformSpecificData`: `{ "isAiGenerated": true, "firstComment": "<URL + #hashtags>" }`
+     - Instagram Account ID: `6a7f7f0777555aae01d99b54`
+   * **Queue Execution via Zernio MCP (`call_tool` with `posts_create_post`)**:
+     ```json
+     {
+       "content": "<Post caption with bullets and CTA>",
+       "media_items": [
+         { "url": "<S3_slide1_url>" },
+         { "url": "<S3_slide2_url>" },
+         { "url": "<S3_slide3_url>" }
+       ],
+       "platforms": [
+         {
+           "platform": "instagram",
+           "accountId": "6a7f7f0777555aae01d99b54",
+           "platformSpecificData": {
+             "isAiGenerated": true
+           }
+         }
+       ],
+       "queued_from_profile": "6a7f74b1839bf39ff3b6aaaa",
+       "queue_id": "6a84b76d2421e968ac81f5bc"
+     }
+     ```
 3. Add a first comment on the post with the article URL and clean hashtags using `comments_reply_to_inbox_post`.
 4. Update `instagramPostId` (and `instagramDraftPostId`) in `content/news/blog-history.json`.

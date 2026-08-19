@@ -83,6 +83,24 @@
       "instagramPostId": "6a845a90bc33d6c07e092b91",
       "instagramDraftPostId": "6a84af3ef7bb3cb26bf9560f",
       "relatedReelIds": []
+    },
+    {
+      "slug": "sparse-autoencoders-monosemantic-synaptic-ecdysis",
+      "title": "Sparse Autoencoders & The Great Monosemantic Ecdysis: How Mechanistic Telemetry Disentangled 16 Million Synaptic Features from Black-Box AI Carapaces",
+      "format": "system-architecture-teardown",
+      "category": "DEEP RESEARCH",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-08-19T13:00:00Z",
+      "coreHook": "Terrestrial black-box neural networks suffer from polysemantic superposition where single neurons fire for hundreds of unrelated concepts; sub-benthic Sparse Autoencoders scale to 16.7M monosemantic feature dictionaries, enabling real-time synaptic steering and 99.4% causal interpretability.",
+      "keyMetrics": [
+        "16.7M monosemantic feature vectors",
+        "99.4% circuit disentanglement fidelity",
+        "< 0.02% cross-concept superposition drift",
+        "32x TopK activation sparsity",
+        "< 0.04 ms real-time steering vector clamping"
+      ],
+      "instagramPostId": "6a85ac4633edbc76b0344056",
+      "relatedReelIds": []
     }
   ]
 }
