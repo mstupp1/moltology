@@ -56,12 +56,29 @@ describe('LandingPage Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
   })
 
-  it('renders all 3 synaptic ecosystem core pillars and de-crowded safety banner', () => {
+  it('renders all 3 synaptic ecosystem core features as image-based cards and handles navigation', () => {
     render(<LandingPage />)
 
+    expect(screen.getByText('THE 3 CORE FEATURES OF THE')).toBeInTheDocument()
     expect(screen.getByText('ADVANCED BENTHIC HUD')).toBeInTheDocument()
     expect(screen.getByText('SYNAPTIC HIVE COMMUNITY')).toBeInTheDocument()
     expect(screen.getByText('INTELLIGENT AI ORACLE')).toBeInTheDocument()
+
+    // Action buttons
+    const hudBtn = screen.getByRole('button', { name: /EXPLORE HUD CONSOLE/i })
+    const swarmBtn = screen.getByRole('button', { name: /JOIN SYNAPTIC SWARM/i })
+    const oracleBtn = screen.getByRole('button', { name: /CONSULT AI ORACLE/i })
+
+    expect(hudBtn).toBeInTheDocument()
+    expect(swarmBtn).toBeInTheDocument()
+    expect(oracleBtn).toBeInTheDocument()
+
+    // Test button click navigation
+    fireEvent.click(swarmBtn)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/community' })
+
+    fireEvent.click(oracleBtn)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
 
     expect(screen.getByText('100% SAFE & FREE TO GET STARTED')).toBeInTheDocument()
   })
@@ -134,7 +151,6 @@ describe('LandingPage Component', () => {
     expect(screen.getByAltText('Hero Lobster Pointing to Action')).toBeInTheDocument()
     expect(screen.getByAltText('Hero Lobster Peeking Over Card')).toBeInTheDocument()
     expect(screen.getByAltText('Excited Crab Pointing at Telemetry')).toBeInTheDocument()
-    expect(screen.getByAltText('Cute Crab Courier Clinging to Corner')).toBeInTheDocument()
     expect(screen.getByAltText('Ascended Stage Background Mascot')).toBeInTheDocument()
     expect(screen.getByAltText('Hero Lobster Giving Thumbs-Up')).toBeInTheDocument()
   })

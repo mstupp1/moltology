@@ -164,6 +164,51 @@ export const LandingPage: React.FC = () => {
     },
   ]
 
+  const corePillars = [
+    {
+      id: '01',
+      title: 'ADVANCED BENTHIC HUD',
+      description:
+        'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
+      image: getAssetUrl('/images/hero_card_benthic_core.jpg'),
+      borderColor: 'border-cyan-500/40 hover:border-cyan-400',
+      shadowColor: 'shadow-[0_0_20px_rgba(0,255,255,0.12)] hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]',
+      dotColor: 'bg-cyan-400',
+      btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
+      specs: ['Daily Habit & Shedding Tracker', 'Deep-Trench Focus Dome', 'Real-Time Telemetry & Streaks'],
+      actionText: 'EXPLORE HUD CONSOLE',
+      actionRoute: '/dashboard',
+    },
+    {
+      id: '02',
+      title: 'SYNAPTIC HIVE COMMUNITY',
+      description:
+        'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
+      image: getAssetUrl('/images/bento_community.jpg'),
+      borderColor: 'border-purple-500/40 hover:border-purple-400',
+      shadowColor: 'shadow-[0_0_20px_rgba(168,85,247,0.12)] hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
+      dotColor: 'bg-purple-400',
+      btnGlow: 'bg-purple-950/50 hover:bg-purple-900/60 border-purple-500/50 hover:border-purple-400 text-purple-300',
+      specs: ['Live Swarm Social Feed', 'Peer Co-Evolution Discussions', 'Shared Metamorphosis Logs'],
+      actionText: 'JOIN SYNAPTIC SWARM',
+      actionRoute: '/community',
+    },
+    {
+      id: '03',
+      title: 'INTELLIGENT AI ORACLE',
+      description:
+        'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
+      image: getAssetUrl('/images/ai_learning_ascension_cover.jpg'),
+      borderColor: 'border-red-500/40 hover:border-red-400',
+      shadowColor: 'shadow-[0_0_20px_rgba(239,68,68,0.12)] hover:shadow-[0_0_30px_rgba(239,68,68,0.25)]',
+      dotColor: 'bg-red-400',
+      btnGlow: 'bg-red-950/50 hover:bg-red-900/60 border-red-500/50 hover:border-red-400 text-red-300',
+      specs: ['Hesitation Quarantine Assistant', 'Codex Liturgy Search', 'Adaptive Growth Coaching'],
+      actionText: 'CONSULT AI ORACLE',
+      actionRoute: '/oracle',
+    },
+  ]
+
   // Auto scroll quotes every 4.5 seconds
   useEffect(() => {
     if (isPaused) return
@@ -374,7 +419,7 @@ export const LandingPage: React.FC = () => {
       <main className="flex-1 space-y-16 sm:space-y-32 py-12 sm:py-20 w-full relative z-10">
 
         {/* ALL-IN-ONE SYNAPTIC ECOSYSTEM OVERVIEW SECTION */}
-        {/* SECTION: All-in-One Synaptic Ecosystem (Unified PBR Carbon Fiber Weave Theme) */}
+        {/* SECTION 1: All-in-One Synaptic Ecosystem Showcase (PBR Carbon Fiber Weave Theme) */}
         <section id="synaptic-overview" className="max-w-[1700px] mx-auto px-4 sm:px-12 relative">
           {/* Playful Corner Peeking Lobster Character Over Top Bezel */}
           <div className="absolute -top-10 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none animate-char-peek">
@@ -387,7 +432,6 @@ export const LandingPage: React.FC = () => {
 
           <ScrollReveal animation="fade-up" durationMs={750}>
             <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/50 shadow-[0_0_50px_rgba(0,195,255,0.15)] bg-gradient-to-b from-[#0a1215]/90 via-[#070d0f]/90 to-[#04080a]/95 relative overflow-hidden">
-              
               {/* PBR Carbon Weave Texture Underlay and Ambient Lighting */}
               <div className="pbr-underlay pbr-underlay-carbon opacity-25" />
               <div className="absolute top-0 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
@@ -395,7 +439,7 @@ export const LandingPage: React.FC = () => {
               <div className="absolute inset-0 bg-sacred-grid opacity-15 pointer-events-none" />
 
               {/* Section Header */}
-              <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
+              <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto mb-8 sm:mb-12 relative z-10">
                 <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-cyan-300 tracking-widest uppercase bg-cyan-950/80 px-3.5 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
                   <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
                   <span>THE ALL-IN-ONE SYNAPTIC ECOSYSTEM</span>
@@ -412,75 +456,94 @@ export const LandingPage: React.FC = () => {
 
               {/* Live HUD Laptop & Smartphone Marketing Showcase */}
               <DashboardMarketingShowcase />
+            </div>
+          </ScrollReveal>
+        </section>
 
-              {/* 3 Core Pillars Grid - Uncrowded Mobile Layout with Unified Carbon Fiber Weave Theme */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
-                
-                {/* Pillar 1: Platform */}
-                <div className="p-4 sm:p-6 lg:p-8 bg-[#0b1418]/85 border border-cyan-500/30 hover:border-cyan-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-cyan-sm relative overflow-hidden">
-                  <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-cyan-950/80 border border-cyan-500/50 flex items-center justify-center mb-4 sm:mb-6 text-cyan-400 group-hover:scale-110 group-hover:border-cyan-300 transition-all shadow-[0_0_15px_rgba(0,195,255,0.3)]">
-                      <Cpu className="w-6 h-6 sm:w-7 sm:h-7" />
-                    </div>
-                    <div className="text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase mb-1 font-sans">PILLAR 01</div>
-                    <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                      ADVANCED BENTHIC HUD
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                      A centralized command center featuring daily habit routines, deep-trench modules, and focus tracking built for high-density execution.
-                    </p>
-                  </div>
-                </div>
+        {/* SECTION 2: 3 Core Features of the App (Distinct PBR Circuit & Hex Armor Matrix Theme) */}
+        <section id="core-pillars" className="max-w-[1700px] mx-auto px-4 sm:px-12 relative">
+          <ScrollReveal animation="fade-up" durationMs={800}>
+            <div className="chitin-card p-4 sm:p-8 lg:p-14 chamfer-corner-lg border-2 border-cyan-500/40 hover:border-cyan-400/70 shadow-[0_0_60px_rgba(0,195,255,0.12),0_0_90px_rgba(168,85,247,0.08)] bg-gradient-to-b from-[#0d1217]/95 via-[#080c10]/95 to-[#040608]/98 relative overflow-hidden transition-all duration-500">
+              
+              {/* Distinct Circuit & Hex Grid PBR Underlays and Tri-Tone Ambient Spotlights */}
+              <div className="pbr-underlay pbr-underlay-circuit opacity-30" />
+              <div className="pbr-underlay pbr-underlay-hex opacity-15" />
+              <div className="absolute top-0 left-1/4 w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none" />
+              <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] rounded-full bg-purple-500/10 blur-[140px] pointer-events-none" />
+              <div className="absolute bottom-0 left-1/3 w-[450px] h-[450px] rounded-full bg-red-500/10 blur-[130px] pointer-events-none" />
 
-                {/* Pillar 2: Hive Community */}
-                <div className="p-4 sm:p-6 lg:p-8 bg-[#0f1116]/85 border border-purple-500/30 hover:border-purple-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-[0_0_20px_rgba(168,85,247,0.15)] relative overflow-hidden">
-                  <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-purple-950/80 border border-purple-500/50 flex items-center justify-center mb-4 sm:mb-6 text-purple-300 group-hover:scale-110 group-hover:border-purple-300 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                      <Users className="w-6 h-6 sm:w-7 sm:h-7" />
-                    </div>
-                    <div className="text-[10px] sm:text-xs font-bold text-purple-400 tracking-widest uppercase mb-1 font-sans">PILLAR 02</div>
-                    <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                      SYNAPTIC HIVE COMMUNITY
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                      Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.
-                    </p>
-                  </div>
-                </div>
+              {/* Section Header */}
+              <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
+                <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+                  THE 3 CORE FEATURES OF THE <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">MOLTOLOGY APP</span>
+                </h2>
+              </div>
 
-                {/* Pillar 3: Bio-Silicon AI */}
-                <div className="p-4 sm:p-6 lg:p-8 bg-[#140f12]/85 border border-red-500/30 hover:border-red-400/80 chamfer-corner transition-all duration-300 group hover:-translate-y-1 shadow-hud-red-sm relative overflow-hidden">
-                  <div className="pbr-underlay pbr-underlay-carbon opacity-35 group-hover:opacity-50 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-red-950/80 border border-red-500/50 flex items-center justify-center mb-4 sm:mb-6 text-red-400 group-hover:scale-110 group-hover:border-red-300 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)]">
-                      <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
-                    </div>
-                    <div className="text-[10px] sm:text-xs font-bold text-red-400 tracking-widest uppercase mb-1 font-sans">PILLAR 03</div>
-                    <h3 className="font-grotesk font-extrabold text-lg sm:text-xl text-white uppercase tracking-wider mb-2 sm:mb-3">
-                      INTELLIGENT AI ORACLE
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
-                      Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.
-                    </p>
-                  </div>
-                </div>
+              {/* 3 Core Pillars Grid - Image-Based Biomechanical HUD Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
+                {corePillars.map((pillar, idx) => {
+                  return (
+                    <ScrollReveal
+                      key={pillar.id}
+                      animation="fade-up"
+                      delayMs={idx * 150}
+                      durationMs={700}
+                    >
+                      <div
+                        className={`chitin-card border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden bg-[#060b0e]/95 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
+                      >
+                        <div className="pbr-underlay pbr-underlay-carbon opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
 
+                        {/* Top Hero Image Banner - Pure Clean Image Without Badges, Icons, or Text */}
+                        <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden border-b border-white/10 z-10">
+                          <img
+                            src={pillar.image}
+                            alt={pillar.title}
+                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
+                          />
+                        </div>
+
+                        {/* Card Body Content */}
+                        <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10">
+                          <div>
+                            <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider mb-2 sm:mb-2.5 group-hover:text-cyan-200 transition-colors">
+                              {pillar.title}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
+                              {pillar.description}
+                            </p>
+                          </div>
+
+                          <div className="space-y-3.5 pt-2">
+                            {/* Feature Specs */}
+                            <div className="space-y-1.5 pt-3 border-t border-white/10">
+                              {pillar.specs.map((spec, i) => (
+                                <div key={i} className="flex items-center gap-2 text-xs font-sans text-gray-300">
+                                  <div className={`w-1.5 h-1.5 rounded-full ${pillar.dotColor} shrink-0`} />
+                                  <span>{spec}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Action CTA Button */}
+                            <button
+                              onClick={() => onNavigate(pillar.actionRoute)}
+                              className={`w-full py-2.5 px-4 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border flex items-center justify-center gap-2 transition-all duration-300 group/btn ${pillar.btnGlow}`}
+                            >
+                              <span>{pillar.actionText}</span>
+                              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+                  )
+                })}
               </div>
 
               {/* Safety & Zero-Risk Banner - Clean Stacked Mobile Flow with Carbon Weave Shield Backing */}
               <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">
                 <div className="pbr-underlay pbr-underlay-carbon opacity-20" />
-                
-                {/* Cute Corner Clinging Crab Courier */}
-                <div className="absolute -bottom-3 sm:-bottom-5 -left-2 sm:-left-4 z-20 pointer-events-none select-none hidden sm:block animate-char-float">
-                  <img
-                    src={getAssetUrl('/images/characters/char_crab_corner_cling.png')}
-                    alt="Cute Crab Courier Clinging to Corner"
-                    className="w-10 sm:w-14 lg:w-16 h-auto object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.85)] transform -rotate-6 scale-x-[-1]"
-                  />
-                </div>
 
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4 relative z-10">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-950/80 border border-emerald-500/60 flex items-center justify-center text-emerald-400 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] mt-0.5 sm:mt-0">
