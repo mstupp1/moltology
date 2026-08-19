@@ -61,20 +61,89 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(accordionContent).toHaveClass('opacity-100')
   })
 
-  it('toggles sidebar collapse rail with shortcut key or collapse button', () => {
+  it('toggles sidebar collapse with shortcut key (Cmd+B)', () => {
     render(<HUDSidebar />)
 
     const aside = screen.getByRole('complementary')
     expect(aside).toHaveClass('md:w-72')
 
-    const toggleBtn = screen.getByTitle(/Collapse Sidebar/i)
-    fireEvent.click(toggleBtn)
-
+    // Press Cmd+B to collapse
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
     expect(aside).toHaveClass('md:w-[72px]')
 
     // Press Cmd+B to un-collapse
     fireEvent.keyDown(window, { key: 'b', metaKey: true })
     expect(aside).toHaveClass('md:w-72')
+  })
+
+  it('toggles sidebar collapse with interactive edge rail click', () => {
+    render(<HUDSidebar />)
+
+    const aside = screen.getByRole('complementary')
+    expect(aside).toHaveClass('md:w-72')
+
+    const rail = screen.getByRole('separator', { name: /Collapse sidebar/i })
+    expect(rail).toBeInTheDocument()
+
+    // Click rail (mouseDown then mouseUp without move)
+    fireEvent.mouseDown(rail, { button: 0, clientX: 288 })
+    fireEvent.mouseUp(window)
+
+    expect(aside).toHaveClass('md:w-[72px]')
+
+    // Click rail again to expand
+    fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
+    fireEvent.mouseUp(window)
+
+    expect(aside).toHaveClass('md:w-72')
+  })
+
+  it('collapses and expands sidebar by dragging the edge rail', () => {
+    render(<HUDSidebar />)
+
+    const aside = screen.getByRole('complementary')
+    expect(aside).toHaveClass('md:w-72')
+
+    const rail = screen.getByRole('separator')
+
+    // Drag left past threshold
+    fireEvent.mouseDown(rail, { button: 0, clientX: 288 })
+    fireEvent.mouseMove(window, { clientX: 100 })
+    fireEvent.mouseUp(window)
+
+    expect(aside).toHaveClass('md:w-[72px]')
+
+    // Drag right past threshold
+    fireEvent.mouseDown(rail, { button: 0, clientX: 72 })
+    fireEvent.mouseMove(window, { clientX: 300 })
+    fireEvent.mouseUp(window)
+
+    expect(aside).toHaveClass('md:w-72')
+  })
+
+  it('renders short centered text names underneath items in collapsed mode', () => {
+    render(<HUDSidebar />)
+
+    // Collapse the sidebar via Cmd+B
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+    const aside = screen.getByRole('complementary')
+    expect(aside).toHaveClass('md:w-[72px]')
+
+    // Check for short labels
+    expect(screen.getByText('CODEX')).toBeInTheDocument()
+    expect(screen.getByText('HUB')).toBeInTheDocument()
+    expect(screen.getByText('ORACLE')).toBeInTheDocument()
+    expect(screen.getByText('ACADEMY')).toBeInTheDocument()
+    expect(screen.getByText('PODCASTS')).toBeInTheDocument()
+    expect(screen.getByText('SCIENCE')).toBeInTheDocument()
+    expect(screen.getByText('JOURNAL')).toBeInTheDocument()
+    expect(screen.getByText('MARKET')).toBeInTheDocument()
+    expect(screen.getByText('CHASSIS')).toBeInTheDocument()
+    expect(screen.getByText('ISOLATION')).toBeInTheDocument()
+    expect(screen.getByText('VATS')).toBeInTheDocument()
+    expect(screen.getByText('VAULT')).toBeInTheDocument()
+    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
+    expect(screen.getByText('SUPPORT')).toBeInTheDocument()
   })
 
   it('toggles mobile HUD menu state on mobile button click and renders icon-only with no text', () => {

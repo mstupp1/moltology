@@ -24,7 +24,7 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`inline-flex items-center gap-3 cursor-pointer group shrink-0 select-none max-w-fit ${className}`}
+      className={`inline-flex items-center gap-3 cursor-pointer group shrink-0 select-none max-w-full overflow-hidden ${className}`}
     >
       {/* Emblem Logo */}
       <div className={`${sizeClasses} flex items-center justify-center shrink-0`}>
@@ -41,7 +41,7 @@ export const HeaderBrand: React.FC<HeaderBrandProps> = ({
 
       {/* Brand Title & Subtext */}
       {!isCollapsed && (
-        <div className="overflow-hidden whitespace-nowrap min-w-0">
+        <div className="overflow-hidden whitespace-nowrap min-w-0 animate-in fade-in slide-in-from-left-2 duration-300">
           <div
             className={`font-grotesk font-extrabold ${titleSizeClasses} tracking-widest uppercase flex items-center gap-2 transition-all duration-300 leading-tight ${
               isCorporate
