@@ -15,6 +15,7 @@ import {
   Microscope,
 } from 'lucide-react'
 import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/codexData'
+import { getAssetUrl } from '@/lib/assets'
 
 function PipelineRoute() {
   // Current user's simulated active position in the micro-clearance pipeline (e.g., 'L-2')
@@ -199,7 +200,7 @@ function PipelineRoute() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 shrink-0 bg-[#030606] border border-[#3a4a49] overflow-hidden chamfer-corner relative">
-                    <img src={stage.img} alt={stage.stageTitle} className="w-full h-full object-cover" />
+                    <img src={getAssetUrl(stage.img)} alt={stage.stageTitle} className="w-full h-full object-cover" />
                   </div>
 
                   <div>
