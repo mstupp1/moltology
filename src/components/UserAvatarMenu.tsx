@@ -180,7 +180,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
               className={
                 isCorporate
                   ? 'border border-sky-300 group-hover:border-sky-500 shadow-sm transition-all shrink-0'
-                  : 'border border-cyan-400/60 group-hover:border-[#00c3ff] shadow-[0_0_8px_rgba(0,255,255,0.3)] transition-all shrink-0'
+                  : 'border border-cyan-400/50 group-hover:border-[#00c3ff] transition-all shrink-0'
               }
             />
             <div className="flex flex-col min-w-0 text-left">
@@ -426,7 +426,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             openDirection === 'up'
               ? 'bottom-full mb-2 origin-bottom'
               : 'top-full mt-2 origin-top'
-          } w-64 max-w-[calc(100vw-2rem)] rounded-2xl p-3.5 z-50 backdrop-blur-2xl transition-all duration-200 ease-out ${
+          } w-64 max-w-[calc(100vw-2rem)] rounded-2xl p-3.5 z-[200] backdrop-blur-2xl transition-all duration-200 ease-out ${
             isCorporate
               ? 'bg-white/95 border border-sky-200/90 shadow-[0_15px_35px_rgba(15,23,42,0.12),0_5px_15px_rgba(2,132,199,0.08)] font-sans'
               : 'bg-[#060a0b]/95 border border-cyan-500/40 shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(0,195,255,0.25)] font-sans'
