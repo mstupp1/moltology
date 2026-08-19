@@ -63,8 +63,13 @@ describe('LaunchpadCarousel Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/lectures' })
   })
 
-  it('toggles daily alignment tasks when clicked', () => {
+  it('toggles daily alignment tasks when clicked and renders all items in scrollable list', () => {
     render(<LaunchpadCarousel />)
+
+    // Check that items throughout the full list are present
+    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
+    expect(screen.getByText('Iterative Refinement')).toBeInTheDocument()
+    expect(screen.getByText('Alignment Review')).toBeInTheDocument()
 
     const uncompletedTask = screen.getByText('Nutritional Efficiency Break')
     fireEvent.click(uncompletedTask)
@@ -73,12 +78,52 @@ describe('LaunchpadCarousel Component', () => {
     expect(uncompletedTask).toHaveClass('line-through')
   })
 
-  it('navigates to news desk when NEWS DESK button is clicked', () => {
+  it('navigates to news desk when VIEW MORE ON MOLTNATION NEWS button is clicked', () => {
     render(<LaunchpadCarousel />)
 
-    const newsDeskBtn = screen.getByText('NEWS DESK')
-    fireEvent.click(newsDeskBtn)
+    const viewMoreBtn = screen.getByText('VIEW MORE ON MOLTNATION NEWS')
+    fireEvent.click(viewMoreBtn)
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/news' })
+  })
+
+  it('renders featured news article card with smooth fade key and periodic counter', () => {
+    render(<LaunchpadCarousel />)
+
+    // Initial featured badge and headline
+    expect(screen.getByText('FEATURED 01')).toBeInTheDocument()
+    expect(screen.getByText('The 2026 Moltmaxxing Protocol')).toBeInTheDocument()
+    expect(screen.getByText('READ ARTICLE')).toBeInTheDocument()
+  })
+
+  it('opens reader modal with parsed markdown when clicking featured news card, and closes it', () => {
+    render(<LaunchpadCarousel />)
+
+    // Click on the featured news card
+    const readArticleBtn = screen.getByText('READ ARTICLE')
+    fireEvent.click(readArticleBtn)
+
+    // Modal reader should be open with close button and markdown content
+    const closeBtn = screen.getByTitle('Close Modal')
+    expect(closeBtn).toBeInTheDocument()
+    expect(screen.getByText('FULL DESK PAGE')).toBeInTheDocument()
+
+    // Close modal
+    fireEvent.click(closeBtn)
+    expect(screen.queryByTitle('Close Modal')).not.toBeInTheDocument()
+  })
+
+  it('opens reader modal when clicking a wire article from the scrollable list', () => {
+    render(<LaunchpadCarousel />)
+
+    // Find wire articles list header
+    expect(screen.getByText(/WIRE ARTICLES/i)).toBeInTheDocument()
+
+    // Click on a wire article item (h5 heading)
+    const wireArticle = screen.getByRole('heading', { level: 5, name: /From Prompt Engineering to Bio-Silicon Cognition/i })
+    fireEvent.click(wireArticle)
+
+    // Modal reader should open
+    expect(screen.getByTitle('Close Modal')).toBeInTheDocument()
   })
 })

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Shield, Terminal, Copy, Check } from 'lucide-react'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface NewsArticleBodyProps {
   content: string
@@ -16,7 +17,7 @@ export const NewsArticleBody: React.FC<NewsArticleBodyProps> = ({ content, class
   if (!content) return null
 
   // 1. Separate code blocks (```...```) to preserve formatting
-  const codeBlockRegex = /```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g
+  const codeBlockRegex = /```([a-zA-Z0-9_-]*)\r?\n([\s\S]*?)```/g
   const blocks: { type: 'code' | 'text'; language?: string; raw: string }[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
@@ -309,6 +310,17 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       continue
     }
 
+    // Heading 5 (##### ...)
+    if (trimmed.startsWith('##### ')) {
+      flushAll(lineKey)
+      elements.push(
+        <h5 key={lineKey} className="font-grotesk font-bold text-sm sm:text-base text-cyan-300 uppercase tracking-wide mt-4 sm:mt-6 mb-2 text-cyan-400 break-words">
+          {trimmed.slice(6)}
+        </h5>
+      )
+      continue
+    }
+
     // Blockquote (> ...)
     if (trimmed.startsWith('> ')) {
       flushParagraph(`${lineKey}-p`)
@@ -354,15 +366,27 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
 }
 
 function RenderFigure({ alt, src }: { alt: string; src: string }) {
+  const resolvedSrc = getAssetUrl(src)
+  const [hasError, setHasError] = React.useState(false)
+
   return (
     <figure className="my-6 sm:my-8 rounded-none border-2 border-cyan-500/50 bg-[#050809] chamfer-corner-lg overflow-hidden shadow-hud-cyan-lg">
-      <div className="relative overflow-hidden group">
-        <img
-          src={src}
-          alt={alt}
-          className="w-full max-h-[280px] sm:max-h-[420px] md:max-h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-          loading="lazy"
-        />
+      <div className="relative overflow-hidden group min-h-[140px] flex items-center justify-center bg-[#070b0c]">
+        {hasError ? (
+          <div className="p-6 text-center text-xs text-cyan-400/80 font-sans flex flex-col items-center gap-2">
+            <Shield className="w-6 h-6 text-cyan-500/50" />
+            <span className="uppercase tracking-widest text-[11px] font-bold">VISUAL TELEMETRY ARCHIVED</span>
+            <span className="text-[10px] text-gray-400">{alt}</span>
+          </div>
+        ) : (
+          <img
+            src={resolvedSrc}
+            alt={alt}
+            onError={() => setHasError(true)}
+            className="w-full max-h-[280px] sm:max-h-[420px] md:max-h-[500px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+            loading="lazy"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#050809] via-transparent to-transparent opacity-30 pointer-events-none" />
       </div>
       {alt && (
@@ -390,25 +414,42 @@ function cleanLatexMath(math: string): string {
 }
 
 function formatInlineMarkdown(text: string): string {
-  return text
-    // Handle standalone block math $$...$$
-    .replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
-      const cleaned = cleanLatexMath(math.trim())
-      return `<div class="my-4 py-2.5 px-4 bg-[#030607] border border-cyan-800/60 text-cyan-300 font-sans text-center text-xs sm:text-sm chamfer-corner shadow-hud-cyan overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
-    })
-    // Handle inline math $...$
-    .replace(/\$([^$\n]+)\$/g, (_, math) => {
-      const cleaned = cleanLatexMath(math.trim())
-      return `<code class="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs font-semibold chamfer-corner select-text">${cleaned}</code>`
-    })
-    // Handle inline markdown images if any in paragraph
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="rounded border border-cyan-900 my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />')
-    // Bold: **text**
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-100 font-sans">$1</strong>')
-    // Italic: *text*
-    .replace(/\*(.*?)\*/g, '<em class="italic text-cyan-200">$1</em>')
-    // Inline Code: `code`
-    .replace(/`([^`]+)`/g, '<code class="bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs chamfer-corner break-all">$1</code>')
-    // Links: [label](url)
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
+  // First escape angle brackets and ampersands so raw symbols like <15ms or >100 are preserved
+  let formatted = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  // Handle standalone block math $$...$$
+  formatted = formatted.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+    const cleaned = cleanLatexMath(math.trim())
+    return `<div class="my-4 py-2.5 px-4 bg-[#030607] border border-cyan-800/60 text-cyan-300 font-sans text-center text-xs sm:text-sm chamfer-corner shadow-hud-cyan overflow-x-auto select-all leading-relaxed tracking-wider">${cleaned}</div>`
+  })
+
+  // Handle inline math $...$
+  formatted = formatted.replace(/\$([^$\n]+)\$/g, (_, math) => {
+    const cleaned = cleanLatexMath(math.trim())
+    return `<code class="bg-cyan-950/90 border border-cyan-700/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs font-semibold chamfer-corner select-text">${cleaned}</code>`
+  })
+
+  // Handle inline markdown images if any in paragraph: ![alt](url)
+  formatted = formatted.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
+    const resolvedUrl = getAssetUrl(src.trim())
+    return `<img src="${resolvedUrl}" alt="${alt}" class="rounded border border-cyan-900 my-4 max-h-[300px] sm:max-h-[400px] w-full object-cover" />`
+  })
+
+  // Bold: **text**
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-100 font-sans">$1</strong>')
+
+  // Italic: *text*
+  formatted = formatted.replace(/\*(.*?)\*/g, '<em class="italic text-cyan-200">$1</em>')
+
+  // Inline Code: `code`
+  formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 px-1.5 py-0.5 font-sans text-[11px] sm:text-xs chamfer-corner break-all">$1</code>')
+
+  // Links: [label](url)
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors font-sans font-bold break-words">$1</a>')
+
+  return formatted
 }
+
