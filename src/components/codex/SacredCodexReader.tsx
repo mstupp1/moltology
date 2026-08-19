@@ -401,7 +401,7 @@ export const SacredCodexReader: React.FC = () => {
       : 'font-grotesk'
 
   return (
-    <div className="space-y-4 pb-12 relative">
+    <div className="space-y-3 sm:space-y-4 pb-12 relative">
       {/* FULLSCREEN SOFT MINIMAL PDF OVERLAY MODAL */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-[#070a0b]/95 backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in duration-200">

@@ -245,7 +245,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
   return (
     <HudGhostWidget isLoading={isLoading} skeleton={<LaunchpadCarouselGhost />}>
       <div
-        className="space-y-4 font-sans relative"
+        className="space-y-3 sm:space-y-4 font-sans relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -369,12 +369,12 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
         )}
 
         {/* Master Bento Box Container */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-stretch">
           {/* Bento Tile 1: Massive Hero Directive Visual Stage (8 cols) */}
           <div className="lg:col-span-8 flex flex-col">
             <HudCard
               variant="teal"
-              className="p-4 sm:p-5 chamfer-corner shadow-2xl relative overflow-hidden transition-all duration-300 h-full flex flex-col justify-between border-[#00c3ff]/40 space-y-4"
+              className="p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl relative overflow-hidden transition-all duration-300 h-full flex flex-col justify-between border-[#00c3ff]/40 space-y-3 sm:space-y-4"
             >
               {/* Header Bar */}
               <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-3 gap-2">
@@ -440,7 +440,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                 </button>
 
                 {/* Bottom Overlay Info Banner */}
-                <div className="relative z-10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-end justify-between gap-3 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/90 to-transparent">
+                <div className="relative z-10 p-3 sm:p-4 md:p-5 flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-3 bg-gradient-to-t from-[#070b0b] via-[#070b0b]/90 to-transparent">
                   <div className="space-y-1 min-w-0">
                     <h3 className="font-grotesk font-extrabold text-lg sm:text-2xl text-[#dfe3e3] tracking-wide uppercase leading-tight drop-shadow-md">
                       {activeModule.title}
@@ -490,7 +490,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
           </div>
 
           {/* Right Column Bento Stack: Daily Alignment + News Feed (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col gap-3 sm:gap-4">
+          <div className="lg:col-span-4 flex flex-col gap-2.5 sm:gap-4">
             {/* Bento Tile 2: Daily Alignment Liturgy & Streak Tracker */}
             <HudCard
               id="daily-routine-hub"

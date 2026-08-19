@@ -142,7 +142,7 @@ function DashboardRoute() {
       : INITIAL_ACTIVITIES.filter((a) => a.category === selectedCategory)
 
   return (
-    <div className="space-y-5 font-sans relative">
+    <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       {/* Changelog Detail Modal */}
       {activeChangelogModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
@@ -207,10 +207,10 @@ function DashboardRoute() {
       <LaunchpadCarousel />
 
       {/* 2-Column Section: Left (Activity Stream) + Right (Changelog & Protocol Releases) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
         {/* Left Column (7 cols): Real-Time Benthic Activity Stream */}
         <div className="lg:col-span-7 flex flex-col">
-          <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4 h-full flex flex-col justify-between">
+          <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
                 <div>
@@ -291,7 +291,7 @@ function DashboardRoute() {
 
         {/* Right Column (5 cols): System Changelog & Releases */}
         <div className="lg:col-span-5 flex flex-col">
-          <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-3.5 h-full flex flex-col justify-between">
+          <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3 sm:space-y-3.5 h-full flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
                 <div className="flex items-center gap-2">

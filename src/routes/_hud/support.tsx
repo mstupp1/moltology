@@ -236,12 +236,12 @@ function SupportPortalRoute() {
   const isAdmin = ['admin', 'super_admin'].includes(effectiveRole)
 
   return (
-    <div className="space-y-6 font-sans text-[#dfe3e3] pb-10">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3] pb-10">
       {/* Header Banner matching Benthic Ascendance HUD standard */}
-      <div className="chitin-card p-5 chamfer-corner shadow-2xl relative overflow-hidden space-y-3">
+      <div className="chitin-card p-3.5 sm:p-5 chamfer-corner shadow-2xl relative overflow-hidden space-y-2.5 sm:space-y-3">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-[#00ffff]/05 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#3a4a49] pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 border-b border-[#3a4a49] pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded bg-[#091113] border border-[#00ffff] flex items-center justify-center p-2 shadow-[0_0_15px_rgba(0,255,255,0.3)]">
               <LifeBuoy className="w-full h-full text-[#00ffff] animate-pulse" />

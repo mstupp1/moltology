@@ -186,10 +186,10 @@ function LecturesRoute() {
       featureName="Molt Academy"
       message="Molt Academy coursework, neural certifications, and video curricula require an authorized initiate account."
     >
-      <div className="space-y-6 font-sans relative">
+      <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans relative">
       {/* Top Breadcrumb & Gamified Academy Header */}
-      <div className="bg-[#171c1c]/90 border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 chamfer-corner shadow-2xl space-y-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-[#171c1c]/90 border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5 sm:space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div>
             <div className="text-[11px] text-[#00ffff] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
               <GraduationCap className="w-4 h-4 text-[#00ffff]" />

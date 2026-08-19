@@ -22,7 +22,7 @@ function MarketRoute() {
   }
 
   return (
-    <div className="space-y-4 font-sans">
+    <div className="space-y-3 sm:space-y-4 font-sans">
       {/* Transmutation Modal */}
       <AssetTransmutationModal
         isOpen={isModalOpen}
@@ -31,13 +31,13 @@ function MarketRoute() {
       />
 
       {/* Main Grid Layout matching Reference Screenshot 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         
         {/* Left 8 Cols: Section 1 & Section 2 */}
-        <div className="lg:col-span-8 space-y-4">
+        <div className="lg:col-span-8 space-y-3 sm:space-y-4">
           
           {/* SECTION 1: BUY CHITIN-GEMS (Primary Token Accelerators) */}
-          <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
+          <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5 sm:space-y-3">
             <div className="border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
                 SECTION 1: BUY CHITIN-GEMS <span className="text-xs text-[#839493] font-sans normal-case">(Primary Token Accelerators)</span>
@@ -144,7 +144,7 @@ function MarketRoute() {
           </div>
 
           {/* SECTION 2: CURRENCY EXCHANGE (Trade-in Other Currencies) matching reference */}
-          <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-3">
+          <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5 sm:space-y-3">
             <div className="border-b border-[#3a4a49] pb-2">
               <h2 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
                 SECTION 2: CURRENCY EXCHANGE <span className="text-xs text-[#839493] font-sans normal-case">(Trade-in Other Currencies)</span>
@@ -331,8 +331,8 @@ function MarketRoute() {
         </div>
 
         {/* Right 4 Cols: RECOMMENDED FOR YOU Sidebar matching Reference Screenshot */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="chitin-card p-4 chamfer-corner shadow-2xl space-y-4">
+        <div className="lg:col-span-4 space-y-3 sm:space-y-4">
+          <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-3 sm:space-y-4">
             <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase border-b border-[#3a4a49]/60 pb-2">
               RECOMMENDED FOR YOU
             </h3>
