@@ -21,7 +21,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
   const isMaxStage = stage >= 4
 
   return (
-    <header className="w-full bg-[#020608]/90 backdrop-blur-md border-b border-[#00c3ff]/15 px-2 sm:px-4 py-1.5 sm:py-2 flex items-center gap-1.5 sm:gap-3 font-sans select-none relative z-30 shadow-[0_2px_20px_rgba(0,195,255,0.1)] shrink-0">
+    <header className="w-full bg-[#020608]/90 backdrop-blur-md border-b border-[#00c3ff]/15 px-2.5 sm:px-4 pt-12 sm:pt-2 pb-2 sm:pb-2 flex items-center gap-2 sm:gap-3 font-sans select-none relative z-30 shadow-[0_2px_20px_rgba(0,195,255,0.1)] shrink-0">
 
       {/* HUD scanline overlay */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>

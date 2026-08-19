@@ -72,7 +72,7 @@ describe('LandingPage Component', () => {
     expect(screen.getByLabelText('Interactive System Showcase')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Desktop/i })).toBeInTheDocument()
     expect(screen.getByText('hub.moltology.org/dashboard')).toBeInTheDocument()
-    expect(screen.getByText('TEST GUEST SANDBOX')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
   })
 
   it('renders the 4 Benthic Sacraments with protocol enforcement actions', () => {

@@ -25,7 +25,7 @@ describe('DashboardMarketingShowcase Component', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
   })
 
-  it('renders both laptop and smartphone live device frames with centered controls and big launch CTA', () => {
+  it('renders both laptop and smartphone live device frames with screenshot previews and big launch CTA', () => {
     render(<DashboardMarketingShowcase />)
 
     // Verify centered controls and launch demo button
@@ -37,19 +37,9 @@ describe('DashboardMarketingShowcase Component', () => {
     expect(screen.getByText('hub.moltology.org/dashboard')).toBeInTheDocument()
     expect(screen.getByText('GUEST READY')).toBeInTheDocument()
 
-    // Verify live HUD header rendered inside laptop
-    expect(screen.getAllByText('MOLTOLOGY').length).toBeGreaterThan(0)
-    expect(screen.getByText('WELCOME,')).toBeInTheDocument()
-    expect(screen.getByText('INITIATE')).toBeInTheDocument()
-
-    // Verify live Launchpad carousel rendered inside laptop
-    expect(screen.getByText('PORTAL DIRECTIVES')).toBeInTheDocument()
-
-    // Verify smartphone mobile frame elements
-    expect(screen.getAllByText('MOLTOLOGY').length).toBeGreaterThan(0)
-    expect(screen.getByText('ACTIVE MOLT')).toBeInTheDocument()
-    expect(screen.getByText('100% SYNCED')).toBeInTheDocument()
-    expect(screen.getByText('TEST GUEST SANDBOX')).toBeInTheDocument()
+    // Verify presence of high-DPI desktop and mobile screenshots
+    expect(screen.getByAltText('Safari preview')).toBeInTheDocument()
+    expect(screen.getByAltText('iPhone 15 Pro preview')).toBeInTheDocument()
   })
 
   it('allows switching device views between dual view, desktop, and mobile', () => {
@@ -68,13 +58,11 @@ describe('DashboardMarketingShowcase Component', () => {
     fireEvent.click(dualBtn)
   })
 
-  it('navigates to /dashboard when Launch Demo or mobile test button is clicked', () => {
+  it('navigates to /dashboard when Launch Demo button is clicked', () => {
     render(<DashboardMarketingShowcase />)
 
-    const launchDemoButtons = screen.getAllByRole('button', { name: /LAUNCH GUEST DEMO|TEST GUEST SANDBOX/i })
-    expect(launchDemoButtons.length).toBeGreaterThan(0)
-
-    fireEvent.click(launchDemoButtons[0])
+    const launchDemoBtn = screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })
+    fireEvent.click(launchDemoBtn)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
   })
 })
