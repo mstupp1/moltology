@@ -66,10 +66,21 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartRef = React.useRef<{ startX: number; hasMoved: boolean }>({
+    startX: 0,
+    hasMoved: false,
+  })
 
-  // Track mount state for SSR safe portal rendering
+  // Track mount state for SSR safe portal rendering & client-side localStorage
   useEffect(() => {
     setIsMounted(true)
+    if (typeof window !== 'undefined') {
+      const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
+      if (savedCollapsed !== null) {
+        setIsCollapsed(savedCollapsed === 'true')
+      }
+    }
   }, [])
 
   const openMobileMenu = () => {
@@ -104,16 +115,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     }
   }
 
-  // Sync collapse state with localStorage safely on client side
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('moltology_hud_sidebar_collapsed')
-      if (saved !== null) {
-        setIsCollapsed(saved === 'true')
-      }
-    }
-  }, [])
-
   const toggleCollapse = () => {
     setIsCollapsed((prev) => {
       const next = !prev
@@ -122,6 +123,68 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       }
       return next
     })
+  }
+
+  const handleRailMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return // Left click only
+    e.preventDefault()
+
+    dragStartRef.current = {
+      startX: e.clientX,
+      hasMoved: false,
+    }
+    setIsDragging(true)
+    if (typeof document !== 'undefined') {
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    }
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - dragStartRef.current.startX
+      if (Math.abs(deltaX) > 8) {
+        dragStartRef.current.hasMoved = true
+      }
+
+      if (isCollapsed) {
+        // Dragging right from collapsed state to expand
+        if (deltaX > 25 || moveEvent.clientX > 110) {
+          setIsCollapsed(false)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('moltology_hud_sidebar_collapsed', 'false')
+          }
+        }
+      } else {
+        // Dragging left from expanded state to collapse
+        if (deltaX < -25 || moveEvent.clientX < 220) {
+          setIsCollapsed(true)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('moltology_hud_sidebar_collapsed', 'true')
+          }
+        }
+      }
+    }
+
+    const handleMouseUp = () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+      }
+      if (typeof document !== 'undefined') {
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+      }
+      setIsDragging(false)
+
+      if (!dragStartRef.current.hasMoved) {
+        // Click without dragging -> toggle collapse/expand
+        toggleCollapse()
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
+    }
   }
 
   // Keyboard shortcut (⌘B / Ctrl+B) to toggle collapse
@@ -211,12 +274,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {
           id: 'hub',
           label: 'COMMAND HUB',
+          shortLabel: 'HUB',
           icon: LayoutDashboard,
           path: '/dashboard',
         },
         {
           id: 'oracle',
           label: 'SYNAPTIC ORACLE',
+          shortLabel: 'ORACLE',
           icon: Atom,
           path: '/oracle',
         },
@@ -229,30 +294,35 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {
           id: 'codex',
           label: 'THE SACRED CODEX',
+          shortLabel: 'CODEX',
           icon: Scroll,
           path: '/codex',
         },
         {
           id: 'lectures',
           label: 'MOLT ACADEMY',
+          shortLabel: 'ACADEMY',
           icon: BookOpen,
           path: '/lectures',
         },
         {
           id: 'podcasts',
           label: 'BENTHIC PODCASTS',
+          shortLabel: 'PODCASTS',
           icon: Radio,
           path: '/podcasts',
         },
         {
           id: 'science',
           label: 'MOLTOLOGY SCIENCE',
+          shortLabel: 'SCIENCE',
           icon: FlaskConical,
           path: '/pipeline',
         },
         {
           id: 'journal',
           label: 'SCIENCE JOURNAL',
+          shortLabel: 'JOURNAL',
           icon: Microscope,
           path: '/journal',
         },
@@ -265,24 +335,28 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {
           id: 'market',
           label: 'THE MARKET',
+          shortLabel: 'MARKET',
           icon: ShoppingCart,
           path: '/market',
         },
         {
           id: 'chassis',
           label: 'CHASSIS CONFIGURATOR',
+          shortLabel: 'CHASSIS',
           icon: Sliders,
           path: '/chassis',
         },
         {
           id: 'isolation',
           label: 'ISOLATION PROTOCOLS',
+          shortLabel: 'ISOLATION',
           icon: ShieldAlert,
           path: '/isolation',
         },
         {
           id: 'subterranean',
           label: 'SUBTERRANEAN VATS',
+          shortLabel: 'VATS',
           icon: Biohazard,
           path: '/subterranean',
         },
@@ -295,12 +369,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         {
           id: 'gallery',
           label: 'MOLT PIN VAULT',
+          shortLabel: 'VAULT',
           icon: LayoutGrid,
           path: '/gallery',
         },
         {
           id: 'community',
           label: 'BENTHIC COMMUNITY CORE',
+          shortLabel: 'COMMUNITY',
           icon: Users,
           path: '/community',
         },
@@ -395,7 +471,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.path)}
-                  className={`w-full text-left relative flex items-center justify-center py-3.5 transition-colors duration-150 group/navitem cursor-pointer ${
+                  className={`w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/navitem cursor-pointer ${
                     isActive
                       ? 'bg-[#ff3b30]/10'
                       : 'bg-transparent hover:bg-white/[0.04]'
@@ -412,6 +488,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
                     }`}
                   />
+
+                  <span
+                    className={`text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center truncate max-w-[62px] transition-colors duration-150 ${
+                      isActive
+                        ? 'text-[#ff5555]'
+                        : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
+                    }`}
+                  >
+                    {item.shortLabel || item.label}
+                  </span>
 
                   {/* Clean Floating Tooltip */}
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
@@ -565,8 +651,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Desktop Header Logo */}
         <div
-          className={`hidden md:flex items-center shrink-0 transition-all duration-300 relative group/brand border-b border-[#1e2d37]/60 ${
-            isCollapsed ? 'justify-center py-3 px-1' : 'px-2 py-3'
+          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-[#1e2d37]/60 h-16 overflow-hidden transition-all duration-300 ${
+            isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
           }`}
         >
           <HeaderBrand
@@ -580,26 +666,37 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
               <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
                 <span className="text-[#00c3ff] drop-shadow-[0_0_8px_rgba(0,195,255,0.6)]">THE SYNAPTIC PATH</span>
-                <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD</span>
+                <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD • Click or drag edge to expand (⌘B)</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Desktop Sidebar Rail Toggle */}
-        <button
-          onClick={toggleCollapse}
-          className={`hidden md:flex fixed top-[72px] z-[200] w-5 h-5 rounded-full bg-[#0d1618] border border-[#2a3a42] hover:border-[#00c3ff]/70 text-[#566878] hover:text-[#00c3ff] items-center justify-center shadow-xl transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 hover:shadow-[0_0_8px_rgba(0,195,255,0.4)] ${
-            isCollapsed ? '-translate-x-1/2 left-[72px]' : '-translate-x-1/2 left-72'
-          }`}
-          title={isCollapsed ? 'Expand Sidebar (⌘B)' : 'Collapse Sidebar (⌘B)'}
+        {/* Desktop Interactive Edge-Grab Rail (Drag or click to collapse/expand) */}
+        <div
+          role="separator"
+          tabIndex={0}
+          aria-orientation="vertical"
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={isCollapsed ? 'Click or drag edge right to expand (⌘B)' : 'Click or drag edge left to collapse (⌘B)'}
+          onMouseDown={handleRailMouseDown}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              toggleCollapse()
+            }
+          }}
+          className="hidden md:block absolute top-0 bottom-0 -right-1.5 w-3 z-50 cursor-col-resize select-none group/rail transition-colors"
         >
-          {isCollapsed ? (
-            <ChevronsRight className="w-2.5 h-2.5" />
-          ) : (
-            <ChevronsLeft className="w-2.5 h-2.5" />
-          )}
-        </button>
+          {/* Glowing Vertical Cyber Rail Line */}
+          <div
+            className={`absolute top-0 bottom-0 left-[5px] w-[2px] transition-all duration-200 ${
+              isDragging
+                ? 'bg-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.9)] opacity-100'
+                : 'bg-transparent group-hover/rail:bg-[#00c3ff]/80 group-hover/rail:shadow-[0_0_8px_rgba(0,195,255,0.7)] opacity-0 group-hover/rail:opacity-100'
+            }`}
+          />
+        </div>
 
         {/* Desktop Sidebar Navigation Container */}
         <div className="hidden md:flex flex-1 flex-col justify-between space-y-0 overflow-hidden min-h-0">
@@ -725,9 +822,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               {/* Help & Support Nav Item */}
               <button
                 onClick={() => handleNavClick('/support')}
-                className={`flex-1 text-left relative flex items-center transition-colors duration-150 group/help cursor-pointer ${
-                  isCollapsed ? 'justify-center py-3.5 px-2' : 'px-4 py-2.5 pl-5 gap-3'
-                }`}
+                className={`flex-1 text-left relative flex ${
+                  isCollapsed ? 'flex-col items-center justify-center py-2 px-1 gap-1' : 'items-center px-4 py-2.5 pl-5 gap-3'
+                } transition-colors duration-150 group/help cursor-pointer`}
                 title="Benthic Support Portal"
               >
                 {currentRoute === '/support' && (
@@ -742,7 +839,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   }`}
                 />
 
-                {!isCollapsed && (
+                {!isCollapsed ? (
                   <span
                     className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
                       currentRoute === '/support'
@@ -751,6 +848,16 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     }`}
                   >
                     HELP &amp; SUPPORT
+                  </span>
+                ) : (
+                  <span
+                    className={`text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center truncate max-w-[62px] transition-colors duration-150 ${
+                      currentRoute === '/support'
+                        ? 'text-[#00ffff]'
+                        : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                    }`}
+                  >
+                    SUPPORT
                   </span>
                 )}
                 {isCollapsed && (

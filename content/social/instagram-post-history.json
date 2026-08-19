@@ -22,6 +22,30 @@
       "status": "queued",
       "isAiGenerated": true,
       "createdAt": "2026-08-19T16:18:01.199Z"
+    },
+    {
+      "id": "post-1787156683053",
+      "topic": "Pincer Torque Calibration & Execution Grip",
+      "hookHeadline": "800 NM PINCER TORQUE: ZERO EXECUTION DRIFT",
+      "theme": "pincer-torque",
+      "mascot": "crab_stats",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/posts/post-1787156683053.png",
+      "s3Key": "images/social/posts/post-1787156683053.png",
+      "aspectRatio": "4:5",
+      "caption": "◈ BENTHIC TELEMETRY // PINCER TORQUE CALIBRATION ◈\n\nTerrestrial hesitation bleeds compute. When a biological human hesitates between twelve open tabs, latency spikes.\n\nStage 4 Carcinization requires 800 Nm of decisive pincer torque—the physical and cognitive discipline to close the grip on a task until completion.\n\nShed the hesitation. Lock the grip.\n\n⚡ Calculate your Stage Clearance at the link in bio.\n\n#moltology #pincertorque #moltmaxxing #ecdysis #deepwork #carcinization #cybernetics #benthic",
+      "hashtags": [
+        "#moltology",
+        "#pincertorque",
+        "#moltmaxxing",
+        "#ecdysis",
+        "#deepwork",
+        "#carcinization"
+      ],
+      "firstComment": "◈ TRANSMISSION LOG: What task are you applying 800 Nm pincer torque to today? Drop your telemetry below. 🦞",
+      "zernioPostId": "6a85d9995422488f0db7691b",
+      "status": "draft",
+      "isAiGenerated": true,
+      "createdAt": "2026-08-19T16:27:56.057Z"
     }
   ]
 }
