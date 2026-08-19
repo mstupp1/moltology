@@ -27,9 +27,12 @@ function HudContent() {
   const isPending = sessionRes?.isPending
   const targetId = isPending ? null : userId || 'guest'
 
-  // Show welcome splash once per user or guest on first visit
+  // Show welcome splash once per user or guest on first visit (bypassed in preview mode)
   useEffect(() => {
     if (!targetId) return
+    if (typeof window !== 'undefined' && window.location.search.includes('preview=true')) {
+      return
+    }
     const key = `moltology:welcomed:${targetId}`
     if (!localStorage.getItem(key)) {
       setShowWelcome(true)
