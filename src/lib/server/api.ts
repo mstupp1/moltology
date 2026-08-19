@@ -1687,9 +1687,10 @@ const submitLeadSchema = z.object({
   source: z.string().optional().default('moltmax_guide'),
   referrer: z.string().optional(),
   turnstileToken: z.string().optional(),
+  emailOptIn: z.boolean().optional().default(false),
 })
 
-export type SubmitLeadInput = z.infer<typeof submitLeadSchema>
+export type SubmitLeadInput = z.input<typeof submitLeadSchema>
 
 export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
   const { data } = args
@@ -1697,6 +1698,7 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
   const normalizedEmail = validated.email.trim().toLowerCase()
   const source = validated.source || 'moltmax_guide'
   const referrer = validated.referrer || null
+  const emailOptIn = validated.emailOptIn ?? false
 
   // Canonical Turnstile bot verification check
   if (validated.turnstileToken) {
@@ -1721,6 +1723,17 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
         .limit(1)
 
       if (existing.length > 0) {
+        if (emailOptIn && !existing[0].emailOptIn) {
+          await db
+            .update(leads)
+            .set({
+              emailOptIn: true,
+              emailOptInAt: new Date(),
+              updatedAt: new Date(),
+            })
+            .where(eq(leads.id, existing[0].id))
+        }
+
         return {
           success: true,
           isExisting: true,
@@ -1736,6 +1749,8 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
         referrer,
         claimedPdf: true,
         convertedToUser: false,
+        emailOptIn,
+        emailOptInAt: emailOptIn ? new Date() : null,
       })
 
       return {
@@ -1764,3 +1779,61 @@ export const submitLeadFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: SubmitLeadInput) => submitLeadSchema.parse(data))
   .handler(submitLeadHandler)
+
+// User Email Communication Preferences API
+const updateEmailPreferencesSchema = z.object({
+  emailOptIn: z.boolean(),
+  source: z.string().optional(),
+  token: z.string().optional(),
+  userId: z.string().optional(),
+})
+
+export type UpdateEmailPreferencesInput = z.input<typeof updateEmailPreferencesSchema>
+
+export async function updateEmailPreferencesHandler({ data, context }: ServerFnArgs<UpdateEmailPreferencesInput>) {
+  let userId = context?.user?.sub || context?.user?.id
+
+  if (!userId && data?.token) {
+    const { verifyNeonJWT } = await import('../jwt')
+    const verification = await verifyNeonJWT(data.token)
+    if (verification.valid && verification.payload?.sub) {
+      userId = verification.payload.sub
+    }
+  }
+
+  if (!userId && data?.userId) {
+    userId = data.userId
+  }
+
+  if (!userId) {
+    throw new Error('Authentication required to update email preferences.')
+  }
+
+  const { ensureUserProfile } = await import('../user-sync')
+  await ensureUserProfile(userId)
+
+  const validated = updateEmailPreferencesSchema.parse(data || {})
+  const dbClient = context?.db || getDb(context?.token ?? data?.token ?? undefined)
+
+  const [updated] = await dbClient
+    .update(profiles)
+    .set({
+      emailOptIn: validated.emailOptIn,
+      emailOptInAt: validated.emailOptIn ? new Date() : null,
+      emailOptInSource: validated.source || 'profile_settings',
+      updatedAt: new Date(),
+    })
+    .where(eq(profiles.id, userId))
+    .returning()
+
+  return {
+    success: true,
+    emailOptIn: updated?.emailOptIn ?? validated.emailOptIn,
+  }
+}
+
+export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: UpdateEmailPreferencesInput) => updateEmailPreferencesSchema.parse(data))
+  .handler(updateEmailPreferencesHandler)
+

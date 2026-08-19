@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, EyeOff, Sparkles, ChevronDown } from 'lucide-react'
+import { LogOut, EyeOff, Sparkles, ChevronDown, Mail } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { UserAvatar } from './UserAvatar'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
+import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 
 export interface UserAvatarMenuProps {
   user: {
@@ -44,8 +45,47 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isExpanded, setIsExpanded] = useState(isOpen)
+  const [emailOptIn, setEmailOptIn] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
+
+  useEffect(() => {
+    if (user?.id && typeof getUserProfileFn === 'function') {
+      try {
+        const res = getUserProfileFn({ data: { userId: user.id } })
+        if (res && typeof (res as any).then === 'function') {
+          ;(res as Promise<any>)
+            .then((profile) => {
+              if (profile && typeof profile.emailOptIn === 'boolean') {
+                setEmailOptIn(profile.emailOptIn)
+              }
+            })
+            .catch(() => {})
+        }
+      } catch {}
+    }
+  }, [user?.id])
+
+  const toggleEmailOptIn = async () => {
+    const nextState = !emailOptIn
+    setEmailOptIn(nextState)
+    if (typeof updateEmailPreferencesFn === 'function') {
+      try {
+        const res = updateEmailPreferencesFn({
+          data: {
+            emailOptIn: nextState,
+            source: 'avatar_menu_toggle',
+            userId: user.id,
+          },
+        })
+        if (res && typeof (res as any).then === 'function') {
+          await res
+        }
+      } catch {
+        setEmailOptIn(!nextState)
+      }
+    }
+  }
 
   const handleToggle = () => setIsOpen((prev) => !prev)
   const handleClose = () => setIsOpen(false)
@@ -269,6 +309,61 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                   </button>
                 </div>
 
+                {/* Email Updates Toggle Row */}
+                <div
+                  className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl ${
+                    isCorporate
+                      ? 'bg-sky-50/70 border border-sky-200/80'
+                      : 'bg-cyan-950/25 border border-cyan-950/60'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Mail
+                      className={`w-4 h-4 shrink-0 ${
+                        isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
+                      }`}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span
+                        className={`text-xs font-bold truncate font-grotesk ${
+                          isCorporate ? 'text-slate-800' : 'text-gray-200'
+                        }`}
+                      >
+                        Email Updates
+                      </span>
+                      <span
+                        className={`text-[10px] truncate font-sans ${
+                          isCorporate ? 'text-slate-500' : 'text-gray-400'
+                        }`}
+                      >
+                        {emailOptIn ? 'Subscribed' : 'No updates'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={emailOptIn}
+                    aria-label="Toggle email updates"
+                    onClick={toggleEmailOptIn}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
+                      isCorporate
+                        ? emailOptIn
+                          ? 'bg-sky-500 focus:ring-sky-400'
+                          : 'bg-slate-200 border-slate-300 focus:ring-sky-400'
+                        : emailOptIn
+                        ? 'bg-[#00c3ff] focus:ring-[#00c3ff]'
+                        : 'bg-cyan-950 border-cyan-800 focus:ring-[#00c3ff]'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        emailOptIn ? 'translate-x-4 bg-white' : 'translate-x-0 bg-slate-300'
+                      }`}
+                    />
+                  </button>
+                </div>
+
                 {/* Sign Out Action Button */}
                 <button
                   type="button"
@@ -397,12 +492,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
 
-          {/* Heavy VFX Toggle Settings Section */}
+          {/* Settings Section: Heavy VFX & Email Updates */}
           <div
-            className={`py-2.5 px-0.5 border-b ${
+            className={`py-2 px-0.5 border-b space-y-1.5 ${
               isCorporate ? 'border-sky-100' : 'border-[#121c1d]'
             }`}
           >
+            {/* Heavy VFX */}
             <div
               className={`flex items-center justify-between gap-2 p-2 rounded-xl transition-all ${
                 isCorporate
@@ -460,6 +556,61 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 <span
                   className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
                     heavyVfxDisabled ? 'translate-x-0 bg-slate-300' : 'translate-x-4 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Email Updates */}
+            <div
+              className={`flex items-center justify-between gap-2 p-2 rounded-xl transition-all ${
+                isCorporate
+                  ? 'bg-sky-50/80 border border-sky-200/80 hover:border-sky-300'
+                  : 'bg-[#091012]/80 border border-cyan-900/40 hover:border-cyan-700/60'
+              }`}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Mail
+                  className={`w-4 h-4 shrink-0 ${
+                    isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
+                  }`}
+                />
+                <div className="flex flex-col min-w-0">
+                  <span
+                    className={`text-[11px] font-bold truncate font-grotesk ${
+                      isCorporate ? 'text-slate-800' : 'text-[#dfe3e3]'
+                    }`}
+                  >
+                    Email Updates
+                  </span>
+                  <span
+                    className={`text-[9px] truncate font-sans ${
+                      isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
+                    }`}
+                  >
+                    {emailOptIn ? 'Subscribed to news' : 'No updates'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={emailOptIn}
+                aria-label="Toggle email updates"
+                onClick={toggleEmailOptIn}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
+                  isCorporate
+                    ? emailOptIn
+                      ? 'bg-sky-500 focus:ring-sky-400'
+                      : 'bg-slate-200 border-slate-300 focus:ring-sky-400'
+                    : emailOptIn
+                    ? 'bg-[#00c3ff] focus:ring-[#00c3ff]'
+                    : 'bg-cyan-950/80 border-cyan-700/50 focus:ring-[#00c3ff]'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    emailOptIn ? 'translate-x-4 bg-white' : 'translate-x-0 bg-slate-300'
                   }`}
                 />
               </button>

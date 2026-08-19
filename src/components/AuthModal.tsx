@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
-import { getUserProfileFn } from '../lib/server/api'
+import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
@@ -26,6 +26,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [emailOptIn, setEmailOptIn] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [error, setError] = useState<string | null>(null)
@@ -76,6 +77,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (res?.error) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
         } else {
+          if (emailOptIn) {
+            const createdUser = (res as any)?.data?.user || (res as any)?.user
+            await updateEmailPreferencesFn({
+              data: {
+                emailOptIn: true,
+                source: 'auth_modal',
+                userId: createdUser?.id,
+              },
+            }).catch(() => {})
+          }
           await getUserProfileFn().catch(() => {})
           if (onSuccess) onSuccess()
           onClose()
@@ -264,6 +275,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
             </HudButton>
           </div>
+
+          {mode === 'signup' && (
+            <div className="pt-2 text-left">
+              <label className="flex items-start gap-2.5 cursor-pointer group select-none">
+                <input
+                  type="checkbox"
+                  checked={emailOptIn}
+                  onChange={(e) => setEmailOptIn(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-[#3a4a49] bg-[#070b0b] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                />
+                <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
+                  Keep me updated with Moltology news, articles, and product updates.
+                </span>
+              </label>
+              <p className="text-[10px] text-[#839493]/70 mt-1 pl-6 font-sans">
+                Zero spam. Unsubscribe at any time.
+              </p>
+            </div>
+          )}
 
           <TurnstileWidget
             ref={turnstileRef}

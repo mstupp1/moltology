@@ -12,7 +12,7 @@ import { ArrowLeft, Shield, Eye, Lock, Database, Trash2, Mail } from 'lucide-rea
 import { PublicHeader } from '@/components/PublicHeader'
 import { MainFooter } from '@/components/MainFooter'
 
-const CURRENT_YEAR = 2025
+const CURRENT_YEAR = 2026
 
 const Section: React.FC<{ id: string; icon: React.ReactNode; title: string; children: React.ReactNode }> = ({
   id,
@@ -69,6 +69,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               ['#rights', 'Your Rights'],
               ['#security', 'Security'],
               ['#cookies', 'Cookies'],
+              ['#communications', 'Email Telemetry'],
               ['#children', 'Children'],
               ['#changes', 'Changes'],
               ['#contact', 'Contact'],
@@ -184,6 +185,17 @@ export const PrivacyPolicyPage: React.FC = () => {
             </p>
           </Section>
 
+          <Section id="communications" icon={<Mail className="w-4 h-4" />} title="Email Communications & Telemetry">
+            <p>
+              When you opt in to receive Moltology updates, field manuals, or article dispatches, we process your email address based on your affirmative consent.
+            </p>
+            <ul className="space-y-2 mt-2 list-disc list-inside">
+              <li><span className="text-cyan-400 font-bold">Explicit Opt-In:</span> We only send ongoing news, article releases, and product updates to individuals who have affirmatively checked an opt-in box or requested materials.</li>
+              <li><span className="text-cyan-400 font-bold">Email Telemetry:</span> Our email transmissions may include standard, privacy-respecting performance indicators (such as aggregate delivery confirmations and link click metrics) to measure campaign engagement and ensure messages reach your inbox. We do not sell your email address or track your physical location.</li>
+              <li><span className="text-cyan-400 font-bold">Immediate Unsubscribe:</span> Every email update includes a functional one-click unsubscribe mechanism in the footer. Authenticated initiates can also toggle communication preferences directly within their account settings at any time.</li>
+            </ul>
+          </Section>
+
           <Section id="children" icon={<Shield className="w-4 h-4" />} title="Children's Data">
             <p>
               The Services are not directed to individuals under the age of 13 (or 16 in certain jurisdictions).
@@ -206,8 +218,8 @@ export const PrivacyPolicyPage: React.FC = () => {
               <p className="text-white font-bold">Moltology System Inc.</p>
               <p>
                 Email:{' '}
-                <a href="mailto:privacy@moltology.com" className="text-cyan-400 hover:underline">
-                  privacy@moltology.com
+                <a href="mailto:privacy@moltology.org" className="text-cyan-400 hover:underline">
+                  privacy@moltology.org
                 </a>
               </p>
             </div>

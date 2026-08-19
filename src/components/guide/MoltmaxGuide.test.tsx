@@ -23,7 +23,7 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
 })
 
 describe('Moltmax Guide Lead Capture Components', () => {
-  it('renders MoltmaxGuideCard with price anchoring and features', () => {
+  it('renders MoltmaxGuideCard with price anchoring, features, and opt-in checkbox', () => {
     render(<MoltmaxGuideCard />)
 
     expect(screen.getByText(/DOWNLOAD THE DEFINITIVE 2026/i)).toBeDefined()
@@ -32,9 +32,10 @@ describe('Moltmax Guide Lead Capture Components', () => {
     expect(screen.getByText(/The 24-Hour Ecdysis Protocol/i)).toBeDefined()
     expect(screen.getByText(/400–600 Nm Pincer Grip Holds/i)).toBeDefined()
     expect(screen.getByPlaceholderText(/Enter email to claim free copy\.\.\./i)).toBeDefined()
+    expect(screen.getByText(/Send me occasional updates, new field manuals, and articles/i)).toBeDefined()
   })
 
-  it('renders MoltmaxGuideModal when open and supports email submission', async () => {
+  it('renders MoltmaxGuideModal when open and supports email submission with opt-in', async () => {
     const onClose = vi.fn()
     const onOpenAuthSignup = vi.fn()
 
@@ -49,6 +50,13 @@ describe('Moltmax Guide Lead Capture Components', () => {
     expect(screen.getByText(/GET THE 2026/i)).toBeDefined()
     expect(screen.getByText(/VALUE \$149\.00 USD/i)).toBeDefined()
     expect(screen.getByText(/FREE TODAY \(\$0\.00\)/i)).toBeDefined()
+
+    const optInCheckbox = screen.getByRole('checkbox')
+    expect(optInCheckbox).toBeDefined()
+    expect(optInCheckbox).not.toBeChecked()
+
+    fireEvent.click(optInCheckbox)
+    expect(optInCheckbox).toBeChecked()
 
     const emailInput = screen.getByPlaceholderText(/initiate@benthic-core\.org/i)
     fireEvent.change(emailInput, { target: { value: 'initiate@moltology.org' } })
