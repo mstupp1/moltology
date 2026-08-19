@@ -23,6 +23,8 @@ describe('Database Schema & RLS Policies', () => {
     expect(leads.source).toBeDefined()
     expect(leads.claimedPdf).toBeDefined()
     expect(leads.convertedToUser).toBeDefined()
+    expect(leads.emailOptIn).toBeDefined()
+    expect(leads.emailOptInAt).toBeDefined()
   })
 
 
@@ -32,6 +34,9 @@ describe('Database Schema & RLS Policies', () => {
     expect(profiles.stage).toBeDefined()
     expect(profiles.moltCredits).toBeDefined()
     expect(profiles.chitinGems).toBeDefined()
+    expect(profiles.emailOptIn).toBeDefined()
+    expect(profiles.emailOptInAt).toBeDefined()
+    expect(profiles.emailOptInSource).toBeDefined()
   })
 
   it('defines required fields on the userStats table', () => {

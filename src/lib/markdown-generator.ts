@@ -176,7 +176,9 @@ export function generatePrivacyMarkdown(): string {
   md += `- **Community Transmissions**: Forum logs, discussion posts, and Benthic Market interactions.\n\n`
   md += `## 3. Data Usage & Protection\n`
   md += `Collected telemetry is used exclusively for personal ascension tracking, AI oracle consultation routing, and platform operation. We never monetize, sell, or broadcast private user data to unaligned third parties.\n\n`
-  md += `## 4. Ecdysis & Deletion Rights\n`
+  md += `## 4. Email Communications & Telemetry\n`
+  md += `We send news dispatches, field manuals, and feature updates exclusively to initiates who have affirmatively opted in. Transmissions include standard aggregate delivery indicators. Initiates may unsubscribe at any time via the one-click footer link or account settings.\n\n`
+  md += `## 5. Ecdysis & Deletion Rights\n`
   md += `Initiates hold the absolute right to purge all telemetry and account associations via account termination protocols.\n`
 
   return md.trim()

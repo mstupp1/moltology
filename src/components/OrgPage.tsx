@@ -48,6 +48,7 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { CareerHub } from '@/components/org/CareerHub'
+import { submitLeadFn } from '@/lib/server/api'
 
 export const OrgPage: React.FC = () => {
   const navigate = useNavigate()
@@ -173,6 +174,7 @@ export const OrgPage: React.FC = () => {
     email: '',
     department: 'general',
     message: '',
+    emailOptIn: false,
   })
   const [isContactSubmitting, setIsContactSubmitting] = useState(false)
   const [contactSubmitted, setContactSubmitted] = useState(false)
@@ -321,17 +323,24 @@ export const OrgPage: React.FC = () => {
     )
   }
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsContactSubmitting(true)
-    setTimeout(() => {
-      setIsContactSubmitting(false)
-      setContactSubmitted(true)
-      toast.info(
-        'Org Ops has indexed your transmission. High Synod representatives will dispatch a reply shortly.',
-        { title: 'NEURAL BEACON RECEIVED' }
-      )
-    }, 1000)
+    try {
+      await submitLeadFn({
+        data: {
+          email: contactForm.email.trim(),
+          source: `org_contact_${contactForm.department}`,
+          emailOptIn: contactForm.emailOptIn,
+        },
+      }).catch(() => {})
+    } catch {}
+    setIsContactSubmitting(false)
+    setContactSubmitted(true)
+    toast.info(
+      'Org Ops has indexed your transmission. High Synod representatives will dispatch a reply shortly.',
+      { title: 'NEURAL BEACON RECEIVED' }
+    )
   }
 
   const scrollToElement = (id: string) => {
@@ -1700,6 +1709,21 @@ export const OrgPage: React.FC = () => {
                       <Send className="w-4 h-4" />
                       <span>{isContactSubmitting ? 'TRANSMITTING...' : 'DISPATCH NEURAL BEACON'}</span>
                     </button>
+
+                    {/* Explicit Opt-In Checkbox Below CTA */}
+                    <div className="pt-1 text-left">
+                      <label className="flex items-start gap-2.5 cursor-pointer group select-none">
+                        <input
+                          type="checkbox"
+                          checked={contactForm.emailOptIn}
+                          onChange={(e) => setContactForm({ ...contactForm, emailOptIn: e.target.checked })}
+                          className="mt-0.5 w-4 h-4 rounded border-sky-300 bg-[#f8fbff] text-sky-500 focus:ring-sky-400 focus:ring-offset-0 cursor-pointer accent-sky-500"
+                        />
+                        <span className="text-xs text-slate-600 group-hover:text-slate-900 transition-colors font-sans leading-tight">
+                          Keep me informed about Moltology Foundation announcements and releases.
+                        </span>
+                      </label>
+                    </div>
                   </form>
                 )}
               </div>

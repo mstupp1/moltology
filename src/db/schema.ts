@@ -22,6 +22,9 @@ export const profiles = pgTable('profiles', {
   synapseShards: integer('synapseShards').default(45).notNull(),
   depthPressureCoins: integer('depthPressureCoins').default(12).notNull(),
   activeAvatarId: text('activeAvatarId'),
+  emailOptIn: boolean('emailOptIn').default(false).notNull(),
+  emailOptInAt: timestamp('emailOptInAt'),
+  emailOptInSource: text('emailOptInSource'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
@@ -362,6 +365,8 @@ export const leads = pgTable('leads', {
   referrer: text('referrer'),
   claimedPdf: boolean('claimedPdf').default(true).notNull(),
   convertedToUser: boolean('convertedToUser').default(false).notNull(),
+  emailOptIn: boolean('emailOptIn').default(false).notNull(),
+  emailOptInAt: timestamp('emailOptInAt'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 }, (table) => [

@@ -10,6 +10,11 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/server/api', () => ({
+  getUserProfileFn: vi.fn().mockResolvedValue({ emailOptIn: false }),
+  updateEmailPreferencesFn: vi.fn().mockResolvedValue({ success: true, emailOptIn: true }),
+}))
+
 describe('UserAvatarMenu Component', () => {
   const mockUser = {
     id: 'user-123',
@@ -149,5 +154,20 @@ describe('UserAvatarMenu Component', () => {
 
     expect(screen.getByRole('button', { name: /sign out/i }).className).toContain('text-rose-600')
   })
-})
 
+  it('renders Email Updates toggle and toggles opt-in preference', async () => {
+    render(<UserAvatarMenu user={mockUser} />)
+
+    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
+    fireEvent.click(avatarBtn)
+
+    expect(screen.getByText('Email Updates')).toBeInTheDocument()
+    const emailToggle = screen.getByRole('switch', { name: /toggle email updates/i })
+    expect(emailToggle).toBeInTheDocument()
+    expect(emailToggle).toHaveAttribute('aria-checked', 'false')
+
+    fireEvent.click(emailToggle)
+
+    expect(emailToggle).toHaveAttribute('aria-checked', 'true')
+  })
+})

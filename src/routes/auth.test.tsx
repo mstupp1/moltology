@@ -37,6 +37,7 @@ vi.mock('@/lib/auth-client', () => ({
 
 vi.mock('@/lib/server/api', () => ({
   getUserProfileFn: vi.fn().mockResolvedValue({ id: 'user-1' }),
+  updateEmailPreferencesFn: vi.fn().mockResolvedValue({ success: true, emailOptIn: true }),
 }))
 
 describe('Auth Split Landing Page Component (/auth)', () => {
@@ -201,5 +202,41 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     render(<AuthRoute />)
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/custom-chassis' })
+  })
+
+  it('renders explicit opt-in checkbox below CTA button on signup and syncs preferences when checked', async () => {
+    const { updateEmailPreferencesFn } = await import('@/lib/server/api')
+    mockSearch = { mode: 'signup' }
+    vi.mocked(authClient.signUp.email).mockResolvedValue({ data: { user: { id: 'user-789' } } } as any)
+
+    render(<AuthRoute />)
+
+    const checkbox = screen.getByRole('checkbox')
+    expect(checkbox).toBeInTheDocument()
+    expect(checkbox).not.toBeChecked()
+    expect(screen.getByText(/Keep me updated with Moltology news, articles, and product updates/i)).toBeInTheDocument()
+    expect(screen.getByText(/Zero spam. Unsubscribe at any time/i)).toBeInTheDocument()
+
+    // Check opt-in checkbox
+    fireEvent.click(checkbox)
+    expect(checkbox).toBeChecked()
+
+    // Fill in and submit
+    fireEvent.change(screen.getByPlaceholderText('Your Name'), { target: { value: 'Subscriber Unit' } })
+    fireEvent.change(screen.getByPlaceholderText('name@example.com'), { target: { value: 'sub@example.com' } })
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'password123' } })
+
+    fireEvent.click(screen.getByRole('button', { name: /^Create Account$/i }))
+
+    await waitFor(() => {
+      expect(authClient.signUp.email).toHaveBeenCalled()
+      expect(updateEmailPreferencesFn).toHaveBeenCalledWith({
+        data: {
+          emailOptIn: true,
+          source: 'auth_page',
+          userId: 'user-789',
+        },
+      })
+    })
   })
 })

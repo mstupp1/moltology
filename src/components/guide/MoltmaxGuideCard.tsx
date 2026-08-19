@@ -30,6 +30,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
   variant = 'full',
 }) => {
   const [email, setEmail] = useState('')
+  const [emailOptIn, setEmailOptIn] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,6 +51,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
           email: email.trim(),
           source,
           referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          emailOptIn,
         },
       })
 
@@ -193,6 +195,22 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                   )}
                 </button>
               </div>
+
+              {/* Explicit Opt-In Checkbox Below CTA */}
+              <div className="pt-0.5 text-left">
+                <label className="flex items-start gap-2.5 cursor-pointer group select-none">
+                  <input
+                    type="checkbox"
+                    checked={emailOptIn}
+                    onChange={(e) => setEmailOptIn(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#020408] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                  />
+                  <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
+                    Send me occasional updates, new field manuals, and articles.
+                  </span>
+                </label>
+              </div>
+
               {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
               <p className="text-[10px] text-[#839493] font-sans">
                 ⚡ Instant access. Subsidized declassified transmission. Zero spam.

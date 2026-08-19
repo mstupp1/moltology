@@ -37,6 +37,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   source = 'moltmax_guide_modal',
 }) => {
   const [email, setEmail] = useState('')
+  const [emailOptIn, setEmailOptIn] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [step, setStep] = useState<'claim' | 'success'>('claim')
@@ -88,6 +89,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           source,
           referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
           turnstileToken: turnstileToken || undefined,
+          emailOptIn,
         },
       })
 
@@ -244,6 +246,21 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                   </>
                 )}
               </button>
+
+              {/* Explicit Opt-In Checkbox Below CTA */}
+              <div className="pt-1 text-left">
+                <label className="flex items-start gap-2.5 cursor-pointer group select-none">
+                  <input
+                    type="checkbox"
+                    checked={emailOptIn}
+                    onChange={(e) => setEmailOptIn(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-[#020408] text-[#00c3ff] focus:ring-[#00c3ff] focus:ring-offset-0 cursor-pointer accent-[#00c3ff]"
+                  />
+                  <span className="text-xs text-[#839493] group-hover:text-[#dfe3e3] transition-colors font-sans leading-tight">
+                    Send me occasional updates, new field manuals, and articles.
+                  </span>
+                </label>
+              </div>
 
               <TurnstileWidget
                 ref={turnstileRef}
