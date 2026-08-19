@@ -33,6 +33,7 @@ import { getUserProfileFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { authClient } from '@/lib/auth-client'
 import { seo } from '@/lib/seo'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 function SupportPortalRoute() {
   const loaderData = Route.useLoaderData()
@@ -66,6 +67,8 @@ function SupportPortalRoute() {
   const [ticketCategory, setTicketCategory] = useState('SHELL_INTEGRITY')
   const [ticketDescription, setTicketDescription] = useState('')
   const [ticketSubmitted, setTicketSubmitted] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
 
   useEffect(() => {
     if (!user?.id) return
@@ -128,6 +131,8 @@ function SupportPortalRoute() {
     e.preventDefault()
     if (!ticketSubject || !ticketDescription) return
     setTicketSubmitted(true)
+    setTurnstileToken(null)
+    turnstileRef.current?.reset()
     setTimeout(() => {
       setTicketSubmitted(false)
       setTicketSubject('')
@@ -645,6 +650,14 @@ function SupportPortalRoute() {
                 <Send className="w-4 h-4" />
                 <span>DISPATCH NEURAL TICKET</span>
               </button>
+
+              <TurnstileWidget
+                ref={turnstileRef}
+                action="support_ticket"
+                size="flexible"
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+              />
             </form>
           )}
         </div>

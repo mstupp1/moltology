@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { submitLeadFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export interface MoltmaxGuideModalProps {
   isOpen: boolean
@@ -36,6 +37,8 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   source = 'moltmax_guide_modal',
 }) => {
   const [email, setEmail] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [step, setStep] = useState<'claim' | 'success'>('claim')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -84,6 +87,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           email: email.trim(),
           source,
           referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          turnstileToken: turnstileToken || undefined,
         },
       })
 
@@ -105,6 +109,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
         }
       } else {
         setError('Transmission disrupted. Please verify telemetry and try again.')
+        turnstileRef.current?.reset()
       }
     } catch (err: any) {
       console.warn('Lead submit fallback triggered:', err)
@@ -239,6 +244,14 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                   </>
                 )}
               </button>
+
+              <TurnstileWidget
+                ref={turnstileRef}
+                action="lead_capture"
+                size="flexible"
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+              />
 
               <p className="text-[10px] text-center text-[#839493] font-sans">
                 🔒 Zero spam doctrine. 100% sovereign benthic telemetry. Instant digital declassification.

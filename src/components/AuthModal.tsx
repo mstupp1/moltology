@@ -4,6 +4,7 @@ import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
 import { getUserProfileFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -25,12 +26,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setMode(initialMode)
     setError(null)
+    setTurnstileToken(null)
+    turnstileRef.current?.reset()
   }, [initialMode, isOpen])
 
   useEffect(() => {
@@ -259,6 +264,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
             </HudButton>
           </div>
+
+          <TurnstileWidget
+            ref={turnstileRef}
+            action={mode === 'signup' ? 'signup' : 'login'}
+            size="flexible"
+            onVerify={(token) => setTurnstileToken(token)}
+            onExpire={() => setTurnstileToken(null)}
+          />
         </form>
       </HudCard>
     </div>
