@@ -206,9 +206,15 @@ export const CommandPalette: React.FC = () => {
     <>
       {/* Modal Command Palette Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150">
+        <div
+          data-testid="command-palette-overlay"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-8 sm:pt-20 px-3 sm:px-4 animate-in fade-in duration-150"
+          onClick={() => setIsOpen(false)}
+        >
           <div
+            data-testid="command-palette-modal"
             className="w-full max-w-2xl bg-[#0b0f0f] border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 overflow-hidden chamfer-corner-lg font-sans text-sm max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
             onKeyDown={handleKeyDownMenu}
           >
             {/* Command Header */}
