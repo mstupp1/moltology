@@ -163,7 +163,7 @@ function SubterraneanRoute() {
       featureName="Subterranean Vats"
       message="Subterranean specimen containment vats and biometric telemetry streams require an authorized initiate account."
     >
-      <div className="space-y-6 font-sans text-[#dfe3e3]">
+      <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3]">
       {/* Flash Alert Banner when Bio-Purging */}
       {isPurging && (
         <div className="fixed inset-0 z-50 bg-[#39ff14]/20 pointer-events-none flex items-center justify-center animate-pulse backdrop-blur-sm">
@@ -180,7 +180,7 @@ function SubterraneanRoute() {
       )}
 
       {/* Subterranean Header Banner */}
-      <div className="bg-[#030a05] border border-[#1b3b24] p-6 chamfer-corner shadow-2xl relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="bg-[#030a05] border border-[#1b3b24] p-3.5 sm:p-6 chamfer-corner shadow-2xl relative flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
         <div>
           <div className="text-xs text-[#39ff14] font-sans tracking-widest uppercase flex flex-wrap items-center gap-2 font-bold">
             <Biohazard className="w-4 h-4 text-[#39ff14] animate-pulse" />
@@ -216,7 +216,7 @@ function SubterraneanRoute() {
       </div>
 
       {/* Main Grid: Vat Selector & Live Biometrics Console */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 lg:gap-6">
         {/* Left 5 Cols: Bio-Vat Selection List */}
         <div className="lg:col-span-5 space-y-4">
           <div className="chitin-card p-4 chamfer-corner space-y-3">

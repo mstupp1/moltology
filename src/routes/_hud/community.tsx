@@ -287,9 +287,9 @@ function CommunityRoute() {
   }
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
       {/* Header Banner */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
+      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-3 sm:p-4 md:p-5 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 shadow-chitin-plate">
         <div>
           <div className="text-xs text-[#ff5540] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <Users className="w-4 h-4 text-[#ff5540]" />
@@ -324,7 +324,7 @@ function CommunityRoute() {
       {/* Main Grid View or Thread Reader */}
       {activeTopicId ? (
         /* Thread Reader View */
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <button
             onClick={() => {
               setActiveTopicId(null)
@@ -338,9 +338,9 @@ function CommunityRoute() {
           {loadingTopicDetail ? (
             <HudGhostCard lines={4} />
           ) : activeTopicData ? (
-            <div className="space-y-6">
+            <div className="space-y-3.5 sm:space-y-5 md:space-y-6">
               {/* Main Topic Post */}
-              <div className="chitin-card p-6 chamfer-corner space-y-4 border border-[#3a4a49] shadow-2xl">
+              <div className="chitin-card p-3.5 sm:p-5 md:p-6 chamfer-corner space-y-3.5 sm:space-y-4 border border-[#3a4a49] shadow-2xl">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#3a4a49] pb-3">
                   <div className="flex items-center gap-2">
                     <span
@@ -510,9 +510,9 @@ function CommunityRoute() {
         </div>
       ) : (
         /* Main Category & Topic Browsing Grid */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 lg:gap-6">
           {/* Main Content Area (8 cols) */}
-          <div className="lg:col-span-8 space-y-4">
+          <div className="lg:col-span-8 space-y-3 sm:space-y-4">
             {/* Search & Sort Toolbar */}
             <div className="chitin-card p-3 chamfer-corner flex flex-col sm:flex-row items-center justify-between gap-3 border border-[#3a4a49]">
               {/* Search Bar */}

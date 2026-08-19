@@ -73,12 +73,12 @@ function OracleRouteComponent() {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4 font-sans text-[#dfe3e3]">
+    <div className="h-full flex flex-col space-y-3 sm:space-y-4 font-sans text-[#dfe3e3]">
       {/* Main Grid: Thread History Sidebar (if logged in) or Guest Gate Callout + Full Chat Panel */}
-      <div className="flex-1 min-h-[500px] flex flex-col md:flex-row gap-4 overflow-hidden">
+      <div className="flex-1 min-h-[500px] flex flex-col md:flex-row gap-3 sm:gap-4 overflow-hidden">
         {/* Thread History Sidebar (Logged In Users) */}
         {userId ? (
-          <div className="w-full md:w-64 bg-[#060a0a]/95 border border-cyan-900/50 p-3 flex flex-col space-y-3 chamfer-corner shrink-0 overflow-y-auto">
+          <div className="w-full md:w-64 bg-[#060a0a]/95 border border-cyan-900/50 p-2.5 sm:p-3 flex flex-col space-y-3 chamfer-corner shrink-0 overflow-y-auto">
             <button
               onClick={handleCreateNewThread}
               className="w-full bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-700/60 py-2 px-3 text-xs flex items-center justify-center space-x-2 chamfer-corner transition-colors"

@@ -99,10 +99,10 @@ function PodcastsPage() {
       featureName="Benthic Podcasts"
       message="Sub-oceanic transmissions and MoltNation podcast audio streams require an authorized initiate account."
     >
-      <div className="space-y-5 font-sans relative">
+      <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       {/* MoltNation Page Header */}
-      <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+      <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3 sm:space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative z-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <MoltNationLogo size="sm" theme="dark" />

@@ -45,9 +45,9 @@ function PipelineRoute() {
   const isCurrent = (code: string) => code === currentSubStageCode
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
       {/* Top Header Banner */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-5 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
+      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-3.5 sm:p-5 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 shadow-chitin-plate">
         <div>
           <div className="text-[10px] text-[#ff5540] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <GitMerge className="w-3.5 h-3.5 text-[#ff5540]" />

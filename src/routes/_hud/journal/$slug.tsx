@@ -15,9 +15,9 @@ function JournalPaperPage() {
 
   if (!paper) {
     return (
-      <div className="space-y-6 font-sans">
+      <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
         <JournalMasthead variant="compact" />
-        <div className="bg-[#0f1414] border border-[#ff5540]/60 p-12 chamfer-corner text-center">
+        <div className="bg-[#0f1414] border border-[#ff5540]/60 p-6 sm:p-12 chamfer-corner text-center">
           <FileText className="w-10 h-10 text-[#ff5540] mx-auto mb-4" />
           <h2 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">
             PAPER NOT FOUND
@@ -38,7 +38,7 @@ function JournalPaperPage() {
   }
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
       <JournalMasthead variant="compact" />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

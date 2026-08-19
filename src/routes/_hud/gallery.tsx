@@ -148,7 +148,7 @@ function GalleryRoute() {
   }, [pins, selectedCategory, selectedAspectRatio, showSavedOnly, savedPinIds, searchQuery])
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 animate-fade-in pb-12">
       {/* Toast Notification Container */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-[#0a0f12] border border-[#00c3ff] text-[#00c3ff] text-xs font-sans font-bold rounded-xl shadow-[0_0_20px_rgba(0,195,255,0.4)] flex items-center gap-2 animate-bounce">
@@ -158,11 +158,11 @@ function GalleryRoute() {
       )}
 
       {/* Top Banner Header */}
-      <div className="relative rounded-2xl overflow-hidden border border-[#00c3ff]/40 bg-[#070b0d]/90 p-6 md:p-8 backdrop-blur-md shadow-2xl">
+      <div className="relative rounded-2xl overflow-hidden border border-[#00c3ff]/40 bg-[#070b0d]/90 p-3.5 sm:p-6 md:p-8 backdrop-blur-md shadow-2xl">
         <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-[#00c3ff]/10 to-transparent pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#00c3ff]/15 border border-[#00c3ff]/50 rounded-full text-[#00c3ff] text-xs font-sans font-bold tracking-widest uppercase shadow-md">
               <Grid className="w-3.5 h-3.5" />

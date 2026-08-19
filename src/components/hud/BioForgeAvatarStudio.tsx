@@ -275,9 +275,9 @@ export const BioForgeAvatarStudio: React.FC = () => {
   const activeStageInfo = STAGE_NAMES[selectedStage]
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
       {/* Studio Header Banner */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#00c3ff] border border-[#3a4a49] p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-chitin-plate">
+      <div className="bg-[#171c1c] border-l-4 border-l-[#00c3ff] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 shadow-chitin-plate">
         <div>
           <div className="text-xs text-[#00c3ff] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
             <Sliders className="w-3.5 h-3.5 text-[#00c3ff]" />
@@ -302,10 +302,10 @@ export const BioForgeAvatarStudio: React.FC = () => {
       </div>
 
       {/* Main Grid: Left Viewport (6 cols) & Right Studio Controls (6 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 lg:gap-6">
         {/* Left Column: Interactive Avatar HUD Viewport */}
-        <div className="lg:col-span-6 space-y-4">
-          <HudCard variant="teal" className="p-4 space-y-4 relative overflow-hidden">
+        <div className="lg:col-span-6 space-y-3 sm:space-y-4">
+          <HudCard variant="teal" className="p-3 sm:p-4 space-y-3 sm:space-y-4 relative overflow-hidden">
             <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
               <div className="flex items-center gap-2">
                 <Crosshair className="w-4 h-4 text-[#00c3ff]" />
