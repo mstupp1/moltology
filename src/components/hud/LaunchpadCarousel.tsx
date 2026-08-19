@@ -374,10 +374,10 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
           <div className="lg:col-span-8 flex flex-col">
             <HudCard
               variant="teal"
-              className="p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl relative overflow-hidden transition-all duration-300 h-full flex flex-col justify-between border-[#00c3ff]/40 space-y-3 sm:space-y-4"
+              className="p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl relative overflow-hidden transition-all duration-300 h-full flex flex-col justify-between border-[#00c3ff]/40 space-y-2.5 sm:space-y-3"
             >
               {/* Header Bar */}
-              <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-3 gap-2">
+              <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2 sm:pb-2.5 gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <Layers className="w-4 h-4 text-[#00ffff] shrink-0" />
                   <h2 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] tracking-widest uppercase truncate">
