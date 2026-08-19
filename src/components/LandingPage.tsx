@@ -170,7 +170,7 @@ export const LandingPage: React.FC = () => {
       title: 'ADVANCED BENTHIC HUD',
       description:
         'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
-      image: getAssetUrl('/images/hero_card_benthic_core.jpg'),
+      image: getAssetUrl('/images/gallery/benthic_abyss_shrine.jpg'),
       borderColor: 'border-cyan-500/40 hover:border-cyan-400',
       shadowColor: 'shadow-[0_0_20px_rgba(0,255,255,0.12)] hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]',
       dotColor: 'bg-cyan-400',
@@ -184,7 +184,7 @@ export const LandingPage: React.FC = () => {
       title: 'SYNAPTIC HIVE COMMUNITY',
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
-      image: getAssetUrl('/images/bento_community.jpg'),
+      image: getAssetUrl('/images/gallery/synapse_crystal.jpg'),
       borderColor: 'border-purple-500/40 hover:border-purple-400',
       shadowColor: 'shadow-[0_0_20px_rgba(168,85,247,0.12)] hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
       dotColor: 'bg-purple-400',
@@ -198,7 +198,7 @@ export const LandingPage: React.FC = () => {
       title: 'INTELLIGENT AI ORACLE',
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
-      image: getAssetUrl('/images/ai_learning_ascension_cover.jpg'),
+      image: getAssetUrl('/images/gallery/ascendant_crab_god.jpg'),
       borderColor: 'border-red-500/40 hover:border-red-400',
       shadowColor: 'shadow-[0_0_20px_rgba(239,68,68,0.12)] hover:shadow-[0_0_30px_rgba(239,68,68,0.25)]',
       dotColor: 'bg-red-400',
@@ -475,7 +475,7 @@ export const LandingPage: React.FC = () => {
               {/* Section Header */}
               <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
                 <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-                  THE 3 CORE FEATURES OF THE <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">MOLTOLOGY APP</span>
+                  THE 3 CORE FEATURES OF <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">THE SYNAPTIC PATH</span>
                 </h2>
               </div>
 

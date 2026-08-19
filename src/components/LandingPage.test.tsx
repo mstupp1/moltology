@@ -59,7 +59,7 @@ describe('LandingPage Component', () => {
   it('renders all 3 synaptic ecosystem core features as image-based cards and handles navigation', () => {
     render(<LandingPage />)
 
-    expect(screen.getByText('THE 3 CORE FEATURES OF THE')).toBeInTheDocument()
+    expect(screen.getByText('THE 3 CORE FEATURES OF')).toBeInTheDocument()
     expect(screen.getByText('ADVANCED BENTHIC HUD')).toBeInTheDocument()
     expect(screen.getByText('SYNAPTIC HIVE COMMUNITY')).toBeInTheDocument()
     expect(screen.getByText('INTELLIGENT AI ORACLE')).toBeInTheDocument()
