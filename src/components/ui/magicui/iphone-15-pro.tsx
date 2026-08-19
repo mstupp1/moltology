@@ -1,5 +1,4 @@
 import React from 'react'
-import { Wifi, Battery } from 'lucide-react'
 
 export interface Iphone15ProProps {
   className?: string
@@ -30,36 +29,25 @@ export const Iphone15Pro: React.FC<Iphone15ProProps> = ({
         {/* Inner Bezel Frame */}
         <div className="relative w-full h-full rounded-[38px] bg-[#060a0b] overflow-hidden border border-[#1b262a]">
           
-          {/* Screen Content Viewport (Full Frame) */}
-          <div className="relative w-full h-full overflow-hidden bg-[#060a0b]">
+          {/* Screen Content Viewport (Seamless pt-5 Offset Below Dynamic Island) */}
+          <div className="relative w-full h-full overflow-hidden bg-[#060a0b] pt-5 flex flex-col">
             {children ? (
               children
             ) : src ? (
               <img
                 src={src}
                 alt="iPhone 15 Pro preview"
-                className="w-full h-full object-fill object-top block"
+                className="w-full flex-1 object-fill object-top block"
               />
             ) : null}
 
-            {/* Floating Dynamic Island + iOS Status Bar Overlay (Pristine Inset) */}
-            <div className="absolute top-0 left-0 right-0 z-40 h-8 px-6 pt-1.5 flex items-center justify-between pointer-events-none select-none">
-              {/* Time */}
-              <span className="text-[10px] font-bold text-gray-200 tracking-tight leading-none">09:41</span>
-
-              {/* Dynamic Island SVG Pill */}
-              <div className="w-[74px] h-[18px] bg-black rounded-full border border-[#222a2e] flex items-center justify-between px-2 shadow-sm">
+            {/* Centered Floating Dynamic Island Pill (Time & Icons Disabled) */}
+            <div className="absolute top-0 left-0 right-0 z-40 h-6 flex items-center justify-center pointer-events-none select-none pt-1">
+              <div className="w-[72px] h-[16px] bg-black rounded-full border border-[#222a2e] flex items-center justify-between px-2 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0a1215] border border-[#1b252a] flex items-center justify-center">
-                  <span className="w-0.5 h-0.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="w-0.5 h-0.5 rounded-full bg-cyan-400/80 animate-pulse" />
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0d1417] border border-[#1b252a]" />
-              </div>
-
-              {/* Signal & Battery Icons */}
-              <div className="flex items-center gap-1 text-gray-200">
-                <span className="text-[7.5px] font-bold tracking-tighter text-cyan-400 leading-none">5G</span>
-                <Wifi className="w-2.5 h-2.5 text-gray-200" />
-                <Battery className="w-3 h-3 text-emerald-400" />
               </div>
             </div>
 
