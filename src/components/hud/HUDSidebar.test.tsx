@@ -14,6 +14,7 @@ vi.mock('@tanstack/react-router', () => ({
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     useSession: vi.fn(() => ({ data: null })),
+    getSession: vi.fn().mockResolvedValue({ data: null }),
     signOut: vi.fn(),
   },
 }))
@@ -225,5 +226,54 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     fireEvent.click(signUpBtn)
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
+  })
+
+  it('stacks Support option on top of Sign Up button in collapsed guest mode and handles clicks', () => {
+    render(<HUDSidebar />)
+
+    // Collapse sidebar
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+
+    const supportBtn = screen.getByRole('button', { name: /SUPPORT/i })
+    expect(supportBtn).toBeInTheDocument()
+
+    const signUpBtn = screen.getByTitle(/Sign Up \/ Initialize Operative/i)
+    expect(signUpBtn).toBeInTheDocument()
+
+    // Test support navigation
+    fireEvent.click(supportBtn)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/support' })
+
+    // Test sign up modal trigger
+    fireEvent.click(signUpBtn)
+    expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
+  })
+
+  it('stacks Support option on top of UserAvatarMenu in collapsed authenticated mode', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'test-user-1',
+          name: 'Operative Alpha',
+          email: 'alpha@moltology.io',
+          role: 'admin',
+        },
+      } as any,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    // Collapse sidebar
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+
+    const supportBtn = screen.getByRole('button', { name: /SUPPORT/i })
+    expect(supportBtn).toBeInTheDocument()
+
+    const userMenuBtn = screen.getByRole('button', { name: /User account menu/i })
+    expect(userMenuBtn).toBeInTheDocument()
+
+    // Test support navigation
+    fireEvent.click(supportBtn)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/support' })
   })
 })

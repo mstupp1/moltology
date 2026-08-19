@@ -811,35 +811,125 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               )}
             </div>
 
-            {/* Combined Row: Help & Support + User Avatar / Auth */}
-            <div
-              className={`flex items-center justify-between relative border-t border-[#1e2d37]/80 transition-colors duration-150 ${
-                currentRoute === '/support'
-                  ? 'bg-[#00c3ff]/10'
-                  : 'bg-[#080d10] hover:bg-white/[0.04]'
-              }`}
-            >
-              {/* Help & Support Nav Item */}
-              <button
-                onClick={() => handleNavClick('/support')}
-                className={`flex-1 text-left relative flex ${
-                  isCollapsed ? 'flex-col items-center justify-center py-2 px-1 gap-1' : 'items-center px-4 py-2.5 pl-5 gap-3'
-                } transition-colors duration-150 group/help cursor-pointer`}
-                title="Benthic Support Portal"
-              >
-                {currentRoute === '/support' && (
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
-                )}
-
-                <LifeBuoy
-                  className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
+            {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
+            {isCollapsed ? (
+              <div className="flex flex-col divide-y divide-[#1e2d37]/80">
+                {/* Help & Support Nav Item (Stacked on Top) */}
+                <div
+                  className={`relative transition-colors duration-150 ${
                     currentRoute === '/support'
-                      ? 'text-[#00ffff]'
-                      : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                      ? 'bg-[#00c3ff]/10'
+                      : 'bg-[#080d10] hover:bg-white/[0.04]'
                   }`}
-                />
+                >
+                  <button
+                    onClick={() => handleNavClick('/support')}
+                    className="w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/help cursor-pointer"
+                    title="Benthic Support Portal"
+                  >
+                    {currentRoute === '/support' && (
+                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
+                    )}
 
-                {!isCollapsed ? (
+                    <LifeBuoy
+                      className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
+                        currentRoute === '/support'
+                          ? 'text-[#00ffff]'
+                          : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                      }`}
+                    />
+
+                    <span
+                      className={`text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center truncate max-w-[62px] transition-colors duration-150 ${
+                        currentRoute === '/support'
+                          ? 'text-[#00ffff]'
+                          : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                      }`}
+                    >
+                      SUPPORT
+                    </span>
+
+                    {/* Tooltip */}
+                    <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
+                      <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
+                        <span className="tracking-wider uppercase">
+                          HELP &amp; SUPPORT
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                {/* User Avatar Menu / Auth Button (Stacked on Bottom) */}
+                <div className="bg-[#080d10] py-2 px-1 flex items-center justify-center">
+                  {!user ? (
+                    <div className="relative group/auth flex justify-center">
+                      <BenthicCTAButton
+                        variant="red"
+                        size="sm"
+                        onClick={() => setIsAuthModalOpen(true)}
+                        className="!px-2.5 !py-1.5 flex items-center justify-center active:scale-95"
+                        title="Sign Up / Initialize Operative"
+                      >
+                        <span className="flex items-center gap-1 text-[11px]">
+                          <UserPlus className="w-3.5 h-3.5" />
+                        </span>
+                      </BenthicCTAButton>
+                      {/* Tooltip */}
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/auth:opacity-100 transition-opacity duration-150">
+                        <div className="bg-[#060a0b] border border-[#ff3b30]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b30]" />
+                          <span className="tracking-wider uppercase">SIGN UP</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative flex items-center justify-center">
+                      <UserAvatarMenu
+                        user={user}
+                        userRole={effectiveUserRole}
+                        onNavigate={(path) => navigate({ to: path })}
+                        align="left"
+                        openDirection="up"
+                      />
+                      {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && (
+                        <span
+                          className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none"
+                          title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Combined Row: Help & Support + User Avatar / Auth (Expanded) */
+              <div
+                className={`flex items-center justify-between relative border-t border-[#1e2d37]/80 transition-colors duration-150 ${
+                  currentRoute === '/support'
+                    ? 'bg-[#00c3ff]/10'
+                    : 'bg-[#080d10] hover:bg-white/[0.04]'
+                }`}
+              >
+                {/* Help & Support Nav Item */}
+                <button
+                  onClick={() => handleNavClick('/support')}
+                  className="flex-1 text-left relative flex items-center px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer"
+                  title="Benthic Support Portal"
+                >
+                  {currentRoute === '/support' && (
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
+                  )}
+
+                  <LifeBuoy
+                    className={`w-4 h-4 shrink-0 transition-colors duration-150 ${
+                      currentRoute === '/support'
+                        ? 'text-[#00ffff]'
+                        : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
+                    }`}
+                  />
+
                   <span
                     className={`text-xs md:text-[12.5px] font-sans font-medium tracking-wide uppercase leading-tight transition-colors duration-150 ${
                       currentRoute === '/support'
@@ -849,62 +939,36 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   >
                     HELP &amp; SUPPORT
                   </span>
-                ) : (
-                  <span
-                    className={`text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center truncate max-w-[62px] transition-colors duration-150 ${
-                      currentRoute === '/support'
-                        ? 'text-[#00ffff]'
-                        : 'text-[#7a8e9e] group-hover/help:text-[#dfe3e3]'
-                    }`}
-                  >
-                    SUPPORT
-                  </span>
-                )}
-                {isCollapsed && (
-                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/help:opacity-100 transition-opacity duration-150">
-                    <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1.5 text-xs font-sans font-bold shadow-lg whitespace-nowrap flex items-center gap-2 chamfer-corner">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
-                      <span className="tracking-wider uppercase">
-                        HELP &amp; SUPPORT
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </button>
+                </button>
 
-              {/* User Avatar Menu / Auth Button */}
-              <div className={`shrink-0 flex items-center ${isCollapsed ? 'pr-1.5' : 'pr-3'}`}>
-                {!user ? (
-                  <BenthicCTAButton
-                    variant="red"
-                    size="sm"
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className={isCollapsed ? '!px-1.5 !py-1' : '!px-2.5 !py-1'}
-                  >
-                    <span className="flex items-center gap-1.5 text-[11px]">
-                      <UserPlus className="w-3.5 h-3.5" />
-                      {!isCollapsed && <span>SIGN UP</span>}
-                    </span>
-                  </BenthicCTAButton>
-                ) : (
-                  <div className="relative flex items-center">
-                    <UserAvatarMenu
-                      user={user}
-                      userRole={effectiveUserRole}
-                      onNavigate={(path) => navigate({ to: path })}
-                      align={isCollapsed ? 'left' : 'right'}
-                      openDirection="up"
-                    />
-                    {effectiveUserRole && ['admin', 'super_admin'].includes(effectiveUserRole) && isCollapsed && (
-                      <span
-                        className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#00ffff] border border-[#060a0b] rounded-full shadow-[0_0_8px_rgba(0,255,255,0.9)] animate-pulse pointer-events-none"
-                        title={effectiveUserRole === 'super_admin' ? 'SUPER ADMIN' : 'ADMIN'}
+                {/* User Avatar Menu / Auth Button */}
+                <div className="shrink-0 flex items-center pr-3">
+                  {!user ? (
+                    <BenthicCTAButton
+                      variant="red"
+                      size="sm"
+                      onClick={() => setIsAuthModalOpen(true)}
+                      className="!px-2.5 !py-1"
+                    >
+                      <span className="flex items-center gap-1.5 text-[11px]">
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>SIGN UP</span>
+                      </span>
+                    </BenthicCTAButton>
+                  ) : (
+                    <div className="relative flex items-center">
+                      <UserAvatarMenu
+                        user={user}
+                        userRole={effectiveUserRole}
+                        onNavigate={(path) => navigate({ to: path })}
+                        align="right"
+                        openDirection="up"
                       />
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </aside>
