@@ -33,7 +33,9 @@ export default defineConfig({
       ? []
       : [
           tanstackStart({
-            routeFileIgnorePattern: '.*\\.test\\..*',
+            router: {
+              routeFileIgnorePattern: '.*\\.test\\..*',
+            },
           }),
           nitro(),
         ]),

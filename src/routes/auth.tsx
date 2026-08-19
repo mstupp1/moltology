@@ -26,7 +26,7 @@ const authSearchSchema = z.object({
   redirect: z.string().optional(),
 })
 
-export function AuthRoute() {
+function AuthRoute() {
   const navigate = useNavigate()
   const search = Route.useSearch()
   const sessionRes = authClient.useSession()
