@@ -26,12 +26,15 @@ import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { AuthModal } from '@/components/AuthModal'
 import { submitLeadFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export const MoltmaxGuidePage: React.FC = () => {
   const navigate = useNavigate()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const [email, setEmail] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [loading, setLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,6 +55,7 @@ export const MoltmaxGuidePage: React.FC = () => {
           email: email.trim(),
           source: 'moltmax_guide_page_hero',
           referrer: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          turnstileToken: turnstileToken || undefined,
         },
       })
 
@@ -70,6 +74,7 @@ export const MoltmaxGuidePage: React.FC = () => {
         }
       } else {
         setError('Transmission disrupted. Please try again.')
+        turnstileRef.current?.reset()
       }
     } catch {
       setIsSubmitted(true)
@@ -177,6 +182,13 @@ export const MoltmaxGuidePage: React.FC = () => {
                   </button>
                 </div>
                 {error && <p className="text-xs text-[#ff453a] font-sans">{error}</p>}
+                <TurnstileWidget
+                  ref={turnstileRef}
+                  action="lead_capture"
+                  size="flexible"
+                  onVerify={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken(null)}
+                />
                 <p className="text-[11px] text-[#839493] font-sans">
                   🔒 Zero spam. Instant high-resolution HTML &amp; PDF download.
                 </p>

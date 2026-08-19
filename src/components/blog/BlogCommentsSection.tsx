@@ -18,6 +18,7 @@ import {
 } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 interface BlogCommentsSectionProps {
   postId?: string
@@ -30,6 +31,8 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
   const [comments, setComments] = useState<BlogCommentEntry[]>([])
   const [loadingComments, setLoadingComments] = useState(true)
   const [commentInput, setCommentInput] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -99,17 +102,21 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
           postId,
           content: trimmed,
           userId: user.id,
+          turnstileToken: turnstileToken || undefined,
         },
       })
 
       if (newComment) {
         setComments((prev) => [newComment, ...prev])
         setCommentInput('')
+        setTurnstileToken(null)
+        turnstileRef.current?.reset()
         setSuccessMessage('Transmission broadcast successfully.')
         setTimeout(() => setSuccessMessage(null), 3500)
       }
     } catch (err: any) {
       console.error('Comment submission error:', err)
+      turnstileRef.current?.reset()
       setErrorMessage(err.message || 'Transmission failed. Verify authorization and try again.')
     } finally {
       setIsSubmitting(false)
@@ -240,6 +247,14 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
                 )}
               </button>
             </div>
+
+            <TurnstileWidget
+              ref={turnstileRef}
+              action="blog_comment"
+              size="flexible"
+              onVerify={(token) => setTurnstileToken(token)}
+              onExpire={() => setTurnstileToken(null)}
+            />
           </form>
         ) : (
           <div className="chitin-card p-5 sm:p-8 border border-cyan-900/60 chamfer-corner bg-[#080d0f]/90 text-center relative overflow-hidden">

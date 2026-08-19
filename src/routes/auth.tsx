@@ -19,6 +19,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
 import { seo } from '@/lib/seo'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 const authSearchSchema = z.object({
   mode: z.enum(['login', 'signup']).optional().catch('login'),
@@ -36,6 +37,8 @@ export function AuthRoute() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -399,6 +402,14 @@ export function AuthRoute() {
                     )}
                   </HudButton>
                 </div>
+
+                <TurnstileWidget
+                  ref={turnstileRef}
+                  action={mode === 'signup' ? 'signup' : 'login'}
+                  size="flexible"
+                  onVerify={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken(null)}
+                />
               </form>
             </HudCard>
 

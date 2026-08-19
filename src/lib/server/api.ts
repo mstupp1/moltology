@@ -18,6 +18,7 @@ import type { PodcastEpisode } from '../podcast-data'
 
 import { getPresignedViewUrl } from '../s3-client'
 import { ORACLE_MODELS, getOracleModel } from '../ai/oracle-models'
+import { verifyTurnstileToken } from './turnstile'
 
 type Db = ReturnType<typeof getDb>
 
@@ -881,6 +882,7 @@ export interface CreateBlogCommentInput {
   postId: string
   content: string
   userId?: string
+  turnstileToken?: string
 }
 
 /**
@@ -938,6 +940,17 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
 
   if (!data?.postId || !data?.content) {
     throw new Error('Invalid input: Post ID and comment content are required.')
+  }
+
+  // Canonical Turnstile bot verification check
+  if (data?.turnstileToken) {
+    const verification = await verifyTurnstileToken({
+      token: data.turnstileToken,
+      expectedAction: 'blog_comment',
+    })
+    if (!verification.success) {
+      throw new Error(verification.errorMessage || 'Bot verification check failed.')
+    }
   }
 
   // Guardrail 1: Clean & sanitize input
@@ -1002,6 +1015,7 @@ export const createBlogCommentFn = createServerFn({ method: 'POST' })
         postId: z.string().min(1),
         content: z.string().min(3).max(1000),
         userId: z.string().optional(),
+        turnstileToken: z.string().optional(),
       })
       .parse(data)
   })
@@ -1672,6 +1686,7 @@ const submitLeadSchema = z.object({
   email: z.string().email('Valid email telemetry is required for decryption transmission.'),
   source: z.string().optional().default('moltmax_guide'),
   referrer: z.string().optional(),
+  turnstileToken: z.string().optional(),
 })
 
 export type SubmitLeadInput = z.infer<typeof submitLeadSchema>
@@ -1682,6 +1697,17 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
   const normalizedEmail = validated.email.trim().toLowerCase()
   const source = validated.source || 'moltmax_guide'
   const referrer = validated.referrer || null
+
+  // Canonical Turnstile bot verification check
+  if (validated.turnstileToken) {
+    const verification = await verifyTurnstileToken({
+      token: validated.turnstileToken,
+      expectedAction: 'lead_capture',
+    })
+    if (!verification.success) {
+      throw new Error(verification.errorMessage || 'Turnstile bot protection check failed.')
+    }
+  }
 
   const downloadUrl = '/downloads/the-2026-moltmaxxing-protocol-guide.html'
 
