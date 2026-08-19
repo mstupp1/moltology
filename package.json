@@ -27,7 +27,10 @@
     "db:reset": "tsx src/db/reset.ts && npm run db:setup",
     "codex:sync": "tsx scripts/sync-codex.ts",
     "codex:check": "tsx scripts/sync-codex.ts --check",
-    "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts"
+    "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts",
+    "comfy:setup": "bash scripts/setup-comfy.sh",
+    "comfy:start": "bash scripts/start-comfy.sh",
+    "post:create": "tsx scripts/create-instagram-post.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",
