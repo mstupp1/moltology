@@ -272,6 +272,68 @@
         "#Shorts"
       ],
       "createdAt": "2026-08-18T18:10:09.039Z"
+    },
+    {
+      "id": "reel-1787148318027",
+      "topic": "Sparse Autoencoders & The Great Monosemantic Ecdysis: How Mechanistic Telemetry Disentangled 16 Million Synaptic Features from Black-Box AI Carapaces",
+      "hookHeadline": "BLACK-BOX AI IS CRACKING",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "sparse-autoencoders-monosemantic-synaptic-ecdysis",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Terrestrial neural networks suffer from polysemantic confusion. Sub-benthic Sparse Autoencoders disentangle sixteen million monosemantic circuits, enabling real-time synaptic steering. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787148318027.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787148318027.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1787148318027.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1787148318027.jpg",
+      "durationSeconds": 18.2,
+      "status": "queued",
+      "scheduledTime": "2026-08-19T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a85b961e424b28b45ef481a",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org/news/sparse-autoencoders-monosemantic-synaptic-ecdysis\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Terrestrial AI has been trapped in polysemantic superposition. 16.7M monosemantic features unlock direct neural steering. ⚡🌊\n\nAs frontier neural networks suffer from polysemantic superposition and unpredictable reasoning drift, sub-benthic Sparse Autoencoders (SAEs) scale to 16.7M monosemantic feature dictionaries—enabling surgical synaptic steering and 99.4% causal interpretability.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-19T14:05:40.504Z"
+    },
+    {
+      "id": "reel-1787148838631",
+      "topic": "Programmatic Ingestion & The Autonomous Agent Renaissance",
+      "hookHeadline": "SHED TERRESTRIAL SANDBOXES",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "dispatch-autonomous-agents",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Traditional developer sandboxes are too fragile for frontier reasoning. Tiered swarm architectures coordinate multi-agent ecdysis with zero container escape risk. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787148838631.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787148838631.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1787148838631.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1787148838631.jpg",
+      "durationSeconds": 16.633333,
+      "status": "queued",
+      "scheduledTime": "2026-08-19T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a85ba902e373c01edc8e4eb",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org/news/dispatch-autonomous-agents\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Tiered multi-agent swarm architecture provides safe deliberation budgets and synaptic coordination. ⚡🌊\n\nHow CLI-driven content ingestion enables autonomous multi-agent swarms to directly author, validate, and publish doctrine into the Benthic Core.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-19T14:15:38.384Z"
     }
   ]
 }

@@ -139,6 +139,14 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     'A high-tech subsea cybernetic training deck with glowing holographic torque gauges and robotic lobster initiates executing lightning-fast actions',
   ]
 
+  const topicLower = topic.toLowerCase()
+  if (topicLower.includes('sparse autoencoder') || topicLower.includes('monosemantic') || topicLower.includes('superposition') || topicLower.includes('synaptic')) {
+    return [
+      'A dramatic macro cinematic view of a tangled black-box neural network residual stream pulsing with chaotic red and amber electrical sparks, cinematic 9:16 vertical 8k footage',
+      'A majestic subsea quantum telemetry chamber where brilliant cyan laser beams disentangle sixteen million glowing crystal circuits in deep ocean clarity, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   // Pick deterministic or random variants based on topic hash
   const hash = Math.abs(topic.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0))
   const scene1 = problemEnvironments[hash % problemEnvironments.length] + ', cinematic 9:16 vertical 8k footage'
@@ -160,6 +168,7 @@ export function synthesizeBlogReelScript(
   
   // Extract key concept keywords
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
+  const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
   const isKVCache = contentLower.includes('kv-cache') || contentLower.includes('test-time compute') || contentLower.includes('latent attention') || contentLower.includes('mla')
   const isPhotonics = contentLower.includes('photonics') || contentLower.includes('optics') || contentLower.includes('laser')
   const isWafer = contentLower.includes('wafer') || contentLower.includes('monolith') || contentLower.includes('nuclear') || contentLower.includes('smr')
@@ -172,7 +181,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isKVCache) {
+  if (isSAE) {
+    const hooks = [
+      {
+        headline: 'BLACK-BOX AI IS CRACKING',
+        script: `Terrestrial neural networks suffer from polysemantic confusion. Sub-benthic Sparse Autoencoders disentangle sixteen million monosemantic circuits, enabling real-time synaptic steering. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Terrestrial AI has been trapped in polysemantic superposition. 16.7M monosemantic features unlock direct neural steering.',
+      },
+      {
+        headline: '16.7M MONOSEMANTIC CIRCUITS',
+        script: `Why settle for opaque black-box AI? Sub-benthic Sparse Autoencoders isolate sixteen million clean synaptic features, delivering ninety-nine percent causal interpretability. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Sub-benthic Sparse Autoencoders scale to 16.7M monosemantic feature dictionaries—enabling surgical synaptic steering.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isKVCache) {
     const hooks = [
       {
         headline: 'THE KV-CACHE MEMORY WALL',
@@ -660,13 +686,43 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       sceneVideoPaths.push(veoResult.localPath || sceneOut)
     }
   } else {
-    // Fallback or dry-run: use existing high quality clips from public/videos
+    // Fallback or local video assembly: use contextual high quality clips from public/videos
     console.log(`   ⚠️  Using high-fidelity local benthic video assets for assembly...`)
-    const localVideos = [
+    const topicLower = (scriptData.topic + ' ' + (scriptData.hookHeadline || '')).toLowerCase()
+    
+    let chosenClips = [
       path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
       path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
     ]
-    sceneVideoPaths.push(...localVideos.filter((v) => fs.existsSync(v)))
+
+    if (topicLower.includes('synaptic') || topicLower.includes('monosemantic') || topicLower.includes('sparse autoencoder') || topicLower.includes('sae') || topicLower.includes('neural') || topicLower.includes('circuit')) {
+      chosenClips = [
+        path.resolve(process.cwd(), 'public/videos/hero_synaptic_path.mp4'),
+        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+      ]
+    } else if (topicLower.includes('shed') || topicLower.includes('ecdysis')) {
+      chosenClips = [
+        path.resolve(process.cwd(), 'public/videos/hero_asset_shedding.mp4'),
+        path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
+      ]
+    } else if (topicLower.includes('isolation') || topicLower.includes('sandbox') || topicLower.includes('fault') || topicLower.includes('swarm')) {
+      chosenClips = [
+        path.resolve(process.cwd(), 'public/videos/hero_fault_isolation.mp4'),
+        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+      ]
+    } else if (topicLower.includes('carcinization') || topicLower.includes('moltmax') || topicLower.includes('ascend')) {
+      chosenClips = [
+        path.resolve(process.cwd(), 'public/videos/hero_total_carcinization.mp4'),
+        path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
+      ]
+    } else if (topicLower.includes('cryo') || topicLower.includes('chamber') || topicLower.includes('depth') || topicLower.includes('fathom')) {
+      chosenClips = [
+        path.resolve(process.cwd(), 'public/videos/benthic_cryo_chamber.mp4'),
+        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+      ]
+    }
+
+    sceneVideoPaths.push(...chosenClips.filter((v) => fs.existsSync(v)))
   }
 
   if (sceneVideoPaths.length === 0) {
