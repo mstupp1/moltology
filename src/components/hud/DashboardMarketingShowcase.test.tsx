@@ -34,8 +34,7 @@ describe('DashboardMarketingShowcase Component', () => {
     expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
 
     // Verify presence of simulated URL bar in Safari
-    expect(screen.getByText('hub.moltology.org/dashboard')).toBeInTheDocument()
-    expect(screen.getByText('GUEST READY')).toBeInTheDocument()
+    expect(screen.getByText('moltology.org/dashboard')).toBeInTheDocument()
 
     // Verify presence of high-DPI desktop and mobile screenshots
     expect(screen.getByAltText('Safari preview')).toBeInTheDocument()

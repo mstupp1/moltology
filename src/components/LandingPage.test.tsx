@@ -71,7 +71,7 @@ describe('LandingPage Component', () => {
 
     expect(screen.getByLabelText('Interactive System Showcase')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Desktop/i })).toBeInTheDocument()
-    expect(screen.getByText('hub.moltology.org/dashboard')).toBeInTheDocument()
+    expect(screen.getByText('moltology.org/dashboard')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
   })
 
