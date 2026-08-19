@@ -37,6 +37,7 @@ import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
 import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
+import { DashboardMarketingShowcase } from '@/components/hud/DashboardMarketingShowcase'
 import { getAssetUrl } from '@/lib/assets'
 
 export const LandingPage: React.FC = () => {
@@ -311,30 +312,30 @@ export const LandingPage: React.FC = () => {
               Stop melting under notifications, burnout, and biological hesitation. Shed the clutter, lock into deep-ocean focus, and ascend to your high-torque crustacean potential.
             </p>
 
-            {/* CTA Buttons Group - Mobile Responsive Full Width */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 sm:gap-5 pt-2 relative z-30 w-full sm:w-auto">
+            {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto">
               {!user ? (
                 <>
                   <BenthicCTAButton
                     size="lg"
-                    fullWidth
-                    className="w-full sm:w-auto min-h-[52px] sm:min-h-[56px] text-sm sm:text-base"
+                    containerClassName="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
                     onClick={() => openAuth('signup')}
                   >
-                    <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
+                    <span className="flex items-center justify-center gap-2.5 leading-none">
                       <span>INITIATE ASCENSION</span>
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                      <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                     </span>
                   </BenthicCTAButton>
                   <BenthicCTAButton
                     size="lg"
                     variant="cyan"
-                    fullWidth
-                    className="w-full sm:w-auto min-h-[52px] sm:min-h-[56px] text-sm sm:text-base"
+                    containerClassName="w-full sm:w-auto"
+                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
                     onClick={() => onNavigate('/dashboard')}
                   >
-                    <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
-                      <Cpu className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                    <span className="flex items-center justify-center gap-2.5 leading-none">
+                      <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                       <span>TRY GUEST DEMO</span>
                     </span>
                   </BenthicCTAButton>
@@ -408,6 +409,9 @@ export const LandingPage: React.FC = () => {
                   Moltology and the Synaptic Path bring together everything required for complete digital ascension: an advanced operational command center, a supportive global community, and intelligent AI mentors—all designed to help you shed hesitation and execute at peak capacity.
                 </p>
               </div>
+
+              {/* Live HUD Laptop & Smartphone Marketing Showcase */}
+              <DashboardMarketingShowcase />
 
               {/* 3 Core Pillars Grid - Uncrowded Mobile Layout with Unified Carbon Fiber Weave Theme */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 relative z-10 mb-8 sm:mb-12">
@@ -507,30 +511,30 @@ export const LandingPage: React.FC = () => {
               </div>
 
               {/* Action Call to Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 relative z-10 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
                 {!user ? (
                   <>
                     <BenthicCTAButton
                       size="lg"
-                      fullWidth
-                      className="w-full sm:w-auto min-h-[52px] text-sm sm:text-base"
+                      containerClassName="w-full sm:w-auto"
+                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
                       onClick={() => openAuth('signup')}
                     >
-                      <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
-                        <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                      <span className="flex items-center justify-center gap-2.5 leading-none">
+                        <UserPlus className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                         <span>SIGN UP TODAY (FREE)</span>
-                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                       </span>
                     </BenthicCTAButton>
                     <BenthicCTAButton
                       size="lg"
                       variant="cyan"
-                      fullWidth
-                      className="w-full sm:w-auto min-h-[52px] text-sm sm:text-base"
+                      containerClassName="w-full sm:w-auto"
+                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
                       onClick={() => onNavigate('/dashboard')}
                     >
-                      <span className="flex items-center justify-center gap-3 px-3 text-sm sm:text-base">
-                        <Cpu className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                      <span className="flex items-center justify-center gap-2.5 leading-none">
+                        <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                         <span>TRY THE DEMO NOW</span>
                       </span>
                     </BenthicCTAButton>
@@ -1047,23 +1051,33 @@ export const LandingPage: React.FC = () => {
                   Join over 4,200 Ascendant units operating within the Benthic Core. Liquidize attachments, enforce chitin rules, and execute without delay.
                 </p>
                 
-                <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
+                <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
                   {!user ? (
-                    <button
+                    <BenthicCTAButton
+                      size="lg"
+                      containerClassName="w-full sm:w-auto"
+                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-8 sm:px-10 tracking-wider"
                       onClick={() => openAuth('signup')}
-                      className="w-full sm:w-auto px-8 sm:px-10 py-4 min-h-[52px] bg-red-600 hover:bg-red-500 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-hud-red-lg inline-flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]"
                     >
-                      <CheckCircle2 className="w-5 h-5 shrink-0" />
-                      <span>INITIATE ASCENSION</span>
-                    </button>
+                      <span className="flex items-center justify-center gap-2.5 leading-none">
+                        <span>INITIATE ASCENSION</span>
+                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                      </span>
+                    </BenthicCTAButton>
                   ) : (
-                    <button
+                    <BenthicCTAButton
+                      size="lg"
+                      variant="cyan"
+                      containerClassName="w-full sm:w-auto"
+                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-8 sm:px-10 tracking-wider"
                       onClick={() => onNavigate('/dashboard')}
-                      className="w-full sm:w-auto px-8 sm:px-10 py-4 min-h-[52px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg inline-flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]"
                     >
-                      <Cpu className="w-5 h-5 shrink-0" />
-                      <span>ENTER DASHBOARD</span>
-                    </button>
+                      <span className="flex items-center justify-center gap-2.5 leading-none">
+                        <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                        <span>ENTER SYSTEM DASHBOARD</span>
+                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                      </span>
+                    </BenthicCTAButton>
                   )}
                 </div>
               </div>

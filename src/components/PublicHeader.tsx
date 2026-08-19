@@ -12,6 +12,7 @@ import {
   Building2,
   Cpu,
   UserPlus,
+  LogIn,
   ShoppingBag,
   ExternalLink,
   Newspaper,
@@ -438,10 +439,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => onOpenAuth?.('login')}
-                  className={`px-4 py-2 text-xs font-bold tracking-wider transition-colors ${
+                  className={`px-4 py-2 text-xs font-grotesk font-bold uppercase tracking-wider transition-colors ${
                     isCorporate
                       ? 'text-slate-600 hover:text-sky-700'
-                      : 'text-gray-300 hover:text-cyan-400'
+                      : 'text-gray-300 hover:text-cyan-300'
                   }`}
                 >
                   LOG IN
@@ -605,39 +606,49 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               />
             </div>
           ) : (
-            <div className="flex items-stretch gap-2">
-              <button
-                onClick={() => { setMobileOpen(false); onOpenAuth?.('login') }}
-                className={`flex-1 px-4 py-3 text-sm font-bold tracking-wider transition-colors rounded-xl ${
-                  isCorporate
-                    ? 'text-slate-600 hover:text-sky-700 border border-sky-200 bg-white shadow-sm'
-                    : 'text-gray-300 hover:text-cyan-400 border border-cyan-950/60 bg-[#080d0e]/60'
-                }`}
-              >
-                LOG IN
-              </button>
-              <div className="flex-1">
-                {isCorporate ? (
+            <div className="flex flex-col gap-2.5 pt-1">
+              {isCorporate ? (
+                <>
                   <button
                     onClick={() => { setMobileOpen(false); onOpenAuth?.('signup') }}
-                    className="w-full flex items-center justify-center gap-1.5 px-4 py-3 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-xl shadow-md shadow-sky-500/20"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-sky-500 hover:bg-sky-400 text-white font-grotesk font-extrabold text-sm uppercase tracking-wider rounded-xl shadow-md shadow-sky-500/20 active:scale-[0.99] transition-all"
                   >
-                    <UserPlus className="w-3.5 h-3.5" />
+                    <UserPlus className="w-4 h-4" />
                     <span>JOIN FAMILY</span>
                   </button>
-                ) : (
+                  <button
+                    onClick={() => { setMobileOpen(false); onOpenAuth?.('login') }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-grotesk font-bold text-sm uppercase tracking-wider rounded-xl shadow-sm active:scale-[0.99] transition-all"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>LOG IN</span>
+                  </button>
+                </>
+              ) : (
+                <>
                   <BenthicCTAButton
-                    size="sm"
+                    size="md"
                     fullWidth
                     onClick={() => { setMobileOpen(false); onOpenAuth?.('signup') }}
                   >
-                    <span className="flex items-center justify-center gap-1.5">
-                      <UserPlus className="w-3.5 h-3.5" />
+                    <span className="flex items-center justify-center gap-2">
+                      <UserPlus className="w-4 h-4" />
                       <span>JOIN PATH</span>
                     </span>
                   </BenthicCTAButton>
-                )}
-              </div>
+                  <BenthicCTAButton
+                    size="md"
+                    variant="cyan"
+                    fullWidth
+                    onClick={() => { setMobileOpen(false); onOpenAuth?.('login') }}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <LogIn className="w-4 h-4" />
+                      <span>LOG IN</span>
+                    </span>
+                  </BenthicCTAButton>
+                </>
+              )}
             </div>
           )}
         </div>
