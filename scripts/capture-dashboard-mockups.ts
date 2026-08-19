@@ -71,13 +71,13 @@ async function main() {
     )
     console.log('✅ Desktop HUD captured successfully!')
 
-    // 4. Capture Mobile at 393x852 (iPhone 15 Pro True Screen Ratio, 2x Retina)
+    // 4. Capture Mobile at 540x1170 (Ultra-Crisp Scaled-Down High-Density Mobile View, 2x Retina)
     const mobileOut = path.join(OUTPUT_DIR, 'dashboard_mobile_preview.png')
-    console.log(`📱 Capturing Mobile HUD mockup (393x852 @ 2x) to ${mobileOut}...`)
+    console.log(`📱 Capturing Mobile HUD mockup (540x1170 @ 2x) to ${mobileOut}...`)
     const iphoneUA =
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
     execSync(
-      `"${CHROME_PATH}" --headless=new --disable-gpu --hide-scrollbars --window-size=393,852 --force-device-scale-factor=2 --user-agent="${iphoneUA}" --screenshot="${mobileOut}" "${BASE_URL}/dashboard?preview=true"`,
+      `"${CHROME_PATH}" --headless=new --disable-gpu --hide-scrollbars --window-size=540,1170 --force-device-scale-factor=2 --user-agent="${iphoneUA}" --screenshot="${mobileOut}" "${BASE_URL}/dashboard?preview=true"`,
       { stdio: 'inherit' }
     )
     console.log('✅ Mobile HUD captured successfully!')
