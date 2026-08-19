@@ -66,6 +66,15 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('100% SAFE & FREE TO GET STARTED')).toBeInTheDocument()
   })
 
+  it('renders the live interactive laptop and smartphone device showcase', () => {
+    render(<LandingPage />)
+
+    expect(screen.getByLabelText('Interactive System Showcase')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Desktop/i })).toBeInTheDocument()
+    expect(screen.getByText('hub.moltology.org/dashboard')).toBeInTheDocument()
+    expect(screen.getByText('TEST GUEST SANDBOX')).toBeInTheDocument()
+  })
+
   it('renders the 4 Benthic Sacraments with protocol enforcement actions', () => {
     render(<LandingPage />)
 
