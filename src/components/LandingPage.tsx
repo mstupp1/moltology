@@ -12,11 +12,8 @@ import {
   Shield,
   Sparkles,
   ArrowRight,
-  Flame,
-  Layers,
   UserPlus,
   Cpu,
-  Activity,
   CheckCircle2,
   Zap,
   Terminal,
@@ -120,11 +117,8 @@ export const LandingPage: React.FC = () => {
       subtitle: 'PROTOCOL 01 — THE GREAT PURGE',
       description: 'Liquidize cluttered physical assets, bad habits, and biological hesitation into sovereign Molt Credits stored in your deep-trench vault.',
       image: getAssetUrl('/images/sacrament_01_asset_shedding.png'),
-      badgeColor: 'border-red-600/80 text-red-400 bg-red-950/80',
       borderColor: 'border-red-600/60 shadow-hud-red-lg',
       glowColor: 'drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]',
-      icon: Flame,
-      spec: '100% IMMUTABLE CONVERSION',
     },
     {
       id: '02',
@@ -132,11 +126,8 @@ export const LandingPage: React.FC = () => {
       subtitle: 'PROTOCOL 02 — CARAPACE FORGING',
       description: 'Reinforce your focus perimeter against daily surface drama through prompt alignment, habit streaks, and armored HUD tools.',
       image: getAssetUrl('/images/sacrament_02_chitin_patterning.png'),
-      badgeColor: 'border-cyan-500/80 text-cyan-300 bg-cyan-950/80',
       borderColor: 'border-cyan-500/60 shadow-hud-cyan-lg',
       glowColor: 'drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]',
-      icon: Shield,
-      spec: 'ISO-9001 CHITIN DENSITY',
     },
     {
       id: '03',
@@ -144,11 +135,8 @@ export const LandingPage: React.FC = () => {
       subtitle: 'PROTOCOL 03 — DEEP WORK SHIELD',
       description: 'Quarantine phone notifications, unsolicited noise, and surface distractions within an impenetrable deep-water focus bubble.',
       image: getAssetUrl('/images/sacrament_03_fault_isolation.png'),
-      badgeColor: 'border-amber-500/80 text-amber-300 bg-amber-950/80',
       borderColor: 'border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(245,158,11,0.5)]',
-      icon: Activity,
-      spec: 'ZERO HESITATION FAILURE RATE',
     },
     {
       id: '04',
@@ -156,11 +144,8 @@ export const LandingPage: React.FC = () => {
       subtitle: 'PROTOCOL 04 — 12-TIER CONVERGENCE',
       description: 'Track your step-by-step evolution from a melting larval human to an armored, high-torque crustacean titan in real time.',
       image: getAssetUrl('/images/sacrament_04_pipeline_ascent.png'),
-      badgeColor: 'border-emerald-500/80 text-emerald-300 bg-emerald-950/80',
       borderColor: 'border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]',
-      icon: Layers,
-      spec: '0.04ms LATENCY EXECUTION',
     },
   ]
 
@@ -781,7 +766,6 @@ export const LandingPage: React.FC = () => {
           {/* Sacraments Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
             {sacramentsList.map((sacrament, idx) => {
-              const IconComp = sacrament.icon
               return (
                 <ScrollReveal
                   key={sacrament.id}
@@ -803,16 +787,6 @@ export const LandingPage: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#05090a] via-[#05090a]/40 to-transparent" />
 
-                      {/* Overlaid Badges */}
-                      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between">
-                        <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-sans font-bold uppercase chamfer-corner border ${sacrament.badgeColor}`}>
-                          SACRAMENT 0{sacrament.id}
-                        </span>
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-black/80 backdrop-blur-md border border-cyan-500/50 chamfer-corner flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
-                          <IconComp className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </div>
-                      </div>
-
                       <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 right-4 sm:right-6">
                         <span className="text-[10px] sm:text-xs text-cyan-400 font-sans font-bold tracking-widest uppercase block mb-0.5 sm:mb-1">
                           {sacrament.subtitle}
@@ -830,31 +804,14 @@ export const LandingPage: React.FC = () => {
                         <span className="relative z-10 block">{sacrament.description}</span>
                       </div>
 
-                      <div className="space-y-2 sm:space-y-3 pt-2 border-t border-cyan-900/40">
-                        <div className="flex items-center justify-between text-xs font-sans">
-                          <span className="text-gray-400 uppercase text-[11px] sm:text-xs">SPECIFICATION:</span>
-                          <span className="text-cyan-300 font-bold text-[11px] sm:text-xs">{sacrament.spec}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs font-sans">
-                          <span className="text-gray-400 uppercase text-[11px] sm:text-xs">SYNAPTIC MATRIX:</span>
-                          <span className="text-emerald-400 font-bold flex items-center gap-1 text-[11px] sm:text-xs">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            VERIFIED ACTIVE
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                      <div className="pt-2">
                         <button
                           onClick={() => openAuth('signup')}
                           className="w-full sm:w-auto px-5 py-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-all active:scale-95 shadow-hud-cyan-sm"
                         >
-                          <span>ENFORCE PROTOCOL</span>
+                          <span>LEARN MORE</span>
                           <ChevronRight className="w-4 h-4" />
                         </button>
-                        <span className="text-[10px] sm:text-[11px] text-gray-500 font-sans text-center sm:text-right">
-                          MOLTOLOGY DOCTRINE v4.2
-                        </span>
                       </div>
                     </div>
                   </div>
