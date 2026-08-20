@@ -38,6 +38,8 @@ import { Route as HudSubterraneanRouteImport } from './routes/_hud/subterranean'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
+import { Route as ChangelogSlugRouteImport } from './routes/changelog/$slug'
 import { Route as CodexMdRouteImport } from './routes/codex.md'
 import { Route as FeedXmlRouteImport } from './routes/feed.xml'
 import { Route as JournalMdRouteImport } from './routes/journal.md'
@@ -197,6 +199,16 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChangelogIndexRoute = ChangelogIndexRouteImport.update({
+  id: '/changelog/',
+  path: '/changelog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogSlugRoute = ChangelogSlugRouteImport.update({
+  id: '/changelog/$slug',
+  path: '/changelog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CodexMdRoute = CodexMdRouteImport.update({
   id: '/codex/md',
   path: '/codex/md',
@@ -296,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
   '/feed/xml': typeof FeedXmlRoute
   '/journal/md': typeof JournalMdRoute
@@ -307,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
+  '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/news/$slug/md': typeof NewsSlugMdRoute
@@ -340,6 +354,7 @@ export interface FileRoutesByTo {
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
   '/feed/xml': typeof FeedXmlRoute
   '/journal/md': typeof JournalMdRoute
@@ -351,6 +366,7 @@ export interface FileRoutesByTo {
   '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
   '/blog': typeof BlogIndexRoute
+  '/changelog': typeof ChangelogIndexRoute
   '/news': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/news/$slug/md': typeof NewsSlugMdRoute
@@ -386,6 +402,7 @@ export interface FileRoutesById {
   '/_hud/subterranean': typeof HudSubterraneanRoute
   '/_hud/support': typeof HudSupportRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
   '/feed/xml': typeof FeedXmlRoute
   '/journal/md': typeof JournalMdRoute
@@ -397,6 +414,7 @@ export interface FileRoutesById {
   '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
+  '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
   '/news/$slug/md': typeof NewsSlugMdRoute
@@ -432,6 +450,7 @@ export interface FileRouteTypes {
     | '/subterranean'
     | '/support'
     | '/blog/$slug'
+    | '/changelog/$slug'
     | '/codex/md'
     | '/feed/xml'
     | '/journal/md'
@@ -443,6 +462,7 @@ export interface FileRouteTypes {
     | '/sitemap/xml'
     | '/terms/md'
     | '/blog/'
+    | '/changelog/'
     | '/news/'
     | '/journal/$slug'
     | '/news/$slug/md'
@@ -476,6 +496,7 @@ export interface FileRouteTypes {
     | '/subterranean'
     | '/support'
     | '/blog/$slug'
+    | '/changelog/$slug'
     | '/codex/md'
     | '/feed/xml'
     | '/journal/md'
@@ -487,6 +508,7 @@ export interface FileRouteTypes {
     | '/sitemap/xml'
     | '/terms/md'
     | '/blog'
+    | '/changelog'
     | '/news'
     | '/journal/$slug'
     | '/news/$slug/md'
@@ -521,6 +543,7 @@ export interface FileRouteTypes {
     | '/_hud/subterranean'
     | '/_hud/support'
     | '/blog/$slug'
+    | '/changelog/$slug'
     | '/codex/md'
     | '/feed/xml'
     | '/journal/md'
@@ -532,6 +555,7 @@ export interface FileRouteTypes {
     | '/sitemap/xml'
     | '/terms/md'
     | '/blog/'
+    | '/changelog/'
     | '/news/'
     | '/_hud/journal/$slug'
     | '/news/$slug/md'
@@ -554,6 +578,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRouteWithChildren
   BlogSlugRoute: typeof BlogSlugRoute
+  ChangelogSlugRoute: typeof ChangelogSlugRoute
   CodexMdRoute: typeof CodexMdRoute
   FeedXmlRoute: typeof FeedXmlRoute
   JournalMdRoute: typeof JournalMdRoute
@@ -562,6 +587,7 @@ export interface RootRouteChildren {
   RssXmlRoute: typeof RssXmlRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ChangelogIndexRoute: typeof ChangelogIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
 }
 
@@ -770,6 +796,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/changelog/': {
+      id: '/changelog/'
+      path: '/changelog'
+      fullPath: '/changelog/'
+      preLoaderRoute: typeof ChangelogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog/$slug': {
+      id: '/changelog/$slug'
+      path: '/changelog/$slug'
+      fullPath: '/changelog/$slug'
+      preLoaderRoute: typeof ChangelogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/codex/md': {
       id: '/codex/md'
       path: '/codex/md'
@@ -968,6 +1008,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   TermsRoute: TermsRouteWithChildren,
   BlogSlugRoute: BlogSlugRoute,
+  ChangelogSlugRoute: ChangelogSlugRoute,
   CodexMdRoute: CodexMdRoute,
   FeedXmlRoute: FeedXmlRoute,
   JournalMdRoute: JournalMdRoute,
@@ -976,6 +1017,7 @@ const rootRouteChildren: RootRouteChildren = {
   RssXmlRoute: RssXmlRoute,
   SitemapXmlRoute: SitemapXmlRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ChangelogIndexRoute: ChangelogIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
 }
 export const routeTree = rootRouteImport

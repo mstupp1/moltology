@@ -46,7 +46,8 @@ export interface BlogPostPayload {
 }
 
 export interface ChangelogPayload {
-  version: string
+  slug: string
+  version?: string
   title: string
   category: string
   summary: string

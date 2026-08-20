@@ -1,5 +1,5 @@
 import { type ChangelogEntry } from '@/lib/changelogs-data'
-import { getPublicChangelogsFn, createChangelogFn, updateChangelogFn, deleteChangelogFn } from '@/lib/server/api'
+import { getPublicChangelogsFn, getChangelogBySlugFn, createChangelogFn, updateChangelogFn, deleteChangelogFn } from '@/lib/server/api'
 
 export type { ChangelogEntry }
 
@@ -13,8 +13,19 @@ export async function getPublicChangelogs(): Promise<ChangelogEntry[]> {
   }
 }
 
+export async function getChangelogBySlug(slug: string): Promise<ChangelogEntry | null> {
+  try {
+    const res = await getChangelogBySlugFn({ data: slug })
+    return (res as ChangelogEntry) || null
+  } catch (err) {
+    console.error(`[getChangelogBySlug] Error fetching changelog for slug "${slug}":`, err)
+    return null
+  }
+}
+
 export async function createChangelog(data: {
-  version: string
+  slug?: string
+  version?: string
   title: string
   category: string
   summary: string
@@ -28,7 +39,8 @@ export async function createChangelog(data: {
 
 export async function updateChangelog(data: {
   id: string
-  version: string
+  slug?: string
+  version?: string
   title: string
   category: string
   summary: string

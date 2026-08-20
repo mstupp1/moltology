@@ -245,17 +245,18 @@ export async function seedDatabase(databaseUrl?: string) {
     }
     console.log(`✓ Seeded ${MOCK_SEED_ROUTINES.length} routine entries`)
 
-    // 5. Seed Changelogs (Unique version seed)
+    // 5. Seed Changelogs (Unique slug seed)
     console.log('[SEED] Seeding system changelogs...')
     for (const item of INITIAL_CHANGELOGS) {
       const existing = await db
         .select()
         .from(schema.changelogs)
-        .where(eq(schema.changelogs.version, item.version))
+        .where(eq(schema.changelogs.slug, item.slug))
         .limit(1)
 
       if (existing.length === 0) {
         await db.insert(schema.changelogs).values({
+          slug: item.slug,
           version: item.version,
           title: item.title,
           category: item.category,

@@ -3,7 +3,7 @@ import { ServerError, formatServerError } from './error'
 import { extractAuthToken } from './middleware'
 import { getDb } from '../../db'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { getPublicChangelogsHandler, getS3AssetUrlHandler, createChangelogHandler } from './api'
+import { getPublicChangelogsHandler, getChangelogBySlugHandler, getS3AssetUrlHandler, createChangelogHandler } from './api'
 import type { ChangelogEntry } from '../changelogs-data'
 
 describe('Server Error & Formatting', () => {
@@ -100,6 +100,16 @@ describe('Server Functions', () => {
     expect(Array.isArray(changelogs)).toBe(true)
     expect(changelogs.length).toBeGreaterThan(0)
     expect(changelogs[0]).toHaveProperty('version')
+    expect(changelogs[0]).toHaveProperty('slug')
+  })
+
+  it('should execute getChangelogBySlugHandler and return single entry', async () => {
+    const changelogs: ChangelogEntry[] = await getPublicChangelogsHandler({ data: undefined, context: {} })
+    if (changelogs.length > 0 && changelogs[0].slug) {
+      const entry = await getChangelogBySlugHandler({ data: changelogs[0].slug, context: {} })
+      expect(entry).toBeDefined()
+      expect(entry?.slug).toBe(changelogs[0].slug)
+    }
   })
 
   it('should execute getS3AssetUrlHandler and return a valid presigned URL', async () => {

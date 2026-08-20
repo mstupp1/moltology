@@ -4,8 +4,9 @@ import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
 import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, podcasts, leads } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc, like, or, sql } from 'drizzle-orm'
+import { eq, desc, like, or, sql, and } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
+import { generateSlug } from '../ingest/parser'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
@@ -40,6 +41,7 @@ interface ServerFnArgs<TData = any> {
 
 const toChangelogEntry = (r: {
   id: string
+  slug: string
   version: string
   title: string
   category: string
@@ -50,6 +52,7 @@ const toChangelogEntry = (r: {
   createdAt: Date | null
 }): ChangelogEntry => ({
   id: r.id,
+  slug: r.slug,
   version: r.version,
   title: r.title,
   category: r.category,
@@ -85,8 +88,36 @@ export const getPublicChangelogsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(getPublicChangelogsHandler)
 
+/**
+ * Server Function: Get a single published changelog entry by its slug.
+ */
+export const getChangelogBySlugHandler = async ({ data, context }: ServerFnArgs<string>) => {
+  const dbClient = context?.db || getDb()
+  const slug = data
+  if (!slug) return null
+
+  try {
+    const [record] = await dbClient
+      .select()
+      .from(changelogs)
+      .where(and(eq(changelogs.slug, slug), eq(changelogs.isPublished, true)))
+      .limit(1)
+
+    return record ? toChangelogEntry(record) : null
+  } catch (error) {
+    console.error('[ServerFn getChangelogBySlugFn] DB query failed:', error)
+    return null
+  }
+}
+
+export const getChangelogBySlugFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: string) => z.string().min(1).parse(data))
+  .handler(getChangelogBySlugHandler)
+
 interface CreateChangelogInput {
-  version: string
+  slug?: string
+  version?: string
   title: string
   category: string
   summary: string
@@ -146,10 +177,13 @@ export const createChangelogHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error('Input payload missing for changelog creation.')
   }
 
+  const computedSlug = data.slug ? generateSlug(data.slug) : generateSlug(data.title)
+
   const [inserted] = await dbClient
     .insert(changelogs)
     .values({
-      version: data.version,
+      slug: computedSlug,
+      version: data.version || 'v1.0.0',
       title: data.title,
       category: data.category,
       summary: data.summary,
@@ -166,7 +200,8 @@ export const createChangelogFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: CreateChangelogInput) => {
     return z.object({
-      version: z.string().min(1),
+      slug: z.string().optional(),
+      version: z.string().optional(),
       title: z.string().min(1),
       category: z.string().min(1),
       summary: z.string().min(1),
@@ -208,10 +243,13 @@ export const updateChangelogHandler = async ({ data, context }: ServerFnArgs<Upd
     throw new Error('Input payload missing changelog id for update.')
   }
 
+  const computedSlug = data.slug ? generateSlug(data.slug) : generateSlug(data.title)
+
   const [updated] = await dbClient
     .update(changelogs)
     .set({
-      version: data.version,
+      slug: computedSlug,
+      version: data.version || 'v1.0.0',
       title: data.title,
       category: data.category,
       summary: data.summary,
@@ -230,7 +268,8 @@ export const updateChangelogFn = createServerFn({ method: 'POST' })
   .validator((data: UpdateChangelogInput) => {
     return z.object({
       id: z.string().min(1),
-      version: z.string().min(1),
+      slug: z.string().optional(),
+      version: z.string().optional(),
       title: z.string().min(1),
       category: z.string().min(1),
       summary: z.string().min(1),

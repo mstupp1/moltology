@@ -34,7 +34,7 @@ describe('Content Ingestion Handlers & Dispatcher', () => {
     const result = await ingestContentItem(raw, { dryRun: true })
     expect(result.success).toBe(true)
     expect(result.action).toBe('validated')
-    expect(result.identifier).toBe('v2.0.0')
+    expect(result.identifier).toBe('next-gen-release')
     expect(result.type).toBe('changelog')
   })
 
