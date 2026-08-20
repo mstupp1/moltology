@@ -214,7 +214,7 @@ export async function upsertChangelog(
     return {
       filePath: parsed.filePath,
       type: 'changelog',
-      identifier: payload.version,
+      identifier: payload.slug,
       title: payload.title,
       action: 'validated',
       success: true,
@@ -224,27 +224,16 @@ export async function upsertChangelog(
   const existing = await dbClient
     .select({ id: schema.changelogs.id })
     .from(schema.changelogs)
-    .where(eq(schema.changelogs.version, payload.version))
+    .where(eq(schema.changelogs.slug, payload.slug))
     .limit(1)
 
-  let action: 'inserted' | 'updated' = 'inserted'
+  const isUpdate = existing.length > 0
 
-  if (existing.length > 0) {
-    action = 'updated'
-    await dbClient
-      .update(schema.changelogs)
-      .set({
-        title: payload.title,
-        category: payload.category,
-        summary: payload.summary,
-        content: payload.content,
-        isPublished: payload.isPublished,
-        releasedAt: payload.releasedAt,
-      })
-      .where(eq(schema.changelogs.id, existing[0].id))
-  } else {
-    await dbClient.insert(schema.changelogs).values({
-      version: payload.version,
+  await dbClient
+    .insert(schema.changelogs)
+    .values({
+      slug: payload.slug,
+      version: payload.version || 'v1.0.0',
       title: payload.title,
       category: payload.category,
       summary: payload.summary,
@@ -252,14 +241,25 @@ export async function upsertChangelog(
       isPublished: payload.isPublished,
       releasedAt: payload.releasedAt,
     })
-  }
+    .onConflictDoUpdate({
+      target: schema.changelogs.slug,
+      set: {
+        version: payload.version || 'v1.0.0',
+        title: payload.title,
+        category: payload.category,
+        summary: payload.summary,
+        content: payload.content,
+        isPublished: payload.isPublished,
+        releasedAt: payload.releasedAt,
+      },
+    })
 
   return {
     filePath: parsed.filePath,
     type: 'changelog',
-    identifier: payload.version,
+    identifier: payload.slug,
     title: payload.title,
-    action,
+    action: isUpdate ? 'updated' : 'inserted',
     success: true,
   }
 }

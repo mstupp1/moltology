@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import {
   LifeBuoy,
@@ -27,6 +27,7 @@ import {
   Pencil,
   Trash2,
   Save,
+  ExternalLink,
 } from 'lucide-react'
 import { getPublicChangelogs, createChangelog, updateChangelog, deleteChangelog, type ChangelogEntry } from '@/lib/changelogs'
 import { getUserProfileFn } from '@/lib/server/api'
@@ -465,22 +466,36 @@ function SupportPortalRoute() {
 
                       {/* Card Footer Toggle Button */}
                       <div className="flex justify-between items-center pt-1">
-                        <button
-                          onClick={() => toggleExpand(key)}
-                          className="text-[11px] text-[#00ffff] hover:text-white font-bold flex items-center gap-1 transition-colors"
-                        >
-                          {isExpanded ? (
-                            <>
-                              <span>COLLAPSE RELEASE DETAILS</span>
-                              <ChevronUp className="w-3.5 h-3.5" />
-                            </>
-                          ) : (
-                            <>
-                              <span>VIEW FULL TRANSMUTATION LOG</span>
-                              <ChevronDown className="w-3.5 h-3.5" />
-                            </>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => toggleExpand(key)}
+                            className="text-[11px] text-[#00ffff] hover:text-white font-bold flex items-center gap-1 transition-colors"
+                          >
+                            {isExpanded ? (
+                              <>
+                                <span>COLLAPSE RELEASE DETAILS</span>
+                                <ChevronUp className="w-3.5 h-3.5" />
+                              </>
+                            ) : (
+                              <>
+                                <span>VIEW FULL TRANSMUTATION LOG</span>
+                                <ChevronDown className="w-3.5 h-3.5" />
+                              </>
+                            )}
+                          </button>
+
+                          {entry.slug && (
+                            <Link
+                              to="/changelog/$slug"
+                              params={{ slug: entry.slug }}
+                              className="text-[10px] text-[#839493] hover:text-[#00ffff] font-sans font-bold flex items-center gap-1 transition-colors border border-[#3a4a49] px-2 py-0.5 chamfer-corner bg-[#030606]"
+                              title="View public permalink page"
+                            >
+                              <span>PERMALINK</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </Link>
                           )}
-                        </button>
+                        </div>
 
                         {isAdmin && (
                           <div className="flex items-center gap-2">

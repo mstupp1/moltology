@@ -63,6 +63,8 @@ describe('Database Schema & RLS Policies', () => {
 
   it('defines required fields on changelogs table', () => {
     expect(changelogs.id).toBeDefined()
+    expect(changelogs.slug).toBeDefined()
+    expect(changelogs.slug.isUnique).toBe(true)
     expect(changelogs.version).toBeDefined()
     expect(changelogs.title).toBeDefined()
     expect(changelogs.isPublished).toBeDefined()

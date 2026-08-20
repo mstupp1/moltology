@@ -1,5 +1,6 @@
 export interface ChangelogEntry {
   id?: string
+  slug: string
   version: string
   title: string
   category: 'TRANSMUTATION' | 'CHASSIS_UPGRADE' | 'SECURITY_ISOLATION' | 'BUG_PURGE' | 'FEATURE' | 'SYSTEM_INIT' | string
@@ -12,6 +13,7 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: 'synaptic-oracle-ai-hub-v1-5-0',
     version: 'v1.5.0',
     title: 'Synaptic Oracle Multi-Mode AI Hub & Navigation Overhaul',
     category: 'FEATURE',
@@ -34,6 +36,7 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-08-03T09:15:00Z',
   },
   {
+    slug: 'moltology-1-0-official-system-launch',
     version: 'v1.0.0',
     title: 'Moltology 1.0 Official System Launch',
     category: 'FEATURE',
@@ -48,6 +51,7 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-08-02T11:00:00Z',
   },
   {
+    slug: 'benthic-support-portal-neural-diagnostics',
     version: 'v1.4.2',
     title: 'Benthic Support Portal & Neural Diagnostics Protocol',
     category: 'TRANSMUTATION',
@@ -62,6 +66,7 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-08-02T10:00:00Z',
   },
   {
+    slug: 'carapace-v4-2-hardening-submergence-depth',
     version: 'v1.4.0',
     title: 'Carapace v4.2 Hardening & Submergence Depth Expansion',
     category: 'CHASSIS_UPGRADE',
@@ -73,6 +78,7 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-07-28T14:30:00Z',
   },
   {
+    slug: 'neon-auth-jwt-row-level-security',
     version: 'v1.3.5',
     title: 'Neon Auth JWT Row Level Security Enforcement',
     category: 'SECURITY_ISOLATION',
@@ -84,6 +90,7 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-07-15T09:15:00Z',
   },
   {
+    slug: 'benthic-market-transmutation-asset-shedding',
     version: 'v1.2.0',
     title: 'Benthic Market Transmutation & Asset Shedding Engine',
     category: 'FEATURE',

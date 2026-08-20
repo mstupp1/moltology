@@ -1,0 +1,271 @@
+import React, { useState, useMemo } from 'react'
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import {
+  Search,
+  Filter,
+  Clock,
+  Terminal,
+  Activity,
+  ArrowRight,
+} from 'lucide-react'
+import { PublicHeader } from '@/components/PublicHeader'
+import { AuthModal } from '@/components/AuthModal'
+import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { getPublicChangelogsFn } from '@/lib/server/api'
+import { INITIAL_CHANGELOGS } from '@/lib/changelogs-data'
+import type { ChangelogEntry } from '@/lib/changelogs-data'
+import { seo } from '@/lib/seo'
+import { getAssetUrl } from '@/lib/assets'
+
+export const Route = createFileRoute('/changelog/')({
+  loader: async () => {
+    try {
+      const logs = await getPublicChangelogsFn()
+      if (logs && logs.length > 0) return logs as ChangelogEntry[]
+    } catch (e) {
+      console.warn('Loader error fetching changelogs:', e)
+    }
+    return INITIAL_CHANGELOGS
+  },
+  head: () => ({
+    meta: [
+      ...seo({
+        title: 'System Changelog · Transmutation Telemetry | Moltology',
+        description: 'Official system updates, chassis upgrades, security isolations, and bio-silicon transmutations powering Moltology.',
+        keywords: 'Moltology changelog, system updates, ecdysis telemetry, chassis upgrades, bio-silicon transmutations',
+        ogImage: getAssetUrl('/images/ai_learning_ascension_cover.jpg'),
+        canonical: 'https://moltology.org/changelog',
+        siteName: 'Moltology Changelog',
+        twitterCard: 'summary_large_image',
+        twitterSite: '@moltology',
+      }),
+    ],
+    links: [
+      { rel: 'canonical', href: 'https://moltology.org/changelog' },
+    ],
+  }),
+  component: ChangelogIndexPage,
+})
+
+function ChangelogIndexPage() {
+  const loaderLogs = Route.useLoaderData() as ChangelogEntry[]
+  const navigate = useNavigate()
+  const [logs] = useState<ChangelogEntry[]>(loaderLogs || INITIAL_CHANGELOGS)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
+
+  const categories = useMemo(() => {
+    const set = new Set<string>()
+    logs.forEach((log) => {
+      if (log.category) set.add(log.category)
+    })
+    return ['ALL', ...Array.from(set)]
+  }, [logs])
+
+  const filteredLogs = useMemo(() => {
+    return logs.filter((log) => {
+      const matchesCategory =
+        selectedCategory === 'ALL' || log.category === selectedCategory
+      const matchesSearch =
+        searchQuery === '' ||
+        log.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.version.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.slug.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchesCategory && matchesSearch
+    })
+  }, [logs, selectedCategory, searchQuery])
+
+  const openAuth = (mode: 'login' | 'signup') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
+  }
+
+  const getCategoryBadgeClass = (category: string) => {
+    switch (category) {
+      case 'TRANSMUTATION':
+        return 'text-cyan-300 border-cyan-500/50 bg-cyan-950/60'
+      case 'CHASSIS_UPGRADE':
+        return 'text-red-400 border-red-500/50 bg-red-950/60'
+      case 'SECURITY_ISOLATION':
+        return 'text-emerald-400 border-emerald-500/50 bg-emerald-950/60'
+      case 'BUG_PURGE':
+        return 'text-amber-400 border-amber-500/50 bg-amber-950/60'
+      default:
+        return 'text-cyan-400 border-cyan-600/40 bg-cyan-950/40'
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#05080a] text-gray-200 font-sans relative flex flex-col justify-between">
+      {/* Background Overlays */}
+      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-20" />
+      <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-25" />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        initialMode={authMode}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => navigate({ to: '/dashboard' })}
+      />
+
+      {/* Main Public HUD Header */}
+      <PublicHeader onOpenAuth={openAuth} />
+
+      {/* Hero Header Section */}
+      <header className="w-full relative pt-28 pb-8 sm:pt-36 sm:pb-12 px-4 sm:px-8 border-b border-cyan-900/40 bg-[#030608]/90 overflow-hidden">
+        <div className="max-w-5xl mx-auto space-y-4 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-950/80 border border-cyan-500/60 text-cyan-300 font-sans text-xs font-bold uppercase tracking-widest chamfer-corner">
+            <Activity className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>TRANSMUTATION TELEMETRY</span>
+          </div>
+
+          <h1 className="font-grotesk font-black text-3xl sm:text-5xl text-gray-100 uppercase tracking-tight leading-tight">
+            SYSTEM CHANGELOG
+          </h1>
+
+          <p className="font-sans text-sm sm:text-base text-gray-400 max-w-2xl leading-relaxed">
+            Continuous deployment telemetry, bio-silicon transmutations, and protocol upgrades powering The Order of the Synaptic Path.
+          </p>
+        </div>
+      </header>
+
+      {/* Controls Bar: Search & Category Filter */}
+      <div className="w-full bg-[#070c0e]/90 border-b border-cyan-900/40 py-3.5 px-4 sm:px-8 sticky top-[60px] z-30 backdrop-blur-md">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0 mr-1 hidden xs:inline" />
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1 text-[11px] font-bold font-grotesk uppercase tracking-wider chamfer-corner transition-all shrink-0 ${
+                  selectedCategory === cat
+                    ? 'bg-cyan-500 text-black shadow-hud-cyan font-black'
+                    : 'bg-[#090e10] text-gray-400 hover:text-white border border-cyan-950'
+                }`}
+              >
+                {cat === 'ALL' ? 'ALL UPDATES' : cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Search Input */}
+          <div className="relative w-full sm:w-72">
+            <Search className="w-3.5 h-3.5 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search transmutations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 bg-[#030607] border border-cyan-900/60 focus:border-cyan-400 text-gray-100 font-sans text-xs chamfer-corner outline-none placeholder-gray-500 transition-colors"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Timeline Feed */}
+      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-8 py-10 w-full relative z-10 space-y-6">
+        {filteredLogs.length === 0 ? (
+          <div className="text-center py-16 chitin-card border border-cyan-900/40 p-8 chamfer-corner">
+            <Terminal className="w-10 h-10 text-cyan-500 mx-auto mb-3 animate-pulse" />
+            <h3 className="font-grotesk text-lg font-bold text-gray-200 uppercase">
+              NO TRANSMUTATION LOGS FOUND
+            </h3>
+            <p className="text-xs text-gray-400 mt-1 font-sans">
+              Reset search query or select another category filter.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6 relative">
+            {/* Timeline Vertical Track */}
+            <div className="absolute left-3.5 sm:left-5 top-4 bottom-4 w-[2px] bg-gradient-to-b from-cyan-500/50 via-cyan-900/40 to-transparent pointer-events-none z-0" />
+
+            {filteredLogs.map((log) => {
+              const formattedDate = log.releasedAt
+                ? new Date(log.releasedAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })
+                : 'AUG 2026'
+
+              return (
+                <article
+                  key={log.slug || log.version}
+                  className="relative z-10 pl-9 sm:pl-12 group"
+                >
+                  {/* Timeline Indicator Ring */}
+                  <div className="absolute left-2 sm:left-3.5 top-4 w-3.5 h-3.5 rounded-full bg-[#05080a] border-2 border-cyan-400 shadow-hud-cyan flex items-center justify-center -translate-x-1/2 group-hover:scale-125 transition-transform duration-300">
+                    <div className="w-1 h-1 bg-cyan-400 rounded-full" />
+                  </div>
+
+                  {/* Card Container */}
+                  <div className="chitin-card p-5 sm:p-6 border border-cyan-900/50 hover:border-cyan-400/80 chamfer-corner bg-[#080d0f]/90 transition-all shadow-xl space-y-3">
+                    {/* Header: Badges & Date */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-950 pb-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {log.version && (
+                          <span className="font-grotesk font-extrabold text-xs text-cyan-300 bg-cyan-950/80 border border-cyan-500/40 px-2.5 py-0.5 chamfer-corner">
+                            {log.version}
+                          </span>
+                        )}
+                        <span className={`text-[10px] font-bold px-2 py-0.5 border ${getCategoryBadgeClass(log.category)} chamfer-corner uppercase`}>
+                          {log.category}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 font-sans">
+                        <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>{formattedDate}</span>
+                      </div>
+                    </div>
+
+                    {/* Title & Summary */}
+                    <div className="space-y-1.5">
+                      <Link
+                        to="/changelog/$slug"
+                        params={{ slug: log.slug }}
+                        className="font-grotesk font-bold text-lg sm:text-xl text-gray-100 group-hover:text-cyan-300 transition-colors uppercase leading-snug block"
+                      >
+                        {log.title}
+                      </Link>
+                      <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
+                        {log.summary}
+                      </p>
+                    </div>
+
+                    {/* Footer Action */}
+                    <div className="pt-2 flex items-center justify-between text-xs">
+                      <Link
+                        to="/changelog/$slug"
+                        params={{ slug: log.slug }}
+                        className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-bold font-sans transition-colors group/link"
+                      >
+                        <span>READ FULL TRANSMUTATION LOG</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+
+                      <span className="text-[10px] text-gray-500 font-sans">
+                        /changelog/{log.slug}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <MoltNationFooter />
+    </div>
+  )
+}

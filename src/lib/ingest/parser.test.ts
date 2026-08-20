@@ -114,7 +114,7 @@ This is the body content.
       expect(payload.isPublished).toBe(true)
     })
 
-    it('normalizes changelog payload with version validation', () => {
+    it('normalizes changelog payload with auto-slug and optional version', () => {
       const raw = {
         metadata: {
           version: 'v1.6.0',
@@ -124,6 +124,7 @@ This is the body content.
         filePath: 'content/changelogs/v1.6.0.md',
       }
       const payload = normalizeChangelogPayload(raw)
+      expect(payload.slug).toBe('autonomous-ingestion')
       expect(payload.version).toBe('v1.6.0')
       expect(payload.title).toBe('Autonomous Ingestion')
       expect(payload.content).toBe('Changelog description details.')
@@ -140,11 +141,11 @@ This is the body content.
 
       expect(() =>
         normalizeChangelogPayload({
-          metadata: { title: 'Some Title' },
+          metadata: {},
           content: '',
           filePath: 'invalid.md',
         })
-      ).toThrowError(/Missing required "version"/)
+      ).toThrowError(/Missing required "title"/)
 
       expect(() =>
         normalizePodcastPayload({

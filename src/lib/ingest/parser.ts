@@ -152,15 +152,17 @@ export function normalizeBlogPayload(parsed: RawParsedContent): BlogPostPayload 
 export function normalizeChangelogPayload(parsed: RawParsedContent): ChangelogPayload {
   const { metadata, content } = parsed
 
-  const version = metadata.version || metadata.tag
-  if (!version || typeof version !== 'string' || !version.trim()) {
-    throw new Error(`Missing required "version" in frontmatter/payload for "${parsed.filePath}"`)
-  }
-
   const title = metadata.title || metadata.name
   if (!title || typeof title !== 'string' || !title.trim()) {
     throw new Error(`Missing required "title" in frontmatter/payload for "${parsed.filePath}"`)
   }
+
+  const slug = metadata.slug ? generateSlug(String(metadata.slug)) : generateSlug(title)
+  if (!slug) {
+    throw new Error(`Could not generate a valid slug from title "${title}" in "${parsed.filePath}"`)
+  }
+
+  const version = metadata.version || metadata.tag || 'v1.0.0'
 
   const summary =
     metadata.summary ||
@@ -172,9 +174,10 @@ export function normalizeChangelogPayload(parsed: RawParsedContent): ChangelogPa
     : new Date()
 
   return {
-    version: version.trim(),
+    slug,
+    version: String(version).trim(),
     title: title.trim(),
-    category: metadata.category || 'FEATURE',
+    category: metadata.category || 'TRANSMUTATION',
     summary: summary.trim(),
     content: content.trim(),
     isPublished: metadata.isPublished !== undefined ? Boolean(metadata.isPublished) : true,

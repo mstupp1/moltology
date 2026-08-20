@@ -1,4 +1,5 @@
 ---
+slug: "sample-system-transmutation-slug"
 version: "v1.6.0"
 title: "Autonomous Ingestion Engine & Telemetry Pipeline"
 category: "FEATURE"

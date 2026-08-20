@@ -19,7 +19,8 @@ async function seed() {
     await sql`
       CREATE TABLE IF NOT EXISTS changelogs (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        version TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        version TEXT NOT NULL DEFAULT 'v1.0.0',
         title TEXT NOT NULL,
         category TEXT NOT NULL,
         summary TEXT NOT NULL,
@@ -31,16 +32,16 @@ async function seed() {
     `
 
     for (const item of INITIAL_CHANGELOGS) {
-      // Check if version exists
-      const existing = await sql`SELECT id FROM changelogs WHERE version = ${item.version};`
+      // Check if slug or version exists
+      const existing = await sql`SELECT id FROM changelogs WHERE slug = ${item.slug} OR version = ${item.version};`
       if (existing.length === 0) {
         await sql`
-          INSERT INTO changelogs (version, title, category, summary, content, "isPublished", "releasedAt")
-          VALUES (${item.version}, ${item.title}, ${item.category}, ${item.summary}, ${item.content}, true, ${item.releasedAt});
+          INSERT INTO changelogs (slug, version, title, category, summary, content, "isPublished", "releasedAt")
+          VALUES (${item.slug}, ${item.version}, ${item.title}, ${item.category}, ${item.summary}, ${item.content}, true, ${item.releasedAt});
         `
-        console.log(`✓ Inserted changelog ${item.version}`)
+        console.log(`✓ Inserted changelog ${item.slug} (${item.version})`)
       } else {
-        console.log(`- Changelog ${item.version} already exists`)
+        console.log(`- Changelog ${item.slug} already exists`)
       }
     }
     console.log('✓ Changelog seeding complete!')

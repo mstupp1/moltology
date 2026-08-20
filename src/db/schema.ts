@@ -85,7 +85,8 @@ export const routines = pgTable('routines', {
 // Public System Transmutation Changelogs Table
 export const changelogs = pgTable('changelogs', {
   id: uuid('id').defaultRandom().primaryKey(),
-  version: text('version').notNull(),
+  slug: text('slug').notNull().unique(),
+  version: text('version').default('v1.0.0').notNull(),
   title: text('title').notNull(),
   category: text('category').notNull(), // TRANSMUTATION, CHASSIS_UPGRADE, SECURITY_ISOLATION, BUG_PURGE
   summary: text('summary').notNull(),
