@@ -185,7 +185,11 @@ function ChangelogIndexPage() {
         ) : (
           <div className="space-y-6 relative">
             {/* Timeline Vertical Track */}
-            <div className="absolute left-3.5 sm:left-5 top-4 bottom-4 w-[2px] bg-gradient-to-b from-cyan-500/50 via-cyan-900/40 to-transparent pointer-events-none z-0" />
+            <div className="absolute left-3.5 sm:left-5 top-4 bottom-4 w-[3px] -translate-x-1/2 pointer-events-none z-0">
+              <div className="absolute inset-0 bg-gradient-to-b from-cyan-400 via-cyan-600/50 to-transparent opacity-60 rounded-full" />
+              <div className="absolute inset-0 bg-cyan-400/10 blur-md rounded-full" />
+              <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,195,255,0.35)_6px,rgba(0,195,255,0.35)_7px)]" />
+            </div>
 
             {filteredLogs.map((log) => {
               const formattedDate = log.releasedAt
@@ -201,9 +205,13 @@ function ChangelogIndexPage() {
                   key={log.slug || log.version}
                   className="relative z-10 pl-9 sm:pl-12 group"
                 >
-                  {/* Timeline Indicator Ring */}
-                  <div className="absolute left-2 sm:left-3.5 top-4 w-3.5 h-3.5 rounded-full bg-[#05080a] border-2 border-cyan-400 shadow-hud-cyan flex items-center justify-center -translate-x-1/2 group-hover:scale-125 transition-transform duration-300">
-                    <div className="w-1 h-1 bg-cyan-400 rounded-full" />
+                  {/* Timeline Indicator Node */}
+                  <div className="absolute left-3.5 sm:left-5 top-4 -translate-x-1/2 group-hover:scale-125 transition-transform duration-300">
+                    <div className="w-4 h-4 rounded-full bg-[#05080a] border-2 border-cyan-400 shadow-hud-cyan relative flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                    </div>
+                    <div className="absolute inset-0 rounded-full bg-cyan-400/40 blur-[6px] -z-10" />
+                    <div className="absolute left-1/2 top-1/2 w-6 h-6 rounded-full border border-cyan-400/30 animate-ping-slow -z-10" />
                   </div>
 
                   {/* Card Container */}
