@@ -141,20 +141,32 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
 
   const flushList = (key: string) => {
     if (currentListItems.length > 0) {
-      elements.push(
-        <ul key={key} className="space-y-2.5 sm:space-y-3 my-3 sm:my-4 pl-0 font-sans text-xs sm:text-sm text-gray-300">
-          {currentListItems.map((item, i) => (
-            <li key={`${key}-item-${i}`} className="flex items-start gap-2 sm:gap-2.5 chitin-card-inset p-2.5 sm:p-3 chamfer-corner">
-              {item.ordered ? (
-                <span className="font-bold text-cyan-400 font-sans text-xs shrink-0 mt-0.5">{item.number}.</span>
-              ) : (
-                <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 shrink-0 mt-0.5" />
-              )}
-              <span className="break-words leading-relaxed" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item.text) }} />
-            </li>
-          ))}
-        </ul>
-      )
+      const isOrdered = currentListItems[0].ordered
+      if (isOrdered) {
+        elements.push(
+          <ol key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-gray-300">
+            {currentListItems.map((item, i) => (
+              <li key={`${key}-item-${i}`} className="flex items-start gap-3 leading-relaxed">
+                <span className="font-bold text-cyan-400 font-sans text-xs sm:text-sm shrink-0 min-w-[1.25rem] mt-0.5">
+                  {item.number || i + 1}.
+                </span>
+                <span className="break-words" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item.text) }} />
+              </li>
+            ))}
+          </ol>
+        )
+      } else {
+        elements.push(
+          <ul key={key} className="space-y-2.5 my-3 sm:my-4 pl-1 sm:pl-2 font-sans text-sm sm:text-base text-gray-300">
+            {currentListItems.map((item, i) => (
+              <li key={`${key}-item-${i}`} className="flex items-start gap-3 leading-relaxed">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-2.5 shrink-0 opacity-80" />
+                <span className="break-words" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item.text) }} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
       currentListItems = []
     }
   }
@@ -165,7 +177,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       elements.push(
         <blockquote
           key={key}
-          className="chitin-card p-4 sm:p-6 border-l-4 border-l-cyan-400 border-y border-r border-cyan-900/40 chamfer-corner my-4 sm:my-6 italic font-serif text-sm sm:text-base md:text-lg text-cyan-100 bg-[#080d0f]/90 shadow-hud-cyan break-words leading-relaxed"
+          className="border-l-2 border-cyan-400 pl-4 py-2 my-4 sm:my-5 italic font-sans text-sm sm:text-base text-cyan-100/90 bg-cyan-950/20 chamfer-corner break-words leading-relaxed"
           dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(text) }}
         />
       )
@@ -189,7 +201,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
       const dataRows = rows.slice(1).filter((r) => !r.every((c) => /^:?-+:?$/.test(c)))
 
       elements.push(
-        <div key={key} className="my-6 overflow-x-auto chitin-card-inset border border-cyan-900/60 chamfer-corner shadow-hud-cyan w-full touch-pan-scroll">
+        <div key={key} className="my-6 overflow-x-auto border border-cyan-900/50 chamfer-corner bg-[#070c0e] shadow-hud-cyan w-full touch-pan-scroll">
           <table className="w-full text-left font-sans text-xs sm:text-sm border-collapse min-w-[500px]">
             <thead>
               <tr className="bg-[#0b1417] border-b border-cyan-900 text-cyan-300 font-bold uppercase tracking-wider">
@@ -270,7 +282,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('# ')) {
       flushAll(lineKey)
       elements.push(
-        <h1 key={lineKey} className="font-grotesk font-black text-2xl sm:text-3xl md:text-4xl text-gray-100 uppercase tracking-tight mt-8 sm:mt-12 mb-3 sm:mb-4 border-b border-cyan-900/50 pb-2 text-cyan-200 break-words leading-tight">
+        <h1 key={lineKey} className="font-grotesk font-bold text-2xl sm:text-3xl md:text-4xl text-gray-100 mt-8 sm:mt-10 mb-3 sm:mb-4 border-b border-cyan-900/40 pb-2 break-words leading-tight">
           {trimmed.slice(2)}
         </h1>
       )
@@ -281,7 +293,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('## ')) {
       flushAll(lineKey)
       elements.push(
-        <h2 key={lineKey} className="font-grotesk font-black text-xl sm:text-2xl md:text-3xl text-gray-100 uppercase tracking-tight mt-7 sm:mt-10 mb-3 sm:mb-4 border-b border-cyan-900/50 pb-2 text-cyan-300 break-words leading-snug">
+        <h2 key={lineKey} className="font-grotesk font-bold text-xl sm:text-2xl text-gray-100 mt-7 sm:mt-9 mb-3 border-b border-cyan-900/30 pb-2 text-cyan-200 break-words leading-snug">
           {trimmed.slice(3)}
         </h2>
       )
@@ -292,7 +304,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('### ')) {
       flushAll(lineKey)
       elements.push(
-        <h3 key={lineKey} className="font-grotesk font-black text-lg sm:text-xl md:text-2xl text-gray-100 uppercase tracking-wide mt-6 sm:mt-10 mb-2.5 sm:mb-4 border-b border-cyan-900/40 pb-2 text-cyan-300 break-words leading-snug">
+        <h3 key={lineKey} className="font-grotesk font-bold text-base sm:text-lg text-cyan-300 mt-6 sm:mt-8 mb-2 break-words leading-snug">
           {trimmed.slice(4)}
         </h3>
       )
@@ -303,7 +315,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('#### ')) {
       flushAll(lineKey)
       elements.push(
-        <h4 key={lineKey} className="font-grotesk font-bold text-base sm:text-lg md:text-xl text-gray-200 uppercase tracking-wide mt-5 sm:mt-8 mb-2 sm:mb-3 text-red-400 break-words">
+        <h4 key={lineKey} className="font-grotesk font-semibold text-sm sm:text-base text-gray-200 mt-4 sm:mt-6 mb-2 break-words">
           {trimmed.slice(5)}
         </h4>
       )
@@ -314,7 +326,7 @@ function RenderTextSection({ rawText, sectionIdx }: { rawText: string; sectionId
     if (trimmed.startsWith('##### ')) {
       flushAll(lineKey)
       elements.push(
-        <h5 key={lineKey} className="font-grotesk font-bold text-sm sm:text-base text-cyan-300 uppercase tracking-wide mt-4 sm:mt-6 mb-2 text-cyan-400 break-words">
+        <h5 key={lineKey} className="font-grotesk font-medium text-xs sm:text-sm text-cyan-400 mt-3 sm:mt-4 mb-1.5 break-words">
           {trimmed.slice(6)}
         </h5>
       )

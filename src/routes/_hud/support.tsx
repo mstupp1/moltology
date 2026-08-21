@@ -35,6 +35,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { authClient } from '@/lib/auth-client'
 import { seo } from '@/lib/seo'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
+import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
 function SupportPortalRoute() {
   const loaderData = Route.useLoaderData()
@@ -467,8 +468,8 @@ function SupportPortalRoute() {
 
                       {/* Expandable Markdown Release Notes */}
                       {isExpanded && (
-                        <div className="pt-3 border-t border-[#3a4a49]/50 bg-[#030606]/60 p-3 chamfer-corner space-y-2 text-xs text-[#b8c7c7] font-sans leading-relaxed whitespace-pre-line">
-                          {entry.content}
+                        <div className="pt-3 border-t border-[#3a4a49]/50 bg-[#030606]/80 p-4 chamfer-corner">
+                          <NewsArticleBody content={entry.content} />
                         </div>
                       )}
 
