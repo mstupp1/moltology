@@ -234,41 +234,22 @@ To achieve studio-grade, photorealistic 3D social carousels with cohesive lighti
 └────────────────────────────────────────┘
 ```
 
-#### 2. Canonical Visual Style Guide (`content/social/style_guide_carousel_slide1.jpg`)
+#### 2. Golden Rule: Anti-Repetition & Bespoke Thematic Backgrounds
 
-All carousel slides must follow the unified MoltNation HUD visual language:
-* **Background Atmosphere**: Deep-sea benthic abyss (nitrogen pods, wafer architectures, laser waveguides, or photonic hubs) with dark teal/slate gradients, ambient underwater caustics, and glowing conduit cables.
-* **Floating Glassmorphic HUD Cards**: Dark translucent rounded glass (`rgba(4, 18, 26, 0.85)`) with glowing 2px neon borders:
-  * **Alert / Legacy Bottleneck**: Crimson Red (`#EF4444` / `rgba(239, 68, 68, 0.85)`).
-  * **Solution / Benthic Ecdysis**: High-Torque Neon Cyan (`#00FFE6` / `rgba(0, 255, 230, 0.9)`).
-  * **Data Matrix / CMX Storage**: Deep Sky Blue (`#38BDF8`).
-* **Subtle Telemetry Schematics**: Faint holographic circuit lines and wireframe telemetry graphs in card corners (low opacity, 20-30%).
-* **Typography Hierarchy**:
-  * **Category Badge (Top Left)**: Rounded pill badge with glowing cyan border (`bold 14px monospace`).
-  * **Main Headline**: Heavy bold geometric sans-serif (white for context, cyan `#00FFE6` for the hook/solution, max 3 lines).
-  * **Sub-Headline**: 1 crisp, high-contrast sentence (`#94A3B8` / `#E2E8F0`).
-  * **Hero Stats**: Giant, bold monospace display figures (`78.4 GB`, `-85.1%`, `94.2%`) in stark white (`#FFFFFF`).
-  * **Card Explanations**: Max 2 short lines of clean, concise text (`#CBD5E1`).
-* **3D Tactile Characters**: Pixar-style 3D mascots (Hero Lobster, Peeking Lobster, Construction Crabs) rendered with ambient rim lighting and soft contact shadows.
-* **Branding Footer**:
-  * Left: `SWIPE FOR HARD DATA ➔` or `SWIPE FOR ASCENSION PROTOCOL ➔` in muted silver (`#64748B`).
-  * Right: MoltNation emblem + `MOLTNATION [NEWS ★]` pill badge.
+* **Strict Rule — Never Feed Past Post Slides into ImagePaths**: NEVER pass a past slide image (such as an old article's carousel slide) into `generate_image`'s `ImagePaths`. AI image models treat reference images as structural conditioning and will replicate background elements (e.g. server racks, submersibles), causing identical visual templates across different articles.
+* **Generate Unique, Bespoke Thematic Backgrounds**: For every carousel, generate 3 distinct, high-res 3D benthic backgrounds (e.g. via `generate_image` with `AspectRatio: '3:4'`) tailored to the specific topic (e.g. robotic pincer carapaces, hydrothermal basalt vents, optical photonics, deep trench research habitats).
+* **No Extra Auxiliary Image Generation**: NEVER make extra `generate_image` calls for auxiliary sub-strips or decorative elements. Limit AI generation strictly to essential hero and background scenes to preserve quota and avoid 429 rate limit delays. Use native canvas vector rendering for subtle waveforms and accents.
+* **Pristine Mascot & Branding Compositing**: Always composite official transparent character cutouts from `scripts/lib/character-overlay.ts` (`char_lobster_pointing_cta.png`, `char_crab_pointing_stats.png`, `char_lobster_engineer.png`) and the clean MoltNation vector watermark badge on top of the render. This guarantees 100% brand consistency, zero hallucinated mascot deformities, and crisp vector logos.
 
-#### 3. Image Generation Tooling & Prompts (`generate_image`)
+#### 3. Typography & Card Layout Hierarchy
 
-When running Stage 2 AI polish via `generate_image`, pass BOTH the slide mockup AND the canonical style guide in `ImagePaths`:
-
-```json
-{
-  "AspectRatio": "3:4",
-  "ImageName": "polished_carousel_slide2",
-  "ImagePaths": [
-    "/absolute/path/to/mockup_slide2.jpg",
-    "/Users/mylesstupp/Development/moltology/content/social/style_guide_carousel_slide1.jpg"
-  ],
-  "Prompt": "A high-end, ultra-polished 3D cinematic sci-fi infographic slide. Use Image 1 as the exact structural layout, text content, metric values, and character placement. Match the exact visual style, glassmorphic HUD cards, glowing neon borders (cyan #00FFE6, crimson #EF4444, sky blue #38BDF8), typography hierarchy, volumetric underwater benthic atmosphere, and 3D character rendering quality from Image 2."
-}
-```
+* **No Tacky Square HUD Corner Ticks**: NEVER draw square corner brackets or tick marks on text cards, modals, or overlays. Keep all card styling clean, minimal, modern, and sleek with smooth rounded corners (`roundRect`).
+* **Non-Dense Formatting**: Keep text concise, bold, and readable at mobile scale (headlines at 48–54px, display numbers at 28–54px).
+* **Category Badge (Top Left)**: Rounded pill badge with glowing cyan border (`bold 14px monospace`).
+* **High-Contrast Glassmorphic Cards**: Dark translucent cards (`rgba(4, 20, 32, 0.90)`) with glowing neon borders (Crimson `#EF4444` for legacy bottlenecks, Neon Cyan `#00FFE6` for benthic breakthroughs, Sky Blue `#38BDF8` or Amber `#F59E0B` for protocols).
+* **Clean Footer Navigation & Emblem**:
+  * Left: `SWIPE FOR HARD DATA ➔` or `SWIPE FOR PROTOCOLS ➔` in muted silver (`#64748B`).
+  * Right: Official MoltNation shield watermark badge.
 
 #### 4. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
 * **The Hook**: Lead with an intriguing premise and a striking statistic.
