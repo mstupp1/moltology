@@ -11,16 +11,18 @@ export type CharacterKey =
   | 'lobster_action'
   | 'crab_stats'
   | 'crab_cling'
+  | 'lobster_engineer'
+  | (string & {})
 
 export interface CharacterInfo {
-  key: CharacterKey
+  key: string
   filename: string
   s3Path: string
   publicUrl: string
-  description: string
+  description?: string
 }
 
-export const CHARACTER_REGISTRY: Record<CharacterKey, CharacterInfo> = {
+export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = {
   lobster_pointing: {
     key: 'lobster_pointing',
     filename: 'char_lobster_pointing_cta.png',
@@ -70,24 +72,55 @@ export const CHARACTER_REGISTRY: Record<CharacterKey, CharacterInfo> = {
     publicUrl: `${S3_BASE_URL}/images/characters/char_crab_corner_cling.png`,
     description: 'Cute crab clinging to side borders or bottom corner edges',
   },
+  lobster_engineer: {
+    key: 'lobster_engineer',
+    filename: 'char_lobster_engineer.png',
+    s3Path: 'images/characters/char_lobster_engineer.png',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_engineer.png`,
+    description: 'Cheerful lobster engineer wearing yellow safety hardhat with holographic diagnostic tablet',
+  },
+}
+
+/**
+ * Resolve character metadata dynamically from key or filename
+ */
+export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo {
+  let raw = characterKeyOrFilename.trim()
+  if (raw.endsWith('.png') || raw.endsWith('.jpg') || raw.endsWith('.webp')) {
+    raw = raw.replace(/\.[^/.]+$/, '')
+  }
+
+  const normKey = (
+    raw === 'lobster_pointing_cta' || raw === 'pointing' ? 'lobster_pointing' :
+    raw === 'lobster_corner_peek' || raw === 'peek' ? 'lobster_peek' :
+    raw === 'crab_corner_cling' || raw === 'crab_corner' || raw === 'cling' ? 'crab_cling' :
+    raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' ? 'crab_stats' :
+    raw === 'lobster_speed_action' || raw === 'action' ? 'lobster_action' :
+    raw === 'lobster_floating_peaceful' || raw === 'peaceful' ? 'lobster_peaceful' :
+    raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' ? 'lobster_engineer' :
+    raw === 'thumbs_up' ? 'lobster_thumbs_up' :
+    raw
+  )
+
+  if (CHARACTER_REGISTRY[normKey]) {
+    return CHARACTER_REGISTRY[normKey]
+  }
+
+  // Dynamic S3 fallback for any character file in images/characters/
+  const filename = normKey.startsWith('char_') ? `${normKey}.png` : `char_${normKey}.png`
+  return {
+    key: normKey,
+    filename,
+    s3Path: `images/characters/${filename}`,
+    publicUrl: `${S3_BASE_URL}/images/characters/${filename}`,
+  }
 }
 
 /**
  * Load character image from local filesystem or fetch from Neon S3 bucket
  */
 export async function loadCharacterImage(characterKey: CharacterKey | string): Promise<any> {
-  const normKey = (
-    characterKey === 'lobster_pointing_cta' || characterKey === 'pointing' ? 'lobster_pointing' :
-    characterKey === 'lobster_corner_peek' || characterKey === 'peek' ? 'lobster_peek' :
-    characterKey === 'crab_corner_cling' || characterKey === 'crab_corner' || characterKey === 'cling' ? 'crab_cling' :
-    characterKey === 'crab_pointing_stats' || characterKey === 'crab_stats' || characterKey === 'stats' ? 'crab_stats' :
-    characterKey === 'lobster_speed_action' || characterKey === 'action' ? 'lobster_action' :
-    characterKey === 'lobster_floating_peaceful' || characterKey === 'peaceful' ? 'lobster_peaceful' :
-    characterKey === 'thumbs_up' ? 'lobster_thumbs_up' :
-    characterKey
-  ) as CharacterKey
-
-  const info = CHARACTER_REGISTRY[normKey] || CHARACTER_REGISTRY.lobster_pointing
+  const info = getCharacterInfo(characterKey)
   const localPath = path.resolve(process.cwd(), 'public/images/characters', info.filename)
 
   if (fs.existsSync(localPath)) {

@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { CHARACTER_REGISTRY } from './character-overlay'
+import { getCharacterInfo, CHARACTER_REGISTRY } from './character-overlay'
 
 describe('Character Overlay & Registry', () => {
-  it('contains all 7 homepage cartoon characters in the registry with valid S3 URLs', () => {
+  it('contains core registered cartoon characters with valid S3 URLs', () => {
     const keys = [
       'lobster_pointing',
       'lobster_peek',
@@ -11,14 +10,25 @@ describe('Character Overlay & Registry', () => {
       'lobster_action',
       'crab_stats',
       'crab_cling',
+      'lobster_engineer',
     ]
 
     for (const key of keys) {
-      const char = CHARACTER_REGISTRY[key as keyof typeof CHARACTER_REGISTRY]
+      const char = CHARACTER_REGISTRY[key]
       expect(char).toBeDefined()
       expect(char.filename).toContain('char_')
       expect(char.publicUrl).toContain('moltology-public-assets/images/characters/')
       expect(char.publicUrl).toContain(char.filename)
     }
+  })
+
+  it('dynamically resolves unlisted character keys directly to S3 images/characters path', () => {
+    const info = getCharacterInfo('custom_scholar_crab')
+    expect(info.filename).toBe('char_custom_scholar_crab.png')
+    expect(info.publicUrl).toContain('moltology-public-assets/images/characters/char_custom_scholar_crab.png')
+
+    const fileInfo = getCharacterInfo('char_deep_diver.png')
+    expect(fileInfo.filename).toBe('char_deep_diver.png')
+    expect(fileInfo.publicUrl).toContain('moltology-public-assets/images/characters/char_deep_diver.png')
   })
 })
