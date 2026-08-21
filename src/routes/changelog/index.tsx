@@ -1,16 +1,17 @@
 import React, { useState, useMemo } from 'react'
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import {
-  Search,
-  Filter,
   Clock,
   Terminal,
   Activity,
   ArrowRight,
+  RotateCcw,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
+import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
+import { HudPagination } from '@/components/ui/HudPagination'
 import { getPublicChangelogsFn } from '@/lib/server/api'
 import { INITIAL_CHANGELOGS } from '@/lib/changelogs-data'
 import type { ChangelogEntry } from '@/lib/changelogs-data'
@@ -53,26 +54,60 @@ function ChangelogIndexPage() {
   const [logs] = useState<ChangelogEntry[]>(loaderLogs || INITIAL_CHANGELOGS)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 20
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
-  const filterOptions = useMemo(() => {
-    const set = new Set<string>()
+  // Compute category options with live counts
+  const categoryOptions = useMemo(() => {
+    const counts: Record<string, number> = {}
     logs.forEach((log) => {
-      if (log.category) set.add(log.category)
+      const cat = log.category || 'Feature'
+      counts[cat] = (counts[cat] || 0) + 1
+    })
+
+    const standardOrder = ['Feature', 'Improvement', 'Security', 'Performance', 'Fix', 'Design']
+    const orderedCats = standardOrder.filter((c) => counts[c] !== undefined)
+    const extraCats = Object.keys(counts).filter((c) => !standardOrder.includes(c))
+
+    return [
+      { label: 'ALL', count: logs.length },
+      ...[...orderedCats, ...extraCats].map((cat) => ({
+        label: cat,
+        count: counts[cat] || 0,
+      })),
+    ]
+  }, [logs])
+
+  // Compute tag options with live counts sorted by frequency
+  const tagOptions = useMemo(() => {
+    const counts: Record<string, number> = {}
+    logs.forEach((log) => {
       if (Array.isArray(log.tags)) {
-        log.tags.forEach((t) => set.add(t))
+        log.tags.forEach((t) => {
+          counts[t] = (counts[t] || 0) + 1
+        })
       }
     })
-    return ['ALL', ...Array.from(set)]
+
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, count]) => ({ label, count }))
   }, [logs])
 
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       const matchesCategory =
         selectedCategory === 'ALL' ||
-        log.category?.toLowerCase() === selectedCategory.toLowerCase() ||
-        (Array.isArray(log.tags) && log.tags.some((t) => t.toLowerCase() === selectedCategory.toLowerCase()))
+        log.category?.toLowerCase() === selectedCategory.toLowerCase()
+
+      const matchesTag =
+        !selectedTag ||
+        (Array.isArray(log.tags) &&
+          log.tags.some((t) => t.toLowerCase() === selectedTag.toLowerCase()))
+
       const matchesSearch =
         searchQuery === '' ||
         log.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -80,10 +115,39 @@ function ChangelogIndexPage() {
         log.version.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (Array.isArray(log.tags) && log.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())))
-      return matchesCategory && matchesSearch
+        (Array.isArray(log.tags) &&
+          log.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())))
+
+      return matchesCategory && matchesTag && matchesSearch
     })
-  }, [logs, selectedCategory, searchQuery])
+  }, [logs, selectedCategory, selectedTag, searchQuery])
+
+  const paginatedLogs = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredLogs.slice(start, start + pageSize)
+  }, [filteredLogs, currentPage, pageSize])
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat)
+    setCurrentPage(1)
+  }
+
+  const handleTagChange = (tag: string | null) => {
+    setSelectedTag(tag)
+    setCurrentPage(1)
+  }
+
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setSelectedCategory('ALL')
+    setSelectedTag(null)
+    setCurrentPage(1)
+  }
 
   const openAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode)
@@ -91,7 +155,7 @@ function ChangelogIndexPage() {
   }
 
   const getCategoryBadgeClass = (category: string) => {
-    switch (category.toLowerCase()) {
+    switch (category?.toLowerCase()) {
       case 'feature':
       case 'features':
         return 'text-cyan-300 border-cyan-500/50 bg-cyan-950/60'
@@ -170,57 +234,46 @@ function ChangelogIndexPage() {
           </h1>
 
           <p className="font-sans text-sm sm:text-base text-gray-400 max-w-2xl leading-relaxed">
-            Continuous deployment telemetry, bio-silicon transmutations, and protocol upgrades powering The Order of the Synaptic Path.
+            Continuous deployment telemetry, system updates, and feature upgrades powering The Order of the Synaptic Path.
           </p>
         </div>
       </header>
 
-      {/* Controls Bar: Search & Category Filter */}
-      <div className="w-full bg-[#070c0e]/90 border-b border-cyan-900/40 py-3.5 px-4 sm:px-8 sticky top-[60px] z-30 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Category & Tag Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-            <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0 mr-1 hidden xs:inline" />
-            {filterOptions.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 text-[11px] font-bold font-grotesk uppercase tracking-wider chamfer-corner transition-all shrink-0 ${
-                  selectedCategory === cat
-                    ? 'bg-cyan-500 text-black shadow-hud-cyan font-black'
-                    : 'bg-[#090e10] text-gray-400 hover:text-white border border-cyan-950'
-                }`}
-              >
-                {cat === 'ALL' ? 'ALL UPDATES' : cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Input */}
-          <div className="relative w-full sm:w-72">
-            <Search className="w-3.5 h-3.5 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search transmutations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 bg-[#030607] border border-cyan-900/60 focus:border-cyan-400 text-gray-100 font-sans text-xs chamfer-corner outline-none placeholder-gray-500 transition-colors"
-            />
-          </div>
-        </div>
-      </div>
+      {/* Standard Responsive Search & Filter Controls Bar */}
+      <ChangelogFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+        selectedTag={selectedTag}
+        onTagChange={handleTagChange}
+        categories={categoryOptions}
+        tags={tagOptions}
+        totalCount={logs.length}
+        filteredCount={filteredLogs.length}
+        onReset={handleResetFilters}
+      />
 
       {/* Main Content Timeline Feed */}
       <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-8 py-10 w-full relative z-10 space-y-6">
         {filteredLogs.length === 0 ? (
-          <div className="text-center py-16 chitin-card border border-cyan-900/40 p-8 chamfer-corner">
-            <Terminal className="w-10 h-10 text-cyan-500 mx-auto mb-3 animate-pulse" />
-            <h3 className="font-grotesk text-lg font-bold text-gray-200 uppercase">
-              NO TRANSMUTATION LOGS FOUND
-            </h3>
-            <p className="text-xs text-gray-400 mt-1 font-sans">
-              Reset search query or select another category filter.
-            </p>
+          <div className="text-center py-16 chitin-card border border-cyan-900/40 p-8 chamfer-corner space-y-4">
+            <Terminal className="w-10 h-10 text-cyan-500 mx-auto animate-pulse" />
+            <div className="space-y-1">
+              <h3 className="font-grotesk text-lg font-bold text-gray-200 uppercase">
+                NO MATCHING RELEASES FOUND
+              </h3>
+              <p className="text-xs text-gray-400 font-sans max-w-md mx-auto">
+                No changelog entries matched your active search query or selected category/tag filters.
+              </p>
+            </div>
+            <button
+              onClick={handleResetFilters}
+              className="px-4 py-2 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-300 font-grotesk font-bold text-xs uppercase chamfer-corner inline-flex items-center gap-2 transition-all active:scale-95 shadow-hud-cyan"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>CLEAR SEARCH & FILTERS</span>
+            </button>
           </div>
         ) : (
           <div className="space-y-6 relative">
@@ -231,7 +284,7 @@ function ChangelogIndexPage() {
               <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,195,255,0.35)_6px,rgba(0,195,255,0.35)_7px)]" />
             </div>
 
-            {filteredLogs.map((log) => {
+            {paginatedLogs.map((log) => {
               const formattedDate = log.releasedAt
                 ? new Date(log.releasedAt).toLocaleDateString('en-US', {
                     month: 'short',
@@ -320,6 +373,20 @@ function ChangelogIndexPage() {
                 </article>
               )
             })}
+
+            {/* Pagination Controls */}
+            <HudPagination
+              currentPage={currentPage}
+              totalItems={filteredLogs.length}
+              pageSize={pageSize}
+              onPageChange={(page) => {
+                setCurrentPage(page)
+                if (typeof window !== 'undefined') {
+                  window.scrollTo({ top: 120, behavior: 'smooth' })
+                }
+              }}
+              itemName="releases"
+            />
           </div>
         )}
       </main>

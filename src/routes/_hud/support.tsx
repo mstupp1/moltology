@@ -29,12 +29,15 @@ import {
   Trash2,
   Save,
   ExternalLink,
+  RotateCcw,
 } from 'lucide-react'
 import { getPublicChangelogs, createChangelog, updateChangelog, deleteChangelog, type ChangelogEntry } from '@/lib/changelogs'
 import { getUserProfileFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { authClient } from '@/lib/auth-client'
 import { seo } from '@/lib/seo'
+import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
+import { HudPagination } from '@/components/ui/HudPagination'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
@@ -46,7 +49,10 @@ function SupportPortalRoute() {
   const [changelogs, setChangelogs] = useState<ChangelogEntry[]>(loaderData?.changelogs || [])
   const [loading, setLoading] = useState(!loaderData?.changelogs)
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 20
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({ v1_0_0: true, v1_4_2: true })
 
   // Admin User Role & Modal state
@@ -104,30 +110,92 @@ function SupportPortalRoute() {
     }))
   }
 
-  const categories = React.useMemo(() => {
-    const set = new Set<string>()
-    ;(Array.isArray(changelogs) ? changelogs : []).forEach((entry) => {
-      if (entry.category) set.add(entry.category)
-      if (Array.isArray(entry.tags)) {
-        entry.tags.forEach((t) => set.add(t))
+  // Compute category options with live counts
+  const categoryOptions = React.useMemo(() => {
+    const counts: Record<string, number> = {}
+    const list = Array.isArray(changelogs) ? changelogs : []
+    list.forEach((log) => {
+      const cat = log.category || 'Feature'
+      counts[cat] = (counts[cat] || 0) + 1
+    })
+
+    const standardOrder = ['Feature', 'Improvement', 'Security', 'Performance', 'Fix', 'Design']
+    const orderedCats = standardOrder.filter((c) => counts[c] !== undefined)
+    const extraCats = Object.keys(counts).filter((c) => !standardOrder.includes(c))
+
+    return [
+      { label: 'ALL', count: list.length },
+      ...[...orderedCats, ...extraCats].map((cat) => ({
+        label: cat,
+        count: counts[cat] || 0,
+      })),
+    ]
+  }, [changelogs])
+
+  // Compute tag options with live counts
+  const tagOptions = React.useMemo(() => {
+    const counts: Record<string, number> = {}
+    const list = Array.isArray(changelogs) ? changelogs : []
+    list.forEach((log) => {
+      if (Array.isArray(log.tags)) {
+        log.tags.forEach((t) => {
+          counts[t] = (counts[t] || 0) + 1
+        })
       }
     })
-    return ['ALL', ...Array.from(set)]
+
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, count]) => ({ label, count }))
   }, [changelogs])
 
   const filteredChangelogs = (Array.isArray(changelogs) ? changelogs : []).filter((entry) => {
     const matchesCategory =
       selectedCategory === 'ALL' ||
-      entry.category?.toLowerCase() === selectedCategory.toLowerCase() ||
-      (Array.isArray(entry.tags) && entry.tags.some((t) => t.toLowerCase() === selectedCategory.toLowerCase()))
+      entry.category?.toLowerCase() === selectedCategory.toLowerCase()
+
+    const matchesTag =
+      !selectedTag ||
+      (Array.isArray(entry.tags) &&
+        entry.tags.some((t) => t.toLowerCase() === selectedTag.toLowerCase()))
+
     const matchesSearch =
       entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.version.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (Array.isArray(entry.tags) && entry.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())))
-    return matchesCategory && matchesSearch
+      (Array.isArray(entry.tags) &&
+        entry.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())))
+
+    return matchesCategory && matchesTag && matchesSearch
   })
+
+  const paginatedChangelogs = React.useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filteredChangelogs.slice(start, start + pageSize)
+  }, [filteredChangelogs, currentPage, pageSize])
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat)
+    setCurrentPage(1)
+  }
+
+  const handleTagChange = (tag: string | null) => {
+    setSelectedTag(tag)
+    setCurrentPage(1)
+  }
+
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setSelectedCategory('ALL')
+    setSelectedTag(null)
+    setCurrentPage(1)
+  }
 
   const getCategoryColor = (cat: string) => {
     switch (cat?.toLowerCase()) {
@@ -399,51 +467,37 @@ function SupportPortalRoute() {
       {/* TAB 1: SYSTEM CHANGELOG */}
       {activeTab === 'changelog' && (
         <div className="space-y-4">
-          {/* Controls Bar: Search, Category Filter & Admin Add Log */}
-          <div className="chitin-card p-4 chamfer-corner flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#00ffff] absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search transmutations, versions, or updates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] pl-9 pr-3 py-2 outline-none transition-colors font-sans chamfer-corner"
-              />
+          {/* Admin Header Action Bar if user is admin */}
+          {isAdmin && (
+            <div className="flex items-center justify-between pb-1">
+              <span className="text-xs text-[#839493] font-mono uppercase">
+                ADMIN DISPATCH CONSOLE · SCOPE: PROD/DEV
+              </span>
+              <button
+                onClick={openCreateModal}
+                className="px-3.5 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.3)] active:scale-95 shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5 text-[#00ffff]" />
+                <span>ADD TRANSMUTATION LOG</span>
+              </button>
             </div>
+          )}
 
-            {/* Category Filter Pills & Admin Action */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-                <Filter className="w-3.5 h-3.5 text-[#839493] shrink-0" />
-                <span className="text-xs text-[#839493] shrink-0 mr-1">FILTER:</span>
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`text-[10px] font-bold px-2.5 py-1 border transition-all whitespace-nowrap chamfer-corner ${
-                      selectedCategory === cat
-                        ? 'border-[#00ffff] bg-[#00ffff]/20 text-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.3)]'
-                        : 'border-[#3a4a49] bg-[#070b0b] text-[#839493] hover:text-[#dfe3e3] hover:border-[#00ffff]/40'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              {isAdmin && (
-                <button
-                  onClick={openCreateModal}
-                  className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.3)] active:scale-95 shrink-0"
-                >
-                  <Plus className="w-3.5 h-3.5 text-[#00ffff]" />
-                  <span>ADD TRANSMUTATION LOG</span>
-                </button>
-              )}
-            </div>
-          </div>
+          {/* Standard Responsive Search & Filter Controls Bar */}
+          <ChangelogFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            selectedTag={selectedTag}
+            onTagChange={handleTagChange}
+            categories={categoryOptions}
+            tags={tagOptions}
+            totalCount={changelogs.length}
+            filteredCount={filteredChangelogs.length}
+            onReset={handleResetFilters}
+            className="rounded-sm border border-[#3a4a49]/60"
+          />
 
           {/* Changelog Entries Timeline */}
           {loading ? (
@@ -453,12 +507,21 @@ function SupportPortalRoute() {
               <HudGhostCard lines={3} />
             </div>
           ) : filteredChangelogs.length === 0 ? (
-            <div className="chitin-card p-8 text-center space-y-2 chamfer-corner">
+            <div className="chitin-card p-8 text-center space-y-3 chamfer-corner">
               <AlertTriangle className="w-8 h-8 text-[#ff5540] mx-auto" />
-              <p className="text-sm font-bold text-[#dfe3e3]">NO CHANGELOG TELEMETRY FOUND</p>
-              <p className="text-xs text-[#839493]">
-                The system changelog is loaded straight from the database — no static fallback file is used. No records match your filter criteria "{searchQuery || selectedCategory}". If records exist but are missing, check the server logs for a `DB query failed` entry.
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-[#dfe3e3]">NO CHANGELOG TELEMETRY FOUND</p>
+                <p className="text-xs text-[#839493] max-w-md mx-auto">
+                  No records match your filter criteria "{searchQuery || selectedCategory}".
+                </p>
+              </div>
+              <button
+                onClick={handleResetFilters}
+                className="px-4 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold chamfer-corner inline-flex items-center gap-1.5 transition-all"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>RESET FILTERS</span>
+              </button>
             </div>
           ) : (
             <div className="space-y-4 relative">
@@ -469,7 +532,7 @@ function SupportPortalRoute() {
                 <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,255,255,0.35)_6px,rgba(0,255,255,0.35)_7px)]" />
               </div>
 
-              {filteredChangelogs.map((entry) => {
+              {paginatedChangelogs.map((entry) => {
                 const isExpanded = expandedEntries[entry.version] || expandedEntries[entry.version.replace('.', '_')]
                 const key = entry.version.replace(/\./g, '_')
 
@@ -510,13 +573,6 @@ function SupportPortalRoute() {
                               month: 'short',
                               day: 'numeric',
                             })}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-[#00ffff] font-sans flex items-center gap-1 bg-[#00ffff]/05 px-2 py-0.5 border border-[#00ffff]/20">
-                            <CheckCircle2 className="w-3 h-3 text-[#00ffff]" />
-                            VERIFIED IN DATABASE
                           </span>
                         </div>
                       </div>
@@ -594,6 +650,20 @@ function SupportPortalRoute() {
                   </div>
                 )
               })}
+
+              {/* Pagination Controls */}
+              <HudPagination
+                currentPage={currentPage}
+                totalItems={filteredChangelogs.length}
+                pageSize={pageSize}
+                onPageChange={(page) => {
+                  setCurrentPage(page)
+                  if (typeof window !== 'undefined') {
+                    window.scrollTo({ top: 120, behavior: 'smooth' })
+                  }
+                }}
+                itemName="releases"
+              />
             </div>
           )}
         </div>
