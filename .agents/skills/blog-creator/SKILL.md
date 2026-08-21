@@ -20,19 +20,13 @@ This skill guides the creation and publication of full-length, dynamically varie
 
 ---
 
-## ◈ Homepage Character Family Catalog (Featured Cutouts on S3)
+## ◈ Character Family Cutouts on S3
 
-All characters featured on the Moltology homepage are available as transparent PNG cutouts hosted on Neon S3 (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/`):
+Transparent PNG mascot cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
-| Mascot Key | S3 Asset Path | Character Description & Role | Recommended Use |
-| :--- | :--- | :--- | :--- |
-| `lobster_pointing` | `images/characters/char_lobster_pointing_cta.png` | Hero lobster pointing at action buttons or key links | CTA cards, end of articles, Slide 3 of carousels |
-| `lobster_peek` | `images/characters/char_lobster_corner_peek.png` | Playful lobster peeking over card bezels and top borders | Intro hero callouts, top of figures, section headers |
-| `lobster_thumbs_up` | `images/characters/char_lobster_thumbs_up.png` | Cheerful lobster giving a thumbs-up approval sign | Verified benchmarks, key takeaways, success stats |
-| `lobster_peaceful` | `images/characters/char_lobster_floating_peaceful.png` | Calm cyber-lobster floating peacefully in deep water | Abyssal depth sections, mental clarity & ecdysis |
-| `lobster_action` | `images/characters/char_lobster_speed_action.png` | Dynamic speed-action lobster dashing forward with glow | High-frequency 120Hz control loops, speed benchmarks |
-| `crab_stats` | `images/characters/char_crab_pointing_stats.png` | Energetic crab pointing at quantitative metrics and charts | Quantitative comparison tables, spec matrices, Slide 2 |
-| `crab_cling` | `images/characters/char_crab_corner_cling.png` | Cute crab clinging with one claw to side borders | Sidebar notes, warnings, hardware footnotes |
+* **Discovery**: Check the `images/characters/` folder on S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to choose an appropriate character for the article theme (e.g. guide lobsters, diagnostic engineers, hardhat data crabs, zen floating mascots).
+* **Compositing**: Any character in `images/characters/` can be stamped onto infographics, slides, or header callouts via `overlayCharacterOnImage`.
+* **New Characters**: To create a fresh character for an article, use the `character-creator` skill.
 
 ---
 

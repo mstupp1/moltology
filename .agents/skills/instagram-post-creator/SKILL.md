@@ -12,19 +12,13 @@ This skill automates the complete lifecycle of Moltology static Instagram posts 
 
 ---
 
-## ◈ Character Family Catalog (Featured Cutouts on S3)
+## ◈ Character Family Cutouts on S3
 
-All characters featured on the Moltology homepage are available for compositing onto posts:
+Transparent PNG character cutouts reside in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
-| Mascot Key | S3 Asset Path | Character Description & Role | Recommended Use in Post |
-| :--- | :--- | :--- | :--- |
-| `lobster_pointing` | `images/characters/char_lobster_pointing_cta.png` | Hero lobster pointing at call to action | Link in bio / audit announcement |
-| `lobster_thumbs_up` | `images/characters/char_lobster_thumbs_up.png` | Cheerful lobster giving thumbs-up | Habit shedding / protocol approvals |
-| `crab_stats` | `images/characters/char_crab_pointing_stats.png` | Energetic crab pointing at quantitative metrics | Pincer torque / telemetry benchmarks |
-| `lobster_peaceful` | `images/characters/char_lobster_floating_peaceful.png` | Calm cyber-lobster floating peacefully | 50,000 fathoms focus / benthic depth |
-| `lobster_action` | `images/characters/char_lobster_speed_action.png` | Dynamic speed-action lobster | High throughput / low-latency execution |
-| `lobster_peek` | `images/characters/char_lobster_corner_peek.png` | Playful lobster peeking over bezels | Hook announcements / teaser graphics |
-| `crab_cling` | `images/characters/char_crab_corner_cling.png` | Cute crab clinging to borders | Status badges / border accents |
+* **Discovery**: Inspect `images/characters/` in S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to select a mascot for post overlays.
+* **Compositing**: Any character in `images/characters/` can be stamped onto social cards via `overlayCharacterOnImage` or ComfyUI composite workflows.
+* **New Characters**: To generate a new mascot with distinct attire, personality, or pose, use the `character-creator` skill.
 
 ---
 

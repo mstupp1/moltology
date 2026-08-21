@@ -12,19 +12,13 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 
 ---
 
-## ◈ Homepage Character Family Catalog (Featured Cutouts on S3)
+## ◈ Character Family Cutouts on S3
 
-All characters featured on the Moltology homepage are available as transparent PNG cutouts hosted on Neon S3 (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/`):
+Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
-| Mascot Key | S3 Asset Path | Character Description & Role | Recommended Use in Video / Reels |
-| :--- | :--- | :--- | :--- |
-| `lobster_pointing` | `images/characters/char_lobster_pointing_cta.png` | Hero lobster pointing at action buttons or links | CTA outro card, 1:1 custom thumbnail corner |
-| `lobster_peek` | `images/characters/char_lobster_corner_peek.png` | Playful lobster peeking over card bezels | Hook scene corner overlay, teaser thumbnails |
-| `lobster_thumbs_up` | `images/characters/char_lobster_thumbs_up.png` | Cheerful lobster giving a thumbs-up approval | Success outro cards, Stage 4 clearance badge |
-| `lobster_peaceful` | `images/characters/char_lobster_floating_peaceful.png` | Calm cyber-lobster floating peacefully | Benthic depth videos, 50,000 fathoms clarity |
-| `lobster_action` | `images/characters/char_lobster_speed_action.png` | Dynamic speed-action lobster dashing forward | Low latency, fast execution, 120Hz control loops |
-| `crab_stats` | `images/characters/char_crab_pointing_stats.png` | Energetic crab pointing at quantitative metrics | Quantitative benchmark thumbnails & outro cards |
-| `crab_cling` | `images/characters/char_crab_corner_cling.png` | Cute crab clinging to borders / lower-third | Status badge overlay, side-border video sticker |
+* **Discovery**: Inspect `images/characters/` in S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to select a mascot for hook overlays, watermark accents, or outro CTA cards.
+* **Compositing**: Any character in `images/characters/` can be stamped onto frames or video overlays via `overlayCharacterOnImage` or `scripts/lib/reel-compositor.ts`.
+* **New Characters**: To generate a new mascot with distinct attire, personality, or pose, use the `character-creator` skill.
 
 ---
 
