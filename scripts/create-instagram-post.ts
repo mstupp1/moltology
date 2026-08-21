@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { generateWithComfy, isComfyRunning } from './lib/comfy-client'
 import { overlayCharacterOnImage, CharacterKey } from './lib/character-overlay'
+import { captureComposite } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 
@@ -23,6 +24,8 @@ export interface CreateInstagramPostOptions {
   theme?: 'moltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
   mascot?: CharacterKey | 'none'
   aspectRatio?: '4:5' | '1:1'
+  template?: 'hook' | 'spec-showdown' | 'directives'
+  composite?: boolean
   harmonize?: boolean
   publishNow?: boolean
   dryRun?: boolean
@@ -134,9 +137,10 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
   const tempDir = path.resolve(process.cwd(), 'tmp')
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true })
 
-  // 1. Check ComfyUI Status
+  // 1. Check ComfyUI Status (if ComfyUI is needed)
+  const isComfy = !options.composite || options.harmonize
   const isOnline = await isComfyRunning()
-  if (!isOnline && !options.dryRun) {
+  if (isComfy && !isOnline && !options.dryRun && !options.composite) {
     throw new Error(
       `Local ComfyUI is not running on http://127.0.0.1:8188.\n` +
       `Start it by running: npm run comfy:start\n` +
@@ -147,38 +151,24 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
   let finalImagePath: string
   const baseImagePath = path.join(tempDir, `post_base_${timestamp}.png`)
 
-  // 2. Image Synthesis via ComfyUI
-  if (isOnline) {
-    console.log(`1️⃣ Generating Base Image with Local ComfyUI (FLUX.1 Schnell)...`)
-    const result = await generateWithComfy({
-      prompt: options.prompt || postData.imagePrompt,
+  // 2. Image Synthesis via Web-Native Composite Studio OR ComfyUI
+  if (options.composite) {
+    console.log(`1️⃣ Generating High-DPI Web-Native Composite (Headless Chrome)...`)
+    const templateType = options.template || 'hook'
+    const compositePath = path.join(tempDir, `post_web_composite_${timestamp}.png`)
+    await captureComposite({
+      template: templateType,
+      theme,
       aspectRatio: aspect,
-      outputPath: baseImagePath,
-      workflowType: 'text2img',
+      mascot: postData.mascot,
+      outputPath: compositePath,
+      scaleFactor: 2,
     })
-    console.log(`   ✅ Base image generated in ${(result.durationMs / 1000).toFixed(1)}s -> ${result.outputPath}`)
-    finalImagePath = result.outputPath
-  } else {
-    console.log(`⚠️ ComfyUI offline [Dry Run Mode]: creating fallback placeholder image...`)
-    finalImagePath = baseImagePath
-    fs.writeFileSync(baseImagePath, Buffer.from('mock_image_data'))
-  }
+    finalImagePath = compositePath
 
-  // 3. Layer Mascot Cutout (if requested)
-  if (postData.mascot && postData.mascot !== 'none' && fs.existsSync(finalImagePath) && isOnline) {
-    console.log(`2️⃣ Compositing Mascot (${postData.mascot})...`)
-    const compositedPath = path.join(tempDir, `post_composite_${timestamp}.png`)
-    await overlayCharacterOnImage(finalImagePath, compositedPath, {
-      character: postData.mascot,
-      position: 'bottom-right',
-      scalePercent: 28,
-    })
-    finalImagePath = compositedPath
-    console.log(`   ✅ Mascot stamped -> ${finalImagePath}`)
-
-    // 4. Optional AI Atmospheric Harmonization Pass
+    // Optional AI Atmospheric Harmonization Pass on the Composite
     if (options.harmonize && isOnline) {
-      console.log(`3️⃣ Running Atmospheric Tone Harmonization Pass in ComfyUI...`)
+      console.log(`2️⃣ Running Atmospheric Tone Harmonization Pass on Composite in ComfyUI...`)
       const harmonizedPath = path.join(tempDir, `post_harmonized_${timestamp}.png`)
       const harmResult = await generateWithComfy({
         prompt: `Benthic cybernetic lighting, submerged underwater caustics, cyan bioluminescence, dark biomechanical atmospheric haze.`,
@@ -191,6 +181,49 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
       finalImagePath = harmResult.outputPath
       console.log(`   ✅ Harmonization complete in ${(harmResult.durationMs / 1000).toFixed(1)}s -> ${finalImagePath}`)
     }
+  } else if (isOnline) {
+    console.log(`1️⃣ Generating Base Image with Local ComfyUI (FLUX.1 Schnell)...`)
+    const result = await generateWithComfy({
+      prompt: options.prompt || postData.imagePrompt,
+      aspectRatio: aspect,
+      outputPath: baseImagePath,
+      workflowType: 'text2img',
+    })
+    console.log(`   ✅ Base image generated in ${(result.durationMs / 1000).toFixed(1)}s -> ${result.outputPath}`)
+    finalImagePath = result.outputPath
+
+    // Layer Mascot Cutout
+    if (postData.mascot && postData.mascot !== 'none' && fs.existsSync(finalImagePath)) {
+      console.log(`2️⃣ Compositing Mascot (${postData.mascot})...`)
+      const compositedPath = path.join(tempDir, `post_composite_${timestamp}.png`)
+      await overlayCharacterOnImage(finalImagePath, compositedPath, {
+        character: postData.mascot,
+        position: 'bottom-right',
+        scalePercent: 28,
+      })
+      finalImagePath = compositedPath
+      console.log(`   ✅ Mascot stamped -> ${finalImagePath}`)
+
+      // Optional Harmonization Pass
+      if (options.harmonize) {
+        console.log(`3️⃣ Running Atmospheric Tone Harmonization Pass in ComfyUI...`)
+        const harmonizedPath = path.join(tempDir, `post_harmonized_${timestamp}.png`)
+        const harmResult = await generateWithComfy({
+          prompt: `Benthic cybernetic lighting, submerged underwater caustics, cyan bioluminescence, dark biomechanical atmospheric haze.`,
+          aspectRatio: aspect,
+          compositeInputPath: finalImagePath,
+          workflowType: 'composite_harmonize',
+          denoise: 0.24,
+          outputPath: harmonizedPath,
+        })
+        finalImagePath = harmResult.outputPath
+        console.log(`   ✅ Harmonization complete in ${(harmResult.durationMs / 1000).toFixed(1)}s -> ${finalImagePath}`)
+      }
+    }
+  } else {
+    console.log(`⚠️ ComfyUI offline [Dry Run Mode]: creating fallback placeholder image...`)
+    finalImagePath = baseImagePath
+    fs.writeFileSync(baseImagePath, Buffer.from('mock_image_data'))
   }
 
   // 5. Upload to Neon S3
@@ -260,6 +293,8 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
   const theme = getArg('--theme')
   const mascot = getArg('--mascot') as CharacterKey | 'none' | undefined
   const aspect = getArg('--aspect') as '4:5' | '1:1' | undefined
+  const template = getArg('--template') as 'hook' | 'spec-showdown' | 'directives' | undefined
+  const composite = args.includes('--composite')
   const dryRun = args.includes('--dry-run')
   const publishNow = args.includes('--publish-now')
   const harmonize = args.includes('--harmonize')
@@ -270,6 +305,8 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
     theme,
     mascot,
     aspectRatio: aspect,
+    template,
+    composite,
     dryRun,
     publishNow,
     harmonize,
