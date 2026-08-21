@@ -48,6 +48,7 @@ import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as NewsMdRouteImport } from './routes/news.md'
 import { Route as OrgMdRouteImport } from './routes/org.md'
 import { Route as PrivacyMdRouteImport } from './routes/privacy.md'
+import { Route as RenderCompositeRouteImport } from './routes/render/composite'
 import { Route as RssXmlRouteImport } from './routes/rss.xml'
 import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as TermsMdRouteImport } from './routes/terms.md'
@@ -249,6 +250,11 @@ const PrivacyMdRoute = PrivacyMdRouteImport.update({
   path: '/md',
   getParentRoute: () => PrivacyRoute,
 } as any)
+const RenderCompositeRoute = RenderCompositeRouteImport.update({
+  id: '/render/composite',
+  path: '/render/composite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RssXmlRoute = RssXmlRouteImport.update({
   id: '/rss/xml',
   path: '/rss/xml',
@@ -316,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/news/md': typeof NewsMdRoute
   '/org/md': typeof OrgMdRoute
   '/privacy/md': typeof PrivacyMdRoute
+  '/render/composite': typeof RenderCompositeRoute
   '/rss/xml': typeof RssXmlRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
@@ -362,6 +369,7 @@ export interface FileRoutesByTo {
   '/news/md': typeof NewsMdRoute
   '/org/md': typeof OrgMdRoute
   '/privacy/md': typeof PrivacyMdRoute
+  '/render/composite': typeof RenderCompositeRoute
   '/rss/xml': typeof RssXmlRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
@@ -410,6 +418,7 @@ export interface FileRoutesById {
   '/news/md': typeof NewsMdRoute
   '/org/md': typeof OrgMdRoute
   '/privacy/md': typeof PrivacyMdRoute
+  '/render/composite': typeof RenderCompositeRoute
   '/rss/xml': typeof RssXmlRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/terms/md': typeof TermsMdRoute
@@ -458,6 +467,7 @@ export interface FileRouteTypes {
     | '/news/md'
     | '/org/md'
     | '/privacy/md'
+    | '/render/composite'
     | '/rss/xml'
     | '/sitemap/xml'
     | '/terms/md'
@@ -504,6 +514,7 @@ export interface FileRouteTypes {
     | '/news/md'
     | '/org/md'
     | '/privacy/md'
+    | '/render/composite'
     | '/rss/xml'
     | '/sitemap/xml'
     | '/terms/md'
@@ -551,6 +562,7 @@ export interface FileRouteTypes {
     | '/news/md'
     | '/org/md'
     | '/privacy/md'
+    | '/render/composite'
     | '/rss/xml'
     | '/sitemap/xml'
     | '/terms/md'
@@ -584,6 +596,7 @@ export interface RootRouteChildren {
   JournalMdRoute: typeof JournalMdRoute
   NewsSlugRoute: typeof NewsSlugRouteWithChildren
   NewsMdRoute: typeof NewsMdRoute
+  RenderCompositeRoute: typeof RenderCompositeRoute
   RssXmlRoute: typeof RssXmlRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -866,6 +879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyMdRouteImport
       parentRoute: typeof PrivacyRoute
     }
+    '/render/composite': {
+      id: '/render/composite'
+      path: '/render/composite'
+      fullPath: '/render/composite'
+      preLoaderRoute: typeof RenderCompositeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rss/xml': {
       id: '/rss/xml'
       path: '/rss/xml'
@@ -1014,6 +1034,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalMdRoute: JournalMdRoute,
   NewsSlugRoute: NewsSlugRouteWithChildren,
   NewsMdRoute: NewsMdRoute,
+  RenderCompositeRoute: RenderCompositeRoute,
   RssXmlRoute: RssXmlRoute,
   SitemapXmlRoute: SitemapXmlRoute,
   BlogIndexRoute: BlogIndexRoute,

@@ -30,6 +30,8 @@
     "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts",
     "comfy:setup": "bash scripts/setup-comfy.sh",
     "comfy:start": "bash scripts/start-comfy.sh",
+    "composite:render": "tsx scripts/render-composite.ts",
+    "composite:capture": "tsx scripts/render-composite.ts",
     "post:create": "tsx scripts/create-instagram-post.ts"
   },
   "dependencies": {
