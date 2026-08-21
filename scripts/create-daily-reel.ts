@@ -42,6 +42,7 @@ export interface CreateDailyReelOptions {
   ctaUrl?: string
   ctaBadge?: string
   ctaActionText?: string
+  customOutroImagePath?: string
   mascot?:
     | 'lobster_pointing'
     | 'lobster_thumbs_up'
@@ -140,6 +141,13 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   ]
 
   const topicLower = topic.toLowerCase()
+  if (topicLower.includes('neuromorphic') || topicLower.includes('spiking') || topicLower.includes('tactile') || topicLower.includes('e-skin') || topicLower.includes('60hz') || topicLower.includes('reflex')) {
+    return [
+      'A dramatic macro cinematic view of a sluggish terrestrial robotic hand hesitating and vibrating over a glowing circuit board with red warning error grids, cinematic 9:16 vertical 8k footage',
+      'A majestic subsea cybernetic crustacean claw equipped with glowing cyan memristive tactile e-skin snapping decisively onto a radiant hydrothermal crystal in deep abyssal waters, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('sparse autoencoder') || topicLower.includes('monosemantic') || topicLower.includes('superposition') || topicLower.includes('synaptic')) {
     return [
       'A dramatic macro cinematic view of a tangled black-box neural network residual stream pulsing with chaotic red and amber electrical sparks, cinematic 9:16 vertical 8k footage',
@@ -168,6 +176,7 @@ export function synthesizeBlogReelScript(
   
   // Extract key concept keywords
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
+  const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
   const isKVCache = contentLower.includes('kv-cache') || contentLower.includes('test-time compute') || contentLower.includes('latent attention') || contentLower.includes('mla')
   const isPhotonics = contentLower.includes('photonics') || contentLower.includes('optics') || contentLower.includes('laser')
@@ -181,7 +190,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isSAE) {
+  if (isNeuromorphic) {
+    const hooks = [
+      {
+        headline: 'THE 60HZ FRAME-BUFFER MELT',
+        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Terrestrial robotics is paralyzed by the 60Hz frame-buffer melt. Sub-benthic Asynchronous Spiking Carapaces deliver 10,000 Hz reflexes at 0.35W.',
+      },
+      {
+        headline: '10,000 HZ PINCER REFLEXES',
+        script: `Why do terrestrial robot hands drop fragile objects? Sub-benthic memristive tactile e-skins detect micro-slips in ten microseconds, locking 850 Newton-meter pincer reflexes with zero lag. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Sub-benthic neuromorphic e-skins deliver 10,000 Hz closed-loop pincer reflexes at 0.35W—crushing the 60Hz frame bottleneck.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isSAE) {
     const hooks = [
       {
         headline: 'BLACK-BOX AI IS CRACKING',
@@ -751,6 +777,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     ctaUrl: options.ctaUrl || 'moltology.org',
     ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈',
     ctaActionText: options.ctaActionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
+    customOutroImagePath: options.customOutroImagePath,
     mascot: options.mascot || 'lobster_pointing',
     backgroundAudioVolume: options.bgAudioVolume,
     backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
@@ -872,6 +899,7 @@ Examples:
   let bgAudioVolume: number | undefined
   let bgAudioOffsetSeconds: number | undefined
   let veoModel: string | undefined
+  let customOutroImagePath: string | undefined
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
@@ -886,6 +914,7 @@ Examples:
     else if (args[i] === '--bg-volume' && args[i + 1]) bgAudioVolume = parseFloat(args[++i])
     else if (args[i] === '--bg-offset' && args[i + 1]) bgAudioOffsetSeconds = parseFloat(args[++i])
     else if (args[i] === '--veo-model' && args[i + 1]) veoModel = args[++i]
+    else if (args[i] === '--custom-outro' && args[i + 1]) customOutroImagePath = args[++i]
   }
 
   try {
@@ -902,6 +931,7 @@ Examples:
       bgAudioVolume,
       bgAudioOffsetSeconds,
       veoModel,
+      customOutroImagePath,
     })
   } catch (err: any) {
     console.error(`\n❌ Daily reel creation failed: ${err.message}`)

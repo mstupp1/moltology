@@ -181,7 +181,7 @@ Examples:
     process.exit(0)
   }
 
-  const prompt = args[0]
+  let prompt = ''
   let model = 'veo-3.1-lite-generate-preview'
   let aspectRatio: '9:16' | '16:9' | '1:1' = '9:16'
   let durationSeconds = 6
@@ -190,8 +190,10 @@ Examples:
   let s3Key: string | undefined
   let outputFilePath: string | undefined
 
-  for (let i = 1; i < args.length; i++) {
-    if (args[i] === '--model' && args[i + 1]) {
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--prompt' && args[i + 1]) {
+      prompt = args[++i]
+    } else if (args[i] === '--model' && args[i + 1]) {
       model = args[++i]
     } else if (args[i] === '--aspect' && args[i + 1]) {
       aspectRatio = args[++i] as any
@@ -203,10 +205,17 @@ Examples:
       outputFilePath = args[++i]
     } else if (args[i] === '--keep-local') {
       keepLocal = true
-    } else if (args[i] === '--no-upload') {
+    } else if (args[i] === '--no-upload' || args[i] === '--no-s3') {
       uploadToS3 = false
       keepLocal = true
+    } else if (!args[i].startsWith('-') && !prompt) {
+      prompt = args[i]
     }
+  }
+
+  if (!prompt) {
+    console.error('❌ Error: Missing prompt for video generation.')
+    process.exit(1)
   }
 
   try {
