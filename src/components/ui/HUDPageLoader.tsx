@@ -10,7 +10,7 @@ import { getAssetUrl } from '@/lib/assets'
 export function HUDPageLoader() {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#030708]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#030708]/65 backdrop-blur-sm animate-in fade-in duration-200 transition-opacity"
       role="status"
       aria-label="Loading"
     >
