@@ -7,6 +7,9 @@ export interface WordBoundaryEvent {
   startMs: number
   endMs: number
   durationMs: number
+  isSentenceEnd?: boolean
+  isClauseEnd?: boolean
+  pauseToNextMs?: number
 }
 
 export interface TTSGenerationOptions {
@@ -52,27 +55,145 @@ export function formatSrtTime(ms: number): string {
 }
 
 /**
- * Build Word Groups (Phrases of 2-3 words) for kinetic captioning
+ * Align raw word boundary events from Edge TTS with original script text to preserve punctuation and sentence boundaries
  */
-export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChunk = 3): WordBoundaryEvent[][] {
-  const chunks: WordBoundaryEvent[][] = []
-  let currentChunk: WordBoundaryEvent[] = []
+export function alignWordsWithOriginalText(
+  words: WordBoundaryEvent[],
+  originalText: string
+): WordBoundaryEvent[] {
+  if (!originalText || words.length === 0) return words
 
-  for (const word of words) {
-    currentChunk.push(word)
-    // Break chunk if punctutation or length reached
-    const hasPunctuation = /[.!?]$/.test(word.word.trim())
-    if (currentChunk.length >= maxWordsPerChunk || hasPunctuation) {
-      chunks.push(currentChunk)
-      currentChunk = []
+  const originalTokens = originalText.trim().split(/\s+/).filter(Boolean)
+  let tokenIdx = 0
+
+  return words.map((w, i) => {
+    let matchedToken = ''
+    const cleanWord = w.word.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+    for (let offset = 0; offset < 4 && tokenIdx + offset < originalTokens.length; offset++) {
+      const candidate = originalTokens[tokenIdx + offset]
+      const cleanCandidate = candidate.toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (
+        cleanCandidate === cleanWord ||
+        (cleanWord.length >= 3 && cleanCandidate.startsWith(cleanWord)) ||
+        (cleanCandidate.length >= 3 && cleanWord.startsWith(cleanCandidate))
+      ) {
+        matchedToken = candidate
+        tokenIdx = tokenIdx + offset + 1
+        break
+      }
     }
+
+    if (!matchedToken && tokenIdx < originalTokens.length) {
+      matchedToken = originalTokens[tokenIdx++]
+    }
+
+    const effectiveToken = matchedToken || w.word
+    const isSentenceEnd = /[.!?]+$/.test(effectiveToken) || /[.!?]+$/.test(w.word)
+    const isClauseEnd = /[,;:\u2014-]+$/.test(effectiveToken) || /[,;:\u2014-]+$/.test(w.word)
+
+    const nextWord = words[i + 1]
+    const pauseToNextMs = nextWord ? nextWord.startMs - w.endMs : 0
+    const hasLongPause = pauseToNextMs >= 240
+
+    return {
+      ...w,
+      word: effectiveToken,
+      isSentenceEnd: isSentenceEnd || hasLongPause,
+      isClauseEnd,
+      pauseToNextMs,
+    }
+  })
+}
+
+/**
+ * Partition words of a single sentence into balanced phrase chunks of 2-3 words
+ */
+function partitionSentenceWords(sentenceWords: WordBoundaryEvent[], maxWordsPerChunk = 3): WordBoundaryEvent[][] {
+  const n = sentenceWords.length
+  if (n === 0) return []
+  if (n <= maxWordsPerChunk) return [sentenceWords]
+
+  // If 4 words: balanced 2 + 2
+  if (n === 4) {
+    return [sentenceWords.slice(0, 2), sentenceWords.slice(2, 4)]
   }
 
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk)
+  // If 5 words: check if clause break at index 1 or 2, else 3 + 2
+  if (n === 5) {
+    if (sentenceWords[1]?.isClauseEnd) {
+      return [sentenceWords.slice(0, 2), sentenceWords.slice(2, 5)]
+    }
+    return [sentenceWords.slice(0, 3), sentenceWords.slice(3, 5)]
+  }
+
+  // If 6 words: 3 + 3
+  if (n === 6) {
+    return [sentenceWords.slice(0, 3), sentenceWords.slice(3, 6)]
+  }
+
+  // General balanced partition
+  const chunks: WordBoundaryEvent[][] = []
+  let i = 0
+
+  while (i < n) {
+    const remaining = n - i
+    if (remaining <= maxWordsPerChunk) {
+      chunks.push(sentenceWords.slice(i, n))
+      break
+    }
+
+    let take = 3
+    if (remaining === 4) {
+      take = 2
+    } else if (remaining === 5) {
+      take = sentenceWords[i + 1]?.isClauseEnd ? 2 : 3
+    } else if (sentenceWords[i + 1]?.isClauseEnd && remaining > 3) {
+      take = 2
+    }
+
+    chunks.push(sentenceWords.slice(i, i + take))
+    i += take
   }
 
   return chunks
+}
+
+/**
+ * Build Word Groups (Phrases of 2-3 words) strictly respecting sentence boundaries and speech cadence
+ */
+export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChunk = 3): WordBoundaryEvent[][] {
+  if (words.length === 0) return []
+
+  // 1. Group words into distinct sentences
+  const sentences: WordBoundaryEvent[][] = []
+  let currentSentence: WordBoundaryEvent[] = []
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i]
+    currentSentence.push(word)
+
+    const isEnd =
+      word.isSentenceEnd === true ||
+      /[.!?]$/.test(word.word.trim()) ||
+      (words[i + 1] && words[i + 1].startMs - word.endMs >= 240)
+
+    if (isEnd || i === words.length - 1) {
+      if (currentSentence.length > 0) {
+        sentences.push(currentSentence)
+        currentSentence = []
+      }
+    }
+  }
+
+  // 2. Partition each sentence into balanced chunks
+  const allChunks: WordBoundaryEvent[][] = []
+  for (const sentence of sentences) {
+    const sentenceChunks = partitionSentenceWords(sentence, maxWordsPerChunk)
+    allChunks.push(...sentenceChunks)
+  }
+
+  return allChunks
 }
 
 /**
@@ -95,7 +216,7 @@ Style: Highlight,Arial,68,&H0000FFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,1
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 `
 
-  const phrases = chunkWordsIntoPhrases(words, 4)
+  const phrases = chunkWordsIntoPhrases(words, 3)
   const lines: string[] = []
 
   for (const phrase of phrases) {
@@ -181,7 +302,7 @@ export async function generateVoiceover(text: string, options: TTSGenerationOpti
   const metadataPath = result.metadataFilePath
 
   // Parse word boundaries
-  const words: WordBoundaryEvent[] = []
+  let words: WordBoundaryEvent[] = []
   if (metadataPath && fs.existsSync(metadataPath)) {
     try {
       const metaJson = JSON.parse(fs.readFileSync(metadataPath, 'utf8'))
@@ -211,6 +332,9 @@ export async function generateVoiceover(text: string, options: TTSGenerationOpti
       console.warn('⚠️ Failed to parse metadata file for word boundaries:', err)
     }
   }
+
+  // Align raw words with original text to preserve punctuation, clause boundaries, and sentence ends
+  words = alignWordsWithOriginalText(words, text)
 
   // Calculate approximate audio duration
   let durationSeconds = 0
