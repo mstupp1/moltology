@@ -184,6 +184,7 @@ export const LandingPage: React.FC = () => {
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
       image: getAssetUrl('/images/gallery/ascendant_crab_god.jpg'),
+      imagePosition: 'center 25%',
       borderColor: 'border-red-500/40 hover:border-red-400',
       shadowColor: 'shadow-[0_0_20px_rgba(239,68,68,0.12)] hover:shadow-[0_0_30px_rgba(239,68,68,0.25)]',
       dotColor: 'bg-red-400',
@@ -473,7 +474,8 @@ export const LandingPage: React.FC = () => {
                         <img
                           src={pillar.image}
                           alt={pillar.title}
-                          className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
+                          style={pillar.imagePosition ? { objectPosition: pillar.imagePosition } : undefined}
+                          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
                         />
 
                         {/* Peripheral Radial Vignette */}
