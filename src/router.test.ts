@@ -12,5 +12,8 @@ describe('TanStack Router Configuration', () => {
     const router = getRouter()
     expect(router.options.defaultNotFoundComponent).toBeDefined()
     expect(router.options.defaultPendingComponent).toBeDefined()
+    expect(router.options.defaultPreload).toBe('intent')
+    expect(router.options.defaultPendingMinMs).toBe(0)
   })
 })
+
