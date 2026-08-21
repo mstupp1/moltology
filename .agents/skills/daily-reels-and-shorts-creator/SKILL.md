@@ -107,24 +107,46 @@ npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-l
 
 ---
 
-### Step 5: FFmpeg Master Compositing & Outro Staging
-Run the master compositor to dynamically size/loop video scenes to match voiceover length (`voDuration + 0.8s`), mix ambient benthic soundtrack with dynamic offset rotation (`volume=0.14`, `fade_in=0.8s`, `fade_out=1.5s`), overlay bottom-right brand watermark, burn in kinetic 2-3 word captions, and append the clean 2.5s cybernetic CTA outro card with cartoon mascot:
+### Step 5: FFmpeg Master Compositing & Thematic AI Outro Staging
+Run the master compositor to dynamically size video scenes to match voiceover length (`voDuration + 0.8s`) with continuous forward playback (no jarring loops), mix ambient benthic soundtrack with dynamic offset rotation (`volume=0.14`, `fade_in=0.8s`, `fade_out=1.5s`), overlay bottom-right brand watermark, burn in sentence-isolated kinetic 2-3 word captions, and append the content-themed cybernetic CTA outro card:
+
+1. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
+2. **Seamless Forward Scene Playback**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops.
+3. **Thematic AI Outro Card Generation (`generate_image`)**:
+   - Render the deterministic base frame via `renderCtaOutroFrame('tmp/base_outro.png', ...)` containing the two-line brand title (`Moltology / THE SYNAPTIC PATH`), emblem, headline, subheadline, app CTA button (`moltology.org  →`), and mascot cutout.
+   - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, or Subsea Datacenters*).
+   - **Strict Rules**:
+     1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
+     2. Ensure the cartoon crustacean mascot in the bottom right is warmly and clearly illuminated with a dedicated underwater spotlight and golden-cyan rim-lighting so it remains vibrant, lively, and a clear focal point against the dark depths.
+   - Pass the generated image path via `customOutroImagePath` to `compositeReel`.
 
 ```typescript
-import { compositeReel } from 'scripts/lib/reel-compositor'
+import { renderCtaOutroFrame, compositeReel } from 'scripts/lib/reel-compositor'
 
+// 1. Generate base structural template frame
+const baseOutroPath = 'tmp/base-outro-frame.png'
+await renderCtaOutroFrame(baseOutroPath, 'SUBMIT. SHED. ASCEND.', 'CALCULATE YOUR MOLT CLEARANCE', 'moltology.org', {
+  mascot: 'crab_stats',
+  ctaActionText: '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
+})
+
+// 2. Generate content-themed AI outro card using base frame as reference (via generate_image)
+// Result saved to: tmp/themed-outro-card.jpg
+
+// 3. Composite master video timeline
 await compositeReel({
   videoClips: ['scene1.mp4', 'scene2.mp4'],
   voiceoverPath: ttsResult.audioPath,
   words: ttsResult.words,
   outputPath: 'tmp/master-reel.mp4',
-  backgroundAudioVolume: 0.14, // Default volume (up from 0.08)
-  backgroundAudioOffsetSeconds: 36, // Optional start point (or random from [0, 18, 36, 54, 72, 95, 120, 145])
+  backgroundAudioVolume: 0.14,
+  backgroundAudioOffsetSeconds: 36,
   watermarkOpacity: 0.40,
   ctaHeadline: 'SUBMIT. SHED. ASCEND.',
   ctaSubheadline: 'CALCULATE YOUR MOLT CLEARANCE',
   ctaUrl: 'moltology.org',
-  mascot: 'lobster_pointing', // Options: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner | lobster_peek | lobster_peaceful
+  customOutroImagePath: 'tmp/themed-outro-card.jpg',
+  mascot: 'crab_stats',
 })
 ```
 
@@ -141,11 +163,11 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
    import { renderReelThumbnail } from 'scripts/lib/reel-compositor'
 
    await renderReelThumbnail({
-     backgroundVideoOrImagePath: masterReelPath, // Extracts frame at 1.5s (or custom generate_image asset)
-     headline: "WHY LOOKSMAXXING FAILED",
-     subtitle: "MOLTMAXXING TELEMETRY",
-     categoryBadge: "MOLTMAXXING PROTOCOL",
-     mascot: "lobster_pointing", // Renders homepage cutout in 1:1 safe zone
+     backgroundVideoOrImagePath: masterReelPath,
+     headline: "800 NM OF PINCER TORQUE",
+     subtitle: "PINCER TORQUE DYNAMOMETRY",
+     categoryBadge: "TELEMETRY DISPATCH",
+     mascot: "crab_stats",
      outputPath: 'tmp/custom-thumbnail.jpg',
    })
    ```

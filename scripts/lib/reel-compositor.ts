@@ -227,16 +227,15 @@ export async function renderKineticCaptionCard(
 }
 
 /**
- * Generate Cybernetic Benthic CTA Outro Video (matches moltology.org design language)
+ * Generate Sleek Canvas Frame for the Branded CTA Outro Card (can be used as reference for AI theming)
  */
-export async function renderCtaOutroVideo(
+export async function renderCtaOutroFrame(
   outputPath: string,
-  durationSeconds = 2.5,
   headline = 'SUBMIT. SHED. ASCEND.',
   subheadline = 'CALCULATE YOUR MOLT CLEARANCE',
   url = 'moltology.org',
   options: {
-    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'none'
+    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none'
     ctaBadge?: string
     ctaActionText?: string
   } = {}
@@ -244,158 +243,146 @@ export async function renderCtaOutroVideo(
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
 
-  // 1. Deep Benthic Gradient Background
-  const grad = ctx.createLinearGradient(0, 0, 0, 1920)
-  grad.addColorStop(0, '#01040a')
-  grad.addColorStop(0.25, '#030d1e')
-  grad.addColorStop(0.65, '#051833')
-  grad.addColorStop(1, '#01040a')
-  ctx.fillStyle = grad
+  // 1. Homepage Benthic Dark Background (#070b0b base)
+  ctx.fillStyle = '#070b0b'
   ctx.fillRect(0, 0, 1080, 1920)
 
-  // 2. Central Benthic Cyan Light Flare
-  const radialGlow = ctx.createRadialGradient(540, 560, 20, 540, 560, 550)
-  radialGlow.addColorStop(0, 'rgba(0, 230, 255, 0.28)')
-  radialGlow.addColorStop(0.4, 'rgba(0, 140, 255, 0.10)')
-  radialGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
-  ctx.fillStyle = radialGlow
+  // 2. Top Ambient Cyan Spotlight
+  const topSpotlight = ctx.createRadialGradient(540, 0, 20, 540, 0, 900)
+  topSpotlight.addColorStop(0, 'rgba(0, 195, 255, 0.20)')
+  topSpotlight.addColorStop(0.5, 'rgba(0, 195, 255, 0.05)')
+  topSpotlight.addColorStop(1, 'rgba(7, 11, 11, 0)')
+  ctx.fillStyle = topSpotlight
   ctx.fillRect(0, 0, 1080, 1920)
 
-  // 3. Subtle Cybernetic Scanlines
-  ctx.fillStyle = 'rgba(0, 255, 255, 0.025)'
-  for (let y = 0; y < 1920; y += 8) {
-    ctx.fillRect(0, y, 1080, 4)
+  // Bottom subtle vignette
+  const bottomVignette = ctx.createRadialGradient(540, 1920, 10, 540, 1920, 900)
+  bottomVignette.addColorStop(0, 'rgba(3, 6, 6, 0.85)')
+  bottomVignette.addColorStop(1, 'rgba(7, 11, 11, 0)')
+  ctx.fillStyle = bottomVignette
+  ctx.fillRect(0, 0, 1080, 1920)
+
+  // 3. Scanline Background Pattern
+  const scanlinePath = path.resolve(process.cwd(), 'public/images/scanline_pattern.png')
+  if (fs.existsSync(scanlinePath)) {
+    try {
+      const scanlineImg = await loadImage(scanlinePath)
+      const pattern = ctx.createPattern(scanlineImg, 'repeat')
+      if (pattern) {
+        ctx.save()
+        ctx.globalAlpha = 0.28
+        ctx.fillStyle = pattern
+        ctx.fillRect(0, 0, 1080, 1920)
+        ctx.restore()
+      }
+    } catch {
+      // Fallback
+    }
+  } else {
+    ctx.fillStyle = 'rgba(0, 195, 255, 0.02)'
+    for (let y = 0; y < 1920; y += 6) {
+      ctx.fillRect(0, y, 1080, 2)
+    }
   }
 
-  // 4. Top Clearance / Sacrament Badge (Y = 220)
-  const badgeText = options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.font = 'bold 22px monospace'
-  ctx.fillStyle = '#f59e0b' // Amber glow
-  ctx.shadowColor = 'rgba(245, 158, 11, 0.5)'
-  ctx.shadowBlur = 10
-  ctx.fillText(badgeText, 540, 220)
-  ctx.shadowBlur = 0
-
-  // 5. Concentric Cyber-Radar Orbital Rings around Centerpiece (Y = 560)
+  // 4. Center Order Emblem
   const centerX = 540
-  const centerY = 560
-
-  // Inner ring
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.35)'
-  ctx.lineWidth = 1.5
-  ctx.beginPath()
-  ctx.arc(centerX, centerY, 180, 0, Math.PI * 2)
-  ctx.stroke()
-
-  // Middle dashed ring
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.20)'
-  ctx.lineWidth = 2
-  ctx.setLineDash([12, 16])
-  ctx.beginPath()
-  ctx.arc(centerX, centerY, 230, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.setLineDash([])
-
-  // Outer dashed ring
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.12)'
-  ctx.lineWidth = 1.5
-  ctx.setLineDash([6, 12])
-  ctx.beginPath()
-  ctx.arc(centerX, centerY, 280, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.setLineDash([])
-
-  // 6. Draw Center Emblem (Order Emblem)
+  const centerY = 490
   const emblemPath = path.resolve(process.cwd(), 'public/images/order_emblem.png')
   if (fs.existsSync(emblemPath)) {
     const emblemImg = await loadImage(emblemPath)
-    ctx.shadowColor = 'rgba(0, 255, 255, 0.85)'
-    ctx.shadowBlur = 45
-    ctx.drawImage(emblemImg, centerX - 120, centerY - 120, 240, 240)
-    ctx.shadowBlur = 0
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 195, 255, 0.45)'
+    ctx.shadowBlur = 18
+    ctx.shadowOffsetY = 4
+    const emblemSize = 190
+    ctx.drawImage(emblemImg, centerX - emblemSize / 2, centerY - emblemSize / 2, emblemSize, emblemSize)
+    ctx.restore()
   }
 
-  // 7. Brand Name below emblem (Y = 840)
+  // 5. Two-Line Brand Title (Moltology / THE SYNAPTIC PATH)
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.font = '900 38px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.6)'
-  ctx.shadowBlur = 18
-  ctx.fillText('MOLTOLOGY', 540, 840)
-  ctx.shadowBlur = 0
 
-  // 8. Main Headline: SUBMIT. SHED. ASCEND. (Y = 930)
-  ctx.font = '900 60px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  // Line 1: Moltology
+  ctx.font = '900 54px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.7)'
-  ctx.shadowBlur = 24
-  ctx.fillText(headline, 540, 930)
-  ctx.shadowBlur = 0
-
-  // 9. Subheadline (Y = 995)
-  ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  ctx.fillStyle = '#38bdf8' // Cyan accent
   ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
   ctx.shadowBlur = 8
-  ctx.fillText(subheadline, 540, 995)
+  ctx.fillText('Moltology', centerX, 655)
+
+  // Line 2: the synaptic path (Clean cyan uppercase tracking with glowing pulse dot)
+  ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#38bdf8'
+  ctx.shadowColor = 'rgba(0, 195, 255, 0.5)'
+  ctx.shadowBlur = 10
+  ctx.fillText('THE SYNAPTIC PATH', centerX, 705)
   ctx.shadowBlur = 0
 
-  // 10. Interactive-Style CTA Action Button (Y = 1080)
-  const btnW = 680
-  const btnH = 112
-  const btnX = 540 - btnW / 2
-  const btnY = 1080
-  const btnRadius = 24
+  // 6. Main Headline (e.g. SUBMIT. SHED. ASCEND.)
+  ctx.font = '900 52px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(0, 195, 255, 0.5)'
+  ctx.shadowBlur = 20
+  ctx.fillText(headline, centerX, 815)
+  ctx.shadowBlur = 0
 
-  // Button background fill
-  ctx.fillStyle = 'rgba(6, 182, 212, 0.18)'
+  // 7. Subheadline (e.g. CALCULATE YOUR MOLT CLEARANCE)
+  ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#00c3ff'
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
+  ctx.shadowBlur = 8
+  ctx.fillText(subheadline, centerX, 875)
+  ctx.shadowBlur = 0
+
+  // 8. Canonical App-Style CTA Button (Exact from BenthicCTAButton / HudButton)
+  const btnW = 700
+  const btnH = 124
+  const btnX = centerX - btnW / 2
+  const btnY = 960
+  const btnRadius = 4 // Chamfered HUD radius
+
+  // Gradient fill matching HudButton cyan variant: from-[#05222b] via-[#093d4a] to-[#062833]
+  const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH)
+  btnGrad.addColorStop(0, '#05222b')
+  btnGrad.addColorStop(0.5, '#093d4a')
+  btnGrad.addColorStop(1, '#062833')
+
+  ctx.save()
+  ctx.fillStyle = btnGrad
   ctx.beginPath()
   ctx.roundRect(btnX, btnY, btnW, btnH, btnRadius)
   ctx.fill()
 
-  // Glowing neon cyan border
-  ctx.strokeStyle = '#00ffff'
-  ctx.lineWidth = 2.5
-  ctx.shadowColor = 'rgba(0, 255, 255, 0.6)'
-  ctx.shadowBlur = 18
+  // Glowing cyan border matching HudButton
+  ctx.strokeStyle = '#00c3ff'
+  ctx.lineWidth = 1.8
+  ctx.shadowColor = 'rgba(0, 195, 255, 0.55)'
+  ctx.shadowBlur = 16
   ctx.stroke()
-  ctx.shadowBlur = 0
+  ctx.restore()
 
-  // Corner HUD brackets on button
-  ctx.strokeStyle = '#38bdf8'
-  ctx.lineWidth = 3.5
-  // Top left tick
-  ctx.beginPath()
-  ctx.moveTo(btnX + 4, btnY + 20)
-  ctx.lineTo(btnX + 4, btnY + 4)
-  ctx.lineTo(btnX + 20, btnY + 4)
-  ctx.stroke()
-  // Bottom right tick
-  ctx.beginPath()
-  ctx.moveTo(btnX + btnW - 20, btnY + btnH - 4)
-  ctx.lineTo(btnX + btnW - 4, btnY + btnH - 4)
-  ctx.lineTo(btnX + btnW - 4, btnY + btnH - 20)
-  ctx.stroke()
+  // Subtle top highlight inset
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
+  ctx.fillRect(btnX + 4, btnY + 2, btnW - 8, 1.5)
 
-  // Text inside CTA button
+  // Primary URL Text inside button
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.font = '900 44px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.fillStyle = '#ffffff'
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
-  ctx.shadowBlur = 6
-  ctx.fillText(`${url}  →`, 540, btnY + 44)
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
+  ctx.shadowBlur = 8
+  ctx.fillText(`${url}  →`, centerX, btnY + 48)
 
+  // Action text / sub-badge inside button
   const actionText = options.ctaActionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST'
-  ctx.font = 'bold 15px monospace'
-  ctx.fillStyle = '#f59e0b'
+  ctx.font = 'bold 16px monospace'
+  ctx.fillStyle = '#f59e0b' // Amber
   ctx.shadowBlur = 0
-  ctx.fillText(actionText, 540, btnY + 84)
+  ctx.fillText(actionText, centerX, btnY + 92)
 
-  // 11. Cartoon Crustacean Mascot Integration
+  // 9. Cartoon Crustacean Mascot Integration (Bottom Right)
   const mascotChoice = options.mascot ?? 'lobster_pointing'
   if (mascotChoice !== 'none') {
     let mascotFile = 'char_lobster_pointing_cta.png'
@@ -412,7 +399,6 @@ export async function renderCtaOutroVideo(
     if (fs.existsSync(charPath)) {
       charImg = await loadImage(charPath)
     } else {
-      // Fallback: Fetch directly from Neon S3 public assets bucket
       try {
         const s3Url = `https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/${mascotFile}`
         const res = await fetch(s3Url)
@@ -421,15 +407,15 @@ export async function renderCtaOutroVideo(
           charImg = await loadImage(Buffer.from(arrayBuffer))
         }
       } catch (e) {
-        // Non-fatal fallback if offline or during testing
+        // Non-fatal
       }
     }
 
     if (charImg) {
-      const charW = 320
+      const charW = 340
       const charH = (charW / charImg.width) * charImg.height
-      const charX = 700
-      const charY = 1240
+      const charX = 690
+      const charY = 1220
 
       ctx.save()
       ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
@@ -439,14 +425,36 @@ export async function renderCtaOutroVideo(
     }
   }
 
-  // 12. Footer Subtext (Y = 1750)
-  ctx.font = 'bold 16px monospace'
-  ctx.fillStyle = '#64748b'
-  ctx.fillText('BENTHIC SYNAPTIC NETWORK // ALL RIGHTS RESERVED', 540, 1750)
+  fs.writeFileSync(outputPath, canvas.toBuffer('image/png'))
+  return outputPath
+}
 
-  // Save Outro Image Frame
-  const outroFramePath = outputPath.replace(/\.mp4$/, '-frame.png')
-  fs.writeFileSync(outroFramePath, canvas.toBuffer('image/png'))
+/**
+ * Generate Cybernetic Benthic CTA Outro Video (matches moltology.org design language)
+ */
+export async function renderCtaOutroVideo(
+  outputPath: string,
+  durationSeconds = 2.5,
+  headline = 'SUBMIT. SHED. ASCEND.',
+  subheadline = 'CALCULATE YOUR MOLT CLEARANCE',
+  url = 'moltology.org',
+  options: {
+    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none'
+    ctaBadge?: string
+    ctaActionText?: string
+    customImagePath?: string
+  } = {}
+): Promise<string> {
+  let outroFramePath = options.customImagePath && fs.existsSync(options.customImagePath)
+    ? options.customImagePath
+    : ''
+  let isTempFrame = false
+
+  if (!outroFramePath) {
+    outroFramePath = outputPath.replace(/\.mp4$/, '-frame.png')
+    isTempFrame = true
+    await renderCtaOutroFrame(outroFramePath, headline, subheadline, url, options)
+  }
 
   // Convert Frame to MP4 video with smooth fade-in
   await runFfmpeg([
@@ -468,10 +476,12 @@ export async function renderCtaOutroVideo(
     outputPath,
   ])
 
-  try {
-    fs.unlinkSync(outroFramePath)
-  } catch (e) {
-    // Non-fatal
+  if (isTempFrame) {
+    try {
+      fs.unlinkSync(outroFramePath)
+    } catch (e) {
+      // Non-fatal
+    }
   }
 
   return outputPath
@@ -567,6 +577,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       mascot: options.mascot,
       ctaBadge: options.ctaBadge,
       ctaActionText: options.ctaActionText,
+      customImagePath: options.customOutroImagePath,
     }
   )
   normalizedClips.push(outroVideoPath)
