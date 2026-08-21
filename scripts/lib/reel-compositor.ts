@@ -149,7 +149,7 @@ export async function renderKineticCaptionCard(
       ctx.font = isHighlight
         ? `900 ${hSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
         : `bold ${bSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-      const text = w.word.toUpperCase()
+      const text = (w.word || '').replace(/[.,;:]+$/, '').toUpperCase()
       const width = ctx.measureText(text).width
       wSum += width
       return { text, isHighlight, width }
@@ -478,22 +478,37 @@ export async function renderCtaOutroVideo(
 }
 
 /**
- * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps with target duration loop support
+ * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps with continuous forward playback (no jarring loops)
  */
 export async function normalizeVideoClip(
   inputPath: string,
   outputPath: string,
   targetDuration?: number
 ): Promise<string> {
-  const vf = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
+  const baseVf = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
   const args = ['-y']
-  if (targetDuration) {
-    args.push('-stream_loop', '-1')
+
+  if (targetDuration && targetDuration > 0) {
+    let inputDuration = targetDuration
+    try {
+      inputDuration = await getMediaDuration(inputPath)
+    } catch {
+      inputDuration = targetDuration
+    }
+
+    if (inputDuration < targetDuration - 0.05) {
+      // Video is shorter than target slot: stretch seamlessly with cinematic slow-motion instead of jarring jump-loop
+      const ptsFactor = (targetDuration / inputDuration).toFixed(4)
+      const slowVf = `setpts=${ptsFactor}*PTS,${baseVf}`
+      args.push('-i', inputPath, '-vf', slowVf, '-c:v', 'libx264', '-an', '-t', targetDuration.toFixed(3))
+    } else {
+      // Video is equal or longer: smoothly forward play and trim cleanly at target duration
+      args.push('-i', inputPath, '-vf', baseVf, '-c:v', 'libx264', '-an', '-t', targetDuration.toFixed(3))
+    }
+  } else {
+    args.push('-i', inputPath, '-vf', baseVf, '-c:v', 'libx264', '-an')
   }
-  args.push('-i', inputPath, '-vf', vf, '-c:v', 'libx264', '-an')
-  if (targetDuration) {
-    args.push('-t', targetDuration.toFixed(3))
-  }
+
   args.push(outputPath)
   await runFfmpeg(args)
   return outputPath

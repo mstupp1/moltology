@@ -667,18 +667,25 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   // 3. Generate Video Scenes
   const sceneVideoPaths: string[] = []
   const useVeo = options.useVeo ?? true
+  const voDuration = ttsResult.durationSeconds
+  const postSpeechBuffer = 0.8
+  const requiredSpeechDuration = voDuration + postSpeechBuffer
+  const numScenes = Math.max(1, scriptData.scenePrompts.length)
+  const perSceneDurationTarget = requiredSpeechDuration / numScenes
+  // Veo supports durationSeconds integer (4 to 8s). Request footage equal or slightly longer than target to ensure zero looping
+  const veoSceneDuration = Math.min(8, Math.max(5, Math.ceil(perSceneDurationTarget + 0.5)))
 
-  console.log(`\n3️⃣ Generating Video Scenes...`)
+  console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
   if (useVeo && !options.dryRun) {
     for (let i = 0; i < scriptData.scenePrompts.length; i++) {
       const prompt = scriptData.scenePrompts[i]
-      console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1...`)
+      console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
       const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
       const veoResult = await generateVeoVideo({
         prompt,
         model: options.veoModel || 'veo-3.1-lite-generate-preview',
         aspectRatio: '9:16',
-        durationSeconds: 6,
+        durationSeconds: veoSceneDuration,
         uploadToS3: false,
         keepLocal: true,
         outputFilePath: sceneOut,
