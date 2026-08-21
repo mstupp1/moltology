@@ -9,6 +9,7 @@ const mockNavigate = vi.fn()
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/dashboard' }),
+  useRouter: () => ({ preloadRoute: vi.fn() }),
 }))
 
 vi.mock('@/lib/auth-client', () => ({

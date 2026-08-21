@@ -12,7 +12,7 @@ export function getRouter() {
     defaultPreload: 'intent',
     defaultPreloadDelay: 50,
     defaultPendingComponent: HUDPageLoader,
-    defaultPendingMs: 150,
+    defaultPendingMs: 250,
     defaultPendingMinMs: 0,
   })
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useNavigate, useLocation } from '@tanstack/react-router'
+import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
 import {
 
   LayoutDashboard,
@@ -51,6 +51,7 @@ interface HUDSidebarProps {
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   larvaId = 'LARVA UNIT #8971',
 }) => {
+  const router = typeof useRouter === 'function' ? useRouter() : null
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -444,6 +445,14 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const tickerText = tickerMessages.join(' • ') + ' • '
 
+  const handlePrefetch = (path: string) => {
+    try {
+      router?.preloadRoute?.({ to: path as any })
+    } catch {
+      // ignore
+    }
+  }
+
   const handleNavClick = (path: string) => {
     setPendingRoute(path)
     navigate({ to: path })
@@ -474,6 +483,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.path)}
+                  onMouseEnter={() => handlePrefetch(item.path)}
+                  onFocus={() => handlePrefetch(item.path)}
                   className={`w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/navitem cursor-pointer ${
                     isActive
                       ? 'bg-[#ff3b30]/10'
@@ -570,6 +581,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.path)}
+                    onMouseEnter={() => handlePrefetch(item.path)}
+                    onFocus={() => handlePrefetch(item.path)}
                     className={`w-full text-left relative flex items-center min-h-[44px] transition-colors duration-150 group/navitem ${
                       isMobile ? 'px-5 py-3 gap-3.5' : 'px-4 py-2.5 pl-5 gap-3'
                     } cursor-pointer ${
@@ -830,6 +843,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 >
                   <button
                     onClick={() => handleNavClick('/support')}
+                    onMouseEnter={() => handlePrefetch('/support')}
+                    onFocus={() => handlePrefetch('/support')}
                     className="w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/help cursor-pointer"
                   >
                     {currentRoute === '/support' && (
@@ -914,6 +929,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 {/* Help & Support Nav Item */}
                 <button
                   onClick={() => handleNavClick('/support')}
+                  onMouseEnter={() => handlePrefetch('/support')}
+                  onFocus={() => handlePrefetch('/support')}
                   className="flex-1 text-left relative flex items-center px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer"
                   title="Benthic Support Portal"
                 >
@@ -1078,6 +1095,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               >
                 <button
                   onClick={() => handleNavClick('/support')}
+                  onMouseEnter={() => handlePrefetch('/support')}
+                  onFocus={() => handlePrefetch('/support')}
                   className="w-full text-left relative flex items-center transition-colors duration-150 group/help cursor-pointer px-4 py-2.5 pl-5 gap-3"
                   title="Benthic Support Portal"
                 >

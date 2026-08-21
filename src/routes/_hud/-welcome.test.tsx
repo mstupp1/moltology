@@ -7,6 +7,7 @@ import { authClient } from '@/lib/auth-client'
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/dashboard' }),
+  useRouter: () => ({ preloadRoute: vi.fn() }),
   Outlet: () => null,
   createFileRoute: () => (config: any) => config,
 }))
