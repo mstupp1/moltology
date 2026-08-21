@@ -25,6 +25,7 @@ import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
 import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 // Mock Activity Data
 interface ActivityItem {
@@ -378,4 +379,5 @@ function DashboardRoute() {
 
 export const Route = createFileRoute('/_hud/dashboard')({
   component: DashboardRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

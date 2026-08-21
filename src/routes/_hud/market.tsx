@@ -5,6 +5,7 @@ import { AssetTransmutationModal } from '@/components/hud/AssetTransmutationModa
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 function MarketRoute() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -440,4 +441,5 @@ export const Route = createFileRoute('/_hud/market')({
     ],
   }),
   component: MarketRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

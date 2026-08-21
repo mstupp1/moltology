@@ -22,6 +22,7 @@ import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 
 export const Route = createFileRoute('/_hud/subterranean')({
   component: SubterraneanRoute,
+  pendingComponent: SubterraneanHubGhost,
 })
 
 interface BioVatSpecimen {
@@ -162,6 +163,7 @@ function SubterraneanRoute() {
     <GuestLockGuard
       featureName="Subterranean Vats"
       message="Subterranean specimen containment vats and biometric telemetry streams require an authorized initiate account."
+      skeleton={<SubterraneanHubGhost />}
     >
       <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3]">
       {/* Flash Alert Banner when Bio-Purging */}

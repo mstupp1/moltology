@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/codexData'
 import { getAssetUrl } from '@/lib/assets'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 function PipelineRoute() {
   // Current user's simulated active position in the micro-clearance pipeline (e.g., 'L-2')
@@ -327,4 +328,5 @@ function PipelineRoute() {
 
 export const Route = createFileRoute('/_hud/pipeline')({
   component: PipelineRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

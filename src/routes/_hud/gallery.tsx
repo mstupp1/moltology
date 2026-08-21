@@ -19,6 +19,7 @@ import type { GalleryPin } from '@/lib/gallery-data'
 import { MasonryGrid } from '@/components/gallery/MasonryGrid'
 import { GalleryPinModal } from '@/components/gallery/GalleryPinModal'
 import { UploadPinModal } from '@/components/gallery/UploadPinModal'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 function GalleryRoute() {
   const [pins, setPins] = useState<GalleryPin[]>(INITIAL_GALLERY_PINS)
@@ -343,4 +344,5 @@ function GalleryRoute() {
 
 export const Route = createFileRoute('/_hud/gallery')({
   component: GalleryRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

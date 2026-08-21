@@ -7,6 +7,7 @@ import { authClient } from '@/lib/auth-client'
 import { getAIThreadsFn } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 function OracleRouteComponent() {
   const oracle = useSafeOracle()
@@ -174,4 +175,5 @@ function OracleRouteComponent() {
 
 export const Route = createFileRoute('/_hud/oracle')({
   component: OracleRouteComponent,
+  pendingComponent: HudWorkspaceGhost,
 })

@@ -4,9 +4,11 @@ import { ArrowLeft, FileText } from 'lucide-react'
 import { getJournalPaperBySlug, JOURNAL_META } from '@/lib/journal-data'
 import { JournalMasthead } from '@/components/journal/JournalMasthead'
 import { JournalPaperReader } from '@/components/journal/JournalPaperReader'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 export const Route = createFileRoute('/_hud/journal/$slug')({
   component: JournalPaperPage,
+  pendingComponent: HudWorkspaceGhost,
 })
 
 function JournalPaperPage() {

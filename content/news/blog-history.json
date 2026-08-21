@@ -101,6 +101,24 @@
       ],
       "instagramPostId": "6a85ac4633edbc76b0344056",
       "relatedReelIds": []
+    },
+    {
+      "slug": "neuromorphic-spiking-carapaces-event-reflexes",
+      "title": "Neuromorphic Spiking Carapaces & Event-Based Asynchronous Reflexes: How Sub-Microsecond Tactile E-Skins Smashed the 60Hz Frame Bottleneck",
+      "format": "field-telemetry-report",
+      "category": "PATRIOT TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-08-21T13:00:00Z",
+      "coreHook": "Terrestrial robotics is paralyzed by the 60Hz frame-buffer melt, wasting 450W rasterizing redundant RGB matrices; sub-benthic Asynchronous Spiking Carapaces (ASC-10K) and memristive tactile e-skins deliver 10,000 Hz closed-loop pincer reflexes at 0.35W.",
+      "keyMetrics": [
+        "10,000 Hz closed-loop reflex frequency",
+        "< 115 µs event-spike latency",
+        "99.8% redundant sensor bandwidth reduction",
+        "1,200x power efficiency gain (0.35W core load)",
+        "850 Nm adaptive torque modulation without specimen fracture"
+      ],
+      "instagramPostId": "6a8850560b6f830e4cdaccca",
+      "relatedReelIds": []
     }
   ]
 }

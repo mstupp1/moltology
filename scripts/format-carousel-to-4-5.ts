@@ -4,12 +4,12 @@ import path from 'node:path'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 
-const ARTIFACT_DIR = path.resolve('/Users/mylesstupp/.gemini/antigravity/brain/68f0fb76-c6b4-4fac-86df-6abe2aa8515d')
+const ARTIFACT_DIR = path.resolve('/Users/mylesstupp/.gemini/antigravity/brain/fe6476db-2fe6-435d-b540-003041323b61')
 
 const SLIDE_PATHS = [
-  path.join(ARTIFACT_DIR, '.user_uploaded/media_1787079997362.jpg'),
-  path.join(ARTIFACT_DIR, '.user_uploaded/media_1787080164872.jpg'),
-  path.join(ARTIFACT_DIR, '.user_uploaded/media_1787080177641.jpg'),
+  path.join(ARTIFACT_DIR, 'polished_carousel_slide1_1787318196046.jpg'),
+  path.join(ARTIFACT_DIR, 'polished_carousel_slide2_1787318231297.jpg'),
+  path.join(ARTIFACT_DIR, 'polished_carousel_slide3_1787318247627.jpg'),
 ]
 
 async function formatToInstagram4x5(inputPath: string, outputPath: string): Promise<string> {
@@ -43,7 +43,7 @@ async function main() {
     const outPath = path.join(ARTIFACT_DIR, `slide${i + 1}_4x5.jpg`)
     await formatToInstagram4x5(SLIDE_PATHS[i], outPath)
 
-    const s3Key = `images/social/test-time-compute-kv-cache-ecdysis/slide${i + 1}.jpg`
+    const s3Key = `images/social/neuromorphic-spiking-carapaces-event-reflexes/slide${i + 1}.jpg`
     const res = await uploadLocalFileToS3(outPath, s3Key)
     console.log(`✓ Uploaded slide ${i + 1} to S3: ${res.publicUrl}`)
     uploadedUrls.push(res.publicUrl)
