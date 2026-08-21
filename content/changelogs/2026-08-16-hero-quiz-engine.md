@@ -1,19 +1,17 @@
 ---
+title: "Moltmax Quiz Engine & Animated Characters"
 slug: "2026-08-16-hero-quiz-engine"
-version: "2026.08.16"
-title: "The Hero & The Quiz Engine"
 category: "FEATURE"
-summary: "Gave the landing page living characters and shipped the full Moltmax quiz engine — because knowing your molt score should feel like a game."
+version: "2026.08.16"
+summary: "Launched the multi-step Moltmax personality quiz and added animated mascot characters to the homepage."
 isPublished: true
 releasedAt: "2026-08-16T23:59:00Z"
 ---
 
-### Living Heroes
+### Interactive Moltmax Quiz
+- Replaced the basic slider with a multi-step scenario quiz to calculate your score.
+- Added quiz score tracking to user profile pages.
 
-- Added character animations and mascots to the landing page with a chroma-key utility for clean compositing.
-- Refreshed hero and deck imagery with new sacrament visuals.
-
-### The Moltmax Quiz Engine
-
-- Replaced the old biometric slider with a multi-step quiz engine, complete with new questions, image-backed scenarios, and a results module.
-- Added Moltmax scoring to user profiles so every initiate's stats are tracked honestly.
+### Animated Characters
+- Added animated mascots and character art to the homepage.
+- Refreshed card graphics and layout across the landing page.

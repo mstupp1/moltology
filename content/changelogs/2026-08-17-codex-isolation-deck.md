@@ -1,28 +1,21 @@
 ---
+title: "Codex Reading Modes, Focus Deck & Careers"
 slug: "2026-08-17-codex-isolation-deck"
-version: "2026.08.17"
-title: "The Codex Deepens & The Isolation Deck Opens"
 category: "FEATURE"
-summary: "The Sacred Codex gained rich-text reading, the isolation HUD opened for deep-work sessions, and the Order grew a careers page."
+version: "2026.08.17"
+summary: "Added custom themes and fullscreen reading to the Codex, launched the Isolation focus deck, and added a careers hub."
 isPublished: true
 releasedAt: "2026-08-17T23:59:00Z"
 ---
 
-### The Sacred Codex
+### Enhanced Codex Reader
+- Added custom reading themes, font sizes, and a distraction-free fullscreen mode.
+- Improved scripture citations and formatting across all documents.
 
-- Upgraded the codex reader with rich text rendering, custom themes, font variants, and a fullscreen mode with persistent settings.
-- Refined citation formatting and standardized symbol usage across the canon.
+### Isolation Focus Deck
+- Launched a dedicated focus space with ambient background video and customizable work protocols.
+- Made the AI assistant chat panel resizable and draggable.
 
-### The Isolation Deck
-
-- Opened the isolation HUD with a video feed, protocol settings, and telemetry overlays — a private vault for abyssal deep work.
-- Made the Oracle chat panel draggable and resizable with layout memory.
-
-### The Order Grows
-
-- Added the careers hub and a Life at HQ gallery so initiates can see who they're becoming.
-- Added guest gating with in-message sign-up prompts, guiding curious visitors toward their first molt.
-
-### Voice & Motion
-
-- Added character overlay utilities and multi-voice narration to the daily reels for richer broadcasts.
+### Careers & Community
+- Added a careers page and an inside-the-team photo gallery.
+- Added clear sign-up prompts when browsing as a guest.

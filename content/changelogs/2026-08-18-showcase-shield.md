@@ -1,25 +1,22 @@
 ---
+title: "Interactive Device Showcase & Spam Protection"
 slug: "2026-08-18-showcase-shield"
-version: "2026.08.18"
-title: "The Showcase & The Shield"
 category: "CHASSIS_UPGRADE"
-summary: "Rebuilt the landing showcase with living device frames, threw up a bot shield at every entry point, and swept the double slashes from the canon."
+version: "2026.08.18"
+summary: "Added interactive browser and mobile preview frames to the homepage, protected forms against spam bots, and cleaned up typography."
 isPublished: true
 releasedAt: "2026-08-18T23:59:00Z"
 ---
 
-### The Showcase
+### Homepage Showcase
+- Added interactive browser and mobile device frames to preview the dashboard directly on the homepage.
+- Updated homepage buttons and cards for a cleaner layout.
 
-- Rebuilt the marketing showcase to mirror the real HUD, framed in browser and phone shells, with pre-rendered dashboard screenshots.
-- Rounded out the landing page call-to-action styling to match.
+### Spam Protection & Sign-in
+- Added automatic bot protection to sign-in, comments, and newsletter signup forms.
+- Added an optional email newsletter subscription.
+- Upgraded authentication screens with custom branding.
 
-### The Shield
-
-- Raised bot protection at every entry point — sign-in, comments, and lead capture. Bots bounce, humans dive.
-- Added an opt-in email subscription flow with database tracking for initiates who want dispatches by wire.
-
-### The Polish
-
-- Replaced the default sign-in surface with fully branded authentication UI.
-- Swept the aesthetic double slashes ("//") from titles and copy across the entire site.
-- Standardized global typography onto a cleaner sans voice.
+### Clean Typography
+- Standardized fonts across all pages for improved readability.
+- Cleaned up formatting and titles throughout the platform.

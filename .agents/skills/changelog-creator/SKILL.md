@@ -35,25 +35,27 @@ Two distinct jobs exist. Pick based on the request:
 
 ---
 
-## 1.1 Tone & Style Checklist (Non-Negotiable)
+## 1.1 Tone, Style & Significance Checklist (Non-Negotiable)
 
-Every changelog entry must read warm, sharp, and satirical — never like a raw commit dump.
+Every changelog entry must be a **high-level, plain explanation** of what was changed and what users gain.
 
-- **Plain, human copy**: Say what the user *gained*. Lead with the benefit, then the how. No pseudo-scientific word salad or faux-math.
-- **No tech-stack leaks**: NEVER surface real framework/stack terms (React, TanStack, Vite, Nitro, Drizzle, Neon, PostgreSQL, JWT, RLS, S3, pgPolicy, etc.). Transmute infrastructure into in-universe lore (*benthic HUD, ecdysis, cyber-chitin, synaptic telemetry, the Order, the Oracle*).
-- **No `//` double slashes** in titles, subtitles, or copy. Use middle dots, colons, or em-dashes.
-- **Keep it concise**: 1–2 sentence `summary`, and a short `content` body of `###` sections with 2–4 bullets each.
-- **Category-fit**: pick one dominant category for the whole day (see mapping below).
+- **Only create entries for significant changes**: If a day or update is just minor tweaks, small styling fixes, internal developer scripts, or backend plumbing, **do not create an entry**. Only create entries for meaningful feature releases, major UI overhauls, or significant platform additions.
+- **High-level, plain English**: Explain what the user gained in clear, simple language. Lead with the tangible benefit.
+- **No heavy jargon or pseudo-science word salad**: Avoid dense techno-babble or over-complicated lore terms (e.g. avoid *"benthic telemetry"*, *"ingestion CLI"*, *"session armor"*, *"policy siege"*, *"sub-surface scanline textures"*, *"diegetic discipline"*).
+- **No tech-stack leaks**: NEVER surface real-world framework/library names (React, TanStack, Vite, Nitro, Drizzle, Neon, PostgreSQL, JWT, RLS, S3, pgPolicy, etc.).
+- **No `//` double slashes** in titles, subtitles, or copy. Use middle dots (`·`), colons (`:`), or em-dashes (`—`).
+- **Keep it concise**: 1–2 sentence `summary`, and a short `content` body with 2–3 clear sections and 2–3 plain bullets each.
+- **Category-fit**: pick one dominant category for the release.
 
 ### Category Mapping Guide
 
-| Category | Choose when the day is mostly about... |
+| Category | Choose when the update is mostly about... |
 | :--- | :--- |
-| `TRANSMUTATION` | Architecture overhauls, migrations, ingestion/content engines, SEO infrastructure |
-| `CHASSIS_UPGRADE` | Visual/UI refinements, theming, typography, marketing showcases, polish passes |
-| `SECURITY_ISOLATION` | Auth, session armor, RLS/policy hardening, bot protection, privacy/legal |
-| `BUG_PURGE` | Fixes, regression remedies, error-handler hardening |
-| `FEATURE` | Net-new tools, hubs, routes, and platform capabilities (use when nothing dominates) |
+| `FEATURE` | Net-new tools, interactive hubs, quizzes, or major platform capabilities |
+| `CHASSIS_UPGRADE` | Visual/UI redesigns, theming, device frames, or responsive layouts |
+| `SECURITY_ISOLATION` | User accounts, authentication options, bot protection, or privacy features |
+| `TRANSMUTATION` | Publishing engines, RSS feeds, or media storage upgrades |
+| `BUG_PURGE` | Major bug fixes, error handling improvements, or stability upgrades |
 
 ---
 
@@ -63,21 +65,25 @@ Every changelog draft created in `content/changelogs/<slug>.md` must include YAM
 
 ```markdown
 ---
-title: "The Changelog Reborn & The Creative Forge"
-slug: "2026-08-19-changelog-reborn-creative-forge"
-category: "FEATURE" # Options: TRANSMUTATION, CHASSIS_UPGRADE, SECURITY_ISOLATION, BUG_PURGE, FEATURE
-version: "2026.08.19" # Date-based for daily digests; optional (defaults to v1.0.0 or date if omitted)
-summary: "Gave the changelog a permanent home with clean permalinks and a unified ingestion CLI, hardened the sidebar, and plugged the creative pipeline into local model-run imagery."
+title: "Permanent Changelog Links & Resizable Sidebar"
+slug: "2026-08-19-permanent-changelog-links-resizable-sidebar"
+category: "FEATURE" # Options: FEATURE, CHASSIS_UPGRADE, SECURITY_ISOLATION, TRANSMUTATION, BUG_PURGE
+version: "2026.08.19" # Date-based for daily digests
+summary: "Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts."
 isPublished: true
 releasedAt: "2026-08-19T23:59:00Z"
 ---
 
-### The Changelog Reborn
-- Reworked changelog routing with clean slug-based permalinks and a unified ingestion CLI, so every future release gets a permanent URL.
-- Refined the launchpad carousel and standardized spacing across HUD components.
+### Shareable Changelog Pages
+- Added dedicated, shareable links for every release so updates are easy to bookmark and reference.
+- Improved spacing and navigation across the update feed.
 
-### The Creative Forge
-- Integrated a local model-run pipeline for generating imagery, with workflow automation and mandatory queue routing.
+### Resizable Sidebar
+- Added a drag handle to resize the navigation sidebar, saving your preferred width automatically.
+- Made the command search palette close when clicking outside.
+
+### Creative Studio
+- Connected local AI image generation to automatically create illustrations for daily social posts.
 ```
 
 ### Slug & Date Conventions
@@ -101,8 +107,9 @@ releasedAt: "2026-08-19T23:59:00Z"
 ### Step 1: Draft Temporary Markdown File
 
 Create `content/changelogs/<slug>.md` using the schema above.
-* Ensure the tone is warm, sharp, and satirical with high clarity (no pseudo-scientific word salad, no `//` double slashes in titles).
-* Translate technical infrastructure into in-universe lore (*sub-benthic computing, ecdysis/shell-shedding, cyber-chitin, synaptic telemetry*).
+* **Significance Check**: Verify that the release contains meaningful user-facing features or major UI additions before authoring. Do not create entries for minor tweaks.
+* **Plain English**: Use plain, high-level explanations of what the user gained (no pseudo-scientific word salad, no heavy techno-babble, no `//` double slashes in titles).
+* **Benefit-First**: Lead with what is now possible or improved for the user, followed by how it works.
 
 ### Step 2: Validate Frontmatter (Dry-Run)
 
@@ -140,24 +147,25 @@ npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(proc
 
 ## 3.5 Daily Digest Backfill (Historical)
 
-Use this when asked to "make a changelog", "backfill history", or "one post per day". Build one digest entry per calendar day of work.
+Use this when asked to "make a changelog", "backfill history", or "one post per day". Build one digest entry per significant calendar day of work.
 
 ### Step A: Derive the days from git history
 ```bash
 # List every distinct day that had commits, newest first:
 git log --format='%ad' --date=short | sort -r | uniq
 ```
-For each day, gather its commits to identify the dominant theme:
+For each day, gather its commits to identify if it had significant changes:
 ```bash
 git log --format='%ad|%s' --date=short | grep '^<YYYY-MM-DD>|'
 ```
+* **Filter out insignificant days**: If a day only had minor styling adjustments, internal scripts, or backend maintenance, skip it.
 
-### Step B: Draft one file per day
+### Step B: Draft one file per significant day
 Create `content/changelogs/<YYYY-MM-DD>-<theme>.md` per the schema, with:
 * `version` = `YYYY.MM.DD` and `slug` = `YYYY-MM-DD-<theme>`.
 * `releasedAt` = `<YYYY-MM-DD>T23:59:00Z`.
-* One dominant `category` (see mapping) and concise, non-jargony copy.
-* Aim for the day's *outcomes*, not a commit-by-commit list.
+* One dominant `category` (see mapping) and plain, high-level, benefit-focused copy.
+* Aim for high-level user outcomes, not a commit-by-commit list.
 
 ### Step C: Validate all drafts
 ```bash
