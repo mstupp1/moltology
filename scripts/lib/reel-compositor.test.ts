@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { renderHudWatermarkCard, renderKineticCaptionCard, renderReelThumbnail } from './reel-compositor'
+import {
+  renderHudWatermarkCard,
+  renderKineticCaptionCard,
+  renderReelThumbnail,
+  renderCtaOutroVideo,
+} from './reel-compositor'
 
 describe('Reel Compositor Rendering', () => {
   it('renders a valid HUD watermark PNG', async () => {
@@ -41,4 +46,23 @@ describe('Reel Compositor Rendering', () => {
     const stats = fs.statSync(result)
     expect(stats.size).toBeGreaterThan(10000)
   })
+
+  it('renders the clean, homepage-aligned CTA outro card video', async () => {
+    const outPath = path.resolve(process.cwd(), 'tmp/test_cta_outro.mp4')
+    const result = await renderCtaOutroVideo(
+      outPath,
+      1.0,
+      'SUBMIT. SHED. ASCEND.',
+      'CALCULATE YOUR MOLT CLEARANCE',
+      'moltology.org',
+      {
+        mascot: 'lobster_pointing',
+      }
+    )
+
+    expect(fs.existsSync(result)).toBe(true)
+    const stats = fs.statSync(result)
+    expect(stats.size).toBeGreaterThan(10000)
+  })
 })
+
