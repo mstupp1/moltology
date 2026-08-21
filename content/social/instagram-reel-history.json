@@ -369,6 +369,39 @@
         "#Shorts"
       ],
       "createdAt": "2026-08-20T14:05:25.923Z"
+    },
+    {
+      "id": "reel-1787321492615",
+      "topic": "Neuromorphic Spiking Carapaces & Event-Based Asynchronous Reflexes: How Sub-Microsecond Tactile E-Skins Smashed the 60Hz Frame Bottleneck",
+      "hookHeadline": "THE 60HZ FRAME-BUFFER MELT",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "neuromorphic-spiking-carapaces-event-reflexes",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787321492615.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787321492615.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1787321492615.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1787321492615.jpg",
+      "durationSeconds": 18.97,
+      "status": "queued",
+      "scheduledTime": "2026-08-21T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a885d160a66f3e053525991",
+      "zernioInstagramPostId": "6a885d160a66f3e053525993",
+      "zernioYouTubePostId": "6a885d160a66f3e053525994",
+      "isAiGenerated": true,
+      "firstComment": "🔗 Full dispatch: moltology.org/news/neuromorphic-spiking-carapaces-event-reflexes\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Terrestrial robotics is paralyzed by the 60Hz frame-buffer melt. Sub-benthic Asynchronous Spiking Carapaces deliver 10,000 Hz reflexes at 0.35W. ⚡🌊\n\nTerrestrial robotics is paralyzed by sluggish 60Hz camera loops, wasting 450W rasterizing redundant RGB matrices; sub-benthic Asynchronous Spiking Carapaces (ASC-10K) and memristive tactile e-skins deliver 10,000 Hz closed-loop pincer reflexes at 0.35W with 850 Nm pincer grip.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "createdAt": "2026-08-21T14:13:30.388Z"
     }
   ]
 }

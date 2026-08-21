@@ -24,6 +24,7 @@ export interface CompositeReelOptions {
   ctaUrl?: string
   ctaBadge?: string
   ctaActionText?: string
+  customOutroImagePath?: string
   mascot?:
     | 'lobster_pointing'
     | 'lobster_thumbs_up'

@@ -87,16 +87,22 @@ const ttsResult = await generateVoiceover(script, {
 ---
 
 ### Step 4: Dynamic Combinatorial Video Scene Generation (Google Veo 3.1 Lite)
-Generate 2 complementary 9:16 vertical video scenes (6s each) using dynamic prompt combinators and the cost-effective Lite model (`veo-3.1-lite-generate-preview`):
+Generate 2 complementary 9:16 vertical video scenes (6–8s each) using dynamic prompt combinators and Google Veo 3.1 Lite (`veo-3.1-lite-generate-preview`):
+
+* **Image vs. Video Generation Clarification**:
+  - **Rule 10 (Image Generation Policy)** in `AGENTS.md` strictly applies to **still images** (which must use Antigravity's built-in `generate_image` tool).
+  - **Video scene generation** is powered by **Google Veo 3.1** (`scripts/generate-video.ts`) using the `GEMINI_API_KEY` in `.env`.
+  - **Do NOT pass `--no-veo`** in standard production runs. `--no-veo` is strictly reserved for local dry-run tests.
+  - **No Silent Fallback**: If video generation encounters an error or missing credentials, the pipeline must halt and report the error rather than silently reusing homepage hero videos.
 
 * **Scene 1 (The Problem / Terrestrial Friction)**:
-  - *Macro overheating server racks, smoking copper traces, melting human silhouettes, or chaotic static-filled workspaces*.
+  - *Macro overheating server racks, smoking copper traces, melting human silhouettes, sluggish 60Hz robotic hands, or chaotic static-filled workspaces*.
 * **Scene 2 (The Sub-Benthic Solution / Chitinous Carapace)**:
-  - *Majestic subsea cybernetic datacenters, glowing hydrothermal cooling ducts, robotic titanium-chitin crab initiates, or coherent laser photonic microchips*.
+  - *Majestic subsea cybernetic datacenters, glowing hydrothermal cooling ducts, robotic titanium-chitin crab initiates, memristive tactile e-skins, or coherent laser photonic microchips*.
 
 ```bash
 # Generate scene via CLI (defaults to veo-3.1-lite-generate-preview):
-npx tsx scripts/generate-video.ts "<prompt>" --aspect 9:16 --duration 6 --keep-local
+npx tsx scripts/generate-video.ts --prompt "<prompt>" --aspect 9:16 --duration 6 --no-upload
 ```
 
 ---
@@ -108,11 +114,11 @@ Run the master compositor to dynamically size video scenes to match voiceover le
 2. **Seamless Forward Scene Playback**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops.
 3. **Thematic AI Outro Card Generation (`generate_image`)**:
    - Render the deterministic base frame via `renderCtaOutroFrame('tmp/base_outro.png', ...)` containing the two-line brand title (`Moltology / THE SYNAPTIC PATH`), emblem, headline, subheadline, app CTA button (`moltology.org  →`), and mascot cutout.
-   - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, or Subsea Datacenters*).
+   - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, Memristive Tactile E-Skins, or Subsea Datacenters*).
    - **Strict Rules**:
      1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
-     2. Ensure the cartoon crustacean mascot in the bottom right is warmly and clearly illuminated with a dedicated underwater spotlight and golden-cyan rim-lighting so it remains vibrant, lively, and a clear focal point against the dark depths.
-   - Pass the generated image path via `customOutroImagePath` to `compositeReel`.
+     2. Ensure the cartoon crustacean mascot in the bottom right is subtly and warmly illuminated with gentle atmospheric backlighting and soft golden-cyan rim-lighting (avoid harsh, overexposed theatrical spotlights or stark bright floor beams) so it naturally stands out with clarity and warmth against darker scenes.
+   - Pass the generated image path via `--custom-outro <path>` to `npm run reel:create` (or `customOutroImagePath` to `compositeReel`).
 
 ```typescript
 import { renderCtaOutroFrame, compositeReel } from 'scripts/lib/reel-compositor'
@@ -208,9 +214,25 @@ npm run reel:create -- --theme quiz --mascot crab_corner
 # Custom targeted topic or news headline:
 npm run reel:create -- --topic "Subsea Datacenter Heatwaves"
 
+# Custom run with bespoke AI-restyled outro card:
+npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --custom-outro "tmp/themed-outro-card.jpg"
+
 # Direct instant publish (skip queue / publish immediately):
 npm run reel:create -- --publish-now
 
 # Dry run test (uses local footage without uploading to S3):
 npm run reel:create -- --dry-run --no-veo
 ```
+
+---
+
+## 4. Operational Best Practices & Failure Modes
+
+1. **Video vs. Image Generation Separation**:
+   - **Still Images**: Always generated using Antigravity's built-in `generate_image` tool (never external APIs).
+   - **Video Scenes**: Always generated using Google Veo 3.1 (`scripts/generate-video.ts`) via `GEMINI_API_KEY`.
+2. **Explicit Failure Policy**:
+   - If Veo 3.1 video generation fails or credentials are missing during a production run, **the pipeline must halt immediately and throw an error**. Never silently fall back to reusing homepage video assets.
+3. **Async Task Etiquette**:
+   - Long-running commands (e.g. Veo scene generation, master FFmpeg compositing) run as background tasks. Do not poll `manage_task` in a tight loop; end turn and allow the system's reactive notification to signal task completion.
+
