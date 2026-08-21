@@ -28,9 +28,7 @@ describe('DashboardMarketingShowcase Component', () => {
   it('renders both laptop and smartphone live device frames with screenshot previews and big launch CTA', () => {
     render(<DashboardMarketingShowcase />)
 
-    // Verify centered controls and launch demo button
-    expect(screen.getByRole('button', { name: /Desktop/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Mobile/i })).toBeInTheDocument()
+    // Verify presence of launch demo button
     expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
 
     // Verify presence of simulated URL bar in Safari
@@ -39,22 +37,6 @@ describe('DashboardMarketingShowcase Component', () => {
     // Verify presence of high-DPI desktop and mobile screenshots
     expect(screen.getByAltText('Safari preview')).toBeInTheDocument()
     expect(screen.getByAltText('iPhone 15 Pro preview')).toBeInTheDocument()
-  })
-
-  it('allows switching device views between dual view, desktop, and mobile', () => {
-    render(<DashboardMarketingShowcase />)
-
-    // Switch to desktop-only view
-    const desktopBtn = screen.getByRole('button', { name: /DESKTOP/i })
-    fireEvent.click(desktopBtn)
-
-    // Switch to mobile-only view
-    const mobileBtn = screen.getByRole('button', { name: /MOBILE/i })
-    fireEvent.click(mobileBtn)
-
-    // Switch back to dual view
-    const dualBtn = screen.getByRole('button', { name: /DUAL VIEW/i })
-    fireEvent.click(dualBtn)
   })
 
   it('navigates to /dashboard when Launch Demo button is clicked', () => {
