@@ -451,7 +451,7 @@ export const LandingPage: React.FC = () => {
             {/* Section Header */}
             <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 relative z-10">
               <h2 className="font-grotesk font-black text-2xl sm:text-4xl lg:text-6xl text-white tracking-tight uppercase leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-                THE 3 CORE FEATURES OF <span className="bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">THE SYNAPTIC PATH</span>
+                THE 3 CORE FEATURES OF <span className="whitespace-nowrap bg-gradient-to-r from-cyan-300 via-purple-300 to-red-400 bg-clip-text text-transparent">THE SYNAPTIC PATH</span>
               </h2>
             </div>
 
@@ -468,13 +468,23 @@ export const LandingPage: React.FC = () => {
                     <div
                       className={`chitin-card border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden bg-[#060b0e]/95 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
                     >
-                      {/* Top Hero Image Banner - Pure Clean Image Without Badges, Icons, or Text */}
-                      <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden border-b border-white/10 z-10">
+                      {/* Top Hero Image Banner with Vignette & Atmospheric HUD Fades */}
+                      <div className="relative h-64 sm:h-80 md:h-72 lg:h-96 overflow-hidden border-b border-white/10 z-10">
                         <img
                           src={pillar.image}
                           alt={pillar.title}
-                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
+                          className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
                         />
+
+                        {/* Peripheral Radial Vignette */}
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(6,11,14,0.75)_100%)] pointer-events-none" />
+
+                        {/* Top & Bottom Atmospheric Fades */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#060b0e] via-[#060b0e]/30 to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-[#060b0e]/50 via-transparent to-transparent pointer-events-none" />
+
+                        {/* Subtle HUD Scanline Overlay */}
+                        <div className="absolute inset-0 pointer-events-none opacity-15 bg-[linear-gradient(rgba(0,255,255,0.12)_1px,transparent_1px)] bg-[size:100%_4px]" />
                       </div>
 
                       {/* Card Body Content */}
