@@ -87,8 +87,9 @@ describe('LandingPage Component', () => {
     render(<LandingPage />)
 
     expect(screen.getByLabelText('Interactive System Showcase')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Desktop/i })).toBeInTheDocument()
     expect(screen.getByText('moltology.org/dashboard')).toBeInTheDocument()
+    expect(screen.getByAltText('Safari preview')).toBeInTheDocument()
+    expect(screen.getByAltText('iPhone 15 Pro preview')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
   })
 
