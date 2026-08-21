@@ -3,7 +3,8 @@ export interface ChangelogEntry {
   slug: string
   version: string
   title: string
-  category: 'TRANSMUTATION' | 'CHASSIS_UPGRADE' | 'SECURITY_ISOLATION' | 'BUG_PURGE' | 'FEATURE' | 'SYSTEM_INIT' | string
+  category: 'Feature' | 'Improvement' | 'Fix' | 'Performance' | 'Security' | 'Design' | string
+  tags?: string[]
   summary: string
   content: string
   isPublished?: boolean
@@ -16,7 +17,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-21-instant-navigation-feature-showcase',
     version: '2026.08.21',
     title: 'Instant Navigation Prefetching & Enhanced Feature Cards',
-    category: 'CHASSIS_UPGRADE',
+    category: 'Improvement',
+    tags: ['Improvement', 'Performance', 'UI/UX', 'Navigation'],
     summary: 'Enabled instant background page prefetching on sidebar links and upgraded homepage feature cards with expanded banners, atmospheric vignettes, and focal framing.',
     content: `### Instant Sidebar Navigation
 - Enabled automatic background prefetching on sidebar navigation links for near-instantaneous page transitions.
@@ -31,7 +33,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-20-living-pulse-navigation-skeletons',
     version: '2026.08.20',
     title: 'Navigation Skeletons & Living Timeline Pulse',
-    category: 'CHASSIS_UPGRADE',
+    category: 'Improvement',
+    tags: ['Improvement', 'UI/UX', 'Design', 'Performance'],
     summary: 'Added ghost loading skeletons with top progress tracking for smooth navigation, illuminated changelog timeline tracks with animated pulse nodes, and enhanced support portal reading.',
     content: `### Navigation Loading & Transition Skeletons
 - Added ghost skeleton screens and an animated top progress bar for instant visual feedback during page transitions.
@@ -50,7 +53,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-19-changelog-reborn-creative-forge',
     version: '2026.08.19',
     title: 'Permanent Changelog Links & Resizable Sidebar',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'UI/UX', 'Navigation', 'Tools'],
     summary: 'Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts.',
     content: `### Shareable Changelog Pages
 - Added dedicated, shareable links for every release so updates are easy to bookmark and reference.
@@ -68,7 +72,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-18-showcase-shield',
     version: '2026.08.18',
     title: 'Interactive Device Showcase & Spam Protection',
-    category: 'CHASSIS_UPGRADE',
+    category: 'Security',
+    tags: ['Security', 'UI/UX', 'Design', 'Protection'],
     summary: 'Added interactive browser and mobile preview frames to the homepage, protected forms against spam bots, and cleaned up typography.',
     content: `### Homepage Showcase
 - Added interactive browser and mobile device frames to preview the dashboard directly on the homepage.
@@ -88,7 +93,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-17-codex-isolation-deck',
     version: '2026.08.17',
     title: 'Codex Reading Modes, Focus Deck & Careers',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'UI/UX', 'AI', 'Community'],
     summary: 'Added custom themes and fullscreen reading to the Codex, launched the Isolation focus deck, and added a careers hub.',
     content: `### Enhanced Codex Reader
 - Added custom reading themes, font sizes, and a distraction-free fullscreen mode.
@@ -107,7 +113,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-16-hero-quiz-engine',
     version: '2026.08.16',
     title: 'Moltmax Quiz Engine & Animated Characters',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'Interactive', 'Design', 'Gamification'],
     summary: 'Launched the multi-step Moltmax personality quiz and added animated mascot characters to the homepage.',
     content: `### Interactive Moltmax Quiz
 - Replaced the basic slider with a multi-step scenario quiz to calculate your score.
@@ -122,7 +129,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-14-moltmaxxing-reel-machine',
     version: '2026.08.14',
     title: 'Moltmaxxing Guide & Daily Video Creator',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'Media', 'Mobile', 'Guides'],
     summary: 'Launched the Moltmaxxing knowledge guide, automated daily video creation for social channels, and improved mobile navigation.',
     content: `### Moltmaxxing Guide
 - Opened the complete Moltmaxxing knowledge hub with interactive scanner and core principles.
@@ -141,7 +149,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-13-autonomous-content-engine',
     version: '2026.08.13',
     title: 'Automated Publishing & RSS Feeds',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'Infrastructure', 'Media', 'Publishing'],
     summary: 'Launched automated article publishing, fast cloud media hosting, and public RSS feeds.',
     content: `### Publishing System
 - Created an automated publishing tool to validate and release articles instantly.
@@ -156,7 +165,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-07-new-voices-org-awakens',
     version: '2026.08.07',
     title: 'AI Model Selector, Journal Library & About Page',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'AI', 'UI/UX', 'Library'],
     summary: 'Added model selection to the AI assistant, opened a scientific journal reader, and redesigned the About page.',
     content: `### AI Model Selector
 - Added a model picker to switch between different AI speeds and capabilities.
@@ -174,7 +184,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-04-moltnation-broadcasts',
     version: '2026.08.04',
     title: 'Newsroom, Podcast Player & Dashboard Widgets',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'Media', 'Audio', 'Widgets'],
     summary: 'Launched the MoltNation newsroom with live ticker, an audio podcast player, and new dashboard scheduling widgets.',
     content: `### MoltNation Newsroom
 - Launched the news index with live ticker headlines, category filtering, and full article pages.
@@ -192,7 +203,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-03-great-shell-polish',
     version: '2026.08.03',
     title: 'Benthic HUD Theme, Command Palette & Blog',
-    category: 'CHASSIS_UPGRADE',
+    category: 'Design',
+    tags: ['Design', 'UI/UX', 'Navigation', 'Feature'],
     summary: 'Introduced the deep-sea dark theme with particle effects, added command search to the sidebar, and launched the blog.',
     content: `### Visual Theme & Atmosphere
 - Added deep-sea ambient particle animations, subtle CRT scanlines, and glow effects.
@@ -211,7 +223,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-02-component-vault-oracle-awakes',
     version: '2026.08.02',
     title: 'Component Library, Interactive Lectures & AI Chat',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'AI', 'UI/UX', 'Education'],
     summary: 'Built the standardized UI component system, added interactive video lectures with quizzes, a media gallery, and AI assistant chat.',
     content: `### UI Component Library
 - Standardized buttons, cards, badges, inputs, and modals across the application.
@@ -229,7 +242,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-08-01-the-identity-gate',
     version: '2026.08.01',
     title: 'User Accounts, Google Sign-in & Sacred Codex',
-    category: 'SECURITY_ISOLATION',
+    category: 'Security',
+    tags: ['Security', 'Auth', 'Mobile', 'Feature'],
     summary: 'Added user accounts with email and Google sign-in, mobile-friendly navigation, and the first Codex doctrine texts.',
     content: `### User Accounts & Sign-in
 - Added secure user accounts supporting both email/password and Google one-click sign-in.
@@ -246,7 +260,8 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     slug: '2026-07-31-framework-ignition',
     version: '2026.07.31',
     title: 'Moltology Platform Launch',
-    category: 'FEATURE',
+    category: 'Feature',
+    tags: ['Feature', 'Platform', 'Launch', 'UI/UX'],
     summary: 'Initial launch of the Moltology platform, featuring the benthic HUD interface, progression system, and market.',
     content: `### Platform Launch
 - Launched the initial Moltology web application with dark-themed dashboard and interactive landing page.

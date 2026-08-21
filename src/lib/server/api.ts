@@ -45,6 +45,7 @@ const toChangelogEntry = (r: {
   version: string
   title: string
   category: string
+  tags?: any
   summary: string
   content: string
   isPublished: boolean
@@ -56,6 +57,7 @@ const toChangelogEntry = (r: {
   version: r.version,
   title: r.title,
   category: r.category,
+  tags: Array.isArray(r.tags) ? r.tags : [],
   summary: r.summary,
   content: r.content,
   isPublished: r.isPublished,
@@ -120,6 +122,7 @@ interface CreateChangelogInput {
   version?: string
   title: string
   category: string
+  tags?: string[]
   summary: string
   content: string
   isPublished?: boolean
@@ -186,6 +189,7 @@ export const createChangelogHandler = async ({ data, context }: ServerFnArgs<Cre
       version: data.version || 'v1.0.0',
       title: data.title,
       category: data.category,
+      tags: data.tags || [],
       summary: data.summary,
       content: data.content,
       isPublished: data.isPublished !== false,
@@ -204,6 +208,7 @@ export const createChangelogFn = createServerFn({ method: 'POST' })
       version: z.string().optional(),
       title: z.string().min(1),
       category: z.string().min(1),
+      tags: z.array(z.string()).optional(),
       summary: z.string().min(1),
       content: z.string().min(1),
       isPublished: z.boolean().optional(),
@@ -252,6 +257,7 @@ export const updateChangelogHandler = async ({ data, context }: ServerFnArgs<Upd
       version: data.version || 'v1.0.0',
       title: data.title,
       category: data.category,
+      tags: data.tags || [],
       summary: data.summary,
       content: data.content,
       isPublished: data.isPublished !== false,
@@ -272,6 +278,7 @@ export const updateChangelogFn = createServerFn({ method: 'POST' })
       version: z.string().optional(),
       title: z.string().min(1),
       category: z.string().min(1),
+      tags: z.array(z.string()).optional(),
       summary: z.string().min(1),
       content: z.string().min(1),
       isPublished: z.boolean().optional(),

@@ -149,7 +149,7 @@ function DashboardRoute() {
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div className="w-full max-w-2xl bg-[#0b0f0f] border border-[#00ffff]/60 shadow-[0_0_30px_rgba(0,255,255,0.25)] chamfer-corner overflow-hidden font-sans text-sm space-y-4">
             <div className="bg-[#171c1c] border-b border-[#3a4a49] p-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <GitCommit className="w-4 h-4 text-[#00ffff]" />
                 <span className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
                   RELEASE {activeChangelogModal.version}
@@ -157,6 +157,14 @@ function DashboardRoute() {
                 <span className="text-xs text-[#839493] bg-[#070b0b] px-2 py-0.5 border border-[#3a4a49]">
                   {activeChangelogModal.category}
                 </span>
+                {Array.isArray(activeChangelogModal.tags) &&
+                  activeChangelogModal.tags
+                    .filter((t) => t.toLowerCase() !== activeChangelogModal.category?.toLowerCase())
+                    .map((tag) => (
+                      <span key={tag} className="text-[10px] text-[#00ffff]/80 bg-[#00ffff]/10 px-1.5 py-0.5 border border-[#00ffff]/30">
+                        {tag}
+                      </span>
+                    ))}
               </div>
               <button
                 onClick={() => setActiveChangelogModal(null)}

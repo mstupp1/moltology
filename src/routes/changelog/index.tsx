@@ -56,10 +56,13 @@ function ChangelogIndexPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
-  const categories = useMemo(() => {
+  const filterOptions = useMemo(() => {
     const set = new Set<string>()
     logs.forEach((log) => {
       if (log.category) set.add(log.category)
+      if (Array.isArray(log.tags)) {
+        log.tags.forEach((t) => set.add(t))
+      }
     })
     return ['ALL', ...Array.from(set)]
   }, [logs])
@@ -67,14 +70,17 @@ function ChangelogIndexPage() {
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       const matchesCategory =
-        selectedCategory === 'ALL' || log.category === selectedCategory
+        selectedCategory === 'ALL' ||
+        log.category?.toLowerCase() === selectedCategory.toLowerCase() ||
+        (Array.isArray(log.tags) && log.tags.some((t) => t.toLowerCase() === selectedCategory.toLowerCase()))
       const matchesSearch =
         searchQuery === '' ||
         log.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.version.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.slug.toLowerCase().includes(searchQuery.toLowerCase())
+        log.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (Array.isArray(log.tags) && log.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())))
       return matchesCategory && matchesSearch
     })
   }, [logs, selectedCategory, searchQuery])
@@ -85,17 +91,51 @@ function ChangelogIndexPage() {
   }
 
   const getCategoryBadgeClass = (category: string) => {
-    switch (category) {
-      case 'TRANSMUTATION':
+    switch (category.toLowerCase()) {
+      case 'feature':
+      case 'features':
         return 'text-cyan-300 border-cyan-500/50 bg-cyan-950/60'
-      case 'CHASSIS_UPGRADE':
-        return 'text-red-400 border-red-500/50 bg-red-950/60'
-      case 'SECURITY_ISOLATION':
+      case 'improvement':
+      case 'improvements':
+        return 'text-purple-300 border-purple-500/50 bg-purple-950/60'
+      case 'security':
         return 'text-emerald-400 border-emerald-500/50 bg-emerald-950/60'
-      case 'BUG_PURGE':
-        return 'text-amber-400 border-amber-500/50 bg-amber-950/60'
+      case 'performance':
+        return 'text-amber-300 border-amber-500/50 bg-amber-950/60'
+      case 'fix':
+      case 'fixes':
+      case 'bug_purge':
+        return 'text-rose-400 border-rose-500/50 bg-rose-950/60'
+      case 'design':
+      case 'ui/ux':
+        return 'text-pink-300 border-pink-500/50 bg-pink-950/60'
       default:
         return 'text-cyan-400 border-cyan-600/40 bg-cyan-950/40'
+    }
+  }
+
+  const getTagBadgeClass = (tag: string) => {
+    switch (tag.toLowerCase()) {
+      case 'performance':
+        return 'text-amber-300/90 border-amber-500/30 bg-amber-950/40'
+      case 'ui/ux':
+      case 'design':
+        return 'text-pink-300/90 border-pink-500/30 bg-pink-950/40'
+      case 'security':
+      case 'auth':
+      case 'protection':
+        return 'text-emerald-300/90 border-emerald-500/30 bg-emerald-950/40'
+      case 'ai':
+        return 'text-indigo-300/90 border-indigo-500/30 bg-indigo-950/40'
+      case 'media':
+      case 'video':
+      case 'audio':
+        return 'text-sky-300/90 border-sky-500/30 bg-sky-950/40'
+      case 'navigation':
+      case 'tools':
+        return 'text-cyan-300/90 border-cyan-500/30 bg-cyan-950/40'
+      default:
+        return 'text-gray-300 border-cyan-900/40 bg-[#0a1013]'
     }
   }
 
@@ -138,10 +178,10 @@ function ChangelogIndexPage() {
       {/* Controls Bar: Search & Category Filter */}
       <div className="w-full bg-[#070c0e]/90 border-b border-cyan-900/40 py-3.5 px-4 sm:px-8 sticky top-[60px] z-30 backdrop-blur-md">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Category Filter Pills */}
+          {/* Category & Tag Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
             <Filter className="w-3.5 h-3.5 text-gray-400 shrink-0 mr-1 hidden xs:inline" />
-            {categories.map((cat) => (
+            {filterOptions.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
@@ -200,6 +240,10 @@ function ChangelogIndexPage() {
                   })
                 : 'AUG 2026'
 
+              const extraTags = Array.isArray(log.tags)
+                ? log.tags.filter((t) => t.toLowerCase() !== log.category?.toLowerCase())
+                : []
+
               return (
                 <article
                   key={log.slug || log.version}
@@ -218,7 +262,7 @@ function ChangelogIndexPage() {
                   <div className="chitin-card p-5 sm:p-6 border border-cyan-900/50 hover:border-cyan-400/80 chamfer-corner bg-[#080d0f]/90 transition-all shadow-xl space-y-3">
                     {/* Header: Badges & Date */}
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-950 pb-3">
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         {log.version && (
                           <span className="font-grotesk font-extrabold text-xs text-cyan-300 bg-cyan-950/80 border border-cyan-500/40 px-2.5 py-0.5 chamfer-corner">
                             {log.version}
@@ -227,6 +271,14 @@ function ChangelogIndexPage() {
                         <span className={`text-[10px] font-bold px-2 py-0.5 border ${getCategoryBadgeClass(log.category)} chamfer-corner uppercase`}>
                           {log.category}
                         </span>
+                        {extraTags.map((tag) => (
+                          <span
+                            key={tag}
+                            className={`text-[9px] font-bold px-1.5 py-0.5 border ${getTagBadgeClass(tag)} chamfer-corner uppercase`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </div>
 
                       <div className="flex items-center gap-1.5 text-xs text-gray-400 font-sans">

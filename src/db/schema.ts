@@ -88,7 +88,8 @@ export const changelogs = pgTable('changelogs', {
   slug: text('slug').notNull().unique(),
   version: text('version').default('v1.0.0').notNull(),
   title: text('title').notNull(),
-  category: text('category').notNull(), // TRANSMUTATION, CHASSIS_UPGRADE, SECURITY_ISOLATION, BUG_PURGE
+  category: text('category').default('Feature').notNull(), // Feature, Improvement, Fix, Performance, Security, Design, etc.
+  tags: jsonb('tags').$type<string[]>().default([]).notNull(),
   summary: text('summary').notNull(),
   content: text('content').notNull(),
   isPublished: boolean('isPublished').default(true).notNull(),

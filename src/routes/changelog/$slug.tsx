@@ -143,19 +143,57 @@ function ChangelogDetailRoute() {
     : 'AUG 2026'
 
   const getCategoryBadgeClass = (category: string) => {
-    switch (category) {
-      case 'TRANSMUTATION':
+    switch (category?.toLowerCase()) {
+      case 'feature':
+      case 'features':
         return 'text-cyan-300 border-cyan-500/50 bg-cyan-950/60'
-      case 'CHASSIS_UPGRADE':
-        return 'text-red-400 border-red-500/50 bg-red-950/60'
-      case 'SECURITY_ISOLATION':
+      case 'improvement':
+      case 'improvements':
+        return 'text-purple-300 border-purple-500/50 bg-purple-950/60'
+      case 'security':
         return 'text-emerald-400 border-emerald-500/50 bg-emerald-950/60'
-      case 'BUG_PURGE':
-        return 'text-amber-400 border-amber-500/50 bg-amber-950/60'
+      case 'performance':
+        return 'text-amber-300 border-amber-500/50 bg-amber-950/60'
+      case 'fix':
+      case 'fixes':
+      case 'bug_purge':
+        return 'text-rose-400 border-rose-500/50 bg-rose-950/60'
+      case 'design':
+      case 'ui/ux':
+        return 'text-pink-300 border-pink-500/50 bg-pink-950/60'
       default:
         return 'text-cyan-400 border-cyan-600/40 bg-cyan-950/40'
     }
   }
+
+  const getTagBadgeClass = (tag: string) => {
+    switch (tag.toLowerCase()) {
+      case 'performance':
+        return 'text-amber-300/90 border-amber-500/30 bg-amber-950/40'
+      case 'ui/ux':
+      case 'design':
+        return 'text-pink-300/90 border-pink-500/30 bg-pink-950/40'
+      case 'security':
+      case 'auth':
+      case 'protection':
+        return 'text-emerald-300/90 border-emerald-500/30 bg-emerald-950/40'
+      case 'ai':
+        return 'text-indigo-300/90 border-indigo-500/30 bg-indigo-950/40'
+      case 'media':
+      case 'video':
+      case 'audio':
+        return 'text-sky-300/90 border-sky-500/30 bg-sky-950/40'
+      case 'navigation':
+      case 'tools':
+        return 'text-cyan-300/90 border-cyan-500/30 bg-cyan-950/40'
+      default:
+        return 'text-gray-300 border-cyan-900/40 bg-[#0a1013]'
+    }
+  }
+
+  const extraTags = Array.isArray(entry.tags)
+    ? entry.tags.filter((t) => t.toLowerCase() !== entry.category?.toLowerCase())
+    : []
 
   return (
     <div className="min-h-screen bg-[#05080a] text-gray-200 font-sans relative flex flex-col justify-between">
@@ -202,6 +240,14 @@ function ChangelogDetailRoute() {
               <span className={`text-[11px] font-bold px-2.5 py-1 border ${getCategoryBadgeClass(entry.category)} chamfer-corner uppercase`}>
                 {entry.category}
               </span>
+              {extraTags.map((tag) => (
+                <span
+                  key={tag}
+                  className={`text-[10px] font-bold px-2 py-0.5 border ${getTagBadgeClass(tag)} chamfer-corner uppercase`}
+                >
+                  {tag}
+                </span>
+              ))}
               <span className="flex items-center gap-1.5 text-gray-400 text-xs">
                 <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                 {formattedDate}

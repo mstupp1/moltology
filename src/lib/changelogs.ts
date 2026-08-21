@@ -28,6 +28,7 @@ export async function createChangelog(data: {
   version?: string
   title: string
   category: string
+  tags?: string[]
   summary: string
   content: string
   isPublished?: boolean
@@ -43,6 +44,7 @@ export async function updateChangelog(data: {
   version?: string
   title: string
   category: string
+  tags?: string[]
   summary: string
   content: string
   isPublished?: boolean

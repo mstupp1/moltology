@@ -1,7 +1,8 @@
 ---
 title: "Moltology Platform Launch"
 slug: "2026-07-31-framework-ignition"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "Platform", "Launch", "UI/UX"]
 version: "2026.07.31"
 summary: "Initial launch of the Moltology platform, featuring the benthic HUD interface, progression system, and market."
 isPublished: true

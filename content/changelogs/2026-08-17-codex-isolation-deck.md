@@ -1,7 +1,8 @@
 ---
 title: "Codex Reading Modes, Focus Deck & Careers"
 slug: "2026-08-17-codex-isolation-deck"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "UI/UX", "AI", "Community"]
 version: "2026.08.17"
 summary: "Added custom themes and fullscreen reading to the Codex, launched the Isolation focus deck, and added a careers hub."
 isPublished: true

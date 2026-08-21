@@ -45,17 +45,20 @@ Every changelog entry must be a **high-level, plain explanation** of what was ch
 - **No tech-stack leaks**: NEVER surface real-world framework/library names (React, TanStack, Vite, Nitro, Drizzle, Neon, PostgreSQL, JWT, RLS, S3, pgPolicy, etc.).
 - **No `//` double slashes** in titles, subtitles, or copy. Use middle dots (`·`), colons (`:`), or em-dashes (`—`).
 - **Keep it concise**: 1–2 sentence `summary`, and a short `content` body with 2–3 clear sections and 2–3 plain bullets each.
-- **Category-fit**: pick one dominant category for the release.
+- **Category & Tags**: Pick one standard primary category, and add overlapping tags to describe all areas touched by the release.
 
-### Category Mapping Guide
+### Standard Categories & Tags Guide
 
-| Category | Choose when the update is mostly about... |
+| Category | Description |
 | :--- | :--- |
-| `FEATURE` | Net-new tools, interactive hubs, quizzes, or major platform capabilities |
-| `CHASSIS_UPGRADE` | Visual/UI redesigns, theming, device frames, or responsive layouts |
-| `SECURITY_ISOLATION` | User accounts, authentication options, bot protection, or privacy features |
-| `TRANSMUTATION` | Publishing engines, RSS feeds, or media storage upgrades |
-| `BUG_PURGE` | Major bug fixes, error handling improvements, or stability upgrades |
+| `Feature` | Net-new tools, interactive hubs, quizzes, or major platform capabilities |
+| `Improvement` | Visual polish, UX refinements, component updates, or workflow enhancements |
+| `Performance` | Speed improvements, prefetching, load time reductions, or resource efficiency |
+| `Security` | User accounts, authentication options, bot protection, or privacy shielding |
+| `Fix` | Bug fixes, regression remedies, error handling, or stability upgrades |
+| `Design` | Theming, layout overhauls, typography refinements, or animations |
+
+**Common Overlapping Tags**: `Feature`, `Improvement`, `UI/UX`, `Performance`, `Navigation`, `Security`, `AI`, `Media`, `Mobile`, `Database`, `Tools`, `Design`, `Guides`, `Fix`
 
 ---
 
@@ -67,7 +70,8 @@ Every changelog draft created in `content/changelogs/<slug>.md` must include YAM
 ---
 title: "Permanent Changelog Links & Resizable Sidebar"
 slug: "2026-08-19-permanent-changelog-links-resizable-sidebar"
-category: "FEATURE" # Options: FEATURE, CHASSIS_UPGRADE, SECURITY_ISOLATION, TRANSMUTATION, BUG_PURGE
+category: "Feature" # Standard: Feature, Improvement, Security, Performance, Fix, Design
+tags: ["Feature", "UI/UX", "Navigation", "Tools"] # Overlapping topic tags
 version: "2026.08.19" # Date-based for daily digests
 summary: "Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts."
 isPublished: true
@@ -92,13 +96,6 @@ releasedAt: "2026-08-19T23:59:00Z"
 - **Version**: mirror the date as `YYYY.MM.DD` (e.g. `2026.08.19`).
 - **releasedAt**: set to end-of-day (`YYYY-MM-DDT23:59:00Z`) so ordering by `releasedAt DESC` is deterministic within a day.
 - **One entry per day**: if multiple features ship on one day, merge them into a single digest under the dominant category.
-
-### Supported Categories:
-* `TRANSMUTATION`: Architectural overhauls, database migrations, and telemetry upgrades.
-* `CHASSIS_UPGRADE`: UI improvements, component enhancements, and visual refinements.
-* `SECURITY_ISOLATION`: Auth, RLS policies, Turnstile protections, and privacy shielding.
-* `BUG_PURGE`: Fixes, regression remedies, and error handler hardening.
-* `FEATURE`: Net-new tools, hubs, and interactive platform capabilities.
 
 ---
 

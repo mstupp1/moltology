@@ -1,7 +1,8 @@
 ---
 title: "Newsroom, Podcast Player & Dashboard Widgets"
 slug: "2026-08-04-moltnation-broadcasts"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "Media", "Audio", "Widgets"]
 version: "2026.08.04"
 summary: "Launched the MoltNation newsroom with live ticker, an audio podcast player, and new dashboard scheduling widgets."
 isPublished: true
