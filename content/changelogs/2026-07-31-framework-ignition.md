@@ -1,15 +1,14 @@
 ---
+title: "Moltology Platform Launch"
 slug: "2026-07-31-framework-ignition"
-version: "2026.07.31"
-title: "The First Shed: The Framework Ignites"
 category: "FEATURE"
-summary: "Lit the forge beneath the waves. The first scaffold, the benthic HUD shell, and the design language that will carry every future transmutation took their first breath."
+version: "2026.07.31"
+summary: "Initial launch of the Moltology platform, featuring the benthic HUD interface, progression system, and market."
 isPublished: true
 releasedAt: "2026-07-31T23:59:00Z"
 ---
 
-### The First Shed
-
-- Kindled the Moltology framework: the structural chassis every future build will mount.
-- Raised the first benthic HUD shell with the market, pipeline, and landing corridors laid out.
-- Locked in the design language for the year ahead — a 3D canvas, a command palette, an AI Oracle, and gamified progression at the center of the experience.
+### Platform Launch
+- Launched the initial Moltology web application with dark-themed dashboard and interactive landing page.
+- Built the asset shedding market and progression pipeline previews.
+- Established the core design language: command search, AI assistance, and gamified tier tracking.

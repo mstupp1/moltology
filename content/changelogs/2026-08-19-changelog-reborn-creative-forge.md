@@ -1,24 +1,20 @@
 ---
+title: "Permanent Changelog Links & Resizable Sidebar"
 slug: "2026-08-19-changelog-reborn-creative-forge"
-version: "2026.08.19"
-title: "The Changelog Reborn & The Creative Forge"
 category: "FEATURE"
-summary: "Gave the changelog a permanent home with clean permalinks and a unified ingestion CLI, hardened the sidebar, and plugged the creative pipeline into local model-run imagery."
+version: "2026.08.19"
+summary: "Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts."
 isPublished: true
 releasedAt: "2026-08-19T23:59:00Z"
 ---
 
-### The Changelog Reborn
+### Shareable Changelog Pages
+- Added dedicated, shareable links for every release so updates are easy to bookmark and reference.
+- Improved spacing and navigation across the update feed.
 
-- Reworked changelog routing with clean slug-based permalinks and a unified ingestion CLI, so every future release gets a permanent URL.
-- Refined the launchpad carousel and standardized spacing across HUD components.
+### Resizable Sidebar
+- Added a drag handle to resize the navigation sidebar, saving your preferred width automatically.
+- Made the command search palette close when clicking outside.
 
-### The Sidebar Refined
-
-- Made the sidebar resizable with a drag rail and persisted collapse state, and stacked identity controls neatly in the collapsed view.
-- Added click-to-close behavior to the command palette.
-
-### The Creative Forge
-
-- Integrated a local model-run pipeline for generating imagery, with workflow automation and mandatory queue routing.
-- Added sparse-autoencoder research content and reel history tracking to the broadcast forge.
+### Creative Studio
+- Connected local AI image generation to automatically create illustrations for daily social posts.

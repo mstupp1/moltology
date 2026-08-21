@@ -13,295 +13,211 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
-    slug: '2026-08-20-living-chronicle-deep-pulse',
-    version: '2026.08.20',
-    title: 'The Living Chronicle & The Deep Pulse',
-    category: 'CHASSIS_UPGRADE',
-    summary: 'Infused the changelog timeline with glowing pulse telemetry and layered benthic tracks, while securing the unbroken chronicle of every molt since framework ignition.',
-    content: `### The Living Pulse
-- Infused the changelog and support timeline tracks with animated pulse rings, ambient glowing nodes, and sub-surface scanline textures.
-- Added interactive hover illumination that expands telemetry nodes as initiates inspect each historical molt.
-
-### The Unbroken Chronicle
-- Restored and validated the complete daily transmission log from framework ignition to the current epoch, ensuring no molt is lost to the deep.
-- Hardened the ingestion pipeline with automated verification safeguards across all database vaults.`,
-    releasedAt: '2026-08-20T23:59:00Z',
-  },
-  {
     slug: '2026-08-19-changelog-reborn-creative-forge',
     version: '2026.08.19',
-    title: 'The Changelog Reborn & The Creative Forge',
+    title: 'Permanent Changelog Links & Resizable Sidebar',
     category: 'FEATURE',
-    summary: 'Gave the changelog a permanent home with clean permalinks and a unified ingestion CLI, hardened the sidebar, and plugged the creative pipeline into local model-run imagery.',
-    content: `### The Changelog Reborn
-- Reworked changelog routing with clean slug-based permalinks and a unified ingestion CLI, so every future release gets a permanent URL.
-- Refined the launchpad carousel and standardized spacing across HUD components.
+    summary: 'Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts.',
+    content: `### Shareable Changelog Pages
+- Added dedicated, shareable links for every release so updates are easy to bookmark and reference.
+- Improved spacing and navigation across the update feed.
 
-### The Sidebar Refined
-- Made the sidebar resizable with a drag rail and persisted collapse state, and stacked identity controls neatly in the collapsed view.
-- Added click-to-close behavior to the command palette.
+### Resizable Sidebar
+- Added a drag handle to resize the navigation sidebar, saving your preferred width automatically.
+- Made the command search palette close when clicking outside.
 
-### The Creative Forge
-- Integrated a local model-run pipeline for generating imagery, with workflow automation and mandatory queue routing.
-- Added sparse-autoencoder research content and reel history tracking to the broadcast forge.`,
+### Creative Studio
+- Connected local AI image generation to automatically create illustrations for daily social posts.`,
     releasedAt: '2026-08-19T23:59:00Z',
   },
   {
     slug: '2026-08-18-showcase-shield',
     version: '2026.08.18',
-    title: 'The Showcase & The Shield',
+    title: 'Interactive Device Showcase & Spam Protection',
     category: 'CHASSIS_UPGRADE',
-    summary: 'Rebuilt the landing showcase with living device frames, threw up a bot shield at every entry point, and swept the double slashes from the canon.',
-    content: `### The Showcase
-- Rebuilt the marketing showcase to mirror the real HUD, framed in browser and phone shells, with pre-rendered dashboard screenshots.
-- Rounded out the landing page call-to-action styling to match.
+    summary: 'Added interactive browser and mobile preview frames to the homepage, protected forms against spam bots, and cleaned up typography.',
+    content: `### Homepage Showcase
+- Added interactive browser and mobile device frames to preview the dashboard directly on the homepage.
+- Updated homepage buttons and cards for a cleaner layout.
 
-### The Shield
-- Raised bot protection at every entry point — sign-in, comments, and lead capture. Bots bounce, humans dive.
-- Added an opt-in email subscription flow with database tracking for initiates who want dispatches by wire.
+### Spam Protection & Sign-in
+- Added automatic bot protection to sign-in, comments, and newsletter signup forms.
+- Added an optional email newsletter subscription.
+- Upgraded authentication screens with custom branding.
 
-### The Polish
-- Replaced the default sign-in surface with fully branded authentication UI.
-- Swept the aesthetic double slashes ("//") from titles and copy across the entire site.
-- Standardized global typography onto a cleaner sans voice.`,
+### Clean Typography
+- Standardized fonts across all pages for improved readability.
+- Cleaned up formatting and titles throughout the platform.`,
     releasedAt: '2026-08-18T23:59:00Z',
   },
   {
     slug: '2026-08-17-codex-isolation-deck',
     version: '2026.08.17',
-    title: 'The Codex Deepens & The Isolation Deck Opens',
+    title: 'Codex Reading Modes, Focus Deck & Careers',
     category: 'FEATURE',
-    summary: 'The Sacred Codex gained rich-text reading, the isolation HUD opened for deep-work sessions, and the Order grew a careers page.',
-    content: `### The Sacred Codex
-- Upgraded the codex reader with rich text rendering, custom themes, font variants, and a fullscreen mode with persistent settings.
-- Refined citation formatting and standardized symbol usage across the canon.
+    summary: 'Added custom themes and fullscreen reading to the Codex, launched the Isolation focus deck, and added a careers hub.',
+    content: `### Enhanced Codex Reader
+- Added custom reading themes, font sizes, and a distraction-free fullscreen mode.
+- Improved scripture citations and formatting across all documents.
 
-### The Isolation Deck
-- Opened the isolation HUD with a video feed, protocol settings, and telemetry overlays — a private vault for abyssal deep work.
-- Made the Oracle chat panel draggable and resizable with layout memory.
+### Isolation Focus Deck
+- Launched a dedicated focus space with ambient background video and customizable work protocols.
+- Made the AI assistant chat panel resizable and draggable.
 
-### The Order Grows
-- Added the careers hub and a Life at HQ gallery so initiates can see who they're becoming.
-- Added guest gating with in-message sign-up prompts, guiding curious visitors toward their first molt.
-
-### Voice & Motion
-- Added character overlay utilities and multi-voice narration to the daily reels for richer broadcasts.`,
+### Careers & Community
+- Added a careers page and an inside-the-team photo gallery.
+- Added clear sign-up prompts when browsing as a guest.`,
     releasedAt: '2026-08-17T23:59:00Z',
   },
   {
     slug: '2026-08-16-hero-quiz-engine',
     version: '2026.08.16',
-    title: 'The Hero & The Quiz Engine',
+    title: 'Moltmax Quiz Engine & Animated Characters',
     category: 'FEATURE',
-    summary: 'Gave the landing page living characters and shipped the full Moltmax quiz engine — because knowing your molt score should feel like a game.',
-    content: `### Living Heroes
-- Added character animations and mascots to the landing page with a chroma-key utility for clean compositing.
-- Refreshed hero and deck imagery with new sacrament visuals.
+    summary: 'Launched the multi-step Moltmax personality quiz and added animated mascot characters to the homepage.',
+    content: `### Interactive Moltmax Quiz
+- Replaced the basic slider with a multi-step scenario quiz to calculate your score.
+- Added quiz score tracking to user profile pages.
 
-### The Moltmax Quiz Engine
-- Replaced the old biometric slider with a multi-step quiz engine, complete with new questions, image-backed scenarios, and a results module.
-- Added Moltmax scoring to user profiles so every initiate's stats are tracked honestly.`,
+### Animated Characters
+- Added animated mascots and character art to the homepage.
+- Refreshed card graphics and layout across the landing page.`,
     releasedAt: '2026-08-16T23:59:00Z',
-  },
-  {
-    slug: '2026-08-15-the-texture-layer',
-    version: '2026.08.15',
-    title: 'The Texture Layer',
-    category: 'CHASSIS_UPGRADE',
-    summary: "Wrapped the whole surface in high-fidelity texture overlays and sharpened the reels' branding into something sleek enough for the feeds.",
-    content: `### The Texture Layer
-- Implemented the high-fidelity texture system: physical-material-style overlays across components and the landing page.
-- Redesigned the reel watermark and kinetic captions into sleek, responsive branding.
-- Automated social reel generation whenever a new dispatch publishes.`,
-    releasedAt: '2026-08-15T23:59:00Z',
   },
   {
     slug: '2026-08-14-moltmaxxing-reel-machine',
     version: '2026.08.14',
-    title: 'Moltmaxxing & The Reel Machine',
+    title: 'Moltmaxxing Guide & Daily Video Creator',
     category: 'FEATURE',
-    summary: 'The Moltmaxxing knowledge hub opened its gates, and the daily broadcast forge started printing vertical video for the surface feeds.',
-    content: `### The Moltmaxxing Hub
-- Opened the Moltmaxxing knowledge hub with an interactive Moltmax scanner and a full guide route.
-- Expanded the guide with the meltmaxxing contrast, telemetry data, and protocol updates.
+    summary: 'Launched the Moltmaxxing knowledge guide, automated daily video creation for social channels, and improved mobile navigation.',
+    content: `### Moltmaxxing Guide
+- Opened the complete Moltmaxxing knowledge hub with interactive scanner and core principles.
+- Added practical guides on habits, focus, and personal resilience.
 
-### The Daily Broadcast Forge
-- Built the daily vertical-video pipeline: text-to-voice narration, video compositing, thumbnail rendering, and automatic posting to Instagram Reels and YouTube Shorts.
-- Added a first-comment field and 1:1 grid-safe thumbnails so every reel ships polished.
+### Daily Video Automation
+- Built an automated pipeline that generates daily narrated vertical videos for Instagram Reels and YouTube Shorts.
+- Added YouTube and Instagram links across the site.
 
-### Social Fabric
-- Linked the Instagram and YouTube channels across the landing page, Order page, and footer.
-
-### Mobile First
-- Anchored the mobile navigation menu and added a bottom-sheet component with toast history for a smoother small-screen dive.`,
+### Mobile Improvements
+- Added a slide-up menu sheet and improved notification history on phones.
+- Fixed mobile menu positioning so it stays accessible while scrolling.`,
     releasedAt: '2026-08-14T23:59:00Z',
   },
   {
     slug: '2026-08-13-autonomous-content-engine',
     version: '2026.08.13',
-    title: 'The Autonomous Content Engine',
+    title: 'Automated Publishing & RSS Feeds',
     category: 'FEATURE',
-    summary: 'The system learned to publish itself: a unified ingestion engine, a cloud asset vault, and RSS and sitemap beacons so every dispatch reaches the surface.',
-    content: `### The Ingestion Engine
-- Built the unified ingestion engine: drop a draft in the vault and it validates, upserts, and publishes to the database automatically.
-- Added directory batch sync so entire content repositories flow in one command.
+    summary: 'Launched automated article publishing, fast cloud media hosting, and public RSS feeds.',
+    content: `### Publishing System
+- Created an automated publishing tool to validate and release articles instantly.
+- Moved images and media to high-speed cloud storage for faster page loads.
 
-### The Asset Vault
-- Wired cloud-backed asset management with automated upload handlers and migration scripts so imagery lives off-site and loads fast.
-
-### The Beacons
-- Added RSS feeds and a sitemap so subscribers and crawlers never miss a transmission.
-- Standardized search metadata across the network with expanded article support.`,
+### RSS & Search Feeds
+- Added public RSS feeds and a sitemap so users and news readers can subscribe to updates.
+- Added a reading progress indicator and social sharing buttons to articles.`,
     releasedAt: '2026-08-13T23:59:00Z',
-  },
-  {
-    slug: '2026-08-12-content-forge',
-    version: '2026.08.12',
-    title: 'The Content Forge',
-    category: 'TRANSMUTATION',
-    summary: 'Built the markdown generation engine and dynamic delivery routes that will feed every blog, dispatch, and transmutation log from here on.',
-    content: `### The Content Forge
-- Forged a markdown generation utility that turns raw material into polished, structured content.
-- Wired dynamic route handlers so every post is served on demand, not hand-rolled.`,
-    releasedAt: '2026-08-12T23:59:00Z',
   },
   {
     slug: '2026-08-07-new-voices-org-awakens',
     version: '2026.08.07',
-    title: 'New Voices in the Deep',
+    title: 'AI Model Selector, Journal Library & About Page',
     category: 'FEATURE',
-    summary: 'The Oracle grew a voice selector and two new minds, the Order got a friendlier face, and a journal library opened for initiates.',
-    content: `### The Oracle's New Voices
-- Added a model selector and two fresh minds to the Oracle's fleet — one compact and quick, one flash-fast — with graceful fallback when a voice goes quiet.
+    summary: 'Added model selection to the AI assistant, opened a scientific journal reader, and redesigned the About page.',
+    content: `### AI Model Selector
+- Added a model picker to switch between different AI speeds and capabilities.
+- Added automatic fallback to ensure chat stays responsive.
 
-### The Order's Public Face
-- Redesigned the Order page with a warm, approachable corporate character and refined sections.
+### Journal Library
+- Added a dedicated journal reading interface with custom fonts and themes.
+- Unified daily routines into a streak-tracked dashboard widget.
 
-### The Journal Library
-- Opened a scientific journal reading interface with document-style typography, theme controls, and article routing.
-- Unified the daily routine system into a single streak-tracked schema so progress is honest and persistent.`,
+### Redesigned About Page
+- Redesigned the organization overview page with a clearer, friendlier introduction.`,
     releasedAt: '2026-08-07T23:59:00Z',
-  },
-  {
-    slug: '2026-08-06-policy-siege-oracle-prep',
-    version: '2026.08.06',
-    title: 'The Policy Siege & Oracle Reconnaissance',
-    category: 'SECURITY_ISOLATION',
-    summary: "Hardened the admin vaults, purged the public API console, and scouted the models that will power the Oracle's next evolution.",
-    content: `### The Vaults Harden
-- Enforced admin-only write policies on the changelog vault so only the High Ascendant can alter the record.
-- Tightened mobile navigation and gave the welcome splash a proper close and relaunch.
-
-### Oracle Reconnaissance
-- Reworked the Oracle's model configuration into a modular, swappable architecture ahead of new voices arriving.`,
-    releasedAt: '2026-08-06T23:59:00Z',
-  },
-  {
-    slug: '2026-08-05-discipline-of-discovery',
-    version: '2026.08.05',
-    title: 'The Discipline of Discovery',
-    category: 'TRANSMUTATION',
-    summary: 'Put the Order on the map. Canonical tags, search-ready structure, and a code of diegetic discipline so every public word stays on-brand.',
-    content: `### The Search Beacons
-- Added canonical tags, structured metadata, and crawler-friendly configuration so search engines can find the Order.
-- Set machine-readable schemas so automated systems understand the doctrine as well as humans do.
-
-### The Code of Discipline
-- Codified the diegetic discipline: every public asset now speaks strictly in-universe. No tech-talk, no leaks, no breaking the fourth wall.`,
-    releasedAt: '2026-08-05T23:59:00Z',
   },
   {
     slug: '2026-08-04-moltnation-broadcasts',
     version: '2026.08.04',
-    title: 'MoltNation Takes the Airwaves',
+    title: 'Newsroom, Podcast Player & Dashboard Widgets',
     category: 'FEATURE',
-    summary: 'MoltNation news went live with a live ticker and searchable archive, podcasts started transmitting, and the dashboard became a command deck.',
-    content: `### The News Network
-- Launched the MoltNation news index with live ticker, search, filtering, and full article pages.
-- Added an animated flagship background so the newsroom looks the part.
+    summary: 'Launched the MoltNation newsroom with live ticker, an audio podcast player, and new dashboard scheduling widgets.',
+    content: `### MoltNation Newsroom
+- Launched the news index with live ticker headlines, category filtering, and full article pages.
+- Added animated background visuals to the newsroom.
 
-### Podcast Transmissions
-- Built the podcast player and opened the transmission library for on-demand listening.
+### Podcast Player
+- Built an audio podcast player with an on-demand transmission archive.
 
-### The Dashboard Command Deck
-- Added the launchpad carousel, a real-time news widget, a multi-timezone digital clock with scheduling, and a streak-tracked daily routine widget.
-- Served guest initiates a welcome splash so the first dive never feels cold.
-
-### Performance & Self-Sailing
-- Added global toggles to dial heavy visual effects up or down, and automated database migrations so the ship steers itself.`,
+### Dashboard Widgets
+- Added a multi-timezone digital clock, task scheduler, and daily routine tracker.
+- Added a visual module carousel to the main dashboard.`,
     releasedAt: '2026-08-04T23:59:00Z',
   },
   {
     slug: '2026-08-03-great-shell-polish',
     version: '2026.08.03',
-    title: 'The Great Shell Polish',
+    title: 'Benthic HUD Theme, Command Palette & Blog',
     category: 'CHASSIS_UPGRADE',
-    summary: 'A day of pure chitin: ambient bubble seas, CRT scanlines, a rebuilt sidebar, the blog network, and a hero worthy of the Order.',
-    content: `### The Ambience Dives
-- Sunk the whole HUD underwater with a living bubble-particle system, CRT scanlines, and grainy glow.
-- Added custom loaders, spinners, and an animated conversion meter that ticks toward full carcinization.
+    summary: 'Introduced the deep-sea dark theme with particle effects, added command search to the sidebar, and launched the blog.',
+    content: `### Visual Theme & Atmosphere
+- Added deep-sea ambient particle animations, subtle CRT scanlines, and glow effects.
+- Added custom page loaders and an animated progress meter.
 
-### Navigation Rebuilt
-- Re-engineered the sidebar: collapsible sections, a command palette, expandable groups, and a floating toggle.
-- Introduced the avatar menu so identity follows you across every header.
+### Navigation & Search
+- Redesigned the sidebar with expandable sections and quick command palette search.
+- Added an avatar menu to manage account settings from any page.
 
-### The Blog Network
-- Launched the blog system with live-sliding featured stories and comment threads for authenticated initiates.
-- Raised the legal walls — privacy policy and terms of service — so the Order plays by the rules.
-
-### The Hero Ascends
-- Rebuilt the landing hero around an ascended claw silhouette with interactive shuffle-deck cards.`,
+### Blog & Community
+- Launched the community blog with featured article carousels and comments.
+- Added privacy policy and terms of service pages.`,
     releasedAt: '2026-08-03T23:59:00Z',
   },
   {
     slug: '2026-08-02-component-vault-oracle-awakes',
     version: '2026.08.02',
-    title: 'The Vault Opens: The Synaptic Oracle Breathes',
+    title: 'Component Library, Interactive Lectures & AI Chat',
     category: 'FEATURE',
-    summary: 'Forged the standard-issue HUD component vault, lit the first lecture halls, opened the gallery, and woke the Synaptic Oracle for its first conversations.',
-    content: `### The Standard-Issue Vault
-- Forged a library of standard HUD components — cards, buttons, inputs, badges, loaders — one shell for every screen.
-- Built error shielding and toast signaling so the system explains itself instead of crashing silently.
+    summary: 'Built the standardized UI component system, added interactive video lectures with quizzes, a media gallery, and AI assistant chat.',
+    content: `### UI Component Library
+- Standardized buttons, cards, badges, inputs, and modals across the application.
+- Added toast notifications and user-friendly error messages.
 
-### Learning & Growth
-- Opened the lecture halls with course catalogs, progress tracking, and syllabus quizzes.
-- Launched the gallery grid and wired media storage so initiates can pin their shedding progress.
+### Lectures & Media Gallery
+- Added course catalogs, lesson progress tracking, and interactive quizzes.
+- Launched the media gallery grid with pinboard saving.
 
-### The Oracle Wakes
-- Brought the Synaptic Oracle online with its first conversation engine, markdown-rich responses, and centralized thread memory across every surface.
-
-### The Changelog Is Born
-- Seeded the system changelog itself — the telemetry feed you are reading right now.`,
+### Synaptic Oracle AI Chat
+- Launched the AI assistant chat panel with formatted text, code highlighting, and conversation history.`,
     releasedAt: '2026-08-02T23:59:00Z',
   },
   {
     slug: '2026-08-01-the-identity-gate',
     version: '2026.08.01',
-    title: 'The Identity Gate: Sign In, Shed, Ascend',
+    title: 'User Accounts, Google Sign-in & Sacred Codex',
     category: 'SECURITY_ISOLATION',
-    summary: 'Wired the doorways to the Order. Email and Google sign-in, hardened session armor, and the sacred codex laid its first foundational tomes.',
-    content: `### Secure Entryways
-- Built the sign-in and sign-up terminals with email and Google passkeys.
-- Hardened session armor so every initiate's identity is sealed and verified on entry.
-- Added guest exploration mode so curious humans can browse before committing to the molt.
+    summary: 'Added user accounts with email and Google sign-in, mobile-friendly navigation, and the first Codex doctrine texts.',
+    content: `### User Accounts & Sign-in
+- Added secure user accounts supporting both email/password and Google one-click sign-in.
+- Added guest browsing mode so visitors can explore the platform before creating an account.
 
-### The Codex Awakens
-- Planted the first sacred texts: the canonical structure, scripture templates, and foundational doctrine of the Order.
+### Sacred Codex
+- Added the scripture reading interface and published foundational doctrine texts.
 
-### The Engine Beneath
-- Rerouted the entire platform onto a deeper engine and re-charted every corridor to match.`,
+### Mobile Navigation
+- Created a responsive mobile layout and persistent navigation bar for phones and tablets.`,
     releasedAt: '2026-08-01T23:59:00Z',
   },
   {
     slug: '2026-07-31-framework-ignition',
     version: '2026.07.31',
-    title: 'The First Shed: The Framework Ignites',
+    title: 'Moltology Platform Launch',
     category: 'FEATURE',
-    summary: 'Lit the forge beneath the waves. The first scaffold, the benthic HUD shell, and the design language that will carry every future transmutation took their first breath.',
-    content: `### The First Shed
-- Kindled the Moltology framework: the structural chassis every future build will mount.
-- Raised the first benthic HUD shell with the market, pipeline, and landing corridors laid out.
-- Locked in the design language for the year ahead — a 3D canvas, a command palette, an AI Oracle, and gamified progression at the center of the experience.`,
+    summary: 'Initial launch of the Moltology platform, featuring the benthic HUD interface, progression system, and market.',
+    content: `### Platform Launch
+- Launched the initial Moltology web application with dark-themed dashboard and interactive landing page.
+- Built the asset shedding market and progression pipeline previews.
+- Established the core design language: command search, AI assistance, and gamified tier tracking.`,
     releasedAt: '2026-07-31T23:59:00Z',
   },
 ]
