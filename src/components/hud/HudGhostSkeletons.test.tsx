@@ -7,6 +7,7 @@ import {
   DashboardNewsGhost,
   SubterraneanHubGhost,
   ActivityFeedGhost,
+  HudWorkspaceGhost,
 } from './HudGhostSkeletons'
 
 describe('HudGhostSkeletons Composite Views', () => {
@@ -34,4 +35,10 @@ describe('HudGhostSkeletons Composite Views', () => {
     const { container } = render(<ActivityFeedGhost />)
     expect(container.firstChild).toBeInTheDocument()
   })
+
+  it('renders HudWorkspaceGhost without crashing', () => {
+    const { container } = render(<HudWorkspaceGhost />)
+    expect(container.firstChild).toBeInTheDocument()
+  })
 })
+

@@ -192,3 +192,43 @@ export function ActivityFeedGhost() {
     </div>
   )
 }
+
+/**
+ * Standard Ghost Skeleton composite for the Hub Workspace outlet.
+ * Used during route transitions across hub pages.
+ */
+export function HudWorkspaceGhost() {
+  return (
+    <div className="space-y-4 font-sans select-none animate-in fade-in duration-150" data-testid="hud-workspace-ghost">
+      {/* Top Banner Skeleton */}
+      <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 chamfer-corner space-y-3 shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <HudGhostSkeleton variant="cyan" preset="avatar" width={32} height={32} />
+            <div className="space-y-1">
+              <HudGhostSkeleton variant="cyan" preset="heading" width={180} height={18} />
+              <HudGhostSkeleton variant="neutral" preset="text" width={260} height={12} />
+            </div>
+          </div>
+          <HudGhostSkeleton variant="cyan" preset="badge" width={90} height={24} />
+        </div>
+      </div>
+
+      {/* Main Grid Content Skeletons */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <HudGhostCard variant="neutral" lines={4} className="md:col-span-2 min-h-[220px]" />
+        <div className="space-y-3 flex flex-col justify-between">
+          <HudGhostStatBox variant="cyan" />
+          <HudGhostStatBox variant="neutral" />
+        </div>
+      </div>
+
+      {/* Secondary Row Skeletons */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <HudGhostCard variant="neutral" lines={3} />
+        <HudGhostCard variant="neutral" lines={3} />
+      </div>
+    </div>
+  )
+}
+

@@ -8,6 +8,8 @@ import { seo, buildJsonLd } from '@/lib/seo'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
 import { HUDNotFound } from '@/components/hud/HUDNotFound'
 import { ToastProvider } from '@/components/ui/ToastProvider'
+import { HUDTopLoadingBar } from '@/components/hud/HUDTopLoadingBar'
+
 
 export const Route = createRootRoute({
   head: () => ({
@@ -82,6 +84,7 @@ function RootDocument() {
         />
       </head>
       <body className="bg-[#0f1414] text-[#dfe3e3] font-sans antialiased selection:bg-[#00ffff] selection:text-[#000a0a]">
+        <HUDTopLoadingBar />
         <HUDErrorBoundary>
           <ToastProvider>
             <NeonAuthUIProvider emailOTP authClient={authClient}>
@@ -91,6 +94,7 @@ function RootDocument() {
         </HUDErrorBoundary>
         <Scripts />
       </body>
+
     </html>
   )
 }

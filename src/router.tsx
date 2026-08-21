@@ -8,10 +8,12 @@ export function getRouter() {
     routeTree,
     scrollRestoration: true,
     defaultNotFoundComponent: HUDNotFound,
-    // Show the HUD page loader after 200 ms on any slow route transition.
+    // Preload routes on intent (hover/focus) for instant navigation transitions.
+    defaultPreload: 'intent',
+    defaultPreloadDelay: 50,
     defaultPendingComponent: HUDPageLoader,
-    defaultPendingMs: 200,
-    defaultPendingMinMs: 500,
+    defaultPendingMs: 150,
+    defaultPendingMinMs: 0,
   })
 
   return router

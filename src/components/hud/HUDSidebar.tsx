@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import {
+
   LayoutDashboard,
   BookOpen,
   Scroll,
@@ -52,7 +53,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
+
   const currentRoute = location.pathname
+
   const [pendingRoute, setPendingRoute] = useState<string | null>(null)
   const effectiveRoute = pendingRoute || currentRoute
 
@@ -477,6 +480,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       : 'bg-transparent hover:bg-white/[0.04]'
                   }`}
                 >
+
+
                   {isActive && (
                     <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)]" />
                   )}
@@ -573,6 +578,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         : 'bg-transparent hover:bg-white/[0.04]'
                     }`}
                   >
+
+
                     {isActive && (
                       <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)]" />
                     )}
