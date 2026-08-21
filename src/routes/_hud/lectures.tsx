@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import {
   Play,
   Pause,
@@ -690,4 +691,5 @@ export const Route = createFileRoute('/_hud/lectures')({
     ],
   }),
   component: LecturesRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

@@ -212,4 +212,16 @@ describe('PublicHeader Navigation Component', () => {
 
     expect(headerEl.className).toContain('translate-y-0')
   })
+
+  it('renders auth skeleton placeholder when session is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: null,
+      isPending: true,
+    } as any)
+
+    render(<PublicHeader activePage="home" />)
+
+    expect(screen.getByTestId('public-header-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /LOG IN/i })).not.toBeInTheDocument()
+  })
 })

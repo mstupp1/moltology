@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Lock, UserPlus, LogIn } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { AuthModal } from '@/components/AuthModal'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 export interface GuestLockGuardProps {
   children: React.ReactNode
@@ -9,6 +10,7 @@ export interface GuestLockGuardProps {
   title?: string
   message?: string
   bypass?: boolean
+  skeleton?: React.ReactNode
 }
 
 export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
@@ -17,10 +19,12 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
   title,
   message,
   bypass = false,
+  skeleton,
 }) => {
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
+  const isPending = sessionRes?.isPending ?? false
   const isGuest = !userId && !bypass
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -29,6 +33,11 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
   const handleOpenAuth = (mode: 'signup' | 'login') => {
     setAuthMode(mode)
     setIsAuthModalOpen(true)
+  }
+
+  // Smoothly render skeleton while auth state is resolving
+  if (!bypass && isPending) {
+    return <>{skeleton || <HudWorkspaceGhost />}</>
   }
 
   if (!isGuest) {
@@ -41,18 +50,18 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
     `Access to ${featureName} is restricted in guest mode. Create your free initiate account in seconds to unlock full access.`
 
   return (
-    <div className="relative w-full h-full min-h-[calc(100vh-140px)] flex flex-col items-center justify-center font-sans">
+    <div className="relative w-full h-full min-h-[calc(100vh-140px)] flex flex-col font-sans">
       {/* Dimmed Background Content Preview (constrained to viewport bounds so it does not overflow) */}
       <div
-        className="absolute inset-0 overflow-hidden pointer-events-none select-none filter blur-[4px] opacity-20 brightness-50 transition-all duration-300"
+        className="w-full h-full overflow-hidden pointer-events-none select-none filter blur-[4px] opacity-20 brightness-50 transition-all duration-300"
         aria-hidden="true"
         tabIndex={-1}
       >
         {children}
       </div>
 
-      {/* Main Workspace Dimming Overlay & Centered Lock Modal Card */}
-      <div className="absolute inset-0 -m-4 md:-m-6 z-20 flex items-center justify-center p-4 sm:p-6 bg-[#030708]/85 backdrop-blur-[2px] animate-fadeIn">
+      {/* Main Workspace Dimming Overlay & Centered Lock Modal Card (Fixed to Viewport) */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#030708]/85 backdrop-blur-[2px] animate-fadeIn">
         <div className="w-full max-w-md bg-[#090f12]/95 border border-[#3a4a49] shadow-[0_0_60px_rgba(0,0,0,0.9)] chamfer-corner p-6 sm:p-8 text-center space-y-5 relative overflow-hidden my-auto">
           {/* Top Subtle Crimson Edge Line */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#ff453a] to-transparent" />

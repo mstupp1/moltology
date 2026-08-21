@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import {
   Users,
@@ -950,4 +951,5 @@ export const Route = createFileRoute('/_hud/community')({
     ],
   }),
   component: CommunityRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

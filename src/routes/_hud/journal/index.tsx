@@ -19,9 +19,11 @@ import {
 } from '@/lib/journal-data'
 import { JournalMasthead } from '@/components/journal/JournalMasthead'
 import { JournalFeedTag } from '@/components/journal/ScientificTable'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 export const Route = createFileRoute('/_hud/journal/')({
   component: JournalIndexPage,
+  pendingComponent: HudWorkspaceGhost,
 })
 
 function JournalIndexPage() {

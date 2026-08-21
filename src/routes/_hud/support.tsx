@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import {
   LifeBuoy,
   FileText,
@@ -937,6 +938,7 @@ export const Route = createFileRoute('/_hud/support')({
     }
   },
   component: SupportPortalRoute,
+  pendingComponent: HudWorkspaceGhost,
   head: () => ({
     meta: seo({ title: 'Benthic Support Portal & System Changelog | Moltology' }),
   }),

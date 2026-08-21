@@ -1,6 +1,7 @@
 import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { SacredCodexReader } from '@/components/codex/SacredCodexReader'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
 function CodexRoute() {
@@ -24,4 +25,5 @@ export const Route = createFileRoute('/_hud/codex')({
     ],
   }),
   component: CodexRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

@@ -86,7 +86,7 @@ describe('GuestLockGuard Component', () => {
   })
 
   it('bypasses guest lock when bypass prop is set to true', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
       <GuestLockGuard featureName="Chassis Configurator" bypass={true}>
@@ -97,4 +97,36 @@ describe('GuestLockGuard Component', () => {
     expect(screen.getByText('Bypassed Studio Content')).toBeInTheDocument()
     expect(screen.queryByText('CHASSIS CONFIGURATOR LOCKED')).not.toBeInTheDocument()
   })
+
+  it('renders default HudWorkspaceGhost when authClient.useSession is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+
+    render(
+      <GuestLockGuard featureName="Lectures">
+        <div>Secret Content</div>
+      </GuestLockGuard>
+    )
+
+    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
+    expect(screen.queryByText('LECTURES LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Secret Content')).not.toBeInTheDocument()
+  })
+
+  it('renders custom skeleton when provided and authClient.useSession is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+
+    render(
+      <GuestLockGuard
+        featureName="Subterranean Vats"
+        skeleton={<div data-testid="custom-vat-skeleton">Loading Vats...</div>}
+      >
+        <div>Vat Content</div>
+      </GuestLockGuard>
+    )
+
+    expect(screen.getByTestId('custom-vat-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('SUBTERRANEAN VATS LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('Vat Content')).not.toBeInTheDocument()
+  })
 })
+

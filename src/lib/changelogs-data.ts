@@ -13,6 +13,40 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-08-21-instant-navigation-feature-showcase',
+    version: '2026.08.21',
+    title: 'Instant Navigation Prefetching & Enhanced Feature Cards',
+    category: 'CHASSIS_UPGRADE',
+    summary: 'Enabled instant background page prefetching on sidebar links and upgraded homepage feature cards with expanded banners, atmospheric vignettes, and focal framing.',
+    content: `### Instant Sidebar Navigation
+- Enabled automatic background prefetching on sidebar navigation links for near-instantaneous page transitions.
+- Tuned navigation delay thresholds to keep route switching smooth and seamless.
+
+### Expanded Feature Showcase
+- Overhauled homepage pillar cards with taller banner heights, layered lighting vignettes, and technical corner overlays.
+- Added custom image focal positioning to highlight key mentor and feature artwork dynamically.`,
+    releasedAt: '2026-08-21T23:59:00Z',
+  },
+  {
+    slug: '2026-08-20-living-pulse-navigation-skeletons',
+    version: '2026.08.20',
+    title: 'Navigation Skeletons & Living Timeline Pulse',
+    category: 'CHASSIS_UPGRADE',
+    summary: 'Added ghost loading skeletons with top progress tracking for smooth navigation, illuminated changelog timeline tracks with animated pulse nodes, and enhanced support portal reading.',
+    content: `### Navigation Loading & Transition Skeletons
+- Added ghost skeleton screens and an animated top progress bar for instant visual feedback during page transitions.
+- Optimized loading states across the navigation sidebar and dashboard views.
+
+### Living Timeline Telemetry
+- Enhanced the changelog and support timeline tracks with animated pulse rings, ambient glowing nodes, and clean hover indicators.
+- Made preview device frames fully responsive for mobile viewports.
+
+### Rich Support Articles
+- Integrated rich article formatting with styled typography, callouts, and clean markdown rendering into the support portal.
+- Refined video scene generation and speech alignment across multimedia dispatches.`,
+    releasedAt: '2026-08-20T23:59:00Z',
+  },
+  {
     slug: '2026-08-19-changelog-reborn-creative-forge',
     version: '2026.08.19',
     title: 'Permanent Changelog Links & Resizable Sidebar',

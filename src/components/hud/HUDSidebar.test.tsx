@@ -294,4 +294,26 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('REPLAY INITIATION BROADCAST')).toBeInTheDocument()
     expect(screen.getByText('• CARAPACE v4.2')).toBeInTheDocument()
   })
+
+  it('renders avatar skeleton placeholder while session is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: null,
+      isPending: true,
+    } as any)
+
+    render(<HUDSidebar />)
+
+    expect(screen.getByTestId('sidebar-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+  })
+
+  it('initializes immediately in collapsed state when saved in localStorage', () => {
+    localStorage.setItem('moltology_hud_sidebar_collapsed', 'true')
+
+    const { container } = render(<HUDSidebar />)
+
+    const aside = container.querySelector('aside')
+    expect(aside?.className).toContain('md:w-[72px]')
+    expect(aside?.className).not.toContain('md:w-72')
+  })
 })

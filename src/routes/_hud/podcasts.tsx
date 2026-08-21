@@ -26,6 +26,7 @@ import { getPodcastsFn } from '../../lib/server/api'
 import { MoltNationLogo } from '../../components/news/MoltNationLogo'
 import { seo } from '@/lib/seo'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 export const Route = createFileRoute('/_hud/podcasts')({
   head: () => ({
@@ -43,6 +44,7 @@ export const Route = createFileRoute('/_hud/podcasts')({
     ],
   }),
   component: PodcastsPage,
+  pendingComponent: HudWorkspaceGhost,
 })
 
 function PodcastsPage() {

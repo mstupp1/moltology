@@ -24,6 +24,7 @@ import { authClient } from '@/lib/auth-client'
 import { HeaderBrand } from '@/components/ui'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { UserAvatarMenu } from '@/components/UserAvatarMenu'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 
 export interface PublicHeaderProps {
   activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax'
@@ -43,20 +44,20 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   try {
     const location = useLocation()
     locationPathname = location?.pathname || ''
-  } catch (e) {
-    // Fallback if router context is missing
+  } catch {
+    // router context not yet ready
   }
 
+  const isCorporate = variant === 'corporate' || locationPathname === '/org' || activePage === 'org'
+
   const currentTab = useMemo(() => {
-    if (locationPathname.startsWith('/moltmax')) return 'moltmax'
     if (locationPathname.startsWith('/news') || locationPathname.startsWith('/blog')) return 'news'
+    if (locationPathname.startsWith('/moltmax')) return 'moltmax'
     if (locationPathname.startsWith('/org')) return 'org'
     if (locationPathname === '/') return 'home'
     if (activePage === 'blog') return 'news'
     return activePage
   }, [activePage, locationPathname])
-
-  const isCorporate = variant ? variant === 'corporate' : currentTab === 'org'
 
   const onNavigate = (path: string) => {
     navigate({ to: path })
@@ -64,6 +65,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   }
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const isSessionPending = sessionRes?.isPending ?? false
 
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
   const targetTab = hoveredTab || currentTab
@@ -410,7 +412,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           </button>
 
           <div className="hidden lg:flex items-center gap-3 sm:gap-4">
-            {user ? (
+            {isSessionPending ? (
+              <div className="flex items-center gap-3" data-testid="public-header-auth-skeleton">
+                <HudGhostSkeleton
+                  variant={isCorporate ? 'neutral' : 'cyan'}
+                  preset="avatar"
+                  width={32}
+                  height={32}
+                />
+              </div>
+            ) : user ? (
               <div className="flex items-center gap-3">
                 {isCorporate ? (
                   <button
@@ -585,7 +596,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             }`}
           />
 
-          {user ? (
+          {isSessionPending ? (
+            <div className="flex items-center justify-center py-2" data-testid="mobile-header-auth-skeleton">
+              <HudGhostSkeleton
+                variant={isCorporate ? 'neutral' : 'cyan'}
+                preset="avatar"
+                width={36}
+                height={36}
+              />
+            </div>
+          ) : user ? (
             <div className="space-y-2 pt-1">
               <button
                 onClick={() => onNavigate('/dashboard')}

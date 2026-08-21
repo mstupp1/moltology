@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { AlertTriangle } from 'lucide-react'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { IsolationVideoFeed } from '@/components/hud/IsolationVideoFeed'
 import {
   IsolationSettingsModal,
@@ -88,4 +89,5 @@ function IsolationRoute() {
 
 export const Route = createFileRoute('/_hud/isolation')({
   component: IsolationRoute,
+  pendingComponent: HudWorkspaceGhost,
 })

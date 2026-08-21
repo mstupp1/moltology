@@ -40,6 +40,7 @@ import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 
 const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
@@ -68,7 +69,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const [isMobileClosing, setIsMobileClosing] = useState(false)
   const [isMobileVisible, setIsMobileVisible] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
+        if (savedCollapsed !== null) {
+          return savedCollapsed === 'true'
+        }
+      } catch {
+        // Fallback for localStorage access restrictions
+      }
+    }
+    return false
+  })
   const [isMounted, setIsMounted] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartRef = React.useRef<{ startX: number; hasMoved: boolean }>({
@@ -80,9 +93,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   useEffect(() => {
     setIsMounted(true)
     if (typeof window !== 'undefined') {
-      const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
-      if (savedCollapsed !== null) {
-        setIsCollapsed(savedCollapsed === 'true')
+      try {
+        const savedCollapsed = localStorage.getItem('moltology_hud_sidebar_collapsed')
+        if (savedCollapsed !== null) {
+          setIsCollapsed(savedCollapsed === 'true')
+        }
+      } catch {
+        // Fallback for localStorage access restrictions
       }
     }
   }, [])
@@ -228,6 +245,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const isSessionPending = sessionRes?.isPending ?? false
   const [userRole, setUserRole] = useState<string | null>(null)
 
   const effectiveUserRole =
@@ -619,7 +637,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       </span>
                     </div>
 
-                    {!user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
+                    {!isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
                       <Lock className="w-3.5 h-3.5 text-[#ff5540]/80 shrink-0 ml-auto" />
                     )}
                   </button>
@@ -642,9 +660,12 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
       {/* Main Desktop Sidebar Container / Mobile Trigger Bar */}
       <aside
+        suppressHydrationWarning
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl transition-all duration-300 ease-in-out group/sidebar overflow-visible`}
+        } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
+          isMounted ? 'transition-all duration-300 ease-in-out' : ''
+        } group/sidebar overflow-visible`}
       >
         {/* Mobile Top Bar (Permanent Header with Brand & Hamburger Toggle) */}
         <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2.5 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0">
@@ -671,7 +692,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
         {/* Desktop Header Logo */}
         <div
-          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-[#1e2d37]/60 h-16 overflow-visible transition-all duration-300 ${
+          className={`hidden md:flex items-center shrink-0 relative group/brand border-b border-[#1e2d37]/60 h-16 overflow-visible ${
+            isMounted ? 'transition-all duration-300' : ''
+          } ${
             isCollapsed ? 'justify-center px-2' : 'justify-start px-3'
           }`}
         >
@@ -883,7 +906,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                 {/* User Avatar Menu / Auth Button (Stacked on Bottom) */}
                 <div className="bg-[#080d10] py-2 px-1 flex items-center justify-center relative overflow-visible">
-                  {!user ? (
+                  {isSessionPending ? (
+                    <div className="flex items-center justify-center p-1" data-testid="sidebar-auth-skeleton">
+                      <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
+                    </div>
+                  ) : !user ? (
                     <div className="relative group/auth flex justify-center overflow-visible">
                       <BenthicCTAButton
                         variant="red"
@@ -959,7 +986,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
                 {/* User Avatar Menu / Auth Button */}
                 <div className="shrink-0 flex items-center pr-3">
-                  {!user ? (
+                  {isSessionPending ? (
+                    <div className="flex items-center justify-center p-1" data-testid="sidebar-auth-skeleton">
+                      <HudGhostSkeleton variant="neutral" preset="avatar" width={28} height={28} />
+                    </div>
+                  ) : !user ? (
                     <BenthicCTAButton
                       variant="red"
                       size="sm"
@@ -1126,7 +1157,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
               {/* Dedicated Operative Account / Auth Separate Row (matching homepage mobile header pattern) */}
               <div className="p-3 bg-[#060a0b]">
-                {user ? (
+                {isSessionPending ? (
+                  <div className="flex items-center justify-center py-2" data-testid="mobile-sidebar-auth-skeleton">
+                    <HudGhostSkeleton variant="neutral" preset="avatar" width={32} height={32} />
+                  </div>
+                ) : user ? (
                   <UserAvatarMenu
                     user={user}
                     userRole={effectiveUserRole}

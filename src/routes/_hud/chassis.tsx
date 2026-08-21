@@ -2,6 +2,7 @@ import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { BioForgeAvatarStudio } from '@/components/hud/BioForgeAvatarStudio'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 function ChassisRoute() {
   return (
@@ -16,5 +17,6 @@ function ChassisRoute() {
 
 export const Route = createFileRoute('/_hud/chassis')({
   component: ChassisRoute,
+  pendingComponent: HudWorkspaceGhost,
 })
 
