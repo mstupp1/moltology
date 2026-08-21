@@ -1,7 +1,8 @@
 ---
 title: "Component Library, Interactive Lectures & AI Chat"
 slug: "2026-08-02-component-vault-oracle-awakes"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "AI", "UI/UX", "Education"]
 version: "2026.08.02"
 summary: "Built the standardized UI component system, added interactive video lectures with quizzes, a media gallery, and AI assistant chat."
 isPublished: true

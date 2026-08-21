@@ -58,7 +58,8 @@ function SupportPortalRoute() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [newVersion, setNewVersion] = useState('')
   const [newTitle, setNewTitle] = useState('')
-  const [newCategory, setNewCategory] = useState('TRANSMUTATION')
+  const [newCategory, setNewCategory] = useState('Feature')
+  const [newTags, setNewTags] = useState('')
   const [newSummary, setNewSummary] = useState('')
   const [newContent, setNewContent] = useState('')
   const [newIsPublished, setNewIsPublished] = useState(true)
@@ -103,30 +104,77 @@ function SupportPortalRoute() {
     }))
   }
 
-  const categories = ['ALL', 'TRANSMUTATION', 'CHASSIS_UPGRADE', 'SECURITY_ISOLATION', 'FEATURE', 'BUG_PURGE']
+  const categories = React.useMemo(() => {
+    const set = new Set<string>()
+    ;(Array.isArray(changelogs) ? changelogs : []).forEach((entry) => {
+      if (entry.category) set.add(entry.category)
+      if (Array.isArray(entry.tags)) {
+        entry.tags.forEach((t) => set.add(t))
+      }
+    })
+    return ['ALL', ...Array.from(set)]
+  }, [changelogs])
 
   const filteredChangelogs = (Array.isArray(changelogs) ? changelogs : []).filter((entry) => {
-    const matchesCategory = selectedCategory === 'ALL' || entry.category === selectedCategory
+    const matchesCategory =
+      selectedCategory === 'ALL' ||
+      entry.category?.toLowerCase() === selectedCategory.toLowerCase() ||
+      (Array.isArray(entry.tags) && entry.tags.some((t) => t.toLowerCase() === selectedCategory.toLowerCase()))
     const matchesSearch =
       entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.version.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      entry.content.toLowerCase().includes(searchQuery.toLowerCase())
+      entry.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (Array.isArray(entry.tags) && entry.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())))
     return matchesCategory && matchesSearch
   })
 
   const getCategoryColor = (cat: string) => {
-    switch (cat) {
-      case 'TRANSMUTATION':
+    switch (cat?.toLowerCase()) {
+      case 'feature':
+      case 'features':
         return 'text-[#00ffff] border-[#00ffff]/40 bg-[#00ffff]/10'
-      case 'CHASSIS_UPGRADE':
-        return 'text-[#ff5540] border-[#ff5540]/40 bg-[#ff5540]/10'
-      case 'SECURITY_ISOLATION':
-        return 'text-[#ff0055] border-[#ff0055]/40 bg-[#ff0055]/10'
-      case 'BUG_PURGE':
-        return 'text-[#eab308] border-[#eab308]/40 bg-[#eab308]/10'
+      case 'improvement':
+      case 'improvements':
+        return 'text-[#c084fc] border-[#c084fc]/40 bg-[#c084fc]/10'
+      case 'security':
+        return 'text-[#34d399] border-[#34d399]/40 bg-[#34d399]/10'
+      case 'performance':
+        return 'text-[#fbbf24] border-[#fbbf24]/40 bg-[#fbbf24]/10'
+      case 'fix':
+      case 'fixes':
+      case 'bug_purge':
+        return 'text-[#f43f5e] border-[#f43f5e]/40 bg-[#f43f5e]/10'
+      case 'design':
+      case 'ui/ux':
+        return 'text-[#f472b6] border-[#f472b6]/40 bg-[#f472b6]/10'
       default:
         return 'text-[#00c3ff] border-[#00c3ff]/40 bg-[#00c3ff]/10'
+    }
+  }
+
+  const getTagColor = (tag: string) => {
+    switch (tag.toLowerCase()) {
+      case 'performance':
+        return 'text-amber-300/90 border-amber-500/30 bg-amber-950/40'
+      case 'ui/ux':
+      case 'design':
+        return 'text-pink-300/90 border-pink-500/30 bg-pink-950/40'
+      case 'security':
+      case 'auth':
+      case 'protection':
+        return 'text-emerald-300/90 border-emerald-500/30 bg-emerald-950/40'
+      case 'ai':
+        return 'text-indigo-300/90 border-indigo-500/30 bg-indigo-950/40'
+      case 'media':
+      case 'video':
+      case 'audio':
+        return 'text-sky-300/90 border-sky-500/30 bg-sky-950/40'
+      case 'navigation':
+      case 'tools':
+        return 'text-cyan-300/90 border-cyan-500/30 bg-cyan-950/40'
+      default:
+        return 'text-[#839493] border-[#3a4a49] bg-[#070b0b]'
     }
   }
 
@@ -148,7 +196,8 @@ function SupportPortalRoute() {
     setNewTitle('')
     setNewSummary('')
     setNewContent('')
-    setNewCategory('TRANSMUTATION')
+    setNewCategory('Feature')
+    setNewTags('')
     setNewIsPublished(true)
     setEditingEntry(null)
   }
@@ -162,7 +211,8 @@ function SupportPortalRoute() {
     setEditingEntry(entry)
     setNewVersion(entry.version)
     setNewTitle(entry.title)
-    setNewCategory(entry.category)
+    setNewCategory(entry.category || 'Feature')
+    setNewTags(Array.isArray(entry.tags) ? entry.tags.join(', ') : '')
     setNewSummary(entry.summary)
     setNewContent(entry.content)
     setNewIsPublished(entry.isPublished !== false)
@@ -174,6 +224,10 @@ function SupportPortalRoute() {
     if (!newVersion || !newTitle || !newSummary || !newContent) return
     setIsSubmittingLog(true)
     setAdminMessage(null)
+    const tagsArray = newTags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
     try {
       if (editingEntry?.id) {
         const entry = await updateChangelog({
@@ -181,6 +235,7 @@ function SupportPortalRoute() {
           version: newVersion,
           title: newTitle,
           category: newCategory,
+          tags: tagsArray,
           summary: newSummary,
           content: newContent,
           isPublished: newIsPublished,
@@ -195,6 +250,7 @@ function SupportPortalRoute() {
           version: newVersion,
           title: newTitle,
           category: newCategory,
+          tags: tagsArray,
           summary: newSummary,
           content: newContent,
           isPublished: newIsPublished,
@@ -432,13 +488,21 @@ function SupportPortalRoute() {
                     <div className="chitin-card p-4 md:p-5 chamfer-corner space-y-3 hover:border-[#00ffff]/60 transition-all shadow-xl">
                       {/* Top Bar: Version & Metadata */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#3a4a49]/60 pb-3">
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
                           <span className="font-grotesk font-extrabold text-sm md:text-base text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-2.5 py-0.5 chamfer-corner">
                             {entry.version}
                           </span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 border ${getCategoryColor(entry.category)} chamfer-corner uppercase`}>
                             {entry.category}
                           </span>
+                          {(Array.isArray(entry.tags) ? entry.tags.filter((t) => t.toLowerCase() !== entry.category?.toLowerCase()) : []).map((tag) => (
+                            <span
+                              key={tag}
+                              className={`text-[9px] font-bold px-1.5 py-0.5 border ${getTagColor(tag)} chamfer-corner uppercase`}
+                            >
+                              {tag}
+                            </span>
+                          ))}
                           <span className="text-[10px] text-[#839493] flex items-center gap-1 border border-[#3a4a49] px-2 py-0.5 bg-[#030606]">
                             <Clock className="w-3 h-3 text-[#00ffff]" />
                             {new Date(entry.releasedAt).toLocaleDateString('en-US', {
@@ -785,13 +849,27 @@ function SupportPortalRoute() {
                     onChange={(e) => setNewCategory(e.target.value)}
                     className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
                   >
-                    <option value="TRANSMUTATION">TRANSMUTATION</option>
-                    <option value="CHASSIS_UPGRADE">CHASSIS_UPGRADE</option>
-                    <option value="SECURITY_ISOLATION">SECURITY_ISOLATION</option>
-                    <option value="BUG_PURGE">BUG_PURGE</option>
-                    <option value="FEATURE">FEATURE</option>
+                    <option value="Feature">Feature</option>
+                    <option value="Improvement">Improvement</option>
+                    <option value="Security">Security</option>
+                    <option value="Performance">Performance</option>
+                    <option value="Fix">Fix</option>
+                    <option value="Design">Design</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[#839493] font-bold block uppercase">
+                  TAGS (COMMA-SEPARATED, E.G., UI/UX, Navigation, AI)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Feature, UI/UX, Performance, Navigation"
+                  value={newTags}
+                  onChange={(e) => setNewTags(e.target.value)}
+                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
+                />
               </div>
 
               <div className="space-y-1">

@@ -1,7 +1,8 @@
 ---
 title: "Permanent Changelog Links & Resizable Sidebar"
 slug: "2026-08-19-changelog-reborn-creative-forge"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "UI/UX", "Navigation", "Tools"]
 version: "2026.08.19"
 summary: "Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts."
 isPublished: true

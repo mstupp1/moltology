@@ -1,7 +1,8 @@
 ---
 title: "Benthic HUD Theme, Command Palette & Blog"
 slug: "2026-08-03-great-shell-polish"
-category: "CHASSIS_UPGRADE"
+category: "Design"
+tags: ["Design", "UI/UX", "Navigation", "Feature"]
 version: "2026.08.03"
 summary: "Introduced the deep-sea dark theme with particle effects, added command search to the sidebar, and launched the blog."
 isPublished: true

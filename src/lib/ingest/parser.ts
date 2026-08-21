@@ -173,11 +173,24 @@ export function normalizeChangelogPayload(parsed: RawParsedContent): ChangelogPa
     ? new Date(metadata.releasedAt || metadata.date)
     : new Date()
 
+  const tags = Array.isArray(metadata.tags)
+    ? metadata.tags.map((t: any) => String(t).trim()).filter(Boolean)
+    : typeof metadata.tags === 'string'
+      ? metadata.tags.split(',').map((t) => t.trim()).filter(Boolean)
+      : []
+
+  const category = metadata.category
+    ? String(metadata.category).trim()
+    : tags.length > 0
+      ? tags[0]
+      : 'Feature'
+
   return {
     slug,
     version: String(version).trim(),
     title: title.trim(),
-    category: metadata.category || 'TRANSMUTATION',
+    category,
+    tags,
     summary: summary.trim(),
     content: content.trim(),
     isPublished: metadata.isPublished !== undefined ? Boolean(metadata.isPublished) : true,

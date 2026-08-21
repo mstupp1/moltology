@@ -1,7 +1,8 @@
 ---
 title: "Navigation Skeletons & Living Timeline Pulse"
 slug: "2026-08-20-living-pulse-navigation-skeletons"
-category: "CHASSIS_UPGRADE"
+category: "Improvement"
+tags: ["Improvement", "UI/UX", "Design", "Performance"]
 version: "2026.08.20"
 summary: "Added ghost loading skeletons with top progress tracking for smooth navigation, illuminated changelog timeline tracks with animated pulse nodes, and enhanced support portal reading."
 isPublished: true

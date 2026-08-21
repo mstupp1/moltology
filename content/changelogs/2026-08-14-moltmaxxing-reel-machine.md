@@ -1,7 +1,8 @@
 ---
 title: "Moltmaxxing Guide & Daily Video Creator"
 slug: "2026-08-14-moltmaxxing-reel-machine"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "Media", "Mobile", "Guides"]
 version: "2026.08.14"
 summary: "Launched the Moltmaxxing knowledge guide, automated daily video creation for social channels, and improved mobile navigation."
 isPublished: true

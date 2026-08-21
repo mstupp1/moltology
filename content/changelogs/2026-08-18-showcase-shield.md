@@ -1,7 +1,8 @@
 ---
 title: "Interactive Device Showcase & Spam Protection"
 slug: "2026-08-18-showcase-shield"
-category: "CHASSIS_UPGRADE"
+category: "Security"
+tags: ["Security", "UI/UX", "Design", "Protection"]
 version: "2026.08.18"
 summary: "Added interactive browser and mobile preview frames to the homepage, protected forms against spam bots, and cleaned up typography."
 isPublished: true

@@ -50,6 +50,7 @@ export interface ChangelogPayload {
   version?: string
   title: string
   category: string
+  tags?: string[]
   summary: string
   content: string
   isPublished?: boolean

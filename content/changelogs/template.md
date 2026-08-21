@@ -1,15 +1,21 @@
 ---
-slug: "sample-system-transmutation-slug"
-version: "v1.6.0"
-title: "Autonomous Ingestion Engine & Telemetry Pipeline"
-category: "FEATURE"
-summary: "Integrated unified CLI ingestion script allowing autonomous agents to publish and update system dispatches directly to the database."
+title: "Permanent Changelog Links & Resizable Sidebar"
+slug: "2026-08-19-permanent-changelog-links-resizable-sidebar"
+category: "Feature" # Standard: Feature, Improvement, Fix, Performance, Security, Design
+tags: ["Feature", "UI/UX", "Navigation", "Tools"] # Overlapping tags
+version: "2026.08.19" # Date-based for daily digests
+summary: "Gave every changelog entry its own shareable link, made the sidebar resizable with memory, and integrated local image generation for social posts."
 isPublished: true
-releasedAt: "2026-08-13T12:00:00Z"
+releasedAt: "2026-08-19T23:59:00Z"
 ---
 
-### 🚀 Release Highlights
+### Shareable Changelog Pages
+- Added dedicated, shareable links for every release so updates are easy to bookmark and reference.
+- Improved spacing and navigation across the update feed.
 
-- **CLI Ingestion Runner**: Added `scripts/ingest.ts` supporting Markdown with YAML frontmatter and JSON payloads.
-- **Drizzle Upsert Handlers**: Safe conflict resolution for blog posts, changelogs, and podcasts.
-- **Content Vault**: Standardized `content/` folder hierarchy.
+### Resizable Sidebar
+- Added a drag handle to resize the navigation sidebar, saving your preferred width automatically.
+- Made the command search palette close when clicking outside.
+
+### Creative Studio
+- Connected local AI image generation to automatically create illustrations for daily social posts.

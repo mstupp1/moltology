@@ -1,7 +1,8 @@
 ---
 title: "Automated Publishing & RSS Feeds"
 slug: "2026-08-13-autonomous-content-engine"
-category: "FEATURE"
+category: "Feature"
+tags: ["Feature", "Infrastructure", "Media", "Publishing"]
 version: "2026.08.13"
 summary: "Launched automated article publishing, fast cloud media hosting, and public RSS feeds."
 isPublished: true

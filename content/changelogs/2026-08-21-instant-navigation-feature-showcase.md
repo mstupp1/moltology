@@ -1,7 +1,8 @@
 ---
 title: "Instant Navigation Prefetching & Enhanced Feature Cards"
 slug: "2026-08-21-instant-navigation-feature-showcase"
-category: "CHASSIS_UPGRADE"
+category: "Improvement"
+tags: ["Improvement", "Performance", "UI/UX", "Navigation"]
 version: "2026.08.21"
 summary: "Enabled instant background page prefetching on sidebar links and upgraded homepage feature cards with expanded banners, atmospheric vignettes, and focal framing."
 isPublished: true
