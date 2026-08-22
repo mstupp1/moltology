@@ -51,7 +51,7 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
 
     render(<ForumBoardPage />)
 
-    expect(screen.getByText('General Discussion')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'General Discussion' })).toBeInTheDocument()
     expect(screen.getByText(cat.description)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /new post/i })).toBeInTheDocument()
   })

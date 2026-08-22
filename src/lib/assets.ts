@@ -24,6 +24,12 @@ const LOCAL_ASSET_WHITELIST = new Set([
   'images/bubble_variant_3.jpg',
   'images/marketing/dashboard_desktop_preview.png',
   'images/marketing/dashboard_mobile_preview.png',
+  'images/forum/forum_rules_bg.jpg',
+  'images/forum/forum_doctrine_bg.jpg',
+  'images/forum/forum_hardware_bg.jpg',
+  'images/forum/forum_moltmax_bg.jpg',
+  'images/forum/forum_general_bg.jpg',
+  'images/forum/forum_market_bg.jpg',
 ])
 
 /**

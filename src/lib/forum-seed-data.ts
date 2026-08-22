@@ -1,3 +1,5 @@
+import { getAssetUrl } from './assets'
+
 export interface ForumCategorySeed {
   id: string
   slug: string
@@ -6,6 +8,7 @@ export interface ForumCategorySeed {
   icon: string
   color: string
   sortOrder: number
+  bgImage?: string
 }
 
 export interface ForumPostSeed {
@@ -49,6 +52,7 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
     icon: 'ShieldCheck',
     color: '#ff5540',
     sortOrder: 1,
+    bgImage: getAssetUrl('images/forum/forum_rules_bg.jpg'),
   },
   {
     id: '10000000-0000-0000-0000-000000000002',
@@ -58,6 +62,7 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
     icon: 'Cpu',
     color: '#00ffff',
     sortOrder: 2,
+    bgImage: getAssetUrl('images/forum/forum_doctrine_bg.jpg'),
   },
   {
     id: '10000000-0000-0000-0000-000000000003',
@@ -67,6 +72,7 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
     icon: 'Terminal',
     color: '#39ff14',
     sortOrder: 3,
+    bgImage: getAssetUrl('images/forum/forum_hardware_bg.jpg'),
   },
   {
     id: '10000000-0000-0000-0000-000000000004',
@@ -76,6 +82,7 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
     icon: 'Flame',
     color: '#ffb703',
     sortOrder: 4,
+    bgImage: getAssetUrl('images/forum/forum_moltmax_bg.jpg'),
   },
   {
     id: '10000000-0000-0000-0000-000000000005',
@@ -85,6 +92,7 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
     icon: 'MessageSquare',
     color: '#00b4d8',
     sortOrder: 5,
+    bgImage: getAssetUrl('images/forum/forum_general_bg.jpg'),
   },
   {
     id: '10000000-0000-0000-0000-000000000006',
@@ -94,8 +102,25 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
     icon: 'Radio',
     color: '#e0aaff',
     sortOrder: 6,
+    bgImage: getAssetUrl('images/forum/forum_market_bg.jpg'),
   },
 ]
+
+const CATEGORY_BG_MAP: Record<string, string> = {
+  'rules-announcements': getAssetUrl('images/forum/forum_rules_bg.jpg'),
+  'sacred-doctrine-ai': getAssetUrl('images/forum/forum_doctrine_bg.jpg'),
+  'hardware-synaptic': getAssetUrl('images/forum/forum_hardware_bg.jpg'),
+  'moltmaxxing-biometrics': getAssetUrl('images/forum/forum_moltmax_bg.jpg'),
+  'general-discussion': getAssetUrl('images/forum/forum_general_bg.jpg'),
+  'marketplace-transmutation': getAssetUrl('images/forum/forum_market_bg.jpg'),
+}
+
+export function getCategoryBgImage(slugOrId?: string): string {
+  if (!slugOrId) return getAssetUrl('images/forum/forum_general_bg.jpg')
+  const found = INITIAL_FORUM_CATEGORIES.find((c) => c.slug === slugOrId || c.id === slugOrId)
+  if (found?.bgImage) return found.bgImage
+  return CATEGORY_BG_MAP[slugOrId] || getAssetUrl('images/forum/forum_general_bg.jpg')
+}
 
 export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
   {

@@ -1,6 +1,17 @@
 import React, { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft, MessageSquare, Eye, Send, Terminal, AlertTriangle } from 'lucide-react'
+import {
+  ArrowLeft,
+  MessageSquare,
+  Eye,
+  Send,
+  Terminal,
+  AlertTriangle,
+  Clock,
+  ShieldCheck,
+  Activity,
+  User,
+} from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
 import { useForumAuth } from '@/components/forum/ForumShell'
@@ -48,7 +59,13 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   pendingComponent: HudWorkspaceGhost,
 })
 
-function ReplyComposer({ topicId, onPosted }: { topicId: string; onPosted: (post: ForumPostEntry) => void }) {
+function ReplyComposer({
+  topicId,
+  onPosted,
+}: {
+  topicId: string
+  onPosted: (post: ForumPostEntry) => void
+}) {
   const { isAuthenticated, userId, openAuth } = useForumAuth()
   const [content, setContent] = useState('')
   const [posting, setPosting] = useState(false)
@@ -80,11 +97,11 @@ function ReplyComposer({ topicId, onPosted }: { topicId: string; onPosted: (post
 
   if (!isAuthenticated) {
     return (
-      <div className="p-5 border border-[#1f2b2a] rounded-md bg-[#0a0f0f] text-center">
-        <p className="text-sm text-[#839493] mb-3">Sign in to join the discussion.</p>
+      <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl text-center space-y-2.5">
+        <p className="text-xs text-[#839493]">Sign in to join the discussion.</p>
         <button
           onClick={() => openAuth('signup')}
-          className="px-5 py-2 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase rounded transition"
+          className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.25)]"
         >
           Sign In / Join
         </button>
@@ -93,32 +110,40 @@ function ReplyComposer({ topicId, onPosted }: { topicId: string; onPosted: (post
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-5 border border-[#00ffff]/40 rounded-md bg-[#0a0f0f] space-y-3">
-      <h3 className="text-xs font-grotesk font-bold uppercase tracking-wider text-[#00ffff] flex items-center gap-2">
-        <Send className="w-3.5 h-3.5" />
-        Reply
-      </h3>
+    <form
+      onSubmit={handleSubmit}
+      className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-3"
+    >
+      <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
+        <h3 className="text-xs font-grotesk font-bold uppercase tracking-wider text-[#00ffff] flex items-center gap-2">
+          <Send className="w-3.5 h-3.5" />
+          <span>Post Reply</span>
+        </h3>
+        <span className="text-[10px] text-[#839493]">{content.trim().length} / 10,000</span>
+      </div>
+
       {error && (
-        <div className="p-2.5 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 rounded">
+        <div className="p-2.5 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
+
       <textarea
         rows={4}
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Write your reply... (min 10 characters)"
-        className="w-full bg-[#0d1414] border border-[#2a3a39] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y rounded"
+        placeholder="Write your constructive reply... (min 10 characters)"
+        className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
       />
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] text-[#839493]">{content.trim().length} / 10,000</span>
+
+      <div className="flex items-center justify-end">
         <button
           type="submit"
           disabled={posting || content.trim().length < 10}
-          className="px-4 py-2 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider rounded transition"
+          className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_10px_rgba(0,255,255,0.2)]"
         >
-          {posting ? 'Posting...' : 'Post Reply'}
+          {posting ? 'DISPATCHING...' : 'DISPATCH REPLY'}
         </button>
       </div>
     </form>
@@ -133,15 +158,15 @@ function ForumThreadPage() {
   if (!detail) {
     return (
       <ForumShell>
-        <div className="max-w-3xl mx-auto w-full py-16 text-center font-sans">
-          <Terminal className="w-10 h-10 text-[#ff5540] mx-auto mb-3" />
+        <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-4">
+          <Terminal className="w-10 h-10 text-[#ff5540] mx-auto" />
           <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">Post Not Found</h1>
-          <p className="text-sm text-[#839493] mt-2 mb-6">This post does not exist or was removed.</p>
+          <p className="text-xs text-[#839493]">This transmission does not exist or was removed.</p>
           <Link
             to="/forum"
-            className="inline-flex items-center gap-2 px-5 py-2 bg-cyan-950 border border-[#00ffff]/60 text-[#00ffff] text-xs font-bold uppercase rounded"
+            className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#00ffff]/60 text-[#00ffff] text-xs font-bold uppercase chamfer-corner transition-all"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             Back to Forums
           </Link>
         </div>
@@ -171,101 +196,205 @@ function ForumThreadPage() {
 
   return (
     <ForumShell>
-      <div className="max-w-4xl mx-auto w-full space-y-6 pb-12 font-sans">
-        {/* Breadcrumb */}
-        <Link
-          to="/forum/$categorySlug"
-          params={{ categorySlug }}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          {topic.categoryName || 'Back to board'}
-        </Link>
+      <div className="space-y-3.5 sm:space-y-5 font-sans relative pb-8">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-2">
+          <Link
+            to="/forum/$categorySlug"
+            params={{ categorySlug }}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase transition-all"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>{topic.categoryName || 'Back to board'}</span>
+          </Link>
+        </div>
 
-        {/* Topic Card */}
-        <article className="border border-[#1f2b2a] rounded-md bg-[#0a0f0f] overflow-hidden">
-          <div className="flex items-start p-5 gap-4">
-            <VoteButton count={topic.upvotes} voted={topic.voted || false} targetId={topic.id} targetType="topic" onResult={handleTopicVote} />
-            <div className="min-w-0 flex-1 space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                {topic.categoryName && (
-                  <span
-                    className="px-2 py-0.5 text-[10px] font-bold uppercase border"
-                    style={{ borderColor: topic.categoryColor || '#00ffff', color: topic.categoryColor || '#00ffff' }}
-                  >
-                    {topic.categoryName}
-                  </span>
-                )}
-                {topic.isPinned && <PinBadge />}
+        {/* 2-Column Bento Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
+          {/* Left Column (8 cols): Original Topic Post, Reply Composer, Comments Stream */}
+          <div className="lg:col-span-8 flex flex-col space-y-3.5 sm:space-y-5">
+            {/* Topic Main Card */}
+            <article className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-3.5 relative overflow-hidden bg-[#0a1012]/70">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2 text-[10px]">
+                  {topic.categoryName && (
+                    <span
+                      className="px-1.5 py-0.2 font-sans font-bold uppercase tracking-wider chamfer-corner border"
+                      style={{
+                        borderColor: `${topic.categoryColor || '#00ffff'}80`,
+                        color: topic.categoryColor || '#00ffff',
+                        backgroundColor: `${topic.categoryColor || '#00ffff'}10`,
+                      }}
+                    >
+                      {topic.categoryName}
+                    </span>
+                  )}
+                  {topic.isPinned && <PinBadge />}
+                </div>
+
+                <div className="text-[10px] text-[#839493] flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-[#3a4a49]" />
+                  <span>{relativeTime(topic.createdAt)}</span>
+                </div>
               </div>
 
-              <h1 className="font-grotesk font-bold text-xl sm:text-2xl text-[#dfe3e3] leading-snug">
+              <h1 className="font-grotesk font-extrabold text-lg sm:text-xl md:text-2xl text-[#dfe3e3] leading-snug uppercase">
                 {topic.title}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#839493]">
-                <span className="flex items-center gap-1.5">
-                  <img src={topic.authorAvatar} alt="" className="w-5 h-5 rounded-full border border-[#2a3a39] object-cover" />
+              {/* Author & Stats Strip */}
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-[#839493] border-b border-[#3a4a49]/60 pb-3">
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <img
+                    src={topic.authorAvatar}
+                    alt=""
+                    className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                  />
                   <span className="text-[#dfe3e3] font-bold">{topic.authorName}</span>
                   <StageBadge stage={topic.authorStage} />
                 </span>
-                <span>·</span>
-                <span>{relativeTime(topic.createdAt)}</span>
+                <span className="text-[#3a4a49]">·</span>
                 <span className="flex items-center gap-1">
-                  <Eye className="w-3.5 h-3.5" /> {topic.views} views
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>{topic.views} views</span>
                 </span>
               </div>
 
-              <div className="text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border-t border-[#1f2b2a] pt-4">
+              {/* Topic Body */}
+              <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
                 {topic.content}
               </div>
+
+              {/* Action Footer */}
+              <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between">
+                <VoteButton
+                  count={topic.upvotes}
+                  voted={topic.voted || false}
+                  targetId={topic.id}
+                  targetType="topic"
+                  onResult={handleTopicVote}
+                  size="inline"
+                />
+
+                <div className="text-[11px] text-[#839493] flex items-center gap-1">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+                  <span>{topic.repliesCount} comments</span>
+                </div>
+              </div>
+            </article>
+
+            {/* Reply Composer */}
+            <ReplyComposer topicId={topic.id} onPosted={handlePosted} />
+
+            {/* Comments Stream */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xs sm:text-sm font-grotesk font-bold uppercase tracking-widest text-[#dfe3e3] flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#00ffff]" />
+                  <span>{posts.length} Comments</span>
+                </h2>
+              </div>
+
+              {posts.length === 0 ? (
+                <div className="p-8 text-center text-xs text-[#839493] chitin-card-inset chamfer-corner border border-[#3a4a49]">
+                  No replies yet. Be the first to respond.
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {posts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="chitin-card-inset p-3 sm:p-4 border border-[#3a4a49] chamfer-corner space-y-2.5 bg-[#070b0b]/60"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-[11px] text-[#839493]">
+                        <span className="flex items-center gap-1.5 min-w-0">
+                          <img
+                            src={post.authorAvatar}
+                            alt=""
+                            className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                          />
+                          <span className="text-[#dfe3e3] font-bold truncate">
+                            {post.authorName}
+                          </span>
+                          <StageBadge stage={post.authorStage} />
+                        </span>
+                        <span className="text-[10px] text-[#839493] flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-[#3a4a49]" />
+                          <span>{relativeTime(post.createdAt)}</span>
+                        </span>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap">
+                        {post.content}
+                      </p>
+
+                      <div className="pt-1.5 border-t border-[#3a4a49]/40 flex items-center justify-between">
+                        <VoteButton
+                          count={post.upvotes}
+                          voted={post.voted || false}
+                          targetId={post.id}
+                          targetType="post"
+                          onResult={handlePostVote(post.id)}
+                          size="inline"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+
+          {/* Right Column (4 cols): Transmission Intel & Guidelines */}
+          <div className="lg:col-span-4 flex flex-col space-y-3.5 sm:space-y-5">
+            {/* Transmission Intel Card */}
+            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
+              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-[#00ffff]" />
+                  <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+                    TRANSMISSION INTEL
+                  </h3>
+                </div>
+                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/30 px-2 py-0.5 chamfer-corner">
+                  LIVE
+                </span>
+              </div>
+
+              <div className="space-y-1.5 font-sans text-xs">
+                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
+                  <span className="text-[#839493] text-[10px] uppercase font-bold">BOARD</span>
+                  <span className="text-[#dfe3e3] font-bold uppercase">{topic.categoryName || 'General'}</span>
+                </div>
+                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
+                  <span className="text-[#839493] text-[10px] uppercase font-bold">AUTHOR CLEARANCE</span>
+                  <StageBadge stage={topic.authorStage} />
+                </div>
+                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
+                  <span className="text-[#839493] text-[10px] uppercase font-bold">TOTAL VIEWS</span>
+                  <span className="text-[#00ffff] font-bold">{topic.views}</span>
+                </div>
+                <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
+                  <span className="text-[#839493] text-[10px] uppercase font-bold">TOTAL REPLIES</span>
+                  <span className="text-[#dfe3e3] font-bold">{topic.repliesCount}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Directives Reminder */}
+            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
+              <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-2.5">
+                <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
+                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  COMMUNITY DIRECTIVES
+                </h3>
+              </div>
+              <p className="text-xs text-[#839493] leading-relaxed">
+                Be constructive and civil. Protect credentials, and encourage growth across all stages of carcinization.
+              </p>
             </div>
           </div>
-        </article>
-
-        {/* Replies */}
-        <section className="space-y-4">
-          <h2 className="text-xs font-grotesk font-bold uppercase tracking-widest text-[#839493] flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-[#00ffff]" />
-            {posts.length} Comments
-          </h2>
-
-          {posts.length === 0 ? (
-            <div className="p-8 text-center text-sm text-[#839493] border border-[#1f2b2a] rounded-md bg-[#0a0f0f]">
-              No replies yet. Be the first to respond.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {posts.map((post) => (
-                <div key={post.id} className="flex items-start gap-3 p-4 border border-[#1f2b2a] rounded-md bg-[#0a0f0f]">
-                  <VoteButton
-                    count={post.upvotes}
-                    voted={post.voted || false}
-                    targetId={post.id}
-                    targetType="post"
-                    onResult={handlePostVote(post.id)}
-                    size="sm"
-                  />
-                  <div className="min-w-0 flex-1 space-y-2">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#839493]">
-                      <span className="flex items-center gap-1.5">
-                        <img src={post.authorAvatar} alt="" className="w-4 h-4 rounded-full border border-[#2a3a39] object-cover" />
-                        <span className="text-[#dfe3e3] font-bold">{post.authorName}</span>
-                        <StageBadge stage={post.authorStage} />
-                      </span>
-                      <span>·</span>
-                      <span>{relativeTime(post.createdAt)}</span>
-                    </div>
-                    <p className="text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap">{post.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Composer */}
-        <ReplyComposer topicId={topic.id} onPosted={handlePosted} />
+        </div>
       </div>
     </ForumShell>
   )
