@@ -75,7 +75,7 @@ describe('LandingPage Component', () => {
 
     // Test button click navigation
     fireEvent.click(swarmBtn)
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/community' })
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
 
     fireEvent.click(oracleBtn)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })

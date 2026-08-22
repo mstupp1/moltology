@@ -279,7 +279,7 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/org`, priority: 0.8, changefreq: 'weekly' },
     { loc: `${baseUrl}/lectures`, priority: 0.7, changefreq: 'weekly' },
     { loc: `${baseUrl}/podcasts`, priority: 0.7, changefreq: 'weekly' },
-    { loc: `${baseUrl}/community`, priority: 0.7, changefreq: 'weekly' },
+    { loc: `${baseUrl}/forum`, priority: 0.8, changefreq: 'daily' },
     { loc: `${baseUrl}/market`, priority: 0.6, changefreq: 'weekly' },
     { loc: `${baseUrl}/privacy`, priority: 0.3, changefreq: 'monthly' },
     { loc: `${baseUrl}/terms`, priority: 0.3, changefreq: 'monthly' },

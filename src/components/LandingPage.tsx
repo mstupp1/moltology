@@ -176,7 +176,7 @@ export const LandingPage: React.FC = () => {
       btnGlow: 'bg-purple-950/50 hover:bg-purple-900/60 border-purple-500/50 hover:border-purple-400 text-purple-300',
       specs: ['Live Swarm Social Feed', 'Peer Co-Evolution Discussions', 'Shared Metamorphosis Logs'],
       actionText: 'JOIN SYNAPTIC SWARM',
-      actionRoute: '/community',
+      actionRoute: '/forum',
     },
     {
       id: '03',
