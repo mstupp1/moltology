@@ -11,7 +11,7 @@ import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
-import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../forum-seed-data'
+import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS, getCategoryBgImage } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
 import { slugifyForumTitle, compareHot } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
@@ -1082,6 +1082,7 @@ export interface ForumCategoryEntry {
   color: string
   sortOrder: number
   topicCount: number
+  bgImage?: string
 }
 
 export interface ForumTopicEntry {
@@ -1189,6 +1190,7 @@ export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnA
         icon: cat.icon,
         color: cat.color,
         sortOrder: cat.sortOrder,
+        bgImage: (cat as any).bgImage || getCategoryBgImage(cat.slug),
         topicCount: countRow?.count || 0,
       }
     }
@@ -1200,6 +1202,7 @@ export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnA
   if (!seedCat) return null
   return {
     ...seedCat,
+    bgImage: seedCat.bgImage || getCategoryBgImage(seedCat.slug),
     topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === seedCat.id).length,
   }
 }
@@ -1249,6 +1252,7 @@ export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Prom
 
       return cats.map((c: any) => ({
         ...c,
+        bgImage: c.bgImage || getCategoryBgImage(c.slug),
         topicCount: countsMap.get(c.id) || 0,
       }))
     }
@@ -1258,6 +1262,7 @@ export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Prom
 
   return INITIAL_FORUM_CATEGORIES.map((c) => ({
     ...c,
+    bgImage: c.bgImage || getCategoryBgImage(c.slug),
     topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === c.id).length,
   }))
 }

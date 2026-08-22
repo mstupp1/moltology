@@ -11,10 +11,13 @@ const STAGE_COLORS: Record<number, string> = {
 }
 
 export function StageBadge({ stage }: { stage: number }) {
-  const cls = STAGE_COLORS[stage] || STAGE_COLORS[1]
+  const normalized = Math.max(1, Math.min(4, stage))
+  const cls = STAGE_COLORS[normalized] || STAGE_COLORS[1]
   return (
-    <span className={`inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 border ${cls}`}>
-      Stage {Math.max(1, Math.min(4, stage))}
+    <span
+      className={`inline-block text-[10px] font-sans font-bold uppercase tracking-wider px-1.5 py-0.2 chamfer-corner border ${cls}`}
+    >
+      STAGE {normalized}
     </span>
   )
 }
@@ -40,8 +43,8 @@ export function CategoryIcon({ icon, color }: { icon: string; color?: string }) 
 
 export function PinBadge() {
   return (
-    <span className="text-[10px] bg-[#ff5540]/20 text-[#ff5540] border border-[#ff5540] px-1.5 py-0.5 font-bold flex items-center gap-1">
-      <Pin className="w-3 h-3" /> PINNED
+    <span className="text-[9px] font-sans bg-[#ff5540]/15 text-[#ff5540] border border-[#ff5540]/50 px-1.5 py-0.2 font-bold chamfer-corner flex items-center gap-1">
+      <Pin className="w-2.5 h-2.5" /> PINNED
     </span>
   )
 }
@@ -52,10 +55,17 @@ interface VoteButtonProps {
   targetId: string
   targetType: 'topic' | 'post'
   onResult?: (res: { upvotes: number; voted: boolean }) => void
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'md' | 'inline'
 }
 
-export function VoteButton({ count, voted, targetId, targetType, onResult, size = 'md' }: VoteButtonProps) {
+export function VoteButton({
+  count,
+  voted,
+  targetId,
+  targetType,
+  onResult,
+  size = 'md',
+}: VoteButtonProps) {
   const { isAuthenticated, userId, openAuth } = useForumAuth()
   const [local, setLocal] = useState({ count, voted })
   const [busy, setBusy] = useState(false)
@@ -94,25 +104,57 @@ export function VoteButton({ count, voted, targetId, targetType, onResult, size 
   }
 
   const active = local.voted
+
+  if (size === 'inline') {
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        aria-pressed={active}
+        title={active ? 'Remove upvote' : 'Upvote'}
+        className={`px-2 py-1 flex items-center gap-1.5 chamfer-corner border transition-all select-none ${
+          active
+            ? 'bg-[#00ffff]/15 border-[#00ffff] text-[#00ffff]'
+            : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/60 hover:text-[#dfe3e3]'
+        }`}
+      >
+        <ArrowBigUp
+          className={`w-3.5 h-3.5 transition-colors ${
+            active ? 'text-[#00ffff] fill-[#00ffff]' : 'text-[#839493] group-hover:text-[#00ffff]'
+          }`}
+        />
+        <span className="font-sans font-bold text-xs tabular-nums leading-none">
+          {local.count}
+        </span>
+      </button>
+    )
+  }
+
   return (
     <button
       type="button"
       onClick={handleClick}
       aria-pressed={active}
       title={active ? 'Remove upvote' : 'Upvote'}
-      className={`group flex flex-col items-center justify-center shrink-0 transition select-none ${
-        size === 'sm' ? 'w-9 gap-0.5' : 'w-12 gap-1'
+      className={`group flex flex-col items-center justify-center shrink-0 transition-all select-none chamfer-corner border ${
+        size === 'sm'
+          ? 'w-9 h-11 p-1 gap-0.5'
+          : 'w-11 h-13 p-1.5 gap-1'
+      } ${
+        active
+          ? 'bg-[#00ffff]/10 border-[#00ffff]/80 text-[#00ffff] shadow-[0_0_10px_rgba(0,255,255,0.15)]'
+          : 'bg-[#070b0b] border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/50 hover:bg-[#0b1011]'
       }`}
     >
       <ArrowBigUp
-        className={`transition ${
-          size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
-        } ${active ? 'text-[#ff5540] fill-[#ff5540]' : 'text-[#839493] group-hover:text-[#ff5540]'}`}
+        className={`transition-colors ${
+          size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'
+        } ${active ? 'text-[#00ffff] fill-[#00ffff]' : 'text-[#839493] group-hover:text-[#00ffff]'}`}
       />
       <span
-        className={`font-bold tabular-nums leading-none ${
-          size === 'sm' ? 'text-[11px]' : 'text-sm'
-        } ${active ? 'text-[#ff5540]' : 'text-[#dfe3e3]'}`}
+        className={`font-sans font-bold tabular-nums leading-none ${
+          size === 'sm' ? 'text-[10px]' : 'text-xs'
+        } ${active ? 'text-[#00ffff]' : 'text-[#dfe3e3]'}`}
       >
         {local.count}
       </span>

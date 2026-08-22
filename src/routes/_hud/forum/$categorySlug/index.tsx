@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Plus, Search, MessageSquare, Terminal } from 'lucide-react'
+import { ArrowLeft, Plus, Search, MessageSquare, Terminal, ChevronRight, Compass } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
-import { CategoryIcon } from '@/components/forum/ForumBits'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
+import { INITIAL_FORUM_CATEGORIES, getCategoryBgImage } from '@/lib/forum-seed-data'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
@@ -81,115 +81,206 @@ function ForumBoardPage() {
   }, [categorySlug, sortBy, searchQuery])
 
   const sortTabs: { key: SortKey; label: string }[] = [
-    { key: 'hot', label: 'Hot' },
-    { key: 'top', label: 'Top' },
-    { key: 'latest', label: 'New' },
-    { key: 'active', label: 'Active' },
+    { key: 'hot', label: 'HOT' },
+    { key: 'top', label: 'TOP' },
+    { key: 'latest', label: 'NEW' },
+    { key: 'active', label: 'ACTIVE' },
   ]
+
+  const otherCategories = INITIAL_FORUM_CATEGORIES.filter((c) => c.slug !== categorySlug)
 
   return (
     <ForumShell>
-      <div className="max-w-6xl mx-auto w-full space-y-6 pb-12 font-sans">
-        {/* Breadcrumb */}
-        <Link
-          to="/forum"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          All Forums
-        </Link>
-
-        {/* Board Header */}
-        {category ? (
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-[#1f2b2a] rounded-md bg-[#0a0f0f] p-5">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded border border-[#2a3a39] bg-[#0d1414]" style={{ color: category.color }}>
-                <CategoryIcon icon={category.icon} color={category.color} />
-              </div>
-              <div>
-                <h1 className="font-grotesk font-bold text-xl sm:text-2xl uppercase tracking-tight" style={{ color: category.color }}>
-                  {category.name}
-                </h1>
-                <p className="text-sm text-[#839493] mt-1">{category.description}</p>
-                <span className="text-[11px] text-[#00ffff] font-bold mt-2 inline-block">
-                  {category.topicCount} topics
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowNew(true)}
-              className="px-5 py-2 bg-[#ff5540] hover:bg-[#ff3b20] text-black text-xs font-bold uppercase tracking-wider rounded shadow-md transition flex items-center gap-1.5 self-start sm:self-center"
-            >
-              <Plus className="w-4 h-4" />
-              New Post
-            </button>
-          </header>
-        ) : (
-          <header className="p-10 text-center border border-[#ff5540]/50 rounded-md bg-[#0a0f0f]">
-            <Terminal className="w-10 h-10 text-[#ff5540] mx-auto mb-3" />
-            <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">Board Not Found</h1>
-            <p className="text-sm text-[#839493] mt-2">This board does not exist.</p>
-          </header>
-        )}
-
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-1 bg-[#0a0f0f] p-1 border border-[#1f2b2a] rounded-md w-full sm:w-auto">
-            {sortTabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setSortBy(tab.key)}
-                className={`px-3 py-1.5 text-[11px] font-bold uppercase transition rounded ${
-                  sortBy === tab.key
-                    ? 'bg-[#00ffff]/20 text-[#00ffff] border border-[#00ffff]/40'
-                    : 'text-[#839493] hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-[#839493] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search this board..."
-              className="w-full pl-9 pr-3 py-2 bg-[#0a0f0f] border border-[#1f2b2a] focus:border-[#00ffff] text-xs text-[#dfe3e3] outline-none rounded"
-            />
-          </div>
+      <div className="space-y-3.5 sm:space-y-5 font-sans relative pb-8">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-2">
+          <Link
+            to="/forum"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase transition-all"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>ALL FORUMS</span>
+          </Link>
+          {category && (
+            <>
+              <span className="text-[#3a4a49]">/</span>
+              <span className="text-xs text-[#839493] font-bold uppercase truncate">
+                {category.name}
+              </span>
+            </>
+          )}
         </div>
 
-        {/* Topics List */}
-        {loading ? (
-          <div className="space-y-2">
-            <div className="h-20 bg-[#0a0f0f] border border-[#1f2b2a] rounded animate-pulse" />
-            <div className="h-20 bg-[#0a0f0f] border border-[#1f2b2a] rounded animate-pulse" />
-          </div>
-        ) : topics.length === 0 ? (
-          <div className="p-12 text-center border border-[#1f2b2a] rounded-md bg-[#0a0f0f] space-y-3">
-            <MessageSquare className="w-8 h-8 text-[#839493] mx-auto opacity-50" />
-            <p className="text-sm text-[#839493]">
-              No posts found{searchQuery ? ' matching your search' : ' in this board yet'}.
-            </p>
-            {!searchQuery && (
-              <button
-                onClick={() => setShowNew(true)}
-                className="px-4 py-2 bg-[#ff5540] text-black text-xs font-bold uppercase rounded"
-              >
-                Start a Discussion
-              </button>
-            )}
+        {/* Board Header Bento Banner */}
+        {category ? (
+          <div
+            className="relative overflow-hidden bg-[#070b0b] border border-[#3a4a49] p-4 sm:p-5 chamfer-corner shadow-2xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            style={{ borderLeftWidth: '4px', borderLeftColor: category.color || '#00ffff' }}
+          >
+            {/* Background Image with Dark Gradient Overlay */}
+            <img
+              src={category.bgImage || getCategoryBgImage(category.slug)}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover object-center opacity-40 pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/80 to-[#070b0b]/40 pointer-events-none" />
+
+            <div className="relative z-10 space-y-1.5 max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1
+                  className="font-grotesk font-extrabold text-xl sm:text-2xl uppercase tracking-tight drop-shadow-md"
+                  style={{ color: category.color }}
+                >
+                  {category.name}
+                </h1>
+                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b]/90 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner backdrop-blur-sm shadow-md">
+                  {category.topicCount} TOPICS
+                </span>
+              </div>
+              <p className="text-xs text-[#dfe3e3]/90 leading-relaxed drop-shadow-sm font-sans">
+                {category.description}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowNew(true)}
+              className="relative z-10 px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5 self-start sm:self-center shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Post</span>
+            </button>
           </div>
         ) : (
-          <div className="divide-y divide-[#1f2b2a] border border-[#1f2b2a] rounded-md overflow-hidden">
-            {topics.map((topic) => (
-              <ForumTopicRow key={topic.id} topic={topic} showCategory={false} />
-            ))}
+          <div className="p-10 text-center chitin-card chamfer-corner border border-[#ff5540]/50 space-y-2">
+            <Terminal className="w-8 h-8 text-[#ff5540] mx-auto" />
+            <h1 className="font-grotesk font-bold text-lg text-[#dfe3e3] uppercase">
+              Board Not Found
+            </h1>
+            <p className="text-xs text-[#839493]">This discussion board does not exist.</p>
           </div>
         )}
+
+        {/* 2-Column Bento Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
+          {/* Left Column (8 cols): Sort Tabs, Search, Topics Stream */}
+          <div className="lg:col-span-8 flex flex-col">
+            <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 h-full flex flex-col justify-between">
+              <div className="space-y-3">
+                {/* Toolbar */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-b border-[#3a4a49] pb-3">
+                  <div className="flex items-center gap-1">
+                    {sortTabs.map((tab) => (
+                      <button
+                        key={tab.key}
+                        onClick={() => setSortBy(tab.key)}
+                        className={`px-2.5 py-1 text-[10px] font-sans font-bold uppercase transition-all chamfer-corner border ${
+                          sortBy === tab.key
+                            ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
+                            : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative w-full sm:w-56">
+                    <Search className="w-3.5 h-3.5 text-[#839493] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search this board..."
+                      className="w-full pl-8 pr-2.5 py-1 bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors placeholder:text-[#839493]/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Topics Stream */}
+                {loading ? (
+                  <div className="space-y-2">
+                    <div className="h-16 bg-[#070b0b] border border-[#3a4a49] chamfer-corner animate-pulse" />
+                    <div className="h-16 bg-[#070b0b] border border-[#3a4a49] chamfer-corner animate-pulse" />
+                  </div>
+                ) : topics.length === 0 ? (
+                  <div className="p-10 text-center chitin-card-inset chamfer-corner border border-[#3a4a49] space-y-3">
+                    <MessageSquare className="w-6 h-6 text-[#839493] mx-auto opacity-60" />
+                    <p className="text-xs text-[#839493]">
+                      No posts found{searchQuery ? ' matching your search' : ' in this board yet'}.
+                    </p>
+                    {!searchQuery && (
+                      <button
+                        onClick={() => setShowNew(true)}
+                        className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
+                      >
+                        Start a Discussion
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {topics.map((topic) => (
+                      <ForumTopicRow key={topic.id} topic={topic} showCategory={false} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column (4 cols): Board Context & Quick Navigation */}
+          <div className="lg:col-span-4 flex flex-col space-y-3.5 sm:space-y-5">
+            {/* Board Directive Card */}
+            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
+              <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-2.5">
+                <Compass className="w-4 h-4 text-[#00ffff]" />
+                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  BOARD DIRECTIVE
+                </h3>
+              </div>
+              <p className="text-xs text-[#839493] leading-relaxed">
+                Ensure submissions focus specifically on {category?.name || 'this board\'s subject'}. Clear, constructive dialogue creates durable chitin for everyone.
+              </p>
+              <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner text-[11px] text-[#dfe3e3] space-y-1">
+                <div className="text-[#00ffff] font-bold">Posting Guidelines:</div>
+                <div className="text-[#839493]">· Check existing threads before posting.</div>
+                <div className="text-[#839493]">· Use descriptive, informative titles.</div>
+                <div className="text-[#839493]">· Respect initiates of all stages.</div>
+              </div>
+            </div>
+
+            {/* Other Discussion Boards Switcher */}
+            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl space-y-2.5">
+              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
+                <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
+                  OTHER BOARDS
+                </h3>
+                <span className="text-[10px] text-[#839493] font-bold">JUMP TO</span>
+              </div>
+              <div className="space-y-1.5 font-sans">
+                {otherCategories.map((c) => (
+                  <Link
+                    key={c.id}
+                    to="/forum/$categorySlug"
+                    params={{ categorySlug: c.slug }}
+                    className="chitin-card-inset p-2 border border-[#3a4a49] hover:border-[#00ffff]/60 chamfer-corner flex items-center justify-between group transition-all"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: c.color }}
+                      />
+                      <span className="text-xs text-[#dfe3e3] group-hover:text-[#00ffff] font-bold uppercase truncate transition-colors">
+                        {c.name}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-3 h-3 text-[#839493] group-hover:text-[#00ffff] group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {showNew && category && (
@@ -198,7 +289,10 @@ function ForumBoardPage() {
           initialCategoryId={category.id}
           onClose={() => setShowNew(false)}
           onCreated={(topic) => {
-            navigate({ to: '/forum/$categorySlug/$topicSlug', params: { categorySlug, topicSlug: topic.slug } })
+            navigate({
+              to: '/forum/$categorySlug/$topicSlug',
+              params: { categorySlug, topicSlug: topic.slug },
+            })
           }}
         />
       )}
