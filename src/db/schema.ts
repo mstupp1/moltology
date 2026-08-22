@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 // Neon Managed Auth Schema Reference
@@ -305,6 +305,35 @@ export const forumPosts = pgTable('forum_posts', {
   pgPolicy('forum_posts_insert_policy', {
     for: 'insert',
     withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
+// Forum Votes Table (one toggleable vote per user per topic or reply)
+export const forumVotes = pgTable('forum_votes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  topicId: uuid('topicId').references(() => forumTopics.id, { onDelete: 'cascade' }),
+  postId: uuid('postId').references(() => forumPosts.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('forum_votes_topic_user_unique').on(table.userId, table.topicId),
+  uniqueIndex('forum_votes_post_user_unique').on(table.userId, table.postId),
+  pgPolicy('forum_votes_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  }),
+  pgPolicy('forum_votes_owner_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+  pgPolicy('forum_votes_owner_update_policy', {
+    for: 'update',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+  pgPolicy('forum_votes_owner_delete_policy', {
+    for: 'delete',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
 ])
 

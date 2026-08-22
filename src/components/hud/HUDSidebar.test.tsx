@@ -144,7 +144,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('ISOLATION')).toBeInTheDocument()
     expect(screen.getByText('VATS')).toBeInTheDocument()
     expect(screen.getByText('VAULT')).toBeInTheDocument()
-    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
+    expect(screen.getByText('FORUM')).toBeInTheDocument()
     expect(screen.getByText('SUPPORT')).toBeInTheDocument()
   })
 

@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   Activity,
+  MessageSquare,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { HeaderBrand } from '@/components/ui'
@@ -27,7 +28,7 @@ import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 
 export interface PublicHeaderProps {
-  activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax'
+  activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax' | 'forum'
   onOpenAuth?: (mode: 'login' | 'signup') => void
   variant?: 'benthic' | 'corporate'
 }
@@ -52,6 +53,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const currentTab = useMemo(() => {
     if (locationPathname.startsWith('/news') || locationPathname.startsWith('/blog')) return 'news'
+    if (locationPathname.startsWith('/forum')) return 'forum'
     if (locationPathname.startsWith('/moltmax')) return 'moltmax'
     if (locationPathname.startsWith('/org')) return 'org'
     if (locationPathname === '/') return 'home'
@@ -284,6 +286,40 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 }`}
               />
               <span>NEWS</span>
+            </div>
+          </button>
+
+          <button
+            ref={(el) => { tabRefs.current['forum'] = el }}
+            onClick={() => onNavigate('/forum')}
+            onMouseEnter={() => setHoveredTab('forum')}
+            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+              targetTab === 'forum'
+                ? isCorporate
+                  ? 'text-sky-700'
+                  : 'text-cyan-300'
+                : isCorporate
+                  ? 'text-slate-500 hover:text-sky-700'
+                  : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <div
+              className={`flex items-center gap-1.5 transition-transform duration-300 ease-[cubic-bezier(0.2,1,0.3,1)] ${
+                targetTab === 'forum' ? 'scale-[1.07]' : 'scale-100 group-hover:scale-[1.03]'
+              }`}
+            >
+              <MessageSquare
+                className={`w-3.5 h-3.5 transition-colors duration-300 ${
+                  targetTab === 'forum'
+                    ? isCorporate
+                      ? 'text-sky-600'
+                      : 'text-cyan-300'
+                    : isCorporate
+                      ? 'text-slate-400 group-hover:text-sky-600'
+                      : 'text-gray-400 group-hover:text-gray-300'
+                }`}
+              />
+              <span>FORUM</span>
             </div>
           </button>
 
@@ -538,6 +574,22 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           >
             <Newspaper className="w-4 h-4" />
             <span>NEWS</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('/forum')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'forum'
+                ? isCorporate
+                  ? 'text-sky-700 bg-sky-50'
+                  : 'text-cyan-300 bg-cyan-950/40'
+                : isCorporate
+                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            }`}
+          >
+            <MessageSquare className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
+            <span>FORUM</span>
           </button>
 
           <button

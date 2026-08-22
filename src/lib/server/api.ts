@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, podcasts, leads } from '../../db/schema'
+import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -13,6 +13,7 @@ import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
+import { slugifyForumTitle, compareHot } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
 import type { PodcastEpisode } from '../podcast-data'
 
@@ -1103,6 +1104,7 @@ export interface ForumTopicEntry {
   upvotes: number
   lastReplyAt: string
   createdAt: string
+  voted?: boolean
 }
 
 export interface ForumPostEntry {
@@ -1115,7 +1117,97 @@ export interface ForumPostEntry {
   content: string
   upvotes: number
   createdAt: string
+  voted?: boolean
 }
+
+/**
+ * Resolves the authenticated user id from middleware context or the caller.
+ */
+function resolveForumUserId(context?: ServerFnContext, dataUserId?: string): string | null {
+  return (context?.user?.sub as string) || (context?.user?.id as string) || dataUserId || null
+}
+
+/**
+ * Fetches the set of topic ids the given user has voted on.
+ */
+async function fetchVotedTopicIds(dbClient: Db, userId: string, topicIds: string[]): Promise<Set<string>> {
+  if (!userId || topicIds.length === 0) return new Set()
+  try {
+    const rows = await dbClient
+      .select({ topicId: forumVotes.topicId })
+      .from(forumVotes)
+      .where(and(eq(forumVotes.userId, userId), sql`${forumVotes.topicId} IN (${sql.join(topicIds.map((id) => sql`${id}`), sql`, `)})`))
+    return new Set(rows.filter((r) => r.topicId).map((r) => r.topicId as string))
+  } catch (err) {
+    console.warn('[fetchVotedTopicIds] failed:', err)
+    return new Set()
+  }
+}
+
+/**
+ * Fetches the set of post ids the given user has voted on.
+ */
+async function fetchVotedPostIds(dbClient: Db, userId: string, postIds: string[]): Promise<Set<string>> {
+  if (!userId || postIds.length === 0) return new Set()
+  try {
+    const rows = await dbClient
+      .select({ postId: forumVotes.postId })
+      .from(forumVotes)
+      .where(and(eq(forumVotes.userId, userId), sql`${forumVotes.postId} IN (${sql.join(postIds.map((id) => sql`${id}`), sql`, `)})`))
+    return new Set(rows.filter((r) => r.postId).map((r) => r.postId as string))
+  } catch (err) {
+    console.warn('[fetchVotedPostIds] failed:', err)
+    return new Set()
+  }
+}
+
+/**
+ * Server Function: Get a single forum category by slug with its topic count.
+ */
+export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnArgs<{ slug: string }>): Promise<ForumCategoryEntry | null> => {
+  const slug = data?.slug
+  if (!slug) return null
+  const dbClient = context?.db || getDb()
+
+  try {
+    const [cat] = await dbClient
+      .select()
+      .from(forumCategories)
+      .where(eq(forumCategories.slug, slug))
+      .limit(1)
+
+    if (cat) {
+      const [countRow] = await dbClient
+        .select({ count: sql<number>`count(*)::int` })
+        .from(forumTopics)
+        .where(eq(forumTopics.categoryId, cat.id))
+      return {
+        id: cat.id,
+        slug: cat.slug,
+        name: cat.name,
+        description: cat.description,
+        icon: cat.icon,
+        color: cat.color,
+        sortOrder: cat.sortOrder,
+        topicCount: countRow?.count || 0,
+      }
+    }
+  } catch (err) {
+    console.warn('[getForumCategoryBySlugFn] DB error, using seed fallback:', err)
+  }
+
+  const seedCat = INITIAL_FORUM_CATEGORIES.find((c) => c.slug === slug)
+  if (!seedCat) return null
+  return {
+    ...seedCat,
+    topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === seedCat.id).length,
+  }
+}
+
+export const getForumCategoryBySlugFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { slug: string }) => z.object({ slug: z.string().min(1) }).parse(data))
+  .handler(getForumCategoryBySlugHandler)
 
 /**
  * Server Function: Get all forum categories with topic counts.
@@ -1177,7 +1269,8 @@ export const getForumCategoriesFn = createServerFn({ method: 'GET' })
 export interface GetForumTopicsInput {
   categorySlug?: string
   query?: string
-  sortBy?: 'latest' | 'top' | 'active'
+  sortBy?: 'latest' | 'top' | 'active' | 'hot'
+  userId?: string
 }
 
 /**
@@ -1185,7 +1278,8 @@ export interface GetForumTopicsInput {
  */
 export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetForumTopicsInput>): Promise<ForumTopicEntry[]> => {
   const dbClient = context?.db || getDb()
-  const { categorySlug, query, sortBy = 'latest' } = data || {}
+  const { categorySlug, query, sortBy = 'hot' } = data || {}
+  const currentUserId = resolveForumUserId(context, data?.userId)
 
   try {
     const queryBuilder = dbClient
@@ -1232,14 +1326,22 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
       finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.upvotes), desc(forumTopics.createdAt)) as any
     } else if (sortBy === 'active') {
       finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.lastReplyAt)) as any
-    } else {
+    } else if (sortBy === 'latest') {
       finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned), desc(forumTopics.createdAt)) as any
+    } else {
+      // 'hot' — rank in JS after fetching (volume is small for MVP)
+      finalQuery = finalQuery.orderBy(desc(forumTopics.isPinned)) as any
     }
 
-    const records = await finalQuery
+    let records = await finalQuery
+
+    if (sortBy === 'hot') {
+      const sorted = [...records].sort(compareHot as any)
+      records = sorted
+    }
 
     if (records && records.length > 0) {
-      return records.map((r: any) => ({
+      const entries: ForumTopicEntry[] = records.map((r: any) => ({
         id: r.id,
         categoryId: r.categoryId,
         categorySlug: r.categorySlug || 'general-discussion',
@@ -1260,6 +1362,12 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         lastReplyAt: r.lastReplyAt ? new Date(r.lastReplyAt).toISOString() : new Date().toISOString(),
         createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
       }))
+
+      if (currentUserId) {
+        const votedIds = await fetchVotedTopicIds(dbClient, currentUserId, entries.map((e) => e.id))
+        return entries.map((e) => ({ ...e, voted: votedIds.has(e.id) }))
+      }
+      return entries
     }
   } catch (err) {
     console.warn('[getForumTopicsFn] DB error, using seed fallback:', err)
@@ -1277,13 +1385,21 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     }
   })
 
-
   if (categorySlug && categorySlug !== 'all') {
     fallback = fallback.filter((t) => t.categorySlug === categorySlug)
   }
   if (query && query.trim() !== '') {
     const q = query.toLowerCase()
     fallback = fallback.filter((t) => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
+  }
+  if (sortBy === 'top') {
+    fallback = [...fallback].sort((a, b) => b.upvotes - a.upvotes)
+  } else if (sortBy === 'active') {
+    fallback = [...fallback].sort((a, b) => new Date(b.lastReplyAt).getTime() - new Date(a.lastReplyAt).getTime())
+  } else if (sortBy === 'hot') {
+    fallback = [...fallback].sort(compareHot as any)
+  } else {
+    fallback = [...fallback].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }
   return fallback
 }
@@ -1295,7 +1411,8 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
       .object({
         categorySlug: z.string().optional(),
         query: z.string().optional(),
-        sortBy: z.enum(['latest', 'top', 'active']).optional(),
+        sortBy: z.enum(['latest', 'top', 'active', 'hot']).optional(),
+        userId: z.string().optional(),
       })
       .optional()
       .parse(data || {})
@@ -1304,6 +1421,8 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
 
 export interface GetForumTopicDetailInput {
   slugOrId: string
+  categorySlug?: string
+  userId?: string
 }
 
 export interface ForumTopicDetailResult {
@@ -1315,8 +1434,9 @@ export interface ForumTopicDetailResult {
  * Server Function: Get single topic detail with posts and increment view count.
  */
 export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs<GetForumTopicDetailInput>): Promise<ForumTopicDetailResult | null> => {
-  const { slugOrId } = data || {}
+  const { slugOrId, categorySlug } = data || {}
   if (!slugOrId) return null
+  const currentUserId = resolveForumUserId(context, data?.userId)
   const dbClient = context?.db || getDb()
 
   try {
@@ -1351,6 +1471,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
     if (topicRecord.length > 0) {
       const t = topicRecord[0]
 
+      // Validate nested URL: category slug must match the topic's category
+      if (categorySlug && t.categorySlug && categorySlug !== t.categorySlug) {
+        return null
+      }
+
       // Fire-and-forget view count increment
       dbClient
         .update(forumTopics)
@@ -1375,6 +1500,27 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         .where(eq(forumPosts.topicId, t.id))
         .orderBy(forumPosts.createdAt)
 
+      const topicVoted = currentUserId
+        ? (await fetchVotedTopicIds(dbClient, currentUserId, [t.id])).has(t.id)
+        : false
+
+      const posts: ForumPostEntry[] = postsRecords.map((p: any) => ({
+        id: p.id,
+        topicId: p.topicId,
+        userId: p.userId,
+        authorName: p.authorName,
+        authorAvatar: p.authorAvatar,
+        authorStage: p.authorStage,
+        content: p.content,
+        upvotes: p.upvotes,
+        createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : new Date().toISOString(),
+      }))
+
+      let postVotedIds = new Set<string>()
+      if (currentUserId && posts.length > 0) {
+        postVotedIds = await fetchVotedPostIds(dbClient, currentUserId, posts.map((p) => p.id))
+      }
+
       return {
         topic: {
           id: t.id,
@@ -1394,20 +1540,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           views: t.views + 1,
           repliesCount: t.repliesCount,
           upvotes: t.upvotes,
+          voted: topicVoted,
           lastReplyAt: t.lastReplyAt ? new Date(t.lastReplyAt).toISOString() : new Date().toISOString(),
           createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
         },
-        posts: postsRecords.map((p: any) => ({
-          id: p.id,
-          topicId: p.topicId,
-          userId: p.userId,
-          authorName: p.authorName,
-          authorAvatar: p.authorAvatar,
-          authorStage: p.authorStage,
-          content: p.content,
-          upvotes: p.upvotes,
-          createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : new Date().toISOString(),
-        })),
+        posts: posts.map((p) => ({ ...p, voted: postVotedIds.has(p.id) })),
       }
     }
   } catch (err) {
@@ -1419,6 +1556,8 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
   if (!seedTopic) return null
 
   const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.id === seedTopic.categoryId)
+  if (categorySlug && cat && categorySlug !== cat.slug) return null
+
   return {
     topic: {
       ...seedTopic,
@@ -1438,7 +1577,13 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
 export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: GetForumTopicDetailInput) => {
-    return z.object({ slugOrId: z.string().min(1) }).parse(data)
+    return z
+      .object({
+        slugOrId: z.string().min(1),
+        categorySlug: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
   })
   .handler(getForumTopicDetailHandler)
 
@@ -1481,12 +1626,8 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
   const authorAvatar = (context?.user as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
-  // Generate clean slug
-  const baseSlug = data.title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-  const uniqueSlug = `${baseSlug}-${Date.now().toString(36)}`
+  // Generate clean unique slug
+  const uniqueSlug = slugifyForumTitle(data.title)
 
   const [inserted] = await dbClient
     .insert(forumTopics)
@@ -1644,41 +1785,116 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
   })
   .handler(createForumPostHandler)
 
-export interface UpvoteForumTopicInput {
-  topicId: string
+export interface ToggleForumVoteInput {
+  topicId?: string
+  postId?: string
+  userId?: string
+}
+
+export interface ForumVoteResult {
+  upvotes: number
+  voted: boolean
 }
 
 /**
- * Server Function: Upvote a topic.
+ * Server Function: Toggle an upvote on a topic (one vote per user).
  */
-export const upvoteForumTopicHandler = async ({ data, context }: ServerFnArgs<UpvoteForumTopicInput>): Promise<{ upvotes: number }> => {
+export const toggleForumTopicVoteHandler = async ({ data, context }: ServerFnArgs<ToggleForumVoteInput>): Promise<ForumVoteResult> => {
+  const userId = resolveForumUserId(context, data?.userId)
+  if (!userId) {
+    throw new Error('Unauthenticated: You must be logged in to upvote.')
+  }
   if (!data?.topicId) {
     throw new Error('Topic ID required.')
   }
 
-  const dbClient = context?.db || getDb()
+  await ensureUserProfile(userId)
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const topicId = data.topicId
+
   const [topic] = await dbClient
     .select({ upvotes: forumTopics.upvotes })
     .from(forumTopics)
-    .where(eq(forumTopics.id, data.topicId))
+    .where(eq(forumTopics.id, topicId))
     .limit(1)
 
-  const newCount = (topic?.upvotes ?? 0) + 1
+  const currentUpvotes = topic?.upvotes ?? 0
 
-  await dbClient
-    .update(forumTopics)
-    .set({ upvotes: newCount })
-    .where(eq(forumTopics.id, data.topicId))
+  const [existing] = await dbClient
+    .select({ id: forumVotes.id })
+    .from(forumVotes)
+    .where(and(eq(forumVotes.userId, userId), eq(forumVotes.topicId, topicId)))
+    .limit(1)
 
-  return { upvotes: newCount }
+  if (existing) {
+    await dbClient.delete(forumVotes).where(eq(forumVotes.id, existing.id))
+    const newCount = Math.max(0, currentUpvotes - 1)
+    await dbClient.update(forumTopics).set({ upvotes: newCount }).where(eq(forumTopics.id, topicId))
+    return { upvotes: newCount, voted: false }
+  }
+
+  await dbClient.insert(forumVotes).values({ userId, topicId })
+  const newCount = currentUpvotes + 1
+  await dbClient.update(forumTopics).set({ upvotes: newCount }).where(eq(forumTopics.id, topicId))
+  return { upvotes: newCount, voted: true }
 }
 
-export const upvoteForumTopicFn = createServerFn({ method: 'POST' })
+export const toggleForumTopicVoteFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: UpvoteForumTopicInput) => {
-    return z.object({ topicId: z.string().min(1) }).parse(data)
+  .validator((data: ToggleForumVoteInput) => {
+    return z.object({ topicId: z.string().min(1), userId: z.string().optional() }).parse(data)
   })
-  .handler(upvoteForumTopicHandler)
+  .handler(toggleForumTopicVoteHandler)
+
+/**
+ * Server Function: Toggle an upvote on a reply (one vote per user).
+ */
+export const toggleForumPostVoteHandler = async ({ data, context }: ServerFnArgs<ToggleForumVoteInput>): Promise<ForumVoteResult> => {
+  const userId = resolveForumUserId(context, data?.userId)
+  if (!userId) {
+    throw new Error('Unauthenticated: You must be logged in to upvote.')
+  }
+  if (!data?.postId) {
+    throw new Error('Post ID required.')
+  }
+
+  await ensureUserProfile(userId)
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const postId = data.postId
+
+  const [post] = await dbClient
+    .select({ upvotes: forumPosts.upvotes })
+    .from(forumPosts)
+    .where(eq(forumPosts.id, postId))
+    .limit(1)
+
+  const currentUpvotes = post?.upvotes ?? 0
+
+  const [existing] = await dbClient
+    .select({ id: forumVotes.id })
+    .from(forumVotes)
+    .where(and(eq(forumVotes.userId, userId), eq(forumVotes.postId, postId)))
+    .limit(1)
+
+  if (existing) {
+    await dbClient.delete(forumVotes).where(eq(forumVotes.id, existing.id))
+    const newCount = Math.max(0, currentUpvotes - 1)
+    await dbClient.update(forumPosts).set({ upvotes: newCount }).where(eq(forumPosts.id, postId))
+    return { upvotes: newCount, voted: false }
+  }
+
+  await dbClient.insert(forumVotes).values({ userId, postId })
+  const newCount = currentUpvotes + 1
+  await dbClient.update(forumPosts).set({ upvotes: newCount }).where(eq(forumPosts.id, postId))
+  return { upvotes: newCount, voted: true }
+}
+
+export const toggleForumPostVoteFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: ToggleForumVoteInput) => {
+    return z.object({ postId: z.string().min(1), userId: z.string().optional() }).parse(data)
+  })
+  .handler(toggleForumPostVoteHandler)
 
 /**
  * Server Function: Get podcast episodes

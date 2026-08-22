@@ -16,17 +16,21 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
     slug: '2026-08-21-instant-navigation-feature-showcase',
     version: '2026.08.21',
-    title: 'Instant Navigation Prefetching & Enhanced Feature Cards',
-    category: 'Improvement',
-    tags: ['Improvement', 'Performance', 'UI/UX', 'Navigation'],
-    summary: 'Enabled instant background page prefetching on sidebar links and upgraded homepage feature cards with expanded banners, atmospheric vignettes, and focal framing.',
+    title: 'Instant Navigation, Changelog Filtering & Composite Studio',
+    category: 'Feature',
+    tags: ['Feature', 'Performance', 'UI/UX', 'Tools'],
+    summary: 'Enabled instant background page prefetching, added category tags and pagination to the update feed, and built an in-browser composite studio for creative asset generation.',
     content: `### Instant Sidebar Navigation
 - Enabled automatic background prefetching on sidebar navigation links for near-instantaneous page transitions.
 - Tuned navigation delay thresholds to keep route switching smooth and seamless.
 
-### Expanded Feature Showcase
-- Overhauled homepage pillar cards with taller banner heights, layered lighting vignettes, and technical corner overlays.
-- Added custom image focal positioning to highlight key mentor and feature artwork dynamically.`,
+### Changelog Filtering & Pagination
+- Added category filter pills, searchable topic tags, and paginated browsing to the changelog and support portals.
+- Enhanced entry metadata display with color-coded category badges and tags.
+
+### In-Browser Composite Studio
+- Built a web-native composite rendering studio for generating slide decks, feature showdowns, and social graphics.
+- Overhauled homepage pillar cards with taller banner heights, layered lighting vignettes, and focal framing.`,
     releasedAt: '2026-08-21T23:59:00Z',
   },
   {
@@ -126,6 +130,22 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-08-16T23:59:00Z',
   },
   {
+    slug: '2026-08-15-pbr-textures-dynamic-dispatches',
+    version: '2026.08.15',
+    title: 'PBR Surface Armor & Kinetic Subtitles',
+    category: 'Design',
+    tags: ['Design', 'UI/UX', 'Media', 'Tools'],
+    summary: 'Introduced high-fidelity PBR surface textures across UI cards and buttons, redesigned video captions with kinetic animations, and automated multimedia dispatches.',
+    content: `### PBR Surface Textures
+- Introduced high-fidelity surface textures including benthic alloy, carbon weave, and chitin plating across cards and interactive buttons.
+- Enhanced landing page feature sections with layered atmospheric materials and tactile borders.
+
+### Kinetic Video Captions & Branding
+- Redesigned social dispatches with animated kinetic subtitles, responsive font scaling, and branded watermarks.
+- Added automated multimedia script generation for new research dispatches.`,
+    releasedAt: '2026-08-15T23:59:00Z',
+  },
+  {
     slug: '2026-08-14-moltmaxxing-reel-machine',
     version: '2026.08.14',
     title: 'Moltmaxxing Guide & Daily Video Creator',
@@ -162,6 +182,21 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
     releasedAt: '2026-08-13T23:59:00Z',
   },
   {
+    slug: '2026-08-12-direct-markdown-endpoints',
+    version: '2026.08.12',
+    title: 'Direct Markdown Endpoints & Content Feeds',
+    category: 'Feature',
+    tags: ['Feature', 'Publishing', 'Content', 'Navigation'],
+    summary: 'Added clean text markdown endpoints for all major platform documents and dispatches, making scriptures and articles easily readable by external tools and readers.',
+    content: `### Direct Markdown Endpoints
+- Added direct .md text routes for all major pages, including the Sacred Codex, research journal, news dispatches, and policy documents.
+- Enabled clean text formatting for easy reading, bookmarking, and indexing by external tools.
+
+### Structured Feed Discovery
+- Updated sitemaps and index guides to ensure all public transmissions and documents are indexed seamlessly.`,
+    releasedAt: '2026-08-12T23:59:00Z',
+  },
+  {
     slug: '2026-08-07-new-voices-org-awakens',
     version: '2026.08.07',
     title: 'AI Model Selector, Journal Library & About Page',
@@ -179,6 +214,40 @@ export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
 ### Redesigned About Page
 - Redesigned the organization overview page with a clearer, friendlier introduction.`,
     releasedAt: '2026-08-07T23:59:00Z',
+  },
+  {
+    slug: '2026-08-06-mobile-navigation-particle-optimizations',
+    version: '2026.08.06',
+    title: 'Mobile Navigation Drawer & Particle Optimizations',
+    category: 'Improvement',
+    tags: ['Improvement', 'Mobile', 'Performance', 'UI/UX'],
+    summary: 'Added a responsive mobile drawer navigation menu, interactive controls to dismiss and relaunch the welcome splash, and optimized background bubble animations for smoother performance.',
+    content: `### Responsive Mobile Drawer
+- Added a slide-out mobile navigation drawer with quick access to all platform sections on smartphones and tablets.
+- Improved header tap targets and layout spacing for small touchscreens.
+
+### Onboarding Splash Controls
+- Added a dismiss button to the audio onboarding splash and an instant relaunch trigger from the interface.
+
+### Particle & Rendering Performance
+- Optimized underwater bubble particle simulations with dynamic frame rate scaling for silky smooth rendering on mobile devices.
+- Replaced synthetic scanlines with lightweight texture assets for reduced processor overhead.`,
+    releasedAt: '2026-08-06T23:59:00Z',
+  },
+  {
+    slug: '2026-08-05-search-discovery-structured-metadata',
+    version: '2026.08.05',
+    title: 'Search Discovery Engine & Structured Metadata',
+    category: 'Improvement',
+    tags: ['Improvement', 'Search', 'Infrastructure', 'Metadata'],
+    summary: 'Implemented comprehensive search discovery metadata, structured JSON-LD schemas, and crawler configurations to ensure all dispatches and doctrine are discoverable.',
+    content: `### Search & Discovery Metadata
+- Added canonical URL management, OpenGraph previews, and structured JSON-LD schema across all public routes.
+- Configured crawler discovery files and comprehensive sitemaps to index community dispatches and doctrine.
+
+### Editorial & Transmission Standards
+- Established canonical documentation rules to ensure consistent in-universe voice and clarity across all public releases.`,
+    releasedAt: '2026-08-05T23:59:00Z',
   },
   {
     slug: '2026-08-04-moltnation-broadcasts',

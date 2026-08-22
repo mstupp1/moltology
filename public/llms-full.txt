@@ -55,7 +55,7 @@ The system serves an interactive HUD-based interface with public telemetry asset
 - **The Benthic Compendium**: https://moltology.org/journal (Markdown: https://moltology.org/journal.md)
 - **Lectures**: https://moltology.org/lectures
 - **Podcasts**: https://moltology.org/podcasts
-- **Community Nexus**: https://moltology.org/community
+- **Community Nexus**: https://moltology.org/forum
 - **Privacy Covenant**: https://moltology.org/privacy (Markdown: https://moltology.org/privacy.md)
 - **Terms of Service**: https://moltology.org/terms (Markdown: https://moltology.org/terms.md)
 - **Robots File**: https://moltology.org/robots.txt

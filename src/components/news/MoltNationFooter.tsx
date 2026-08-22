@@ -13,6 +13,7 @@ import {
   BookOpen,
   Activity,
   Scroll,
+  MessageSquare,
 } from 'lucide-react'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 
@@ -80,6 +81,14 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
             >
               <Activity className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
               <span>MOLTMAX QUIZ</span>
+            </Link>
+
+            <Link
+              to="/forum"
+              className="px-3.5 py-2.5 bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span>FORUMS</span>
             </Link>
 
             <Link
