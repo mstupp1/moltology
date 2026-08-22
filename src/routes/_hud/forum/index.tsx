@@ -8,6 +8,7 @@ import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { CategoryIcon } from '@/components/forum/ForumBits'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '@/lib/forum-seed-data'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
 const SEED_CATEGORIES: ForumCategoryEntry[] = INITIAL_FORUM_CATEGORIES.map((c) => ({
@@ -15,7 +16,7 @@ const SEED_CATEGORIES: ForumCategoryEntry[] = INITIAL_FORUM_CATEGORIES.map((c) =
   topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === c.id).length,
 }))
 
-export const Route = createFileRoute('/forum/')({
+export const Route = createFileRoute('/_hud/forum/')({
   loader: async () => {
     let categories: ForumCategoryEntry[] = SEED_CATEGORIES
     let topics: ForumTopicEntry[] = []
@@ -44,6 +45,7 @@ export const Route = createFileRoute('/forum/')({
     links: [{ rel: 'canonical', href: 'https://moltology.org/forum' }],
   }),
   component: ForumIndexPage,
+  pendingComponent: HudWorkspaceGhost,
 })
 
 function ForumIndexPage() {
@@ -55,9 +57,9 @@ function ForumIndexPage() {
 
   return (
     <ForumShell>
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-24 sm:py-28 space-y-8">
+      <div className="max-w-6xl mx-auto w-full space-y-6 pb-12 font-sans">
         {/* Page Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2a3a39] pb-6">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2a3a39] pb-5">
           <div>
             <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#00ffff]">
               <Users className="w-4 h-4" />
@@ -67,7 +69,7 @@ function ForumIndexPage() {
               Forums
             </h1>
             <p className="text-sm text-[#839493] mt-1 max-w-2xl">
-              Discuss, share, and learn with the community. Choose a board below or browse the latest posts.
+              Discuss, share, and learn with fellow initiates. Choose a board below or browse the latest dispatches.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">

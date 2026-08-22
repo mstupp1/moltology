@@ -41,7 +41,6 @@ import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
 import { Route as ChangelogSlugRouteImport } from './routes/changelog/$slug'
 import { Route as CodexMdRouteImport } from './routes/codex.md'
 import { Route as FeedXmlRouteImport } from './routes/feed.xml'
-import { Route as ForumIndexRouteImport } from './routes/forum/index'
 import { Route as JournalMdRouteImport } from './routes/journal.md'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
@@ -52,11 +51,12 @@ import { Route as RenderCompositeRouteImport } from './routes/render/composite'
 import { Route as RssXmlRouteImport } from './routes/rss.xml'
 import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as TermsMdRouteImport } from './routes/terms.md'
+import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
 import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
-import { Route as ForumCategorySlugIndexRouteImport } from './routes/forum/$categorySlug/index'
-import { Route as ForumCategorySlugTopicSlugRouteImport } from './routes/forum/$categorySlug/$topicSlug'
 import { Route as NewsSlugMdRouteImport } from './routes/news.$slug.md'
+import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
+import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -217,11 +217,6 @@ const FeedXmlRoute = FeedXmlRouteImport.update({
   path: '/feed/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForumIndexRoute = ForumIndexRouteImport.update({
-  id: '/forum/',
-  path: '/forum/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const JournalMdRoute = JournalMdRouteImport.update({
   id: '/journal/md',
   path: '/journal/md',
@@ -272,6 +267,11 @@ const TermsMdRoute = TermsMdRouteImport.update({
   path: '/md',
   getParentRoute: () => TermsRoute,
 } as any)
+const HudForumIndexRoute = HudForumIndexRouteImport.update({
+  id: '/forum/',
+  path: '/forum/',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudJournalIndexRoute = HudJournalIndexRouteImport.update({
   id: '/journal/',
   path: '/journal/',
@@ -282,22 +282,23 @@ const HudJournalSlugRoute = HudJournalSlugRouteImport.update({
   path: '/journal/$slug',
   getParentRoute: () => HudRoute,
 } as any)
-const ForumCategorySlugIndexRoute = ForumCategorySlugIndexRouteImport.update({
-  id: '/forum/$categorySlug/',
-  path: '/forum/$categorySlug/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForumCategorySlugTopicSlugRoute =
-  ForumCategorySlugTopicSlugRouteImport.update({
-    id: '/forum/$categorySlug/$topicSlug',
-    path: '/forum/$categorySlug/$topicSlug',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const NewsSlugMdRoute = NewsSlugMdRouteImport.update({
   id: '/md',
   path: '/md',
   getParentRoute: () => NewsSlugRoute,
 } as any)
+const HudForumCategorySlugIndexRoute =
+  HudForumCategorySlugIndexRouteImport.update({
+    id: '/forum/$categorySlug/',
+    path: '/forum/$categorySlug/',
+    getParentRoute: () => HudRoute,
+  } as any)
+const HudForumCategorySlugTopicSlugRoute =
+  HudForumCategorySlugTopicSlugRouteImport.update({
+    id: '/forum/$categorySlug/$topicSlug',
+    path: '/forum/$categorySlug/$topicSlug',
+    getParentRoute: () => HudRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -340,13 +341,13 @@ export interface FileRoutesByFullPath {
   '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
-  '/forum/': typeof ForumIndexRoute
   '/news/': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
-  '/forum/$categorySlug/$topicSlug': typeof ForumCategorySlugTopicSlugRoute
   '/news/$slug/md': typeof NewsSlugMdRoute
+  '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
-  '/forum/$categorySlug/': typeof ForumCategorySlugIndexRoute
+  '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
+  '/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -389,13 +390,13 @@ export interface FileRoutesByTo {
   '/terms/md': typeof TermsMdRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
-  '/forum': typeof ForumIndexRoute
   '/news': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
-  '/forum/$categorySlug/$topicSlug': typeof ForumCategorySlugTopicSlugRoute
   '/news/$slug/md': typeof NewsSlugMdRoute
+  '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
-  '/forum/$categorySlug': typeof ForumCategorySlugIndexRoute
+  '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
+  '/forum/$categorySlug': typeof HudForumCategorySlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -440,13 +441,13 @@ export interface FileRoutesById {
   '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
-  '/forum/': typeof ForumIndexRoute
   '/news/': typeof NewsIndexRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
-  '/forum/$categorySlug/$topicSlug': typeof ForumCategorySlugTopicSlugRoute
   '/news/$slug/md': typeof NewsSlugMdRoute
+  '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
-  '/forum/$categorySlug/': typeof ForumCategorySlugIndexRoute
+  '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
+  '/_hud/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -491,12 +492,12 @@ export interface FileRouteTypes {
     | '/terms/md'
     | '/blog/'
     | '/changelog/'
-    | '/forum/'
     | '/news/'
     | '/journal/$slug'
-    | '/forum/$categorySlug/$topicSlug'
     | '/news/$slug/md'
+    | '/forum/'
     | '/journal/'
+    | '/forum/$categorySlug/$topicSlug'
     | '/forum/$categorySlug/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -540,12 +541,12 @@ export interface FileRouteTypes {
     | '/terms/md'
     | '/blog'
     | '/changelog'
-    | '/forum'
     | '/news'
     | '/journal/$slug'
-    | '/forum/$categorySlug/$topicSlug'
     | '/news/$slug/md'
+    | '/forum'
     | '/journal'
+    | '/forum/$categorySlug/$topicSlug'
     | '/forum/$categorySlug'
   id:
     | '__root__'
@@ -590,13 +591,13 @@ export interface FileRouteTypes {
     | '/terms/md'
     | '/blog/'
     | '/changelog/'
-    | '/forum/'
     | '/news/'
     | '/_hud/journal/$slug'
-    | '/forum/$categorySlug/$topicSlug'
     | '/news/$slug/md'
+    | '/_hud/forum/'
     | '/_hud/journal/'
-    | '/forum/$categorySlug/'
+    | '/_hud/forum/$categorySlug/$topicSlug'
+    | '/_hud/forum/$categorySlug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -626,10 +627,7 @@ export interface RootRouteChildren {
   SitemapXmlRoute: typeof SitemapXmlRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
-  ForumIndexRoute: typeof ForumIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
-  ForumCategorySlugTopicSlugRoute: typeof ForumCategorySlugTopicSlugRoute
-  ForumCategorySlugIndexRoute: typeof ForumCategorySlugIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -858,13 +856,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/forum/': {
-      id: '/forum/'
-      path: '/forum'
-      fullPath: '/forum/'
-      preLoaderRoute: typeof ForumIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/journal/md': {
       id: '/journal/md'
       path: '/journal/md'
@@ -935,6 +926,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsMdRouteImport
       parentRoute: typeof TermsRoute
     }
+    '/_hud/forum/': {
+      id: '/_hud/forum/'
+      path: '/forum'
+      fullPath: '/forum/'
+      preLoaderRoute: typeof HudForumIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/journal/': {
       id: '/_hud/journal/'
       path: '/journal'
@@ -949,26 +947,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudJournalSlugRouteImport
       parentRoute: typeof HudRoute
     }
-    '/forum/$categorySlug/': {
-      id: '/forum/$categorySlug/'
-      path: '/forum/$categorySlug'
-      fullPath: '/forum/$categorySlug/'
-      preLoaderRoute: typeof ForumCategorySlugIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forum/$categorySlug/$topicSlug': {
-      id: '/forum/$categorySlug/$topicSlug'
-      path: '/forum/$categorySlug/$topicSlug'
-      fullPath: '/forum/$categorySlug/$topicSlug'
-      preLoaderRoute: typeof ForumCategorySlugTopicSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/news/$slug/md': {
       id: '/news/$slug/md'
       path: '/md'
       fullPath: '/news/$slug/md'
       preLoaderRoute: typeof NewsSlugMdRouteImport
       parentRoute: typeof NewsSlugRoute
+    }
+    '/_hud/forum/$categorySlug/': {
+      id: '/_hud/forum/$categorySlug/'
+      path: '/forum/$categorySlug'
+      fullPath: '/forum/$categorySlug/'
+      preLoaderRoute: typeof HudForumCategorySlugIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/forum/$categorySlug/$topicSlug': {
+      id: '/_hud/forum/$categorySlug/$topicSlug'
+      path: '/forum/$categorySlug/$topicSlug'
+      fullPath: '/forum/$categorySlug/$topicSlug'
+      preLoaderRoute: typeof HudForumCategorySlugTopicSlugRouteImport
+      parentRoute: typeof HudRoute
     }
   }
 }
@@ -987,7 +985,10 @@ interface HudRouteChildren {
   HudSubterraneanRoute: typeof HudSubterraneanRoute
   HudSupportRoute: typeof HudSupportRoute
   HudJournalSlugRoute: typeof HudJournalSlugRoute
+  HudForumIndexRoute: typeof HudForumIndexRoute
   HudJournalIndexRoute: typeof HudJournalIndexRoute
+  HudForumCategorySlugTopicSlugRoute: typeof HudForumCategorySlugTopicSlugRoute
+  HudForumCategorySlugIndexRoute: typeof HudForumCategorySlugIndexRoute
 }
 
 const HudRouteChildren: HudRouteChildren = {
@@ -1004,7 +1005,10 @@ const HudRouteChildren: HudRouteChildren = {
   HudSubterraneanRoute: HudSubterraneanRoute,
   HudSupportRoute: HudSupportRoute,
   HudJournalSlugRoute: HudJournalSlugRoute,
+  HudForumIndexRoute: HudForumIndexRoute,
   HudJournalIndexRoute: HudJournalIndexRoute,
+  HudForumCategorySlugTopicSlugRoute: HudForumCategorySlugTopicSlugRoute,
+  HudForumCategorySlugIndexRoute: HudForumCategorySlugIndexRoute,
 }
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
@@ -1079,10 +1083,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapXmlRoute: SitemapXmlRoute,
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
-  ForumIndexRoute: ForumIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
-  ForumCategorySlugTopicSlugRoute: ForumCategorySlugTopicSlugRoute,
-  ForumCategorySlugIndexRoute: ForumCategorySlugIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

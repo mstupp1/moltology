@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Biohazard,
   Microscope,
+  Users,
 } from 'lucide-react'
 
 interface CommandItem {
@@ -128,6 +129,17 @@ export const CommandPalette: React.FC = () => {
       shortcut: 'G J',
       action: () => {
         navigate({ to: '/journal' })
+        setIsOpen(false)
+      },
+    },
+    {
+      id: 'nav-forum',
+      label: 'Open Community Forums & Discussions',
+      category: 'Navigation',
+      icon: <Users className="w-4 h-4 text-[#00ffff]" />,
+      shortcut: 'G F',
+      action: () => {
+        navigate({ to: '/forum' })
         setIsOpen(false)
       },
     },

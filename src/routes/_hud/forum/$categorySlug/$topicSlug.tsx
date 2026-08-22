@@ -7,9 +7,10 @@ import { useForumAuth } from '@/components/forum/ForumShell'
 import { getForumTopicDetailFn, createForumPostFn, ForumPostEntry, ForumTopicEntry } from '@/lib/server/api'
 import { validateForumContent } from '@/lib/community-rules'
 import { relativeTime } from '@/lib/forum-utils'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
-export const Route = createFileRoute('/forum/$categorySlug/$topicSlug')({
+export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   loader: async ({ params }) => {
     try {
       const res = await getForumTopicDetailFn({
@@ -44,6 +45,7 @@ export const Route = createFileRoute('/forum/$categorySlug/$topicSlug')({
     }
   },
   component: ForumThreadPage,
+  pendingComponent: HudWorkspaceGhost,
 })
 
 function ReplyComposer({ topicId, onPosted }: { topicId: string; onPosted: (post: ForumPostEntry) => void }) {
@@ -131,7 +133,7 @@ function ForumThreadPage() {
   if (!detail) {
     return (
       <ForumShell>
-        <div className="max-w-3xl mx-auto px-4 sm:px-8 py-28 text-center">
+        <div className="max-w-3xl mx-auto w-full py-16 text-center font-sans">
           <Terminal className="w-10 h-10 text-[#ff5540] mx-auto mb-3" />
           <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">Post Not Found</h1>
           <p className="text-sm text-[#839493] mt-2 mb-6">This post does not exist or was removed.</p>
@@ -169,7 +171,7 @@ function ForumThreadPage() {
 
   return (
     <ForumShell>
-      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-24 sm:py-28 space-y-6">
+      <div className="max-w-4xl mx-auto w-full space-y-6 pb-12 font-sans">
         {/* Breadcrumb */}
         <Link
           to="/forum/$categorySlug"

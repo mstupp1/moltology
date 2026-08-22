@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../../lib/forum-seed-data'
+import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../../../lib/forum-seed-data'
 
 const mockUseLoaderData = vi.fn()
 const mockNavigate = vi.fn()
@@ -34,7 +34,7 @@ vi.mock('@/lib/auth-client', () => ({
 import { Route } from './index'
 const ForumIndexPage = Route.options.component!
 
-describe('ForumIndexPage (/forum)', () => {
+describe('ForumIndexPage (/_hud/forum/)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

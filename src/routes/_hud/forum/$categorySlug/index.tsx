@@ -6,9 +6,10 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { CategoryIcon } from '@/components/forum/ForumBits'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
-export const Route = createFileRoute('/forum/$categorySlug/')({
+export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
   loader: async ({ params }) => {
     let category: ForumCategoryEntry | null = null
     let topics: ForumTopicEntry[] = []
@@ -42,6 +43,7 @@ export const Route = createFileRoute('/forum/$categorySlug/')({
     }
   },
   component: ForumBoardPage,
+  pendingComponent: HudWorkspaceGhost,
 })
 
 type SortKey = 'hot' | 'top' | 'latest' | 'active'
@@ -87,7 +89,7 @@ function ForumBoardPage() {
 
   return (
     <ForumShell>
-      <div className="max-w-4xl mx-auto px-4 sm:px-8 py-24 sm:py-28 space-y-6">
+      <div className="max-w-6xl mx-auto w-full space-y-6 pb-12 font-sans">
         {/* Breadcrumb */}
         <Link
           to="/forum"

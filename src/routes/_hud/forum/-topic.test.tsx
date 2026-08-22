@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { INITIAL_FORUM_TOPICS } from '../../lib/forum-seed-data'
+import { INITIAL_FORUM_TOPICS } from '../../../lib/forum-seed-data'
 
 const mockUseLoaderData = vi.fn()
 const mockUseParams = vi.fn()
@@ -34,7 +34,7 @@ vi.mock('@/lib/auth-client', () => ({
 import { Route } from './$categorySlug/$topicSlug'
 const ForumThreadPage = Route.options.component!
 
-describe('ForumThreadPage (/forum/$categorySlug/$topicSlug)', () => {
+describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseParams.mockReturnValue({ categorySlug: 'rules-announcements', topicSlug: 'welcome-to-community-core-directives' })
