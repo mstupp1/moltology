@@ -63,4 +63,28 @@ describe('Daily Reel Dynamic Script Formulation', () => {
     expect(prompts1[0]).toContain('cinematic 9:16 vertical 8k')
     expect(prompts1[1]).toContain('cinematic 9:16 vertical 8k')
   })
+
+  it('supports all distinct CTA goals with matching comment keywords and target URLs', () => {
+    const goals: Array<{ goal: any; keyword: string; urlFragment: string }> = [
+      { goal: 'quiz', keyword: 'QUIZ', urlFragment: 'moltology.org/quiz' },
+      { goal: 'guide', keyword: 'GUIDE', urlFragment: 'moltology.org/news/the-2026-moltmaxxing-protocol-guide' },
+      { goal: 'codex', keyword: 'CODEX', urlFragment: 'moltology.org/codex' },
+      { goal: 'demo', keyword: 'DEMO', urlFragment: 'moltology.org' },
+      { goal: 'homepage', keyword: 'INITIATE', urlFragment: 'moltology.org' },
+    ]
+
+    for (const { goal, keyword, urlFragment } of goals) {
+      const script = generateDailyReelScript({
+        topic: `Focusing on ${goal}`,
+        ctaGoal: goal,
+      })
+
+      expect(script.ctaGoal).toBe(goal)
+      expect(script.commentTriggerKeyword).toBe(keyword)
+      expect(script.caption).toContain(keyword)
+      expect(script.caption).toContain(urlFragment)
+      expect(script.firstComment).toContain(keyword)
+      expect(script.trialParams).toEqual({ graduationStrategy: 'SS_PERFORMANCE' })
+    }
+  })
 })
