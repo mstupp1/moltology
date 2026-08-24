@@ -173,4 +173,24 @@ describe('Composite UI Components', () => {
     expect(img?.getAttribute('src')).toContain('char_lobster_pointing_cta.png')
     expect(img?.getAttribute('loading')).toBe('eager')
   })
+
+  it('renders CompositeStudioUI in full-height layout with zoom controls and scrolling sidebar', async () => {
+    const { CompositeStudioUI } = await import('./CompositeStudioUI')
+    const { container } = render(<CompositeStudioUI />)
+
+    // Check header & app title
+    expect(screen.getByText('Composite Studio')).toBeInTheDocument()
+    expect(screen.getByText('ADMIN ENGINE')).toBeInTheDocument()
+
+    // Check full-height layout classes
+    const root = container.firstChild as HTMLElement
+    expect(root.className).toContain('h-screen')
+    expect(root.className).toContain('overflow-hidden')
+
+    // Check zoom controls
+    expect(screen.getByTitle('Zoom In (+5%)')).toBeInTheDocument()
+    expect(screen.getByTitle('Zoom Out (-5%)')).toBeInTheDocument()
+    expect(screen.getByTitle('Fit to Screen')).toBeInTheDocument()
+    expect(screen.getByTitle('100% Native Resolution')).toBeInTheDocument()
+  })
 })
