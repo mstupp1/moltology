@@ -69,7 +69,7 @@ const CAMPAIGN_PRESETS: Record<string, Partial<SocialMarketingSlideProps>> = {
     quoteText: 'Everything you need to shatter biological hesitation and build armored focus!',
     commentKeyword: 'GUIDE',
     commentCtaText: 'Comment "GUIDE" below',
-    mascot: 'lobster_pointing',
+    mascot: 'lobster_thumbs_up',
     benefits: [
       {
         icon: 'shield',
@@ -198,7 +198,7 @@ const CAMPAIGN_PRESETS: Record<string, Partial<SocialMarketingSlideProps>> = {
     quoteText: 'The sacred doctrines that turned human hesitation into high-torque titan power!',
     commentKeyword: 'CODEX',
     commentCtaText: 'Comment "CODEX" below',
-    mascot: 'lobster_pointing',
+    mascot: 'lobster_thumbs_up',
     benefits: [
       {
         icon: 'shield',

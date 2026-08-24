@@ -15,7 +15,7 @@ export const ReelThumbnailCard: React.FC<ReelThumbnailCardProps> = ({
   headline = 'WHY AI COMPUTE MOVED UNDERWATER',
   subtitle = '50 FATHOMS DEEP · SUB-BENTHIC',
   categoryBadge = 'TELEMETRY DISPATCH',
-  mascot = 'lobster_pointing',
+  mascot = 'lobster_thumbs_up',
   backgroundImageUrl,
 }) => {
   return (

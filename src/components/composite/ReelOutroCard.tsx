@@ -34,7 +34,7 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
   actionBadgeText = '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
   linkInBioText = 'LINK IN BIO',
   ctaTexture = 'chitin',
-  mascot = 'lobster_pointing',
+  mascot = 'lobster_thumbs_up',
   backgroundImageUrl,
 }) => {
   const formattedLinkInBio =
