@@ -112,5 +112,16 @@ describe('Oracle Route Component', () => {
     // Drawer should close
     expect(drawer).toHaveClass('-translate-x-full')
   })
+
+  it('shows the new chat screen initially when opened, even if user has existing threads', async () => {
+    mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
+    const Component = (Route as any).component
+    render(<Component />)
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+      expect(screen.getAllByText('Carcinization Inquiries').length).toBeGreaterThan(0)
+    })
+  })
 })
 
