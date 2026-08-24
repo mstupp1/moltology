@@ -3,6 +3,8 @@ import { getDb } from '../../db'
 import { aiThreads, aiMessages } from '../../db/schema'
 import { ensureUserProfile } from '../user-sync'
 
+import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
+
 export interface CreateThreadInput {
   userId: string
   title?: string
@@ -15,6 +17,44 @@ export interface SaveMessageInput {
   role: 'user' | 'assistant' | 'system'
   content: string
   parts?: Record<string, unknown>[]
+}
+
+/**
+ * Summarizes the user's initial inquiry into a concise 3-6 word conversation title using Qwen 3.7 Flash.
+ * Falls back to a sliced excerpt of the user's message if AI generation is unavailable.
+ */
+export async function summarizeThreadTitle(
+  firstMessageText: string,
+  modelId: string = ORACLE_TITLE_MODEL_ID
+): Promise<string> {
+  const fallback = firstMessageText.trim().split('\n')[0].slice(0, 100) || 'Ascendance Consultation'
+  if (!firstMessageText || !firstMessageText.trim()) {
+    return fallback
+  }
+
+  try {
+    const { generateText } = await import('ai')
+    const result = await generateText({
+      model: modelId as any,
+      system:
+        'You are a conversation title generator. Create a brief, concise, and clear 3 to 6 word title summarizing the user inquiry. Output ONLY the title with no quotation marks, no markdown, no punctuation at the end, and no "Title:" prefix.',
+      prompt: `User message: "${firstMessageText.slice(0, 500)}"`,
+    })
+
+    const raw = result.text?.trim()
+    if (!raw) return fallback
+
+    const cleanTitle = raw
+      .replace(/^["'`]|["'`]$/g, '')
+      .replace(/^Title:\s*/i, '')
+      .replace(/\.+$/, '')
+      .trim()
+
+    return cleanTitle.slice(0, 120) || fallback
+  } catch (err) {
+    console.warn('[summarizeThreadTitle] AI title summarization warning, falling back to message excerpt:', err)
+    return fallback
+  }
 }
 
 /**

@@ -46,8 +46,8 @@ export const Message: React.FC<MessageProps> = ({
       <div
         className={`max-w-[88%] p-3 text-xs leading-relaxed chamfer-corner ${
           isUser
-            ? 'bg-cyan-950/80 border border-cyan-600/60 text-cyan-100 shadow-md shadow-cyan-950/40'
-            : 'bg-[#0f1414]/90 border border-cyan-800/50 text-gray-200 shadow-lg shadow-cyan-950/50'
+            ? 'bg-cyan-950/70 backdrop-blur-xs border border-cyan-600/50 text-cyan-100 shadow-md shadow-cyan-950/40'
+            : 'bg-[#0a1214]/80 backdrop-blur-sm border border-cyan-800/45 text-gray-200 shadow-lg shadow-cyan-950/40'
         }`}
       >
         {children}

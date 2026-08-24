@@ -666,7 +666,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     throw new Error(guardrail.reason || 'Message blocked by AI guardrails.')
   }
 
-  const { saveAIMessage, createAIThread } = await import('../ai/service')
+  const { saveAIMessage, createAIThread, summarizeThreadTitle } = await import('../ai/service')
   let activeThreadId = inputThreadId
 
   // Guest Mode Gating: Unauthenticated seekers receive friendly, clear guidance directing them to sign up
@@ -690,9 +690,10 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
   if (userId) {
     try {
       if (!activeThreadId) {
+        const title = await summarizeThreadTitle(userText)
         const newThread = await createAIThread({
           userId,
-          title: userText.slice(0, 30) + '...',
+          title,
           persona: 'oracle',
         })
         activeThreadId = newThread?.id || activeThreadId

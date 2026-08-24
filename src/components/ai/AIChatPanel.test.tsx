@@ -51,11 +51,12 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument()
   })
 
-  it('renders authenticated welcome without guest CTA when userId is provided', () => {
+  it('renders authenticated new chat screen without guest CTA when userId is provided', () => {
     render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
 
     expect(screen.queryByText(/Sign up free to unlock/i)).not.toBeInTheDocument()
-    expect(screen.getByText(/Welcome back! I am the SYNAPTIC ORACLE/i)).toBeInTheDocument()
+    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
   })
 
   it('submits a shortcut in guest mode and receives vague guest answer with in-message CTA button', async () => {
@@ -87,7 +88,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     })
   })
 
-  it('resets conversation to initial welcome when clicking New Chat button', async () => {
+  it('resets conversation to new chat screen when clicking New Chat button', async () => {
     render(<AIChatPanel userId="usr_valid_user" />)
 
     const shortcutBtn = screen.getByRole('button', { name: /🦞 What is Moltology\?/i })
@@ -103,7 +104,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
 
     await waitFor(() => {
       expect(screen.queryByText(/Stage 3 Exoshell requires complete chitin hardening/i)).not.toBeInTheDocument()
-      expect(screen.getByText(/What would you like to explore or improve today\?/i)).toBeInTheDocument()
+      expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
     })
   })
 })
