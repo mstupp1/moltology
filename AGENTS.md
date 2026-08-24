@@ -73,13 +73,14 @@
 - **No Lazy Tech Stack Leaks**: NEVER lazily leak real-world tech stack terms (e.g. `React`, `TanStack`, `Vite`, `Nitro`, `Neon PostgreSQL`, `Drizzle`, `JWT`, `RLS`, `pgPolicy`, `S3`, `@neondatabase/postgrest-js`, or internal `.ts` file paths) in user-facing UI, blog content, changelogs, or API docs.
 - **Diegetic Transmutation of Tech**: All technical infrastructure must be translated into in-universe lore.
 
-## 8. Non-Negotiable Rules
+## 8. Non-Negotiable Rules & Verification Strategy
 
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
 - **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
-- **Check Work**:
-  - **Scoped / Minor Changes** (e.g., UI tweaks, single component updates): Run targeted Vitest tests for modified files (e.g., `npx vitest run path/to/file.test.ts`) and ensure clean TypeScript/build verification (`npm run build`).
-  - **Major / Full Work Completion**: Run the full test suite (`npm run test`) and `npm run build` before final delivery/commit. Must be 100% pass.
+- **Fast-Feedback Verification Policy (Avoid Full-Suite Fatigue)**:
+  - **Tier 1 (Scoped / Component / Feature Changes)**: Run targeted tests for the specific file(s) touched (e.g., `npx vitest run path/to/file.test.ts` or `npm run test:changed`) and use `npm run typecheck` (`tsc --noEmit`) for fast type validation. **Do NOT run the entire 100+ test suite or full `npm run build` for localized edits.**
+  - **Tier 2 (Core Logic / Backend / Schema / Ingest / Tooling)**: When changing shared libraries (`src/lib/`), database schemas (`src/db/`), auth, security, or ingestion, run `npm run test:core` (`src/lib` + `src/db` in ~2s) or `npm run test:scripts`.
+  - **Tier 3 (Major Architecture / Migrations / Full Release Readiness)**: Run the full test suite (`npm run test`) and production build (`npm run build`) ONLY for major cross-cutting refactors, database schema migrations, or when preparing final full-system delivery.
 
 ## 9. Asset Storage & Media Best Practices
 
