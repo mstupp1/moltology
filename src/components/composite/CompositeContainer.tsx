@@ -1,5 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
+import { getAssetUrl } from '@/lib/assets'
 
 export type CompositeAspectRatio = '4:5' | '1:1' | '9:16' | '16:9' | '16:10'
 
@@ -75,7 +76,7 @@ export const CompositeContainer: React.FC<CompositeContainerProps> = ({
         <div
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${backgroundImageUrl})`,
+            backgroundImage: `url(${getAssetUrl(backgroundImageUrl)})`,
             opacity: backgroundOpacity,
           }}
         />

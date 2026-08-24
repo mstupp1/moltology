@@ -134,4 +134,37 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('800 NM PINCER TORQUE')).toBeInTheDocument()
     expect(screen.getByText('OFFICIAL 2026 EDITION')).toBeInTheDocument()
   })
+
+  it('correctly normalizes mascot keys and aliases in getMascotInfo', async () => {
+    const { normalizeMascotKey, getMascotInfo, MASCOT_REGISTRY } = await import('./MascotOverlay')
+
+    expect(normalizeMascotKey('pointing')).toBe('lobster_pointing')
+    expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_pointing')
+    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_action')
+    expect(normalizeMascotKey('stats')).toBe('crab_stats')
+    expect(normalizeMascotKey('cling')).toBe('crab_cling')
+    expect(normalizeMascotKey('peaceful')).toBe('lobster_peaceful')
+    expect(normalizeMascotKey('engineer')).toBe('lobster_engineer')
+    expect(normalizeMascotKey('thumbs_up')).toBe('lobster_thumbs_up')
+
+    // Verify all 8 registry items have valid Neon S3 CDN URLs
+    expect(Object.keys(MASCOT_REGISTRY).length).toBe(8)
+    for (const key of Object.keys(MASCOT_REGISTRY)) {
+      const info = getMascotInfo(key)
+      expect(info.s3Url).toContain('moltology-public-assets/images/characters/')
+      expect(info.filename).toMatch(/\.png$/)
+    }
+  })
+
+  it('renders MascotOverlay with image and fallback capabilities', async () => {
+    const { MascotOverlay } = await import('./MascotOverlay')
+    const { container } = render(
+      <MascotOverlay mascot="lobster_pointing" width={300} />
+    )
+
+    const img = container.querySelector('img')
+    expect(img).toBeInTheDocument()
+    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_cta.png')
+    expect(img?.getAttribute('loading')).toBe('eager')
+  })
 })
