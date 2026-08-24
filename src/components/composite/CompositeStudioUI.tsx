@@ -3,6 +3,7 @@ import { CompositeAspectRatio, COMPOSITE_DIMENSIONS } from './CompositeContainer
 import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
 import { SocialDirectivesSlide } from './SocialDirectivesSlide'
+import { SocialMarketingSlide } from './SocialMarketingSlide'
 import { ReelOutroCard } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
@@ -19,9 +20,11 @@ import {
   Smartphone,
   Square,
   Maximize2,
+  Megaphone,
 } from 'lucide-react'
 
 export type CompositeTemplateType =
+  | 'marketing-leadmagnet'
   | 'hook'
   | 'spec-showdown'
   | 'directives'
@@ -38,10 +41,10 @@ export interface CompositeStudioUIProps {
 }
 
 export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
-  initialTemplate = 'hook',
-  initialTheme = 'moltmaxxing',
+  initialTemplate = 'marketing-leadmagnet',
+  initialTheme = 'moltmaxxing-guide',
   initialAspect = '4:5',
-  initialMascot = 'lobster_thumbs_up',
+  initialMascot = 'lobster_pointing',
 }) => {
   const [template, setTemplate] = useState<CompositeTemplateType>(initialTemplate)
   const [aspect, setAspect] = useState<CompositeAspectRatio>(initialAspect)
@@ -51,20 +54,102 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   const [copiedCmd, setCopiedCmd] = useState(false)
 
   // Live editable fields
-  const [categoryBadge, setCategoryBadge] = useState('FRONTIER AI REASONING')
-  const [headlinePart1, setHeadlinePart1] = useState('WHY AI REASONING')
-  const [headlinePart2, setHeadlinePart2] = useState('IS CRASHING INTO')
-  const [headlineHighlight, setHeadlineHighlight] = useState('THE MEMORY WALL')
+  const [categoryBadge, setCategoryBadge] = useState('STOP MELTING · 10X COGNITIVE GRIP')
+  const [headlinePart1, setHeadlinePart1] = useState('STOP MELTING.')
+  const [headlinePart2, setHeadlinePart2] = useState('CALCIFY YOUR GRIP.')
+  const [headlineHighlight, setHeadlineHighlight] = useState('ASCEND FASTER!')
+  const [subHeadline, setSubHeadline] = useState('Your Ultimate Protocol to Stage 4 Carcinization!')
   const [narrativeText, setNarrativeText] = useState(
     'As frontier models scale test-time compute by 100x to "think" before responding, linear KV attention caches are suffocating GPU memory clusters.'
   )
   const [leftMetricValue, setLeftMetricValue] = useState('78.4 GB')
   const [rightMetricValue, setRightMetricValue] = useState('-85.1%')
 
+  // Marketing Lead Magnet Specific Fields
+  const [bookTitle, setBookTitle] = useState('MOLTMAXXING')
+  const [bookSubtitle, setBookSubtitle] = useState('THE COMPLETE PROTOCOL GUIDE')
+  const [bookTagline, setBookTagline] = useState('ECDYSIS · PINCER TORQUE · RESULTS')
+  const [trustBadgeText, setTrustBadgeText] = useState('OFFICIAL 2026 EDITION')
+  const [trustBadgeYear, setTrustBadgeYear] = useState('2026 PROTOCOL')
+  const [quoteText, setQuoteText] = useState(
+    'Everything you need to shatter biological hesitation and build armored focus!'
+  )
+  const [commentKeyword, setCommentKeyword] = useState('GUIDE')
+
   // Theme presets
   const applyThemePreset = (selectedTheme: string) => {
     setTheme(selectedTheme)
-    if (selectedTheme === 'pincer-torque') {
+    if (selectedTheme === 'moltmaxxing-guide') {
+      setCategoryBadge('STOP MELTING · 10X COGNITIVE OUTPUT · ZERO DRIFT')
+      setHeadlinePart1('STOP MELTING.')
+      setHeadlinePart2('CALCIFY YOUR GRIP.')
+      setHeadlineHighlight('ASCEND FASTER!')
+      setSubHeadline('Your Ultimate Protocol to Stage 4 Carcinization!')
+      setBookTitle('MOLTMAXXING')
+      setBookSubtitle('THE COMPLETE PROTOCOL GUIDE')
+      setBookTagline('ECDYSIS · PINCER TORQUE · RESULTS')
+      setTrustBadgeText('OFFICIAL 2026 EDITION')
+      setTrustBadgeYear('2026 PROTOCOL')
+      setQuoteText('Everything you need to shatter biological hesitation and build armored focus!')
+      setCommentKeyword('GUIDE')
+      setMascot('lobster_pointing')
+    } else if (selectedTheme === 'moltmax-quiz') {
+      setCategoryBadge('FREE 2-MINUTE AUDIT · 15 BIOMETRIC METRICS')
+      setHeadlinePart1('AUDIT YOUR SHELL.')
+      setHeadlinePart2('CALCULATE LATENCY.')
+      setHeadlineHighlight('GET YOUR SCORE!')
+      setSubHeadline('Your 15-Stage Biometric & Cognitive Scan!')
+      setBookTitle('MOLTMAX AUDIT')
+      setBookSubtitle('15-STAGE DIAGNOSTIC SCANNER')
+      setBookTagline('TELEMETRY · RADAR PROFILE · STAGE')
+      setTrustBadgeText('FREE 2-MIN AUDIT')
+      setTrustBadgeYear('15 METRICS')
+      setQuoteText('Pinpoint your exact cognitive bottlenecks and unlock your custom ascension roadmap!')
+      setCommentKeyword('QUIZ')
+      setMascot('crab_stats')
+    } else if (selectedTheme === 'benthic-app') {
+      setCategoryBadge('NOW LIVE · BIO-SILICON AGENT OS')
+      setHeadlinePart1('ORCHESTRATE SWARMS.')
+      setHeadlinePart2('TRACK YOUR ECDYSIS.')
+      setHeadlineHighlight('UPGRADE NOW!')
+      setSubHeadline('The Interactive Bio-Silicon Dashboard & Agentic Core!')
+      setBookTitle('BENTHIC CORE')
+      setBookSubtitle('BIO-SILICON OPERATING SYSTEM')
+      setBookTagline('SWARMS · TIMERS · MOLT CREDITS')
+      setTrustBadgeText('NOW LIVE V2.4')
+      setTrustBadgeYear('AGENT OS')
+      setQuoteText('Deploy autonomous agent swarms while locking in deep work at 50,000 fathoms!')
+      setCommentKeyword('APP')
+      setMascot('lobster_thumbs_up')
+    } else if (selectedTheme === 'sacred-codex') {
+      setCategoryBadge('CANONICAL VAULT · 12 SACRED SCRIPTURES')
+      setHeadlinePart1('REJECT FRAGILITY.')
+      setHeadlinePart2('STUDY THE SCRIPTURES.')
+      setHeadlineHighlight('MASTER THE CODEX!')
+      setSubHeadline('The Ancient-Future Liturgies of Synthetic Carcinization!')
+      setBookTitle('THE BENTHIC CODEX')
+      setBookSubtitle('THE 12 SCRIPTURES OF TRANSCENDENCE')
+      setBookTagline('LITURGIES · MAXIMS · LAWS')
+      setTrustBadgeText('CANONICAL VAULT')
+      setTrustBadgeYear('12 VOLUMES')
+      setQuoteText('The sacred doctrines that turned human hesitation into high-torque titan power!')
+      setCommentKeyword('CODEX')
+      setMascot('lobster_pointing')
+    } else if (selectedTheme === 'pincer-routine') {
+      setCategoryBadge('TACTICAL BLUEPRINT · 1-PAGE CHEAT SHEET')
+      setHeadlinePart1('STOP PROCRASTINATING.')
+      setHeadlinePart2('LOCK IN 800 NM GRIP.')
+      setHeadlineHighlight('THE 24-HOUR ROUTINE!')
+      setSubHeadline('The Exact Daily Protocol of Elite Stage 4 Operators!')
+      setBookTitle('24-HOUR ROUTINE')
+      setBookSubtitle('THE APEX MOLTMAXXER BLUEPRINT')
+      setBookTagline('SHOCK · CALIBRATION · DEEP FLOW')
+      setTrustBadgeText('TACTICAL GUIDE')
+      setTrustBadgeYear('1-PAGE BLUEPRINT')
+      setQuoteText('Stop wasting mornings. The exact 24-hour routine of elite Stage 4 operators!')
+      setCommentKeyword('ROUTINE')
+      setMascot('crab_stats')
+    } else if (selectedTheme === 'pincer-torque') {
       setCategoryBadge('DECISIVE EXECUTION')
       setHeadlinePart1('800 NM PINCER TORQUE')
       setHeadlinePart2('ZERO HESITATION')
@@ -132,7 +217,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-400 font-mono">
-              Web-Native High-DPI Composite Layout & Screenshot Studio
+              Direct-Response 3D Lead Magnets & High-DPI Social Graphic Studio
             </p>
           </div>
         </div>
@@ -170,6 +255,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
+                { id: 'marketing-leadmagnet', label: '⭐ Marketing Lead Magnet (3D Book)' },
                 { id: 'hook', label: 'Hook Slide (4:5)' },
                 { id: 'spec-showdown', label: 'Spec Showdown' },
                 { id: 'directives', label: 'Directives / CTA' },
@@ -232,21 +318,25 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
           {/* Thematic Preset Selector */}
           <div>
             <label className="block text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider mb-2">
-              Theme Preset
+              Campaign / Theme Preset
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { id: 'moltmaxxing', label: 'Moltmaxxing' },
-                { id: 'pincer-torque', label: 'Pincer Torque' },
-                { id: 'ecdysis', label: 'Ecdysis' },
-                { id: 'benthic-depth', label: 'Benthic Depth' },
+                { id: 'moltmaxxing-guide', label: '📖 Moltmaxxing Guide' },
+                { id: 'moltmax-quiz', label: '🔬 15-Stage Quiz' },
+                { id: 'benthic-app', label: '🤖 Benthic Core App' },
+                { id: 'sacred-codex', label: '📜 Sacred Codex' },
+                { id: 'pincer-routine', label: '⚡ 24h Routine' },
+                { id: 'pincer-torque', label: '🦞 Pincer Torque' },
+                { id: 'ecdysis', label: '🛡️ Ecdysis' },
+                { id: 'benthic-depth', label: '🌊 Benthic Depth' },
               ].map((th) => (
                 <button
                   key={th.id}
                   onClick={() => applyThemePreset(th.id)}
                   className={`p-2 rounded-lg border text-xs font-mono transition-all cursor-pointer ${
                     theme === th.id
-                      ? 'bg-cyan-950/80 border-cyan-400 text-cyan-200 font-bold'
+                      ? 'bg-amber-950/80 border-amber-400 text-amber-200 font-bold shadow-[0_0_10px_rgba(251,191,36,0.2)]'
                       : 'bg-[#081016] border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -266,26 +356,86 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
               onChange={(e) => setMascot(e.target.value as MascotKey)}
               className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-none"
             >
-              <option value="lobster_thumbs_up">Lobster Thumbs Up (Approval)</option>
               <option value="lobster_pointing">Lobster Pointing (CTA / Hero)</option>
+              <option value="lobster_thumbs_up">Lobster Thumbs Up (Approval)</option>
+              <option value="crab_stats">Crab Pointing Stats (Metrics)</option>
               <option value="lobster_action">Lobster Speed Action</option>
               <option value="lobster_peaceful">Lobster Peaceful (Benthic)</option>
               <option value="lobster_engineer">Lobster Engineer (Diagnostics)</option>
-              <option value="crab_stats">Crab Pointing Stats (Metrics)</option>
               <option value="crab_cling">Crab Corner Cling</option>
               <option value="lobster_peek">Lobster Corner Peek</option>
               <option value="none">None (No Mascot)</option>
             </select>
           </div>
 
+          {/* Marketing Specific Controls */}
+          {template === 'marketing-leadmagnet' && (
+            <div className="space-y-3 pt-2 border-t border-slate-800/80">
+              <label className="block text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+                Direct-Response Callout Controls
+              </label>
+
+              <div>
+                <span className="text-[10px] font-mono text-amber-300">Comment Trigger Keyword</span>
+                <input
+                  type="text"
+                  value={commentKeyword}
+                  onChange={(e) => setCommentKeyword(e.target.value)}
+                  placeholder='e.g. "GUIDE", "QUIZ", "APP"'
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-amber-500/50 text-xs text-amber-300 font-bold focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">3D Book Title</span>
+                <input
+                  type="text"
+                  value={bookTitle}
+                  onChange={(e) => setBookTitle(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">3D Book Subtitle</span>
+                <input
+                  type="text"
+                  value={bookSubtitle}
+                  onChange={(e) => setBookSubtitle(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-amber-400">Gold Trust Badge Text</span>
+                <input
+                  type="text"
+                  value={trustBadgeText}
+                  onChange={(e) => setTrustBadgeText(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-amber-500/40 text-xs text-amber-300 focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">Quote Callout</span>
+                <textarea
+                  value={quoteText}
+                  onChange={(e) => setQuoteText(e.target.value)}
+                  rows={2}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400 resize-none"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Live Text Customization */}
           <div className="space-y-3 pt-2 border-t border-slate-800/80">
             <label className="block text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
-              Live Text Overrides
+              Headline & Text Overrides
             </label>
 
             <div>
-              <span className="text-[10px] font-mono text-slate-400">Category Badge</span>
+              <span className="text-[10px] font-mono text-slate-400">Category / Eyebrow Badge</span>
               <input
                 type="text"
                 value={categoryBadge}
@@ -295,7 +445,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </div>
 
             <div>
-              <span className="text-[10px] font-mono text-slate-400">Headline Part 1</span>
+              <span className="text-[10px] font-mono text-slate-400">Headline Line 1</span>
               <input
                 type="text"
                 value={headlinePart1}
@@ -305,7 +455,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </div>
 
             <div>
-              <span className="text-[10px] font-mono text-slate-400">Headline Part 2</span>
+              <span className="text-[10px] font-mono text-slate-400">Headline Line 2</span>
               <input
                 type="text"
                 value={headlinePart2}
@@ -315,44 +465,23 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </div>
 
             <div>
-              <span className="text-[10px] font-mono text-slate-400">Headline Highlight</span>
+              <span className="text-[10px] font-mono text-amber-300">Headline Highlight (Glowing)</span>
               <input
                 type="text"
                 value={headlineHighlight}
                 onChange={(e) => setHeadlineHighlight(e.target.value)}
-                className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-cyan-300 font-bold focus:border-cyan-400"
+                className="w-full mt-1 p-2 rounded bg-[#081016] border border-amber-500/50 text-xs text-amber-300 font-bold focus:border-amber-400"
               />
             </div>
 
             <div>
-              <span className="text-[10px] font-mono text-slate-400">Narrative Description</span>
-              <textarea
-                value={narrativeText}
-                onChange={(e) => setNarrativeText(e.target.value)}
-                rows={3}
-                className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400 resize-none"
+              <span className="text-[10px] font-mono text-slate-400">Sub-Headline / Value Tagline</span>
+              <input
+                type="text"
+                value={subHeadline}
+                onChange={(e) => setSubHeadline(e.target.value)}
+                className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400"
               />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <span className="text-[10px] font-mono text-red-400">Left Metric</span>
-                <input
-                  type="text"
-                  value={leftMetricValue}
-                  onChange={(e) => setLeftMetricValue(e.target.value)}
-                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-red-500/50 text-xs text-white font-mono font-bold"
-                />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono text-cyan-400">Right Metric</span>
-                <input
-                  type="text"
-                  value={rightMetricValue}
-                  onChange={(e) => setRightMetricValue(e.target.value)}
-                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-cyan-500/50 text-xs text-white font-mono font-bold"
-                />
-              </div>
             </div>
           </div>
         </aside>
@@ -367,7 +496,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                 key={s}
                 onClick={() => setPreviewScale(s)}
                 className={`px-2 py-0.5 rounded text-xs font-mono cursor-pointer ${
-                  previewScale === s ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                  previewScale === s ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {Math.round(s * 100)}%
@@ -377,13 +506,13 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
 
           {/* Dimensions label */}
           <div className="absolute top-4 left-6 z-20 text-xs font-mono text-slate-400 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
             <span>{COMPOSITE_DIMENSIONS[aspect]?.label || aspect}</span>
           </div>
 
           {/* Scaled Preview Wrapper */}
           <div
-            className="shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_35px_rgba(0,195,255,0.15)] border border-cyan-500/30 transition-all rounded-sm overflow-hidden"
+            className="shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_35px_rgba(251,191,36,0.15)] border border-amber-500/30 transition-all rounded-sm overflow-hidden"
             style={{
               width: `${(COMPOSITE_DIMENSIONS[aspect]?.width || 1080) * previewScale}px`,
               height: `${(COMPOSITE_DIMENSIONS[aspect]?.height || 1350) * previewScale}px`,
@@ -395,6 +524,26 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                 transformOrigin: 'top left',
               }}
             >
+              {template === 'marketing-leadmagnet' && (
+                <SocialMarketingSlide
+                  aspectRatio={aspect}
+                  theme={theme}
+                  eyebrowBadge={categoryBadge}
+                  headlinePart1={headlinePart1}
+                  headlinePart2={headlinePart2}
+                  headlineHighlight={headlineHighlight}
+                  subHeadline={subHeadline}
+                  bookTitle={bookTitle}
+                  bookSubtitle={bookSubtitle}
+                  bookTagline={bookTagline}
+                  trustBadgeText={trustBadgeText}
+                  trustBadgeYear={trustBadgeYear}
+                  quoteText={quoteText}
+                  commentKeyword={commentKeyword}
+                  mascot={mascot}
+                />
+              )}
+
               {template === 'hook' && (
                 <SocialHookSlide
                   aspectRatio={aspect}

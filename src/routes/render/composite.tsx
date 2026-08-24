@@ -7,6 +7,7 @@ import {
   SocialHookSlide,
   SocialSpecShowdownSlide,
   SocialDirectivesSlide,
+  SocialMarketingSlide,
   ReelOutroCard,
   ReelThumbnailCard,
   BlogSchematicCard,
@@ -72,6 +73,29 @@ function CompositeRenderRoute() {
   if (isRaw) {
     return (
       <div className="w-screen h-screen m-0 p-0 overflow-hidden bg-[#02080c] flex items-start justify-start">
+        {template === 'marketing-leadmagnet' && (
+          <SocialMarketingSlide
+            aspectRatio={aspect}
+            theme={theme}
+            eyebrowBadge={customData.eyebrowBadge || customData.categoryBadge}
+            headlinePart1={customData.headlinePart1}
+            headlinePart2={customData.headlinePart2}
+            headlineHighlight={customData.headlineHighlight}
+            subHeadline={customData.subHeadline || customData.subtitle}
+            bookTitle={customData.bookTitle}
+            bookSubtitle={customData.bookSubtitle}
+            bookTagline={customData.bookTagline}
+            trustBadgeText={customData.trustBadgeText}
+            trustBadgeYear={customData.trustBadgeYear}
+            quoteText={customData.quoteText}
+            benefits={customData.benefits}
+            commentKeyword={customData.commentKeyword}
+            commentCtaText={customData.commentCtaText}
+            mascot={mascot}
+            backgroundImageUrl={customData.backgroundImageUrl}
+          />
+        )}
+
         {template === 'hook' && (
           <SocialHookSlide
             aspectRatio={aspect}

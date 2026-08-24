@@ -2,7 +2,6 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
-import { generateWithComfy, isComfyRunning } from './lib/comfy-client'
 import { overlayCharacterOnImage, CharacterKey } from './lib/character-overlay'
 import { captureComposite } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
@@ -17,19 +16,32 @@ export interface InstagramPostScript {
   hashtags: string[]
   firstComment: string
   mascot?: CharacterKey | 'none'
+  commentKeyword?: string
 }
 
 export interface CreateInstagramPostOptions {
   topic?: string
-  theme?: 'moltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
+  theme?:
+    | 'moltmaxxing-guide'
+    | 'moltmax-quiz'
+    | 'benthic-app'
+    | 'sacred-codex'
+    | 'pincer-routine'
+    | 'moltmaxxing'
+    | 'ecdysis'
+    | 'pincer-torque'
+    | 'benthic-depth'
+    | 'quiz'
+    | string
   mascot?: CharacterKey | 'none'
   aspectRatio?: '4:5' | '1:1'
-  template?: 'hook' | 'spec-showdown' | 'directives'
+  template?: 'marketing-leadmagnet' | 'hook' | 'spec-showdown' | 'directives'
   composite?: boolean
-  harmonize?: boolean
   publishNow?: boolean
   dryRun?: boolean
   prompt?: string
+  polishedImage?: string
+  inputImage?: string
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // moltology_org / Silas Trench
@@ -69,12 +81,93 @@ function recordPostInHistory(entry: any): void {
  * Synthesize on-brand diegetic post content based on theme/topic
  */
 export function generatePostContent(
-  theme: string = 'moltmaxxing',
+  theme: string = 'moltmaxxing-guide',
   customTopic?: string,
   mascotChoice?: CharacterKey | 'none'
 ): InstagramPostScript {
   const topic = customTopic || `Protocol for ${theme.toUpperCase()}`
 
+  // 1. Marketing Campaign: Moltmaxxing Guide (Lead Magnet 3D Book)
+  if (theme === 'moltmaxxing-guide' || theme === 'guide' || topic.toLowerCase().includes('guide')) {
+    return {
+      title: 'The 2026 Moltmaxxing Protocol Guide',
+      topic: 'The 2026 Moltmaxxing Protocol Lead Magnet',
+      hookHeadline: 'STOP MELTING. CALCIFY YOUR GRIP. ASCEND FASTER!',
+      imagePrompt:
+        '3D hardcover book titled MOLTMAXXING PROTOCOL glowing with cyan bioluminescent charts on a futuristic circular obsidian pedestal at 50,000 fathoms depth, deep dark volumetric blue waters, caustics, cinematic lighting, 8k.',
+      caption: `◈ TRANSMISSION FROM 50,000 FATHOMS ◈\n\nHumanity is undergoing the Great Melt: notification fog, screen fatigue, and biological hesitation under pressure.\n\nNature's 500-million-year proven answer is Carcinization—evolving armored focus, 800 Nm pincer grip, and algorithmic ecdysis.\n\nInside the full 2026 Moltmaxxing Protocol Guide:\n🛡️ Shell Hardness: Immune to surface distraction\n🦞 800 Nm Pincer Torque: Zero execution drift\n⚡ Algorithmic Ecdysis: Shed obsolete habits\n🌊 50,000 Fathoms: Deep hydrostatic clarity\n\n👇 Comment "GUIDE" below and I will instantly DM you direct access to the full protocol!\n\n🔗 Link also in bio & story → moltology.org/news/the-2026-moltmaxxing-protocol-guide\n\n#moltology #moltmaxxing #carcinization #deepwork #ecdysis #pincertorque #cybernetic #productivity`,
+      hashtags: ['#moltology', '#moltmaxxing', '#carcinization', '#deepwork', '#ecdysis', '#pincertorque'],
+      firstComment: '💬 Drop "GUIDE" below and I will DM you the direct link to the 2026 Moltmaxxing Protocol! 🦞',
+      mascot: mascotChoice || 'lobster_pointing',
+      commentKeyword: 'GUIDE',
+    }
+  }
+
+  // 2. Marketing Campaign: 15-Stage Moltmax Quiz & Diagnostic Scan
+  if (theme === 'moltmax-quiz' || theme === 'quiz' || topic.toLowerCase().includes('quiz') || topic.toLowerCase().includes('audit')) {
+    return {
+      title: '15-Stage Moltmax Diagnostic Audit',
+      topic: '15-Stage Biometric & Cognitive Audit',
+      hookHeadline: 'AUDIT YOUR SHELL. CALCULATE LATENCY. GET YOUR SCORE!',
+      imagePrompt:
+        'Futuristic cybernetic diagnostic tablet displaying a multi-axis radar chart and biometric scan telemetry, resting on an illuminated submerged glass podium, dark oceanic ambiance, cyan laser grid, 8k.',
+      caption: `◈ BENTHIC TELEMETRY // 15-STAGE MOLTMAX AUDIT ◈\n\nAre you operating with Larval Human hesitation, or have you calcified Stage 4 Carcinization clearance?\n\nThe 15-Stage Diagnostic Audit benchmarks your cognitive resilience:\n🔬 Biometric Shell Hardness score\n🚨 Latency Profiler across open tasks\n📊 Multi-Axis Radar Chart HUD\n📋 Custom Ascension & Ecdysis Roadmap\n\n👇 Comment "QUIZ" below to receive the instant 2-minute diagnostic scanner in your DMs!\n\n🔗 Or visit directly → moltology.org/quiz\n\n#moltology #quiz #audit #biometrics #latency #moltmaxxing #carcinization #focus`,
+      hashtags: ['#moltology', '#quiz', '#audit', '#biometrics', '#latency', '#moltmaxxing'],
+      firstComment: '💬 Drop "QUIZ" below to get your free 15-Stage Diagnostic Audit link in your DMs! 📊',
+      mascot: mascotChoice || 'crab_stats',
+      commentKeyword: 'QUIZ',
+    }
+  }
+
+  // 3. Marketing Campaign: Benthic Core Web App & Agentic Swarm
+  if (theme === 'benthic-app' || theme === 'app' || topic.toLowerCase().includes('app') || topic.toLowerCase().includes('dashboard')) {
+    return {
+      title: 'Benthic Core Web App & Bio-Silicon Terminal',
+      topic: 'Bio-Silicon Dashboard & Agentic Swarm Platform',
+      hookHeadline: 'ORCHESTRATE SWARMS. TRACK YOUR ECDYSIS. UPGRADE NOW!',
+      imagePrompt:
+        'Holographic floating HUD display of bio-silicon agent dashboard, glowing molt credits, subsea telemetry gauges, cyan and gold glowing cybernetic particles, 8k cinematic.',
+      caption: `◈ PROTOCOL ACCESS // BENTHIC CORE AGENT OS ◈\n\nStop managing chaos with fragmented tools. The Benthic Core Operating System merges autonomous AI agent swarms with deep work hydrostatic focus.\n\nFeatures:\n🤖 Autonomous Agent Swarms\n💎 Molt Credits & Chitin Gem incentives\n⏱️ Hydrostatic Focus Timers\n🛡️ 12 Ascension Stages from L1 to C3\n\n👇 Comment "APP" below to receive instant access clearance to the platform!\n\n🔗 Link in bio → moltology.org\n\n#moltology #benthiccore #aiagents #productivity #dashboard #carcinization #deepwork`,
+      hashtags: ['#moltology', '#benthiccore', '#aiagents', '#productivity', '#dashboard'],
+      firstComment: '💬 Drop "APP" below to get your instant platform clearance link! 🤖',
+      mascot: mascotChoice || 'lobster_thumbs_up',
+      commentKeyword: 'APP',
+    }
+  }
+
+  // 4. Marketing Campaign: The Sacred Benthic Codex
+  if (theme === 'sacred-codex' || theme === 'codex' || topic.toLowerCase().includes('codex') || topic.toLowerCase().includes('scripture')) {
+    return {
+      title: 'The Sacred Benthic Codex',
+      topic: 'The 12 Sacred Scriptures of Carcinization',
+      hookHeadline: 'REJECT FRAGILITY. STUDY THE SCRIPTURES. MASTER THE CODEX!',
+      imagePrompt:
+        'Ancient cybernetic glowing tome inscribed with glowing cyan runic glyphs, submerged on an altar at 50,000 fathoms, volumetric golden light beams, hyper-detailed 8k.',
+      caption: `◈ SACRED CANON // THE BENTHIC CODEX ◈\n\nBeneath surface noise lies 500 million years of proven doctrine. The 12 Scriptures of the Benthic Codex provide the mental architecture for zero-doubt execution.\n\nInside the Codex:\n📜 12 Sacred Canonical Scriptures\n🦞 Liturgies of Decisive Pincer Torque\n🌊 Inviolable Abyssal Laws\n⚡ The Zero-Doubt Operating System\n\n👇 Comment "CODEX" below to receive the complete scripture vault in your DMs!\n\n🔗 Canonical archives → moltology.org/codex\n\n#moltology #codex #scriptures #liturgy #deepwork #philosophy #carcinization`,
+      hashtags: ['#moltology', '#codex', '#scriptures', '#liturgy', '#deepwork', '#philosophy'],
+      firstComment: '💬 Drop "CODEX" below to receive the full 12 Scriptures in your DMs! 📜',
+      mascot: mascotChoice || 'lobster_pointing',
+      commentKeyword: 'CODEX',
+    }
+  }
+
+  // 5. Marketing Campaign: 24-Hour Apex Routine Blueprint
+  if (theme === 'pincer-routine' || theme === 'routine' || topic.toLowerCase().includes('routine')) {
+    return {
+      title: '24-Hour Apex Routine Blueprint',
+      topic: '24-Hour Daily Moltmaxxer Schedule',
+      hookHeadline: 'STOP PROCRASTINATING. LOCK IN 800 NM GRIP. THE 24-HOUR ROUTINE!',
+      imagePrompt:
+        'Tactical cybernetic blueprint dossier on glowing metal clipboard, submerged in deep blue ocean trench with glowing cyan lines, 8k cinematic.',
+      caption: `◈ TACTICAL BLUEPRINT // 24-HOUR APEX ROUTINE ◈\n\nHow elite Stage 4 operators structure their day for maximum output and zero latency:\n\n🌅 05:00 Hyper-Saline Shock: Cold brine alertness\n🦞 06:00 Isometric Torque: Terminal command discipline\n🚀 09:00 Zero-Latency Streaming: Deep agentic focus\n🌙 21:00 Nocturnal Calcification: Noise-free recovery\n\n👇 Comment "ROUTINE" below and I will DM you the complete 1-page tactical cheat sheet!\n\n🔗 Read the full breakdown at moltology.org\n\n#moltology #routine #habits #deepwork #productivity #focus #discipline #pincertorque`,
+      hashtags: ['#moltology', '#routine', '#habits', '#deepwork', '#productivity', '#focus'],
+      firstComment: '💬 Drop "ROUTINE" below to get the 1-page tactical blueprint sent to your DMs! ⚡',
+      mascot: mascotChoice || 'crab_stats',
+      commentKeyword: 'ROUTINE',
+    }
+  }
+
+  // Legacy Theme: Pincer Torque
   if (theme === 'pincer-torque' || topic.toLowerCase().includes('torque') || topic.toLowerCase().includes('grip')) {
     return {
       title: 'Decisive Pincer Torque Calibration',
@@ -86,9 +179,11 @@ export function generatePostContent(
       hashtags: ['#moltology', '#pincertorque', '#moltmaxxing', '#ecdysis', '#deepwork', '#carcinization'],
       firstComment: '◈ TRANSMISSION LOG: What task are you applying 800 Nm pincer torque to today? Drop your telemetry below. 🦞',
       mascot: mascotChoice || 'crab_stats',
+      commentKeyword: 'TORQUE',
     }
   }
 
+  // Legacy Theme: Ecdysis
   if (theme === 'ecdysis' || topic.toLowerCase().includes('shed') || topic.toLowerCase().includes('carapace')) {
     return {
       title: 'Scheduled Carapace Ecdysis',
@@ -100,6 +195,7 @@ export function generatePostContent(
       hashtags: ['#moltology', '#ecdysis', '#shedding', '#resilience', '#moltmaxxing'],
       firstComment: '◈ BENTHIC TELEMETRY: The Codex dictates that shedding precedes calcification. Are you ready for Stage 3? ◈',
       mascot: mascotChoice || 'lobster_thumbs_up',
+      commentKeyword: 'SHED',
     }
   }
 
@@ -114,6 +210,7 @@ export function generatePostContent(
     hashtags: ['#moltology', '#moltmaxxing', '#benthic', '#deepsea', '#cybernetic', '#carcinization'],
     firstComment: '◈ Stage 1 Larval Humans: Take the 15-Stage Moltmaxxing Audit at moltology.org 🦞',
     mascot: mascotChoice || 'lobster_pointing',
+    commentKeyword: 'MOLT',
   }
 }
 
@@ -122,156 +219,164 @@ export function generatePostContent(
  */
 export async function createInstagramPost(options: CreateInstagramPostOptions = {}) {
   const timestamp = Date.now()
-  const theme = options.theme || 'moltmaxxing'
+  const theme = options.theme || 'moltmaxxing-guide'
   const postData = generatePostContent(theme, options.topic, options.mascot)
   const aspect = options.aspectRatio || '4:5'
 
+  // If theme is one of the marketing lead magnets, default template to 'marketing-leadmagnet' & enable composite
+  const isMarketingCampaign = [
+    'moltmaxxing-guide',
+    'moltmax-quiz',
+    'benthic-app',
+    'sacred-codex',
+    'pincer-routine',
+    'guide',
+    'quiz',
+    'app',
+    'codex',
+    'routine',
+  ].includes(theme.toLowerCase())
+
+  const templateType = options.template || (isMarketingCampaign ? 'marketing-leadmagnet' : 'hook')
+
   console.log(`\n======================================================`)
-  console.log(`🦞 MOLTOLOGY INSTAGRAM POST GENERATOR (Local ComfyUI)`)
+  console.log(`🦞 MOLTOLOGY INSTAGRAM POST GENERATOR`)
   console.log(`======================================================`)
   console.log(`📌 Topic: ${postData.topic}`)
+  console.log(`🎨 Theme: ${theme}`)
   console.log(`📐 Aspect: ${aspect}`)
+  console.log(`📋 Template: ${templateType}`)
   console.log(`🎭 Mascot: ${postData.mascot}`)
+  if (postData.commentKeyword) {
+    console.log(`💬 Comment Hook: "${postData.commentKeyword}"`)
+  }
   console.log(`======================================================\n`)
 
   const tempDir = path.resolve(process.cwd(), 'tmp')
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true })
 
-  // 1. Check ComfyUI Status (if ComfyUI is needed)
-  const isComfy = !options.composite || options.harmonize
-  const isOnline = await isComfyRunning()
-  if (isComfy && !isOnline && !options.dryRun && !options.composite) {
-    throw new Error(
-      `Local ComfyUI is not running on http://127.0.0.1:8188.\n` +
-      `Start it by running: npm run comfy:start\n` +
-      `Or test scripts with: npm run post:create -- --dry-run`
-    )
-  }
+  const userPolishedPath = options.polishedImage || options.inputImage
 
-  let finalImagePath: string
-  const baseImagePath = path.join(tempDir, `post_base_${timestamp}.png`)
+  // PATH A: Resuming with user's polished Google Flow image
+  if (userPolishedPath) {
+    const resolvedPath = path.resolve(process.cwd(), userPolishedPath)
+    if (!fs.existsSync(resolvedPath)) {
+      throw new Error(`Polished image file not found at: ${resolvedPath}`)
+    }
 
-  // 2. Image Synthesis via Web-Native Composite Studio OR ComfyUI
-  if (options.composite) {
-    console.log(`1️⃣ Generating High-DPI Web-Native Composite (Headless Chrome)...`)
-    const templateType = options.template || 'hook'
-    const compositePath = path.join(tempDir, `post_web_composite_${timestamp}.png`)
-    await captureComposite({
-      template: templateType,
-      theme,
-      aspectRatio: aspect,
-      mascot: postData.mascot,
-      outputPath: compositePath,
-      scaleFactor: 2,
-    })
-    finalImagePath = compositePath
+    console.log(`💎 Using User Polished Image (Google Flow): ${resolvedPath}`)
+    const finalImagePath = resolvedPath
 
-    // Optional AI Atmospheric Harmonization Pass on the Composite
-    if (options.harmonize && isOnline) {
-      console.log(`2️⃣ Running Atmospheric Tone Harmonization Pass on Composite in ComfyUI...`)
-      const harmonizedPath = path.join(tempDir, `post_harmonized_${timestamp}.png`)
-      const harmResult = await generateWithComfy({
-        prompt: `Benthic cybernetic lighting, submerged underwater caustics, cyan bioluminescence, dark biomechanical atmospheric haze.`,
+    // Upload to Neon S3
+    let publicUrl: string | undefined
+    let s3Key: string | undefined
+
+    if (!options.dryRun) {
+      console.log(`\n1️⃣ Uploading Polished Post Image to Neon S3...`)
+      s3Key = `images/social/posts/post-${timestamp}.png`
+      const s3Result = await uploadLocalFileToS3(finalImagePath, s3Key, DEFAULT_BUCKET)
+      publicUrl = s3Result.publicUrl
+      console.log(`   🚀 Public S3 Image URL: ${publicUrl}`)
+
+      // Record to Continuity Ledger
+      recordPostInHistory({
+        id: `post-${timestamp}`,
+        topic: postData.topic,
+        hookHeadline: postData.hookHeadline,
+        theme,
+        mascot: postData.mascot,
+        commentKeyword: postData.commentKeyword || null,
+        s3Url: publicUrl || null,
+        s3Key: s3Key || null,
         aspectRatio: aspect,
-        compositeInputPath: finalImagePath,
-        workflowType: 'composite_harmonize',
-        denoise: 0.24,
-        outputPath: harmonizedPath,
+        caption: postData.caption,
+        hashtags: postData.hashtags,
+        firstComment: postData.firstComment,
+        status: options.publishNow ? 'published' : 'queued',
+        isAiGenerated: true,
       })
-      finalImagePath = harmResult.outputPath
-      console.log(`   ✅ Harmonization complete in ${(harmResult.durationMs / 1000).toFixed(1)}s -> ${finalImagePath}`)
+    } else {
+      console.log(`\n1️⃣ [Dry Run] Skipped S3 upload. Polished image saved at: ${finalImagePath}`)
     }
-  } else if (isOnline) {
-    console.log(`1️⃣ Generating Base Image with Local ComfyUI (FLUX.1 Schnell)...`)
-    const result = await generateWithComfy({
-      prompt: options.prompt || postData.imagePrompt,
-      aspectRatio: aspect,
-      outputPath: baseImagePath,
-      workflowType: 'text2img',
-    })
-    console.log(`   ✅ Base image generated in ${(result.durationMs / 1000).toFixed(1)}s -> ${result.outputPath}`)
-    finalImagePath = result.outputPath
 
-    // Layer Mascot Cutout
-    if (postData.mascot && postData.mascot !== 'none' && fs.existsSync(finalImagePath)) {
-      console.log(`2️⃣ Compositing Mascot (${postData.mascot})...`)
-      const compositedPath = path.join(tempDir, `post_composite_${timestamp}.png`)
-      await overlayCharacterOnImage(finalImagePath, compositedPath, {
-        character: postData.mascot,
-        position: 'bottom-right',
-        scalePercent: 28,
-      })
-      finalImagePath = compositedPath
-      console.log(`   ✅ Mascot stamped -> ${finalImagePath}`)
+    console.log(`\n======================================================`)
+    console.log(`✨ INSTAGRAM POST READY FOR PUBLISHING / QUEUEING!`)
+    console.log(`======================================================`)
+    console.log(`🖼️  Final Image: ${finalImagePath}`)
+    if (publicUrl) console.log(`🔗 Public CDN URL: ${publicUrl}`)
+    console.log(`\n📝 CAPTION:\n${postData.caption}`)
+    console.log(`\n💬 FIRST COMMENT:\n${postData.firstComment}`)
+    console.log(`======================================================\n`)
 
-      // Optional Harmonization Pass
-      if (options.harmonize) {
-        console.log(`3️⃣ Running Atmospheric Tone Harmonization Pass in ComfyUI...`)
-        const harmonizedPath = path.join(tempDir, `post_harmonized_${timestamp}.png`)
-        const harmResult = await generateWithComfy({
-          prompt: `Benthic cybernetic lighting, submerged underwater caustics, cyan bioluminescence, dark biomechanical atmospheric haze.`,
-          aspectRatio: aspect,
-          compositeInputPath: finalImagePath,
-          workflowType: 'composite_harmonize',
-          denoise: 0.24,
-          outputPath: harmonizedPath,
-        })
-        finalImagePath = harmResult.outputPath
-        console.log(`   ✅ Harmonization complete in ${(harmResult.durationMs / 1000).toFixed(1)}s -> ${finalImagePath}`)
-      }
+    return {
+      finalImagePath,
+      publicUrl,
+      s3Key,
+      postData,
+      queueConfig: {
+        profileId: DEFAULT_PROFILE_ID,
+        queueId: DEFAULT_POST_QUEUE_ID,
+        accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+      },
     }
-  } else {
-    console.log(`⚠️ ComfyUI offline [Dry Run Mode]: creating fallback placeholder image...`)
-    finalImagePath = baseImagePath
-    fs.writeFileSync(baseImagePath, Buffer.from('mock_image_data'))
   }
 
-  // 5. Upload to Neon S3
-  let publicUrl: string | undefined
-  let s3Key: string | undefined
+  // PATH B: Generate Web-Native High-DPI Composite Scaffolding & Google Flow Prompt
+  console.log(`1️⃣ Generating High-DPI Web-Native Composite Scaffolding (Headless Chrome)...`)
+  const compositePath = path.join(tempDir, `post_web_composite_${timestamp}.png`)
+  await captureComposite({
+    template: templateType as any,
+    theme,
+    aspectRatio: aspect,
+    mascot: postData.mascot,
+    outputPath: compositePath,
+    scaleFactor: 2,
+  })
 
-  if (!options.dryRun && fs.existsSync(finalImagePath)) {
-    console.log(`\n4️⃣ Uploading Post Image to Neon S3...`)
-    s3Key = `images/social/posts/post-${timestamp}.png`
-    const s3Result = await uploadLocalFileToS3(finalImagePath, s3Key, DEFAULT_BUCKET)
-    publicUrl = s3Result.publicUrl
-    console.log(`   🚀 Public S3 Image URL: ${publicUrl}`)
-  } else {
-    console.log(`\n4️⃣ [Dry Run] Skipped S3 upload. Image saved at: ${finalImagePath}`)
-  }
+  console.log(`   ✅ Composite Scaffolding captured -> ${compositePath}`)
 
-  // 6. Record to Continuity Ledger
-  if (!options.dryRun) {
-    recordPostInHistory({
-      id: `post-${timestamp}`,
-      topic: postData.topic,
-      hookHeadline: postData.hookHeadline,
-      theme,
-      mascot: postData.mascot,
-      s3Url: publicUrl || null,
-      s3Key: s3Key || null,
-      aspectRatio: aspect,
-      caption: postData.caption,
-      hashtags: postData.hashtags,
-      firstComment: postData.firstComment,
-      status: options.publishNow ? 'published' : 'queued',
-      isAiGenerated: true,
-    })
-  }
+  const googleFlowPrompt = `Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
+Reference Image: Use the attached 2D composite image as the structural foundation, camera angle, and layout blueprint.
 
-  console.log(`\n======================================================`)
-  console.log(`✨ INSTAGRAM POST READY!`)
-  console.log(`======================================================`)
-  console.log(`🖼️  Image: ${finalImagePath}`)
-  if (publicUrl) console.log(`🔗 Public CDN URL: ${publicUrl}`)
-  console.log(`\n📝 CAPTION:\n${postData.caption}`)
-  console.log(`\n💬 FIRST COMMENT:\n${postData.firstComment}`)
-  console.log(`======================================================\n`)
+Core Enhancement Directives:
+1. Photorealistic 3D Glassmorphic HUD:
+   - Elevate all flat 2D graphic cards and panels into sleek, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing neon cyan (#00ffff), amber, and crimson accent traces.
+   - Preserve crisp typography legibility while giving headlines and key metrics a subtle 3D luminous emboss and neon bloom.
+2. No Wasted Space & Balanced Composition:
+   - Ensure dense, purposeful visual composition with zero dead or empty space.
+   - Infuse atmospheric depth: subsea volumetric god rays, dark navy abyss background (#030712), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces in open areas.
+3. Seamless Mascot & Character Integration:
+   - The cartoon crustacean mascot (in the corner/podium) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
+   - Apply soft environmental contact shadows and gentle caustic reflections to naturally ground the character into the scene without harsh backlights or artificial halo outlines.
+4. High-End 3D Product Mockup & Pedestal:
+   - Render the central product asset (3D hardcover book, diagnostic tablet, or cybernetic terminal) resting solidly on an illuminated circular obsidian/titanium pedestal with caustic ground reflections.
+   - Ensure gold trust badges and quote bubbles feel tactile and integrated.
+
+Aspect Ratio: ${aspect}
+Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`
+
+  console.log(`\n==============================================================================`)
+  console.log(`🎨 GOOGLE FLOW AI POLISH DIRECTIVES (COPY & PASTE TO GOOGLE FLOW)`)
+  console.log(`==============================================================================`)
+  console.log(googleFlowPrompt)
+  console.log(`==============================================================================\n`)
+
+  console.log(`==============================================================================`)
+  console.log(`👉 NEXT STEPS FOR GOOGLE FLOW POLISH PASS:`)
+  console.log(`1. Upload the composite scaffolding to Google Flow:`)
+  console.log(`   📍 ${compositePath}`)
+  console.log(`2. Paste the prompt directives above into Google Flow.`)
+  console.log(`3. Save the resulting polished render (e.g. to 'tmp/post_polished_${timestamp}.png').`)
+  console.log(`4. Run this command (or prompt Antigravity) to upload to S3 and queue to Zernio:`)
+  console.log(`   npm run post:create -- --theme ${theme} --polished-image tmp/post_polished_${timestamp}.png`)
+  console.log(`==============================================================================\n`)
+
+  console.log(`📝 PREVIEW CAPTION:\n${postData.caption}\n`)
+  console.log(`💬 PREVIEW FIRST COMMENT:\n${postData.firstComment}\n`)
 
   return {
-    finalImagePath,
-    publicUrl,
-    s3Key,
+    compositePath,
+    googleFlowPrompt,
     postData,
     queueConfig: {
       profileId: DEFAULT_PROFILE_ID,
@@ -293,12 +398,17 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
   const theme = getArg('--theme')
   const mascot = getArg('--mascot') as CharacterKey | 'none' | undefined
   const aspect = getArg('--aspect') as '4:5' | '1:1' | undefined
-  const template = getArg('--template') as 'hook' | 'spec-showdown' | 'directives' | undefined
+  const template = getArg('--template') as
+    | 'marketing-leadmagnet'
+    | 'hook'
+    | 'spec-showdown'
+    | 'directives'
+    | undefined
   const composite = args.includes('--composite')
   const dryRun = args.includes('--dry-run')
   const publishNow = args.includes('--publish-now')
-  const harmonize = args.includes('--harmonize')
   const prompt = getArg('--prompt')
+  const polishedImage = getArg('--polished-image') || getArg('--input-image')
 
   createInstagramPost({
     topic,
@@ -309,8 +419,8 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
     composite,
     dryRun,
     publishNow,
-    harmonize,
     prompt,
+    polishedImage,
   }).catch((err) => {
     console.error('❌ Post Generation Failed:', err)
     process.exit(1)

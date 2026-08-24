@@ -28,11 +28,10 @@
     "codex:sync": "tsx scripts/sync-codex.ts",
     "codex:check": "tsx scripts/sync-codex.ts --check",
     "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts",
-    "comfy:setup": "bash scripts/setup-comfy.sh",
-    "comfy:start": "bash scripts/start-comfy.sh",
     "composite:render": "tsx scripts/render-composite.ts",
     "composite:capture": "tsx scripts/render-composite.ts",
-    "post:create": "tsx scripts/create-instagram-post.ts"
+    "post:create": "tsx scripts/create-instagram-post.ts",
+    "carousel:create": "tsx scripts/create-instagram-carousel.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",
