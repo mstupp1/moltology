@@ -43,26 +43,17 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
       aspectRatio="16:9"
       backgroundImageUrl={backgroundImageUrl}
       showScanlines={true}
-      showCornerBrackets={true}
+      showCornerBrackets={false}
       className="p-10 flex flex-col justify-between"
     >
-      {/* 1. Top Telemetry Header */}
-      <div className="p-4 rounded-xl bg-[#040f16]/90 border border-cyan-400/60 backdrop-blur-md flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-4">
-          <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(0,255,230,0.8)]" />
-          <div>
-            <div className="font-mono font-bold text-xs text-cyan-400 tracking-wider uppercase">
-              {categoryBadge}
-            </div>
-            <h1 className="font-black text-2xl text-white tracking-tight uppercase">
-              {headline}
-            </h1>
-          </div>
+      {/* 1. Top Header */}
+      <div>
+        <div className="font-mono font-bold text-xs text-cyan-400 tracking-wider uppercase">
+          {categoryBadge}
         </div>
-
-        <div className="font-mono text-xs text-slate-400 text-right max-w-sm hidden sm:block">
-          {subtitle}
-        </div>
+        <h1 className="font-black text-2xl text-white tracking-tight uppercase mt-0.5">
+          {headline}
+        </h1>
       </div>
 
       {/* 2. Side-by-Side Comparison Panels */}
@@ -115,21 +106,6 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
               </li>
             ))}
           </ul>
-        </div>
-      </div>
-
-      {/* 3. Bottom Telemetry Status Bar */}
-      <div className="p-3 rounded-lg bg-[#040f16]/90 border border-slate-700 flex items-center justify-between font-mono text-xs text-slate-400 max-w-[78%]">
-        <div className="flex items-center gap-4">
-          <span className="text-cyan-400 font-bold">CMX CONTEXT TIER: OPTICAL NVME</span>
-          <span>·</span>
-          <span>RECALL LATENCY: &lt; 0.18 MS</span>
-          <span>·</span>
-          <span className="text-sky-300">PRUNING: 94.2%</span>
-        </div>
-
-        <div className="hidden lg:block text-slate-500">
-          MOLTOLOGY CODEX
         </div>
       </div>
 

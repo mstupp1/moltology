@@ -123,7 +123,7 @@ describe('Composite UI Components', () => {
   })
 
   it('renders SocialMarketingSlide with 3D book mockup, benefit items, and comment CTA banner', () => {
-    render(
+    const { container } = render(
       <SocialMarketingSlide
         theme="moltmaxxing-guide"
         commentKeyword="GUIDE"
@@ -139,6 +139,19 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('SHELL HARDNESS')).toBeInTheDocument()
     expect(screen.getByText('800 NM PINCER TORQUE')).toBeInTheDocument()
     expect(screen.getByText('OFFICIAL 2026 EDITION')).toBeInTheDocument()
+
+    // Verify chevrons >>>>>> are removed
+    expect(screen.queryByText('>>>>>>')).not.toBeInTheDocument()
+
+    // Verify no pulsing or pinging animations exist in marketing slide
+    expect(container.querySelector('.animate-pulse')).toBeNull()
+    expect(container.querySelector('.animate-ping')).toBeNull()
+
+    // Verify mascot is positioned at top-right
+    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_pointing"]')
+    expect(mascotWrapper).toBeInTheDocument()
+    expect(mascotWrapper?.className).toContain('top-2')
+    expect(mascotWrapper?.className).toContain('right-0')
   })
 
   it('renders ThreeBookCover canvas element with dimensions and custom props', async () => {
