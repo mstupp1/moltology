@@ -16,6 +16,13 @@ export interface UseAlignmentRemindersOptions {
   enabledInitially?: boolean
 }
 
+// Global set across all hook instances on the page to prevent duplicate notifications
+const globalTriggeredReminderKeys = new Set<string>()
+
+export function resetTriggeredReminders() {
+  globalTriggeredReminderKeys.clear()
+}
+
 export function useAlignmentReminders(
   tasks: AlignmentTaskItem[] = [],
   options: UseAlignmentRemindersOptions = {}
@@ -45,6 +52,7 @@ export function useAlignmentReminders(
   }
 
   const [remindersEnabled, setRemindersEnabled] = useState<boolean>(enabledInitially)
+  const lastTestTriggerRef = useRef<number>(0)
 
   // Sync state with localStorage post-hydration on client side
   useEffect(() => {
@@ -55,9 +63,6 @@ export function useAlignmentReminders(
       }
     }
   }, [])
-
-  // Ref to track triggered task keys to avoid duplicate toasts on the same date
-  const triggeredKeysRef = useRef<Set<string>>(new Set())
 
   // Persist reminder toggle preference
   const toggleReminders = useCallback(() => {
@@ -86,11 +91,29 @@ export function useAlignmentReminders(
       if (isReminderDue(task.time, now, offsetMinutes)) {
         const key = `${task.id}-${dateStr}-${reminderInfo.reminderHours}:${reminderInfo.reminderMinutes}`
 
-        if (!triggeredKeysRef.current.has(key)) {
-          triggeredKeysRef.current.add(key)
+        let isStored = false
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          try {
+            isStored = sessionStorage.getItem(`molt_reminder_${key}`) === '1'
+          } catch {
+            // ignore
+          }
+        }
+
+        if (!globalTriggeredReminderKeys.has(key) && !isStored) {
+          globalTriggeredReminderKeys.add(key)
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            try {
+              sessionStorage.setItem(`molt_reminder_${key}`, '1')
+            } catch {
+              // ignore
+            }
+          }
+
           toast.hud(
             `Upcoming alignment protocol "${task.title}" starts in ${offsetMinutes}m (at ${reminderInfo.startTimeFormatted}). Prepare chassis!`,
             {
+              id: `alignment-reminder-${key}`,
               title: `ALIGNMENT REMINDER (${reminderInfo.reminderTimeFormatted}) 🔔`,
               duration: 8000,
             }
@@ -110,6 +133,12 @@ export function useAlignmentReminders(
   // Dispatch an instant test reminder toast
   const triggerTestReminder = useCallback(
     (customTask?: AlignmentTaskItem) => {
+      const now = Date.now()
+      if (now - lastTestTriggerRef.current < 1000) {
+        return
+      }
+      lastTestTriggerRef.current = now
+
       const targetTask = customTask || tasks.find((t) => !t.completed) || tasks[0] || {
         id: 'test',
         time: '12:00',
@@ -125,6 +154,7 @@ export function useAlignmentReminders(
       toast.hud(
         `[TEST ALERT] "${targetTask.title}" scheduled for ${startTimeDisplay}. Reminder window active 10m prior at ${reminderTimeDisplay}.`,
         {
+          id: `test-reminder-${targetTask.id}-${now}`,
           title: `ALIGNMENT REMINDER (${reminderTimeDisplay}) 🔔`,
           duration: 6000,
         }

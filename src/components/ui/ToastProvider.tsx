@@ -49,6 +49,7 @@ const DEFAULT_DURATION = 5000
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const [toastHistory, setToastHistory] = useState<ToastItem[]>([])
+  const recentToastsRef = React.useRef<Map<string, number>>(new Map())
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((item) => item.id !== id))
@@ -57,14 +58,36 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const clearToasts = useCallback(() => {
     setToasts([])
     setToastHistory([])
+    recentToastsRef.current.clear()
   }, [])
 
   const addToast = useCallback(
     (message: string, options: ToastOptions = {}): string => {
-      const id = options.id || `toast-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
       const type = options.type || 'info'
+      const title = options.title || ''
       const duration = options.duration ?? DEFAULT_DURATION
-      const timestamp = Date.now()
+      const now = Date.now()
+
+      // Deduplicate identical toasts dispatched in rapid succession (< 2000ms)
+      const dedupeKey = options.id ? `id:${options.id}` : `msg:${type}:${title}:${message}`
+      const lastTriggered = recentToastsRef.current.get(dedupeKey)
+
+      if (lastTriggered && now - lastTriggered < 2000) {
+        return options.id || dedupeKey
+      }
+
+      recentToastsRef.current.set(dedupeKey, now)
+
+      // Prune stale cache entries
+      if (recentToastsRef.current.size > 50) {
+        for (const [k, ts] of recentToastsRef.current.entries()) {
+          if (now - ts > 10000) {
+            recentToastsRef.current.delete(k)
+          }
+        }
+      }
+
+      const id = options.id || `toast-${now}-${Math.random().toString(36).substring(2, 7)}`
 
       const newToast: ToastItem = {
         id,
@@ -72,10 +95,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         message,
         type,
         duration,
-        timestamp,
+        timestamp: now,
       }
 
-      setToasts((prev) => [newToast, ...prev].slice(0, 5)) // Max 5 active floating toasts
+      setToasts((prev) => {
+        if (prev.some((item) => item.id === id)) {
+          return prev
+        }
+        return [newToast, ...prev].slice(0, 5) // Max 5 active floating toasts
+      })
+
       setToastHistory((prev) => [newToast, ...prev.filter((t) => t.id !== id)].slice(0, 15)) // Max 15 in history
 
       if (duration > 0) {

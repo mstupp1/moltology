@@ -125,6 +125,13 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       } catch {}
     }
 
+    // If closing from small window (popout) mode, reset launcher button tile position
+    if (mode === 'popout' && targetMode === 'closed' && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('moltology:oracle_button_pos')
+      } catch {}
+    }
+
     if (targetMode === mode) return
 
     setModeState(targetMode)
