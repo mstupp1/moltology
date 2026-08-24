@@ -249,6 +249,25 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     return () => window.removeEventListener('resize', handleResize)
   }, [isMounted, getSafeButtonCoords, getSafePopoutDims, getSafePopoutCoords, updateButtonPos, updatePopoutPos, updatePopoutSize])
 
+  // Reset popout position and size when switching from sidebar mode to small window (popout) mode
+  const prevOracleModeRef = useRef<string | null>(oracle ? oracle.mode : null)
+  useEffect(() => {
+    if (!oracle) return
+    const prevMode = prevOracleModeRef.current
+    const currentMode = oracle.mode
+    prevOracleModeRef.current = currentMode
+
+    if (prevMode === 'sidebar' && currentMode === 'popout') {
+      try {
+        localStorage.removeItem(STORAGE_KEY_POPOUT_POS)
+        localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
+      } catch {}
+      const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
+      updatePopoutSize(defaultDims, true)
+      updatePopoutPos(getSafePopoutCoords(null, defaultDims), true)
+    }
+  }, [oracle?.mode, updatePopoutSize, updatePopoutPos, getSafePopoutCoords])
+
   const handleToggle = () => {
     if (oracle) {
       oracle.toggleMode()

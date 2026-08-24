@@ -169,9 +169,6 @@ function OracleRouteComponent() {
       .then((data) => {
         if (Array.isArray(data)) {
           setLocalThreads(data)
-          if (data.length > 0 && !localActiveThreadId) {
-            setLocalActiveThreadId(data[0].id)
-          }
         }
       })
       .catch((err) => console.warn('Failed to load user AI threads:', err))

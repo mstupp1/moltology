@@ -89,9 +89,6 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const data = await getAIThreadsFn({ data: { userId } })
       if (Array.isArray(data)) {
         setThreads(data)
-        if (data.length > 0 && !activeThreadId) {
-          setActiveThreadId(data[0].id)
-        }
       }
     } catch (err) {
       console.warn('Failed to load user AI threads:', err)
@@ -118,6 +115,14 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, targetMode)
         } catch {}
       }
+    }
+
+    // If transitioning from sidebar mode to small window (popout) mode, clear saved custom layout
+    if (mode === 'sidebar' && targetMode === 'popout' && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('moltology:oracle_popout_pos')
+        localStorage.removeItem('moltology:oracle_popout_size')
+      } catch {}
     }
 
     if (targetMode === mode) return

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { renderHook, act } from '@testing-library/react'
 import { OracleProvider, useOracle, useSafeOracle } from './OracleContext'
@@ -9,10 +9,12 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
 }))
 
+let mockUser: any = null
+
 // Mock authClient
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: () => ({ data: null }),
+    useSession: () => ({ data: mockUser ? { user: mockUser } : null }),
   },
 }))
 
@@ -22,6 +24,11 @@ vi.mock('@/lib/server/api', () => ({
 }))
 
 describe('OracleContext & Mode Management', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUser = null
+  })
+
   it('useSafeOracle returns undefined when used outside of OracleProvider', () => {
     const { result } = renderHook(() => useSafeOracle())
     expect(result.current).toBeUndefined()
@@ -115,5 +122,29 @@ describe('OracleContext & Mode Management', () => {
       result.current.toggleMode()
     })
     expect(result.current.mode).toBe('sidebar')
+  })
+
+  it('keeps activeThreadId as null after loading threads so new chat screen is presented initially', async () => {
+    mockUser = { id: 'usr_initiate_test', name: 'Test Initiate' }
+    const { getAIThreadsFn } = await import('@/lib/server/api')
+    ;(getAIThreadsFn as any).mockResolvedValue([
+      { id: 'thread-existing-1', title: 'Prior Consultation' },
+      { id: 'thread-existing-2', title: 'Deep Trench Analysis' },
+    ])
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <OracleProvider>{children}</OracleProvider>
+    )
+
+    const { result } = renderHook(() => useOracle(), { wrapper })
+
+    expect(result.current.activeThreadId).toBeNull()
+
+    await act(async () => {
+      await result.current.refreshThreads()
+    })
+
+    expect(result.current.threads).toHaveLength(2)
+    expect(result.current.activeThreadId).toBeNull()
   })
 })

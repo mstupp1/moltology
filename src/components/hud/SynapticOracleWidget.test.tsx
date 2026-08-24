@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SynapticOracleWidget } from './SynapticOracleWidget'
-import { OracleProvider } from './OracleContext'
+import { OracleProvider, useSafeOracle } from './OracleContext'
 
 // Mock scrollIntoView for test environment
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
@@ -250,6 +250,51 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     const closeChatsBtn = screen.getByRole('button', { name: /Close Chats Window/i })
     fireEvent.click(closeChatsBtn)
     expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
+  })
+
+  it('resets popout position and size when switching from sidebar mode to small window (popout) mode', () => {
+    let contextModeSetter: ((mode: any) => void) | null = null
+
+    function TestController() {
+      const oracle = useSafeOracle()
+      if (oracle) {
+        contextModeSetter = oracle.setMode
+      }
+      return <SynapticOracleWidget />
+    }
+
+    render(
+      <OracleProvider>
+        <TestController />
+      </OracleProvider>
+    )
+
+    // Save custom popout size and position
+    localStorage.setItem(
+      'moltology:oracle_popout_pos',
+      JSON.stringify({ x: 120, y: 140 })
+    )
+    localStorage.setItem(
+      'moltology:oracle_popout_size',
+      JSON.stringify({ width: 550, height: 750 })
+    )
+
+    // Switch to sidebar mode
+    act(() => {
+      contextModeSetter!('sidebar')
+    })
+
+    // Switch from sidebar mode to popout mode
+    act(() => {
+      contextModeSetter!('popout')
+    })
+
+    // Check localStorage has been reset to default dimensions (384x640)
+    const savedSize = localStorage.getItem('moltology:oracle_popout_size')
+    expect(savedSize).not.toBeNull()
+    const parsedSize = JSON.parse(savedSize!)
+    expect(parsedSize.width).toBe(384)
+    expect(parsedSize.height).toBe(640)
   })
 })
 
