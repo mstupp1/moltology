@@ -473,25 +473,25 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
           aria-label="Daily alignment tasks schedule"
-          className={`flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 bg-[#02080a]/90 hover:bg-[#061418] border border-[#00c3ff]/40 hover:border-[#00c3ff]/70 rounded-md font-sans text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 ${className}`}
+          className={`flex items-center justify-center w-9 h-9 sm:w-auto sm:h-9 sm:px-3 sm:py-1.5 bg-[#080d0e]/90 hover:bg-cyan-900/60 border border-cyan-800/80 hover:border-cyan-500/60 text-cyan-300 rounded-lg font-sans text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 ${className}`}
         >
-          {/* Mobile: Task List Icon */}
+          {/* Mobile: Task List Icon (matches hamburger button size and icon) */}
           <div className="flex sm:hidden items-center justify-center relative">
-            <ListTodo className="w-4 h-4 text-[#00c3ff] group-hover:text-[#00ffff] transition-colors" />
+            <ListTodo className="w-5 h-5 text-cyan-300 group-hover:text-cyan-200 transition-colors" />
             {toastsList.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff5540] animate-ping" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#ff5540] animate-ping" />
             )}
           </div>
 
           {/* Desktop (sm and up): Next Task Indicator & Chevron */}
           <div className="hidden sm:flex items-center gap-1.5">
             {nextTask && !allTasksCompleted ? (
-              <div className="flex items-center gap-1.5 text-xs text-[#dfe3e3] truncate max-w-[260px] group-hover:text-[#00ffff] transition-colors">
+              <div className="flex items-center gap-1.5 text-xs text-[#dfe3e3] truncate max-w-[260px] group-hover:text-cyan-200 transition-colors">
                 <span className="text-[#ff5540] font-bold shrink-0">NEXT:</span>
                 <span className="truncate">{nextTask.title}</span>
               </div>
             ) : (
-              <span className="text-xs font-bold text-[#00ffff] tracking-wide">
+              <span className="text-xs font-bold text-cyan-300 tracking-wide">
                 TASKS COMPLETE
               </span>
             )}
@@ -501,8 +501,8 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
             )}
 
             <ChevronDown
-              className={`w-3.5 h-3.5 text-[#00c3ff] shrink-0 transition-transform duration-200 ${
-                isScheduleOpen ? 'rotate-180 text-[#00ffff]' : 'group-hover:text-[#00ffff]'
+              className={`w-3.5 h-3.5 text-cyan-300 shrink-0 transition-transform duration-200 ${
+                isScheduleOpen ? 'rotate-180 text-cyan-200' : 'group-hover:text-cyan-200'
               }`}
             />
           </div>

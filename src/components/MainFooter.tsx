@@ -86,19 +86,12 @@ export const MainFooter: React.FC<MainFooterProps> = ({
                   <span>{brandTitle}</span>
                 </div>
                 <div
-                  className={`text-[10px] font-bold tracking-widest uppercase truncate flex items-center gap-1.5 mt-0.5 ${
+                  className={`text-[10px] font-bold tracking-widest uppercase truncate mt-0.5 ${
                     isCorporate
                       ? 'text-sky-600'
                       : 'text-cyan-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] [text-shadow:0_0_8px_rgba(0,195,255,0.5)]'
                   }`}
                 >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full animate-pulse shrink-0 ${
-                      isCorporate
-                        ? 'bg-sky-500 shadow-[0_0_6px_#0284c7]'
-                        : 'bg-cyan-400 shadow-[0_0_8px_#00ffff]'
-                    }`}
-                  />
                   <span className="truncate">{brandSubtext}</span>
                 </div>
               </div>
