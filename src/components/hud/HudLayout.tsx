@@ -18,7 +18,8 @@ function HudContent() {
   const oracle = useSafeOracle()
   const location = useLocation()
   const isSubterranean = location.pathname.startsWith('/subterranean')
-  const isIsolation = location.pathname.startsWith('/isolation')
+  const isFullscreenRoute =
+    location.pathname.startsWith('/isolation') || location.pathname.startsWith('/oracle')
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const userId = user?.id || user?.sub || null
@@ -161,7 +162,7 @@ function HudContent() {
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
               className={`flex-1 min-h-0 ${
-                isIsolation ? 'p-0 overflow-hidden' : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto'
+                isFullscreenRoute ? 'p-0 overflow-hidden' : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto'
               } bg-[#070b0b]/10 backdrop-blur-[1px] border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl flex flex-col`}
             >
               <Outlet />

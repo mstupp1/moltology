@@ -60,15 +60,19 @@ function OracleSidebarContent({
             {threads.map((t) => (
               <button
                 key={t.id}
+                type="button"
                 onClick={() => onSelectThread(t.id)}
-                className={`w-full text-left p-2 text-xs truncate transition-all chamfer-corner flex items-center space-x-2 cursor-pointer ${
+                title={t.title}
+                className={`w-full text-left px-2 py-1.5 text-xs block truncate transition-all chamfer-corner cursor-pointer border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none ${
                   activeThreadId === t.id
-                    ? 'bg-cyan-950 border border-cyan-500 text-cyan-200 shadow-md'
-                    : 'bg-[#080d0d] hover:bg-cyan-950/50 text-gray-400 border border-cyan-950'
+                    ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
+                    : 'bg-[#080d0e]/50 hover:bg-cyan-950/40 text-gray-400 backdrop-blur-xs'
                 }`}
+                style={{ outline: 'none', WebkitTapHighlightColor: 'transparent' }}
               >
-                <MessageSquare className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span className="truncate">{t.title}</span>
+                <span className="block truncate select-none">
+                  {t.title || 'Untitled Consultation'}
+                </span>
               </button>
             ))}
           </div>
@@ -87,7 +91,7 @@ function OracleSidebarContent({
         <p className="text-[11px] text-gray-400 leading-relaxed">
           You are exploring the Oracle as a guest. Chats in guest mode are temporary and limited.
         </p>
-        <div className="p-2.5 bg-cyan-950/40 border border-cyan-800/40 chamfer-corner space-y-1.5 text-[10px] text-cyan-300">
+        <div className="p-2.5 bg-cyan-950/30 border border-cyan-800/35 backdrop-blur-xs chamfer-corner space-y-1.5 text-[10px] text-cyan-300">
           <div className="font-bold text-cyan-200 flex items-center gap-1">
             <Shield className="w-3 h-3 text-cyan-400" />
             <span>MEMBER BENEFITS:</span>
@@ -181,11 +185,11 @@ function OracleRouteComponent() {
 
   return (
     <div className="h-full flex flex-col font-sans text-[#dfe3e3]">
-      {/* Unified Single Container (No Gap between Sidebar & Chat Canvas) */}
-      <div className="flex-1 min-h-[500px] h-full bg-[#060a0a] border border-cyan-900/60 chamfer-corner flex overflow-hidden relative shadow-2xl">
+      {/* Full-Screen Unified Container with Translucent Glass Backdrop */}
+      <div className="flex-1 h-full bg-[#060a0c]/40 backdrop-blur-md flex overflow-hidden relative">
         
-        {/* Desktop Sidebar (Integrated with left border, hidden on mobile) */}
-        <aside className="hidden md:flex w-64 lg:w-72 bg-[#050808]/95 border-r border-cyan-900/50 p-3 flex-col shrink-0 overflow-y-auto z-10">
+        {/* Desktop Sidebar with Translucent Glass Styling */}
+        <aside className="hidden md:flex w-64 lg:w-72 bg-[#050809]/75 backdrop-blur-md border-r border-cyan-900/40 p-3 flex-col shrink-0 overflow-y-auto z-10">
           <OracleSidebarContent
             userId={userId}
             threads={threads}
@@ -204,7 +208,7 @@ function OracleRouteComponent() {
             threadId={activeThreadId}
             onThreadCreated={handleThreadCreated}
             personaName="SYNAPTIC ORACLE"
-            className="h-full border-none shadow-none"
+            className="h-full border-none shadow-none bg-transparent"
             onToggleConversations={() => setIsMobileDrawerOpen(true)}
           />
         </div>
@@ -222,7 +226,7 @@ function OracleRouteComponent() {
 
         {/* Mobile Slide-Over Conversations Drawer */}
         <div
-          className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-[#060a0a] border-r border-cyan-900/80 shadow-2xl z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
+          className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-[#050809]/95 backdrop-blur-md border-r border-cyan-900/60 shadow-2xl z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
             isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           role="dialog"
@@ -230,7 +234,7 @@ function OracleRouteComponent() {
           aria-label="Conversations"
         >
           {/* Mobile Drawer Header */}
-          <div className="flex items-center justify-between p-3 border-b border-cyan-900/60 bg-[#0b1010] shrink-0">
+          <div className="flex items-center justify-between p-3 border-b border-cyan-900/50 bg-[#090e0f]/90 shrink-0">
             <div className="flex items-center space-x-2 text-cyan-300">
               <MessageSquare className="w-4 h-4 text-cyan-400" />
               <span className="text-xs font-bold tracking-wider uppercase font-sans">
