@@ -6,10 +6,14 @@
  * Heavy content, quiz graphics, PBR textures, character cutouts, and guides resolve to Neon S3.
  */
 
-export const S3_BASE_URL =
-  process.env.AWS_ENDPOINT_URL_S3 && process.env.AWS_S3_BUCKET
-    ? `${process.env.AWS_ENDPOINT_URL_S3.replace(/\/+$/, '')}/${process.env.AWS_S3_BUCKET}`
-    : 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets'
+const getEndpoint = () => {
+  if (typeof process !== 'undefined' && process.env?.AWS_ENDPOINT_URL_S3 && process.env?.AWS_S3_BUCKET) {
+    return `${process.env.AWS_ENDPOINT_URL_S3.replace(/\/+$/, '')}/${process.env.AWS_S3_BUCKET}`
+  }
+  return 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets'
+}
+
+export const S3_BASE_URL = getEndpoint()
 
 /**
  * Local assets that stay in public/ for zero-latency initial HTML/CSS render

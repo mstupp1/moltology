@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { CompositeAspectRatio, COMPOSITE_DIMENSIONS } from './CompositeContainer'
 import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
@@ -7,7 +7,7 @@ import { SocialMarketingSlide } from './SocialMarketingSlide'
 import { ReelOutroCard } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
-import { MascotKey } from './MascotOverlay'
+import { MascotKey, MASCOT_REGISTRY } from './MascotOverlay'
 import {
   Layers,
   Copy,
@@ -50,8 +50,18 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   const [aspect, setAspect] = useState<CompositeAspectRatio>(initialAspect)
   const [mascot, setMascot] = useState<MascotKey>(initialMascot)
   const [theme, setTheme] = useState(initialTheme)
-  const [previewScale, setPreviewScale] = useState<number>(0.45)
+  const [previewScale, setPreviewScale] = useState<number>(0.75)
   const [copiedCmd, setCopiedCmd] = useState(false)
+
+  // Preload all mascot cutouts from S3 CDN on mount for zero-latency preview switches
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      Object.values(MASCOT_REGISTRY).forEach((m) => {
+        const img = new Image()
+        img.src = m.s3Url
+      })
+    }
+  }, [])
 
   // Live editable fields
   const [categoryBadge, setCategoryBadge] = useState('STOP MELTING · 10X COGNITIVE GRIP')
