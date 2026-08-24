@@ -136,26 +136,89 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     []
   )
 
-  // Helpers to update and persist coordinates
-  const updateButtonPos = useCallback((pos: { x: number; y: number } | null, persist = false) => {
-    buttonPosRef.current = pos
-    setButtonPos(pos)
-    if (persist && pos) {
-      try {
-        localStorage.setItem(STORAGE_KEY_BTN_POS, JSON.stringify(pos))
-      } catch {}
-    }
-  }, [])
+  // Convert button position to corresponding popout position
+  const btnPosToPopoutPos = useCallback(
+    (btnPos: { x: number; y: number } | null, size: { width: number; height: number }) => {
+      if (typeof window === 'undefined' || !btnPos) return getSafePopoutCoords(null, size)
+      const btnW = buttonRef.current?.offsetWidth || 150
+      const btnH = buttonRef.current?.offsetHeight || 48
+      const centerX = window.innerWidth / 2
+      const centerY = window.innerHeight / 2
+      const btnCenterX = btnPos.x + btnW / 2
+      const btnCenterY = btnPos.y + btnH / 2
 
-  const updatePopoutPos = useCallback((pos: { x: number; y: number } | null, persist = false) => {
-    popoutPosRef.current = pos
-    setPopoutPos(pos)
-    if (persist && pos) {
-      try {
-        localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(pos))
-      } catch {}
-    }
-  }, [])
+      const targetX = btnCenterX > centerX ? btnPos.x + btnW - size.width : btnPos.x
+      const targetY = btnCenterY > centerY ? btnPos.y + btnH - size.height : btnPos.y
+
+      return getSafePopoutCoords({ x: targetX, y: targetY }, size)
+    },
+    [getSafePopoutCoords]
+  )
+
+  // Convert popout position to corresponding button position
+  const popoutPosToBtnPos = useCallback(
+    (popPos: { x: number; y: number } | null, size: { width: number; height: number }) => {
+      if (typeof window === 'undefined' || !popPos) return getSafeButtonCoords(null)
+      const btnW = buttonRef.current?.offsetWidth || 150
+      const btnH = buttonRef.current?.offsetHeight || 48
+      const centerX = window.innerWidth / 2
+      const centerY = window.innerHeight / 2
+      const popCenterX = popPos.x + size.width / 2
+      const popCenterY = popPos.y + size.height / 2
+
+      const targetX = popCenterX > centerX ? popPos.x + size.width - btnW : popPos.x
+      const targetY = popCenterY > centerY ? popPos.y + size.height - btnH : popPos.y
+
+      return getSafeButtonCoords({ x: targetX, y: targetY })
+    },
+    [getSafeButtonCoords]
+  )
+
+  // Unified helpers: Updating button synchronizes popout position
+  const updateButtonPos = useCallback(
+    (pos: { x: number; y: number } | null, persist = false) => {
+      buttonPosRef.current = pos
+      setButtonPos(pos)
+      const synchedPopout = btnPosToPopoutPos(pos, popoutSizeRef.current)
+      popoutPosRef.current = synchedPopout
+      setPopoutPos(synchedPopout)
+
+      if (persist) {
+        try {
+          if (pos) {
+            localStorage.setItem(STORAGE_KEY_BTN_POS, JSON.stringify(pos))
+          }
+          if (synchedPopout) {
+            localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(synchedPopout))
+          }
+        } catch {}
+      }
+    },
+    [btnPosToPopoutPos]
+  )
+
+  // Unified helpers: Updating popout synchronizes button position
+  const updatePopoutPos = useCallback(
+    (pos: { x: number; y: number } | null, persist = false) => {
+      popoutPosRef.current = pos
+      setPopoutPos(pos)
+      const synchedBtn = popoutPosToBtnPos(pos, popoutSizeRef.current)
+      buttonPosRef.current = synchedBtn
+      setButtonPos(synchedBtn)
+
+      if (persist) {
+        try {
+          if (pos) {
+            localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(pos))
+          }
+          if (synchedBtn) {
+            localStorage.setItem(STORAGE_KEY_BTN_POS, JSON.stringify(synchedBtn))
+          }
+        } catch {}
+      }
+    },
+    [popoutPosToBtnPos]
+  )
 
   const updatePopoutSize = useCallback((size: { width: number; height: number }, persist = false) => {
     popoutSizeRef.current = size
@@ -175,18 +238,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
 
     try {
-      const savedBtn = localStorage.getItem(STORAGE_KEY_BTN_POS)
-      if (savedBtn) {
-        const parsed = JSON.parse(savedBtn)
-        if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
-          updateButtonPos(getSafeButtonCoords(parsed))
-        } else {
-          updateButtonPos(getSafeButtonCoords(null))
-        }
-      } else {
-        updateButtonPos(getSafeButtonCoords(null))
-      }
-
       const savedSize = localStorage.getItem(STORAGE_KEY_POPOUT_SIZE)
       let initialSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
       if (savedSize) {
@@ -198,24 +249,54 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       updatePopoutSize(initialSize)
 
       const savedPopoutPos = localStorage.getItem(STORAGE_KEY_POPOUT_POS)
+      const savedBtn = localStorage.getItem(STORAGE_KEY_BTN_POS)
+
       if (savedPopoutPos) {
         const parsed = JSON.parse(savedPopoutPos)
         if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
-          updatePopoutPos(getSafePopoutCoords(parsed, initialSize))
+          const safePop = getSafePopoutCoords(parsed, initialSize)
+          popoutPosRef.current = safePop
+          setPopoutPos(safePop)
+          const synchedBtn = popoutPosToBtnPos(safePop, initialSize)
+          buttonPosRef.current = synchedBtn
+          setButtonPos(synchedBtn)
         } else {
           updatePopoutPos(getSafePopoutCoords(null, initialSize))
         }
+      } else if (savedBtn) {
+        const parsed = JSON.parse(savedBtn)
+        if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
+          const safeBtn = getSafeButtonCoords(parsed)
+          buttonPosRef.current = safeBtn
+          setButtonPos(safeBtn)
+          const synchedPop = btnPosToPopoutPos(safeBtn, initialSize)
+          popoutPosRef.current = synchedPop
+          setPopoutPos(synchedPop)
+        } else {
+          updateButtonPos(getSafeButtonCoords(null))
+        }
       } else {
-        updatePopoutPos(getSafePopoutCoords(null, initialSize))
+        const defDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
+        updatePopoutSize(defDims)
+        const defPop = getSafePopoutCoords(null, defDims)
+        const defBtn = getSafeButtonCoords(null)
+        buttonPosRef.current = defBtn
+        setButtonPos(defBtn)
+        popoutPosRef.current = defPop
+        setPopoutPos(defPop)
       }
     } catch (err) {
       console.warn('Failed to load Oracle widget position from storage:', err)
-      updateButtonPos(getSafeButtonCoords(null))
       const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
       updatePopoutSize(defaultDims)
-      updatePopoutPos(getSafePopoutCoords(null, defaultDims))
+      const defPop = getSafePopoutCoords(null, defaultDims)
+      const defBtn = getSafeButtonCoords(null)
+      buttonPosRef.current = defBtn
+      setButtonPos(defBtn)
+      popoutPosRef.current = defPop
+      setPopoutPos(defPop)
     }
-  }, [getSafeButtonCoords, getSafePopoutDims, getSafePopoutCoords, updateButtonPos, updatePopoutPos, updatePopoutSize])
+  }, [getSafeButtonCoords, getSafePopoutDims, getSafePopoutCoords, updateButtonPos, updatePopoutPos, updatePopoutSize, btnPosToPopoutPos, popoutPosToBtnPos])
 
   // Re-clamp on window resize without resetting position
   useEffect(() => {
@@ -249,7 +330,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     return () => window.removeEventListener('resize', handleResize)
   }, [isMounted, getSafeButtonCoords, getSafePopoutDims, getSafePopoutCoords, updateButtonPos, updatePopoutPos, updatePopoutSize])
 
-  // Reset popout position and size when switching from sidebar mode to small window (popout) mode
+  // Reset popout/button position and size when leaving sidebar mode (X-close or switch to mini window)
   const prevOracleModeRef = useRef<string | null>(oracle ? oracle.mode : null)
   useEffect(() => {
     if (!oracle) return
@@ -257,23 +338,22 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     const currentMode = oracle.mode
     prevOracleModeRef.current = currentMode
 
-    if (prevMode === 'sidebar' && currentMode === 'popout') {
+    if (prevMode === 'sidebar' && (currentMode === 'popout' || currentMode === 'closed')) {
       try {
         localStorage.removeItem(STORAGE_KEY_POPOUT_POS)
         localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
-      } catch {}
-      const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
-      updatePopoutSize(defaultDims, true)
-      updatePopoutPos(getSafePopoutCoords(null, defaultDims), true)
-    }
-
-    if (prevMode === 'popout' && currentMode === 'closed') {
-      try {
         localStorage.removeItem(STORAGE_KEY_BTN_POS)
       } catch {}
-      updateButtonPos(getSafeButtonCoords(null))
+      const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
+      updatePopoutSize(defaultDims)
+      const defPop = getSafePopoutCoords(null, defaultDims)
+      const defBtn = getSafeButtonCoords(null)
+      popoutPosRef.current = defPop
+      buttonPosRef.current = defBtn
+      setPopoutPos(defPop)
+      setButtonPos(defBtn)
     }
-  }, [oracle?.mode, updatePopoutSize, updatePopoutPos, updateButtonPos, getSafePopoutCoords, getSafeButtonCoords])
+  }, [oracle?.mode, updatePopoutSize, getSafePopoutCoords, getSafeButtonCoords])
 
   const handleToggle = () => {
     if (oracle) {
@@ -284,11 +364,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   }
 
   const handleClose = () => {
-    try {
-      localStorage.removeItem(STORAGE_KEY_BTN_POS)
-    } catch {}
-    updateButtonPos(getSafeButtonCoords(null))
-
     if (oracle) {
       oracle.setMode('closed')
     } else {
@@ -357,9 +432,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
     if (wasDrag) {
       if (buttonPosRef.current) {
-        try {
-          localStorage.setItem(STORAGE_KEY_BTN_POS, JSON.stringify(buttonPosRef.current))
-        } catch {}
+        // Persist both positions atomically via unified updater
+        updateButtonPos(buttonPosRef.current, true)
       }
     } else {
       handleToggle()
@@ -418,9 +492,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     setIsDraggingWindow(false)
 
     if (popoutPosRef.current) {
-      try {
-        localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(popoutPosRef.current))
-      } catch {}
+      // Persist both positions atomically via unified updater
+      updatePopoutPos(popoutPosRef.current, true)
     }
   }
 
@@ -514,9 +587,10 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     setActiveResizeDir(null)
 
     if (popoutSizeRef.current && popoutPosRef.current) {
+      // Re-sync button position now that popout size may have changed the anchor
+      updatePopoutPos(popoutPosRef.current, true)
       try {
         localStorage.setItem(STORAGE_KEY_POPOUT_SIZE, JSON.stringify(popoutSizeRef.current))
-        localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(popoutPosRef.current))
       } catch {}
     }
   }
