@@ -87,4 +87,28 @@ describe('Daily Reel Dynamic Script Formulation', () => {
       expect(script.trialParams).toEqual({ graduationStrategy: 'SS_PERFORMANCE' })
     }
   })
+
+  it('resolves cohesive contextual color grading presets based on topic and theme', async () => {
+    const { resolveColorGradingPresets } = await import('./create-daily-reel')
+
+    // Default 2-scene ecdysis progression: Scene 1 thermal-melt, Scene 2 benthic-cyan
+    const defaultPresets = resolveColorGradingPresets('ecdysis', 'Generic Topic', 2)
+    expect(defaultPresets).toEqual(['thermal-melt', 'benthic-cyan'])
+
+    // Photonics topics
+    const photonicsPresets = resolveColorGradingPresets('moltmaxxing', 'Silicon Photonics and Laser Waveguides', 2)
+    expect(photonicsPresets).toEqual(['photonics-matrix', 'photonics-matrix'])
+
+    // Torque & Carapace topics
+    const torquePresets = resolveColorGradingPresets('pincer-torque', '800 Nm Pincer Torque Dynamometry', 2)
+    expect(torquePresets).toEqual(['calcified-armor', 'calcified-armor'])
+
+    // Abyssal & Subsea topics
+    const abyssalPresets = resolveColorGradingPresets('benthic-depth', 'Subsea Datacenter Cooling', 2)
+    expect(abyssalPresets).toEqual(['benthic-cyan', 'benthic-cyan'])
+
+    // Explicit user override
+    const overridePresets = resolveColorGradingPresets('ecdysis', 'Generic Topic', 2, 'calcified-armor')
+    expect(overridePresets).toEqual(['calcified-armor', 'calcified-armor'])
+  })
 })

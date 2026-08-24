@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
-import { compositeReel, renderReelThumbnail } from './lib/reel-compositor'
+import { compositeReel, renderReelThumbnail, ColorGradingPreset } from './lib/reel-compositor'
 import { generateVeoVideo } from './generate-video'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
@@ -150,9 +150,73 @@ export interface CreateDailyReelOptions {
     | 'none'
   watermarkOpacity?: number
   watermarkSize?: number
+  colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string
   bgAudioVolume?: number
   bgAudioOffsetSeconds?: number
   veoModel?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
+}
+
+/**
+ * Contextual Color Grading Resolver
+ * Maps topics and themes to cohesive, cinematic color grading presets
+ */
+export function resolveColorGradingPresets(
+  theme?: string,
+  topic?: string,
+  numScenes = 2,
+  userOverride?: ColorGradingPreset | string
+): ColorGradingPreset[] {
+  if (userOverride && userOverride !== 'auto' && userOverride !== 'ecdysis-transmute') {
+    return Array(numScenes).fill(userOverride as ColorGradingPreset)
+  }
+
+  const topicAndTheme = `${theme || ''} ${topic || ''}`.toLowerCase()
+
+  // Topic-specific cinematic color grading
+  if (
+    topicAndTheme.includes('photonics') ||
+    topicAndTheme.includes('laser') ||
+    topicAndTheme.includes('circuit') ||
+    topicAndTheme.includes('optics') ||
+    topicAndTheme.includes('lightspeed')
+  ) {
+    return Array(numScenes).fill('photonics-matrix')
+  }
+
+  if (
+    topicAndTheme.includes('torque') ||
+    topicAndTheme.includes('carapace') ||
+    topicAndTheme.includes('hardening') ||
+    topicAndTheme.includes('armor') ||
+    topicAndTheme.includes('calcified') ||
+    topicAndTheme.includes('dynamometry')
+  ) {
+    return Array(numScenes).fill('calcified-armor')
+  }
+
+  if (
+    topicAndTheme.includes('abyss') ||
+    topicAndTheme.includes('fathom') ||
+    topicAndTheme.includes('subsea') ||
+    topicAndTheme.includes('ocean') ||
+    topicAndTheme.includes('hydrothermal') ||
+    topicAndTheme.includes('cooling')
+  ) {
+    return Array(numScenes).fill('benthic-cyan')
+  }
+
+  // Default dynamic 2-scene ecdysis progression:
+  // Scene 1 (Terrestrial Problem/Melt): Subtle thermal warm amber tone
+  // Scene 2 (Benthic Solution/Carapace): Subtle oceanic cyan tone
+  if (numScenes <= 1) {
+    return ['benthic-cyan']
+  }
+
+  const presets: ColorGradingPreset[] = ['thermal-melt']
+  for (let i = 1; i < numScenes; i++) {
+    presets.push('benthic-cyan')
+  }
+  return presets
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // Silas Trench
@@ -897,11 +961,19 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   })
 
   const masterReelPath = path.join(tempDir, `master-reel-${timestamp}.mp4`)
+  const colorGradingPresets = resolveColorGradingPresets(
+    options.theme,
+    scriptData.topic,
+    sceneVideoPaths.length,
+    options.colorGrading
+  )
+
   const compositeResult = await compositeReel({
     videoClips: sceneVideoPaths,
     voiceoverPath: ttsResult.audioPath,
     words: ttsResult.words,
     outputPath: masterReelPath,
+    colorGrading: colorGradingPresets,
     watermarkOpacity: options.watermarkOpacity ?? 0.40,
     watermarkSize: options.watermarkSize ?? 110,
     ctaHeadline: options.ctaHeadline || ctaConfig.headline,
@@ -1008,6 +1080,7 @@ Options:
   --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner | none
   --topic <string>          Specific topic or breaking news story
   --holiday <string>        Specific holiday or cultural event
+  --color-grade <preset>    Cinematic color grading: auto | benthic-cyan | thermal-melt | photonics-matrix | calcified-armor | none
   --publish-now             Publish directly to Instagram immediately (skip draft)
   --schedule-best-time      Schedule for optimal audience engagement time via Zernio
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
@@ -1020,7 +1093,7 @@ Options:
 Examples:
   npx tsx scripts/create-daily-reel.ts
   npx tsx scripts/create-daily-reel.ts --theme ecdysis --cta-goal guide --mascot lobster_pointing
-  npx tsx scripts/create-daily-reel.ts --theme pincer-torque --cta-goal quiz --bg-volume 0.16
+  npx tsx scripts/create-daily-reel.ts --theme pincer-torque --cta-goal quiz --color-grade calcified-armor
   npx tsx scripts/create-daily-reel.ts --dry-run --no-veo
 `)
     process.exit(0)
@@ -1031,6 +1104,7 @@ Examples:
   let ctaGoal: any
   let mascot: any
   let holidayOrEvent: string | undefined
+  let colorGrading: any
   let publishNow = false
   let scheduleBestTime = false
   let useVeo = true
@@ -1047,6 +1121,7 @@ Examples:
     else if (args[i] === '--cta-goal' && args[i + 1]) ctaGoal = args[++i]
     else if (args[i] === '--mascot' && args[i + 1]) mascot = args[++i]
     else if (args[i] === '--holiday' && args[i + 1]) holidayOrEvent = args[++i]
+    else if ((args[i] === '--color-grade' || args[i] === '--visual-preset') && args[i + 1]) colorGrading = args[++i]
     else if (args[i] === '--publish-now') publishNow = true
     else if (args[i] === '--schedule-best-time') scheduleBestTime = true
     else if (args[i] === '--no-veo') useVeo = false
@@ -1065,6 +1140,7 @@ Examples:
       ctaGoal,
       mascot,
       holidayOrEvent,
+      colorGrading,
       publishNow,
       scheduleBestTime,
       useVeo,

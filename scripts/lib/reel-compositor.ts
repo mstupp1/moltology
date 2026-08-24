@@ -7,11 +7,39 @@ import { WordBoundaryEvent, chunkWordsIntoPhrases } from './tts-engine'
 
 const execFileAsync = promisify(execFile)
 
+export type ColorGradingPreset =
+  | 'auto'
+  | 'benthic-cyan'
+  | 'thermal-melt'
+  | 'photonics-matrix'
+  | 'calcified-armor'
+  | 'ecdysis-transmute'
+  | 'none'
+
+export const COLOR_GRADING_FILTERS: Record<string, string> = {
+  'benthic-cyan': 'eq=contrast=1.08:brightness=-0.01:saturation=1.08,colorbalance=rs=-0.04:bs=0.08',
+  'thermal-melt': 'eq=contrast=1.08:saturation=1.12,colorbalance=rs=0.08:gs=0.01:bs=-0.06',
+  'photonics-matrix': 'eq=contrast=1.10:brightness=-0.01:saturation=1.12,unsharp=3:3:0.6:3:3:0.0',
+  'calcified-armor': 'eq=contrast=1.10:saturation=0.96,colorbalance=bs=0.04:rs=-0.02,unsharp=3:3:0.6:3:3:0.0',
+  'none': '',
+}
+
+/**
+ * Resolves a specific FFmpeg video filter string for a given color grading preset
+ */
+export function getColorGradingFilter(preset?: ColorGradingPreset | string): string {
+  if (!preset || preset === 'none' || preset === 'auto' || preset === 'ecdysis-transmute') {
+    return ''
+  }
+  return COLOR_GRADING_FILTERS[preset] || ''
+}
+
 export interface CompositeReelOptions {
   videoClips: string[] // Array of local video paths
   voiceoverPath: string
   words: WordBoundaryEvent[]
   outputPath: string
+  colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string | string[]
   backgroundAudioPath?: string
   backgroundAudioVolume?: number // Volume multiplier (default 0.14)
   backgroundAudioOffsetSeconds?: number // Audio start offset in seconds
@@ -489,14 +517,18 @@ export async function renderCtaOutroVideo(
 }
 
 /**
- * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps with continuous forward playback (no jarring loops)
+ * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps with continuous forward playback and optional atmospheric color grading
  */
 export async function normalizeVideoClip(
   inputPath: string,
   outputPath: string,
-  targetDuration?: number
+  targetDuration?: number,
+  colorPreset?: ColorGradingPreset | string
 ): Promise<string> {
-  const baseVf = 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
+  const gradeFilter = getColorGradingFilter(colorPreset)
+  const baseVf = gradeFilter
+    ? `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p,${gradeFilter}`
+    : 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
   const args = ['-y']
 
   if (targetDuration && targetDuration > 0) {
@@ -555,12 +587,26 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
 
   console.log(`   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips @ ${perClipDuration.toFixed(2)}s each)`)
 
-  // 2. Normalize video clips to exact target duration (seamlessly looping shorter clips)
+  // 2. Normalize video clips to exact target duration with contextual color grading
   const normalizedClips: string[] = []
+  const gradingOpt = options.colorGrading || 'auto'
+
   for (let i = 0; i < options.videoClips.length; i++) {
     const normPath = path.join(tempDir, `norm-clip-${i}.mp4`)
-    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${perClipDuration.toFixed(2)}s)...`)
-    await normalizeVideoClip(options.videoClips[i], normPath, perClipDuration)
+    let clipPreset: string | undefined
+
+    if (Array.isArray(gradingOpt)) {
+      clipPreset = gradingOpt[i] || gradingOpt[0] || 'none'
+    } else if (gradingOpt === 'auto' || gradingOpt === 'ecdysis-transmute') {
+      // Subtle narrative arc: Scene 1 (The Problem/Melt) gets warm thermal grade, subsequent scenes get benthic cyan
+      clipPreset = i === 0 ? 'thermal-melt' : 'benthic-cyan'
+    } else {
+      clipPreset = gradingOpt
+    }
+
+    const presetLabel = clipPreset && clipPreset !== 'none' ? ` [Grade: ${clipPreset}]` : ''
+    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${perClipDuration.toFixed(2)}s)${presetLabel}...`)
+    await normalizeVideoClip(options.videoClips[i], normPath, perClipDuration, clipPreset)
     normalizedClips.push(normPath)
   }
 

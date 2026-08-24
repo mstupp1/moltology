@@ -64,5 +64,17 @@ describe('Reel Compositor Rendering', () => {
     const stats = fs.statSync(result)
     expect(stats.size).toBeGreaterThan(10000)
   })
+
+  it('resolves valid FFmpeg video filter strings for color grading presets', async () => {
+    const { getColorGradingFilter } = await import('./reel-compositor')
+    
+    expect(getColorGradingFilter('benthic-cyan')).toContain('eq=contrast=1.08')
+    expect(getColorGradingFilter('benthic-cyan')).toContain('colorbalance=rs=-0.04')
+    expect(getColorGradingFilter('thermal-melt')).toContain('eq=contrast=1.08:saturation=1.12')
+    expect(getColorGradingFilter('photonics-matrix')).toContain('unsharp=3:3:0.6')
+    expect(getColorGradingFilter('calcified-armor')).toContain('saturation=0.96')
+    expect(getColorGradingFilter('none')).toBe('')
+    expect(getColorGradingFilter('auto')).toBe('')
+  })
 })
 
