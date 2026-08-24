@@ -86,6 +86,26 @@ describe('AIChatPanel Guest Mode Gating', () => {
       expect(screen.getAllByText(/Create Account/i).length).toBeGreaterThan(0)
     })
   })
+
+  it('resets conversation to initial welcome when clicking New Chat button', async () => {
+    render(<AIChatPanel userId="usr_valid_user" />)
+
+    const shortcutBtn = screen.getByRole('button', { name: /🦞 What is Moltology\?/i })
+    fireEvent.click(shortcutBtn)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Stage 3 Exoshell requires complete chitin hardening/i)).toBeInTheDocument()
+    })
+
+    const newChatBtn = screen.getByRole('button', { name: /New Chat/i })
+    expect(newChatBtn).toBeInTheDocument()
+    fireEvent.click(newChatBtn)
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Stage 3 Exoshell requires complete chitin hardening/i)).not.toBeInTheDocument()
+      expect(screen.getByText(/What would you like to explore or improve today\?/i)).toBeInTheDocument()
+    })
+  })
 })
 
 describe('sendChatMessageHandler Server Gating', () => {

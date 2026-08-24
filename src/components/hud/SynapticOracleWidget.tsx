@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { BrainCircuit } from 'lucide-react'
+import { getAssetUrl } from '@/lib/assets'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { useSafeOracle } from './OracleContext'
 
@@ -244,7 +244,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   const handleToggle = () => {
     if (oracle) {
-      oracle.toggleMode('popout')
+      oracle.toggleMode()
     } else {
       setLocalIsOpen((prev) => !prev)
     }
@@ -520,8 +520,12 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             title="Drag to Move • Click to Open Oracle AI"
             aria-label="Open Oracle AI Popout"
           >
-            <div className="relative pointer-events-none">
-              <BrainCircuit className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform" />
+            <div className="relative pointer-events-none flex items-center justify-center">
+              <img
+                src={getAssetUrl('/images/order_emblem.png')}
+                alt="Oracle AI"
+                className="w-5 h-5 object-contain filter hue-rotate-180 brightness-110 drop-shadow-[0_0_6px_rgba(0,195,255,0.6)] group-hover:rotate-12 transition-transform"
+              />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
             </div>
             <span className="text-xs tracking-wider text-cyan-300 font-bold pointer-events-none">
@@ -548,64 +552,80 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
               : undefined
           }
         >
-          {/* Edge Resize Handles - Clean invisible hit areas */}
+          {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'n')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
+            title="Double-click to reset window position & size"
           />
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 's')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute bottom-0 left-3 right-3 h-2 cursor-s-resize z-30"
+            title="Double-click to reset window position & size"
           />
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'w')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
+            title="Double-click to reset window position & size"
           />
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'e')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute top-3 bottom-3 right-0 w-2 cursor-e-resize z-30"
+            title="Double-click to reset window position & size"
           />
 
-          {/* Corner Resize Handles - Clean invisible hit areas */}
+          {/* Corner Resize Handles - Clean invisible hit areas (double-click to reset) */}
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
+            title="Double-click to reset window position & size"
           />
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'ne')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
+            title="Double-click to reset window position & size"
           />
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'sw')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
+            title="Double-click to reset window position & size"
           />
           <div
             onPointerDown={(e) => handleResizePointerDown(e, 'se')}
             onPointerMove={handleResizePointerMove}
             onPointerUp={handleResizePointerUp}
             onPointerCancel={handleResizePointerUp}
+            onDoubleClick={handleResetLayout}
             className="absolute bottom-0 right-0 w-3.5 h-3.5 cursor-se-resize z-40"
+            title="Double-click to reset window position & size"
           />
 
           {/* Main Chat Panel */}
@@ -620,9 +640,9 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
               onPointerMove: handleHeaderPointerMove,
               onPointerUp: handleHeaderPointerUp,
               onPointerCancel: handleHeaderPointerUp,
-              title: 'Drag header to move chat window',
+              onDoubleClick: handleResetLayout,
+              title: 'Drag header to move chat window (double-click edge or header to reset)',
             }}
-            onResetLayout={handleResetLayout}
             className="h-full w-full border-none shadow-none"
           />
         </div>

@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
-  BrainCircuit,
   X,
-  RefreshCw,
+  Pencil,
   AlertCircle,
   Minimize2,
-  PanelRight,
   Maximize2,
+  PanelRight,
   ChevronDown,
   Shield,
   UserPlus,
-  RotateCcw,
+  MessageSquare,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
@@ -20,6 +19,7 @@ import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
+import { getAssetUrl } from '../../lib/assets'
 
 export interface AIChatPanelProps {
   userId?: string | null
@@ -32,7 +32,7 @@ export interface AIChatPanelProps {
   showModeControls?: boolean
   headerDragProps?: React.HTMLAttributes<HTMLDivElement>
   isDraggable?: boolean
-  onResetLayout?: () => void
+  onToggleConversations?: () => void
 }
 
 interface ChatMessage {
@@ -60,7 +60,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   showModeControls = true,
   headerDragProps,
   isDraggable = false,
-  onResetLayout,
+  onToggleConversations,
 }) => {
   const oracle = useSafeOracle()
 
@@ -194,6 +194,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }
 
+  const handleNewChat = () => {
+    if (oracle) {
+      oracle.setActiveThreadId(null)
+    }
+    setMessages([buildInitialWelcome()])
+    setErrorMessage(null)
+  }
+
   const handleClose = () => {
     if (oracle) {
       oracle.setMode('closed')
@@ -216,49 +224,29 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       >
         {/* Left Section: Icon, Title & Model Pill */}
         <div className="flex items-center space-x-2 min-w-0 flex-1 truncate">
-          <BrainCircuit className="w-4 h-4 text-cyan-400 animate-pulse shrink-0 pointer-events-none" />
+          {onToggleConversations && (
+            <button
+              type="button"
+              onClick={onToggleConversations}
+              className="flex items-center gap-1.5 bg-[#040707] hover:bg-cyan-950/70 text-cyan-400 hover:text-cyan-200 border border-cyan-800/60 hover:border-cyan-500/70 px-2 py-1 chamfer-corner text-xs font-medium md:hidden transition-colors shrink-0 select-none shadow-sm"
+              title="View Conversations"
+              aria-label="Toggle Conversations"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-bold tracking-wider uppercase hidden xs:inline">
+                Conversations
+              </span>
+            </button>
+          )}
+
+          <img
+            src={getAssetUrl('/images/order_emblem.png')}
+            alt="Oracle"
+            className="w-4 h-4 object-contain filter hue-rotate-180 brightness-110 drop-shadow-[0_0_6px_rgba(0,195,255,0.6)] shrink-0 pointer-events-none"
+          />
           <span className="text-xs font-bold text-cyan-300 tracking-wider truncate pointer-events-none hidden xs:inline">
             {personaName}
           </span>
-
-          {/* Model Selector */}
-          <div
-            className="relative pointer-events-auto shrink-0"
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setModelMenuOpen((v) => !v)}
-              className="flex items-center gap-1 bg-[#040707] border border-cyan-900/70 px-2 py-0.5 chamfer-corner text-[10px] text-cyan-200 hover:border-cyan-500/70 transition-all max-w-[130px]"
-              title="Select Oracle model"
-            >
-              <span>{selectedModel.label}</span>
-              <ChevronDown className="w-3 h-3 text-cyan-500 shrink-0" />
-            </button>
-
-            {modelMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
-                <div className="absolute left-0 top-full mt-1 z-50 bg-[#0b1010] border border-cyan-900/70 shadow-xl shadow-cyan-950/80 chamfer-corner py-1 min-w-44">
-                  {ORACLE_MODELS.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => {
-                        setSelectedModelId(m.id)
-                        setModelMenuOpen(false)
-                      }}
-                      className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 text-[11px] transition-colors ${
-                        m.id === selectedModelId
-                          ? 'bg-cyan-950 text-cyan-200'
-                          : 'text-gray-300 hover:bg-cyan-950/50'
-                      }`}
-                    >
-                      <span className="truncate">{m.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
         </div>
 
         {/* Mode Switcher & Panel Controls */}
@@ -267,59 +255,45 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           onPointerDown={(e) => e.stopPropagation()}
         >
           {showModeControls && oracle && (
-            <div className="flex items-center bg-[#040707] border border-cyan-900/70 p-0.5 chamfer-corner space-x-0.5">
+            <>
               <button
-                onClick={() => handleModeSwitch('popout')}
-                className={`p-1 transition-all rounded-none ${
-                  oracle.mode === 'popout'
-                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/80 shadow-[0_0_8px_rgba(0,195,255,0.4)]'
-                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/40'
-                }`}
-                title="Popout Overlay Widget"
-              >
-                <Minimize2 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => handleModeSwitch('sidebar')}
-                className={`p-1 transition-all rounded-none ${
+                onClick={() => handleModeSwitch(oracle.mode === 'sidebar' ? 'popout' : 'sidebar')}
+                className={`hidden md:inline-flex p-1 transition-colors ${
                   oracle.mode === 'sidebar'
-                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/80 shadow-[0_0_8px_rgba(0,195,255,0.4)]'
-                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/40'
+                    ? 'text-cyan-300 bg-cyan-950/60'
+                    : 'text-gray-400 hover:text-cyan-300'
                 }`}
-                title="Dock to Right Sidebar"
+                title="Sidebar"
+                aria-label="Sidebar"
               >
                 <PanelRight className="w-3.5 h-3.5" />
               </button>
               <button
-                onClick={() => handleModeSwitch('page')}
-                className={`p-1 transition-all rounded-none ${
+                onClick={() => handleModeSwitch(oracle.mode === 'page' ? 'popout' : 'page')}
+                className={`p-1 transition-colors ${
                   oracle.mode === 'page'
-                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/80 shadow-[0_0_8px_rgba(0,195,255,0.4)]'
-                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-950/40'
+                    ? 'text-cyan-300 bg-cyan-950/60'
+                    : 'text-gray-400 hover:text-cyan-300'
                 }`}
-                title="Expand to Full Dedicated Page"
+                title={oracle.mode === 'page' ? 'Popout' : 'Expand'}
+                aria-label={oracle.mode === 'page' ? 'Popout' : 'Expand'}
               >
-                <Maximize2 className="w-3.5 h-3.5" />
+                {oracle.mode === 'page' ? (
+                  <Minimize2 className="w-3.5 h-3.5" />
+                ) : (
+                  <Maximize2 className="w-3.5 h-3.5" />
+                )}
               </button>
-            </div>
-          )}
-
-          {onResetLayout && (
-            <button
-              onClick={onResetLayout}
-              className="text-gray-400 hover:text-cyan-300 p-1 transition-colors"
-              title="Reset Window Position & Size"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+            </>
           )}
 
           <button
-            onClick={() => setMessages([buildInitialWelcome()])}
+            onClick={handleNewChat}
             className="text-gray-400 hover:text-cyan-300 p-1 transition-colors"
-            title="Reset Conversation"
+            title="New Chat"
+            aria-label="New Chat"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <Pencil className="w-3.5 h-3.5" />
           </button>
 
           <button
@@ -396,7 +370,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           ))}
           {isSending && (
             <div className="flex items-center space-x-2 text-cyan-400 text-xs py-1">
-              <BrainCircuit className="w-4 h-4 animate-spin text-cyan-400" />
+              <img
+                src={getAssetUrl('/images/order_emblem.png')}
+                alt="Oracle synthesizing"
+                className="w-4 h-4 object-contain filter hue-rotate-180 brightness-110 animate-spin drop-shadow-[0_0_6px_rgba(0,195,255,0.6)]"
+              />
               <span className="animate-pulse text-[11px]">
                 Synthesizing response via {selectedModel.label}...
               </span>
@@ -409,6 +387,51 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       {/* Input Box */}
       <div className="shrink-0">
         <PromptInput onSubmit={handlePromptSubmit} status={isSending ? 'streaming' : 'ready'} />
+      </div>
+
+      {/* Model Picker Row below typing box */}
+      <div
+        className="px-3 py-1.5 bg-[#050808] border-t border-cyan-950/60 flex items-center justify-between gap-2 shrink-0 select-none text-[11px]"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-1.5">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setModelMenuOpen((v) => !v)}
+              className="flex items-center gap-1.5 bg-[#040707] hover:bg-cyan-950/60 border border-cyan-900/70 hover:border-cyan-500/60 px-2 py-0.5 chamfer-corner text-[10px] text-cyan-200 transition-all cursor-pointer"
+              title="Select Oracle model"
+            >
+              <span>{selectedModel.label}</span>
+              <ChevronDown className="w-3 h-3 text-cyan-500 shrink-0" />
+            </button>
+
+            {modelMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
+                <div className="absolute left-0 bottom-full mb-1.5 z-50 bg-[#0b1010] border border-cyan-900/70 shadow-xl shadow-cyan-950/80 chamfer-corner py-1 min-w-44">
+                  {ORACLE_MODELS.map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedModelId(m.id)
+                        setModelMenuOpen(false)
+                      }}
+                      className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 text-[11px] transition-colors cursor-pointer ${
+                        m.id === selectedModelId
+                          ? 'bg-cyan-950 text-cyan-200 font-medium'
+                          : 'text-gray-300 hover:bg-cyan-950/50'
+                      }`}
+                    >
+                      <span className="truncate">{m.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Auth Modal Triggered from In-Chat Gating CTAs */}

@@ -75,7 +75,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
 
     // Popout window should now be open
     expect(screen.getAllByText('SYNAPTIC ORACLE').length).toBeGreaterThan(0)
-    expect(screen.getByTitle('Drag header to move chat window')).toBeInTheDocument()
+    expect(screen.getByTitle(/Drag header to move chat window/i)).toBeInTheDocument()
   })
 
   it('drags the floating button without opening popout if movement exceeds threshold', () => {
@@ -116,7 +116,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     fireEvent.pointerDown(btn, { clientX: 100, clientY: 100, pointerId: 1, button: 0 })
     fireEvent.pointerUp(btn, { clientX: 100, clientY: 100, pointerId: 1 })
 
-    const header = screen.getByTitle('Drag header to move chat window')
+    const header = screen.getByTitle(/Drag header to move chat window/i)
     expect(header).toBeInTheDocument()
 
     // Drag header to (350, 180)
@@ -141,7 +141,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     fireEvent.pointerUp(reopenBtn, { clientX: 100, clientY: 100, pointerId: 4 })
 
     // Popout window should be open at the exact same saved position
-    const reopenedHeader = screen.getByTitle('Drag header to move chat window')
+    const reopenedHeader = screen.getByTitle(/Drag header to move chat window/i)
     expect(reopenedHeader).toBeInTheDocument()
 
     const currentSaved = localStorage.getItem('moltology:oracle_popout_pos')
@@ -173,8 +173,8 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     expect(savedSize).not.toBeNull()
   })
 
-  it('resets window position and size when clicking reset layout button', () => {
-    render(
+  it('resets window position and size when double clicking window edge', () => {
+    const { container } = render(
       <OracleProvider>
         <SynapticOracleWidget />
       </OracleProvider>
@@ -189,10 +189,10 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     localStorage.setItem('moltology:oracle_popout_pos', JSON.stringify({ x: 100, y: 100 }))
     localStorage.setItem('moltology:oracle_popout_size', JSON.stringify({ width: 500, height: 600 }))
 
-    const resetBtn = screen.getByTitle('Reset Window Position & Size')
-    expect(resetBtn).toBeInTheDocument()
+    const northHandle = container.querySelector('.cursor-n-resize')
+    expect(northHandle).not.toBeNull()
 
-    fireEvent.click(resetBtn)
+    fireEvent.doubleClick(northHandle!)
 
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()

@@ -1,6 +1,7 @@
 import React from 'react'
-import { BrainCircuit, User } from 'lucide-react'
+import { User } from 'lucide-react'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   from: 'user' | 'assistant' | 'system'
@@ -32,7 +33,11 @@ export const Message: React.FC<MessageProps> = ({
           </>
         ) : (
           <>
-            <BrainCircuit className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <img
+              src={getAssetUrl('/images/order_emblem.png')}
+              alt="Oracle"
+              className="w-3.5 h-3.5 object-contain filter hue-rotate-180 brightness-110 drop-shadow-[0_0_4px_rgba(0,195,255,0.5)]"
+            />
             <span>{senderLabel || 'SYNAPTIC ORACLE'}</span>
           </>
         )}
