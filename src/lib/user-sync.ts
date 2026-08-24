@@ -1,12 +1,13 @@
 import { getDb } from '../db'
 import { profiles, userStats } from '../db/schema'
 import { eq, sql } from 'drizzle-orm'
+import { SUPER_ADMIN_EMAILS, isSuperAdminEmail } from './permissions'
 
-export const SUPER_ADMIN_EMAILS = ['mylesstupp@gmail.com']
+export { SUPER_ADMIN_EMAILS }
 
 /**
  * Idempotently ensures a `profiles` and `user_stats` row exist for a Neon Auth user id.
- * Automatically elevates known super admin accounts (e.g. mylesstupp@gmail.com) in `profiles`.
+ * Automatically elevates known super admin accounts in `profiles`.
  */
 export async function ensureUserProfile(userId?: string | null) {
   if (!userId) return null
@@ -19,7 +20,7 @@ export async function ensureUserProfile(userId?: string | null) {
         sql`SELECT email FROM neon_auth.user WHERE id::text = ${userId} LIMIT 1`
       )
       const email = (authUserRes?.rows?.[0] as { email?: string } | undefined)?.email
-      if (email && SUPER_ADMIN_EMAILS.includes(email.toLowerCase())) {
+      if (isSuperAdminEmail(email)) {
         isSuperAdmin = true
       }
     } catch {

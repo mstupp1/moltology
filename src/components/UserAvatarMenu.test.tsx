@@ -84,6 +84,19 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
   })
 
+  it('renders SUPER ADMIN badge when user email is myles@moltology.org', () => {
+    const superAdminUser = {
+      ...mockUser,
+      email: 'myles@moltology.org',
+    }
+    render(<UserAvatarMenu user={superAdminUser} />)
+
+    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
+    fireEvent.click(avatarBtn)
+
+    expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
+  })
+
   it('renders Heavy VFX toggle switch inside dropdown menu and toggles state', () => {
     localStorage.clear()
     render(<UserAvatarMenu user={mockUser} />)
