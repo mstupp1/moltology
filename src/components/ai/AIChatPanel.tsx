@@ -6,22 +6,32 @@ import {
   Minimize2,
   Maximize2,
   PanelRight,
-  MessageSquare,
+  Menu,
   Shield,
   UserPlus,
+  MessageSquare,
+  Lock,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
-import { sendChatMessageFn, getAIMessagesFn } from '../../lib/server/api'
+import { sendChatMessageFn, getAIMessagesFn, getAIThreadsFn } from '../../lib/server/api'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
+import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { getAssetUrl } from '../../lib/assets'
 
 export interface AIChatPanelProps {
+  user?: {
+    name?: string | null
+    email?: string | null
+    image?: string | null
+    avatar?: string | null
+    picture?: string | null
+  } | null
   userId?: string | null
   threadId?: string | null
   personaName?: string
@@ -44,6 +54,7 @@ interface ChatMessage {
 }
 
 export const AIChatPanel: React.FC<AIChatPanelProps> = ({
+  user: propUser,
   userId: propUserId,
   threadId: propThreadId,
   personaName = 'SYNAPTIC ORACLE',
@@ -57,11 +68,29 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   onToggleConversations,
 }) => {
   const oracle = useSafeOracle()
+  const sessionRes = authClient.useSession()
+  const sessionUser = sessionRes?.data?.user || (sessionRes as any)?.user
+  const user = propUser !== undefined ? propUser : sessionUser
 
-  const userId = propUserId !== undefined ? propUserId : oracle?.userId || null
+  const userId =
+    propUserId !== undefined
+      ? propUserId
+      : user?.id || user?.sub || oracle?.userId || null
   const isGuest = !userId
+
+  const [localActiveThreadId, setLocalActiveThreadId] = useState<string | null>(propThreadId || null)
   const activeThreadId =
-    oracle?.activeThreadId !== undefined ? oracle.activeThreadId : propThreadId || null
+    oracle?.activeThreadId !== undefined ? oracle.activeThreadId : propThreadId !== undefined ? propThreadId : localActiveThreadId
+
+  const [localThreads, setLocalThreads] = useState<any[]>([])
+  const [localIsLoadingThreads, setLocalIsLoadingThreads] = useState(false)
+  const [isChatsOpen, setIsChatsOpen] = useState(false)
+
+  const chatsDropdownRef = useRef<HTMLDivElement>(null)
+  const chatsButtonRef = useRef<HTMLButtonElement>(null)
+
+  const threads = oracle ? oracle.threads : localThreads
+  const isLoadingThreads = oracle ? oracle.isLoadingThreads : localIsLoadingThreads
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
@@ -74,6 +103,59 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     setIsMounted(true)
   }, [])
 
+  const refreshLocalThreads = async () => {
+    if (!userId) {
+      setLocalThreads([])
+      return
+    }
+    setLocalIsLoadingThreads(true)
+    try {
+      const data = await getAIThreadsFn({ data: { userId } })
+      if (Array.isArray(data)) {
+        setLocalThreads(data)
+      }
+    } catch (err) {
+      console.warn('Failed to load user AI threads:', err)
+    } finally {
+      setLocalIsLoadingThreads(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!oracle && userId) {
+      refreshLocalThreads()
+    }
+  }, [oracle, userId])
+
+  // Click outside and Escape key listeners to dismiss chats popover
+  useEffect(() => {
+    if (!isChatsOpen) return
+
+    const handleClickOutside = (e: MouseEvent | PointerEvent) => {
+      if (
+        chatsDropdownRef.current &&
+        !chatsDropdownRef.current.contains(e.target as Node) &&
+        chatsButtonRef.current &&
+        !chatsButtonRef.current.contains(e.target as Node)
+      ) {
+        setIsChatsOpen(false)
+      }
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsChatsOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handleClickOutside)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isChatsOpen])
+
   const getTimeString = (d: Date = new Date()) => {
     if (!isMounted) return ''
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -81,27 +163,25 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const selectedModel = getOracleModel(selectedModelId)
 
-  const buildInitialWelcome = (): ChatMessage => ({
-    id: 'welcome-1',
-    role: 'assistant',
-    content: isGuest
-      ? `Welcome! I am the ${personaName}. You're currently exploring in Guest Mode, so answers are brief and chats aren't saved. Sign up for free to unlock full guidance and save your history!`
-      : `Welcome back! I am the ${personaName}. What would you like to explore or improve today?`,
-    timestamp: getTimeString(),
-    isGuest: false,
-  })
-
-  const [messages, setMessages] = useState<ChatMessage[]>([buildInitialWelcome()])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const loadedThreadIdRef = useRef<string | null>(activeThreadId)
 
   // Check if current conversation has active user messages
   const hasUserMessages = messages.some((m) => m.role === 'user')
 
-  // Reset to welcome screen when activeThreadId is null, or fetch thread messages if set
+  // Reset to empty messages when activeThreadId is null, or fetch thread messages if set
   useEffect(() => {
     if (!activeThreadId) {
-      setMessages([buildInitialWelcome()])
+      loadedThreadIdRef.current = null
+      setMessages([])
       return
     }
+
+    if (loadedThreadIdRef.current === activeThreadId) {
+      return
+    }
+
+    loadedThreadIdRef.current = activeThreadId
 
     if (!userId) return
 
@@ -121,9 +201,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 : '',
           }))
           setMessages(mapped)
+        } else {
+          setMessages([])
         }
       })
-      .catch((err) => console.warn('Failed to load thread messages:', err))
+      .catch((err) => {
+        console.warn('Failed to load thread messages:', err)
+        setMessages([])
+      })
   }, [activeThreadId, userId, isMounted, isGuest, selectedModelId])
 
   // Auto scroll to bottom
@@ -161,9 +246,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       })
 
       if (res?.threadId && res.threadId !== activeThreadId) {
+        loadedThreadIdRef.current = res.threadId
         if (oracle) {
           oracle.setActiveThreadId(res.threadId)
           oracle.refreshThreads()
+        } else {
+          setLocalActiveThreadId(res.threadId)
+          if (userId) {
+            refreshLocalThreads()
+          }
         }
         if (onThreadCreated) {
           onThreadCreated(res.threadId)
@@ -192,12 +283,35 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
   }
 
+  const handleToggleChats = () => {
+    if (!isChatsOpen) {
+      if (oracle) {
+        oracle.refreshThreads()
+      } else if (userId) {
+        refreshLocalThreads()
+      }
+    }
+    setIsChatsOpen((prev) => !prev)
+  }
+
+  const handleSelectThread = (selectedId: string) => {
+    if (oracle) {
+      oracle.setActiveThreadId(selectedId)
+    } else {
+      setLocalActiveThreadId(selectedId)
+    }
+    setIsChatsOpen(false)
+  }
+
   const handleNewChat = () => {
     if (oracle) {
       oracle.setActiveThreadId(null)
+    } else {
+      setLocalActiveThreadId(null)
     }
-    setMessages([buildInitialWelcome()])
+    setMessages([])
     setErrorMessage(null)
+    setIsChatsOpen(false)
   }
 
   const handleClose = () => {
@@ -211,36 +325,61 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   return (
     <div
-      className={`flex flex-col bg-[#070c0e]/60 backdrop-blur-md border border-cyan-900/40 shadow-2xl font-sans overflow-hidden h-full w-full ${className}`}
+      className={`flex flex-col bg-[#070c0e]/60 backdrop-blur-md border border-cyan-900/40 shadow-2xl font-sans overflow-hidden h-full w-full relative ${className}`}
     >
+      {/* Faded Grayscale Watermark Logo Background */}
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <img
+          src={getAssetUrl('/images/order_emblem.png')}
+          alt=""
+          className="w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 max-w-[65%] max-h-[65%] object-contain grayscale opacity-[0.035] pointer-events-none select-none"
+        />
+      </div>
+
       {/* Shared Simplified Header */}
       <div
-        className={`bg-[#070c0e]/75 backdrop-blur-md border-b border-cyan-900/40 px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none ${
+        className={`bg-[#070c0e]/75 backdrop-blur-md border-b border-cyan-900/40 px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10 ${
           isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
         }`}
         {...headerDragProps}
       >
-        {/* Left Section: Icon, Title & Model Pill */}
+        {/* Left Section: Icon, Title & Chats Button */}
         <div className="flex items-center space-x-2 min-w-0 flex-1 truncate">
-          {onToggleConversations && (
+          {onToggleConversations ? (
             <button
               type="button"
               onClick={onToggleConversations}
-              className="flex items-center gap-1.5 bg-[#040707] hover:bg-cyan-950/70 text-cyan-400 hover:text-cyan-200 border border-cyan-800/60 hover:border-cyan-500/70 px-2 py-1 chamfer-corner text-xs font-medium md:hidden transition-colors shrink-0 select-none shadow-sm cursor-pointer"
-              title="View Conversations"
-              aria-label="Toggle Conversations"
+              className="text-gray-400 hover:text-cyan-300 p-1 md:hidden transition-colors cursor-pointer shrink-0"
+              title="Chats"
+              aria-label="Toggle Chats"
             >
               <MessageSquare className="w-3.5 h-3.5" />
-              <span className="text-[10px] font-bold tracking-wider uppercase hidden xs:inline">
-                Conversations
-              </span>
+            </button>
+          ) : (
+            <button
+              ref={chatsButtonRef}
+              type="button"
+              onClick={handleToggleChats}
+              className={`p-1 transition-colors cursor-pointer shrink-0 ${
+                isChatsOpen
+                  ? 'text-cyan-300 bg-cyan-950/60 rounded-xs'
+                  : 'text-gray-400 hover:text-cyan-300'
+              }`}
+              title="Chats"
+              aria-label="Toggle Chats"
+              aria-expanded={isChatsOpen}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
             </button>
           )}
 
           <img
             src={getAssetUrl('/images/order_emblem.png')}
             alt="Oracle"
-            className="w-4 h-4 object-contain filter hue-rotate-180 brightness-110 drop-shadow-[0_0_6px_rgba(0,195,255,0.6)] shrink-0 pointer-events-none"
+            className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(0,195,255,0.4)] shrink-0 pointer-events-none"
           />
           <span className="text-xs font-bold text-cyan-300 tracking-wider truncate pointer-events-none hidden xs:inline">
             {personaName}
@@ -304,6 +443,114 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         </div>
       </div>
 
+      {/* Small Scrollable Chats Window Overlay / Dropdown */}
+      {isChatsOpen && (
+        <div
+          ref={chatsDropdownRef}
+          onPointerDown={(e) => e.stopPropagation()}
+          className={`absolute top-10 left-2 z-50 bg-[#060a0d]/95 backdrop-blur-xl border border-cyan-500/60 shadow-2xl shadow-cyan-950/90 rounded-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 font-sans ${
+            isCompact
+              ? 'w-56 sm:w-64 max-w-[calc(100%-1rem)] max-h-[48%]'
+              : 'w-64 sm:w-72 max-w-[calc(100%-1rem)] max-h-[65%]'
+          }`}
+        >
+          {/* Header of the chats window */}
+          <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-cyan-950 bg-[#080e11]/90 shrink-0 select-none">
+            <span className="text-[11px] font-bold text-cyan-500 tracking-wider uppercase font-sans">
+              CHATS
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setIsChatsOpen(false)}
+              className="p-1 text-gray-400 hover:text-red-400 transition-colors cursor-pointer rounded"
+              title="Close Chats Window"
+              aria-label="Close Chats Window"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Scrollable Body */}
+          <div
+            className={`flex-1 overflow-y-auto p-2 space-y-1.5 min-h-0 ${
+              isCompact ? 'max-h-40 sm:max-h-48' : 'max-h-60 sm:max-h-72'
+            }`}
+          >
+            {userId ? (
+              isLoadingThreads ? (
+                <div className="py-6 text-center text-xs text-gray-400 flex flex-col items-center justify-center gap-2">
+                  <img
+                    src={getAssetUrl('/images/order_emblem.png')}
+                    alt="Loading"
+                    className="w-4 h-4 object-contain animate-pulse drop-shadow-[0_0_6px_rgba(0,195,255,0.4)]"
+                  />
+                  <span className="text-[11px] text-cyan-400/80 animate-pulse">Accessing archives...</span>
+                </div>
+              ) : threads.length === 0 ? (
+                <div className="py-6 px-3 text-center text-xs text-gray-400 space-y-2">
+                  <p className="text-[11px] text-gray-400">No recorded chats yet.</p>
+                </div>
+              ) : (
+                threads.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => handleSelectThread(t.id)}
+                    title={t.title}
+                    className={`w-full text-left px-2 py-1.5 text-xs block transition-all chamfer-corner cursor-pointer border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none ${
+                      activeThreadId === t.id
+                        ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
+                        : 'bg-[#080d0e]/50 hover:bg-cyan-950/40 text-gray-400 backdrop-blur-xs'
+                    }`}
+                    style={{ outline: 'none', WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <span className="block truncate select-none">
+                      {t.title || 'Untitled Consultation'}
+                    </span>
+                    {t.createdAt && (
+                      <span className="block text-[9px] text-gray-500 font-mono mt-0.5 select-none">
+                        {new Date(t.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    )}
+                  </button>
+                ))
+              )
+            ) : (
+              /* Guest Mode Notice */
+              <div className="p-3 space-y-3 font-sans">
+                <div className="flex items-center space-x-2 text-cyan-400">
+                  <Lock className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span className="text-xs font-bold tracking-wider uppercase">GUEST MODE</span>
+                </div>
+                <p className="text-[11px] text-gray-400 leading-relaxed">
+                  Chats in guest mode are temporary. Create a free initiate account to preserve your neural consultations.
+                </p>
+                <BenthicCTAButton
+                  variant="red"
+                  size="sm"
+                  fullWidth
+                  onClick={() => {
+                    setIsAuthModalOpen(true)
+                    setIsChatsOpen(false)
+                  }}
+                >
+                  <span className="flex items-center justify-center gap-1.5 text-xs font-bold font-grotesk tracking-wider uppercase">
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>SIGN UP FREE</span>
+                  </span>
+                </BenthicCTAButton>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Error Alert */}
       {errorMessage && (
         <div className="bg-red-950/80 border-b border-red-800 px-3 py-1.5 text-[11px] text-red-300 flex items-center justify-between shrink-0">
@@ -319,7 +566,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
       {/* Main View Area: Either Centered New Chat Screen OR Active Conversation */}
       {!hasUserMessages && !activeThreadId ? (
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0 relative z-10">
           <NewChatScreen
             userId={userId}
             isGuest={isGuest}
@@ -333,7 +580,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           />
         </div>
       ) : (
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative z-10">
           {/* Message Canvas */}
           <Conversation className="flex-1 min-h-0">
             <ConversationContent>
@@ -342,6 +589,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   key={msg.id}
                   from={msg.role === 'user' ? 'user' : 'assistant'}
                   timestamp={msg.timestamp}
+                  user={msg.role === 'user' ? user : undefined}
                 >
                   <MessageContent>
                     <MessageResponse>{msg.content}</MessageResponse>
@@ -372,7 +620,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   <img
                     src={getAssetUrl('/images/order_emblem.png')}
                     alt="Oracle synthesizing"
-                    className="w-4 h-4 object-contain filter hue-rotate-180 brightness-110 animate-spin drop-shadow-[0_0_6px_rgba(0,195,255,0.6)]"
+                    className="w-4 h-4 object-contain animate-pulse drop-shadow-[0_0_6px_rgba(0,195,255,0.4)]"
                   />
                   <span className="animate-pulse text-[11px]">
                     Synthesizing response via {selectedModel.label}...

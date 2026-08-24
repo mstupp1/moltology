@@ -35,11 +35,8 @@ describe('NewChatScreen Component', () => {
     expect(screen.getByRole('button', { name: /Voice Dictation/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Transmit Query/i })).toBeInTheDocument()
 
-    // Suggestions
-    expect(screen.getByRole('button', { name: /🦞 What is Moltology\?/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /⚡ How to level up/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /🛡️ Stop hesitating/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /🌊 The Great Molt vs The Great Melt/i })).toBeInTheDocument()
+    // Subtle thought cycler
+    expect(screen.getByRole('button', { name: /what is moltology/i })).toBeInTheDocument()
   })
 
   it('allows switching workspace via dropdown', () => {
@@ -111,7 +108,7 @@ describe('NewChatScreen Component', () => {
       />
     )
 
-    const suggestionBtn = screen.getByRole('button', { name: /🦞 What is Moltology\?/i })
+    const suggestionBtn = screen.getByRole('button', { name: /what is moltology/i })
     fireEvent.click(suggestionBtn)
 
     expect(mockOnSubmit).toHaveBeenCalledWith({

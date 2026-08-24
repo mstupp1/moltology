@@ -12,9 +12,9 @@ const STORAGE_KEY_POPOUT_POS = 'moltology:oracle_popout_pos'
 const STORAGE_KEY_POPOUT_SIZE = 'moltology:oracle_popout_size'
 
 const MIN_WIDTH = 320
-const MIN_HEIGHT = 380
+const MIN_HEIGHT = 500
 const DEFAULT_WIDTH = 384
-const DEFAULT_HEIGHT = 520
+const DEFAULT_HEIGHT = 640
 
 type ResizeDirection = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
@@ -30,6 +30,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const isPopoutActive = oracle ? oracle.mode === 'popout' : localIsOpen
 
   const [isMounted, setIsMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Positions & sizes state + refs to prevent stale closure bugs
   const [buttonPos, setButtonPos] = useState<{ x: number; y: number } | null>(null)
@@ -169,6 +170,9 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   // Initial load from localStorage on mount
   useEffect(() => {
     setIsMounted(true)
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 640)
+    }
 
     try {
       const savedBtn = localStorage.getItem(STORAGE_KEY_BTN_POS)
@@ -217,6 +221,9 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   useEffect(() => {
     if (!isMounted) return
     const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < 640)
+      }
       if (buttonPosRef.current) {
         const clampedBtn = getSafeButtonCoords(buttonPosRef.current)
         if (clampedBtn.x !== buttonPosRef.current.x || clampedBtn.y !== buttonPosRef.current.y) {
@@ -524,9 +531,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
               <img
                 src={getAssetUrl('/images/order_emblem.png')}
                 alt="Oracle AI"
-                className="w-5 h-5 object-contain filter hue-rotate-180 brightness-110 drop-shadow-[0_0_6px_rgba(0,195,255,0.6)] group-hover:rotate-12 transition-transform"
+                className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(0,195,255,0.4)] transition-transform"
               />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
             </div>
             <span className="text-xs tracking-wider text-cyan-300 font-bold pointer-events-none">
               ORACLE AI
@@ -535,11 +541,15 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         </div>
       ) : (
         <div
-          className={`fixed z-40 font-sans rounded-none overflow-hidden chamfer-corner shadow-2xl shadow-cyan-950/90 border border-cyan-900/80 bg-[#080d0d] ${
-            isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
-          } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`}
+          className={`fixed z-40 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] ${
+            isMobile
+              ? 'inset-x-0 bottom-0 w-full h-[75vh] max-h-[85dvh] border-t border-cyan-500/40 rounded-t-lg rounded-b-none'
+              : `chamfer-corner border border-cyan-900/80 rounded-none ${
+                  isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
+                } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`
+          }`}
           style={
-            currentPopoutPos
+            !isMobile && currentPopoutPos
               ? {
                   left: `${currentPopoutPos.x}px`,
                   top: `${currentPopoutPos.y}px`,
@@ -552,81 +562,86 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
               : undefined
           }
         >
-          {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'n')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
-            title="Double-click to reset window position & size"
-          />
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 's')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute bottom-0 left-3 right-3 h-2 cursor-s-resize z-30"
-            title="Double-click to reset window position & size"
-          />
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'w')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
-            title="Double-click to reset window position & size"
-          />
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'e')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute top-3 bottom-3 right-0 w-2 cursor-e-resize z-30"
-            title="Double-click to reset window position & size"
-          />
+          {/* Resize handles only rendered on desktop / non-mobile */}
+          {!isMobile && (
+            <>
+              {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'n')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
+                title="Double-click to reset window position & size"
+              />
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 's')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute bottom-0 left-3 right-3 h-2 cursor-s-resize z-30"
+                title="Double-click to reset window position & size"
+              />
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'w')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
+                title="Double-click to reset window position & size"
+              />
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'e')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute top-3 bottom-3 right-0 w-2 cursor-e-resize z-30"
+                title="Double-click to reset window position & size"
+              />
 
-          {/* Corner Resize Handles - Clean invisible hit areas (double-click to reset) */}
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
-            title="Double-click to reset window position & size"
-          />
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'ne')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
-            title="Double-click to reset window position & size"
-          />
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'sw')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
-            title="Double-click to reset window position & size"
-          />
-          <div
-            onPointerDown={(e) => handleResizePointerDown(e, 'se')}
-            onPointerMove={handleResizePointerMove}
-            onPointerUp={handleResizePointerUp}
-            onPointerCancel={handleResizePointerUp}
-            onDoubleClick={handleResetLayout}
-            className="absolute bottom-0 right-0 w-3.5 h-3.5 cursor-se-resize z-40"
-            title="Double-click to reset window position & size"
-          />
+              {/* Corner Resize Handles - Clean invisible hit areas (double-click to reset) */}
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
+                title="Double-click to reset window position & size"
+              />
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'ne')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
+                title="Double-click to reset window position & size"
+              />
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'sw')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
+                title="Double-click to reset window position & size"
+              />
+              <div
+                onPointerDown={(e) => handleResizePointerDown(e, 'se')}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+                onDoubleClick={handleResetLayout}
+                className="absolute bottom-0 right-0 w-3.5 h-3.5 cursor-se-resize z-40"
+                title="Double-click to reset window position & size"
+              />
+            </>
+          )}
 
           {/* Main Chat Panel */}
           <AIChatPanel
@@ -634,15 +649,19 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             isCompact={true}
             onClose={handleClose}
             personaName="SYNAPTIC ORACLE"
-            isDraggable={true}
-            headerDragProps={{
-              onPointerDown: handleHeaderPointerDown,
-              onPointerMove: handleHeaderPointerMove,
-              onPointerUp: handleHeaderPointerUp,
-              onPointerCancel: handleHeaderPointerUp,
-              onDoubleClick: handleResetLayout,
-              title: 'Drag header to move chat window (double-click edge or header to reset)',
-            }}
+            isDraggable={!isMobile}
+            headerDragProps={
+              !isMobile
+                ? {
+                    onPointerDown: handleHeaderPointerDown,
+                    onPointerMove: handleHeaderPointerMove,
+                    onPointerUp: handleHeaderPointerUp,
+                    onPointerCancel: handleHeaderPointerUp,
+                    onDoubleClick: handleResetLayout,
+                    title: 'Drag header to move chat window (double-click edge or header to reset)',
+                  }
+                : undefined
+            }
             className="h-full w-full border-none shadow-none"
           />
         </div>
