@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap, Radio, X, Trash2 } from 'lucide-react'
+import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap, Radio, X, Trash2, ListTodo } from 'lucide-react'
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -455,44 +455,6 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           )}
         </div>
       )}
-
-      {/* Footer Control Strip */}
-      <div className="pt-2 border-t border-[#00c3ff]/20 flex items-center justify-between text-[10px] flex-wrap gap-2">
-        {/* Mode & format buttons */}
-        <div className="flex items-center gap-1 flex-wrap">
-          <button
-            onClick={(e) => { e.stopPropagation(); toggleReminders(); }}
-            className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded flex items-center gap-1 hover:border-[#00c3ff]"
-            title="Toggle automated 10m prior toast reminders"
-          >
-            {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
-            <span>{remindersEnabled ? '10M' : 'OFF'}</span>
-          </button>
-
-          <button
-            onClick={(e) => { e.stopPropagation(); triggerTestReminder(); }}
-            className="px-1.5 py-0.5 bg-[#071214] border border-yellow-400/40 text-yellow-400 font-bold rounded flex items-center gap-0.5 hover:border-yellow-400"
-            title="Dispatch instant 10m reminder test toast"
-          >
-            <Zap className="w-2.5 h-2.5 text-yellow-400" />
-            <span>TEST</span>
-          </button>
-
-          <button
-            onClick={(e) => { e.stopPropagation(); setIs24Hour(!is24Hour); }}
-            className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded hover:border-[#00c3ff]"
-          >
-            {is24Hour ? '24H' : '12H'}
-          </button>
-
-          <button
-            onClick={(e) => { e.stopPropagation(); setMode(mode === 'LOCAL' ? 'UTC' : mode === 'UTC' ? 'BENTHIC' : 'LOCAL'); }}
-            className="px-1.5 py-0.5 bg-[#071214] border border-[#00c3ff]/30 text-[#00c3ff] font-bold rounded hover:border-[#00c3ff]"
-          >
-            {mode}
-          </button>
-        </div>
-      </div>
     </>
   )
 
@@ -510,42 +472,40 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsScheduleOpen(!isScheduleOpen) }}
           aria-expanded={isScheduleOpen}
           aria-haspopup="dialog"
-          className={`flex items-center gap-1 sm:gap-1.5 bg-[#02080a]/90 hover:bg-[#061418] border border-[#00c3ff]/40 hover:border-[#00c3ff]/70 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-sans text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 ${className}`}
+          aria-label="Daily alignment tasks schedule"
+          className={`flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 bg-[#02080a]/90 hover:bg-[#061418] border border-[#00c3ff]/40 hover:border-[#00c3ff]/70 rounded-md font-sans text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 ${className}`}
         >
-          {/* Pulsing Clock Icon */}
-          <Clock className="w-3.5 h-3.5 text-[#00c3ff] animate-pulse shrink-0" />
-
-          {/* Compact Digital Time */}
-          <div className="flex items-baseline gap-0.5 tracking-wider font-bold">
-            <span className="text-[#00ffff] filter drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">{hours}</span>
-            <span className="text-[#ff5540] animate-pulse">:</span>
-            <span className="text-[#00ffff] filter drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">{minutes}</span>
-            <span className="text-[#ff5540] animate-pulse hidden xs:inline">:</span>
-            <span className="text-[#00ffff] filter drop-shadow-[0_0_5px_rgba(0,255,255,0.7)] hidden xs:inline">{seconds}</span>
-            {ampm && <span className="text-[9px] text-[#ff5540] ml-0.5">{ampm}</span>}
+          {/* Mobile: Task List Icon */}
+          <div className="flex sm:hidden items-center justify-center relative">
+            <ListTodo className="w-4 h-4 text-[#00c3ff] group-hover:text-[#00ffff] transition-colors" />
+            {toastsList.length > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#ff5540] animate-ping" />
+            )}
           </div>
 
-          {/* Compact Next Activity Preview (Desktop) */}
-          {nextTask && !allTasksCompleted && (
-            <div className="hidden xl:flex items-center gap-1 ml-1 border-l border-[#00c3ff]/25 pl-2 text-[10px] text-[#a8b8b8] truncate max-w-[170px] group-hover:text-[#dfe3e3] transition-colors">
-              <span className="text-[#ff5540] font-bold shrink-0">NEXT:</span>
-              <span className="truncate text-[#dfe3e3]">{nextTask.time} {nextTask.title}</span>
-            </div>
-          )}
+          {/* Desktop (sm and up): Next Task Indicator & Chevron */}
+          <div className="hidden sm:flex items-center gap-1.5">
+            {nextTask && !allTasksCompleted ? (
+              <div className="flex items-center gap-1.5 text-xs text-[#dfe3e3] truncate max-w-[260px] group-hover:text-[#00ffff] transition-colors">
+                <span className="text-[#ff5540] font-bold shrink-0">NEXT:</span>
+                <span className="truncate">{nextTask.title}</span>
+              </div>
+            ) : (
+              <span className="text-xs font-bold text-[#00ffff] tracking-wide">
+                TASKS COMPLETE
+              </span>
+            )}
 
-          {/* Notification / Task Pulse Indicator */}
-          {toastsList.length > 0 ? (
-            <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-ping ml-0.5" />
-          ) : !allTasksCompleted ? (
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] ml-0.5" />
-          ) : null}
+            {toastsList.length > 0 && (
+              <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-ping ml-0.5" />
+            )}
 
-          {/* Chevron Indicator */}
-          <ChevronDown
-            className={`w-3.5 h-3.5 text-[#00c3ff] shrink-0 transition-transform duration-200 ${
-              isScheduleOpen ? 'rotate-180 text-[#00ffff]' : 'group-hover:text-[#00ffff]'
-            }`}
-          />
+            <ChevronDown
+              className={`w-3.5 h-3.5 text-[#00c3ff] shrink-0 transition-transform duration-200 ${
+                isScheduleOpen ? 'rotate-180 text-[#00ffff]' : 'group-hover:text-[#00ffff]'
+              }`}
+            />
+          </div>
         </div>
 
         {/* ═══ DESKTOP FLOATING DROPDOWN MODAL (sm and up) ═══ */}
