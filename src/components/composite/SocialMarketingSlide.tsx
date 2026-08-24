@@ -432,10 +432,12 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
         </div>
 
         {/* Right Column (7 Cols): 3D Mockup + Trust Badge + Quote Bubble */}
-        <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[540px]">
-          
-          {/* Top-Right Circular Golden Trust Certification Seal (Larger, positioned to the right) */}
-          <div className="absolute -top-1 -right-2 z-30 flex flex-col items-center justify-center shrink-0">
+        <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[560px]">
+          {/* Subtle Atmospheric Stage Back-Glow linking character, badge, and platter */}
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,195,255,0.14)_0%,rgba(251,191,36,0.07)_40%,transparent_72%)] pointer-events-none" />
+
+          {/* Top-Right Circular Golden Trust Certification Seal */}
+          <div className="absolute -top-2 -right-1 z-30 flex flex-col items-center justify-center shrink-0">
             <div className="w-[148px] h-[148px] rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0">
               <div className="w-full h-full rounded-full bg-[#060b12] border-2 border-amber-300 flex flex-col items-center justify-center text-center p-2.5">
                 <div className="flex gap-0.5 text-amber-300 text-[13px]">
@@ -518,12 +520,12 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                   </div>
                 </div>
               ) : (
-                /* Three.js Photorealistic 3D Hardcover Book (Enlarged) */
+                /* Three.js Photorealistic 3D Hardcover Book on Oval Platter */
                 <ThreeBookCover
-                  width={470}
-                  height={590}
+                  width={520}
+                  height={650}
                   bookWidth={3.5}
-                  bookHeight={4.9}
+                  bookHeight={4.85}
                   bookThickness={0.48}
                   rotateY={0.36}
                   rotateX={0.05}
@@ -541,7 +543,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           </div>
 
           {/* Floating Quote Callout on Lower Right */}
-          <div className="absolute -bottom-2 right-0 z-30 max-w-[250px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-amber-400 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md">
+          <div className="absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-amber-400 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md">
             <div className="flex items-start gap-1.5">
               <span className="text-amber-400 font-serif text-2xl leading-none">“</span>
               <p className="text-xs font-semibold text-slate-100 leading-snug">
