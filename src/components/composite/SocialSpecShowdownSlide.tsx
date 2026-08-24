@@ -69,9 +69,9 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
     >
       {/* 1. Category Pill Badge */}
       <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono font-bold text-sm tracking-wider text-cyan-300 uppercase">
+        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
+          <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="font-mono font-bold text-lg tracking-widest text-cyan-300 uppercase">
             {categoryBadge}
           </span>
         </div>
@@ -79,7 +79,7 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
 
       {/* 2. Headline */}
       <div className="mt-4">
-        <h1 className="text-[50px] leading-tight font-black text-white tracking-tight uppercase">
+        <h1 className="text-[62px] leading-[1.02] font-black text-white tracking-tight uppercase">
           {headline}
         </h1>
       </div>
@@ -87,7 +87,6 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
       {/* 3. Three Structured Comparison Cards */}
       <div className="mt-4 space-y-4 flex-1">
         {cards.map((card, idx) => {
-          const isThird = idx === 2
           const variantClasses = {
             red: 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]',
             cyan: 'bg-[#041822]/90 border-cyan-400/85 shadow-[0_0_20px_rgba(0,255,230,0.25)]',
@@ -105,35 +104,33 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
           return (
             <div
               key={idx}
-              className={`p-5 rounded-xl border backdrop-blur-md transition-all ${variantClasses} ${
-                isThird ? 'w-[64%]' : 'w-full'
-              }`}
+              className={`w-[64%] p-6 rounded-2xl border backdrop-blur-md transition-all ${variantClasses}`}
             >
               <div className="flex items-center gap-3">
-                <span className="px-2 py-0.5 rounded bg-black/40 border border-white/20 font-mono font-black text-xs text-white">
+                <span className="px-3 py-1 rounded-md bg-black/50 border border-white/25 font-mono font-black text-sm text-white">
                   {card.number}
                 </span>
-                <span className={`font-mono font-bold text-sm tracking-wider uppercase ${headerColor}`}>
+                <span className={`font-mono font-bold text-[19px] tracking-wider uppercase ${headerColor}`}>
                   {card.title}
                 </span>
               </div>
 
-              <div className="mt-2 font-mono font-black text-3xl text-white tracking-tight">
+              <div className="mt-2.5 font-mono font-black text-[40px] leading-tight text-white tracking-tight">
                 {card.metric}
               </div>
 
               {card.description && (
-                <p className="mt-2 text-sm text-slate-300 font-sans leading-relaxed">
+                <p className="mt-2 text-[17px] text-slate-200 font-sans leading-snug">
                   {card.description}
                 </p>
               )}
 
               {card.bullets && (
-                <ul className="mt-2 space-y-1 text-xs text-slate-300">
+                <ul className="mt-2.5 space-y-1.5 text-[15px] text-slate-200">
                   {card.bullets.map((b, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full bg-cyan-400" />
-                      <span>{b}</span>
+                    <li key={i} className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
+                      <span className="font-medium">{b}</span>
                     </li>
                   ))}
                 </ul>
@@ -146,19 +143,19 @@ export const SocialSpecShowdownSlide: React.FC<SocialSpecShowdownSlideProps> = (
         <MascotOverlay
           mascot={mascot}
           position="bottom-right"
-          width={350}
+          width={360}
           className="bottom-14 right-2"
         />
       </div>
 
       {/* 4. Bottom Navigation & Logo */}
       <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-800/80">
-        <div className="flex items-center gap-2 font-mono font-bold text-base text-slate-400">
+        <div className="flex items-center gap-3 font-mono font-bold text-[22px] text-slate-300">
           <span>{swipeCta}</span>
-          <ArrowRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+          <ArrowRight className="w-7 h-7 text-cyan-400 animate-pulse" />
         </div>
 
-        <MoltNationLogo size="sm" theme="dark" />
+        <MoltNationLogo size="md" theme="dark" />
       </div>
     </CompositeContainer>
   )

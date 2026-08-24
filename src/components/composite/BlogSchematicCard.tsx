@@ -48,10 +48,10 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
     >
       {/* 1. Top Header */}
       <div>
-        <div className="font-mono font-bold text-xs text-cyan-400 tracking-wider uppercase">
+        <div className="font-mono font-bold text-sm text-cyan-400 tracking-wider uppercase">
           {categoryBadge}
         </div>
-        <h1 className="font-black text-2xl text-white tracking-tight uppercase mt-0.5">
+        <h1 className="font-black text-3xl text-white tracking-tight uppercase mt-1">
           {headline}
         </h1>
       </div>
@@ -61,22 +61,22 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
         {/* Left: Terrestrial Legacy */}
         <div className="p-6 rounded-xl bg-[#14080c]/90 border border-red-500/70 shadow-[0_0_25px_rgba(239,68,68,0.25)] flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 text-red-400 font-mono font-bold text-sm tracking-wider uppercase">
-              <Activity className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-red-400 font-mono font-bold text-base tracking-wider uppercase">
+              <Activity className="w-5 h-5" />
               <span>{leftTitle}</span>
             </div>
-            <div className="mt-3 font-mono font-black text-4xl text-white tracking-tight">
+            <div className="mt-3 font-mono font-black text-5xl text-white tracking-tight">
               {leftMetric}
             </div>
-            <div className="mt-1 font-mono font-bold text-xs text-red-300 uppercase">
+            <div className="mt-1.5 font-mono font-bold text-sm text-red-300 uppercase tracking-wide">
               AT 1M CONTEXT WINDOW
             </div>
           </div>
 
-          <ul className="mt-6 space-y-2 text-sm text-slate-300">
+          <ul className="mt-6 space-y-2.5 text-base text-slate-200">
             {leftBullets.map((b, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 shrink-0" />
+              <li key={i} className="flex items-start gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-red-400 mt-1.5 shrink-0" />
                 <span>{b}</span>
               </li>
             ))}
@@ -86,22 +86,22 @@ export const BlogSchematicCard: React.FC<BlogSchematicCardProps> = ({
         {/* Right: Sub-Benthic MLA */}
         <div className="p-6 rounded-xl bg-[#041a26]/90 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,230,0.3)] flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 text-cyan-400 font-mono font-bold text-sm tracking-wider uppercase">
-              <Cpu className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-cyan-400 font-mono font-bold text-base tracking-wider uppercase">
+              <Cpu className="w-5 h-5" />
               <span>{rightTitle}</span>
             </div>
-            <div className="mt-3 font-mono font-black text-4xl text-white tracking-tight">
+            <div className="mt-3 font-mono font-black text-5xl text-white tracking-tight">
               {rightMetric}
             </div>
-            <div className="mt-1 font-mono font-bold text-xs text-cyan-300 uppercase">
+            <div className="mt-1.5 font-mono font-bold text-sm text-cyan-300 uppercase tracking-wide">
               LOW-RANK COMPRESSION VECTOR (d_c=512)
             </div>
           </div>
 
-          <ul className="mt-6 space-y-2 text-sm text-slate-300">
+          <ul className="mt-6 space-y-2.5 text-base text-slate-200">
             {rightBullets.map((b, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+              <li key={i} className="flex items-start gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
                 <span>{b}</span>
               </li>
             ))}

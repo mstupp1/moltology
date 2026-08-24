@@ -60,9 +60,9 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
     >
       {/* 1. Category Pill Badge */}
       <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono font-bold text-sm tracking-wider text-cyan-300 uppercase">
+        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
+          <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="font-mono font-bold text-lg tracking-widest text-cyan-300 uppercase">
             {categoryBadge}
           </span>
         </div>
@@ -70,31 +70,31 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
 
       {/* 2. Headline */}
       <div className="mt-4 space-y-1">
-        <h1 className="text-[52px] leading-tight font-black text-white tracking-tight uppercase">
+        <h1 className="text-[64px] leading-[1.02] font-black text-white tracking-tight uppercase">
           {headlinePart1}
         </h1>
-        <h2 className="text-[52px] leading-tight font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-sky-400 drop-shadow-[0_0_20px_rgba(0,255,230,0.4)] tracking-tight uppercase">
+        <h2 className="text-[64px] leading-[1.02] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-sky-400 drop-shadow-[0_0_20px_rgba(0,255,230,0.4)] tracking-tight uppercase">
           {headlinePart2}
         </h2>
       </div>
 
       {/* 3. Actionable Directives List */}
-      <div className="mt-5 space-y-3.5">
+      <div className="mt-5 space-y-4">
         {directives.map((item, idx) => (
           <div
             key={idx}
-            className="p-4 rounded-xl bg-[#04141e]/90 border border-cyan-500/40 backdrop-blur-md shadow-lg flex items-start gap-4"
+            className="p-6 rounded-2xl bg-[#04141e]/90 border border-cyan-500/40 backdrop-blur-md shadow-lg flex items-start gap-5"
           >
             {/* Number Pill */}
-            <div className="w-12 h-12 rounded-lg bg-cyan-950/80 border border-cyan-400/90 text-cyan-300 font-mono font-black text-xl flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,195,255,0.25)]">
+            <div className="w-16 h-16 rounded-2xl bg-cyan-950/80 border border-cyan-400/90 text-cyan-300 font-mono font-black text-3xl flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,195,255,0.25)]">
               {item.number}
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-mono font-bold text-lg text-white tracking-wide uppercase">
+              <h3 className="font-mono font-bold text-[23px] text-white tracking-wide uppercase">
                 {item.title}
               </h3>
-              <p className="mt-1 text-sm text-slate-300 font-sans leading-relaxed">
+              <p className="mt-1.5 text-[18px] text-slate-200 font-sans leading-snug">
                 {item.description}
               </p>
             </div>
@@ -103,21 +103,21 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
       </div>
 
       {/* 4. Hero CTA Card & Pointing Lobster */}
-      <div className="mt-5 relative flex-1 flex items-stretch">
-        <div className="w-[62%] p-6 rounded-2xl bg-[#041a26]/95 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,230,0.25)] flex flex-col justify-between">
-          <div>
-            <div className="font-mono font-bold text-xs text-sky-400 uppercase tracking-wider mb-2">
-              {ctaHeader}
-            </div>
-            <div className="w-full py-4 px-5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-[#020b10] font-mono font-black text-lg uppercase tracking-tight flex items-center justify-between shadow-[0_0_20px_rgba(0,255,230,0.4)] cursor-pointer">
-              <span>{ctaButtonText}</span>
-              <ArrowUpRight className="w-6 h-6 stroke-[3]" />
-            </div>
+      <div className="mt-6 relative flex-1 flex items-start">
+        <div className="w-[62%] h-fit p-7 rounded-3xl bg-[#041a26]/95 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,230,0.25)] flex flex-col">
+          <div className="font-mono font-bold text-base text-sky-400 uppercase tracking-wider mb-3">
+            {ctaHeader}
+          </div>
+          <div className="w-full py-5 px-7 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-[#020b10] font-mono font-black text-[24px] uppercase tracking-tight flex items-center justify-between shadow-[0_0_20px_rgba(0,255,230,0.4)] cursor-pointer">
+            <span>{ctaButtonText}</span>
+            <ArrowUpRight className="w-8 h-8 stroke-[3.5]" />
           </div>
 
-          <div className="text-xs text-slate-400 font-sans pt-2">
-            {ctaSubtitle}
-          </div>
+          {ctaSubtitle && (
+            <div className="text-[16px] font-medium text-slate-300 font-sans pt-3.5">
+              {ctaSubtitle}
+            </div>
+          )}
         </div>
 
         {/* Mascot */}
@@ -131,11 +131,11 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
 
       {/* 5. Bottom Logo & Watermark */}
       <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-800/80">
-        <div className="font-mono text-xs text-slate-500 tracking-wider">
+        <div className="font-mono text-base text-slate-400 tracking-wider">
           ONE NATION UNDER CHITIN
         </div>
 
-        <MoltNationLogo size="sm" theme="dark" />
+        <MoltNationLogo size="md" theme="dark" />
       </div>
     </CompositeContainer>
   )

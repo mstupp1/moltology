@@ -403,7 +403,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           {finalBenefits.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-4 p-4 rounded-2xl bg-[#041b30]/95 border-2 border-cyan-400/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform"
+              className="flex items-center gap-4 p-5 rounded-2xl bg-[#041b30]/95 border-2 border-cyan-400/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform"
             >
               {/* Circular Icon Badge */}
               <div
@@ -420,10 +420,10 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
               {/* Text Info */}
               <div className="min-w-0 flex-1">
-                <h4 className="font-mono font-black text-[17px] tracking-wide text-white uppercase leading-tight truncate">
+                <h4 className="font-mono font-black text-[19px] tracking-wide text-white uppercase leading-tight truncate">
                   {item.title}
                 </h4>
-                <p className="text-[14px] text-slate-200 font-sans font-medium leading-snug mt-1 line-clamp-2">
+                <p className="text-[16px] text-slate-200 font-sans font-medium leading-snug mt-1 line-clamp-2">
                   {item.description}
                 </p>
               </div>
@@ -557,7 +557,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
       {/* 3. Massive High-Contrast Comment-to-DM Bottom CTA Banner */}
       <div className="mt-2 z-20 shrink-0">
-        <div className="w-full py-5 px-8 rounded-3xl bg-[#01060e] border-4 border-amber-400 shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden">
+        <div className="w-full py-6 px-9 rounded-3xl bg-[#01060e] border-4 border-amber-400 shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden">
           {/* Subtle static amber background accent */}
           <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-yellow-400/15 to-amber-500/10 pointer-events-none" />
 
@@ -567,7 +567,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           </div>
 
           {/* Center Callout: Comment "KEYWORD" below */}
-          <div className="flex items-center justify-center gap-4.5 mx-auto">
+          <div className="flex items-center justify-center gap-4 mx-auto">
             <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 flex items-center justify-center shadow-2xl font-black shrink-0 border-2 border-yellow-100">
               <MessageSquare className="w-8 h-8 fill-slate-950" />
             </div>
@@ -592,13 +592,13 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       </div>
 
       {/* 4. Sub-footer Link in Bio & Watermark */}
-      <div className="mt-3 flex items-center justify-between text-xs font-mono text-slate-400 z-10 shrink-0">
-        <div className="flex items-center gap-2 font-bold text-sm">
+      <div className="mt-3 flex items-center justify-between text-sm font-mono text-slate-400 z-10 shrink-0">
+        <div className="flex items-center gap-2 font-bold text-base">
           <span className="text-cyan-300">🔗 Link in bio & story</span>
           <span>·</span>
           <span className="text-slate-300">moltology.org</span>
         </div>
-        <MoltNationLogo size="sm" theme="dark" />
+        <MoltNationLogo size="md" theme="dark" />
       </div>
     </CompositeContainer>
   )

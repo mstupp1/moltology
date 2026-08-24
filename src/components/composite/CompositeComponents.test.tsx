@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { CompositeContainer } from './CompositeContainer'
 import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
+import { SocialDirectivesSlide } from './SocialDirectivesSlide'
 import { ReelOutroCard } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
@@ -23,8 +24,8 @@ describe('Composite UI Components', () => {
     expect(frame.style.height).toBe('1350px')
   })
 
-  it('renders SocialHookSlide with badges, headlines, and metrics', () => {
-    render(
+  it('renders SocialHookSlide with badges, headlines, metrics, and fit-height metrics container', () => {
+    const { container } = render(
       <SocialHookSlide
         categoryBadge="TEST BADGE"
         headlinePart1="PART ONE"
@@ -51,10 +52,15 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('HIGHLIGHT')).toBeInTheDocument()
     expect(screen.getByText('100 GB')).toBeInTheDocument()
     expect(screen.getByText('-50%')).toBeInTheDocument()
+    expect(screen.getByText('Key Architectural Metrics')).toBeInTheDocument()
+
+    // Verify key architectural metrics container wraps text and doesn't stretch to bottom
+    const metricsContainer = screen.getByText('Key Architectural Metrics').closest('.w-\\[62\\%\\]')
+    expect(metricsContainer).toHaveClass('h-fit')
   })
 
-  it('renders SocialSpecShowdownSlide with comparison cards', () => {
-    render(
+  it('renders SocialSpecShowdownSlide with all 3 comparison cards having equal 64% width', () => {
+    const { container } = render(
       <SocialSpecShowdownSlide
         headline="TEST SPEC SHOWDOWN"
         cards={[
@@ -65,14 +71,61 @@ describe('Composite UI Components', () => {
             description: 'First card desc',
             variant: 'red',
           },
+          {
+            number: '02',
+            title: 'CARD TWO',
+            metric: '88.8%',
+            description: 'Second card desc',
+            variant: 'cyan',
+          },
+          {
+            number: '03',
+            title: 'CARD THREE',
+            metric: '77.7%',
+            description: 'Third card desc',
+            variant: 'sky',
+          },
         ]}
       />
     )
 
     expect(screen.getByText('TEST SPEC SHOWDOWN')).toBeInTheDocument()
     expect(screen.getByText('CARD ONE')).toBeInTheDocument()
-    expect(screen.getByText('99.9%')).toBeInTheDocument()
-    expect(screen.getByText('First card desc')).toBeInTheDocument()
+    expect(screen.getByText('CARD TWO')).toBeInTheDocument()
+    expect(screen.getByText('CARD THREE')).toBeInTheDocument()
+
+    // Verify all 3 cards have w-[64%]
+    const card1 = screen.getByText('CARD ONE').closest('.w-\\[64\\%\\]')
+    const card2 = screen.getByText('CARD TWO').closest('.w-\\[64\\%\\]')
+    const card3 = screen.getByText('CARD THREE').closest('.w-\\[64\\%\\]')
+    expect(card1).toBeInTheDocument()
+    expect(card2).toBeInTheDocument()
+    expect(card3).toBeInTheDocument()
+    expect(card1).toHaveClass('w-[64%]')
+    expect(card2).toHaveClass('w-[64%]')
+    expect(card3).toHaveClass('w-[64%]')
+  })
+
+  it('renders SocialDirectivesSlide with fit-height CTA card', () => {
+    render(
+      <SocialDirectivesSlide
+        headlinePart1="DIRECTIVE TITLE"
+        headlinePart2="SUBTITLE"
+        ctaHeader="READ THE FULL DISPATCH"
+        ctaButtonText="VISIT MOLTOLOGY"
+      />
+    )
+
+    expect(screen.getByText('DIRECTIVE TITLE')).toBeInTheDocument()
+    expect(screen.getByText('SUBTITLE')).toBeInTheDocument()
+    expect(screen.getByText('READ THE FULL DISPATCH')).toBeInTheDocument()
+    expect(screen.getByText('VISIT MOLTOLOGY')).toBeInTheDocument()
+
+    // Verify CTA card has h-fit and w-[62%]
+    const ctaCard = screen.getByText('READ THE FULL DISPATCH').closest('.w-\\[62\\%\\]')
+    expect(ctaCard).toBeInTheDocument()
+    expect(ctaCard).toHaveClass('h-fit')
+    expect(ctaCard).toHaveClass('w-[62%]')
   })
 
   it('renders ReelOutroCard with brand emblem, headline, CTA button, and removes zero latency telemetry and tap to audit', () => {
