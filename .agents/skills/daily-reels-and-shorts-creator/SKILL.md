@@ -30,8 +30,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
 * **Dynamic Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, with `+8%` to `+14%` rate) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
-* **1:1 Grid Safe Thumbnails with Mascots**: Custom 1080x1920 covers with bold high-contrast headlines, category pills, and homepage mascot cutouts rendered in the 1:1 square safe zone (`Y=420` to `Y=1500`).
-* **Asset Storage**: Neon S3 (`videos/social/reels/` and `images/social/thumbnails/`).
+* **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
 * **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `queue_preview_queue`, `queue_get_next_queue_slot`).
 * **Queue Configuration**:
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
@@ -40,7 +39,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
 
 ---
 
-## 2. 7-Step Production Workflow
+## 2. 6-Step Production Workflow
 
 ### Step 1: Dynamic Research, Topic Ideation & Anti-Repetition Check
 1. **Mandatory History Check**:
@@ -117,7 +116,7 @@ Run the master compositor to dynamically size video scenes to match voiceover le
    - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, Memristive Tactile E-Skins, or Subsea Datacenters*).
    - **Strict Rules**:
      1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
-     2. Ensure the cartoon crustacean mascot in the bottom right is subtly and warmly illuminated with gentle atmospheric backlighting and soft golden-cyan rim-lighting (avoid harsh, overexposed theatrical spotlights or stark bright floor beams) so it naturally stands out with clarity and warmth against darker scenes.
+     2. **Character Visibility & Natural Scene Blending**: Make sure the cartoon crustacean mascot in the bottom right is clearly visible and seamlessly blended into the scene with consistent ambient lighting. The lighting effect should **not be obvious** (avoid artificial backlight halos, stark spotlights, or exaggerated rim lights). Given enough space, the character can be a bit larger than its reference to ensure strong visual clarity, presence, and personality.
    - Pass the generated image path via `--custom-outro <path>` to `npm run reel:create` (or `customOutroImagePath` to `compositeReel`).
 
 ```typescript
@@ -153,33 +152,10 @@ await compositeReel({
 
 ---
 
-### Step 6: 1:1 Grid-Safe Custom Thumbnail Generation (With Mascot Cutouts)
-For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
-1. **Grid Safe Zone Rule**: While full-screen reels are `1080x1920` (9:16), the profile grid crops to the center `1080x1080` (1:1 square, between `Y=420` and `Y=1500`).
-2. **Mascot Stamping**: The selected mascot cutout is cleanly drawn in the bottom corner of the 1:1 safe zone (`X = 740, Y = 1200`), pointing or reacting to the hook headline.
-3. **Custom Image Generation Policy**: If a bespoke custom background illustration or graphic is generated rather than extracting a video frame, it MUST be generated exclusively using Antigravity's built-in `generate_image` tool (never Gemini API / external endpoints).
-   * **Unavailability Rule**: If `generate_image` is unavailable or hits rate limits, **STOP THE RUN IMMEDIATELY** and present the proposed plan/prompts to the user for decision.
-4. **Execution**:
-   ```typescript
-   import { renderReelThumbnail } from 'scripts/lib/reel-compositor'
+### Step 6: S3 Upload & Zernio MCP Multi-Platform Staging
 
-   await renderReelThumbnail({
-     backgroundVideoOrImagePath: masterReelPath,
-     headline: "800 NM OF PINCER TORQUE",
-     subtitle: "PINCER TORQUE DYNAMOMETRY",
-     categoryBadge: "TELEMETRY DISPATCH",
-     mascot: "crab_stats",
-     outputPath: 'tmp/custom-thumbnail.jpg',
-   })
-   ```
-
----
-
-### Step 7: S3 Upload & Zernio MCP Multi-Platform Staging
-
-1. **Upload Assets to Neon S3**:
-   * Video: `videos/social/reels/reel-<timestamp>.mp4`
-   * Thumbnail: `images/social/thumbnails/reel-thumb-<timestamp>.jpg`
+1. **Upload Master Reel to Neon S3**:
+   * Video: `videos/social/reels/master-reel-<timestamp>.mp4`
 
 2. **Mandatory Zernio Queue Routing & Trial Reels**:
    * **Strict Queue Rule**: All reels/shorts MUST ALWAYS be routed into the designated Zernio queue (`queued_from_profile: '6a7f74b1839bf39ff3b6aaaa'`, `queue_id: '6a84b7702421e968ac81f5bd'`).
@@ -196,7 +172,7 @@ For maximum Explore click-through rate (CTR) and clean profile grid aesthetics:
      - Save without scheduling when manual human sign-off is requested.
 
 3. **Update Narrative History Ledger**:
-   * Append record to `content/social/instagram-reel-history.json` with `thumbnailUrl`, `s3Key`, `isAiGenerated`, `ctaGoal`, `commentTriggerKeyword`, `commentTriggerUrl`, `trialParams`, and platform IDs (`status: "queued"`, `"published"`, or `"draft"`).
+   * Append record to `content/social/instagram-reel-history.json` with `s3Url`, `s3Key`, `durationSeconds`, `isAiGenerated`, `ctaGoal`, `commentTriggerKeyword`, `commentTriggerUrl`, `trialParams`, and platform IDs (`status: "queued"`, `"published"`, or `"draft"`).
 
 ---
 

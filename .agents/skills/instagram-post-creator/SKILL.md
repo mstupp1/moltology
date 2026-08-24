@@ -18,6 +18,7 @@ Transparent PNG character cutouts reside in the Neon S3 public assets bucket und
 
 * **Discovery**: Inspect `images/characters/` in S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to select a mascot for post overlays.
 * **Compositing**: Any character in `images/characters/` can be stamped onto social cards via `overlayCharacterOnImage` or ComfyUI composite workflows.
+* **Character Visibility & Natural Scene Blending**: Characters must always be clearly visible with strong contrast against the background, naturally blended into the scene with ambient environmental shading. Lighting on the character should **not be obvious** (avoid artificial backlight halos or stark rim lines). When space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
 * **New Characters**: To generate a new mascot with distinct attire, personality, or pose, use the `character-creator` skill.
 
 ---
