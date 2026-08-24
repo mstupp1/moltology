@@ -47,7 +47,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   initialTemplate = 'marketing-leadmagnet',
   initialTheme = 'moltmaxxing-guide',
   initialAspect = '4:5',
-  initialMascot = 'lobster_pointing',
+  initialMascot = 'lobster_thumbs_up',
 }) => {
   const [template, setTemplate] = useState<CompositeTemplateType>(initialTemplate)
   const [aspect, setAspect] = useState<CompositeAspectRatio>(initialAspect)
@@ -164,7 +164,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('2026 PROTOCOL')
       setQuoteText('Everything you need to shatter biological hesitation and build armored focus!')
       setCommentKeyword('GUIDE')
-      setMascot('lobster_pointing')
+      setMascot('lobster_thumbs_up')
     } else if (selectedTheme === 'moltmax-quiz') {
       setCategoryBadge('FREE 2-MINUTE AUDIT · 15 BIOMETRIC METRICS')
       setHeadlinePart1('AUDIT YOUR SHELL.')
@@ -206,7 +206,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setTrustBadgeYear('12 VOLUMES')
       setQuoteText('The sacred doctrines that turned human hesitation into high-torque titan power!')
       setCommentKeyword('CODEX')
-      setMascot('lobster_pointing')
+      setMascot('lobster_thumbs_up')
     } else if (selectedTheme === 'pincer-routine') {
       setCategoryBadge('TACTICAL BLUEPRINT · 1-PAGE CHEAT SHEET')
       setHeadlinePart1('STOP PROCRASTINATING.')

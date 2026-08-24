@@ -201,7 +201,7 @@ describe('Composite UI Components', () => {
     expect(container.querySelector('.animate-ping')).toBeNull()
 
     // Verify mascot is positioned at top-right
-    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_pointing"]')
+    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_thumbs_up"]')
     expect(mascotWrapper).toBeInTheDocument()
     expect(mascotWrapper?.className).toContain('top-2')
     expect(mascotWrapper?.className).toContain('right-0')

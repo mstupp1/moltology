@@ -118,6 +118,11 @@ export async function loadCharacterImage(characterKey: CharacterKey | string): P
     return await loadImage(localPath)
   }
 
+  const scratchPath = path.resolve(process.cwd(), 'scratch/character_refs', info.filename)
+  if (fs.existsSync(scratchPath)) {
+    return await loadImage(scratchPath)
+  }
+
   // Fetch from Neon S3 public assets bucket
   try {
     const res = await fetch(info.publicUrl)

@@ -46,16 +46,18 @@ Always invoke the built-in Antigravity `generate_image` tool with strict backgro
 
 #### Prompt Blueprint:
 ```text
-3D Pixar and Overwatch style, cute charismatic cybernetic cartoon [SUBJECT], [ACTION_OR_POSE], [EXPRESSION_AND_DETAILS], [MATERIAL_PROPERTIES_E.G._CHITIN_METALLIC_GOLD_CYAN_LEDS], isolated on a completely uniform seamless flat solid vivid [COLOR_NAME] background (hex #[HEX_CODE]), perfectly plain solid flat [COLOR_NAME], no gradients, no textures, no floor, no shadows on the background, clean sharp vector-like outline, the subject does not contain any [COLOR_NAME] color, high-resolution full body render.
+3D Pixar and DreamWorks animated feature film CGI style, high-end 3D character render, cute charismatic cartoon [SUBJECT], [ACTION_OR_POSE], [EXPRESSION_AND_DETAILS], smooth chitin shell with subtle satin sheen and soft specular highlights along curved contours, warm underbelly with subsurface scattering, volumetric 3D modeling with ray-traced ambient occlusion, isolated on a completely uniform seamless flat solid vivid [COLOR_NAME] background (hex #[HEX_CODE]), perfectly plain solid flat [COLOR_NAME], no gradients, no textures, no floor, no shadows on the background, clean sharp silhouette, the subject does not contain any [COLOR_NAME] color, no 2D flat illustration, no flat vector art, no cel-shading, high-resolution full body 3D character render.
 ```
 
 #### Key Prompt Constraints:
 * **Explicit Background Isolation**: State `"isolated on a completely uniform seamless flat solid vivid [COLOR] background"` and `"perfectly plain solid flat [COLOR]"`.
 * **Zero Shadow / Gradient Constraint**: State `"no gradients, no textures, no floor, no shadows on the background"`.
 * **Negative Color Exclusion**: Explicitly declare `"the subject does not contain any [COLOR] color"`.
+* **Anti-Flatness Guards**: Explicitly include `"no 2D flat illustration, no flat vector art, no cel-shading, high-end 3D CGI character render"`.
 * **Tool Call Parameters**:
   - `AspectRatio`: `'1:1'` (mascots/stickers), `'3:4'` (standing characters), or `'16:9'` (wide scene elements).
   - `ImageName`: Descriptive lowercase name (e.g. `mantis_punch_chroma`).
+  - `ImagePaths`: Optional paths to existing character references (e.g. `scratch/character_refs/char_lobster_speed_action.png`) for style anchoring.
 
 ---
 
@@ -64,7 +66,7 @@ Always invoke the built-in Antigravity `generate_image` tool with strict backgro
 Call `generate_image` directly:
 ```json
 {
-  "Prompt": "3D Pixar and DreamWorks animated feature film style, cute charming cartoon coral-red lobster mascot, wearing a cute yellow safety hardhat with small goggles, holding up a glowing cyan holographic diagnostic tablet screen in one claw, waving cheerfully with the other claw, warm toothy smile, big expressive friendly brown eyes, soft velvety matte red chitin shell texture with pale tan segmented belly plates, articulated claws and legs, isolated on a completely uniform seamless flat solid vivid hot pink background (hex #FF00FF), perfectly plain solid flat hot pink, no gradients, no textures, no floor, no shadows on the background, clean sharp silhouette, the character does not contain any pink color, high-resolution full body 3D character render",
+  "Prompt": "3D Pixar and DreamWorks animated feature film CGI style, high-end 3D character render, cute charming cartoon coral-red lobster mascot, wearing a cute yellow safety hardhat with small goggles, holding up a glowing cyan holographic diagnostic tablet screen in one claw, waving cheerfully with the other claw, warm toothy smile, big glossy expressive friendly brown eyes with specular catchlights, smooth red chitin shell with subtle satin sheen and soft specular lighting highlights, pale tan segmented belly plates with subsurface scattering, volumetric 3D modeling with ray-traced ambient occlusion, articulated claws and legs, isolated on a completely uniform seamless flat solid vivid hot pink background (hex #FF00FF), perfectly plain solid flat hot pink, no gradients, no textures, no floor, no shadows on the background, clean sharp silhouette, the character does not contain any pink color, no 2D flat illustration, no flat vector art, no cel-shading, high-resolution full body 3D character render",
   "ImageName": "lobster_engineer_chroma",
   "AspectRatio": "1:1"
 }

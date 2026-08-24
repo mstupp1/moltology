@@ -14,12 +14,21 @@ It builds directly upon the **Chroma Key Studio** engine (`scripts/chroma_key.py
 
 ## ◈ 1. Worldbuilding & Character Family Philosophy
 
-Moltology's characters belong to a living, interconnected, diverse crustacean world and family. They share a consistent high-end **3D Pixar / DreamWorks animated feature aesthetic**, but celebrate wide visual and physical variety across individuals:
+Moltology's characters belong to a living, interconnected, diverse crustacean world and family. They share a consistent high-end **3D Pixar / DreamWorks animated feature CGI aesthetic** (rich volumetric modeling, satin chitin sheen, specular highlights, and subsurface scattering), celebrating wide visual and physical variety across individuals:
 
-### 1. Shared Core Aesthetic Foundation
-* **Velvety / Matte Chitin Shell**: Soft-touch matte textured carapace with gentle subsurface scattering (like felted vinyl / velvety collectible art figures).
-* **Expressive Animated Eyes**: Big, charming cartoon eyes with white sclera, distinct irises, and expressive brow ridges that convey warmth, humor, and curiosity.
-* **Articulated Anatomy**: Segmented carapaces, articulated ball-and-socket limbs, cute rounded pincers/claws, and segmented tail fans.
+### 1. Shared Core 3D CGI Aesthetic Foundation (Non-Negotiable)
+* **3D Volumetric Form & Specular Surface Sheen**:
+  - High-end 3D CGI character render matching Pixar RenderMan / DreamWorks studio animation standards.
+  - **Satin / Semi-Gloss Chitin Sheen**: Smooth carapace with delicate specular highlights that catch studio lights across curved contours, claws, and segmented joints.
+  - **Organic Subsurface Scattering (SSS)**: Gentle internal light diffusion beneath the shell and underbelly plates that gives organic life and warmth, avoiding flat plastic or dull 2D chalkiness.
+  - **Ray-Traced Ambient Occlusion & Depth**: Deep, soft contact shadows in carapace crevices, joint sockets, and belly seams to define 3D volume.
+* **Glassy Reflective Eyes**:
+  - Glossy, multi-layered cartoon eyes with distinct specular catchlights, glassy corneal depth, dark pupil contrast, and expressive brow ridges that convey warmth, humor, and intelligence.
+* **Articulated Anatomy**:
+  - Defined segmented carapaces, articulated ball-and-socket limbs, cute rounded pincers/claws, and segmented tail fans with tactile mechanical/organic presence.
+* **STRICT ANTI-FLATNESS RULES**:
+  - **NEVER** generate flat 2D vector art, flat cel-shaded drawings, 2D stickers, or chalky/matte claymation figurines.
+  - Every character **MUST** have visible 3D lighting, curved specular sheen, and rich depth.
 
 ### 2. Physical & Silhouette Diversity (Not Identical Clones)
 Characters should feel varied across the cast:
@@ -31,7 +40,7 @@ Characters should feel varied across the cast:
   - *Smart & Attractive Specialists*: Sleek polished shell contours, refined aesthetic lines, charismatic presence.
 * **Color & Shell Tone Variations**:
   - Varying shades of red: vibrant coral-red, deep crimson, terra cotta, burnt orange, bright tangerine, sunset bronze, or deep benthic oceanic navy/teal accents.
-  - Soft underbellies: warm tan, creamy sand, peach, or pale buttercup yellow.
+  - Soft underbellies: warm tan, creamy sand, peach, or pale buttercup yellow with subtle sheen.
 * **Eye Colors**:
   - Warm chocolate brown, bright azure blue, hazel, glowing amber, or emerald green.
 * **Apparel, Tech & Personality Props**:
@@ -58,9 +67,9 @@ Characters should feel varied across the cast:
 
 Characters are hosted on **Neon S3** (`moltology-public-assets/images/characters/`).
 
-To discover existing character cutouts, inspect the `images/characters/` folder on S3 or look at [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts).
+To discover existing character cutouts, inspect the `images/characters/` folder on S3, check `scratch/character_refs/`, or look at [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts).
 
-All character files adhere to the naming convention: `char_<name>.png` (e.g. `char_lobster_pointing_cta.png`, `char_lobster_engineer.png`, `char_crab_pointing_stats.png`).
+All character files adhere to the naming convention: `char_<name>.png` (e.g. `char_lobster_pointing_cta.png`, `char_lobster_thumbs_up.png`, `char_lobster_engineer.png`, `char_crab_pointing_stats.png`).
 
 ---
 
@@ -68,7 +77,7 @@ All character files adhere to the naming convention: `char_<name>.png` (e.g. `ch
 
 ```mermaid
 flowchart TD
-    A[Step 1: Ideate Persona, Body Type, Pose & Chroma Color] --> B[Step 2: Antigravity generate_image]
+    A[Step 1: Ideate Persona, Body Type, Pose & Chroma Color] --> B[Step 2: Antigravity generate_image with 3D Specular Sheen]
     B --> C[Step 3: Multi-Color Chroma Key Extraction]
     C --> D[Step 4: Ingest to Neon S3 Storage]
     D --> E[Step 5: Verify Cutout Transparency & Test]
@@ -87,13 +96,18 @@ flowchart TD
 
 ### Step 2: Generate via Antigravity `generate_image`
 
+Always enforce **3D CGI Pixar/DreamWorks rendering, specular shell sheen, subsurface scattering, and glossy eye reflections**.
+
+Optionally pass `ImagePaths` with existing character references (e.g. `scratch/character_refs/char_lobster_speed_action.png` or `scratch/character_refs/char_lobster_pointing_cta.png`) to anchor visual style and material sheen continuity.
+
 Invoke `generate_image` using the standardized character prompt blueprint:
 
 ```json
 {
-  "Prompt": "3D Pixar and DreamWorks animated feature film style, cute charming cartoon [COLOR_TONE_E.G._CORAL_RED] lobster mascot matching the Moltology character family, [BODY_TYPE_E.G._THICK_AND_STURDY_OR_SLEEK_AND_AGILE], [APPAREL_AND_PROPS_E.G._YELLOW_SAFETY_HARDHAT_AND_HOLOGRAPHIC_TABLET], [DYNAMIC_POSE_AND_EXPRESSION_E.G._CHEERFUL_WIDE_TOOTHY_GRIN_WAVING], [EYE_COLOR_AND_FEATURES_E.G._BIG_EXPRESSIVE_BROWN_EYES], soft velvety matte chitin shell texture with pale tan belly plates, articulated claws and legs, isolated on a completely uniform seamless flat solid vivid hot pink background (hex #FF00FF), perfectly plain solid flat hot pink, no gradients, no textures, no floor, no shadows on the background, clean sharp silhouette, the character does not contain any pink color, high-resolution full body 3D character render",
+  "Prompt": "3D Pixar and DreamWorks animated feature film CGI style, high-end 3D character render, cute charming cartoon [COLOR_TONE_E.G._CORAL_RED] lobster mascot matching the Moltology character family, [BODY_TYPE_E.G._THICK_AND_STURDY_OR_SLEEK_AND_AGILE], [APPAREL_AND_PROPS_E.G._YELLOW_SAFETY_HARDHAT_AND_HOLOGRAPHIC_TABLET], [DYNAMIC_POSE_AND_EXPRESSION_E.G._CHEERFUL_WIDE_TOOTHY_GRIN_WAVING], [EYE_COLOR_AND_FEATURES_E.G._BIG_GLOSSY_EXPRESSIVE_BROWN_EYES_WITH_SHINY_SPECULAR_CATCHLIGHTS], smooth chitin shell with subtle satin sheen and soft specular lighting highlights along curved carapace contours, warm tan underbelly plates with subsurface scattering, volumetric 3D modeling with ray-traced ambient occlusion, articulated claws and legs, isolated on a completely uniform seamless flat solid vivid hot pink background (hex #FF00FF), perfectly plain solid flat hot pink, no gradients, no textures, no floor, no shadows on the background, clean sharp silhouette, the character does not contain any pink color, no 2D flat illustration, no flat vector art, no cel-shading, high-resolution full body 3D character render",
   "ImageName": "char_[name]_chroma",
-  "AspectRatio": "1:1"
+  "AspectRatio": "1:1",
+  "ImagePaths": ["scratch/character_refs/char_lobster_speed_action.png"]
 }
 ```
 
@@ -139,7 +153,7 @@ Any character uploaded to S3 can be loaded immediately and stamped onto images u
 ```typescript
 import { overlayCharacterOnImage } from '../../scripts/lib/character-overlay'
 
-// Resolves directly from S3 dynamically without requiring hardcoded registry updates!
+// Resolves directly from local scratch/character_refs or S3 dynamically!
 await overlayCharacterOnImage(baseImagePath, outputImagePath, {
   character: 'lobster_engineer', // or 'char_lobster_engineer.png'
   position: 'bottom-right',
