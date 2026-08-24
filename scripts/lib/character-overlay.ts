@@ -10,7 +10,6 @@ export type CharacterKey =
   | 'lobster_peaceful'
   | 'lobster_action'
   | 'crab_stats'
-  | 'crab_cling'
   | 'lobster_engineer'
   | (string & {})
 
@@ -65,13 +64,6 @@ export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = {
     publicUrl: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.png`,
     description: 'Energetic crab pointing at quantitative metrics and charts',
   },
-  crab_cling: {
-    key: 'crab_cling',
-    filename: 'char_crab_corner_cling.png',
-    s3Path: 'images/characters/char_crab_corner_cling.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_crab_corner_cling.png`,
-    description: 'Cute crab clinging to side borders or bottom corner edges',
-  },
   lobster_engineer: {
     key: 'lobster_engineer',
     filename: 'char_lobster_engineer.png',
@@ -93,7 +85,6 @@ export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo 
   const normKey = (
     raw === 'lobster_pointing_cta' || raw === 'pointing' ? 'lobster_pointing' :
     raw === 'lobster_corner_peek' || raw === 'peek' ? 'lobster_peek' :
-    raw === 'crab_corner_cling' || raw === 'crab_corner' || raw === 'cling' ? 'crab_cling' :
     raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' ? 'crab_stats' :
     raw === 'lobster_speed_action' || raw === 'action' ? 'lobster_action' :
     raw === 'lobster_floating_peaceful' || raw === 'peaceful' ? 'lobster_peaceful' :

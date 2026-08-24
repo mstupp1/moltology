@@ -434,7 +434,6 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
               <option value="lobster_action">Lobster Speed Action</option>
               <option value="lobster_peaceful">Lobster Peaceful (Benthic)</option>
               <option value="lobster_engineer">Lobster Engineer (Diagnostics)</option>
-              <option value="crab_cling">Crab Corner Cling</option>
               <option value="lobster_peek">Lobster Corner Peek</option>
               <option value="none">None (No Mascot)</option>
             </select>

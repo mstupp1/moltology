@@ -143,8 +143,6 @@ export interface CreateDailyReelOptions {
     | 'lobster_thumbs_up'
     | 'lobster_action'
     | 'crab_stats'
-    | 'crab_corner'
-    | 'crab_cling'
     | 'lobster_peek'
     | 'lobster_peaceful'
     | 'none'
@@ -1082,7 +1080,7 @@ Usage:
 Options:
   --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
   --cta-goal <name>         Conversion goal: quiz | guide | codex | demo | homepage
-  --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner | none
+  --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | lobster_peek | lobster_peaceful | none
   --topic <string>          Specific topic or breaking news story
   --holiday <string>        Specific holiday or cultural event
   --color-grade <preset>    Cinematic color grading: auto | benthic-cyan | thermal-melt | photonics-matrix | calcified-armor | none
