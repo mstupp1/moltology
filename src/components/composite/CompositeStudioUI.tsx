@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { CompositeAspectRatio, COMPOSITE_DIMENSIONS } from './CompositeContainer'
 import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
@@ -21,6 +21,9 @@ import {
   Square,
   Maximize2,
   Megaphone,
+  Minus,
+  Plus,
+  RotateCcw,
 } from 'lucide-react'
 
 export type CompositeTemplateType =
@@ -51,8 +54,66 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   const [mascot, setMascot] = useState<MascotKey>(initialMascot)
   const [ctaTexture, setCtaTexture] = useState<CtaTextureKey>('chitin')
   const [theme, setTheme] = useState(initialTheme)
-  const [previewScale, setPreviewScale] = useState<number>(0.75)
+  const [previewScale, setPreviewScale] = useState<number>(0.6)
   const [copiedCmd, setCopiedCmd] = useState(false)
+
+  const canvasContainerRef = useRef<HTMLDivElement>(null)
+
+  // Calculate dynamic scale to ensure template fits cleanly with vertical breathing room
+  const calculateFitScale = useCallback(() => {
+    if (!canvasContainerRef.current) return 0.55
+    const { clientWidth, clientHeight } = canvasContainerRef.current
+    const dim = COMPOSITE_DIMENSIONS[aspect] || COMPOSITE_DIMENSIONS['4:5']
+
+    // Provide comfortable top/bottom and left/right padding
+    const verticalPadding = 64
+    const horizontalPadding = 48
+
+    const availH = Math.max(clientHeight - verticalPadding, 100)
+    const availW = Math.max(clientWidth - horizontalPadding, 100)
+
+    const scaleH = availH / dim.height
+    const scaleW = availW / dim.width
+
+    // Scale so it fits in both dimensions, especially respecting vertical room
+    const fit = Math.min(scaleH, scaleW)
+    return Math.max(0.15, Math.min(1.5, Math.round(fit * 100) / 100))
+  }, [aspect])
+
+  // Auto-fit scale whenever aspect ratio changes or the viewport/container resizes
+  useEffect(() => {
+    const updateScale = () => {
+      const fit = calculateFitScale()
+      setPreviewScale(fit)
+    }
+
+    updateScale()
+
+    if (typeof window === 'undefined' || !canvasContainerRef.current) return
+
+    const observer = new ResizeObserver(() => {
+      updateScale()
+    })
+
+    observer.observe(canvasContainerRef.current)
+    return () => observer.disconnect()
+  }, [calculateFitScale])
+
+  const handleZoomIn = () => {
+    setPreviewScale((prev) => Math.min(2.0, Math.round((prev + 0.05) * 100) / 100))
+  }
+
+  const handleZoomOut = () => {
+    setPreviewScale((prev) => Math.max(0.15, Math.round((prev - 0.05) * 100) / 100))
+  }
+
+  const handleResetFit = () => {
+    setPreviewScale(calculateFitScale())
+  }
+
+  const handleSet100 = () => {
+    setPreviewScale(1.0)
+  }
 
   // Preload all mascot cutouts from S3 CDN on mount for zero-latency preview switches
   useEffect(() => {
@@ -211,23 +272,23 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   const rawUrl = `/render/composite?template=${template}&theme=${theme}&aspect=${aspect}&mascot=${mascot}&mode=raw&data=${encodeURIComponent(JSON.stringify({ ctaTexture }))}`
 
   return (
-    <div className="w-full min-h-screen bg-[#03070a] text-[#dfe3e3] flex flex-col font-sans">
+    <div className="w-full h-screen h-[100dvh] max-h-screen overflow-hidden bg-[#03070a] text-[#dfe3e3] flex flex-col font-sans select-none">
       {/* Studio Header Bar */}
-      <header className="h-16 bg-[#060c10] border-b border-cyan-500/30 px-6 flex items-center justify-between z-30 sticky top-0">
+      <header className="h-14 sm:h-16 flex-shrink-0 bg-[#060c10] border-b border-cyan-500/30 px-4 sm:px-6 flex items-center justify-between z-30">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-cyan-950/80 border border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(0,195,255,0.3)]">
             <Layers className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-grotesk font-black text-lg text-white tracking-wider uppercase">
+              <h1 className="font-grotesk font-black text-base sm:text-lg text-white tracking-wider uppercase">
                 Composite Studio
               </h1>
               <span className="px-2 py-0.5 rounded bg-cyan-950 border border-cyan-400 text-cyan-300 font-mono text-[10px] font-bold">
                 ADMIN ENGINE
               </span>
             </div>
-            <p className="text-xs text-slate-400 font-mono">
+            <p className="text-xs text-slate-400 font-mono hidden sm:block">
               Direct-Response 3D Lead Magnets & High-DPI Social Graphic Studio
             </p>
           </div>
@@ -256,9 +317,9 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       </header>
 
       {/* Main Studio Body: Controls Sidebar + Live Preview Canvas */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* Controls Sidebar */}
-        <aside className="w-96 bg-[#04080c] border-r border-slate-800/80 p-6 overflow-y-auto space-y-6">
+        <aside className="w-80 md:w-96 flex-shrink-0 bg-[#04080c] border-r border-slate-800/80 p-5 sm:p-6 overflow-y-auto space-y-6 h-full min-h-0">
           {/* Template Selector */}
           <div>
             <label className="block text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider mb-2">
@@ -518,21 +579,65 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
         </aside>
 
         {/* Center Live Canvas Workspace */}
-        <main className="flex-1 bg-[#020508] p-8 flex flex-col items-center justify-center overflow-auto relative">
+        <main
+          ref={canvasContainerRef}
+          className="flex-1 min-h-0 bg-[#020508] p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center overflow-auto relative"
+        >
           {/* Zoom / Scale Toolbar */}
-          <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-[#060c10]/90 border border-slate-800 px-3 py-1.5 rounded-lg backdrop-blur-md">
-            <span className="text-xs font-mono text-slate-400">Zoom:</span>
-            {[0.35, 0.45, 0.6, 0.75, 1.0].map((s) => (
-              <button
-                key={s}
-                onClick={() => setPreviewScale(s)}
-                className={`px-2 py-0.5 rounded text-xs font-mono cursor-pointer ${
-                  previewScale === s ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {Math.round(s * 100)}%
-              </button>
-            ))}
+          <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-[#060c10]/95 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg shadow-lg backdrop-blur-md font-mono text-xs">
+            <span className="text-[11px] font-mono text-slate-400 mr-1 hidden sm:inline">Zoom:</span>
+
+            <button
+              type="button"
+              onClick={handleZoomOut}
+              title="Zoom Out (-5%)"
+              className="p-1 rounded hover:bg-cyan-950 text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleResetFit}
+              title="Reset to Vertical Fit"
+              className="px-2 py-0.5 rounded bg-[#0b161f] border border-cyan-500/40 text-cyan-300 font-bold min-w-[52px] text-center hover:border-cyan-400 cursor-pointer transition-colors"
+            >
+              {Math.round(previewScale * 100)}%
+            </button>
+
+            <button
+              type="button"
+              onClick={handleZoomIn}
+              title="Zoom In (+5%)"
+              className="p-1 rounded hover:bg-cyan-950 text-slate-400 hover:text-cyan-300 transition-colors cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+
+            <div className="w-[1px] h-4 bg-slate-800 mx-1" />
+
+            <button
+              type="button"
+              onClick={handleResetFit}
+              className="px-2 py-1 rounded hover:bg-cyan-950 text-slate-400 hover:text-cyan-300 text-[11px] font-bold tracking-wider flex items-center gap-1 transition-colors cursor-pointer"
+              title="Fit to Screen"
+            >
+              <Maximize2 className="w-3 h-3" />
+              <span>FIT</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSet100}
+              className={`px-2 py-1 rounded text-[11px] font-bold tracking-wider transition-colors cursor-pointer ${
+                Math.round(previewScale * 100) === 100
+                  ? 'bg-amber-400 text-slate-950 font-bold'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+              }`}
+              title="100% Native Resolution"
+            >
+              100%
+            </button>
           </div>
 
           {/* Dimensions label */}
