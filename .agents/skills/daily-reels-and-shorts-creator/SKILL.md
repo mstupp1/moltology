@@ -111,7 +111,7 @@ npx tsx scripts/generate-video.ts --prompt "<prompt>" --aspect 9:16 --duration 6
 Run the master compositor to dynamically size video scenes to match voiceover length (`voDuration + 0.8s`) with continuous forward playback (no jarring loops), mix ambient benthic soundtrack with dynamic offset rotation (`volume=0.14`, `fade_in=0.8s`, `fade_out=1.5s`), overlay bottom-right brand watermark, burn in sentence-isolated kinetic 2-3 word captions, and append the content-themed cybernetic CTA outro card:
 
 1. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
-2. **Seamless Forward Scene Playback**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops.
+2. **Seamless Forward Scene Playback & Atmospheric Color Grading**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops, and receive tasteful, cinematic contextual color grading (`benthic-cyan`, `thermal-melt`, `photonics-matrix`, `calcified-armor`, or 2-scene `ecdysis-transmute` auto progression).
 3. **Thematic AI Outro Card Generation (`generate_image`)**:
    - Render the deterministic base frame via `renderCtaOutroFrame('tmp/base_outro.png', ...)` containing the two-line brand title (`Moltology / THE SYNAPTIC PATH`), emblem, headline, subheadline, app CTA button (`moltology.org  →`), and mascot cutout.
    - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, Memristive Tactile E-Skins, or Subsea Datacenters*).
@@ -133,12 +133,13 @@ await renderCtaOutroFrame(baseOutroPath, 'SUBMIT. SHED. ASCEND.', 'CALCULATE YOU
 // 2. Generate content-themed AI outro card using base frame as reference (via generate_image)
 // Result saved to: tmp/themed-outro-card.jpg
 
-// 3. Composite master video timeline
+// 3. Composite master video timeline with contextual color grading
 await compositeReel({
   videoClips: ['scene1.mp4', 'scene2.mp4'],
   voiceoverPath: ttsResult.audioPath,
   words: ttsResult.words,
   outputPath: 'tmp/master-reel.mp4',
+  colorGrading: ['thermal-melt', 'benthic-cyan'], // or 'auto' / 'benthic-cyan' / 'calcified-armor'
   backgroundAudioVolume: 0.14,
   backgroundAudioOffsetSeconds: 36,
   watermarkOpacity: 0.40,
@@ -254,14 +255,14 @@ npm run reel:create -- --cta-goal codex
 npm run reel:create -- --cta-goal demo
 npm run reel:create -- --cta-goal homepage
 
-# Custom thematic pillar with specific mascot and conversion goal:
+# Custom thematic pillar with specific mascot, conversion goal, and optional color grade:
 npm run reel:create -- --theme moltmaxxing --cta-goal quiz --mascot lobster_pointing
-npm run reel:create -- --theme ecdysis --cta-goal guide --mascot lobster_thumbs_up
-npm run reel:create -- --theme pincer-torque --cta-goal quiz --mascot crab_stats
-npm run reel:create -- --theme benthic-depth --cta-goal codex --mascot lobster_peaceful
+npm run reel:create -- --theme ecdysis --cta-goal guide --mascot lobster_thumbs_up --color-grade auto
+npm run reel:create -- --theme pincer-torque --cta-goal quiz --mascot crab_stats --color-grade calcified-armor
+npm run reel:create -- --theme benthic-depth --cta-goal codex --mascot lobster_peaceful --color-grade benthic-cyan
 
 # Custom targeted topic or news headline:
-npm run reel:create -- --topic "Subsea Datacenter Heatwaves" --cta-goal demo
+npm run reel:create -- --topic "Subsea Datacenter Heatwaves" --cta-goal demo --color-grade thermal-melt
 
 # Custom run with bespoke AI-restyled outro card:
 npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --custom-outro "tmp/themed-outro-card.jpg"
