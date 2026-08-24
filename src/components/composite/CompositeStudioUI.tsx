@@ -4,7 +4,7 @@ import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
 import { SocialDirectivesSlide } from './SocialDirectivesSlide'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
-import { ReelOutroCard } from './ReelOutroCard'
+import { ReelOutroCard, CtaTextureKey } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
 import { MascotKey, MASCOT_REGISTRY } from './MascotOverlay'
@@ -49,6 +49,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   const [template, setTemplate] = useState<CompositeTemplateType>(initialTemplate)
   const [aspect, setAspect] = useState<CompositeAspectRatio>(initialAspect)
   const [mascot, setMascot] = useState<MascotKey>(initialMascot)
+  const [ctaTexture, setCtaTexture] = useState<CtaTextureKey>('chitin')
   const [theme, setTheme] = useState(initialTheme)
   const [previewScale, setPreviewScale] = useState<number>(0.75)
   const [copiedCmd, setCopiedCmd] = useState(false)
@@ -199,7 +200,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   }
 
   // Generate CLI command
-  const cliCommand = `npm run composite:render -- --template ${template} --theme ${theme} --aspect ${aspect} --mascot ${mascot}`
+  const cliCommand = `npm run composite:render -- --template ${template} --theme ${theme} --aspect ${aspect} --mascot ${mascot}${ctaTexture !== 'chitin' ? ` --cta-texture ${ctaTexture}` : ''}`
 
   const copyCommand = () => {
     navigator.clipboard.writeText(cliCommand)
@@ -207,7 +208,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
     setTimeout(() => setCopiedCmd(false), 2000)
   }
 
-  const rawUrl = `/render/composite?template=${template}&theme=${theme}&aspect=${aspect}&mascot=${mascot}&mode=raw`
+  const rawUrl = `/render/composite?template=${template}&theme=${theme}&aspect=${aspect}&mascot=${mascot}&mode=raw&data=${encodeURIComponent(JSON.stringify({ ctaTexture }))}`
 
   return (
     <div className="w-full min-h-screen bg-[#03070a] text-[#dfe3e3] flex flex-col font-sans">
@@ -375,6 +376,26 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
               <option value="crab_cling">Crab Corner Cling</option>
               <option value="lobster_peek">Lobster Corner Peek</option>
               <option value="none">None (No Mascot)</option>
+            </select>
+          </div>
+
+          {/* CTA Molting Texture Selector */}
+          <div>
+            <label className="block text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider mb-2">
+              CTA Molting Texture
+            </label>
+            <select
+              value={ctaTexture}
+              onChange={(e) => setCtaTexture(e.target.value as CtaTextureKey)}
+              className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-none"
+            >
+              <option value="chitin">Chitin Plates (Classic Molt)</option>
+              <option value="hex">Hex Lattice (Cellular Chitin)</option>
+              <option value="alloy">Benthic Alloy (Titanium Cybernetics)</option>
+              <option value="carbon">Carbon Weave (High-Torque Armor)</option>
+              <option value="basalt">Deep Basalt (Abyssal Volcanic)</option>
+              <option value="circuit">Circuit Matrix (Bio-Silicon AI)</option>
+              <option value="none">Solid HUD Gradient (No Texture)</option>
             </select>
           </div>
 
@@ -601,8 +622,10 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
 
               {template === 'reel-outro' && (
                 <ReelOutroCard
-                  headline={`${headlinePart1} ${headlinePart2}`}
-                  subheadline={headlineHighlight}
+                  headline={headlinePart1 && headlinePart2 ? `${headlinePart1} ${headlinePart2}` : (headlinePart1 || 'SUBMIT. SHED. ASCEND.')}
+                  subheadline={headlineHighlight || subHeadline || 'CALCULATE YOUR MOLT CLEARANCE'}
+                  actionBadgeText={trustBadgeText || (commentKeyword ? `⚡ COMMENT "${commentKeyword}" TO AUDIT` : '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST')}
+                  ctaTexture={ctaTexture}
                   mascot={mascot}
                 />
               )}

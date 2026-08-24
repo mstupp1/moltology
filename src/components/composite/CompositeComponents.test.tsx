@@ -75,12 +75,14 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('First card desc')).toBeInTheDocument()
   })
 
-  it('renders ReelOutroCard with brand emblem, headline, and CTA button', () => {
+  it('renders ReelOutroCard with brand emblem, headline, CTA button, and removes zero latency telemetry and tap to audit', () => {
     render(
       <ReelOutroCard
         headline="ASCEND NOW"
         subheadline="CALCULATE CLEARANCE"
         url="moltology.org"
+        actionBadgeText="⚡ TAKE THE 15-STAGE MOLTMAXXING TEST"
+        linkInBioText="LINK IN BIO"
       />
     )
 
@@ -89,6 +91,10 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('ASCEND NOW')).toBeInTheDocument()
     expect(screen.getByText('CALCULATE CLEARANCE')).toBeInTheDocument()
     expect(screen.getByText('moltology.org')).toBeInTheDocument()
+    expect(screen.getByText('⚡ TAKE THE 15-STAGE MOLTMAXXING TEST')).toBeInTheDocument()
+    expect(screen.getByText('LINK IN BIO')).toBeInTheDocument()
+    expect(screen.queryByText(/TAP TO AUDIT/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/ZERO LATENCY TELEMETRY/i)).not.toBeInTheDocument()
   })
 
   it('renders ReelThumbnailCard with 1:1 safe-zone center hook', () => {

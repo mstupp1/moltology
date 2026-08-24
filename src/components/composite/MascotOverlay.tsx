@@ -192,10 +192,10 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
       style={{ width: `${width}px` }}
       data-mascot-key={info.key}
     >
-      {/* Ambient Cyan Radial Glow */}
+      {/* Ambient Cyan Radial Glow (Smooth, unclipped blur) */}
       {glow && (
         <div
-          className="absolute inset-0 -m-16 rounded-full bg-[radial-gradient(circle,rgba(0,255,230,0.22)_0%,rgba(0,180,220,0.06)_50%,transparent_70%)] pointer-events-none -z-10"
+          className="absolute -inset-24 rounded-full bg-[radial-gradient(circle,rgba(0,195,255,0.18)_0%,rgba(0,195,255,0.05)_50%,transparent_70%)] blur-2xl pointer-events-none -z-10"
         />
       )}
 

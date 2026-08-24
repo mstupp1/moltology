@@ -3,6 +3,7 @@ import path from 'node:path'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
+import { captureComposite } from './composite-renderer'
 import { WordBoundaryEvent, chunkWordsIntoPhrases } from './tts-engine'
 
 const execFileAsync = promisify(execFile)
@@ -52,6 +53,7 @@ export interface CompositeReelOptions {
   ctaUrl?: string
   ctaBadge?: string
   ctaActionText?: string
+  ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
   customOutroImagePath?: string
   mascot?:
     | 'lobster_pointing'
@@ -148,95 +150,82 @@ export async function renderHudWatermarkCard(
 }
 
 /**
- * Generate clean kinetic caption overlay card (2-3 words, no heavy double box, auto font sizing)
+ * Render Kinetic Subtitle Card with active word glowing cyan (Sentence-Isolated 2-3 word chunks)
  */
 export async function renderKineticCaptionCard(
-  phrase: WordBoundaryEvent[],
+  wordsInPhrase: WordBoundaryEvent[],
   activeWordIndex: number,
   outputPath: string
 ): Promise<string> {
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
 
-  // Caption Safe Zone: Y = 1300 (above platform UI, below screen center)
-  const centerY = 1300
+  const centerY = 1380
+  const maxLineWidth = 920
 
-  // Initial font setup
-  let baseFontSize = 54
-  let highlightFontSize = 60
-  ctx.font = `900 ${highlightFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+  const phraseText = wordsInPhrase.map((w) => w.word).join(' ')
+  let baseFontSize = 64
+  if (phraseText.length > 24) baseFontSize = 54
+  if (phraseText.length > 34) baseFontSize = 46
 
-  // Measure phrase width and dynamically scale font down if phrase is too wide
-  const spaceWidth = 16
-  let totalTextWidth = 0
-  let wordMeasurements: { text: string; isHighlight: boolean; width: number }[] = []
+  ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+  let phraseMetrics = ctx.measureText(phraseText)
 
-  const computeLayout = (hSize: number, bSize: number) => {
-    let wSum = 0
-    const items = phrase.map((w, idx) => {
-      const isHighlight = idx === activeWordIndex
-      ctx.font = isHighlight
-        ? `900 ${hSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-        : `bold ${bSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-      const text = (w.word || '').replace(/[.,;:]+$/, '').toUpperCase()
-      const width = ctx.measureText(text).width
-      wSum += width
-      return { text, isHighlight, width }
-    })
-    return { items, totalW: wSum + (phrase.length - 1) * spaceWidth }
+  if (phraseMetrics.width > maxLineWidth) {
+    baseFontSize = Math.floor(baseFontSize * (maxLineWidth / phraseMetrics.width))
+    ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+    phraseMetrics = ctx.measureText(phraseText)
   }
 
-  let layout = computeLayout(highlightFontSize, baseFontSize)
-  // Max width safe limit is 860px (out of 1080px)
-  if (layout.totalW > 860) {
-    baseFontSize = 42
-    highlightFontSize = 48
-    layout = computeLayout(highlightFontSize, baseFontSize)
-  }
-  if (layout.totalW > 860) {
-    baseFontSize = 36
-    highlightFontSize = 42
-    layout = computeLayout(highlightFontSize, baseFontSize)
-  }
+  const spaceWidth = ctx.measureText(' ').width
+  const wordMeasurements = wordsInPhrase.map((w) => {
+    ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+    return {
+      text: w.word,
+      width: ctx.measureText(w.word).width,
+    }
+  })
 
-  const { items: wordsWithWidth, totalW: totalWidth } = layout
+  const totalCalculatedWidth =
+    wordMeasurements.reduce((acc, curr) => acc + curr.width, 0) +
+    (wordsInPhrase.length - 1) * spaceWidth
 
-  // Subtle, sleek dark pill backdrop
-  const padX = 32
-  const padY = 18
-  const pillW = Math.min(totalWidth + padX * 2, 940)
-  const pillH = highlightFontSize + padY * 2 + 10
-  const pillX = 540 - pillW / 2
-  const pillY = centerY - pillH / 2
+  let currentX = (1080 - totalCalculatedWidth) / 2
 
-  ctx.fillStyle = 'rgba(2, 6, 23, 0.70)'
-  ctx.beginPath()
-  ctx.roundRect(pillX, pillY, pillW, pillH, 20)
-  ctx.fill()
-
-  ctx.strokeStyle = 'rgba(0, 255, 255, 0.25)'
-  ctx.lineWidth = 1.5
-  ctx.stroke()
-
-  // Render individual words
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  let currentX = 540 - totalWidth / 2
 
-  for (const item of wordsWithWidth) {
+  for (let i = 0; i < wordsInPhrase.length; i++) {
+    const item = wordMeasurements[i]
     const wordCenterX = currentX + item.width / 2
 
-    if (item.isHighlight) {
-      ctx.font = `900 ${highlightFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-      
-      // Cyan glow + outline
-      ctx.shadowColor = 'rgba(0, 255, 255, 0.9)'
-      ctx.shadowBlur = 22
-      ctx.fillStyle = '#00ffff'
-      ctx.fillText(item.text, wordCenterX, centerY)
+    if (i === activeWordIndex) {
+      // Glow background pill behind active word
+      ctx.save()
+      const pillPadX = 16
+      const pillPadY = 10
+      const pillH = baseFontSize + pillPadY * 2
+      const pillW = item.width + pillPadX * 2
+      const pillX = currentX - pillPadX
+      const pillY = centerY - pillH / 2
 
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
-      ctx.shadowBlur = 8
+      ctx.fillStyle = 'rgba(0, 45, 60, 0.75)'
+      ctx.strokeStyle = '#00c3ff'
+      ctx.lineWidth = 2
+      ctx.shadowColor = 'rgba(0, 195, 255, 0.7)'
+      ctx.shadowBlur = 18
+
+      ctx.beginPath()
+      ctx.roundRect(pillX, pillY, pillW, pillH, 8)
+      ctx.fill()
+      ctx.stroke()
+      ctx.restore()
+
+      // Luminous active word text
+      ctx.font = `900 ${baseFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
+      ctx.shadowColor = 'rgba(0, 195, 255, 0.95)'
+      ctx.shadowBlur = 14
+      ctx.fillStyle = '#00ffff'
       ctx.fillText(item.text, wordCenterX, centerY)
       ctx.shadowBlur = 0
     } else {
@@ -256,7 +245,7 @@ export async function renderKineticCaptionCard(
 }
 
 /**
- * Generate Sleek Canvas Frame for the Branded CTA Outro Card (can be used as reference for AI theming)
+ * Generate Sleek Frame for the Branded CTA Outro Card via Composite Studio (Headless Chrome) with Canvas Fallback
  */
 export async function renderCtaOutroFrame(
   outputPath: string,
@@ -264,11 +253,49 @@ export async function renderCtaOutroFrame(
   subheadline = 'CALCULATE YOUR MOLT CLEARANCE',
   url = 'moltology.org',
   options: {
-    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none'
+    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none' | string
     ctaBadge?: string
     ctaActionText?: string
+    linkInBioText?: string
+    ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
+    useCanvasOnly?: boolean
   } = {}
 ): Promise<string> {
+  const mascotChoice = (options.mascot ?? 'lobster_pointing') as any
+
+  // 1. Primary: High-DPI Web Composite Studio Capture via Headless Chrome
+  if (!options.useCanvasOnly) {
+    try {
+      const outDir = path.dirname(outputPath)
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true })
+      }
+
+      await captureComposite({
+        template: 'reel-outro',
+        aspectRatio: '9:16',
+        mascot: mascotChoice === 'none' ? undefined : mascotChoice,
+        scaleFactor: 1, // 1080x1920 native vertical resolution
+        data: {
+          headline,
+          subheadline,
+          url,
+          actionBadgeText: options.ctaActionText || options.ctaBadge,
+          linkInBioText: (options.linkInBioText || 'LINK IN BIO').replace(/(\s*·\s*)?TAP TO AUDIT/gi, '').trim() || 'LINK IN BIO',
+          ctaTexture: options.ctaTexture || 'chitin',
+        },
+        outputPath,
+      })
+
+      if (fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+        return outputPath
+      }
+    } catch (e: any) {
+      console.warn(`   ⚠️ Headless Chrome Composite Studio capture fallback: ${e.message}`)
+    }
+  }
+
+  // 2. Resilient Canvas Fallback (Center aligned, matching site styling, large mascot, no zero latency telemetry)
   const canvas = createCanvas(1080, 1920)
   const ctx = canvas.getContext('2d')
 
@@ -307,22 +334,17 @@ export async function renderCtaOutroFrame(
     } catch {
       // Fallback
     }
-  } else {
-    ctx.fillStyle = 'rgba(0, 195, 255, 0.02)'
-    for (let y = 0; y < 1920; y += 6) {
-      ctx.fillRect(0, y, 1080, 2)
-    }
   }
 
   // 4. Center Order Emblem
   const centerX = 540
-  const centerY = 490
+  const centerY = 470
   const emblemPath = path.resolve(process.cwd(), 'public/images/order_emblem.png')
   if (fs.existsSync(emblemPath)) {
     const emblemImg = await loadImage(emblemPath)
     ctx.save()
     ctx.shadowColor = 'rgba(0, 195, 255, 0.45)'
-    ctx.shadowBlur = 18
+    ctx.shadowBlur = 24
     ctx.shadowOffsetY = 4
     const emblemSize = 190
     ctx.drawImage(emblemImg, centerX - emblemSize / 2, centerY - emblemSize / 2, emblemSize, emblemSize)
@@ -334,18 +356,18 @@ export async function renderCtaOutroFrame(
   ctx.textBaseline = 'middle'
 
   // Line 1: Moltology
-  ctx.font = '900 54px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.font = '900 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.fillStyle = '#ffffff'
   ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
-  ctx.shadowBlur = 8
-  ctx.fillText('Moltology', centerX, 655)
+  ctx.shadowBlur = 10
+  ctx.fillText('Moltology', centerX, 635)
 
-  // Line 2: the synaptic path (Clean cyan uppercase tracking with glowing pulse dot)
+  // Line 2: THE SYNAPTIC PATH (Clean cyan uppercase tracking)
   ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
   ctx.fillStyle = '#38bdf8'
   ctx.shadowColor = 'rgba(0, 195, 255, 0.5)'
   ctx.shadowBlur = 10
-  ctx.fillText('THE SYNAPTIC PATH', centerX, 705)
+  ctx.fillText('THE SYNAPTIC PATH', centerX, 685)
   ctx.shadowBlur = 0
 
   // 6. Main Headline (e.g. SUBMIT. SHED. ASCEND.)
@@ -353,7 +375,7 @@ export async function renderCtaOutroFrame(
   ctx.fillStyle = '#ffffff'
   ctx.shadowColor = 'rgba(0, 195, 255, 0.5)'
   ctx.shadowBlur = 20
-  ctx.fillText(headline, centerX, 815)
+  ctx.fillText(headline, centerX, 805)
   ctx.shadowBlur = 0
 
   // 7. Subheadline (e.g. CALCULATE YOUR MOLT CLEARANCE)
@@ -361,15 +383,15 @@ export async function renderCtaOutroFrame(
   ctx.fillStyle = '#00c3ff'
   ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
   ctx.shadowBlur = 8
-  ctx.fillText(subheadline, centerX, 875)
+  ctx.fillText(subheadline, centerX, 865)
   ctx.shadowBlur = 0
 
-  // 8. Canonical App-Style CTA Button (Exact from BenthicCTAButton / HudButton)
+  // 8. Canonical App-Style CTA Button (Exact from BenthicCTAButton / HudButton with Chitin Texture)
   const btnW = 700
   const btnH = 124
   const btnX = centerX - btnW / 2
-  const btnY = 960
-  const btnRadius = 4 // Chamfered HUD radius
+  const btnY = 945
+  const btnRadius = 6
 
   // Gradient fill matching HudButton cyan variant: from-[#05222b] via-[#093d4a] to-[#062833]
   const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH)
@@ -385,14 +407,14 @@ export async function renderCtaOutroFrame(
 
   // Glowing cyan border matching HudButton
   ctx.strokeStyle = '#00c3ff'
-  ctx.lineWidth = 1.8
+  ctx.lineWidth = 2
   ctx.shadowColor = 'rgba(0, 195, 255, 0.55)'
-  ctx.shadowBlur = 16
+  ctx.shadowBlur = 18
   ctx.stroke()
   ctx.restore()
 
   // Subtle top highlight inset
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.20)'
   ctx.fillRect(btnX + 4, btnY + 2, btnW - 8, 1.5)
 
   // Primary URL Text inside button
@@ -405,14 +427,19 @@ export async function renderCtaOutroFrame(
   ctx.fillText(`${url}  →`, centerX, btnY + 48)
 
   // Action text / sub-badge inside button
-  const actionText = options.ctaActionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST'
+  const actionText = options.ctaActionText || options.ctaBadge || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST'
   ctx.font = 'bold 16px monospace'
   ctx.fillStyle = '#f59e0b' // Amber
   ctx.shadowBlur = 0
   ctx.fillText(actionText, centerX, btnY + 92)
 
-  // 9. Cartoon Crustacean Mascot Integration (Bottom Right)
-  const mascotChoice = options.mascot ?? 'lobster_pointing'
+  // Subtitle directly below button (No zero latency telemetry, No tap to audit)
+  const displayLinkInBio = (options.linkInBioText || 'LINK IN BIO').replace(/(\s*·\s*)?TAP TO AUDIT/gi, '').trim() || 'LINK IN BIO'
+  ctx.font = 'bold 14px monospace'
+  ctx.fillStyle = '#94a3b8' // Slate-400
+  ctx.fillText(displayLinkInBio, centerX, btnY + 145)
+
+  // 9. Large Cartoon Crustacean Mascot Integration (Bottom Right)
   if (mascotChoice !== 'none') {
     let mascotFile = 'char_lobster_pointing_cta.png'
     if (mascotChoice === 'lobster_thumbs_up') mascotFile = 'char_lobster_thumbs_up.png'
@@ -426,31 +453,21 @@ export async function renderCtaOutroFrame(
     let charImg: any = null
 
     if (fs.existsSync(charPath)) {
-      charImg = await loadImage(charPath)
-    } else {
       try {
-        const s3Url = `https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/${mascotFile}`
-        const res = await fetch(s3Url)
-        if (res.ok) {
-          const arrayBuffer = await res.arrayBuffer()
-          charImg = await loadImage(Buffer.from(arrayBuffer))
-        }
-      } catch (e) {
-        // Non-fatal
-      }
+        charImg = await loadImage(charPath)
+      } catch {}
     }
 
     if (charImg) {
-      // Scale character with ample presence when space permits and blend naturally
-      const charW = 390
+      // Large character size for strong presence and personality
+      const charW = 540
       const charH = (charW / charImg.width) * charImg.height
-      const charX = 640
-      const charY = 1170
+      const charX = 510
+      const charY = 1180
 
       ctx.save()
-      // Soft, natural contact shadow for seamless scene integration without artificial halos
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.80)'
-      ctx.shadowBlur = 20
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'
+      ctx.shadowBlur = 24
       ctx.drawImage(charImg, charX, charY, charW, charH)
       ctx.restore()
     }
@@ -470,9 +487,10 @@ export async function renderCtaOutroVideo(
   subheadline = 'CALCULATE YOUR MOLT CLEARANCE',
   url = 'moltology.org',
   options: {
-    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none'
+    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none' | string
     ctaBadge?: string
     ctaActionText?: string
+    ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
     customImagePath?: string
   } = {}
 ): Promise<string> {
@@ -626,6 +644,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       mascot: options.mascot,
       ctaBadge: options.ctaBadge,
       ctaActionText: options.ctaActionText,
+      ctaTexture: options.ctaTexture,
       customImagePath: options.customOutroImagePath,
     }
   )
