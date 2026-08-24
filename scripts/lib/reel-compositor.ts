@@ -60,8 +60,6 @@ export interface CompositeReelOptions {
     | 'lobster_thumbs_up'
     | 'lobster_action'
     | 'crab_stats'
-    | 'crab_corner'
-    | 'crab_cling'
     | 'lobster_peek'
     | 'lobster_peaceful'
     | 'none'
@@ -253,7 +251,7 @@ export async function renderCtaOutroFrame(
   subheadline = 'CALCULATE YOUR MOLT CLEARANCE',
   url = 'moltology.org',
   options: {
-    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none' | string
+    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'lobster_peek' | 'lobster_peaceful' | 'none' | string
     ctaBadge?: string
     ctaActionText?: string
     linkInBioText?: string
@@ -445,7 +443,6 @@ export async function renderCtaOutroFrame(
     if (mascotChoice === 'lobster_thumbs_up') mascotFile = 'char_lobster_thumbs_up.png'
     else if (mascotChoice === 'lobster_action') mascotFile = 'char_lobster_speed_action.png'
     else if (mascotChoice === 'crab_stats') mascotFile = 'char_crab_pointing_stats.png'
-    else if (mascotChoice === 'crab_corner' || mascotChoice === 'crab_cling') mascotFile = 'char_crab_corner_cling.png'
     else if (mascotChoice === 'lobster_peek') mascotFile = 'char_lobster_corner_peek.png'
     else if (mascotChoice === 'lobster_peaceful') mascotFile = 'char_lobster_floating_peaceful.png'
 
@@ -487,7 +484,7 @@ export async function renderCtaOutroVideo(
   subheadline = 'CALCULATE YOUR MOLT CLEARANCE',
   url = 'moltology.org',
   options: {
-    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'crab_cling' | 'lobster_peek' | 'lobster_peaceful' | 'none' | string
+    mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'lobster_peek' | 'lobster_peaceful' | 'none' | string
     ctaBadge?: string
     ctaActionText?: string
     ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
@@ -873,7 +870,7 @@ export interface ReelThumbnailOptions {
   categoryBadge?: string // e.g. "TELEMETRY DISPATCH"
   outputPath: string
   seekSecond?: number // default 1.5 if input is video
-  mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'crab_corner' | 'none' | string
+  mascot?: 'lobster_pointing' | 'lobster_thumbs_up' | 'lobster_action' | 'crab_stats' | 'none' | string
 }
 
 /**
@@ -1031,7 +1028,6 @@ export async function renderReelThumbnail(options: ReelThumbnailOptions): Promis
     if (mascotChoice === 'lobster_thumbs_up') mascotFile = 'char_lobster_thumbs_up.png'
     else if (mascotChoice === 'lobster_action') mascotFile = 'char_lobster_speed_action.png'
     else if (mascotChoice === 'crab_stats') mascotFile = 'char_crab_pointing_stats.png'
-    else if (mascotChoice === 'crab_corner' || mascotChoice === 'crab_cling') mascotFile = 'char_crab_corner_cling.png'
     else if (mascotChoice === 'lobster_peek') mascotFile = 'char_lobster_corner_peek.png'
     else if (mascotChoice === 'lobster_peaceful') mascotFile = 'char_lobster_floating_peaceful.png'
 

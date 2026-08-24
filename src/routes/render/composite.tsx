@@ -16,6 +16,7 @@ import {
 import { authClient } from '@/lib/auth-client'
 import { getUserProfileFn } from '@/lib/server/api'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
 
 interface CompositeSearchParams {
   template?: CompositeTemplateType
@@ -47,6 +48,7 @@ export const Route = createFileRoute('/render/composite')({
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),
+  pendingComponent: HUDPageLoader,
   component: CompositeRenderRoute,
 })
 
@@ -188,6 +190,7 @@ function CompositeRenderRoute() {
       featureName="COMPOSITE STUDIO"
       title="COMPOSITE STUDIO LOCKED"
       message="Access to the high-DPI composite and graphic generation studio is restricted to Moltology Administrators and Superadmins. Sign in with an authorized administrator account to access."
+      skeleton={<HUDPageLoader />}
     >
       <CompositeStudioUI
         initialTemplate={template}

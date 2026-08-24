@@ -143,8 +143,8 @@ export async function captureComposite(options: CaptureCompositeOptions): Promis
     console.log(`   • URL: ${targetUrl}`)
     console.log(`   • Output: ${options.outputPath}`)
 
-    // Chrome headless screenshot command with virtual time budget for asset settling
-    const chromeCmd = `"${CHROME_PATH}" --headless=new --disable-gpu --hide-scrollbars --allow-running-insecure-content --disable-web-security --virtual-time-budget=${delay} --window-size=${dims.width},${dims.height} --force-device-scale-factor=${scale} --screenshot="${options.outputPath}" "${targetUrl}"`
+    // Chrome headless screenshot command with WebGL support and virtual time budget for asset settling
+    const chromeCmd = `"${CHROME_PATH}" --headless=new --enable-webgl --ignore-gpu-blocklist --hide-scrollbars --allow-running-insecure-content --disable-web-security --virtual-time-budget=${delay} --window-size=${dims.width},${dims.height} --force-device-scale-factor=${scale} --screenshot="${options.outputPath}" "${targetUrl}"`
 
     // Execute Chrome snapshot
     execSync(chromeCmd, { stdio: 'inherit' })

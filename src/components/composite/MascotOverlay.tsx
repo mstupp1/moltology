@@ -7,7 +7,6 @@ export type MascotKey =
   | 'lobster_thumbs_up'
   | 'lobster_action'
   | 'crab_stats'
-  | 'crab_cling'
   | 'lobster_peek'
   | 'lobster_peaceful'
   | 'lobster_engineer'
@@ -51,13 +50,6 @@ export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
     s3Url: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.png`,
     description: 'Energetic crab pointing at quantitative metrics and charts',
   },
-  crab_cling: {
-    key: 'crab_cling',
-    name: 'Crab Corner Cling (Bezel)',
-    filename: 'char_crab_corner_cling.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_crab_corner_cling.png`,
-    description: 'Cute crab clinging to side borders or bottom corner edges',
-  },
   lobster_peek: {
     key: 'lobster_peek',
     name: 'Lobster Corner Peek (Surprise)',
@@ -97,7 +89,6 @@ export function normalizeMascotKey(rawKey: string): string {
   // Comprehensive alias normalization
   if (raw === 'lobster_pointing_cta' || raw === 'pointing' || raw === 'cta' || raw === 'lobster_cta') return 'lobster_pointing'
   if (raw === 'lobster_corner_peek' || raw === 'peek' || raw === 'corner_peek') return 'lobster_peek'
-  if (raw === 'crab_corner_cling' || raw === 'crab_corner' || raw === 'cling' || raw === 'corner_cling') return 'crab_cling'
   if (raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' || raw === 'pointing_stats') return 'crab_stats'
   if (raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'action' || raw === 'speed') return 'lobster_action'
   if (raw === 'lobster_floating_peaceful' || raw === 'floating_peaceful' || raw === 'peaceful' || raw === 'zen' || raw === 'floating') return 'lobster_peaceful'

@@ -1,6 +1,7 @@
 import React from 'react'
 import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
+import { ThreeBookCover } from './ThreeBookCover'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
 import {
   Shield,
@@ -40,6 +41,8 @@ export interface SocialMarketingSlideProps {
   bookTitle?: string
   bookSubtitle?: string
   bookTagline?: string
+  bookCoverImageUrl?: string
+  bookImageUrl?: string
   trustBadgeText?: string
   trustBadgeYear?: string
   quoteText?: string
@@ -303,6 +306,8 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
   bookTitle,
   bookSubtitle,
   bookTagline,
+  bookCoverImageUrl,
+  bookImageUrl,
   trustBadgeText,
   trustBadgeYear,
   quoteText,
@@ -323,6 +328,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
   const finalBookTitle = bookTitle || preset.bookTitle || 'MOLTMAXXING'
   const finalBookSubtitle = bookSubtitle || preset.bookSubtitle || 'THE COMPLETE PROTOCOL GUIDE'
   const finalBookTagline = bookTagline || preset.bookTagline || 'ECDYSIS · PINCER TORQUE · RESULTS'
+  const finalBookCoverUrl = bookCoverImageUrl || bookImageUrl || preset.bookCoverImageUrl || preset.bookImageUrl
   const finalTrustText = trustBadgeText || preset.trustBadgeText || 'OFFICIAL 2026 EDITION'
   const finalTrustYear = trustBadgeYear || preset.trustBadgeYear || '2026 PROTOCOL'
   const finalQuote = quoteText || preset.quoteText || 'Everything you need to shatter biological hesitation and build armored focus!'
@@ -506,63 +512,24 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                 </div>
               </div>
             ) : (
-              /* 3D Hardcover Book Graphic */
-              <div
-                className="relative w-[320px] h-[450px] rounded-r-3xl rounded-l-md bg-gradient-to-r from-[#01060c] via-[#0b2840] to-[#041626] border-t-3 border-r-3 border-b-3 border-cyan-400/80 shadow-[35px_40px_80px_rgba(0,0,0,0.98),0_0_55px_rgba(0,255,230,0.35)] flex flex-col p-6 overflow-hidden text-center justify-between"
-                style={{
-                  transform: 'rotateY(-18deg) rotateX(6deg) rotateZ(1deg)',
-                  transformStyle: 'preserve-3d',
-                }}
-              >
-                {/* Embossed Left Book Spine Accent */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/95 via-slate-900/90 to-transparent border-r-2 border-cyan-500/50 flex items-center justify-center">
-                  <span className="text-[11px] font-mono font-black text-cyan-300 -rotate-90 uppercase tracking-widest whitespace-nowrap">
-                    {finalBookTitle}
-                  </span>
-                </div>
-
-                {/* Book Header Top */}
-                <div className="pl-6 pt-2">
-                  <div className="text-[11px] font-mono font-black tracking-widest text-cyan-400 uppercase">
-                    {finalBookSubtitle}
-                  </div>
-                  <div className="w-16 h-[2.5px] bg-cyan-400 mx-auto mt-2 shadow-[0_0_12px_rgba(0,255,230,1)]" />
-                </div>
-
-                {/* Book Center Hero: Massive Embossed Title & Glowing Benthic Graphic */}
-                <div className="pl-6 my-auto flex flex-col items-center">
-                  <h3 className="font-grotesk font-black text-4xl leading-none text-white tracking-tight uppercase drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)]">
-                    {finalBookTitle}
-                  </h3>
-                  <div className="font-serif italic text-amber-300 text-xl font-bold mt-1.5">
-                    Protocol
-                  </div>
-
-                  {/* Glowing Magnifying Glass / Chart Graphic on Cover */}
-                  <div className="relative mt-4 w-32 h-22 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-cyan-500/30 rounded-xl blur-lg" />
-                    {/* Rising Bar Chart Line */}
-                    <div className="w-full h-full rounded-xl bg-[#010810]/95 border-2 border-cyan-400/90 p-2.5 flex items-end justify-between gap-2 shadow-inner">
-                      <div className="w-3 h-5 bg-cyan-600 rounded-xs" />
-                      <div className="w-3 h-9 bg-cyan-500 rounded-xs" />
-                      <div className="w-3 h-13 bg-cyan-400 rounded-xs" />
-                      <div className="w-3 h-17 bg-amber-400 rounded-xs shadow-[0_0_15px_rgba(251,191,36,1)]" />
-                    </div>
-                    {/* Magnifying Glass Accent */}
-                    <div className="absolute -top-2 -right-2 p-1.5 rounded-full bg-cyan-950 border-2 border-cyan-300 text-cyan-300 shadow-[0_0_18px_rgba(0,255,230,1)]">
-                      <TrendingUp className="w-4 h-4" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Book Bottom Tagline & Micro Icons */}
-                <div className="pl-6 pb-1">
-                  <div className="w-full h-[1.5px] bg-cyan-500/60 mb-2" />
-                  <div className="font-mono font-black text-[10px] tracking-wider text-slate-100 uppercase">
-                    {finalBookTagline}
-                  </div>
-                </div>
-              </div>
+              /* Three.js Photorealistic 3D Hardcover Book (ThreeBookCover) */
+              <ThreeBookCover
+                width={420}
+                height={540}
+                bookWidth={3.3}
+                bookHeight={4.6}
+                bookThickness={0.46}
+                rotateY={0.36}
+                rotateX={0.05}
+                coverImageUrl={finalBookCoverUrl}
+                coverEyebrow={finalBookSubtitle}
+                coverTitlePart1={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'MOLT'}
+                coverTitlePart2={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'MAXXING'}
+                coverSubtitle="STAGE 4 CARCINIZATION"
+                coverTagline={finalBookTagline}
+                spineTitle={finalBookTitle}
+                themeVariant={theme === 'sacred-codex' ? 'amber' : 'cyan'}
+              />
             )}
 
             {/* 3D Circular Pedestal / Plinth Beneath the Mockup */}

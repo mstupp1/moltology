@@ -141,6 +141,26 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('OFFICIAL 2026 EDITION')).toBeInTheDocument()
   })
 
+  it('renders ThreeBookCover canvas element with dimensions and custom props', async () => {
+    const { ThreeBookCover } = await import('./ThreeBookCover')
+    const { container } = render(
+      <ThreeBookCover
+        width={420}
+        height={540}
+        coverTitlePart1="MOLT"
+        coverTitlePart2="MAXXING"
+        coverSubtitle="ADVANCED PROTOCOL"
+        coverTagline="TORQUE · CLARITY"
+        themeVariant="cyan"
+      />
+    )
+
+    const canvas = container.querySelector('canvas')
+    expect(canvas).toBeInTheDocument()
+    expect(canvas?.getAttribute('width')).toBe('420')
+    expect(canvas?.getAttribute('height')).toBe('540')
+  })
+
   it('correctly normalizes mascot keys and aliases in getMascotInfo', async () => {
     const { normalizeMascotKey, getMascotInfo, MASCOT_REGISTRY } = await import('./MascotOverlay')
 
@@ -148,13 +168,13 @@ describe('Composite UI Components', () => {
     expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_pointing')
     expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_action')
     expect(normalizeMascotKey('stats')).toBe('crab_stats')
-    expect(normalizeMascotKey('cling')).toBe('crab_cling')
+    expect(normalizeMascotKey('peek')).toBe('lobster_peek')
     expect(normalizeMascotKey('peaceful')).toBe('lobster_peaceful')
     expect(normalizeMascotKey('engineer')).toBe('lobster_engineer')
     expect(normalizeMascotKey('thumbs_up')).toBe('lobster_thumbs_up')
 
-    // Verify all 8 registry items have valid Neon S3 CDN URLs
-    expect(Object.keys(MASCOT_REGISTRY).length).toBe(8)
+    // Verify all 7 registry items have valid Neon S3 CDN URLs
+    expect(Object.keys(MASCOT_REGISTRY).length).toBe(7)
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)
       expect(info.s3Url).toContain('moltology-public-assets/images/characters/')
