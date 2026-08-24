@@ -839,11 +839,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
                     className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
                   />
-                  <div className="text-[10px] font-sans text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                    <span className="group-hover:hidden">CARAPACE v4.2</span>
-                    <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>
-                  </div>
                 </div>
               )}
             </div>
@@ -1103,11 +1098,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     containerClassName="w-20 h-20 aspect-square rounded-full overflow-hidden flex items-center justify-center"
                     className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
                   />
-                  <div className="text-[10px] font-sans text-[#00c3ff]/70 tracking-widest uppercase flex items-center justify-center gap-1.5 mt-1 group-hover:text-[#00ffff] transition-colors">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse" />
-                    <span className="group-hover:hidden">CARAPACE v4.2</span>
-                    <span className="hidden group-hover:inline text-[#00ffff]">▶ REPLAY BROADCAST</span>
-                  </div>
                 </div>
               </div>
 
