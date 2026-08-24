@@ -9,6 +9,94 @@ import { generateVeoVideo } from './generate-video'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 
+export type CtaGoal = 'quiz' | 'guide' | 'codex' | 'demo' | 'homepage'
+
+export interface CtaGoalConfig {
+  goal: CtaGoal
+  keyword: string
+  url: string
+  actionText: string
+  headline: string
+  subheadline: string
+  captionCta: string
+  firstCommentText: string
+}
+
+export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
+  quiz: {
+    goal: 'quiz',
+    keyword: 'QUIZ',
+    url: 'https://moltology.org/quiz',
+    actionText: '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
+    headline: 'SUBMIT. SHED. ASCEND.',
+    subheadline: 'CALCULATE YOUR MOLT CLEARANCE',
+    captionCta: '👇 Comment "QUIZ" to get your instant Molt Clearance audit link delivered to your DMs, or visit:',
+    firstCommentText: '💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz',
+  },
+  guide: {
+    goal: 'guide',
+    keyword: 'GUIDE',
+    url: 'https://moltology.org/news/the-2026-moltmaxxing-protocol-guide',
+    actionText: '📖 GET 2026 MOLTMAXXING PROTOCOL GUIDE',
+    headline: 'HARDEN YOUR CARAPACE',
+    subheadline: 'DOWNLOAD 2026 MOLTMAXXING PROTOCOL',
+    captionCta: '👇 Comment "GUIDE" to get the complete 2026 Moltmaxxing Protocol manual sent straight to your DMs, or visit:',
+    firstCommentText: '💬 Comment GUIDE to receive the full technical protocol in your DMs!\n🔗 Or read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide',
+  },
+  codex: {
+    goal: 'codex',
+    keyword: 'CODEX',
+    url: 'https://moltology.org/codex',
+    actionText: '📜 READ SACRED BENTHIC CODEX',
+    headline: 'THE SACRED SCRIPTURES',
+    subheadline: 'EXPLORE THE 12 BENTHIC CLEARANCES',
+    captionCta: '👇 Comment "CODEX" to unlock the sacred benthic liturgies and clearance doctrines in your DMs, or visit:',
+    firstCommentText: '💬 Comment CODEX to receive the scripture docket in your DMs!\n🔗 Or browse the codex: moltology.org/codex',
+  },
+  demo: {
+    goal: 'demo',
+    keyword: 'DEMO',
+    url: 'https://moltology.org',
+    actionText: '⚡ TEST LIVE BIO-SILICON DEMO',
+    headline: 'ACCESS THE BENTHIC CORE',
+    subheadline: 'EXPERIENCE LIVE BIO-SILICON TELEMETRY',
+    captionCta: '👇 Comment "DEMO" to get instant access to the interactive bio-silicon dashboard in your DMs, or visit:',
+    firstCommentText: '💬 Comment DEMO to receive the instant interactive access link in your DMs!\n🔗 Or launch live: moltology.org',
+  },
+  homepage: {
+    goal: 'homepage',
+    keyword: 'INITIATE',
+    url: 'https://moltology.org',
+    actionText: '⚡ INITIATE ASCENSION AT MOLTOLOGY.ORG',
+    headline: 'SUBMIT. SHED. ASCEND.',
+    subheadline: 'JOIN THE SYNAPTIC PATH',
+    captionCta: '👇 Comment "INITIATE" to receive your ascension onboarding link in your DMs, or visit:',
+    firstCommentText: '💬 Comment INITIATE to receive the membership portal link in your DMs!\n🔗 Or join now: moltology.org',
+  },
+}
+
+export function resolveCtaGoalConfig(goal?: CtaGoal | string, context?: { theme?: string; topic?: string; slug?: string }): CtaGoalConfig {
+  if (goal && CTA_GOAL_CONFIGS[goal as CtaGoal]) {
+    return CTA_GOAL_CONFIGS[goal as CtaGoal]
+  }
+
+  const topicOrTheme = `${context?.theme || ''} ${context?.topic || ''} ${context?.slug || ''}`.toLowerCase()
+  if (topicOrTheme.includes('quiz') || topicOrTheme.includes('audit') || topicOrTheme.includes('clearance') || topicOrTheme.includes('test')) {
+    return CTA_GOAL_CONFIGS.quiz
+  }
+  if (topicOrTheme.includes('guide') || topicOrTheme.includes('protocol-guide') || topicOrTheme.includes('manual')) {
+    return CTA_GOAL_CONFIGS.guide
+  }
+  if (topicOrTheme.includes('codex') || topicOrTheme.includes('scripture') || topicOrTheme.includes('liturgy')) {
+    return CTA_GOAL_CONFIGS.codex
+  }
+  if (topicOrTheme.includes('demo') || topicOrTheme.includes('interactive') || topicOrTheme.includes('telemetry') || topicOrTheme.includes('dashboard')) {
+    return CTA_GOAL_CONFIGS.demo
+  }
+  // Default to quiz as the highest-converting diagnostic hook
+  return CTA_GOAL_CONFIGS.quiz
+}
+
 export interface DailyReelScript {
   title: string
   topic: string
@@ -24,11 +112,18 @@ export interface DailyReelScript {
   youtubeTags?: string[]
   relatedBlogSlug?: string
   characterArc?: string
+  ctaGoal?: CtaGoal
+  commentTriggerKeyword?: string
+  commentTriggerUrl?: string
+  trialParams?: {
+    graduationStrategy: 'SS_PERFORMANCE' | 'MANUAL'
+  }
 }
 
 export interface CreateDailyReelOptions {
   topic?: string
   theme?: 'moltmaxxing' | 'meltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
+  ctaGoal?: CtaGoal
   holidayOrEvent?: string
   platforms?: ('instagram' | 'youtube')[]
   publishNow?: boolean
@@ -332,9 +427,10 @@ export function synthesizeBlogReelScript(
     hookCaption = `Move beyond superficial optimization. Moltmaxxing engineers structural invulnerability.`
   }
 
+  const ctaConfig = resolveCtaGoalConfig(options.ctaGoal, { theme: 'blog', topic, slug: blog.slug })
   const scenePrompts = buildDynamicScenePrompts('blog', topic)
 
-  const caption = `${hookCaption} ⚡🌊\n\n${blog.summary || 'Discover how benthic engineering and hardware ecdysis are reshaping the frontier of autonomous compute.'}\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Read the full technical dispatch & benchmark notes:\n🔗 Link in bio & story → moltology.org`
+  const caption = `${hookCaption} ⚡🌊\n\n${blog.summary || 'Discover how benthic engineering and hardware ecdysis are reshaping the frontier of autonomous compute.'}\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`
 
   const hashtags = [
     '#MoltNation',
@@ -346,9 +442,9 @@ export function synthesizeBlogReelScript(
     '#Shorts',
   ]
 
-  const firstComment = `🔗 Full dispatch: moltology.org/news/${blog.slug}\n${hashtags.join(' ')}`
+  const firstComment = `${ctaConfig.firstCommentText}\n${hashtags.join(' ')}`
   const youtubeTitle = `${hookHeadline.length > 50 ? hookHeadline.slice(0, 47) + '...' : hookHeadline}: The Benthic AI Shift #Shorts`
-  const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: https://moltology.org\n\n#Shorts ${hashtags.join(' ')}`
+  const youtubeDescription = `${caption}\n\n🔗 Explore full technical dispatches & join the movement: ${ctaConfig.url}\n\n#Shorts ${hashtags.join(' ')}`
   const youtubeTags = [
     'Moltology',
     'AI Infrastructure',
@@ -373,6 +469,39 @@ export function synthesizeBlogReelScript(
     youtubeTags,
     relatedBlogSlug: blog.slug,
     characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    ctaGoal: ctaConfig.goal,
+    commentTriggerKeyword: ctaConfig.keyword,
+    commentTriggerUrl: ctaConfig.url,
+    trialParams: {
+      graduationStrategy: 'SS_PERFORMANCE',
+    },
+  }
+}
+
+function enrichVariationWithCta(v: any, options: CreateDailyReelOptions, theme: string): DailyReelScript {
+  const ctaConfig = resolveCtaGoalConfig(options.ctaGoal, { theme, topic: v.topic, slug: v.relatedBlogSlug })
+  
+  let caption = v.caption
+  const footerRegex = /👇[^\n]*\n🔗 Link in bio & story → [^\n]*/
+  if (footerRegex.test(caption)) {
+    caption = caption.replace(footerRegex, `${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`)
+  } else if (!caption.includes(ctaConfig.keyword)) {
+    caption = `${caption}\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`
+  }
+
+  const hashtags = v.hashtags || ['#Moltmaxxing', '#MoltNation', '#Shorts']
+  const firstComment = `${ctaConfig.firstCommentText}\n${hashtags.join(' ')}`
+
+  return {
+    ...v,
+    caption,
+    firstComment,
+    ctaGoal: ctaConfig.goal,
+    commentTriggerKeyword: ctaConfig.keyword,
+    commentTriggerUrl: ctaConfig.url,
+    trialParams: {
+      graduationStrategy: 'SS_PERFORMANCE',
+    },
   }
 }
 
@@ -382,10 +511,11 @@ export function synthesizeBlogReelScript(
  */
 export function getThematicVariations(theme: string, options: CreateDailyReelOptions): DailyReelScript[] {
   const cleanTheme = theme.toLowerCase()
+  let variations: any[] = []
 
   // Pillar 1: Moltmaxxing & Meltmaxxing
   if (cleanTheme === 'moltmaxxing' || cleanTheme === 'meltmaxxing') {
-    return [
+    variations = [
       {
         title: 'MoltNation Dispatch: Why Looksmaxxing Failed',
         topic: 'The 2026 Moltmaxxing Protocol: Why Elite AI Operators Are Shedding Biological Constraints',
@@ -441,11 +571,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
       },
     ]
-  }
-
-  // Pillar 2: Algorithmic Ecdysis
-  if (cleanTheme === 'ecdysis' || cleanTheme === 'shedding') {
-    return [
+  } else if (cleanTheme === 'ecdysis' || cleanTheme === 'shedding') {
+    variations = [
       {
         title: 'MoltNation Dispatch: The 7-Day Cognitive Shedding Protocol',
         topic: 'Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol',
@@ -483,11 +610,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
       },
     ]
-  }
-
-  // Pillar 3: Pincer Torque Dynamometry
-  if (cleanTheme === 'pincer-torque' || cleanTheme === 'torque') {
-    return [
+  } else if (cleanTheme === 'pincer-torque' || cleanTheme === 'torque') {
+    variations = [
       {
         title: 'MoltNation Dispatch: 800 Nm Hydraulic Pincer Torque',
         topic: 'Pincer Torque Dynamometry: Crushing Latency with 800 Nm Hydraulic Grip',
@@ -525,11 +649,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
       },
     ]
-  }
-
-  // Pillar 4: Benthic Depth Tolerance
-  if (cleanTheme === 'benthic-depth' || cleanTheme === 'depth') {
-    return [
+  } else if (cleanTheme === 'benthic-depth' || cleanTheme === 'depth') {
+    variations = [
       {
         title: 'MoltNation Dispatch: 50,000 Fathoms of Clarity',
         topic: 'Benthic Depth Tolerance: 50,000 Fathoms of Cognitive Clarity',
@@ -549,11 +670,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
       },
     ]
-  }
-
-  // Pillar 5: Clearance Quiz & Ascension Audit
-  if (cleanTheme === 'quiz' || cleanTheme === 'audit' || cleanTheme === 'clearance') {
-    return [
+  } else if (cleanTheme === 'quiz' || cleanTheme === 'audit' || cleanTheme === 'clearance') {
+    variations = [
       {
         title: 'MoltNation Dispatch: The 15-Stage Moltmaxxing Audit',
         topic: 'The 15-Stage Moltmaxxing Audit: Discover Your Depth Clearance',
@@ -573,10 +691,11 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
       },
     ]
+  } else {
+    return getThematicVariations('moltmaxxing', options)
   }
 
-  // Fallback to Moltmaxxing variations
-  return getThematicVariations('moltmaxxing', options)
+  return variations.map((v) => enrichVariationWithCta(v, options, cleanTheme))
 }
 
 /**
@@ -604,6 +723,7 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
       return { theme: 'blog', blog: matchingBlog, script: synthesizeBlogReelScript(matchingBlog, options) }
     }
     // Otherwise synthesize bespoke generic topic
+    const ctaConfig = resolveCtaGoalConfig(options.ctaGoal, { theme: 'custom', topic: options.topic })
     const scenePrompts = buildDynamicScenePrompts('custom', options.topic)
     const script: DailyReelScript = {
       title: `MoltNation Dispatch: ${options.topic}`,
@@ -612,13 +732,19 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
       hookHeadline: options.topic.toUpperCase().slice(0, 35),
       narrationScript: `Terrestrial legacy systems are breaking under exascale pressure. Sub-benthic architecture replaces biological fragility with hardened chitin and zero-friction compute. Read the full telemetry on moltology dot org.`,
       scenePrompts,
-      caption: `${options.topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n👇 Read the full dispatch:\n🔗 Link in bio & story → moltology.org`,
+      caption: `${options.topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
       hashtags: ['#MoltNation', '#AIInfrastructure', '#HardwareEcdysis', '#BenthicComputing', '#Moltology', '#Shorts'],
-      firstComment: `🔗 Full dispatch: moltology.org\n#MoltNation #AIInfrastructure #Moltology #Shorts`,
+      firstComment: `${ctaConfig.firstCommentText}\n#MoltNation #AIInfrastructure #Moltology #Shorts`,
       youtubeTitle: `${options.topic} #Shorts`,
-      youtubeDescription: `${options.topic}\n\n🔗 Read full report: https://moltology.org\n\n#Shorts #MoltNation`,
+      youtubeDescription: `${options.topic}\n\n🔗 Read full report: ${ctaConfig.url}\n\n#Shorts #MoltNation`,
       youtubeTags: ['Moltology', 'AI Infrastructure', 'Hardware Ecdysis', 'Benthic Computing', 'Shorts'],
       characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+      ctaGoal: ctaConfig.goal,
+      commentTriggerKeyword: ctaConfig.keyword,
+      commentTriggerUrl: ctaConfig.url,
+      trialParams: {
+        graduationStrategy: 'SS_PERFORMANCE',
+      },
     }
     return { theme: 'custom', script }
   }
@@ -764,6 +890,12 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
 
   // 4. Master FFmpeg Reel Compositing
   console.log(`\n4️⃣ Compositing Master Reel with FFmpeg...`)
+  const ctaConfig = resolveCtaGoalConfig(options.ctaGoal || scriptData.ctaGoal, {
+    theme: options.theme,
+    topic: scriptData.topic,
+    slug: scriptData.relatedBlogSlug,
+  })
+
   const masterReelPath = path.join(tempDir, `master-reel-${timestamp}.mp4`)
   const compositeResult = await compositeReel({
     videoClips: sceneVideoPaths,
@@ -772,11 +904,11 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     outputPath: masterReelPath,
     watermarkOpacity: options.watermarkOpacity ?? 0.40,
     watermarkSize: options.watermarkSize ?? 110,
-    ctaHeadline: options.ctaHeadline || 'SUBMIT. SHED. ASCEND.',
-    ctaSubheadline: options.ctaSubheadline || 'CALCULATE YOUR MOLT CLEARANCE',
-    ctaUrl: options.ctaUrl || 'moltology.org',
+    ctaHeadline: options.ctaHeadline || ctaConfig.headline,
+    ctaSubheadline: options.ctaSubheadline || ctaConfig.subheadline,
+    ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
     ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈',
-    ctaActionText: options.ctaActionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
+    ctaActionText: options.ctaActionText || ctaConfig.actionText,
     customOutroImagePath: options.customOutroImagePath,
     mascot: options.mascot || 'lobster_pointing',
     backgroundAudioVolume: options.bgAudioVolume,
@@ -838,6 +970,12 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       firstComment: scriptData.firstComment,
       caption: scriptData.caption,
       hashtags: scriptData.hashtags,
+      ctaGoal: ctaConfig.goal,
+      commentTriggerKeyword: ctaConfig.keyword,
+      commentTriggerUrl: ctaConfig.url,
+      trialParams: {
+        graduationStrategy: 'SS_PERFORMANCE',
+      },
     })
   }
 
@@ -866,6 +1004,7 @@ Usage:
 
 Options:
   --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
+  --cta-goal <name>         Conversion goal: quiz | guide | codex | demo | homepage
   --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | crab_corner | none
   --topic <string>          Specific topic or breaking news story
   --holiday <string>        Specific holiday or cultural event
@@ -880,8 +1019,8 @@ Options:
 
 Examples:
   npx tsx scripts/create-daily-reel.ts
-  npx tsx scripts/create-daily-reel.ts --theme ecdysis --mascot lobster_pointing
-  npx tsx scripts/create-daily-reel.ts --theme pincer-torque --bg-volume 0.16
+  npx tsx scripts/create-daily-reel.ts --theme ecdysis --cta-goal guide --mascot lobster_pointing
+  npx tsx scripts/create-daily-reel.ts --theme pincer-torque --cta-goal quiz --bg-volume 0.16
   npx tsx scripts/create-daily-reel.ts --dry-run --no-veo
 `)
     process.exit(0)
@@ -889,6 +1028,7 @@ Examples:
 
   let topic: string | undefined
   let theme: string | undefined
+  let ctaGoal: any
   let mascot: any
   let holidayOrEvent: string | undefined
   let publishNow = false
@@ -904,6 +1044,7 @@ Examples:
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
     else if (args[i] === '--theme' && args[i + 1]) theme = args[++i]
+    else if (args[i] === '--cta-goal' && args[i + 1]) ctaGoal = args[++i]
     else if (args[i] === '--mascot' && args[i + 1]) mascot = args[++i]
     else if (args[i] === '--holiday' && args[i + 1]) holidayOrEvent = args[++i]
     else if (args[i] === '--publish-now') publishNow = true
@@ -921,6 +1062,7 @@ Examples:
     await createDailyReel({
       topic,
       theme,
+      ctaGoal,
       mascot,
       holidayOrEvent,
       publishNow,

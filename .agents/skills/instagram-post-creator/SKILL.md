@@ -93,7 +93,27 @@ Transparent PNG character cutouts reside in the Neon S3 public assets bucket und
 
 ---
 
-## 3. Fast CLI Execution
+## 3. High-Conversion Engagement Hooks & Comment-to-DM
+
+Static and carousel posts should include high-converting one-word comment callouts paired with Zernio comment automations (`POST /v1/comment-automations`):
+
+| Goal | Keyword Trigger | Target URL | Conversion Action |
+|------|-----------------|------------|-------------------|
+| **Quiz** | `QUIZ` or `AUDIT` | `https://moltology.org/quiz` | Direct DM delivery of 15-Stage Moltmaxxing diagnostic. |
+| **Guide** | `GUIDE` or `MOLTMAX` | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` | Direct DM delivery of full 2026 Moltmaxxing Protocol. |
+| **Codex** | `CODEX` or `SHED` | `https://moltology.org/codex` | Direct DM delivery of Sacred Benthic Codex scriptures. |
+| **Demo** | `DEMO` | `https://moltology.org` | Direct DM delivery of interactive bio-silicon dashboard. |
+| **Homepage** | `INITIATE` | `https://moltology.org` | Direct DM delivery of Ascension Onboarding portal. |
+
+**Caption Format**:
+```text
+👇 Comment "QUIZ" to receive the instant diagnostic audit in your DMs, or visit:
+🔗 Link in bio & story → moltology.org/quiz
+```
+
+---
+
+## 4. Fast CLI Execution
 
 Run the complete pipeline with a single command:
 
