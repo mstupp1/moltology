@@ -19,6 +19,7 @@ async function main() {
   const mascot = (getArg('--mascot') || 'lobster_thumbs_up') as MascotKey
   const scaleFactor = getArg('--scale') ? parseFloat(getArg('--scale')!) : 2
   const customDataRaw = getArg('--data')
+  const ctaTexture = getArg('--cta-texture')
 
   let data: Record<string, any> | undefined
   if (customDataRaw) {
@@ -27,6 +28,10 @@ async function main() {
     } catch {
       console.warn('⚠️ Could not parse --data JSON string')
     }
+  }
+
+  if (ctaTexture) {
+    data = { ...data, ctaTexture }
   }
 
   const timestamp = Date.now()

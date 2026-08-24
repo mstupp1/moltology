@@ -144,7 +144,9 @@ function CompositeRenderRoute() {
             headline={customData.headline}
             subheadline={customData.subheadline}
             url={customData.url}
-            actionBadgeText={customData.actionBadgeText}
+            actionBadgeText={customData.actionBadgeText || customData.actionText || customData.ctaActionText}
+            linkInBioText={customData.linkInBioText}
+            ctaTexture={customData.ctaTexture}
             mascot={mascot}
             backgroundImageUrl={customData.backgroundImageUrl}
           />

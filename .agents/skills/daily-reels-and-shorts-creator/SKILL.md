@@ -111,21 +111,40 @@ Run the master compositor to dynamically size video scenes to match voiceover le
 
 1. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
 2. **Seamless Forward Scene Playback & Atmospheric Color Grading**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops, and receive tasteful, cinematic contextual color grading (`benthic-cyan`, `thermal-melt`, `photonics-matrix`, `calcified-armor`, or 2-scene `ecdysis-transmute` auto progression).
-3. **Thematic AI Outro Card Generation (`generate_image`)**:
-   - Render the deterministic base frame via `renderCtaOutroFrame('tmp/base_outro.png', ...)` containing the two-line brand title (`Moltology / THE SYNAPTIC PATH`), emblem, headline, subheadline, app CTA button (`moltology.org  →`), and mascot cutout.
-   - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, Memristive Tactile E-Skins, or Subsea Datacenters*).
-   - **Strict Rules**:
-     1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
-     2. **Character Visibility & Natural Scene Blending**: Make sure the cartoon crustacean mascot in the bottom right is clearly visible and seamlessly blended into the scene with consistent ambient lighting. The lighting effect should **not be obvious** (avoid artificial backlight halos, stark spotlights, or exaggerated rim lights). Given enough space, the character can be a bit larger than its reference to ensure strong visual clarity, presence, and personality.
-   - Pass the generated image path via `--custom-outro <path>` to `npm run reel:create` (or `customOutroImagePath` to `compositeReel`).
+3. **Composite Studio Base Frame Generation & Thematic AI Outro Staging (`generate_image`)**:
+   - **Base Outro Generation via Composite Studio**: Render the deterministic base structural frame via **Composite Studio** (`npm run composite:render -- --template reel-outro ...` or `renderCtaOutroFrame('tmp/base-outro-frame.png', ...)`). The web-rendered frame delivers:
+     - 1080×1920 (9:16 vertical standard)
+     - Strict center alignment matching site fonts (`Space Grotesk`, `Inter`, `font-mono`) and theme tokens (`#00c3ff`, `#38bdf8`, `#f59e0b`)
+     - Order emblem, two-line brand title (`Moltology` / `THE SYNAPTIC PATH`), headline, subheadline, canonical HUD CTA button (`moltology.org  →` + action badge), and `LINK IN BIO`
+     - **Contextual CTA Molting Texture Selection**: When drafting the reel, select the matching molting texture (`--cta-texture <key>` / `ctaTexture`) for the CTA button backdrop based on the topic:
+       - `circuit` (Silicon Photonic Matrix) — For AI compute, optical latency, subsea datacenters, neural telemetry, LLMs.
+       - `chitin` (Chitin Plates) — For shedding habits, ecdysis, soft biology vs. hard shell, moltmaxxing doctrine.
+       - `carbon` (Carbon Weave Armor) — For pincer torque, high-load execution, burnout resistance, discipline.
+       - `alloy` (Benthic Titanium Alloy) — For cybernetics, titanium exoskeletons, agent swarms, structural integrity.
+       - `basalt` (Deep Abyssal Basalt) — For deep work, 50,000 fathoms focus, silence beneath surface noise.
+       - `hex` (Hex Lattice) — For cellular optimization, sacred geometry, bio-synthetic architecture.
+       - `none` (Solid HUD) — Clean dark cyan gradient without texture.
+     - Prominent, large cartoon crustacean mascot (~520px) anchored with natural soft contact shadow
+   - **Thematic AI Post-Processing Elevation (`generate_image`)**:
+     - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, Memristive Tactile E-Skins, or Subsea Datacenters*).
+     - **Strict Rules**:
+       1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
+       2. **Character Visibility & Natural Scene Blending**: Make sure the cartoon crustacean mascot in the bottom right is clearly visible and seamlessly blended into the scene with consistent ambient lighting. The lighting effect should **not be obvious** (avoid artificial backlight halos, stark spotlights, or exaggerated rim lights). The character must remain large and prominent to ensure strong visual clarity, presence, and personality.
+     - Pass the generated image path via `--custom-outro <path>` to `npm run reel:create` (or `customOutroImagePath` to `compositeReel`).
+
+```bash
+# Render base outro frame via Composite Studio CLI with contextual CTA texture:
+npx tsx scripts/render-composite.ts --template reel-outro --aspect 9:16 --mascot crab_stats --cta-texture circuit --data '{"headline":"CALCIFY YOUR GRIP","subheadline":"CALCULATE YOUR MOLT CLEARANCE","url":"moltology.org","actionBadgeText":"⚡ TAKE THE 15-STAGE MOLTMAXXING TEST"}' --out tmp/base-outro-frame.png
+```
 
 ```typescript
 import { renderCtaOutroFrame, compositeReel } from 'scripts/lib/reel-compositor'
 
-// 1. Generate base structural template frame
+// 1. Generate base structural template frame via Composite Studio with chosen molting texture
 const baseOutroPath = 'tmp/base-outro-frame.png'
-await renderCtaOutroFrame(baseOutroPath, 'SUBMIT. SHED. ASCEND.', 'CALCULATE YOUR MOLT CLEARANCE', 'moltology.org', {
+await renderCtaOutroFrame(baseOutroPath, 'CALCIFY YOUR GRIP', 'CALCULATE YOUR MOLT CLEARANCE', 'moltology.org', {
   mascot: 'crab_stats',
+  ctaTexture: 'circuit', // 'circuit' | 'chitin' | 'carbon' | 'alloy' | 'basalt' | 'hex' | 'none'
   ctaActionText: '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
 })
 
