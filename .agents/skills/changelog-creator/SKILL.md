@@ -14,13 +14,13 @@ This skill guides the creation, validation, and automated ingestion of system ch
 
 ## 0. Choosing the Right Workflow
 
-Two distinct jobs exist. Pick based on the request:
+Select the workflow matching the request:
 
-| Request type | Use section |
-| :--- | :--- |
-| Add one new release/update now | **§3 Production Workflow** |
-| Backfill history / "make a changelog from git history" / "one post per day" | **§3.5 Daily Digest Backfill** |
-| Clean junk/test entries out of the DB | **§3.6 Cleanup** |
+| Request type | Workflow | Description |
+| :--- | :--- | :--- |
+| Regular update / "update changelog" / "backfill missing entries" | **§3 Incremental Update & Recent Backfill (Default)** | Checks the latest recorded release date, identifies any recent missed days with significant work, and drafts/ingests only the new entries. |
+| Full historical rebuild / initial setup | **§3.5 Full Historical Backfill** | Rebuilds the entire history from initial launch day. Used only for complete migrations or initial project setups. |
+| Clean junk/test entries | **§3.6 Cleanup** | Deletes test or invalid entries by slug or version. |
 
 ---
 
@@ -31,6 +31,7 @@ Two distinct jobs exist. Pick based on the request:
 * **Flexible Versioning**: Strict SemVer is not required. Version tags can be custom (e.g. `v1.6.0`), date-based (e.g. `2026.08.20`), or auto-defaulted for daily updates. **For daily digests use date-based versions** (e.g. `2026.08.20`).
 * **Draft & Clean Workflow**: Drafts are authored temporarily in `content/changelogs/<slug>.md`, ingested via `scripts/ingest.ts --clean`, and automatically purged upon successful database commit.
 * **One Post Per Day**: Keep the timeline clean — **at most one entry per calendar day**. Group all of a day's work into a single digest entry.
+* **Incremental Ingestion (No Full Re-verification Needed)**: Regular runs only need to validate and ingest the newly drafted entries. Do NOT wipe or batch re-verify the entire historical database for normal daily additions.
 * **Idempotent Upsert**: The ingestion CLI upserts on `slug`, so re-running is safe and drafts double as the durable source of truth.
 
 ---
@@ -99,52 +100,67 @@ releasedAt: "2026-08-19T23:59:00Z"
 
 ---
 
-## 3. Production Workflow (4 Steps)
+## 3. Incremental Update & Recent Backfill Workflow (Standard)
 
-### Step 1: Draft Temporary Markdown File
+Use this default workflow whenever adding today's entry or ensuring recent runs haven't missed any days. You do **not** need to wipe or re-verify the whole historical changelog.
 
-Create `content/changelogs/<slug>.md` using the schema above.
-* **Significance Check**: Verify that the release contains meaningful user-facing features or major UI additions before authoring. Do not create entries for minor tweaks.
+### Step 1: Check Latest Date & Identify Missed Recent Days
+
+1. Check the latest release version in `src/lib/changelogs-data.ts` (or query the DB for the newest `version`).
+2. List recent git commit dates since that release:
+```bash
+git log --format='%ad' --date=short --since="<YYYY-MM-DD>" | sort -r | uniq
+```
+3. For any day between the latest recorded release and today that has significant feature or UI commits, gather commits:
+```bash
+git log --format='%ad|%s' --date=short | grep '^<YYYY-MM-DD>|'
+```
+
+### Step 2: Draft Temporary Markdown File(s)
+
+Create `content/changelogs/<slug>.md` only for the new / missed days.
+* **Significance Check**: Verify that each day contains meaningful user-facing features or major UI additions before authoring. Do not create entries for minor tweaks.
 * **Plain English**: Use plain, high-level explanations of what the user gained (no pseudo-scientific word salad, no heavy techno-babble, no `//` double slashes in titles).
 * **Benefit-First**: Lead with what is now possible or improved for the user, followed by how it works.
 
-### Step 2: Validate Frontmatter (Dry-Run)
+### Step 3: Validate Frontmatter (Dry-Run)
 
-Validate the markdown frontmatter and schema without writing to the database:
+Validate only the newly drafted markdown files without writing to the database:
 ```bash
-npx tsx scripts/ingest.ts content/changelogs/<slug>.md --dry-run
+npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md --dry-run
 ```
 
-### Step 3: Ingest to Neon Database & Clean Draft
+### Step 4: Ingest to Neon Database & Prepend Seed
 
-Run the ingestion CLI with the `--clean` flag to upsert into Neon PostgreSQL and automatically delete the temporary draft file:
-
+1. Ingest only the new entries to development and production:
 ```bash
-# Ingest to production database:
-npx tsx scripts/ingest.ts content/changelogs/<slug>.md --clean
+# Ingest to DEV database:
+npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md --dev
 
-# Or target development database:
-npx tsx scripts/ingest.ts content/changelogs/<slug>.md --dev --clean
+# Ingest to PROD database:
+npx tsx scripts/ingest.ts content/changelogs/<new-slug>.md
 ```
+*(Optionally add `--clean` if you want the temporary draft file automatically deleted after ingestion).*
 
-### Step 4: Verify Publication
+2. Prepend the new entry/entries to `INITIAL_CHANGELOGS` in `src/lib/changelogs-data.ts` to keep the SSR fallback and seed data in sync.
 
-Verify that the entry is accessible:
+### Step 5: Verify Publication
+
+Verify that the new entry is accessible:
 * Public index: `https://moltology.org/changelog`
 * Permalinks: `https://moltology.org/changelog/<slug>`
 * HUD Support Portal: `/_hud/support`
 
-**Verify the database record directly** (confirms count, ordering, and no junk):
+Verify the latest records directly in Neon DB:
 ```bash
-# Point DATABASE_URL at the target branch, then:
-npx tsx -e "import { neon } from '@neondatabase/serverless'; const sql=neon(process.env.DATABASE_URL!); const r=await sql\`SELECT version,title FROM changelogs ORDER BY \"releasedAt\" DESC\`; console.log('count:',r.length, r.map(x=>x.version).join(','))"
+npx tsx -e "require('dotenv').config(); const { neon } = require('@neondatabase/serverless'); const sql = neon(process.env.PROD_DATABASE_URL || process.env.DATABASE_URL); sql\`SELECT slug, version, title, \"releasedAt\" FROM changelogs ORDER BY \"releasedAt\" DESC LIMIT 5\`.then(r => console.log(r));"
 ```
 
 ---
 
-## 3.5 Daily Digest Backfill (Historical)
+## 3.5 Full Historical Backfill (Full Rebuild Only)
 
-Use this when asked to "make a changelog", "backfill history", or "one post per day". Build one digest entry per significant calendar day of work.
+Use this **only** for complete migrations, initial repository setups, or full timeline resets. Do **not** use this for routine daily updates.
 
 ### Step A: Derive the days from git history
 ```bash

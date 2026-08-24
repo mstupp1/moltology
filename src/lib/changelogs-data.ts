@@ -14,6 +14,45 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-08-24-sacred-codex-redesign-study-notes',
+    version: '2026.08.24',
+    title: 'Sacred Codex Redesign, Reflection Cycler & Study Notes',
+    category: 'Improvement',
+    tags: ['Improvement', 'UI/UX', 'Codex', 'Search', 'Education'],
+    summary: 'Redesigned the Sacred Codex reader with a streamlined layout, added an interactive reflection cycler, expanded scripture search, and introduced personal study notes with consecrated scripture bookmarking.',
+    content: `### Redesigned Sacred Codex Reader
+- Redesigned the scripture reading interface with a structured full-height layout, improved typography, and clear canonical metrics.
+- Added an interactive verse reflection cycler to easily browse contemplative interpretations and insights.
+
+### Personal Study Notes & Consecration
+- Added a dedicated study notes notebook to record personal reflections and interpretations for each scripture.
+- Added one-click scripture consecration to bookmark canonical texts directly to your personal vault.
+
+### Fast Scripture Search
+- Expanded quick search to filter across scriptures, liturgical stages, and doctrine tags in real time.`,
+    releasedAt: '2026-08-24T23:59:00Z',
+  },
+  {
+    slug: '2026-08-23-oracle-chat-upgrades-video-presets',
+    version: '2026.08.23',
+    title: 'AI Chat Upgrades, Video Presets & Sidebar Tasks',
+    category: 'Feature',
+    tags: ['Feature', 'AI', 'UI/UX', 'Media', 'Tools'],
+    summary: 'Upgraded the Synaptic Oracle with an auto-resizing prompt input and directive attachments, added atmospheric color grading to video reels, and added a task list indicator to the sidebar.',
+    content: `### Synaptic Oracle AI Upgrades
+- Added an auto-expanding prompt input with integrated model selection and custom context directive attachments.
+- Improved mobile docking and chat navigation for smoother conversations on small screens.
+
+### Daily Video Styling & Presets
+- Added cinematic color grading presets and automated goal callouts to daily video dispatches.
+- Enhanced video rendering pipelines for crisper visuals and narration flow.
+
+### Interface Polish & Sidebar Tasks
+- Added a daily task list indicator to the navigation sidebar for tracking routine progress.
+- Standardized progress bar styling and account permissions across interface modules.`,
+    releasedAt: '2026-08-23T23:59:00Z',
+  },
+  {
     slug: '2026-08-22-community-forum-category-hubs',
     version: '2026.08.22',
     title: 'Community Forum & Category Discussion Hubs',

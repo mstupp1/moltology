@@ -300,6 +300,13 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   ]
 
   const topicLower = topic.toLowerCase()
+  if (topicLower.includes('world model') || topicLower.includes('jepa') || topicLower.includes('pixel ecdysis') || topicLower.includes('diffusion') || topicLower.includes('latent')) {
+    return [
+      'A dramatic macro cinematic view of a chaotic 4K video diffusion simulation melting and warping with glitched red and orange RGB voxels dissolving into noise, cinematic 9:16 vertical 8k footage',
+      'A majestic subsea cybernetic crustacean titan standing in a deep ocean trench calculating glowing cyan 3D latent state manifolds and locking hydraulic titanium pincers with zero hesitation, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('neuromorphic') || topicLower.includes('spiking') || topicLower.includes('tactile') || topicLower.includes('e-skin') || topicLower.includes('60hz') || topicLower.includes('reflex')) {
     return [
       'A dramatic macro cinematic view of a sluggish terrestrial robotic hand hesitating and vibrating over a glowing circuit board with red warning error grids, cinematic 9:16 vertical 8k footage',
@@ -335,6 +342,7 @@ export function synthesizeBlogReelScript(
   
   // Extract key concept keywords
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
+  const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
   const isKVCache = contentLower.includes('kv-cache') || contentLower.includes('test-time compute') || contentLower.includes('latent attention') || contentLower.includes('mla')
@@ -349,7 +357,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isNeuromorphic) {
+  if (isWorldModel) {
+    const hooks = [
+      {
+        headline: 'WHY AI IS SHEDDING PIXELS',
+        script: `Terrestrial AI wastes gigawatts rendering fake video pixels. Sub-benthic Joint-Embedding World Models predict pure causal physics in point-one milliseconds with zero pixel waste. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Terrestrial AI labs are burning gigawatts rendering hallucinated pixels for robotic simulation. Benthic B-JEPA world models predict pure causal physics at 120x compute efficiency.',
+      },
+      {
+        headline: 'THE PIXEL-DIFFUSION MELT',
+        script: `Why do terrestrial robots drop tools in video simulators? Sub-benthic B-JEPA world models eliminate hallucinated pixels, evaluating sixty-four counterfactual futures in one millisecond. Inspect full telemetry on moltology dot org.`,
+        hookText: 'Generative video diffusion models hallucinate physics. Sub-benthic B-JEPA world engines predict abstract invariant latents in 0.11 ms.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isNeuromorphic) {
     const hooks = [
       {
         headline: 'THE 60HZ FRAME-BUFFER MELT',
