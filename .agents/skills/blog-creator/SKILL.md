@@ -77,22 +77,12 @@ Rotate across distinct liturgical and scientific personas:
 
 ---
 
-### Step 2: Dynamic Visual Art Direction & Image Generation
+### Step 2: Dynamic Visual Art Direction & Image Generation (Antigravity `generate_image`)
 
-#### Exclusive Use of Built-in Antigravity Tools (Strict Rule)
-* **Exclusively Use Built-in Antigravity Tools**: All image generation MUST be executed using the native `generate_image` tool in Antigravity. DO NOT use or write external scripts calling Gemini API or third-party image APIs for image generation.
+All image assets for the blog article itself (16:9 Hero Cover and 1–2 inline supporting figures) are generated directly using **Antigravity's built-in `generate_image` tool**.
+
 * **Featured Cover Image Rule**: The featured cover image (`coverImageUrl`) must always be a standalone, pure, cinematic 3D visual without any text overlays, text boxes, modals, or HUD cards.
-* **No Duplicate In-Article Images**: Never repeat the featured cover image as the first figure inside the article body. Inline figures must be distinct supporting technical schematics, architectural blueprints, or hardware renders.
-
-#### Non-Negotiable Rule: Antigravity Image Generation Unavailability
-* **Stop the Run Immediately**: If the built-in Antigravity `generate_image` tool is unavailable, returns an error, or hits rate limits/quota exhaustion (e.g. 429 `RESOURCE_EXHAUSTED`):
-  * **DO NOT** attempt to automatically fallback to existing images or proceed on autopilot with makeshift assets.
-  * **STOP THE RUN IMMEDIATELY.**
-  * Outline to the user what should happen:
-    1. Proposed article metadata (slug, headline, archetype, author persona, executive summary).
-    2. Exact visual assets needed (16:9 Cover Hero, 16:9 Figure 1, 16:9 Figure 2, and 3:4/4:5 Carousel Slides).
-    3. The exact detailed visual prompts and parameters for each image.
-    4. A clear request for user decision (e.g. whether the user will generate the images manually, provide alternative assets, or instruct a manual composite run).
+* **Inline Supporting Figures Rule**: Inline figures are cool supportive cinematic visuals (e.g. subsea compute pods, laser waveguides, cryogenic cooling channels, wafer-scale silicon) generated directly via `generate_image` similar to the hero cover (instead of complex canvas mockups). Never repeat the featured cover image as the first inline figure.
 
 #### Visual Style Modes (Rotate Aesthetics across Articles)
 1. **Mode 1: Abyssal Benthic Photorealism**: Deep ocean research stations, glowing cyan hydrothermal vents, nitrogen-sealed titanium server hulls, underwater bubbles.
@@ -104,22 +94,27 @@ Rotate across distinct liturgical and scientific personas:
 #### 1. Cover Hero Image (16:9)
 * **Standalone 3D Cinematic Render**: Focus on a single heroic subject (e.g. an abyssal pressurized server pod, wafer-scale silicon architecture, optical laser waveguides).
 * **Zero Text Overlays**: Keep completely free of HUD cards, text boxes, or titles.
-* **AspectRatio**: `16:9` generated via `generate_image`.
+* **Generation via `generate_image`**:
+  ```ts
+  generate_image({
+    Prompt: 'Cinematic 3D render of a pressurized subsea datacenter pod at 50,000 fathoms depth, glowing cyan hydrothermal vents, titanium-chitin hull, volumetric god rays, dark deep blue ocean caustics, 8k',
+    ImageName: 'hero_cover_<slug>',
+    AspectRatio: '16:9',
+  })
+  ```
 
-#### 2. Inline Supporting Figures (2 Images, 16:9 — Mockup-to-AI Polish Pipeline)
-Inline supporting figures (Figure 1 and Figure 2) visually explain the core engineering breakthroughs, architectural trade-offs, and hardware systems in the article.
-
-Follow the **2-Stage Mockup-to-AI Polish Pipeline** for inline figures:
-1. **Stage 1 (Low-Density Canvas Mockup)**:
-   * Build a lean, high-contrast canvas composition representing the architecture (e.g. side-by-side comparison cards or subsea telemetry callouts).
-   * **Strict Purposefulness Rule**: Only include diagrams, metrics, and callouts that **directly explain the core engineering point of the article**. Do NOT add decorative widgets, faux-math noise, or redundant text boxes.
-   * Keep text concise and bold (stark numbers, key architectural names, high-contrast badges).
-2. **Stage 2 (Antigravity AI Polish via `generate_image`)**:
-   * Feed the canvas mockup into `generate_image` with `AspectRatio: '16:9'` and `ImagePaths: ["/path/to/fig_mockup.jpg"]`.
-   * The AI model transforms the 2D mockup into a cohesive, photorealistic 3D schematic—integrating holographic glassmorphic cards, glowing optical waveguides, ambient benthic lighting, and volumetric depth.
-3. **Figure Roles**:
-   * **Figure 1 (The Architectural Bottleneck & Solution)**: Exploded schematic or side-by-side comparison highlighting the friction of the legacy system vs. the benthic breakthrough (e.g., Dense MHA vs. Compressed MLA).
-   * **Figure 2 (The Deployed System / Telemetry Matrix)**: Physical deployment environment, subsea pressure pod, or tiered data storage architecture demonstrating real-world execution.
+#### 2. Inline Supporting Figures (1–2 Images, 16:9)
+Generate 1–2 distinct, supportive visual scenes that complement the core engineering concepts discussed in the article body:
+* **Figure 1 (Hardware / Architecture Focus)**: Exploded chip architecture, optical waveguides, or subsea pressure vessel.
+* **Figure 2 (Deployment / Telemetry Focus)**: Deep sea robotic deployment, hydrothermal energy conduit, or bio-silicon memory array.
+* **Generation via `generate_image`**:
+  ```ts
+  generate_image({
+    Prompt: 'Macro 3D schematic render of coherent laser silicon photonics microchip, glowing cyan and gold traces, dark glassmorphic substrate, volumetric lighting, 8k',
+    ImageName: 'figure1_<slug>',
+    AspectRatio: '16:9',
+  })
+  ```
 
 ---
 
@@ -210,92 +205,113 @@ Append the newly published article into `content/news/blog-history.json`:
 
 ---
 
-### Step 6: Multi-Channel Social Distribution (Mockup-to-AI Polish Pipeline)
+### Step 6: Multi-Channel Social Distribution (Web Composite ➔ Google Flow ➔ Zernio)
 
 Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) and publish them to Instagram via Zernio.
 
-#### 1. The 2-Stage Carousel Creation Architecture
+#### 1. The Core Mental Model: Composite Scaffolding ➔ Google Flow Polish ➔ Zernio
 
-To achieve studio-grade, photorealistic 3D social carousels with cohesive lighting, tactile character integration, and readable HUD telemetry, follow this 2-stage pipeline:
+To maintain consistent visual mastery across all social carousels:
+
+* **Stage 1: The 2D Canvas Composite is ONLY a Mockup (Scaffolding)**:
+  - The 2D canvas composite is strictly a **layout blueprint / structural storyboard** (`1080x1350`).
+  - It positions the typography, data metrics, comparison tables, flowchart nodes, character cutouts, and background into their designated spatial coordinates.
+  - **Non-Negotiable Rule**: A raw 2D canvas composite is **NEVER a finished deliverable**. It must NEVER be uploaded directly to S3 or staged into the production queue as the final post.
+
+* **Stage 2: The Google Flow AI Polish Pass (User Handoff Directives)**:
+  - The agent renders the 2D scaffolding slides to `tmp/mockup_slide_1.png`, `tmp/mockup_slide_2.png`, `tmp/mockup_slide_3.png`.
+  - The agent **prompts the USER** with rich, ready-to-copy **Google Flow prompt directives** for each slide:
+    1. **Photorealistic 3D Glassmorphic HUD**: Transforms flat 2D graphic boxes into rich, visually captivating 3D glassmorphic HUD interfaces with glowing neon bezel traces (#00ffff / #ef4444) and tactile depth while preserving legibility.
+    2. **NO WASTED SPACE**: Enforce dense, purposeful visual composition; fill negative voids with atmospheric subsea god rays, subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces.
+    3. **Seamless Mascot Blending**: Render cartoon crustacean characters with soft matte chitin textures, casting realistic ambient environmental lighting and contact shadows without harsh backlights or artificial halo outlines.
+    4. **Refined 3D Typography**: Blend headline and metric typography into the scene with subtle luminescence and volumetric bloom.
 
 ```
-┌────────────────────────────────────────┐
-│  Stage 1: Low-Density Canvas Mockup    │
-│  - Big typography & stark numbers      │
-│  - Streamlined, non-dense cards        │
-│  - Character cutout placement          │
-└──────────────────┬─────────────────────┘
-                   │
-                   ▼ (ImagePaths: [mockup.jpg, style_guide.jpg])
-┌────────────────────────────────────────┐
-│  Stage 2: Antigravity AI Image Polish  │
-│  - 3D oceanic lighting & depth         │
-│  - Glassmorphic glowing HUD panels     │
-│  - Seamless character ambient shading  │
-└────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 1: 2D Canvas Composite (THE MOCKUP SCAFFOLDING)       │
+│  - Spatial layout of headlines, metrics, and data charts     │
+│  - Low information density (max 1–2 focal points per slide)  │
+│  - Character cutout & vector watermark placement             │
+│  - Output: tmp/mockup_slide_<N>.png                          │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼ (Agent Prompts User)
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 2: User Polish Pass (Google Flow AI)                  │
+│  - User uploads slide scaffolding into Google Flow           │
+│  - Uses rich enhancement prompt directives from agent        │
+│  - Enforces NO WASTED SPACE with volumetric caustics & depth │
+│  - Turns flat cards into glowing glassmorphic 3D HUD panels  │
+│  - User saves outputs to tmp/polished_slide_<N>.png          │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼ (User Drops Assets Back)
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 3: S3 Ingestion & Zernio Carousel Queueing            │
+│  - Agent uploads polished slides to Neon S3                  │
+│  - Stages carousel into dedicated Zernio Queue (6a84b76d...) │
+│  - Updates narrative continuity ledger                       │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-#### 2. Golden Rule: Anti-Repetition & Bespoke Thematic Backgrounds
+#### 2. Narrative Storytelling Arc & Low-Density Rule (Max 1–2 Key Takeaways Per Slide)
 
-* **Strict Rule — Never Feed Past Post Slides into ImagePaths**: NEVER pass a past slide image (such as an old article's carousel slide) into `generate_image`'s `ImagePaths`. AI image models treat reference images as structural conditioning and will replicate background elements (e.g. server racks, submersibles), causing identical visual templates across different articles.
-* **Generate Unique, Bespoke Thematic Backgrounds**: For every carousel, generate 3 distinct, high-res 3D benthic backgrounds (e.g. via `generate_image` with `AspectRatio: '3:4'`) tailored to the specific topic (e.g. robotic pincer carapaces, hydrothermal basalt vents, optical photonics, deep trench research habitats).
-* **No Extra Auxiliary Image Generation**: NEVER make extra `generate_image` calls for auxiliary sub-strips or decorative elements. Limit AI generation strictly to essential hero and background scenes to preserve quota and avoid 429 rate limit delays. Use native canvas vector rendering for subtle waveforms and accents.
-* **Pristine Mascot & Branding Compositing**: Always composite official transparent character cutouts from `scripts/lib/character-overlay.ts` (`char_lobster_pointing_cta.png`, `char_crab_pointing_stats.png`, `char_lobster_engineer.png`) and the clean MoltNation vector watermark badge on top of the render. Ensure mascots are clearly visible, naturally blended with soft ambient contact shadows (no obvious/artificial backlight halos), and sized with ample presence when layout space allows. This guarantees 100% brand consistency, zero hallucinated mascot deformities, and crisp vector logos.
+* **Rule of Low Information Density**: Mobile viewers scan in 1–2 seconds. **NEVER clutter slides with walls of text, multi-bullet paragraphs, or redundant cards.** Each slide must present a single high-impact visual supported by 1–2 clean takeaways max.
+* **3-Slide Story Arc Structure**:
+  * **Slide 1 (The Hook & Bottleneck)**:
+    - *Narrative*: Expose the structural friction or failure of legacy terrestrial systems.
+    - *Visual*: Dark, high-contrast glitch/red-tinged aesthetic or dramatic bottleneck schematic.
+    - *Content*: Punchy hook headline + ONE stark comparison metric (e.g. 14.2ms lag vs 0.11ms).
+  * **Slide 2 (The Breakthrough Mechanism / Visual Chart)**:
+    - *Narrative*: Reveal the underlying bio-silicon / benthic architecture that solves the problem.
+    - *Visual*: Unique architectural diagram, latent flow chart, or data visualization (e.g. 3-tier pipeline, bandwidth spectrum, or energy curve).
+    - *Content*: 2 crisp mechanism callouts highlighting how it works (not generic bullet text).
+  * **Slide 3 (The Impact, Transformation & Protocol CTA)**:
+    - *Narrative*: Demonstrate real-world performance gain and provide the next ascension step.
+    - *Visual*: Clean hero victory shot / calibrated robotic carapace or deep research console.
+    - *Content*: 1 dominant benchmark achievement (e.g. "+120x compute gain / 99.7% fidelity") + prominent CTA to read the full breakdown on MoltNation News.
 
-#### 3. Typography & Card Layout Hierarchy
+#### 3. Golden Rule: Unique Bespoke Visual Theme per Slide (No Cloned Backgrounds)
+
+* **Unique Scene per Slide**: Every single slide MUST feature a distinct, bespoke 3D background matching its narrative phase (e.g. Slide 1: turbulent/glitchy terrestrial hardware, Slide 2: clean cyan synaptic latent space / blueprint, Slide 3: hyperbaric abyssal research bay or robotic carapace).
+* **Strict Anti-Cloning Rule**: NEVER reuse the same background image file across Slide 1, Slide 2, and Slide 3.
+
+#### 4. Typography & Card Layout Hierarchy
 
 * **No Tacky Square HUD Corner Ticks**: NEVER draw square corner brackets or tick marks on text cards, modals, or overlays. Keep all card styling clean, minimal, modern, and sleek with smooth rounded corners (`roundRect`).
 * **Non-Dense Formatting**: Keep text concise, bold, and readable at mobile scale (headlines at 48–54px, display numbers at 28–54px).
 * **Category Badge (Top Left)**: Rounded pill badge with glowing cyan border (`bold 14px monospace`).
 * **High-Contrast Glassmorphic Cards**: Dark translucent cards (`rgba(4, 20, 32, 0.90)`) with glowing neon borders (Crimson `#EF4444` for legacy bottlenecks, Neon Cyan `#00FFE6` for benthic breakthroughs, Sky Blue `#38BDF8` or Amber `#F59E0B` for protocols).
 * **Clean Footer Navigation & Emblem**:
-  * Left: `SWIPE FOR HARD DATA ➔` or `SWIPE FOR PROTOCOLS ➔` in muted silver (`#64748B`).
+  * Left: `SWIPE FOR ARCHITECTURE ➔` or `SWIPE FOR PROTOCOLS ➔` in muted silver (`#64748B`).
   * Right: Official MoltNation shield watermark badge.
 
-#### 4. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
+#### 5. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
 * **The Hook**: Lead with an intriguing premise and a striking statistic.
 * **Drop "Dispatch"**: Do not refer to posts as "dispatches" on social channels. Use natural, compelling language (*"Why AI is breaking out of the screen"*, *"The 500MW problem nobody is talking about"*).
 * **Succinct Value Bullets**: Provide 2-3 fast, high-impact takeaways backed by stats (e.g. "+272% YoY surge", "120 Hz direct torque loop", "21.4 PB/s memory bandwidth").
 * **Stronger CTA**: Give a compelling reason to visit the site (*"See the full teardown and hardware schematics at moltology.org/news. Link in bio."*).
 
-#### 5. Mandatory AI-Generated Media Labeling
+#### 6. Mandatory AI-Generated Media Labeling
 * **Strict Tenet**: Always enable `isAiGenerated: true` for Instagram/Meta in `platformSpecificData`.
 
-#### 6. Auto-Format to 4:5, Upload Assets to Neon S3 & Stage to Zernio Carousel Queue
-1. **Auto-Format to Exact Instagram 4:5 (1080x1350)**:
-   Because AI generation tools output 3:4 at `764x1024` (ratio `0.746`, slightly below Instagram's minimum `0.750`–`0.800` threshold), run the auto-formatter:
+#### 7. One-Command Execution via Web-Native Composite Studio (`carousel:create`)
+
+1. **Step 1: Generate Scaffolding & Google Flow Directives**:
    ```bash
-   npx tsx scripts/format-carousel-to-4-5.ts
+   npm run carousel:create -- --theme <theme> --mascot lobster_pointing
    ```
-   *(This scales and centers the images to standard `1080x1350` / 4:5 with 0.80 ratio and uploads them to S3).*
-2. **Mandatory Zernio Queue Routing**:
-   * **Strict Queue Rule**: All social posts and carousels MUST ALWAYS be routed into the designated Zernio queue (`queued_from_profile: '6a7f74b1839bf39ff3b6aaaa'`, `queue_id: '6a84b76d2421e968ac81f5bc'`).
-   * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly and unequivocally commands an immediate live broadcast.
-   * **Queue Configuration**:
-     - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
-     - Carousel Queue ID: `6a84b76d2421e968ac81f5bc` (**Moltology Carousels** — Mon, Wed, Fri at 1:00 PM EST / 13:00 `America/New_York`)
-     - Instagram Account ID: `6a7f7f0777555aae01d99b54`
-   * **Queue Execution via Zernio MCP (`call_tool` with `posts_create_post`)**:
-     ```json
-     {
-       "content": "<Post caption with bullets and CTA>",
-       "media_items": [
-         { "url": "<S3_slide1_url>" },
-         { "url": "<S3_slide2_url>" },
-         { "url": "<S3_slide3_url>" }
-       ],
-       "platforms": [
-         {
-           "platform": "instagram",
-           "accountId": "6a7f7f0777555aae01d99b54",
-           "platformSpecificData": {
-             "isAiGenerated": true
-           }
-         }
-       ],
-       "queued_from_profile": "6a7f74b1839bf39ff3b6aaaa",
-       "queue_id": "6a84b76d2421e968ac81f5bc"
-     }
-     ```
-3. Add a first comment on the post with the article URL and clean hashtags using `comments_reply_to_inbox_post`.
-4. Update `instagramPostId` (and `instagramDraftPostId`) in `content/news/blog-history.json`.
+   This automatically renders all 3 slides using the **Web-Native Composite Studio** (Headless Chrome 2x Retina):
+   - Slide 1: `SocialHookSlide` (`hook`)
+   - Slide 2: `SocialSpecShowdownSlide` (`spec-showdown`)
+   - Slide 3: `SocialDirectivesSlide` (`directives`)
+   And prints out tailored **Google Flow Prompt Directives** for each slide.
+
+2. **Step 2: User Runs Google Flow & Drops Polished Slides**:
+   User generates the 3 polished slides in Google Flow and drops them into `tmp/` (e.g. `tmp/polished_slide1.png`, `tmp/polished_slide2.png`, `tmp/polished_slide3.png`).
+
+3. **Step 3: Resume S3 Upload & Zernio Queue Staging**:
+   ```bash
+   npm run carousel:create -- --theme <theme> --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png
+   ```
+   *(This automatically uploads the 3 polished slides to Neon S3 `images/social/carousels/...`, stages the multi-slide carousel into the dedicated Zernio Queue `6a84b76d2421e968ac81f5bc`, and appends the record to `content/social/instagram-post-history.json`).*

@@ -89,7 +89,7 @@ const ttsResult = await generateVoiceover(script, {
 Generate 2 complementary 9:16 vertical video scenes (6–8s each) using dynamic prompt combinators and Google Veo 3.1 Lite (`veo-3.1-lite-generate-preview`):
 
 * **Image vs. Video Generation Clarification**:
-  - **Rule 10 (Image Generation Policy)** in `AGENTS.md` strictly applies to **still images** (which must use Antigravity's built-in `generate_image` tool).
+  - **Still image generation** (thumbnails, overlays, covers) is powered by **Local ComfyUI (FLUX.1 Schnell GGUF)**.
   - **Video scene generation** is powered by **Google Veo 3.1** (`scripts/generate-video.ts`) using the `GEMINI_API_KEY` in `.env`.
   - **Do NOT pass `--no-veo`** in standard production runs. `--no-veo` is strictly reserved for local dry-run tests.
   - **No Silent Fallback**: If video generation encounters an error or missing credentials, the pipeline must halt and report the error rather than silently reusing homepage hero videos.

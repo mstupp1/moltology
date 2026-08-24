@@ -23,6 +23,32 @@ describe('create-instagram-post', () => {
     expect(post.caption).toContain('800 Nm')
   })
 
+  it('generates Moltmaxxing Guide marketing lead magnet post content', () => {
+    const post = generatePostContent('moltmaxxing-guide')
+    expect(post.title).toContain('Protocol Guide')
+    expect(post.hookHeadline).toContain('STOP MELTING')
+    expect(post.commentKeyword).toBe('GUIDE')
+    expect(post.caption).toContain('Comment "GUIDE"')
+    expect(post.firstComment).toContain('GUIDE')
+    expect(post.mascot).toBe('lobster_pointing')
+  })
+
+  it('generates 15-Stage Quiz marketing post content', () => {
+    const post = generatePostContent('moltmax-quiz')
+    expect(post.title).toContain('Diagnostic Audit')
+    expect(post.commentKeyword).toBe('QUIZ')
+    expect(post.caption).toContain('Comment "QUIZ"')
+    expect(post.mascot).toBe('crab_stats')
+  })
+
+  it('generates Benthic Core App marketing post content', () => {
+    const post = generatePostContent('benthic-app')
+    expect(post.title).toContain('Benthic Core')
+    expect(post.commentKeyword).toBe('APP')
+    expect(post.caption).toContain('Comment "APP"')
+    expect(post.mascot).toBe('lobster_thumbs_up')
+  })
+
   it('has valid default Zernio queue and profile identifiers', () => {
     expect(DEFAULT_PROFILE_ID).toBe('6a7f74b1839bf39ff3b6aaaa')
     expect(DEFAULT_INSTAGRAM_ACCOUNT_ID).toBe('6a7f7f0777555aae01d99b54')

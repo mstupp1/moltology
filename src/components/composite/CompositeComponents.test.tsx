@@ -7,6 +7,7 @@ import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
 import { ReelOutroCard } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
+import { SocialMarketingSlide } from './SocialMarketingSlide'
 
 describe('Composite UI Components', () => {
   it('renders CompositeContainer with correct dimensions and scanlines', () => {
@@ -113,5 +114,24 @@ describe('Composite UI Components', () => {
 
     expect(screen.getByText('SUB-BENTHIC POD')).toBeInTheDocument()
     expect(screen.getByText('LATENT ATTENTION SCHEMATIC')).toBeInTheDocument()
+  })
+
+  it('renders SocialMarketingSlide with 3D book mockup, benefit items, and comment CTA banner', () => {
+    render(
+      <SocialMarketingSlide
+        theme="moltmaxxing-guide"
+        commentKeyword="GUIDE"
+        bookTitle="MOLTMAXXING"
+        trustBadgeText="OFFICIAL 2026 EDITION"
+      />
+    )
+
+    expect(screen.getByText('STOP MELTING.')).toBeInTheDocument()
+    expect(screen.getByText('CALCIFY YOUR GRIP.')).toBeInTheDocument()
+    expect(screen.getByText('ASCEND FASTER!')).toBeInTheDocument()
+    expect(screen.getByText('“GUIDE”')).toBeInTheDocument()
+    expect(screen.getByText('SHELL HARDNESS')).toBeInTheDocument()
+    expect(screen.getByText('800 NM PINCER TORQUE')).toBeInTheDocument()
+    expect(screen.getByText('OFFICIAL 2026 EDITION')).toBeInTheDocument()
   })
 })

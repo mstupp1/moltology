@@ -88,7 +88,12 @@
 - **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) for resolving asset URLs in code and components.
 - **Sync & Verification**: Run `npm run s3:sync` to upload/sync local assets to S3 and `npm run s3:verify` to check CDN asset parity.
 
-## 10. Image Generation Policy (Strict Non-Negotiable Rule)
+## 10. Image Generation & Social Media Asset Policy
 
-- **Exclusive Antigravity Tooling**: ALL image generation across the project (blog cover imagery, inline schematics/figures, UI mockups, thumbnails, hero backgrounds, and social assets) MUST be executed EXCLUSIVELY using the built-in Antigravity `generate_image` tool.
-- **No Gemini API for Images**: NEVER call the Gemini API, Imagen API, REST endpoints (`generativelanguage.googleapis.com`), or external SDKs to generate images. Do not write or execute scripts that call image generation APIs directly.
+- **Blog Articles (Antigravity `generate_image`)**: 16:9 Hero cover images and 1–2 inline supporting figures inside blog posts are generated directly via Antigravity `generate_image` (standalone cinematic 3D benthic/sci-fi imagery, sub-benthic compute pods, laser waveguides).
+- **Social Media Posts, Lead Magnets & Carousels (Composite ➔ Google Flow ➔ S3/Zernio Pipeline)**:
+  - **Stage 1 (Scaffolding)**: Render high-DPI 2x Retina 2D composite layouts via Headless Chrome (`scripts/lib/composite-renderer.ts` / `npm run post:create`) as structural blueprints.
+  - **Stage 2 (User Google Flow Handoff)**: Prompt the USER with the composite image path and rich, ready-to-copy **Google Flow prompt directives** (elevating flat layouts to photorealistic 3D glassmorphic HUD panels, ensuring **no wasted space**, and applying natural ambient mascot lighting and contact shadows without harsh backlights).
+  - **Stage 3 (Publishing & Queueing)**: The user drops the polished Google Flow asset back into `tmp/`, and the agent resumes with Neon S3 upload (`images/social/posts/...`), Zernio MCP queue staging (`6a84b76d2421e968ac81f5bc`), and continuity ledger updates.
+- **Short-Form Video (Reels & Shorts)**: Video scenes are synthesized via Google Veo 3.1 (`scripts/generate-video.ts`), still outro cards via `generate_image`.
+- **No Flux / ComfyUI**: Flux and ComfyUI have been completely uninstalled and are not used across the codebase.
