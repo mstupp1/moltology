@@ -43,15 +43,19 @@ import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
+import { HUDProgressBar } from './HUDProgressBar'
+import { DigitalClock } from './DigitalClock'
 
 const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
 
 interface HUDSidebarProps {
   larvaId?: string
+  stage?: number
 }
 
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   larvaId = 'LARVA UNIT #8971',
+  stage = 1,
 }) => {
   const router = typeof useRouter === 'function' ? useRouter() : null
   const navigate = useNavigate()
@@ -645,6 +649,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     })
   }
 
+  const isMobileHeaderOpen = isMobileOpen && !isMobileClosing
+
   return (
     <>
       <AuthModal
@@ -662,27 +668,81 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           isMounted ? 'transition-all duration-300 ease-in-out' : ''
         } group/sidebar overflow-visible`}
       >
-        {/* Mobile Top Bar (Permanent Header with Brand & Hamburger Toggle) */}
-        <div className="flex md:hidden items-center justify-between gap-2 px-3 py-2.5 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0">
-          <HeaderBrand
-            subtext="BENTHIC TEMPLE HUD"
-            logoSize="sm"
-            onClick={() => handleNavClick('/')}
-          />
-
-          <button
-            onClick={toggleMobileMenu}
-            aria-label={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
-            aria-expanded={isMobileOpen}
-            title={isMobileOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
-            className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500/50 shrink-0 cursor-pointer"
-          >
-            {isMobileOpen ? (
-              <X className="w-5 h-5 text-red-400 transition-transform duration-200" />
-            ) : (
-              <Menu className="w-5 h-5 text-cyan-300 transition-transform duration-200" />
+        {/* Mobile Top Bar (Transitions between HeaderBrand and Progress Bar when hamburger menu is toggled) */}
+        <div className="flex md:hidden items-center justify-between gap-2 px-2.5 py-2 h-14 bg-[#060a0b] border-b border-[#3a4a49]/65 relative z-50 shrink-0 overflow-hidden">
+          {/* HUD scanline overlay in mobile header */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+            <div
+              className="absolute inset-0 opacity-[0.02]"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.5) 2px, rgba(0,255,255,0.5) 3px)',
+              }}
+            />
+            {isMobileHeaderOpen && (
+              <div
+                className="absolute left-0 right-0 h-6 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(to bottom, transparent 0%, rgba(0,195,255,0.05) 50%, transparent 100%)',
+                  animation: 'hudScan 4s linear infinite',
+                }}
+              />
             )}
-          </button>
+          </div>
+
+          {/* Left Brand Area (Visible when menu is closed, slides smoothly back into view when closing) */}
+          <div
+            className={`flex items-center min-w-0 z-10 transition-all duration-200 ease-out ${
+              isMobileHeaderOpen
+                ? 'opacity-0 -translate-x-4 pointer-events-none absolute left-2.5'
+                : 'opacity-100 translate-x-0 relative flex-1'
+            }`}
+          >
+            <HeaderBrand
+              subtext="BENTHIC TEMPLE HUD"
+              logoSize="sm"
+              onClick={() => handleNavClick('/')}
+            />
+          </div>
+
+          {/* Progress Bar Row Area (Fades in in-place when open without horizontal slide) */}
+          <div
+            className={`flex items-center min-w-0 z-10 transition-opacity duration-150 ${
+              isMobileHeaderOpen
+                ? 'opacity-100 relative flex-1 mr-1'
+                : 'opacity-0 pointer-events-none absolute inset-y-0 left-2.5 right-12'
+            }`}
+          >
+            <HUDProgressBar stage={stage} showClock={false} className="w-full" />
+          </div>
+
+          {/* Right Action Controls */}
+          <div className="flex items-center gap-1.5 shrink-0 z-10">
+            {/* Task list button next to hamburger (visible when menu is closed) */}
+            {!isMobileHeaderOpen && (
+              <div className="flex items-center animate-in fade-in duration-200">
+                <DigitalClock variant="header" />
+              </div>
+            )}
+
+            {/* Hamburger / Close Menu Toggle Button */}
+            <button
+              onClick={toggleMobileMenu}
+              aria-label={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
+              aria-expanded={isMobileHeaderOpen}
+              title={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
+              className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all active:scale-95 focus:outline-none focus:ring-2 shrink-0 cursor-pointer ${
+                isMobileHeaderOpen
+                  ? 'bg-red-950/50 border-red-800/80 text-red-400 hover:bg-red-900/60 focus:ring-red-500/50'
+                  : 'bg-[#080d0e]/90 border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-cyan-500/50'
+              }`}
+            >
+              {isMobileHeaderOpen ? (
+                <X className="w-5 h-5 text-red-400 transition-transform duration-200" />
+              ) : (
+                <Menu className="w-5 h-5 text-cyan-300 transition-transform duration-200" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Desktop Header Logo */}

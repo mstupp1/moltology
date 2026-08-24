@@ -151,6 +151,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
   it('toggles mobile HUD menu state on mobile button click and renders icon-only with no text', () => {
     render(<HUDSidebar />)
 
+    // When mobile menu is closed, task list button is present in header next to hamburger
+    expect(screen.getByLabelText('Daily alignment tasks schedule')).toBeInTheDocument()
+
     const mobileMenuBtn = screen.getByRole('button', { name: /Open HUD Menu/i })
     expect(mobileMenuBtn).toBeInTheDocument()
     expect(mobileMenuBtn.textContent).toBe('')
@@ -160,6 +163,11 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const closeMenuBtn = screen.getByRole('button', { name: /Close HUD Menu/i })
     expect(closeMenuBtn).toBeInTheDocument()
     expect(closeMenuBtn.textContent).toBe('')
+
+    // When mobile menu is open, the progress bar row is rendered in the top header
+    expect(screen.getByLabelText('Level 1 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Level 2 Badge')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Exoshell Claw' })).toBeInTheDocument()
   })
 
   it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {
