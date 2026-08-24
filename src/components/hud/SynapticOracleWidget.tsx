@@ -266,7 +266,14 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       updatePopoutSize(defaultDims, true)
       updatePopoutPos(getSafePopoutCoords(null, defaultDims), true)
     }
-  }, [oracle?.mode, updatePopoutSize, updatePopoutPos, getSafePopoutCoords])
+
+    if (prevMode === 'popout' && currentMode === 'closed') {
+      try {
+        localStorage.removeItem(STORAGE_KEY_BTN_POS)
+      } catch {}
+      updateButtonPos(getSafeButtonCoords(null))
+    }
+  }, [oracle?.mode, updatePopoutSize, updatePopoutPos, updateButtonPos, getSafePopoutCoords, getSafeButtonCoords])
 
   const handleToggle = () => {
     if (oracle) {
@@ -277,6 +284,11 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   }
 
   const handleClose = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY_BTN_POS)
+    } catch {}
+    updateButtonPos(getSafeButtonCoords(null))
+
     if (oracle) {
       oracle.setMode('closed')
     } else {

@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import React from 'react'
 import { ToastProvider } from '@/components/ui/ToastProvider'
-import { useAlignmentReminders, AlignmentTaskItem } from './useAlignmentReminders'
+import { useAlignmentReminders, AlignmentTaskItem, resetTriggeredReminders } from './useAlignmentReminders'
 import { parseStartTime, calculateReminderTime, isReminderDue } from '@/lib/alignment-reminders'
 
 describe('alignment-reminders lib', () => {
@@ -40,14 +40,19 @@ describe('alignment-reminders lib', () => {
   })
 })
 
-const TestConsumer: React.FC<{ tasks: AlignmentTaskItem[] }> = ({ tasks }) => {
+const TestConsumer: React.FC<{ tasks: AlignmentTaskItem[]; testIdPrefix?: string }> = ({
+  tasks,
+  testIdPrefix = '',
+}) => {
   const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
     useAlignmentReminders(tasks)
 
   return (
     <div>
-      <div data-testid="enabled-state">{remindersEnabled ? 'ENABLED' : 'DISABLED'}</div>
-      <div data-testid="task-reminder-time">{getTaskReminderTime('05:30')}</div>
+      <div data-testid={`${testIdPrefix}enabled-state`}>
+        {remindersEnabled ? 'ENABLED' : 'DISABLED'}
+      </div>
+      <div data-testid={`${testIdPrefix}task-reminder-time`}>{getTaskReminderTime('05:30')}</div>
       <button onClick={toggleReminders}>TOGGLE</button>
       <button onClick={() => triggerTestReminder()}>TEST</button>
     </div>
@@ -62,6 +67,8 @@ describe('useAlignmentReminders hook', () => {
 
   beforeEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
+    resetTriggeredReminders()
   })
 
   it('renders with reminders enabled by default and returns 10m prior time', () => {
@@ -103,5 +110,30 @@ describe('useAlignmentReminders hook', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument()
     expect(screen.getByText(/\[TEST ALERT\]/i)).toBeInTheDocument()
     expect(screen.getByText(/Silent Synchronization/i)).toBeInTheDocument()
+  })
+
+  it('ensures 3 concurrent consumer hook instances on the same page only trigger 1 notification when due', () => {
+    vi.useFakeTimers()
+    const mockDate = new Date(2026, 7, 4, 5, 20, 0) // 05:20 is 10 min before 05:30
+    vi.setSystemTime(mockDate)
+
+    render(
+      <ToastProvider>
+        {/* Simulating 1: HUDHeader DigitalClock, 2: HUDSidebar DigitalClock, 3: LaunchpadCarousel */}
+        <TestConsumer tasks={sampleTasks} testIdPrefix="header-" />
+        <TestConsumer tasks={sampleTasks} testIdPrefix="sidebar-" />
+        <TestConsumer tasks={sampleTasks} testIdPrefix="carousel-" />
+      </ToastProvider>
+    )
+
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+
+    const alerts = screen.getAllByRole('alert')
+    expect(alerts).toHaveLength(1)
+    expect(screen.getByText(/Upcoming alignment protocol "Silent Synchronization"/i)).toBeInTheDocument()
+
+    vi.useRealTimers()
   })
 })

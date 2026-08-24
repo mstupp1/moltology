@@ -148,4 +148,36 @@ describe('ToastProvider & useToast', () => {
     expect(screen.queryByText('Info notice message')).not.toBeInTheDocument()
     expect(screen.queryByText('Transformation success!')).not.toBeInTheDocument()
   })
+
+  it('deduplicates identical toast messages triggered rapidly to prevent visual duplicates', () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    )
+
+    // Click 3 times in rapid succession
+    fireEvent.click(screen.getByText('Trigger Info Toast'))
+    fireEvent.click(screen.getByText('Trigger Info Toast'))
+    fireEvent.click(screen.getByText('Trigger Info Toast'))
+
+    const toasts = screen.getAllByText('Info notice message')
+    expect(toasts).toHaveLength(1)
+  })
+
+  it('deduplicates toasts with the same ID', () => {
+    render(
+      <ToastProvider>
+        <TestComponent />
+      </ToastProvider>
+    )
+
+    // Trigger custom toast with explicit id 'custom-1' multiple times
+    fireEvent.click(screen.getByText('Trigger Custom Toast'))
+    fireEvent.click(screen.getByText('Trigger Custom Toast'))
+    fireEvent.click(screen.getByText('Trigger Custom Toast'))
+
+    const customToasts = screen.getAllByText('Custom toast message')
+    expect(customToasts).toHaveLength(1)
+  })
 })
