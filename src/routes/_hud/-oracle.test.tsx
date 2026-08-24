@@ -65,17 +65,17 @@ describe('Oracle Route Component', () => {
     })
   })
 
-  it('toggles mobile conversations overlay drawer open and close', async () => {
+  it('toggles mobile chats overlay drawer open and close', async () => {
     mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
     const Component = (Route as any).component
     render(<Component />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Toggle Conversations/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Toggle Chats/i })).toBeInTheDocument()
     })
 
-    const toggleBtn = screen.getByRole('button', { name: /Toggle Conversations/i })
-    const drawer = screen.getByRole('dialog', { name: /Conversations/i })
+    const toggleBtn = screen.getByRole('button', { name: /Toggle Chats/i })
+    const drawer = screen.getByRole('dialog', { name: /Chats/i })
 
     // Initially drawer should be hidden via transform
     expect(drawer).toHaveClass('-translate-x-full')
@@ -85,7 +85,7 @@ describe('Oracle Route Component', () => {
     expect(drawer).toHaveClass('translate-x-0')
 
     // Close drawer via close button
-    const closeBtn = screen.getByRole('button', { name: /Close Conversations/i })
+    const closeBtn = screen.getByRole('button', { name: /Close Chats/i })
     fireEvent.click(closeBtn)
     expect(drawer).toHaveClass('-translate-x-full')
   })
@@ -99,10 +99,10 @@ describe('Oracle Route Component', () => {
       expect(screen.getAllByText('Carcinization Inquiries').length).toBeGreaterThan(0)
     })
 
-    const toggleBtn = screen.getByRole('button', { name: /Toggle Conversations/i })
+    const toggleBtn = screen.getByRole('button', { name: /Toggle Chats/i })
     fireEvent.click(toggleBtn)
 
-    const drawer = screen.getByRole('dialog', { name: /Conversations/i })
+    const drawer = screen.getByRole('dialog', { name: /Chats/i })
     expect(drawer).toHaveClass('translate-x-0')
 
     // Find thread button inside mobile drawer and click it

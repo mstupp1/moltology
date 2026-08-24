@@ -97,5 +97,17 @@ describe('UserAvatar Component', () => {
     const avatar = container.firstChild as HTMLElement
     expect(avatar.className).toContain('bg-slate-100')
   })
+
+  it('renders xxs size preset with w-4 h-4 text-[8px]', () => {
+    const user = {
+      name: 'Benthic Initiate',
+      email: 'initiate@moltology.org',
+    }
+
+    const { container } = render(<UserAvatar user={user} size="xxs" />)
+    const avatar = container.firstChild as HTMLElement
+    expect(avatar.className).toContain('w-4 h-4 text-[8px]')
+    expect(screen.getByText('B')).toBeInTheDocument()
+  })
 })
 

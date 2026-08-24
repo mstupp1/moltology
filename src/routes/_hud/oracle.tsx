@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { MessageSquare, Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
+import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { authClient } from '@/lib/auth-client'
@@ -17,6 +17,7 @@ interface OracleSidebarContentProps {
   onSelectThread: (id: string | null) => void
   onNewChat?: () => void
   onOpenAuthModal: () => void
+  hideHeader?: boolean
 }
 
 function OracleSidebarContent({
@@ -27,29 +28,32 @@ function OracleSidebarContent({
   onSelectThread,
   onNewChat,
   onOpenAuthModal,
+  hideHeader = false,
 }: OracleSidebarContentProps) {
   if (userId) {
     return (
       <div className="flex flex-col h-full space-y-3 font-sans">
-        <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5 shrink-0">
-          <span className="text-[11px] font-bold text-cyan-500 tracking-wider uppercase">
-            CHATS
-          </span>
-          {onNewChat && (
-            <button
-              type="button"
-              onClick={onNewChat}
-              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-300 transition-colors p-1 group cursor-pointer chamfer-corner hover:bg-cyan-950/50"
-              title="New Chat"
-              aria-label="New Chat"
-            >
-              <span className="text-[10px] tracking-wider uppercase font-medium text-gray-400 group-hover:text-cyan-300">
-                New Chat
-              </span>
-              <Pencil className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-200" />
-            </button>
-          )}
-        </div>
+        {!hideHeader && (
+          <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5 shrink-0">
+            <span className="text-[11px] font-bold text-cyan-500 tracking-wider uppercase">
+              CHATS
+            </span>
+            {onNewChat && (
+              <button
+                type="button"
+                onClick={onNewChat}
+                className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-cyan-300 transition-colors p-1 group cursor-pointer chamfer-corner hover:bg-cyan-950/50"
+                title="New Chat"
+                aria-label="New Chat"
+              >
+                <span className="text-[10px] tracking-wider uppercase font-medium text-gray-400 group-hover:text-cyan-300">
+                  New Chat
+                </span>
+                <Pencil className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-200" />
+              </button>
+            )}
+          </div>
+        )}
 
         {isLoadingThreads ? (
           <div className="text-xs text-gray-500 py-4 text-center">Loading threads...</div>
@@ -63,7 +67,7 @@ function OracleSidebarContent({
                 type="button"
                 onClick={() => onSelectThread(t.id)}
                 title={t.title}
-                className={`w-full text-left px-2 py-1.5 text-xs block truncate transition-all chamfer-corner cursor-pointer border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none ${
+                className={`w-full text-left px-2 py-1.5 text-xs block transition-all chamfer-corner cursor-pointer border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none ${
                   activeThreadId === t.id
                     ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
                     : 'bg-[#080d0e]/50 hover:bg-cyan-950/40 text-gray-400 backdrop-blur-xs'
@@ -73,6 +77,16 @@ function OracleSidebarContent({
                 <span className="block truncate select-none">
                   {t.title || 'Untitled Consultation'}
                 </span>
+                {t.createdAt && (
+                  <span className="block text-[9px] text-gray-500 font-mono mt-0.5 select-none">
+                    {new Date(t.createdAt).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -224,30 +238,46 @@ function OracleRouteComponent() {
           aria-hidden="true"
         />
 
-        {/* Mobile Slide-Over Conversations Drawer */}
+        {/* Mobile Slide-Over Chats Drawer */}
         <div
           className={`fixed md:hidden top-0 bottom-0 left-0 w-72 sm:w-80 max-w-[85vw] bg-[#050809]/95 backdrop-blur-md border-r border-cyan-900/60 shadow-2xl z-50 flex flex-col h-full transform transition-transform duration-300 ease-in-out ${
             isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           role="dialog"
           aria-modal="true"
-          aria-label="Conversations"
+          aria-label="Chats"
         >
           {/* Mobile Drawer Header */}
           <div className="flex items-center justify-between p-3 border-b border-cyan-900/50 bg-[#090e0f]/90 shrink-0">
-            <div className="flex items-center space-x-2 text-cyan-300">
-              <MessageSquare className="w-4 h-4 text-cyan-400" />
-              <span className="text-xs font-bold tracking-wider uppercase font-sans">
-                Conversations
-              </span>
+            <span className="text-xs font-bold text-cyan-300 tracking-wider uppercase font-sans">
+              CHATS
+            </span>
+            <div className="flex items-center gap-2">
+              {userId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCreateNewThread()
+                    setIsMobileDrawerOpen(false)
+                  }}
+                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-cyan-300 transition-colors p-1 group cursor-pointer chamfer-corner hover:bg-cyan-950/50"
+                  title="New Chat"
+                  aria-label="New Chat"
+                >
+                  <span className="text-[10px] tracking-wider uppercase font-medium text-gray-400 group-hover:text-cyan-300">
+                    New Chat
+                  </span>
+                  <Pencil className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-200" />
+                </button>
+              )}
+              <button
+                onClick={() => setIsMobileDrawerOpen(false)}
+                className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-950/40 rounded transition-colors"
+                aria-label="Close Chats"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={() => setIsMobileDrawerOpen(false)}
-              className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-950/40 rounded transition-colors"
-              aria-label="Close Conversations"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Mobile Drawer Body */}
@@ -269,6 +299,7 @@ function OracleRouteComponent() {
                 setIsAuthModalOpen(true)
                 setIsMobileDrawerOpen(false)
               }}
+              hideHeader={true}
             />
           </div>
         </div>

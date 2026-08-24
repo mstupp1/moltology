@@ -197,4 +197,59 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()
   })
+
+  it('docks to bottom and sides with no resize handles on mobile viewport', () => {
+    window.innerWidth = 375
+    window.innerHeight = 667
+
+    const { container } = render(
+      <OracleProvider>
+        <SynapticOracleWidget />
+      </OracleProvider>
+    )
+
+    // Open popout
+    const btn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
+    fireEvent.pointerDown(btn, { clientX: 100, clientY: 100, pointerId: 1, button: 0 })
+    fireEvent.pointerUp(btn, { clientX: 100, clientY: 100, pointerId: 1 })
+
+    // Popout container should have mobile docking classes
+    const popoutContainer = container.querySelector('.inset-x-0.bottom-0.w-full')
+    expect(popoutContainer).not.toBeNull()
+
+    // Resize handles should NOT exist on mobile
+    const seHandle = container.querySelector('.cursor-se-resize')
+    expect(seHandle).toBeNull()
+    const northHandle = container.querySelector('.cursor-n-resize')
+    expect(northHandle).toBeNull()
+
+    // Header drag title should not be present on mobile
+    expect(screen.queryByTitle(/Drag header to move chat window/i)).not.toBeInTheDocument()
+  })
+
+  it('renders Chats button in popout and toggles scrollable chats window', () => {
+    render(
+      <OracleProvider>
+        <SynapticOracleWidget />
+      </OracleProvider>
+    )
+
+    // Open popout
+    const btn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
+    fireEvent.pointerDown(btn, { clientX: 100, clientY: 100, pointerId: 1, button: 0 })
+    fireEvent.pointerUp(btn, { clientX: 100, clientY: 100, pointerId: 1 })
+
+    // Find and click Chats button
+    const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
+    expect(chatsBtn).toBeInTheDocument()
+    fireEvent.click(chatsBtn)
+
+    expect(screen.getByText('CHATS')).toBeInTheDocument()
+
+    // Close chats window
+    const closeChatsBtn = screen.getByRole('button', { name: /Close Chats Window/i })
+    fireEvent.click(closeChatsBtn)
+    expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
+  })
 })
+

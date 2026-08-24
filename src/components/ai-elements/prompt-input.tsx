@@ -161,7 +161,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                             }`}
                           >
                             <span className="truncate">{m.label}</span>
-                            {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-purple-400 shrink-0" />}
+                            {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
                           </button>
                         ))}
                       </div>
@@ -190,7 +190,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
               <button
                 type="submit"
                 disabled={disabled || isStreaming || !text.trim()}
-                className="w-7 h-7 rounded-full bg-[#a28cd6] hover:bg-[#b5a1e6] active:bg-[#927bc7] disabled:opacity-40 disabled:hover:bg-[#a28cd6] text-white flex items-center justify-center shadow-md shadow-black/30 transition-all cursor-pointer disabled:cursor-not-allowed"
+                className="w-7 h-7 rounded-full bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 disabled:opacity-40 disabled:hover:bg-cyan-500 text-black flex items-center justify-center shadow-md shadow-cyan-950/40 transition-all cursor-pointer disabled:cursor-not-allowed"
                 title="Transmit"
                 aria-label="Transmit"
               >

@@ -1,12 +1,21 @@
 import React from 'react'
-import { User } from 'lucide-react'
 import { MarkdownRenderer } from '../ui/MarkdownRenderer'
 import { getAssetUrl } from '@/lib/assets'
+import { UserAvatar } from '../UserAvatar'
 
 export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
   from: 'user' | 'assistant' | 'system'
   timestamp?: string
   senderLabel?: string
+  user?: {
+    name?: string | null
+    email?: string | null
+    image?: string | null
+    avatar?: string | null
+    picture?: string | null
+  } | null
+  avatar?: React.ReactNode | string
+  avatarSrc?: string | null
   children: React.ReactNode
 }
 
@@ -14,11 +23,53 @@ export const Message: React.FC<MessageProps> = ({
   from,
   timestamp,
   senderLabel,
+  user,
+  avatar,
+  avatarSrc,
   children,
   className = '',
   ...props
 }) => {
   const isUser = from === 'user'
+
+  const renderAvatar = () => {
+    if (avatar) {
+      if (typeof avatar === 'string') {
+        return (
+          <img
+            src={avatar}
+            alt={senderLabel || (isUser ? 'User avatar' : 'Oracle')}
+            className="w-4 h-4 rounded-full object-cover shrink-0"
+          />
+        )
+      }
+      return avatar
+    }
+
+    if (isUser) {
+      return (
+        <UserAvatar
+          user={user}
+          src={avatarSrc}
+          fallbackLetter={senderLabel ? senderLabel[0] : (user?.name ? user.name[0] : 'I')}
+          size="xxs"
+          className="shrink-0"
+          alt={senderLabel || user?.name || 'Initiate'}
+        />
+      )
+    }
+
+    return (
+      <img
+        src={avatarSrc || getAssetUrl('/images/order_emblem.png')}
+        alt={senderLabel || 'Oracle'}
+        className="w-3.5 h-3.5 object-contain drop-shadow-[0_0_4px_rgba(0,195,255,0.4)] shrink-0"
+      />
+    )
+  }
+
+  const effectiveSenderLabel =
+    senderLabel || (isUser ? user?.name?.toUpperCase() || 'INITIATE' : 'SYNAPTIC ORACLE')
 
   return (
     <div
@@ -26,21 +77,8 @@ export const Message: React.FC<MessageProps> = ({
       {...props}
     >
       <div className="flex items-center gap-1.5 mb-1 text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
-        {isUser ? (
-          <>
-            <User className="w-3 h-3 text-cyan-400" />
-            <span>{senderLabel || 'INITIATE'}</span>
-          </>
-        ) : (
-          <>
-            <img
-              src={getAssetUrl('/images/order_emblem.png')}
-              alt="Oracle"
-              className="w-3.5 h-3.5 object-contain filter hue-rotate-180 brightness-110 drop-shadow-[0_0_4px_rgba(0,195,255,0.5)]"
-            />
-            <span>{senderLabel || 'SYNAPTIC ORACLE'}</span>
-          </>
-        )}
+        {renderAvatar()}
+        <span>{effectiveSenderLabel}</span>
         {timestamp && <span className="text-gray-500 font-normal">[{timestamp}]</span>}
       </div>
       <div

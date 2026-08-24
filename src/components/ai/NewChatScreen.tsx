@@ -12,6 +12,7 @@ import {
   FileText,
   Radio,
   Zap,
+  Sparkles,
 } from 'lucide-react'
 import { ORACLE_MODELS, OracleModel } from '@/lib/ai/oracle-models'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -19,13 +20,16 @@ import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 export interface PromptShortcut {
   label: string
   prompt: string
+  emoji?: string
 }
 
 export const DEFAULT_PROMPT_SHORTCUTS: PromptShortcut[] = [
-  { label: '🦞 What is Moltology?', prompt: 'What is Moltology and why should I molt?' },
-  { label: '⚡ How to level up', prompt: 'How do I earn Molt Credits and upgrade my shell?' },
-  { label: '🛡️ Stop hesitating', prompt: 'How do I stop hesitating and build emotional resilience?' },
-  { label: '🌊 The Great Molt vs The Great Melt', prompt: 'Explain the difference between The Great Melt and The Great Molt.' },
+  { label: 'what is moltology', emoji: '🦞', prompt: 'What is Moltology and why should I molt?' },
+  { label: 'how do i moltmaxx', emoji: '⚡', prompt: 'How do I start moltmaxxing and optimize my routine?' },
+  { label: 'how to earn molt credits', emoji: '💎', prompt: 'How do I earn Molt Credits and upgrade my shell?' },
+  { label: 'stop hesitating & build chitin armor', emoji: '🛡️', prompt: 'How do I stop hesitating and build emotional resilience?' },
+  { label: 'the great molt vs the great melt', emoji: '🌊', prompt: 'Explain the difference between The Great Melt and The Great Molt.' },
+  { label: 'how to level up my clearance stage', emoji: '🧬', prompt: 'What are the clearances and stages of Carcinization?' },
 ]
 
 export const WORKSPACE_OPTIONS = [
@@ -67,13 +71,45 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   const [plusMenuOpen, setPlusMenuOpen] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
 
+  // Gentle thought cycler state (fade in/out, up/down)
+  const [activeShortcutIndex, setActiveShortcutIndex] = useState(0)
+  const [animPhase, setAnimPhase] = useState<'entering' | 'active' | 'exiting'>('active')
+  const [isHovered, setIsHovered] = useState(false)
+
+  useEffect(() => {
+    if (!shortcuts || shortcuts.length <= 1 || isHovered) return
+
+    const displayDuration = 4200
+    const transitionDuration = 750
+
+    const timer = setTimeout(() => {
+      setAnimPhase('exiting')
+      const switchTimer = setTimeout(() => {
+        setActiveShortcutIndex((prev) => (prev + 1) % shortcuts.length)
+        setAnimPhase('entering')
+        const enterTimer = setTimeout(() => {
+          setAnimPhase('active')
+        }, 50)
+        return () => clearTimeout(enterTimer)
+      }, transitionDuration)
+
+      return () => clearTimeout(switchTimer)
+    }, displayDuration)
+
+    return () => clearTimeout(timer)
+  }, [activeShortcutIndex, isHovered, shortcuts])
+
+  const currentThought = shortcuts && shortcuts.length > 0
+    ? shortcuts[activeShortcutIndex % shortcuts.length]
+    : null
+
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = `${Math.max(56, Math.min(textareaRef.current.scrollHeight, 200))}px`
+      textareaRef.current.style.height = `${Math.max(36, Math.min(textareaRef.current.scrollHeight, 180))}px`
     }
   }, [inputText])
 
@@ -104,11 +140,40 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   const currentWorkspace = WORKSPACE_OPTIONS.find((w) => w.id === selectedWorkspace) || WORKSPACE_OPTIONS[0]
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-full w-full px-4 py-8 select-none font-sans ${className}`}>
-      <div className="w-full max-w-2xl flex flex-col space-y-3">
+    <div className={`flex flex-col items-center justify-center min-h-full w-full px-3 sm:px-4 py-4 sm:py-6 select-none font-sans ${className}`}>
+      <div className="w-full max-w-2xl flex flex-col space-y-2">
         
+        {/* Subtle Synaptic Thought Cycler (Above Folder / Workspace Row) */}
+        {currentThought && (
+          <div className="flex items-center justify-center min-h-[30px] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => handleShortcutClick(currentThought.prompt)}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className={`group inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#181a26]/40 hover:bg-[#202438]/80 border border-[#32364a]/30 hover:border-cyan-500/40 text-xs text-gray-400 hover:text-cyan-200 cursor-pointer select-none backdrop-blur-xs transition-all ${
+                animPhase === 'entering'
+                  ? 'opacity-0 translate-y-2 duration-0'
+                  : animPhase === 'exiting'
+                  ? 'opacity-0 -translate-y-2 duration-700 ease-in'
+                  : 'opacity-100 translate-y-0 duration-700 ease-out'
+              }`}
+              title="Click to consult the Oracle on this thought"
+              aria-label={`Ask: ${currentThought.label}`}
+            >
+              <Sparkles className="w-3 h-3 text-cyan-400/70 group-hover:text-cyan-300 transition-colors animate-pulse shrink-0" />
+              <span className="font-sans text-xs tracking-wide text-gray-300/90 group-hover:text-cyan-100 transition-colors">
+                {currentThought.label}
+              </span>
+              {currentThought.emoji && (
+                <span className="text-xs shrink-0 leading-none">{currentThought.emoji}</span>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* Top Folder / Workspace Selector */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-0.5">
           <div className="relative">
             <button
               type="button"
@@ -117,7 +182,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                 setModelMenuOpen(false)
                 setPlusMenuOpen(false)
               }}
-              className="flex items-center gap-1.5 text-[#8f94a8] hover:text-[#d1d5db] text-xs font-medium px-2 py-1 rounded transition-colors group cursor-pointer"
+              className="flex items-center gap-1 text-[#8f94a8] hover:text-[#d1d5db] text-xs font-medium px-1.5 py-0.5 rounded transition-colors group cursor-pointer"
               title="Select Workspace Context"
               aria-label="Workspace Context"
             >
@@ -151,7 +216,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                         <span className="font-mono text-xs">{w.label}</span>
                         <span className="text-[10px] text-gray-400">{w.description}</span>
                       </div>
-                      {w.id === selectedWorkspace && <Check className="w-3.5 h-3.5 text-purple-400 shrink-0" />}
+                      {w.id === selectedWorkspace && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
                     </button>
                   ))}
                 </div>
@@ -168,7 +233,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
         </div>
 
         {/* Centered Main Prompt Card */}
-        <div className="relative bg-[#202231]/90 backdrop-blur-md border border-[#32364a]/60 rounded-2xl p-3 sm:p-4 shadow-2xl shadow-black/40">
+        <div className="relative bg-[#202231]/90 backdrop-blur-md border border-[#32364a]/60 rounded-xl p-2 sm:p-2.5 shadow-2xl shadow-black/40">
           <form onSubmit={handleSubmit} className="flex flex-col">
             {/* Multiline Textarea Input */}
             <textarea
@@ -178,16 +243,16 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
               onKeyDown={handleKeyDown}
               placeholder={`Ask the ${personaName}...`}
               disabled={isSending}
-              rows={2}
-              className="w-full bg-transparent text-gray-100 placeholder-gray-400 text-sm sm:text-base focus:outline-none resize-none min-h-[56px] max-h-[220px] leading-relaxed font-sans"
+              rows={1}
+              className="w-full bg-transparent text-gray-100 placeholder-gray-400 text-xs sm:text-sm focus:outline-none resize-none min-h-[36px] max-h-[180px] leading-relaxed font-sans px-1 py-0.5"
               autoFocus
             />
 
             {/* Bottom Controls Bar Inside the Box - No horizontal divider */}
-            <div className="flex items-center justify-between pt-1 mt-0.5 select-none">
+            <div className="flex items-center justify-between pt-1 select-none">
               
               {/* Left Action Buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {/* Plus (+) Action Button */}
                 <div className="relative">
                   <button
@@ -197,11 +262,11 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                       setModelMenuOpen(false)
                       setWorkspaceMenuOpen(false)
                     }}
-                    className="p-1.5 text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60 rounded-lg transition-colors cursor-pointer"
+                    className="p-1 text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60 rounded-lg transition-colors cursor-pointer"
                     title="Add Context / Attachment"
                     aria-label="Add Context"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
 
                   {plusMenuOpen && (
@@ -249,11 +314,11 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                       setPlusMenuOpen(false)
                       setWorkspaceMenuOpen(false)
                     }}
-                    className="flex items-center gap-1.5 text-xs text-[#c3c7d5] hover:text-white bg-[#282a3a]/70 hover:bg-[#32354a]/80 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] sm:text-xs text-[#c3c7d5] hover:text-white bg-[#282a3a]/70 hover:bg-[#32354a]/80 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
                     title="Select Cognition Model"
                     aria-label="Select Cognition Model"
                   >
-                    <span className="truncate max-w-[160px] sm:max-w-none font-medium">{selectedModel.label}</span>
+                    <span className="truncate max-w-[140px] sm:max-w-none font-medium">{selectedModel.label}</span>
                     <ChevronDown className="w-3 h-3 text-[#8f94a8] shrink-0" />
                   </button>
 
@@ -279,7 +344,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                             }`}
                           >
                             <span className="truncate">{m.label}</span>
-                            {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-purple-400 shrink-0" />}
+                            {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
                           </button>
                         ))}
                       </div>
@@ -289,12 +354,12 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
               </div>
 
               {/* Right Action Buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {/* Voice Dictation (Mic) */}
                 <button
                   type="button"
                   onClick={() => setIsRecording((v) => !v)}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isRecording
                       ? 'text-red-400 bg-red-950/60 animate-pulse'
                       : 'text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60'
@@ -302,45 +367,27 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                   title={isRecording ? 'Listening... Click to stop' : 'Voice Dictation'}
                   aria-label="Voice Dictation"
                 >
-                  <Mic className="w-4 h-4" />
+                  <Mic className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Submit Arrow Button */}
                 <button
                   type="submit"
                   disabled={!inputText.trim() || isSending}
-                  className="w-8 h-8 rounded-full bg-[#a28cd6] hover:bg-[#b5a1e6] active:bg-[#927bc7] disabled:opacity-40 disabled:hover:bg-[#a28cd6] text-white flex items-center justify-center shadow-md shadow-black/30 transition-all cursor-pointer disabled:cursor-not-allowed"
+                  className="w-7 h-7 rounded-full bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 disabled:opacity-40 disabled:hover:bg-cyan-500 text-black flex items-center justify-center shadow-md shadow-cyan-950/40 transition-all cursor-pointer disabled:cursor-not-allowed"
                   title="Transmit Query"
                   aria-label="Transmit Query"
                 >
                   {isSending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-3.5 h-3.5" />
                   )}
                 </button>
               </div>
 
             </div>
           </form>
-        </div>
-
-        {/* Suggestions Row - Clean without label */}
-        <div className="pt-1">
-          <div className="flex flex-wrap gap-2">
-            {shortcuts.map((item, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleShortcutClick(item.prompt)}
-                className="bg-[#181a26]/90 hover:bg-[#232738] border border-[#32364a]/60 hover:border-[#4f5573] text-[#c3c7d5] hover:text-white px-3 py-1.5 text-xs rounded-xl backdrop-blur-xs transition-all cursor-pointer shadow-sm text-left group"
-              >
-                <span className="group-hover:translate-x-0.5 transition-transform inline-block">
-                  {item.label}
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Guest Mode Banner if guest */}
