@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { getAssetUrl } from '@/lib/assets'
 import { AIChatPanel } from '../ai/AIChatPanel'
 import { useSafeOracle } from './OracleContext'
@@ -51,6 +52,10 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const [isDraggingButton, setIsDraggingButton] = useState(false)
   const [isDraggingWindow, setIsDraggingWindow] = useState(false)
   const [activeResizeDir, setActiveResizeDir] = useState<ResizeDirection | null>(null)
+
+  // Popout open/close animation state — mirrors HudBottomSheet pattern
+  const [isRendered, setIsRendered] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
   const buttonDragRef = useRef<{
@@ -363,12 +368,29 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
   }
 
-  const handleClose = () => {
-    if (oracle) {
-      oracle.setMode('closed')
-    } else {
-      setLocalIsOpen(false)
+  // Animate the popout panel in/out — isRendered keeps it in the DOM during exit transition
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>
+    if (isPopoutActive) {
+      setIsRendered(true)
+      timer = setTimeout(() => setIsVisible(true), 20)
+    } else if (isRendered) {
+      setIsVisible(false)
+      timer = setTimeout(() => setIsRendered(false), 280)
     }
+    return () => clearTimeout(timer)
+  }, [isPopoutActive])
+
+  const handleClose = () => {
+    // Kick off exit animation then actually close
+    setIsVisible(false)
+    setTimeout(() => {
+      if (oracle) {
+        oracle.setMode('closed')
+      } else {
+        setLocalIsOpen(false)
+      }
+    }, 280)
   }
 
   const handleResetLayout = () => {
@@ -605,7 +627,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   return (
     <>
-      {!isPopoutActive ? (
+      {!isPopoutActive && !isRendered ? (
         <div
           className={`fixed z-40 font-sans select-none ${
             isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4'
@@ -644,31 +666,83 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             </span>
           </button>
         </div>
-      ) : (
-        <div
-          className={`fixed z-40 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] ${
-            isMobile
-              ? 'inset-x-0 bottom-0 w-full h-[75vh] max-h-[85dvh] border-t border-cyan-500/40 rounded-t-lg rounded-b-none'
-              : `chamfer-corner border border-cyan-900/80 rounded-none ${
-                  isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
-                } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`
-          }`}
-          style={
-            !isMobile && currentPopoutPos
-              ? {
-                  left: `${currentPopoutPos.x}px`,
-                  top: `${currentPopoutPos.y}px`,
-                  width: `${popoutSize.width}px`,
-                  height: `${popoutSize.height}px`,
-                  minWidth: `${MIN_WIDTH}px`,
-                  minHeight: `${MIN_HEIGHT}px`,
-                  touchAction: 'none',
-                }
-              : undefined
-          }
-        >
-          {/* Resize handles only rendered on desktop / non-mobile */}
-          {!isMobile && (
+      ) : isRendered ? (
+        isMobile ? (
+          // ── Mobile: Portal with dimming backdrop + slide-up sheet ──
+          isMounted && typeof document !== 'undefined'
+            ? createPortal(
+                <div className="fixed inset-0 z-[99990] flex flex-col justify-end font-sans select-none">
+                  {/* Dimming backdrop */}
+                  <div
+                    onClick={handleClose}
+                    aria-hidden="true"
+                    className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+                    style={{
+                      opacity: isVisible ? 1 : 0,
+                      transition: 'opacity 280ms ease-out',
+                      pointerEvents: isVisible ? 'auto' : 'none',
+                    }}
+                  />
+
+                  {/* Slide-up sheet */}
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Oracle AI"
+                    className="relative z-[99991] w-full overflow-hidden bg-[#080d0d] border-t border-cyan-500/40 rounded-t-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.15)]"
+                    style={{
+                      height: '80dvh',
+                      maxHeight: '85dvh',
+                      transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
+                      transition: 'transform 280ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
+                  >
+                    {/* Drag handle */}
+                    <div
+                      className="w-full pt-3 pb-1 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
+                      aria-label="Drag handle"
+                    >
+                      <div className="w-12 h-1 rounded-full bg-cyan-500/40" />
+                    </div>
+
+                    <AIChatPanel
+                      userId={userId}
+                      isCompact={true}
+                      onClose={handleClose}
+                      personaName="SYNAPTIC ORACLE"
+                      isDraggable={false}
+                      className="h-[calc(100%-2rem)] w-full border-none shadow-none"
+                    />
+                  </div>
+                </div>,
+                document.body
+              )
+            : null
+        ) : (
+          // ── Desktop: Fixed positioned panel with fade + scale-in ──
+          <div
+            className={`fixed z-40 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] chamfer-corner border border-cyan-900/80 rounded-none ${
+              isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
+            } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`}
+            style={{
+              ...(currentPopoutPos
+                ? {
+                    left: `${currentPopoutPos.x}px`,
+                    top: `${currentPopoutPos.y}px`,
+                    width: `${popoutSize.width}px`,
+                    height: `${popoutSize.height}px`,
+                    minWidth: `${MIN_WIDTH}px`,
+                    minHeight: `${MIN_HEIGHT}px`,
+                    touchAction: 'none',
+                  }
+                : {}),
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
+              transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+              transformOrigin: 'bottom right',
+            }}
+          >
+            {/* Resize handles only rendered on desktop / non-mobile */}
             <>
               {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
               <div
@@ -708,7 +782,7 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
                 title="Double-click to reset window position & size"
               />
 
-              {/* Corner Resize Handles - Clean invisible hit areas (double-click to reset) */}
+              {/* Corner Resize Handles */}
               <div
                 onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
                 onPointerMove={handleResizePointerMove}
@@ -746,31 +820,27 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
                 title="Double-click to reset window position & size"
               />
             </>
-          )}
 
-          {/* Main Chat Panel */}
-          <AIChatPanel
-            userId={userId}
-            isCompact={true}
-            onClose={handleClose}
-            personaName="SYNAPTIC ORACLE"
-            isDraggable={!isMobile}
-            headerDragProps={
-              !isMobile
-                ? {
-                    onPointerDown: handleHeaderPointerDown,
-                    onPointerMove: handleHeaderPointerMove,
-                    onPointerUp: handleHeaderPointerUp,
-                    onPointerCancel: handleHeaderPointerUp,
-                    onDoubleClick: handleResetLayout,
-                    title: 'Drag header to move chat window (double-click edge or header to reset)',
-                  }
-                : undefined
-            }
-            className="h-full w-full border-none shadow-none"
-          />
-        </div>
-      )}
+            {/* Main Chat Panel */}
+            <AIChatPanel
+              userId={userId}
+              isCompact={true}
+              onClose={handleClose}
+              personaName="SYNAPTIC ORACLE"
+              isDraggable={true}
+              headerDragProps={{
+                onPointerDown: handleHeaderPointerDown,
+                onPointerMove: handleHeaderPointerMove,
+                onPointerUp: handleHeaderPointerUp,
+                onPointerCancel: handleHeaderPointerUp,
+                onDoubleClick: handleResetLayout,
+                title: 'Drag header to move chat window (double-click edge or header to reset)',
+              }}
+              className="h-full w-full border-none shadow-none"
+            />
+          </div>
+        )
+      ) : null}
     </>
   )
 }

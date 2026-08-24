@@ -105,16 +105,19 @@ describe('SynapticOracleWidget Drag & Resize', () => {
   })
 
   it('drags the popout window via the header and preserves position across minimize and reopen', () => {
+    vi.useFakeTimers()
+
     render(
       <OracleProvider>
         <SynapticOracleWidget />
       </OracleProvider>
     )
 
-    // Open popout
+    // Open popout (advance past 20ms enter delay)
     const btn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
     fireEvent.pointerDown(btn, { clientX: 100, clientY: 100, pointerId: 1, button: 0 })
     fireEvent.pointerUp(btn, { clientX: 100, clientY: 100, pointerId: 1 })
+    act(() => { vi.advanceTimersByTime(50) })
 
     const header = screen.getByTitle(/Drag header to move chat window/i)
     expect(header).toBeInTheDocument()
@@ -132,6 +135,9 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     const closeBtn = screen.getByTitle('Close Panel')
     fireEvent.click(closeBtn)
 
+    // Advance past exit animation (280ms) so isRendered → false and launcher button re-appears
+    act(() => { vi.advanceTimersByTime(350) })
+
     // Popout should be closed
     expect(screen.queryByTitle('Drag header to move chat window')).not.toBeInTheDocument()
 
@@ -139,6 +145,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     const reopenBtn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
     fireEvent.pointerDown(reopenBtn, { clientX: 100, clientY: 100, pointerId: 4, button: 0 })
     fireEvent.pointerUp(reopenBtn, { clientX: 100, clientY: 100, pointerId: 4 })
+    act(() => { vi.advanceTimersByTime(50) })
 
     // Popout window should be open at the exact same saved position
     const reopenedHeader = screen.getByTitle(/Drag header to move chat window/i)
@@ -146,6 +153,8 @@ describe('SynapticOracleWidget Drag & Resize', () => {
 
     const currentSaved = localStorage.getItem('moltology:oracle_popout_pos')
     expect(JSON.parse(currentSaved!)).toEqual(parsedPos)
+
+    vi.useRealTimers()
   })
 
   it('resizes the popout window and persists dimensions', () => {
@@ -202,29 +211,32 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     window.innerWidth = 375
     window.innerHeight = 667
 
-    const { container } = render(
+    vi.useFakeTimers()
+
+    render(
       <OracleProvider>
         <SynapticOracleWidget />
       </OracleProvider>
     )
 
-    // Open popout
+    // Open popout (advance past 20ms enter delay)
     const btn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
     fireEvent.pointerDown(btn, { clientX: 100, clientY: 100, pointerId: 1, button: 0 })
     fireEvent.pointerUp(btn, { clientX: 100, clientY: 100, pointerId: 1 })
+    act(() => { vi.advanceTimersByTime(50) })
 
-    // Popout container should have mobile docking classes
-    const popoutContainer = container.querySelector('.inset-x-0.bottom-0.w-full')
-    expect(popoutContainer).not.toBeNull()
+    // Mobile popout is rendered into document.body via portal — look there
+    const mobileSheet = document.body.querySelector('[role="dialog"][aria-label="Oracle AI"]')
+    expect(mobileSheet).not.toBeNull()
 
-    // Resize handles should NOT exist on mobile
-    const seHandle = container.querySelector('.cursor-se-resize')
-    expect(seHandle).toBeNull()
-    const northHandle = container.querySelector('.cursor-n-resize')
-    expect(northHandle).toBeNull()
+    // Resize handles should NOT exist anywhere (neither in container nor body)
+    expect(document.body.querySelector('.cursor-se-resize')).toBeNull()
+    expect(document.body.querySelector('.cursor-n-resize')).toBeNull()
 
     // Header drag title should not be present on mobile
     expect(screen.queryByTitle(/Drag header to move chat window/i)).not.toBeInTheDocument()
+
+    vi.useRealTimers()
   })
 
   it('renders Chats button in popout and toggles scrollable chats window', () => {
