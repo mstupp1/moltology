@@ -33,7 +33,7 @@ export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
     key: 'lobster_thumbs_up',
     name: 'Lobster Thumbs Up (Approval)',
     filename: 'char_lobster_thumbs_up.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=2`,
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=3`,
     description: 'Cheerful lobster giving a thumbs-up approval sign',
   },
   lobster_action: {
@@ -162,7 +162,7 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
     if (!hasFailed) {
       setHasFailed(true)
       // Fallback to S3 default thumbs-up
-      setCurrentSrc(`${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=2`)
+      setCurrentSrc(`${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=3`)
     }
   }
 
