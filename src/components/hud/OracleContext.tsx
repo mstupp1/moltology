@@ -117,17 +117,12 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     }
 
-    // If transitioning from sidebar mode to small window (popout) mode, clear saved custom layout
-    if (mode === 'sidebar' && targetMode === 'popout' && typeof window !== 'undefined') {
+    // If leaving sidebar mode (closing or switching to small window), reset saved popout layout
+    // so the floating tile and mini window appear at a fresh default position
+    if (mode === 'sidebar' && (targetMode === 'popout' || targetMode === 'closed') && typeof window !== 'undefined') {
       try {
         localStorage.removeItem('moltology:oracle_popout_pos')
         localStorage.removeItem('moltology:oracle_popout_size')
-      } catch {}
-    }
-
-    // If closing from small window (popout) mode, reset launcher button tile position
-    if (mode === 'popout' && targetMode === 'closed' && typeof window !== 'undefined') {
-      try {
         localStorage.removeItem('moltology:oracle_button_pos')
       } catch {}
     }

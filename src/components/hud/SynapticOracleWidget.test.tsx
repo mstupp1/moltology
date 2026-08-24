@@ -284,17 +284,15 @@ describe('SynapticOracleWidget Drag & Resize', () => {
       contextModeSetter!('sidebar')
     })
 
-    // Switch from sidebar mode to popout mode
+    // Switch from sidebar mode to popout mode (or close)
     act(() => {
       contextModeSetter!('popout')
     })
 
-    // Check localStorage has been reset to default dimensions (384x640)
-    const savedSize = localStorage.getItem('moltology:oracle_popout_size')
-    expect(savedSize).not.toBeNull()
-    const parsedSize = JSON.parse(savedSize!)
-    expect(parsedSize.width).toBe(384)
-    expect(parsedSize.height).toBe(640)
+    // localStorage keys should be cleared — positions are held in memory at default values
+    expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()
+    expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
+    expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
   })
 })
 
