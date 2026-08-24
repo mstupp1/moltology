@@ -177,8 +177,8 @@ export async function overlayCharacterOnImage(
     return outputImagePath
   }
 
-  // 3. Compute dimensions
-  const scale = (options.scalePercent || 28) / 100
+  // 3. Compute dimensions (default 32% scale for strong visual presence and clarity)
+  const scale = (options.scalePercent || 32) / 100
   const charW = baseImg.width * scale
   const charH = (charW / charImg.width) * charImg.height
 
@@ -206,7 +206,7 @@ export async function overlayCharacterOnImage(
   posX += options.offsetX || 0
   posY += options.offsetY || 0
 
-  // 4. Draw character with drop shadow
+  // 4. Draw character with natural ambient contact shadow
   ctx.save()
   if (options.rotationDegrees) {
     ctx.translate(posX + charW / 2, posY + charH / 2)
@@ -214,8 +214,8 @@ export async function overlayCharacterOnImage(
     ctx.translate(-(posX + charW / 2), -(posY + charH / 2))
   }
 
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'
-  ctx.shadowBlur = 24
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.80)'
+  ctx.shadowBlur = 20
   ctx.drawImage(charImg, posX, posY, charW, charH)
   ctx.restore()
 

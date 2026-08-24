@@ -26,6 +26,7 @@ Transparent PNG mascot cutouts are hosted in the Neon S3 public assets bucket un
 
 * **Discovery**: Check the `images/characters/` folder on S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to choose an appropriate character for the article theme (e.g. guide lobsters, diagnostic engineers, hardhat data crabs, zen floating mascots).
 * **Compositing**: Any character in `images/characters/` can be stamped onto infographics, slides, or header callouts via `overlayCharacterOnImage`.
+* **Character Visibility & Natural Scene Blending**: Characters must be clearly visible against backgrounds, naturally blended with ambient scene shading rather than obvious lighting effects (avoid artificial backlight halos or stark rim lines). When layout space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
 * **New Characters**: To create a fresh character for an article, use the `character-creator` skill.
 
 ---
@@ -239,7 +240,7 @@ To achieve studio-grade, photorealistic 3D social carousels with cohesive lighti
 * **Strict Rule — Never Feed Past Post Slides into ImagePaths**: NEVER pass a past slide image (such as an old article's carousel slide) into `generate_image`'s `ImagePaths`. AI image models treat reference images as structural conditioning and will replicate background elements (e.g. server racks, submersibles), causing identical visual templates across different articles.
 * **Generate Unique, Bespoke Thematic Backgrounds**: For every carousel, generate 3 distinct, high-res 3D benthic backgrounds (e.g. via `generate_image` with `AspectRatio: '3:4'`) tailored to the specific topic (e.g. robotic pincer carapaces, hydrothermal basalt vents, optical photonics, deep trench research habitats).
 * **No Extra Auxiliary Image Generation**: NEVER make extra `generate_image` calls for auxiliary sub-strips or decorative elements. Limit AI generation strictly to essential hero and background scenes to preserve quota and avoid 429 rate limit delays. Use native canvas vector rendering for subtle waveforms and accents.
-* **Pristine Mascot & Branding Compositing**: Always composite official transparent character cutouts from `scripts/lib/character-overlay.ts` (`char_lobster_pointing_cta.png`, `char_crab_pointing_stats.png`, `char_lobster_engineer.png`) and the clean MoltNation vector watermark badge on top of the render. This guarantees 100% brand consistency, zero hallucinated mascot deformities, and crisp vector logos.
+* **Pristine Mascot & Branding Compositing**: Always composite official transparent character cutouts from `scripts/lib/character-overlay.ts` (`char_lobster_pointing_cta.png`, `char_crab_pointing_stats.png`, `char_lobster_engineer.png`) and the clean MoltNation vector watermark badge on top of the render. Ensure mascots are clearly visible, naturally blended with soft ambient contact shadows (no obvious/artificial backlight halos), and sized with ample presence when layout space allows. This guarantees 100% brand consistency, zero hallucinated mascot deformities, and crisp vector logos.
 
 #### 3. Typography & Card Layout Hierarchy
 

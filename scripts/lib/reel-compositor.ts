@@ -441,14 +441,16 @@ export async function renderCtaOutroFrame(
     }
 
     if (charImg) {
-      const charW = 340
+      // Scale character with ample presence when space permits and blend naturally
+      const charW = 390
       const charH = (charW / charImg.width) * charImg.height
-      const charX = 690
-      const charY = 1220
+      const charX = 640
+      const charY = 1170
 
       ctx.save()
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
-      ctx.shadowBlur = 30
+      // Soft, natural contact shadow for seamless scene integration without artificial halos
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.80)'
+      ctx.shadowBlur = 20
       ctx.drawImage(charImg, charX, charY, charW, charH)
       ctx.restore()
     }
@@ -1033,14 +1035,16 @@ export async function renderReelThumbnail(options: ReelThumbnailOptions): Promis
     }
 
     if (charImg) {
-      const charW = 280
+      // Scale character with strong visibility and presence in the 1:1 safe zone
+      const charW = 330
       const charH = (charW / charImg.width) * charImg.height
-      const charX = 740
-      const charY = 1200
+      const charX = 690
+      const charY = 1160
 
       ctx.save()
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)'
-      ctx.shadowBlur = 24
+      // Soft natural ambient shadow for clean, integrated grounding
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'
+      ctx.shadowBlur = 18
       ctx.drawImage(charImg, charX, charY, charW, charH)
       ctx.restore()
     }

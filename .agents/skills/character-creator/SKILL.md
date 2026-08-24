@@ -47,6 +47,11 @@ Characters should feel varied across the cast:
     - *Benthic Calm / Zen*: Floating weightlessly in hydrostatic peace, meditating, observing caustics.
     - *Playful / Curious*: Peeking over a border, clinging with one claw, scratching head in puzzlement.
 
+### 3. Lighting, Scene Blending, Visibility & Sizing Guidelines
+* **Clear Visibility Without Obvious Lighting**: Characters must always be clearly visible with high contrast against the backdrop, but any lighting effect should **not be obvious** (avoid artificial or forced backlights, stark floor beams, or halo outlines).
+* **Seamless Scene Integration**: Characters should look naturally blended into their environment with consistent ambient shading and soft contact shadows that ground them organically.
+* **Proportional Scaling & Space**: When given enough layout space (such as in outro CTA cards, editorial banners, hero mockups, or social post graphics), characters **can be sized slightly larger than their reference** to ensure strong visual clarity, expressive charm, and engaging presence.
+
 ---
 
 ## ◈ 2. Discovering Available Characters in S3
