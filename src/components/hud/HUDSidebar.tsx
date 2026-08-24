@@ -38,6 +38,7 @@ import { getAuthJWTToken } from '../../lib/jwt'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
+import { getEffectiveRole } from '../../lib/permissions'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
@@ -248,10 +249,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const isSessionPending = sessionRes?.isPending ?? false
   const [userRole, setUserRole] = useState<string | null>(null)
 
-  const effectiveUserRole =
-    userRole === 'super_admin' || user?.email?.toLowerCase() === 'mylesstupp@gmail.com'
-      ? 'super_admin'
-      : userRole || user?.role || null
+  const effectiveUserRole = getEffectiveRole(user, userRole)
 
   useEffect(() => {
     if (!user?.id) {
@@ -264,16 +262,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
       .then((profile) => {
         if (isSubscribed) {
-          const role =
-            profile?.role ||
-            (user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : user?.role || null)
+          const role = getEffectiveRole(user, profile?.role)
           setUserRole(role)
         }
       })
       .catch(() => {
         if (isSubscribed) {
-          const role =
-            user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : user?.role || null
+          const role = getEffectiveRole(user, null)
           setUserRole(role)
         }
       })

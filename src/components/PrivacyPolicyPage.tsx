@@ -160,8 +160,8 @@ export const PrivacyPolicyPage: React.FC = () => {
             </ul>
             <p className="mt-3">
               To exercise any of these rights, contact us at{' '}
-              <a href="mailto:privacy@moltology.com" className="text-cyan-400 hover:underline">
-                privacy@moltology.com
+              <a href="mailto:privacy@moltology.org" className="text-cyan-400 hover:underline">
+                privacy@moltology.org
               </a>
               . We will respond within 30 days.
             </p>

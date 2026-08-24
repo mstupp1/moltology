@@ -4,6 +4,7 @@ import { authClient } from '@/lib/auth-client'
 import { UserAvatar } from './UserAvatar'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { getEffectiveRole } from '@/lib/permissions'
 
 export interface UserAvatarMenuProps {
   user: {
@@ -147,13 +148,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   }, [isOpen, inline])
 
   const displayName = user.name || user.email?.split('@')[0] || 'Operative'
-  const isSuperAdminEmail = user.email?.toLowerCase() === 'mylesstupp@gmail.com'
-  const effectiveRole =
-    userRole === 'super_admin' || isSuperAdminEmail
-      ? 'super_admin'
-      : userRole === 'admin' || user.role === 'admin'
-      ? 'admin'
-      : userRole || user.role
+  const effectiveRole = getEffectiveRole(user, userRole)
 
   // Mobile / Drawer Inline Layout
   if (inline) {

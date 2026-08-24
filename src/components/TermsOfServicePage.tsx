@@ -253,8 +253,8 @@ export const TermsOfServicePage: React.FC = () => {
               <p className="text-white font-bold">Moltology System Inc.</p>
               <p>
                 Email:{' '}
-                <a href="mailto:legal@moltology.com" className="text-cyan-400 hover:underline">
-                  legal@moltology.com
+                <a href="mailto:legal@moltology.org" className="text-cyan-400 hover:underline">
+                  legal@moltology.org
                 </a>
               </p>
             </div>

@@ -38,6 +38,7 @@ import { authClient } from '@/lib/auth-client'
 import { seo } from '@/lib/seo'
 import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
 import { HudPagination } from '@/components/ui/HudPagination'
+import { getEffectiveRole, isAdminOrSuperAdmin } from '@/lib/permissions'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
@@ -91,13 +92,14 @@ function SupportPortalRoute() {
       })
       .then((profile) => {
         if (isMounted) {
-          const role = profile?.role || (user?.email?.toLowerCase() === 'mylesstupp@gmail.com' ? 'super_admin' : user?.role || 'user')
+          const role = getEffectiveRole(user, profile?.role) || 'user'
           setUserRole(role)
         }
       })
       .catch(() => {
-        if (isMounted && user?.email?.toLowerCase() === 'mylesstupp@gmail.com') {
-          setUserRole('super_admin')
+        if (isMounted) {
+          const role = getEffectiveRole(user, null) || 'user'
+          setUserRole(role)
         }
       })
     return () => { isMounted = false }
@@ -355,12 +357,8 @@ function SupportPortalRoute() {
     }
   }
 
-  const effectiveRole =
-    userRole === 'super_admin' || user?.email?.toLowerCase() === 'mylesstupp@gmail.com'
-      ? 'super_admin'
-      : userRole || user?.role || 'user'
-
-  const isAdmin = ['admin', 'super_admin'].includes(effectiveRole)
+  const effectiveRole = getEffectiveRole(user, userRole) || 'user'
+  const isAdmin = isAdminOrSuperAdmin(user, userRole)
 
   return (
     <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3] pb-10">
