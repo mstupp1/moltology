@@ -70,4 +70,50 @@ describe('OracleContext & Mode Management', () => {
     expect(result.current.mode).toBe('popout')
     expect(result.current.mode).not.toBe('sidebar')
   })
+
+  it('redirects sidebar mode to page mode on mobile viewports', () => {
+    const originalWidth = window.innerWidth
+    window.innerWidth = 500
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <OracleProvider>{children}</OracleProvider>
+    )
+
+    const { result } = renderHook(() => useOracle(), { wrapper })
+
+    act(() => {
+      result.current.setMode('sidebar')
+    })
+    expect(result.current.mode).toBe('page')
+
+    window.innerWidth = originalWidth
+  })
+
+  it('preserves sidebar mode when closing and reopening without arguments', () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <OracleProvider>{children}</OracleProvider>
+    )
+
+    const { result } = renderHook(() => useOracle(), { wrapper })
+
+    // Activate sidebar mode
+    act(() => {
+      result.current.setMode('sidebar')
+    })
+    expect(result.current.mode).toBe('sidebar')
+    expect(result.current.lastActiveMode).toBe('sidebar')
+
+    // Close the Oracle
+    act(() => {
+      result.current.setMode('closed')
+    })
+    expect(result.current.mode).toBe('closed')
+    expect(result.current.lastActiveMode).toBe('sidebar')
+
+    // Reopen without explicit mode argument (e.g. clicking launcher button)
+    act(() => {
+      result.current.toggleMode()
+    })
+    expect(result.current.mode).toBe('sidebar')
+  })
 })

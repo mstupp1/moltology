@@ -5,6 +5,8 @@ import { getAIThreadsFn } from '@/lib/server/api'
 
 export type OracleMode = 'closed' | 'popout' | 'sidebar' | 'page'
 
+export const STORAGE_KEY_ORACLE_LAST_MODE = 'moltology:oracle_last_mode'
+
 export interface OracleThread {
   id: string
   title: string
@@ -14,8 +16,9 @@ export interface OracleThread {
 
 interface OracleContextType {
   mode: OracleMode
+  lastActiveMode: 'popout' | 'sidebar' | 'page'
   setMode: (mode: OracleMode) => void
-  toggleMode: (targetMode: 'popout' | 'sidebar' | 'page') => void
+  toggleMode: (targetMode?: 'popout' | 'sidebar' | 'page') => void
   activeThreadId: string | null
   setActiveThreadId: (id: string | null) => void
   threads: OracleThread[]
@@ -38,6 +41,17 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [mode, setModeState] = useState<OracleMode>(() =>
     currentPath === '/oracle' ? 'page' : 'closed'
   )
+  const [lastActiveMode, setLastActiveMode] = useState<'popout' | 'sidebar' | 'page'>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_ORACLE_LAST_MODE)
+        if (saved === 'sidebar' || saved === 'popout' || saved === 'page') {
+          return saved
+        }
+      } catch {}
+    }
+    return 'popout'
+  })
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
   const [threads, setThreads] = useState<OracleThread[]>([])
   const [isLoadingThreads, setIsLoadingThreads] = useState(false)
@@ -91,11 +105,26 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [userId])
 
   const setMode = (newMode: OracleMode) => {
-    if (newMode === mode) return
+    // If mobile and sidebar mode is requested, redirect to dedicated page mode
+    let targetMode = newMode
+    if (targetMode === 'sidebar' && typeof window !== 'undefined' && window.innerWidth < 768) {
+      targetMode = 'page'
+    }
 
-    setModeState(newMode)
+    if (targetMode !== 'closed') {
+      setLastActiveMode(targetMode)
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY_ORACLE_LAST_MODE, targetMode)
+        } catch {}
+      }
+    }
 
-    if (newMode === 'page') {
+    if (targetMode === mode) return
+
+    setModeState(targetMode)
+
+    if (targetMode === 'page') {
       if (currentPath !== '/oracle') {
         navigate({ to: '/oracle' })
       }
@@ -110,11 +139,17 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }
 
-  const toggleMode = (targetMode: 'popout' | 'sidebar' | 'page') => {
-    if (mode === targetMode) {
+  const toggleMode = (targetMode?: 'popout' | 'sidebar' | 'page') => {
+    const effectiveTarget = targetMode || lastActiveMode || 'popout'
+    const resolvedMode =
+      effectiveTarget === 'sidebar' && typeof window !== 'undefined' && window.innerWidth < 768
+        ? 'page'
+        : effectiveTarget
+
+    if (mode === resolvedMode) {
       setMode('closed')
     } else {
-      setMode(targetMode)
+      setMode(resolvedMode)
     }
   }
 
@@ -122,6 +157,7 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <OracleContext.Provider
       value={{
         mode,
+        lastActiveMode,
         setMode,
         toggleMode,
         activeThreadId,
