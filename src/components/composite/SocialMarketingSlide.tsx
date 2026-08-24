@@ -345,10 +345,18 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       showCornerBrackets={false}
       className="bg-gradient-to-b from-[#010812] via-[#02182b] to-[#01060e] flex flex-col justify-between p-8"
     >
-      {/* Background Subtle Tech Accents: Chevrons & Dot Grids */}
-      <div className="absolute top-8 right-8 flex items-center gap-1.5 opacity-70">
-        <span className="text-cyan-400 font-mono text-3xl font-black tracking-tighter">&gt;&gt;&gt;&gt;&gt;&gt;</span>
-      </div>
+      {/* Top-Right Crustacean Mascot (Layered underneath the nearby badge & book) */}
+      {finalMascot && finalMascot !== 'none' && (
+        <MascotOverlay
+          mascot={finalMascot}
+          position="top-right"
+          width={440}
+          glow={false}
+          className="top-2 right-0 z-0 drop-shadow-[0_20px_35px_rgba(0,0,0,0.95)]"
+        />
+      )}
+
+      {/* Background Subtle Tech Dot Grid */}
       <div className="absolute top-40 left-8 grid grid-cols-6 gap-2.5 opacity-30 pointer-events-none">
         {Array.from({ length: 36 }).map((_, i) => (
           <span key={i} className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
@@ -356,10 +364,10 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       </div>
 
       {/* 1. Header Section: Eyebrow Badge & Punchy Impact Headline */}
-      <div className="z-10 shrink-0">
+      <div className="z-10 shrink-0 max-w-[660px]">
         {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 border-2 border-yellow-100 shadow-[0_0_30px_rgba(251,191,36,0.7)]">
-          <span className="w-3 h-3 rounded-full bg-slate-950 animate-ping" />
+        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 border-2 border-yellow-100 shadow-[0_4px_14px_rgba(0,0,0,0.6)]">
+          <span className="w-3 h-3 rounded-full bg-slate-950" />
           <span className="font-mono font-black text-[15px] tracking-wider text-slate-950 uppercase">
             {finalEyebrow}
           </span>
@@ -373,14 +381,14 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           <h2 className="text-[58px] leading-[0.98] font-black text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
             {finalH2}
           </h2>
-          <h2 className="text-[64px] leading-[0.98] font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 drop-shadow-[0_0_35px_rgba(251,191,36,0.8)] tracking-tight uppercase">
+          <h2 className="text-[64px] leading-[0.98] font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] tracking-tight uppercase">
             {finalHighlight}
           </h2>
         </div>
 
         {/* Sub-headline / Hook */}
         <div className="mt-3.5 flex items-center gap-3">
-          <div className="w-2.5 h-7 bg-amber-400 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.9)]" />
+          <div className="w-2.5 h-7 bg-amber-400 rounded-full shadow-sm" />
           <p className="text-[24px] font-bold text-slate-100 tracking-wide">
             {finalSub}
           </p>
@@ -399,12 +407,12 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
             >
               {/* Circular Icon Badge */}
               <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-xl ${
+                className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg ${
                   item.badgeVariant === 'amber'
-                    ? 'bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 border-2 border-amber-100 shadow-amber-500/50'
+                    ? 'bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 border-2 border-amber-100'
                     : item.badgeVariant === 'emerald'
-                    ? 'bg-gradient-to-tr from-emerald-600 to-teal-300 text-slate-950 border-2 border-emerald-100 shadow-emerald-500/50'
-                    : 'bg-gradient-to-tr from-cyan-500 to-sky-200 text-slate-950 border-2 border-cyan-100 shadow-cyan-500/50'
+                    ? 'bg-gradient-to-tr from-emerald-600 to-teal-300 text-slate-950 border-2 border-emerald-100'
+                    : 'bg-gradient-to-tr from-cyan-500 to-sky-200 text-slate-950 border-2 border-cyan-100'
                 }`}
               >
                 {renderBenefitIcon(item.icon)}
@@ -423,30 +431,26 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           ))}
         </div>
 
-        {/* Right Column (7 Cols): 3D Mockup on Pedestal + Trust Badge + Quote Bubble */}
-        <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[520px]">
+        {/* Right Column (7 Cols): 3D Mockup + Trust Badge + Quote Bubble */}
+        <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[540px]">
           
-          {/* Top-Right Circular Golden Trust Certification Seal */}
-          <div className="absolute -top-3 right-0 z-30 flex flex-col items-center justify-center shrink-0">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 p-1 shadow-[0_0_40px_rgba(251,191,36,0.9)] animate-pulse shrink-0">
-              <div className="w-full h-full rounded-full bg-[#060b12] border-2 border-amber-300 flex flex-col items-center justify-center text-center p-2">
-                <div className="flex gap-0.5 text-amber-300 text-[11px]">
+          {/* Top-Right Circular Golden Trust Certification Seal (Larger, positioned to the right) */}
+          <div className="absolute -top-1 -right-2 z-30 flex flex-col items-center justify-center shrink-0">
+            <div className="w-[148px] h-[148px] rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0">
+              <div className="w-full h-full rounded-full bg-[#060b12] border-2 border-amber-300 flex flex-col items-center justify-center text-center p-2.5">
+                <div className="flex gap-0.5 text-amber-300 text-[13px]">
                   {'★★★★★'}
                 </div>
-                <div className="font-mono font-black text-[11px] uppercase text-amber-300 leading-tight mt-0.5">
+                <div className="font-mono font-black text-[12.5px] uppercase text-amber-300 leading-tight mt-1">
                   {finalTrustText}
                 </div>
-                <div className="w-10 h-[1.5px] bg-amber-400 my-0.5" />
-                <div className="font-mono font-bold text-[9px] tracking-wider uppercase text-amber-200">
+                <div className="w-12 h-[1.5px] bg-amber-400 my-1" />
+                <div className="font-mono font-bold text-[10px] tracking-wider uppercase text-amber-200">
                   {finalTrustYear}
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Glowing Atmospheric Aura Behind Mockup */}
-          <div className="absolute w-96 h-96 rounded-full bg-cyan-500/30 blur-3xl -z-10" />
-          <div className="absolute w-80 h-80 rounded-full bg-amber-500/25 blur-2xl -z-10" />
 
           {/* 3D Realistic Hardcover Book / Tablet HUD Container */}
           <div
@@ -455,92 +459,89 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
               perspective: '1400px',
             }}
           >
-            {finalMockupType === 'tablet' ? (
-              /* Diagnostic Tablet HUD Graphic */
-              <div
-                className="relative w-[340px] h-[450px] rounded-3xl bg-gradient-to-b from-[#031422] via-[#05233a] to-[#020d18] border-4 border-cyan-400/90 shadow-[35px_40px_80px_rgba(0,0,0,0.98),0_0_55px_rgba(0,255,230,0.4)] flex flex-col p-6 overflow-hidden text-center justify-between"
-                style={{
-                  transform: 'rotateY(-12deg) rotateX(5deg)',
-                  transformStyle: 'preserve-3d',
-                }}
-              >
-                {/* Glowing Top Bezel & Camera */}
-                <div className="flex items-center justify-between pb-2 border-b border-cyan-500/40">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse" />
-                    <span className="font-mono font-bold text-xs text-cyan-300 uppercase tracking-wider">
-                      LIVE BIOMETRIC TELEMETRY
-                    </span>
-                  </div>
-                  <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(0,255,230,1)]" />
-                </div>
-
-                {/* Tablet Center Radar & Telemetry */}
-                <div className="my-auto flex flex-col items-center">
-                  <h3 className="font-grotesk font-black text-3xl text-white uppercase tracking-tight">
-                    {finalBookTitle}
-                  </h3>
-                  <div className="font-mono text-cyan-300 text-xs font-bold mt-1">
-                    {finalBookSubtitle}
+            {/* 3D Mockup Graphic */}
+            <div className="relative z-20">
+              {finalMockupType === 'tablet' ? (
+                /* Diagnostic Tablet HUD Graphic (Enlarged) */
+                <div
+                  className="relative w-[370px] h-[480px] rounded-3xl bg-gradient-to-b from-[#031422] via-[#05233a] to-[#020d18] border-4 border-cyan-400/90 shadow-[35px_40px_80px_rgba(0,0,0,0.98)] flex flex-col p-6 overflow-hidden text-center justify-between"
+                  style={{
+                    transform: 'rotateY(-12deg) rotateX(5deg)',
+                    transformStyle: 'preserve-3d',
+                  }}
+                >
+                  {/* Top Bezel & Camera */}
+                  <div className="flex items-center justify-between pb-2 border-b border-cyan-500/40">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                      <span className="font-mono font-bold text-xs text-cyan-300 uppercase tracking-wider">
+                        LIVE BIOMETRIC TELEMETRY
+                      </span>
+                    </div>
+                    <div className="w-2 h-2 rounded-full bg-cyan-400" />
                   </div>
 
-                  {/* Multi-Axis Radar Scan Graphic */}
-                  <div className="relative mt-4 w-44 h-36 rounded-2xl bg-[#010810]/95 border-2 border-cyan-400/80 p-3 flex flex-col items-center justify-center shadow-inner overflow-hidden">
-                    <div className="absolute inset-0 bg-cyan-500/10" />
-                    <div className="w-28 h-28 rounded-full border border-cyan-500/40 flex items-center justify-center relative">
-                      <div className="w-20 h-20 rounded-full border border-cyan-500/60 flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full border border-cyan-400" />
+                  {/* Tablet Center Radar & Telemetry */}
+                  <div className="my-auto flex flex-col items-center">
+                    <h3 className="font-grotesk font-black text-3xl text-white uppercase tracking-tight">
+                      {finalBookTitle}
+                    </h3>
+                    <div className="font-mono text-cyan-300 text-xs font-bold mt-1">
+                      {finalBookSubtitle}
+                    </div>
+
+                    {/* Multi-Axis Radar Scan Graphic */}
+                    <div className="relative mt-4 w-44 h-36 rounded-2xl bg-[#010810]/95 border-2 border-cyan-400/80 p-3 flex flex-col items-center justify-center shadow-inner overflow-hidden">
+                      <div className="absolute inset-0 bg-cyan-500/10" />
+                      <div className="w-28 h-28 rounded-full border border-cyan-500/40 flex items-center justify-center relative">
+                        <div className="w-20 h-20 rounded-full border border-cyan-500/60 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full border border-cyan-400" />
+                        </div>
+                        {/* Radar Polygon Shape */}
+                        <svg className="absolute inset-0 w-full h-full text-cyan-400/80" viewBox="0 0 100 100">
+                          <polygon
+                            points="50,15 85,38 75,80 30,85 20,40"
+                            fill="rgba(0, 255, 230, 0.3)"
+                            stroke="#00ffe6"
+                            strokeWidth="2"
+                          />
+                        </svg>
+                        <Compass className="w-6 h-6 text-amber-300 z-10" />
                       </div>
-                      {/* Radar Polygon Shape */}
-                      <svg className="absolute inset-0 w-full h-full text-cyan-400/80" viewBox="0 0 100 100">
-                        <polygon
-                          points="50,15 85,38 75,80 30,85 20,40"
-                          fill="rgba(0, 255, 230, 0.3)"
-                          stroke="#00ffe6"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                      <Compass className="w-6 h-6 text-amber-300 z-10 animate-spin" />
                     </div>
                   </div>
-                </div>
 
-                {/* Tablet Footer */}
-                <div className="pt-2 border-t border-cyan-500/40 flex items-center justify-between text-[11px] font-mono text-slate-300">
-                  <span>STAGE: APEX (C3)</span>
-                  <span className="text-amber-300 font-bold">CLEARANCE: 99.4%</span>
+                  {/* Tablet Footer */}
+                  <div className="pt-2 border-t border-cyan-500/40 flex items-center justify-between text-[11px] font-mono text-slate-300">
+                    <span>STAGE: APEX (C3)</span>
+                    <span className="text-amber-300 font-bold">CLEARANCE: 99.4%</span>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              /* Three.js Photorealistic 3D Hardcover Book (ThreeBookCover) */
-              <ThreeBookCover
-                width={420}
-                height={540}
-                bookWidth={3.3}
-                bookHeight={4.6}
-                bookThickness={0.46}
-                rotateY={0.36}
-                rotateX={0.05}
-                coverImageUrl={finalBookCoverUrl}
-                coverEyebrow={finalBookSubtitle}
-                coverTitlePart1={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'MOLT'}
-                coverTitlePart2={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'MAXXING'}
-                coverSubtitle="STAGE 4 CARCINIZATION"
-                coverTagline={finalBookTagline}
-                spineTitle={finalBookTitle}
-                themeVariant={theme === 'sacred-codex' ? 'amber' : 'cyan'}
-              />
-            )}
-
-            {/* 3D Circular Pedestal / Plinth Beneath the Mockup */}
-            <div className="relative -mt-7 w-88 h-18 rounded-[100%] bg-gradient-to-b from-[#113350] to-[#010a12] border-3 border-cyan-400 shadow-[0_25px_50px_rgba(0,0,0,1),0_0_40px_rgba(0,255,230,0.6)] flex items-center justify-center overflow-hidden">
-              {/* Caustics Reflection on Podium Top */}
-              <div className="w-full h-full rounded-[100%] bg-radial from-cyan-400/50 via-transparent to-transparent" />
+              ) : (
+                /* Three.js Photorealistic 3D Hardcover Book (Enlarged) */
+                <ThreeBookCover
+                  width={470}
+                  height={590}
+                  bookWidth={3.5}
+                  bookHeight={4.9}
+                  bookThickness={0.48}
+                  rotateY={0.36}
+                  rotateX={0.05}
+                  coverImageUrl={finalBookCoverUrl}
+                  coverEyebrow={finalBookSubtitle}
+                  coverTitlePart1={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'MOLT'}
+                  coverTitlePart2={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'MAXXING'}
+                  coverSubtitle="STAGE 4 CARCINIZATION"
+                  coverTagline={finalBookTagline}
+                  spineTitle={finalBookTitle}
+                  themeVariant={theme === 'sacred-codex' ? 'amber' : 'cyan'}
+                />
+              )}
             </div>
           </div>
 
           {/* Floating Quote Callout on Lower Right */}
-          <div className="absolute -bottom-2 right-0 z-30 max-w-[250px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-amber-400 shadow-[0_15px_35px_rgba(0,0,0,0.95),0_0_25px_rgba(251,191,36,0.4)] backdrop-blur-md">
+          <div className="absolute -bottom-2 right-0 z-30 max-w-[250px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-amber-400 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md">
             <div className="flex items-start gap-1.5">
               <span className="text-amber-400 font-serif text-2xl leading-none">“</span>
               <p className="text-xs font-semibold text-slate-100 leading-snug">
@@ -549,28 +550,17 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
               <span className="text-amber-400 font-serif text-2xl leading-none self-end">”</span>
             </div>
           </div>
-
-          {/* Mascot Overlay positioned cleanly on the far bottom right */}
-          {finalMascot && finalMascot !== 'none' && (
-            <MascotOverlay
-              mascot={finalMascot}
-              position="bottom-right"
-              width={220}
-              className="-bottom-6 -right-10 z-40 drop-shadow-[0_25px_35px_rgba(0,0,0,1)]"
-            />
-          )}
         </div>
       </div>
 
       {/* 3. Massive High-Contrast Comment-to-DM Bottom CTA Banner */}
       <div className="mt-2 z-20 shrink-0">
-        <div className="w-full py-5 px-8 rounded-3xl bg-[#01060e] border-4 border-amber-400 shadow-[0_0_50px_rgba(251,191,36,0.8),0_25px_50px_rgba(0,0,0,1)] flex items-center justify-between relative overflow-hidden">
-          {/* Subtle amber background gradient pulse */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 animate-pulse pointer-events-none" />
+        <div className="w-full py-5 px-8 rounded-3xl bg-[#01060e] border-4 border-amber-400 shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden">
+          {/* Subtle static amber background accent */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-yellow-400/15 to-amber-500/10 pointer-events-none" />
 
-          {/* Left Arrow Accents */}
-          <div className="flex items-center gap-1.5 text-amber-300 font-black text-3xl hidden sm:flex">
-            <span>⚡</span>
+          {/* Left Arrow Accents (No lightning bolt emojis) */}
+          <div className="flex items-center gap-2 text-amber-300 font-black text-3xl hidden sm:flex">
             <span>👉</span>
           </div>
 
@@ -583,7 +573,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
               <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
                 Comment
               </span>
-              <span className="font-grotesk font-black text-4xl md:text-5xl text-amber-300 tracking-wider uppercase drop-shadow-[0_0_25px_rgba(251,191,36,1)]">
+              <span className="font-grotesk font-black text-4xl md:text-5xl text-amber-300 tracking-wider uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                 “{finalKeyword}”
               </span>
               <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
@@ -592,10 +582,9 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
             </div>
           </div>
 
-          {/* Right Arrow Accents */}
-          <div className="flex items-center gap-1.5 text-amber-300 font-black text-3xl hidden sm:flex">
+          {/* Right Arrow Accents (No lightning bolt emojis) */}
+          <div className="flex items-center gap-2 text-amber-300 font-black text-3xl hidden sm:flex">
             <span>👈</span>
-            <span>⚡</span>
           </div>
         </div>
       </div>

@@ -556,7 +556,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </div>
 
             <div>
-              <span className="text-[10px] font-mono text-amber-300">Headline Highlight (Glowing)</span>
+              <span className="text-[10px] font-mono text-amber-300">Headline Highlight</span>
               <input
                 type="text"
                 value={headlineHighlight}
