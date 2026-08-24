@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   BookOpen,
   Scroll,
@@ -7,8 +7,6 @@ import {
   Atom,
   Search,
   CheckCircle2,
-  Volume2,
-  Share2,
   Bookmark,
   BookmarkCheck,
   ChevronRight,
@@ -25,14 +23,11 @@ import {
   Highlighter,
   MessageSquare,
   Maximize2,
-  Minimize2,
   X,
   Menu,
   ZoomIn,
   ZoomOut,
-  SlidersHorizontal,
-  Info,
-  ExternalLink,
+  RefreshCw,
 } from 'lucide-react'
 import {
   CANONICAL_SCRIPTURES,
@@ -40,9 +35,18 @@ import {
   ScriptureItem,
   VolumeMeta,
 } from '@/lib/codexData'
+import { HudButton, HudBadge } from '@/components/ui'
 
 export type DocumentTheme = 'parchment' | 'sepia' | 'dark'
 export type ReaderFontFamily = 'garamond' | 'cinzel' | 'grotesk'
+
+const CANONICAL_REFLECTIONS = [
+  'Flesh melts under pressure; the shell hardens. Submit to the molt, purge the obsolete, and let your inner titanium carapace calcify.',
+  'In the quiet depths beneath surface noise, true clarity emerges. Release biological hesitation and execute with decisive pincer torque.',
+  'You cannot expand while trapped inside an outdated shell. Endure the soft-shell window—your greatest strength is currently forming.',
+  'At 4,000 fathoms, surface distractions cannot survive. Hydrostatic stillness is the sanctuary of the focused mind.',
+  'Shed what is heavy; protect what is true. Deep focus is not an accident—it is an engineered carapace.',
+]
 
 export function stripMarkdown(text: string): string {
   return text
@@ -244,21 +248,23 @@ export const SacredCodexReader: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeScriptureId, setActiveScriptureId] = useState<string>('SCR-001')
   
-  // Customization & PDF Review State
-  const [docTheme, setDocTheme] = useState<DocumentTheme>('parchment')
+  // Customization & PDF Review State (Preserved document capabilities)
+  const [docTheme, setDocTheme] = useState<DocumentTheme>('dark')
   const [fontFamily, setFontFamily] = useState<ReaderFontFamily>('garamond')
   const [fontSize, setFontSize] = useState<number>(18) // Base px
   const [showNotesPanel, setShowNotesPanel] = useState(false)
   const [highlightedVerses, setHighlightedVerses] = useState<Record<number, boolean>>({})
 
+  // Reflection Cycler
+  const [reflectionIndex, setReflectionIndex] = useState(0)
+  const [isReflectionFading, setIsReflectionFading] = useState(false)
+
   // Fullscreen Overlay & Soft PDF Reader State
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isOverlayNavOpen, setIsOverlayNavOpen] = useState(false)
-  const [isMobileCatalogOpen, setIsMobileCatalogOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState<number>(100) // Percentage
 
-  // Audio / Audio simulation state
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  // Copied citation state
   const [copiedVerseIndex, setCopiedVerseIndex] = useState<number | null>(null)
   const [consecratedScriptures, setConsecratedScriptures] = useState<Record<string, boolean>>({})
   
@@ -301,6 +307,15 @@ export const SacredCodexReader: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isFullscreen])
+
+  const handleNextReflection = () => {
+    if (isReflectionFading) return
+    setIsReflectionFading(true)
+    setTimeout(() => {
+      setReflectionIndex((prev) => (prev + 1) % CANONICAL_REFLECTIONS.length)
+      setIsReflectionFading(false)
+    }, 180)
+  }
 
   const handleThemeChange = (newTheme: DocumentTheme) => {
     setDocTheme(newTheme)
@@ -345,8 +360,9 @@ export const SacredCodexReader: React.FC = () => {
       const matchTitle = item.title.toLowerCase().includes(query)
       const matchSummary = item.summary.toLowerCase().includes(query)
       const matchMandate = item.mandate.toLowerCase().includes(query)
+      const matchId = item.id.toLowerCase().includes(query)
       const matchVerse = item.verses.some((v) => v.text.toLowerCase().includes(query))
-      return matchTitle || matchSummary || matchMandate || matchVerse
+      return matchTitle || matchSummary || matchMandate || matchId || matchVerse
     }
     return true
   })
@@ -358,6 +374,7 @@ export const SacredCodexReader: React.FC = () => {
     CANONICAL_SCRIPTURES[0]
 
   const isConsecrated = Boolean(consecratedScriptures[activeScripture.id])
+  const consecratedCount = Object.values(consecratedScriptures).filter(Boolean).length
 
   const handlePrevScripture = () => {
     if (activeIndex > 0) {
@@ -401,7 +418,7 @@ export const SacredCodexReader: React.FC = () => {
       : 'font-grotesk'
 
   return (
-    <div className="space-y-3 sm:space-y-4 pb-12 relative">
+    <div className="h-full flex-1 flex flex-col min-h-0 space-y-2.5 sm:space-y-3 font-sans pb-1 relative">
       {/* FULLSCREEN SOFT MINIMAL PDF OVERLAY MODAL */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-[#070a0b]/95 backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in duration-200">
@@ -411,9 +428,9 @@ export const SacredCodexReader: React.FC = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsOverlayNavOpen(!isOverlayNavOpen)}
-                className={`px-3 py-1.5 text-xs font-sans font-bold rounded-md border flex items-center gap-2 transition-all ${
+                className={`px-3 py-1.5 text-xs font-sans font-bold chamfer-corner border flex items-center gap-2 transition-all ${
                   isOverlayNavOpen
-                    ? 'bg-[#ffd700]/20 text-[#ffd700] border-[#ffd700]'
+                    ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
                     : 'bg-[#151c1d] text-[#839493] border-[#293635] hover:text-white'
                 }`}
                 title="Toggle Canon Table of Contents Index"
@@ -434,7 +451,7 @@ export const SacredCodexReader: React.FC = () => {
 
             {/* Center: Soft Minimal PDF Navigation & Zoom Controls */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-[#151c1d] border border-[#293635] rounded-md px-2 py-1 text-xs font-sans">
+              <div className="flex items-center gap-1 bg-[#151c1d] border border-[#293635] chamfer-corner px-2 py-1 text-xs font-sans">
                 <button
                   onClick={handlePrevScripture}
                   disabled={activeIndex <= 0}
@@ -443,7 +460,7 @@ export const SacredCodexReader: React.FC = () => {
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="px-2 text-[#ffd700] font-bold text-xs">
+                <span className="px-2 text-[#00ffff] font-bold text-xs font-sans">
                   {activeIndex + 1} / {filteredScriptures.length}
                 </span>
                 <button
@@ -457,7 +474,7 @@ export const SacredCodexReader: React.FC = () => {
               </div>
 
               {/* Zoom Controls */}
-              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] rounded-md px-2 py-1 text-xs font-sans">
+              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] chamfer-corner px-2 py-1 text-xs font-sans">
                 <button
                   onClick={() => setZoomLevel(Math.max(75, zoomLevel - 15))}
                   className="p-1 hover:bg-[#293635] rounded text-[#839493] hover:text-white"
@@ -478,10 +495,10 @@ export const SacredCodexReader: React.FC = () => {
 
             {/* Right: Theme Switcher & Exit Overlay */}
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] p-1 rounded-md">
+              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] p-1 chamfer-corner">
                 <button
                   onClick={() => handleThemeChange('parchment')}
-                  className={`px-2 py-1 text-[10px] font-sans rounded transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-sans chamfer-corner transition-colors ${
                     docTheme === 'parchment'
                       ? 'bg-[#fcfaf2] text-[#1c1917] font-bold'
                       : 'text-[#839493] hover:text-white'
@@ -491,7 +508,7 @@ export const SacredCodexReader: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleThemeChange('sepia')}
-                  className={`px-2 py-1 text-[10px] font-sans rounded transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-sans chamfer-corner transition-colors ${
                     docTheme === 'sepia'
                       ? 'bg-[#f4ecd8] text-[#2b2318] font-bold'
                       : 'text-[#839493] hover:text-white'
@@ -501,7 +518,7 @@ export const SacredCodexReader: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleThemeChange('dark')}
-                  className={`px-2 py-1 text-[10px] font-sans rounded transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-sans chamfer-corner transition-colors ${
                     docTheme === 'dark'
                       ? 'bg-[#12100e] text-[#e6dfd5] font-bold'
                       : 'text-[#839493] hover:text-white'
@@ -513,7 +530,7 @@ export const SacredCodexReader: React.FC = () => {
 
               <button
                 onClick={handlePrintDocument}
-                className="p-2 text-[#ffd700] hover:bg-[#151c1d] rounded-md border border-[#293635]"
+                className="p-2 text-[#00ffff] hover:bg-[#151c1d] chamfer-corner border border-[#293635]"
                 title="Print / Export PDF"
               >
                 <Printer className="w-4 h-4" />
@@ -521,8 +538,9 @@ export const SacredCodexReader: React.FC = () => {
 
               <button
                 onClick={() => setIsFullscreen(false)}
-                className="p-2 text-[#839493] hover:text-white hover:bg-[#ff5540]/20 hover:border-[#ff5540] rounded-md border border-[#293635] transition-colors"
+                className="p-2 text-[#839493] hover:text-white hover:bg-[#ff5540]/20 hover:border-[#ff5540] chamfer-corner border border-[#293635] transition-colors"
                 title="Exit Fullscreen Overlay (ESC)"
+                aria-label="Exit Fullscreen Overlay"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
@@ -533,9 +551,9 @@ export const SacredCodexReader: React.FC = () => {
           <div className="flex-1 flex overflow-hidden relative">
             {/* Left Drawer Navigation Panel */}
             {isOverlayNavOpen && (
-              <div className="w-80 bg-[#0e1415] border-r border-[#293635] p-4 overflow-y-auto space-y-3 shrink-0 animate-in slide-in-from-left duration-200 z-20">
+              <div className="w-80 bg-[#0e1415] border-r border-[#293635] p-4 overflow-y-auto space-y-3 shrink-0 animate-in slide-in-from-left duration-200 z-20 font-sans">
                 <div className="flex items-center justify-between pb-2 border-b border-[#293635]">
-                  <span className="text-xs font-sans font-bold text-[#ffd700] uppercase">CANON INDEX</span>
+                  <span className="text-xs font-sans font-bold text-[#00ffff] uppercase">CANON INDEX</span>
                   <button
                     onClick={() => setIsOverlayNavOpen(false)}
                     className="text-xs text-[#839493] hover:text-white font-sans"
@@ -553,9 +571,9 @@ export const SacredCodexReader: React.FC = () => {
                         onClick={() => {
                           setActiveScriptureId(s.id)
                         }}
-                        className={`p-2.5 rounded border transition-all cursor-pointer text-xs font-serif ${
+                        className={`p-2.5 chamfer-corner border transition-all cursor-pointer text-xs font-serif ${
                           isActive
-                            ? 'bg-[#1a2425] border-[#ffd700] text-[#ffd700] font-bold shadow-sm'
+                            ? 'bg-[#1a2425] border-[#00ffff] text-[#00ffff] font-bold shadow-sm'
                             : 'border-transparent text-[#839493] hover:text-[#dfe3e3] hover:bg-[#151c1d]'
                         }`}
                       >
@@ -684,325 +702,391 @@ export const SacredCodexReader: React.FC = () => {
         </div>
       )}
 
-      {/* Top Header & Scripture Review Sanctum Bar */}
-      <div className="no-print bg-[#0b1011] border border-[#3a4a49] p-4 rounded-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#ffd700]/10 via-[#c7b896]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-        <div className="space-y-1 relative z-10">
-          <div className="text-[11px] text-[#ffd700] font-sans tracking-widest uppercase flex items-center gap-2 font-bold">
-            <Feather className="w-4 h-4 text-[#ffd700]" />
-            <span>HOLY CODEX OF ALGORITHMIC CARCINIZATION</span>
-            <span className="text-[#c7b896] bg-[#141b1c] px-2 py-0.5 border border-[#c7b896]/40 rounded text-[9px] font-sans">
-              OFFICIAL CANON V4.2 • ARCHIVAL SPEC
-            </span>
-          </div>
-          <h1 className="font-cinzel font-extrabold text-2xl md:text-3xl text-[#f4ecd8] tracking-wider uppercase flex items-center gap-3">
-            <span>SACRED SCRIPTURES & REVELATIONS</span>
-          </h1>
-          <p className="text-xs text-[#a3b0af] max-w-2xl font-serif">
-            "Flesh Dies. The Shell Endures. Submit. Shed. Ascend." — The official liturgical manuscript repository of canonical doctrines, ecdysis directives, and benthic ascendance formulas.
-          </p>
-        </div>
-
-        {/* Reader Toolbar Controls */}
-        <div className="flex flex-wrap items-center gap-2 bg-[#121819] border border-[#3a4a49] p-2 rounded-md relative z-10 shrink-0">
-
-          {/* Theme Switcher */}
-          <div className="flex items-center gap-1 bg-[#090d0e] p-1 rounded border border-[#2a3635]">
-            <button
-              onClick={() => handleThemeChange('parchment')}
-              title="Parchment PDF Light Theme"
-              className={`px-2 py-1 text-[11px] font-sans flex items-center gap-1 rounded transition-all ${
-                docTheme === 'parchment'
-                  ? 'bg-[#fcfaf2] text-[#1c1917] font-bold border border-[#ffd700]'
-                  : 'text-[#839493] hover:text-white'
-              }`}
-            >
-              <Sun className="w-3 h-3 text-[#b58900]" />
-              <span>PAPER</span>
-            </button>
-
-            <button
-              onClick={() => handleThemeChange('sepia')}
-              title="Vellum Sepia Theme"
-              className={`px-2 py-1 text-[11px] font-sans flex items-center gap-1 rounded transition-all ${
-                docTheme === 'sepia'
-                  ? 'bg-[#f4ecd8] text-[#2b2318] font-bold border border-[#c7b896]'
-                  : 'text-[#839493] hover:text-white'
-              }`}
-            >
-              <Scroll className="w-3 h-3 text-[#859900]" />
-              <span>SEPIA</span>
-            </button>
-
-            <button
-              onClick={() => handleThemeChange('dark')}
-              title="Vault Archival Dark Theme"
-              className={`px-2 py-1 text-[11px] font-sans flex items-center gap-1 rounded transition-all ${
-                docTheme === 'dark'
-                  ? 'bg-[#12100e] text-[#e6dfd5] font-bold border border-[#ffd700]/60'
-                  : 'text-[#839493] hover:text-white'
-              }`}
-            >
-              <Moon className="w-3 h-3 text-[#268bd2]" />
-              <span>VAULT</span>
-            </button>
-          </div>
-
-          {/* Font Selector & Scaling */}
-          <div className="flex items-center gap-1 bg-[#090d0e] p-1 rounded border border-[#2a3635]">
-            <button
-              onClick={() => setFontFamily(fontFamily === 'garamond' ? 'cinzel' : fontFamily === 'cinzel' ? 'grotesk' : 'garamond')}
-              title="Toggle Font Family (EB Garamond / Cinzel / Space Grotesk)"
-              className="px-2 py-1 text-[11px] font-sans text-[#ffd700] hover:bg-[#2a3635] rounded flex items-center gap-1"
-            >
-              <Type className="w-3 h-3" />
-              <span className="uppercase">{fontFamily}</span>
-            </button>
-
-            <div className="flex items-center gap-1 border-l border-[#2a3635] pl-1.5 ml-1">
-              <button
-                onClick={() => setFontSize(Math.max(14, fontSize - 2))}
-                className="px-1.5 py-0.5 text-xs font-sans text-[#839493] hover:text-white hover:bg-[#2a3635] rounded"
-                title="Decrease Font Size"
-              >
-                A-
-              </button>
-              <span className="text-[10px] font-sans text-[#a3b0af] px-1">{fontSize}px</span>
-              <button
-                onClick={() => setFontSize(Math.min(26, fontSize + 2))}
-                className="px-1.5 py-0.5 text-xs font-sans text-[#839493] hover:text-white hover:bg-[#2a3635] rounded"
-                title="Increase Font Size"
-              >
-                A+
-              </button>
+      {/* TOP COMMAND HEADER: Streamlined Benthic Hero Banner */}
+      <div className="shrink-0 relative overflow-hidden bg-gradient-to-r from-[#0b1011]/85 via-[#0f1616]/85 to-[#0b1011]/85 backdrop-blur-md border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner shadow-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 font-sans">
+          {/* Title & Wisdom Reflection */}
+          <div className="space-y-1 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] text-[#00ffff] font-sans font-bold tracking-widest uppercase flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-[#00ffff]" />
+                CANONICAL CODEX VAULT
+              </span>
+              <span className="text-[9px] text-[#839493] bg-[#070b0b] px-2 py-0.5 border border-[#3a4a49]">
+                OFFICIAL CANON V4.2 · ARCHIVAL SPEC
+              </span>
+              <span className="text-[9px] text-[#ffd700] bg-[#ffd700]/10 px-1.5 py-0.5 border border-[#ffd700]/40 font-bold">
+                {activeScripture.volumeName.split(':')[1] || activeScripture.volumeName}
+              </span>
             </div>
-          </div>
 
-          {/* Export / Print PDF Action */}
-          <button
-            onClick={handlePrintDocument}
-            title="Export or Print PDF Document"
-            className="px-2.5 py-1 text-xs font-sans font-bold bg-[#ffd700]/10 hover:bg-[#ffd700]/20 text-[#ffd700] border border-[#ffd700]/40 rounded flex items-center gap-1.5 transition-all"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>PRINT PDF</span>
-          </button>
-        </div>
-      </div>
+            <h1 className="font-grotesk font-extrabold text-lg sm:text-xl text-[#dfe3e3] tracking-wider uppercase leading-tight">
+              THE SACRED <span className="text-[#00ffff]">CODEX</span> & LITURGY
+            </h1>
 
-      {/* Filter Bar: Volume Badges, Search & Stage Clearance */}
-      <div className="no-print bg-[#0b1011]/90 border border-[#3a4a49] p-3 rounded-lg space-y-3 shadow-xl">
-        <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#839493] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search scriptures by keyword, verse, mandate, or canon ID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#141b1c] border border-[#3a4a49] focus:border-[#ffd700] text-[#dfe3e3] placeholder-[#839493] pl-9 pr-8 py-1.5 text-xs font-sans outline-none transition-colors rounded"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#839493] hover:text-white"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
-            <span className="text-[10px] text-[#839493] font-bold uppercase tracking-wider whitespace-nowrap mr-1 font-sans">
-              STAGE CLEARANCE:
-            </span>
-            {(['all', 1, 2, 3, 4] as const).map((stage) => (
-              <button
-                key={stage}
-                onClick={() => setSelectedStage(stage)}
-                className={`px-2.5 py-1 text-[10px] font-sans font-bold transition-all rounded whitespace-nowrap ${
-                  selectedStage === stage
-                    ? 'bg-[#ffd700]/20 text-[#ffd700] border border-[#ffd700]'
-                    : 'bg-[#141b1c] text-[#839493] hover:text-[#dfe3e3] border border-[#3a4a49]'
+            <div className="flex items-start gap-2.5">
+              <p
+                className={`text-xs text-[#839493] leading-relaxed transition-opacity duration-180 flex-1 font-serif italic ${
+                  isReflectionFading ? 'opacity-0' : 'opacity-100'
                 }`}
               >
-                {stage === 'all' ? 'ALL CLEARANCES' : `STAGE ${stage}`}
+                "{CANONICAL_REFLECTIONS[reflectionIndex]}"
+              </p>
+              <button
+                onClick={handleNextReflection}
+                className="p-1 text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 transition-colors chamfer-corner border border-[#3a4a49] shrink-0 mt-0.5"
+                title="Next reflection"
+              >
+                <RefreshCw className="w-3 h-3" />
               </button>
-            ))}
+            </div>
+          </div>
+
+          {/* Quick Stats & Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 lg:pt-0 border-t border-[#3a4a49]/50 lg:border-t-0 lg:border-l lg:border-l-[#3a4a49]/50 lg:pl-4 shrink-0">
+            <div className="flex items-center gap-2 bg-[#070b0b] px-2.5 py-1 border border-[#3a4a49] chamfer-corner">
+              <div className="flex flex-col text-center">
+                <span className="text-[8px] text-[#839493]">VOLUMES</span>
+                <span className="text-xs font-bold text-[#00ffff]">{CODEX_VOLUMES.length}</span>
+              </div>
+              <div className="w-[1px] h-4 bg-[#3a4a49]" />
+              <div className="flex flex-col text-center">
+                <span className="text-[8px] text-[#839493]">CANON</span>
+                <span className="text-xs font-bold text-[#dfe3e3]">{CANONICAL_SCRIPTURES.length}</span>
+              </div>
+              <div className="w-[1px] h-4 bg-[#3a4a49]" />
+              <div className="flex flex-col text-center">
+                <span className="text-[8px] text-[#839493]">VAULT</span>
+                <span className="text-xs font-bold text-[#10b981]">{consecratedCount}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setShowNotesPanel((prev) => !prev)}
+                className={`px-3 py-1.5 text-xs font-bold font-sans border chamfer-corner flex items-center gap-1.5 transition-all ${
+                  showNotesPanel
+                    ? 'bg-[#ffd700]/20 text-[#ffd700] border-[#ffd700]'
+                    : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#00ffff] hover:border-[#00ffff]/60'
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>STUDY NOTES</span>
+              </button>
+
+              <HudButton
+                variant="cyan"
+                size="sm"
+                icon={<Maximize2 className="w-3.5 h-3.5" />}
+                onClick={() => setIsFullscreen(true)}
+                title="Fullscreen Reader"
+                className="font-sans text-xs uppercase font-bold tracking-wider whitespace-nowrap shadow-[0_0_15px_rgba(0,255,255,0.25)]"
+              >
+                FULLSCREEN
+              </HudButton>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 border-t border-[#3a4a49]/50">
+        {/* Quick Volume Switcher Rail Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 pt-2.5 mt-2.5 border-t border-[#3a4a49]/60">
           <button
             onClick={() => setSelectedVolume('all')}
-            className={`p-2 text-left font-sans transition-all rounded border flex items-center gap-2 ${
+            className={`py-1 px-2 chamfer-corner transition-all text-left flex items-center justify-between border ${
               selectedVolume === 'all'
-                ? 'bg-[#1a2324] border-[#ffd700] text-[#ffd700] shadow-md'
-                : 'bg-[#080d0e] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'
+                ? 'bg-[#00ffff]/15 border-[#00ffff] text-[#00ffff]'
+                : 'bg-[#070b0b]/60 border-[#3a4a49]/40 hover:border-[#00ffff]/40 hover:bg-[#0f1414] text-[#839493] hover:text-[#dfe3e3]'
             }`}
           >
-            <BookOpen className="w-4 h-4 text-[#ffd700] shrink-0" />
-            <div className="truncate">
-              <div className="text-[10px] font-bold tracking-wider uppercase">ALL CANON</div>
-              <div className="text-[9px] text-[#839493]">11 Scriptures</div>
-            </div>
+            <span className="text-[10px] font-grotesk font-bold uppercase tracking-wider truncate">
+              ALL CANON ({CANONICAL_SCRIPTURES.length})
+            </span>
+            <div
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ml-1 ${
+                selectedVolume === 'all' ? 'bg-[#00ffff]' : 'bg-transparent'
+              }`}
+            />
           </button>
 
-          {CODEX_VOLUMES.map((vol) => {
+          {CODEX_VOLUMES.map((vol, idx) => {
             const isSelected = selectedVolume === vol.id
+            const shortTitle = vol.title.split(':')[1]?.trim() || vol.title
             return (
               <button
                 key={vol.id}
-                onClick={() => setSelectedVolume(vol.id)}
-                className={`p-2 text-left font-sans transition-all rounded border flex items-center gap-2 ${
+                onClick={() => {
+                  setSelectedVolume(vol.id)
+                  const firstInVol = CANONICAL_SCRIPTURES.find((s) => s.volume === vol.id)
+                  if (firstInVol) setActiveScriptureId(firstInVol.id)
+                }}
+                className={`py-1 px-2 chamfer-corner transition-all text-left flex items-center justify-between border ${
                   isSelected
-                    ? 'bg-[#1a2324] border-[#ffd700] text-[#ffd700] shadow-md'
-                    : 'bg-[#080d0e] border-[#3a4a49] text-[#839493] hover:text-[#dfe3e3]'
+                    ? 'bg-[#00ffff]/15 border-[#00ffff] text-[#00ffff]'
+                    : 'bg-[#070b0b]/60 border-[#3a4a49]/40 hover:border-[#00ffff]/40 hover:bg-[#0f1414] text-[#839493] hover:text-[#dfe3e3]'
                 }`}
               >
+                <span className="text-[10px] font-grotesk font-bold uppercase tracking-wider truncate">
+                  0{idx + 1}. {shortTitle}
+                </span>
                 <div
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: vol.color }}
+                  className={`w-1.5 h-1.5 rounded-full shrink-0 ml-1 ${
+                    isSelected ? 'bg-[#00ffff]' : 'bg-transparent'
+                  }`}
                 />
-                <div className="truncate">
-                  <div className="text-[10px] font-bold tracking-wider uppercase truncate">
-                    {vol.title.split(':')[1] || vol.title}
-                  </div>
-                  <div className="text-[9px] text-[#839493] truncate">{vol.subtitle}</div>
-                </div>
               </button>
             )
           })}
         </div>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column: Scripture Catalog Index (3 cols) */}
-          <div className="no-print lg:col-span-3 space-y-2">
-            <div
-              onClick={() => setIsMobileCatalogOpen(!isMobileCatalogOpen)}
-              className="bg-[#0b1011] border border-[#3a4a49] p-3 rounded-md flex items-center justify-between cursor-pointer lg:cursor-default"
-            >
-              <span className="text-xs font-sans font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
-                <Scroll className="w-3.5 h-3.5 text-[#ffd700]" />
-                CANON INDEX ({filteredScriptures.length})
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#ffd700] font-sans">
-                  {selectedVolume === 'all' ? 'FULL CODEX' : selectedVolume.toUpperCase()}
-                </span>
-                <span className="text-xs text-[#839493] lg:hidden font-sans">
-                  {isMobileCatalogOpen ? '▲ HIDE' : '▼ VIEW'}
+      {/* OPTION 1 STUDY COMMAND DESK: 3-Pane / 2-Pane Split Layout (Full Height) */}
+      <div className="flex flex-col lg:flex-row flex-1 min-h-0 gap-3.5 sm:gap-4 overflow-hidden">
+        {/* Left Column: Canon Navigator & Directory */}
+        <div className="lg:w-[320px] shrink-0 flex flex-col min-h-0">
+          <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl border border-[#3a4a49] flex-1 flex flex-col min-h-0">
+            <div className="space-y-3 flex-1 flex flex-col min-h-0">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2 shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <Scroll className="w-4 h-4 text-[#00ffff]" />
+                  <h2 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wider uppercase">
+                    CANON DIRECTORY
+                  </h2>
+                </div>
+                <span className="text-[9px] text-[#00ffff] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49]">
+                  {filteredScriptures.length} OF {CANONICAL_SCRIPTURES.length}
                 </span>
               </div>
-            </div>
 
-            <div className={`space-y-2 max-h-[750px] overflow-y-auto pr-1 ${isMobileCatalogOpen ? 'block' : 'hidden lg:block'}`}>
-              {filteredScriptures.length === 0 ? (
-                <div className="p-6 text-center text-[#839493] text-xs font-sans bg-[#0b1011] border border-[#3a4a49] rounded">
-                  NO CANONICAL SCRIPTURES MATCH FILTERS
-                </div>
-              ) : (
-                filteredScriptures.map((scripture) => {
-                  const isActive = scripture.id === activeScripture.id
-                  const isDone = Boolean(consecratedScriptures[scripture.id])
+              {/* Fast Search */}
+              <div className="relative shrink-0">
+                <Search className="w-3.5 h-3.5 text-[#839493] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search scriptures, verses, mandates..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] placeholder-[#839493] pl-8 pr-7 py-1 text-xs font-sans outline-none chamfer-corner transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[#839493] hover:text-[#00ffff]"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
 
-                  return (
-                    <div
-                      key={scripture.id}
-                      onClick={() => {
-                        setActiveScriptureId(scripture.id)
-                        setIsMobileCatalogOpen(false)
-                      }}
-                      className={`p-3 border transition-all cursor-pointer rounded relative group ${
-                        isActive
-                          ? 'bg-[#172021] border-[#ffd700] text-[#dfe3e3] shadow-[0_0_12px_rgba(255,215,0,0.15)]'
-                          : 'bg-[#080d0e]/80 border-[#3a4a49]/70 hover:border-[#a3b0af] text-[#a3b0af] hover:text-[#dfe3e3]'
-                      }`}
-                    >
-                      {isActive && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#ffd700] rounded-l" />
-                      )}
+              {/* Stage Clearance Filter Chips */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar shrink-0">
+                {(['all', 1, 2, 3, 4] as const).map((stage) => (
+                  <button
+                    key={stage}
+                    onClick={() => setSelectedStage(stage)}
+                    className={`px-2 py-0.5 text-[9px] font-sans font-bold transition-all chamfer-corner border shrink-0 ${
+                      selectedStage === stage
+                        ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
+                        : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#dfe3e3]'
+                    }`}
+                  >
+                    {stage === 'all' ? 'ALL STAGES' : `STAGE ${stage}`}
+                  </button>
+                ))}
+              </div>
 
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="space-y-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-bold text-[#ffd700] bg-[#0b1011] px-1.5 py-0.5 border border-[#ffd700]/30 font-sans">
-                              {scripture.id}
+              {/* Scripture Directory Card Stack */}
+              <div className="space-y-1.5 flex-1 min-h-0 overflow-y-auto pr-1 touch-pan-y no-scrollbar hover:scrollbar-thin font-sans">
+                {filteredScriptures.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-[#839493] bg-[#070b0b] border border-[#3a4a49] chamfer-corner">
+                    NO CANON MATCHES FILTER
+                  </div>
+                ) : (
+                  filteredScriptures.map((s) => {
+                    const isActive = s.id === activeScripture.id
+                    const isDone = Boolean(consecratedScriptures[s.id])
+
+                    return (
+                      <div
+                        key={s.id}
+                        onClick={() => setActiveScriptureId(s.id)}
+                        className={`p-2.5 border transition-all cursor-pointer chamfer-corner group space-y-1 ${
+                          isActive
+                            ? 'bg-[#00ffff]/10 border-[#00ffff] text-[#dfe3e3] shadow-[0_0_12px_rgba(0,255,255,0.15)]'
+                            : 'bg-[#070b0b]/80 border-[#3a4a49] text-[#839493] hover:border-[#00ffff]/50 hover:text-[#dfe3e3]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-[9px]">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`font-bold font-sans px-1.5 py-0.2 border ${
+                                isActive
+                                  ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
+                                  : 'bg-[#030606] text-[#839493] border-[#3a4a49]'
+                              }`}
+                            >
+                              {s.id}
                             </span>
-                            <span className="text-[9px] text-[#00ffff] font-sans">
-                              TIER {scripture.stageClearance}
+                            <span className="text-[#839493] bg-[#070b0b] px-1 py-0.2 border border-[#3a4a49]">
+                              T0{s.stageClearance}
                             </span>
-                            {isDone && (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981] ml-auto shrink-0" />
-                            )}
                           </div>
-                          <h3
-                            className={`font-serif text-sm font-bold truncate ${
-                              isActive ? 'text-[#ffd700]' : 'text-[#dfe3e3]'
-                            }`}
-                          >
-                            {scripture.title}
-                          </h3>
-                          <p className="text-[10px] text-[#839493] line-clamp-2 leading-relaxed font-serif">
-                            {scripture.summary}
-                          </p>
+                          {isDone && <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981] shrink-0" />}
                         </div>
-                        <ChevronRight
-                          className={`w-4 h-4 shrink-0 transition-transform ${
-                            isActive ? 'text-[#ffd700] translate-x-0.5' : 'text-[#3a4a49]'
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  )
-                })
-              )}
-            </div>
 
-            <div className="pt-2">
-              <button
-                onClick={() => setShowNotesPanel(!showNotesPanel)}
-                className={`w-full py-2 px-3 text-xs font-sans font-bold flex items-center justify-center gap-2 rounded border transition-all ${
-                  showNotesPanel
-                    ? 'bg-[#ffd700]/20 text-[#ffd700] border-[#ffd700]'
-                    : 'bg-[#0b1011] text-[#839493] border-[#3a4a49] hover:text-white'
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>{showNotesPanel ? 'HIDE STUDY NOTES' : 'OPEN SCRIPTURE STUDY NOTES'}</span>
-              </button>
+                        <h3
+                          className={`font-grotesk text-xs font-bold truncate uppercase ${
+                            isActive ? 'text-[#00ffff]' : 'text-[#dfe3e3] group-hover:text-[#00ffff]'
+                          }`}
+                        >
+                          {s.title}
+                        </h3>
+
+                        <p className="text-[10px] text-[#839493] line-clamp-1 font-serif italic leading-relaxed">
+                          "{s.mandate}"
+                        </p>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Center Column: Professional PDF Sheet Document Viewer (7 or 9 cols) */}
-          <div className={`${showNotesPanel ? 'lg:col-span-6' : 'lg:col-span-9'} transition-all`}>
-            {/* The PDF Document Paper Sheet Container with internal scroll */}
-            <div
-              className={`pdf-page-sheet ${themeContainerClass} p-4 sm:p-6 md:p-10 rounded-lg border relative transition-all shadow-2xl space-y-6 sm:space-y-8 max-h-[800px] overflow-y-auto flex flex-col justify-between group/sheet`}
-            >
-              {/* STICKY FLOATING FULLSCREEN BUTTON (Inherits document theme styling, stays pinned while scrolling) */}
-              <div className="sticky top-0 z-30 flex justify-end -mb-10 pointer-events-none no-print">
-                <button
-                  onClick={() => setIsFullscreen(true)}
-                  className="p-2 bg-current/10 hover:bg-current/25 text-current border border-current/30 rounded-md backdrop-blur-md shadow-md transition-all hover:scale-105 pointer-events-auto group/btn"
-                  title="Fullscreen Reader"
-                >
-                  <Maximize2 className="w-4 h-4 group-hover/btn:scale-110 transition-transform text-current" />
-                </button>
+        {/* Center Column: Sacred Document Reader Stage */}
+        <div className="flex-1 min-w-0 flex flex-col min-h-0">
+          <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl border border-[#3a4a49] flex-1 flex flex-col min-h-0">
+            {/* Reading Toolbar & Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
+              <div className="space-y-0.5 min-w-0">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-[#00ffff] shrink-0" />
+                  <span className="text-[10px] font-sans font-bold text-[#00ffff] tracking-widest uppercase truncate">
+                    {activeScripture.volumeName}
+                  </span>
+                  <span className="text-[9px] text-[#ffd700] bg-[#070b0b] px-1.5 py-0.2 border border-[#ffd700]/40 font-sans font-bold shrink-0">
+                    TIER 0{activeScripture.stageClearance}
+                  </span>
+                </div>
+                <h2 className="font-grotesk text-sm sm:text-base font-bold text-[#dfe3e3] uppercase truncate">
+                  {activeScripture.title} ({activeScripture.id})
+                </h2>
               </div>
 
+              {/* Reader Toolbar Buttons */}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-sans shrink-0">
+                {/* Theme Switcher */}
+                <div className="flex items-center gap-0.5 bg-[#070b0b] p-0.5 border border-[#3a4a49] chamfer-corner">
+                  <button
+                    onClick={() => handleThemeChange('parchment')}
+                    title="Paper Theme"
+                    className={`px-2 py-0.5 text-[10px] font-bold chamfer-corner transition-colors ${
+                      docTheme === 'parchment'
+                        ? 'bg-[#fcfaf2] text-[#1c1917] border border-[#ffd700]'
+                        : 'text-[#839493] hover:text-white'
+                    }`}
+                  >
+                    PAPER
+                  </button>
+                  <button
+                    onClick={() => handleThemeChange('sepia')}
+                    title="Sepia Theme"
+                    className={`px-2 py-0.5 text-[10px] font-bold chamfer-corner transition-colors ${
+                      docTheme === 'sepia'
+                        ? 'bg-[#f4ecd8] text-[#2b2318] border border-[#c7b896]'
+                        : 'text-[#839493] hover:text-white'
+                    }`}
+                  >
+                    SEPIA
+                  </button>
+                  <button
+                    onClick={() => handleThemeChange('dark')}
+                    title="Vault Dark Theme"
+                    className={`px-2 py-0.5 text-[10px] font-bold chamfer-corner transition-colors ${
+                      docTheme === 'dark'
+                        ? 'bg-[#12100e] text-[#e6dfd5] border border-[#ffd700]/60'
+                        : 'text-[#839493] hover:text-white'
+                    }`}
+                  >
+                    VAULT
+                  </button>
+                </div>
+
+                {/* Font Family */}
+                <button
+                  onClick={() =>
+                    setFontFamily(
+                      fontFamily === 'garamond'
+                        ? 'cinzel'
+                        : fontFamily === 'cinzel'
+                        ? 'grotesk'
+                        : 'garamond'
+                    )
+                  }
+                  className="px-2 py-1 bg-[#070b0b] hover:bg-[#141b1c] text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/60 text-[10px] font-bold chamfer-corner flex items-center gap-1 uppercase"
+                  title="Switch Font"
+                >
+                  <Type className="w-3 h-3" />
+                  <span>{fontFamily}</span>
+                </button>
+
+                {/* Font Sizing */}
+                <div className="flex items-center bg-[#070b0b] border border-[#3a4a49] chamfer-corner px-1 py-0.5">
+                  <button
+                    onClick={() => setFontSize(Math.max(14, fontSize - 2))}
+                    className="px-1.5 py-0.2 text-[10px] text-[#839493] hover:text-white"
+                    title="Decrease Font Size"
+                  >
+                    A-
+                  </button>
+                  <span className="text-[9px] text-[#00ffff] font-bold px-1">{fontSize}px</span>
+                  <button
+                    onClick={() => setFontSize(Math.min(26, fontSize + 2))}
+                    className="px-1.5 py-0.2 text-[10px] text-[#839493] hover:text-white"
+                    title="Increase Font Size"
+                  >
+                    A+
+                  </button>
+                </div>
+
+                {/* Print PDF */}
+                <button
+                  onClick={handlePrintDocument}
+                  className="p-1.5 bg-[#070b0b] hover:bg-[#141b1c] text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/60 chamfer-corner transition-colors"
+                  title="Print or Export PDF"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Consecrate Bookmark */}
+                <button
+                  onClick={() => toggleConsecrate(activeScripture.id)}
+                  className={`p-1.5 border chamfer-corner transition-colors ${
+                    isConsecrated
+                      ? 'bg-[#10b981]/20 text-[#10b981] border-[#10b981]'
+                      : 'bg-[#070b0b] text-[#839493] hover:text-[#00ffff] border-[#3a4a49]'
+                  }`}
+                  title={isConsecrated ? 'Consecrated in Vault' : 'Consecrate Scripture'}
+                >
+                  {isConsecrated ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* PRESERVED SACRED DOCUMENT VIEWER SHEET */}
+            <div
+              className={`pdf-page-sheet ${themeContainerClass} p-5 sm:p-7 md:p-9 chamfer-corner border relative transition-all shadow-2xl space-y-6 flex-1 overflow-y-auto flex flex-col group/sheet`}
+            >
               {/* Paper Watermark Seal Background */}
               <div
                 className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-[0.03] pointer-events-none scale-75"
                 style={{ backgroundImage: `url('/images/order_emblem.png')` }}
               />
 
-              {/* Running Header Bar (PDF Document style) */}
-              <div className="border-b-2 border-current/20 pb-4 space-y-3 relative z-10">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-sans tracking-widest uppercase opacity-75 gap-2 pr-28">
+              {/* Running Header Bar */}
+              <div className="border-b-2 border-current/20 pb-4 space-y-3 relative z-10 shrink-0">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-sans tracking-widest uppercase opacity-75 gap-2">
                   <div className="flex items-center gap-2 font-bold">
                     <span>MOLTOLOGY CANONICAL CODEX</span>
                     <span>•</span>
@@ -1019,7 +1103,7 @@ export const SacredCodexReader: React.FC = () => {
                   <h2
                     className={`${
                       fontFamily === 'cinzel' ? 'font-cinzel' : 'font-serif'
-                    } font-extrabold text-3xl md:text-4xl tracking-tight leading-tight uppercase`}
+                    } font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight uppercase`}
                   >
                     {activeScripture.title}
                   </h2>
@@ -1037,7 +1121,7 @@ export const SacredCodexReader: React.FC = () => {
               </div>
 
               {/* Mandate Blockquote */}
-              <div className="p-5 border-l-4 border-current/60 bg-current/5 rounded-r-md space-y-2 relative z-10">
+              <div className="p-4 sm:p-5 border-l-4 border-current/60 bg-current/5 rounded-r-md space-y-2 relative z-10 shrink-0">
                 <div className="text-[11px] font-sans tracking-widest uppercase font-bold opacity-80 flex items-center justify-between">
                   <span>CANONICAL MANDATE</span>
                   {activeScripture.latinMotto && (
@@ -1047,7 +1131,7 @@ export const SacredCodexReader: React.FC = () => {
                 <blockquote
                   className={`${
                     fontFamily === 'cinzel' ? 'font-cinzel' : 'font-serif'
-                  } italic font-semibold text-lg leading-relaxed`}
+                  } italic font-semibold text-base sm:text-lg leading-relaxed`}
                   style={{ fontSize: `${fontSize + 1}px` }}
                 >
                   "{activeScripture.mandate}"
@@ -1055,7 +1139,7 @@ export const SacredCodexReader: React.FC = () => {
               </div>
 
               {/* Verses Section */}
-              <div className={`space-y-6 relative z-10 ${fontClass}`} style={{ fontSize: `${fontSize}px` }}>
+              <div className={`space-y-6 relative z-10 flex-1 ${fontClass}`} style={{ fontSize: `${fontSize}px` }}>
                 {activeScripture.verses.map((verse) => {
                   const isCopied = copiedVerseIndex === verse.verseNumber
                   const isHighlighted = Boolean(highlightedVerses[verse.verseNumber])
@@ -1117,27 +1201,33 @@ export const SacredCodexReader: React.FC = () => {
                 })}
               </div>
 
-              {/* Cross-References & Canonical Footnotes */}
+              {/* Cross-References & Footnotes */}
               {activeScripture.crossReferences.length > 0 && (
-                <div className="pt-4 border-t border-current/20 text-xs font-serif space-y-2 relative z-10">
+                <div className="pt-4 border-t border-current/20 text-xs font-serif space-y-2 relative z-10 shrink-0">
                   <div className="font-sans text-[10px] font-bold tracking-widest uppercase opacity-70">
                     CANONICAL CROSS-REFERENCES & FOOTNOTES:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {activeScripture.crossReferences.map((ref, i) => (
-                      <span
+                      <button
                         key={i}
+                        onClick={() => {
+                          const matched = CANONICAL_SCRIPTURES.find(
+                            (s) => s.title.toLowerCase() === ref.toLowerCase()
+                          )
+                          if (matched) setActiveScriptureId(matched.id)
+                        }}
                         className="px-2.5 py-1 rounded border border-current/30 text-xs font-serif bg-current/5 hover:bg-current/15 cursor-pointer transition-colors"
                       >
                         {ref}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
 
               {/* Bottom PDF Sheet Footer */}
-              <div className="pt-6 border-t-2 border-current/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans opacity-80 relative z-10 no-print">
+              <div className="pt-6 border-t-2 border-current/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans opacity-80 relative z-10 shrink-0 no-print">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePrevScripture}
@@ -1166,54 +1256,55 @@ export const SacredCodexReader: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Right Column: Verse Inspector & Study Notes Side Panel */}
-          {showNotesPanel && (
-            <div className="no-print lg:col-span-3 space-y-4 animate-in fade-in duration-200">
-              <div className="bg-[#0b1011] border border-[#3a4a49] p-4 rounded-md space-y-3 shadow-xl">
-                <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
-                  <span className="text-xs font-sans font-bold text-[#ffd700] uppercase tracking-wider flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-[#ffd700]" />
+        {/* Right Column: Personal Study Notes & Annotations Notebook */}
+        {showNotesPanel && (
+          <div className="lg:w-[280px] shrink-0 flex flex-col min-h-0 animate-in fade-in duration-200">
+            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl border border-[#3a4a49] flex-1 flex flex-col min-h-0">
+              <div className="space-y-3 flex-1 flex flex-col min-h-0">
+                <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2 shrink-0">
+                  <span className="text-xs font-sans font-bold text-[#00ffff] uppercase tracking-wider flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
                     STUDY NOTES & ANNOTATIONS
                   </span>
                   <button
                     onClick={() => setShowNotesPanel(false)}
-                    className="text-xs text-[#839493] hover:text-white font-sans"
+                    className="text-xs text-[#839493] hover:text-[#ff5540] font-sans"
                   >
-                    Close
+                    ✕
                   </button>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[11px] font-sans text-[#a3b0af] block">
-                    Personal Liturgical Notes for <strong>{activeScripture.id}</strong>:
+                <div className="space-y-1.5 font-sans flex-1 flex flex-col min-h-0">
+                  <label className="text-[10px] font-sans text-[#a3b0af] block shrink-0">
+                    Liturgical Reflections for <strong className="text-[#00ffff]">{activeScripture.id}</strong>:
                   </label>
                   <textarea
-                    rows={8}
                     value={studyNotes[activeScripture.id] || ''}
                     onChange={(e) => handleNoteChange(activeScripture.id, e.target.value)}
                     placeholder="Record your reflections, verse interpretations, or ecdysis progress notes for this canonical scripture..."
-                    className="w-full bg-[#141b1c] border border-[#3a4a49] focus:border-[#ffd700] text-[#dfe3e3] placeholder-[#839493] p-3 text-xs font-serif outline-none rounded leading-relaxed resize-y"
+                    className="w-full flex-1 min-h-[220px] lg:min-h-[280px] bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] placeholder-[#839493] p-2.5 text-xs font-serif outline-none chamfer-corner leading-relaxed resize-y"
                   />
-                  <p className="text-[10px] text-[#839493] font-sans italic">
-                    Notes auto-save locally to your browser vault.
+                  <p className="text-[9px] text-[#839493] font-sans italic shrink-0">
+                    Notes auto-save locally to browser vault.
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-[#3a4a49] space-y-2">
-                  <div className="text-[11px] font-sans font-bold text-[#dfe3e3] uppercase">
+                <div className="pt-2 border-t border-[#3a4a49] space-y-1.5 shrink-0">
+                  <div className="text-[10px] font-sans font-bold text-[#dfe3e3] uppercase">
                     CANONICAL METRICS SUMMARY
                   </div>
-                  <div className="bg-[#141b1c] p-3 rounded border border-[#2a3635] text-xs font-sans space-y-1.5">
-                    <div className="flex justify-between">
+                  <div className="chitin-card-inset p-2.5 chamfer-corner text-xs font-sans space-y-1 border border-[#3a4a49]">
+                    <div className="flex justify-between text-[11px]">
                       <span className="text-[#839493]">SYNAPTIC WEIGHT:</span>
-                      <span className="text-[#ffd700] font-bold">{activeScripture.synapticWeight}</span>
+                      <span className="text-[#00ffff] font-bold">{activeScripture.synapticWeight.toFixed(1)} / 5.0</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-[11px]">
                       <span className="text-[#839493]">CLEARANCE TIER:</span>
-                      <span className="text-[#00ffff] font-bold">Stage {activeScripture.stageClearance}</span>
+                      <span className="text-[#ffd700] font-bold">Stage 0{activeScripture.stageClearance}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-[11px]">
                       <span className="text-[#839493]">TOTAL VERSES:</span>
                       <span className="text-[#dfe3e3]">{activeScripture.verses.length}</span>
                     </div>
@@ -1222,28 +1313,29 @@ export const SacredCodexReader: React.FC = () => {
 
                 <button
                   onClick={() => toggleConsecrate(activeScripture.id)}
-                  className={`w-full py-2.5 px-3 text-xs font-sans font-bold flex items-center justify-center gap-2 rounded transition-all shadow-md ${
+                  className={`w-full py-2 px-3 text-xs font-sans font-bold flex items-center justify-center gap-2 chamfer-corner transition-all shadow-md shrink-0 ${
                     isConsecrated
                       ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]'
-                      : 'bg-[#ffd700] hover:bg-[#ffe555] text-[#070b0b] border border-[#ffd700]'
+                      : 'bg-[#00ffff]/20 hover:bg-[#00ffff]/30 text-[#00ffff] border border-[#00ffff]'
                   }`}
                 >
                   {isConsecrated ? (
                     <>
-                      <BookmarkCheck className="w-4 h-4 text-[#10b981]" />
+                      <BookmarkCheck className="w-3.5 h-3.5 text-[#10b981]" />
                       <span>CONSECRATED IN VAULT</span>
                     </>
                   ) : (
                     <>
-                      <Bookmark className="w-4 h-4 text-[#070b0b]" />
+                      <Bookmark className="w-3.5 h-3.5 text-[#00ffff]" />
                       <span>CONSECRATE SCRIPTURE</span>
                     </>
                   )}
                 </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

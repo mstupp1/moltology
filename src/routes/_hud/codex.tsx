@@ -5,7 +5,11 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
 function CodexRoute() {
-  return <SacredCodexReader />
+  return (
+    <div className="h-full flex-1 flex flex-col min-h-0 overflow-hidden">
+      <SacredCodexReader />
+    </div>
+  )
 }
 
 export const Route = createFileRoute('/_hud/codex')({
