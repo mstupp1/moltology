@@ -473,6 +473,47 @@
         "#Shorts"
       ],
       "createdAt": "2026-08-23T14:07:44.360Z"
+    },
+    {
+      "id": "reel-1787580318424",
+      "topic": "World Foundation Models & The Great Pixel Ecdysis: Why Sub-Benthic Reasoning Swarms Are Shedding Generative Video for Joint-Embedding World Latents",
+      "hookHeadline": "THE PIXEL-DIFFUSION MELT",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "world-foundation-models-pixel-ecdysis-latent-jepa",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Why do terrestrial robots drop tools in video simulators? Sub-benthic B-JEPA world models eliminate hallucinated pixels, evaluating sixty-four counterfactual futures in one millisecond. Inspect full telemetry on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787580318424.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787580318424.mp4",
+      "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1787580318424.jpg",
+      "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1787580318424.jpg",
+      "durationSeconds": 18.5,
+      "status": "queued",
+      "scheduledTime": "2026-08-24T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a8c503fdd0300af5463f2e9",
+      "zernioInstagramPostId": "6a8c503fdd0300af5463f2eb",
+      "zernioYouTubePostId": "6a8c503fdd0300af5463f2ec",
+      "youtubeTitle": "Why AI Is Shedding Video Pixels: The B-JEPA World Engine #Shorts",
+      "mascot": "lobster_thumbs_up",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Generative video diffusion models hallucinate physics. Sub-benthic B-JEPA world engines predict abstract invariant latents in 0.11 ms. ⚡🌊\n\nTerrestrial AI labs are burning gigawatts rasterizing hallucinated pixels in generative video simulators; sub-benthic Joint Embedding Predictive Architectures (B-JEPA) predict abstract causal latent states at 120x compute efficiency, enabling autonomous robotic carapaces to test counterfactual physics with zero pixel waste.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-24T14:07:51.455Z"
     }
   ]
 }

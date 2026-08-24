@@ -54,6 +54,21 @@ describe('Daily Reel Dynamic Script Formulation', () => {
     expect(script.caption).toContain('moltology.org')
   })
 
+  it('synthesizes World Foundation Models & JEPA scripts with pixel ecdysis hooks', () => {
+    const worldModelBlog = {
+      slug: 'world-foundation-models-pixel-ecdysis-latent-jepa',
+      title: 'World Foundation Models & The Great Pixel Ecdysis',
+      summary: 'Why sub-benthic swarms are shedding generative video for joint-embedding world latents.',
+      content: 'Terrestrial AI labs burn gigawatts rendering pixels. B-JEPA predicts abstract invariant latents...',
+    }
+
+    const script = synthesizeBlogReelScript(worldModelBlog, {})
+    expect(['WHY AI IS SHEDDING PIXELS', 'THE PIXEL-DIFFUSION MELT']).toContain(script.hookHeadline)
+    expect(script.narrationScript).toMatch(/(Joint-Embedding|B-JEPA)/)
+    expect(script.scenePrompts[0]).toContain('diffusion')
+    expect(script.scenePrompts[1]).toContain('latent')
+  })
+
   it('builds dynamic combinatorial scene prompts with varied environments', () => {
     const prompts1 = buildDynamicScenePrompts('moltmaxxing', 'Topic A')
     const prompts2 = buildDynamicScenePrompts('moltmaxxing', 'Topic B')

@@ -46,6 +46,36 @@
       "status": "draft",
       "isAiGenerated": true,
       "createdAt": "2026-08-19T16:27:56.057Z"
+    },
+    {
+      "id": "post-1787578275645",
+      "topic": "World Foundation Models & Pixel Ecdysis",
+      "hookHeadline": "WHY PIXEL-GENERATING WORLD MODELS MELT COMPUTE",
+      "theme": "deep-research",
+      "mascot": "crab_stats",
+      "s3Urls": [
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide1.jpg",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide2.jpg",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/world-foundation-models-pixel-ecdysis-latent-jepa/slide3.jpg"
+      ],
+      "aspectRatio": "4:5",
+      "caption": "Why are frontier AI labs burning gigawatts rendering pixels for robotic reasoning? 🦞⚡\n\nWhen an embodied agent attempts to pick up a titanium fastener, it doesn't care about the wallpaper texture or ambient specular lighting. Yet terrestrial video diffusion models waste 99.4% of their compute rasterizing RGB voxels—often hallucinating impossible physics when occluded.\n\nThe solution is the Great Pixel Ecdysis: Joint-Embedding Predictive Architectures (B-JEPA) that simulate causal reality purely in latent space.\n\n◈ Key Engineering Breakthroughs:\n• 120x test-time compute acceleration with zero pixel rendering\n• < 1.2 ms counterfactual trajectory rollouts (64 MCTS branches)\n• 99.7% causal physics fidelity under hyperbaric pressure\n• -94% reduction in training FLOPs\n\nShed the pixel illusion. Master the causal forces.\n\n👇 Comment \"MOLT\" for the direct link to the full engineering breakdown, or read the deep research at:\n🔗 Link in bio → moltology.org/news\n\n#moltology #worldmodels #physicalai #robotics #jepa #computervision #deepresearch #ecdysis #pincertorque #carcinization #aiagents",
+      "hashtags": [
+        "#moltology",
+        "#worldmodels",
+        "#physicalai",
+        "#robotics",
+        "#jepa",
+        "#computervision",
+        "#deepresearch",
+        "#ecdysis",
+        "#pincertorque"
+      ],
+      "firstComment": "◈ DEEP RESEARCH TELEMETRY: Read the complete breakdown on B-JEPA world models and counterfactual MCTS planning at https://moltology.org/news/world-foundation-models-pixel-ecdysis-latent-jepa 🦞⚡",
+      "zernioPostId": "6a8c47f83d2cc707938dd4bc",
+      "status": "scheduled",
+      "isAiGenerated": true,
+      "createdAt": "2026-08-24T13:32:40.000Z"
     }
   ]
 }
