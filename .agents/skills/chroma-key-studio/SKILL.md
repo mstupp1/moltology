@@ -119,4 +119,4 @@ If the character is added to the permanent Moltology mascot roster:
    npx tsx scripts/upload-asset.ts <output_png_path> --key images/characters/<filename>.png
    ```
 2. Register in `scripts/lib/character-overlay.ts` under `CHARACTER_REGISTRY`.
-3. Update `scripts/lib/character-overlay.test.ts` and run `npm run test`.
+3. Update `scripts/lib/character-overlay.test.ts` and run `npx vitest run scripts/lib/character-overlay.test.ts`.
