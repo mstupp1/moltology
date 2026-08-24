@@ -171,9 +171,9 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
     >
       {/* 1. Category Pill Badge (Clean, No '//') */}
       <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono font-bold text-sm tracking-wider text-cyan-300 uppercase">
+        <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
+          <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="font-mono font-bold text-lg tracking-widest text-cyan-300 uppercase">
             {finalBadge}
           </span>
         </div>
@@ -182,60 +182,60 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
       {/* 2. Punchy Main Headline */}
       <div className="mt-5 space-y-1">
         {finalH1 && (
-          <h1 className="text-[54px] leading-[1.05] font-black text-white tracking-tight uppercase">
+          <h1 className="text-[64px] leading-[1.02] font-black text-white tracking-tight uppercase">
             {finalH1}
           </h1>
         )}
         {finalH2 && (
-          <h2 className="text-[54px] leading-[1.05] font-black text-white tracking-tight uppercase">
+          <h2 className="text-[64px] leading-[1.02] font-black text-white tracking-tight uppercase">
             {finalH2}
           </h2>
         )}
         {finalHighlight && (
-          <h2 className="text-[54px] leading-[1.05] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-400 to-sky-400 drop-shadow-[0_0_20px_rgba(0,255,230,0.4)] tracking-tight uppercase">
+          <h2 className="text-[64px] leading-[1.02] font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-400 to-sky-400 drop-shadow-[0_0_20px_rgba(0,255,230,0.4)] tracking-tight uppercase">
             {finalHighlight}
           </h2>
         )}
       </div>
 
-      {/* 3. Narrative Translucent Card */}
+      {/* 3. Narrative Paragraph (Clean, Border Removed) */}
       {finalNarrative && (
-        <div className="mt-5 p-5 rounded-xl bg-[#04121a]/85 border border-cyan-500/40 backdrop-blur-md shadow-lg">
-          <p className="text-[22px] leading-snug font-medium text-slate-200">
+        <div className="mt-5">
+          <p className="text-[29px] leading-snug font-medium text-slate-100">
             {finalNarrative}
           </p>
         </div>
       )}
 
       {/* 4. Two Comparison Metric Panels */}
-      <div className="mt-5 grid grid-cols-2 gap-5">
+      <div className="mt-6 grid grid-cols-2 gap-6">
         {/* Left Panel */}
         <div
-          className={`p-6 rounded-xl border backdrop-blur-md ${
+          className={`p-7 rounded-2xl border backdrop-blur-md ${
             finalLeftMetric.variant === 'red'
               ? 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
               : 'bg-[#041822]/90 border-cyan-400/80 shadow-[0_0_20px_rgba(0,255,230,0.2)]'
           }`}
         >
           <div
-            className={`font-mono font-bold text-sm tracking-wider uppercase ${
+            className={`font-mono font-bold text-[18px] tracking-wider uppercase ${
               finalLeftMetric.variant === 'red' ? 'text-red-400' : 'text-cyan-400'
             }`}
           >
             {finalLeftMetric.label}
           </div>
-          <div className="mt-3 font-mono font-black text-5xl text-white tracking-tight">
+          <div className="mt-3.5 font-mono font-black text-[64px] leading-none text-white tracking-tight">
             {finalLeftMetric.value}
           </div>
           <div
-            className={`mt-1 font-mono font-bold text-base tracking-wide uppercase ${
+            className={`mt-2 font-mono font-bold text-[20px] tracking-wide uppercase ${
               finalLeftMetric.variant === 'red' ? 'text-red-300' : 'text-cyan-300'
             }`}
           >
             {finalLeftMetric.sublabel}
           </div>
           {finalLeftMetric.description && (
-            <p className="mt-3 text-sm text-slate-300 font-sans leading-relaxed">
+            <p className="mt-3.5 text-[19px] text-slate-200 font-sans leading-snug">
               {finalLeftMetric.description}
             </p>
           )}
@@ -243,31 +243,31 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
 
         {/* Right Panel */}
         <div
-          className={`p-6 rounded-xl border backdrop-blur-md ${
+          className={`p-7 rounded-2xl border backdrop-blur-md ${
             finalRightMetric.variant === 'red'
               ? 'bg-[#1a080c]/90 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
               : 'bg-[#041822]/90 border-cyan-400/80 shadow-[0_0_20px_rgba(0,255,230,0.2)]'
           }`}
         >
           <div
-            className={`font-mono font-bold text-sm tracking-wider uppercase ${
+            className={`font-mono font-bold text-[18px] tracking-wider uppercase ${
               finalRightMetric.variant === 'red' ? 'text-red-400' : 'text-cyan-400'
             }`}
           >
             {finalRightMetric.label}
           </div>
-          <div className="mt-3 font-mono font-black text-5xl text-white tracking-tight">
+          <div className="mt-3.5 font-mono font-black text-[64px] leading-none text-white tracking-tight">
             {finalRightMetric.value}
           </div>
           <div
-            className={`mt-1 font-mono font-bold text-base tracking-wide uppercase ${
+            className={`mt-2 font-mono font-bold text-[20px] tracking-wide uppercase ${
               finalRightMetric.variant === 'red' ? 'text-red-300' : 'text-cyan-300'
             }`}
           >
             {finalRightMetric.sublabel}
           </div>
           {finalRightMetric.description && (
-            <p className="mt-3 text-sm text-slate-300 font-sans leading-relaxed">
+            <p className="mt-3.5 text-[19px] text-slate-200 font-sans leading-snug">
               {finalRightMetric.description}
             </p>
           )}
@@ -275,17 +275,17 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
       </div>
 
       {/* 5. Lower Highlight Banner & Mascot */}
-      <div className="mt-5 relative flex-1 flex items-stretch">
-        <div className="w-[62%] p-5 rounded-xl bg-[#061a26]/90 border border-cyan-500/50 backdrop-blur-md shadow-lg flex flex-col justify-center">
-          <div className="flex items-center gap-2 text-sky-400 font-bold text-lg mb-2">
-            <Sparkles className="w-5 h-5 text-cyan-300" />
+      <div className="mt-6 relative flex-1 flex items-start">
+        <div className="w-[62%] h-fit p-7 rounded-2xl bg-[#061a26]/90 border border-cyan-500/50 backdrop-blur-md shadow-lg flex flex-col">
+          <div className="flex items-center gap-3 text-sky-300 font-black text-2xl mb-3.5">
+            <Sparkles className="w-6 h-6 text-cyan-300" />
             <span>Key Architectural Metrics</span>
           </div>
-          <ul className="space-y-1.5 text-slate-200 text-base">
+          <ul className="space-y-2.5 text-slate-100 text-[21px]">
             {finalBullets.map((pt, i) => (
-              <li key={i} className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
-                <span className="font-medium">{pt}</span>
+              <li key={i} className="flex items-center gap-3">
+                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0" />
+                <span className="font-semibold">{pt}</span>
               </li>
             ))}
           </ul>
@@ -295,19 +295,19 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
         <MascotOverlay
           mascot={mascot}
           position="bottom-right"
-          width={mascot === 'crab_stats' ? 320 : 360}
+          width={mascot === 'crab_stats' ? 330 : 370}
           className="bottom-4 right-2"
         />
       </div>
 
       {/* 6. Bottom Navigation Cue & Watermark */}
       <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-800/80">
-        <div className="flex items-center gap-2 font-mono font-bold text-base text-slate-400">
+        <div className="flex items-center gap-3 font-mono font-bold text-[22px] text-slate-300">
           <span>{swipeCta}</span>
-          <ArrowRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+          <ArrowRight className="w-7 h-7 text-cyan-400 animate-pulse" />
         </div>
 
-        <MoltNationLogo size="sm" theme="dark" />
+        <MoltNationLogo size="md" theme="dark" />
       </div>
     </CompositeContainer>
   )

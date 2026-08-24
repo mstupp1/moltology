@@ -69,7 +69,7 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
                 Moltology
               </h1>
               <div className="mt-2 flex items-center justify-center">
-                <span className="font-sans font-bold text-xl tracking-[0.25em] text-[#38bdf8] uppercase drop-shadow-[0_0_10px_rgba(0,195,255,0.5)]">
+                <span className="font-sans font-bold text-2xl tracking-[0.25em] text-[#38bdf8] uppercase drop-shadow-[0_0_10px_rgba(0,195,255,0.5)]">
                   THE SYNAPTIC PATH
                 </span>
               </div>
@@ -77,20 +77,20 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
           </div>
 
           {/* 2. Center Headline & Subheadline (Balanced & No Orphan Words) */}
-          <div className="mt-10 flex flex-col items-center text-center space-y-3 max-w-2xl px-4">
-            <h2 className="text-5xl font-black text-white tracking-tight uppercase leading-[1.15] drop-shadow-[0_0_25px_rgba(0,195,255,0.45)] whitespace-pre-line [text-wrap:balance]">
+          <div className="mt-10 flex flex-col items-center text-center space-y-3.5 max-w-2xl px-4">
+            <h2 className="text-6xl font-black text-white tracking-tight uppercase leading-[1.12] drop-shadow-[0_0_25px_rgba(0,195,255,0.45)] whitespace-pre-line [text-wrap:balance]">
               {headline}
             </h2>
-            <p className="text-2xl font-bold text-[#00c3ff] font-mono tracking-wider uppercase drop-shadow-[0_0_12px_rgba(0,195,255,0.35)] whitespace-pre-line [text-wrap:balance]">
+            <p className="text-3xl font-bold text-[#00c3ff] font-mono tracking-wider uppercase drop-shadow-[0_0_12px_rgba(0,195,255,0.35)] whitespace-pre-line [text-wrap:balance]">
               {subheadline}
             </p>
           </div>
 
           {/* 3. Canonical App-Style HUD CTA Button with Selected Molting Texture */}
           <div className="mt-8 w-full max-w-[700px] flex flex-col items-center space-y-3.5 mx-auto">
-            <div className="w-full p-[1.5px] rounded-xl bg-gradient-to-r from-[#00c3ff] via-[#38bdf8] to-[#00c3ff] shadow-[0_0_30px_rgba(0,195,255,0.5),inset_0_0_15px_rgba(0,195,255,0.25)]">
+            <div className="w-full p-[1.5px] rounded-2xl bg-gradient-to-r from-[#00c3ff] via-[#38bdf8] to-[#00c3ff] shadow-[0_0_30px_rgba(0,195,255,0.5),inset_0_0_15px_rgba(0,195,255,0.25)]">
               <div
-                className="w-full py-5 px-8 rounded-[10px] bg-cover bg-center flex flex-col items-center justify-center relative overflow-hidden border border-cyan-400/40 cursor-pointer"
+                className="w-full py-5 px-8 rounded-[14px] bg-cover bg-center flex flex-col items-center justify-center relative overflow-hidden border border-cyan-400/40 cursor-pointer"
                 style={{
                   backgroundImage: textureUrl
                     ? `linear-gradient(to bottom, rgba(5, 34, 43, 0.82), rgba(9, 61, 74, 0.78), rgba(6, 40, 51, 0.88)), url('${textureUrl}')`
@@ -98,20 +98,20 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
                 }}
               >
                 <div className="absolute top-0 inset-x-0 h-[1.5px] bg-white/25 pointer-events-none" />
-                <div className="flex items-center justify-center gap-3 text-white font-black text-4xl tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                <div className="flex items-center justify-center gap-3 text-white font-black text-5xl tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
                   <span>{url}</span>
-                  <ArrowRight className="w-8 h-8 text-cyan-300 stroke-[3.5] drop-shadow-[0_0_10px_rgba(0,195,255,0.8)]" />
+                  <ArrowRight className="w-9 h-9 text-cyan-300 stroke-[3.5] drop-shadow-[0_0_10px_rgba(0,195,255,0.8)]" />
                 </div>
                 {actionBadgeText && (
-                  <div className="mt-2.5 flex items-center justify-center gap-2 text-amber-400 font-mono font-bold text-base tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
-                    <Sparkles className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                  <div className="mt-3 flex items-center justify-center gap-2 text-amber-400 font-mono font-bold text-lg tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
+                    <Sparkles className="w-5 h-5 text-amber-400 fill-amber-400/20" />
                     <span>{actionBadgeText}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <p className="text-sm font-mono font-bold tracking-[0.25em] text-slate-400 uppercase">
+            <p className="text-base font-mono font-bold tracking-[0.25em] text-slate-400 uppercase">
               {formattedLinkInBio}
             </p>
           </div>
