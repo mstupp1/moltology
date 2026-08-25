@@ -698,7 +698,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             }`}
           >
             <HeaderBrand
-              subtext="BENTHIC TEMPLE HUD"
+              subtext="BENTHIC CORE"
               logoSize="sm"
               onClick={() => handleNavClick('/')}
             />
@@ -754,7 +754,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           }`}
         >
           <HeaderBrand
-            subtext="BENTHIC TEMPLE HUD"
+            subtext="BENTHIC CORE"
             isCollapsed={isCollapsed}
             onClick={() => handleNavClick('/')}
           />
@@ -764,7 +764,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/brand:opacity-100 transition-all duration-200">
               <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#dfe3e3] px-2.5 py-1 text-xs font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner">
                 <span className="text-[#00c3ff] drop-shadow-[0_0_8px_rgba(0,195,255,0.6)]">THE SYNAPTIC PATH</span>
-                <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC TEMPLE HUD • Click or drag edge to expand (⌘B)</span>
+                <span className="block text-[9px] text-[#7a8e9e] font-sans">BENTHIC CORE • Click or drag edge to expand (⌘B)</span>
               </div>
             </div>
           )}
