@@ -10,14 +10,15 @@ Follow [`.agents/skills/blog-creator/SKILL.md`](../.agents/skills/blog-creator/S
 
 When an agent is asked to **"run blog creation process"**, it follows this loop:
 
-1. **Pull from the Drive inbox** (`Projects/Moltology/inbox/ready/`):
+1. **Pull from Google Drive** (`Projects/Moltology/news/ready/`):
+   - Sibling folders: `drafts/` (do not publish) and `shipped/` (already ingested).
    - If one or more ingest-ready markdown files exist (frontmatter matching `content/news`), pick the **oldest** and use that body as the article.
-   - If `ready/` is empty, **STOP**. Do not write a fallback article. End the run.
+   - If `ready/` is empty, **STOP**. Skip the day. Do not write a fallback article. End the run.
 2. **Generate Cover & Inline Images** (only after a ready file is selected):
-   - Call `generate_image` with cinematic 16:9 prompts drawn from the inbox article.
+   - Call `generate_image` with cinematic 16:9 prompts drawn from the selected article.
    - Generate a main cover image AND 1-3 inline supporting diagrams/figures.
-3. **Stage the Inbox Article with Inline Figures**:
-   - Copy the inbox markdown to `content/news/<slug>.md`. Keep the inbox prose. Point frontmatter and figure slots at the generated images:
+3. **Stage the Ready Article with Inline Figures**:
+   - Copy the ready markdown to `content/news/<slug>.md`. Keep that prose. Point frontmatter and figure slots at the generated images:
      ```markdown
      ---
      title: "Article Title"
@@ -29,19 +30,19 @@ When an agent is asked to **"run blog creation process"**, it follows this loop:
      ---
 
      ### Executive Summary
-     Inbox body...
+     Article body...
 
      ![Sub-Benthic Compute Pod Telemetry Frame](path/to/generated_inline_figure_1.png)
 
      ### Deep Abyssal Analysis
-     Inbox body...
+     Article body...
 
      ![Hydrothermal Power Coupling Matrix](path/to/generated_inline_figure_2.png)
      ```
 4. **Ingest to Live Database**:
    - Execute: `npx tsx scripts/ingest.ts content/news/<slug>.md`
    - *(The CLI automatically uploads the cover image AND all inline body images to Neon S3 `moltology-public-assets`, replaces local paths with public HTTPS URLs in the Markdown body, and upserts the post into production PostgreSQL).*
-   - After a successful ingest, move the Drive file to `Projects/Moltology/inbox/shipped/`. Do not leave it in `ready/`.
+   - After a successful ingest, move the Drive file to `Projects/Moltology/news/shipped/`. Do not leave it in `ready/`.
 5. **Verify Live Output**:
    - Confirm article and rendered HUD figures are live on `https://moltology.org/news/<slug>`.
 
