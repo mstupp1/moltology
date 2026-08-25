@@ -28,7 +28,13 @@ import {
 
 
 import { getPresignedViewUrl } from '../s3-client'
-import { ORACLE_MODELS, getOracleModel } from '../ai/oracle-models'
+import {
+  formatOracleUnavailableMessage,
+  getLastUserText,
+  getOracleCandidateModelIds,
+  pickGuestOracleResponse,
+  toModelMessages,
+} from '../ai/oracle-chat'
 import { verifyTurnstileToken } from './turnstile'
 
 type Db = ReturnType<typeof getDb>
@@ -417,8 +423,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     throw new Error('Messages array is required')
   }
 
-  const lastMsg = messages[messages.length - 1]
-  const userText = lastMsg?.content || lastMsg?.text || ''
+  const userText = getLastUserText(messages)
 
   const { validateInputGuardrails, checkRateLimit } = await import('../ai/guardrails')
   const clientIp = '127.0.0.1'
@@ -429,7 +434,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
 
   const guardrail = validateInputGuardrails(userText)
   if (!guardrail.allowed) {
-    throw new Error(guardrail.reason || 'Message blocked by AI guardrails.')
+    throw new Error(guardrail.reason || 'Message blocked by safety filters.')
   }
 
   const { saveAIMessage, createAIThread, summarizeThreadTitle } = await import('../ai/service')
@@ -437,16 +442,8 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
 
   // Guest Mode Gating: Unauthenticated seekers receive friendly, clear guidance directing them to sign up
   if (!userId) {
-    const GUEST_ORACLE_RESPONSES = [
-      "The Oracle sees great potential in you, but you're still in Guest Mode! Create a free account to unlock detailed answers, advice, and save your chat history.",
-      "That is a great question! In Guest Mode, my answers are kept brief. Sign up for a free account to unlock full Oracle guidance and start your journey.",
-      "I'd love to give you the full breakdown, but you're browsing as a guest. Create your free account in seconds to get complete answers and track your progress!",
-      "The answer lies just beneath the surface! In Guest Mode, detailed insights and saved chats are locked. Sign up for free to unlock the full Oracle experience.",
-      "You're asking the right questions, but full answers require a free account. Sign up below to unlock complete answers and permanent chat history!",
-    ]
-    const index = Math.abs(userText.length + messages.length) % GUEST_ORACLE_RESPONSES.length
     return {
-      text: GUEST_ORACLE_RESPONSES[index],
+      text: pickGuestOracleResponse(userText, messages.length),
       threadId: null,
       isGuest: true,
     }
@@ -483,17 +480,10 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
 
   let assistantText = ''
   const systemPrompt = buildSystemPrompt()
-  const payloadMessages = messages.map((m) => ({
-    role: m.role as any,
-    content: m.content || m.text || '',
-  }))
+  const payloadMessages = toModelMessages(messages)
 
   // Model cascade: selected model first, then remaining candidates, so a rate-limited or restricted model falls through to a reachable one.
-  const selectedModel = getOracleModel(selectedModelId)
-  const candidateModels = [
-    selectedModel.id,
-    ...ORACLE_MODELS.filter((m) => m.id !== selectedModel.id).map((m) => m.id),
-  ]
+  const candidateModels = getOracleCandidateModelIds(selectedModelId)
   let lastError: Error | null = null
 
   for (const modelCandidate of candidateModels) {
@@ -508,13 +498,13 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
         break
       }
     } catch (err: any) {
-      console.warn(`[Benthic Neural Gateway] Model candidate '${modelCandidate}' failed:`, err.message)
+      console.warn(`[Oracle Chat] Model candidate '${modelCandidate}' failed:`, err.message)
       lastError = err
     }
   }
 
   if (!assistantText) {
-    assistantText = `[SYNAPTIC ORACLE SYSTEM ERROR] The Benthic neural gateway could not reach any registered cognition core. Your current Ascension tier does not grant passage to the requested Oracle channels. Await re-synchronization or petition a higher tier. (${lastError?.message || 'Gateway Unavailable'})`
+    assistantText = formatOracleUnavailableMessage(lastError)
   }
 
   // Safe DB Assistant message logging

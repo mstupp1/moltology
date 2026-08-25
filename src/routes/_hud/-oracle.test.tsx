@@ -32,7 +32,10 @@ vi.mock('@/lib/server/api', () => ({
     { id: 'thread-1', title: 'Carcinization Inquiries' },
   ]),
   getAIMessagesFn: vi.fn().mockResolvedValue([]),
-  sendChatMessageFn: vi.fn().mockResolvedValue({
+}))
+
+vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
+  streamOracleChat: vi.fn().mockResolvedValue({
     text: 'Guest response from the deep.',
     isGuest: true,
   }),

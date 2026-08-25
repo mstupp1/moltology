@@ -29,15 +29,18 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
   const actual = await importOriginal<any>()
   return {
     ...actual,
-    sendChatMessageFn: vi.fn().mockResolvedValue({
-      text: 'Oracle transmission response.',
-      threadId: null,
-      isGuest: true,
-    }),
     getAIMessagesFn: vi.fn().mockResolvedValue([]),
     getAIThreadsFn: vi.fn().mockResolvedValue([]),
   }
 })
+
+vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
+  streamOracleChat: vi.fn().mockResolvedValue({
+    text: 'Oracle transmission response.',
+    threadId: null,
+    isGuest: true,
+  }),
+}))
 
 describe('SynapticOracleWidget Drag & Resize', () => {
   beforeEach(() => {
