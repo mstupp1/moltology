@@ -212,7 +212,7 @@ function DashboardRoute() {
       {/* Serene & Inspiring Welcome Initiate Hero Section */}
       <WelcomeInitiateHero />
 
-      {/* Comprehensive Bento Box (6-Directive Rotating Carousel + Daily Alignment + MoltNation News) */}
+      {/* Comprehensive Bento Box (6-Directive Rotating Carousel + MoltNation News) */}
       <LaunchpadCarousel />
 
       {/* 2-Column Section: Left (Activity Stream) + Right (Changelog & Protocol Releases) */}

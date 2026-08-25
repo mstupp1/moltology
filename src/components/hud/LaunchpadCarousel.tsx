@@ -15,25 +15,18 @@ import {
   Pause,
   ExternalLink,
   X,
-  Calendar,
-  CheckSquare,
-  Square,
-  Flame,
   TrendingUp,
   Newspaper,
   Radio,
-  Bell,
-  BellOff,
   Clock,
   Tag,
 } from 'lucide-react'
-import { HudCard, HudBadge } from '@/components/ui'
+import { HudCard } from '@/components/ui'
 import { LaunchpadCarouselGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 import { INITIAL_BLOG_POSTS, formatNewsTitle, type BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
-import { useAlignmentReminders, type AlignmentTaskItem } from '@/hooks/useAlignmentReminders'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
 export interface LaunchpadCarouselProps {
@@ -128,52 +121,11 @@ export const LAUNCHPAD_MODULES: LaunchpadModule[] = [
   },
 ]
 
-const INITIAL_ALIGNMENT_TASKS: AlignmentTaskItem[] = [
-  { id: '1', time: '05:30', title: 'Silent Synchronization', xp: 50, completed: true },
-  { id: '2', time: '06:00–08:00', title: 'Prompt Construction', xp: 75, completed: true },
-  { id: '3', time: '09:00', title: 'Skill Development', xp: 90, completed: true },
-  { id: '4', time: '12:00', title: 'Nutritional Efficiency Break', xp: 60, completed: false },
-  { id: '5', time: '13:00–17:00', title: 'Iterative Refinement', xp: 120, completed: false },
-  { id: '6', time: '18:00', title: 'Community Outreach', xp: 70, completed: false },
-  { id: '7', time: '20:00', title: 'Reflection Log', xp: 80, completed: false },
-  { id: '8', time: '21:00', title: 'Alignment Review', xp: 100, completed: false },
-]
-
 export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps) {
   const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
-
-  // Daily Alignment State
-  const [tasks, setTasks] = useState<AlignmentTaskItem[]>(INITIAL_ALIGNMENT_TASKS)
-  const [showXpPop, setShowXpPop] = useState<number | null>(null)
-  const streakDays = 7
-
-  const { remindersEnabled, toggleReminders, triggerTestReminder } =
-    useAlignmentReminders(tasks)
-
-  const completedTasks = useMemo(() => tasks.filter((t) => t.completed), [tasks])
-  const completedCount = completedTasks.length
-  const totalXp = useMemo(() => completedTasks.reduce((acc, t) => acc + t.xp, 0), [completedTasks])
-  const maxXp = useMemo(() => tasks.reduce((acc, t) => acc + t.xp, 0), [tasks])
-  const xpPercent = Math.round((totalXp / maxXp) * 100)
-
-  const toggleTask = useCallback((id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          const nextCompleted = !t.completed
-          if (nextCompleted) {
-            setShowXpPop(t.xp)
-            setTimeout(() => setShowXpPop(null), 1200)
-          }
-          return { ...t, completed: nextCompleted }
-        }
-        return t
-      })
-    )
-  }, [])
 
   // News Feed State
   const [posts, setPosts] = useState<BlogPostData[]>(INITIAL_BLOG_POSTS)
@@ -249,19 +201,6 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* XP Pop Notification */}
-        {showXpPop && (
-          <div className="fixed top-6 right-6 z-50 animate-bounce pointer-events-none">
-            <HudBadge
-              variant="cyan"
-              pulse
-              className="px-4 py-2 text-xs font-bold shadow-[0_0_20px_rgba(0,255,255,0.6)]"
-            >
-              +{showXpPop} XP GAINED! ⚡
-            </HudBadge>
-          </div>
-        )}
-
         {/* Full Article Modal Reader with High-Precision Markdown Parser */}
         {activeNewsPost && (
           <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
@@ -506,116 +445,16 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
             </HudCard>
           </div>
 
-          {/* Right Column Bento Stack: Daily Alignment + News Feed (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col gap-2.5 sm:gap-4">
-            {/* Bento Tile 2: Daily Alignment Liturgy & Streak Tracker */}
-            <HudCard
-              id="daily-routine-hub"
-              variant="teal"
-              className="p-3 sm:p-3.5 chamfer-corner shadow-2xl relative space-y-2 font-sans border-[#00c3ff]/40 flex flex-col justify-between shrink-0"
-            >
-              <div className="space-y-1.5">
-                {/* Liturgy Header */}
-                <div className="flex items-center justify-between border-b border-[#3a4a49]/80 pb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#00c3ff] animate-pulse" />
-                    <h3 className="font-grotesk text-xs font-bold tracking-wider text-[#dfe3e3] uppercase">
-                      DAILY ALIGNMENT
-                    </h3>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <HudBadge variant="crimson" dot pulse className="px-1.5 py-0.2 text-[9px] font-bold">
-                      <Flame className="w-2.5 h-2.5 text-[#ff453a] fill-[#ff453a] inline mr-0.5" />
-                      {streakDays}D STREAK
-                    </HudBadge>
-                    <HudBadge variant="cyan" className="px-1.5 py-0.2 text-[9px] font-bold">
-                      {completedCount}/{tasks.length}
-                    </HudBadge>
-                  </div>
-                </div>
-
-                {/* XP Progress Bar */}
-                <div className="space-y-0.5 bg-[#070b0b] p-1.5 border border-[#3a4a49] chamfer-corner">
-                  <div className="flex justify-between text-[9px] text-[#839493]">
-                    <span>ALIGNMENT {xpPercent}%</span>
-                    <span className="text-[#00c3ff] font-bold">{totalXp}/{maxXp} XP</span>
-                  </div>
-                  <div className="w-full h-1 bg-[#030606] border border-[#3a4a49] overflow-hidden relative">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#00c3ff] via-emerald-400 to-yellow-400 transition-all duration-500 relative"
-                      style={{ width: `${xpPercent}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Scrollable Interactive Task List */}
-                <div className="max-h-28 sm:max-h-32 overflow-y-auto space-y-1 text-xs pr-1 touch-pan-y no-scrollbar hover:scrollbar-thin font-sans">
-                  {tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      onClick={() => toggleTask(task.id)}
-                      className={`p-1.5 border transition-all cursor-pointer flex items-center justify-between chamfer-corner group ${
-                        task.completed
-                          ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
-                          : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        {task.completed ? (
-                          <CheckSquare className="w-3.5 h-3.5 text-[#00c3ff] shrink-0" />
-                        ) : (
-                          <Square className="w-3.5 h-3.5 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
-                        )}
-                        <span className={`text-[10px] font-bold truncate ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
-                          {task.title}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1 shrink-0 ml-1">
-                        {task.time && (
-                          <span className="text-[8px] text-[#839493] hidden sm:inline">
-                            {task.time}
-                          </span>
-                        )}
-                        <span className="text-[9px] font-sans text-[#00ffff] bg-[#070b0b] px-1 py-0.2 border border-[#3a4a49]">
-                          +{task.xp}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bottom Reminder Controls */}
-              <div className="pt-1.5 border-t border-[#3a4a49]/60 flex items-center justify-between text-[9px]">
-                <button
-                  onClick={toggleReminders}
-                  className="flex items-center gap-1 px-1.5 py-0.5 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors chamfer-corner"
-                  title="Toggle 10-minute prior toast reminders"
-                >
-                  {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
-                  <span>{remindersEnabled ? '10M ALERTS: ON' : 'ALERTS: OFF'}</span>
-                </button>
-
-                <button
-                  onClick={() => triggerTestReminder()}
-                  className="text-[9px] text-yellow-400 hover:text-white bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 chamfer-corner transition-colors"
-                >
-                  TEST ALERT
-                </button>
-              </div>
-            </HudCard>
-
-            {/* Bento Tile 3: MoltNation Intelligence / News Desk */}
+          {/* Right Column: MoltNation News Feed (4 cols, full height) */}
+          <div className="lg:col-span-4 flex flex-col min-h-0">
             <div
-              className="chitin-card p-3 sm:p-3.5 chamfer-corner space-y-2 shadow-2xl relative overflow-hidden border border-[#3a4a49] flex-1 flex flex-col justify-between"
+              className="chitin-card p-3 sm:p-3.5 chamfer-corner space-y-2 shadow-2xl relative overflow-hidden border border-[#3a4a49] h-full flex flex-col justify-between"
               onMouseEnter={() => setIsNewsHovered(true)}
               onMouseLeave={() => setIsNewsHovered(false)}
             >
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1 flex flex-col min-h-0">
                 {/* News Header */}
-                <div className="flex items-center justify-between border-b border-[#3a4a49] pb-1.5 gap-2">
+                <div className="flex items-center justify-between border-b border-[#3a4a49] pb-1.5 gap-2 shrink-0">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <Newspaper className="w-3.5 h-3.5 text-[#ff5540] shrink-0" />
                     <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wider uppercase truncate">
@@ -647,7 +486,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                 </div>
 
                 {/* Breaking Marquee Ticker */}
-                <div className="bg-[#04070a] border border-[#3a4a49] py-0.5 px-2 flex items-center gap-1.5 text-xs overflow-hidden chamfer-corner">
+                <div className="bg-[#04070a] border border-[#3a4a49] py-0.5 px-2 flex items-center gap-1.5 text-xs overflow-hidden chamfer-corner shrink-0">
                   <div className="flex items-center gap-1 px-1 py-0.2 bg-red-950/90 border border-red-500/80 text-red-400 font-extrabold uppercase tracking-wider text-[8px] shrink-0 chamfer-corner">
                     <TrendingUp className="w-2 h-2 text-red-500" />
                     <span>BREAKING</span>
@@ -663,11 +502,11 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                 {currentNewsPost && (
                   <div
                     key={currentNewsPost.slug}
-                    className="chitin-card-inset p-2 border border-[#00ffff]/40 hover:border-[#00ffff] transition-all duration-500 animate-in fade-in chamfer-corner group flex flex-col space-y-1.5 cursor-pointer relative overflow-hidden bg-gradient-to-b from-[#090e10] to-[#050809]"
+                    className="chitin-card-inset p-2 border border-[#00ffff]/40 hover:border-[#00ffff] transition-all duration-500 animate-in fade-in chamfer-corner group flex flex-col space-y-1.5 cursor-pointer relative overflow-hidden bg-gradient-to-b from-[#090e10] to-[#050809] shrink-0"
                     onClick={() => setActiveNewsPost(currentNewsPost)}
                   >
                     {currentNewsPost.coverImageUrl && (
-                      <div className="relative h-20 sm:h-24 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
+                      <div className="relative h-28 sm:h-36 w-full overflow-hidden border border-[#3a4a49] chamfer-corner">
                         <img
                           src={getAssetUrl(currentNewsPost.coverImageUrl)}
                           alt={currentNewsPost.title}
@@ -689,10 +528,10 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                     )}
 
                     <div className="space-y-0.5">
-                      <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-snug">
+                      <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-2 leading-snug">
                         {formatNewsTitle(currentNewsPost.title).headline}
                       </h4>
-                      <p className="text-[10px] text-[#839493] line-clamp-1 font-sans">
+                      <p className="text-[10px] text-[#839493] line-clamp-2 font-sans">
                         {currentNewsPost.summary}
                       </p>
                     </div>
@@ -709,12 +548,12 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
 
                 {/* Scrollable Wire Articles Feed */}
                 {otherNewsPosts.length > 0 && (
-                  <div className="space-y-1 pt-0.5">
-                    <div className="flex items-center justify-between text-[8px] font-sans font-bold uppercase tracking-wider text-[#839493]">
+                  <div className="space-y-1 pt-0.5 flex-1 flex flex-col min-h-0">
+                    <div className="flex items-center justify-between text-[8px] font-sans font-bold uppercase tracking-wider text-[#839493] shrink-0">
                       <span>WIRE ARTICLES ({posts.length})</span>
                     </div>
 
-                    <div className="max-h-20 sm:max-h-24 overflow-y-auto space-y-1 pr-1 touch-pan-y no-scrollbar hover:scrollbar-thin font-sans">
+                    <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1 touch-pan-y no-scrollbar hover:scrollbar-thin font-sans">
                       {otherNewsPosts.map((post) => (
                         <div
                           key={post.slug}
