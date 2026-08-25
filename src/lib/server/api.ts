@@ -11,7 +11,7 @@ import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
-import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS, getCategoryBgImage } from '../forum-seed-data'
+import { getCategoryBgImage } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
 import { slugifyForumTitle, compareHot } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
@@ -952,16 +952,11 @@ export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnA
         topicCount: countRow?.count || 0,
       }
     }
-  } catch (err) {
-    console.warn('[getForumCategoryBySlugFn] DB error, using seed fallback:', err)
-  }
 
-  const seedCat = INITIAL_FORUM_CATEGORIES.find((c) => c.slug === slug)
-  if (!seedCat) return null
-  return {
-    ...seedCat,
-    bgImage: seedCat.bgImage || getCategoryBgImage(seedCat.slug),
-    topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === seedCat.id).length,
+    return null
+  } catch (err) {
+    console.error('[getForumCategoryBySlugFn] DB query failed:', err)
+    return null
   }
 }
 
@@ -1014,15 +1009,12 @@ export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Prom
         topicCount: countsMap.get(c.id) || 0,
       }))
     }
-  } catch (err) {
-    console.warn('[getForumCategoriesFn] DB error, using seed fallback:', err)
-  }
 
-  return INITIAL_FORUM_CATEGORIES.map((c) => ({
-    ...c,
-    bgImage: c.bgImage || getCategoryBgImage(c.slug),
-    topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === c.id).length,
-  }))
+    return []
+  } catch (err) {
+    console.error('[getForumCategoriesFn] DB query failed:', err)
+    return []
+  }
 }
 
 export const getForumCategoriesFn = createServerFn({ method: 'GET' })
@@ -1134,39 +1126,13 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
       }
       return entries
     }
+
+    // Empty DB is a valid state — never return seed IDs that cannot be replied to / voted on.
+    return []
   } catch (err) {
-    console.warn('[getForumTopicsFn] DB error, using seed fallback:', err)
+    console.error('[getForumTopicsFn] DB query failed:', err)
+    return []
   }
-
-  // Fallback to initial seed topics
-  let fallback: ForumTopicEntry[] = INITIAL_FORUM_TOPICS.map((t) => {
-    const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.id === t.categoryId)
-    return {
-      ...t,
-      userId: t.userId ?? null,
-      categorySlug: cat?.slug || 'general-discussion',
-      categoryName: cat?.name || 'General Discussion',
-      categoryColor: cat?.color || '#00ffff',
-    }
-  })
-
-  if (categorySlug && categorySlug !== 'all') {
-    fallback = fallback.filter((t) => t.categorySlug === categorySlug)
-  }
-  if (query && query.trim() !== '') {
-    const q = query.toLowerCase()
-    fallback = fallback.filter((t) => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
-  }
-  if (sortBy === 'top') {
-    fallback = [...fallback].sort((a, b) => b.upvotes - a.upvotes)
-  } else if (sortBy === 'active') {
-    fallback = [...fallback].sort((a, b) => new Date(b.lastReplyAt).getTime() - new Date(a.lastReplyAt).getTime())
-  } else if (sortBy === 'hot') {
-    fallback = [...fallback].sort(compareHot as any)
-  } else {
-    fallback = [...fallback].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }
-  return fallback
 }
 
 export const getForumTopicsFn = createServerFn({ method: 'POST' })
@@ -1322,31 +1288,13 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         })),
       }
     }
+
+    // Topic not in DB — never invent seed rows with non-writable IDs.
+    return null
   } catch (err) {
-    console.warn('[getForumTopicDetailFn] DB error, using seed fallback:', err)
+    console.error('[getForumTopicDetailFn] DB query failed:', err)
+    return null
   }
-
-  // Seed Fallback
-  const seedTopic = INITIAL_FORUM_TOPICS.find((t) => t.slug === slugOrId || t.id === slugOrId)
-  if (!seedTopic) return null
-
-  const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.id === seedTopic.categoryId)
-  if (categorySlug && cat && categorySlug !== cat.slug) return null
-
-  return {
-    topic: {
-      ...seedTopic,
-      userId: seedTopic.userId ?? null,
-      categorySlug: cat?.slug || 'general-discussion',
-      categoryName: cat?.name || 'General Discussion',
-      categoryColor: cat?.color || '#00ffff',
-    },
-    posts: (seedTopic.posts || []).map((p) => ({
-      ...p,
-      userId: p.userId ?? null,
-    })),
-  }
-
 }
 
 export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
@@ -1502,6 +1450,16 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
+  const [topicExists] = await dbClient
+    .select({ id: forumTopics.id })
+    .from(forumTopics)
+    .where(eq(forumTopics.id, data.topicId))
+    .limit(1)
+
+  if (!topicExists) {
+    throw new Error('This thread is no longer available. Refresh the forums and try again.')
+  }
+
   const [inserted] = await dbClient
     .insert(forumPosts)
     .values({
@@ -1595,7 +1553,11 @@ export const toggleForumTopicVoteHandler = async ({ data, context }: ServerFnArg
     .where(eq(forumTopics.id, topicId))
     .limit(1)
 
-  const currentUpvotes = topic?.upvotes ?? 0
+  if (!topic) {
+    throw new Error('This thread is no longer available. Refresh the forums and try again.')
+  }
+
+  const currentUpvotes = topic.upvotes
 
   const [existing] = await dbClient
     .select({ id: forumVotes.id })
@@ -1650,7 +1612,11 @@ export const toggleForumPostVoteHandler = async ({ data, context }: ServerFnArgs
     .where(eq(forumPosts.id, postId))
     .limit(1)
 
-  const currentUpvotes = post?.upvotes ?? 0
+  if (!post) {
+    throw new Error('This reply is no longer available. Refresh the thread and try again.')
+  }
+
+  const currentUpvotes = post.upvotes
 
   const [existing] = await dbClient
     .select({ id: forumVotes.id })
