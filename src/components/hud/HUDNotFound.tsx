@@ -40,6 +40,12 @@ export function HUDNotFound() {
 
   return (
     <div className="min-h-screen bg-[#070b0c] text-[#dfe3e3] flex flex-col font-sans selection:bg-[#00ffff] selection:text-[#000a0a]">
+      <title>Sector Void — Trench Uncharted | Moltology</title>
+      <meta name="robots" content="noindex, nofollow" />
+      <meta
+        name="description"
+        content="The requested synaptic coordinate does not exist within the active Benthic Lattice. Return to the Synaptic Path or MoltNation News."
+      />
       {/* Top Public / HUD Header */}
       <PublicHeader />
 

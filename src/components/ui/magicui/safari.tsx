@@ -1,13 +1,23 @@
 import React from 'react'
 import { Lock } from 'lucide-react'
 
+export interface SafariSource {
+  type?: string
+  media?: string
+  srcSet: string
+}
+
 export interface SafariProps {
   url?: string
   className?: string
   children?: React.ReactNode
   src?: string
+  sources?: SafariSource[]
+  loading?: 'lazy' | 'eager'
+  fetchPriority?: 'high' | 'low' | 'auto'
   width?: number | string
   height?: number | string
+  sizes?: string
 }
 
 export const Safari: React.FC<SafariProps> = ({
@@ -15,6 +25,12 @@ export const Safari: React.FC<SafariProps> = ({
   className = '',
   children,
   src,
+  sources,
+  loading = 'lazy',
+  fetchPriority = 'low',
+  width,
+  height,
+  sizes,
 }) => {
   // Clean URL to realistic standard presentation
   const displayUrl = url
@@ -51,7 +67,27 @@ export const Safari: React.FC<SafariProps> = ({
         {children ? (
           children
         ) : src ? (
-          <img src={src} alt="Safari preview" className="w-full h-auto object-cover" />
+          <picture>
+            {(sources ?? []).map((source) => (
+              <source
+                key={`${source.media ?? ''}:${source.srcSet}`}
+                type={source.type}
+                media={source.media}
+                srcSet={source.srcSet}
+              />
+            ))}
+            <img
+              src={src}
+              alt="Safari preview"
+              className="w-full h-auto object-cover"
+              loading={loading}
+              fetchPriority={fetchPriority}
+              decoding="async"
+              width={width}
+              height={height}
+              sizes={sizes}
+            />
+          </picture>
         ) : null}
       </div>
     </div>

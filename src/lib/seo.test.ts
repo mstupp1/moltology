@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { seo, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
+import { seo, privatePageSeo, notFoundSeo, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
 
 describe('SEO Meta Tag Generator', () => {
   it('generates standard metadata including default robots and ogType', () => {
@@ -35,6 +35,32 @@ describe('SEO Meta Tag Generator', () => {
         { property: 'og:url', content: 'https://moltology.org/codex' },
       ])
     )
+  })
+
+  it('emits noindex metadata for private gateways without a canonical og:url', () => {
+    const meta = privatePageSeo({
+      title: 'Authentication Gateway | The Synaptic Path',
+      description: 'Access your Moltology account.',
+    })
+
+    expect(meta).toEqual(
+      expect.arrayContaining([
+        { name: 'robots', content: 'noindex, nofollow' },
+        { title: 'Authentication Gateway | The Synaptic Path' },
+      ]),
+    )
+    expect(meta.some((entry) => entry.property === 'og:url')).toBe(false)
+  })
+
+  it('emits a unique noindex title for uncharted sectors', () => {
+    const meta = notFoundSeo()
+    expect(meta).toEqual(
+      expect.arrayContaining([
+        { name: 'robots', content: 'noindex, nofollow' },
+        { title: 'Sector Void — Trench Uncharted | Moltology' },
+      ]),
+    )
+    expect(meta.some((entry) => entry.property === 'og:url')).toBe(false)
   })
 
   it('includes openGraph image and twitter image when ogImage is supplied', () => {
@@ -118,7 +144,33 @@ describe('Sitemap and RSS XML Generators', () => {
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>')
     expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     expect(xml).toContain('<loc>https://moltology.org/news</loc>')
+    expect(xml).toContain('<loc>https://moltology.org/guide</loc>')
+    expect(xml).toContain('<loc>https://moltology.org/changelog</loc>')
     expect(xml).toContain('<loc>https://moltology.org/news/first-dispatch</loc>')
+    expect(xml).not.toContain('<loc>https://moltology.org/auth</loc>')
+    expect(xml).not.toContain('<loc>https://moltology.org/dashboard</loc>')
+    expect(xml).not.toContain('<loc>https://moltology.org/oracle</loc>')
+  })
+
+  it('includes every supplied published slug so sitemap can match the news listing', () => {
+    const livePosts = [
+      {
+        slug: 'world-foundation-models-pixel-ecdysis-latent-jepa',
+        title: 'World Foundation Models',
+        summary: 'Latent JEPA ecdysis.',
+        publishedAt: '2026-08-24T00:00:00.000Z',
+      },
+      {
+        slug: 'another-live-dispatch',
+        title: 'Another Live Dispatch',
+        summary: 'On the wire.',
+        publishedAt: '2026-08-23T00:00:00.000Z',
+      },
+    ]
+    const xml = generateSitemapXml(livePosts, 'https://moltology.org')
+    for (const post of livePosts) {
+      expect(xml).toContain(`<loc>https://moltology.org/news/${post.slug}</loc>`)
+    }
   })
 
   it('generates a valid RSS 2.0 feed with items and escaping', () => {

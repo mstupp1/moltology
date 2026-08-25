@@ -81,4 +81,33 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     expect(screen.getByText('STREAMING NOW')).toBeInTheDocument()
     expect(screen.getByText('MOLTNATION PODCAST DISPATCHES')).toBeInTheDocument()
   })
+
+  it('eager-loads the flag LCP still and lazy-loads remaining dispatch artwork', () => {
+    render(<NewsIndexPage />)
+
+    const flag = screen.getByAltText('MoltNation Flag Background')
+    expect(flag.getAttribute('loading')).toBe('eager')
+    expect(flag.getAttribute('fetchpriority')).toBe('high')
+
+    const lead = screen.getByAltText(INITIAL_BLOG_POSTS[0].title)
+    expect(lead.getAttribute('loading')).toBe('eager')
+    expect(lead.getAttribute('fetchpriority')).not.toBe('high')
+
+    const listingCovers = screen.getAllByAltText(INITIAL_BLOG_POSTS[1].title)
+    expect(listingCovers.length).toBeGreaterThan(0)
+    listingCovers.forEach((img) => {
+      expect(img.getAttribute('loading')).toBe('lazy')
+    })
+  })
+
+  it('emits crawlable article hrefs for every listed dispatch', () => {
+    const { container } = render(<NewsIndexPage />)
+
+    expect(screen.getByRole('navigation', { name: 'MoltNation dispatch registry' })).toBeInTheDocument()
+
+    for (const post of INITIAL_BLOG_POSTS) {
+      const links = container.querySelectorAll(`a[href="/news/${post.slug}"]`)
+      expect(links.length).toBeGreaterThan(0)
+    }
+  })
 })

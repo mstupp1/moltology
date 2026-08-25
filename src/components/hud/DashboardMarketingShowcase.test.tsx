@@ -39,6 +39,24 @@ describe('DashboardMarketingShowcase Component', () => {
     expect(screen.getByAltText('iPhone 15 Pro preview')).toBeInTheDocument()
   })
 
+  it('serves compressed WebP mockups with viewport sources and lazy loading', () => {
+    const { container } = render(<DashboardMarketingShowcase />)
+
+    const desktop = screen.getByAltText('Safari preview') as HTMLImageElement
+    const mobile = screen.getByAltText('iPhone 15 Pro preview') as HTMLImageElement
+
+    expect(desktop.getAttribute('loading')).toBe('lazy')
+    expect(mobile.getAttribute('loading')).toBe('lazy')
+    expect(desktop.getAttribute('src')).toContain('dashboard_desktop_preview.webp')
+    expect(mobile.getAttribute('src')).toContain('dashboard_mobile_preview.webp')
+
+    const sourceMedia = Array.from(container.querySelectorAll('source')).map((node) => node.getAttribute('media'))
+    expect(sourceMedia).toContain('(max-width: 767px)')
+    expect(sourceMedia).toContain('(min-width: 768px)')
+    expect(container.querySelector('source[srcset*="dashboard_desktop_preview_sm.webp"]')).toBeTruthy()
+    expect(container.querySelector('source[srcset*="dashboard_mobile_preview_sm.webp"]')).toBeTruthy()
+  })
+
   it('navigates to /dashboard when Launch Demo button is clicked', () => {
     render(<DashboardMarketingShowcase />)
 

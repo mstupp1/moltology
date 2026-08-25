@@ -18,6 +18,15 @@ describe('Asset URL Resolver', () => {
     expect(getAssetUrl('/favicon.ico')).toBe('/favicon.ico')
     expect(getAssetUrl('/images/bubble_variant_1.jpg')).toBe('/images/bubble_variant_1.jpg')
     expect(getAssetUrl('/images/scanline_pattern.png')).toBe('/images/scanline_pattern.png')
+    expect(getAssetUrl('/images/marketing/dashboard_desktop_preview.webp')).toBe(
+      '/images/marketing/dashboard_desktop_preview.webp',
+    )
+    expect(getAssetUrl('/images/marketing/dashboard_desktop_preview_sm.webp')).toBe(
+      '/images/marketing/dashboard_desktop_preview_sm.webp',
+    )
+    expect(getAssetUrl('/images/marketing/dashboard_mobile_preview.webp')).toBe(
+      '/images/marketing/dashboard_mobile_preview.webp',
+    )
   })
 
   it('maps heavy content and quiz assets to Neon S3 CDN', () => {

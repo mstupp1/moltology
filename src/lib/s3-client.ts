@@ -62,6 +62,8 @@ export async function ensureBucketExists(bucket: string = DEFAULT_BUCKET): Promi
   }
 }
 
+export const PUBLIC_ASSET_CACHE_CONTROL = 'public, max-age=31536000'
+
 export async function uploadObject(params: {
   key: string;
   body: Buffer | Uint8Array | string;
@@ -77,6 +79,7 @@ export async function uploadObject(params: {
       Key: params.key,
       Body: params.body,
       ContentType: params.contentType,
+      CacheControl: PUBLIC_ASSET_CACHE_CONTROL,
     })
   );
 }

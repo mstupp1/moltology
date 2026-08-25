@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
+import { eagerImageProps } from '@/lib/media-priority'
 
 export interface HeroCard {
   id: string
@@ -9,6 +10,8 @@ export interface HeroCard {
   video?: string
   accentColor: 'cyan' | 'amber' | 'emerald' | 'purple' | 'red'
 }
+
+export const HERO_DECK_CROSSFADE_MS = 700
 
 const CARDS: HeroCard[] = [
   {
@@ -85,54 +88,115 @@ const COLOR_MAPS = {
 
 export const HeroShuffleDeck: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [outgoingIndex, setOutgoingIndex] = useState<number | null>(null)
   const [isPaused, setIsPaused] = useState(false)
+  const [inView, setInView] = useState(false)
+  const [playbackReady, setPlaybackReady] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
+  const viewportRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   const totalCards = CARDS.length
+  const canMountVideo = inView && playbackReady && !reducedMotion
 
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % totalCards)
-  }
+  const goTo = useCallback((nextIndex: number) => {
+    setActiveIndex((prev) => {
+      if (nextIndex === prev) return prev
+      setOutgoingIndex(prev)
+      return nextIndex
+    })
+  }, [])
 
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + totalCards) % totalCards)
-  }
+  const handleNext = useCallback(() => {
+    setActiveIndex((prev) => {
+      const next = (prev + 1) % totalCards
+      setOutgoingIndex(prev)
+      return next
+    })
+  }, [totalCards])
 
-  // Auto-advance timer: 9.5s per clip
+  const handlePrev = useCallback(() => {
+    setActiveIndex((prev) => {
+      const next = (prev - 1 + totalCards) % totalCards
+      setOutgoingIndex(prev)
+      return next
+    })
+  }, [totalCards])
+
   useEffect(() => {
-    if (isPaused) return
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    if (!media) return
+    const sync = () => setReducedMotion(media.matches)
+    sync()
+    media.addEventListener?.('change', sync)
+    return () => media.removeEventListener?.('change', sync)
+  }, [])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (document.readyState === 'complete') {
+      setPlaybackReady(true)
+      return
+    }
+    const onLoad = () => setPlaybackReady(true)
+    window.addEventListener('load', onLoad)
+    return () => window.removeEventListener('load', onLoad)
+  }, [])
+
+  useEffect(() => {
+    const node = viewportRef.current
+    if (!node || typeof IntersectionObserver === 'undefined') return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        setInView(Boolean(entry?.isIntersecting && entry.intersectionRatio > 0.2))
+      },
+      { threshold: [0, 0.2, 0.4] },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (outgoingIndex === null) return
+    const timer = window.setTimeout(() => setOutgoingIndex(null), HERO_DECK_CROSSFADE_MS)
+    return () => window.clearTimeout(timer)
+  }, [outgoingIndex, activeIndex])
+
+  // Auto-advance only while the deck is on-screen
+  useEffect(() => {
+    if (isPaused || !inView) return
 
     const interval = setInterval(() => {
       handleNext()
     }, 9500)
 
     return () => clearInterval(interval)
-  }, [isPaused, totalCards])
+  }, [isPaused, inView, handleNext])
 
-  // Reset and play active video from 0:00 whenever activeIndex changes
   useEffect(() => {
+    if (!canMountVideo) return
     const currentCard = CARDS[activeIndex]
     const videoEl = videoRefs.current[currentCard.id]
-    if (videoEl) {
+    if (!videoEl) return
+    try {
       videoEl.currentTime = 0
-      try {
-        const playPromise = videoEl.play()
-        if (playPromise && typeof playPromise.catch === 'function') {
-          playPromise.catch(() => {})
-        }
-      } catch (e) {
-        // Ignore playback errors in headless or restricted browser environments
+      const playPromise = videoEl.play()
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {})
       }
+    } catch {
+      // Ignore playback errors in headless or restricted browser environments
     }
-  }, [activeIndex])
+  }, [activeIndex, canMountVideo])
 
   const handleJump = (index: number) => {
-    setActiveIndex(index)
+    goTo(index)
   }
 
-  // Touch Swipe Handlers for mobile navigation
   const onTouchStart = (e: React.TouchEvent) => {
     touchEndX.current = null
     touchStartX.current = e.targetTouches[0].clientX
@@ -156,9 +220,14 @@ export const HeroShuffleDeck: React.FC = () => {
 
   const activeCard = CARDS[activeIndex]
   const activeTheme = COLOR_MAPS[activeCard.accentColor]
+  const visibleIndexes = [activeIndex]
+  if (outgoingIndex !== null && outgoingIndex !== activeIndex) {
+    visibleIndexes.push(outgoingIndex)
+  }
 
   return (
     <div
+      ref={viewportRef}
       className="relative w-full max-w-4xl mx-auto select-none group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -185,32 +254,36 @@ export const HeroShuffleDeck: React.FC = () => {
       <div
         className={`relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-700`}
       >
-        {/* Crossfading Media Stack */}
-        {CARDS.map((card, idx) => {
+        {/* Crossfading Media Stack — posters always, clips only when in view */}
+        {visibleIndexes.map((idx) => {
+          const card = CARDS[idx]
           const isActive = idx === activeIndex
+          const shouldMountVideo = Boolean(canMountVideo && card.video)
           return (
             <div
               key={card.id}
               className={`absolute inset-0 transition-opacity duration-[700ms] ease-in-out ${
-                isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-20 pointer-events-none'
               }`}
             >
-              {card.video ? (
+              <img
+                src={card.image}
+                alt={isActive ? card.title : ''}
+                {...(idx === 0 && isActive ? eagerImageProps : { loading: 'lazy' as const, decoding: 'async' as const })}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {shouldMountVideo && (
                 <video
                   ref={(el) => {
                     videoRefs.current[card.id] = el
                   }}
                   src={card.video}
-                  autoPlay
+                  poster={card.image}
                   muted
                   playsInline
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <img
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-cover"
+                  autoPlay
+                  preload="none"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               )}
             </div>

@@ -19,7 +19,7 @@ import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
-import { seo } from '@/lib/seo'
+import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 const authSearchSchema = z.object({
@@ -468,22 +468,20 @@ function AuthRoute() {
 
 export const Route = createFileRoute('/auth')({
   validateSearch: (search: Record<string, unknown>) => authSearchSchema.parse(search),
+  headers: () => xRobotsNoindexHeaders(),
   head: () => ({
     meta: [
-      ...seo({
+      ...privatePageSeo({
         title: 'Authentication Gateway | The Synaptic Path',
         description:
           'Access your Moltology account, persist your session state, and synchronize with the Benthic Core.',
         keywords: 'Moltology sign in, login, sign up, authentication, synaptic path',
         ogImage:
           'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/cyber_lobster_hero.jpg',
-        canonical: 'https://moltology.org/auth',
         siteName: 'Moltology',
-        twitterCard: 'summary_large_image',
         twitterSite: '@moltology',
       }),
     ],
-    links: [{ rel: 'canonical', href: 'https://moltology.org/auth' }],
   }),
   component: AuthRoute,
 })

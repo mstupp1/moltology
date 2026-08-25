@@ -40,6 +40,20 @@ function waitForServer(url: string, timeoutMs = 15000): Promise<void> {
   })
 }
 
+function encodeMarketingWebp(
+  inputPng: string,
+  outputWebp: string,
+  quality: number,
+  maxWidth?: number,
+) {
+  const scale = maxWidth ? `-vf scale=${maxWidth}:-1 ` : ''
+  console.log(`🗜️ Encoding ${path.basename(outputWebp)} (q=${quality}${maxWidth ? `, w=${maxWidth}` : ''})...`)
+  execSync(
+    `ffmpeg -y -i "${inputPng}" ${scale}-quality ${quality} "${outputWebp}"`,
+    { stdio: 'inherit' },
+  )
+}
+
 async function main() {
   console.log('📸 Starting automated dashboard mockup capture pipeline...')
 
@@ -81,6 +95,15 @@ async function main() {
       { stdio: 'inherit' }
     )
     console.log('✅ Mobile HUD captured successfully!')
+
+    encodeMarketingWebp(desktopOut, path.join(OUTPUT_DIR, 'dashboard_desktop_preview.webp'), 90)
+    encodeMarketingWebp(desktopOut, path.join(OUTPUT_DIR, 'dashboard_desktop_preview_sm.webp'), 86, 1280)
+    encodeMarketingWebp(mobileOut, path.join(OUTPUT_DIR, 'dashboard_mobile_preview.webp'), 90)
+    encodeMarketingWebp(mobileOut, path.join(OUTPUT_DIR, 'dashboard_mobile_preview_sm.webp'), 86, 540)
+    for (const png of [desktopOut, mobileOut]) {
+      if (fs.existsSync(png)) fs.unlinkSync(png)
+    }
+    console.log('✅ Marketing WebP variants encoded for first-paint payload!')
 
     console.log('\n🎉 ALL DASHBOARD MOCKUP SCREENSHOTS CAPTURED WITH 100% VISUAL FIDELITY!')
   } finally {
