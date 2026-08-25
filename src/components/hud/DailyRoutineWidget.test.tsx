@@ -59,6 +59,7 @@ describe('DailyRoutineWidget Component', () => {
 
     expect(screen.getByText('1/8 COMPLETE')).toBeInTheDocument()
     expect(firstTask).toHaveClass('line-through')
+    expect(screen.queryByText('SYNCING')).not.toBeInTheDocument()
   })
 
   it('displays the neutral-positive completion toast when all 8 tasks are completed', async () => {

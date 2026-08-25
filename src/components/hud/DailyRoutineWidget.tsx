@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Shield, Sparkles, Bell, BellOff, Zap, RefreshCw } from 'lucide-react'
+import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Shield, Sparkles, Bell, BellOff, Zap } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
@@ -19,7 +19,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
     streakDays,
     streakHistory,
     isLoading: isAlignmentLoading,
-    isSyncing,
     toggleTask,
   } = useDailyAlignment()
 
@@ -44,12 +43,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
               <HudBadge variant="cyan" className="text-[10px]">
                 MANDATORY LITURGY
               </HudBadge>
-              {isSyncing && (
-                <HudBadge variant="warning" pulse className="text-[9px] flex items-center gap-1">
-                  <RefreshCw className="w-2.5 h-2.5 animate-spin" />
-                  SYNCING
-                </HudBadge>
-              )}
             </div>
             <p className="text-xs text-[#839493]">
               Complete your 8 scheduled alignment items daily to maintain carapace density and preserve your active streak.
