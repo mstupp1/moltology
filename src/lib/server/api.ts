@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -16,6 +16,15 @@ import { validateForumContent } from '../community-rules'
 import { slugifyForumTitle, compareHot } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
 import type { PodcastEpisode } from '../podcast-data'
+import {
+  CANONICAL_ALIGNMENT_TASKS,
+  TOTAL_ALIGNMENT_TASKS,
+  mergeCompletions,
+  computeStreak,
+  shiftDays,
+  localDateString,
+  type AlignmentTaskItem,
+} from '../alignment-tasks'
 
 
 import { getPresignedViewUrl } from '../s3-client'
@@ -2104,4 +2113,175 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: UpdateEmailPreferencesInput) => updateEmailPreferencesSchema.parse(data))
   .handler(updateEmailPreferencesHandler)
+
+export interface GetDailyAlignmentInput {
+  date?: string
+}
+
+export interface ToggleDailyAlignmentInput {
+  taskKey: string
+  completed: boolean
+  date: string
+}
+
+export interface DailyAlignmentResponse {
+  date: string
+  tasks: AlignmentTaskItem[]
+  completedKeys: string[]
+  completedCount: number
+  totalCount: number
+  isAllCompleted: boolean
+  history: Array<{ date: string; completedCount: number }>
+  streakDays: number
+}
+
+const getDailyAlignmentSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+})
+
+const toggleDailyAlignmentSchema = z.object({
+  taskKey: z.string().min(1),
+  completed: z.boolean(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+})
+
+export const getDailyAlignmentData = async (
+  dbClient: Db,
+  userId: string,
+  targetDate: string
+): Promise<DailyAlignmentResponse> => {
+  const todayCompletions = await dbClient
+    .select({
+      taskKey: routineCompletions.taskKey,
+    })
+    .from(routineCompletions)
+    .where(
+      and(
+        eq(routineCompletions.userId, userId),
+        eq(routineCompletions.completedOn, targetDate)
+      )
+    )
+
+  const completedKeys = todayCompletions.map((r) => r.taskKey)
+  const tasks = mergeCompletions(completedKeys)
+  const completedCount = completedKeys.length
+
+  const startDate = shiftDays(targetDate, -30)
+  const pastCompletions = await dbClient
+    .select({
+      completedOn: routineCompletions.completedOn,
+      taskKey: routineCompletions.taskKey,
+    })
+    .from(routineCompletions)
+    .where(
+      and(
+        eq(routineCompletions.userId, userId),
+        sql`${routineCompletions.completedOn} >= ${startDate}`,
+        sql`${routineCompletions.completedOn} <= ${targetDate}`
+      )
+    )
+
+  const dayCounts = new Map<string, Set<string>>()
+  for (const c of pastCompletions) {
+    if (!dayCounts.has(c.completedOn)) {
+      dayCounts.set(c.completedOn, new Set())
+    }
+    dayCounts.get(c.completedOn)!.add(c.taskKey)
+  }
+
+  const history: Array<{ date: string; completedCount: number }> = []
+  for (let i = 30; i >= 0; i--) {
+    const d = shiftDays(targetDate, -i)
+    const count = dayCounts.get(d)?.size || 0
+    history.push({ date: d, completedCount: count })
+  }
+
+  const streakDays = computeStreak(history, targetDate)
+
+  return {
+    date: targetDate,
+    tasks,
+    completedKeys,
+    completedCount,
+    totalCount: TOTAL_ALIGNMENT_TASKS,
+    isAllCompleted: completedCount >= TOTAL_ALIGNMENT_TASKS,
+    history,
+    streakDays,
+  }
+}
+
+export const getDailyAlignmentHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
+  const userId = context?.user?.sub || context?.user?.id
+  if (!userId) {
+    throw new Error('Unauthenticated: Authentication required to fetch daily alignment.')
+  }
+
+  const { date } = getDailyAlignmentSchema.parse(data || {})
+  const targetDate = date || localDateString()
+
+  const { ensureUserProfile } = await import('../user-sync')
+  await ensureUserProfile(userId)
+
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  return await getDailyAlignmentData(dbClient, userId, targetDate)
+}
+
+export const toggleDailyAlignmentTaskHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<ToggleDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
+  const userId = context?.user?.sub || context?.user?.id
+  if (!userId) {
+    throw new Error('Unauthenticated: Authentication required to update daily alignment.')
+  }
+
+  const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
+
+  const isValidKey = CANONICAL_ALIGNMENT_TASKS.some((t) => t.key === taskKey)
+  if (!isValidKey) {
+    throw new Error(`Invalid task key: ${taskKey}`)
+  }
+
+  const { ensureUserProfile } = await import('../user-sync')
+  await ensureUserProfile(userId)
+
+  const dbClient = context?.db || getDb(context?.token ?? undefined)
+
+  if (completed) {
+    await dbClient
+      .insert(routineCompletions)
+      .values({
+        userId,
+        taskKey,
+        completedOn: date,
+      })
+      .onConflictDoNothing()
+  } else {
+    await dbClient
+      .delete(routineCompletions)
+      .where(
+        and(
+          eq(routineCompletions.userId, userId),
+          eq(routineCompletions.taskKey, taskKey),
+          eq(routineCompletions.completedOn, date)
+        )
+      )
+  }
+
+  return await getDailyAlignmentData(dbClient, userId, date)
+}
+
+export const getDailyAlignmentFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .validator((data?: GetDailyAlignmentInput) => getDailyAlignmentSchema.parse(data || {}))
+  .handler(getDailyAlignmentHandler)
+
+export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
+  .middleware(authenticatedMiddleware)
+  .validator((data: ToggleDailyAlignmentInput) => toggleDailyAlignmentSchema.parse(data))
+  .handler(toggleDailyAlignmentTaskHandler)
+
 

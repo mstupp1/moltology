@@ -82,6 +82,21 @@ export const routines = pgTable('routines', {
   })
 ])
 
+// Daily Routine Completions Table (Per-day task completion log)
+export const routineCompletions = pgTable('routine_completions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  taskKey: text('taskKey').notNull(),
+  completedOn: text('completedOn').notNull(), // 'YYYY-MM-DD'
+  completedAt: timestamp('completedAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('routine_completions_user_task_date_unique').on(table.userId, table.taskKey, table.completedOn),
+  pgPolicy('routine_completions_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
 // Public System Transmutation Changelogs Table
 export const changelogs = pgTable('changelogs', {
   id: uuid('id').defaultRandom().primaryKey(),

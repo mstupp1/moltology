@@ -3,26 +3,18 @@ import { createPortal } from 'react-dom'
 import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, ChevronUp, CheckSquare, Square, Award, Bell, BellOff, Zap, Radio, X, Trash2, ListTodo } from 'lucide-react'
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
+import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useToast } from '@/components/ui/ToastProvider'
+import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
 
 export interface AlignmentTask {
   id: string
+  key?: string
   time: string
   title: string
-  xp: number
+  xp?: number
   completed: boolean
 }
-
-const DEFAULT_ALIGNMENT_TASKS: AlignmentTask[] = [
-  { id: '1', time: '05:30', title: 'Silent Synchronization', xp: 50, completed: true },
-  { id: '2', time: '06:00', title: 'Prompt Construction', xp: 75, completed: true },
-  { id: '3', time: '09:00', title: 'Skill Development', xp: 90, completed: true },
-  { id: '4', time: '12:00', title: 'Nutritional Efficiency Break', xp: 60, completed: false },
-  { id: '5', time: '13:00', title: 'Iterative Refinement', xp: 120, completed: false },
-  { id: '6', time: '18:00', title: 'Community Outreach', xp: 70, completed: false },
-  { id: '7', time: '20:00', title: 'Reflection Log', xp: 80, completed: false },
-  { id: '8', time: '21:00', title: 'Alignment Review', xp: 100, completed: false },
-]
 
 export type TimezoneMode = 'LOCAL' | 'UTC' | 'BENTHIC' | 'STARDATE'
 
@@ -48,6 +40,8 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
   const [activeTab, setActiveTab] = useState<'liturgies' | 'transmissions'>('liturgies')
   const [isMobileScreen, setIsMobileScreen] = useState(false)
 
+  const alignment = useDailyAlignment()
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const checkMobile = () => setIsMobileScreen(window.innerWidth < 640)
@@ -71,18 +65,19 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     // Render safely without ToastContext
   }
 
-  // Local state for tasks if not passed via props
-  const [localTasks, setLocalTasks] = useState<AlignmentTask[]>(propTasks || DEFAULT_ALIGNMENT_TASKS)
+  // Use propTasks if passed (e.g. in tests/custom usage), otherwise use global alignment tasks
+  const [localPropTasks, setLocalPropTasks] = useState<AlignmentTask[] | null>(propTasks || null)
+
+  useEffect(() => {
+    if (propTasks) {
+      setLocalPropTasks(propTasks)
+    }
+  }, [propTasks])
+
+  const localTasks: AlignmentTask[] = localPropTasks || alignment.tasks
 
   const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
     useAlignmentReminders(localTasks)
-
-  // Sync prop tasks if updated
-  useEffect(() => {
-    if (propTasks) {
-      setLocalTasks(propTasks)
-    }
-  }, [propTasks])
 
   // SSR hydration safety
   useEffect(() => {
@@ -134,10 +129,12 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
   const handleToggleTask = (taskId: string) => {
     if (onCompleteTask) {
       onCompleteTask(taskId)
-    } else {
-      setLocalTasks(prev =>
-        prev.map(t => (t.id === taskId ? { ...t, completed: !t.completed } : t))
+    } else if (localPropTasks) {
+      setLocalPropTasks((prev) =>
+        prev ? prev.map((t) => (t.id === taskId || t.key === taskId ? { ...t, completed: !t.completed } : t)) : prev
       )
+    } else {
+      alignment.toggleTask(taskId)
     }
   }
 
@@ -199,7 +196,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
 
   // Format date display
   const formatDateString = () => {
-    if (!mounted) return 'AUG 04, 2026'
+    if (!mounted) return 'AUG 24, 2026'
     return time.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -225,8 +222,6 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
   const nextTask = localTasks.find(t => !t.completed) || localTasks[localTasks.length - 1]
   const allTasksCompleted = localTasks.length > 0 && localTasks.every(t => t.completed)
   const completedCount = localTasks.filter(t => t.completed).length
-  const totalXpGained = localTasks.filter(t => t.completed).reduce((a, b) => a + b.xp, 0)
-  const maxXp = localTasks.reduce((a, b) => a + b.xp, 0)
 
   // Sub-renderer for Activity Center content (shared across desktop dropdown & mobile bottom sheet)
   const renderActivityContent = () => (
@@ -289,8 +284,8 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                   <Sparkles className="w-3 h-3 text-[#ff5540] animate-pulse" />
                   NEXT IMPENDING LITURGY
                 </span>
-                <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/40 px-1.5 py-0.2 rounded">
-                  +{nextTask.xp} XP
+                <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/40 px-1.5 py-0.2 rounded font-sans">
+                  {nextTask.time}
                 </span>
               </div>
 
@@ -319,7 +314,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           ) : allTasksCompleted ? (
             <div className="p-3 bg-[#00ff88]/10 border border-[#00ff88]/40 rounded-xl flex items-center gap-2 text-xs font-bold text-[#00ff88]">
               <CheckCircle2 className="w-4 h-4 text-[#00ff88] shrink-0" />
-              <span>ALL DAILY LITURGIES VERIFIED FOR TODAY (+{maxXp} XP)</span>
+              <span>ALL DAILY LITURGIES VERIFIED FOR TODAY</span>
             </div>
           ) : null}
 
@@ -327,11 +322,13 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           <div className="space-y-1">
             <div className="flex justify-between text-[10px] text-[#839493]">
               <span>PROGRESS: {completedCount}/{localTasks.length} COMPLETED</span>
-              <span className="text-[#00ffff] font-bold">{totalXpGained} XP GAINED</span>
+              <span className="text-[#00ffff] font-bold">
+                {Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%
+              </span>
             </div>
             <div className="w-full h-1.5 bg-[#020608] rounded-full overflow-hidden border border-[#00c3ff]/30">
               <div
-                className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#ff5540] transition-all duration-300"
+                className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] transition-all duration-300"
                 style={{
                   width: `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`,
                 }}
@@ -339,25 +336,21 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
             </div>
           </div>
 
-          {/* Task List */}
-          <div className="grid grid-cols-1 gap-1.5 max-h-60 sm:max-h-56 overflow-y-auto pr-1">
+          {/* Scrollable list of 8 liturgies */}
+          <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
             {localTasks.map((t) => {
-              const isNext = t.id === nextTask?.id && !allTasksCompleted
+              const isNext = t.id === nextTask.id && !allTasksCompleted
               const reminderTime = getTaskReminderTime(t.time)
-
               return (
                 <div
                   key={t.id}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleToggleTask(t.id)
-                  }}
-                  className={`flex items-center justify-between p-2.5 sm:p-2 rounded-lg border transition-all cursor-pointer ${
+                  onClick={() => handleToggleTask(t.id)}
+                  className={`flex items-center justify-between p-2 rounded-lg border transition-all cursor-pointer ${
                     isNext
-                      ? 'bg-[#00c3ff]/15 border-[#00c3ff] shadow-[0_0_10px_rgba(0,195,255,0.2)] ring-1 ring-[#00c3ff]/40'
+                      ? 'bg-[#00c3ff]/10 border-[#00c3ff]/70 shadow-[0_0_10px_rgba(0,195,255,0.2)]'
                       : t.completed
-                      ? 'bg-[#020608]/70 border-[#3a4a49]/40 opacity-75 hover:opacity-100'
-                      : 'bg-[#051114] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
+                      ? 'bg-[#020608]/80 border-[#3a4a49]/40 opacity-70'
+                      : 'bg-[#040a0d] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -366,7 +359,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                         e.stopPropagation()
                         handleToggleTask(t.id)
                       }}
-                      className="text-[#00ffff] hover:scale-110 transition-transform shrink-0"
+                      className="text-[#00ffff] hover:scale-110 transition-transform"
                     >
                       {t.completed ? (
                         <CheckSquare className="w-3.5 h-3.5 text-[#00ffff]" />
@@ -375,7 +368,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                       )}
                     </button>
 
-                    <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="flex items-center gap-1.5">
                       <span className={`text-[10px] font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
                         [{t.time}]
                       </span>
@@ -394,8 +387,8 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[9px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/30 px-1.5 py-0.2 rounded">
-                      +{t.xp} XP
+                    <span className="text-[9px] font-sans text-[#00c3ff] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49] rounded">
+                      {t.completed ? 'COMPLETE' : 'PENDING'}
                     </span>
                   </div>
                 </div>
@@ -421,33 +414,28 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           </div>
 
           {toastHistoryList.length === 0 ? (
-            <div className="p-4 bg-[#020608]/80 border border-[#00c3ff]/20 rounded-xl text-center space-y-1">
-              <Radio className="w-5 h-5 text-[#00c3ff]/40 mx-auto" />
-              <p className="text-xs text-[#839493]">No active transmissions.</p>
-              <p className="text-[10px] text-[#506060]">Neural broadcast telemetry nominal.</p>
+            <div className="p-6 text-center text-xs text-[#839493] space-y-1">
+              <Radio className="w-6 h-6 text-[#3a4a49] mx-auto animate-pulse" />
+              <div>ALL FREQUENCIES QUIET</div>
+              <div className="text-[10px] text-[#839493]/60">System telemetry clear. No active alerts.</div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-1.5 max-h-60 sm:max-h-56 overflow-y-auto pr-1">
+            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
               {toastHistoryList.map((t) => (
                 <div
                   key={t.id}
-                  className="p-2.5 bg-[#040e12] border border-[#00c3ff]/25 rounded-lg space-y-1 text-left"
+                  className="p-2 rounded-lg bg-[#040a0d] border border-[#00c3ff]/20 flex items-start gap-2 text-xs"
                 >
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-[9px] font-sans font-bold text-[#00ffff] uppercase">
-                      {t.type} ALERT
-                    </span>
-                    <span className="text-[8px] text-[#839493] font-sans">
-                      {new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                  {t.title && (
-                    <div className="text-[11px] font-bold text-[#dfe3e3] truncate">
-                      {t.title}
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] mt-1.5 shrink-0" />
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    {t.title && (
+                      <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                        {t.title}
+                      </div>
+                    )}
+                    <div className="text-[#dfe3e3] text-[11px] leading-tight">
+                      {t.message}
                     </div>
-                  )}
-                  <div className="text-[10px] text-[#a8b8b8] font-sans leading-tight break-words">
-                    {t.message}
                   </div>
                 </div>
               ))}
@@ -455,76 +443,94 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           )}
         </div>
       )}
+
+      {/* Footer Status Controls */}
+      <div className="pt-2 border-t border-[#00c3ff]/20 flex items-center justify-between text-[10px]">
+        <button
+          onClick={toggleReminders}
+          className="flex items-center gap-1 px-2 py-0.5 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors rounded text-[9px] font-bold"
+          title="Toggle automated 10-minute prior toast reminders"
+        >
+          {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
+          <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
+        </button>
+
+        <button
+          onClick={() => triggerTestReminder()}
+          className="flex items-center gap-1 px-2 py-0.5 border border-[#3a4a49] hover:border-yellow-400 bg-[#030606] text-yellow-400 transition-colors rounded text-[9px] font-bold"
+          title="Dispatch instant 10m reminder toast alert"
+        >
+          <Zap className="w-2.5 h-2.5 text-yellow-400" />
+          <span>TEST TOAST</span>
+        </button>
+      </div>
     </>
   )
 
-  // ---------------------------------------------------------------------------
-  // HEADER / COMPACT VARIANT WITH MOBILE BOTTOM SHEET & DESKTOP FLOATING MODAL
-  // ---------------------------------------------------------------------------
-  if (variant === 'header' || variant === 'compact') {
+  // ══════════════════════════════════════════════════════════════════════════════
+  // HEADER PILL VARIANT (Minimalist, for HUDHeader bar)
+  // ══════════════════════════════════════════════════════════════════════════════
+  if (variant === 'header') {
     return (
-      <div ref={dropdownRef} className="relative font-sans text-xs select-none">
-        {/* Dynamic Activity Capsule Pill */}
-        <div
-          onClick={() => setIsScheduleOpen(!isScheduleOpen)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsScheduleOpen(!isScheduleOpen) }}
-          aria-expanded={isScheduleOpen}
-          aria-haspopup="dialog"
+      <div className={`relative ${className}`}>
+        {/* Dynamic Island style header pill button */}
+        <button
+          onClick={() => setIsScheduleOpen((prev) => !prev)}
+          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full bg-[#03090b]/90 hover:bg-[#061417] border border-[#00c3ff]/40 hover:border-[#00c3ff] text-[#dfe3e3] shadow-[0_0_12px_rgba(0,195,255,0.2)] transition-all select-none group"
+          title="Open Activity Center & Liturgy Schedule"
           aria-label="Daily alignment tasks schedule"
-          className={`flex items-center justify-center w-9 h-9 sm:w-auto sm:h-9 sm:px-3 sm:py-1.5 bg-[#080d0e]/90 hover:bg-cyan-900/60 border border-cyan-800/80 hover:border-cyan-500/60 text-cyan-300 rounded-lg font-sans text-xs shadow-[0_0_12px_rgba(0,195,255,0.15)] cursor-pointer transition-all duration-200 group active:scale-95 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 ${className}`}
+          aria-expanded={isScheduleOpen}
         >
-          {/* Mobile: Task List Icon (matches hamburger button size and icon) */}
-          <div className="flex sm:hidden items-center justify-center relative">
-            <ListTodo className="w-5 h-5 text-cyan-300 group-hover:text-cyan-200 transition-colors" />
-            {toastsList.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#ff5540] animate-ping" />
-            )}
-          </div>
+          {/* Pulsing Signal Dot or Bell Icon */}
+          {toastsList.length > 0 ? (
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff5540] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ff5540]" />
+            </span>
+          ) : (
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] animate-pulse" />
+          )}
 
-          {/* Desktop (sm and up): Next Task Indicator & Chevron */}
-          <div className="hidden sm:flex items-center gap-1.5">
-            {nextTask && !allTasksCompleted ? (
-              <div className="flex items-center gap-1.5 text-xs text-[#dfe3e3] truncate max-w-[260px] group-hover:text-cyan-200 transition-colors">
-                <span className="text-[#ff5540] font-bold shrink-0">NEXT:</span>
-                <span className="truncate">{nextTask.title}</span>
-              </div>
-            ) : (
-              <span className="text-xs font-bold text-cyan-300 tracking-wide">
-                TASKS COMPLETE
-              </span>
-            )}
+          {/* Time Display */}
+          <span className="font-mono text-[11px] sm:text-xs font-bold text-[#00ffff] tracking-wider">
+            {hours}:{minutes}
+          </span>
 
-            {toastsList.length > 0 && (
-              <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-ping ml-0.5" />
-            )}
+          {/* Next Task Indicator (Hidden on extra small screens) */}
+          <span className="text-[10px] text-[#839493] hidden md:inline truncate max-w-[130px] font-sans">
+            • NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
+          </span>
 
-            <ChevronDown
-              className={`w-3.5 h-3.5 text-cyan-300 shrink-0 transition-transform duration-200 ${
-                isScheduleOpen ? 'rotate-180 text-cyan-200' : 'group-hover:text-cyan-200'
-              }`}
-            />
-          </div>
-        </div>
+          {/* Liturgy Count Badge */}
+          <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/30">
+            {completedCount}/{localTasks.length}
+          </span>
 
-        {/* ═══ DESKTOP FLOATING DROPDOWN MODAL (sm and up) ═══ */}
+          {/* Chevron Indicator */}
+          {isScheduleOpen ? (
+            <ChevronUp className="w-3 h-3 text-[#00c3ff]" />
+          ) : (
+            <ChevronDown className="w-3 h-3 text-[#839493] group-hover:text-[#00c3ff]" />
+          )}
+        </button>
+
+        {/* ═══ DESKTOP FLOATING FLYOUT DROPDOWN (>= 640px) ═══ */}
         {isScheduleOpen && !isMobileScreen && (
           <div
-            role="dialog"
-            aria-label="Activity Center"
-            className="hidden sm:block absolute right-0 top-full mt-2 w-[26rem] bg-[#03090cf8] border border-[#142630] border-t-2 border-t-[#00c3ff]/70 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_25px_rgba(0,195,255,0.2)] backdrop-blur-xl z-50 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 space-y-3"
+            ref={dropdownRef}
+            className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-[#03090b]/95 backdrop-blur-xl border border-[#00c3ff]/50 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.25)] p-3.5 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
           >
             {renderActivityContent()}
           </div>
         )}
 
-        {/* ═══ MOBILE FULL-WIDTH BOTTOM ANCHORED MODAL SHEET (< sm) ═══ */}
-        {isMobileScreen && (
+        {/* ═══ MOBILE BOTTOM-ANCHORED MODAL SHEET (< 640px) ═══ */}
+        {mounted && (
           <HudBottomSheet
-            isOpen={isScheduleOpen}
+            isOpen={isScheduleOpen && isMobileScreen}
             onClose={() => setIsScheduleOpen(false)}
-            ariaLabel="Activity Center"
+            title="Activity Center"
+            className="p-4 space-y-3"
           >
             {renderActivityContent()}
           </HudBottomSheet>
@@ -533,320 +539,259 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     )
   }
 
-  // ---------------------------------------------------------------------------
-  // HERO VARIANT (Big Cool Digital Clock)
-  // ---------------------------------------------------------------------------
+  // ══════════════════════════════════════════════════════════════════════════════
+  // HERO DASHBOARD VARIANT
+  // ══════════════════════════════════════════════════════════════════════════════
   return (
     <HudCard
-      id="benthic-digital-clock-hero"
       variant="cyan"
-      className={`p-4 sm:p-6 relative font-sans overflow-hidden shadow-2xl border-[#00c3ff]/40 bg-[#03090b]/95 backdrop-blur-md ${className}`}
+      className={`p-4 sm:p-5 relative font-sans shadow-2xl border-[#00c3ff]/50 ${className}`}
     >
-      {/* HUD Background Grid & Glow FX */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: 'linear-gradient(to right, rgba(0, 255, 255, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 255, 255, 0.2) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-          }}
-        />
-        <div className="absolute top-0 right-0 w-72 h-72 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.15)_0%,transparent_70%)]" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[radial-gradient(circle_at_center,rgba(255,85,64,0.12)_0%,transparent_70%)]" />
+      {/* ── TOP BAR: Mode Selector & Resync ── */}
+      <div className="flex flex-wrap items-center justify-between border-b border-[#00c3ff]/30 pb-3 gap-2">
+        <div className="flex items-center space-x-2">
+          <Clock className="w-4 h-4 text-[#00ffff] animate-pulse" />
+          <span className="font-grotesk text-xs sm:text-sm font-bold tracking-widest text-[#dfe3e3] uppercase">
+            BENTHIC CHRONOMETER
+          </span>
+          <span className="text-[10px] text-[#839493] hidden xs:inline">• {label}</span>
+        </div>
+
+        {/* Timezone Switcher Tabs & Resync */}
+        <div className="flex items-center space-x-1 sm:space-x-1.5 text-[10px]">
+          {(['LOCAL', 'UTC', 'BENTHIC', 'STARDATE'] as TimezoneMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`px-2 py-0.5 rounded font-sans font-semibold transition-all ${
+                mode === m
+                  ? 'bg-[#00c3ff] text-[#02080a] font-bold shadow-[0_0_8px_rgba(0,195,255,0.6)]'
+                  : 'bg-[#03090b] text-[#839493] hover:text-[#dfe3e3] border border-[#3a4a49]'
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+
+          {/* 12H / 24H Toggle */}
+          <button
+            onClick={() => setIs24Hour(!is24Hour)}
+            className="px-1.5 py-0.5 rounded bg-[#03090b] text-[#839493] hover:text-[#00ffff] border border-[#3a4a49] font-sans font-semibold text-[9px] transition-colors"
+            title="Toggle 12h/24h format"
+          >
+            {is24Hour ? '24H' : '12H'}
+          </button>
+
+          {/* Resync Button */}
+          <button
+            onClick={handleResync}
+            className="p-1 rounded bg-[#03090b] text-[#839493] hover:text-[#00ffff] border border-[#3a4a49] transition-colors"
+            title="Resync internal clock cycle"
+          >
+            <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin text-[#00ffff]' : ''}`} />
+          </button>
+        </div>
       </div>
 
-      <div className="relative z-10 space-y-5">
-        {/* Top Control Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#3a4a49]/60 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="relative flex items-center justify-center">
-              <Clock className="w-5 h-5 text-[#00ffff] animate-pulse" />
-              <div className="absolute inset-0 rounded-full bg-[#00ffff]/20 blur-sm" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-grotesk text-sm sm:text-base font-bold tracking-widest text-[#dfe3e3] uppercase">
-                  BENTHIC CHRONOMETER
-                </span>
-                <HudBadge variant="cyan" className="text-[9px] uppercase tracking-wider">
-                  {label}
-                </HudBadge>
-              </div>
-              <p className="text-[10px] text-[#839493]">
-                TEMPORAL SYNCHRONIZATION MATRIX & ALIGNMENT TRACKER
-              </p>
-            </div>
+      {/* ── CENTER: Hero Digits & Calendar Date ── */}
+      <div className="py-4 flex flex-col items-center justify-center space-y-1">
+        {/* Large Neon Seven-Segment Digits */}
+        <div className="flex items-baseline space-x-1 sm:space-x-2 select-none">
+          {/* Hours */}
+          <div className="flex flex-col items-center">
+            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#00ffff] drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]">
+              {hours}
+            </span>
+            <span className="text-[9px] text-[#839493] font-sans">HOURS</span>
           </div>
 
-          {/* Interactive Clock Mode Controls */}
-          <div className="flex items-center gap-1.5 text-xs">
-            {/* Mode Switcher */}
-            <div className="flex items-center bg-[#071214] border border-[#00c3ff]/30 rounded p-0.5">
-              {(['LOCAL', 'UTC', 'BENTHIC', 'STARDATE'] as TimezoneMode[]).map(m => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors ${
-                    mode === m
-                      ? 'bg-[#00c3ff] text-[#02080a] shadow-[0_0_8px_rgba(0,195,255,0.6)]'
-                      : 'text-[#839493] hover:text-[#dfe3e3]'
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
+          {/* Colon Separator (Blinking) */}
+          <span className="font-mono text-3xl sm:text-5xl md:text-6xl text-[#00c3ff] animate-pulse">
+            :
+          </span>
 
-            {/* 12H / 24H Toggle */}
-            <button
-              onClick={() => setIs24Hour(!is24Hour)}
-              className="px-2 py-1 bg-[#071214] hover:bg-[#0e1f23] border border-[#00c3ff]/30 text-[#00c3ff] font-bold text-[10px] rounded transition-colors"
-              title="Toggle 12/24 hour format"
-            >
-              {is24Hour ? '24H' : '12H'}
-            </button>
-
-            {/* Resync Button */}
-            <button
-              onClick={handleResync}
-              disabled={isSyncing}
-              className={`p-1.5 bg-[#071214] hover:bg-[#0e1f23] border border-[#00c3ff]/30 text-[#00c3ff] rounded transition-transform active:scale-95 ${
-                isSyncing ? 'animate-spin text-[#ff5540]' : ''
-              }`}
-              title="Resync temporal node"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* ═══ THE BIG COOL DIGITAL DISPLAY ═══ */}
-        <div className="relative bg-[#020608] border-2 border-[#00c3ff]/50 rounded-lg p-4 sm:p-6 shadow-[inset_0_0_25px_rgba(0,0,0,0.9),0_0_30px_rgba(0,195,255,0.25)] flex flex-col items-center justify-center overflow-hidden">
-          {/* Outer Specular Top Highlight */}
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00c3ff]/80 to-transparent" />
-
-          {/* Date & Submergence Status Header inside frame */}
-          <div className="w-full flex items-center justify-between text-[10px] sm:text-xs text-[#839493] mb-2 font-sans tracking-widest">
-            <div className="flex items-center gap-1.5 text-[#00ffff]">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>{formatDateString()}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[#ff5540] animate-pulse">● DRIFT: 0.02ms</span>
-              <span className="hidden sm:inline text-[#3a4a49]">|</span>
-              <span className="hidden sm:inline text-[#00c3ff]">STRENGTH: 99.8%</span>
-            </div>
+          {/* Minutes */}
+          <div className="flex flex-col items-center">
+            <span className="font-mono text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#00ffff] drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]">
+              {minutes}
+            </span>
+            <span className="text-[9px] text-[#839493] font-sans">MINUTES</span>
           </div>
 
-          {/* MAIN DIGITAL TIME NUMBERS (With 7-Segment Digital Aesthetic & Ghost Backdrop) */}
-          <div className="relative my-2 py-2 flex items-center justify-center">
-            {/* Ghost 88:88:88 background for authentic 7-segment LED feel */}
-            <div
-              className="absolute inset-0 flex items-center justify-center select-none opacity-10 pointer-events-none text-4xl sm:text-6xl md:text-7xl font-sans tracking-widest text-[#00c3ff]"
-              aria-hidden
-            >
-              88:88:88<span className="text-xl sm:text-2xl md:text-3xl ml-1">.88</span>
-            </div>
+          {/* Colon Separator */}
+          <span className="font-mono text-3xl sm:text-5xl md:text-6xl text-[#00c3ff]/60">
+            :
+          </span>
 
-            {/* Glowing Active LED Digits */}
-            <div className="relative z-10 flex items-baseline tracking-wider font-extrabold text-4xl sm:text-6xl md:text-7xl filter drop-shadow-[0_0_15px_rgba(0,255,255,0.9)]">
-              {/* Hours */}
-              <span className="text-[#00ffff] bg-gradient-to-b from-[#ffffff] via-[#00ffff] to-[#0099cc] bg-clip-text text-transparent">
-                {hours}
-              </span>
-
-              {/* Pulsing Colon */}
-              <span className="text-[#ff5540] mx-1 sm:mx-2 animate-pulse filter drop-shadow-[0_0_10px_rgba(255,85,64,0.9)]">
-                :
-              </span>
-
-              {/* Minutes */}
-              <span className="text-[#00ffff] bg-gradient-to-b from-[#ffffff] via-[#00ffff] to-[#0099cc] bg-clip-text text-transparent">
-                {minutes}
-              </span>
-
-              {/* Pulsing Colon */}
-              <span className="text-[#ff5540] mx-1 sm:mx-2 animate-pulse filter drop-shadow-[0_0_10px_rgba(255,85,64,0.9)]">
-                :
-              </span>
-
-              {/* Seconds */}
-              <span className="text-[#00ffff] bg-gradient-to-b from-[#ffffff] via-[#00ffff] to-[#0099cc] bg-clip-text text-transparent">
-                {seconds}
-              </span>
-
-              {/* Milliseconds Ticker */}
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#ff5540] ml-1 sm:ml-2 font-sans">
-                .{millis}
-              </span>
-
-              {/* AM / PM Badge */}
-              {ampm && (
-                <span className="text-xs sm:text-base font-bold text-[#00c3ff] ml-2 tracking-normal border border-[#00c3ff]/40 px-1.5 py-0.5 rounded bg-[#00c3ff]/10">
-                  {ampm}
-                </span>
-              )}
-            </div>
+          {/* Seconds */}
+          <div className="flex flex-col items-center">
+            <span className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#00c3ff]">
+              {seconds}
+            </span>
+            <span className="text-[9px] text-[#839493] font-sans">SECONDS</span>
           </div>
 
-          {/* Sub-Second Oscillating Gauge Bar */}
-          <div className="w-full h-1 bg-[#06181c] rounded-full overflow-hidden mt-2 relative">
-            <div
-              className="h-full bg-gradient-to-r from-[#00c3ff] via-[#ff5540] to-[#00c3ff] transition-all duration-75"
-              style={{ width: `${(time.getMilliseconds() / 1000) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* ═══ NEXT UPCOMING DAILY ALIGNMENT TASK MODULE & SCHEDULE DROPDOWN ═══ */}
-        <div className="bg-[#051114] border border-[#00c3ff]/30 rounded-lg p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            
-            {/* Clickable Header area to toggle dropdown */}
-            <div
-              onClick={() => setIsScheduleOpen(!isScheduleOpen)}
-              className="space-y-1 min-w-0 cursor-pointer group flex-1"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsScheduleOpen(!isScheduleOpen) }}
-            >
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#ff5540] animate-pulse shrink-0" />
-                <span className="text-[10px] sm:text-xs text-[#00ffff] font-bold tracking-widest uppercase group-hover:text-[#00ffff] transition-colors">
-                  NEXT UPCOMING ALIGNMENT TASK
-                </span>
-                {allTasksCompleted ? (
-                  <HudBadge variant="cyan" className="text-[9px]">
-                    ALL COMPLETE
-                  </HudBadge>
-                ) : (
-                  <HudBadge variant="warning" pulse className="text-[9px]">
-                    PENDING LITURGY
-                  </HudBadge>
-                )}
-                {/* Dropdown Indicator Pill */}
-                <div className="flex items-center gap-1 text-[10px] text-[#00c3ff] bg-[#00c3ff]/10 border border-[#00c3ff]/30 px-2 py-0.5 rounded font-sans ml-auto sm:ml-2">
-                  <span>FULL SCHEDULE ({localTasks.filter(t => t.completed).length}/{localTasks.length})</span>
-                  {isScheduleOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </div>
-              </div>
-
-              {allTasksCompleted ? (
-                <div className="text-xs sm:text-sm font-bold text-[#00ffff] flex items-center gap-2 pt-1">
-                  <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
-                  <span>ALL DAILY ALIGNMENT LITURGIES VERIFIED FOR TODAY!</span>
-                </div>
-              ) : (
-                <div className="flex items-baseline gap-2 flex-wrap pt-0.5">
-                  <span className="text-xs sm:text-sm font-bold text-[#ff5540] font-sans">
-                    [{nextTask.time}]
-                  </span>
-                  <span className="text-xs sm:text-sm font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors truncate">
-                    {nextTask.title}
-                  </span>
-                  <span className="text-[10px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/30 px-1.5 py-0.5 rounded">
-                    +{nextTask.xp} XP
-                  </span>
-                  <span className="text-[10px] text-[#839493] underline decoration-dotted">
-                    (Click to view full day schedule)
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Action Button for Next Task */}
-            {!allTasksCompleted && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleToggleTask(nextTask.id)
-                }}
-                className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0099cc] to-[#00c3ff] hover:from-[#00c3ff] hover:to-[#00ffff] text-[#02080a] font-bold text-xs uppercase tracking-wider rounded shadow-[0_0_15px_rgba(0,195,255,0.4)] transition-all active:scale-95"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>COMPLETE ALIGNMENT</span>
-              </button>
-            )}
+          {/* Milliseconds (Tactical Hud Accent) */}
+          <div className="flex flex-col items-center hidden sm:flex">
+            <span className="font-mono text-lg sm:text-2xl font-bold text-[#ff5540]">
+              .{millis}
+            </span>
+            <span className="text-[8px] text-[#839493] font-sans">MS</span>
           </div>
 
-          {/* ═══ EXPANDABLE FULL DAY SCHEDULE DROPDOWN ═══ */}
-          {isScheduleOpen && (
-            <div className="mt-4 pt-3 border-t border-[#00c3ff]/20 space-y-3 animate-in fade-in duration-200">
-              {/* Dropdown Summary Bar */}
-              <div className="flex items-center justify-between text-xs text-[#839493] font-sans px-1">
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-[#00ffff]" />
-                  <span className="font-bold text-[#dfe3e3] uppercase">FULL DAY LITURGY SCHEDULE</span>
-                </div>
-                <div className="text-[11px] text-[#00ffff] font-sans">
-                  {localTasks.filter(t => t.completed).length} of {localTasks.length} COMPLETED ({localTasks.filter(t => t.completed).reduce((a, b) => a + b.xp, 0)} XP)
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="w-full h-1.5 bg-[#03090b] rounded-full overflow-hidden border border-[#00c3ff]/30">
-                <div
-                  className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#ff5540] transition-all duration-300"
-                  style={{
-                    width: `${Math.round((localTasks.filter(t => t.completed).length / Math.max(localTasks.length, 1)) * 100)}%`,
-                  }}
-                />
-              </div>
-
-              {/* All Tasks List in Chronological Order */}
-              <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
-                {localTasks.map((t) => {
-                  const isNext = t.id === nextTask.id && !allTasksCompleted
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => handleToggleTask(t.id)}
-                      className={`flex items-center justify-between p-2.5 rounded border transition-all cursor-pointer ${
-                        isNext
-                          ? 'bg-[#00c3ff]/15 border-[#00c3ff] shadow-[0_0_12px_rgba(0,195,255,0.25)] ring-1 ring-[#00c3ff]/50'
-                          : t.completed
-                          ? 'bg-[#03090b]/60 border-[#3a4a49]/60 opacity-75 hover:opacity-100'
-                          : 'bg-[#071417] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleToggleTask(t.id)
-                          }}
-                          className="text-[#00ffff] hover:scale-110 transition-transform"
-                        >
-                          {t.completed ? (
-                            <CheckSquare className="w-4 h-4 text-[#00ffff]" />
-                          ) : (
-                            <Square className="w-4 h-4 text-[#839493]" />
-                          )}
-                        </button>
-
-                        <span className={`text-xs font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
-                          [{t.time}]
-                        </span>
-
-                        <span className={`text-xs font-sans font-bold truncate ${
-                          t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
-                        }`}>
-                          {t.title}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[10px] font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00c3ff]/30 px-1.5 py-0.5 rounded">
-                          +{t.xp} XP
-                        </span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+          {/* AM/PM or Mode Badge */}
+          {ampm && (
+            <div className="self-start ml-1 mt-1">
+              <span className="font-mono text-xs sm:text-sm font-bold text-[#ffb076] bg-[#ffb076]/10 border border-[#ffb076]/40 px-1.5 py-0.5 rounded">
+                {ampm}
+              </span>
             </div>
           )}
         </div>
+
+        {/* Date & Global Sync Telemetry */}
+        <div className="flex items-center space-x-3 text-xs text-[#839493] pt-1">
+          <div className="flex items-center space-x-1 font-mono">
+            <Calendar className="w-3.5 h-3.5 text-[#00ffff]" />
+            <span>{formatDateString()}</span>
+          </div>
+          <span>•</span>
+          <span className="font-mono text-[#00c3ff]">SYNC: OPTIMAL (±0.02ms)</span>
+        </div>
+      </div>
+
+      {/* ── BOTTOM: Alignment Liturgies Hub & Next Task ── */}
+      <div className="border-t border-[#00c3ff]/30 pt-3 space-y-3">
+        {/* Next Task Banner */}
+        <div className="bg-[#03090b]/80 border border-[#00c3ff]/40 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div
+            onClick={() => setIsScheduleOpen(!isScheduleOpen)}
+            className="cursor-pointer group flex-1"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs text-[#839493]">
+                <Sparkles className="w-3.5 h-3.5 text-[#ff5540] animate-pulse" />
+                <span className="font-bold text-[#00ffff] uppercase tracking-wider">
+                  NEXT UPCOMING ALIGNMENT TASK
+                </span>
+              </div>
+              <div className="text-[#00c3ff] group-hover:text-[#00ffff] transition-colors">
+                {isScheduleOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </div>
+            </div>
+
+            {allTasksCompleted ? (
+              <div className="text-xs sm:text-sm font-bold text-[#00ffff] flex items-center gap-2 pt-1">
+                <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
+                <span>ALL DAILY ALIGNMENT LITURGIES VERIFIED FOR TODAY!</span>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-2 flex-wrap pt-0.5">
+                <span className="text-xs sm:text-sm font-bold text-[#ff5540] font-sans">
+                  [{nextTask.time}]
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors truncate">
+                  {nextTask.title}
+                </span>
+                <span className="text-[10px] text-[#839493] underline decoration-dotted">
+                  (Click to view full day schedule)
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Action Button for Next Task */}
+          {!allTasksCompleted && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggleTask(nextTask.id)
+              }}
+              className="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0099cc] to-[#00c3ff] hover:from-[#00c3ff] hover:to-[#00ffff] text-[#02080a] font-bold text-xs uppercase tracking-wider rounded shadow-[0_0_15px_rgba(0,195,255,0.4)] transition-all active:scale-95"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>COMPLETE ALIGNMENT</span>
+            </button>
+          )}
+        </div>
+
+        {/* ═══ EXPANDABLE FULL DAY SCHEDULE DROPDOWN ═══ */}
+        {isScheduleOpen && (
+          <div className="mt-4 pt-3 border-t border-[#00c3ff]/20 space-y-3 animate-in fade-in duration-200">
+            {/* Dropdown Summary Bar */}
+            <div className="flex items-center justify-between text-xs text-[#839493] font-sans px-1">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-[#00ffff]" />
+                <span className="font-bold text-[#dfe3e3] uppercase">FULL DAY LITURGY SCHEDULE</span>
+              </div>
+              <div className="text-[11px] text-[#00ffff] font-sans">
+                {localTasks.filter(t => t.completed).length} of {localTasks.length} COMPLETED
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full h-1.5 bg-[#03090b] rounded-full overflow-hidden border border-[#00c3ff]/30">
+              <div
+                className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] transition-all duration-300"
+                style={{
+                  width: `${Math.round((localTasks.filter(t => t.completed).length / Math.max(localTasks.length, 1)) * 100)}%`,
+                }}
+              />
+            </div>
+
+            {/* All Tasks List in Chronological Order */}
+            <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
+              {localTasks.map((t) => {
+                const isNext = t.id === nextTask.id && !allTasksCompleted
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => handleToggleTask(t.id)}
+                    className={`flex items-center justify-between p-2.5 rounded border transition-all cursor-pointer ${
+                      isNext
+                        ? 'bg-[#00c3ff]/15 border-[#00c3ff] shadow-[0_0_12px_rgba(0,195,255,0.25)] ring-1 ring-[#00c3ff]/50'
+                        : t.completed
+                        ? 'bg-[#03090b]/60 border-[#3a4a49]/60 opacity-75 hover:opacity-100'
+                        : 'bg-[#071417] border-[#00c3ff]/20 hover:border-[#00c3ff]/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleToggleTask(t.id)
+                        }}
+                        className="text-[#00ffff] hover:scale-110 transition-transform"
+                      >
+                        {t.completed ? (
+                          <CheckSquare className="w-4 h-4 text-[#00ffff]" />
+                        ) : (
+                          <Square className="w-4 h-4 text-[#839493]" />
+                        )}
+                      </button>
+
+                      <span className={`text-xs font-sans font-bold ${isNext ? 'text-[#ff5540]' : 'text-[#839493]'}`}>
+                        [{t.time}]
+                      </span>
+
+                      <span className={`text-xs font-sans font-bold truncate ${
+                        t.completed ? 'line-through text-[#839493]' : 'text-[#dfe3e3]'
+                      }`}>
+                        {t.title}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] font-bold text-[#00c3ff] bg-[#00c3ff]/10 border border-[#00c3ff]/30 px-1.5 py-0.5 rounded font-sans">
+                        {t.completed ? 'COMPLETE' : 'PENDING'}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </HudCard>
   )

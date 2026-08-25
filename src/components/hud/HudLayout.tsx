@@ -7,6 +7,7 @@ import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
 import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
+import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { authClient } from '@/lib/auth-client'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -187,7 +188,9 @@ function HudContent() {
 export function HudLayout() {
   return (
     <OracleProvider>
-      <HudContent />
+      <AlignmentProvider>
+        <HudContent />
+      </AlignmentProvider>
     </OracleProvider>
   )
 }
