@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ArrowBigUp, ShieldCheck, Cpu, Terminal, Flame, Radio, MessageSquare, Pin } from 'lucide-react'
 import { toggleForumTopicVoteFn, toggleForumPostVoteFn } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { useForumAuth } from './ForumShell'
 
 const STAGE_COLORS: Record<number, string> = {
@@ -89,10 +90,15 @@ export function VoteButton({
     setLocal(optimistic)
     setBusy(true)
     try {
+      const token = await getAuthJWTToken()
       const res =
         targetType === 'topic'
-          ? await toggleForumTopicVoteFn({ data: { topicId: targetId, userId: userId ?? undefined } })
-          : await toggleForumPostVoteFn({ data: { postId: targetId, userId: userId ?? undefined } })
+          ? await toggleForumTopicVoteFn({
+              data: { topicId: targetId, userId: userId ?? undefined, token: token ?? undefined },
+            })
+          : await toggleForumPostVoteFn({
+              data: { postId: targetId, userId: userId ?? undefined, token: token ?? undefined },
+            })
       setLocal({ count: res.upvotes, voted: res.voted })
       onResult?.(res)
     } catch (err) {

@@ -5,6 +5,7 @@ import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { authClient } from '@/lib/auth-client'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
 import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult } from '@/lib/moltmax-quiz'
@@ -264,6 +265,7 @@ export const MoltMaxPage: React.FC = () => {
   const handleSave = async () => {
     if (!result || !user) return
     try {
+      const token = await getAuthJWTToken()
       await updateUserStatsFn({
         data: {
           pincerTorque: result.dimensionScores.pincerTorque,
@@ -273,6 +275,7 @@ export const MoltMaxPage: React.FC = () => {
           moltmaxClearance: result.clearance,
           moltmaxStage: result.stage,
           moltmaxDimensionScores: result.dimensionScores,
+          token: token ?? undefined,
         },
       })
       setIsSaved(true)

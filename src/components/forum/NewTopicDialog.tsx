@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { X, AlertTriangle, MessageSquare } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useForumAuth } from './ForumShell'
 
@@ -38,8 +39,9 @@ export function NewTopicDialog({
     setCreating(true)
     setError(null)
     try {
+      const token = await getAuthJWTToken()
       const topic = await createForumTopicFn({
-        data: { categoryId, title, content, userId: userId ?? undefined },
+        data: { categoryId, title, content, userId: userId ?? undefined, token: token ?? undefined },
       })
       onCreated(topic)
       onClose()

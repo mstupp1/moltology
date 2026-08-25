@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { authClient } from '@/lib/auth-client'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { useToast } from '@/components/ui/ToastProvider'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -75,7 +76,10 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const data = await getDailyAlignmentFn({ data: { date: targetDate } })
+      const token = await getAuthJWTToken()
+      const data = await getDailyAlignmentFn({
+        data: { date: targetDate, token: token ?? undefined },
+      })
       if (data) {
         setTasks(data.tasks)
         setHistory(data.history || [])
@@ -167,11 +171,13 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     if (userId) {
       setIsSyncing(true)
       try {
+        const token = await getAuthJWTToken()
         const response = await toggleDailyAlignmentTaskFn({
           data: {
             taskKey: currentTask.key,
             completed: nextCompleted,
             date: currentDate,
+            token: token ?? undefined,
           },
         })
 

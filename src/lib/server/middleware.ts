@@ -1,42 +1,26 @@
 import { createMiddleware } from '@tanstack/react-start'
-import { verifyNeonJWT } from '../jwt'
+import { looksLikeJwt, verifyNeonJWT } from '../jwt'
 import { getDb } from '../../db'
 import { ensureUserProfile } from '../user-sync'
 import { ServerError } from './error'
 
 /**
- * Extracts a Bearer token or x-auth-token from request headers.
+ * Extracts a JWKS-verifiable JWT from request headers only.
+ * Opaque Better Auth session cookies are never treated as JWTs.
  */
 export function extractAuthToken(request?: Request | null): string | null {
   if (!request || !request.headers) return null
 
   const authHeader = request.headers.get('authorization') || request.headers.get('Authorization')
   if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
-    return authHeader.substring(7).trim()
+    const token = authHeader.substring(7).trim()
+    return looksLikeJwt(token) ? token : null
   }
 
   const customHeader = request.headers.get('x-auth-token')
   if (customHeader) {
-    return customHeader.trim()
-  }
-
-  const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie')
-  if (cookieHeader) {
-    const cookies = cookieHeader.split(';').map((c) => c.trim())
-    for (const cookie of cookies) {
-      const [name, ...valParts] = cookie.split('=')
-      const val = valParts.join('=')
-      if (
-        (name === 'better-auth.session_token' ||
-          name === '__Secure-better-auth.session_token' ||
-          name === 'session_token' ||
-          name === 'neon_auth_token' ||
-          name === 'auth_token') &&
-        val
-      ) {
-        return decodeURIComponent(val)
-      }
-    }
+    const token = customHeader.trim()
+    return looksLikeJwt(token) ? token : null
   }
 
   return null
@@ -58,10 +42,14 @@ export const loggingMiddleware = createMiddleware().server(async ({ request, nex
 
 /**
  * Middleware enforcing valid Neon Auth JWT authentication.
- * Automatically injects verified user payload, JWT token, and RLS-scoped db client into context.
+ * Injects verified user payload, JWT token, and owner db client into context.
+ * Callers that cannot send cookies must pass a JWT via Bearer / x-auth-token
+ * (or resolve identity in the handler with `data.token` via resolveWriteAuth).
  */
-export const authMiddleware = createMiddleware().server(async ({ request, next }) => {
-  const token = extractAuthToken(request)
+export const authMiddleware = createMiddleware().server(async ({ request, next, data }: any) => {
+  const headerToken = extractAuthToken(request)
+  const dataToken = typeof data?.token === 'string' && looksLikeJwt(data.token) ? data.token : null
+  const token = headerToken || dataToken
 
   if (!token) {
     throw new ServerError('Unauthorized - Missing authentication token', 'UNAUTHORIZED', 401)
@@ -77,7 +65,7 @@ export const authMiddleware = createMiddleware().server(async ({ request, next }
   }
 
   const user = verification.payload
-  const db = getDb(token)
+  const db = getDb()
   await ensureUserProfile(user.sub)
 
   return next({
@@ -91,10 +79,12 @@ export const authMiddleware = createMiddleware().server(async ({ request, next }
 
 /**
  * Middleware for optional authentication.
- * Injects user payload and RLS db client if valid token provided; falls back to default db if unauthenticated.
+ * Injects user payload if a valid JWT is present; otherwise uses the default owner db.
  */
-export const optionalAuthMiddleware = createMiddleware().server(async ({ request, next }) => {
-  const token = extractAuthToken(request)
+export const optionalAuthMiddleware = createMiddleware().server(async ({ request, next, data }: any) => {
+  const headerToken = extractAuthToken(request)
+  const dataToken = typeof data?.token === 'string' && looksLikeJwt(data.token) ? data.token : null
+  const token = headerToken || dataToken
   let ctx: { user: any; token: string | null; db: ReturnType<typeof getDb> }
 
   if (!token) {
@@ -103,7 +93,7 @@ export const optionalAuthMiddleware = createMiddleware().server(async ({ request
     const verification = await verifyNeonJWT(token)
     if (verification.valid && verification.payload) {
       await ensureUserProfile(verification.payload.sub)
-      ctx = { user: verification.payload, token, db: getDb(token) }
+      ctx = { user: verification.payload, token, db: getDb() }
     } else {
       ctx = { user: null, token: null, db: getDb() }
     }
