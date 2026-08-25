@@ -110,3 +110,22 @@ export const MessageResponse: React.FC<{ children: React.ReactNode; className?: 
   }
   return <div className={`whitespace-pre-wrap ${className}`}>{children}</div>
 }
+
+export const MessageThinkingDots: React.FC<{ className?: string }> = ({
+  className = '',
+}) => {
+  return (
+    <div
+      className={`flex items-center gap-1.5 py-1 px-0.5 text-cyan-400 select-none ${className}`}
+      aria-label="Thinking..."
+      role="status"
+    >
+      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.3s] drop-shadow-[0_0_4px_rgba(0,195,255,0.6)]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.15s] drop-shadow-[0_0_4px_rgba(0,195,255,0.6)]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce drop-shadow-[0_0_4px_rgba(0,195,255,0.6)]" />
+      <span className="sr-only">Thinking...</span>
+    </div>
+  )
+}
+
+

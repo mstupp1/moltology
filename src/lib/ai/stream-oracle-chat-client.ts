@@ -81,8 +81,13 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   fullText += decoder.decode()
   params.onChunk?.(fullText)
 
+  if (!fullText.trim()) {
+    throw new Error('The Oracle was unable to formulate a response. Please try again.')
+  }
+
   return {
     text: fullText,
     threadId: headerThreadId,
   }
 }
+

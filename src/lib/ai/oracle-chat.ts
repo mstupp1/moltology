@@ -45,8 +45,11 @@ export function getLastUserText(messages: OracleChatMessageInput[]): string {
 }
 
 export function toModelMessages(messages: OracleChatMessageInput[]) {
-  return messages.map((m) => ({
-    role: m.role as 'user' | 'assistant' | 'system',
-    content: m.content || m.text || '',
-  }))
+  return messages
+    .filter((m) => Boolean((m.content || m.text || '').trim()))
+    .map((m) => ({
+      role: m.role as 'user' | 'assistant' | 'system',
+      content: (m.content || m.text || '').trim(),
+    }))
 }
+
