@@ -7,7 +7,7 @@ import { extractAuthToken } from '../server/middleware'
 import { verifyNeonJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt } from './codex-prompt'
-import { saveAIMessage, createAIThread, summarizeThreadTitle } from './service'
+import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle } from './service'
 import {
   formatOracleUnavailableMessage,
   getLastUserText,
@@ -83,12 +83,16 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   }
 
   let activeThreadId = body.threadId
+  let isNewThread = false
+  const initialThreadTitle =
+    userText.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
+
   try {
     if (!activeThreadId) {
-      const title = await summarizeThreadTitle(userText)
+      isNewThread = true
       const newThread = await createAIThread({
         userId,
-        title,
+        title: initialThreadTitle,
         persona: 'oracle',
       })
       activeThreadId = newThread?.id || activeThreadId
@@ -114,19 +118,35 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   for (const modelCandidate of candidateModels) {
     try {
       const threadIdForSave = activeThreadId
+      const shouldSummarizeTitle = isNewThread
       const result = streamText({
         model: modelCandidate as any,
         system: systemPrompt,
         messages: payloadMessages,
         onFinish: async ({ text }) => {
-          if (!userId || !threadIdForSave || !text) return
+          if (!userId || !threadIdForSave) return
           try {
-            await saveAIMessage({
-              threadId: threadIdForSave,
-              userId,
-              role: 'assistant',
-              content: text,
-            })
+            if (text) {
+              await saveAIMessage({
+                threadId: threadIdForSave,
+                userId,
+                role: 'assistant',
+                content: text,
+              })
+            }
+
+            if (shouldSummarizeTitle) {
+              // Asynchronously summarize thread title in the background without blocking TTFT
+              summarizeThreadTitle(userText)
+                .then(async (aiTitle) => {
+                  if (aiTitle && aiTitle !== initialThreadTitle) {
+                    await updateAIThreadTitle(threadIdForSave, aiTitle)
+                  }
+                })
+                .catch((err) => {
+                  console.warn('[handleOracleChatRequest] Async title summarization warning:', err)
+                })
+            }
           } catch (dbErr) {
             console.warn('[handleOracleChatRequest] DB assistant response logging warning:', dbErr)
           }

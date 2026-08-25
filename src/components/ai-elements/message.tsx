@@ -76,13 +76,13 @@ export const Message: React.FC<MessageProps> = ({
       className={`flex flex-col w-full ${isUser ? 'items-end' : 'items-start'} ${className}`}
       {...props}
     >
-      <div className="flex items-center gap-1.5 mb-1 text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
+      <div className="flex items-center gap-1.5 mb-1.5 text-[10px] sm:text-[11px] text-cyan-400 font-bold uppercase tracking-wider">
         {renderAvatar()}
         <span>{effectiveSenderLabel}</span>
         {timestamp && <span className="text-gray-500 font-normal">[{timestamp}]</span>}
       </div>
       <div
-        className={`max-w-[88%] p-3 text-xs leading-relaxed chamfer-corner ${
+        className={`max-w-[92%] sm:max-w-[88%] p-3.5 sm:p-4 text-xs sm:text-[13px] leading-[1.7] chamfer-corner ${
           isUser
             ? 'bg-cyan-950/70 backdrop-blur-xs border border-cyan-600/50 text-cyan-100 shadow-md shadow-cyan-950/40'
             : 'bg-[#0a1214]/80 backdrop-blur-sm border border-cyan-800/45 text-gray-200 shadow-lg shadow-cyan-950/40'
@@ -98,7 +98,7 @@ export const MessageContent: React.FC<{ children: React.ReactNode; className?: s
   children,
   className = '',
 }) => {
-  return <div className={`space-y-2 ${className}`}>{children}</div>
+  return <div className={`space-y-3 ${className}`}>{children}</div>
 }
 
 export const MessageResponse: React.FC<{ children: React.ReactNode; className?: string }> = ({

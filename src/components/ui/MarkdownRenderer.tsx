@@ -19,7 +19,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
   const tokens = marked.lexer(content, { gfm: true, breaks: true })
 
   return (
-    <div className={`space-y-2 text-xs leading-relaxed text-gray-200 font-sans ${className}`}>
+    <div className={`space-y-3.5 text-xs sm:text-[13px] leading-[1.75] text-[#dfe3e3] font-sans ${className}`}>
       <RenderTokens tokens={tokens} keyPrefix="root" />
     </div>
   )
@@ -35,9 +35,9 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
   }
 
   return (
-    <div className="relative my-2.5 bg-[#040708] border border-cyan-900/70 chamfer-corner overflow-hidden group shadow-lg">
+    <div className="relative my-3.5 sm:my-4 bg-[#040708] border border-cyan-900/70 chamfer-corner overflow-hidden group shadow-lg">
       {/* Code Header Bar */}
-      <div className="bg-[#0b1011] border-b border-cyan-950 px-3 py-1 flex items-center justify-between text-[10px] text-cyan-400 font-sans select-none">
+      <div className="bg-[#0b1011] border-b border-cyan-950 px-3.5 py-1.5 flex items-center justify-between text-[11px] text-cyan-400 font-sans select-none">
         <div className="flex items-center space-x-1.5">
           <Terminal className="w-3.5 h-3.5 text-cyan-400" />
           <span className="uppercase tracking-widest font-bold">{language || 'code'}</span>
@@ -45,17 +45,17 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-cyan-300 transition-colors p-0.5 cursor-pointer"
+          className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-cyan-300 transition-colors p-0.5 cursor-pointer"
           title="Copy code"
         >
           {copied ? (
             <>
-              <Check className="w-3 h-3 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-400" />
               <span className="text-emerald-400 font-semibold">COPIED</span>
             </>
           ) : (
             <>
-              <Copy className="w-3 h-3" />
+              <Copy className="w-3.5 h-3.5" />
               <span>COPY</span>
             </>
           )}
@@ -63,7 +63,7 @@ const CodeBlock: React.FC<{ language: string; code: string }> = ({ language, cod
       </div>
 
       {/* Code Content */}
-      <pre className="p-3 overflow-x-auto text-[11px] font-mono text-cyan-200 leading-relaxed no-scrollbar select-text">
+      <pre className="p-3.5 sm:p-4 overflow-x-auto text-xs font-mono text-cyan-200 leading-[1.7] no-scrollbar select-text">
         <code>{code}</code>
       </pre>
     </div>
@@ -91,7 +91,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
               return (
                 <h1
                   key={key}
-                  className="text-sm font-bold text-cyan-300 tracking-wider uppercase border-b border-cyan-900/60 pb-1 mt-3 mb-2 font-grotesk"
+                  className="text-sm sm:text-base font-bold text-cyan-300 tracking-wider uppercase border-b border-cyan-900/60 pb-1.5 mt-4 sm:mt-5 mb-2.5 sm:mb-3 font-grotesk first:mt-0"
                 >
                   {inner}
                 </h1>
@@ -101,7 +101,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
               return (
                 <h2
                   key={key}
-                  className="text-xs font-bold text-cyan-300 tracking-wider uppercase border-b border-cyan-950 pb-0.5 mt-2.5 mb-1.5 font-grotesk"
+                  className="text-xs sm:text-sm font-bold text-cyan-300 tracking-wider uppercase border-b border-cyan-950/80 pb-1 mt-3.5 sm:mt-4 mb-2 font-grotesk first:mt-0"
                 >
                   {inner}
                 </h2>
@@ -109,13 +109,19 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             }
             if (headingToken.depth === 3) {
               return (
-                <h3 key={key} className="text-xs font-semibold text-cyan-300 mt-2 mb-1">
+                <h3
+                  key={key}
+                  className="text-xs sm:text-[13px] font-semibold text-cyan-300 tracking-wide mt-3 mb-1.5 font-grotesk first:mt-0"
+                >
                   {inner}
                 </h3>
               )
             }
             return (
-              <h4 key={key} className="text-xs font-medium text-cyan-400 mt-1.5 mb-0.5">
+              <h4
+                key={key}
+                className="text-xs font-medium text-cyan-400 tracking-wide mt-2.5 mb-1 font-grotesk first:mt-0"
+              >
                 {inner}
               </h4>
             )
@@ -124,7 +130,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
           case 'paragraph': {
             const paragraphToken = token as Tokens.Paragraph
             return (
-              <p key={key} className="my-1.5 leading-relaxed text-gray-200">
+              <p key={key} className="my-2 sm:my-2.5 leading-[1.75] text-[#dfe3e3] first:mt-0 last:mb-0">
                 <RenderTokens tokens={paragraphToken.tokens} keyPrefix={`${key}-p`} />
               </p>
             )
@@ -135,15 +141,15 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <div
                 key={key}
-                className="my-3 overflow-x-auto rounded border border-cyan-900/60 bg-[#060a0d]/80 shadow-md"
+                className="my-3.5 sm:my-4 overflow-x-auto rounded border border-cyan-900/60 bg-[#060a0d]/80 shadow-md"
               >
-                <table className="w-full text-left text-xs border-collapse min-w-full">
+                <table className="w-full text-left text-xs sm:text-[13px] border-collapse min-w-full">
                   <thead>
                     <tr className="border-b border-cyan-800/60 bg-cyan-950/40">
                       {tableToken.header.map((col, hIdx) => (
                         <th
                           key={hIdx}
-                          className={`px-3 py-2 text-cyan-300 font-semibold text-[11px] uppercase tracking-wider ${
+                          className={`px-3.5 py-2.5 text-cyan-300 font-semibold text-xs uppercase tracking-wider ${
                             col.align === 'center'
                               ? 'text-center'
                               : col.align === 'right'
@@ -168,7 +174,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
                         {row.map((cell, cIdx) => (
                           <td
                             key={cIdx}
-                            className={`px-3 py-2 text-gray-200 text-xs ${
+                            className={`px-3.5 py-2.5 text-[#dfe3e3] text-xs sm:text-[13px] leading-relaxed ${
                               cell.align === 'center'
                                 ? 'text-center'
                                 : cell.align === 'right'
@@ -196,13 +202,13 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <ListTag
                 key={key}
-                className={`my-1.5 space-y-1 pl-5 text-xs text-gray-200 ${
+                className={`my-2.5 sm:my-3 space-y-1.5 pl-5 sm:pl-6 text-xs sm:text-[13px] text-[#dfe3e3] ${
                   listToken.ordered ? 'list-decimal' : 'list-disc'
                 }`}
                 start={typeof listToken.start === 'number' && listToken.start !== 1 ? listToken.start : undefined}
               >
                 {listToken.items.map((item, itemIdx) => (
-                  <li key={`${key}-item-${itemIdx}`} className="leading-relaxed">
+                  <li key={`${key}-item-${itemIdx}`} className="leading-[1.75] pl-0.5">
                     <RenderTokens tokens={item.tokens} keyPrefix={`${key}-item-${itemIdx}`} />
                   </li>
                 ))}
@@ -213,7 +219,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
           case 'list_item': {
             const itemToken = token as Tokens.ListItem
             return (
-              <li key={key} className="leading-relaxed">
+              <li key={key} className="leading-[1.75] pl-0.5">
                 <RenderTokens tokens={itemToken.tokens} keyPrefix={`${key}-li`} />
               </li>
             )
@@ -224,7 +230,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <blockquote
                 key={key}
-                className="border-l-2 border-cyan-500/70 pl-3 py-1 my-2 bg-cyan-950/20 text-cyan-200/90 text-xs italic rounded-r"
+                className="border-l-2 border-cyan-500/70 pl-3.5 sm:pl-4 py-2 sm:py-2.5 my-3 sm:my-3.5 bg-cyan-950/25 text-cyan-200/90 text-xs sm:text-[13px] italic rounded-r leading-[1.75]"
               >
                 <RenderTokens tokens={blockquoteToken.tokens} keyPrefix={`${key}-bq`} />
               </blockquote>
@@ -247,7 +253,7 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
             return (
               <code
                 key={key}
-                className="bg-cyan-950/70 border border-cyan-800/40 text-cyan-200 px-1.5 py-0.5 rounded font-mono text-[11px]"
+                className="bg-cyan-950/80 border border-cyan-800/50 text-cyan-200 px-1.5 py-0.5 mx-0.5 rounded font-mono text-[11.5px] sm:text-xs"
               >
                 {codespanToken.text}
               </code>
@@ -305,13 +311,13 @@ const RenderTokens: React.FC<RenderTokensProps> = ({ tokens, keyPrefix = 'tok' }
                 src={imageToken.href}
                 alt={imageToken.text || imageToken.title || ''}
                 title={imageToken.title || undefined}
-                className="max-w-full rounded border border-cyan-900/50 my-2"
+                className="max-w-full rounded border border-cyan-900/50 my-3 sm:my-4"
               />
             )
           }
 
           case 'hr': {
-            return <hr key={key} className="border-cyan-900/50 my-3" />
+            return <hr key={key} className="border-cyan-900/50 my-4 sm:my-5" />
           }
 
           case 'br': {
