@@ -6,7 +6,7 @@ export interface AlignmentTaskItem {
   id: string
   time: string
   title: string
-  xp: number
+  xp?: number
   completed: boolean
 }
 

@@ -20,14 +20,16 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS users ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_stats ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routines ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS routine_completions ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, user_avatars')
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, user_avatars')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
     await sql`DROP POLICY IF EXISTS users_isolation_policy ON users;`
     await sql`DROP POLICY IF EXISTS user_stats_isolation_policy ON user_stats;`
     await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
+    await sql`DROP POLICY IF EXISTS routine_completions_isolation_policy ON routine_completions;`
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
 
     // 3. Create RLS policies for user isolation against Neon Auth JWT 'sub' claim
@@ -51,6 +53,15 @@ async function applyRLS() {
 
     await sql`
       CREATE POLICY routines_isolation_policy ON routines
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY routine_completions_isolation_policy ON routine_completions
       FOR ALL
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')

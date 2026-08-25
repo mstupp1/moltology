@@ -9,7 +9,7 @@ describe('DigitalClock', () => {
     
     expect(screen.getByText('BENTHIC CHRONOMETER')).toBeInTheDocument()
     expect(screen.getByText('NEXT UPCOMING ALIGNMENT TASK')).toBeInTheDocument()
-    expect(screen.getByText('Nutritional Efficiency Break')).toBeInTheDocument()
+    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
     expect(screen.getByText('COMPLETE ALIGNMENT')).toBeInTheDocument()
   })
 
@@ -25,15 +25,15 @@ describe('DigitalClock', () => {
     
     const utcButton = screen.getByText('UTC')
     fireEvent.click(utcButton)
-    expect(screen.getByText('ZULU / UTC')).toBeInTheDocument()
+    expect(screen.getByText('• ZULU / UTC')).toBeInTheDocument()
 
     const benthicButton = screen.getByText('BENTHIC')
     fireEvent.click(benthicButton)
-    expect(screen.getByText('BENTHIC CHRONO')).toBeInTheDocument()
+    expect(screen.getByText('• BENTHIC CHRONO')).toBeInTheDocument()
 
     const stardateButton = screen.getByText('STARDATE')
     fireEvent.click(stardateButton)
-    expect(screen.getByText('NEURAL STARDATE')).toBeInTheDocument()
+    expect(screen.getByText('• NEURAL STARDATE')).toBeInTheDocument()
   })
 
   it('allows toggling 12H / 24H format', () => {
@@ -50,7 +50,7 @@ describe('DigitalClock', () => {
     
     const completeBtn = screen.getByText('COMPLETE ALIGNMENT')
     fireEvent.click(completeBtn)
-    expect(onComplete).toHaveBeenCalledWith('4') // task id '4' is Nutritional Efficiency Break
+    expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
   })
 
   it('toggles the floating schedule dropdown and allows tab switching and spotlight task completion', () => {
@@ -63,13 +63,13 @@ describe('DigitalClock', () => {
     fireEvent.click(headerClockPill)
 
     expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
-    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
+    expect(screen.getAllByText('Silent Synchronization').length).toBeGreaterThan(0)
     expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
 
     // Test Spotlight Complete Button
     const completeBtns = screen.getAllByRole('button', { name: /COMPLETE/i })
     fireEvent.click(completeBtns[0])
-    expect(onComplete).toHaveBeenCalledWith('4')
+    expect(onComplete).toHaveBeenCalledWith('silent-synchronization')
 
     // Test Tab Switching to ALERTS / TRANSMISSIONS
     const alertsTab = screen.getByText(/ALERTS/i)

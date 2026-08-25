@@ -19,7 +19,7 @@ describe('LaunchpadCarousel Component', () => {
 
     // Daily Alignment Section
     expect(screen.getByText('DAILY ALIGNMENT')).toBeInTheDocument()
-    expect(screen.getByText('7D STREAK')).toBeInTheDocument()
+    expect(screen.getByText(/STREAK/i)).toBeInTheDocument()
     expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
 
     // MoltNation News Section

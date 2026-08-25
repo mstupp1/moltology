@@ -22,6 +22,7 @@ import {
   FileText,
 } from 'lucide-react'
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
+import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
@@ -214,6 +215,9 @@ function DashboardRoute() {
 
       {/* Comprehensive Bento Box (6-Directive Rotating Carousel + Daily Alignment + MoltNation News) */}
       <LaunchpadCarousel />
+
+      {/* Full Daily Alignment Routine & 14-Day Streak Matrix */}
+      <DailyRoutineWidget />
 
       {/* 2-Column Section: Left (Activity Stream) + Right (Changelog & Protocol Releases) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">

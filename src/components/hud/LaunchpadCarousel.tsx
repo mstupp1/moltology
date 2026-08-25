@@ -34,6 +34,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { INITIAL_BLOG_POSTS, formatNewsTitle, type BlogPostData } from '@/lib/blog-data'
 import { getBlogPostsFn } from '@/lib/server/api'
 import { useAlignmentReminders, type AlignmentTaskItem } from '@/hooks/useAlignmentReminders'
+import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
 export interface LaunchpadCarouselProps {
@@ -145,35 +146,18 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Daily Alignment State
-  const [tasks, setTasks] = useState<AlignmentTaskItem[]>(INITIAL_ALIGNMENT_TASKS)
-  const [showXpPop, setShowXpPop] = useState<number | null>(null)
-  const streakDays = 7
+  // Daily Alignment State from Shared Provider
+  const {
+    tasks,
+    completedCount,
+    streakDays,
+    toggleTask,
+  } = useDailyAlignment()
 
   const { remindersEnabled, toggleReminders, triggerTestReminder } =
     useAlignmentReminders(tasks)
 
-  const completedTasks = useMemo(() => tasks.filter((t) => t.completed), [tasks])
-  const completedCount = completedTasks.length
-  const totalXp = useMemo(() => completedTasks.reduce((acc, t) => acc + t.xp, 0), [completedTasks])
-  const maxXp = useMemo(() => tasks.reduce((acc, t) => acc + t.xp, 0), [tasks])
-  const xpPercent = Math.round((totalXp / maxXp) * 100)
-
-  const toggleTask = useCallback((id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          const nextCompleted = !t.completed
-          if (nextCompleted) {
-            setShowXpPop(t.xp)
-            setTimeout(() => setShowXpPop(null), 1200)
-          }
-          return { ...t, completed: nextCompleted }
-        }
-        return t
-      })
-    )
-  }, [])
+  const completionPercent = Math.round((completedCount / Math.max(tasks.length, 1)) * 100)
 
   // News Feed State
   const [posts, setPosts] = useState<BlogPostData[]>(INITIAL_BLOG_POSTS)
@@ -249,19 +233,6 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* XP Pop Notification */}
-        {showXpPop && (
-          <div className="fixed top-6 right-6 z-50 animate-bounce pointer-events-none">
-            <HudBadge
-              variant="cyan"
-              pulse
-              className="px-4 py-2 text-xs font-bold shadow-[0_0_20px_rgba(0,255,255,0.6)]"
-            >
-              +{showXpPop} XP GAINED! ⚡
-            </HudBadge>
-          </div>
-        )}
-
         {/* Full Article Modal Reader with High-Precision Markdown Parser */}
         {activeNewsPost && (
           <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
@@ -535,16 +506,16 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   </div>
                 </div>
 
-                {/* XP Progress Bar */}
+                {/* Progress Bar */}
                 <div className="space-y-0.5 bg-[#070b0b] p-1.5 border border-[#3a4a49] chamfer-corner">
                   <div className="flex justify-between text-[9px] text-[#839493]">
-                    <span>ALIGNMENT {xpPercent}%</span>
-                    <span className="text-[#00c3ff] font-bold">{totalXp}/{maxXp} XP</span>
+                    <span>ALIGNMENT {completionPercent}%</span>
+                    <span className="text-[#00c3ff] font-bold">{completedCount}/{tasks.length} COMPLETED</span>
                   </div>
                   <div className="w-full h-1 bg-[#030606] border border-[#3a4a49] overflow-hidden relative">
                     <div
-                      className="h-full bg-gradient-to-r from-[#00c3ff] via-emerald-400 to-yellow-400 transition-all duration-500 relative"
-                      style={{ width: `${xpPercent}%` }}
+                      className="h-full bg-gradient-to-r from-[#00c3ff] via-emerald-400 to-[#00ff88] transition-all duration-500 relative"
+                      style={{ width: `${completionPercent}%` }}
                     />
                   </div>
                 </div>
@@ -554,7 +525,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   {tasks.map((task) => (
                     <div
                       key={task.id}
-                      onClick={() => toggleTask(task.id)}
+                      onClick={() => toggleTask(task.key || task.id)}
                       className={`p-1.5 border transition-all cursor-pointer flex items-center justify-between chamfer-corner group ${
                         task.completed
                           ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
@@ -574,13 +545,10 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
 
                       <div className="flex items-center gap-1 shrink-0 ml-1">
                         {task.time && (
-                          <span className="text-[8px] text-[#839493] hidden sm:inline">
+                          <span className="text-[9px] font-sans text-[#00c3ff] bg-[#070b0b] px-1 py-0.2 border border-[#3a4a49]">
                             {task.time}
                           </span>
                         )}
-                        <span className="text-[9px] font-sans text-[#00ffff] bg-[#070b0b] px-1 py-0.2 border border-[#3a4a49]">
-                          +{task.xp}
-                        </span>
                       </div>
                     </div>
                   ))}
