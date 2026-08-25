@@ -43,31 +43,15 @@ describe('Message Component Avatar Rendering', () => {
     expect(screen.getByText('DEEP ZEALOT')).toBeInTheDocument()
   })
 
-  it('renders active bioforge vault avatar from localStorage for user message', () => {
-    localStorage.setItem(
-      'moltology_saved_avatars',
-      JSON.stringify([
-        {
-          id: 'custom-ascendant',
-          name: 'Ascendant Lobster',
-          imageUrl: 'https://assets.moltology.org/images/stage4_carcinization.png',
-          isActive: true,
-        },
-      ])
-    )
-
+  it('renders letter fallback for user message when no profile image is set', () => {
     render(
       <Message from="user" senderLabel="INITIATE">
-        <div>Testing vault avatar in chat</div>
+        <div>Testing letter fallback in chat</div>
       </Message>
     )
 
-    const img = screen.getByRole('img', { name: 'INITIATE' })
-    expect(img).toBeInTheDocument()
-    expect(img).toHaveAttribute(
-      'src',
-      'https://assets.moltology.org/images/stage4_carcinization.png'
-    )
+    expect(screen.getByText('I')).toBeInTheDocument()
+    expect(screen.getByText('INITIATE')).toBeInTheDocument()
   })
 
   it('renders custom avatar if avatar prop is supplied', () => {

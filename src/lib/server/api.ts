@@ -2,9 +2,9 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc, like, or, sql, and } from 'drizzle-orm'
+import { eq, desc, like, or, sql, and, asc } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
@@ -25,6 +25,18 @@ import {
   localDateString,
   type AlignmentTaskItem,
 } from '../alignment-tasks'
+import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import {
+  VAULT_SIZE,
+  computeLoadoutTotals,
+  planGearMove,
+  type CatalogRef,
+  type GearItemState,
+  type LoadoutTotals,
+  type MoveTarget,
+  EQUIPMENT_CATEGORIES,
+} from '../chassis-loadout'
+import type { EquipmentCategory } from '../../db/schema'
 
 
 import { getPresignedViewUrl } from '../s3-client'
@@ -2016,4 +2028,172 @@ export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
   .validator((data: ToggleDailyAlignmentInput) => toggleDailyAlignmentSchema.parse(data))
   .handler(toggleDailyAlignmentTaskHandler)
 
+// ─── Chassis loadout (equipment vault) ───────────────────────────────────────
+
+function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    flavorText: row.flavorText,
+    category: row.category,
+    rarity: row.rarity,
+    primaryStat: row.primaryStat,
+    imageUrl: row.imageUrl,
+    sortOrder: row.sortOrder,
+  }
+}
+
+function toGearState(row: typeof userGearItems.$inferSelect): GearItemState {
+  return {
+    id: row.id,
+    catalogItemId: row.catalogItemId,
+    equippedSlot: row.equippedSlot ?? null,
+    vaultIndex: row.vaultIndex ?? null,
+  }
+}
+
+async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
+  catalog: CatalogRef[]
+  items: GearItemState[]
+  totals: LoadoutTotals
+  vaultSize: number
+}> {
+  const catalogRows = await dbClient
+    .select()
+    .from(equipmentCatalog)
+    .orderBy(asc(equipmentCatalog.sortOrder))
+
+  let gearRows = await dbClient
+    .select()
+    .from(userGearItems)
+    .where(eq(userGearItems.userId, userId))
+
+  if (gearRows.length === 0 && catalogRows.length > 0) {
+    const starterIds = STARTER_EQUIPMENT_CATALOG_IDS.filter((id) =>
+      catalogRows.some((c) => c.id === id)
+    )
+    if (starterIds.length > 0) {
+      await dbClient.insert(userGearItems).values(
+        starterIds.map((catalogItemId, index) => ({
+          userId,
+          catalogItemId,
+          equippedSlot: null,
+          vaultIndex: index,
+        }))
+      )
+      gearRows = await dbClient
+        .select()
+        .from(userGearItems)
+        .where(eq(userGearItems.userId, userId))
+    }
+  }
+
+  const catalog = catalogRows.map(toCatalogRef)
+  const items = gearRows.map(toGearState)
+  const catalogById = new Map(catalog.map((c) => [c.id, c]))
+  const totals = computeLoadoutTotals(items, catalogById)
+
+  return { catalog, items, totals, vaultSize: VAULT_SIZE }
+}
+
+const getChassisLoadoutHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to inspect chassis loadout.')
+  return loadChassisPayload(auth.dbClient, auth.userId)
+}
+
+export const getChassisLoadoutFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data ?? {})
+  )
+  .handler(getChassisLoadoutHandler)
+
+const moveGearTargetSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('equip'),
+    slot: z.enum(EQUIPMENT_CATEGORIES as [EquipmentCategory, ...EquipmentCategory[]]),
+  }),
+  z.object({
+    type: z.literal('vault'),
+    index: z.number().int().min(0).max(VAULT_SIZE - 1),
+  }),
+])
+
+interface MoveGearItemInput {
+  itemId: string
+  target: MoveTarget
+  token?: string
+  userId?: string
+}
+
+const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGearItemInput>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to rearrange chassis gear.')
+  if (!data?.itemId || !data?.target) throw new Error('Missing gear move payload.')
+  const { userId, dbClient } = auth
+
+  const catalogRows = await dbClient.select().from(equipmentCatalog)
+  const gearRows = await dbClient
+    .select()
+    .from(userGearItems)
+    .where(eq(userGearItems.userId, userId))
+
+  const catalog = catalogRows.map(toCatalogRef)
+  const items = gearRows.map(toGearState)
+  const catalogById = new Map(catalog.map((c) => [c.id, c]))
+
+  const plan = planGearMove(items, catalogById, data.itemId, data.target, VAULT_SIZE)
+  if (!plan.ok) throw new Error(plan.error)
+
+  if (plan.updates.length > 0) {
+    // Clear positions first to avoid unique-index collisions during swaps
+    const ids = plan.updates.map((u) => u.id)
+    for (const id of ids) {
+      await dbClient
+        .update(userGearItems)
+        .set({
+          equippedSlot: null,
+          vaultIndex: null,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(userGearItems.id, id), eq(userGearItems.userId, userId)))
+    }
+    for (const update of plan.updates) {
+      await dbClient
+        .update(userGearItems)
+        .set({
+          equippedSlot: update.equippedSlot,
+          vaultIndex: update.vaultIndex,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(userGearItems.id, update.id), eq(userGearItems.userId, userId)))
+    }
+  }
+
+  return loadChassisPayload(dbClient, userId)
+}
+
+export const moveGearItemFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: MoveGearItemInput) =>
+    z
+      .object({
+        itemId: z.string().uuid(),
+        target: moveGearTargetSchema,
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(moveGearItemHandler)
 

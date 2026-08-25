@@ -372,6 +372,54 @@ export const userAvatars = pgTable('user_avatars', {
   })
 ])
 
+/** Chassis equipment categories (equip slots). */
+export type EquipmentCategory = 'carapace' | 'claws' | 'head' | 'legs' | 'antennae'
+
+/** Classic rarity ladder for chassis gear. */
+export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+
+// Global equipment catalog (public read)
+export const equipmentCatalog = pgTable('equipment_catalog', {
+  id: uuid('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  flavorText: text('flavorText').notNull(),
+  category: text('category').$type<EquipmentCategory>().notNull(),
+  rarity: text('rarity').$type<EquipmentRarity>().notNull(),
+  primaryStat: integer('primaryStat').notNull(),
+  imageUrl: text('imageUrl'),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('equipment_catalog_public_read_policy', {
+    for: 'select',
+    using: sql`true`
+  })
+])
+
+// Owned gear instances — equipped or vaulted
+export const userGearItems = pgTable('user_gear_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  catalogItemId: uuid('catalogItemId').notNull().references(() => equipmentCatalog.id, { onDelete: 'restrict' }),
+  equippedSlot: text('equippedSlot').$type<EquipmentCategory>(),
+  vaultIndex: integer('vaultIndex'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  pgPolicy('user_gear_items_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+  // Partial unique: only enforce when slot/index is set (Postgres allows multiple NULLs either way)
+  uniqueIndex('user_gear_equipped_slot_uidx')
+    .on(table.userId, table.equippedSlot)
+    .where(sql`"equippedSlot" IS NOT NULL`),
+  uniqueIndex('user_gear_vault_index_uidx')
+    .on(table.userId, table.vaultIndex)
+    .where(sql`"vaultIndex" IS NOT NULL`),
+])
+
 // Podcasts / Audio Transmissions Table
 export const podcasts = pgTable('podcasts', {
   id: uuid('id').defaultRandom().primaryKey(),
