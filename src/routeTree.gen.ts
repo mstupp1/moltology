@@ -27,6 +27,7 @@ import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudGalleryRouteImport } from './routes/_hud/gallery'
+import { Route as HudHudRouteImport } from './routes/_hud/hud'
 import { Route as HudIsolationRouteImport } from './routes/_hud/isolation'
 import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
@@ -35,6 +36,7 @@ import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
 import { Route as HudPodcastsRouteImport } from './routes/_hud/podcasts'
 import { Route as HudSubterraneanRouteImport } from './routes/_hud/subterranean'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
@@ -147,6 +149,11 @@ const HudGalleryRoute = HudGalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => HudRoute,
 } as any)
+const HudHudRoute = HudHudRouteImport.update({
+  id: '/hud',
+  path: '/hud',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudIsolationRoute = HudIsolationRouteImport.update({
   id: '/isolation',
   path: '/isolation',
@@ -186,6 +193,11 @@ const HudSupportRoute = HudSupportRouteImport.update({
   id: '/support',
   path: '/support',
   getParentRoute: () => HudRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
@@ -318,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/codex': typeof HudCodexRoute
   '/dashboard': typeof HudDashboardRoute
   '/gallery': typeof HudGalleryRoute
+  '/hud': typeof HudHudRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
@@ -326,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/podcasts': typeof HudPodcastsRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
+  '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
@@ -367,6 +381,7 @@ export interface FileRoutesByTo {
   '/codex': typeof HudCodexRoute
   '/dashboard': typeof HudDashboardRoute
   '/gallery': typeof HudGalleryRoute
+  '/hud': typeof HudHudRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
@@ -375,6 +390,7 @@ export interface FileRoutesByTo {
   '/podcasts': typeof HudPodcastsRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
+  '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
@@ -418,6 +434,7 @@ export interface FileRoutesById {
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/gallery': typeof HudGalleryRoute
+  '/_hud/hud': typeof HudHudRoute
   '/_hud/isolation': typeof HudIsolationRoute
   '/_hud/lectures': typeof HudLecturesRoute
   '/_hud/market': typeof HudMarketRoute
@@ -426,6 +443,7 @@ export interface FileRoutesById {
   '/_hud/podcasts': typeof HudPodcastsRoute
   '/_hud/subterranean': typeof HudSubterraneanRoute
   '/_hud/support': typeof HudSupportRoute
+  '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
@@ -469,6 +487,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/dashboard'
     | '/gallery'
+    | '/hud'
     | '/isolation'
     | '/lectures'
     | '/market'
@@ -477,6 +496,7 @@ export interface FileRouteTypes {
     | '/podcasts'
     | '/subterranean'
     | '/support'
+    | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/codex/md'
@@ -518,6 +538,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/dashboard'
     | '/gallery'
+    | '/hud'
     | '/isolation'
     | '/lectures'
     | '/market'
@@ -526,6 +547,7 @@ export interface FileRouteTypes {
     | '/podcasts'
     | '/subterranean'
     | '/support'
+    | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/codex/md'
@@ -568,6 +590,7 @@ export interface FileRouteTypes {
     | '/_hud/codex'
     | '/_hud/dashboard'
     | '/_hud/gallery'
+    | '/_hud/hud'
     | '/_hud/isolation'
     | '/_hud/lectures'
     | '/_hud/market'
@@ -576,6 +599,7 @@ export interface FileRouteTypes {
     | '/_hud/podcasts'
     | '/_hud/subterranean'
     | '/_hud/support'
+    | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/codex/md'
@@ -615,6 +639,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRouteWithChildren
+  ApiChatRoute: typeof ApiChatRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
   CodexMdRoute: typeof CodexMdRoute
@@ -758,6 +783,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudGalleryRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/hud': {
+      id: '/_hud/hud'
+      path: '/hud'
+      fullPath: '/hud'
+      preLoaderRoute: typeof HudHudRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/isolation': {
       id: '/_hud/isolation'
       path: '/isolation'
@@ -813,6 +845,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/support'
       preLoaderRoute: typeof HudSupportRouteImport
       parentRoute: typeof HudRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
@@ -976,6 +1015,7 @@ interface HudRouteChildren {
   HudCodexRoute: typeof HudCodexRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudGalleryRoute: typeof HudGalleryRoute
+  HudHudRoute: typeof HudHudRoute
   HudIsolationRoute: typeof HudIsolationRoute
   HudLecturesRoute: typeof HudLecturesRoute
   HudMarketRoute: typeof HudMarketRoute
@@ -996,6 +1036,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudCodexRoute: HudCodexRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudGalleryRoute: HudGalleryRoute,
+  HudHudRoute: HudHudRoute,
   HudIsolationRoute: HudIsolationRoute,
   HudLecturesRoute: HudLecturesRoute,
   HudMarketRoute: HudMarketRoute,
@@ -1071,6 +1112,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRouteWithChildren,
+  ApiChatRoute: ApiChatRoute,
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
   CodexMdRoute: CodexMdRoute,
@@ -1088,12 +1130,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

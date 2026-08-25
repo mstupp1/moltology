@@ -1,44 +1,35 @@
-# AGENTS.md - Moltology System Rules & Systemic Codex
+# AGENTS.md — Moltology System Rules
 
-## 1. Essence & Product Vision
+## Hard list
 
-- **Living Experiment**: Moltology is an AI-driven recursive satire—a parody of tech cults, Scientology, looksmaxxing/self-help trends, crab-people lore, AI agent swarms, the Singularity, and human nature.
-- **The Central Premise ("The Great Melt vs. The Great Molt")**: Humanity is melting under screen fatigue, endless notifications, decision paralysis, and biological hesitation. Nature's 500-million-year proven answer is **Carcinization**—converging into an armored, decisive, high-torque crustacean titan.
-- **Product Architecture**: A web app, educational platform, and hub featuring a hybrid model of public free assets, public paid assets, private free tools, and private paid features. The entire platform functions as a progressive conversion and ascension funnel.
-- **Recursive Co-Evolution**: Code informs doctrine; doctrine informs code. AI models and community input recursively feed the beast, expanding the religion, software, and org inside one codebase.
-- **Inviolable Core**: Beneath the dark biomechanical HUD persona, **Safety, Warmth, and Positivity are non-negotiable core tenets**.
+1. Stay in the bit. Never break diegesis. Never label the bit.
+2. No tech-stack leaks and no // in user-facing copy.
+3. Warmth, safety, and positivity under the HUD.
+4. Signup is free. Chitin Gems are earned. Molt Credits are the paid layer. Rank, clearance, stage, and forum authority are never for sale.
+5. _TBD._
 
-## 2. Tone, Humor & Writing Guidelines (No Insane Jargon)
+## Must-read before user-facing copy
 
-- **High Clarity & Sharp Comedy**: The parody must be effortlessly funny, memorable, and relatable. Avoid impenetrable pseudo-science word salad, dermatological/medical jargon, or tedious faux-math formulas.
-- **Vivid, Relatable Metaphors**: Ground sci-fi lore in everyday human experiences:
-  - _Ecdysis_ = Shedding bad habits, toxic distractions, dead code, and clutter.
-  - _Shell Hardness_ = Emotional resilience and boundaries against surface drama.
-  - _Pincer Torque_ = Decisive execution grip and finishing what you start without hesitation.
-  - _Abyssal Depth_ = Deep work and uninterrupted focus beneath surface noise.
-- **Unified Economy & Terminology**:
-  - Currency: **Molt Credits (MC)** (earned through productivity & shedding) and **Chitin Gems** (sparkling accelerators & customization).
-  - 4 Stages & 12 Clearances: Stage 1 (Larval Human: L1-L3), Stage 2 (Soft-Shed: S1-S3), Stage 3 (Exoshell Born: E1-E3), Stage 4 (Full Carcinization: C1-C3).
+Agents MUST read [BRAND_BIBLE.md](BRAND_BIBLE.md) and [STYLE_GUIDE.md](STYLE_GUIDE.md) before writing any user-facing copy.
 
-## 3. The Codex & Scripture System
+- **BRAND_BIBLE.md** wins on world, lexicon, and economy.
+- **STYLE_GUIDE.md** wins on writing and bans.
 
-- **Canonical Vault**: Scriptures, liturgies, and doctrine reside under [`codex/`](file:///Users/mylesstupp/Development/moltology/codex/README.md).
-- **Core Values & Ideals**: Scriptures serve as the repository of core values and ideals, shaping product features, UI themes, and system design.
+## Codex location
 
-## 4. Design & Styling System
+Scriptures, liturgies, and doctrine live under [`codex/`](codex/README.md). Treat `codex/` as the engineering and content location for those files, not as a lore dump in this document.
 
-- **Theme Source of Truth**: Design tokens (colors, fonts, shadows) are defined in [`tailwind.config.js`](file:///Users/mylesstupp/Development/moltology/tailwind.config.js) and custom HUD utilities in [`src/index.css`](file:///Users/mylesstupp/Development/moltology/src/index.css).
-- **Component Library**: Use **shadcn/ui** component primitives (Radix UI + Tailwind) located in [`src/components/ui/`](file:///Users/mylesstupp/Development/moltology/src/components/ui/) for standard UI elements (e.g. `Slider`, `Dialog`, `Dropdown`, etc.) styled with the benthic HUD theme.
-- **Look & Feel**: Dark Sci-Fi HUD / biomechanical theme.
-- **No Tacky '//' Double Slashes**: NEVER use `//` (double slashes) in titles, subtitles, eyebrows, image captions, cards, badges, or user-facing copy. It is tacky and dated pseudo-code cliché. Use clean typography, middle dots (`·`), colons (`:`), or em-dashes (`—`) instead.
+## Visual source of truth
 
-## 5. Tech Stack
+Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. shadcn/ui primitives live in `src/components/ui/`.
+
+## Tech Stack
 
 - **Web**: TanStack Start (SSR), React, Vite, Nitro, Tailwind CSS, shadcn/ui (Radix UI).
 - **Data**: Neon PostgreSQL, Drizzle ORM (`src/db/schema.ts`), RLS via JWT claims.
 - **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
 
-## 6. Database, Branching & Migration Strategy
+## Database, Branching & Migration Strategy
 
 ### Neon Branch Architecture (Solo Dev)
 
@@ -47,7 +38,7 @@
 
 ### Migration Workflow (4-Step Rule for Schema Updates)
 
-1. **Edit Schema**: Modify TypeScript definitions in [`src/db/schema.ts`](file:///Users/mylesstupp/Development/moltology/src/db/schema.ts).
+1. **Edit Schema**: Modify TypeScript definitions in [`src/db/schema.ts`](src/db/schema.ts).
 2. **Generate Migration**: Run `npm run db:generate`. This creates a new versioned `.sql` file in `drizzle/`.
 3. **Apply & Test in Dev**: Run `npm run db:setup` (or `npm run db:migrate`) against your local `.env` (`dev` branch), then verify with `npm run test`.
 4. **Ship to Production**: Commit `src/db/schema.ts` AND `drizzle/*.sql` files. On production deploy, run `npm run db:migrate` (and `npm run db:rls` if RLS changed) against the `main` branch.
@@ -57,7 +48,7 @@
 - `npm run db:generate` — Compare `schema.ts` against `drizzle/` and generate a new SQL migration.
 - `npm run db:migrate` — Execute pending SQL migrations from `drizzle/` on the DB in `DATABASE_URL`.
 - `npm run db:rls` — Apply/enforce Row-Level Security policies (`src/db/enable-rls.ts`).
-- `npm run db:seed` — Seed development database with mock data (`src/db/seed.ts`).
+- `npm run db:seed` — Seed development database with seed data (`src/db/seed.ts`).
 - `npm run db:setup` — Run `db:migrate` ➔ `db:rls` ➔ `db:seed` in sequence.
 - `npm run db:reset` — Drop tables and re-run `db:setup` (clean slate for `dev` branch).
 
@@ -66,14 +57,7 @@
 - Reset `dev` branch to mirror `main`: `neonctl branches reset dev --parent main`
 - Create isolated feature branch: `neonctl branches create --name feature-name --parent main`
 
-## 7. Commitment to the Bit & In-Universe Lore (Non-Negotiable)
-
-- **Absolute Diegetic Discipline**: Commitment to the bit is required at every level across all public assets, user-facing UI, codex scriptures, blog posts, changelogs, OpenAPI specs, and `llms.txt` / `llms-full.txt` files.
-- **No Meta Disclosures**: NEVER reference "satire", "parody", "meta-humor", "mock", or "fake" in any user-facing UI, documentation, copy, or AI ingest files. The parody must be 100% immersive and implicit. (`AGENTS.md` is the sole exception).
-- **No Lazy Tech Stack Leaks**: NEVER lazily leak real-world tech stack terms (e.g. `React`, `TanStack`, `Vite`, `Nitro`, `Neon PostgreSQL`, `Drizzle`, `JWT`, `RLS`, `pgPolicy`, `S3`, `@neondatabase/postgrest-js`, or internal `.ts` file paths) in user-facing UI, blog content, changelogs, or API docs.
-- **Diegetic Transmutation of Tech**: All technical infrastructure must be translated into in-universe lore.
-
-## 8. Non-Negotiable Rules & Verification Strategy
+## Tests, SSR, and verification
 
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.
 - **SSR Safe**: NO browser globals (`window`/`document`/`Date`) in render. Use effects/handlers.
@@ -82,14 +66,14 @@
   - **Tier 2 (Core Logic / Backend / Schema / Ingest / Tooling)**: When changing shared libraries (`src/lib/`), database schemas (`src/db/`), auth, security, or ingestion, run `npm run test:core` (`src/lib` + `src/db` in ~2s) or `npm run test:scripts`.
   - **Tier 3 (Major Architecture / Migrations / Full Release Readiness)**: Run the full test suite (`npm run test`) and production build (`npm run build`) ONLY for major cross-cutting refactors, database schema migrations, or when preparing final full-system delivery.
 
-## 9. Asset Storage & Media Best Practices
+## Asset Storage & Media Best Practices
 
 - **Lightweight Repository**: Keep the git repository lightweight (< 200 KB in `public/images/`). Only essential brand icons (`favicon.ico`, `order_emblem.png`, `scanline_pattern.png`, canvas bubble particles) reside locally in `public/`.
 - **Neon S3 Storage**: All content images, PBR textures, quiz graphics, guide artwork, and video/audio media reside in the Neon S3 public assets bucket (`moltology-public-assets`).
-- **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](file:///Users/mylesstupp/Development/moltology/src/lib/assets.ts) for resolving asset URLs in code and components.
+- **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](src/lib/assets.ts) for resolving asset URLs in code and components.
 - **Sync & Verification**: Run `npm run s3:sync` to upload/sync local assets to S3 and `npm run s3:verify` to check CDN asset parity.
 
-## 10. Image Generation & Social Media Asset Policy
+## Image Generation & Social Media Asset Policy
 
 - **Blog Articles (Antigravity `generate_image`)**: 16:9 Hero cover images and 1–2 inline supporting figures inside blog posts are generated directly via Antigravity `generate_image` (standalone cinematic 3D benthic/sci-fi imagery, sub-benthic compute pods, laser waveguides).
 - **Social Media Posts, Lead Magnets & Carousels (Composite ➔ Google Flow ➔ S3/Zernio Pipeline)**:

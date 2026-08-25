@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, routines, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -7,6 +7,7 @@ describe('Database Schema & RLS Policies', () => {
     expect(users).toBeDefined()
     expect(userStats).toBeDefined()
     expect(routines).toBeDefined()
+    expect(routineCompletions).toBeDefined()
     expect(changelogs).toBeDefined()
     expect(neonAuthUser).toBeDefined()
     expect(galleryPins).toBeDefined()
@@ -59,6 +60,14 @@ describe('Database Schema & RLS Policies', () => {
     expect(routines.recurrence).toBeDefined()
     expect(routines.streakCount).toBeDefined()
     expect(routines.lastCompletedAt).toBeDefined()
+  })
+
+  it('defines required fields on the routineCompletions table', () => {
+    expect(routineCompletions.id).toBeDefined()
+    expect(routineCompletions.userId).toBeDefined()
+    expect(routineCompletions.taskKey).toBeDefined()
+    expect(routineCompletions.completedOn).toBeDefined()
+    expect(routineCompletions.completedAt).toBeDefined()
   })
 
   it('defines required fields on changelogs table', () => {

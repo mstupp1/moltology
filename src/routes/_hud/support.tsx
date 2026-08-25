@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -8,11 +8,8 @@ import {
   HelpCircle,
   Send,
   Activity,
-  Search,
-  Filter,
   ChevronDown,
   ChevronUp,
-  Tag,
   Clock,
   CheckCircle2,
   AlertTriangle,
@@ -20,58 +17,27 @@ import {
   ShieldCheck,
   Zap,
   Terminal,
-  Layers,
-  MessageSquare,
-  Sparkles,
-  Plus,
-  X,
-  Pencil,
-  Trash2,
-  Save,
   ExternalLink,
   RotateCcw,
 } from 'lucide-react'
-import { getPublicChangelogs, createChangelog, updateChangelog, deleteChangelog, type ChangelogEntry } from '@/lib/changelogs'
-import { getUserProfileFn } from '@/lib/server/api'
-import { getAuthJWTToken } from '@/lib/jwt'
-import { authClient } from '@/lib/auth-client'
+import { getPublicChangelogs, type ChangelogEntry } from '@/lib/changelogs'
 import { seo } from '@/lib/seo'
 import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
 import { HudPagination } from '@/components/ui/HudPagination'
-import { getEffectiveRole, isAdminOrSuperAdmin } from '@/lib/permissions'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
 function SupportPortalRoute() {
   const loaderData = Route.useLoaderData()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket' | 'diagnostics'>('changelog')
-  const [changelogs, setChangelogs] = useState<ChangelogEntry[]>(loaderData?.changelogs || [])
-  const [loading, setLoading] = useState(!loaderData?.changelogs)
+  const changelogs: ChangelogEntry[] = loaderData?.changelogs || []
+  const loading = !loaderData?.changelogs
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 20
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({ v1_0_0: true, v1_4_2: true })
-
-  // Admin User Role & Modal state
-  const [userRole, setUserRole] = useState<string>('user')
-  const [authToken, setAuthToken] = useState<string | null>(null)
-  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false)
-  const [editingEntry, setEditingEntry] = useState<ChangelogEntry | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<ChangelogEntry | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [newVersion, setNewVersion] = useState('')
-  const [newTitle, setNewTitle] = useState('')
-  const [newCategory, setNewCategory] = useState('Feature')
-  const [newTags, setNewTags] = useState('')
-  const [newSummary, setNewSummary] = useState('')
-  const [newContent, setNewContent] = useState('')
-  const [newIsPublished, setNewIsPublished] = useState(true)
-  const [isSubmittingLog, setIsSubmittingLog] = useState(false)
-  const [adminMessage, setAdminMessage] = useState<string | null>(null)
 
   // Ticket Form state
   const [ticketSubject, setTicketSubject] = useState('')
@@ -80,30 +46,6 @@ function SupportPortalRoute() {
   const [ticketSubmitted, setTicketSubmitted] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
-
-  useEffect(() => {
-    if (!user?.id) return
-    let isMounted = true
-    getAuthJWTToken()
-      .catch(() => null)
-      .then((token) => {
-        if (isMounted) setAuthToken(token)
-        return getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } })
-      })
-      .then((profile) => {
-        if (isMounted) {
-          const role = getEffectiveRole(user, profile?.role) || 'user'
-          setUserRole(role)
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          const role = getEffectiveRole(user, null) || 'user'
-          setUserRole(role)
-        }
-      })
-    return () => { isMounted = false }
-  }, [user?.id, user?.email, user?.role])
 
   const toggleExpand = (version: string) => {
     setExpandedEntries((prev) => ({
@@ -261,105 +203,6 @@ function SupportPortalRoute() {
     }, 4000)
   }
 
-  const resetForm = () => {
-    setNewVersion('')
-    setNewTitle('')
-    setNewSummary('')
-    setNewContent('')
-    setNewCategory('Feature')
-    setNewTags('')
-    setNewIsPublished(true)
-    setEditingEntry(null)
-  }
-
-  const openCreateModal = () => {
-    resetForm()
-    setIsAdminModalOpen(true)
-  }
-
-  const openEditModal = (entry: ChangelogEntry) => {
-    setEditingEntry(entry)
-    setNewVersion(entry.version)
-    setNewTitle(entry.title)
-    setNewCategory(entry.category || 'Feature')
-    setNewTags(Array.isArray(entry.tags) ? entry.tags.join(', ') : '')
-    setNewSummary(entry.summary)
-    setNewContent(entry.content)
-    setNewIsPublished(entry.isPublished !== false)
-    setIsAdminModalOpen(true)
-  }
-
-  const handleCreateChangelog = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newVersion || !newTitle || !newSummary || !newContent) return
-    setIsSubmittingLog(true)
-    setAdminMessage(null)
-    const tagsArray = newTags
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean)
-    try {
-      if (editingEntry?.id) {
-        const entry = await updateChangelog({
-          id: editingEntry.id,
-          version: newVersion,
-          title: newTitle,
-          category: newCategory,
-          tags: tagsArray,
-          summary: newSummary,
-          content: newContent,
-          isPublished: newIsPublished,
-          userId: user?.id,
-          token: authToken ?? undefined,
-          releasedAt: editingEntry.releasedAt,
-        })
-        setChangelogs((prev) => prev.map((c) => (c.id === entry.id ? entry : c)))
-        setAdminMessage('✓ System Transmutation Log successfully updated in database!')
-      } else {
-        const entry = await createChangelog({
-          version: newVersion,
-          title: newTitle,
-          category: newCategory,
-          tags: tagsArray,
-          summary: newSummary,
-          content: newContent,
-          isPublished: newIsPublished,
-          userId: user?.id,
-          token: authToken ?? undefined,
-        })
-        setChangelogs((prev) => [entry, ...prev])
-        setAdminMessage('✓ System Transmutation Log successfully published to database!')
-      }
-      setIsAdminModalOpen(false)
-      resetForm()
-    } catch (err: any) {
-      console.error('Failed saving changelog:', err)
-      setAdminMessage(`❌ Failed to save log: ${err?.message || 'Unauthorized or network error'}`)
-    } finally {
-      setIsSubmittingLog(false)
-    }
-  }
-
-  const handleDeleteChangelog = async () => {
-    if (!deleteTarget?.id) return
-    setIsDeleting(true)
-    setAdminMessage(null)
-    try {
-      await deleteChangelog({ id: deleteTarget.id, userId: user?.id, token: authToken ?? undefined })
-      setChangelogs((prev) => prev.filter((c) => c.id !== deleteTarget.id))
-      setDeleteTarget(null)
-      setAdminMessage('✓ System Transmutation Log purged from database!')
-    } catch (err: any) {
-      console.error('Failed deleting changelog:', err)
-      setAdminMessage(`❌ Failed to purge log: ${err?.message || 'Unauthorized or network error'}`)
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  const effectiveRole = getEffectiveRole(user, userRole) || 'user'
-  const isAdmin = isAdminOrSuperAdmin(user, userRole)
-
   return (
     <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3] pb-10">
       {/* Header Banner matching Benthic Ascendance HUD standard */}
@@ -384,13 +227,8 @@ function SupportPortalRoute() {
             </div>
           </div>
 
-          {/* Realtime Status Indicator & Admin Badge */}
+          {/* Realtime Status Indicator */}
           <div className="flex flex-wrap items-center gap-2">
-            {isAdmin && (
-              <span className="text-[10px] text-[#00ffff] font-extrabold tracking-widest uppercase bg-[#00ffff]/15 border border-[#00ffff] px-2.5 py-1 chamfer-corner shadow-[0_0_10px_rgba(0,255,255,0.4)]">
-                ROLE: {effectiveRole.toUpperCase()}
-              </span>
-            )}
             <div className="flex items-center gap-2 bg-[#05090a] border border-[#3a4a49] px-3 py-1.5 chamfer-corner">
               <span className="w-2 h-2 rounded-full bg-[#00ffff] animate-ping" />
               <span className="text-xs text-[#00ffff] font-bold">SYSTEM STATUS: OPTIMAL</span>
@@ -454,33 +292,9 @@ function SupportPortalRoute() {
         </div>
       </div>
 
-      {adminMessage && (
-        <div className={`p-3 chamfer-corner text-xs font-bold font-sans border ${
-          adminMessage.startsWith('✓') ? 'bg-[#00ffff]/10 border-[#00ffff] text-[#00ffff]' : 'bg-[#ff0055]/10 border-[#ff0055] text-[#ff0055]'
-        }`}>
-          {adminMessage}
-        </div>
-      )}
-
       {/* TAB 1: SYSTEM CHANGELOG */}
       {activeTab === 'changelog' && (
         <div className="space-y-4">
-          {/* Admin Header Action Bar if user is admin */}
-          {isAdmin && (
-            <div className="flex items-center justify-between pb-1">
-              <span className="text-xs text-[#839493] font-mono uppercase">
-                ADMIN DISPATCH CONSOLE · SCOPE: PROD/DEV
-              </span>
-              <button
-                onClick={openCreateModal}
-                className="px-3.5 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.3)] active:scale-95 shrink-0"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#00ffff]" />
-                <span>ADD TRANSMUTATION LOG</span>
-              </button>
-            </div>
-          )}
-
           {/* Standard Responsive Search & Filter Controls Bar */}
           <ChangelogFilterBar
             searchQuery={searchQuery}
@@ -624,25 +438,6 @@ function SupportPortalRoute() {
                             </Link>
                           )}
                         </div>
-
-                        {isAdmin && (
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => openEditModal(entry)}
-                              className="text-[11px] text-[#ff5540] hover:text-white font-bold flex items-center gap-1 border border-[#3a4a49] px-2 py-1 chamfer-corner bg-[#070b0b] hover:border-[#00ffff]/60 transition-all"
-                            >
-                              <Pencil className="w-3 h-3" />
-                              <span>EDIT</span>
-                            </button>
-                            <button
-                              onClick={() => setDeleteTarget(entry)}
-                              className="text-[11px] text-[#ff0055] hover:text-white font-bold flex items-center gap-1 border border-[#3a4a49] px-2 py-1 chamfer-corner bg-[#070b0b] hover:border-[#ff0055]/70 transition-all"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              <span>PURGE</span>
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -861,210 +656,6 @@ function SupportPortalRoute() {
                 <Terminal className="w-4 h-4 text-[#ff5540]" />
                 <span>3,400 FATHOMS</span>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ADMIN CHANGELOG ENTRY MODAL */}
-      {isAdminModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="chitin-card w-full max-w-2xl p-6 chamfer-corner space-y-4 shadow-[0_0_40px_rgba(0,255,255,0.2)] border border-[#00ffff] bg-[#070b0b] relative">
-<div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
-                <div className="flex items-center gap-2">
-                  {editingEntry ? (
-                    <Pencil className="w-5 h-5 text-[#ff5540] animate-pulse" />
-                  ) : (
-                    <Sparkles className="w-5 h-5 text-[#00ffff] animate-pulse" />
-                  )}
-                  <h2 className="font-grotesk text-base font-bold text-[#dfe3e3] uppercase tracking-wider">
-                    {editingEntry ? 'EDIT SYSTEM TRANSMUTATION LOG' : 'PUBLISH SYSTEM TRANSMUTATION LOG'}
-                  </h2>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsAdminModalOpen(false)
-                    resetForm()
-                  }}
-                  className="text-[#839493] hover:text-[#00ffff] p-1 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-            <form onSubmit={handleCreateChangelog} className="space-y-4 font-sans text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[#839493] font-bold block uppercase">
-                    VERSION (E.G., v1.5.0)
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="v1.5.0"
-                    value={newVersion}
-                    onChange={(e) => setNewVersion(e.target.value)}
-                    className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[#839493] font-bold block uppercase">
-                    CATEGORY
-                  </label>
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                  >
-                    <option value="Feature">Feature</option>
-                    <option value="Improvement">Improvement</option>
-                    <option value="Security">Security</option>
-                    <option value="Performance">Performance</option>
-                    <option value="Fix">Fix</option>
-                    <option value="Design">Design</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[#839493] font-bold block uppercase">
-                  TAGS (COMMA-SEPARATED, E.G., UI/UX, Navigation, AI)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Feature, UI/UX, Performance, Navigation"
-                  value={newTags}
-                  onChange={(e) => setNewTags(e.target.value)}
-                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[#839493] font-bold block uppercase">
-                  TRANSMUTATION TITLE
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g., Admin Changelog System Transmutation"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[#839493] font-bold block uppercase">
-                  SUMMARY OVERVIEW
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Brief summary of what changed in this version..."
-                  value={newSummary}
-                  onChange={(e) => setNewSummary(e.target.value)}
-                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[#839493] font-bold block uppercase">
-                  RELEASE NOTES / MARKDOWN DETAILS
-                </label>
-                <textarea
-                  required
-                  rows={5}
-                  placeholder="Bullet points and markdown content for release notes..."
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] p-2.5 outline-none chamfer-corner resize-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-[#3a4a49]">
-                <label className="flex items-center gap-2 text-[#839493] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newIsPublished}
-                    onChange={(e) => setNewIsPublished(e.target.checked)}
-                    className="accent-[#00ffff] w-4 h-4"
-                  />
-                  <span>PUBLISH IMMEDIATELY</span>
-                </label>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAdminModalOpen(false)
-                      resetForm()
-                    }}
-                    className="px-4 py-2 border border-[#3a4a49] text-[#839493] hover:text-white text-xs font-bold chamfer-corner"
-                  >
-                    CANCEL
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmittingLog}
-                    className="px-5 py-2 bg-[#00ffff]/20 hover:bg-[#00ffff]/30 border border-[#00ffff] text-[#00ffff] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.4)] disabled:opacity-50"
-                  >
-                    {isSubmittingLog
-                      ? 'SYNCING...'
-                      : editingEntry
-                        ? 'UPDATE DATABASE RECORD'
-                        : 'PUBLISH TO NEON DB'}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ADMIN DELETE CONFIRMATION MODAL */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="chitin-card w-full max-w-md p-6 chamfer-corner space-y-4 shadow-[0_0_40px_rgba(255,0,85,0.2)] border border-[#ff0055] bg-[#070b0b] relative">
-            <div className="flex items-center justify-between border-b border-[#3a4a49] pb-3">
-              <div className="flex items-center gap-2">
-                <Trash2 className="w-5 h-5 text-[#ff0055] animate-pulse" />
-                <h2 className="font-grotesk text-base font-bold text-[#dfe3e3] uppercase tracking-wider">
-                  CONFIRM PURGE OF TELEMETRY
-                </h2>
-              </div>
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="text-[#839493] hover:text-[#00ffff] p-1 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs text-[#ff5540] font-bold border border-[#ff5540]/40 bg-[#ff5540]/10 px-3 py-2 chamfer-corner">
-                ⚠️ IRREVERSIBLE OPERATION. THIS RECORD WILL BE PERMANENTLY DESTROYED:
-              </p>
-              <p className="text-sm font-bold text-[#dfe3e3]">
-                <span className="text-[#00ffff]">{deleteTarget.version}</span> — {deleteTarget.title}
-              </p>
-              <p className="text-xs text-[#839493]">Category: {deleteTarget.category}</p>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#3a4a49]">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2 border border-[#3a4a49] text-[#839493] hover:text-white text-xs font-bold chamfer-corner"
-              >
-                ABORT
-              </button>
-              <button
-                onClick={handleDeleteChangelog}
-                disabled={isDeleting}
-                className="px-5 py-2 bg-[#ff0055]/20 hover:bg-[#ff0055]/30 border border-[#ff0055] text-[#ff0055] text-xs font-bold flex items-center gap-1.5 chamfer-corner transition-all shadow-[0_0_12px_rgba(255,0,85,0.4)] disabled:opacity-50 active:scale-95"
-              >
-                {isDeleting ? <span>PURGING...</span> : <><Trash2 className="w-3.5 h-3.5" /><span>CONFIRM PURGE</span></>}
-              </button>
             </div>
           </div>
         </div>

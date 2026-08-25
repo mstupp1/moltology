@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
-import { publicMiddleware, authenticatedMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads } from '../../db/schema'
+import { publicMiddleware } from './functions'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
-import { generateSlug } from '../ingest/parser'
+import { resolveWriteAuth } from './write-auth'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
 import type { GalleryPin } from '../gallery-data'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
@@ -16,10 +16,25 @@ import { validateForumContent } from '../community-rules'
 import { slugifyForumTitle, compareHot } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
 import type { PodcastEpisode } from '../podcast-data'
+import {
+  CANONICAL_ALIGNMENT_TASKS,
+  TOTAL_ALIGNMENT_TASKS,
+  mergeCompletions,
+  computeStreak,
+  shiftDays,
+  localDateString,
+  type AlignmentTaskItem,
+} from '../alignment-tasks'
 
 
 import { getPresignedViewUrl } from '../s3-client'
-import { ORACLE_MODELS, getOracleModel } from '../ai/oracle-models'
+import {
+  formatOracleUnavailableMessage,
+  getLastUserText,
+  getOracleCandidateModelIds,
+  pickGuestOracleResponse,
+  toModelMessages,
+} from '../ai/oracle-chat'
 import { verifyTurnstileToken } from './turnstile'
 
 type Db = ReturnType<typeof getDb>
@@ -118,262 +133,18 @@ export const getChangelogBySlugFn = createServerFn({ method: 'POST' })
   .validator((data: string) => z.string().min(1).parse(data))
   .handler(getChangelogBySlugHandler)
 
-interface CreateChangelogInput {
-  slug?: string
-  version?: string
-  title: string
-  category: string
-  tags?: string[]
-  summary: string
-  content: string
-  isPublished?: boolean
-  userId?: string
-  token?: string
-}
-
-import { ensureUserProfile } from '../user-sync'
-
-/**
- * Resolves the authenticated user id and RLS-scoped db client for admin changelog
- * mutations. Mirrors getUserProfileHandler: falls back to an explicit Neon JWT in
- * `data.token` because the JWT is not reliably available via cookies on the client.
- */
-const resolveChangelogAuth = async (opts: { data?: { token?: string; userId?: string }; context?: any }) => {
-  const { data, context } = opts
-  const authToken = context?.token || data?.token || undefined
-  let userId = context?.user?.sub || context?.user?.id
-  if (!userId && authToken) {
-    const { verifyNeonJWT } = await import('../jwt')
-    const verification = await verifyNeonJWT(authToken)
-    if (verification.valid && verification.payload?.sub) {
-      userId = verification.payload.sub
-    }
-  }
-  if (!userId && data?.userId) {
-    userId = data.userId
-  }
-  const dbClient = context?.db || getDb(authToken)
-  return { userId, dbClient, authToken }
-}
-
-/**
- * Server Function: Create system changelog entry (Admin / Super Admin only).
- */
-export const createChangelogHandler = async ({ data, context }: ServerFnArgs<CreateChangelogInput>) => {
-  const { userId, dbClient } = await resolveChangelogAuth({ data, context })
-  if (!userId) {
-    throw new Error('Unauthenticated: Authentication required to create system changelogs.')
-  }
-
-  await ensureUserProfile(userId)
-
-  const [userRecord] = await dbClient
-    .select({ role: profiles.role })
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
-
-  if (!userRecord || !['admin', 'super_admin'].includes(userRecord.role)) {
-    throw new Error('Unauthorized: Admin or Super Admin privileges required to post changelogs.')
-  }
-
-  if (!data) {
-    throw new Error('Input payload missing for changelog creation.')
-  }
-
-  const computedSlug = data.slug ? generateSlug(data.slug) : generateSlug(data.title)
-
-  const [inserted] = await dbClient
-    .insert(changelogs)
-    .values({
-      slug: computedSlug,
-      version: data.version || 'v1.0.0',
-      title: data.title,
-      category: data.category,
-      tags: data.tags || [],
-      summary: data.summary,
-      content: data.content,
-      isPublished: data.isPublished !== false,
-      releasedAt: new Date(),
-    })
-    .returning()
-
-  return toChangelogEntry(inserted)
-}
-
-export const createChangelogFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: CreateChangelogInput) => {
-    return z.object({
-      slug: z.string().optional(),
-      version: z.string().optional(),
-      title: z.string().min(1),
-      category: z.string().min(1),
-      tags: z.array(z.string()).optional(),
-      summary: z.string().min(1),
-      content: z.string().min(1),
-      isPublished: z.boolean().optional(),
-      userId: z.string().optional(),
-      token: z.string().optional(),
-    }).parse(data)
-  })
-  .handler(createChangelogHandler)
-
-interface UpdateChangelogInput extends CreateChangelogInput {
-  id: string
-  releasedAt?: string | Date
-}
-
-/**
- * Server Function: Update an existing system changelog entry (Admin / Super Admin only).
- */
-export const updateChangelogHandler = async ({ data, context }: ServerFnArgs<UpdateChangelogInput>) => {
-  const { userId, dbClient } = await resolveChangelogAuth({ data, context })
-  if (!userId) {
-    throw new Error('Unauthenticated: Authentication required to edit system changelogs.')
-  }
-
-  await ensureUserProfile(userId)
-
-  const [userRecord] = await dbClient
-    .select({ role: profiles.role })
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
-
-  if (!userRecord || !['admin', 'super_admin'].includes(userRecord.role)) {
-    throw new Error('Unauthorized: Admin or Super Admin privileges required to edit changelogs.')
-  }
-
-  if (!data?.id) {
-    throw new Error('Input payload missing changelog id for update.')
-  }
-
-  const computedSlug = data.slug ? generateSlug(data.slug) : generateSlug(data.title)
-
-  const [updated] = await dbClient
-    .update(changelogs)
-    .set({
-      slug: computedSlug,
-      version: data.version || 'v1.0.0',
-      title: data.title,
-      category: data.category,
-      tags: data.tags || [],
-      summary: data.summary,
-      content: data.content,
-      isPublished: data.isPublished !== false,
-      releasedAt: data.releasedAt ? new Date(data.releasedAt) : new Date(),
-    })
-    .where(eq(changelogs.id, data.id))
-    .returning()
-
-  return toChangelogEntry(updated)
-}
-
-export const updateChangelogFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: UpdateChangelogInput) => {
-    return z.object({
-      id: z.string().min(1),
-      slug: z.string().optional(),
-      version: z.string().optional(),
-      title: z.string().min(1),
-      category: z.string().min(1),
-      tags: z.array(z.string()).optional(),
-      summary: z.string().min(1),
-      content: z.string().min(1),
-      isPublished: z.boolean().optional(),
-      userId: z.string().optional(),
-      token: z.string().optional(),
-      releasedAt: z.union([z.string(), z.date()]).optional(),
-    }).parse(data)
-  })
-  .handler(updateChangelogHandler)
-
-interface DeleteChangelogInput {
-  id: string
-  userId?: string
-  token?: string
-}
-
-/**
- * Server Function: Delete a system changelog entry (Admin / Super Admin only).
- */
-export const deleteChangelogHandler = async ({ data, context }: ServerFnArgs<DeleteChangelogInput>) => {
-  const { userId, dbClient } = await resolveChangelogAuth({ data, context })
-  if (!userId) {
-    throw new Error('Unauthenticated: Authentication required to delete system changelogs.')
-  }
-
-  await ensureUserProfile(userId)
-
-  const [userRecord] = await dbClient
-    .select({ role: profiles.role })
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
-
-  if (!userRecord || !['admin', 'super_admin'].includes(userRecord.role)) {
-    throw new Error('Unauthorized: Admin or Super Admin privileges required to delete changelogs.')
-  }
-
-  if (!data?.id) {
-    throw new Error('Input payload missing changelog id for deletion.')
-  }
-
-  const [deleted] = await dbClient
-    .delete(changelogs)
-    .where(eq(changelogs.id, data.id))
-    .returning()
-
-  return toChangelogEntry(deleted)
-}
-
-export const deleteChangelogFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: DeleteChangelogInput) => {
-    return z.object({
-      id: z.string().min(1),
-      userId: z.string().optional(),
-      token: z.string().optional(),
-    }).parse(data)
-  })
-  .handler(deleteChangelogHandler)
-
-
-
 /**
  * Server Function: Get authenticated user profile.
- * Accepts optional `token` (Neon JWT) or `userId` fallback for client components
- * where the JWT isn't available via cookies (Neon's get-j-w-t-token is unavailable).
+ * Accepts optional Neon JWT in `data.token` when cookies are unavailable.
  */
 const getUserProfileHandler = async ({ data, context }: ServerFnArgs<{ token?: string; userId?: string }>) => {
-  let userId = context?.user?.sub || context?.user?.id
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return null
 
-  // Try explicit JWT if middleware couldn't resolve from cookies
-  if (!userId && data?.token) {
-    const { verifyNeonJWT } = await import('../jwt')
-    const verification = await verifyNeonJWT(data.token)
-    if (verification.valid && verification.payload?.sub) {
-      userId = verification.payload.sub
-    }
-  }
-
-  // Final fallback: userId passed directly from client session
-  if (!userId && data?.userId) {
-    userId = data.userId
-  }
-
-  if (!userId) return null
-
-  const { ensureUserProfile } = await import('../user-sync')
-  await ensureUserProfile(userId)
-
-  const dbClient = context?.db || getDb(context?.token ?? data?.token ?? undefined)
-  const [profileRecord] = await dbClient
+  const [profileRecord] = await auth.dbClient
     .select()
     .from(profiles)
-    .where(eq(profiles.id, userId))
+    .where(eq(profiles.id, auth.userId))
     .limit(1)
 
   return profileRecord || null
@@ -387,24 +158,22 @@ export const getUserProfileFn = createServerFn({ method: 'POST' })
 /**
  * Server Function: Get authenticated user stats.
  */
-const getUserStatsHandler = async ({ context }: ServerFnArgs) => {
-  const userId = context?.user?.sub || context?.user?.id
-  if (!userId) {
-    return null
-  }
+const getUserStatsHandler = async ({ data, context }: ServerFnArgs<{ token?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return null
 
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
-  const [stats] = await dbClient
+  const [stats] = await auth.dbClient
     .select()
     .from(userStats)
-    .where(eq(userStats.userId, userId))
+    .where(eq(userStats.userId, auth.userId))
     .limit(1)
 
   return stats || null
 }
 
 export const getUserStatsFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string }) => data ?? {})
   .handler(getUserStatsHandler)
 
 interface UserStatsInput {
@@ -415,32 +184,27 @@ interface UserStatsInput {
   moltmaxClearance?: string
   moltmaxStage?: string
   moltmaxDimensionScores?: Record<string, number>
+  token?: string
 }
 
 /**
  * Server Function: Update authenticated user stats with input validation.
  */
 const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<UserStatsInput>) => {
-  const userId = context?.user?.sub || context?.user?.id
-  if (!userId) {
-    throw new Error('User identifier missing from context')
-  }
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to update stats.')
+  const { userId, dbClient } = auth
 
-  // Auth flows can succeed before the profile/stat sync request finishes. Make
-  // the save path self-healing instead of allowing a zero-row UPDATE.
-  const { ensureUserProfile } = await import('../user-sync')
-  await ensureUserProfile(userId)
-
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
   await dbClient
     .insert(userStats)
     .values({ userId })
     .onConflictDoNothing()
 
   const input = data ?? {}
-  const statsData = input.moltmaxScore === undefined
-    ? input
-    : { ...input, moltmaxCompletedAt: new Date() }
+  const { token: _token, ...statsFields } = input
+  const statsData = statsFields.moltmaxScore === undefined
+    ? statsFields
+    : { ...statsFields, moltmaxCompletedAt: new Date() }
   const [updated] = await dbClient
     .update(userStats)
     .set({ ...statsData, updatedAt: new Date() })
@@ -451,7 +215,7 @@ const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<UserStatsI
 }
 
 export const updateUserStatsFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
   .validator((data: UserStatsInput) => {
     return z
       .object({
@@ -462,6 +226,7 @@ export const updateUserStatsFn = createServerFn({ method: 'POST' })
         moltmaxClearance: z.string().min(1).max(10).optional(),
         moltmaxStage: z.string().min(1).max(100).optional(),
         moltmaxDimensionScores: z.record(z.string(), z.number().min(0).max(100)).optional(),
+        token: z.string().optional(),
       })
       .parse(data)
   })
@@ -609,26 +374,33 @@ export const getAIMessagesFn = createServerFn({ method: 'POST' })
 interface CreateAIThreadInput {
   title?: string
   persona?: string
+  token?: string
 }
 
 /**
  * Server Function: Create a new AI conversation thread.
  */
 const createAIThreadHandler = async ({ data, context }: ServerFnArgs<CreateAIThreadInput>) => {
-  const userId = context?.user?.sub || context?.user?.id
-  if (!userId) throw new Error('Unauthenticated')
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated')
   const { createAIThread } = await import('../ai/service')
   return await createAIThread({
-    userId,
+    userId: auth.userId,
     title: data?.title || 'Ascendance Consultation',
     persona: data?.persona || 'oracle',
   })
 }
 
 export const createAIThreadFn = createServerFn({ method: 'POST' })
-  .middleware(authenticatedMiddleware)
+  .middleware(publicMiddleware)
   .validator((data: CreateAIThreadInput) => {
-    return z.object({ title: z.string().optional(), persona: z.string().optional() }).parse(data)
+    return z
+      .object({
+        title: z.string().optional(),
+        persona: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
   })
   .handler(createAIThreadHandler)
 
@@ -651,8 +423,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     throw new Error('Messages array is required')
   }
 
-  const lastMsg = messages[messages.length - 1]
-  const userText = lastMsg?.content || lastMsg?.text || ''
+  const userText = getLastUserText(messages)
 
   const { validateInputGuardrails, checkRateLimit } = await import('../ai/guardrails')
   const clientIp = '127.0.0.1'
@@ -663,7 +434,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
 
   const guardrail = validateInputGuardrails(userText)
   if (!guardrail.allowed) {
-    throw new Error(guardrail.reason || 'Message blocked by AI guardrails.')
+    throw new Error(guardrail.reason || 'Message blocked by safety filters.')
   }
 
   const { saveAIMessage, createAIThread, summarizeThreadTitle } = await import('../ai/service')
@@ -671,16 +442,8 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
 
   // Guest Mode Gating: Unauthenticated seekers receive friendly, clear guidance directing them to sign up
   if (!userId) {
-    const GUEST_ORACLE_RESPONSES = [
-      "The Oracle sees great potential in you, but you're still in Guest Mode! Create a free account to unlock detailed answers, advice, and save your chat history.",
-      "That is a great question! In Guest Mode, my answers are kept brief. Sign up for a free account to unlock full Oracle guidance and start your journey.",
-      "I'd love to give you the full breakdown, but you're browsing as a guest. Create your free account in seconds to get complete answers and track your progress!",
-      "The answer lies just beneath the surface! In Guest Mode, detailed insights and saved chats are locked. Sign up for free to unlock the full Oracle experience.",
-      "You're asking the right questions, but full answers require a free account. Sign up below to unlock complete answers and permanent chat history!",
-    ]
-    const index = Math.abs(userText.length + messages.length) % GUEST_ORACLE_RESPONSES.length
     return {
-      text: GUEST_ORACLE_RESPONSES[index],
+      text: pickGuestOracleResponse(userText, messages.length),
       threadId: null,
       isGuest: true,
     }
@@ -717,17 +480,10 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
 
   let assistantText = ''
   const systemPrompt = buildSystemPrompt()
-  const payloadMessages = messages.map((m) => ({
-    role: m.role as any,
-    content: m.content || m.text || '',
-  }))
+  const payloadMessages = toModelMessages(messages)
 
   // Model cascade: selected model first, then remaining candidates, so a rate-limited or restricted model falls through to a reachable one.
-  const selectedModel = getOracleModel(selectedModelId)
-  const candidateModels = [
-    selectedModel.id,
-    ...ORACLE_MODELS.filter((m) => m.id !== selectedModel.id).map((m) => m.id),
-  ]
+  const candidateModels = getOracleCandidateModelIds(selectedModelId)
   let lastError: Error | null = null
 
   for (const modelCandidate of candidateModels) {
@@ -742,13 +498,13 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
         break
       }
     } catch (err: any) {
-      console.warn(`[Benthic Neural Gateway] Model candidate '${modelCandidate}' failed:`, err.message)
+      console.warn(`[Oracle Chat] Model candidate '${modelCandidate}' failed:`, err.message)
       lastError = err
     }
   }
 
   if (!assistantText) {
-    assistantText = `[SYNAPTIC ORACLE SYSTEM ERROR] The Benthic neural gateway could not reach any registered cognition core. Your current Ascension tier does not grant passage to the requested Oracle channels. Await re-synchronization or petition a higher tier. (${lastError?.message || 'Gateway Unavailable'})`
+    assistantText = formatOracleUnavailableMessage(lastError)
   }
 
   // Safe DB Assistant message logging
@@ -930,6 +686,7 @@ export interface CreateBlogCommentInput {
   postId: string
   content: string
   userId?: string
+  token?: string
   turnstileToken?: string
 }
 
@@ -981,10 +738,11 @@ export const getBlogCommentsFn = createServerFn({ method: 'POST' })
  * Server Function: Create a blog comment (Authenticated registered users only).
  */
 export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<CreateBlogCommentInput>): Promise<BlogCommentEntry> => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
-  if (!userId) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
     throw new Error('Unauthenticated: You must be registered and logged in to post comments.')
   }
+  const { userId, dbClient, payload } = auth
 
   if (!data?.postId || !data?.content) {
     throw new Error('Invalid input: Post ID and comment content are required.')
@@ -1020,16 +778,13 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
     }
   }
 
-  await ensureUserProfile(userId)
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
-
   const [userProfile] = await dbClient
     .select()
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = userProfile?.larvaId || (context?.user as any)?.name || 'Ascendant Initiate'
+  const authorName = userProfile?.larvaId || (payload as any)?.name || 'Ascendant Initiate'
   const authorAvatar = '/images/stage1_larva.png'
 
   const [inserted] = await dbClient
@@ -1063,6 +818,7 @@ export const createBlogCommentFn = createServerFn({ method: 'POST' })
         postId: z.string().min(1),
         content: z.string().min(3).max(1000),
         userId: z.string().optional(),
+        token: z.string().optional(),
         turnstileToken: z.string().optional(),
       })
       .parse(data)
@@ -1123,10 +879,11 @@ export interface ForumPostEntry {
 }
 
 /**
- * Resolves the authenticated user id from middleware context or the caller.
+ * Resolves the authenticated user id from middleware context only.
+ * Bare client userId is not trusted for writes.
  */
-function resolveForumUserId(context?: ServerFnContext, dataUserId?: string): string | null {
-  return (context?.user?.sub as string) || (context?.user?.id as string) || dataUserId || null
+function resolveForumUserId(context?: ServerFnContext, _dataUserId?: string): string | null {
+  return (context?.user?.sub as string) || (context?.user?.id as string) || null
 }
 
 /**
@@ -1598,16 +1355,18 @@ export interface CreateForumTopicInput {
   title: string
   content: string
   userId?: string
+  token?: string
 }
 
 /**
  * Server Function: Create a new topic with guardrails validation.
  */
 export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<CreateForumTopicInput>): Promise<ForumTopicEntry> => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
-  if (!userId) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
     throw new Error('Unauthenticated: You must be registered and logged in to create discussion topics.')
   }
+  const { userId, dbClient, payload } = auth
 
   if (!data?.categoryId || !data?.title || !data?.content) {
     throw new Error('Invalid input: Category, title, and content are required.')
@@ -1619,17 +1378,14 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error(`Guardrail Trigger: ${validation.error}`)
   }
 
-  await ensureUserProfile(userId)
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
-
   const [userProfile] = await dbClient
     .select()
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = userProfile?.larvaId || (context?.user as any)?.name || 'Ascendant Initiate'
-  const authorAvatar = (context?.user as any)?.image || '/images/stage1_larva.png'
+  const authorName = userProfile?.larvaId || (payload as any)?.name || 'Ascendant Initiate'
+  const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
   // Generate clean unique slug
@@ -1689,6 +1445,7 @@ export const createForumTopicFn = createServerFn({ method: 'POST' })
         title: z.string().min(5).max(150),
         content: z.string().min(10).max(10000),
         userId: z.string().optional(),
+        token: z.string().optional(),
       })
       .parse(data)
   })
@@ -1698,16 +1455,18 @@ export interface CreateForumPostInput {
   topicId: string
   content: string
   userId?: string
+  token?: string
 }
 
 /**
  * Server Function: Create a reply to an existing forum topic.
  */
 export const createForumPostHandler = async ({ data, context }: ServerFnArgs<CreateForumPostInput>): Promise<ForumPostEntry> => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
-  if (!userId) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
     throw new Error('Unauthenticated: You must be registered and logged in to post replies.')
   }
+  const { userId, dbClient, payload } = auth
 
   if (!data?.topicId || !data?.content) {
     throw new Error('Invalid input: Topic ID and content are required.')
@@ -1719,17 +1478,14 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error(`Guardrail Trigger: ${validation.error}`)
   }
 
-  await ensureUserProfile(userId)
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
-
   const [userProfile] = await dbClient
     .select()
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = userProfile?.larvaId || (context?.user as any)?.name || 'Ascendant Initiate'
-  const authorAvatar = (context?.user as any)?.image || '/images/stage1_larva.png'
+  const authorName = userProfile?.larvaId || (payload as any)?.name || 'Ascendant Initiate'
+  const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
   const [inserted] = await dbClient
@@ -1786,6 +1542,7 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
         topicId: z.string().min(1),
         content: z.string().min(10).max(10000),
         userId: z.string().optional(),
+        token: z.string().optional(),
       })
       .parse(data)
   })
@@ -1795,6 +1552,7 @@ export interface ToggleForumVoteInput {
   topicId?: string
   postId?: string
   userId?: string
+  token?: string
 }
 
 export interface ForumVoteResult {
@@ -1806,16 +1564,15 @@ export interface ForumVoteResult {
  * Server Function: Toggle an upvote on a topic (one vote per user).
  */
 export const toggleForumTopicVoteHandler = async ({ data, context }: ServerFnArgs<ToggleForumVoteInput>): Promise<ForumVoteResult> => {
-  const userId = resolveForumUserId(context, data?.userId)
-  if (!userId) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
     throw new Error('Unauthenticated: You must be logged in to upvote.')
   }
   if (!data?.topicId) {
     throw new Error('Topic ID required.')
   }
 
-  await ensureUserProfile(userId)
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const { userId, dbClient } = auth
   const topicId = data.topicId
 
   const [topic] = await dbClient
@@ -1848,7 +1605,13 @@ export const toggleForumTopicVoteHandler = async ({ data, context }: ServerFnArg
 export const toggleForumTopicVoteFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: ToggleForumVoteInput) => {
-    return z.object({ topicId: z.string().min(1), userId: z.string().optional() }).parse(data)
+    return z
+      .object({
+        topicId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
   })
   .handler(toggleForumTopicVoteHandler)
 
@@ -1856,16 +1619,15 @@ export const toggleForumTopicVoteFn = createServerFn({ method: 'POST' })
  * Server Function: Toggle an upvote on a reply (one vote per user).
  */
 export const toggleForumPostVoteHandler = async ({ data, context }: ServerFnArgs<ToggleForumVoteInput>): Promise<ForumVoteResult> => {
-  const userId = resolveForumUserId(context, data?.userId)
-  if (!userId) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
     throw new Error('Unauthenticated: You must be logged in to upvote.')
   }
   if (!data?.postId) {
     throw new Error('Post ID required.')
   }
 
-  await ensureUserProfile(userId)
-  const dbClient = context?.db || getDb(context?.token ?? undefined)
+  const { userId, dbClient } = auth
   const postId = data.postId
 
   const [post] = await dbClient
@@ -1898,7 +1660,13 @@ export const toggleForumPostVoteHandler = async ({ data, context }: ServerFnArgs
 export const toggleForumPostVoteFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: ToggleForumVoteInput) => {
-    return z.object({ postId: z.string().min(1), userId: z.string().optional() }).parse(data)
+    return z
+      .object({
+        postId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
   })
   .handler(toggleForumPostVoteHandler)
 
@@ -2059,29 +1827,13 @@ const updateEmailPreferencesSchema = z.object({
 export type UpdateEmailPreferencesInput = z.input<typeof updateEmailPreferencesSchema>
 
 export async function updateEmailPreferencesHandler({ data, context }: ServerFnArgs<UpdateEmailPreferencesInput>) {
-  let userId = context?.user?.sub || context?.user?.id
-
-  if (!userId && data?.token) {
-    const { verifyNeonJWT } = await import('../jwt')
-    const verification = await verifyNeonJWT(data.token)
-    if (verification.valid && verification.payload?.sub) {
-      userId = verification.payload.sub
-    }
-  }
-
-  if (!userId && data?.userId) {
-    userId = data.userId
-  }
-
-  if (!userId) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
     throw new Error('Authentication required to update email preferences.')
   }
 
-  const { ensureUserProfile } = await import('../user-sync')
-  await ensureUserProfile(userId)
-
   const validated = updateEmailPreferencesSchema.parse(data || {})
-  const dbClient = context?.db || getDb(context?.token ?? data?.token ?? undefined)
+  const { userId, dbClient } = auth
 
   const [updated] = await dbClient
     .update(profiles)
@@ -2104,4 +1856,171 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: UpdateEmailPreferencesInput) => updateEmailPreferencesSchema.parse(data))
   .handler(updateEmailPreferencesHandler)
+
+export interface GetDailyAlignmentInput {
+  date?: string
+  token?: string
+}
+
+export interface ToggleDailyAlignmentInput {
+  taskKey: string
+  completed: boolean
+  date: string
+  token?: string
+}
+
+export interface DailyAlignmentResponse {
+  date: string
+  tasks: AlignmentTaskItem[]
+  completedKeys: string[]
+  completedCount: number
+  totalCount: number
+  isAllCompleted: boolean
+  history: Array<{ date: string; completedCount: number }>
+  streakDays: number
+}
+
+const getDailyAlignmentSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  token: z.string().optional(),
+})
+
+const toggleDailyAlignmentSchema = z.object({
+  taskKey: z.string().min(1),
+  completed: z.boolean(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  token: z.string().optional(),
+})
+
+export const getDailyAlignmentData = async (
+  dbClient: Db,
+  userId: string,
+  targetDate: string
+): Promise<DailyAlignmentResponse> => {
+  const todayCompletions = await dbClient
+    .select({
+      taskKey: routineCompletions.taskKey,
+    })
+    .from(routineCompletions)
+    .where(
+      and(
+        eq(routineCompletions.userId, userId),
+        eq(routineCompletions.completedOn, targetDate)
+      )
+    )
+
+  const completedKeys = todayCompletions.map((r) => r.taskKey)
+  const tasks = mergeCompletions(completedKeys)
+  const completedCount = completedKeys.length
+
+  const startDate = shiftDays(targetDate, -30)
+  const pastCompletions = await dbClient
+    .select({
+      completedOn: routineCompletions.completedOn,
+      taskKey: routineCompletions.taskKey,
+    })
+    .from(routineCompletions)
+    .where(
+      and(
+        eq(routineCompletions.userId, userId),
+        sql`${routineCompletions.completedOn} >= ${startDate}`,
+        sql`${routineCompletions.completedOn} <= ${targetDate}`
+      )
+    )
+
+  const dayCounts = new Map<string, Set<string>>()
+  for (const c of pastCompletions) {
+    if (!dayCounts.has(c.completedOn)) {
+      dayCounts.set(c.completedOn, new Set())
+    }
+    dayCounts.get(c.completedOn)!.add(c.taskKey)
+  }
+
+  const history: Array<{ date: string; completedCount: number }> = []
+  for (let i = 30; i >= 0; i--) {
+    const d = shiftDays(targetDate, -i)
+    const count = dayCounts.get(d)?.size || 0
+    history.push({ date: d, completedCount: count })
+  }
+
+  const streakDays = computeStreak(history, targetDate)
+
+  return {
+    date: targetDate,
+    tasks,
+    completedKeys,
+    completedCount,
+    totalCount: TOTAL_ALIGNMENT_TASKS,
+    isAllCompleted: completedCount >= TOTAL_ALIGNMENT_TASKS,
+    history,
+    streakDays,
+  }
+}
+
+export const getDailyAlignmentHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required to fetch daily alignment.')
+  }
+
+  const { date } = getDailyAlignmentSchema.parse(data || {})
+  const targetDate = date || localDateString()
+
+  return await getDailyAlignmentData(auth.dbClient, auth.userId, targetDate)
+}
+
+export const toggleDailyAlignmentTaskHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<ToggleDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required to update daily alignment.')
+  }
+
+  const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
+  const { userId, dbClient } = auth
+
+  const isValidKey = CANONICAL_ALIGNMENT_TASKS.some((t) => t.key === taskKey)
+  if (!isValidKey) {
+    throw new Error(`Invalid task key: ${taskKey}`)
+  }
+
+  if (completed) {
+    await dbClient
+      .insert(routineCompletions)
+      .values({
+        userId,
+        taskKey,
+        completedOn: date,
+      })
+      .onConflictDoNothing()
+  } else {
+    await dbClient
+      .delete(routineCompletions)
+      .where(
+        and(
+          eq(routineCompletions.userId, userId),
+          eq(routineCompletions.taskKey, taskKey),
+          eq(routineCompletions.completedOn, date)
+        )
+      )
+  }
+
+  return await getDailyAlignmentData(dbClient, userId, date)
+}
+
+export const getDailyAlignmentFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: GetDailyAlignmentInput) => getDailyAlignmentSchema.parse(data || {}))
+  .handler(getDailyAlignmentHandler)
+
+export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: ToggleDailyAlignmentInput) => toggleDailyAlignmentSchema.parse(data))
+  .handler(toggleDailyAlignmentTaskHandler)
+
 
