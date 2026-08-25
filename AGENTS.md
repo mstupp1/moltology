@@ -29,44 +29,9 @@ Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js
 - **Data**: Neon PostgreSQL, Drizzle ORM (`src/db/schema.ts`), RLS via JWT claims.
 - **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
 
-### Authenticated writes (TanStack Start `createServerFn`)
+### Neon, migrations, seeding, and HUD writes
 
-Essential pattern for any mutating HUD surface (daily alignment, forum, blog comments, etc.):
-
-1. **Declare** server functions with a statically visible chain: `createServerFn({ method: 'POST' }).middleware([...]).validator(...).handler(...)` — do not wrap `.handler()` behind a helper (see [`src/lib/server/functions.ts`](src/lib/server/functions.ts)).
-2. **Parse session** on the client as `sessionRes?.data?.user || (sessionRes as any)?.user` (never only `data.user` without the root fallback).
-3. **Client write loop**: optimistic local UI → `await getAuthJWTToken()` (real Neon JWT only; never opaque session cookies) → call the server fn with `{ token, userId? }` → reconcile from the returned payload; surface failures (toast / inline error). Optional: `useHudPersist().begin/end` for the shell spinner.
-4. **Server**: `resolveWriteAuth` + owner `getDb()` — never trust bare `userId` without a matching verified JWT `sub`.
-
-This repo does **not** use React Query `useMutation` / `invalidateQueries` for these writes.
-
-## Database, Branching & Migration Strategy
-
-### Neon Branch Architecture (Solo Dev)
-
-- **`main` Branch (Production)**: The live production database with active user data. Production deployments connect `DATABASE_URL` to `main`.
-- **`dev` Branch (Local Development)**: A copy-on-write clone of `main`. Local `.env` connects `DATABASE_URL` to `dev`.
-
-### Migration Workflow (4-Step Rule for Schema Updates)
-
-1. **Edit Schema**: Modify TypeScript definitions in [`src/db/schema.ts`](src/db/schema.ts).
-2. **Generate Migration**: Run `npm run db:generate`. This creates a new versioned `.sql` file in `drizzle/`.
-3. **Apply & Test in Dev**: Run `npm run db:setup` (or `npm run db:migrate`) against your local `.env` (`dev` branch), then verify with `npm run test`.
-4. **Ship to Production**: Commit `src/db/schema.ts` AND `drizzle/*.sql` files. On production deploy, run `npm run db:migrate` (and `npm run db:rls` if RLS changed) against the `main` branch.
-
-### Command Reference
-
-- `npm run db:generate` — Compare `schema.ts` against `drizzle/` and generate a new SQL migration.
-- `npm run db:migrate` — Execute pending SQL migrations from `drizzle/` on the DB in `DATABASE_URL`.
-- `npm run db:rls` — Apply/enforce Row-Level Security policies (`src/db/enable-rls.ts`).
-- `npm run db:seed` — Seed development database with seed data (`src/db/seed.ts`).
-- `npm run db:setup` — Run `db:migrate` ➔ `db:rls` ➔ `db:seed` in sequence.
-- `npm run db:reset` — Drop tables and re-run `db:setup` (clean slate for `dev` branch).
-
-### Neon Branching Quick Commands
-
-- Reset `dev` branch to mirror `main`: `neonctl branches reset dev --parent main`
-- Create isolated feature branch: `neonctl branches create --name feature-name --parent main`
+Full workflow lives in [`.agents/skills/neon-data-platform/SKILL.md`](.agents/skills/neon-data-platform/SKILL.md): Neon `dev`/`main` branches, Drizzle generate → migrate on dev, prod via `.github/workflows/migrate.yml`, seeding (no ghost seed IDs), and TanStack `createServerFn` + JWT write patterns. Read that skill before schema, migration, seed, or authenticated mutation work.
 
 ## Tests, SSR, and verification
 
