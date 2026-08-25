@@ -13,11 +13,11 @@ describe('HeaderBrand Component', () => {
   })
 
   it('hides text when isCollapsed is true', () => {
-    render(<HeaderBrand isCollapsed={true} subtext="BENTHIC TEMPLE HUD" />)
+    render(<HeaderBrand isCollapsed={true} subtext="BENTHIC CORE" />)
 
     expect(screen.getByAltText('Order Emblem')).toBeInTheDocument()
     expect(screen.queryByText('THE SYNAPTIC PATH')).not.toBeInTheDocument()
-    expect(screen.queryByText('BENTHIC TEMPLE HUD')).not.toBeInTheDocument()
+    expect(screen.queryByText('BENTHIC CORE')).not.toBeInTheDocument()
   })
 
   it('calls onClick handler when clicked', () => {
