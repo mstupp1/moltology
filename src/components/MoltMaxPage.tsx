@@ -257,9 +257,9 @@ export const MoltMaxPage: React.FC = () => {
     if (typeof navigator === 'undefined' || !navigator.clipboard) return
     navigator.clipboard.writeText('https://moltology.org/moltmax').then(() => {
       setIsCopied(true)
-      toast.success('Moltmax audit link copied to clipboard.')
+      toast.success('Moltmax audit beacon copied to neural clipboard.', { title: 'BEACON ENCODED' })
       window.setTimeout(() => setIsCopied(false), 2500)
-    }).catch(() => toast.error('The link could not reach your clipboard.'))
+    }).catch(() => toast.error('The beacon link could not reach your clipboard.', { title: 'CLIPBOARD DISRUPTED' }))
   }
 
   const handleSave = async () => {
@@ -279,9 +279,9 @@ export const MoltMaxPage: React.FC = () => {
         },
       })
       setIsSaved(true)
-      toast.success('Results saved to your profile.')
+      toast.success('Carapace diagnostics indexed to your neural profile.', { title: 'DIAGNOSTICS RECORDED' })
     } catch {
-      toast.error('Could not save your results. Please try again.')
+      toast.error('Telemetry could not record assessment results. Please re-engage.', { title: 'TELEMETRY DISRUPTION' })
     }
   }
 
@@ -343,9 +343,9 @@ export const MoltMaxPage: React.FC = () => {
       link.download = `moltmax-clearance-${result.score}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
-      toast.success('Scorecard image exported successfully.')
+      toast.success('Carapace scorecard synthesized and exported.', { title: 'SCORECARD EXPORTED' })
     } catch {
-      toast.error('Could not export scorecard. Try taking a screenshot.')
+      toast.error('Carapace scorecard visual could not render. Capture screen directly.', { title: 'RENDER DISRUPTED' })
     } finally {
       setIsGeneratingImage(false)
     }

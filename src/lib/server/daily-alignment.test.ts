@@ -5,10 +5,12 @@ import {
 } from './api'
 
 describe('Daily Alignment Server Handlers', () => {
-  it('throws unauthenticated error when called without user context in getDailyAlignmentHandler', async () => {
-    await expect(
-      getDailyAlignmentHandler({ data: { date: '2026-08-24' }, context: {} })
-    ).rejects.toThrow('Unauthenticated')
+  it('returns default empty alignment when called without user context in getDailyAlignmentHandler', async () => {
+    const res = await getDailyAlignmentHandler({ data: { date: '2026-08-24' }, context: {} })
+    expect(res).toBeDefined()
+    expect(res.tasks).toHaveLength(8)
+    expect(res.completedCount).toBe(0)
+    expect(res.streakDays).toBe(0)
   })
 
   it('throws unauthenticated error when called without user context in toggleDailyAlignmentTaskHandler', async () => {
@@ -26,7 +28,7 @@ describe('Daily Alignment Server Handlers', () => {
         data: { taskKey: 'invalid-nonexistent-task', completed: true, date: '2026-08-24' },
         context: { user: { sub: '00000000-0000-0000-0000-000000000001' } },
       })
-    ).rejects.toThrow('Invalid task key')
+    ).rejects.toThrow('Invalid liturgy identifier')
   })
 
   it('fetches daily alignment successfully with mock db and computes task list & streak', async () => {
