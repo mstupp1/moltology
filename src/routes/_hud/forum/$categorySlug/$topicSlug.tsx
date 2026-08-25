@@ -16,6 +16,7 @@ import { ForumShell } from '@/components/forum/ForumShell'
 import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { getForumTopicDetailFn, createForumPostFn, ForumPostEntry, ForumTopicEntry } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { relativeTime } from '@/lib/forum-utils'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -85,7 +86,10 @@ function ReplyComposer({
     setPosting(true)
     setError(null)
     try {
-      const post = await createForumPostFn({ data: { topicId, content, userId: userId ?? undefined } })
+      const token = await getAuthJWTToken()
+      const post = await createForumPostFn({
+        data: { topicId, content, userId: userId ?? undefined, token: token ?? undefined },
+      })
       onPosted(post)
       setContent('')
     } catch (err: any) {

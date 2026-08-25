@@ -4,6 +4,7 @@ import { authClient } from '@/lib/auth-client'
 import { UserAvatar } from './UserAvatar'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { getEffectiveRole } from '@/lib/permissions'
 
 export interface UserAvatarMenuProps {
@@ -52,18 +53,17 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
   useEffect(() => {
     if (user?.id && typeof getUserProfileFn === 'function') {
-      try {
-        const res = getUserProfileFn({ data: { userId: user.id } })
-        if (res && typeof (res as any).then === 'function') {
-          ;(res as Promise<any>)
-            .then((profile) => {
-              if (profile && typeof profile.emailOptIn === 'boolean') {
-                setEmailOptIn(profile.emailOptIn)
-              }
-            })
-            .catch(() => {})
-        }
-      } catch {}
+      ;(async () => {
+        try {
+          const token = await getAuthJWTToken()
+          const profile = await getUserProfileFn({
+            data: { userId: user.id, token: token ?? undefined },
+          })
+          if (profile && typeof profile.emailOptIn === 'boolean') {
+            setEmailOptIn(profile.emailOptIn)
+          }
+        } catch {}
+      })()
     }
   }, [user?.id])
 
@@ -72,11 +72,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
     setEmailOptIn(nextState)
     if (typeof updateEmailPreferencesFn === 'function') {
       try {
+        const token = await getAuthJWTToken()
         const res = updateEmailPreferencesFn({
           data: {
             emailOptIn: nextState,
             source: 'avatar_menu_toggle',
             userId: user.id,
+            token: token ?? undefined,
           },
         })
         if (res && typeof (res as any).then === 'function') {

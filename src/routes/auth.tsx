@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { getAuthJWTToken } from '@/lib/jwt'
 import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
@@ -92,15 +93,18 @@ function AuthRoute() {
         } else {
           if (emailOptIn) {
             const createdUser = (res as any)?.data?.user || (res as any)?.user
+            const token = await getAuthJWTToken()
             await updateEmailPreferencesFn({
               data: {
                 emailOptIn: true,
                 source: 'auth_page',
                 userId: createdUser?.id,
+                token: token ?? undefined,
               },
             }).catch(() => {})
           }
-          await getUserProfileFn().catch(() => {})
+          const token = await getAuthJWTToken()
+          await getUserProfileFn({ data: { token: token ?? undefined } }).catch(() => {})
           const destination = search.redirect || '/dashboard'
           navigate({ to: destination as any })
         }

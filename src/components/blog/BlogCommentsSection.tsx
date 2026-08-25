@@ -11,6 +11,7 @@ import {
   Terminal,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getBlogCommentsFn,
   createBlogCommentFn,
@@ -97,11 +98,13 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     setIsSubmitting(true)
 
     try {
+      const token = await getAuthJWTToken()
       const newComment = await createBlogCommentFn({
         data: {
           postId,
           content: trimmed,
           userId: user.id,
+          token: token ?? undefined,
           turnstileToken: turnstileToken || undefined,
         },
       })
