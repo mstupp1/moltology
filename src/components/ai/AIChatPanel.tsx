@@ -271,7 +271,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
       setMessages((prev) => [...prev, assistantMsg])
     } catch (err: any) {
-      setErrorMessage(err.message || 'Transmission interrupted. Please check network/guardrails.')
+      setErrorMessage(err.message || 'Something went wrong sending your message. Please try again.')
     } finally {
       setIsSending(false)
     }
@@ -623,7 +623,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     className="w-4 h-4 object-contain animate-pulse drop-shadow-[0_0_6px_rgba(0,195,255,0.4)]"
                   />
                   <span className="animate-pulse text-[11px]">
-                    Synthesizing response via {selectedModel.label}...
+                    Thinking with {selectedModel.label}...
                   </span>
                 </div>
               )}

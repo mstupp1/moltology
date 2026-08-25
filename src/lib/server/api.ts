@@ -757,7 +757,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
   }
 
   if (!assistantText) {
-    assistantText = `[SYNAPTIC ORACLE SYSTEM ERROR] The Benthic neural gateway could not reach any registered cognition core. Your current Ascension tier does not grant passage to the requested Oracle channels. Await re-synchronization or petition a higher tier. (${lastError?.message || 'Gateway Unavailable'})`
+    assistantText = `Sorry — the Oracle couldn't reach a working model right now. Please try again in a moment.${lastError?.message ? ` (${lastError.message})` : ''}`
   }
 
   // Safe DB Assistant message logging
