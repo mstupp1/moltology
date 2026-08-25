@@ -309,6 +309,7 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
           ref={videoRef}
           src={currentFeed.videoUrl}
           poster={currentFeed.posterUrl}
+          preload="none"
           autoPlay
           muted={isMuted}
           playsInline

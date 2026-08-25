@@ -30,6 +30,7 @@ import type { PodcastEpisode } from '@/lib/podcast-data'
 import { getPodcastsFn } from '@/lib/server/api'
 import { seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
+import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
 
 
 export const Route = createFileRoute('/news/')({
@@ -173,6 +174,7 @@ function NewsIndexPage() {
         <img
           src={getAssetUrl('/images/moltnation_flag_bg.jpg')}
           alt="MoltNation Flag Background"
+          {...lcpImageProps}
           className="absolute inset-0 w-full h-full object-cover filter brightness-105 contrast-115 opacity-95 scale-105 pointer-events-none"
         />
         {/* Subtle Radial & Gradient Overlays */}
@@ -308,6 +310,7 @@ function NewsIndexPage() {
                     <img
                       src={mainLeadPost.coverImageUrl}
                       alt={mainLeadPost.title}
+                      {...eagerImageProps}
                       className="w-full h-full object-cover filter brightness-95 group-hover:brightness-105 group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#05080a] via-transparent to-transparent" />
@@ -316,6 +319,7 @@ function NewsIndexPage() {
                         <img
                           src={mainLeadPost.authorAvatar}
                           alt={mainLeadPost.authorName}
+                          {...lazyImageProps}
                           className="w-5 h-5 rounded-full border border-cyan-400"
                         />
                         <span className="text-gray-200 font-bold">{mainLeadPost.authorName}</span>
@@ -356,6 +360,7 @@ function NewsIndexPage() {
                       <img
                         src={post.coverImageUrl}
                         alt={post.title}
+                        {...lazyImageProps}
                         className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                       />
                     </div>
@@ -388,6 +393,7 @@ function NewsIndexPage() {
                     <img
                       src={leftColPosts[0].coverImageUrl}
                       alt={leftColPosts[0].title}
+                      {...lazyImageProps}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                     />
                     <span className="absolute top-2 left-2 bg-cyan-950/90 border border-cyan-500/80 text-cyan-300 text-[10px] font-sans font-bold px-2 py-0.5 uppercase chamfer-corner">
@@ -524,6 +530,7 @@ function NewsIndexPage() {
                   <img
                     src={getAssetUrl('/images/benthic_abyss_hero.jpg')}
                     alt="MoltNation TV Stream"
+                    {...lazyImageProps}
                     className="w-full h-full object-cover filter brightness-80 group-hover:brightness-95 transition-all duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -649,6 +656,7 @@ function NewsIndexPage() {
                       <img
                         src={ep.authorAvatar}
                         alt={ep.authorName}
+                        {...lazyImageProps}
                         className="w-7 h-7 rounded-full border border-cyan-500/50 object-cover"
                       />
                       <div>
@@ -713,6 +721,7 @@ function NewsIndexPage() {
                   <img
                     src={getAssetUrl('/images/stage3_exoshell.png')}
                     alt="Right to Record"
+                    {...lazyImageProps}
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
@@ -748,6 +757,7 @@ function NewsIndexPage() {
                   <img
                     src={getAssetUrl('/images/stage2_softshed.png')}
                     alt="The Groypers"
+                    {...lazyImageProps}
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
                   <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
@@ -782,6 +792,7 @@ function NewsIndexPage() {
                   <img
                     src={getAssetUrl('/images/org_hero_lair.jpg')}
                     alt="Sin Tax"
+                    {...lazyImageProps}
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
                   <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
@@ -816,6 +827,7 @@ function NewsIndexPage() {
                   <img
                     src={getAssetUrl('/images/ai_learning_ascension_cover.jpg')}
                     alt="Man Camps"
+                    {...lazyImageProps}
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
                   />
                   <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 text-cyan-400 font-sans text-[10px] border border-cyan-900">
@@ -907,6 +919,7 @@ function NewsIndexPage() {
                     <img
                       src={posts[1].coverImageUrl}
                       alt={posts[1].title}
+                      {...lazyImageProps}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
                     />
                   </div>
@@ -958,6 +971,7 @@ function NewsIndexPage() {
                     <img
                       src={getAssetUrl('/images/stage4_carcinization.png')}
                       alt="Bio-Silicon HUD"
+                      {...lazyImageProps}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>

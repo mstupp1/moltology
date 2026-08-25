@@ -112,6 +112,24 @@ describe('LandingPage Component', () => {
     expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
   })
 
+  it('eager-loads a single LCP hero still and lazy-loads below-fold artwork', () => {
+    render(<LandingPage />)
+
+    const hero = screen.getByAltText('Benthic Abyss Widescreen Hero')
+    expect(hero.getAttribute('loading')).toBe('eager')
+    expect(hero.getAttribute('fetchpriority')).toBe('high')
+
+    expect(screen.getByAltText('Hero Lobster Peeking Over Card').getAttribute('loading')).toBe('lazy')
+    expect(screen.getByAltText('ADVANCED BENTHIC HUD').getAttribute('loading')).toBe('lazy')
+    expect(screen.getByAltText('Safari preview').getAttribute('loading')).toBe('lazy')
+    expect(screen.getByAltText('iPhone 15 Pro preview').getAttribute('loading')).toBe('lazy')
+  })
+
+  it('does not mount all six hero transmissions on first paint', () => {
+    const { container } = render(<LandingPage />)
+    expect(container.querySelectorAll('video')).toHaveLength(0)
+  })
+
   it('renders the 4 Benthic Sacraments with protocol enforcement actions', () => {
     render(<LandingPage />)
 

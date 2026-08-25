@@ -26,7 +26,24 @@ export function DashboardMarketingShowcase() {
           {/* Open-Source Magic UI Safari Window Frame with 100% True High-DPI Desktop Screenshot */}
           <Safari
             url="moltology.org/dashboard"
-            src={getAssetUrl('/images/marketing/dashboard_desktop_preview.png')}
+            src={getAssetUrl('/images/marketing/dashboard_desktop_preview.webp')}
+            sources={[
+              {
+                type: 'image/webp',
+                media: '(max-width: 767px)',
+                srcSet: getAssetUrl('/images/marketing/dashboard_desktop_preview_sm.webp'),
+              },
+              {
+                type: 'image/webp',
+                media: '(min-width: 768px)',
+                srcSet: getAssetUrl('/images/marketing/dashboard_desktop_preview.webp'),
+              },
+            ]}
+            loading="lazy"
+            fetchPriority="low"
+            width={1760}
+            height={1100}
+            sizes="(max-width: 767px) 100vw, 1152px"
           />
         </div>
 
@@ -35,7 +52,24 @@ export function DashboardMarketingShowcase() {
           {/* Open-Source Magic UI iPhone 15 Pro Frame with 100% True High-DPI Mobile Screenshot */}
           <Iphone15Pro
             className="w-[88px] min-[370px]:w-[105px] min-[440px]:w-[130px] sm:w-[180px] md:w-[230px] lg:w-[280px] xl:w-[320px]"
-            src={getAssetUrl('/images/marketing/dashboard_mobile_preview.png')}
+            src={getAssetUrl('/images/marketing/dashboard_mobile_preview.webp')}
+            sources={[
+              {
+                type: 'image/webp',
+                media: '(max-width: 767px)',
+                srcSet: getAssetUrl('/images/marketing/dashboard_mobile_preview_sm.webp'),
+              },
+              {
+                type: 'image/webp',
+                media: '(min-width: 768px)',
+                srcSet: getAssetUrl('/images/marketing/dashboard_mobile_preview.webp'),
+              },
+            ]}
+            loading="lazy"
+            fetchPriority="low"
+            imageWidth={540}
+            imageHeight={1170}
+            sizes="(max-width: 640px) 130px, 320px"
           />
         </div>
       </div>

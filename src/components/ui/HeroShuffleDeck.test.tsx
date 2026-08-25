@@ -1,9 +1,115 @@
 import React from 'react'
-import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { HeroShuffleDeck } from './HeroShuffleDeck'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
+import { HeroShuffleDeck, HERO_DECK_CROSSFADE_MS } from './HeroShuffleDeck'
+
+class MockIntersectionObserver {
+  callback: IntersectionObserverCallback
+  static instance: MockIntersectionObserver | null = null
+
+  constructor(callback: IntersectionObserverCallback) {
+    this.callback = callback
+    MockIntersectionObserver.instance = this
+  }
+
+  observe = vi.fn()
+  unobserve = vi.fn()
+  disconnect = vi.fn()
+  takeRecords = vi.fn(() => [])
+
+  trigger(isIntersecting: boolean) {
+    this.callback(
+      [
+        {
+          isIntersecting,
+          intersectionRatio: isIntersecting ? 1 : 0,
+          target: document.createElement('div'),
+        } as IntersectionObserverEntry,
+      ],
+      this as unknown as IntersectionObserver,
+    )
+  }
+}
 
 describe('HeroShuffleDeck Component', () => {
+  beforeEach(() => {
+    MockIntersectionObserver.instance = null
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      configurable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    })
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  it('renders posters without mounting hero clips on first paint', () => {
+    const { container } = render(<HeroShuffleDeck />)
+
+    expect(container.querySelectorAll('video')).toHaveLength(0)
+    expect(screen.getByAltText('CYBER-BENTHIC ASCENSION')).toBeInTheDocument()
+    expect(container.querySelectorAll('img')).toHaveLength(1)
+  })
+
+  it('mounts a single in-view clip with poster and preload=none', () => {
+    const { container } = render(<HeroShuffleDeck />)
+
+    act(() => {
+      MockIntersectionObserver.instance?.trigger(true)
+    })
+
+    const videos = container.querySelectorAll('video')
+    expect(videos).toHaveLength(1)
+    expect(videos[0].getAttribute('preload')).toBe('none')
+    expect((videos[0] as HTMLVideoElement).muted).toBe(true)
+    expect(videos[0].getAttribute('poster')).toBeTruthy()
+    expect(videos[0].getAttribute('src')).toBe('/videos/hero_benthic_core.mp4')
+  })
+
+  it('does not mount every transmission when advancing the deck', () => {
+    const { container } = render(<HeroShuffleDeck />)
+
+    act(() => {
+      MockIntersectionObserver.instance?.trigger(true)
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
+    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(2)
+
+    fireEvent.click(screen.getByRole('button', { name: /jump to total carcinization/i }))
+    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(2)
+    expect(container.querySelector('video[src="/videos/hero_total_carcinization.mp4"]')).toBeTruthy()
+    expect(container.querySelectorAll('video').length).toBeLessThan(6)
+  })
+
+  it('unmounts the outgoing clip after the crossfade', () => {
+    vi.useFakeTimers()
+    const { container } = render(<HeroShuffleDeck />)
+
+    act(() => {
+      MockIntersectionObserver.instance?.trigger(true)
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
+    expect(container.querySelectorAll('video').length).toBe(2)
+
+    act(() => {
+      vi.advanceTimersByTime(HERO_DECK_CROSSFADE_MS + 20)
+    })
+
+    expect(container.querySelectorAll('video')).toHaveLength(1)
+    expect(container.querySelector('video')?.getAttribute('src')).toBe('/videos/hero_asset_shedding.mp4')
+  })
+
   it('renders minimal video container with hover-only controls', () => {
     render(<HeroShuffleDeck />)
 
@@ -21,11 +127,9 @@ describe('HeroShuffleDeck Component', () => {
     const nextBtn = screen.getByRole('button', { name: /next video transmission/i })
     const prevBtn = screen.getByRole('button', { name: /previous video transmission/i })
 
-    // Click Next -> moves to Card 2 (ASSET TRANSMUTATION)
     fireEvent.click(nextBtn)
     expect(screen.getByRole('button', { name: /jump to asset transmutation/i })).toBeInTheDocument()
 
-    // Click Prev -> moves back to Card 1
     fireEvent.click(prevBtn)
     expect(screen.getByRole('button', { name: /jump to cyber-benthic ascension/i })).toBeInTheDocument()
   })
@@ -43,14 +147,12 @@ describe('HeroShuffleDeck Component', () => {
     const { container } = render(<HeroShuffleDeck />)
     const deck = container.firstChild as HTMLElement
 
-    // Swipe Left (touchStart at 200, touchEnd at 100 -> diff 100 > 45) -> Next Card
     fireEvent.touchStart(deck, { targetTouches: [{ clientX: 200 }] })
     fireEvent.touchMove(deck, { targetTouches: [{ clientX: 100 }] })
     fireEvent.touchEnd(deck)
 
     expect(screen.getByRole('button', { name: /jump to asset transmutation/i })).toBeInTheDocument()
 
-    // Swipe Right (touchStart at 100, touchEnd at 200 -> diff -100 < -45) -> Previous Card
     fireEvent.touchStart(deck, { targetTouches: [{ clientX: 100 }] })
     fireEvent.touchMove(deck, { targetTouches: [{ clientX: 200 }] })
     fireEvent.touchEnd(deck)

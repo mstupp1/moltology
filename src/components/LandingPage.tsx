@@ -37,6 +37,7 @@ import { MainFooter } from '@/components/MainFooter'
 import { DashboardMarketingShowcase } from '@/components/hud/DashboardMarketingShowcase'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
+import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -260,6 +261,7 @@ export const LandingPage: React.FC = () => {
         <img
           src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
           alt="Benthic Abyss Widescreen Hero"
+          {...lcpImageProps}
           className="absolute inset-0 w-full h-full object-cover opacity-22 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
         />
 
@@ -274,6 +276,7 @@ export const LandingPage: React.FC = () => {
         <img
           src={getAssetUrl('/images/chitin_texture_bg.jpg')}
           alt="Chitin Exoshell Background Texture"
+          {...eagerImageProps}
           className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
         />
         
@@ -434,6 +437,7 @@ export const LandingPage: React.FC = () => {
             <img
               src={getAssetUrl('/images/characters/char_lobster_corner_peek.png')}
               alt="Hero Lobster Peeking Over Card"
+              {...lazyImageProps}
               className="w-16 sm:w-24 lg:w-32 h-auto object-contain transform -rotate-3 hover:rotate-0 transition-transform duration-300"
             />
           </div>
@@ -497,6 +501,7 @@ export const LandingPage: React.FC = () => {
                           src={pillar.image}
                           alt={pillar.title}
                           style={pillar.imagePosition ? { objectPosition: pillar.imagePosition } : undefined}
+                          {...lazyImageProps}
                           className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
                         />
 
@@ -649,6 +654,7 @@ export const LandingPage: React.FC = () => {
             <img
               src={getAssetUrl('/images/underwater_looking_up.jpg')}
               alt="Sub-Benthic Abyss Scroll Reveal"
+              {...lazyImageProps}
               className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/70 to-[#070b0b] z-0" />
@@ -671,6 +677,7 @@ export const LandingPage: React.FC = () => {
             <img
               src={getAssetUrl('/images/characters/char_crab_pointing_stats.png')}
               alt="Excited Crab Pointing at Telemetry"
+              {...lazyImageProps}
               className="w-10 sm:w-12 lg:w-14 h-auto object-contain"
             />
           </div>
@@ -798,6 +805,7 @@ export const LandingPage: React.FC = () => {
             <img
               src={getAssetUrl('/images/characters/char_lobster_pointing_cta.png')}
               alt="Hero Lobster Pointing to Action"
+              {...lazyImageProps}
               className="w-16 sm:w-20 lg:w-24 h-auto object-contain"
             />
           </div>
@@ -837,6 +845,7 @@ export const LandingPage: React.FC = () => {
                       <img
                         src={sacrament.image}
                         alt={sacrament.title}
+                        {...lazyImageProps}
                         className="w-full h-full object-cover transform group-hover:scale-108 transition-transform duration-700 filter brightness-90 group-hover:brightness-100"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#05090a] via-[#05090a]/40 to-transparent" />
@@ -889,6 +898,7 @@ export const LandingPage: React.FC = () => {
               <img
                 src={getAssetUrl('/images/characters/char_lobster_floating_peaceful.png')}
                 alt="Ascended Stage Background Mascot"
+                {...lazyImageProps}
                 className="w-full h-auto object-contain"
               />
             </div>
@@ -936,6 +946,7 @@ export const LandingPage: React.FC = () => {
                   <img
                     src={stages[activeStage].image}
                     alt={stages[activeStage].title}
+                    {...lazyImageProps}
                     className="w-full h-60 sm:h-80 lg:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent" />
@@ -1094,6 +1105,7 @@ export const LandingPage: React.FC = () => {
               <img
                 src={getAssetUrl('/images/characters/char_lobster_thumbs_up.png')}
                 alt="Hero Lobster Giving Thumbs-Up"
+                {...lazyImageProps}
                 className="w-20 sm:w-28 lg:w-36 h-auto object-contain"
               />
             </div>
