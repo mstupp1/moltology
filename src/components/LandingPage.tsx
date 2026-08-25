@@ -435,7 +435,7 @@ export const LandingPage: React.FC = () => {
           {/* Playful Corner Peeking Lobster Character Over Top Bezel */}
           <div className="absolute -top-10 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none">
             <img
-              src={getAssetUrl('/images/characters/char_lobster_corner_peek.png')}
+              src={getAssetUrl('/images/characters/char_lobster_corner_peek.webp')}
               alt="Hero Lobster Peeking Over Card"
               {...lazyImageProps}
               className="w-16 sm:w-24 lg:w-32 h-auto object-contain transform -rotate-3 hover:rotate-0 transition-transform duration-300"
@@ -675,7 +675,7 @@ export const LandingPage: React.FC = () => {
           {/* Excited Little Crab Pointing at Live Telemetry */}
           <div className="hidden md:flex absolute -top-8 left-6 lg:left-16 z-20 items-center pointer-events-none select-none transform scale-x-[-1]">
             <img
-              src={getAssetUrl('/images/characters/char_crab_pointing_stats.png')}
+              src={getAssetUrl('/images/characters/char_crab_pointing_stats.webp')}
               alt="Excited Crab Pointing at Telemetry"
               {...lazyImageProps}
               className="w-10 sm:w-12 lg:w-14 h-auto object-contain"
@@ -803,7 +803,7 @@ export const LandingPage: React.FC = () => {
           {/* Pointing Lobster Hero Directing Focus to Canonical Doctrine */}
           <div className="hidden lg:flex absolute -top-10 sm:-top-14 right-10 sm:right-20 lg:right-28 z-20 items-center pointer-events-none select-none">
             <img
-              src={getAssetUrl('/images/characters/char_lobster_pointing_cta.png')}
+              src={getAssetUrl('/images/characters/char_lobster_pointing_cta.webp')}
               alt="Hero Lobster Pointing to Action"
               {...lazyImageProps}
               className="w-16 sm:w-20 lg:w-24 h-auto object-contain"
@@ -896,7 +896,7 @@ export const LandingPage: React.FC = () => {
             {/* Ascended Cyber Mascot in 4 Stages Section - Faded Blueprint Watermark on the Right Side */}
             <div className="absolute -right-12 sm:-right-6 lg:right-2 xl:right-8 bottom-0 sm:-bottom-4 lg:-bottom-8 w-[280px] sm:w-[420px] lg:w-[580px] xl:w-[680px] pointer-events-none select-none z-0 opacity-15 sm:opacity-20">
               <img
-                src={getAssetUrl('/images/characters/char_lobster_floating_peaceful.png')}
+                src={getAssetUrl('/images/characters/char_lobster_floating_peaceful.webp')}
                 alt="Ascended Stage Background Mascot"
                 {...lazyImageProps}
                 className="w-full h-auto object-contain"
@@ -1103,7 +1103,7 @@ export const LandingPage: React.FC = () => {
             {/* Encouraging Thumbs-Up Hero Lobster atop Bottom Conversion Banner */}
             <div className="hidden sm:block absolute -top-12 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none">
               <img
-                src={getAssetUrl('/images/characters/char_lobster_thumbs_up.png')}
+                src={getAssetUrl('/images/characters/char_lobster_thumbs_up.webp')}
                 alt="Hero Lobster Giving Thumbs-Up"
                 {...lazyImageProps}
                 className="w-20 sm:w-28 lg:w-36 h-auto object-contain"

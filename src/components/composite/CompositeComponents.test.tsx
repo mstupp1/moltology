@@ -244,7 +244,7 @@ describe('Composite UI Components', () => {
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)
       expect(info.s3Url).toContain('moltology-public-assets/images/characters/')
-      expect(info.filename).toMatch(/\.png$/)
+      expect(info.filename).toMatch(/\.(webp|png)$/)
     }
   })
 
@@ -256,7 +256,7 @@ describe('Composite UI Components', () => {
 
     const img = container.querySelector('img')
     expect(img).toBeInTheDocument()
-    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_cta.png')
+    expect(img?.getAttribute('src')).toContain('char_lobster_pointing_cta.webp')
     expect(img?.getAttribute('loading')).toBe('eager')
   })
 

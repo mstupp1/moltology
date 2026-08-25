@@ -25,50 +25,50 @@ export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
   lobster_pointing: {
     key: 'lobster_pointing',
     name: 'Lobster Pointing (CTA / Hero)',
-    filename: 'char_lobster_pointing_cta.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.png`,
+    filename: 'char_lobster_pointing_cta.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.webp`,
     description: 'Hero lobster pointing directly at call to action buttons or key links',
   },
   lobster_thumbs_up: {
     key: 'lobster_thumbs_up',
     name: 'Lobster Thumbs Up (Approval)',
-    filename: 'char_lobster_thumbs_up.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=3`,
+    filename: 'char_lobster_thumbs_up.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`,
     description: 'Cheerful lobster giving a thumbs-up approval sign',
   },
   lobster_action: {
     key: 'lobster_action',
     name: 'Lobster Speed Action (Kinetic)',
-    filename: 'char_lobster_speed_action.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_speed_action.png`,
+    filename: 'char_lobster_speed_action.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_speed_action.webp`,
     description: 'Dynamic speed-action lobster dashing forward with propulsion glow',
   },
   crab_stats: {
     key: 'crab_stats',
     name: 'Crab Pointing Stats (Metrics)',
-    filename: 'char_crab_pointing_stats.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.png`,
+    filename: 'char_crab_pointing_stats.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.webp`,
     description: 'Energetic crab pointing at quantitative metrics and charts',
   },
   lobster_peek: {
     key: 'lobster_peek',
     name: 'Lobster Corner Peek (Surprise)',
-    filename: 'char_lobster_corner_peek.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.png`,
+    filename: 'char_lobster_corner_peek.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.webp`,
     description: 'Playful lobster peeking over top or side container bezels',
   },
   lobster_peaceful: {
     key: 'lobster_peaceful',
     name: 'Lobster Peaceful (Zen Benthic)',
-    filename: 'char_lobster_floating_peaceful.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.png`,
+    filename: 'char_lobster_floating_peaceful.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.webp`,
     description: 'Calm cyber-lobster floating peacefully in deep benthic waters',
   },
   lobster_engineer: {
     key: 'lobster_engineer',
     name: 'Lobster Engineer (Hardhat Diagnostic)',
-    filename: 'char_lobster_engineer.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_engineer.png`,
+    filename: 'char_lobster_engineer.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_engineer.webp`,
     description: 'Cheerful lobster engineer wearing safety hardhat with holographic tablet',
   },
 }
@@ -161,8 +161,8 @@ export const MascotOverlay: React.FC<MascotOverlayProps> = ({
   const handleImageError = () => {
     if (!hasFailed) {
       setHasFailed(true)
-      // Fallback to S3 default thumbs-up
-      setCurrentSrc(`${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=3`)
+      // Fallback to S3 default thumbs-up WebP
+      setCurrentSrc(`${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`)
     }
   }
 

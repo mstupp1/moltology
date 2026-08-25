@@ -53,5 +53,41 @@ class TestChromaKey(unittest.TestCase):
             self.assertEqual(res_img.mode, "RGBA")
             self.assertGreater(res_arr[res_arr.shape[0]//2, res_arr.shape[1]//2, 3], 200)
 
+    def test_chroma_key_process_webp(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            in_path = os.path.join(tmpdir, "test_input.png")
+            out_path = os.path.join(tmpdir, "test_output.webp")
+
+            arr = np.zeros((100, 100, 3), dtype=np.uint8)
+            arr[:, :] = [255, 0, 255]
+            arr[30:70, 30:70] = [0, 220, 220]
+            Image.fromarray(arr).save(in_path)
+
+            chroma_key_process(in_path, out_path, key_color=(255, 0, 255), tolerance=40, smoothness=20)
+            self.assertTrue(os.path.exists(out_path))
+            res_img = Image.open(out_path)
+            self.assertEqual(res_img.format, "WEBP")
+            self.assertEqual(res_img.mode, "RGBA")
+
+    def test_chroma_key_process_dual_webp(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            in_path = os.path.join(tmpdir, "test_input.png")
+            out_png = os.path.join(tmpdir, "test_output.png")
+            expected_webp = os.path.join(tmpdir, "test_output.webp")
+
+            arr = np.zeros((100, 100, 3), dtype=np.uint8)
+            arr[:, :] = [255, 0, 255]
+            arr[30:70, 30:70] = [0, 220, 220]
+            Image.fromarray(arr).save(in_path)
+
+            chroma_key_process(in_path, out_png, key_color=(255, 0, 255), export_webp=True, webp_quality=88)
+            self.assertTrue(os.path.exists(out_png))
+            self.assertTrue(os.path.exists(expected_webp))
+
+            res_png = Image.open(out_png)
+            res_webp = Image.open(expected_webp)
+            self.assertEqual(res_png.format, "PNG")
+            self.assertEqual(res_webp.format, "WEBP")
+
 if __name__ == "__main__":
     unittest.main()

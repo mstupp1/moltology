@@ -122,6 +122,8 @@ def chroma_key_process(
     despill_strength: float = 0.85,
     trim: bool = False,
     margin: int = 20,
+    export_webp: bool = False,
+    webp_quality: int = 90,
 ) -> str:
     """
     Core chroma key extraction algorithm with Hollywood Keylight de-mixing.
@@ -193,8 +195,20 @@ def chroma_key_process(
     out_dir = os.path.dirname(os.path.abspath(output_path))
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
-    result_img.save(output_path, "PNG")
-    print(f"Successfully exported transparent cutout: {output_path} ({result_img.width}x{result_img.height})")
+    
+    ext = os.path.splitext(output_path)[1].lower()
+    if ext == ".webp":
+        result_img.save(output_path, "WEBP", quality=webp_quality, method=6)
+        print(f"Successfully exported transparent WebP cutout: {output_path} ({result_img.width}x{result_img.height}, q={webp_quality})")
+    else:
+        result_img.save(output_path, "PNG")
+        print(f"Successfully exported transparent PNG cutout: {output_path} ({result_img.width}x{result_img.height})")
+    
+    if export_webp and ext != ".webp":
+        webp_path = f"{os.path.splitext(output_path)[0]}.webp"
+        result_img.save(webp_path, "WEBP", quality=webp_quality, method=6)
+        print(f"Successfully exported companion WebP cutout: {webp_path} ({result_img.width}x{result_img.height}, q={webp_quality})")
+
     return output_path
 
 # Alias for backwards compatibility
@@ -202,10 +216,10 @@ chroma_key = chroma_key_process
 
 def main():
     parser = argparse.ArgumentParser(
-        description="High-Precision Multi-Color Chroma Key Studio Engine for Transparent PNG Extraction"
+        description="High-Precision Multi-Color Chroma Key Studio Engine for Transparent PNG and WebP Extraction"
     )
     parser.add_argument("input", help="Path to input image file (JPEG, PNG, WEBP)")
-    parser.add_argument("output", nargs="?", default=None, help="Path to output transparent PNG file")
+    parser.add_argument("output", nargs="?", default=None, help="Path to output transparent file (.png or .webp)")
     parser.add_argument(
         "-c", "--color",
         default="auto",
@@ -217,6 +231,8 @@ def main():
     parser.add_argument("--despill-strength", type=float, default=0.85, help="Despill strength from 0.0 to 1.0 (default: 0.85)")
     parser.add_argument("--trim", action="store_true", help="Auto-crop transparent margins around subject")
     parser.add_argument("--margin", type=int, default=20, help="Margin padding in pixels when trimming (default: 20)")
+    parser.add_argument("--webp", action="store_true", help="Also generate a companion .webp file alongside PNG")
+    parser.add_argument("--quality", type=int, default=90, help="WebP compression quality from 1 to 100 (default: 90)")
 
     args = parser.parse_args()
 
@@ -238,6 +254,8 @@ def main():
         despill_strength=args.despill_strength,
         trim=args.trim,
         margin=args.margin,
+        export_webp=args.webp,
+        webp_quality=args.quality,
     )
 
 if __name__ == "__main__":

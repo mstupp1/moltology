@@ -79,46 +79,47 @@ Call `generate_image` directly:
 Execute `scripts/chroma_key.py` on the generated image:
 
 ```bash
-# Auto-detect background color (recommended):
-python3 scripts/chroma_key.py <input_image_path> <output_png_path> --auto --trim --margin 24
+# Auto-detect background color and generate both PNG master and WebP web cutout:
+python3 scripts/chroma_key.py <input_image_path> scratch/characters/char_<name>.png --auto --trim --margin 24 --webp
 
-# Or specify exact key color and tune thresholds:
-python3 scripts/chroma_key.py <input_image_path> <output_png_path> \
-  --color pink \
-  --tolerance 60 \
-  --smoothness 30 \
-  --despill-strength 0.85 \
-  --trim \
-  --margin 24
+# Or export directly to WebP:
+python3 scripts/chroma_key.py <input_image_path> scratch/characters/char_<name>.webp --color pink --tolerance 48 --smoothness 28 --trim --margin 24
 ```
 
 #### CLI Parameters:
 * `-c, --color`: Color preset (`pink`, `magenta`, `green`, `blue`, `cyan`, `yellow`, `white`, `black`), hex (`#FF00FF`), or `auto` (default: `auto`).
-* `-t, --tolerance`: Inner distance threshold for 100% transparency (default: `60.0`).
-* `-s, --smoothness`: Outer smooth transition width for soft anti-aliased alpha ramp (default: `30.0`).
+* `-t, --tolerance`: Inner distance threshold for 100% transparency (default: `48.0`).
+* `-s, --smoothness`: Outer smooth transition width for soft anti-aliased alpha ramp (default: `28.0`).
 * `--despill-strength`: Color fringe suppression strength from `0.0` to `1.0` (default: `0.85`).
 * `--trim`: Automatically crops transparent margins to the subject's tight bounding box.
 * `--margin`: Extra padding in pixels when trimming (default: `20`).
+* `--webp`: Automatically generates a high-efficiency companion `.webp` file alongside the output PNG (q=90 with alpha preservation, saving 75–85% payload).
+* `--quality`: WebP compression quality from 1 to 100 (default: `90`).
 * `--no-flood-fill`: Disables hole protection (by default, internal holes matching the key color are protected).
 
 ---
 
 ### Step 4: Quality & Alpha Verification
 
-Verify the transparent PNG:
+Verify the transparent PNG/WebP:
 1. **Alpha Channel**: Confirm that background pixels have `alpha = 0` and subject pixels have `alpha = 255`.
 2. **Edge Smoothness**: Check that edges are anti-aliased with no jagged pixelation.
 3. **Despill Check**: Ensure there is no colored halo/glow around the perimeter of the subject.
 4. **Hole Protection**: Verify that white/gray highlights inside the subject remain opaque.
+5. **WebP Compression Ratio**: Confirm WebP output is ~30–70 KB (vs 200–500 KB PNG) with zero visible edge artifacts.
 
 ---
 
 ### Step 5: Registry & Asset Pipeline Integration (Optional)
 
 If the character is added to the permanent Moltology mascot roster:
-1. Upload transparent PNG to Neon S3 (`moltology-public-assets/images/characters/<filename>.png`):
+1. Upload transparent WebP to Neon S3 (`moltology-public-assets/images/characters/<filename>.webp`):
    ```bash
-   npx tsx scripts/upload-asset.ts <output_png_path> --key images/characters/<filename>.png
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.webp --key images/characters/char_<name>.webp
    ```
-2. Register in `scripts/lib/character-overlay.ts` under `CHARACTER_REGISTRY`.
-3. Update `scripts/lib/character-overlay.test.ts` and run `npx vitest run scripts/lib/character-overlay.test.ts`.
+2. (Optional master archive) Upload transparent PNG:
+   ```bash
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.png --key images/characters/char_<name>.png
+   ```
+3. Register in `scripts/lib/character-overlay.ts` under `CHARACTER_REGISTRY`.
+4. Update `scripts/lib/character-overlay.test.ts` and run `npx vitest run scripts/lib/character-overlay.test.ts`.
