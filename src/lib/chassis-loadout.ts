@@ -347,3 +347,26 @@ export function applyMoveUpdates(
     }
   })
 }
+
+export interface ChassisLoadoutPayload {
+  catalog: CatalogRef[]
+  items: GearItemState[]
+  totals: LoadoutTotals
+  vaultSize: number
+}
+
+let chassisLoadoutCache: { userId: string; payload: ChassisLoadoutPayload } | null = null
+
+/** Session-scoped cache so HUD route remounts do not flash loaders. */
+export function getCachedChassisLoadout(userId: string): ChassisLoadoutPayload | null {
+  if (chassisLoadoutCache?.userId === userId) return chassisLoadoutCache.payload
+  return null
+}
+
+export function setCachedChassisLoadout(userId: string, payload: ChassisLoadoutPayload): void {
+  chassisLoadoutCache = { userId, payload }
+}
+
+export function clearChassisLoadoutCache(): void {
+  chassisLoadoutCache = null
+}

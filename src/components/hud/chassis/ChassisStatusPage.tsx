@@ -19,8 +19,11 @@ import {
   applyMoveUpdates,
   computeLoadoutTotals,
   emptyTotals,
+  getCachedChassisLoadout,
   planGearMove,
+  setCachedChassisLoadout,
   type CatalogRef,
+  type ChassisLoadoutPayload,
   type GearItemState,
   type LoadoutTotals,
   type MoveTarget,
@@ -28,8 +31,6 @@ import {
 } from '@/lib/chassis-loadout'
 import type { EquipmentCategory } from '@/db/schema'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
-import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { ChassisStatusGhost } from '@/components/hud/HudGhostSkeletons'
 import { GearDetail } from './GearDetail'
 import { GearItemCard } from './GearItemCard'
 import { LoadoutStatsPanel } from './LoadoutStatsPanel'
@@ -56,11 +57,12 @@ export const ChassisStatusPage: React.FC = () => {
   const userId = user?.id || user?.sub || null
   const persist = useHudPersist()
 
-  const [catalog, setCatalog] = useState<CatalogRef[]>([])
-  const [items, setItems] = useState<GearItemState[]>([])
-  const [totals, setTotals] = useState<LoadoutTotals>(emptyTotals())
-  const [vaultSize, setVaultSize] = useState(VAULT_SIZE)
-  const [loading, setLoading] = useState(true)
+  const cached = userId ? getCachedChassisLoadout(userId) : null
+
+  const [catalog, setCatalog] = useState<CatalogRef[]>(() => cached?.catalog ?? [])
+  const [items, setItems] = useState<GearItemState[]>(() => cached?.items ?? [])
+  const [totals, setTotals] = useState<LoadoutTotals>(() => cached?.totals ?? emptyTotals())
+  const [vaultSize, setVaultSize] = useState(() => cached?.vaultSize ?? VAULT_SIZE)
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [detailItemId, setDetailItemId] = useState<string | null>(null)
@@ -74,38 +76,39 @@ export const ChassisStatusPage: React.FC = () => {
   )
 
   const applyPayload = useCallback(
-    (payload: {
-      catalog: CatalogRef[]
-      items: GearItemState[]
-      totals: LoadoutTotals
-      vaultSize: number
-    }) => {
+    (payload: ChassisLoadoutPayload) => {
       setCatalog(payload.catalog)
       setItems(payload.items)
       setTotals(payload.totals)
       setVaultSize(payload.vaultSize)
+      if (userId) setCachedChassisLoadout(userId, payload)
     },
-    []
+    [userId]
   )
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       if (!userId) return
-      setLoading(true)
-      setError(null)
+
+      const sessionCache = getCachedChassisLoadout(userId)
+      if (sessionCache && !cancelled) {
+        applyPayload(sessionCache)
+      }
+
       try {
         const token = await getAuthJWTToken()
         const payload = await getChassisLoadoutFn({
           data: { token: token ?? undefined, userId },
         })
-        if (!cancelled) applyPayload(payload)
-      } catch (e) {
         if (!cancelled) {
+          applyPayload(payload)
+          setError(null)
+        }
+      } catch (e) {
+        if (!cancelled && !getCachedChassisLoadout(userId)) {
           setError(e instanceof Error ? e.message : 'Chassis loadout could not be retrieved.')
         }
-      } finally {
-        if (!cancelled) setLoading(false)
       }
     })()
     return () => {
@@ -218,7 +221,7 @@ export const ChassisStatusPage: React.FC = () => {
     return catalogById.get(item.catalogItemId) ?? null
   }, [items, activeDragId, catalogById])
 
-  if (error && !loading) {
+  if (error && catalog.length === 0 && items.length === 0) {
     return (
       <div className="flex flex-col flex-1 min-h-0 h-full font-sans relative">
         <div className="chitin-card p-4 chamfer-corner border border-[#ff5540]/40 bg-[#1a0808] text-[#ff5540] text-sm">
@@ -230,8 +233,7 @@ export const ChassisStatusPage: React.FC = () => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 h-full w-full">
-      <HudGhostWidget isLoading={loading} skeleton={<ChassisStatusGhost />}>
-        <DndContext
+      <DndContext
         sensors={sensors}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
@@ -330,7 +332,6 @@ export const ChassisStatusPage: React.FC = () => {
           </HudBottomSheet>
         </div>
       </DndContext>
-    </HudGhostWidget>
     </div>
   )
 }

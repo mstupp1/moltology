@@ -2,8 +2,12 @@ import { describe, it, expect } from 'vitest'
 import {
   applyMoveUpdates,
   computeLoadoutTotals,
+  clearChassisLoadoutCache,
+  emptyTotals,
   findFirstFreeVaultIndex,
+  getCachedChassisLoadout,
   planGearMove,
+  setCachedChassisLoadout,
   type CatalogRef,
   type GearItemState,
 } from './chassis-loadout'
@@ -111,5 +115,20 @@ describe('chassis-loadout', () => {
     const next = applyMoveUpdates(items, plan.updates)
     expect(next.find((i) => i.id === 'a')?.vaultIndex).toBe(1)
     expect(next.find((i) => i.id === 'b')?.vaultIndex).toBe(0)
+  })
+
+  it('caches loadout per user for session remounts', () => {
+    clearChassisLoadoutCache()
+    const payload = {
+      catalog,
+      items: [],
+      totals: emptyTotals(),
+      vaultSize: 20,
+    }
+    setCachedChassisLoadout('user-a', payload)
+    expect(getCachedChassisLoadout('user-a')).toEqual(payload)
+    expect(getCachedChassisLoadout('user-b')).toBeNull()
+    clearChassisLoadoutCache()
+    expect(getCachedChassisLoadout('user-a')).toBeNull()
   })
 })
