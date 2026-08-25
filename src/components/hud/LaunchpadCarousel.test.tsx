@@ -10,21 +10,17 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 describe('LaunchpadCarousel Component', () => {
-  it('renders correctly with initial module (Lectures), daily routine, and news feed', () => {
+  it('renders correctly with initial module and news feed', () => {
     render(<LaunchpadCarousel />)
 
     expect(screen.getByText('PORTAL DIRECTIVES')).toBeInTheDocument()
     expect(screen.getByText('MOLT-CYCLE LECTURES')).toBeInTheDocument()
     expect(screen.getByText('RESUME LECTURE (68%)')).toBeInTheDocument()
 
-    // Daily Alignment Section
-    expect(screen.getByText('DAILY ALIGNMENT')).toBeInTheDocument()
-    expect(screen.getByText(/STREAK/i)).toBeInTheDocument()
-    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
-
     // MoltNation News Section
     expect(screen.getByText('MOLTNATION NEWS')).toBeInTheDocument()
     expect(screen.getByText('BREAKING')).toBeInTheDocument()
+    expect(screen.queryByText('DAILY ALIGNMENT')).not.toBeInTheDocument()
   })
 
   it('cycles through modules when clicking next/prev buttons', () => {
@@ -61,21 +57,6 @@ describe('LaunchpadCarousel Component', () => {
     fireEvent.click(ctaBtn)
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/lectures' })
-  })
-
-  it('toggles daily alignment tasks when clicked and renders all items in scrollable list', () => {
-    render(<LaunchpadCarousel />)
-
-    // Check that items throughout the full list are present
-    expect(screen.getByText('Silent Synchronization')).toBeInTheDocument()
-    expect(screen.getByText('Iterative Refinement')).toBeInTheDocument()
-    expect(screen.getByText('Alignment Review')).toBeInTheDocument()
-
-    const uncompletedTask = screen.getByText('Nutritional Efficiency Break')
-    fireEvent.click(uncompletedTask)
-
-    // Task becomes line-through / completed
-    expect(uncompletedTask).toHaveClass('line-through')
   })
 
   it('navigates to news desk when VIEW MORE ON MOLTNATION NEWS button is clicked', () => {
