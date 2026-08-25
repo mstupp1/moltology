@@ -6,6 +6,9 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { INITIAL_FORUM_CATEGORIES, getCategoryBgImage } from '@/lib/forum-seed-data'
+import { authClient } from '@/lib/auth-client'
+import { getAuthJWTToken } from '@/lib/jwt'
+import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
@@ -52,6 +55,9 @@ function ForumBoardPage() {
   const { categorySlug } = Route.useParams()
   const loader = Route.useLoaderData()
   const navigate = useNavigate()
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const userId = user?.id ?? user?.sub ?? null
   const [category, setCategory] = useState<ForumCategoryEntry | null>(loader.category)
   const [topics, setTopics] = useState<ForumTopicEntry[]>(loader.topics || [])
   const [sortBy, setSortBy] = useState<SortKey>('hot')
@@ -67,18 +73,33 @@ function ForumBoardPage() {
   useEffect(() => {
     let active = true
     setLoading(true)
-    getForumTopicsFn({ data: { categorySlug, query: searchQuery, sortBy } })
-      .then((res) => {
-        if (active) setTopics(res || [])
-      })
-      .catch(() => null)
-      .finally(() => {
+    ;(async () => {
+      try {
+        const token = userId ? await getAuthJWTToken() : null
+        const res = await getForumTopicsFn({
+          data: {
+            categorySlug,
+            query: searchQuery,
+            sortBy,
+            userId: userId || undefined,
+            token: token ?? undefined,
+          },
+        })
+        if (active) {
+          const next = res || []
+          if (userId) syncForumVotesFromServer(userId, next)
+          setTopics(next)
+        }
+      } catch {
+        if (active) setTopics([])
+      } finally {
         if (active) setLoading(false)
-      })
+      }
+    })()
     return () => {
       active = false
     }
-  }, [categorySlug, sortBy, searchQuery])
+  }, [categorySlug, sortBy, searchQuery, userId])
 
   const sortTabs: { key: SortKey; label: string }[] = [
     { key: 'hot', label: 'HOT' },
@@ -235,17 +256,17 @@ function ForumBoardPage() {
               <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-2.5">
                 <Compass className="w-4 h-4 text-[#00ffff]" />
                 <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-                  BOARD DIRECTIVE
+                  BOARD GUIDE
                 </h3>
               </div>
               <p className="text-xs text-[#839493] leading-relaxed">
-                Ensure submissions focus specifically on {category?.name || 'this board\'s subject'}. Clear, constructive dialogue creates durable chitin for everyone.
+                Keep posts focused on {category?.name || 'this board\'s subject'}. Clear, constructive dialogue helps everyone.
               </p>
               <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner text-[11px] text-[#dfe3e3] space-y-1">
                 <div className="text-[#00ffff] font-bold">Posting Guidelines:</div>
                 <div className="text-[#839493]">· Check existing threads before posting.</div>
                 <div className="text-[#839493]">· Use descriptive, informative titles.</div>
-                <div className="text-[#839493]">· Respect initiates of all stages.</div>
+                <div className="text-[#839493]">· Respect members of all stages.</div>
               </div>
             </div>
 

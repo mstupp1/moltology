@@ -17,7 +17,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
     <div className="chitin-card-inset p-3 sm:p-3.5 border border-[#3a4a49] hover:border-[#00ffff]/60 transition-all chamfer-corner group flex items-start gap-3 sm:gap-3.5 bg-[#070b0b]/60">
       <VoteButton
         count={topic.upvotes}
-        voted={topic.voted || false}
+        voted={topic.voted}
         targetId={topic.id}
         targetType="topic"
         size="sm"

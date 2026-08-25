@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -17,8 +17,11 @@ import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { getForumTopicDetailFn, createForumPostFn, ForumPostEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { validateForumContent } from '@/lib/community-rules'
 import { relativeTime } from '@/lib/forum-utils'
+import { useHudPersist } from '@/hooks/useHudPersist'
+import { authClient } from '@/lib/auth-client'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
@@ -68,6 +71,7 @@ function ReplyComposer({
   onPosted: (post: ForumPostEntry) => void
 }) {
   const { isAuthenticated, userId, openAuth } = useForumAuth()
+  const persist = useHudPersist()
   const [content, setContent] = useState('')
   const [posting, setPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -85,6 +89,7 @@ function ReplyComposer({
     }
     setPosting(true)
     setError(null)
+    persist.begin('forum-reply')
     try {
       const token = await getAuthJWTToken()
       const post = await createForumPostFn({
@@ -95,6 +100,7 @@ function ReplyComposer({
     } catch (err: any) {
       setError(err?.message || 'Failed to post reply. Please try again.')
     } finally {
+      persist.end('forum-reply')
       setPosting(false)
     }
   }
@@ -147,7 +153,7 @@ function ReplyComposer({
           disabled={posting || content.trim().length < 10}
           className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_10px_rgba(0,255,255,0.2)]"
         >
-          {posting ? 'DISPATCHING...' : 'DISPATCH REPLY'}
+          {posting ? 'Posting...' : 'Reply'}
         </button>
       </div>
     </form>
@@ -157,7 +163,43 @@ function ReplyComposer({
 function ForumThreadPage() {
   const { categorySlug, topicSlug } = Route.useParams()
   const loader = Route.useLoaderData()
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const userId = user?.id ?? user?.sub ?? null
   const [detail, setDetail] = useState(loader)
+
+  useEffect(() => {
+    setDetail(loader)
+  }, [loader])
+
+  // Hydrate vote flags without bumping the view counter again.
+  useEffect(() => {
+    if (!userId || !loader) return
+    let active = true
+    ;(async () => {
+      try {
+        const token = await getAuthJWTToken()
+        const res = await getForumTopicDetailFn({
+          data: {
+            slugOrId: topicSlug,
+            categorySlug,
+            userId,
+            token: token ?? undefined,
+            trackView: false,
+          },
+        })
+        if (active && res) {
+          syncForumVotesFromServer(userId, [res.topic, ...res.posts])
+          setDetail(res)
+        }
+      } catch {
+        // Keep loader detail if vote hydration fails
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [userId, topicSlug, categorySlug, loader])
 
   if (!detail) {
     return (
@@ -165,7 +207,7 @@ function ForumThreadPage() {
         <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-4">
           <Terminal className="w-10 h-10 text-[#ff5540] mx-auto" />
           <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">Post Not Found</h1>
-          <p className="text-xs text-[#839493]">This transmission does not exist or was removed.</p>
+          <p className="text-xs text-[#839493]">This post does not exist or was removed.</p>
           <Link
             to="/forum"
             className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#00ffff]/60 text-[#00ffff] text-xs font-bold uppercase chamfer-corner transition-all"
@@ -273,7 +315,7 @@ function ForumThreadPage() {
               <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between">
                 <VoteButton
                   count={topic.upvotes}
-                  voted={topic.voted || false}
+                  voted={topic.voted}
                   targetId={topic.id}
                   targetType="topic"
                   onResult={handleTopicVote}
@@ -335,7 +377,7 @@ function ForumThreadPage() {
                       <div className="pt-1.5 border-t border-[#3a4a49]/40 flex items-center justify-between">
                         <VoteButton
                           count={post.upvotes}
-                          voted={post.voted || false}
+                          voted={post.voted}
                           targetId={post.id}
                           targetType="post"
                           onResult={handlePostVote(post.id)}
@@ -357,7 +399,7 @@ function ForumThreadPage() {
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-[#00ffff]" />
                   <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-                    TRANSMISSION INTEL
+                    THREAD INFO
                   </h3>
                 </div>
                 <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/30 px-2 py-0.5 chamfer-corner">
@@ -371,7 +413,7 @@ function ForumThreadPage() {
                   <span className="text-[#dfe3e3] font-bold uppercase">{topic.categoryName || 'General'}</span>
                 </div>
                 <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
-                  <span className="text-[#839493] text-[10px] uppercase font-bold">AUTHOR CLEARANCE</span>
+                  <span className="text-[#839493] text-[10px] uppercase font-bold">AUTHOR STAGE</span>
                   <StageBadge stage={topic.authorStage} />
                 </div>
                 <div className="chitin-card-inset p-2 border border-[#3a4a49] chamfer-corner flex items-center justify-between">
@@ -390,11 +432,11 @@ function ForumThreadPage() {
               <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-2.5">
                 <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
                 <h3 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-                  COMMUNITY DIRECTIVES
+                  COMMUNITY RULES
                 </h3>
               </div>
               <p className="text-xs text-[#839493] leading-relaxed">
-                Be constructive and civil. Protect credentials, and encourage growth across all stages of carcinization.
+                Be constructive and civil. Keep credentials private, and encourage growth across every stage.
               </p>
             </div>
           </div>

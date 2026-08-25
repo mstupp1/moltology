@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, createContext, useContext } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import { AuthModal } from '@/components/AuthModal'
 import { authClient } from '@/lib/auth-client'
 
@@ -22,9 +21,8 @@ interface ForumShellProps {
 }
 
 export function ForumShell({ children }: ForumShellProps) {
-  const navigate = useNavigate()
-  const { data: session } = authClient.useSession()
-  const user = session?.user
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
@@ -38,7 +36,7 @@ export function ForumShell({ children }: ForumShellProps) {
     () => ({
       openAuth,
       isAuthenticated: !!user,
-      userId: user?.id ?? null,
+      userId: user?.id ?? user?.sub ?? null,
     }),
     [openAuth, user]
   )
@@ -49,7 +47,7 @@ export function ForumShell({ children }: ForumShellProps) {
         isOpen={authOpen}
         initialMode={authMode}
         onClose={() => setAuthOpen(false)}
-        onSuccess={() => navigate({ to: '/forum' })}
+        onSuccess={() => setAuthOpen(false)}
       />
       <div className="w-full relative">{children}</div>
     </ForumAuthContext.Provider>

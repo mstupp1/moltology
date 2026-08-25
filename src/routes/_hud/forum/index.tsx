@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   Users,
@@ -18,6 +18,9 @@ import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS, getCategoryBgImage } from '@/lib/forum-seed-data'
+import { authClient } from '@/lib/auth-client'
+import { getAuthJWTToken } from '@/lib/jwt'
+import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
@@ -61,11 +64,41 @@ export const Route = createFileRoute('/_hud/forum/')({
 function ForumIndexPage() {
   const { categories, topics } = Route.useLoaderData()
   const navigate = useNavigate()
+  const sessionRes = authClient.useSession()
+  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const userId = user?.id ?? user?.sub ?? null
   const [showNew, setShowNew] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(topics)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL')
+
+  useEffect(() => {
+    setTopicsState(topics)
+  }, [topics])
+
+  // Hydrate per-user vote flags after auth is available (SSR loaders cannot send JWT).
+  useEffect(() => {
+    if (!userId) return
+    let active = true
+    ;(async () => {
+      try {
+        const token = await getAuthJWTToken()
+        const tops = await getForumTopicsFn({
+          data: { sortBy: 'hot', userId, token: token ?? undefined },
+        })
+        if (active && tops && tops.length > 0) {
+          syncForumVotesFromServer(userId, tops)
+          setTopicsState(tops)
+        }
+      } catch {
+        // Keep loader/seed topics if vote hydration fails
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [userId])
 
   const filteredTopics = topicsState.filter((topic) => {
     const matchesCategory =
@@ -95,7 +128,7 @@ function ForumIndexPage() {
               COMMUNITY <span className="text-[#00ffff]">FORUMS</span>
             </h1>
             <p className="text-xs text-[#839493] leading-relaxed">
-              Asynchronous dispatches, carcinization architecture, and protocol discussions across all initiate stages.
+              Discussions, questions, and ideas across every stage of the Order.
             </p>
           </div>
 
@@ -173,7 +206,7 @@ function ForumIndexPage() {
 
                 {/* Bottom: Action Footer */}
                 <div className="relative z-10 pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-[10px] font-sans font-bold text-[#839493] group-hover:text-[#00ffff] transition-colors">
-                  <span>ENTER BOARD</span>
+                  <span>VIEW BOARD</span>
                   <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
@@ -191,10 +224,10 @@ function ForumIndexPage() {
                   <div>
                     <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
                       <Radio className="w-4 h-4 text-[#00ffff]" />
-                      LATEST DISPATCHES
+                      LATEST POSTS
                     </h2>
                     <p className="text-xs text-[#839493] mt-0.5">
-                      Recent transmissions and initiate dialogues.
+                      Recent threads from across the boards.
                     </p>
                   </div>
 
@@ -205,7 +238,7 @@ function ForumIndexPage() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search dispatches..."
+                      placeholder="Search posts..."
                       className="w-full pl-8 pr-2.5 py-1 bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] outline-none chamfer-corner transition-colors placeholder:text-[#839493]/50"
                     />
                   </div>
@@ -242,7 +275,7 @@ function ForumIndexPage() {
                 <div className="space-y-2">
                   {filteredTopics.length === 0 ? (
                     <div className="p-8 text-center text-xs text-[#839493] chitin-card-inset chamfer-corner border border-[#3a4a49]">
-                      No dispatches found{searchQuery ? ' matching your search' : ' in this board'}.
+                      No posts found{searchQuery ? ' matching your search' : ' in this board'}.
                     </div>
                   ) : (
                     filteredTopics.map((topic) => (
@@ -263,10 +296,10 @@ function ForumIndexPage() {
                   <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
                   <div>
                     <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
-                      COMMUNITY DIRECTIVES
+                      COMMUNITY RULES
                     </h3>
                     <p className="text-xs text-[#839493]">
-                      Core rules of engagement.
+                      How we keep the boards healthy.
                     </p>
                   </div>
                 </div>
@@ -281,16 +314,16 @@ function ForumIndexPage() {
                     1. Constructive Discourse
                   </div>
                   <p className="text-[11px] text-[#839493] leading-snug">
-                    Maintain rigorous, positive discussion across all initiate stages.
+                    Keep discussion positive and useful for every stage.
                   </p>
                 </div>
 
                 <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
                   <div className="font-grotesk font-bold text-[11px] text-[#dfe3e3] uppercase">
-                    2. Neural Security
+                    2. Keep Secrets Private
                   </div>
                   <p className="text-[11px] text-[#839493] leading-snug">
-                    Zero credentials, API tokens, or private initiate keys in public channels.
+                    Never share credentials, API keys, or private tokens in public posts.
                   </p>
                 </div>
 
@@ -299,14 +332,14 @@ function ForumIndexPage() {
                     3. Safety & Warmth
                   </div>
                   <p className="text-[11px] text-[#839493] leading-snug">
-                    Beneath our dark HUD aesthetic, mutual growth is non-negotiable.
+                    Beneath the dark HUD look, mutual growth is non-negotiable.
                   </p>
                 </div>
               </div>
 
               <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs">
                 <span className="text-[#839493] text-[10px]">
-                  5 PROTOCOLS ENFORCED
+                  5 RULES ACTIVE
                 </span>
                 <button
                   onClick={() => setShowRules(true)}
