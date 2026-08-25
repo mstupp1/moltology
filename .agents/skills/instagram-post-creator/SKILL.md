@@ -31,10 +31,11 @@ Transparent PNG character cutouts reside in the Neon S3 public assets bucket und
   - **Stage 1 (Scaffolding)**: Web-Native High-DPI Composite Studio via Headless Chrome 2x Retina rendering (`scripts/lib/composite-renderer.ts`)
   - **Stage 2 (Visual Polish Pass)**: User-facing AI (**Google Flow**) using rich, structured prompt directives
 * **Asset Storage**: Neon S3 (`images/social/posts/post-<timestamp>.png`)
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `queue_preview_queue`)
+* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `comments_reply_to_inbox_post`, `queue_preview_queue`)
 * **Queue Configuration**:
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
-  - Dedicated Posts/Carousels Queue ID: `6a84b76d2421e968ac81f5bc` (**Moltology Carousels & Posts** — Mon, Wed, Fri at 13:00 EST / `America/New_York`)
+  - Carousels & Editorial Queue ID: `6a84b76d2421e968ac81f5bc` (**Moltology Carousels & Posts** — Mon, Wed, Fri at 13:00 EST / `America/New_York`)
+  - Lead Magnet Daily Queue ID: `6a8d93576f0e96efe2960c91` (**Moltology Lead Magnets — Daily** — Every day at 13:00 EST / `America/New_York`) — use this for all marketing lead magnet post archetypes (guide, quiz, app, codex, routine)
 * **Continuity Ledger**: `content/social/instagram-post-history.json`
 
 ---
@@ -89,10 +90,22 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
                                │
                                ▼ (User Drops Asset Back)
 ┌──────────────────────────────────────────────────────────────┐
-│  STAGE 3: S3 Ingestion & Zernio Queue Staging                │
+│  STAGE 3: S3 Ingestion & Zernio Publish / Queue Staging      │
+│  - Resize image to exact 4:5 (1080×1350) if needed          │
 │  - Agent uploads polished image to Neon S3                   │
-│  - Stages post into dedicated Zernio Queue (6a84b76d...)     │
+│  - Lead magnet themes → Daily Queue (6a8d93576f0e96efe2960c91)│
+│  - Editorial/carousel themes → MWF Queue (6a84b76d2421e968ac81f5bc)│
 │  - Appends record to narrative continuity ledger             │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼ (Mandatory — Always)
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 4: First Comment (Algorithmic Seed)                   │
+│  - Agent calls comments_reply_to_inbox_post via Zernio MCP  │
+│  - Posts postData.firstComment immediately after publish     │
+│  - Account ID: 6a7f7f0777555aae01d99b54                     │
+│  - This step is NEVER skipped — even for scheduled posts     │
+│    (for scheduled posts, note it in the ledger for follow-up)│
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -122,11 +135,21 @@ When executing this pipeline as an agent, **always present the user with a struc
 3. The resumption command or drop-in path.
 
 ### Step 4: Resume S3 Upload & Zernio Queue Staging
-Once the user saves the polished image (e.g. `tmp/post_polished.png`), execute:
-```bash
-npm run post:create -- --theme moltmaxxing-guide --polished-image tmp/post_polished.png
-```
-This automatically uploads to Neon S3 (`images/social/posts/post-<timestamp>.png`), stages into the Zernio queue, and updates `content/social/instagram-post-history.json`.
+Once the user saves the polished image (e.g. `tmp/post_polished.png`):
+1. Check image dimensions — if not exactly `1080×1350` (4:5), crop/resize with `sips` before uploading.
+2. Run ingestion: `npm run post:create -- --theme <theme> --polished-image tmp/post_polished.png`
+3. This uploads to Neon S3 (`images/social/posts/post-<timestamp>.png`) and updates the ledger.
+4. Call `posts_create` or `posts_publish_now` via Zernio MCP:
+   - **Lead magnet archetypes** (guide, quiz, app, codex, routine) → use queue ID `6a8d93576f0e96efe2960c91` (Daily, any day 13:00 EST)
+   - **Editorial / carousel posts** → use queue ID `6a84b76d2421e968ac81f5bc` (Mon, Wed, Fri 13:00 EST)
+
+### Step 5: Post First Comment (MANDATORY — Never Skip)
+Immediately after the post is published or queued, call `comments_reply_to_inbox_post`:
+- `post_id`: the Zernio post ID returned by `posts_create` / `posts_publish_now`
+- `account_id`: `6a7f7f0777555aae01d99b54`
+- `message`: `postData.firstComment` (the pre-written algorithmic seed comment)
+
+This seeds the comment section for algorithmic engagement and comment-to-DM automation. **Always execute this step — do not wait for user instruction.**
 
 ---
 

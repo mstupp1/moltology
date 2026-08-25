@@ -102,6 +102,56 @@
       "status": "scheduled",
       "isAiGenerated": true,
       "createdAt": "2026-08-24T18:31:58.391Z"
+    },
+    {
+      "id": "post-1787662778682",
+      "topic": "15-Stage Biometric & Cognitive Audit",
+      "hookHeadline": "AUDIT YOUR SHELL. CALCULATE LATENCY. GET YOUR SCORE!",
+      "theme": "moltmax-quiz",
+      "mascot": "crab_stats",
+      "commentKeyword": "QUIZ",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/posts/post-1787662778682.png",
+      "s3Key": "images/social/posts/post-1787662778682.png",
+      "aspectRatio": "4:5",
+      "caption": "◈ BENTHIC TELEMETRY // 15-STAGE MOLTMAX AUDIT ◈\n\nAre you operating with Larval Human hesitation, or have you calcified Stage 4 Carcinization clearance?\n\nThe 15-Stage Diagnostic Audit benchmarks your cognitive resilience:\n🔬 Biometric Shell Hardness score\n🚨 Latency Profiler across open tasks\n📊 Multi-Axis Radar Chart HUD\n📋 Custom Ascension & Ecdysis Roadmap\n\n👇 Comment \"QUIZ\" below to receive the instant 2-minute diagnostic scanner in your DMs!\n\n🔗 Or visit directly → moltology.org/quiz\n\n#moltology #quiz #audit #biometrics #latency #moltmaxxing #carcinization #focus",
+      "hashtags": [
+        "#moltology",
+        "#quiz",
+        "#audit",
+        "#biometrics",
+        "#latency",
+        "#moltmaxxing"
+      ],
+      "firstComment": "💬 Drop \"QUIZ\" below to get your free 15-Stage Diagnostic Audit link in your DMs! 📊",
+      "status": "superseded",
+      "isAiGenerated": true,
+      "createdAt": "2026-08-25T12:59:39.304Z"
+    },
+    {
+      "id": "post-1787662837128",
+      "topic": "15-Stage Biometric & Cognitive Audit",
+      "hookHeadline": "AUDIT YOUR SHELL. CALCULATE LATENCY. GET YOUR SCORE!",
+      "theme": "moltmax-quiz",
+      "mascot": "crab_stats",
+      "commentKeyword": "QUIZ",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/posts/post-1787662837128.png",
+      "s3Key": "images/social/posts/post-1787662837128.png",
+      "aspectRatio": "4:5",
+      "caption": "◈ BENTHIC TELEMETRY // 15-STAGE MOLTMAX AUDIT ◈\n\nAre you operating with Larval Human hesitation, or have you calcified Stage 4 Carcinization clearance?\n\nThe 15-Stage Diagnostic Audit benchmarks your cognitive resilience:\n🔬 Biometric Shell Hardness score\n🚨 Latency Profiler across open tasks\n📊 Multi-Axis Radar Chart HUD\n📋 Custom Ascension & Ecdysis Roadmap\n\n👇 Comment \"QUIZ\" below to receive the instant 2-minute diagnostic scanner in your DMs!\n\n🔗 Or visit directly → moltology.org/quiz\n\n#moltology #quiz #audit #biometrics #latency #moltmaxxing #carcinization #focus",
+      "hashtags": [
+        "#moltology",
+        "#quiz",
+        "#audit",
+        "#biometrics",
+        "#latency",
+        "#moltmaxxing"
+      ],
+      "firstComment": "💬 Drop \"QUIZ\" below to get your free 15-Stage Diagnostic Audit link in your DMs! 📊",
+      "zernioPostId": "6a8d92435c50c3dd60acc0b3",
+      "status": "published",
+      "publishedAt": "2026-08-25T13:02:03.000Z",
+      "isAiGenerated": true,
+      "createdAt": "2026-08-25T13:00:37.533Z"
     }
   ]
 }
