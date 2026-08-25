@@ -17,21 +17,16 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
-import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS, getCategoryBgImage } from '@/lib/forum-seed-data'
+import { getCategoryBgImage } from '@/lib/forum-seed-data'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
-const SEED_CATEGORIES: ForumCategoryEntry[] = INITIAL_FORUM_CATEGORIES.map((c) => ({
-  ...c,
-  topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === c.id).length,
-}))
-
 export const Route = createFileRoute('/_hud/forum/')({
   loader: async () => {
-    let categories: ForumCategoryEntry[] = SEED_CATEGORIES
+    let categories: ForumCategoryEntry[] = []
     let topics: ForumTopicEntry[] = []
     try {
       const [cats, tops] = await Promise.all([

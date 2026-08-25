@@ -55,6 +55,57 @@ describe('Forum Server Handlers', () => {
     ).rejects.toThrow('Unauthenticated')
   })
 
+  it('throws when creating a reply for a missing topic', async () => {
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockResolvedValue([]),
+          })),
+        })),
+      })),
+      insert: vi.fn(),
+    }
+
+    await expect(
+      createForumPostHandler({
+        data: {
+          topicId: '20000000-0000-0000-0000-000000000099',
+          content: 'This is enough content for a forum reply.',
+        },
+        context: {
+          user: { sub: 'test-user-id' },
+          db: mockDb as any,
+        },
+      })
+    ).rejects.toThrow('no longer available')
+    expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
+  it('throws when upvoting a missing topic', async () => {
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockResolvedValue([]),
+          })),
+        })),
+      })),
+      insert: vi.fn(),
+    }
+
+    await expect(
+      toggleForumTopicVoteHandler({
+        data: { topicId: '20000000-0000-0000-0000-000000000099' },
+        context: {
+          user: { sub: 'test-user-id' },
+          db: mockDb as any,
+        },
+      })
+    ).rejects.toThrow('no longer available')
+    expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
   it('creates a topic and returns the mapped entry', async () => {
     const inserted = {
       id: 'topic-1',
