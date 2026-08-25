@@ -16,10 +16,13 @@ vi.mock('@/components/LandingPage', () => ({
 import { Route } from './index'
 
 describe('Homepage route head', () => {
-  it('preloads only the widescreen LCP still', () => {
+  it('preloads only the widescreen LCP still', async () => {
     const headFn = Route.options.head
     expect(headFn).toBeTypeOf('function')
-    const head = headFn({} as never)
+    if (typeof headFn !== 'function') {
+      throw new Error('homepage route is missing a head function')
+    }
+    const head = await headFn({} as never)
 
     expect(head.links).toEqual(
       expect.arrayContaining([
@@ -28,7 +31,7 @@ describe('Homepage route head', () => {
       ]),
     )
 
-    const preloads = (head.links ?? []).filter((link: { rel?: string }) => link.rel === 'preload')
+    const preloads = (head.links ?? []).filter((link) => link && 'rel' in link && link.rel === 'preload')
     expect(preloads).toHaveLength(1)
   })
 })
