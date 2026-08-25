@@ -452,9 +452,17 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               <div className="flex items-center gap-3" data-testid="public-header-auth-skeleton">
                 <HudGhostSkeleton
                   variant={isCorporate ? 'neutral' : 'cyan'}
+                  preset="button"
+                  width={108}
+                  height={34}
+                  cornerCut={!isCorporate}
+                  className={isCorporate ? 'rounded-full' : ''}
+                />
+                <HudGhostSkeleton
+                  variant={isCorporate ? 'neutral' : 'cyan'}
                   preset="avatar"
-                  width={32}
-                  height={32}
+                  width={34}
+                  height={34}
                 />
               </div>
             ) : user ? (
@@ -649,12 +657,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           />
 
           {isSessionPending ? (
-            <div className="flex items-center justify-center py-2" data-testid="mobile-header-auth-skeleton">
+            <div className="py-2 space-y-2" data-testid="mobile-header-auth-skeleton">
               <HudGhostSkeleton
                 variant={isCorporate ? 'neutral' : 'cyan'}
-                preset="avatar"
-                width={36}
-                height={36}
+                preset="button"
+                className="w-full h-11 rounded-xl"
               />
             </div>
           ) : user ? (
