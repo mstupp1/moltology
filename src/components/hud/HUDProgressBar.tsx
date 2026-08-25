@@ -1,10 +1,12 @@
 import React from 'react'
-import { DigitalClock } from './DigitalClock'
+import { HUDTaskBar } from './HUDTaskBar'
 import { getAssetUrl } from '@/lib/assets'
 
 export interface HUDProgressBarProps {
   stage?: number
   className?: string
+  showTaskBar?: boolean
+  /** @deprecated Use showTaskBar */
   showClock?: boolean
 }
 
@@ -13,8 +15,10 @@ const PROGRESS = 0.68
 export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
   stage = 1,
   className = '',
+  showTaskBar,
   showClock = true,
 }) => {
+  const isTaskBarVisible = showTaskBar !== undefined ? showTaskBar : showClock
   // Segment tick count for the bar
   const TICK_COUNT = 16
   const nextStage = Math.min(stage + 1, 4)
@@ -150,8 +154,8 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
 
       </div>{/* end center col */}
 
-      {/* ── FAR RIGHT: Activity Island & Digital Clock Capsule ── */}
-      {showClock && <DigitalClock variant="header" className="shrink-0 z-10" />}
+      {/* ── FAR RIGHT: Activity Island & Up Next Task Bar Capsule ── */}
+      {isTaskBarVisible && <HUDTaskBar variant="header" className="shrink-0 z-10" />}
     </div>
   )
 }

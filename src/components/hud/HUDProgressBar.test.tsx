@@ -51,7 +51,12 @@ describe('HUDProgressBar Component', () => {
     expect(clawImg).toHaveAttribute('src', getAssetUrl('/images/crab_claw.png'))
   })
 
-  it('conditionally hides clock when showClock is false', () => {
+  it('conditionally hides task bar when showTaskBar is false', () => {
+    const { container } = render(<HUDProgressBar showTaskBar={false} />)
+    expect(container.querySelector('[aria-label="Daily alignment tasks schedule"]')).not.toBeInTheDocument()
+  })
+
+  it('conditionally hides task bar when legacy showClock is false', () => {
     const { container } = render(<HUDProgressBar showClock={false} />)
     expect(container.querySelector('[aria-label="Daily alignment tasks schedule"]')).not.toBeInTheDocument()
   })

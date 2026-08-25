@@ -119,7 +119,7 @@ describe('useAlignmentReminders hook', () => {
 
     render(
       <ToastProvider>
-        {/* Simulating 1: HUDHeader DigitalClock, 2: HUDSidebar DigitalClock, 3: LaunchpadCarousel */}
+        {/* Simulating 1: HUDHeader HUDTaskBar, 2: HUDSidebar HUDTaskBar, 3: LaunchpadCarousel */}
         <TestConsumer tasks={sampleTasks} testIdPrefix="header-" />
         <TestConsumer tasks={sampleTasks} testIdPrefix="sidebar-" />
         <TestConsumer tasks={sampleTasks} testIdPrefix="carousel-" />

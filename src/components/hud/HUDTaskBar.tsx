@@ -18,14 +18,14 @@ export interface AlignmentTask {
 
 export type TimezoneMode = 'LOCAL' | 'UTC' | 'BENTHIC' | 'STARDATE'
 
-export interface DigitalClockProps {
+export interface HUDTaskBarProps {
   variant?: 'hero' | 'header' | 'compact'
   tasks?: AlignmentTask[]
   onCompleteTask?: (taskId: string) => void
   className?: string
 }
 
-export const DigitalClock: React.FC<DigitalClockProps> = ({
+export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   variant = 'hero',
   tasks: propTasks,
   onCompleteTask,
@@ -481,24 +481,9 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
         >
-          {/* Pulsing Signal Dot or Bell Icon */}
-          {toastsList.length > 0 ? (
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff5540] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ff5540]" />
-            </span>
-          ) : (
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] animate-pulse" />
-          )}
-
-          {/* Time Display */}
-          <span className="font-mono text-[11px] sm:text-xs font-bold text-[#00ffff] tracking-wider">
-            {hours}:{minutes}
-          </span>
-
           {/* Next Task Indicator (Hidden on extra small screens) */}
           <span className="text-[10px] text-[#839493] hidden md:inline truncate max-w-[130px] font-sans">
-            • NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
+            NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
           </span>
 
           {/* Liturgy Count Badge */}
@@ -796,3 +781,7 @@ export const DigitalClock: React.FC<DigitalClockProps> = ({
     </HudCard>
   )
 }
+
+// Backward-compatibility alias
+export const DigitalClock = HUDTaskBar
+export type DigitalClockProps = HUDTaskBarProps
