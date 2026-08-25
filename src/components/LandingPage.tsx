@@ -35,6 +35,7 @@ import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 import { DashboardMarketingShowcase } from '@/components/hud/DashboardMarketingShowcase'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 
 export const LandingPage: React.FC = () => {
@@ -42,6 +43,7 @@ export const LandingPage: React.FC = () => {
   const onNavigate = (path: string) => navigate({ to: path })
   const sessionRes = authClient.useSession()
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const isSessionPending = sessionRes?.isPending ?? false
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
@@ -345,7 +347,22 @@ export const LandingPage: React.FC = () => {
 
             {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto">
-              {!user ? (
+              {isSessionPending ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="hero-auth-skeleton">
+                  <HudGhostSkeleton
+                    variant="crimson"
+                    preset="button"
+                    cornerCut
+                    className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px]"
+                  />
+                  <HudGhostSkeleton
+                    variant="cyan"
+                    preset="button"
+                    cornerCut
+                    className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px]"
+                  />
+                </div>
+              ) : !user ? (
                 <>
                   <BenthicCTAButton
                     size="lg"
@@ -372,14 +389,19 @@ export const LandingPage: React.FC = () => {
                   </BenthicCTAButton>
                 </>
               ) : (
-                <button
+                <BenthicCTAButton
+                  size="lg"
+                  variant="cyan"
+                  containerClassName="w-full sm:w-auto"
+                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
                   onClick={() => onNavigate('/dashboard')}
-                  className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 min-h-[52px] sm:min-h-[56px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm sm:text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
                 >
-                  <Cpu className="w-5 h-5 shrink-0" />
-                  <span className="truncate">ENTER SYSTEM DASHBOARD</span>
-                  <ArrowRight className="w-5 h-5 shrink-0" />
-                </button>
+                  <span className="flex items-center justify-center gap-2.5 leading-none">
+                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                    <span>ENTER SYSTEM DASHBOARD</span>
+                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                  </span>
+                </BenthicCTAButton>
               )}
             </div>
 
@@ -559,7 +581,22 @@ export const LandingPage: React.FC = () => {
 
             {/* Action Call to Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
-              {!user ? (
+              {isSessionPending ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="pillars-auth-skeleton">
+                  <HudGhostSkeleton
+                    variant="crimson"
+                    preset="button"
+                    cornerCut
+                    className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px]"
+                  />
+                  <HudGhostSkeleton
+                    variant="cyan"
+                    preset="button"
+                    cornerCut
+                    className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px]"
+                  />
+                </div>
+              ) : !user ? (
                 <>
                   <BenthicCTAButton
                     size="lg"
@@ -587,14 +624,19 @@ export const LandingPage: React.FC = () => {
                   </BenthicCTAButton>
                 </>
               ) : (
-                <button
+                <BenthicCTAButton
+                  size="lg"
+                  variant="cyan"
+                  containerClassName="w-full sm:w-auto"
+                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
                   onClick={() => onNavigate('/dashboard')}
-                  className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 min-h-[52px] bg-gradient-to-r from-cyan-600 via-cyan-500 to-cyan-600 hover:from-cyan-500 hover:to-cyan-400 text-white font-grotesk font-bold text-sm sm:text-base uppercase tracking-widest chamfer-corner shadow-hud-cyan-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:scale-[0.98]"
                 >
-                  <Cpu className="w-5 h-5 shrink-0" />
-                  <span className="truncate">ENTER SYSTEM DASHBOARD</span>
-                  <ArrowRight className="w-5 h-5 shrink-0" />
-                </button>
+                  <span className="flex items-center justify-center gap-2.5 leading-none">
+                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                    <span>ENTER SYSTEM DASHBOARD</span>
+                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                  </span>
+                </BenthicCTAButton>
               )}
             </div>
           </ScrollReveal>
@@ -1069,7 +1111,16 @@ export const LandingPage: React.FC = () => {
                 </p>
                 
                 <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
-                  {!user ? (
+                  {isSessionPending ? (
+                    <div className="flex items-center justify-center w-full sm:w-auto" data-testid="bottom-auth-skeleton">
+                      <HudGhostSkeleton
+                        variant="crimson"
+                        preset="button"
+                        cornerCut
+                        className="w-full sm:w-[240px] min-h-[50px] sm:min-h-[54px]"
+                      />
+                    </div>
+                  ) : !user ? (
                     <BenthicCTAButton
                       size="lg"
                       containerClassName="w-full sm:w-auto"
