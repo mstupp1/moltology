@@ -4,7 +4,7 @@ description: >-
   Neon + Drizzle schema/migration workflow (dev branch → GitHub Actions on prod main),
   seeding rules (no ghost seed IDs), RLS, TanStack Start authenticated write patterns
   (createServerFn, JWT, resolveWriteAuth), and HUD UI conventions (chitin-card page chrome,
-  HudGhostWidget / HudWorkspaceGhost loaders). Use when editing schema.ts, drizzle
+  route-level HudWorkspaceGhost only). Use when editing schema.ts, drizzle
   migrations, db:seed / seed scripts, forum or HUD mutations, Neon branches, DATABASE_URL,
   RLS, createServerFn write handlers, or building authenticated HUD pages/widgets that
   load Neon data.
@@ -141,26 +141,30 @@ When building or redoing authenticated HUD routes/widgets that load Neon data, m
 
 Reference pages: [`src/routes/_hud/dashboard.tsx`](../../../src/routes/_hud/dashboard.tsx), [`src/routes/_hud/forum/index.tsx`](../../../src/routes/_hud/forum/index.tsx), [`src/routes/_hud/pipeline.tsx`](../../../src/routes/_hud/pipeline.tsx), [`src/components/hud/chassis/ChassisStatusPage.tsx`](../../../src/components/hud/chassis/ChassisStatusPage.tsx).
 
-### Ghost loaders (required for async HUD data)
+### Ghost loaders (HUD standard)
 
-Do **not** show plain “Loading…” text for Neon-backed HUD fetches.
+Use **`HudWorkspaceGhost` only** for route-level pending — set `pendingComponent: HudWorkspaceGhost` on `_hud` file routes. Do **not** add per-page `*Ghost` composites or wrap Neon fetches in `HudGhostWidget` unless you are building a **dashboard widget** that embeds inside another page (e.g. `DailyRoutineGhost` on the home dashboard).
 
 | Situation | Pattern |
 | :--- | :--- |
-| Route transition / SSR pending | `pendingComponent: HudWorkspaceGhost` on the file route |
-| In-page / widget data fetch | Wrap with `HudGhostWidget` + a feature skeleton from [`HudGhostSkeletons.tsx`](../../../src/components/hud/HudGhostSkeletons.tsx) |
-| New feature layout | Add a named `*Ghost` composite next to existing ones (e.g. `ChassisStatusGhost`, `DailyRoutineGhost`) using `HudGhostSkeleton` / `HudGhostCard` / `HudGhostStatBox` |
+| Route transition / code-split pending | `pendingComponent: HudWorkspaceGhost` on the file route |
+| Authenticated page data (Neon fetch) | TanStack `loader` when public/cached, **or** a small session cache + silent background refetch — never re-show ghosts on remount |
+| In-flight writes | `useHudPersist().begin/end` (shell spinner), not page ghosts |
+| Embedded dashboard widget | `HudGhostWidget` + an existing widget ghost only when the widget has no loader cache |
 
 ```tsx
-import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { ChassisStatusGhost } from '@/components/hud/HudGhostSkeletons'
-
-<HudGhostWidget isLoading={loading} skeleton={<ChassisStatusGhost />}>
-  {/* live UI */}
-</HudGhostWidget>
+// Route — generic ghost during navigation only
+export const Route = createFileRoute('/_hud/example')({
+  component: ExamplePage,
+  pendingComponent: HudWorkspaceGhost,
+})
 ```
 
-Primitives live in [`src/components/ui/HudGhostLoader.tsx`](../../../src/components/ui/HudGhostLoader.tsx). Composites live in [`src/components/hud/HudGhostSkeletons.tsx`](../../../src/components/hud/HudGhostSkeletons.tsx).
+For auth-gated pages without a loader, cache the last successful payload in `src/lib/*` (see `getCachedChassisLoadout` / `setCachedChassisLoadout` in [`chassis-loadout.ts`](../../../src/lib/chassis-loadout.ts)) so returning to the route renders instantly and refreshes quietly.
+
+Do **not** show plain “Loading…” copy for Neon-backed HUD surfaces.
+
+Primitives: [`HudGhostLoader.tsx`](../../../src/components/ui/HudGhostLoader.tsx). Generic route composite: [`HudWorkspaceGhost`](../../../src/components/hud/HudGhostSkeletons.tsx) in [`HudGhostSkeletons.tsx`](../../../src/components/hud/HudGhostSkeletons.tsx).
 
 ## Related paths
 

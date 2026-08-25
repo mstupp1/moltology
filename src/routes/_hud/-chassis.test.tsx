@@ -33,9 +33,12 @@ vi.mock('@/hooks/useHudPersist', () => ({
   }),
 }))
 
+import { clearChassisLoadoutCache } from '@/lib/chassis-loadout'
+
 describe('Chassis Configurator HUD Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearChassisLoadoutCache()
   })
 
   it('renders guest lock screen when unauthenticated', () => {
