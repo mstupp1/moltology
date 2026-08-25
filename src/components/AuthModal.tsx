@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
+import { getAuthJWTToken } from '../lib/jwt'
 import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
@@ -79,15 +80,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         } else {
           if (emailOptIn) {
             const createdUser = (res as any)?.data?.user || (res as any)?.user
+            const token = await getAuthJWTToken()
             await updateEmailPreferencesFn({
               data: {
                 emailOptIn: true,
                 source: 'auth_modal',
                 userId: createdUser?.id,
+                token: token ?? undefined,
               },
             }).catch(() => {})
           }
-          await getUserProfileFn().catch(() => {})
+          const token = await getAuthJWTToken()
+          await getUserProfileFn({ data: { token: token ?? undefined, userId: (res as any)?.data?.user?.id || (res as any)?.user?.id } }).catch(() => {})
           if (onSuccess) onSuccess()
           onClose()
         }
