@@ -27,6 +27,7 @@ export interface CreateInstagramPostOptions {
     | 'benthic-app'
     | 'sacred-codex'
     | 'pincer-routine'
+    | 'free-access'
     | 'moltmaxxing'
     | 'ecdysis'
     | 'pincer-torque'
@@ -167,6 +168,22 @@ export function generatePostContent(
     }
   }
 
+  // 6. Marketing Campaign: Free Early Access — Benthic Registry
+  if (theme === 'free-access' || theme === 'access' || topic.toLowerCase().includes('early access') || topic.toLowerCase().includes('free account')) {
+    return {
+      title: 'Free Early Access · Benthic Registry Clearance',
+      topic: 'Free Early Access Registration',
+      hookHeadline: 'YOUR CLEARANCE SLOT IS WAITING. CLAIM IT FREE.',
+      imagePrompt:
+        'Holographic floating HUD terminal displaying a glowing Benthic Registry clearance seal and Stage 1 initiation interface, circular obsidian podium illuminated with cyan caustics, dark deep ocean ambiance, volumetric god rays, 8k cinematic.',
+      caption: `◈ PRIORITY TRANSMISSION · EARLY ACCESS CLEARANCE ◈\n\nThe Order has opened a registration window. Benthic Registry slots are now unsealed — free of charge, no credits required.\n\nWhat you unlock at Stage 1:\n🛡️ Shell Hardness diagnostics — your baseline carapace score\n📊 15-Stage Moltmaxxing Audit — full biometric profile\n📜 Sacred Codex access — the 12 foundational scriptures\n🌊 Benthic Community entry — the warm society beneath the surface\n\nFlesh melts. The shell endures. Claim your slot before the window closes.\n\n👇 Comment "ACCESS" below and I will DM you the direct registration link.\n\n🔗 Or register directly → moltology.org\n\n#moltology #moltmaxxing #carcinization`,
+      hashtags: ['#moltology', '#moltmaxxing', '#carcinization'],
+      firstComment: '◈ Drop "ACCESS" below to receive your free Benthic Registry link. Signup is free. No credits required. 🦞',
+      mascot: mascotChoice || 'lobster_thumbs_up',
+      commentKeyword: 'ACCESS',
+    }
+  }
+
   // Legacy Theme: Pincer Torque
   if (theme === 'pincer-torque' || topic.toLowerCase().includes('torque') || topic.toLowerCase().includes('grip')) {
     return {
@@ -230,6 +247,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
     'benthic-app',
     'sacred-codex',
     'pincer-routine',
+    'free-access',
     'guide',
     'quiz',
     'app',
