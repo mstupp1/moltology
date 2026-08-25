@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as GuideRouteImport } from './routes/guide'
-import { Route as HudRouteImport } from './routes/hud'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MoltmaxRouteImport } from './routes/moltmax'
@@ -28,6 +27,7 @@ import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudGalleryRouteImport } from './routes/_hud/gallery'
+import { Route as HudHudRouteImport } from './routes/_hud/hud'
 import { Route as HudIsolationRouteImport } from './routes/_hud/isolation'
 import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
@@ -76,11 +76,6 @@ const AuthRoute = AuthRouteImport.update({
 const GuideRoute = GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HudRoute = HudRouteImport.update({
-  id: '/hud',
-  path: '/hud',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -151,6 +146,11 @@ const HudDashboardRoute = HudDashboardRouteImport.update({
 const HudGalleryRoute = HudGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudHudRoute = HudHudRouteImport.update({
+  id: '/hud',
+  path: '/hud',
   getParentRoute: () => HudRoute,
 } as any)
 const HudIsolationRoute = HudIsolationRouteImport.update({
@@ -310,7 +310,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/guide': typeof GuideRoute
-  '/hud': typeof HudRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -325,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/codex': typeof HudCodexRoute
   '/dashboard': typeof HudDashboardRoute
   '/gallery': typeof HudGalleryRoute
+  '/hud': typeof HudHudRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
@@ -360,7 +360,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/guide': typeof GuideRoute
-  '/hud': typeof HudRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -375,6 +374,7 @@ export interface FileRoutesByTo {
   '/codex': typeof HudCodexRoute
   '/dashboard': typeof HudDashboardRoute
   '/gallery': typeof HudGalleryRoute
+  '/hud': typeof HudHudRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
@@ -412,7 +412,6 @@ export interface FileRoutesById {
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
   '/guide': typeof GuideRoute
-  '/hud': typeof HudRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -427,6 +426,7 @@ export interface FileRoutesById {
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/gallery': typeof HudGalleryRoute
+  '/_hud/hud': typeof HudHudRoute
   '/_hud/isolation': typeof HudIsolationRoute
   '/_hud/lectures': typeof HudLecturesRoute
   '/_hud/market': typeof HudMarketRoute
@@ -464,7 +464,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/guide'
-    | '/hud'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -479,6 +478,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/dashboard'
     | '/gallery'
+    | '/hud'
     | '/isolation'
     | '/lectures'
     | '/market'
@@ -514,7 +514,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/guide'
-    | '/hud'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -529,6 +528,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/dashboard'
     | '/gallery'
+    | '/hud'
     | '/isolation'
     | '/lectures'
     | '/market'
@@ -565,7 +565,6 @@ export interface FileRouteTypes {
     | '/_hud'
     | '/auth'
     | '/guide'
-    | '/hud'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -580,6 +579,7 @@ export interface FileRouteTypes {
     | '/_hud/codex'
     | '/_hud/dashboard'
     | '/_hud/gallery'
+    | '/_hud/hud'
     | '/_hud/isolation'
     | '/_hud/lectures'
     | '/_hud/market'
@@ -617,7 +617,6 @@ export interface RootRouteChildren {
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
   GuideRoute: typeof GuideRoute
-  HudRoute: typeof HudRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   MoltmaxRoute: typeof MoltmaxRoute
@@ -671,13 +670,6 @@ declare module '@tanstack/react-router' {
       path: '/guide'
       fullPath: '/guide'
       preLoaderRoute: typeof GuideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hud': {
-      id: '/hud'
-      path: '/hud'
-      fullPath: '/hud'
-      preLoaderRoute: typeof HudRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -776,6 +768,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/gallery'
       preLoaderRoute: typeof HudGalleryRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/hud': {
+      id: '/_hud/hud'
+      path: '/hud'
+      fullPath: '/hud'
+      preLoaderRoute: typeof HudHudRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/isolation': {
@@ -996,6 +995,7 @@ interface HudRouteChildren {
   HudCodexRoute: typeof HudCodexRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudGalleryRoute: typeof HudGalleryRoute
+  HudHudRoute: typeof HudHudRoute
   HudIsolationRoute: typeof HudIsolationRoute
   HudLecturesRoute: typeof HudLecturesRoute
   HudMarketRoute: typeof HudMarketRoute
@@ -1016,6 +1016,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudCodexRoute: HudCodexRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudGalleryRoute: HudGalleryRoute,
+  HudHudRoute: HudHudRoute,
   HudIsolationRoute: HudIsolationRoute,
   HudLecturesRoute: HudLecturesRoute,
   HudMarketRoute: HudMarketRoute,
@@ -1081,7 +1082,6 @@ const rootRouteChildren: RootRouteChildren = {
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
   GuideRoute: GuideRoute,
-  HudRoute: HudRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   MoltmaxRoute: MoltmaxRoute,
