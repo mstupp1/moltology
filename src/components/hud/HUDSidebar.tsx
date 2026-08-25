@@ -44,7 +44,7 @@ import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 import { HUDProgressBar } from './HUDProgressBar'
-import { DigitalClock } from './DigitalClock'
+import { HUDTaskBar } from './HUDTaskBar'
 
 const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
 
@@ -712,7 +712,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 : 'opacity-0 pointer-events-none absolute inset-y-0 left-2.5 right-12'
             }`}
           >
-            <HUDProgressBar stage={stage} showClock={false} className="w-full" />
+            <HUDProgressBar stage={stage} showTaskBar={false} className="w-full" />
           </div>
 
           {/* Right Action Controls */}
@@ -720,7 +720,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {/* Task list button next to hamburger (visible when menu is closed) */}
             {!isMobileHeaderOpen && (
               <div className="flex items-center animate-in fade-in duration-200">
-                <DigitalClock variant="header" />
+                <HUDTaskBar variant="header" />
               </div>
             )}
 
