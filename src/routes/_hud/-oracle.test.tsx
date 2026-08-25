@@ -126,5 +126,15 @@ describe('Oracle Route Component', () => {
       expect(screen.getAllByText('Carcinization Inquiries').length).toBeGreaterThan(0)
     })
   })
+
+  it('marks the oracle noindex without a homepage canonical', () => {
+    const head = (Route as any).head()
+    expect(head.meta).toEqual(
+      expect.arrayContaining([{ name: 'robots', content: 'noindex, nofollow' }]),
+    )
+    expect(head.links ?? []).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ rel: 'canonical' })]),
+    )
+  })
 })
 

@@ -38,6 +38,8 @@ describe('HUDNotFound (404 Component)', () => {
     expect(screen.getByText(/BENTHIC TRANSMISSION: UNRESOLVED/i)).toBeInTheDocument()
     expect(screen.getByText(/10,928m \/ 108.6 MPa/i)).toBeInTheDocument()
     expect(screen.getByText('/non-existent-sector')).toBeInTheDocument()
+    expect(document.querySelector('title')?.textContent).toBe('Sector Void — Trench Uncharted | Moltology')
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex, nofollow')
   })
 
   it('provides navigation links back to Surface, Central HUD, and MoltNation News', () => {

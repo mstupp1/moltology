@@ -81,4 +81,15 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     expect(screen.getByText('STREAMING NOW')).toBeInTheDocument()
     expect(screen.getByText('MOLTNATION PODCAST DISPATCHES')).toBeInTheDocument()
   })
+
+  it('emits crawlable article hrefs for every listed dispatch', () => {
+    const { container } = render(<NewsIndexPage />)
+
+    expect(screen.getByRole('navigation', { name: 'MoltNation dispatch registry' })).toBeInTheDocument()
+
+    for (const post of INITIAL_BLOG_POSTS) {
+      const links = container.querySelectorAll(`a[href="/news/${post.slug}"]`)
+      expect(links.length).toBeGreaterThan(0)
+    }
+  })
 })

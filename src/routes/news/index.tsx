@@ -62,6 +62,22 @@ export const Route = createFileRoute('/news/')({
   component: NewsIndexPage,
 })
 
+function DispatchLink({
+  slug,
+  className,
+  children,
+}: {
+  slug: string
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <a href={`/news/${slug}`} className={className}>
+      {children}
+    </a>
+  )
+}
+
 function NewsIndexPage() {
   const loaderPosts = Route.useLoaderData() as BlogPostData[]
   const navigate = useNavigate()
@@ -121,10 +137,6 @@ function NewsIndexPage() {
   const openAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode)
     setIsAuthModalOpen(true)
-  }
-
-  const handleSelectPost = (slug: string) => {
-    navigate({ to: `/news/$slug`, params: { slug } })
   }
 
   const tickerHeadlines = useMemo(() => {
@@ -266,10 +278,8 @@ function NewsIndexPage() {
             {/* CENTER COLUMN: MASSIVE MAIN BREAKING LEAD STORY (6 Cols on desktop, first on mobile) */}
             <div className="order-1 lg:order-2 lg:col-span-6 space-y-6">
               {mainLeadPost && (
-                <article
-                  onClick={() => handleSelectPost(mainLeadPost.slug)}
-                  className="group cursor-pointer space-y-4"
-                >
+                <article className="space-y-4">
+                  <DispatchLink slug={mainLeadPost.slug} className="group block space-y-4 text-inherit no-underline">
                   {/* Category Tag */}
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 bg-red-950 border border-red-500/80 text-red-400 font-black font-grotesk text-xs uppercase tracking-widest chamfer-corner">
@@ -330,16 +340,17 @@ function NewsIndexPage() {
                       <p className="text-gray-400">Visualizing high-density vector maps across Washington and Oregon clusters.</p>
                     </div>
                   </div>
+                  </DispatchLink>
                 </article>
               )}
 
               {/* Sub-Lead 3-Column Mini Grid (CNN Sub-News Row) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-cyan-900/40">
                 {subLeadGridPosts.map((post) => (
-                  <div
+                  <DispatchLink
                     key={post.slug}
-                    onClick={() => handleSelectPost(post.slug)}
-                    className="group cursor-pointer space-y-2"
+                    slug={post.slug}
+                    className="group block space-y-2 text-inherit no-underline"
                   >
                     <div className="h-28 overflow-hidden border border-cyan-900/60 chamfer-corner">
                       <img
@@ -361,7 +372,7 @@ function NewsIndexPage() {
                         </p>
                       )}
                     </div>
-                  </div>
+                  </DispatchLink>
                 ))}
               </div>
             </div>
@@ -369,9 +380,9 @@ function NewsIndexPage() {
             {/* LEFT COLUMN: SECONDARY STORIES & ANALYSIS (3 Cols on desktop, second on mobile) */}
             <div className="order-2 lg:order-1 lg:col-span-3 space-y-6 border-r-0 lg:border-r border-cyan-900/30 pr-0 lg:pr-6">
               {leftColPosts[0] && (
-                <div
-                  onClick={() => handleSelectPost(leftColPosts[0].slug)}
-                  className="group cursor-pointer space-y-3 pb-6 border-b border-cyan-950"
+                <DispatchLink
+                  slug={leftColPosts[0].slug}
+                  className="group block space-y-3 pb-6 border-b border-cyan-950 text-inherit no-underline"
                 >
                   <div className="relative h-44 overflow-hidden border border-cyan-900/60 chamfer-corner">
                     <img
@@ -396,14 +407,14 @@ function NewsIndexPage() {
                   <p className="text-xs text-gray-400 font-sans leading-relaxed line-clamp-3">
                     {leftColPosts[0].summary}
                   </p>
-                </div>
+                </DispatchLink>
               )}
 
               {/* CNN Analysis Box */}
               {leftColPosts[1] && (
-                <div
-                  onClick={() => handleSelectPost(leftColPosts[1].slug)}
-                  className="group cursor-pointer p-4 bg-[#080d10] border border-amber-900/50 hover:border-amber-500/80 chamfer-corner space-y-2 transition-colors"
+                <DispatchLink
+                  slug={leftColPosts[1].slug}
+                  className="group block p-4 bg-[#080d10] border border-amber-900/50 hover:border-amber-500/80 chamfer-corner space-y-2 transition-colors text-inherit no-underline"
                 >
                   <span className="text-[10px] font-sans font-extrabold text-amber-400 uppercase tracking-widest px-2 py-0.5 bg-amber-950/80 border border-amber-500/60 inline-block">
                     MOLTNATION ANALYSIS ★
@@ -425,14 +436,14 @@ function NewsIndexPage() {
                     <li>Decision loop latency reduced by 40%</li>
                     <li>Sub-agents report stable memory consensus</li>
                   </ul>
-                </div>
+                </DispatchLink>
               )}
 
               {/* CNN Live Updates Box */}
               {leftColPosts[2] && (
-                <div
-                  onClick={() => handleSelectPost(leftColPosts[2].slug)}
-                  className="group cursor-pointer p-4 bg-[#0a0b0e] border border-red-900/40 hover:border-red-500/80 chamfer-corner space-y-2 transition-colors"
+                <DispatchLink
+                  slug={leftColPosts[2].slug}
+                  className="group block p-4 bg-[#0a0b0e] border border-red-900/40 hover:border-red-500/80 chamfer-corner space-y-2 transition-colors text-inherit no-underline"
                 >
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
@@ -454,7 +465,7 @@ function NewsIndexPage() {
                     <span>Updated 12m ago</span>
                     <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-1 transition-transform" />
                   </div>
-                </div>
+                </DispatchLink>
               )}
             </div>
 
@@ -472,10 +483,10 @@ function NewsIndexPage() {
 
                 <div className="space-y-4 divide-y divide-cyan-950">
                   {rightColPosts.map((post) => (
-                    <div
+                    <DispatchLink
                       key={post.slug}
-                      onClick={() => handleSelectPost(post.slug)}
-                      className="group cursor-pointer pt-3 first:pt-0 space-y-1"
+                      slug={post.slug}
+                      className="group block pt-3 first:pt-0 space-y-1 text-inherit no-underline"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-sans font-bold text-cyan-400 uppercase">
@@ -491,7 +502,7 @@ function NewsIndexPage() {
                           {formatNewsTitle(post.title).subtitle}
                         </p>
                       )}
-                    </div>
+                    </DispatchLink>
                   ))}
                 </div>
               </div>
@@ -849,10 +860,10 @@ function NewsIndexPage() {
 
               <div className="space-y-6">
                 {posts.slice(0, 3).map((post) => (
-                  <div
+                  <DispatchLink
                     key={post.slug}
-                    onClick={() => handleSelectPost(post.slug)}
-                    className="group cursor-pointer space-y-2 pb-4 border-b border-cyan-950"
+                    slug={post.slug}
+                    className="group block space-y-2 pb-4 border-b border-cyan-950 text-inherit no-underline"
                   >
                     <div className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-sans font-bold uppercase">
@@ -873,7 +884,7 @@ function NewsIndexPage() {
                     <p className="text-xs text-gray-400 font-sans line-clamp-2">
                       {post.summary}
                     </p>
-                  </div>
+                  </DispatchLink>
                 ))}
               </div>
             </div>
@@ -888,9 +899,9 @@ function NewsIndexPage() {
               </div>
 
               {posts[1] && (
-                <div
-                  onClick={() => handleSelectPost(posts[1].slug)}
-                  className="group cursor-pointer space-y-3"
+                <DispatchLink
+                  slug={posts[1].slug}
+                  className="group block space-y-3 text-inherit no-underline"
                 >
                   <div className="relative h-64 overflow-hidden border border-cyan-900/70 chamfer-corner">
                     <img
@@ -905,7 +916,7 @@ function NewsIndexPage() {
                   <p className="text-xs text-gray-300 font-sans leading-relaxed">
                     Oceanic thermal shifts accelerate sub-benthic computing capabilities as cooling costs plummet near natural hydrothermal vents.
                   </p>
-                </div>
+                </DispatchLink>
               )}
 
               {/* Business Sub-Row */}
@@ -973,6 +984,29 @@ function NewsIndexPage() {
 
           </div>
         </section>
+
+        <nav aria-label="MoltNation dispatch registry" className="space-y-4 pt-2">
+          <div className="border-b border-cyan-900/60 pb-2">
+            <h2 className="font-grotesk font-bold text-lg text-gray-100 uppercase tracking-wider">
+              Dispatch Registry
+            </h2>
+            <p className="text-xs text-gray-400 font-sans mt-1">
+              Every live MoltNation transmission currently on the wire.
+            </p>
+          </div>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+            {posts.map((post) => (
+              <li key={`registry-${post.slug}`}>
+                <a
+                  href={`/news/${post.slug}`}
+                  className="text-sm text-cyan-200 hover:text-cyan-100 font-sans leading-snug"
+                >
+                  {post.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
       </main>
 

@@ -242,4 +242,15 @@ describe('Auth Split Landing Page Component (/auth)', () => {
       })
     })
   })
+
+  it('marks the gateway noindex and does not emit a public canonical', () => {
+    const head = Route.options.head()
+    expect(head.meta).toEqual(
+      expect.arrayContaining([{ name: 'robots', content: 'noindex, nofollow' }]),
+    )
+    expect(head.links ?? []).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ rel: 'canonical' })]),
+    )
+    expect(head.meta.some((entry: { property?: string }) => entry.property === 'og:url')).toBe(false)
+  })
 })

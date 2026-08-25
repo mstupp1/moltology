@@ -2,6 +2,9 @@ import type { DetailedHTMLProps, MetaHTMLAttributes } from 'react'
 
 export type MetaElement = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>
 
+export const SITE_ORIGIN = 'https://moltology.org'
+export const NOINDEX_ROBOTS = 'noindex, nofollow'
+
 export interface SEOOptions {
   title?: string
   description?: string
@@ -17,6 +20,42 @@ export interface SEOOptions {
   author?: string
   publishedTime?: string
   section?: string
+}
+
+export const HOMEPAGE_SEO: SEOOptions = {
+  title: 'Moltology \u2014 The Synaptic Path',
+  description:
+    'The digital onboarding portal for algorithmic carcinization, benthic philosophy, and personal optimization.',
+  keywords: 'Synaptic Path, Moltology, moltism, benthic core, carcinization, ascension, algorithmic ecdysis',
+  canonical: SITE_ORIGIN,
+  ogImage: `${SITE_ORIGIN}/images/order_emblem.png`,
+  twitterSite: '@moltology',
+}
+
+export function canonicalLink(href: string) {
+  return { rel: 'canonical' as const, href }
+}
+
+export function privatePageSeo(
+  options: Pick<SEOOptions, 'title' | 'description' | 'keywords' | 'ogImage' | 'twitterSite' | 'siteName'>,
+): MetaElement[] {
+  return seo({
+    ...options,
+    robots: NOINDEX_ROBOTS,
+  })
+}
+
+export function notFoundSeo(): MetaElement[] {
+  return seo({
+    title: 'Sector Void \u2014 Trench Uncharted | Moltology',
+    description:
+      'The requested synaptic coordinate does not exist within the active Benthic Lattice. Return to the Synaptic Path or MoltNation News.',
+    robots: NOINDEX_ROBOTS,
+  })
+}
+
+export function xRobotsNoindexHeaders() {
+  return { 'X-Robots-Tag': NOINDEX_ROBOTS }
 }
 
 export function seo({
@@ -274,12 +313,14 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/`, priority: 1.0, changefreq: 'daily' },
     { loc: `${baseUrl}/moltmax`, priority: 0.95, changefreq: 'daily' },
     { loc: `${baseUrl}/moltmaxxing`, priority: 0.95, changefreq: 'daily' },
+    { loc: `${baseUrl}/guide`, priority: 0.95, changefreq: 'daily' },
     { loc: `${baseUrl}/news`, priority: 0.9, changefreq: 'daily' },
     { loc: `${baseUrl}/codex`, priority: 0.8, changefreq: 'weekly' },
     { loc: `${baseUrl}/org`, priority: 0.8, changefreq: 'weekly' },
     { loc: `${baseUrl}/lectures`, priority: 0.7, changefreq: 'weekly' },
     { loc: `${baseUrl}/podcasts`, priority: 0.7, changefreq: 'weekly' },
     { loc: `${baseUrl}/forum`, priority: 0.8, changefreq: 'daily' },
+    { loc: `${baseUrl}/changelog`, priority: 0.6, changefreq: 'weekly' },
     { loc: `${baseUrl}/market`, priority: 0.6, changefreq: 'weekly' },
     { loc: `${baseUrl}/privacy`, priority: 0.3, changefreq: 'monthly' },
     { loc: `${baseUrl}/terms`, priority: 0.3, changefreq: 'monthly' },
