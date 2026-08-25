@@ -23,12 +23,9 @@ export function LaunchpadCarouselGhost() {
       </div>
 
       {/* Hero launchpad card skeleton grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
         <HudGhostCard variant="neutral" lines={4} className="md:col-span-2 min-h-[200px]" />
-        <div className="space-y-3 flex flex-col justify-between">
-          <HudGhostStatBox variant="cyan" />
-          <HudGhostStatBox variant="neutral" />
-        </div>
+        <HudGhostCard variant="cyan" lines={6} className="min-h-[200px] h-full" />
       </div>
 
       {/* Footer / dots skeleton */}
