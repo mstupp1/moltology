@@ -16,6 +16,7 @@ import {
   getDailyAlignmentFn,
   toggleDailyAlignmentTaskFn,
 } from '@/lib/server/api'
+import { useHudPersist } from '@/hooks/useHudPersist'
 
 export interface AlignmentContextValue {
   tasks: AlignmentTaskItem[]
@@ -41,6 +42,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const userId = user?.id || user?.sub || null
   const isAuthPending = sessionRes?.isPending ?? false
   const isGuest = !userId && !isAuthPending
+  const persist = useHudPersist()
 
   let toast: {
     success: (m: string, o?: any) => string
@@ -176,6 +178,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     // Authenticated users: persist to backend
     if (userId) {
       setIsSyncing(true)
+      persist.begin('daily-alignment')
       try {
         const token = await getAuthJWTToken()
         const response = await toggleDailyAlignmentTaskFn({
@@ -209,6 +212,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
           }
         )
       } finally {
+        persist.end('daily-alignment')
         setIsSyncing(false)
       }
     } else {
@@ -218,7 +222,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         return [...existing, { date: currentDate, completedCount: nextCount }]
       })
     }
-  }, [tasks, userId, currentDate, toast])
+  }, [tasks, userId, currentDate, toast, persist])
 
   const refetch = useCallback(async () => {
     await fetchAlignment(currentDate)

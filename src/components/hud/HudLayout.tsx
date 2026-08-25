@@ -8,6 +8,8 @@ import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
 import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
+import { HudPersistProvider } from '@/hooks/useHudPersist'
+import { HudPersistIndicator } from '@/components/hud/HudPersistIndicator'
 import { authClient } from '@/lib/auth-client'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -156,7 +158,7 @@ function HudContent() {
         {/* Workspace Column & Optional Right AI Drawer */}
         <div className="flex-1 min-w-0 flex h-full overflow-hidden">
           {/* Main Workspace */}
-          <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
+          <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
             {/* Portal Top Bar */}
             <HUDHeader />
 
@@ -168,6 +170,8 @@ function HudContent() {
             >
               <Outlet />
             </main>
+
+            <HudPersistIndicator />
           </div>
 
           {/* Right-Hand Dockable AI Sidebar Drawer */}
@@ -188,9 +192,11 @@ function HudContent() {
 export function HudLayout() {
   return (
     <OracleProvider>
-      <AlignmentProvider>
-        <HudContent />
-      </AlignmentProvider>
+      <HudPersistProvider>
+        <AlignmentProvider>
+          <HudContent />
+        </AlignmentProvider>
+      </HudPersistProvider>
     </OracleProvider>
   )
 }

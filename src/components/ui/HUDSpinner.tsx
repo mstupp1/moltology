@@ -13,7 +13,10 @@ export type HUDSpinnerVariant = 'cyan' | 'crimson' | 'neutral'
 export interface HUDSpinnerProps {
   size?: HUDSpinnerSize
   variant?: HUDSpinnerVariant
+  /** Visible caption under the spinner (also used as aria-label when aria-label is omitted). */
   label?: string
+  /** Accessible name when no visible label is shown. Defaults to label or "Loading". */
+  'aria-label'?: string
   className?: string
 }
 
@@ -54,6 +57,7 @@ export function HUDSpinner({
   size = 'md',
   variant = 'cyan',
   label,
+  'aria-label': ariaLabel,
   className,
 }: HUDSpinnerProps) {
   const { px, stroke, gap } = SIZE_MAP[size]
@@ -66,7 +70,7 @@ export function HUDSpinner({
     <span
       className={cn('inline-flex flex-col items-center justify-center', className)}
       role="status"
-      aria-label={label ?? 'Loading'}
+      aria-label={ariaLabel ?? label ?? 'Loading'}
       style={{ gap }}
     >
       <svg
@@ -113,11 +117,6 @@ export function HUDSpinner({
             <stop offset="100%" stopColor={primary} />
           </linearGradient>
         </defs>
-
-        {/* Center dot pulse */}
-        <circle cx={px / 2} cy={px / 2} r={stroke * 0.7} fill={primary} opacity="0.8">
-          <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.1s" repeatCount="indefinite" />
-        </circle>
       </svg>
 
       {label && (
