@@ -227,14 +227,7 @@ function SupportPortalRoute() {
             </div>
           </div>
 
-          {/* Realtime Status Indicator */}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 bg-[#05090a] border border-[#3a4a49] px-3 py-1.5 chamfer-corner">
-              <span className="w-2 h-2 rounded-full bg-[#00ffff] animate-ping" />
-              <span className="text-xs text-[#00ffff] font-bold">SYSTEM STATUS: OPTIMAL</span>
-              <span className="text-xs text-[#839493] border-l border-[#3a4a49] pl-2 ml-1">3,400 FATHOMS</span>
-            </div>
-          </div>
+
         </div>
 
         {/* Tab Navigation */}
@@ -650,13 +643,7 @@ function SupportPortalRoute() {
               </div>
             </div>
 
-            <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">SUBMERGENCE PRESSURE</span>
-              <div className="text-sm font-bold text-[#ff5540] flex items-center gap-1.5">
-                <Terminal className="w-4 h-4 text-[#ff5540]" />
-                <span>3,400 FATHOMS</span>
-              </div>
-            </div>
+
           </div>
         </div>
       )}

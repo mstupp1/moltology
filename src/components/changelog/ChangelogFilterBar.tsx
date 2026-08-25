@@ -63,23 +63,24 @@ export function ChangelogFilterBar({
 
   return (
     <div
-      className={`w-full bg-[#070c0e]/95 border-b border-cyan-900/40 py-3 px-4 sm:px-8 sticky top-[60px] z-30 backdrop-blur-md transition-all ${className}`}
+      className={`w-full bg-[#070c0e]/95 border-b border-cyan-900/40 py-3 px-4 sm:px-8 relative z-10 ${className}`}
     >
       <div className="max-w-5xl mx-auto space-y-2.5">
         {/* Top Controls Row: Primary Category Tabs & Search Bar */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
           {/* Primary Category Tabs (Horizontally scrollable on mobile) */}
-          <div className="relative flex-1 min-w-0">
+          <div className="relative flex-1 min-w-0 flex items-center gap-2">
+            {/* Label anchored outside scroll — never clips */}
+            <div className="hidden lg:flex items-center text-[#839493] shrink-0 text-[11px] font-sans font-bold">
+              <SlidersHorizontal className="w-3.5 h-3.5 mr-1 text-cyan-400" />
+              <span>CATEGORIES:</span>
+            </div>
+
             <div
-              className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 scroll-smooth snap-x snap-mandatory"
+              className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 scroll-smooth snap-x snap-mandatory flex-1 min-w-0"
               role="tablist"
               aria-label="Filter by primary category"
             >
-              <div className="hidden lg:flex items-center text-[#839493] shrink-0 mr-1 text-[11px] font-sans font-bold">
-                <SlidersHorizontal className="w-3.5 h-3.5 mr-1 text-cyan-400" />
-                <span>CATEGORIES:</span>
-              </div>
-
               {categories.map((cat) => {
                 const isActive = selectedCategory === cat.label
                 return (
@@ -143,45 +144,76 @@ export function ChangelogFilterBar({
           </div>
         </div>
 
-        {/* Secondary Row: Overlapping Tags & Active Filter Badges */}
+        {/* Secondary Row: Tags Strip & Count/Reset */}
         {(tags.length > 0 || hasActiveFilters) && (
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-cyan-950/60 text-xs font-sans">
-            {/* Tags Strip */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0">
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider shrink-0 flex items-center gap-1 mr-0.5">
-                <Tag className="w-3 h-3 text-cyan-400" />
-                <span>TAGS:</span>
-              </span>
+          <div className="flex flex-col gap-1.5 pt-1 border-t border-cyan-950/60 text-xs font-sans">
+            {/* Tags + inline count (sm+) */}
+            <div className="flex items-center gap-2">
+              {/* Tags Strip */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0">
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider shrink-0 flex items-center gap-1 mr-0.5">
+                  <Tag className="w-3 h-3 text-cyan-400" />
+                  <span>TAGS:</span>
+                </span>
 
-              {tags.map((tag) => {
-                const isTagActive = selectedTag === tag.label
-                return (
+                {tags.map((tag) => {
+                  const isTagActive = selectedTag === tag.label
+                  return (
+                    <button
+                      key={tag.label}
+                      onClick={() => {
+                        if (onTagChange) {
+                          onTagChange(isTagActive ? null : tag.label)
+                        }
+                      }}
+                      className={`px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase transition-all shrink-0 rounded-sm flex items-center gap-1 ${
+                        isTagActive
+                          ? 'bg-purple-500 text-white font-extrabold shadow-[0_0_8px_rgba(192,132,252,0.5)] border border-purple-300'
+                          : 'bg-[#060a0c] text-gray-400 hover:text-cyan-300 border border-cyan-900/40 hover:border-cyan-700/60'
+                      }`}
+                    >
+                      <span>#{tag.label}</span>
+                      {typeof tag.count === 'number' && (
+                        <span className="text-[9px] opacity-75 font-mono">
+                          ({tag.count})
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Count & Reset — inline on sm+ screens */}
+              <div className="hidden sm:flex items-center gap-2 shrink-0 pl-2 text-[11px] text-gray-400">
+                <span>
+                  {filteredCount === totalCount ? (
+                    <>
+                      <strong className="text-cyan-300 font-mono">{totalCount}</strong> updates
+                    </>
+                  ) : (
+                    <>
+                      <strong className="text-cyan-300 font-mono">{filteredCount}</strong> of{' '}
+                      <span className="font-mono">{totalCount}</span> updates
+                    </>
+                  )}
+                </span>
+
+                {hasActiveFilters && (
                   <button
-                    key={tag.label}
-                    onClick={() => {
-                      if (onTagChange) {
-                        onTagChange(isTagActive ? null : tag.label)
-                      }
-                    }}
-                    className={`px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase transition-all shrink-0 rounded-sm flex items-center gap-1 ${
-                      isTagActive
-                        ? 'bg-purple-500 text-white font-extrabold shadow-[0_0_8px_rgba(192,132,252,0.5)] border border-purple-300'
-                        : 'bg-[#060a0c] text-gray-400 hover:text-cyan-300 border border-cyan-900/40 hover:border-cyan-700/60'
-                    }`}
+                    type="button"
+                    onClick={onReset}
+                    className="px-2 py-0.5 bg-red-950/60 hover:bg-red-900 border border-red-500/50 text-red-300 hover:text-white text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all active:scale-95"
+                    title="Reset all filters"
                   >
-                    <span>#{tag.label}</span>
-                    {typeof tag.count === 'number' && (
-                      <span className="text-[9px] opacity-75 font-mono">
-                        ({tag.count})
-                      </span>
-                    )}
+                    <RotateCcw className="w-2.5 h-2.5" />
+                    <span>RESET</span>
                   </button>
-                )
-              })}
+                )}
+              </div>
             </div>
 
-            {/* Results Count & Reset Button */}
-            <div className="flex items-center gap-2 shrink-0 ml-auto pl-2 text-[11px] text-gray-400">
+            {/* Count & Reset — own row on mobile only */}
+            <div className="flex sm:hidden items-center justify-between text-[11px] text-gray-400">
               <span>
                 {filteredCount === totalCount ? (
                   <>
