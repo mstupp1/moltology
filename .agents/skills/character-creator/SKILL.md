@@ -126,7 +126,7 @@ Invoke `generate_image` using the standardized character prompt blueprint:
 
 ### Step 3: Run High-Precision Chroma Key Extraction
 
-Execute `scripts/chroma_key.py` with auto-detection, Hollywood Keylight de-mixing, edge-weighted despill, and auto-trimming:
+Execute `scripts/chroma_key.py` with auto-detection, Hollywood Keylight de-mixing, edge-weighted despill, auto-trimming, and `--webp` generation:
 
 ```bash
 python3 scripts/chroma_key.py \
@@ -137,23 +137,31 @@ python3 scripts/chroma_key.py \
   --smoothness 28 \
   --despill-strength 0.85 \
   --trim \
-  --margin 24
+  --margin 24 \
+  --webp
 ```
+*(This produces both a lossless master `char_<name>.png` and an ultra-optimized ~30–70 KB transparent `char_<name>.webp` with identical crisp alpha transparency).*
 
 ---
 
 ### Step 4: Ingest to Neon S3 Storage
 
-Upload the extracted PNG cutout to the Neon S3 public assets bucket (`moltology-public-assets`):
+Upload the extracted WebP cutout (for web delivery) and PNG (for asset archive) to the Neon S3 public assets bucket (`moltology-public-assets`):
 
 ```bash
+# Upload primary WebP web cutout (75–85% bandwidth reduction on landing/editorial pages)
+npx tsx scripts/upload-asset.ts \
+  scratch/characters/char_<name>.webp \
+  --key images/characters/char_<name>.webp
+
+# Upload companion master PNG
 npx tsx scripts/upload-asset.ts \
   scratch/characters/char_<name>.png \
   --key images/characters/char_<name>.png
 ```
 
 Verify the uploaded public CDN URL:
-`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/char_<name>.png`
+`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/char_<name>.webp`
 
 ---
 
@@ -164,9 +172,9 @@ Any character uploaded to S3 can be loaded immediately and stamped onto images u
 ```typescript
 import { overlayCharacterOnImage } from '../../scripts/lib/character-overlay'
 
-// Resolves directly from local scratch/character_refs or S3 dynamically!
+// Resolves directly from local scratch/character_refs (.webp / .png) or S3 dynamically!
 await overlayCharacterOnImage(baseImagePath, outputImagePath, {
-  character: 'lobster_engineer', // or 'char_lobster_engineer.png'
+  character: 'lobster_engineer', // or 'char_lobster_engineer.webp'
   position: 'bottom-right',
   scalePercent: 30,
 })
@@ -176,18 +184,18 @@ await overlayCharacterOnImage(baseImagePath, outputImagePath, {
 
 ## ◈ 4. Effortless In-Place Character Replacement Protocol (Zero Code Refactoring)
 
-When refining, re-rendering, or replacing an existing mascot in the character roster (e.g. updating `char_lobster_thumbs_up.png` or `char_lobster_pointing_cta.png`), follow this exact 5-step workflow to update the asset everywhere in seconds without touching any components or references across the codebase:
+When refining, re-rendering, or replacing an existing mascot in the character roster (e.g. updating `char_lobster_thumbs_up.webp` or `char_lobster_pointing_cta.webp`), follow this exact 5-step workflow to update the asset everywhere in seconds without touching any components or references across the codebase:
 
 ```mermaid
 flowchart LR
-    A[1. Generate 3D Chroma Cutout] --> B[2. Run Chroma Key Extraction]
-    B --> C[3. Overwrite Local Reference]
+    A[1. Generate 3D Chroma Cutout] --> B[2. Run Chroma Key with --webp]
+    B --> C[3. Overwrite Local References]
     C --> D[4. In-Place S3 Upload]
     D --> E[5. Bump Cache-Buster in MascotOverlay]
 ```
 
 ### 1. Generate & Extract Cutout
-Synthesize the new 3D character render on flat solid hot pink (`#FF00FF`) with attached eyebrows, then run the chroma key engine:
+Synthesize the new 3D character render on flat solid hot pink (`#FF00FF`) with attached eyebrows, then run the chroma key engine with `--webp`:
 ```bash
 python3 scripts/chroma_key.py \
   <path_to_generated_image.jpg> \
@@ -197,23 +205,29 @@ python3 scripts/chroma_key.py \
   --smoothness 28 \
   --despill-strength 0.85 \
   --trim \
-  --margin 24
+  --margin 24 \
+  --webp
 ```
 
 ### 2. Overwrite Local Reference
 Keep the local character reference vault in sync for fast local/offline script execution:
 ```bash
 cp scratch/characters/char_<name>.png scratch/character_refs/char_<name>.png
+cp scratch/characters/char_<name>.webp scratch/character_refs/char_<name>.webp
 ```
 
 ### 3. In-Place Overwrite on Neon S3
-Upload the new cutout directly over the existing S3 key:
+Upload the new cutouts directly over the existing S3 keys:
 ```bash
+npx tsx scripts/upload-asset.ts \
+  scratch/characters/char_<name>.webp \
+  --key images/characters/char_<name>.webp
+
 npx tsx scripts/upload-asset.ts \
   scratch/characters/char_<name>.png \
   --key images/characters/char_<name>.png
 ```
-Because the S3 key remains identical, all existing routes, Landing Page components, video pipelines, and social generators automatically point to the new asset without changing code paths.
+Because the S3 keys remain identical, all existing routes, Landing Page components, video pipelines, and social generators automatically point to the new asset without changing code paths.
 
 ### 4. Bump Cache-Buster Version in MascotOverlay
 To prevent browser HTTP/CDN cache latency for users viewing Composite Studio or web routes, increment the version query parameter (e.g. `?v=4`) in [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx):

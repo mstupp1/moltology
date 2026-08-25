@@ -22,10 +22,14 @@ This skill guides the automated generation and synchronization of high-DPI, pixe
 │ scripts/capture-dashboard-mockups.ts                   │
 └────────────────────────────────────────────────────────┘
          │
-         ├──► public/images/marketing/dashboard_desktop_preview.png  (1440x900 @ 2x)
-         └──► public/images/marketing/dashboard_mobile_preview.png   (393x852 @ 2x)
+         ├──► ffmpeg WebP encoding (q=90 & responsive q=86)
          │
-         ▼
+         ├──► public/images/marketing/dashboard_desktop_preview.webp     (1760x1100 @ 2x)
+         ├──► public/images/marketing/dashboard_desktop_preview_sm.webp  (1280px max width)
+         ├──► public/images/marketing/dashboard_mobile_preview.webp      (540x1170 @ 2x)
+         └──► public/images/marketing/dashboard_mobile_preview_sm.webp   (540px max width)
+         │
+         ▼  Responsive <picture> / <source> WebP Loading
 ┌────────────────────────────────────────────────────────┐
 │ src/components/hud/DashboardMarketingShowcase.tsx      │
 │  ├── Safari (Magic UI Desktop Mockup Frame)            │
@@ -36,8 +40,8 @@ This skill guides the automated generation and synchronization of high-DPI, pixe
 ### Core Pipeline Files
 * **Capture Script**: [`scripts/capture-dashboard-mockups.ts`](file:///Users/mylesstupp/Development/moltology/scripts/capture-dashboard-mockups.ts)
 * **NPM Command**: `npm run mockups:capture`
-* **Desktop Asset**: `public/images/marketing/dashboard_desktop_preview.png`
-* **Mobile Asset**: `public/images/marketing/dashboard_mobile_preview.png`
+* **Desktop WebP Assets**: `public/images/marketing/dashboard_desktop_preview.webp`, `dashboard_desktop_preview_sm.webp`
+* **Mobile WebP Assets**: `public/images/marketing/dashboard_mobile_preview.webp`, `dashboard_mobile_preview_sm.webp`
 * **Consumer Component**: [`src/components/hud/DashboardMarketingShowcase.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/hud/DashboardMarketingShowcase.tsx)
 * **Unit Tests**: [`src/components/hud/DashboardMarketingShowcase.test.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/hud/DashboardMarketingShowcase.test.tsx)
 
@@ -56,9 +60,9 @@ This script will:
 1. Ensure the production server bundle is built (`npm run build`).
 2. Boot a background server instance on an isolated port (`3019`).
 3. Launch headless Chrome with `--force-device-scale-factor=2` and `--hide-scrollbars`.
-4. Capture the full desktop view at `1440 × 900` (`2880 × 1800` effective resolution).
-5. Capture the mobile view at `393 × 852` (`786 × 1704` effective resolution) using an iPhone User-Agent.
-6. Write the optimized images to `public/images/marketing/`.
+4. Capture the desktop view at `1760 × 1100` (MacBook Pro 16:10 ratio, 2x Retina).
+5. Capture the mobile view at `540 × 1170` (High-density Mobile, 2x Retina) using an iPhone User-Agent.
+6. Automatically encode high-performance WebP variants (`.webp` and `_sm.webp`) via `ffmpeg` and remove bulky raw PNGs to optimize initial first-paint LCP payload.
 
 ### Step 2: (Optional) Sync to S3 CDN
 If syncing all assets to the Neon S3 storage bucket:

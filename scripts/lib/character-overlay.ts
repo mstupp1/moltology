@@ -24,51 +24,51 @@ export interface CharacterInfo {
 export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = {
   lobster_pointing: {
     key: 'lobster_pointing',
-    filename: 'char_lobster_pointing_cta.png',
-    s3Path: 'images/characters/char_lobster_pointing_cta.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.png`,
+    filename: 'char_lobster_pointing_cta.webp',
+    s3Path: 'images/characters/char_lobster_pointing_cta.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_pointing_cta.webp`,
     description: 'Hero lobster pointing directly at call to action buttons or key links',
   },
   lobster_peek: {
     key: 'lobster_peek',
-    filename: 'char_lobster_corner_peek.png',
-    s3Path: 'images/characters/char_lobster_corner_peek.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.png`,
+    filename: 'char_lobster_corner_peek.webp',
+    s3Path: 'images/characters/char_lobster_corner_peek.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_corner_peek.webp`,
     description: 'Playful lobster peeking over top or side container bezels',
   },
   lobster_thumbs_up: {
     key: 'lobster_thumbs_up',
-    filename: 'char_lobster_thumbs_up.png',
-    s3Path: 'images/characters/char_lobster_thumbs_up.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png`,
+    filename: 'char_lobster_thumbs_up.webp',
+    s3Path: 'images/characters/char_lobster_thumbs_up.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp`,
     description: 'Cheerful lobster giving a thumbs-up approval sign',
   },
   lobster_peaceful: {
     key: 'lobster_peaceful',
-    filename: 'char_lobster_floating_peaceful.png',
-    s3Path: 'images/characters/char_lobster_floating_peaceful.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.png`,
+    filename: 'char_lobster_floating_peaceful.webp',
+    s3Path: 'images/characters/char_lobster_floating_peaceful.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.webp`,
     description: 'Calm cyber-lobster floating peacefully in deep benthic waters',
   },
   lobster_action: {
     key: 'lobster_action',
-    filename: 'char_lobster_speed_action.png',
-    s3Path: 'images/characters/char_lobster_speed_action.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_speed_action.png`,
+    filename: 'char_lobster_speed_action.webp',
+    s3Path: 'images/characters/char_lobster_speed_action.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_speed_action.webp`,
     description: 'Dynamic speed-action lobster dashing forward with propulsion glow',
   },
   crab_stats: {
     key: 'crab_stats',
-    filename: 'char_crab_pointing_stats.png',
-    s3Path: 'images/characters/char_crab_pointing_stats.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.png`,
+    filename: 'char_crab_pointing_stats.webp',
+    s3Path: 'images/characters/char_crab_pointing_stats.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_crab_pointing_stats.webp`,
     description: 'Energetic crab pointing at quantitative metrics and charts',
   },
   lobster_engineer: {
     key: 'lobster_engineer',
-    filename: 'char_lobster_engineer.png',
-    s3Path: 'images/characters/char_lobster_engineer.png',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_engineer.png`,
+    filename: 'char_lobster_engineer.webp',
+    s3Path: 'images/characters/char_lobster_engineer.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_engineer.webp`,
     description: 'Cheerful lobster engineer wearing yellow safety hardhat with holographic diagnostic tablet',
   },
 }
@@ -112,28 +112,40 @@ export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo 
  */
 export async function loadCharacterImage(characterKey: CharacterKey | string): Promise<any> {
   const info = getCharacterInfo(characterKey)
-  const localPath = path.resolve(process.cwd(), 'public/images/characters', info.filename)
+  const baseName = info.filename.replace(/\.[^/.]+$/, '')
+  const candidates = [`${baseName}.webp`, `${baseName}.png`]
 
-  if (fs.existsSync(localPath)) {
-    return await loadImage(localPath)
-  }
-
-  const scratchPath = path.resolve(process.cwd(), 'scratch/character_refs', info.filename)
-  if (fs.existsSync(scratchPath)) {
-    return await loadImage(scratchPath)
-  }
-
-  // Fetch from Neon S3 public assets bucket
-  try {
-    const res = await fetch(info.publicUrl)
-    if (res.ok) {
-      const arrayBuffer = await res.arrayBuffer()
-      return await loadImage(Buffer.from(arrayBuffer))
+  for (const fn of candidates) {
+    const localPath = path.resolve(process.cwd(), 'public/images/characters', fn)
+    if (fs.existsSync(localPath)) {
+      return await loadImage(localPath)
     }
-  } catch (err) {
-    console.warn(`⚠️ Failed to fetch character from S3 (${info.publicUrl}):`, err)
+
+    const scratchPath = path.resolve(process.cwd(), 'scratch/character_refs', fn)
+    if (fs.existsSync(scratchPath)) {
+      return await loadImage(scratchPath)
+    }
   }
 
+  // Fetch from Neon S3 public assets bucket (try webp first, then configured publicUrl)
+  const s3Candidates = [
+    `${S3_BASE_URL}/images/characters/${baseName}.webp`,
+    info.publicUrl,
+  ]
+
+  for (const url of s3Candidates) {
+    try {
+      const res = await fetch(url)
+      if (res.ok) {
+        const arrayBuffer = await res.arrayBuffer()
+        return await loadImage(Buffer.from(arrayBuffer))
+      }
+    } catch (err) {
+      // Continue to next candidate
+    }
+  }
+
+  console.warn(`⚠️ Failed to fetch character from S3 (${info.publicUrl})`)
   return null
 }
 
