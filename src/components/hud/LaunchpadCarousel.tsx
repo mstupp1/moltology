@@ -445,12 +445,13 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
             </HudCard>
           </div>
 
-          {/* Right Column: MoltNation News Feed (4 cols, full height) */}
-          <div className="lg:col-span-4 flex flex-col h-full min-h-0">
+          {/* Right Column: MoltNation News Feed — capped on mobile to match desktop bento height */}
+          <div className="lg:col-span-4 flex flex-col h-[785px] max-h-[785px] lg:h-full lg:max-h-none min-h-0">
             <div
               className="chitin-card p-3 sm:p-3.5 chamfer-corner space-y-2 shadow-2xl relative overflow-hidden border border-[#3a4a49] h-full flex flex-col justify-between min-h-0"
               onMouseEnter={() => setIsNewsHovered(true)}
               onMouseLeave={() => setIsNewsHovered(false)}
+              data-testid="moltnation-news-panel"
             >
               <div className="space-y-2 flex-1 flex flex-col min-h-0">
                 {/* News Header */}
