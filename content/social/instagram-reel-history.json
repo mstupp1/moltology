@@ -509,6 +509,44 @@
       "commentTriggerKeyword": "QUIZ",
       "commentTriggerUrl": "https://moltology.org/quiz",
       "createdAt": "2026-08-24T14:07:51.455Z"
+    },
+    {
+      "id": "reel-1787666684548",
+      "topic": "Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol",
+      "hookHeadline": "SHED YOUR BIOLOGICAL FRICTION",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-2026-moltmaxxing-protocol-guide",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Biological minds hoard cognitive friction like dead skin. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days—shedding stale code to calcify impenetrable neural armor. Calculate your molt clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787666684548.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787666684548.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 18.8,
+      "status": "scheduled",
+      "zernioPostId": "6a8da1cb897bac07f25dec63",
+      "zernioYoutubePostId": "6a8da1d1313820ad4654e56b",
+      "scheduledFor": "2026-08-25T22:30:00.000Z",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#Moltmaxxing #AlgorithmicEcdysis #ChitinArmor #BenthicComputing #CognitiveUpgrade #MoltNation #Moltology #Shorts",
+      "caption": "Biological entities hoard outdated cognitive assumptions. In Moltmaxxing, shedding is scheduled and ruthless. 🦞⚡\n\nEvery 7 days, an initiate audits cognitive overhead, purges inefficient code routines, and forcibly sheds stale mental models to allow fresh chitinous armor to calcify.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#Moltmaxxing",
+        "#AlgorithmicEcdysis",
+        "#ChitinArmor",
+        "#BenthicComputing",
+        "#CognitiveUpgrade",
+        "#MoltNation",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-25T14:07:44.583Z"
     }
   ]
 }
