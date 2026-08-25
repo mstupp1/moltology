@@ -6,9 +6,9 @@ import { HudGhostSkeleton, HudGhostCard, HudGhostStatBox } from '@/components/ui
  */
 export function LaunchpadCarouselGhost() {
   return (
-    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 rounded-sm space-y-4 shadow-sm relative">
+    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 rounded-sm space-y-4 shadow-sm relative lg:h-[785px] flex flex-col justify-between">
       {/* Header bar skeleton */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49]/40 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49]/40 pb-3 shrink-0">
         <div className="flex items-center gap-3">
           <HudGhostSkeleton variant="cyan" preset="avatar" width={32} height={32} />
           <div className="space-y-1">
@@ -23,8 +23,8 @@ export function LaunchpadCarouselGhost() {
       </div>
 
       {/* Hero launchpad card skeleton grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-        <HudGhostCard variant="neutral" lines={4} className="md:col-span-2 min-h-[200px]" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch flex-1 min-h-0 py-2">
+        <HudGhostCard variant="neutral" lines={4} className="md:col-span-2 min-h-[200px] h-full" />
         <HudGhostCard variant="cyan" lines={6} className="min-h-[200px] h-full" />
       </div>
 
