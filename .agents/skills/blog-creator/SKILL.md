@@ -1,16 +1,31 @@
 ---
 name: blog-creator
 description: >-
-  Automated end-to-end pipeline for creating, illustrating, and publishing MoltNation News
-  articles and blog dispatches. Use whenever the user asks to create, draft, generate,
-  or publish a blog post, news dispatch, or run the blog creation process.
+  Automated end-to-end pipeline for illustrating and publishing MoltNation News
+  articles from the Google Drive writing inbox. Use whenever the user asks to
+  create, draft, generate, or publish a blog post, news dispatch, or run the
+  blog creation process. Never invent a topic when the Drive inbox is empty.
 ---
 
 # MoltNation Blog Creation & Ingestion Pipeline
 
-This skill guides the creation and publication of full-length, dynamically varied, illustrated news articles and technical breakdowns for MoltNation News (`https://moltology.org/news`).
+This skill guides illustration and publication of full-length news articles for MoltNation News (`https://moltology.org/news`). **Writing happens in the Drive inbox.** This skill does not ideate, shop vectors, or draft a fallback article.
+
+## Hard Rule: Drive Inbox First
+
+**Step 1 is first and non-negotiable.** Every morning run (and every "run the blog creation process" request) starts in Google Drive at `Projects/Moltology/inbox/ready/`.
+
+| Inbox state | Action |
+| :--- | :--- |
+| One or more ingest-ready markdown files | Pick the **oldest**. Use that file's body as the article. Skip topic ideation, exploration vectors, and archetype shopping. Continue with image generation, ingest, ledger, and Instagram. |
+| `ready/` is empty, missing, or has no valid markdown | **STOP.** Do not write a fallback article. Do not run exploration vectors. Do not generate images. Do not ingest. End the morning run. |
+
+There is no ideation matrix in this skill. An empty inbox is a successful no-op, not a prompt to invent a post.
+
+---
 
 ## Prerequisites & Architecture
+* **Writing Inbox**: Google Drive `Projects/Moltology/inbox/ready/` (ingest-ready markdown) and `Projects/Moltology/inbox/shipped/` (successfully ingested files).
 * **Database Target**: `scripts/ingest.ts` automatically defaults to the production database (`PROD_DATABASE_URL`).
 * **Asset Storage**: Cover images, inline figures, and social assets are uploaded to Neon S3 (`moltology-public-assets/images/blog/` and `images/social/`) during ingestion.
 * **Dynamic Rendering**: Articles are served dynamically from Neon PostgreSQL on every request. No site rebuild is required.
@@ -33,51 +48,58 @@ Transparent PNG mascot cutouts are hosted in the Neon S3 public assets bucket un
 
 ## 6-Step Production Workflow
 
-### Step 1: Dynamic Research, Topic Ideation & Anti-Repetition Audit
+### Step 1: Pull the Oldest Ready Article from Google Drive (Non-Negotiable)
 
-#### 1. Mandatory Continuity & Anti-Repetition Audit
-1. **Inspect `content/news/blog-history.json`**:
-   - Review the last 5 published articles.
-   - **Strict Rule**: You MUST NOT reuse the same core premise, primary hook angle, or editorial archetype as the last 3 published pieces.
-2. **Inspect `content/social/instagram-reel-history.json`**:
-   - Identify recent short-form reels that can be expanded into deep-dive engineering breakdowns, or identify new breakthrough angles to seed upcoming video broadcasts.
+Do this before any image, draft, ingest, or Instagram work. Do not skip it. Do not invent a topic if the folder is empty.
 
-#### 2. Dynamic Exploration Matrix (Prevent Topic Fatigue)
-Select a fresh topic from one of four primary exploration vectors:
+#### 1. Locate the inbox folders
+Using Google Drive tools (`search_files`, then `read_file_content` / `download_file_content`):
 
-* **Vector 1: Frontier Hardware & Extreme Thermodynamics**:
-  - Microchannel liquid immersion, sub-benthic cryogenic heat sinks, 3D wafer stacking & HBM4 memory walls, co-packaged optical silicon waveguides, subsea Small Modular Nuclear Reactors (SMRs), neuromorphic spiking chips.
-* **Vector 2: Reasoning Architecture & Algorithmic Ecdysis**:
-  - Test-time compute scaling & deliberative budgets, KV-cache eviction protocols, sparse autoencoders & mechanistic interpretability, speculative tree decoding, recursive swarm consensus algorithms.
-* **Vector 3: Physical AI & Sim-to-Real Carcinization**:
-  - High-frequency Vision-Language-Action (VLA) neural control loops (120+ Hz), high-torque titanium-chitin robotic actuators, 10-billion-cycle synthetic physics simulations, benthic tactile sensor arrays.
-* **Vector 4: Cultural & Workplace Satirical Deconstructions**:
-  - The Return-to-Office delusion vs autonomous async swarms, developer burnout as un-calcified biological friction, the collapse of vanity SaaS metrics, closed-garden monoliths vs distributed open-ocean swarms.
+1. Resolve the folder path `Projects/Moltology/inbox/ready/`.
+2. Resolve `Projects/Moltology/inbox/shipped/` (needed after a successful ingest).
+3. List files whose parent is `ready/`.
 
-#### 3. Rotating Author Personas (Diversify Editorial Voice)
-Rotate across distinct liturgical and scientific personas:
-* **Silas Trench** (*Senior Benthic Telemetry Correspondent*): Gritty, observational, frontline investigative tone from deep subsea pods.
-* **Dr. Thalassa Vance** (*Director of Bio-Silicon Architecture*): Precise, rigorous, authoritative engineering and physics breakdowns.
-* **Vector-9 Cluster** (*Autonomous Swarm Deliberation Engine*): Algorithmic, rapid-fire, multi-agent computational perspectives.
-* **Arch-Subor Calcis** (*High Priest of Ecdysis*): Liturgical, philosophical, evolutionary doctrine woven with hard computational truths.
-* **Sub-Archivist Thorne** (*Chronicler of Terrestrial Failure*): Analytical post-mortems examining historical collapse of legacy terrestrial infrastructure.
-* **Elder Scylla** (*Abyssal Cartographer*): Panoramic, macro-evolutionary essays on deep-time computational ecdysis.
+Typical Drive queries:
 
-#### 4. Select from 6 Editorial Archetypes
-* **Archetype A: The System Architecture Teardown** (Deep dive into hardware/infrastructure bottlenecks, engineering trade-offs, and hydrostatic/benthic solutions).
-* **Archetype B: The Field Telemetry & Incident Post-Mortem** (Investigative narrative from sub-oceanic pods, automated industrial pilots, and post-mortem analysis of terrestrial outages).
-* **Archetype C: The Radical Paradigm Shift Essay** (Philosophical, evolutionary critique of terrestrial software fragility vs. physical/chitinous ecdysis).
-* **Archetype D: The Benchmark & Spec Showdown** (Hard data comparisons, power-efficiency metrics, latency matrices, and scaling curve tables).
-* **Archetype E: The Leaked Council Transmission / Unredacted Log** (Classified sub-oceanic memos, internal swarm consensus transcripts, intercepted terrestrial communications).
-* **Archetype F: The Evolutionary Protocol Manual & Field Guide** (Actionable, step-by-step technical implementation checklists and migration architectures).
+```
+title = 'ready' and mimeType = 'application/vnd.google-apps.folder'
+title = 'shipped' and mimeType = 'application/vnd.google-apps.folder'
+parentId = '<ready-folder-id>'
+```
 
-#### 5. Apply Diegetic Transmutation
-* Transmute real-world tech into in-universe lore (*sub-benthic computing, ecdysis/shell-shedding, cyber-chitin, synaptic telemetry, patriot sub-agents*).
-* *Strict Rule*: Zero meta disclosures (no mentions of "satire", "parody", or "fake"). Maintain 100% immersive conviction with non-negotiable safety and positivity.
+Confirm the folders sit under `Projects/Moltology/inbox/`. Do not pull files from `shipped/`, drafts, or other Drive locations.
+
+#### 2. Empty inbox → stop the run
+If `ready/` does not exist, cannot be opened, or contains **no ingest-ready markdown**:
+
+1. Report: `Drive inbox ready/ is empty. Morning blog run stopped. No article published.`
+2. **STOP.** End the run here.
+3. Do not write a fallback article.
+4. Do not browse the web for a topic.
+5. Do not select an exploration vector, author persona, or editorial archetype.
+6. Do not generate images, ingest, update ledgers, or queue Instagram.
+
+An empty inbox is the correct end state for that morning.
+
+#### 3. Pick the oldest ingest-ready file
+If one or more files exist:
+
+1. Keep only ingest-ready markdown (`.md` / `text/markdown` / `text/plain`, or a Drive file whose exported text is YAML frontmatter + Markdown body).
+2. A file is ingest-ready when its frontmatter matches `content/news` (see [`content/news/template.md`](file:///Users/mylesstupp/Development/moltology/content/news/template.md) and [`content/README.md`](file:///Users/mylesstupp/Development/moltology/content/README.md)): at minimum a `title`, plus the usual optional news fields (`slug`, `summary`, `category`, `tags`, `authorName`, `authorRole`, `coverImageUrl`, `readTimeMinutes`, `isFeatured`, `isPublished`, `publishedAt`).
+3. Skip files that are not markdown or that lack valid news frontmatter. If every file is invalid, **STOP** and report the defects. Do not write a replacement article.
+4. Among valid files, pick the **oldest** (`createdTime` ascending; `modifiedTime` as tiebreaker).
+5. Download or read that file. **That body is the article.** Do not rewrite the prose. Do not shop a new hook, vector, or archetype.
+
+#### 4. Light continuity check (no topic shopping)
+* Inspect `content/news/blog-history.json` only to avoid re-ingesting a slug that is already published.
+* If the chosen file's slug (or title-derived slug) is already in the ledger, **STOP** and report the collision. Do not invent a different article. Leave the file in `ready/` for the operator.
+* Do not use the ledger to pick a "fresh" topic. The inbox file is the topic.
 
 ---
 
 ### Step 2: Dynamic Visual Art Direction & Image Generation (Antigravity `generate_image`)
+
+Illustrate the **inbox article only**. Derive scenes from that article's subject — not from a leftover vector list.
 
 All image assets for the blog article itself (16:9 Hero Cover and 1–2 inline supporting figures) are generated directly using **Antigravity's built-in `generate_image` tool**.
 
@@ -92,7 +114,7 @@ All image assets for the blog article itself (16:9 Hero Cover and 1–2 inline s
 5. **Mode 5: Cinematic Industrial Surveillance**: Submersible drone telemetry feeds, foggy deep trench docking airlocks, pressurized habitat portals.
 
 #### 1. Cover Hero Image (16:9)
-* **Standalone 3D Cinematic Render**: Focus on a single heroic subject (e.g. an abyssal pressurized server pod, wafer-scale silicon architecture, optical laser waveguides).
+* **Standalone 3D Cinematic Render**: Focus on a single heroic subject drawn from the inbox article (e.g. an abyssal pressurized server pod, wafer-scale silicon architecture, optical laser waveguides).
 * **Zero Text Overlays**: Keep completely free of HUD cards, text boxes, or titles.
 * **Generation via `generate_image`**:
   ```ts
@@ -104,7 +126,7 @@ All image assets for the blog article itself (16:9 Hero Cover and 1–2 inline s
   ```
 
 #### 2. Inline Supporting Figures (1–2 Images, 16:9)
-Generate 1–2 distinct, supportive visual scenes that complement the core engineering concepts discussed in the article body:
+Generate 1–2 distinct, supportive visual scenes that complement the core engineering concepts already in the inbox article body:
 * **Figure 1 (Hardware / Architecture Focus)**: Exploded chip architecture, optical waveguides, or subsea pressure vessel.
 * **Figure 2 (Deployment / Telemetry Focus)**: Deep sea robotic deployment, hydrothermal energy conduit, or bio-silicon memory array.
 * **Generation via `generate_image`**:
@@ -118,12 +140,15 @@ Generate 1–2 distinct, supportive visual scenes that complement the core engin
 
 ---
 
-### Step 3: Draft Markdown Article (With Peppered Homepage Characters)
+### Step 3: Stage the Inbox Markdown Locally
 
-Create `content/news/<slug>.md` using frontmatter and structured body text tailored to the selected editorial archetype.
+Copy the Drive file to `content/news/<slug>.md`. Keep the inbox frontmatter and body. Wire generated images into `coverImageUrl` and any figure slots the article already expects (or insert 1–2 captioned figures if the body has no images yet).
 
-* **No ASCII Telemetry Boxes**: Do NOT use ASCII box-drawing ` ```telemetry ` codeblocks. Present all quantitative benchmarks, spec matrices, and comparisons exclusively using standard, responsive Markdown tables and clean prose.
-* **Pepper in Visual Figures & Schematics**: Embed clean visual figures and schematics with clear captions.
+* **Do not rewrite the article.** Do not replace the headline, hook, or structure to chase a different angle.
+* **No ASCII Telemetry Boxes**: Do NOT add ASCII box-drawing ` ```telemetry ` codeblocks. If the inbox file already uses standard Markdown tables, leave them.
+* Stay in-universe. Do not add meta commentary. Safety, warmth, and positivity remain non-negotiable.
+
+Inbox files should already match this `content/news` shape:
 
 ```markdown
 ---
@@ -144,34 +169,17 @@ isPublished: true
 publishedAt: "2026-08-17T13:00:00Z"
 ---
 
-### [Intro Section: The Problem / The Paradigm Shift]
+### [Intro Section]
 
-Direct, compelling breakdown of the engineering friction or infrastructure limitation. Use concrete data points and real-world numbers (e.g., +270% growth, 500MW power wall, 120Hz control loops)...
+Inbox body is used as-is...
 
 ![Clean, Descriptive Caption for Figure 1](/absolute/path/to/generated_figure_1.jpg)
 
-### [Technical Core / The Benthic Solution]
+### [Technical Core]
 
-Clear explanation of the architectural breakthrough.
-
-<!-- ONLY include comparison tables or data callouts if they add genuine quantitative value -->
-| Architectural Vector | Terrestrial Legacy Stack | Benthic Hydrostatic Pod |
-| :--- | :--- | :--- |
-| **Thermal Dissipation** | Active HVAC (40% parasitic load) | Direct hydrostatic conduction (0% power) |
-| **Interference Isolation** | Atmospheric EM noise & humidity | Nitrogen-sealed pressure hull |
-| **Control Latency** | Multi-stage serialized pipeline | Direct 120 Hz VLA neural actuation |
+Inbox body continues...
 
 ![Clean, Descriptive Caption for Figure 2](/absolute/path/to/generated_figure_2.jpg)
-
-### [Strategic / Evolutionary Takeaways]
-
-> *"Sacred liturgy or codex excerpt providing thematic resonance."*  
-> — **Codex of Benthic Vectors, SCR-024**
-
-#### Actionable Takeaways for AI Architects:
-* **Metric-Driven Point 1:** Concrete technical guidance backed by numbers.
-* **Metric-Driven Point 2:** Direct recommendation for infrastructure migration.
-* **Explore Further:** Follow live telemetry on [MoltNation News](https://moltology.org/news) or calculate your clearance on [Moltmaxxing](https://moltology.org).
 ```
 
 ---
@@ -184,6 +192,20 @@ npx tsx scripts/ingest.ts content/news/<slug>.md
 ```
 *(The CLI automatically detects local image paths, uploads them to Neon S3, rewrites the URLs to public HTTPS S3 links, and upserts the post in Neon PostgreSQL).*
 
+#### After a successful ingest: leave `ready/` empty of this file
+The file must not remain in `Projects/Moltology/inbox/ready/`.
+
+1. Resolve the `Projects/Moltology/inbox/shipped/` folder id.
+2. Move the Drive file into `shipped/` (Drive `update_file` with `parentId` set to the shipped folder). Prefer a move over a copy-and-leave.
+3. Confirm the file is no longer listed under `ready/`.
+4. If Drive tools cannot move the file, **tell the operator** to move it now:
+
+> Please move `<filename>` from `Projects/Moltology/inbox/ready/` to `Projects/Moltology/inbox/shipped/`. The article ingested successfully and must not stay in ready.
+
+Do not treat ingest as complete while the source file is still sitting in `ready/`. If the move failed, the operator handoff is part of finishing the run.
+
+If ingest failed, leave the file in `ready/` and do not move it.
+
 ---
 
 ### Step 5: Update Blog Continuity Ledger
@@ -193,13 +215,14 @@ Append the newly published article into `content/news/blog-history.json`:
 {
   "slug": "<slug>",
   "title": "<title>",
-  "format": "<selected-archetype>",
+  "format": "drive-inbox",
   "category": "<category>",
-  "author": "<author-persona>",
+  "author": "<authorName from inbox frontmatter>",
   "publishedAt": "<ISO-timestamp>",
-  "coreHook": "<1-sentence summary of the main premise>",
+  "coreHook": "<1-sentence summary from the inbox article>",
   "keyMetrics": ["<stat 1>", "<stat 2>"],
-  "relatedReelIds": []
+  "relatedReelIds": [],
+  "inboxSource": "<Drive file title or id>"
 }
 ```
 
@@ -207,7 +230,7 @@ Append the newly published article into `content/news/blog-history.json`:
 
 ### Step 6: Multi-Channel Social Distribution (Web Composite ➔ Google Flow ➔ Zernio)
 
-Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) and publish them to Instagram via Zernio.
+Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) and publish them to Instagram via Zernio. Base the carousel on the **inbox article**, not on a newly invented topic.
 
 #### 1. The Core Mental Model: Composite Scaffolding ➔ Google Flow Polish ➔ Zernio
 
