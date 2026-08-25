@@ -30,8 +30,9 @@ describe('DailyRoutineWidget Component', () => {
 
     expect(screen.getByText('DAILY ALIGNMENT ROUTINE')).toBeInTheDocument()
     expect(screen.getByText('MANDATORY LITURGY')).toBeInTheDocument()
-    expect(screen.getByText(/STREAK CALENDAR & MATRIX/i)).toBeInTheDocument()
-    expect(screen.getByText(/CARAPACE ALIGNMENT STATUS/i)).toBeInTheDocument()
+    expect(screen.getByText(/STREAK CALENDAR \& MATRIX/i)).toBeInTheDocument()
+    expect(screen.getByText(/52-Week Activity/i)).toBeInTheDocument()
+    // CARAPACE ALIGNMENT STATUS card has been replaced by the activity heatmap
 
     // All 8 canonical tasks should be rendered
     CANONICAL_ALIGNMENT_TASKS.forEach((task) => {
@@ -41,6 +42,8 @@ describe('DailyRoutineWidget Component', () => {
     // Assert that no XP references are rendered on the widget
     expect(screen.queryByText(/XP/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/LEVEL 4 INITIATE/i)).not.toBeInTheDocument()
+    // Old carapace card should no longer exist
+    expect(screen.queryByText(/CARAPACE ALIGNMENT STATUS/i)).not.toBeInTheDocument()
   })
 
   it('toggles a task on click and updates completion count', () => {

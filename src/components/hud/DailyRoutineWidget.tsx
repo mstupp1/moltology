@@ -1,11 +1,252 @@
-import React, { useState } from 'react'
-import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Shield, Sparkles, Bell, BellOff, Zap } from 'lucide-react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
+import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Bell, BellOff, Zap } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { localDateString, shiftDays, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
+
+// ---------------------------------------------------------------------------
+// ActivityHeatmap — 52-week GitHub-style grid (Sun–Sat rows, weeks as cols)
+// ---------------------------------------------------------------------------
+const CELL = 14   // px — cell width & height
+const GAP  = 3    // px — gap between cells in a column (and between columns)
+const COL_W = CELL + GAP   // 17px per column (cell + right gap)
+const DOW_GUTTER = 32      // px — left gutter for day-of-week labels
+const MIN_MONTH_GAP = 3    // minimum columns between month label ticks
+
+interface HeatmapCell {
+  date: string
+  count: number
+  isToday: boolean
+  isFuture: boolean
+}
+
+function buildHeatmapGrid(
+  history: Array<{ date: string; completedCount: number }>,
+  todayDate: string,
+  totalTasks: number = TOTAL_ALIGNMENT_TASKS,
+  weeks = 52
+): { grid: HeatmapCell[][]; monthLabels: Array<{ label: string; colIndex: number }> } {
+  const countMap = new Map<string, number>()
+  for (const item of history) {
+    countMap.set(item.date, item.completedCount)
+  }
+
+  // Anchor end of grid to the Saturday of the week containing today
+  const todayObj = parseLocalDate(todayDate)
+  const todayDow = todayObj.getDay()                    // 0=Sun … 6=Sat
+  const daysToSat = (6 - todayDow + 7) % 7
+  const gridEnd = new Date(todayObj)
+  gridEnd.setDate(todayObj.getDate() + daysToSat)
+
+  // Grid starts 52 weeks back (Sun of that week)
+  const gridStart = new Date(gridEnd)
+  gridStart.setDate(gridEnd.getDate() - weeks * 7 + 1)
+
+  const cols: HeatmapCell[][] = []
+  const monthLabels: Array<{ label: string; colIndex: number }> = []
+  let lastMonth = -1
+  let lastLabelCol = -MIN_MONTH_GAP - 1               // allow first label at col 0
+
+  for (let w = 0; w < weeks; w++) {
+    const col: HeatmapCell[] = []
+    for (let d = 0; d < 7; d++) {
+      const cellDate = new Date(gridStart)
+      cellDate.setDate(gridStart.getDate() + w * 7 + d)
+
+      const dateStr = localDateString(cellDate)
+      const isToday = dateStr === todayDate
+      const isFuture = cellDate > todayObj && !isToday
+
+      col.push({ date: dateStr, count: isFuture ? 0 : (countMap.get(dateStr) ?? 0), isToday, isFuture })
+    }
+
+    // Month label: emit when month changes AND minimum gap from last label is respected
+    const refDate = parseLocalDate(col[0].date)
+    const month = refDate.getMonth()
+    if (month !== lastMonth && w - lastLabelCol >= MIN_MONTH_GAP) {
+      lastMonth = month
+      lastLabelCol = w
+      monthLabels.push({
+        label: refDate.toLocaleDateString('en-US', { month: 'short' }),
+        colIndex: w,
+      })
+    }
+
+    cols.push(col)
+  }
+
+  return { grid: cols, monthLabels }
+}
+
+function heatmapColor(count: number, isFuture: boolean, isToday: boolean): string {
+  if (isFuture) return 'bg-[#0d1414] border-[#1a2626]'
+  if (count === 0) return 'bg-[#0d1414] border-[#1e2e2e]'
+  if (count <= 2) return 'bg-[#00c3ff]/20 border-[#00c3ff]/25'
+  if (count <= 4) return 'bg-[#00c3ff]/55 border-[#00c3ff]/45'
+  if (count <= 6) return 'bg-emerald-600/80 border-emerald-500/70'
+  // 7–8: full or near-full — bright green at the peak
+  return isToday
+    ? 'bg-gradient-to-br from-emerald-400 to-[#00ff88] border-emerald-300 animate-pulse'
+    : 'bg-emerald-400 border-emerald-300/80'
+}
+
+interface ActivityHeatmapProps {
+  history: Array<{ date: string; completedCount: number }>
+  currentDate: string
+  totalTasks?: number
+}
+
+function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TASKS }: ActivityHeatmapProps) {
+  const [tooltip, setTooltip] = useState<{ cell: HeatmapCell; x: number; y: number } | null>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const { grid, monthLabels } = useMemo(
+    () => buildHeatmapGrid(history, currentDate, totalTasks),
+    [history, currentDate, totalTasks]
+  )
+
+  // Auto-scroll to the rightmost position (most recent week = today) on mount & whenever grid changes
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    // Small rAF delay so the DOM has laid out before we measure scrollWidth
+    const id = requestAnimationFrame(() => {
+      el.scrollLeft = el.scrollWidth
+    })
+    return () => cancelAnimationFrame(id)
+  }, [grid])
+
+  // DOW labels — only render on alternate rows to avoid crowding at small heights
+  const DOW_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const VISIBLE_DOW = new Set([0, 2, 4, 6]) // Sun, Tue, Thu, Sat
+
+  return (
+    <div className="bg-[#070b0b] border border-[#3a4a49] p-4 chamfer-corner space-y-3 text-xs">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-[#00c3ff]" />
+          <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider">
+            52-Week Activity
+          </span>
+        </div>
+        <span className="text-[10px] text-[#839493]">Daily tasks done</span>
+      </div>
+
+      {/* Scroll container — must have min-w-0 so it doesn't expand the parent */}
+      <div
+        ref={scrollRef}
+        className="overflow-x-auto pb-2 relative min-w-0"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+        onMouseLeave={() => setTooltip(null)}
+      >
+        {/* Inner content — w-max keeps everything together and lets overflow-x-auto work */}
+        <div className="w-max">
+          {/* Month labels row */}
+          <div className="flex mb-2">
+            {/* DOW gutter spacer */}
+            <div style={{ width: DOW_GUTTER }} className="shrink-0" />
+            {/* Relative container sized to exactly the grid width */}
+            <div
+              className="relative"
+              style={{ width: grid.length * COL_W, height: 16 }}
+            >
+              {monthLabels.map(({ label, colIndex }) => (
+                <span
+                  key={`${label}-${colIndex}`}
+                  className="absolute text-[10px] text-[#839493] font-sans"
+                  style={{ left: colIndex * COL_W }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Grid: DOW labels + week columns */}
+          <div className="flex items-start">
+            {/* Day-of-week labels — sized to match cell height + gap */}
+            <div
+              className="flex flex-col shrink-0 pr-2"
+              style={{ width: DOW_GUTTER, gap: GAP }}
+            >
+              {DOW_LABELS.map((label, i) => (
+                <div key={label} style={{ height: CELL }} className="flex items-center">
+                  <span
+                    className={`text-[9px] text-[#839493] leading-none ${VISIBLE_DOW.has(i) ? '' : 'invisible'}`}
+                  >
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Week columns */}
+            <div className="flex items-start" style={{ gap: GAP }}>
+              {grid.map((col, wIdx) => (
+                <div key={wIdx} className="flex flex-col" style={{ gap: GAP }}>
+                  {col.map((cell, dIdx) => (
+                    <div
+                      key={dIdx}
+                      className={`border rounded-[2px] cursor-pointer transition-opacity hover:opacity-70 ${heatmapColor(cell.count, cell.isFuture, cell.isToday)}`}
+                      style={{ width: CELL, height: CELL }}
+                      onMouseEnter={(e) => {
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                        const containerRect = scrollRef.current!.getBoundingClientRect()
+                        setTooltip({
+                          cell,
+                          x: rect.left - containerRect.left + scrollRef.current!.scrollLeft,
+                          y: rect.top - containerRect.top,
+                        })
+                      }}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tooltip — positioned inside the scrolling container so it tracks correctly */}
+          {tooltip && (
+            <div
+              className="absolute z-30 pointer-events-none bg-[#0b1010] border border-[#00c3ff] px-2 py-1 text-[10px] whitespace-nowrap text-[#dfe3e3] shadow-lg chamfer-corner"
+              style={{
+                left: tooltip.x + 16,
+                top: tooltip.y - 36,
+              }}
+            >
+              <span className="text-[#00c3ff] font-bold">{tooltip.cell.date}</span>
+              {' — '}
+              {tooltip.cell.isFuture
+                ? 'future'
+                : tooltip.cell.count === 0
+                ? 'no tasks done'
+                : `${tooltip.cell.count} / ${totalTasks} tasks done`}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-2 pt-1 border-t border-[#3a4a49]/40">
+        <span className="text-[10px] text-[#839493]">Less</span>
+        {[0, 2, 4, 6, 8].map((lvl) => (
+          <div
+            key={lvl}
+            className={`border rounded-[2px] ${heatmapColor(lvl, false, false)}`}
+            style={{ width: CELL, height: CELL }}
+          />
+        ))}
+        <span className="text-[10px] text-[#839493]">More</span>
+      </div>
+    </div>
+  )
+}
+
 
 export interface DailyRoutineWidgetProps {
   isLoading?: boolean
@@ -18,6 +259,8 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
     totalCount,
     streakDays,
     streakHistory,
+    history,
+    currentDate,
     isLoading: isAlignmentLoading,
     toggleTask,
   } = useDailyAlignment()
@@ -217,55 +460,11 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
               </div>
             </div>
 
-            {/* Carapace Alignment Status Card */}
-            <div className="bg-[#070b0b] border border-[#3a4a49] p-3.5 chamfer-corner space-y-3 text-xs">
-              <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">
-                <span className="flex items-center gap-1.5 text-[#00c3ff] font-bold font-grotesk text-xs uppercase">
-                  <Shield className="w-4 h-4 text-[#00c3ff]" /> CARAPACE ALIGNMENT STATUS
-                </span>
-                <span className="text-emerald-400 text-[10px] font-bold">
-                  {completedCount === totalCount ? 'OPTIMAL' : 'ACTIVE'}
-                </span>
-              </div>
 
-              <div className="space-y-2 text-[11px]">
-                <div className="flex items-center justify-between bg-[#0f1414] p-2 border border-[#3a4a49]">
-                  <span className="text-[#839493] flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#00c3ff]" /> DAILY COMPLIANCE
-                  </span>
-                  <span className="text-[#00c3ff] font-bold">
-                    {completedCount === totalCount ? '100% COMPLETE' : `${completedCount}/${totalCount} LOGGED`}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between bg-[#0f1414] p-2 border border-[#3a4a49]">
-                  <span className="text-[#839493] flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5 text-[#ff453a]" /> ACTIVE STREAK
-                  </span>
-                  <span className="text-[#ffb076] font-bold">{streakDays} DAYS</span>
-                </div>
-
-                <div className="flex items-center justify-between bg-[#0f1414] p-2 border border-[#3a4a49]">
-                  <span className="text-[#839493] flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-yellow-400" /> LITURGY PROTOCOL
-                  </span>
-                  <span className="text-yellow-400 font-bold">
-                    {completedCount === totalCount ? 'ALL VERIFIED' : 'IN PROGRESS'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Badges Ribbon */}
-              <div className="pt-1 flex flex-wrap items-center justify-between gap-1 text-[10px]">
-                <span className="text-[#839493]">STATUS MATRIX:</span>
-                <div className="flex items-center gap-1">
-                  <HudBadge variant="cyan">🛡️ CARAPACE STABLE</HudBadge>
-                  <HudBadge variant="sacred">🔥 BENTHIC SYNC</HudBadge>
-                  <HudBadge variant="emerald">⚡ DISCIPLINE</HudBadge>
-                </div>
-              </div>
-            </div>
+            {/* 52-Week Activity Heatmap */}
+            <ActivityHeatmap history={history} currentDate={currentDate} />
           </div>
+
         </div>
       </HudCard>
     </HudGhostWidget>
