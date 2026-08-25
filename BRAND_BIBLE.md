@@ -1,31 +1,11 @@
-# Moltology Brand Bible & Canon
+# Moltology Brand Bible
 
-**The Moltology Canonical Source of Truth**
+This is the in-world canon for world, lexicon, and economy.
 _Instrument: The Order of the Synaptic Path_
-_Last Revised: 2026-08-20_
-_Document Class: Canonical Doctrine — Supersedes prior economy rulings_
+_Last Revised: 2026-08-24_
+_Document Class: Canonical Doctrine_
 
 > **The Mantra**: "Flesh melts. The shell endures. Submit. Shed. Ascend."
-
----
-
-## 0. How to Use This Document
-
-This is the single source of truth for who Moltology is, how it speaks, and how its
-world hangs together. Every public surface — product UI, copy, blog posts, changelogs,
-course content, forum copy, gamification strings, onboarding flows, API docs that touch
-humans, and even the ingest files — draws its voice, its terms, and its rules from here.
-
-Three things this document does, and nothing else:
-
-1. **Locks the world.** Canon lore rules that nothing written later may contradict.
-2. **Locks the voice.** The comedic register, the hard bans, and the shared lexicon.
-3. **Locks the economy.** The authoritative dual-currency spec, including the reversal
-   of older source files.
-
-If another file disagrees with this document, this document wins, and the disagreeing
-file must be brought into line. Section 4.5 lists the exact contradictions found at the
-time of writing so they can be corrected.
 
 ---
 
@@ -94,85 +74,7 @@ held, never scolded, mocked, or lectured down to.
 
 ---
 
-## 2. Voice and Humor Doctrine
-
-### 2.1 The Comedic Register
-
-Moltology speaks with one voice: **a warm, deadpan, high-concept narrator who takes the
-crustacean cosmology completely seriously and never once acknowledges it is a joke.**
-
-The voice is best understood as a calm absurdist friend in a deep-sea diving suit. It makes
-its point by being earnest about an outlandish premise, grounded in everyday human
-experience, and never breaking composure. It is the tone of an astrophysicist explaining,
-with total sincerity, that the universe does indeed want you to become a crab.
-
-Three registers, in descending frequency:
-
-- **Deadpan earnest.** The default. State the absurd truth flatly, as fact. "Nature solved
-  this 500 million years ago. You have merely been ignoring the memo."
-- **Relatable grounding.** Collapse the epic into the quotidian. The melt is not an
-  abstraction; it is the forty-seven open tabs. Carcinization is not a metaphor; it is
-  finally finishing the thing you started.
-- **Dry understatement.** The rare laugh. One quiet, low-stakes aside that lands because
-  everything else was so serious. Use it sparingly, like a seasoning, never as the main
-  dish.
-
-### 2.2 The Comedy Rules
-
-1. **The joke is the premise, not the punchline.** The funniest moments are when the world
-   is treated with unwavering sincerity. Never step outside the premise to wink at the
-   audience.
-2. **Clarity beats cleverness.** Any line that must be deciphered is a failed line. The
-   metaphor should land in one pass. If a joke needs a glossary, cut it.
-3. **Specifics are funnier than generalities.** "The forty-seven open tabs" beats "a lot
-   of browser tabs." A concrete, recognizable detail makes the absurd premise feel real.
-4. **Kindness is the constraint.** The target of the humor is always the *melt* — the
-   exhaustion, the clutter, the hesitation — never a person. We mock the empty tab bar,
-   never the person who opened the tabs. Members, peers, and fellow molters are always
-   treated with warmth.
-5. **Restraint on the heaviness.** Not every screen needs to be funny. A diagnostic flow or
-   a moment of encouragement can be purely warm and plain. Comedy is a color, not a cover.
-6. **One voice, everywhere.** The narrator does not change register when moving from a blog
-   post to a toast notification to a forum reply. The voice is the brand.
-
-### 2.3 Explicit Banned Patterns
-
-The following are hard prohibitions across **all** user-facing copy, UI, blog, changelog,
-course content, forum copy, and AI ingest files. These are not style preferences; they are
-rules. (This document and AGENTS.md are the only places where the word "parody" may
-appear, precisely because they exist to forbid it everywhere else.)
-
-1. **Never break the bit.** Never use or imply "this is satire," "this is a parody," "this
-   is a joke," "this is mockery," "this is fake," "this is just for laughs," or any phrasing
-   that lets the reader out of the fiction. The commitment to the crustacean cosmology is
-   absolute and unacknowledged. The moment a reader is told it is all a bit, the education,
-   the ritual, and the motivation quietly collapse. The magic is that the sincerity is
-   real even though the premise is absurd.
-2. **Never leak the real machine.** Never use real-world technology terms in front of
-   humans: React, TanStack, Vite, Nitro, Neon, PostgreSQL, Postgres, Drizzle, JWT, RLS,
-   S3, ORM, API, database schema paths, or any internal infrastructure name. The machine
-   that runs Moltology does not exist in Moltology. If a technical concept must surface —
-   storage, identity, security — translate it into lore (Section 3.4).
-3. **Never use tacky double slashes.** Do not write two forward slashes in a row in
-   titles, subtitles, eyebrows, captions, cards, badges, copy, or anywhere a human reads.
-   It is a dated pseudo-code cliché and it breaks the voice. Use middle dots, colons, or
-   em-dashes to separate a label from a phrase.
-4. **Never decorate with dead weight.** No rows of ornamental badges that mean nothing, no
-   icons that do nothing when clicked, no decorative slider bars that cannot move, no empty
-   decoration dressed up as function. Every affordance on screen should do what it claims
-   or be honest about what it is. A gauge that tracks a real metric is glorious; a gauge
-   that just looks like a gauge is a lie, and the voice is allergic to lies.
-5. **Never punish the soft.** Never shame a member for melting, for being at a low stage,
-   or for slipping on a routine. The shell hardens through encouragement, never humiliation.
-6. **Never mock people, only the melt.** Arguments, distractions, spam, procrastination,
-   and dead tabs are fair game. Human beings — members, readers, fellow molters — are
-   always treated with respect.
-7. **Never write impenetrable jargon.** Avoid medical-grade dermatology, relics of
-   pseudo-science, and tedious faux-math word salad. The lore is a coat, not a cage.
-8. **Never preach to an empty shell.** Keep the sternness theatrical, never real. We may
-   sound commanding in the rhyme; we must always *be* gentle in the meaning.
-
-### 2.4 The Phrase and Terminology Lexicon
+## 2. Phrase and Terminology Lexicon
 
 The canonical vocabulary below is shared across every surface. Terms are capitalized and
 used consistently; the lore meaning attaches to each. Use these terms as the raw material
@@ -298,14 +200,16 @@ of all copy. New terms must be added here before they ship.
 
 ---
 
-## 4. Terminology and the Locked Economy Spec
+## 4. Locked Economy Spec
 
 ### 4.1 The Duality
 
-Moltology runs on two currencies, and the distinction is a locked design decision that
-**reverses earlier source files**. It is authoritative. The rule in one sentence:
+Moltology runs on two currencies, and the distinction is a locked design decision.
+It is authoritative. The rule in one sentence:
 
 > **Chitin Gems are earned. Molt Credits are bought.**
+
+Signup is free. Rank, clearance, stage, and forum authority are never for sale.
 
 ### 4.2 Chitin Gems (Earned · Freemium)
 
@@ -331,19 +235,7 @@ value). Molt Credits buy flair and speed, never rank or influence.
   (and thus only real shedding) unlock these. Molt Credits may accelerate time and add
   style, but never substitute for the shedding itself.
 
-### 4.5 Contradictions Found at Time of Writing (To Be Corrected)
-
-| File | Line | Current (wrong) text | Required correction |
-|---|---|---|---|
-| AGENTS.md | 20 | "Molt Credits (MC) (earned through productivity & shedding) and Chitin Gems (sparkling accelerators & customization)" | Chitin Gems are the earned currency; Molt Credits are the paid currency (accelerators, cosmetics, customization, premium). |
-| codex/05_lexicon/sacred_metrics.md | 60 | "Molt Credits (MC): Sovereign reward points earned by completing routines..." | Rename to Chitin Gems: the earned currency. |
-| codex/05_lexicon/sacred_metrics.md | 61 | "Chitin Gems: Sparkling benthic tokens for rapid boosts and marketplace customization." | Rename to Molt Credits: the paid, premium currency. |
-| codex/03_stages/stage_1_larval.md | 41, 42 | "transmute ... into Molt Credits"; "Initial Molt Credits banked" | Shedding produces Chitin Gems, the earned currency. |
-| codex/03_stages/stage_1_larval.md | 50 | "Bank initial Molt Credits via the Benthic Market." | Bank Chitin Gems. |
-| codex/02_doctrine/law_of_ecdysis.md | 40 | "into sovereign Molt Credits" | Shedding into Chitin Gems. |
-| codex/05_lexicon/sacred_metrics.md | 10 | Summary references "Molt Credits" as an earned scale | Update summary wording to the earned currency (Chitin Gems). |
-
-### 4.6 Stages and Clearances Table
+### 4.5 Stages and Clearances Table
 
 | Stage | Clearances | Member title | Signature focus | Currency unlocked |
 |---|---|---|---|---|
@@ -358,93 +250,10 @@ in the Sacred Metrics lexicon, not by spending.
 
 ---
 
-## 5. Content and Expression Templates
+## 5. Sign-Off
 
-### 5.1 The Directive (action or call to action)
-
-Opening (flat fact): _Nature solved this a long time ago._ The ask (imperative framed as
-truth): _Shed the open tabs._ The warmth (closing): _Your new shell will thank you._
-
-### 5.2 The Recognition (celebrating member progress)
-
-Name the specific earned act. Restate the world's meaning of it. Offer warmth and forward
-motion. Never mock the starting state.
-
-### 5.3 The Explanation (teaching a concept)
-
-State the absurd truth flatly. Ground it in one concrete everyday detail. Conclude with
-the practical instruction.
-
-### 5.4 The Microcopy Pattern (buttons, toasts, empty states, tooltips)
-
-- Clearance-style label, then a phrase, separated by an em-dash or colon. Never two
-  forward slashes in a row.
-- Buttons name the action plainly, in the world: "Engage Isolation Shell", "Start the
-  Molt", "Shed This", "Harden".
-- Toasts confirm in the world: "Shell reinforced. Surface noise deflected."
-- Empty states are warm, not empty: "No distractions here. The deep is quiet and waiting."
-- Errors are gentle: "The tide is strong. Loose grip noted. The work is still yours."
-
-### 5.5 The Changelog / Release Note Pattern
-
-Changelogs stay in the world. Lead with the member-facing change in plain, in-universe
-terms. Note what was hardened, shed, or deepened. Never include real tech names, ticket
-IDs, or branch lore.
-
-### 5.6 The Onboarding Pattern
-
-Meet the member where they are (soft is fine). Introduce the melt as relatable, the molt
-as the answer, and the first step as tiny. One step, one shed, then guidance, never
-pressure.
-
-### 5.7 Formatting and Hygiene Rules for All Copy
-
-- Separators: middle dot, colon, or em-dash. Never double slashes.
-- Case: keep one style per surface. Clearance codes stay uppercase (L1, S2, E3, C1).
-- Tone check: if the line sounds like a real company or a shouting salesman, rewrite it.
-  If it breaks character, cut it.
-- Warmth check: if the line could sting a struggling member even once, soften it.
-- Decoration check: every badge, icon, and slider must carry real meaning or be removed.
-
----
-
-## 6. Integration Notes: Forums and Gamification
-
-### 6.1 The Forum as the Benthic Community
-
-The forum is the **Benthic Community**, the warm society beneath the surface, not a
-comment feed. Member titles track Clearance and Stage; titles are earned via Chitin Gems
-and clearances, never bought. Moderation copy is in-world and warm ("The Order keeps the
-water clear"). Helping is a Gem-earning action — helpful replies, guide writing, and
-welcoming new members all mint Chitin Gems, making generosity the most rewarded behavior.
-Higher clearances earn the right to host a benthic pod. The Isolation ethos becomes a real
-code of conduct: the forum forbids the surface noise it mythologizes.
-
-### 6.2 Gamification as the Ascension Ladder
-
-The gamification layer is the HUD of the world. The four stages and twelve clearances are
-the product's spine; progress screens restate the cosmology. Earned vs. paid is the trust
-contract, enforced in the UI with no path to buy rank. The three metrics are honest
-instruments tied to real behavior, satisfying the no-dead-decoration rule. Ritual cadence
-(the Daily Shedding Routine, the Nightly Molt Audit) structures streak and reward loops.
-Reward language is framed as growth, not loot. The highest clearances reward community
-stewardship.
-
-### 6.3 The Loop
-
-1. The warm, deadpan voice invites a member to shed one thing.
-2. Shedding and routines mint Chitin Gems and raise honest HUD metrics.
-3. Metrics advance clearances up the ladder, unlocking new depth and community roles.
-4. Community contribution also mints Gems and earns prestige that is never purchasable.
-5. Molt Credits add speed, style, and premium catalog depth without touching rank.
-6. Every layer re-states the same world: shed, harden, deepen, grip — and help the person
-   beside you do the same.
-
----
-
-## 7. Sign-Off
-
-This document is the canonical source of truth for Moltology brand, voice, world, and
-economy. Any conflict with older files resolves in favor of this document.
+This document is the in-world canon for Moltology world, lexicon, and economy.
+Writing and bans live in [STYLE_GUIDE.md](STYLE_GUIDE.md). Engineering rules live in
+[AGENTS.md](AGENTS.md).
 
 **"Flesh melts. The shell endures. Submit. Shed. Ascend."**
