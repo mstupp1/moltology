@@ -127,8 +127,8 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
 
-  // News Feed State
-  const [posts, setPosts] = useState<BlogPostData[]>(INITIAL_BLOG_POSTS)
+  // News Feed State (capped at 20 most recent articles)
+  const [posts, setPosts] = useState<BlogPostData[]>(() => INITIAL_BLOG_POSTS.slice(0, 20))
   const [activeNewsPost, setActiveNewsPost] = useState<BlogPostData | null>(null)
   const [featuredNewsIndex, setFeaturedNewsIndex] = useState(0)
   const [isNewsAutoPlay, setIsNewsAutoPlay] = useState(true)
@@ -139,7 +139,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
       try {
         const fetched = await getBlogPostsFn()
         if (isMounted && fetched && fetched.length > 0) {
-          setPosts(fetched as BlogPostData[])
+          setPosts((fetched as BlogPostData[]).slice(0, 20))
         }
       } catch {
         // graceful fallback to INITIAL_BLOG_POSTS
@@ -308,15 +308,15 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
         )}
 
         {/* Master Bento Box Container */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 items-stretch lg:h-[785px]">
           {/* Bento Tile 1: Massive Hero Directive Visual Stage (8 cols) */}
-          <div className="lg:col-span-8 flex flex-col">
+          <div className="lg:col-span-8 flex flex-col h-full min-h-0">
             <HudCard
               variant="teal"
               className="p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl relative overflow-hidden transition-all duration-300 h-full flex flex-col justify-between border-[#00c3ff]/40 space-y-2.5 sm:space-y-3"
             >
               {/* Header Bar */}
-              <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2 sm:pb-2.5 gap-2">
+              <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2 sm:pb-2.5 gap-2 shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
                   <Layers className="w-4 h-4 text-[#00ffff] shrink-0" />
                   <h2 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] tracking-widest uppercase truncate">
@@ -419,7 +419,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
               </div>
 
               {/* Bottom Minimal HUD Tab Rail */}
-              <div className="grid grid-cols-6 gap-1.5 sm:gap-2 pt-0.5">
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2 pt-0.5 shrink-0">
                 {LAUNCHPAD_MODULES.map((mod, idx) => (
                   <button
                     key={mod.id}
@@ -446,9 +446,9 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
           </div>
 
           {/* Right Column: MoltNation News Feed (4 cols, full height) */}
-          <div className="lg:col-span-4 flex flex-col min-h-0">
+          <div className="lg:col-span-4 flex flex-col h-full min-h-0">
             <div
-              className="chitin-card p-3 sm:p-3.5 chamfer-corner space-y-2 shadow-2xl relative overflow-hidden border border-[#3a4a49] h-full flex flex-col justify-between"
+              className="chitin-card p-3 sm:p-3.5 chamfer-corner space-y-2 shadow-2xl relative overflow-hidden border border-[#3a4a49] h-full flex flex-col justify-between min-h-0"
               onMouseEnter={() => setIsNewsHovered(true)}
               onMouseLeave={() => setIsNewsHovered(false)}
             >
@@ -468,7 +468,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
 
                   <div className="flex items-center gap-2 text-xs shrink-0">
                     <span className="text-[9px] font-sans text-[#839493]">
-                      <span className="text-[#00ffff] font-bold">0{featuredNewsIndex + 1}</span> / 0{posts.length}
+                      <span className="text-[#00ffff] font-bold">{String(featuredNewsIndex + 1).padStart(2, '0')}</span> / {String(posts.length).padStart(2, '0')}
                     </span>
 
                     <button
@@ -498,7 +498,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   </div>
                 </div>
 
-                {/* Featured Article Card (Auto-cycled periodically with smooth fade) */}
+                {/* Featured Article Card */}
                 {currentNewsPost && (
                   <div
                     key={currentNewsPost.slug}
@@ -514,7 +514,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                         />
                         <div className="absolute top-1 left-1 flex items-center gap-1">
                           <span className="bg-[#ff5540]/90 text-white font-extrabold font-sans text-[7px] px-1 py-0.2 uppercase tracking-widest chamfer-corner border border-red-400">
-                            FEATURED 0{featuredNewsIndex + 1}
+                            FEATURED {String(featuredNewsIndex + 1).padStart(2, '0')}
                           </span>
                           <span className="bg-[#0b0f0f]/90 text-[#00ffff] font-sans text-[7px] px-1 py-0.2 uppercase tracking-wider chamfer-corner border border-[#00ffff]/40">
                             {currentNewsPost.category}
@@ -590,7 +590,7 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
               {/* Bottom Quick Action */}
               <button
                 onClick={() => navigate({ to: '/news' })}
-                className="w-full py-1 bg-[#070b0b] hover:bg-[#0f1414] border border-[#3a4a49] hover:border-[#00ffff]/60 text-[9px] font-bold font-grotesk text-[#00ffff] uppercase tracking-wider chamfer-corner transition-all flex items-center justify-center gap-1 shrink-0"
+                className="w-full py-1 bg-[#070b0b] hover:bg-[#0f1414] border border-[#3a4a49] hover:border-[#00ffff]/60 text-[9px] font-bold font-grotesk text-[#00ffff] uppercase tracking-wider chamfer-corner transition-all flex items-center justify-center gap-1 shrink-0 mt-2"
               >
                 <span>VIEW MORE ON MOLTNATION NEWS</span>
                 <ExternalLink className="w-2.5 h-2.5" />
