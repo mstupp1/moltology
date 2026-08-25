@@ -36,6 +36,7 @@ import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
 import { Route as HudPodcastsRouteImport } from './routes/_hud/podcasts'
 import { Route as HudSubterraneanRouteImport } from './routes/_hud/subterranean'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
@@ -193,6 +194,11 @@ const HudSupportRoute = HudSupportRouteImport.update({
   path: '/support',
   getParentRoute: () => HudRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/podcasts': typeof HudPodcastsRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
+  '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/podcasts': typeof HudPodcastsRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
+  '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   '/_hud/podcasts': typeof HudPodcastsRoute
   '/_hud/subterranean': typeof HudSubterraneanRoute
   '/_hud/support': typeof HudSupportRoute
+  '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/codex/md': typeof CodexMdRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/podcasts'
     | '/subterranean'
     | '/support'
+    | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/codex/md'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/podcasts'
     | '/subterranean'
     | '/support'
+    | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/codex/md'
@@ -588,6 +599,7 @@ export interface FileRouteTypes {
     | '/_hud/podcasts'
     | '/_hud/subterranean'
     | '/_hud/support'
+    | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/codex/md'
@@ -627,6 +639,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRouteWithChildren
+  ApiChatRoute: typeof ApiChatRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
   CodexMdRoute: typeof CodexMdRoute
@@ -832,6 +845,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/support'
       preLoaderRoute: typeof HudSupportRouteImport
       parentRoute: typeof HudRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
@@ -1092,6 +1112,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRouteWithChildren,
+  ApiChatRoute: ApiChatRoute,
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
   CodexMdRoute: CodexMdRoute,
@@ -1109,12 +1130,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
