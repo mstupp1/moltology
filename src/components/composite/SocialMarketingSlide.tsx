@@ -31,6 +31,7 @@ export interface SocialMarketingSlideProps {
     | 'benthic-app'
     | 'sacred-codex'
     | 'pincer-routine'
+    | 'free-access'
     | string
   eyebrowBadge?: string
   headlinePart1?: string
@@ -266,6 +267,49 @@ const CAMPAIGN_PRESETS: Record<string, Partial<SocialMarketingSlideProps>> = {
         title: '21:00 CALCIFICATION',
         description: 'Noise-free recovery chamber to forge armor',
         badgeVariant: 'emerald',
+      },
+    ],
+  },
+  'free-access': {
+    eyebrowBadge: 'FREE ACCOUNT · EARLY ACCESS NOW OPEN',
+    headlinePart1: 'YOUR CLEARANCE SLOT',
+    headlinePart2: 'IS WAITING.',
+    headlineHighlight: 'CLAIM IT FREE.',
+    subHeadline: 'Early Access Registration — No Credits Required!',
+    mockupType: 'tablet',
+    bookTitle: 'EARLY ACCESS',
+    bookSubtitle: 'BENTHIC REGISTRY CLEARANCE',
+    bookTagline: 'FREE · STAGE 1 · CARCINIZATION',
+    trustBadgeText: 'FREE ACCOUNT',
+    trustBadgeYear: 'EARLY ACCESS',
+    quoteText: 'Register free. Audit your shell. Begin the molt. The window is open — for now.',
+    commentKeyword: 'ACCESS',
+    commentCtaText: 'Comment "ACCESS" below',
+    mascot: 'lobster_thumbs_up',
+    benefits: [
+      {
+        icon: 'shield',
+        title: 'SHELL DIAGNOSTICS',
+        description: 'Your baseline carapace hardness score',
+        badgeVariant: 'cyan',
+      },
+      {
+        icon: 'chart',
+        title: '15-STAGE AUDIT',
+        description: 'Full biometric Moltmaxxing profile',
+        badgeVariant: 'amber',
+      },
+      {
+        icon: 'check',
+        title: 'CODEX ACCESS',
+        description: '12 foundational scriptures — free',
+        badgeVariant: 'emerald',
+      },
+      {
+        icon: 'depth',
+        title: 'BENTHIC COMMUNITY',
+        description: 'The warm society beneath the surface',
+        badgeVariant: 'cyan',
       },
     ],
   },

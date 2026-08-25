@@ -64,6 +64,7 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
 | **Benthic Core App** | Bio-Silicon Agentic OS | `APP` or `INITIATE` | 3D Holographic Terminal & Dashboard | `https://moltology.org` |
 | **Sacred Codex** | 12 Canonical Scriptures | `CODEX` or `SHED` | 3D Cybernetic Tome & Gold Rays | `https://moltology.org/codex` |
 | **24-Hour Routine** | Tactical Blueprint Sheet | `ROUTINE` | 3D Tactical Dossier & Clipboard | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` |
+| **Free Early Access** | Benthic Registry Clearance | `ACCESS` or `JOIN` | 3D Holographic Terminal & Dashboard | `https://moltology.org` |
 
 ---
 
@@ -162,10 +163,12 @@ npm run post:create -- --theme moltmax-quiz --mascot crab_stats
 npm run post:create -- --theme benthic-app --mascot lobster_thumbs_up
 npm run post:create -- --theme sacred-codex --mascot lobster_pointing
 npm run post:create -- --theme pincer-routine --mascot crab_stats
+npm run post:create -- --theme free-access --mascot lobster_thumbs_up
 
 # 2. Ingest Polished Google Flow Image & Stage to Zernio Queue:
 npm run post:create -- --theme moltmaxxing-guide --polished-image tmp/post_polished.png
 
 # 3. Dry Run Preview (Generates scaffolding locally in tmp/ without S3 upload):
 npm run post:create -- --theme moltmaxxing-guide --dry-run
+npm run post:create -- --theme free-access --dry-run
 ```
