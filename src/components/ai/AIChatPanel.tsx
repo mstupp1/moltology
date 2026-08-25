@@ -16,7 +16,8 @@ import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
-import { sendChatMessageFn, getAIMessagesFn, getAIThreadsFn } from '../../lib/server/api'
+import { getAIMessagesFn, getAIThreadsFn } from '../../lib/server/api'
+import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
 import { authClient } from '../../lib/auth-client'
@@ -227,8 +228,36 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       timestamp: getTimeString(),
     }
 
-    setMessages((prev) => [...prev, userMsg])
+    const assistantId = (Date.now() + 1).toString()
+    setMessages((prev) => [
+      ...prev,
+      userMsg,
+      {
+        id: assistantId,
+        role: 'assistant',
+        content: '',
+        timestamp: getTimeString(),
+        isGuest: isGuest,
+      },
+    ])
     setIsSending(true)
+
+    const applyThreadId = (newThreadId: string) => {
+      if (!newThreadId || newThreadId === activeThreadId) return
+      loadedThreadIdRef.current = newThreadId
+      if (oracle) {
+        oracle.setActiveThreadId(newThreadId)
+        oracle.refreshThreads()
+      } else {
+        setLocalActiveThreadId(newThreadId)
+        if (userId) {
+          refreshLocalThreads()
+        }
+      }
+      if (onThreadCreated) {
+        onThreadCreated(newThreadId)
+      }
+    }
 
     try {
       const payloadMessages = [...messages, userMsg].map((m) => ({
@@ -236,41 +265,36 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         content: m.content,
       }))
 
-      const res = await sendChatMessageFn({
-        data: {
-          messages: payloadMessages,
-          userId: userId || undefined,
-          threadId: activeThreadId || undefined,
-          model: selectedModelId,
+      const res = await streamOracleChat({
+        messages: payloadMessages,
+        userId: userId || undefined,
+        threadId: activeThreadId || undefined,
+        model: selectedModelId,
+        onThreadId: applyThreadId,
+        onChunk: (fullText) => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, content: fullText } : m))
+          )
         },
       })
 
-      if (res?.threadId && res.threadId !== activeThreadId) {
-        loadedThreadIdRef.current = res.threadId
-        if (oracle) {
-          oracle.setActiveThreadId(res.threadId)
-          oracle.refreshThreads()
-        } else {
-          setLocalActiveThreadId(res.threadId)
-          if (userId) {
-            refreshLocalThreads()
-          }
-        }
-        if (onThreadCreated) {
-          onThreadCreated(res.threadId)
-        }
+      if (res.threadId) {
+        applyThreadId(res.threadId)
       }
 
-      const assistantMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: res?.text || 'The Oracle acknowledges your query.',
-        timestamp: getTimeString(),
-        isGuest: Boolean((res as any)?.isGuest || isGuest),
-      }
-
-      setMessages((prev) => [...prev, assistantMsg])
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? {
+                ...m,
+                content: res.text || 'The Oracle acknowledges your query.',
+                isGuest: Boolean(res.isGuest || isGuest),
+              }
+            : m
+        )
+      )
     } catch (err: any) {
+      setMessages((prev) => prev.filter((m) => !(m.id === assistantId && !m.content)))
       setErrorMessage(err.message || 'Something went wrong sending your message. Please try again.')
     } finally {
       setIsSending(false)
@@ -592,8 +616,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   user={msg.role === 'user' ? user : undefined}
                 >
                   <MessageContent>
-                    <MessageResponse>{msg.content}</MessageResponse>
-                    {msg.role === 'assistant' && (msg.isGuest || isGuest) && (
+                    {msg.content ? (
+                      <MessageResponse>{msg.content}</MessageResponse>
+                    ) : null}
+                    {msg.role === 'assistant' && (msg.isGuest || isGuest) && msg.content && (
                       <div className="mt-2 pt-2 border-t border-[#ff453a]/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#0e0506]/85 px-2.5 py-1.5 chamfer-corner border border-[#ff453a]/30 shadow-[0_0_12px_rgba(255,69,58,0.06)]">
                         <div className="text-[10.5px] text-red-200/90 font-sans flex items-center gap-1.5 min-w-0">
                           <Shield className="w-3 h-3 text-[#ff453a] shrink-0" />
@@ -615,11 +641,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   </MessageContent>
                 </Message>
               ))}
-              {isSending && (
+              {isSending && !messages.some((m) => m.role === 'assistant' && m.content) && (
                 <div className="flex items-center space-x-2 text-cyan-400 text-xs py-1">
                   <img
                     src={getAssetUrl('/images/order_emblem.png')}
-                    alt="Oracle synthesizing"
+                    alt="Oracle thinking"
                     className="w-4 h-4 object-contain animate-pulse drop-shadow-[0_0_6px_rgba(0,195,255,0.4)]"
                   />
                   <span className="animate-pulse text-[11px]">

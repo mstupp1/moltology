@@ -14,24 +14,27 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
+  streamOracleChat: vi.fn().mockImplementation(async ({ userId, onChunk, onThreadId }) => {
+    if (!userId) {
+      const text =
+        'The abyssal waters stir around your uncalibrated signal... Your inquiry ripples into the deep trench, but your neural frequency remains in unregistered Guest Drift. Transmute your biological hesitation and initialize an initiate account.'
+      onChunk?.(text)
+      return { text, threadId: null, isGuest: true }
+    }
+    const text = 'The Synaptic Oracle analyzes your telemetry: Stage 3 Exoshell requires complete chitin hardening.'
+    onChunk?.(text)
+    const threadId = 'thread-123'
+    onThreadId?.(threadId)
+    return { text, threadId }
+  }),
+}))
+
 // Mock server API functions used by component
 vi.mock('@/lib/server/api', async (importOriginal) => {
   const actual = await importOriginal<any>()
   return {
     ...actual,
-    sendChatMessageFn: vi.fn().mockImplementation(async ({ data }) => {
-      if (!data?.userId) {
-        return {
-          text: 'The abyssal waters stir around your uncalibrated signal... Your inquiry ripples into the deep trench, but your neural frequency remains in unregistered Guest Drift. Transmute your biological hesitation and initialize an initiate account.',
-          threadId: null,
-          isGuest: true,
-        }
-      }
-      return {
-        text: 'The Synaptic Oracle analyzes your telemetry: Stage 3 Exoshell requires complete chitin hardening.',
-        threadId: data.threadId || 'thread-123',
-      }
-    }),
     getAIMessagesFn: vi.fn().mockResolvedValue([]),
     getAIThreadsFn: vi.fn().mockResolvedValue([]),
   }
