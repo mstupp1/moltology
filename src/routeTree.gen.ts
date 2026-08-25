@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as GuideRouteImport } from './routes/guide'
+import { Route as HudRouteImport } from './routes/hud'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MoltmaxRouteImport } from './routes/moltmax'
@@ -75,6 +76,11 @@ const AuthRoute = AuthRouteImport.update({
 const GuideRoute = GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HudRoute = HudRouteImport.update({
+  id: '/hud',
+  path: '/hud',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -304,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/guide': typeof GuideRoute
+  '/hud': typeof HudRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -353,6 +360,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/guide': typeof GuideRoute
+  '/hud': typeof HudRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -404,6 +412,7 @@ export interface FileRoutesById {
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
   '/guide': typeof GuideRoute
+  '/hud': typeof HudRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
@@ -455,6 +464,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/guide'
+    | '/hud'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -504,6 +514,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/guide'
+    | '/hud'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -554,6 +565,7 @@ export interface FileRouteTypes {
     | '/_hud'
     | '/auth'
     | '/guide'
+    | '/hud'
     | '/landing'
     | '/login'
     | '/moltmax'
@@ -605,6 +617,7 @@ export interface RootRouteChildren {
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
   GuideRoute: typeof GuideRoute
+  HudRoute: typeof HudRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   MoltmaxRoute: typeof MoltmaxRoute
@@ -658,6 +671,13 @@ declare module '@tanstack/react-router' {
       path: '/guide'
       fullPath: '/guide'
       preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hud': {
+      id: '/hud'
+      path: '/hud'
+      fullPath: '/hud'
+      preLoaderRoute: typeof HudRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -1061,6 +1081,7 @@ const rootRouteChildren: RootRouteChildren = {
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
   GuideRoute: GuideRoute,
+  HudRoute: HudRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   MoltmaxRoute: MoltmaxRoute,
