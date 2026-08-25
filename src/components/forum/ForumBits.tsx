@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { ArrowBigUp, ShieldCheck, Cpu, Terminal, Flame, Radio, MessageSquare, Pin } from 'lucide-react'
 import { toggleForumTopicVoteFn, toggleForumPostVoteFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { peekForumVote, resolveForumVoted, writeForumVote } from '@/lib/forum-vote-cache'
+import { useHudPersist } from '@/hooks/useHudPersist'
+import { useToast } from '@/components/ui/ToastProvider'
 import { useForumAuth } from './ForumShell'
 
 const STAGE_COLORS: Record<number, string> = {
@@ -52,7 +55,8 @@ export function PinBadge() {
 
 interface VoteButtonProps {
   count: number
-  voted: boolean
+  /** `undefined` = server has not hydrated vote state yet; use session cache for instant paint. */
+  voted?: boolean
   targetId: string
   targetType: 'topic' | 'post'
   onResult?: (res: { upvotes: number; voted: boolean }) => void
@@ -68,12 +72,32 @@ export function VoteButton({
   size = 'md',
 }: VoteButtonProps) {
   const { isAuthenticated, userId, openAuth } = useForumAuth()
-  const [local, setLocal] = useState({ count, voted })
+  const persist = useHudPersist()
+  const [local, setLocal] = useState(() => ({
+    count,
+    voted: resolveForumVoted(voted, userId, targetId),
+  }))
   const [busy, setBusy] = useState(false)
 
+  let toast: { warning: (m: string, o?: any) => string }
+  try {
+    toast = useToast().toast
+  } catch {
+    toast = { warning: () => '' }
+  }
+
   useEffect(() => {
-    setLocal({ count, voted })
-  }, [count, voted])
+    if (typeof voted === 'boolean') {
+      setLocal({ count, voted })
+      writeForumVote(userId, targetId, voted)
+      return
+    }
+    const cached = peekForumVote(userId, targetId)
+    setLocal({
+      count,
+      voted: cached === true,
+    })
+  }, [count, voted, userId, targetId])
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -83,12 +107,15 @@ export function VoteButton({
       openAuth('signup')
       return
     }
+    const rollback = { count: local.count, voted: local.voted }
     const optimistic = {
       count: local.count + (local.voted ? -1 : 1),
       voted: !local.voted,
     }
     setLocal(optimistic)
+    writeForumVote(userId, targetId, optimistic.voted)
     setBusy(true)
+    persist.begin('forum-vote')
     try {
       const token = await getAuthJWTToken()
       const res =
@@ -100,11 +127,19 @@ export function VoteButton({
               data: { postId: targetId, userId: userId ?? undefined, token: token ?? undefined },
             })
       setLocal({ count: res.upvotes, voted: res.voted })
+      writeForumVote(userId, targetId, res.voted)
       onResult?.(res)
     } catch (err) {
       console.error('Vote failed:', err)
-      setLocal({ count, voted })
+      setLocal(rollback)
+      writeForumVote(userId, targetId, rollback.voted)
+      toast.warning('Upvote could not be recorded. Please try again.', {
+        id: 'forum-vote-sync-warning',
+        title: 'UPVOTE',
+        duration: 4000,
+      })
     } finally {
+      persist.end('forum-vote')
       setBusy(false)
     }
   }

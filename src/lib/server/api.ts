@@ -1034,6 +1034,8 @@ export interface GetForumTopicsInput {
   query?: string
   sortBy?: 'latest' | 'top' | 'active' | 'hot'
   userId?: string
+  /** Neon Auth JWT so vote state can hydrate for the current initiate. */
+  token?: string
 }
 
 /**
@@ -1176,6 +1178,7 @@ export const getForumTopicsFn = createServerFn({ method: 'POST' })
         query: z.string().optional(),
         sortBy: z.enum(['latest', 'top', 'active', 'hot']).optional(),
         userId: z.string().optional(),
+        token: z.string().optional(),
       })
       .optional()
       .parse(data || {})
@@ -1186,6 +1189,10 @@ export interface GetForumTopicDetailInput {
   slugOrId: string
   categorySlug?: string
   userId?: string
+  /** Neon Auth JWT so topic/reply vote state can hydrate for the current initiate. */
+  token?: string
+  /** When false, skip the view counter bump (client vote-state hydration). Default true. */
+  trackView?: boolean
 }
 
 export interface ForumTopicDetailResult {
@@ -1197,7 +1204,7 @@ export interface ForumTopicDetailResult {
  * Server Function: Get single topic detail with posts and increment view count.
  */
 export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs<GetForumTopicDetailInput>): Promise<ForumTopicDetailResult | null> => {
-  const { slugOrId, categorySlug } = data || {}
+  const { slugOrId, categorySlug, trackView = true } = data || {}
   if (!slugOrId) return null
   const currentUserId = resolveForumUserId(context, data?.userId)
   const dbClient = context?.db || getDb()
@@ -1239,12 +1246,14 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         return null
       }
 
-      // Fire-and-forget view count increment
-      dbClient
-        .update(forumTopics)
-        .set({ views: t.views + 1 })
-        .where(eq(forumTopics.id, t.id))
-        .catch((err: any) => console.warn('[getForumTopicDetailFn] View count update error:', err))
+      // Fire-and-forget view count increment (skip on vote-state hydration refetches)
+      if (trackView) {
+        dbClient
+          .update(forumTopics)
+          .set({ views: t.views + 1 })
+          .where(eq(forumTopics.id, t.id))
+          .catch((err: any) => console.warn('[getForumTopicDetailFn] View count update error:', err))
+      }
 
       // Fetch posts / replies
       const postsRecords = await dbClient
@@ -1300,14 +1309,17 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           content: t.content,
           isPinned: t.isPinned,
           isLocked: t.isLocked,
-          views: t.views + 1,
+          views: trackView ? t.views + 1 : t.views,
           repliesCount: t.repliesCount,
           upvotes: t.upvotes,
-          voted: topicVoted,
+          ...(currentUserId ? { voted: topicVoted } : {}),
           lastReplyAt: t.lastReplyAt ? new Date(t.lastReplyAt).toISOString() : new Date().toISOString(),
           createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
         },
-        posts: posts.map((p) => ({ ...p, voted: postVotedIds.has(p.id) })),
+        posts: posts.map((p) => ({
+          ...p,
+          ...(currentUserId ? { voted: postVotedIds.has(p.id) } : {}),
+        })),
       }
     }
   } catch (err) {
@@ -1345,6 +1357,8 @@ export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
         slugOrId: z.string().min(1),
         categorySlug: z.string().optional(),
         userId: z.string().optional(),
+        token: z.string().optional(),
+        trackView: z.boolean().optional(),
       })
       .parse(data)
   })

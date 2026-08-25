@@ -29,6 +29,17 @@ Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js
 - **Data**: Neon PostgreSQL, Drizzle ORM (`src/db/schema.ts`), RLS via JWT claims.
 - **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
 
+### Authenticated writes (TanStack Start `createServerFn`)
+
+Essential pattern for any mutating HUD surface (daily alignment, forum, blog comments, etc.):
+
+1. **Declare** server functions with a statically visible chain: `createServerFn({ method: 'POST' }).middleware([...]).validator(...).handler(...)` — do not wrap `.handler()` behind a helper (see [`src/lib/server/functions.ts`](src/lib/server/functions.ts)).
+2. **Parse session** on the client as `sessionRes?.data?.user || (sessionRes as any)?.user` (never only `data.user` without the root fallback).
+3. **Client write loop**: optimistic local UI → `await getAuthJWTToken()` (real Neon JWT only; never opaque session cookies) → call the server fn with `{ token, userId? }` → reconcile from the returned payload; surface failures (toast / inline error). Optional: `useHudPersist().begin/end` for the shell spinner.
+4. **Server**: `resolveWriteAuth` + owner `getDb()` — never trust bare `userId` without a matching verified JWT `sub`.
+
+This repo does **not** use React Query `useMutation` / `invalidateQueries` for these writes.
+
 ## Database, Branching & Migration Strategy
 
 ### Neon Branch Architecture (Solo Dev)

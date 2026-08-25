@@ -31,6 +31,10 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/jwt', () => ({
+  getAuthJWTToken: vi.fn().mockResolvedValue(null),
+}))
+
 import { Route } from './index'
 const ForumIndexPage = Route.options.component!
 

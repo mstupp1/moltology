@@ -3,6 +3,7 @@ import { X, AlertTriangle, MessageSquare } from 'lucide-react'
 import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
+import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumAuth } from './ForumShell'
 
 interface NewTopicDialogProps {
@@ -19,6 +20,7 @@ export function NewTopicDialog({
   onCreated,
 }: NewTopicDialogProps) {
   const { isAuthenticated, userId, openAuth } = useForumAuth()
+  const persist = useHudPersist()
   const [categoryId, setCategoryId] = useState(initialCategoryId || categories[0]?.id || '')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -38,6 +40,7 @@ export function NewTopicDialog({
     }
     setCreating(true)
     setError(null)
+    persist.begin('forum-topic')
     try {
       const token = await getAuthJWTToken()
       const topic = await createForumTopicFn({
@@ -48,6 +51,7 @@ export function NewTopicDialog({
     } catch (err: any) {
       setError(err?.message || 'Failed to create post. Please try again.')
     } finally {
+      persist.end('forum-topic')
       setCreating(false)
     }
   }
@@ -59,7 +63,7 @@ export function NewTopicDialog({
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-[#00ffff]" />
             <h2 className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
-              NEW TRANSMISSION
+              NEW POST
             </h2>
           </div>
           <button
@@ -131,7 +135,7 @@ export function NewTopicDialog({
           </div>
 
           <p className="text-[11px] text-[#839493] leading-relaxed border-l-2 border-[#3a4a49] pl-2.5">
-            Be civil and constructive. Safeguard private initiate credentials, keys, and tokens.
+            Be civil and constructive. Keep private credentials, keys, and tokens out of public posts.
           </p>
 
           <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#3a4a49]">
@@ -147,7 +151,7 @@ export function NewTopicDialog({
               disabled={creating || title.trim().length < 5 || content.trim().length < 10}
               className="px-5 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.2)]"
             >
-              {creating ? 'DISPATCHING...' : 'DISPATCH POST'}
+              {creating ? 'Posting...' : 'Post'}
             </button>
           </div>
         </form>

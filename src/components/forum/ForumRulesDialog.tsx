@@ -14,7 +14,7 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
             <h2 className="text-xs text-[#00ffff] font-bold tracking-widest uppercase">
-              COMMUNITY DIRECTIVES & RULES
+              COMMUNITY RULES
             </h2>
           </div>
           <button
@@ -28,7 +28,7 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
 
         <div className="p-4 sm:p-5 space-y-3 max-h-[70vh] overflow-y-auto">
           <p className="text-xs text-[#839493] leading-relaxed border-l-2 border-[#00ffff] pl-3">
-            Beneath our dark biomechanical HUD theme, safety, warmth, and mutual growth are non-negotiable core tenets.
+            Beneath the dark biomechanical look, safety, warmth, and mutual growth stay non-negotiable.
           </p>
 
           {COMMUNITY_RULES.map((rule) => (
@@ -59,12 +59,12 @@ export function ForumRulesDialog({ onClose }: ForumRulesDialogProps) {
         </div>
 
         <div className="bg-[#070b0b] border-t border-[#3a4a49] p-3 flex items-center justify-between text-xs text-[#839493]">
-          <span>5 DIRECTIVES ACTIVE</span>
+          <span>5 RULES ACTIVE</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 font-bold text-xs chamfer-corner transition-colors uppercase tracking-wider"
           >
-            ACKNOWLEDGE
+            Understood
           </button>
         </div>
       </div>
