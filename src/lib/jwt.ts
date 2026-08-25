@@ -12,7 +12,7 @@ const JWKS = createRemoteJWKSet(new URL(NEON_JWKS_URL))
  * Opaque Better Auth session cookies must not be treated as JWTs.
  */
 export function looksLikeJwt(token?: string | null): boolean {
-  if (!token) return false
+  if (!token || typeof token !== 'string') return false
   const parts = token.split('.')
   return parts.length === 3 && parts.every((p) => p.length > 0)
 }
@@ -31,31 +31,51 @@ export async function verifyNeonJWT(token: string) {
 
 /**
  * Get a real Neon Auth JWT for the current session.
- * Prefer `authClient.token()` (JWT plugin). Never return the opaque
- * `session.token` / cookie session id — that fails JWKS verification.
+ * Prefer `authClient.token()` (JWT plugin). Never return opaque
+ * session cookies or session IDs — they fail JWKS verification.
  */
 export async function getAuthJWTToken(): Promise<string | null> {
   try {
     const client = authClient as any
 
+    // 1. Try explicit JWT client plugin
     if (typeof client.token === 'function') {
-      const tokenRes = await client.token()
-      const jwt =
-        tokenRes?.data?.token ||
-        tokenRes?.token ||
-        (typeof tokenRes === 'string' ? tokenRes : null)
-      if (looksLikeJwt(jwt)) return jwt
+      try {
+        const tokenRes = await client.token()
+        const jwt =
+          tokenRes?.data?.token ||
+          tokenRes?.token ||
+          (typeof tokenRes === 'string' ? tokenRes : null)
+        if (looksLikeJwt(jwt)) return jwt
+      } catch {
+        // Fall back to inspecting session candidates
+      }
     }
 
-    const session = await client.getSession()
-    const accessToken =
-      session?.data?.session?.access_token ||
-      session?.data?.access_token ||
-      session?.session?.access_token ||
-      session?.access_token ||
-      null
+    // 2. Try inspecting session payload
+    if (typeof client.getSession === 'function') {
+      try {
+        const session = await client.getSession()
+        const candidates = [
+          session?.data?.session?.access_token,
+          session?.data?.access_token,
+          session?.session?.access_token,
+          session?.access_token,
+          session?.data?.session?.token,
+          session?.session?.token,
+          session?.data?.token,
+          session?.token,
+          session?.data?.session?.jwt,
+          session?.data?.jwt,
+        ]
 
-    if (looksLikeJwt(accessToken)) return accessToken
+        for (const candidate of candidates) {
+          if (looksLikeJwt(candidate)) return candidate
+        }
+      } catch {
+        // Fall back to null
+      }
+    }
 
     return null
   } catch (err) {

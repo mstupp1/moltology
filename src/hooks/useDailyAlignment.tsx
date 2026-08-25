@@ -45,6 +45,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   let toast: {
     success: (m: string, o?: any) => string
     error: (m: string, o?: any) => string
+    warning: (m: string, o?: any) => string
+    info: (m: string, o?: any) => string
+    hud: (m: string, o?: any) => string
   }
   try {
     const toastCtx = useToast()
@@ -53,6 +56,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     toast = {
       success: () => '',
       error: () => '',
+      warning: () => '',
+      info: () => '',
+      hud: () => '',
     }
   }
 
@@ -177,6 +183,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
             taskKey: currentTask.key,
             completed: nextCompleted,
             date: currentDate,
+            userId: userId || undefined,
             token: token ?? undefined,
           },
         })
@@ -187,10 +194,20 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
           setServerStreakDays(response.streakDays || 0)
         }
       } catch (err) {
-        console.error('[useDailyAlignment] Failed to toggle task on server:', err)
-        // Rollback optimistic state
-        setTasks(prevTasks)
-        toast.error('Could not save alignment task to server. Please try again.')
+        console.warn('[useDailyAlignment] Remote alignment sync disrupted:', err)
+        // Maintain optimistic task state and record local history
+        setHistory((prev) => {
+          const existing = prev.filter((h) => h.date !== currentDate)
+          return [...existing, { date: currentDate, completedCount: nextCount }]
+        })
+        toast.warning(
+          'Alignment liturgy recorded locally. Telemetry synchronization will re-engage.',
+          {
+            id: 'daily-alignment-sync-warning',
+            title: 'TELEMETRY SYNC',
+            duration: 4000,
+          }
+        )
       } finally {
         setIsSyncing(false)
       }

@@ -1869,6 +1869,7 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
 
 export interface GetDailyAlignmentInput {
   date?: string
+  userId?: string
   token?: string
 }
 
@@ -1876,6 +1877,7 @@ export interface ToggleDailyAlignmentInput {
   taskKey: string
   completed: boolean
   date: string
+  userId?: string
   token?: string
 }
 
@@ -1892,6 +1894,7 @@ export interface DailyAlignmentResponse {
 
 const getDailyAlignmentSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  userId: z.string().optional(),
   token: z.string().optional(),
 })
 
@@ -1899,6 +1902,7 @@ const toggleDailyAlignmentSchema = z.object({
   taskKey: z.string().min(1),
   completed: z.boolean(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  userId: z.string().optional(),
   token: z.string().optional(),
 })
 
@@ -1971,13 +1975,22 @@ export const getDailyAlignmentHandler = async ({
   data,
   context,
 }: ServerFnArgs<GetDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
-  const auth = await resolveWriteAuth({ data, context })
-  if (!auth) {
-    throw new Error('Unauthenticated: Authentication required to fetch daily alignment.')
-  }
-
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
   const { date } = getDailyAlignmentSchema.parse(data || {})
   const targetDate = date || localDateString()
+
+  if (!auth) {
+    return {
+      date: targetDate,
+      tasks: mergeCompletions([]),
+      completedKeys: [],
+      completedCount: 0,
+      totalCount: TOTAL_ALIGNMENT_TASKS,
+      isAllCompleted: false,
+      history: [],
+      streakDays: 0,
+    }
+  }
 
   return await getDailyAlignmentData(auth.dbClient, auth.userId, targetDate)
 }
@@ -1988,7 +2001,7 @@ export const toggleDailyAlignmentTaskHandler = async ({
 }: ServerFnArgs<ToggleDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) {
-    throw new Error('Unauthenticated: Authentication required to update daily alignment.')
+    throw new Error('Unauthenticated: Identity verification required to update daily alignment.')
   }
 
   const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
@@ -1996,7 +2009,7 @@ export const toggleDailyAlignmentTaskHandler = async ({
 
   const isValidKey = CANONICAL_ALIGNMENT_TASKS.some((t) => t.key === taskKey)
   if (!isValidKey) {
-    throw new Error(`Invalid task key: ${taskKey}`)
+    throw new Error(`Invalid liturgy identifier: ${taskKey}`)
   }
 
   if (completed) {
