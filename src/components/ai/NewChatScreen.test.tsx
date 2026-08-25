@@ -76,7 +76,7 @@ describe('NewChatScreen Component', () => {
     const qwenOptions = screen.getAllByRole('button', { name: /Qwen 3.7 Flash/i })
     fireEvent.click(qwenOptions[qwenOptions.length - 1])
 
-    expect(mockOnSelectModel).toHaveBeenCalledWith('qwen/qwen3.7-flash')
+    expect(mockOnSelectModel).toHaveBeenCalledWith('alibaba/qwen3.7-flash')
   })
 
   it('submits typed prompt on submit click and Enter key press', () => {
