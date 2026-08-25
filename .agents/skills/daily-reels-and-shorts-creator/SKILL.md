@@ -176,12 +176,9 @@ await compositeReel({
 1. **Upload Master Reel to Neon S3**:
    * Video: `videos/social/reels/master-reel-<timestamp>.mp4`
 
-2. **Mandatory Zernio Queue Routing & Trial Reels**:
+2. **Mandatory Zernio Queue Routing**:
    * **Strict Queue Rule**: All reels/shorts MUST ALWAYS be routed into the designated Zernio queue (`queued_from_profile: '6a7f74b1839bf39ff3b6aaaa'`, `queue_id: '6a84b7702421e968ac81f5bd'`).
    * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly and unequivocally commands an immediate live broadcast.
-   * **Trial Reels Configuration (Instagram)**:
-     - All Instagram Reels MUST include `trialParams: { graduationStrategy: "SS_PERFORMANCE" }` in platform parameters.
-     - **Mechanism**: Meta shows Trial Reels **exclusively to non-followers first**. If the video achieves strong retention and engagement metrics, Meta automatically graduates the Reel to your main profile and amplifies it to the global Explore feed.
    * **Queue Configuration**:
      - Profile ID: `6a7f74b1839bf39ff3b6aaaa`
      - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — Slots daily at 6:30 PM EST / 18:30 `America/New_York`)
@@ -191,7 +188,7 @@ await compositeReel({
      - Save without scheduling when manual human sign-off is requested.
 
 3. **Update Narrative History Ledger**:
-   * Append record to `content/social/instagram-reel-history.json` with `s3Url`, `s3Key`, `durationSeconds`, `isAiGenerated`, `ctaGoal`, `commentTriggerKeyword`, `commentTriggerUrl`, `trialParams`, and platform IDs (`status: "queued"`, `"published"`, or `"draft"`).
+   * Append record to `content/social/instagram-reel-history.json` with `s3Url`, `s3Key`, `durationSeconds`, `isAiGenerated`, `ctaGoal`, `commentTriggerKeyword`, `commentTriggerUrl`, and platform IDs (`status: "queued"`, `"published"`, or `"draft"`).
 
 ---
 

@@ -487,12 +487,10 @@
       "thumbnailUrl": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/thumbnails/custom-thumbnail-1787580318424.jpg",
       "s3ThumbKey": "images/social/thumbnails/custom-thumbnail-1787580318424.jpg",
       "durationSeconds": 18.5,
-      "status": "queued",
-      "scheduledTime": "2026-08-24T22:30:00.000Z",
-      "queueId": "6a84b7702421e968ac81f5bd",
-      "zernioPostId": "6a8c503fdd0300af5463f2e9",
-      "zernioInstagramPostId": "6a8c503fdd0300af5463f2eb",
-      "zernioYouTubePostId": "6a8c503fdd0300af5463f2ec",
+      "status": "scheduled",
+      "scheduledTime": "2026-08-25T03:06:00.000Z",
+      "zernioInstagramPostId": "6a8cce7f617a846d53ecb851",
+      "zernioYouTubePostId": "6a8cce8cce7235d0837d3702",
       "youtubeTitle": "Why AI Is Shedding Video Pixels: The B-JEPA World Engine #Shorts",
       "mascot": "lobster_thumbs_up",
       "isAiGenerated": true,
@@ -510,9 +508,6 @@
       "ctaGoal": "quiz",
       "commentTriggerKeyword": "QUIZ",
       "commentTriggerUrl": "https://moltology.org/quiz",
-      "trialParams": {
-        "graduationStrategy": "SS_PERFORMANCE"
-      },
       "createdAt": "2026-08-24T14:07:51.455Z"
     }
   ]
