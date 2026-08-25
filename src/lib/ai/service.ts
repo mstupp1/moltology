@@ -123,3 +123,18 @@ export async function saveAIMessage(input: SaveMessageInput) {
 
   return message
 }
+
+/**
+ * Updates the title of an existing AI conversation thread.
+ */
+export async function updateAIThreadTitle(threadId: string, title: string) {
+  if (!threadId || !title || !title.trim()) return null
+  const dbClient = getDb()
+  const [updated] = await dbClient
+    .update(aiThreads)
+    .set({ title: title.trim().slice(0, 120), updatedAt: new Date() })
+    .where(eq(aiThreads.id, threadId))
+    .returning()
+
+  return updated
+}
