@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useSafeOracle } from '@/components/hud/OracleContext'
@@ -313,6 +314,15 @@ function OracleRouteComponent() {
 }
 
 export const Route = createFileRoute('/_hud/oracle')({
+  headers: () => xRobotsNoindexHeaders(),
+  head: () => ({
+    meta: [
+      ...privatePageSeo({
+        title: 'Synaptic Oracle | Moltology',
+        description: 'Private benthic consultation channel for authenticated units.',
+      }),
+    ],
+  }),
   component: OracleRouteComponent,
   pendingComponent: HudWorkspaceGhost,
 })

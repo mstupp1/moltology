@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import {
   Activity,
   ShoppingCart,
@@ -390,6 +391,15 @@ function DashboardRoute() {
 }
 
 export const Route = createFileRoute('/_hud/dashboard')({
+  headers: () => xRobotsNoindexHeaders(),
+  head: () => ({
+    meta: [
+      ...privatePageSeo({
+        title: 'Central HUD | Moltology',
+        description: 'Initiate telemetry, daily alignment, and benthic workspace for authenticated units.',
+      }),
+    ],
+  }),
   component: DashboardRoute,
   pendingComponent: HudWorkspaceGhost,
 })

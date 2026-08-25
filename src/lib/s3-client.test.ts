@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getS3Config, DEFAULT_BUCKET } from "./s3-client";
+import { getS3Config, DEFAULT_BUCKET, PUBLIC_ASSET_CACHE_CONTROL } from "./s3-client";
 
 describe("s3-client", () => {
   it("should return valid configuration from environment variables", () => {
@@ -13,5 +13,9 @@ describe("s3-client", () => {
   it("should have a default bucket configured as moltology-public-assets", () => {
     expect(DEFAULT_BUCKET).toBe("moltology-public-assets");
   });
-});
+
+  it("stamps future public uploads with long-lived Cache-Control", () => {
+    expect(PUBLIC_ASSET_CACHE_CONTROL).toBe("public, max-age=31536000");
+  });
+})
 

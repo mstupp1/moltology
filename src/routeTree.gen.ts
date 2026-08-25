@@ -12,17 +12,26 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
+import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as GuideRouteImport } from './routes/guide'
+import { Route as JournalDotmdRouteImport } from './routes/journal[.]md'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MoltmaxRouteImport } from './routes/moltmax'
 import { Route as MoltmaxxingRouteImport } from './routes/moltmaxxing'
+import { Route as NewsDotmdRouteImport } from './routes/news[.]md'
 import { Route as OrgRouteImport } from './routes/org'
+import { Route as OrgDotmdRouteImport } from './routes/org[.]md'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PrivacyDotmdRouteImport } from './routes/privacy[.]md'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
@@ -41,22 +50,13 @@ import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
 import { Route as ChangelogSlugRouteImport } from './routes/changelog/$slug'
-import { Route as CodexMdRouteImport } from './routes/codex.md'
-import { Route as FeedXmlRouteImport } from './routes/feed.xml'
-import { Route as JournalMdRouteImport } from './routes/journal.md'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
-import { Route as NewsMdRouteImport } from './routes/news.md'
-import { Route as OrgMdRouteImport } from './routes/org.md'
-import { Route as PrivacyMdRouteImport } from './routes/privacy.md'
+import { Route as NewsSlugDotmdRouteImport } from './routes/news/$slug[.]md'
 import { Route as RenderCompositeRouteImport } from './routes/render/composite'
-import { Route as RssXmlRouteImport } from './routes/rss.xml'
-import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
-import { Route as TermsMdRouteImport } from './routes/terms.md'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
 import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
-import { Route as NewsSlugMdRouteImport } from './routes/news.$slug.md'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
 
@@ -74,9 +74,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CodexDotmdRoute = CodexDotmdRouteImport.update({
+  id: '/codex.md',
+  path: '/codex.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
+  id: '/feed.xml',
+  path: '/feed.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuideRoute = GuideRouteImport.update({
   id: '/guide',
   path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalDotmdRoute = JournalDotmdRouteImport.update({
+  id: '/journal.md',
+  path: '/journal.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -99,14 +114,34 @@ const MoltmaxxingRoute = MoltmaxxingRouteImport.update({
   path: '/moltmaxxing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewsDotmdRoute = NewsDotmdRouteImport.update({
+  id: '/news.md',
+  path: '/news.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrgRoute = OrgRouteImport.update({
   id: '/org',
   path: '/org',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrgDotmdRoute = OrgDotmdRouteImport.update({
+  id: '/org.md',
+  path: '/org.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyDotmdRoute = PrivacyDotmdRouteImport.update({
+  id: '/privacy.md',
+  path: '/privacy.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -124,9 +159,19 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsDotmdRoute = TermsDotmdRouteImport.update({
+  id: '/terms.md',
+  path: '/terms.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HudChassisRoute = HudChassisRouteImport.update({
@@ -219,21 +264,6 @@ const ChangelogSlugRoute = ChangelogSlugRouteImport.update({
   path: '/changelog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CodexMdRoute = CodexMdRouteImport.update({
-  id: '/codex/md',
-  path: '/codex/md',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedXmlRoute = FeedXmlRouteImport.update({
-  id: '/feed/xml',
-  path: '/feed/xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JournalMdRoute = JournalMdRouteImport.update({
-  id: '/journal/md',
-  path: '/journal/md',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const NewsIndexRoute = NewsIndexRouteImport.update({
   id: '/news/',
   path: '/news/',
@@ -244,40 +274,15 @@ const NewsSlugRoute = NewsSlugRouteImport.update({
   path: '/news/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NewsMdRoute = NewsMdRouteImport.update({
-  id: '/news/md',
-  path: '/news/md',
+const NewsSlugDotmdRoute = NewsSlugDotmdRouteImport.update({
+  id: '/news/$slug.md',
+  path: '/news/$slug.md',
   getParentRoute: () => rootRouteImport,
-} as any)
-const OrgMdRoute = OrgMdRouteImport.update({
-  id: '/md',
-  path: '/md',
-  getParentRoute: () => OrgRoute,
-} as any)
-const PrivacyMdRoute = PrivacyMdRouteImport.update({
-  id: '/md',
-  path: '/md',
-  getParentRoute: () => PrivacyRoute,
 } as any)
 const RenderCompositeRoute = RenderCompositeRouteImport.update({
   id: '/render/composite',
   path: '/render/composite',
   getParentRoute: () => rootRouteImport,
-} as any)
-const RssXmlRoute = RssXmlRouteImport.update({
-  id: '/rss/xml',
-  path: '/rss/xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapXmlRoute = SitemapXmlRouteImport.update({
-  id: '/sitemap/xml',
-  path: '/sitemap/xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsMdRoute = TermsMdRouteImport.update({
-  id: '/md',
-  path: '/md',
-  getParentRoute: () => TermsRoute,
 } as any)
 const HudForumIndexRoute = HudForumIndexRouteImport.update({
   id: '/forum/',
@@ -293,11 +298,6 @@ const HudJournalSlugRoute = HudJournalSlugRouteImport.update({
   id: '/journal/$slug',
   path: '/journal/$slug',
   getParentRoute: () => HudRoute,
-} as any)
-const NewsSlugMdRoute = NewsSlugMdRouteImport.update({
-  id: '/md',
-  path: '/md',
-  getParentRoute: () => NewsSlugRoute,
 } as any)
 const HudForumCategorySlugIndexRoute =
   HudForumCategorySlugIndexRouteImport.update({
@@ -315,17 +315,26 @@ const HudForumCategorySlugTopicSlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/codex.md': typeof CodexDotmdRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
+  '/journal.md': typeof JournalDotmdRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
   '/moltmaxxing': typeof MoltmaxxingRoute
-  '/org': typeof OrgRouteWithChildren
-  '/privacy': typeof PrivacyRouteWithChildren
+  '/news.md': typeof NewsDotmdRoute
+  '/org': typeof OrgRoute
+  '/org.md': typeof OrgDotmdRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy.md': typeof PrivacyDotmdRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
-  '/terms': typeof TermsRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
+  '/terms.md': typeof TermsDotmdRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/dashboard': typeof HudDashboardRoute
@@ -342,22 +351,13 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
-  '/codex/md': typeof CodexMdRoute
-  '/feed/xml': typeof FeedXmlRoute
-  '/journal/md': typeof JournalMdRoute
-  '/news/$slug': typeof NewsSlugRouteWithChildren
-  '/news/md': typeof NewsMdRoute
-  '/org/md': typeof OrgMdRoute
-  '/privacy/md': typeof PrivacyMdRoute
+  '/news/$slug': typeof NewsSlugRoute
+  '/news/$slug.md': typeof NewsSlugDotmdRoute
   '/render/composite': typeof RenderCompositeRoute
-  '/rss/xml': typeof RssXmlRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
-  '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
-  '/news/$slug/md': typeof NewsSlugMdRoute
   '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
@@ -366,17 +366,26 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/codex.md': typeof CodexDotmdRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
+  '/journal.md': typeof JournalDotmdRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
   '/moltmaxxing': typeof MoltmaxxingRoute
-  '/org': typeof OrgRouteWithChildren
-  '/privacy': typeof PrivacyRouteWithChildren
+  '/news.md': typeof NewsDotmdRoute
+  '/org': typeof OrgRoute
+  '/org.md': typeof OrgDotmdRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy.md': typeof PrivacyDotmdRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
-  '/terms': typeof TermsRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
+  '/terms.md': typeof TermsDotmdRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/dashboard': typeof HudDashboardRoute
@@ -393,22 +402,13 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
-  '/codex/md': typeof CodexMdRoute
-  '/feed/xml': typeof FeedXmlRoute
-  '/journal/md': typeof JournalMdRoute
-  '/news/$slug': typeof NewsSlugRouteWithChildren
-  '/news/md': typeof NewsMdRoute
-  '/org/md': typeof OrgMdRoute
-  '/privacy/md': typeof PrivacyMdRoute
+  '/news/$slug': typeof NewsSlugRoute
+  '/news/$slug.md': typeof NewsSlugDotmdRoute
   '/render/composite': typeof RenderCompositeRoute
-  '/rss/xml': typeof RssXmlRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
-  '/terms/md': typeof TermsMdRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
   '/news': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
-  '/news/$slug/md': typeof NewsSlugMdRoute
   '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
@@ -419,17 +419,26 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
+  '/codex.md': typeof CodexDotmdRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
+  '/journal.md': typeof JournalDotmdRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/moltmax': typeof MoltmaxRoute
   '/moltmaxxing': typeof MoltmaxxingRoute
-  '/org': typeof OrgRouteWithChildren
-  '/privacy': typeof PrivacyRouteWithChildren
+  '/news.md': typeof NewsDotmdRoute
+  '/org': typeof OrgRoute
+  '/org.md': typeof OrgDotmdRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy.md': typeof PrivacyDotmdRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
-  '/terms': typeof TermsRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
+  '/terms.md': typeof TermsDotmdRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/dashboard': typeof HudDashboardRoute
@@ -446,22 +455,13 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
-  '/codex/md': typeof CodexMdRoute
-  '/feed/xml': typeof FeedXmlRoute
-  '/journal/md': typeof JournalMdRoute
-  '/news/$slug': typeof NewsSlugRouteWithChildren
-  '/news/md': typeof NewsMdRoute
-  '/org/md': typeof OrgMdRoute
-  '/privacy/md': typeof PrivacyMdRoute
+  '/news/$slug': typeof NewsSlugRoute
+  '/news/$slug.md': typeof NewsSlugDotmdRoute
   '/render/composite': typeof RenderCompositeRoute
-  '/rss/xml': typeof RssXmlRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
-  '/terms/md': typeof TermsMdRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
-  '/news/$slug/md': typeof NewsSlugMdRoute
   '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
   '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
@@ -472,17 +472,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/codex.md'
+    | '/feed.xml'
     | '/guide'
+    | '/journal.md'
     | '/landing'
     | '/login'
     | '/moltmax'
     | '/moltmaxxing'
+    | '/news.md'
     | '/org'
+    | '/org.md'
     | '/privacy'
+    | '/privacy.md'
+    | '/rss.xml'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
+    | '/sitemap.xml'
     | '/terms'
+    | '/terms.md'
     | '/chassis'
     | '/codex'
     | '/dashboard'
@@ -499,22 +508,13 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
-    | '/codex/md'
-    | '/feed/xml'
-    | '/journal/md'
     | '/news/$slug'
-    | '/news/md'
-    | '/org/md'
-    | '/privacy/md'
+    | '/news/$slug.md'
     | '/render/composite'
-    | '/rss/xml'
-    | '/sitemap/xml'
-    | '/terms/md'
     | '/blog/'
     | '/changelog/'
     | '/news/'
     | '/journal/$slug'
-    | '/news/$slug/md'
     | '/forum/'
     | '/journal/'
     | '/forum/$categorySlug/$topicSlug'
@@ -523,17 +523,26 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/codex.md'
+    | '/feed.xml'
     | '/guide'
+    | '/journal.md'
     | '/landing'
     | '/login'
     | '/moltmax'
     | '/moltmaxxing'
+    | '/news.md'
     | '/org'
+    | '/org.md'
     | '/privacy'
+    | '/privacy.md'
+    | '/rss.xml'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
+    | '/sitemap.xml'
     | '/terms'
+    | '/terms.md'
     | '/chassis'
     | '/codex'
     | '/dashboard'
@@ -550,22 +559,13 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
-    | '/codex/md'
-    | '/feed/xml'
-    | '/journal/md'
     | '/news/$slug'
-    | '/news/md'
-    | '/org/md'
-    | '/privacy/md'
+    | '/news/$slug.md'
     | '/render/composite'
-    | '/rss/xml'
-    | '/sitemap/xml'
-    | '/terms/md'
     | '/blog'
     | '/changelog'
     | '/news'
     | '/journal/$slug'
-    | '/news/$slug/md'
     | '/forum'
     | '/journal'
     | '/forum/$categorySlug/$topicSlug'
@@ -575,17 +575,26 @@ export interface FileRouteTypes {
     | '/'
     | '/_hud'
     | '/auth'
+    | '/codex.md'
+    | '/feed.xml'
     | '/guide'
+    | '/journal.md'
     | '/landing'
     | '/login'
     | '/moltmax'
     | '/moltmaxxing'
+    | '/news.md'
     | '/org'
+    | '/org.md'
     | '/privacy'
+    | '/privacy.md'
+    | '/rss.xml'
     | '/sign-in'
     | '/sign-up'
     | '/signup'
+    | '/sitemap.xml'
     | '/terms'
+    | '/terms.md'
     | '/_hud/chassis'
     | '/_hud/codex'
     | '/_hud/dashboard'
@@ -602,22 +611,13 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/blog/$slug'
     | '/changelog/$slug'
-    | '/codex/md'
-    | '/feed/xml'
-    | '/journal/md'
     | '/news/$slug'
-    | '/news/md'
-    | '/org/md'
-    | '/privacy/md'
+    | '/news/$slug.md'
     | '/render/composite'
-    | '/rss/xml'
-    | '/sitemap/xml'
-    | '/terms/md'
     | '/blog/'
     | '/changelog/'
     | '/news/'
     | '/_hud/journal/$slug'
-    | '/news/$slug/md'
     | '/_hud/forum/'
     | '/_hud/journal/'
     | '/_hud/forum/$categorySlug/$topicSlug'
@@ -628,28 +628,32 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CodexDotmdRoute: typeof CodexDotmdRoute
+  FeedDotxmlRoute: typeof FeedDotxmlRoute
   GuideRoute: typeof GuideRoute
+  JournalDotmdRoute: typeof JournalDotmdRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   MoltmaxRoute: typeof MoltmaxRoute
   MoltmaxxingRoute: typeof MoltmaxxingRoute
-  OrgRoute: typeof OrgRouteWithChildren
-  PrivacyRoute: typeof PrivacyRouteWithChildren
+  NewsDotmdRoute: typeof NewsDotmdRoute
+  OrgRoute: typeof OrgRoute
+  OrgDotmdRoute: typeof OrgDotmdRoute
+  PrivacyRoute: typeof PrivacyRoute
+  PrivacyDotmdRoute: typeof PrivacyDotmdRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SignupRoute: typeof SignupRoute
-  TermsRoute: typeof TermsRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
+  TermsDotmdRoute: typeof TermsDotmdRoute
   ApiChatRoute: typeof ApiChatRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
-  CodexMdRoute: typeof CodexMdRoute
-  FeedXmlRoute: typeof FeedXmlRoute
-  JournalMdRoute: typeof JournalMdRoute
-  NewsSlugRoute: typeof NewsSlugRouteWithChildren
-  NewsMdRoute: typeof NewsMdRoute
+  NewsSlugRoute: typeof NewsSlugRoute
+  NewsSlugDotmdRoute: typeof NewsSlugDotmdRoute
   RenderCompositeRoute: typeof RenderCompositeRoute
-  RssXmlRoute: typeof RssXmlRoute
-  SitemapXmlRoute: typeof SitemapXmlRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
@@ -678,11 +682,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/codex.md': {
+      id: '/codex.md'
+      path: '/codex.md'
+      fullPath: '/codex.md'
+      preLoaderRoute: typeof CodexDotmdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed.xml': {
+      id: '/feed.xml'
+      path: '/feed.xml'
+      fullPath: '/feed.xml'
+      preLoaderRoute: typeof FeedDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guide': {
       id: '/guide'
       path: '/guide'
       fullPath: '/guide'
       preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal.md': {
+      id: '/journal.md'
+      path: '/journal.md'
+      fullPath: '/journal.md'
+      preLoaderRoute: typeof JournalDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -713,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoltmaxxingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/news.md': {
+      id: '/news.md'
+      path: '/news.md'
+      fullPath: '/news.md'
+      preLoaderRoute: typeof NewsDotmdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/org': {
       id: '/org'
       path: '/org'
@@ -720,11 +752,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/org.md': {
+      id: '/org.md'
+      path: '/org.md'
+      fullPath: '/org.md'
+      preLoaderRoute: typeof OrgDotmdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy.md': {
+      id: '/privacy.md'
+      path: '/privacy.md'
+      fullPath: '/privacy.md'
+      preLoaderRoute: typeof PrivacyDotmdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -748,11 +801,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms.md': {
+      id: '/terms.md'
+      path: '/terms.md'
+      fullPath: '/terms.md'
+      preLoaderRoute: typeof TermsDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_hud/chassis': {
@@ -881,27 +948,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChangelogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/codex/md': {
-      id: '/codex/md'
-      path: '/codex/md'
-      fullPath: '/codex/md'
-      preLoaderRoute: typeof CodexMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feed/xml': {
-      id: '/feed/xml'
-      path: '/feed/xml'
-      fullPath: '/feed/xml'
-      preLoaderRoute: typeof FeedXmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/journal/md': {
-      id: '/journal/md'
-      path: '/journal/md'
-      fullPath: '/journal/md'
-      preLoaderRoute: typeof JournalMdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/news/': {
       id: '/news/'
       path: '/news'
@@ -916,26 +962,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/news/md': {
-      id: '/news/md'
-      path: '/news/md'
-      fullPath: '/news/md'
-      preLoaderRoute: typeof NewsMdRouteImport
+    '/news/$slug.md': {
+      id: '/news/$slug.md'
+      path: '/news/$slug.md'
+      fullPath: '/news/$slug.md'
+      preLoaderRoute: typeof NewsSlugDotmdRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/org/md': {
-      id: '/org/md'
-      path: '/md'
-      fullPath: '/org/md'
-      preLoaderRoute: typeof OrgMdRouteImport
-      parentRoute: typeof OrgRoute
-    }
-    '/privacy/md': {
-      id: '/privacy/md'
-      path: '/md'
-      fullPath: '/privacy/md'
-      preLoaderRoute: typeof PrivacyMdRouteImport
-      parentRoute: typeof PrivacyRoute
     }
     '/render/composite': {
       id: '/render/composite'
@@ -943,27 +975,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/render/composite'
       preLoaderRoute: typeof RenderCompositeRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/rss/xml': {
-      id: '/rss/xml'
-      path: '/rss/xml'
-      fullPath: '/rss/xml'
-      preLoaderRoute: typeof RssXmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap/xml': {
-      id: '/sitemap/xml'
-      path: '/sitemap/xml'
-      fullPath: '/sitemap/xml'
-      preLoaderRoute: typeof SitemapXmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms/md': {
-      id: '/terms/md'
-      path: '/md'
-      fullPath: '/terms/md'
-      preLoaderRoute: typeof TermsMdRouteImport
-      parentRoute: typeof TermsRoute
     }
     '/_hud/forum/': {
       id: '/_hud/forum/'
@@ -985,13 +996,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/journal/$slug'
       preLoaderRoute: typeof HudJournalSlugRouteImport
       parentRoute: typeof HudRoute
-    }
-    '/news/$slug/md': {
-      id: '/news/$slug/md'
-      path: '/md'
-      fullPath: '/news/$slug/md'
-      preLoaderRoute: typeof NewsSlugMdRouteImport
-      parentRoute: typeof NewsSlugRoute
     }
     '/_hud/forum/$categorySlug/': {
       id: '/_hud/forum/$categorySlug/'
@@ -1054,75 +1058,36 @@ const HudRouteChildren: HudRouteChildren = {
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
 
-interface OrgRouteChildren {
-  OrgMdRoute: typeof OrgMdRoute
-}
-
-const OrgRouteChildren: OrgRouteChildren = {
-  OrgMdRoute: OrgMdRoute,
-}
-
-const OrgRouteWithChildren = OrgRoute._addFileChildren(OrgRouteChildren)
-
-interface PrivacyRouteChildren {
-  PrivacyMdRoute: typeof PrivacyMdRoute
-}
-
-const PrivacyRouteChildren: PrivacyRouteChildren = {
-  PrivacyMdRoute: PrivacyMdRoute,
-}
-
-const PrivacyRouteWithChildren =
-  PrivacyRoute._addFileChildren(PrivacyRouteChildren)
-
-interface TermsRouteChildren {
-  TermsMdRoute: typeof TermsMdRoute
-}
-
-const TermsRouteChildren: TermsRouteChildren = {
-  TermsMdRoute: TermsMdRoute,
-}
-
-const TermsRouteWithChildren = TermsRoute._addFileChildren(TermsRouteChildren)
-
-interface NewsSlugRouteChildren {
-  NewsSlugMdRoute: typeof NewsSlugMdRoute
-}
-
-const NewsSlugRouteChildren: NewsSlugRouteChildren = {
-  NewsSlugMdRoute: NewsSlugMdRoute,
-}
-
-const NewsSlugRouteWithChildren = NewsSlugRoute._addFileChildren(
-  NewsSlugRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
+  CodexDotmdRoute: CodexDotmdRoute,
+  FeedDotxmlRoute: FeedDotxmlRoute,
   GuideRoute: GuideRoute,
+  JournalDotmdRoute: JournalDotmdRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   MoltmaxRoute: MoltmaxRoute,
   MoltmaxxingRoute: MoltmaxxingRoute,
-  OrgRoute: OrgRouteWithChildren,
-  PrivacyRoute: PrivacyRouteWithChildren,
+  NewsDotmdRoute: NewsDotmdRoute,
+  OrgRoute: OrgRoute,
+  OrgDotmdRoute: OrgDotmdRoute,
+  PrivacyRoute: PrivacyRoute,
+  PrivacyDotmdRoute: PrivacyDotmdRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SignupRoute: SignupRoute,
-  TermsRoute: TermsRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
+  TermsDotmdRoute: TermsDotmdRoute,
   ApiChatRoute: ApiChatRoute,
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
-  CodexMdRoute: CodexMdRoute,
-  FeedXmlRoute: FeedXmlRoute,
-  JournalMdRoute: JournalMdRoute,
-  NewsSlugRoute: NewsSlugRouteWithChildren,
-  NewsMdRoute: NewsMdRoute,
+  NewsSlugRoute: NewsSlugRoute,
+  NewsSlugDotmdRoute: NewsSlugDotmdRoute,
   RenderCompositeRoute: RenderCompositeRoute,
-  RssXmlRoute: RssXmlRoute,
-  SitemapXmlRoute: SitemapXmlRoute,
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
@@ -1130,12 +1095,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

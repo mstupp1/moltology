@@ -1,18 +1,37 @@
 import React from 'react'
 
+export interface IphoneSource {
+  type?: string
+  media?: string
+  srcSet: string
+}
+
 export interface Iphone15ProProps {
   className?: string
   children?: React.ReactNode
   src?: string
+  sources?: IphoneSource[]
+  loading?: 'lazy' | 'eager'
+  fetchPriority?: 'high' | 'low' | 'auto'
   width?: number | string
   height?: number | string
+  imageWidth?: number
+  imageHeight?: number
+  sizes?: string
 }
 
 export const Iphone15Pro: React.FC<Iphone15ProProps> = ({
   className = '',
   children,
   src,
+  sources,
+  loading = 'lazy',
+  fetchPriority = 'low',
   width,
+  height,
+  imageWidth,
+  imageHeight,
+  sizes,
 }) => {
   return (
     <div
@@ -34,11 +53,27 @@ export const Iphone15Pro: React.FC<Iphone15ProProps> = ({
             {children ? (
               children
             ) : src ? (
-              <img
-                src={src}
-                alt="iPhone 15 Pro preview"
-                className="w-full flex-1 object-fill object-top block"
-              />
+              <picture>
+                {(sources ?? []).map((source) => (
+                  <source
+                    key={`${source.media ?? ''}:${source.srcSet}`}
+                    type={source.type}
+                    media={source.media}
+                    srcSet={source.srcSet}
+                  />
+                ))}
+                <img
+                  src={src}
+                  alt="iPhone 15 Pro preview"
+                  className="w-full flex-1 object-fill object-top block"
+                  loading={loading}
+                  fetchPriority={fetchPriority}
+                  decoding="async"
+                  width={imageWidth}
+                  height={imageHeight}
+                  sizes={sizes}
+                />
+              </picture>
             ) : null}
 
             {/* Centered Floating Dynamic Island Pill (Hidden on mobile for ultra-clean screen visibility, scaled on tablet/desktop) */}
