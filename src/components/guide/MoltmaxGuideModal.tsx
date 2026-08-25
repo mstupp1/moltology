@@ -306,7 +306,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
               <ul className="text-xs text-[#dfe3e3] space-y-1.5 list-disc list-inside">
                 <li>Track your 24-Hour Ecdysis streaks in the live HUD</li>
                 <li>Record pincer torque dynamometry biometrics</li>
-                <li>Forge your mutated bio-silicon avatar in BioForge Studio</li>
+                <li>Calibrate your chassis loadout and seat vault gear on hardpoints</li>
               </ul>
 
               <button

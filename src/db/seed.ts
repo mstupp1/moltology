@@ -12,6 +12,7 @@ import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
 import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
 import { INITIAL_PODCASTS } from '../lib/podcast-data'
+import { INITIAL_EQUIPMENT_CATALOG } from '../lib/equipment-seed-data'
 
 dotenv.config()
 
@@ -411,6 +412,26 @@ export async function seedDatabase(databaseUrl?: string) {
         .onConflictDoNothing({ target: schema.podcasts.slug })
     }
     console.log(`✓ Seeded ${INITIAL_PODCASTS.length} podcast episodes`)
+
+    // 10. Seed equipment catalog (chassis loadout)
+    console.log('[SEED] Seeding equipment catalog...')
+    for (const item of INITIAL_EQUIPMENT_CATALOG) {
+      await db
+        .insert(schema.equipmentCatalog)
+        .values({
+          id: item.id,
+          slug: item.slug,
+          name: item.name,
+          flavorText: item.flavorText,
+          category: item.category,
+          rarity: item.rarity,
+          primaryStat: item.primaryStat,
+          imageUrl: item.imageUrl ?? null,
+          sortOrder: item.sortOrder,
+        })
+        .onConflictDoNothing()
+    }
+    console.log(`✓ Seeded ${INITIAL_EQUIPMENT_CATALOG.length} equipment catalog entries`)
 
     // 9. Ingest live markdown content from content/ repository
     const contentDir = path.resolve(process.cwd(), 'content')

@@ -22,7 +22,9 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS routines ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routine_completions ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, user_avatars')
+    await sql`ALTER TABLE IF EXISTS equipment_catalog ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS user_gear_items ENABLE ROW LEVEL SECURITY;`
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, user_avatars, equipment_catalog, user_gear_items')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
@@ -31,6 +33,8 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
     await sql`DROP POLICY IF EXISTS routine_completions_isolation_policy ON routine_completions;`
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
+    await sql`DROP POLICY IF EXISTS equipment_catalog_public_read_policy ON equipment_catalog;`
+    await sql`DROP POLICY IF EXISTS user_gear_items_isolation_policy ON user_gear_items;`
 
     // 3. Create RLS policies for user isolation against Neon Auth JWT 'sub' claim
     await sql`
@@ -71,6 +75,21 @@ async function applyRLS() {
 
     await sql`
       CREATE POLICY user_avatars_isolation_policy ON user_avatars
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY equipment_catalog_public_read_policy ON equipment_catalog
+      FOR SELECT
+      USING (true);
+    `
+
+    await sql`
+      CREATE POLICY user_gear_items_isolation_policy ON user_gear_items
       FOR ALL
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')

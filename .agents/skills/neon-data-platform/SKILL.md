@@ -2,15 +2,18 @@
 name: neon-data-platform
 description: >-
   Neon + Drizzle schema/migration workflow (dev branch → GitHub Actions on prod main),
-  seeding rules (no ghost seed IDs), RLS, and TanStack Start authenticated write patterns
-  (createServerFn, JWT, resolveWriteAuth). Use when editing schema.ts, drizzle migrations,
-  db:seed / seed scripts, forum or HUD mutations, Neon branches, DATABASE_URL, RLS, or
-  createServerFn write handlers.
+  seeding rules (no ghost seed IDs), RLS, TanStack Start authenticated write patterns
+  (createServerFn, JWT, resolveWriteAuth), and HUD UI conventions (chitin-card page chrome,
+  HudGhostWidget / HudWorkspaceGhost loaders). Use when editing schema.ts, drizzle
+  migrations, db:seed / seed scripts, forum or HUD mutations, Neon branches, DATABASE_URL,
+  RLS, createServerFn write handlers, or building authenticated HUD pages/widgets that
+  load Neon data.
 ---
 
 # Neon Data Platform (Moltology)
 
-Canonical workflow for Postgres schema, migrations, seeding, and authenticated HUD writes.
+Canonical workflow for Postgres schema, migrations, seeding, authenticated HUD writes,
+and HUD surfaces that present that data.
 Do **not** re-document this in AGENTS.md — keep that file for diegesis/brand/stack pointers only.
 
 ## Branch map
@@ -124,6 +127,41 @@ Do **not** wrap `.handler()` behind a helper — see [`src/lib/server/functions.
 
 Before insert/vote/update that FKs to another table, verify the parent row exists (or catch FK and map to a clear user-facing error). Prefer existence checks so prod empty-DB fails loudly instead of opaque constraint errors.
 
+## HUD UI when shipping Neon-backed pages
+
+When building or redoing authenticated HUD routes/widgets that load Neon data, match existing HUD chrome — do not invent a narrower one-off layout.
+
+### Page shell (copy from dashboard / forum / pipeline / chassis)
+
+- Full-width page body: `space-y-3.5 sm:space-y-5 font-sans relative` (no `max-w-* mx-auto` unless the page already uses a deliberate content column).
+- Top banner: gradient + `border-l-4` accent + `border border-[#3a4a49]` + `chamfer-corner` + `shadow-2xl` (see forum index / pipeline / chassis).
+- Content panels: `chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl` (and `chitin-card-inset` for nested cells).
+- Section titles: `font-grotesk text-sm font-bold … tracking-wider uppercase` with a short `text-xs text-[#839493]` subtitle when helpful.
+- Guest-locked features: wrap in `GuestLockGuard`; route `pendingComponent: HudWorkspaceGhost`.
+
+Reference pages: [`src/routes/_hud/dashboard.tsx`](../../../src/routes/_hud/dashboard.tsx), [`src/routes/_hud/forum/index.tsx`](../../../src/routes/_hud/forum/index.tsx), [`src/routes/_hud/pipeline.tsx`](../../../src/routes/_hud/pipeline.tsx), [`src/components/hud/chassis/ChassisStatusPage.tsx`](../../../src/components/hud/chassis/ChassisStatusPage.tsx).
+
+### Ghost loaders (required for async HUD data)
+
+Do **not** show plain “Loading…” text for Neon-backed HUD fetches.
+
+| Situation | Pattern |
+| :--- | :--- |
+| Route transition / SSR pending | `pendingComponent: HudWorkspaceGhost` on the file route |
+| In-page / widget data fetch | Wrap with `HudGhostWidget` + a feature skeleton from [`HudGhostSkeletons.tsx`](../../../src/components/hud/HudGhostSkeletons.tsx) |
+| New feature layout | Add a named `*Ghost` composite next to existing ones (e.g. `ChassisStatusGhost`, `DailyRoutineGhost`) using `HudGhostSkeleton` / `HudGhostCard` / `HudGhostStatBox` |
+
+```tsx
+import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { ChassisStatusGhost } from '@/components/hud/HudGhostSkeletons'
+
+<HudGhostWidget isLoading={loading} skeleton={<ChassisStatusGhost />}>
+  {/* live UI */}
+</HudGhostWidget>
+```
+
+Primitives live in [`src/components/ui/HudGhostLoader.tsx`](../../../src/components/ui/HudGhostLoader.tsx). Composites live in [`src/components/hud/HudGhostSkeletons.tsx`](../../../src/components/hud/HudGhostSkeletons.tsx).
+
 ## Related paths
 
 | Path | Role |
@@ -136,3 +174,5 @@ Before insert/vote/update that FKs to another table, verify the parent row exist
 | `src/lib/server/write-auth.ts` | Write auth resolution |
 | `src/lib/jwt.ts` | `getAuthJWTToken` / JWKS verify |
 | `.github/workflows/migrate.yml` | Prod migrate + RLS |
+| `src/components/ui/HudGhostLoader.tsx` | Ghost loader primitives + `HudGhostWidget` |
+| `src/components/hud/HudGhostSkeletons.tsx` | Page/widget ghost composites |

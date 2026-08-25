@@ -10,6 +10,29 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/server/api', () => ({
+  getChassisLoadoutFn: vi.fn().mockResolvedValue({
+    catalog: [],
+    items: [],
+    totals: { defense: 0, attack: 0, intelligence: 0, speed: 0, perception: 0 },
+    vaultSize: 20,
+  }),
+  moveGearItemFn: vi.fn(),
+}))
+
+vi.mock('@/lib/jwt', () => ({
+  getAuthJWTToken: vi.fn().mockResolvedValue('a.b.c'),
+}))
+
+vi.mock('@/hooks/useHudPersist', () => ({
+  useHudPersist: () => ({
+    begin: vi.fn(),
+    end: vi.fn(),
+    run: vi.fn(async (fn: () => Promise<unknown>) => fn()),
+    isPersisting: false,
+  }),
+}))
+
 describe('Chassis Configurator HUD Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -23,20 +46,21 @@ describe('Chassis Configurator HUD Route', () => {
     expect(screen.getByText('CHASSIS CONFIGURATOR LOCKED')).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(
-      screen.getByText('The BioForge avatar customizer and chassis plating generator require an authorized initiate account.')
+      screen.getByText(
+        'Chassis loadout, vault storage, and hardpoint calibration require an authorized initiate account.'
+      )
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
   })
 
-  it('renders BioForge avatar studio when authenticated', () => {
+  it('renders chassis status page when authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(screen.getByText('MOLTMAXXING & BIO-FORGE AVATAR STUDIO')).toBeInTheDocument()
-    expect(screen.getByText('CARCINIZATION & COSMETIC TRANSMUTATION')).toBeInTheDocument()
-    expect(screen.getAllByText('STAGE 4: HIGH ASCENDANT').length).toBeGreaterThanOrEqual(1)
+    expect(await screen.findByText('Chassis Status')).toBeInTheDocument()
+    expect(screen.getByText(/Equip plating across five hardpoints/i)).toBeInTheDocument()
   })
 })
