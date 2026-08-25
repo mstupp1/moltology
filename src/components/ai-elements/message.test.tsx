@@ -92,4 +92,15 @@ describe('Message Component Avatar Rendering', () => {
     expect(oracleImg.getAttribute('src')).toContain('order_emblem.png')
     expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
   })
+
+  it('renders MessageThinkingDots with accessible role and animation dots', async () => {
+    const { MessageThinkingDots } = await import('./message')
+    render(<MessageThinkingDots />)
+
+    const status = screen.getByRole('status')
+    expect(status).toBeInTheDocument()
+    expect(status).toHaveAttribute('aria-label', 'Thinking...')
+    expect(screen.getByText('Thinking...')).toBeInTheDocument()
+  })
 })
+

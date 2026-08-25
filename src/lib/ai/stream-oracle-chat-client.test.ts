@@ -72,4 +72,26 @@ describe('streamOracleChat client', () => {
       streamOracleChat({ messages: [{ role: 'user', content: 'hi' }] })
     ).rejects.toThrow('Rate limit exceeded.')
   })
+
+  it('throws error when plain text stream completes with empty content', async () => {
+    const body = new ReadableStream({
+      start(controller) {
+        controller.close()
+      },
+    })
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+      new Response(body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      })
+    )
+
+    await expect(
+      streamOracleChat({ messages: [{ role: 'user', content: 'hi' }] })
+    ).rejects.toThrow('The Oracle was unable to formulate a response. Please try again.')
+  })
 })
+

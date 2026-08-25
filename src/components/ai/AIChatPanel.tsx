@@ -13,7 +13,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { Conversation, ConversationContent } from '../ai-elements/conversation'
-import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
+import { Message, MessageContent, MessageResponse, MessageThinkingDots } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
 import { getAIMessagesFn, getAIThreadsFn } from '../../lib/server/api'
@@ -260,10 +260,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
 
     try {
-      const payloadMessages = [...messages, userMsg].map((m) => ({
-        role: m.role,
-        content: m.content,
-      }))
+      const payloadMessages = [...messages, userMsg]
+        .filter((m) => Boolean(m.content && m.content.trim()))
+        .map((m) => ({
+          role: m.role,
+          content: m.content,
+        }))
 
       const res = await streamOracleChat({
         messages: payloadMessages,
@@ -287,7 +289,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           m.id === assistantId
             ? {
                 ...m,
-                content: res.text || 'The Oracle acknowledges your query.',
+                content: res.text,
                 isGuest: Boolean(res.isGuest || isGuest),
               }
             : m
@@ -618,6 +620,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   <MessageContent>
                     {msg.content ? (
                       <MessageResponse>{msg.content}</MessageResponse>
+                    ) : msg.role === 'assistant' ? (
+                      <MessageThinkingDots />
                     ) : null}
                     {msg.role === 'assistant' && (msg.isGuest || isGuest) && msg.content && (
                       <div className="mt-2 pt-2 border-t border-[#ff453a]/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#0e0506]/85 px-2.5 py-1.5 chamfer-corner border border-[#ff453a]/30 shadow-[0_0_12px_rgba(255,69,58,0.06)]">
@@ -641,18 +645,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   </MessageContent>
                 </Message>
               ))}
-              {isSending && !messages.some((m) => m.role === 'assistant' && m.content) && (
-                <div className="flex items-center space-x-2 text-cyan-400 text-xs py-1">
-                  <img
-                    src={getAssetUrl('/images/order_emblem.png')}
-                    alt="Oracle thinking"
-                    className="w-4 h-4 object-contain animate-pulse drop-shadow-[0_0_6px_rgba(0,195,255,0.4)]"
-                  />
-                  <span className="animate-pulse text-[11px]">
-                    Thinking with {selectedModel.label}...
-                  </span>
-                </div>
-              )}
               <div ref={endRef} />
             </ConversationContent>
           </Conversation>

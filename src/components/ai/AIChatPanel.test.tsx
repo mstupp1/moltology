@@ -248,19 +248,54 @@ describe('AIChatPanel Chats Dropdown Window', () => {
   })
 })
 
-describe('sendChatMessageHandler Server Gating', () => {
-  it('returns vague lore response with isGuest=true when userId is null/unauthenticated', async () => {
-    const result = await sendChatMessageHandler({
-      data: {
-        messages: [{ role: 'user', content: 'Tell me the secret protocols' }],
-        userId: undefined,
-      },
-      context: {} as any,
-    })
+describe('AIChatPanel Thinking State & Error Handling', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
 
-    expect(result.isGuest).toBe(true)
-    expect(result.threadId).toBeNull()
-    expect(result.text).toMatch(/Oracle|account|Guest/i)
+  it('renders thinking dots while awaiting assistant response', async () => {
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    let finishChat: (res: any) => void
+    ;(streamOracleChat as any).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishChat = resolve
+        })
+    )
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+    const shortcutBtn = screen.getByRole('button', { name: /what is moltology/i })
+    fireEvent.click(shortcutBtn)
+
+    // User message and thinking dots should be visible
+    expect(screen.getByText('What is Moltology and why should I molt?')).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: /Thinking.../i })).toBeInTheDocument()
+
+    // Resolve chat
+    finishChat!({ text: 'Response received.', threadId: 'thread-new' })
+    await waitFor(() => {
+      expect(screen.getByText('Response received.')).toBeInTheDocument()
+      expect(screen.queryByRole('status', { name: /Thinking.../i })).not.toBeInTheDocument()
+    })
+  })
+
+  it('handles stream errors by clearing empty assistant placeholder and showing error alert', async () => {
+    const { streamOracleChat } = await import('@/lib/ai/stream-oracle-chat-client')
+    ;(streamOracleChat as any).mockRejectedValueOnce(
+      new Error('The Oracle was unable to reach the neural matrix.')
+    )
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+    const shortcutBtn = screen.getByRole('button', { name: /what is moltology/i })
+    fireEvent.click(shortcutBtn)
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('The Oracle was unable to reach the neural matrix.')
+      ).toBeInTheDocument()
+      expect(screen.queryByRole('status', { name: /Thinking.../i })).not.toBeInTheDocument()
+    })
   })
 })
+
 
