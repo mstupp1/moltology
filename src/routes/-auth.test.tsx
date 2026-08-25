@@ -243,14 +243,18 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     })
   })
 
-  it('marks the gateway noindex and does not emit a public canonical', () => {
-    const head = Route.options.head()
+  it('marks the gateway noindex and does not emit a public canonical', async () => {
+    const headFn = Route.options.head
+    if (typeof headFn !== 'function') {
+      throw new Error('auth route is missing a head function')
+    }
+    const head = await headFn({} as never)
     expect(head.meta).toEqual(
       expect.arrayContaining([{ name: 'robots', content: 'noindex, nofollow' }]),
     )
     expect(head.links ?? []).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ rel: 'canonical' })]),
     )
-    expect(head.meta.some((entry: { property?: string }) => entry.property === 'og:url')).toBe(false)
+    expect(head.meta?.some((entry) => entry && 'property' in entry && entry.property === 'og:url')).toBe(false)
   })
 })

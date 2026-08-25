@@ -10,7 +10,10 @@ export const Route = createFileRoute('/news/$slug.md')({
       GET: async ({ request, params }) => {
         const pathname = new URL(request.url).pathname
         const slugFromPath = pathname.match(/^\/news\/(.+)\.md$/)?.[1]
-        const slug = slugFromPath || params.slug || (params as Record<string, string | undefined>)['slug.md']
+        const slugFromParams = Object.values(params).find(
+          (value): value is string => typeof value === 'string' && value.length > 0,
+        )
+        const slug = slugFromPath || slugFromParams
 
         if (!slug) {
           return markdownDocumentResponse(
