@@ -18,6 +18,7 @@ import { useHudPersist } from '@/hooks/useHudPersist'
 import {
   applyMoveUpdates,
   computeLoadoutTotals,
+  deriveSynapticAbilities,
   emptyTotals,
   getCachedChassisLoadout,
   planGearMove,
@@ -33,6 +34,7 @@ import type { EquipmentCategory } from '@/db/schema'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { GearDetail } from './GearDetail'
 import { GearItemCard } from './GearItemCard'
+import { GearTooltip } from './GearTooltip'
 import { LoadoutStatsPanel } from './LoadoutStatsPanel'
 import { AbilitiesPanel } from './AbilitiesPanel'
 import { PaperDoll } from './PaperDoll'
@@ -66,9 +68,14 @@ export const ChassisStatusPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [detailItemId, setDetailItemId] = useState<string | null>(null)
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
 
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog])
+  const abilities = useMemo(
+    () => deriveSynapticAbilities(items, catalogById),
+    [items, catalogById]
+  )
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -215,6 +222,12 @@ export const ChassisStatusPage: React.FC = () => {
     return catalogById.get(item.catalogItemId) ?? null
   }, [items, detailItemId, catalogById])
 
+  const hoverCatalog = useMemo(() => {
+    const item = items.find((i) => i.id === hoveredItemId)
+    if (!item) return null
+    return catalogById.get(item.catalogItemId) ?? null
+  }, [items, hoveredItemId, catalogById])
+
   const dragCatalog = useMemo(() => {
     const item = items.find((i) => i.id === activeDragId)
     if (!item) return null
@@ -270,12 +283,13 @@ export const ChassisStatusPage: React.FC = () => {
                   selectedItemId={selectedItemId}
                   onSelectItem={handleSelectItem}
                   onSlotActivate={handleSlotActivate}
+                  onHoverItem={setHoveredItemId}
                 />
               </div>
 
               <div className="md:hidden space-y-3.5 shrink-0">
                 <LoadoutStatsPanel totals={totals} variant="strip" />
-                <AbilitiesPanel variant="strip" />
+                <AbilitiesPanel abilities={abilities} variant="strip" />
               </div>
 
               <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl shrink-0">
@@ -286,6 +300,7 @@ export const ChassisStatusPage: React.FC = () => {
                   selectedItemId={selectedItemId}
                   onSelectItem={handleSelectItem}
                   onCellActivate={handleCellActivate}
+                  onHoverItem={setHoveredItemId}
                 />
               </div>
 
@@ -303,10 +318,16 @@ export const ChassisStatusPage: React.FC = () => {
             </div>
 
             <div className="order-3 hidden md:flex md:flex-col md:min-h-0">
-              <AbilitiesPanel variant="panel" />
+              <AbilitiesPanel abilities={abilities} variant="panel" />
             </div>
           </div>
         </div>
+
+        {hoverCatalog && hoveredItemId !== detailItemId && (
+          <div className="hidden md:block pointer-events-none fixed top-24 right-4 z-50 w-72 max-w-[calc(100vw-2rem)]">
+            <GearTooltip catalog={hoverCatalog} />
+          </div>
+        )}
 
         <DragOverlay dropAnimation={null}>
           {dragCatalog ? (
