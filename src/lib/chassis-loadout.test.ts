@@ -188,8 +188,8 @@ describe('chassis-loadout', () => {
   })
 
   it('maps visual types onto type-level 9:16 image paths', () => {
-    expect(chassisTypeImageUrl('helm')).toBe('/images/chassis/helm.svg')
-    expect(chassisTypeImageUrl('hammer')).toBe('/images/chassis/hammer.svg')
+    expect(chassisTypeImageUrl('helm')).toBe('/images/chassis/helm.webp')
+    expect(chassisTypeImageUrl('hammer')).toBe('/images/chassis/hammer.webp')
     expect(VISUAL_TYPE_SLOT.hammer).toBe('claws')
     expect(VISUAL_TYPE_SLOT.pincer).toBe('claws')
   })

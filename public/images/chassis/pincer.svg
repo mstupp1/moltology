@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640" width="360" height="640" role="img" aria-label="Pincer">
-  <rect width="360" height="640" fill="#070b0b"/>
-  <rect x="16" y="16" width="328" height="608" fill="none" stroke="#1c3a3a" stroke-width="2"/>
-  <rect x="28" y="28" width="304" height="584" fill="#0a1212" stroke="#143232" stroke-width="1"/>
-  <path d="M150 430 L170 300 L210 250 L250 230 L270 250 L230 290 L210 340 L200 430 Z" fill="#1a1410" stroke="#fb923c" stroke-width="3"/>
-  <path d="M210 250 L280 180 L300 200 L250 270" fill="#1a1410" stroke="#fdba74" stroke-width="3"/>
-  <path d="M210 250 L140 160 L120 180 L180 270" fill="#1a1410" stroke="#fdba74" stroke-width="3"/>
-  <circle cx="210" cy="248" r="8" fill="#fb923c"/>
-</svg>

@@ -28,6 +28,7 @@ import {
 import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
 import {
   VAULT_SIZE,
+  chassisTypeImageUrl,
   computeLoadoutTotals,
   planGearMove,
   planStarterGrants,
@@ -2033,6 +2034,9 @@ export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
 // ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 
 function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
+  const visualType = resolveVisualType(row.category, row.visualType)
+  const rawUrl = row.imageUrl
+  const imageUrl = rawUrl && !rawUrl.endsWith('.svg') ? rawUrl : chassisTypeImageUrl(visualType)
   return {
     id: row.id,
     slug: row.slug,
@@ -2040,11 +2044,11 @@ function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
     flavorText: row.flavorText,
     category: row.category,
     rarity: row.rarity,
-    visualType: resolveVisualType(row.category, row.visualType),
+    visualType,
     primaryStat: row.primaryStat,
     affixes: row.affixes ?? [],
     uniquePower: row.uniquePower ?? null,
-    imageUrl: row.imageUrl,
+    imageUrl,
     sortOrder: row.sortOrder,
   }
 }

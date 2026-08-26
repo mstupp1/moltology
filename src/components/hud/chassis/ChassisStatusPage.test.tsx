@@ -43,7 +43,7 @@ const catalog: CatalogRef[] = [
     primaryStat: 12,
     affixes: [],
     uniquePower: null,
-    imageUrl: '/images/chassis/carapace.svg',
+    imageUrl: '/images/chassis/carapace.webp',
     sortOrder: 1,
   },
   {
@@ -60,7 +60,7 @@ const catalog: CatalogRef[] = [
       name: 'Zero-Latency Clamp',
       description: 'The first grip of a session closes without hesitation.',
     },
-    imageUrl: '/images/chassis/pincer.svg',
+    imageUrl: '/images/chassis/pincer.webp',
     sortOrder: 7,
   },
 ]
@@ -121,11 +121,13 @@ describe('ChassisStatusPage', () => {
     expect(screen.queryByText(/stub readout/i)).not.toBeInTheDocument()
   })
 
-  it('equips a selected vault piece onto a matching hardpoint and updates attack', async () => {
+  it('equips a selected vault piece onto a matching hardpoint on desktop without opening bottom modal', async () => {
     render(<ChassisStatusPage />)
     const claw = await screen.findByRole('button', { name: /Synapse-Shear Claws/i })
     fireEvent.click(claw)
-    expect((await screen.findAllByText('+96 Attack')).length).toBeGreaterThan(0)
+
+    // Verify no bottom sheet modal dialog is opened on desktop
+    expect(screen.queryByRole('dialog', { name: /Gear/i })).not.toBeInTheDocument()
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Claws slot' })[0])
 
@@ -137,5 +139,27 @@ describe('ChassisStatusPage', () => {
     expect(call.data.target).toEqual({ type: 'equip', slot: 'claws' })
     expect((await screen.findAllByText('96')).length).toBeGreaterThan(0)
     expect(screen.getAllByText('Ready').length).toBeGreaterThan(0)
+  })
+
+  it('opens bottom sheet modal when tapping an item on mobile viewports', async () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('max-width'),
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })))
+
+    render(<ChassisStatusPage />)
+    const claw = await screen.findByRole('button', { name: /Synapse-Shear Claws/i })
+    fireEvent.click(claw)
+
+    expect(await screen.findByRole('dialog', { name: /Synapse-Shear Claws/i })).toBeInTheDocument()
+    expect((await screen.findAllByText('+96 Attack')).length).toBeGreaterThan(0)
+
+    vi.unstubAllGlobals()
   })
 })

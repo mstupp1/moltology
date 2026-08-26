@@ -70,6 +70,21 @@ export const ChassisStatusPage: React.FC = () => {
   const [detailItemId, setDetailItemId] = useState<string | null>(null)
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const media = window.matchMedia('(max-width: 767px)')
+    const updateMobile = () => setIsMobile(media.matches)
+    updateMobile()
+    if (media.addEventListener) {
+      media.addEventListener('change', updateMobile)
+      return () => media.removeEventListener('change', updateMobile)
+    } else if ((media as any).addListener) {
+      ;(media as any).addListener(updateMobile)
+      return () => (media as any).removeListener(updateMobile)
+    }
+  }, [])
 
   const catalogById = useMemo(() => new Map(catalog.map((c) => [c.id, c])), [catalog])
   const abilities = useMemo(
@@ -165,14 +180,14 @@ export const ChassisStatusPage: React.FC = () => {
 
   const handleSelectItem = useCallback(
     (id: string | null) => {
-      if (id && id === selectedItemId) {
-        setDetailItemId(id)
-        return
-      }
       setSelectedItemId(id)
-      if (id) setDetailItemId(id)
+      if (isMobile && id) {
+        setDetailItemId(id)
+      } else {
+        setDetailItemId(null)
+      }
     },
-    [selectedItemId]
+    [isMobile]
   )
 
   const handleSlotActivate = useCallback(
@@ -303,18 +318,6 @@ export const ChassisStatusPage: React.FC = () => {
                   onHoverItem={setHoveredItemId}
                 />
               </div>
-
-              {selectedItemId && (
-                <p className="text-[10px] text-center text-[#00ffff]/80 uppercase tracking-widest shrink-0">
-                  Gear selected — tap an empty slot or vault cell to seat it
-                </p>
-              )}
-
-              {detailCatalog && (
-                <div className="hidden md:block chitin-card chamfer-corner shadow-2xl overflow-hidden max-w-lg shrink-0">
-                  <GearDetail catalog={detailCatalog} />
-                </div>
-              )}
             </div>
 
             <div className="order-3 hidden md:flex md:flex-col md:min-h-0">
@@ -323,7 +326,7 @@ export const ChassisStatusPage: React.FC = () => {
           </div>
         </div>
 
-        {hoverCatalog && hoveredItemId !== detailItemId && (
+        {hoverCatalog && (
           <div className="hidden md:block pointer-events-none fixed top-24 right-4 z-50 w-72 max-w-[calc(100vw-2rem)]">
             <GearTooltip catalog={hoverCatalog} />
           </div>
@@ -339,10 +342,11 @@ export const ChassisStatusPage: React.FC = () => {
 
         <div className="md:hidden">
           <HudBottomSheet
-            isOpen={Boolean(detailCatalog)}
+            isOpen={isMobile && Boolean(detailCatalog)}
             onClose={() => setDetailItemId(null)}
             title={detailCatalog?.name ?? 'Gear'}
             ariaLabel="Gear detail"
+            containerClassName="md:hidden"
           >
             {detailCatalog && <GearDetail catalog={detailCatalog} />}
             {detailCatalog && (
