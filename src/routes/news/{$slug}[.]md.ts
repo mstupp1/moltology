@@ -4,7 +4,7 @@ import { getBlogPostBySlugFn } from '@/lib/server/api'
 import { INITIAL_BLOG_POSTS, type BlogPostData } from '@/lib/blog-data'
 import { markdownDocumentResponse } from '@/lib/server/document-feeds'
 
-export const Route = createFileRoute('/news/$slug.md')({
+export const Route = createFileRoute('/news/{$slug}.md')({
   server: {
     handlers: {
       GET: async ({ request, params }) => {
