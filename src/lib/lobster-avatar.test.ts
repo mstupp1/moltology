@@ -24,13 +24,14 @@ describe('lobster-avatar', () => {
     expect(parseLobsterAvatarConfig(null)).toBeNull()
   })
 
-  it('generates deterministic SVG for the same seed', () => {
+  it('generates deterministic SVG for the same seed with lobster claws layer', () => {
     const config = { style: 'critters' as const, seed: 'lobster-alpha' }
     const svg1 = generateLobsterAvatarSvg(config)
     const svg2 = generateLobsterAvatarSvg(config)
     expect(svg1).toBeTruthy()
     expect(svg1).toBe(svg2)
-    expect(svg1).toContain('<svg')
+    expect(svg1).toContain('id="lobster-claws-layer"')
+    expect(svg1).toContain('id="lobster-arms-layer"')
   })
 
   it('produces random larva seeds', () => {
