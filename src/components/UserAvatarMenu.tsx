@@ -269,33 +269,40 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                   </button>
                 </div>
 
-                {/* Settings Link */}
-                <button
-                  type="button"
-                  onClick={handleOpenSettings}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk transition-all ${
-                    isCorporate
-                      ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
-                      : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
+                {/* Account Actions Section: Settings & Sign Out */}
+                <div
+                  className={`pt-1 border-t space-y-2 ${
+                    isCorporate ? 'border-sky-100' : 'border-cyan-950/80'
                   }`}
                 >
-                  <Settings className="w-4 h-4 shrink-0" />
-                  <span>Settings</span>
-                </button>
+                  {/* Settings Link */}
+                  <button
+                    type="button"
+                    onClick={handleOpenSettings}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
+                      isCorporate
+                        ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
+                        : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 shrink-0" />
+                    <span>SETTINGS</span>
+                  </button>
 
-                {/* Sign Out Action Button */}
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
-                    isCorporate
-                      ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
-                      : 'text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600'
-                  }`}
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>SIGN OUT</span>
-                </button>
+                  {/* Sign Out Action Button */}
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
+                      isCorporate
+                        ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
+                        : 'text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600'
+                    }`}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>SIGN OUT</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -411,9 +418,9 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
 
-          {/* Settings Section: Heavy VFX */}
+          {/* Display & Performance Section: Heavy VFX */}
           <div
-            className={`py-2 px-0.5 border-b space-y-1.5 ${
+            className={`py-2 px-0.5 border-b ${
               isCorporate ? 'border-sky-100' : 'border-[#121c1d]'
             }`}
           >
@@ -479,11 +486,14 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 />
               </button>
             </div>
+          </div>
 
+          {/* Account Actions Section: Settings & Sign Out */}
+          <div className="pt-2 space-y-1.5">
             <button
               type="button"
               onClick={handleOpenSettings}
-              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk flex items-center gap-2.5 transition-all group cursor-pointer ${
+              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
                 isCorporate
                   ? 'text-sky-700 hover:bg-sky-50 border border-sky-200/80 hover:border-sky-300'
                   : 'text-[#00c3ff] hover:bg-[#00c3ff]/10 border border-cyan-900/40 hover:border-[#00c3ff]/40'
@@ -494,16 +504,14 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                   isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
                 }`}
               />
-              <span>Settings</span>
+              <span>SETTINGS</span>
             </button>
-          </div>
 
-          {/* Sign Out Action Button */}
-          <div className="pt-2">
+            {/* Sign Out Action Button */}
             <button
               type="button"
               onClick={handleSignOut}
-              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk flex items-center gap-2.5 transition-all group cursor-pointer ${
+              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
                 isCorporate
                   ? 'text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 hover:border-rose-300'
                   : 'text-[#ff5540] hover:text-white bg-[#ff3b30]/10 hover:bg-[#ff3b30]/25 border border-[#ff3b30]/30 hover:border-[#ff3b30]'
