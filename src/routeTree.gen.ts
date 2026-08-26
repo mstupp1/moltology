@@ -52,7 +52,7 @@ import { Route as ChangelogIndexRouteImport } from './routes/changelog/index'
 import { Route as ChangelogSlugRouteImport } from './routes/changelog/$slug'
 import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
-import { Route as NewsSlugDotmdRouteImport } from './routes/news/$slug[.]md'
+import { Route as NewsChar123slugChar125DotmdRouteImport } from './routes/news/{$slug}[.]md'
 import { Route as RenderCompositeRouteImport } from './routes/render/composite'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
@@ -274,11 +274,12 @@ const NewsSlugRoute = NewsSlugRouteImport.update({
   path: '/news/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NewsSlugDotmdRoute = NewsSlugDotmdRouteImport.update({
-  id: '/news/$slug.md',
-  path: '/news/$slug.md',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const NewsChar123slugChar125DotmdRoute =
+  NewsChar123slugChar125DotmdRouteImport.update({
+    id: '/news/{$slug}.md',
+    path: '/news/{$slug}.md',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const RenderCompositeRoute = RenderCompositeRouteImport.update({
   id: '/render/composite',
   path: '/render/composite',
@@ -352,7 +353,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
-  '/news/$slug.md': typeof NewsSlugDotmdRoute
+  '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
@@ -403,7 +404,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
-  '/news/$slug.md': typeof NewsSlugDotmdRoute
+  '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
@@ -456,7 +457,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/changelog/$slug': typeof ChangelogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
-  '/news/$slug.md': typeof NewsSlugDotmdRoute
+  '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
@@ -509,7 +510,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/news/$slug'
-    | '/news/$slug.md'
+    | '/news/{$slug}.md'
     | '/render/composite'
     | '/blog/'
     | '/changelog/'
@@ -560,7 +561,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/news/$slug'
-    | '/news/$slug.md'
+    | '/news/{$slug}.md'
     | '/render/composite'
     | '/blog'
     | '/changelog'
@@ -612,7 +613,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/changelog/$slug'
     | '/news/$slug'
-    | '/news/$slug.md'
+    | '/news/{$slug}.md'
     | '/render/composite'
     | '/blog/'
     | '/changelog/'
@@ -652,7 +653,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
   NewsSlugRoute: typeof NewsSlugRoute
-  NewsSlugDotmdRoute: typeof NewsSlugDotmdRoute
+  NewsChar123slugChar125DotmdRoute: typeof NewsChar123slugChar125DotmdRoute
   RenderCompositeRoute: typeof RenderCompositeRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
@@ -962,11 +963,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/news/$slug.md': {
-      id: '/news/$slug.md'
-      path: '/news/$slug.md'
-      fullPath: '/news/$slug.md'
-      preLoaderRoute: typeof NewsSlugDotmdRouteImport
+    '/news/{$slug}.md': {
+      id: '/news/{$slug}.md'
+      path: '/news/{$slug}.md'
+      fullPath: '/news/{$slug}.md'
+      preLoaderRoute: typeof NewsChar123slugChar125DotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/render/composite': {
@@ -1086,7 +1087,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
   NewsSlugRoute: NewsSlugRoute,
-  NewsSlugDotmdRoute: NewsSlugDotmdRoute,
+  NewsChar123slugChar125DotmdRoute: NewsChar123slugChar125DotmdRoute,
   RenderCompositeRoute: RenderCompositeRoute,
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
