@@ -137,6 +137,22 @@
       ],
       "instagramPostId": "6a8c73bc6e180beb3f1e322b",
       "relatedReelIds": []
+    },
+    {
+      "slug": "the-unmoved-chair",
+      "title": "The Unmoved Chair",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-08-26T13:00:00Z",
+      "coreHook": "A humanoid ran 100m in 9.39s this weekend at the World Humanoid Robot Games; sitting in the feed is the melt, standing is the first ecdysis of the night.",
+      "keyMetrics": [
+        "9.39s humanoid 100m sprint mark",
+        "2,056 robots / 666 teams at the 2026 Games",
+        "1st calcification via screenless standing"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-unmoved-chair.md"
     }
   ]
 }

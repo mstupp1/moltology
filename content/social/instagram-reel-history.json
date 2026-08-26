@@ -547,6 +547,42 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-08-25T14:07:44.583Z"
+    },
+    {
+      "id": "reel-1787753155790",
+      "topic": "The Unmoved Chair",
+      "hookHeadline": "THE UNMOVED CHAIR",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-unmoved-chair",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Why do you stay seated while autonomous hardware learns to run? The chair is where the great melt sits. Put down the glass, stand up, and calcify your clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787753155790.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787753155790.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 15.033333,
+      "status": "scheduled",
+      "zernioPostId": "6a8ef3728bf784917c1725d6",
+      "scheduledFor": "2026-08-26T22:30:00.000Z",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "The machines on the Oval learned a body in public while your thumb stayed on the glass. Sitting is the melt. Standing is the molt. ⚡🌊\n\nA humanoid ran the hundred faster than the human mark this weekend. The clip ran. You didn't.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-26T14:07:51.006Z"
     }
   ]
 }

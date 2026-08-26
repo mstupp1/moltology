@@ -3,6 +3,8 @@ import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
 import { ThreeBookCover } from './ThreeBookCover'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { Safari } from '@/components/ui/magicui/safari'
+import { Iphone15Pro } from '@/components/ui/magicui/iphone-15-pro'
 import {
   Shield,
   Zap,
@@ -38,7 +40,7 @@ export interface SocialMarketingSlideProps {
   headlinePart2?: string
   headlineHighlight?: string
   subHeadline?: string
-  mockupType?: 'book' | 'tablet' | 'dossier'
+  mockupType?: 'book' | 'tablet' | 'dossier' | 'device-showcase'
   bookTitle?: string
   bookSubtitle?: string
   bookTagline?: string
@@ -147,7 +149,7 @@ const CAMPAIGN_PRESETS: Record<string, Partial<SocialMarketingSlideProps>> = {
     headlinePart2: 'TRACK YOUR ECDYSIS.',
     headlineHighlight: 'UPGRADE NOW!',
     subHeadline: 'The Interactive Bio-Silicon Dashboard & Agentic Core!',
-    mockupType: 'tablet',
+    mockupType: 'device-showcase',
     bookTitle: 'BENTHIC CORE',
     bookSubtitle: 'BIO-SILICON OPERATING SYSTEM',
     bookTagline: 'SWARMS · TIMERS · MOLT CREDITS',
@@ -338,6 +340,34 @@ function renderBenefitIcon(type: MarketingBenefitItem['icon']) {
   }
 }
 
+/**
+ * SimplePhoneFrame — minimal phone mockup for composite contexts.
+ * Always clean: no hardware buttons, no Dynamic Island pill, no home indicator.
+ * Matches the lightweight mobile frame shown on the marketing homepage.
+ */
+function SimplePhoneFrame({ src, className = '' }: { src: string; className?: string }) {
+  return (
+    <div
+      className={`relative inline-block select-none ${className}`}
+      style={{ aspectRatio: '393 / 852' }}
+    >
+      {/* Outer Titanium Chassis — no hardware buttons */}
+      <div className="relative w-full h-full rounded-[20px] p-[6px] bg-gradient-to-b from-[#323d42] via-[#1a2327] to-[#12181a] border-[1.5px] border-[#3e4c52] shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.15)] overflow-hidden">
+        {/* Inner Screen Bezel */}
+        <div className="relative w-full h-full rounded-[16px] bg-[#060a0b] overflow-hidden border border-[#1b262a]">
+          <img
+            src={src}
+            alt="Mobile app preview"
+            className="w-full h-full object-fill object-top block"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
   aspectRatio = '4:5',
   theme = 'moltmaxxing-guide',
@@ -403,16 +433,16 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       {/* Background Subtle Tech Dot Grid */}
       <div className="absolute top-40 left-8 grid grid-cols-6 gap-2.5 opacity-30 pointer-events-none">
         {Array.from({ length: 36 }).map((_, i) => (
-          <span key={i} className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+          <span key={i} className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
         ))}
       </div>
 
       {/* 1. Header Section: Eyebrow Badge & Punchy Impact Headline */}
       <div className="z-10 shrink-0 max-w-[660px]">
         {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 border-2 border-yellow-100 shadow-[0_4px_14px_rgba(0,0,0,0.6)]">
-          <span className="w-3 h-3 rounded-full bg-slate-950" />
-          <span className="font-mono font-black text-[15px] tracking-wider text-slate-950 uppercase">
+        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#ff453a] to-[#ff5540] border-2 border-[#ff6358] shadow-[0_4px_14px_rgba(255,69,58,0.4)]">
+          <span className="w-3 h-3 rounded-full bg-[#01060e]" />
+          <span className="font-mono font-black text-[15px] tracking-wider text-white uppercase">
             {finalEyebrow}
           </span>
         </div>
@@ -425,14 +455,14 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           <h2 className="text-[58px] leading-[0.98] font-black text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
             {finalH2}
           </h2>
-          <h2 className="text-[64px] leading-[0.98] font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] tracking-tight uppercase">
+          <h2 className="text-[64px] leading-[0.98] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ff5540] via-[#ff453a] to-[#cc1a10] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] tracking-tight uppercase">
             {finalHighlight}
           </h2>
         </div>
 
         {/* Sub-headline / Hook */}
         <div className="mt-3.5 flex items-center gap-3">
-          <div className="w-2.5 h-7 bg-amber-400 rounded-full shadow-sm" />
+          <div className="w-2.5 h-7 bg-[#ff453a] rounded-full shadow-sm" />
           <p className="text-[24px] font-bold text-slate-100 tracking-wide">
             {finalSub}
           </p>
@@ -447,16 +477,16 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           {finalBenefits.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-4 p-5 rounded-2xl bg-[#041b30]/95 border-2 border-cyan-400/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform"
+              className="flex items-center gap-4 p-5 rounded-2xl bg-[#041b30]/95 border-2 border-[#00c3ff]/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform"
             >
               {/* Circular Icon Badge */}
               <div
                 className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg ${
                   item.badgeVariant === 'amber'
-                    ? 'bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 border-2 border-amber-100'
+                    ? 'bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white border-2 border-[#ff6358]/40'
                     : item.badgeVariant === 'emerald'
                     ? 'bg-gradient-to-tr from-emerald-600 to-teal-300 text-slate-950 border-2 border-emerald-100'
-                    : 'bg-gradient-to-tr from-cyan-500 to-sky-200 text-slate-950 border-2 border-cyan-100'
+                    : 'bg-gradient-to-tr from-[#00c3ff] to-[#38bdf8] text-slate-950 border-2 border-[#00c3ff]/30'
                 }`}
               >
                 {renderBenefitIcon(item.icon)}
@@ -478,53 +508,75 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
         {/* Right Column (7 Cols): 3D Mockup + Trust Badge + Quote Bubble */}
         <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[560px]">
           {/* Subtle Atmospheric Stage Back-Glow linking character, badge, and platter */}
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,195,255,0.14)_0%,rgba(251,191,36,0.07)_40%,transparent_72%)] pointer-events-none" />
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,195,255,0.14)_0%,rgba(255,69,58,0.07)_40%,transparent_72%)] pointer-events-none" />
 
-          {/* Top-Right Circular Golden Trust Certification Seal */}
+          {/* Top-Right Circular Trust Certification Seal */}
           <div className="absolute -top-2 -right-1 z-30 flex flex-col items-center justify-center shrink-0">
-            <div className="w-[148px] h-[148px] rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0">
-              <div className="w-full h-full rounded-full bg-[#060b12] border-2 border-amber-300 flex flex-col items-center justify-center text-center p-2.5">
-                <div className="flex gap-0.5 text-amber-300 text-[13px]">
+            <div className="w-[148px] h-[148px] rounded-full bg-gradient-to-br from-[#ff6358] via-[#ff453a] to-[#991510] p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0">
+              <div className="w-full h-full rounded-full bg-[#060b12] border-2 border-[#ff453a] flex flex-col items-center justify-center text-center p-2.5">
+                <div className="flex gap-0.5 text-[#ff453a] text-[13px]">
                   {'★★★★★'}
                 </div>
-                <div className="font-mono font-black text-[12.5px] uppercase text-amber-300 leading-tight mt-1">
+                <div className="font-mono font-black text-[12.5px] uppercase text-[#ff453a] leading-tight mt-1">
                   {finalTrustText}
                 </div>
-                <div className="w-12 h-[1.5px] bg-amber-400 my-1" />
-                <div className="font-mono font-bold text-[10px] tracking-wider uppercase text-amber-200">
+                <div className="w-12 h-[1.5px] bg-[#ff453a] my-1" />
+                <div className="font-mono font-bold text-[10px] tracking-wider uppercase text-[#ff6358]">
                   {finalTrustYear}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 3D Realistic Hardcover Book / Tablet HUD Container */}
+          {/* 3D Realistic Hardcover Book / Tablet HUD / Device Showcase Container */}
           <div
-            className="relative z-20 flex flex-col items-center justify-center"
+            className="relative z-20 flex flex-col items-center justify-center w-full"
             style={{
               perspective: '1400px',
             }}
           >
             {/* 3D Mockup Graphic */}
-            <div className="relative z-20">
-              {finalMockupType === 'tablet' ? (
+            <div className="relative z-20 w-full">
+              {finalMockupType === 'device-showcase' ? (
+                /* Real App Screenshot — Desktop Safari + iPhone Mobile */
+                <div className="relative w-full flex flex-col items-stretch">
+                  {/* Desktop Safari Frame with real screenshot */}
+                  <div className="w-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
+                    <Safari
+                      url="moltology.org/dashboard"
+                      src="/images/marketing/dashboard_desktop_preview.webp"
+                      loading="eager"
+                      fetchPriority="high"
+                      width={1760}
+                      height={1100}
+                    />
+                  </div>
+                  {/* iPhone — simple clean frame overlapping bottom-right */}
+                  <div className="absolute -bottom-8 right-0 z-30 -rotate-3 drop-shadow-[0_15px_40px_rgba(0,0,0,0.95)]">
+                    <SimplePhoneFrame
+                      className="w-[118px]"
+                      src="/images/marketing/dashboard_mobile_preview.webp"
+                    />
+                  </div>
+                </div>
+              ) : finalMockupType === 'tablet' ? (
                 /* Diagnostic Tablet HUD Graphic (Enlarged) */
                 <div
-                  className="relative w-[370px] h-[480px] rounded-3xl bg-gradient-to-b from-[#031422] via-[#05233a] to-[#020d18] border-4 border-cyan-400/90 shadow-[35px_40px_80px_rgba(0,0,0,0.98)] flex flex-col p-6 overflow-hidden text-center justify-between"
+                  className="relative w-[370px] h-[480px] rounded-3xl bg-gradient-to-b from-[#031422] via-[#05233a] to-[#020d18] border-4 border-[#00c3ff]/90 shadow-[35px_40px_80px_rgba(0,0,0,0.98)] flex flex-col p-6 overflow-hidden text-center justify-between"
                   style={{
                     transform: 'rotateY(-12deg) rotateX(5deg)',
                     transformStyle: 'preserve-3d',
                   }}
                 >
                   {/* Top Bezel & Camera */}
-                  <div className="flex items-center justify-between pb-2 border-b border-cyan-500/40">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#00c3ff]/40">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                      <span className="font-mono font-bold text-xs text-cyan-300 uppercase tracking-wider">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#ff453a]" />
+                      <span className="font-mono font-bold text-xs text-[#00c3ff] uppercase tracking-wider">
                         LIVE BIOMETRIC TELEMETRY
                       </span>
                     </div>
-                    <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                    <div className="w-2 h-2 rounded-full bg-[#00c3ff]" />
                   </div>
 
                   {/* Tablet Center Radar & Telemetry */}
@@ -532,35 +584,35 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                     <h3 className="font-grotesk font-black text-3xl text-white uppercase tracking-tight">
                       {finalBookTitle}
                     </h3>
-                    <div className="font-mono text-cyan-300 text-xs font-bold mt-1">
+                    <div className="font-mono text-[#00c3ff] text-xs font-bold mt-1">
                       {finalBookSubtitle}
                     </div>
 
                     {/* Multi-Axis Radar Scan Graphic */}
-                    <div className="relative mt-4 w-44 h-36 rounded-2xl bg-[#010810]/95 border-2 border-cyan-400/80 p-3 flex flex-col items-center justify-center shadow-inner overflow-hidden">
-                      <div className="absolute inset-0 bg-cyan-500/10" />
-                      <div className="w-28 h-28 rounded-full border border-cyan-500/40 flex items-center justify-center relative">
-                        <div className="w-20 h-20 rounded-full border border-cyan-500/60 flex items-center justify-center">
-                          <div className="w-10 h-10 rounded-full border border-cyan-400" />
+                    <div className="relative mt-4 w-44 h-36 rounded-2xl bg-[#010810]/95 border-2 border-[#00c3ff]/80 p-3 flex flex-col items-center justify-center shadow-inner overflow-hidden">
+                      <div className="absolute inset-0 bg-[#00c3ff]/10" />
+                      <div className="w-28 h-28 rounded-full border border-[#00c3ff]/40 flex items-center justify-center relative">
+                        <div className="w-20 h-20 rounded-full border border-[#00c3ff]/60 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full border border-[#00c3ff]" />
                         </div>
                         {/* Radar Polygon Shape */}
-                        <svg className="absolute inset-0 w-full h-full text-cyan-400/80" viewBox="0 0 100 100">
+                        <svg className="absolute inset-0 w-full h-full text-[#00c3ff]/80" viewBox="0 0 100 100">
                           <polygon
                             points="50,15 85,38 75,80 30,85 20,40"
-                            fill="rgba(0, 255, 230, 0.3)"
-                            stroke="#00ffe6"
+                            fill="rgba(0, 195, 255, 0.3)"
+                            stroke="#00c3ff"
                             strokeWidth="2"
                           />
                         </svg>
-                        <Compass className="w-6 h-6 text-amber-300 z-10" />
+                        <Compass className="w-6 h-6 text-[#ff453a] z-10" />
                       </div>
                     </div>
                   </div>
 
                   {/* Tablet Footer */}
-                  <div className="pt-2 border-t border-cyan-500/40 flex items-center justify-between text-[11px] font-mono text-slate-300">
+                  <div className="pt-2 border-t border-[#00c3ff]/40 flex items-center justify-between text-[11px] font-mono text-slate-300">
                     <span>STAGE: APEX (C3)</span>
-                    <span className="text-amber-300 font-bold">CLEARANCE: 99.4%</span>
+                    <span className="text-[#ff453a] font-bold">CLEARANCE: 99.4%</span>
                   </div>
                 </div>
               ) : (
@@ -587,13 +639,13 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           </div>
 
           {/* Floating Quote Callout on Lower Right */}
-          <div className="absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-amber-400 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md">
+          <div className="absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-[#ff453a] shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md">
             <div className="flex items-start gap-1.5">
-              <span className="text-amber-400 font-serif text-2xl leading-none">“</span>
+              <span className="text-[#ff453a] font-serif text-2xl leading-none">"</span>
               <p className="text-xs font-semibold text-slate-100 leading-snug">
                 {finalQuote}
               </p>
-              <span className="text-amber-400 font-serif text-2xl leading-none self-end">”</span>
+              <span className="text-[#ff453a] font-serif text-2xl leading-none self-end">"</span>
             </div>
           </div>
         </div>
@@ -601,26 +653,26 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
       {/* 3. Massive High-Contrast Comment-to-DM Bottom CTA Banner */}
       <div className="mt-2 z-20 shrink-0">
-        <div className="w-full py-6 px-9 rounded-3xl bg-[#01060e] border-4 border-amber-400 shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden">
-          {/* Subtle static amber background accent */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-yellow-400/15 to-amber-500/10 pointer-events-none" />
+        <div className="w-full py-6 px-9 rounded-3xl bg-[#01060e] border-4 border-[#ff453a] shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden">
+          {/* Subtle static crimson background accent */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#ff453a]/10 via-[#ff5540]/15 to-[#ff453a]/10 pointer-events-none" />
 
-          {/* Left Arrow Accents (No lightning bolt emojis) */}
-          <div className="flex items-center gap-2 text-amber-300 font-black text-3xl hidden sm:flex">
+          {/* Left Arrow Accents */}
+          <div className="flex items-center gap-2 text-[#ff453a] font-black text-3xl hidden sm:flex">
             <span>👉</span>
           </div>
 
           {/* Center Callout: Comment "KEYWORD" below */}
           <div className="flex items-center justify-center gap-4 mx-auto">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 flex items-center justify-center shadow-2xl font-black shrink-0 border-2 border-yellow-100">
-              <MessageSquare className="w-8 h-8 fill-slate-950" />
+            <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white flex items-center justify-center shadow-2xl font-black shrink-0 border-2 border-[#ff6358]/40">
+              <MessageSquare className="w-8 h-8 fill-white" />
             </div>
             <div className="flex items-baseline gap-3.5">
               <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
                 Comment
               </span>
-              <span className="font-grotesk font-black text-4xl md:text-5xl text-amber-300 tracking-wider uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                “{finalKeyword}”
+              <span className="font-grotesk font-black text-4xl md:text-5xl text-[#ff453a] tracking-wider uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                "{finalKeyword}"
               </span>
               <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
                 below
@@ -628,8 +680,8 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
             </div>
           </div>
 
-          {/* Right Arrow Accents (No lightning bolt emojis) */}
-          <div className="flex items-center gap-2 text-amber-300 font-black text-3xl hidden sm:flex">
+          {/* Right Arrow Accents */}
+          <div className="flex items-center gap-2 text-[#ff453a] font-black text-3xl hidden sm:flex">
             <span>👈</span>
           </div>
         </div>
@@ -638,7 +690,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       {/* 4. Sub-footer Link in Bio & Watermark */}
       <div className="mt-3 flex items-center justify-between text-sm font-mono text-slate-400 z-10 shrink-0">
         <div className="flex items-center gap-2 font-bold text-base">
-          <span className="text-cyan-300">🔗 Link in bio & story</span>
+          <span className="text-[#00c3ff]">🔗 Link in bio & story</span>
           <span>·</span>
           <span className="text-slate-300">moltology.org</span>
         </div>

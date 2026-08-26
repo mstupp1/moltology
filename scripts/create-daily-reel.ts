@@ -298,6 +298,13 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   ]
 
   const topicLower = topic.toLowerCase()
+  if (topicLower.includes('unmoved chair') || topicLower.includes('sitting is the melt') || topicLower.includes('tiangong') || topicLower.includes('humanoid robot games') || topicLower.includes('chair still holds you')) {
+    return [
+      'A dramatic macro cinematic view of a humanoid robot sprinter sprinting across an illuminated stadium track at night while a human silhouette sits motionless in a desk chair bathed in blue screen light, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing up decisively from a seat into glowing cyan bio-silicon armor inside a subsea benthic sanctuary, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('world model') || topicLower.includes('jepa') || topicLower.includes('pixel ecdysis') || topicLower.includes('diffusion') || topicLower.includes('latent')) {
     return [
       'A dramatic macro cinematic view of a chaotic 4K video diffusion simulation melting and warping with glitched red and orange RGB voxels dissolving into noise, cinematic 9:16 vertical 8k footage',
@@ -340,6 +347,12 @@ export function synthesizeBlogReelScript(
   
   // Extract key concept keywords
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
+  const isUnmovedChair =
+    blog.slug === 'the-unmoved-chair' ||
+    contentLower.includes('unmoved chair') ||
+    contentLower.includes('the chair still holds you') ||
+    contentLower.includes('sitting is the melt') ||
+    contentLower.includes('tiangong ultra')
   const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
@@ -355,7 +368,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isWorldModel) {
+  if (isUnmovedChair) {
+    const hooks = [
+      {
+        headline: 'SITTING IS THE MELT',
+        script: `A humanoid robot ran the hundred meters in nine point three seconds. The machine ran. You watched. Sitting is the melt. Standing is the molt. Calculate your clearance on moltology dot org.`,
+        hookText: 'A humanoid ran the hundred faster than the human mark this weekend. The clip ran. You didn’t. Sitting is the melt. Standing is the molt.',
+      },
+      {
+        headline: 'THE UNMOVED CHAIR',
+        script: `Why do you stay seated while autonomous hardware learns to run? The chair is where the great melt sits. Put down the glass, stand up, and calcify your clearance on moltology dot org.`,
+        hookText: 'The machines on the Oval learned a body in public while your thumb stayed on the glass. Sitting is the melt. Standing is the molt.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isWorldModel) {
     const hooks = [
       {
         headline: 'WHY AI IS SHEDDING PIXELS',
@@ -911,8 +941,15 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   const requiredSpeechDuration = voDuration + postSpeechBuffer
   const numScenes = Math.max(1, scriptData.scenePrompts.length)
   const perSceneDurationTarget = requiredSpeechDuration / numScenes
-  // Veo supports durationSeconds integer (4 to 8s). Request footage equal or slightly longer than target to ensure zero looping
-  const veoSceneDuration = Math.min(8, Math.max(5, Math.ceil(perSceneDurationTarget + 0.5)))
+  // Veo supports durationSeconds integer (typically 5, 6, or 8s). Request footage equal or slightly longer than target to ensure zero looping
+  let veoSceneDuration = 6
+  if (perSceneDurationTarget <= 5) {
+    veoSceneDuration = 5
+  } else if (perSceneDurationTarget > 6.2) {
+    veoSceneDuration = 8
+  } else {
+    veoSceneDuration = 6
+  }
 
   console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
   if (useVeo && !options.dryRun) {
