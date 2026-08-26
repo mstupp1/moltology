@@ -10,6 +10,8 @@ export interface LobsterAvatarDisplayProps extends PixelateOptions {
   alt?: string
   containerClassName?: string
   className?: string
+  /** Additional classes applied directly to the inner <img> element (e.g. `object-top` for portrait crop) */
+  imgClassName?: string
   maskRadial?: boolean
   pixelated?: boolean
   crt?: boolean
@@ -30,6 +32,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
   alt = 'Your avatar',
   containerClassName = '',
   className = 'w-full h-full object-cover',
+  imgClassName = '',
   pixelated = true,
   pixelResolution = 64,
   outputSize = 256,
@@ -157,7 +160,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
         <img
           src={displaySrc}
           alt={alt}
-          className={`w-full h-full object-cover brightness-[0.94] contrast-[1.08] [image-rendering:pixelated] [image-rendering:crisp-edges] ${glowStyles}`}
+          className={`w-full h-full object-cover brightness-[0.94] contrast-[1.08] [image-rendering:pixelated] [image-rendering:crisp-edges] ${glowStyles} ${imgClassName}`}
         />
 
         {/* Directional Top Illumination Gradient masked to character */}
