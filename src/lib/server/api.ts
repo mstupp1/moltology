@@ -194,7 +194,11 @@ export const getUserStatsFn = createServerFn({ method: 'POST' })
 interface UserStatsInput {
   pincerTorque?: number
   shellHardness?: number
+  processingPower?: number
+  durability?: number
   clawStrength?: number
+  socialDetachmentIndex?: number
+  submergenceDepthRating?: number
   moltmaxScore?: number
   moltmaxClearance?: string
   moltmaxStage?: string
@@ -236,7 +240,11 @@ export const updateUserStatsFn = createServerFn({ method: 'POST' })
       .object({
         pincerTorque: z.number().min(0).max(100).optional(),
         shellHardness: z.number().min(0).max(100).optional(),
+        processingPower: z.number().min(0).max(100).optional(),
+        durability: z.number().min(0).max(100).optional(),
         clawStrength: z.number().min(0).max(100).optional(),
+        socialDetachmentIndex: z.number().min(0).max(100).optional(),
+        submergenceDepthRating: z.number().min(0).max(100000).optional(),
         moltmaxScore: z.number().int().min(12).max(99).optional(),
         moltmaxClearance: z.string().min(1).max(10).optional(),
         moltmaxStage: z.string().min(1).max(100).optional(),
