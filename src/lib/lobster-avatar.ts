@@ -4,9 +4,30 @@ import critters from '@dicebear/styles/critters.json' with { type: 'json' }
 
 export const LOBSTER_AVATAR_STYLE = 'critters' as const
 
+export interface BackgroundTheme {
+  id: string
+  name: string
+  label: string
+  topColor: string
+  bottomColor: string
+  accentColor: string
+  gridColor: string
+  glowColor: string
+}
+
+export interface BackgroundPattern {
+  id: string
+  name: string
+  label: string
+  render: (theme: BackgroundTheme, patternId: string) => string
+}
+
 export interface LobsterAvatarConfig {
   style: typeof LOBSTER_AVATAR_STYLE
   seed: string
+  backgroundTheme?: string
+  backgroundPattern?: string
+  transparentBackground?: boolean
 }
 
 const crittersStyle = new Style(critters as StyleDefinition)
@@ -21,7 +42,18 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (typeof obj.seed !== 'string') return null
   const seed = obj.seed.trim()
   if (!seed || seed.length > 128) return null
-  return { style: LOBSTER_AVATAR_STYLE, seed }
+
+  const config: LobsterAvatarConfig = { style: LOBSTER_AVATAR_STYLE, seed }
+  if (typeof obj.backgroundTheme === 'string' && obj.backgroundTheme.trim()) {
+    config.backgroundTheme = obj.backgroundTheme.trim()
+  }
+  if (typeof obj.backgroundPattern === 'string' && obj.backgroundPattern.trim()) {
+    config.backgroundPattern = obj.backgroundPattern.trim()
+  }
+  if (typeof obj.transparentBackground === 'boolean') {
+    config.transparentBackground = obj.transparentBackground
+  }
+  return config
 }
 
 export function randomLobsterSeed(): string {
@@ -31,6 +63,318 @@ export function randomLobsterSeed(): string {
     return `larva-${bytes[0].toString(36)}-${bytes[1].toString(36)}`
   }
   return `larva-${Math.random().toString(36).slice(2, 10)}`
+}
+
+/**
+ * 8 Canonical On-Brand Benthic & Cyber Background Color Themes
+ * High-contrast dark oceanic and HUD environments that make red/coral chitin pop vibrantly.
+ */
+export const LOBSTER_BACKGROUND_THEMES: readonly BackgroundTheme[] = [
+  // 0: Deep Benthic Void Matrix (Classic Moltology deep abyss)
+  {
+    id: 'deep_abyss',
+    name: 'Benthic Void',
+    label: 'Deep Void',
+    topColor: '#071624',
+    bottomColor: '#01050a',
+    accentColor: '#00c3ff',
+    gridColor: 'rgba(0, 195, 255, 0.16)',
+    glowColor: 'rgba(0, 195, 255, 0.28)',
+  },
+  // 1: Sub-Benthic Hydro Trench (Bioluminescent cyan deep ocean)
+  {
+    id: 'bio_cyan',
+    name: 'Hydro Trench',
+    label: 'Hydro Cyan',
+    topColor: '#032433',
+    bottomColor: '#010d14',
+    accentColor: '#38bdf8',
+    gridColor: 'rgba(56, 189, 248, 0.18)',
+    glowColor: 'rgba(0, 255, 255, 0.32)',
+  },
+  // 2: Algal Mariana Depths (Sub-benthic emerald algae flora)
+  {
+    id: 'hydro_emerald',
+    name: 'Algal Depths',
+    label: 'Emerald Algae',
+    topColor: '#052922',
+    bottomColor: '#010f0b',
+    accentColor: '#34d399',
+    gridColor: 'rgba(52, 211, 153, 0.16)',
+    glowColor: 'rgba(52, 211, 153, 0.28)',
+  },
+  // 3: Synaptic Void Rift (Deep purple-indigo neural trench)
+  {
+    id: 'abyssal_indigo',
+    name: 'Synaptic Void',
+    label: 'Void Indigo',
+    topColor: '#180e2e',
+    bottomColor: '#070212',
+    accentColor: '#a78bfa',
+    gridColor: 'rgba(167, 139, 250, 0.16)',
+    glowColor: 'rgba(167, 139, 250, 0.26)',
+  },
+  // 4: Hydrothermal Magma Vent (Volcanic crustacean vent basalt)
+  {
+    id: 'thermal_vent',
+    name: 'Thermal Vent',
+    label: 'Magma Vent',
+    topColor: '#2a0c0a',
+    bottomColor: '#0d0202',
+    accentColor: '#ff5540',
+    gridColor: 'rgba(255, 85, 64, 0.16)',
+    glowColor: 'rgba(255, 85, 64, 0.28)',
+  },
+  // 5: Titanium Chitin Alloy (Sub-dermal metallic armor plate)
+  {
+    id: 'titanium_slate',
+    name: 'Titanium Alloy',
+    label: 'Slate Alloy',
+    topColor: '#15222e',
+    bottomColor: '#060b10',
+    accentColor: '#7dd3fc',
+    gridColor: 'rgba(125, 211, 252, 0.15)',
+    glowColor: 'rgba(125, 211, 252, 0.24)',
+  },
+  // 6: Sacred Mariana Relic (Ancient amber sediment glow)
+  {
+    id: 'sacred_amber',
+    name: 'Sacred Relic',
+    label: 'Amber Relic',
+    topColor: '#261805',
+    bottomColor: '#0c0701',
+    accentColor: '#fbbf24',
+    gridColor: 'rgba(251, 191, 36, 0.16)',
+    glowColor: 'rgba(251, 191, 36, 0.26)',
+  },
+  // 7: Cobalt Superconductor (High-frequency electric core)
+  {
+    id: 'cobalt_pulse',
+    name: 'Superconductor',
+    label: 'Cobalt Pulse',
+    topColor: '#0a1a3a',
+    bottomColor: '#020612',
+    accentColor: '#60a5fa',
+    gridColor: 'rgba(96, 165, 250, 0.18)',
+    glowColor: 'rgba(96, 165, 250, 0.32)',
+  },
+]
+
+export const LOBSTER_BACKGROUND_THEME_MAP: Record<string, BackgroundTheme> = Object.fromEntries(
+  LOBSTER_BACKGROUND_THEMES.map((theme) => [theme.id, theme])
+)
+
+/**
+ * 8 Canonical Simple Pixel-Art Background Patterns
+ * Vector geometries calibrated to downscale into authentic 16-bit arcade pixel art.
+ */
+export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
+  // 0: Coordinate Matrix Grid (Sub-benthic HUD grid with crosshair intersections)
+  {
+    id: 'matrix_grid',
+    name: 'Coordinate Matrix Grid',
+    label: 'Matrix Grid',
+    render: (theme) => {
+      const vLines = [-60, -40, -20, 0, 20, 40, 60, 80, 100, 120, 140, 160]
+        .map((x) => `<line x1="${x}" y1="-50" x2="${x}" y2="205" stroke="${theme.accentColor}" stroke-width="1.2" opacity="0.16" />`)
+        .join('')
+      const hLines = [-30, -10, 10, 30, 50, 70, 90, 110, 130, 150, 170, 190]
+        .map((y) => `<line x1="-80" y1="${y}" x2="180" y2="${y}" stroke="${theme.accentColor}" stroke-width="1.2" opacity="0.16" />`)
+        .join('')
+      const nodes = [
+        { x: -20, y: 30 },
+        { x: 120, y: 30 },
+        { x: -20, y: 130 },
+        { x: 120, y: 130 },
+        { x: 50, y: 70 },
+      ]
+        .map(
+          (pt) => `
+            <path d="M ${pt.x - 3} ${pt.y} L ${pt.x + 3} ${pt.y} M ${pt.x} ${pt.y - 3} L ${pt.x} ${pt.y + 3}" stroke="${theme.accentColor}" stroke-width="1.6" opacity="0.4" />
+            <circle cx="${pt.x}" cy="${pt.y}" r="1.5" fill="${theme.accentColor}" opacity="0.6" />
+          `
+        )
+        .join('')
+      return `<g id="pattern-matrix-grid">${vLines}${hLines}${nodes}</g>`
+    },
+  },
+  // 1: Telemetry Sonar Dots (Retro dot-matrix radar grid)
+  {
+    id: 'sonar_dots',
+    name: 'Telemetry Sonar Dots',
+    label: 'Sonar Dots',
+    render: (theme) => {
+      const dots: string[] = []
+      for (let x = -60; x <= 160; x += 22) {
+        for (let y = -35; y <= 195; y += 22) {
+          dots.push(`<circle cx="${x}" cy="${y}" r="1.8" fill="${theme.accentColor}" opacity="0.22" />`)
+        }
+      }
+      return `<g id="pattern-sonar-dots">${dots.join('')}</g>`
+    },
+  },
+  // 2: Terminal Scanlines (Horizontal telemetry raster bars)
+  {
+    id: 'terminal_scanlines',
+    name: 'Terminal Scanlines',
+    label: 'Scanlines',
+    render: (theme) => {
+      const lines: string[] = []
+      for (let y = -36; y <= 196; y += 10) {
+        lines.push(
+          `<line x1="-80" y1="${y}" x2="180" y2="${y}" stroke="${theme.accentColor}" stroke-width="2.2" opacity="0.15" />`
+        )
+      }
+      return `<g id="pattern-terminal-scanlines">${lines.join('')}</g>`
+    },
+  },
+  // 3: Carbon Chitin Weave (45-degree diagonal armor hatching)
+  {
+    id: 'carbon_weave',
+    name: 'Carbon Armor Weave',
+    label: 'Armor Weave',
+    render: (theme) => {
+      const lines: string[] = []
+      for (let offset = -280; offset <= 280; offset += 20) {
+        lines.push(
+          `<line x1="${-80 + offset}" y1="-50" x2="${-80 + offset + 260}" y2="210" stroke="${theme.accentColor}" stroke-width="1.8" opacity="0.14" />`
+        )
+      }
+      return `<g id="pattern-carbon-weave">${lines.join('')}</g>`
+    },
+  },
+  // 4: Diamond Sonar Rings (Concentric diamond telemetry rings behind torso)
+  {
+    id: 'diamond_sonar',
+    name: 'Diamond Sonar Rings',
+    label: 'Diamond Sonar',
+    render: (theme) => {
+      const cx = 50
+      const cy = 77
+      const radii = [30, 60, 90, 120, 150, 180]
+      const rings = radii
+        .map(
+          (r, idx) =>
+            `<path d="M ${cx} ${cy - r} L ${cx + r} ${cy} L ${cx} ${cy + r} L ${cx - r} ${cy} Z" stroke="${theme.accentColor}" stroke-width="${idx % 2 === 0 ? 2 : 1.2}" fill="none" opacity="${0.24 - idx * 0.03}" />`
+        )
+        .join('')
+      const cross = `
+        <line x1="-80" y1="${cy}" x2="180" y2="${cy}" stroke="${theme.accentColor}" stroke-width="1.2" opacity="0.15" stroke-dasharray="4 4" />
+        <line x1="${cx}" y1="-50" x2="${cx}" y2="205" stroke="${theme.accentColor}" stroke-width="1.2" opacity="0.15" stroke-dasharray="4 4" />
+      `
+      return `<g id="pattern-diamond-sonar">${cross}${rings}</g>`
+    },
+  },
+  // 5: Hexagonal Chitin Lattice (Exoskeleton honeycomb cells)
+  {
+    id: 'chitin_hex',
+    name: 'Hexagonal Chitin Lattice',
+    label: 'Hex Lattice',
+    render: (theme) => {
+      const hexes: string[] = []
+      const r = 18
+      const dx = r * 1.732
+      const dy = r * 1.5
+      for (let row = -2; row <= 10; row++) {
+        const y = -40 + row * dy
+        const xOffset = (row % 2 === 0) ? 0 : dx / 2
+        for (let col = -3; col <= 8; col++) {
+          const x = -50 + col * dx + xOffset
+          hexes.push(
+            `<polygon points="${x},${y - r} ${x + dx / 2},${y - r / 2} ${x + dx / 2},${y + r / 2} ${x},${y + r} ${x - dx / 2},${y + r / 2} ${x - dx / 2},${y - r / 2}" fill="none" stroke="${theme.accentColor}" stroke-width="1.2" opacity="0.13" />`
+          )
+        }
+      }
+      return `<g id="pattern-chitin-hex">${hexes.join('')}</g>`
+    },
+  },
+  // 6: Sub-Benthic Halo Core (Stepped concentric glow disc halo behind carapace)
+  {
+    id: 'radial_halo',
+    name: 'Sub-Benthic Halo Core',
+    label: 'Halo Core',
+    render: (theme) => {
+      const cx = 50
+      const cy = 72
+      const radii = [26, 52, 78, 106, 136, 168]
+      const rings = radii
+        .map(
+          (r, idx) =>
+            `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${theme.accentColor}" stroke-width="${idx === 0 ? 2.5 : 1.4}" opacity="${0.28 - idx * 0.035}" ${idx % 2 === 1 ? 'stroke-dasharray="6 4"' : ''} />`
+        )
+        .join('')
+      const core = `<circle cx="${cx}" cy="${cy}" r="38" fill="${theme.accentColor}" opacity="0.08" />`
+      return `<g id="pattern-radial-halo">${core}${rings}</g>`
+    },
+  },
+  // 7: 16-Bit Arcade Dither (Classic arcade checkerboard dither bands)
+  {
+    id: 'arcade_dither',
+    name: '16-Bit Arcade Dither',
+    label: 'Arcade Dither',
+    render: (theme) => {
+      const blocks: string[] = []
+      for (let x = -70; x <= 170; x += 12) {
+        for (let y = -40; y <= 30; y += 12) {
+          if (((x + y) / 12) % 2 === 0) {
+            blocks.push(`<rect x="${x}" y="${y}" width="5" height="5" fill="${theme.accentColor}" opacity="0.18" />`)
+          }
+        }
+      }
+      for (let x = -70; x <= 170; x += 12) {
+        for (let y = 130; y <= 200; y += 12) {
+          if (((x + y) / 12) % 2 === 0) {
+            blocks.push(`<rect x="${x}" y="${y}" width="6" height="6" fill="#000000" opacity="0.45" />`)
+          }
+        }
+      }
+      return `<g id="pattern-arcade-dither">${blocks.join('')}</g>`
+    },
+  },
+]
+
+export const LOBSTER_BACKGROUND_PATTERN_MAP: Record<string, BackgroundPattern> = Object.fromEntries(
+  LOBSTER_BACKGROUND_PATTERNS.map((pat) => [pat.id, pat])
+)
+
+/**
+ * Returns the deterministic chassis & telemetry attributes computed from an avatar seed.
+ */
+export function getLobsterAvatarSeededOptions(seed: string): {
+  theme: BackgroundTheme
+  pattern: BackgroundPattern
+  clawPose: ClawPose
+  antennaStyle: AntennaStyle
+  tailPose: 'right' | 'left' | 'center'
+} {
+  let hash1 = 0
+  let hash2 = 0
+  let hash3 = 0
+  let hash4 = 0
+  for (let i = 0; i < seed.length; i++) {
+    const ch = seed.charCodeAt(i)
+    hash1 = (((hash1 << 5) - hash1) + ch) | 0
+    hash2 = ((hash2 * 37) + ch + 11) | 0
+    hash3 = (((hash3 << 7) - hash3) + ch * 17 + 19) | 0
+    hash4 = (((hash4 << 9) + hash4) + ch * 31 + 23) | 0
+  }
+
+  const poseIndex = Math.abs(hash1) % LOBSTER_CLAW_POSES.length
+  const clawPose = LOBSTER_CLAW_POSES[poseIndex]
+
+  const antennaIndex = Math.abs(hash2) % ANTENNA_VARIANTS.length
+  const antennaStyle = ANTENNA_VARIANTS[antennaIndex]
+
+  const tailPoseIndex = Math.abs(hash1) % 3
+  const tailPose = tailPoseIndex === 0 ? 'right' : tailPoseIndex === 1 ? 'left' : 'center'
+
+  const themeIndex = Math.abs(hash3) % LOBSTER_BACKGROUND_THEMES.length
+  const theme = LOBSTER_BACKGROUND_THEMES[themeIndex]
+
+  const patternIndex = Math.abs(hash4) % LOBSTER_BACKGROUND_PATTERNS.length
+  const pattern = LOBSTER_BACKGROUND_PATTERNS[patternIndex]
+
+  return { theme, pattern, clawPose, antennaStyle, tailPose }
 }
 
 export const LOBSTER_CRUSTACEAN_OPTIONS = {
@@ -311,24 +655,23 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
  * modular antennae styles, anthropomorphic standing legs, and ground-resting fan tail
  * into the generated DiceBear SVG.
  */
-function injectLobsterChitinLayers(rawSvg: string, seed: string): string {
+function injectLobsterChitinLayers(
+  rawSvg: string,
+  configOrSeed: LobsterAvatarConfig | string
+): string {
+  const seed = typeof configOrSeed === 'string' ? configOrSeed : configOrSeed.seed
+  const config = typeof configOrSeed === 'object' ? configOrSeed : { style: LOBSTER_AVATAR_STYLE, seed }
+
   // Extract generated chitin shell fill color from SVG or fallback to canonical coral red
   const colorMatch = rawSvg.match(/fill="(#(?:c2410c|be123c|ea580c|dc2626|b91c1c|991b1b|e11d48|f97316))"/i)
   const chitinColor = colorMatch ? colorMatch[1] : '#c2410c'
-
-  // Deterministic seed hashes for claw pose and antenna variations
-  let hash1 = 0
-  let hash2 = 0
-  for (let i = 0; i < seed.length; i++) {
-    const ch = seed.charCodeAt(i)
-    hash1 = (((hash1 << 5) - hash1) + ch) | 0
-    hash2 = ((hash2 * 37) + ch) | 0
-  }
-  const poseIndex = Math.abs(hash1) % LOBSTER_CLAW_POSES.length
-  const pose = LOBSTER_CLAW_POSES[poseIndex]
-
-  const antennaIndex = Math.abs(hash2) % ANTENNA_VARIANTS.length
-  const antennaStyle = ANTENNA_VARIANTS[antennaIndex]
+  const seeded = getLobsterAvatarSeededOptions(seed)
+  const pose = seeded.clawPose
+  const antennaStyle = seeded.antennaStyle
+  const tailPose = seeded.tailPose
+  const theme = (config.backgroundTheme && LOBSTER_BACKGROUND_THEME_MAP[config.backgroundTheme]) || seeded.theme
+  const pattern = (config.backgroundPattern && LOBSTER_BACKGROUND_PATTERN_MAP[config.backgroundPattern]) || seeded.pattern
+  const isTransparent = Boolean(config.transparentBackground)
 
   // Subtle curved cartoon eyebrows positioned right above the orbital eye sockets
   const leftEyebrow = 'M 31 35 Q 37 31 43 35'
@@ -337,11 +680,34 @@ function injectLobsterChitinLayers(rawSvg: string, seed: string): string {
   // Render modular antenna variant
   const antennaeLayer = antennaStyle.render(chitinColor)
 
-  // Determine tail pose: 0 = sweep right, 1 = sweep left, 2 = straight down
-  const tailPoseIndex = Math.abs(hash1) % 3
-  const tailPose = tailPoseIndex === 0 ? 'right' : tailPoseIndex === 1 ? 'left' : 'center'
   const tailFlip = tailPose === 'left' ? 'transform="translate(100, 0) scale(-1, 1)"' : ''
   const tailShadowX = tailPose === 'right' ? 108 : tailPose === 'left' ? -8 : 50
+
+  // 0. On-Brand Background Defs and Layer
+  const bgGradId = `lobster-bg-grad-${theme.id}`
+  const bgGlowId = `lobster-bg-glow-${theme.id}`
+  const defsLayer = `
+    <defs>
+      <linearGradient id="${bgGradId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${theme.topColor}" />
+        <stop offset="100%" stop-color="${theme.bottomColor}" />
+      </linearGradient>
+      <radialGradient id="${bgGlowId}" cx="50%" cy="38%" r="65%">
+        <stop offset="0%" stop-color="${theme.glowColor}" />
+        <stop offset="60%" stop-color="${theme.glowColor}" stop-opacity="0.2" />
+        <stop offset="100%" stop-color="${theme.glowColor}" stop-opacity="0" />
+      </radialGradient>
+    </defs>`
+
+  const backgroundLayer = `
+    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}">
+      <!-- Base Background Gradient -->
+      <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGradId})" />
+      <!-- Ambient Radial Glow Disc -->
+      <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGlowId})" />
+      <!-- Seeded Telemetry & Geometry Pattern -->
+      ${pattern.render(theme, pattern.id)}
+    </g>`
 
   // Ground Contact Shadow Layer (Distinct pools for feet and ground-resting tail)
   const groundShadowLayer = `
@@ -619,28 +985,53 @@ function injectLobsterChitinLayers(rawSvg: string, seed: string): string {
 
   let outputSvg = rawSvg
 
-  // 1. Expand ViewBox from 0 0 100 100 to wide vertical character frame (fully houses wide side tails, claws, and antennas)
-  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', 'viewBox="-70 -40 240 235"')
+  // 1. Expand ViewBox from 0 0 100 100 to tightly framed square character frame (housing side tails, claws, and antennas with balanced margins)
+  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', 'viewBox="-65 -38 230 230"')
+  if (!outputSvg.includes('xmlns:xlink=')) {
+    outputSvg = outputSvg.replace('<svg ', '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ')
+  }
 
-  // 2. Strip any opaque background rect, clipPath defs, and clip-path attributes for clean alpha transparency
+  // 2. Strip any opaque background rect and outer root 100x100 viewport clipPath for clean alpha transparency
   outputSvg = outputSvg.replace(/<rect width="100" height="100"[^>]*\/>/g, '')
-  outputSvg = outputSvg.replace(/<clipPath id="[^"]+"><rect width="100" height="100"[^>]*\/><\/clipPath>/g, '')
-  outputSvg = outputSvg.replace(/clip-path="url\([^)]+\)"/g, '')
+  outputSvg = outputSvg.replace(/<clipPath id="clip-[^"]+"><rect width="100" height="100"[^>]*\/><\/clipPath>/g, '')
+  outputSvg = outputSvg.replace(/clip-path="url\(#clip-[^)]+\)"/g, '')
 
-  // 3. Suppress stubby default critters antennae (so our long sweeping feelers take precedence)
+  // 3. Ensure all <use> tags support SVG 1.1 / xlink:href for wide rasterizer and canvas compatibility
+  outputSvg = outputSvg.replace(/<use([^>]+)href="/g, '<use$1xlink:href="')
+
+  // 4. Suppress stubby default critters antennae (so our long sweeping feelers take precedence)
   outputSvg = outputSvg.replace('<g class="dbcr-t">', '<g class="dbcr-t" opacity="0">')
 
-  // 4. Inject sub-carapace elements (ground shadow, tail fan on floor, flank limbs, standing legs, abdomen, arms) behind the main carapace
-  const backgroundLayers = groundShadowLayer + tailFanLayer + flankLimbsLayer + legsLayer + abdomenLayer + armsLayer
-  const bodyUseIndex = outputSvg.indexOf('<use href="#body-')
-  if (bodyUseIndex !== -1) {
-    outputSvg = outputSvg.slice(0, bodyUseIndex) + backgroundLayers + outputSvg.slice(bodyUseIndex)
+  // 5. Inject SVG <defs> containing background gradients
+  if (!isTransparent) {
+    const svgTagIndex = outputSvg.indexOf('>')
+    if (svgTagIndex !== -1) {
+      outputSvg = outputSvg.slice(0, svgTagIndex + 1) + defsLayer + outputSvg.slice(svgTagIndex + 1)
+    }
+  }
+
+  // 6. Inject sub-carapace elements (on-brand background + pattern, ground shadow, tail fan on floor, flank limbs, standing legs, abdomen, arms) behind the main carapace
+  const backgroundLayers =
+    (isTransparent ? '' : backgroundLayer) +
+    groundShadowLayer +
+    tailFanLayer +
+    flankLimbsLayer +
+    legsLayer +
+    abdomenLayer +
+    armsLayer
+
+  const bodyUseIndex = outputSvg.indexOf('<use')
+  const bodyPeakIndex = outputSvg.search(/<use[^>]+#body-/)
+  const insertTarget = bodyPeakIndex !== -1 ? bodyPeakIndex : bodyUseIndex
+
+  if (insertTarget !== -1) {
+    outputSvg = outputSvg.slice(0, insertTarget) + backgroundLayers + outputSvg.slice(insertTarget)
   } else {
     const insertIndex = outputSvg.lastIndexOf('</g></svg>')
     outputSvg = outputSvg.slice(0, insertIndex) + backgroundLayers + outputSvg.slice(insertIndex)
   }
 
-  // 5. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
+  // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
   const endGIndex = outputSvg.lastIndexOf('</g></svg>')
   if (endGIndex !== -1) {
     outputSvg = outputSvg.slice(0, endGIndex) + clawsLayer + browLayer + antennaeLayer + outputSvg.slice(endGIndex)
@@ -659,7 +1050,7 @@ export function generateLobsterAvatarSvg(
     ...LOBSTER_CRUSTACEAN_OPTIONS,
   })
   const rawSvg = avatar.toString()
-  return injectLobsterChitinLayers(rawSvg, config.seed)
+  return injectLobsterChitinLayers(rawSvg, config)
 }
 
 export function generateLobsterAvatarDataUri(

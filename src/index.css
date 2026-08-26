@@ -343,6 +343,12 @@ input[type="range"].stat-slider::-moz-range-thumb {
   background-repeat: repeat;
 }
 
+.crt-avatar-scanlines {
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 1px, transparent 1px);
+  background-size: 100% 3px;
+  background-repeat: repeat;
+}
+
 .crt-scanlines-dual {
   background-image: 
     url('/images/scanline_pattern.png'),

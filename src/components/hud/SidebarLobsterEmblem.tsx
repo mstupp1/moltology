@@ -1,5 +1,6 @@
 import React from 'react'
 import { ChromaElement } from '@/components/ui'
+import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 import { getAssetUrl } from '@/lib/assets'
 
 export interface SidebarLobsterEmblemProps {
@@ -9,6 +10,7 @@ export interface SidebarLobsterEmblemProps {
 }
 
 export const SidebarLobsterEmblem: React.FC<SidebarLobsterEmblemProps> = ({
+  avatarSrc,
   variant,
   onClick,
 }) => {
@@ -16,6 +18,22 @@ export const SidebarLobsterEmblem: React.FC<SidebarLobsterEmblemProps> = ({
 
   const renderEmblem = () => {
     if (isCollapsed) {
+      if (avatarSrc) {
+        return (
+          <LobsterAvatarDisplay
+            src={avatarSrc}
+            alt="Carapace Avatar"
+            pixelated={true}
+            pixelResolution={48}
+            outputSize={128}
+            glowColor="cyan"
+            maskRadial={false}
+            vignette={false}
+            containerClassName="w-9 h-9"
+            className="w-full h-full object-cover"
+          />
+        )
+      }
       return (
         <ChromaElement
           src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
@@ -32,6 +50,23 @@ export const SidebarLobsterEmblem: React.FC<SidebarLobsterEmblemProps> = ({
       variant === 'mobile'
         ? 'w-20 h-20 aspect-square rounded-full overflow-hidden flex items-center justify-center'
         : 'w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center'
+
+    if (avatarSrc) {
+      return (
+        <LobsterAvatarDisplay
+          src={avatarSrc}
+          alt="Carapace Avatar"
+          pixelated={true}
+          pixelResolution={64}
+          outputSize={256}
+          glowColor="cyan"
+          maskRadial={false}
+          vignette={false}
+          containerClassName={containerClassName}
+          className="w-full h-full object-cover scale-110 transition-transform duration-300 group-hover:scale-115"
+        />
+      )
+    }
 
     return (
       <ChromaElement

@@ -28,11 +28,15 @@ export const SettingsPage: React.FC = () => {
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [savedConfig, setSavedConfig] = useState<LobsterAvatarConfig | null>(null)
   const [draftSeed, setDraftSeed] = useState('')
+  const [draftTheme, setDraftTheme] = useState<string>('auto')
+  const [draftPattern, setDraftPattern] = useState<string>('auto')
   const [loading, setLoading] = useState(true)
 
   const draftConfig: LobsterAvatarConfig = {
     style: LOBSTER_AVATAR_STYLE,
     seed: draftSeed || randomLobsterSeed(),
+    ...(draftTheme !== 'auto' ? { backgroundTheme: draftTheme } : {}),
+    ...(draftPattern !== 'auto' ? { backgroundPattern: draftPattern } : {}),
   }
 
   const loadProfile = useCallback(async () => {
@@ -49,6 +53,8 @@ export const SettingsPage: React.FC = () => {
       const parsed = parseLobsterAvatarConfig(profile?.avatarConfig)
       setSavedConfig(parsed)
       setDraftSeed(parsed?.seed ?? randomLobsterSeed())
+      setDraftTheme(parsed?.backgroundTheme ?? 'auto')
+      setDraftPattern(parsed?.backgroundPattern ?? 'auto')
     } catch {
       toast.error('Could not load settings.')
     } finally {
@@ -84,11 +90,18 @@ export const SettingsPage: React.FC = () => {
 
   const handleRandomize = () => {
     setDraftSeed(randomLobsterSeed())
+    setDraftTheme('auto')
+    setDraftPattern('auto')
   }
 
   const handleSaveAvatar = async () => {
     if (!userId || !draftSeed.trim()) return
-    const config: LobsterAvatarConfig = { style: LOBSTER_AVATAR_STYLE, seed: draftSeed.trim() }
+    const config: LobsterAvatarConfig = {
+      style: LOBSTER_AVATAR_STYLE,
+      seed: draftSeed.trim(),
+      ...(draftTheme !== 'auto' ? { backgroundTheme: draftTheme } : {}),
+      ...(draftPattern !== 'auto' ? { backgroundPattern: draftPattern } : {}),
+    }
     try {
       await persist.run('settings-avatar', async () => {
         const token = await getAuthJWTToken()
@@ -164,17 +177,17 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className="relative w-48 sm:w-56 h-[320px] sm:h-[380px] p-4 sm:p-6 rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] flex flex-col items-center justify-center overflow-hidden shrink-0 shadow-[0_0_25px_rgba(0,195,255,0.08)]">
+          <div className="relative w-48 sm:w-56 aspect-square rounded-2xl border-2 border-[#00c3ff]/40 bg-[#030c14] overflow-hidden shrink-0 shadow-[0_0_30px_rgba(0,195,255,0.18)] group">
             {/* Subtle ambient spotlight behind character */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none z-0" />
 
-            {/* Character Preview Layer with Character-Masked Scanlines */}
+            {/* Character Preview Layer */}
             <LobsterAvatarPreview
               config={draftConfig}
               size={320}
               maskRadial={false}
-              containerClassName="relative z-10 w-full h-full flex items-center justify-center"
-              className="w-full h-full object-contain"
+              containerClassName="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-cover"
               alt="Avatar preview"
             />
           </div>
