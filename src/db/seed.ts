@@ -12,7 +12,7 @@ import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
 import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
 import { INITIAL_PODCASTS } from '../lib/podcast-data'
-import { INITIAL_EQUIPMENT_CATALOG } from '../lib/equipment-seed-data'
+import { INITIAL_EQUIPMENT_CATALOG, catalogSeedInsertValues } from '../lib/equipment-seed-data'
 
 dotenv.config()
 
@@ -416,20 +416,26 @@ export async function seedDatabase(databaseUrl?: string) {
     // 10. Seed equipment catalog (chassis loadout)
     console.log('[SEED] Seeding equipment catalog...')
     for (const item of INITIAL_EQUIPMENT_CATALOG) {
+      const values = catalogSeedInsertValues(item)
       await db
         .insert(schema.equipmentCatalog)
-        .values({
-          id: item.id,
-          slug: item.slug,
-          name: item.name,
-          flavorText: item.flavorText,
-          category: item.category,
-          rarity: item.rarity,
-          primaryStat: item.primaryStat,
-          imageUrl: item.imageUrl ?? null,
-          sortOrder: item.sortOrder,
+        .values(values)
+        .onConflictDoUpdate({
+          target: schema.equipmentCatalog.id,
+          set: {
+            slug: values.slug,
+            name: values.name,
+            flavorText: values.flavorText,
+            category: values.category,
+            rarity: values.rarity,
+            visualType: values.visualType,
+            primaryStat: values.primaryStat,
+            affixes: values.affixes,
+            uniquePower: values.uniquePower,
+            imageUrl: values.imageUrl,
+            sortOrder: values.sortOrder,
+          },
         })
-        .onConflictDoNothing()
     }
     console.log(`✓ Seeded ${INITIAL_EQUIPMENT_CATALOG.length} equipment catalog entries`)
 

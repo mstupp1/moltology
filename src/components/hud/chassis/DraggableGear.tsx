@@ -9,6 +9,7 @@ export interface DraggableGearProps {
   catalog: CatalogRef
   selected?: boolean
   onSelect?: () => void
+  onHoverChange?: (hovered: boolean) => void
   compact?: boolean
 }
 
@@ -17,6 +18,7 @@ export const DraggableGear: React.FC<DraggableGearProps> = ({
   catalog,
   selected,
   onSelect,
+  onHoverChange,
   compact,
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -37,6 +39,7 @@ export const DraggableGear: React.FC<DraggableGearProps> = ({
         selected={selected}
         compact={compact}
         onClick={onSelect}
+        onHoverChange={onHoverChange}
         dragHandleProps={{ ...listeners, ...attributes }}
         className="h-full"
       />

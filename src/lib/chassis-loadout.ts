@@ -1,6 +1,18 @@
-import type { EquipmentCategory, EquipmentRarity } from '../db/schema'
+import type {
+  ChassisVisualType,
+  EquipmentAffix,
+  EquipmentCategory,
+  EquipmentRarity,
+  EquipmentUniquePower,
+} from '../db/schema'
 
-export type { EquipmentCategory, EquipmentRarity }
+export type {
+  ChassisVisualType,
+  EquipmentAffix,
+  EquipmentCategory,
+  EquipmentRarity,
+  EquipmentUniquePower,
+}
 
 export const VAULT_SIZE = 20
 
@@ -49,6 +61,53 @@ export const CATEGORY_LABELS: Record<EquipmentCategory, string> = {
   head: 'Head',
   legs: 'Legs',
   antennae: 'Antennae',
+}
+
+/** One 9:16 still per visual type. Drop matching `.webp` beside the SVG placeholders. */
+export const CHASSIS_VISUAL_TYPES: ChassisVisualType[] = [
+  'helm',
+  'carapace',
+  'pincer',
+  'hammer',
+  'antennae',
+  'greaves',
+]
+
+export const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
+  helm: 'head',
+  carapace: 'carapace',
+  pincer: 'claws',
+  hammer: 'claws',
+  antennae: 'antennae',
+  greaves: 'legs',
+}
+
+export const VISUAL_TYPE_LABELS: Record<ChassisVisualType, string> = {
+  helm: 'Helm',
+  carapace: 'Carapace',
+  pincer: 'Pincer',
+  hammer: 'Hammer',
+  antennae: 'Antennae',
+  greaves: 'Greaves',
+}
+
+export const SLOT_DEFAULT_VISUAL: Record<EquipmentCategory, ChassisVisualType> = {
+  head: 'helm',
+  carapace: 'carapace',
+  claws: 'pincer',
+  antennae: 'antennae',
+  legs: 'greaves',
+}
+
+export function chassisTypeImageUrl(visualType: ChassisVisualType): string {
+  return `/images/chassis/${visualType}.svg`
+}
+
+export function resolveVisualType(
+  category: EquipmentCategory,
+  visualType?: ChassisVisualType | null
+): ChassisVisualType {
+  return visualType || SLOT_DEFAULT_VISUAL[category]
 }
 
 export const RARITY_LABELS: Record<EquipmentRarity, string> = {
@@ -103,7 +162,10 @@ export interface CatalogRef {
   flavorText: string
   category: EquipmentCategory
   rarity: EquipmentRarity
+  visualType: ChassisVisualType
   primaryStat: number
+  affixes: EquipmentAffix[]
+  uniquePower: EquipmentUniquePower | null
   imageUrl?: string | null
   sortOrder: number
 }
@@ -143,8 +205,62 @@ export function computeLoadoutTotals(
     if (!cat) continue
     const stat = CATEGORY_TO_STAT[item.equippedSlot]
     totals[stat] += cat.primaryStat
+    for (const affix of cat.affixes ?? []) {
+      if (affix.stat in totals) totals[affix.stat] += affix.value
+    }
   }
   return totals
+}
+
+export function formatAffixLine(affix: EquipmentAffix): string {
+  const sign = affix.value >= 0 ? '+' : ''
+  return `${sign}${affix.value} ${STAT_LABELS[affix.stat]}`
+}
+
+export function primaryStatLine(catalog: CatalogRef): string {
+  const stat = CATEGORY_TO_STAT[catalog.category]
+  return `+${catalog.primaryStat} ${STAT_LABELS[stat]}`
+}
+
+export type AbilityStatus = 'Ready' | 'Locked' | 'Cooling'
+
+export interface SynapticAbility {
+  id: string
+  catalogItemId: string
+  name: string
+  description: string
+  slot: EquipmentCategory
+  status: AbilityStatus
+  locked: boolean
+}
+
+/** Unique powers from owned legendary plating. Equipped = Ready; vaulted = Locked. */
+export function deriveSynapticAbilities(
+  items: GearItemState[],
+  catalogById: Map<string, CatalogRef> | Record<string, CatalogRef>
+): SynapticAbility[] {
+  const lookup =
+    catalogById instanceof Map
+      ? (id: string) => catalogById.get(id)
+      : (id: string) => catalogById[id]
+
+  const abilities: SynapticAbility[] = []
+  for (const item of items) {
+    const cat = lookup(item.catalogItemId)
+    if (!cat?.uniquePower?.name) continue
+    const equipped = Boolean(item.equippedSlot)
+    abilities.push({
+      id: item.id,
+      catalogItemId: cat.id,
+      name: cat.uniquePower.name,
+      description: cat.uniquePower.description,
+      slot: cat.category,
+      status: equipped ? 'Ready' : 'Locked',
+      locked: !equipped,
+    })
+  }
+  abilities.sort((a, b) => Number(a.locked) - Number(b.locked) || a.name.localeCompare(b.name))
+  return abilities
 }
 
 export function findFirstFreeVaultIndex(
@@ -346,6 +462,37 @@ export function applyMoveUpdates(
       vaultIndex: u.vaultIndex,
     }
   })
+}
+
+export interface StarterGrant {
+  catalogItemId: string
+  vaultIndex: number
+}
+
+/** Fill free vault cells with any starter catalog IDs the member does not yet own. */
+export function planStarterGrants(
+  existing: GearItemState[],
+  catalogIdsPresent: Iterable<string>,
+  starterIds: string[],
+  vaultSize: number = VAULT_SIZE
+): StarterGrant[] {
+  const present = new Set(catalogIdsPresent)
+  const owned = new Set(existing.map((item) => item.catalogItemId))
+  const missing = starterIds.filter((id) => present.has(id) && !owned.has(id))
+  const planned: GearItemState[] = [...existing]
+  const grants: StarterGrant[] = []
+  for (const catalogItemId of missing) {
+    const vaultIndex = findFirstFreeVaultIndex(planned, vaultSize)
+    if (vaultIndex === null) break
+    planned.push({
+      id: `grant-${catalogItemId}`,
+      catalogItemId,
+      equippedSlot: null,
+      vaultIndex,
+    })
+    grants.push({ catalogItemId, vaultIndex })
+  }
+  return grants
 }
 
 export interface ChassisLoadoutPayload {

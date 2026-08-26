@@ -378,6 +378,19 @@ export type EquipmentCategory = 'carapace' | 'claws' | 'head' | 'legs' | 'antenn
 /** Classic rarity ladder for chassis gear. */
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
+/** Shared 9:16 art key — one image per visual type, not per catalog row. */
+export type ChassisVisualType = 'helm' | 'carapace' | 'pincer' | 'hammer' | 'antennae' | 'greaves'
+
+export type EquipmentAffix = {
+  stat: 'defense' | 'attack' | 'intelligence' | 'speed' | 'perception'
+  value: number
+}
+
+export type EquipmentUniquePower = {
+  name: string
+  description: string
+}
+
 // Global equipment catalog (public read)
 export const equipmentCatalog = pgTable('equipment_catalog', {
   id: uuid('id').primaryKey(),
@@ -386,7 +399,10 @@ export const equipmentCatalog = pgTable('equipment_catalog', {
   flavorText: text('flavorText').notNull(),
   category: text('category').$type<EquipmentCategory>().notNull(),
   rarity: text('rarity').$type<EquipmentRarity>().notNull(),
+  visualType: text('visualType').$type<ChassisVisualType>().default('carapace').notNull(),
   primaryStat: integer('primaryStat').notNull(),
+  affixes: jsonb('affixes').$type<EquipmentAffix[]>().default([]).notNull(),
+  uniquePower: jsonb('uniquePower').$type<EquipmentUniquePower | null>(),
   imageUrl: text('imageUrl'),
   sortOrder: integer('sortOrder').default(0).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
