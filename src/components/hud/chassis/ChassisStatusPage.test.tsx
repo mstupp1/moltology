@@ -16,6 +16,7 @@ vi.mock('@/lib/auth-client', () => ({
 vi.mock('@/lib/server/api', () => ({
   getChassisLoadoutFn: vi.fn(),
   moveGearItemFn: vi.fn(),
+  getUserProfileFn: vi.fn().mockResolvedValue({ avatarConfig: null }),
 }))
 
 vi.mock('@/lib/jwt', () => ({

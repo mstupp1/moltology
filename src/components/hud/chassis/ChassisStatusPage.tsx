@@ -13,7 +13,7 @@ import { Atom } from 'lucide-react'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
+import { getChassisLoadoutFn, getUserProfileFn, moveGearItemFn } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import {
   applyMoveUpdates,
@@ -30,6 +30,10 @@ import {
   type MoveTarget,
   VAULT_SIZE,
 } from '@/lib/chassis-loadout'
+import {
+  generateLobsterAvatarDataUri,
+  parseLobsterAvatarConfig,
+} from '@/lib/lobster-avatar'
 import type { EquipmentCategory } from '@/db/schema'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { GearDetail } from './GearDetail'
@@ -71,6 +75,7 @@ export const ChassisStatusPage: React.FC = () => {
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
@@ -137,6 +142,36 @@ export const ChassisStatusPage: React.FC = () => {
       cancelled = true
     }
   }, [userId, applyPayload])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadAvatar = async () => {
+      if (!userId) {
+        setAvatarSrc(null)
+        return
+      }
+      try {
+        const token = await getAuthJWTToken()
+        const profile = await getUserProfileFn({
+          data: { userId, token: token ?? undefined },
+        })
+        if (cancelled) return
+        const config = parseLobsterAvatarConfig(profile?.avatarConfig)
+        setAvatarSrc(config ? generateLobsterAvatarDataUri(config, 256) : null)
+      } catch {
+        if (!cancelled) setAvatarSrc(null)
+      }
+    }
+    loadAvatar()
+    const handleAvatarChanged = () => {
+      loadAvatar()
+    }
+    window.addEventListener('profile-avatar-changed', handleAvatarChanged)
+    return () => {
+      cancelled = true
+      window.removeEventListener('profile-avatar-changed', handleAvatarChanged)
+    }
+  }, [userId])
 
   const persistMove = useCallback(
     async (itemId: string, target: MoveTarget) => {
@@ -299,6 +334,8 @@ export const ChassisStatusPage: React.FC = () => {
                   onSelectItem={handleSelectItem}
                   onSlotActivate={handleSlotActivate}
                   onHoverItem={setHoveredItemId}
+                  avatarSrc={avatarSrc}
+                  avatarAlt={user?.name ? `${user.name}'s avatar` : 'Your avatar'}
                 />
               </div>
 

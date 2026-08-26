@@ -12,7 +12,6 @@ vi.mock('@/lib/auth-client', () => ({
 
 vi.mock('@/lib/server/api', () => ({
   getUserProfileFn: vi.fn().mockResolvedValue({ emailOptIn: false }),
-  updateEmailPreferencesFn: vi.fn().mockResolvedValue({ success: true, emailOptIn: true }),
 }))
 
 describe('UserAvatarMenu Component', () => {
@@ -168,19 +167,15 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByRole('button', { name: /sign out/i }).className).toContain('text-rose-600')
   })
 
-  it('renders Email Updates toggle and toggles opt-in preference', async () => {
-    render(<UserAvatarMenu user={mockUser} />)
+  it('renders Settings link inside dropdown menu', () => {
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
 
-    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
-    fireEvent.click(avatarBtn)
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    const settingsBtn = screen.getByRole('button', { name: /^settings$/i })
+    expect(settingsBtn).toBeInTheDocument()
 
-    expect(screen.getByText('Email Updates')).toBeInTheDocument()
-    const emailToggle = screen.getByRole('switch', { name: /toggle email updates/i })
-    expect(emailToggle).toBeInTheDocument()
-    expect(emailToggle).toHaveAttribute('aria-checked', 'false')
-
-    fireEvent.click(emailToggle)
-
-    expect(emailToggle).toHaveAttribute('aria-checked', 'true')
+    fireEvent.click(settingsBtn)
+    expect(onNavigate).toHaveBeenCalledWith('/settings')
   })
 })

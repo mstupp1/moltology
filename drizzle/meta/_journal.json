@@ -127,6 +127,13 @@
       "when": 1787770488872,
       "tag": "0017_complete_skin",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1787774119111,
+      "tag": "0018_mighty_mordo",
+      "breakpoints": true
     }
   ]
 }
