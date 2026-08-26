@@ -18,7 +18,7 @@ const legendary: CatalogRef = {
     name: 'Zero-Latency Clamp',
     description: 'The first grip of a session closes without hesitation.',
   },
-  imageUrl: '/images/chassis/pincer.svg',
+  imageUrl: '/images/chassis/pincer.webp',
   sortOrder: 7,
 }
 

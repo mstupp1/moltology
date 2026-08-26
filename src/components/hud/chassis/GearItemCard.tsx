@@ -5,6 +5,7 @@ import {
   CATEGORY_LABELS,
   chassisTypeImageUrl,
 } from '@/lib/chassis-loadout'
+import { getAssetUrl } from '@/lib/assets'
 
 export interface GearItemCardProps {
   catalog: CatalogRef
@@ -30,7 +31,11 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
   style,
 }) => {
   const rarity = RARITY_STYLES[catalog.rarity]
-  const imageSrc = catalog.imageUrl || chassisTypeImageUrl(catalog.visualType)
+  const rawSrc =
+    catalog.imageUrl && !catalog.imageUrl.endsWith('.svg')
+      ? catalog.imageUrl
+      : chassisTypeImageUrl(catalog.visualType)
+  const imageSrc = getAssetUrl(rawSrc)
 
   return (
     <button

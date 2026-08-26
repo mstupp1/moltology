@@ -38,7 +38,7 @@ describe('equipment catalog seed', () => {
     expect(urls.size).toBeLessThanOrEqual(CHASSIS_VISUAL_TYPES.length)
     for (const item of INITIAL_EQUIPMENT_CATALOG) {
       expect(item.imageUrl).toBe(chassisTypeImageUrl(item.visualType))
-      expect(item.imageUrl).toMatch(/^\/images\/chassis\/[a-z]+\.svg$/)
+      expect(item.imageUrl).toMatch(/^\/images\/chassis\/[a-z]+\.webp$/)
       expect(VISUAL_TYPE_SLOT[item.visualType]).toBe(item.category)
     }
   })

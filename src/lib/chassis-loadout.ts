@@ -100,7 +100,7 @@ export const SLOT_DEFAULT_VISUAL: Record<EquipmentCategory, ChassisVisualType> =
 }
 
 export function chassisTypeImageUrl(visualType: ChassisVisualType): string {
-  return `/images/chassis/${visualType}.svg`
+  return `/images/chassis/${visualType}.webp`
 }
 
 export function resolveVisualType(

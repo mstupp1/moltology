@@ -31,7 +31,7 @@ const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
 }
 
 function typeImage(visualType: ChassisVisualType): string {
-  return `/images/chassis/${visualType}.svg`
+  return `/images/chassis/${visualType}.webp`
 }
 
 function piece(
@@ -48,8 +48,8 @@ function piece(
 }
 
 /**
- * Original benthic catalog. Art is type-level: every helm shares helm.svg,
- * every pincer shares pincer.svg, and so on. Do not point imageUrl at a per-row file.
+ * Original benthic catalog. Art is type-level: every helm shares helm.webp,
+ * every pincer shares pincer.webp, and so on. Do not point imageUrl at a per-row file.
  */
 export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
   piece({

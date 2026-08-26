@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640" width="360" height="640" role="img" aria-label="Helm">
-  <rect width="360" height="640" fill="#070b0b"/>
-  <rect x="16" y="16" width="328" height="608" fill="none" stroke="#1c3a3a" stroke-width="2"/>
-  <rect x="28" y="28" width="304" height="584" fill="#0a1212" stroke="#143232" stroke-width="1"/>
-  <path d="M90 250 L180 190 L270 250 L270 330 L230 380 L180 400 L130 380 L90 330 Z" fill="#102222" stroke="#5eead4" stroke-width="3"/>
-  <path d="M118 292 L180 268 L242 292 L232 328 L180 344 L128 328 Z" fill="#071010" stroke="#67e8f9" stroke-width="2"/>
-  <path d="M150 310 L180 302 L210 310" fill="none" stroke="#22d3ee" stroke-width="2"/>
-  <circle cx="180" cy="318" r="6" fill="#22d3ee"/>
-</svg>
