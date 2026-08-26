@@ -164,12 +164,17 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className="relative p-2 rounded-full border border-[#00c3ff]/30 bg-[#050808]/80 shrink-0">
+          <div className="relative w-48 sm:w-56 h-[320px] sm:h-[380px] p-4 sm:p-6 rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] flex flex-col items-center justify-center overflow-hidden shrink-0 shadow-[0_0_25px_rgba(0,195,255,0.08)]">
+            {/* Subtle ambient spotlight behind character */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
+
+            {/* Character Preview Layer with Character-Masked Scanlines */}
             <LobsterAvatarPreview
               config={draftConfig}
-              size={160}
-              containerClassName="w-40 h-40"
-              className="w-full h-full object-cover"
+              size={320}
+              maskRadial={false}
+              containerClassName="relative z-10 w-full h-full flex items-center justify-center"
+              className="w-full h-full object-contain"
               alt="Avatar preview"
             />
           </div>

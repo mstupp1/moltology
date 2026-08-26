@@ -1,7 +1,6 @@
 import React from 'react'
 import { ChromaElement } from '@/components/ui'
 import { getAssetUrl } from '@/lib/assets'
-import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 
 export interface SidebarLobsterEmblemProps {
   avatarSrc?: string | null
@@ -10,41 +9,12 @@ export interface SidebarLobsterEmblemProps {
 }
 
 export const SidebarLobsterEmblem: React.FC<SidebarLobsterEmblemProps> = ({
-  avatarSrc,
   variant,
   onClick,
 }) => {
   const isCollapsed = variant === 'collapsed'
-  const isAvatar = Boolean(avatarSrc)
 
   const renderEmblem = () => {
-    if (isAvatar && avatarSrc) {
-      if (isCollapsed) {
-        return (
-          <LobsterAvatarDisplay
-            src={avatarSrc}
-            maskRadial={false}
-            containerClassName="w-9 h-9 rounded-full overflow-hidden"
-            className="w-full h-full object-cover"
-          />
-        )
-      }
-
-      const containerClassName =
-        variant === 'mobile'
-          ? 'w-20 h-20 aspect-square rounded-full overflow-hidden flex items-center justify-center'
-          : 'w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center'
-
-      return (
-        <LobsterAvatarDisplay
-          src={avatarSrc}
-          maskRadial
-          containerClassName={containerClassName}
-          className="w-full h-full object-cover scale-110 transition-transform duration-300 group-hover:scale-115"
-        />
-      )
-    }
-
     if (isCollapsed) {
       return (
         <ChromaElement
