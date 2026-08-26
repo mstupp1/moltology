@@ -1,49 +1,192 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import {
+  pixelateImage,
+  getCachedPixelatedImage,
+  type PixelateOptions,
+} from '@/lib/pixelate-avatar'
 
-export interface LobsterAvatarDisplayProps {
+export interface LobsterAvatarDisplayProps extends PixelateOptions {
   src: string
   alt?: string
   containerClassName?: string
   className?: string
   maskRadial?: boolean
   pixelated?: boolean
+  crt?: boolean
+  glowColor?: 'cyan' | 'crimson' | 'gold' | 'none'
+  terminalEffects?: boolean
+  lightingSource?: 'overhead' | 'none'
+  vignette?: boolean
 }
 
-/** Clean character avatar display — renders transparent SVG with character-masked pixel grid & drop shadow */
+/**
+ * Authentic Pixel-Art Character Avatar Display with Overhead Spotlight & Cinematic Vignette
+ * Groups the character sprite and all silhouette-masked overlay layers inside a synchronized wrapper
+ * so any scale, translation, or zoom transform applies uniformly to both the sprite and its overlays,
+ * preventing ghosting/misalignment.
+ */
 export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
   src,
   alt = 'Your avatar',
   containerClassName = '',
-  className = 'w-full h-full object-contain',
+  className = 'w-full h-full object-cover',
   pixelated = true,
+  pixelResolution = 64,
+  outputSize = 256,
+  crt = true,
+  glowColor = 'cyan',
+  maskRadial = false,
+  terminalEffects = true,
+  lightingSource = 'overhead',
+  vignette = true,
 }) => {
-  const maskStyle: React.CSSProperties = {
-    WebkitMaskImage: `url("${src}")`,
-    maskImage: `url("${src}")`,
-    WebkitMaskSize: 'contain',
-    maskSize: 'contain',
+  // Check in-memory cache synchronously for instant zero-flicker render
+  const cachedSrc = pixelated
+    ? getCachedPixelatedImage(src, { pixelResolution, outputSize })
+    : null
+
+  const [displaySrc, setDisplaySrc] = useState<string>(cachedSrc ?? src)
+
+  useEffect(() => {
+    if (!pixelated || !src) {
+      setDisplaySrc(src)
+      return
+    }
+
+    const cached = getCachedPixelatedImage(src, { pixelResolution, outputSize })
+    if (cached) {
+      setDisplaySrc(cached)
+      return
+    }
+
+    let isMounted = true
+    pixelateImage(src, { pixelResolution, outputSize }).then((pixelatedUri) => {
+      if (isMounted) {
+        setDisplaySrc(pixelatedUri)
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [src, pixelated, pixelResolution, outputSize])
+
+  const glowStyles = {
+    cyan: 'drop-shadow-[0_0_14px_rgba(0,195,255,0.4)]',
+    crimson: 'drop-shadow-[0_0_14px_rgba(255,69,58,0.4)]',
+    gold: 'drop-shadow-[0_0_14px_rgba(255,215,0,0.4)]',
+    none: '',
+  }[glowColor]
+
+  const glowBgColor = {
+    cyan: 'bg-[#00c3ff]',
+    crimson: 'bg-[#ff453a]',
+    gold: 'bg-[#ffd700]',
+    none: '',
+  }[glowColor]
+
+  const characterMaskStyle: React.CSSProperties = {
+    WebkitMaskImage: `url("${displaySrc}")`,
+    maskImage: `url("${displaySrc}")`,
+    WebkitMaskSize: 'cover',
+    maskSize: 'cover',
     WebkitMaskPosition: 'center',
     maskPosition: 'center',
     WebkitMaskRepeat: 'no-repeat',
     maskRepeat: 'no-repeat',
   }
 
-  return (
-    <div className={`relative flex items-center justify-center ${containerClassName}`}>
-      {/* 1. Base transparent mascot image with crisp pixelated rendering */}
-      <img
-        src={src}
-        alt={alt}
-        className={`w-full h-full object-contain drop-shadow-[0_0_12px_rgba(0,195,255,0.25)] transition-transform duration-300 [image-rendering:pixelated] ${className}`}
-      />
+  const radialMaskStyle: React.CSSProperties = maskRadial
+    ? {
+        WebkitMaskImage:
+          'radial-gradient(circle at center, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 80%)',
+        maskImage:
+          'radial-gradient(circle at center, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 80%)',
+      }
+    : {}
 
-      {/* 2. Cyber Pixel Grid masked strictly to the character silhouette */}
-      {pixelated && (
+  return (
+    <div
+      className={`relative inline-flex items-center justify-center overflow-hidden ${containerClassName}`}
+      style={radialMaskStyle}
+    >
+      {/* 1. Background CRT Scanlines & Cyber Grain across entire card */}
+      {terminalEffects && (
+        <>
+          <div
+            data-testid="crt-bg-scanlines"
+            className="absolute inset-0 crt-scanlines opacity-30 pointer-events-none z-0"
+          />
+          <div
+            data-testid="crt-bg-grain"
+            className="absolute inset-0 crt-grain opacity-20 mix-blend-overlay pointer-events-none z-0"
+          />
+        </>
+      )}
+
+      {/* 2. Overhead Spotlight Cone Light Source */}
+      {lightingSource === 'overhead' && (
+        <>
+          <div
+            data-testid="avatar-light-source"
+            className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(0,195,255,0.24)_0%,rgba(0,195,255,0.05)_55%,transparent_85%)] pointer-events-none z-0"
+          />
+          <div className="absolute top-0 inset-x-0 h-1/4 bg-gradient-to-b from-[#00c3ff]/18 via-transparent to-transparent pointer-events-none z-0" />
+        </>
+      )}
+
+      {/* 3. Ambient Background Phosphor Aura */}
+      {glowColor !== 'none' && (
         <div
-          className="absolute inset-0 crt-pixel-grid opacity-45 pointer-events-none z-20"
-          style={maskStyle}
+          data-testid="avatar-glow-aura"
+          className={`absolute inset-0 rounded-2xl blur-md opacity-20 pointer-events-none z-0 ${glowBgColor}`}
         />
       )}
+
+      {/* 4. Cinematic Background Edge Vignette */}
+      {vignette && (
+        <div
+          data-testid="avatar-vignette"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.45)_65%,rgba(1,4,7,0.85)_100%)] pointer-events-none z-0"
+        />
+      )}
+
+      {/* 5. Synchronized Character Layer (Wraps sprite + all silhouette-masked overlays together so all transforms/scales stay 1:1) */}
+      <div className={`relative z-10 w-full h-full flex items-center justify-center ${className}`}>
+        {/* Base Pixelated Mascot Sprite */}
+        <img
+          src={displaySrc}
+          alt={alt}
+          className={`w-full h-full object-cover brightness-[0.94] contrast-[1.08] [image-rendering:pixelated] [image-rendering:crisp-edges] ${glowStyles}`}
+        />
+
+        {/* Directional Top Illumination Gradient masked to character */}
+        {lightingSource === 'overhead' && (
+          <div
+            data-testid="avatar-character-light"
+            className="absolute inset-0 bg-gradient-to-b from-cyan-300/35 via-transparent to-black/40 pointer-events-none z-20 mix-blend-overlay"
+            style={characterMaskStyle}
+          />
+        )}
+
+        {/* CRT Scanline Layer masked strictly to the character silhouette */}
+        {crt && (
+          <div
+            data-testid="crt-avatar-scanlines"
+            className="absolute inset-0 crt-avatar-scanlines opacity-50 pointer-events-none z-20"
+            style={characterMaskStyle}
+          />
+        )}
+
+        {/* CRT Cyber Grain Overlay masked to the character silhouette */}
+        {terminalEffects && (
+          <div
+            data-testid="crt-avatar-grain"
+            className="absolute inset-0 crt-grain opacity-25 mix-blend-overlay pointer-events-none z-20"
+            style={characterMaskStyle}
+          />
+        )}
+      </div>
     </div>
   )
 }

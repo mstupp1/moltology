@@ -1864,6 +1864,8 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
 const lobsterAvatarConfigSchema = z.object({
   style: z.string().min(1).max(64),
   seed: z.string().min(1).max(128),
+  backgroundTheme: z.string().max(64).optional(),
+  backgroundPattern: z.string().max(64).optional(),
   token: z.string().optional(),
   userId: z.string().optional(),
 })
@@ -1884,9 +1886,21 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     throw new Error('Invalid avatar style.')
   }
 
-  const avatarConfig = {
+  const avatarConfig: {
+    style: string
+    seed: string
+    backgroundTheme?: string
+    backgroundPattern?: string
+  } = {
     style: LOBSTER_AVATAR_STYLE,
     seed: validated.seed.trim(),
+  }
+
+  if (validated.backgroundTheme?.trim()) {
+    avatarConfig.backgroundTheme = validated.backgroundTheme.trim()
+  }
+  if (validated.backgroundPattern?.trim()) {
+    avatarConfig.backgroundPattern = validated.backgroundPattern.trim()
   }
 
   const [updated] = await dbClient
