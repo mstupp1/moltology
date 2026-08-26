@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Mail, Settings, Shuffle, Trash2 } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Mail, Radio, Settings, Shuffle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -17,7 +17,7 @@ import {
   randomLobsterSeed,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import { LobsterAvatarPreview } from './LobsterAvatarPreview'
+import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 
 export const SettingsPage: React.FC = () => {
   const sessionRes = authClient.useSession()
@@ -32,12 +32,14 @@ export const SettingsPage: React.FC = () => {
   const [draftPattern, setDraftPattern] = useState<string>('auto')
   const [loading, setLoading] = useState(true)
 
-  const draftConfig: LobsterAvatarConfig = {
-    style: LOBSTER_AVATAR_STYLE,
-    seed: draftSeed || randomLobsterSeed(),
-    ...(draftTheme !== 'auto' ? { backgroundTheme: draftTheme } : {}),
-    ...(draftPattern !== 'auto' ? { backgroundPattern: draftPattern } : {}),
-  }
+  const draftConfig = useMemo((): LobsterAvatarConfig => {
+    return {
+      style: LOBSTER_AVATAR_STYLE,
+      seed: draftSeed,
+      ...(draftTheme !== 'auto' ? { backgroundTheme: draftTheme } : {}),
+      ...(draftPattern !== 'auto' ? { backgroundPattern: draftPattern } : {}),
+    }
+  }, [draftSeed, draftTheme, draftPattern])
 
   const loadProfile = useCallback(async () => {
     if (!userId) return
@@ -140,6 +142,12 @@ export const SettingsPage: React.FC = () => {
     }
   }
 
+  const handleRestartWelcome = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('launch-welcome-splash'))
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-3.5 sm:space-y-5 font-sans relative">
@@ -166,92 +174,117 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-4">
-        <div>
-          <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
-            Avatar
-          </h2>
-          <p className="text-xs text-[#839493] font-sans mt-0.5">
-            Shows on your chassis page when saved.
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className="relative w-48 sm:w-56 aspect-square rounded-2xl border-2 border-[#00c3ff]/40 bg-[#030c14] overflow-hidden shrink-0 shadow-[0_0_30px_rgba(0,195,255,0.18)] group">
-            {/* Subtle ambient spotlight behind character */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none z-0" />
-
-            {/* Character Preview Layer */}
-            <LobsterAvatarPreview
-              config={draftConfig}
-              size={320}
-              maskRadial={false}
-              containerClassName="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-              className="w-full h-full object-cover"
-              alt="Avatar preview"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <button
-              type="button"
-              onClick={handleRandomize}
-              className="px-4 py-2 border border-[#3a4a49] hover:border-[#00c3ff]/50 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors inline-flex items-center gap-2"
-            >
-              <Shuffle className="w-4 h-4" />
-              Randomize
-            </button>
-            <button
-              type="button"
-              onClick={handleSaveAvatar}
-              disabled={!draftSeed.trim()}
-              className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Save Avatar
-            </button>
-            {savedConfig && (
-              <button
-                type="button"
-                onClick={handleClearAvatar}
-                className="px-4 py-2 bg-[#ff5540]/10 hover:bg-[#ff5540]/20 border border-[#ff5540]/40 text-[#ff5540] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors inline-flex items-center gap-1.5"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                Remove
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
-        <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
-          <div className="flex items-center gap-3 min-w-0">
-            <Mail className="w-5 h-5 shrink-0 text-[#00c3ff]" />
-            <div className="min-w-0">
-              <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
-                Email Updates
-              </span>
-              <span className="text-xs text-[#839493] font-sans">
-                {emailOptIn ? 'Subscribed to news and updates' : 'Not subscribed'}
-              </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {/* Left: Avatar */}
+          <div className="space-y-4">
+            <div>
+              <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+                Avatar
+              </h2>
+              <p className="text-xs text-[#839493] font-sans mt-0.5">
+                Shows on your chassis page when saved.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center gap-4">
+              <LobsterAvatarPortrait
+                config={draftConfig}
+                size={320}
+                interactive
+                alt="Avatar preview"
+              />
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRandomize}
+                  className="px-4 py-2 border border-[#3a4a49] hover:border-[#00c3ff]/50 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors inline-flex items-center gap-2"
+                >
+                  <Shuffle className="w-4 h-4" />
+                  Randomize
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveAvatar}
+                  disabled={!draftSeed.trim()}
+                  className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Save Avatar
+                </button>
+                {savedConfig && (
+                  <button
+                    type="button"
+                    onClick={handleClearAvatar}
+                    className="px-4 py-2 bg-[#ff5540]/10 hover:bg-[#ff5540]/20 border border-[#ff5540]/40 text-[#ff5540] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={emailOptIn}
-            aria-label="Toggle email updates"
-            onClick={toggleEmailOptIn}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
-              emailOptIn ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                emailOptIn ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
-              }`}
-            />
-          </button>
+
+          {/* Right: Preferences */}
+          <div className="space-y-4">
+            <div>
+              <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+                Preferences
+              </h2>
+              <p className="text-xs text-[#839493] font-sans mt-0.5">
+                Communication and onboarding options.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Mail className="w-5 h-5 shrink-0 text-[#00c3ff]" />
+                  <div className="min-w-0">
+                    <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
+                      Email Updates
+                    </span>
+                    <span className="text-xs text-[#839493] font-sans">
+                      {emailOptIn ? 'Subscribed to news and updates' : 'Not subscribed'}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={emailOptIn}
+                  aria-label="Toggle email updates"
+                  onClick={toggleEmailOptIn}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
+                    emailOptIn ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                      emailOptIn ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleRestartWelcome}
+                className="w-full chitin-card-inset p-3 sm:p-4 flex items-center gap-3 rounded-sm text-left hover:bg-white/[0.03] transition-colors group"
+              >
+                <Radio className="w-5 h-5 shrink-0 text-[#00c3ff] group-hover:text-[#00ffff] transition-colors" />
+                <div className="min-w-0 flex-1">
+                  <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
+                    Replay Initiation Broadcast
+                  </span>
+                  <span className="text-xs text-[#839493] font-sans">
+                    Restart the welcome guide from the beginning
+                  </span>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

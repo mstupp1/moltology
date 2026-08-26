@@ -44,11 +44,6 @@ import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
-import { SidebarLobsterEmblem } from './SidebarLobsterEmblem'
-import {
-  generateLobsterAvatarDataUri,
-  parseLobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
@@ -258,19 +253,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const isSessionPending = sessionRes?.isPending ?? false
   const [userRole, setUserRole] = useState<string | null>(null)
-  const [sidebarAvatarSrc, setSidebarAvatarSrc] = useState<string | null>(null)
-
   const effectiveUserRole = getEffectiveRole(user, userRole)
 
-  const loadProfileAvatar = useCallback(async (userId: string) => {
+  const loadUserProfile = useCallback(async (userId: string) => {
     try {
       const token = await getAuthJWTToken().catch(() => null)
-      const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
-      const config = parseLobsterAvatarConfig(profile?.avatarConfig)
-      setSidebarAvatarSrc(config ? generateLobsterAvatarDataUri(config, 128) : null)
-      return profile
+      return await getUserProfileFn({ data: { token: token ?? undefined, userId } })
     } catch {
-      setSidebarAvatarSrc(null)
       return null
     }
   }, [])
@@ -278,11 +267,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   useEffect(() => {
     if (!user?.id) {
       setUserRole(null)
-      setSidebarAvatarSrc(null)
       return
     }
     let isSubscribed = true
-    loadProfileAvatar(user.id)
+    loadUserProfile(user.id)
       .then((profile) => {
         if (isSubscribed) {
           const role = getEffectiveRole(user, profile?.role)
@@ -298,22 +286,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     return () => {
       isSubscribed = false
     }
-  }, [user?.id, user?.email, user?.role, loadProfileAvatar])
-
-  useEffect(() => {
-    if (!user?.id) return
-    const handleAvatarChanged = () => {
-      loadProfileAvatar(user.id)
-    }
-    window.addEventListener('profile-avatar-changed', handleAvatarChanged)
-    return () => window.removeEventListener('profile-avatar-changed', handleAvatarChanged)
-  }, [user?.id, loadProfileAvatar])
+  }, [user?.id, user?.email, user?.role, loadUserProfile])
 
   const displayName = user?.name || user?.email?.split('@')[0] || larvaId
-
-  const launchWelcomeSplash = () => {
-    window.dispatchEvent(new CustomEvent('launch-welcome-splash'))
-  }
 
   const handleOpenCommandPalette = () => {
     window.dispatchEvent(new CustomEvent('open-command-palette'))
@@ -892,17 +867,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             {renderNavGroupContent(false)}
           </nav>
 
-          {/* Desktop Bottom Controls: Lobster + Combined Help & Profile/Auth */}
+          {/* Desktop Bottom Controls: Help & Profile/Auth */}
           <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] relative z-40 overflow-visible">
-            {/* Lobster Emblem */}
-            <div className="px-4 pb-3 pt-3 border-b border-[#1e2d37]/60 relative overflow-visible">
-              <SidebarLobsterEmblem
-                avatarSrc={sidebarAvatarSrc}
-                variant={isCollapsed ? 'collapsed' : 'expanded'}
-                onClick={launchWelcomeSplash}
-              />
-            </div>
-
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
             {isCollapsed ? (
               <div className="flex flex-col divide-y divide-[#1e2d37]/80 relative overflow-visible">
@@ -1136,21 +1102,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               {renderNavGroupContent(true)}
             </nav>
 
-            {/* Mobile Bottom Controls: Lobster Intact + Help & Support + Operative Account / Auth (Separate Rows) */}
+            {/* Mobile Bottom Controls: Help & Support + Operative Account / Auth */}
             <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-              {/* Lobster Emblem (Intact centered format as original) */}
-              <div className="px-4 pb-2.5 pt-2.5 border-b border-[#1e2d37]/60">
-                <SidebarLobsterEmblem
-                  avatarSrc={sidebarAvatarSrc}
-                  variant="mobile"
-                  onClick={() => {
-                    closeMobileMenu(() => {
-                      launchWelcomeSplash()
-                    })
-                  }}
-                />
-              </div>
-
               {/* Help & Support Nav Item (Full width row) */}
               <div
                 className={`transition-colors duration-150 ${

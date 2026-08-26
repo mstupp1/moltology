@@ -1,33 +1,68 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 import * as pixelateModule from '@/lib/pixelate-avatar'
+import { generateLobsterAvatarDataUri } from '@/lib/lobster-avatar'
+
+const testSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="red"/></svg>'
+const testSrc = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(testSvg)}`
+
+function mockMatchMedia(reducedMotion: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(prefers-reduced-motion: reduce)' ? reducedMotion : false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  })
+}
 
 describe('LobsterAvatarDisplay Component', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    mockMatchMedia(false)
   })
 
-  it('renders an image with pixelated styling and alt text', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('renders inline animated svg by default for svg data uris', () => {
     render(<LobsterAvatarDisplay src={testSrc} alt="Test Character Avatar" />)
+
+    const inlineSvg = screen.getByTestId('lobster-avatar-inline-svg')
+    expect(inlineSvg).toBeInTheDocument()
+    expect(inlineSvg).toHaveClass('lobster-avatar-animated')
+    expect(inlineSvg).toHaveAttribute('aria-label', 'Test Character Avatar')
+    expect(screen.queryByAltText('Test Character Avatar')).toBeNull()
+  })
+
+  it('renders pixelated img when animated is false', () => {
+    render(<LobsterAvatarDisplay src={testSrc} alt="Test Character Avatar" animated={false} />)
 
     const img = screen.getByAltText('Test Character Avatar')
     expect(img).toBeInTheDocument()
     expect(img).toHaveClass('[image-rendering:pixelated]')
+    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
   })
 
   it('does not render any crt-pixel-grid overlay div', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
     const { container } = render(<LobsterAvatarDisplay src={testSrc} />)
 
     const gridOverlay = container.querySelector('.crt-pixel-grid')
     expect(gridOverlay).toBeNull()
   })
 
-  it('asynchronously updates to pixelated data URI when available', async () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
+  it('asynchronously updates to pixelated data URI when reduced motion is enabled', async () => {
+    mockMatchMedia(true)
     const mockPixelated = 'data:image/png;base64,pixelatedLobsterPng'
 
     vi.spyOn(pixelateModule, 'pixelateImage').mockResolvedValue(mockPixelated)
@@ -41,7 +76,6 @@ describe('LobsterAvatarDisplay Component', () => {
   })
 
   it('renders masked crt-avatar-scanlines overlay by default', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
     render(<LobsterAvatarDisplay src={testSrc} />)
 
     const scanlines = screen.getByTestId('crt-avatar-scanlines')
@@ -50,14 +84,12 @@ describe('LobsterAvatarDisplay Component', () => {
   })
 
   it('suppresses crt-avatar-scanlines when crt is false', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
     render(<LobsterAvatarDisplay src={testSrc} crt={false} />)
 
     expect(screen.queryByTestId('crt-avatar-scanlines')).toBeNull()
   })
 
   it('renders ambient glow aura, grain overlay, light source, and vignette by default', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
     render(<LobsterAvatarDisplay src={testSrc} glowColor="cyan" terminalEffects={true} />)
 
     expect(screen.getByTestId('avatar-glow-aura')).toBeInTheDocument()
@@ -70,17 +102,33 @@ describe('LobsterAvatarDisplay Component', () => {
   })
 
   it('suppresses vignette when vignette is false', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
     render(<LobsterAvatarDisplay src={testSrc} vignette={false} />)
 
     expect(screen.queryByTestId('avatar-vignette')).toBeNull()
   })
 
   it('suppresses light source when lightingSource is none', () => {
-    const testSrc = 'data:image/svg+xml;charset=utf-8,%3Csvg%3E%3C/svg%3E'
     render(<LobsterAvatarDisplay src={testSrc} lightingSource="none" />)
 
     expect(screen.queryByTestId('avatar-light-source')).toBeNull()
     expect(screen.queryByTestId('avatar-character-light')).toBeNull()
+  })
+
+  it('applies eased eye tracking transform on the svg eyes layer', async () => {
+    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'larva-eye-test' }, 256)
+    expect(avatarSrc).toBeTruthy()
+
+    render(<LobsterAvatarDisplay src={avatarSrc!} eyeTracking animated />)
+
+    const inlineSvg = screen.getByTestId('lobster-avatar-inline-svg')
+    const eyesLayer = inlineSvg.querySelector('#lobster-eyes-layer')
+    expect(eyesLayer).toBeTruthy()
+
+    fireEvent.mouseMove(window, { clientX: 9999, clientY: 9999 })
+
+    await waitFor(() => {
+      const transform = (eyesLayer as SVGGraphicsElement).style.transform
+      expect(transform).toMatch(/translate\(.+px, .+px\)/)
+    })
   })
 })
