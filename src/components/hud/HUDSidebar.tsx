@@ -31,7 +31,7 @@ import {
   Biohazard,
   Microscope,
   Lock,
-  Settings,
+
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -338,13 +338,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           icon: Atom,
           path: '/oracle',
         },
-        {
-          id: 'settings',
-          label: 'SETTINGS',
-          shortLabel: 'SETTINGS',
-          icon: Settings,
-          path: '/settings',
-        },
+
       ],
     },
     {
