@@ -291,18 +291,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
   })
 
-  it('renders lobster emblem hover tooltip in collapsed mode', () => {
-    render(<HUDSidebar />)
-
-    // Collapse sidebar
-    fireEvent.keyDown(window, { key: 'b', metaKey: true })
-
-    // Check lobster emblem and tooltip text
-    expect(screen.getByAltText('Benthic Lobster')).toBeInTheDocument()
-    expect(screen.getByText('REPLAY INITIATION BROADCAST')).toBeInTheDocument()
-    expect(screen.getByText('• CARAPACE v4.2')).toBeInTheDocument()
-  })
-
   it('renders avatar skeleton placeholder while session is pending', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: null,

@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import {
   pixelateImage,
   getCachedPixelatedImage,
   type PixelateOptions,
 } from '@/lib/pixelate-avatar'
+import {
+  computeLobsterEyeOffset,
+  decodeSvgDataUri,
+  resolveIdleAnimationPhase,
+  stepLobsterEyeOffset,
+} from '@/lib/lobster-avatar-idle'
 
 export interface LobsterAvatarDisplayProps extends PixelateOptions {
   src: string
   alt?: string
   containerClassName?: string
   className?: string
-  /** Additional classes applied directly to the inner <img> element (e.g. `object-top` for portrait crop) */
+  /** Additional classes applied directly to the inner sprite (img or inline SVG wrapper) */
   imgClassName?: string
   maskRadial?: boolean
   pixelated?: boolean
@@ -19,6 +25,12 @@ export interface LobsterAvatarDisplayProps extends PixelateOptions {
   terminalEffects?: boolean
   lightingSource?: 'overhead' | 'none'
   vignette?: boolean
+  /** Enable layered idle breathing/sway animation (default true) */
+  animated?: boolean
+  /** Optional seed for deterministic animation phase offset */
+  animationSeed?: string
+  /** Subtle cursor-following eye shift with eased resistance (default on) */
+  eyeTracking?: boolean
 }
 
 /**
@@ -42,16 +54,104 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
   terminalEffects = true,
   lightingSource = 'overhead',
   vignette = true,
+  animated = true,
+  animationSeed,
+  eyeTracking = true,
 }) => {
-  // Check in-memory cache synchronously for instant zero-flicker render
-  const cachedSrc = pixelated
+  const rootRef = useRef<HTMLDivElement>(null)
+  const animatedRef = useRef<HTMLDivElement>(null)
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    if (!media) return
+    const sync = () => setReducedMotion(media.matches)
+    sync()
+    media.addEventListener?.('change', sync)
+    return () => media.removeEventListener?.('change', sync)
+  }, [])
+
+  const useAnimatedSvg = animated && !reducedMotion && src.startsWith('data:image/svg+xml')
+
+  const animatedSvgMarkup = useMemo(() => {
+    if (!useAnimatedSvg) return null
+    return decodeSvgDataUri(src)
+  }, [useAnimatedSvg, src])
+
+  const idlePhase = useMemo(
+    () => resolveIdleAnimationPhase(src, animationSeed),
+    [src, animationSeed]
+  )
+
+  const idleStyle = useAnimatedSvg
+    ? ({ '--lobster-idle-phase': idlePhase } as React.CSSProperties)
+    : undefined
+
+  const applyEyeOffset = useCallback((x: number, y: number) => {
+    const layer = animatedRef.current?.querySelector('#lobster-eyes-layer')
+    if (!(layer instanceof SVGGraphicsElement)) return
+    layer.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`
+  }, [])
+
+  const resetEyeOffset = useCallback(() => {
+    const layer = animatedRef.current?.querySelector('#lobster-eyes-layer')
+    if (layer instanceof SVGGraphicsElement) {
+      layer.style.removeProperty('transform')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!eyeTracking || !useAnimatedSvg || reducedMotion) {
+      resetEyeOffset()
+      return
+    }
+
+    const target = { x: 0, y: 0 }
+    const current = { x: 0, y: 0 }
+    let raf = 0
+    let running = true
+
+    const tick = () => {
+      if (!running) return
+      const next = stepLobsterEyeOffset(current, target)
+      current.x = next.x
+      current.y = next.y
+      applyEyeOffset(current.x, current.y)
+      raf = requestAnimationFrame(tick)
+    }
+
+    const onMove = (event: MouseEvent) => {
+      const anchor = rootRef.current
+      if (!anchor) return
+      const offset = computeLobsterEyeOffset(
+        event.clientX,
+        event.clientY,
+        anchor.getBoundingClientRect()
+      )
+      target.x = offset.x
+      target.y = offset.y
+    }
+
+    raf = requestAnimationFrame(tick)
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => {
+      running = false
+      cancelAnimationFrame(raf)
+      window.removeEventListener('mousemove', onMove)
+      resetEyeOffset()
+    }
+  }, [eyeTracking, useAnimatedSvg, reducedMotion, animatedSvgMarkup, applyEyeOffset, resetEyeOffset])
+
+  const shouldPixelate = pixelated && !useAnimatedSvg
+
+  const cachedSrc = shouldPixelate
     ? getCachedPixelatedImage(src, { pixelResolution, outputSize })
     : null
 
   const [displaySrc, setDisplaySrc] = useState<string>(cachedSrc ?? src)
 
   useEffect(() => {
-    if (!pixelated || !src) {
+    if (!shouldPixelate || !src) {
       setDisplaySrc(src)
       return
     }
@@ -72,7 +172,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
     return () => {
       isMounted = false
     }
-  }, [src, pixelated, pixelResolution, outputSize])
+  }, [src, shouldPixelate, pixelResolution, outputSize])
 
   const glowStyles = {
     cyan: 'drop-shadow-[0_0_14px_rgba(0,195,255,0.4)]',
@@ -88,9 +188,11 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
     none: '',
   }[glowColor]
 
+  const maskSrc = src
+
   const characterMaskStyle: React.CSSProperties = {
-    WebkitMaskImage: `url("${displaySrc}")`,
-    maskImage: `url("${displaySrc}")`,
+    WebkitMaskImage: `url("${maskSrc}")`,
+    maskImage: `url("${maskSrc}")`,
     WebkitMaskSize: 'cover',
     maskSize: 'cover',
     WebkitMaskPosition: 'center',
@@ -108,8 +210,11 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
       }
     : {}
 
+  const spriteClasses = `w-full h-full brightness-[0.94] contrast-[1.08] ${glowStyles} ${imgClassName}`
+
   return (
     <div
+      ref={rootRef}
       className={`relative inline-flex items-center justify-center overflow-hidden ${containerClassName}`}
       style={radialMaskStyle}
     >
@@ -156,12 +261,23 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
 
       {/* 5. Synchronized Character Layer (Wraps sprite + all silhouette-masked overlays together so all transforms/scales stay 1:1) */}
       <div className={`relative z-10 w-full h-full flex items-center justify-center ${className}`}>
-        {/* Base Pixelated Mascot Sprite */}
-        <img
-          src={displaySrc}
-          alt={alt}
-          className={`w-full h-full object-cover brightness-[0.94] contrast-[1.08] [image-rendering:pixelated] [image-rendering:crisp-edges] ${glowStyles} ${imgClassName}`}
-        />
+        {useAnimatedSvg && animatedSvgMarkup ? (
+          <div
+            ref={animatedRef}
+            data-testid="lobster-avatar-inline-svg"
+            className={`lobster-avatar-animated ${spriteClasses} [&>svg]:w-full [&>svg]:h-full [image-rendering:pixelated] [image-rendering:crisp-edges]`}
+            style={idleStyle}
+            dangerouslySetInnerHTML={{ __html: animatedSvgMarkup }}
+            role="img"
+            aria-label={alt}
+          />
+        ) : (
+          <img
+            src={displaySrc}
+            alt={alt}
+            className={`${spriteClasses} object-cover [image-rendering:pixelated] [image-rendering:crisp-edges]`}
+          />
+        )}
 
         {/* Directional Top Illumination Gradient masked to character */}
         {lightingSource === 'overhead' && (

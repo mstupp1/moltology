@@ -62,6 +62,13 @@ describe('lobster-avatar', () => {
     expect(svg1).toContain('id="lobster-claws-layer"')
     expect(svg1).toContain('id="lobster-arms-layer"')
     expect(svg1).toContain('id="lobster-brow-layer"')
+    expect(svg1).toContain('id="lobster-carapace-layer"')
+    expect(svg1).toContain('id="lobster-eyes-layer"')
+    expect(svg1).toContain('class="lobster-idle-layer lobster-idle-carapace"')
+    expect(svg1).toContain('id="lobster-arm-left"')
+    expect(svg1).toContain('id="lobster-arm-right"')
+    expect(svg1).toContain('id="lobster-claw-left"')
+    expect(svg1).toContain('id="lobster-claw-right"')
   })
 
   it('computes deterministic seeded background theme and pattern', () => {

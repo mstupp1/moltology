@@ -183,7 +183,6 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
                 alt="Carapace Avatar Preview"
                 containerClassName="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
                 className="w-full h-full object-cover"
-                pixelated={true}
                 pixelResolution={64}
               />
             ) : (

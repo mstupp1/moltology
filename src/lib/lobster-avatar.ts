@@ -494,6 +494,38 @@ function renderClawElement(
     </g>`
 }
 
+function wrapDiceBearUsesInCarapaceLayer(svg: string): string {
+  const bodyPeakIndex = svg.search(/<use[^>]+#body-/)
+  const startIndex = bodyPeakIndex !== -1 ? bodyPeakIndex : svg.indexOf('<use')
+  if (startIndex === -1) return svg
+
+  const useTagPattern = /<use[^>]*\/>/g
+  useTagPattern.lastIndex = startIndex
+
+  const matches: { start: number; end: number }[] = []
+  let match: RegExpExecArray | null
+  while ((match = useTagPattern.exec(svg)) !== null) {
+    if (match.index < startIndex) continue
+    if (matches.length > 0) {
+      const gap = svg.slice(matches[matches.length - 1].end, match.index).trim()
+      if (gap) break
+    }
+    matches.push({ start: match.index, end: match.index + match[0].length })
+  }
+
+  if (matches.length === 0) return svg
+
+  const blockStart = matches[0].start
+  const blockEnd = matches[matches.length - 1].end
+  const usesBlock = svg.slice(blockStart, blockEnd)
+  const eyesWrappedBlock = usesBlock.replace(
+    /(<use[^>]*(?:xlink:)?href="#eyes-[^"]+"[^>]*\/>)/,
+    '<g id="lobster-eyes-layer" class="lobster-eye-track-layer">$1</g>'
+  )
+  const wrapped = `<g id="lobster-carapace-layer" class="lobster-idle-layer lobster-idle-carapace">${eyesWrappedBlock}</g>`
+  return svg.slice(0, blockStart) + wrapped + svg.slice(blockEnd)
+}
+
 interface AntennaStyle {
   name: string
   render: (chitinColor: string) => string
@@ -509,7 +541,7 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
   {
     name: 'sweeping_whips',
     render: (chitin) => `
-      <g id="lobster-antennae-layer" data-antenna="sweeping_whips">
+      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="sweeping_whips">
         <!-- Shadow -->
         <g opacity="0.25" transform="translate(1.5, 2)">
           <path d="M 43 32 C 40 10 30 -10 14 -24" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
@@ -540,7 +572,7 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
   {
     name: 'cyber_lightning',
     render: (chitin) => `
-      <g id="lobster-antennae-layer" data-antenna="cyber_lightning">
+      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="cyber_lightning">
         <!-- Shadow -->
         <g opacity="0.25" transform="translate(1.5, 2)">
           <path d="M 43 30 L 36 12 L 42 2 L 26 -14 L 16 -26" stroke="#020810" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
@@ -569,7 +601,7 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
   {
     name: 'spiral_horns',
     render: (chitin) => `
-      <g id="lobster-antennae-layer" data-antenna="spiral_horns">
+      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="spiral_horns">
         <!-- Shadow -->
         <g opacity="0.25" transform="translate(1.5, 2)">
           <path d="M 43 30 C 40 8 20 0 14 -12 C 8 -22 18 -30 26 -22 C 30 -16 26 -10 18 -14" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
@@ -594,7 +626,7 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
   {
     name: 'twin_beacons',
     render: (chitin) => `
-      <g id="lobster-antennae-layer" data-antenna="twin_beacons">
+      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="twin_beacons">
         <!-- Shadow -->
         <g opacity="0.25" transform="translate(1.5, 2)">
           <path d="M 44 30 C 43 10 40 -10 36 -28" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
@@ -622,7 +654,7 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
   {
     name: 'plumed_crest',
     render: (chitin) => `
-      <g id="lobster-antennae-layer" data-antenna="plumed_crest">
+      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="plumed_crest">
         <!-- Shadow -->
         <g opacity="0.25" transform="translate(1.5, 2)">
           <path d="M 43 30 C 40 8 28 -8 16 -24" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
@@ -725,7 +757,7 @@ function injectLobsterChitinLayers(
   const tailFanLayer =
     tailPose === 'center'
       ? `
-    <g id="lobster-tail-fan-layer" data-tail-pose="center">
+    <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="center">
       <!-- Floor Shadow Layer for Straight Down Tail -->
       <g opacity="0.28" transform="translate(0, 3)">
         <ellipse cx="50" cy="176" rx="38" ry="6" fill="#020810" />
@@ -782,7 +814,7 @@ function injectLobsterChitinLayers(
       <path d="M 56 167 C 68 168 79 174 78 178 C 72 179 62 175 55 168" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
     </g>`
       : `
-    <g id="lobster-tail-fan-layer" data-tail-pose="${tailPose}" ${tailFlip}>
+    <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="${tailPose}" ${tailFlip}>
       <!-- Shadow Layer on Floor -->
       <g opacity="0.28" transform="translate(2.5, 3)">
         <!-- Conical Trunk Shadow (Fattest at body, tapering to fan) -->
@@ -871,7 +903,7 @@ function injectLobsterChitinLayers(
 
   // Anthropomorphic Bipedal Standing Legs (Planted on ground line y=172 with wide muscular stance)
   const legsLayer = `
-    <g id="lobster-legs-layer">
+    <g id="lobster-legs-layer" class="lobster-idle-layer lobster-idle-legs">
       <!-- Legs Drop Shadow -->
       <g opacity="0.24" transform="translate(1.5, 2)">
         <!-- Left Standing Leg -->
@@ -925,7 +957,7 @@ function injectLobsterChitinLayers(
 
   // Massive, Robust Anthropomorphic Abdominal Pleon Somites (Full-width torso)
   const abdomenLayer = `
-    <g id="lobster-abdomen-layer">
+    <g id="lobster-abdomen-layer" class="lobster-idle-layer lobster-idle-abdomen">
       <!-- Somite 5 / Armored Pelvic Girdle (Broad solid base) -->
       <path d="M 20 122 C 18 131 22 137 28 137 L 72 137 C 78 137 82 131 80 122 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
       <path d="M 20 122 C 18 131 22 137 28 137 L 72 137 C 78 137 82 131 80 122 Z" fill="${chitinColor}" />
@@ -964,18 +996,26 @@ function injectLobsterChitinLayers(
         <path d="${pose.rightArm}" fill="#020810" />
       </g>
       <!-- Base Arm Tubes -->
-      <path d="${pose.leftArm}" fill="${chitinColor}" />
-      <path d="${pose.rightArm}" fill="${chitinColor}" />
+      <g id="lobster-arm-left" class="lobster-idle-layer lobster-idle-arm-left">
+        <path d="${pose.leftArm}" fill="${chitinColor}" />
+      </g>
+      <g id="lobster-arm-right" class="lobster-idle-layer lobster-idle-arm-right">
+        <path d="${pose.rightArm}" fill="${chitinColor}" />
+      </g>
     </g>`
 
   const clawsLayer = `
     <g id="lobster-claws-layer">
-      ${renderClawElement(pose.leftClaw, chitinColor)}
-      ${renderClawElement(pose.rightClaw, chitinColor)}
+      <g id="lobster-claw-left" class="lobster-idle-layer lobster-idle-claw-left">
+        ${renderClawElement(pose.leftClaw, chitinColor)}
+      </g>
+      <g id="lobster-claw-right" class="lobster-idle-layer lobster-idle-claw-right">
+        ${renderClawElement(pose.rightClaw, chitinColor)}
+      </g>
     </g>`
 
   const browLayer = `
-    <g id="lobster-brow-layer">
+    <g id="lobster-brow-layer" class="lobster-idle-layer lobster-idle-brow">
       <!-- Left & Right sculpted cartoon chitin eyebrows -->
       <path d="${leftEyebrow}" stroke="#020810" stroke-width="2.5" stroke-linecap="round" opacity="0.22" />
       <path d="${leftEyebrow}" stroke="${chitinColor}" stroke-width="1.8" stroke-linecap="round" />
@@ -1030,6 +1070,8 @@ function injectLobsterChitinLayers(
     const insertIndex = outputSvg.lastIndexOf('</g></svg>')
     outputSvg = outputSvg.slice(0, insertIndex) + backgroundLayers + outputSvg.slice(insertIndex)
   }
+
+  outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg)
 
   // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
   const endGIndex = outputSvg.lastIndexOf('</g></svg>')

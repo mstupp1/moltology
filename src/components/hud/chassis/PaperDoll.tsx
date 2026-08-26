@@ -8,7 +8,7 @@ import {
   EQUIPMENT_CATEGORIES,
 } from '@/lib/chassis-loadout'
 import { DraggableGear } from './DraggableGear'
-import { LobsterAvatarDisplay } from '@/components/hud/LobsterAvatarDisplay'
+import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 
 const LEFT_SLOTS: EquipmentCategory[] = ['head', 'carapace', 'antennae']
 const RIGHT_SLOTS: EquipmentCategory[] = ['claws', 'legs']
@@ -128,32 +128,27 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
     )
   }
 
-  const renderCenterUnit = (sizeClass: string, imgSizeClass: string) => (
-    <div
-      className={`relative flex items-center justify-center ${sizeClass} rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] overflow-hidden p-3 sm:p-4 shadow-[0_0_25px_rgba(0,195,255,0.08)]`}
-    >
-      {/* Subtle ambient spotlight behind character */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
-
-      {/* Character Image Layer */}
+  const renderCenterUnit = (sizeClass: string) => (
+    <div className={`relative flex items-center justify-center ${sizeClass} shrink-0`}>
       {avatarSrc ? (
-        <LobsterAvatarDisplay
+        <LobsterAvatarPortrait
           src={avatarSrc}
+          size={320}
           alt={avatarAlt}
-          pixelated={true}
-          pixelResolution={64}
-          containerClassName={`relative z-10 ${imgSizeClass} flex items-center justify-center`}
-          className="w-full h-full object-contain"
+          className="w-full h-full max-w-[min(100%,14rem)] max-h-[min(100%,14rem)]"
         />
       ) : (
-        <ChromaElement
-          src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
-          alt="Chassis unit schematic"
-          blendMode="screen"
-          glowColor="cyan"
-          terminalEffects={false}
-          className={`relative z-10 ${imgSizeClass} object-contain`}
-        />
+        <div className="relative flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] overflow-hidden p-3 sm:p-4 shadow-[0_0_25px_rgba(0,195,255,0.08)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
+          <ChromaElement
+            src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
+            alt="Chassis unit schematic"
+            blendMode="screen"
+            glowColor="cyan"
+            terminalEffects={false}
+            className="relative z-10 w-full h-full object-contain"
+          />
+        </div>
       )}
     </div>
   )
@@ -170,9 +165,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
           {LEFT_SLOTS.map(renderSlot)}
         </div>
 
-        <div className="relative flex items-center justify-center w-48 md:w-56 aspect-[4/5] max-h-[350px] shrink-0">
-          {renderCenterUnit('w-48 md:w-56 aspect-[4/5] max-h-[350px]', 'w-full h-full')}
-        </div>
+        {renderCenterUnit('w-48 md:w-56 aspect-square max-h-[350px]')}
 
         <div className="flex flex-col items-center justify-center gap-2 w-16 md:w-20">
           {RIGHT_SLOTS.map(renderSlot)}
@@ -182,9 +175,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
 
       {/* Mobile: lobster then 5-slot strip */}
       <div className="flex sm:hidden flex-col items-center justify-center gap-3 w-full flex-1 min-h-0">
-        <div className="relative flex items-center justify-center w-44 aspect-[4/5] max-h-[260px] shrink-0">
-          {renderCenterUnit('w-44 aspect-[4/5] max-h-[260px]', 'w-full h-full')}
-        </div>
+        {renderCenterUnit('w-44 aspect-square max-h-[260px]')}
         <div className="grid grid-cols-5 gap-1.5 w-full max-w-sm mx-auto justify-items-center">
           {EQUIPMENT_CATEGORIES.map(renderSlot)}
         </div>
