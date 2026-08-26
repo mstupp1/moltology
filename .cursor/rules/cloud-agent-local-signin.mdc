@@ -1,19 +1,15 @@
 ---
-description: Sign into the local app with CURSORAGENT_LOGIN and CURSORAGENT_PASSWORD. Never print or commit those values.
+description: Sign into the local app only when a test needs a session. Use CURSORAGENT_LOGIN and CURSORAGENT_PASSWORD. Never print those values.
 alwaysApply: true
 ---
 
-# Local app sign-in (cloud agents)
+# Local app sign-in
 
-When a task needs a signed-in member on the **local** Moltology app (dev server against Neon `dev`):
+Do not sign in by default. Sign into the **local** app only when a test or task needs a member session.
 
-1. Read `CURSORAGENT_LOGIN` and `CURSORAGENT_PASSWORD` from the process environment.
-2. Open the local Sign In flow (`/login` or `/auth?mode=login`).
-3. Enter the email from `CURSORAGENT_LOGIN` and the password from `CURSORAGENT_PASSWORD`, then submit Sign In.
-4. Never print, log, commit, echo, screenshot, or record those values. Refer to them by **name only**.
+`CURSORAGENT_LOGIN` and `CURSORAGENT_PASSWORD` are Cloud Agent secrets. Local Cursor usually will not have them.
 
-## Hard limits
-
-- Never put these values in `AGENTS.md`, `.env` files, `.cursor/environment.json`, source code, comments, PRs, or walkthrough artifacts.
-- This account is a **cloud-agent test member only**. Do not use Probe's `qa@moltology.org`. Do not use this account on production `moltology.org`.
-- If `CURSORAGENT_LOGIN` or `CURSORAGENT_PASSWORD` is missing, say so and skip login. Do not guess, invent credentials, or fall back to another account.
+1. If either var is unset, skip login and say so.
+2. Open `/login` or `/auth?mode=login`.
+3. Fill email and password from those env vars, then Sign In.
+4. Never print, log, commit, or echo the values.
