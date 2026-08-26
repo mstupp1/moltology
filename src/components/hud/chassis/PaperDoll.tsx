@@ -129,16 +129,19 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   }
 
   const renderCenterUnit = (sizeClass: string, imgSizeClass: string) => (
-    <div className={`relative flex items-center justify-center ${sizeClass}`}>
-      <div className="absolute inset-0 rounded-full border border-[#00c3ff]/25" />
-      <div className="absolute inset-3 rounded-full border border-[#00c3ff]/15" />
+    <div
+      className={`relative flex items-center justify-center ${sizeClass} rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] overflow-hidden p-4 sm:p-6 shadow-[0_0_25px_rgba(0,195,255,0.08)]`}
+    >
+      {/* Subtle ambient spotlight behind character */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
+
+      {/* Character Image Layer with Character-Masked Scanlines */}
       {avatarSrc ? (
         <LobsterAvatarDisplay
           src={avatarSrc}
           alt={avatarAlt}
-          maskRadial
-          containerClassName={`relative ${imgSizeClass} rounded-full overflow-hidden`}
-          className={`w-full h-full object-cover`}
+          containerClassName={`relative z-10 ${imgSizeClass} flex items-center justify-center`}
+          className="w-full h-full object-contain"
         />
       ) : (
         <ChromaElement
@@ -146,7 +149,8 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
           alt="Chassis unit schematic"
           blendMode="screen"
           glowColor="cyan"
-          className={`relative ${imgSizeClass} object-contain`}
+          terminalEffects={false}
+          className={`relative z-10 ${imgSizeClass} object-contain`}
         />
       )}
     </div>
@@ -164,8 +168,8 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
           {LEFT_SLOTS.map(renderSlot)}
         </div>
 
-        <div className="relative flex items-center justify-center w-36 h-36 md:w-48 md:h-48 shrink-0">
-          {renderCenterUnit('w-36 h-36 md:w-48 md:h-48', 'w-28 h-28 md:w-40 md:h-40')}
+        <div className="relative flex items-center justify-center w-48 md:w-56 h-[320px] md:h-[390px] shrink-0">
+          {renderCenterUnit('w-48 md:w-56 h-[320px] md:h-[390px]', 'w-full h-full')}
         </div>
 
         <div className="flex flex-col items-center justify-center gap-2 w-16 md:w-20">
@@ -176,8 +180,8 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
 
       {/* Mobile: lobster then 5-slot strip */}
       <div className="flex sm:hidden flex-col items-center justify-center gap-3 w-full flex-1 min-h-0">
-        <div className="relative flex items-center justify-center w-28 h-28 shrink-0">
-          {renderCenterUnit('w-28 h-28', 'w-24 h-24')}
+        <div className="relative flex items-center justify-center w-44 h-64 shrink-0">
+          {renderCenterUnit('w-44 h-64', 'w-full h-full')}
         </div>
         <div className="grid grid-cols-5 gap-1.5 w-full max-w-sm mx-auto justify-items-center">
           {EQUIPMENT_CATEGORIES.map(renderSlot)}

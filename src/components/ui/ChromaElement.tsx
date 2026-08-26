@@ -22,7 +22,7 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
   containerClassName = '',
   pulse = false,
   hoverScale = true,
-  maskRadial = true,
+  maskRadial = false,
   terminalEffects = true,
 }) => {
   const glowStyles = {
@@ -52,10 +52,10 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
         pulse ? 'animate-pulse' : ''
       } ${containerClassName}`}
     >
-      {/* Background Radial Glow */}
+      {/* Background Glow */}
       {glowColor !== 'none' && (
         <div
-          className={`absolute inset-0 rounded-full blur-md opacity-20 pointer-events-none ${
+          className={`absolute inset-0 rounded-2xl blur-md opacity-15 pointer-events-none ${
             glowColor === 'cyan'
               ? 'bg-[#00c3ff]'
               : glowColor === 'crimson'
@@ -78,8 +78,8 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
       {/* CRT Terminal Overlays: Static Scanlines & Grain */}
       {terminalEffects && (
         <>
-          <div className="absolute inset-0 rounded-full crt-scanlines pointer-events-none z-20" />
-          <div className="absolute inset-0 rounded-full crt-grain opacity-35 mix-blend-overlay pointer-events-none z-20" />
+          <div className="absolute inset-0 rounded-2xl crt-scanlines pointer-events-none z-20" />
+          <div className="absolute inset-0 rounded-2xl crt-grain opacity-25 mix-blend-overlay pointer-events-none z-20" />
         </>
       )}
     </div>

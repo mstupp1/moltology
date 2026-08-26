@@ -148,35 +148,40 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
         <div className="lg:col-span-5 flex flex-col items-center space-y-4">
           {/* Avatar Hologram Card */}
           <div
-            className="relative w-full aspect-square max-w-[260px] sm:max-w-[290px] rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center border border-[#00ffff]/30 bg-[#020b12]/90 overflow-hidden group shrink-0"
-            style={{
-              boxShadow:
-                '0 0 30px rgba(0,255,255,0.12), inset 0 0 25px rgba(0,255,255,0.06)',
-            }}
+            className="relative w-full aspect-[3/4] max-w-[260px] sm:max-w-[290px] min-h-[320px] rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center border border-[#00ffff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] overflow-hidden group shrink-0 shadow-[0_0_25px_rgba(0,255,255,0.08)]"
           >
-            {/* Tech Corner Reticles */}
-            <div className="absolute top-2 left-2 text-[10px] text-[#00ffff]/40 font-mono">┌</div>
-            <div className="absolute top-2 right-2 text-[10px] text-[#00ffff]/40 font-mono">┐</div>
-            <div className="absolute bottom-2 left-2 text-[10px] text-[#00ffff]/40 font-mono">└</div>
-            <div className="absolute bottom-2 right-2 text-[10px] text-[#00ffff]/40 font-mono">┘</div>
+            {/* Subtle ambient spotlight behind character */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,255,255,0.12),transparent_70%)] pointer-events-none" />
 
-            {/* Glowing Reticle Rings in background */}
-            <div className="absolute w-52 h-52 rounded-full border border-[#00ffff]/10 pointer-events-none animate-pulse" />
-            <div className="absolute w-36 h-36 rounded-full border border-[#00ffff]/15 pointer-events-none" />
-
-            {/* Live Avatar Preview */}
+            {/* Live Avatar Preview with Character-Masked Pixel Grid */}
             {avatarDataUri ? (
-              <img
-                src={avatarDataUri}
-                alt="Carapace Avatar Preview"
-                className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 object-contain transition-transform duration-300 group-hover:scale-105"
-              />
+              <div className="relative z-10 w-full h-full max-h-[320px] flex items-center justify-center">
+                <img
+                  src={avatarDataUri}
+                  alt="Carapace Avatar Preview"
+                  className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-transform duration-300 group-hover:scale-105 [image-rendering:pixelated]"
+                />
+                {/* Cyber Pixel Grid masked ONLY to the character silhouette */}
+                <div
+                  className="absolute inset-0 crt-pixel-grid opacity-45 pointer-events-none z-20"
+                  style={{
+                    WebkitMaskImage: `url("${avatarDataUri}")`,
+                    maskImage: `url("${avatarDataUri}")`,
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                    WebkitMaskPosition: 'center',
+                    maskPosition: 'center',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                  }}
+                />
+              </div>
             ) : (
-              <div className="w-40 h-40 rounded-full bg-[#051520] animate-pulse" />
+              <div className="w-40 h-56 rounded-2xl bg-[#051520] animate-pulse" />
             )}
 
             {/* Badge Tag */}
-            <div className="absolute bottom-2.5 z-10 px-2.5 py-0.5 rounded-full bg-[#00ffff]/15 border border-[#00ffff]/40 text-[9px] font-mono tracking-widest text-[#00ffff] uppercase">
+            <div className="absolute bottom-2.5 z-30 px-2.5 py-0.5 rounded-full bg-[#00ffff]/15 border border-[#00ffff]/40 text-[9px] font-mono tracking-widest text-[#00ffff] uppercase">
               CHASSIS VERIFIED
             </div>
           </div>

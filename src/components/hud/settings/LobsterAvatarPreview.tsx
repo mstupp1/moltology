@@ -19,11 +19,11 @@ export interface LobsterAvatarPreviewProps {
  */
 export const LobsterAvatarPreview: React.FC<LobsterAvatarPreviewProps> = ({
   config,
-  size = 192,
-  className = 'w-full h-full object-cover',
+  size = 256,
+  className = 'w-full h-full object-contain',
   containerClassName = '',
   alt = 'Avatar preview',
-  maskRadial = true,
+  maskRadial = false,
 }) => {
   const [dataUri, setDataUri] = useState<string | null>(null)
 
@@ -39,8 +39,7 @@ export const LobsterAvatarPreview: React.FC<LobsterAvatarPreviewProps> = ({
   if (!config || !dataUri) {
     return (
       <div
-        className={`flex items-center justify-center bg-[#050808] border border-dashed border-[#3a4a49] rounded-full ${containerClassName} ${className}`}
-        style={{ width: size, height: size }}
+        className={`flex items-center justify-center bg-[#050808] border border-dashed border-[#3a4a49] rounded-2xl ${containerClassName} ${className}`}
         aria-hidden
       >
         <span className="text-[10px] uppercase tracking-wider text-[#4a5a59] text-center px-2">
@@ -55,7 +54,7 @@ export const LobsterAvatarPreview: React.FC<LobsterAvatarPreviewProps> = ({
       src={dataUri}
       alt={alt}
       maskRadial={maskRadial}
-      containerClassName={`rounded-full overflow-hidden ${containerClassName}`}
+      containerClassName={`rounded-2xl overflow-hidden flex items-center justify-center ${containerClassName}`}
       className={className}
     />
   )
