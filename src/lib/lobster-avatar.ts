@@ -110,7 +110,7 @@ const LOBSTER_CLAW_POSES: readonly ClawPose[] = [
     name: 'victory_right',
     leftArm: 'M 38 76 C 24 76 16 78 12 82 C 8 86 12 92 18 90 C 24 88 30 82 38 84 Z',
     rightArm: 'M 62 78 C 76 76 86 64 90 48 C 94 42 88 38 82 42 C 78 54 70 74 62 86 Z',
-    leftClaw: { x: 10, y: 78, rot: -135, scale: 0.75 },
+    leftClaw: { x: 10, y: 84, rot: -100, scale: 0.75 },
     rightClaw: { x: 90, y: 38, rot: 30, scale: 0.85, flipX: true },
   },
   // 2: Left Wave / Victory (Left raised UP, Right lowered hanging naturally at side)
@@ -119,15 +119,15 @@ const LOBSTER_CLAW_POSES: readonly ClawPose[] = [
     leftArm: 'M 38 78 C 24 76 14 64 10 48 C 6 42 12 38 18 42 C 22 54 30 74 38 86 Z',
     rightArm: 'M 62 76 C 76 76 84 78 88 82 C 92 86 88 92 82 90 C 76 88 70 82 62 84 Z',
     leftClaw: { x: 10, y: 38, rot: -30, scale: 0.85 },
-    rightClaw: { x: 90, y: 78, rot: 135, scale: 0.75, flipX: true },
+    rightClaw: { x: 90, y: 84, rot: 100, scale: 0.75, flipX: true },
   },
   // 3: Hip Rest / Lowered (Both arms relaxed, both claws hanging naturally at sides)
   {
     name: 'hip_rest',
     leftArm: 'M 38 76 C 24 76 16 78 12 82 C 8 86 12 92 18 90 C 24 88 30 82 38 84 Z',
     rightArm: 'M 62 76 C 76 76 84 78 88 82 C 92 86 88 92 82 90 C 76 88 70 82 62 84 Z',
-    leftClaw: { x: 10, y: 78, rot: -135, scale: 0.75 },
-    rightClaw: { x: 90, y: 78, rot: 135, scale: 0.75, flipX: true },
+    leftClaw: { x: 10, y: 84, rot: -100, scale: 0.75 },
+    rightClaw: { x: 90, y: 84, rot: 100, scale: 0.75, flipX: true },
   },
 ]
 
