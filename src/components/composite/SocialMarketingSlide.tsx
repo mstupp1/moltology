@@ -3,6 +3,7 @@ import { CompositeContainer, CompositeAspectRatio } from './CompositeContainer'
 import { MascotOverlay, MascotKey } from './MascotOverlay'
 import { ThreeBookCover } from './ThreeBookCover'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { HeaderBrand } from '@/components/ui/HeaderBrand'
 import { Safari } from '@/components/ui/magicui/safari'
 import { Iphone15Pro } from '@/components/ui/magicui/iphone-15-pro'
 import {
@@ -691,10 +692,12 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       <div className="mt-3 flex items-center justify-between text-sm font-mono text-slate-400 z-10 shrink-0">
         <div className="flex items-center gap-2 font-bold text-base">
           <span className="text-[#00c3ff]">🔗 Link in bio & story</span>
-          <span>·</span>
-          <span className="text-slate-300">moltology.org</span>
         </div>
-        <MoltNationLogo size="md" theme="dark" />
+        <HeaderBrand
+          logoSize="sm"
+          subtext="MOLTOLOGY.ORG · JOIN THE ORDER"
+          className="opacity-90"
+        />
       </div>
     </CompositeContainer>
   )
