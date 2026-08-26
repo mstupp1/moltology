@@ -30,7 +30,7 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.queryByText('Carcinus Ascendant')).not.toBeInTheDocument()
   })
 
-  it('opens dropdown menu when avatar button is clicked and displays user details and SIGN OUT button', () => {
+  it('opens dropdown menu when avatar button is clicked and displays user details, SETTINGS, and SIGN OUT button', () => {
     render(<UserAvatarMenu user={mockUser} />)
 
     const btn = screen.getByRole('button', { name: /user account menu/i })
@@ -38,7 +38,10 @@ describe('UserAvatarMenu Component', () => {
 
     expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
     expect(screen.getByText('carcinus@moltology.org')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^sign out$/i })).toBeInTheDocument()
+    expect(screen.getByText('SIGN OUT')).toBeInTheDocument()
+    expect(screen.getByText('SETTINGS')).toBeInTheDocument()
   })
 
   it('triggers authClient.signOut when clicking SIGN OUT button inside dropdown menu', async () => {
@@ -48,7 +51,7 @@ describe('UserAvatarMenu Component', () => {
     const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
     fireEvent.click(avatarBtn)
 
-    const signOutBtn = screen.getByRole('button', { name: /sign out/i })
+    const signOutBtn = screen.getByRole('button', { name: /^sign out$/i })
     fireEvent.click(signOutBtn)
 
     expect(authClient.signOut).toHaveBeenCalled()
