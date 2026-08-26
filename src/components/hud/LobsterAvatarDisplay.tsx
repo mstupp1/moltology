@@ -5,11 +5,16 @@ import {
   type PixelateOptions,
 } from '@/lib/pixelate-avatar'
 import {
-  computeLobsterEyeOffset,
+  computeLobsterPupilOffset,
   decodeSvgDataUri,
+  LOBSTER_EYE_TRACK_FOLLOW_LEFT,
+  LOBSTER_EYE_TRACK_FOLLOW_RIGHT,
   resolveIdleAnimationPhase,
   stepLobsterEyeOffset,
+  type LobsterPupilSide,
 } from '@/lib/lobster-avatar-idle'
+
+const PUPIL_SIDES: LobsterPupilSide[] = ['left', 'right']
 
 export interface LobsterAvatarDisplayProps extends PixelateOptions {
   src: string
@@ -87,49 +92,55 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
     ? ({ '--lobster-idle-phase': idlePhase } as React.CSSProperties)
     : undefined
 
-  const applyEyeOffset = useCallback((x: number, y: number) => {
-    const layer = animatedRef.current?.querySelector('#lobster-eyes-layer')
-    if (!(layer instanceof SVGGraphicsElement)) return
-    layer.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`
+  const applyPupilOffsets = useCallback((offsets: Record<LobsterPupilSide, { x: number; y: number }>) => {
+    for (const side of PUPIL_SIDES) {
+      const layer = animatedRef.current?.querySelector(`#lobster-pupil-${side}`)
+      if (!(layer instanceof SVGGraphicsElement)) continue
+      const { x, y } = offsets[side]
+      layer.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`
+    }
   }, [])
 
-  const resetEyeOffset = useCallback(() => {
-    const layer = animatedRef.current?.querySelector('#lobster-eyes-layer')
-    if (layer instanceof SVGGraphicsElement) {
-      layer.style.removeProperty('transform')
+  const resetPupilOffsets = useCallback(() => {
+    for (const side of PUPIL_SIDES) {
+      const layer = animatedRef.current?.querySelector(`#lobster-pupil-${side}`)
+      if (layer instanceof SVGGraphicsElement) {
+        layer.style.removeProperty('transform')
+      }
     }
   }, [])
 
   useEffect(() => {
     if (!eyeTracking || !useAnimatedSvg || reducedMotion) {
-      resetEyeOffset()
+      resetPupilOffsets()
       return
     }
 
-    const target = { x: 0, y: 0 }
-    const current = { x: 0, y: 0 }
+    const target = {
+      left: { x: 0, y: 0 },
+      right: { x: 0, y: 0 },
+    }
+    const current = {
+      left: { x: 0, y: 0 },
+      right: { x: 0, y: 0 },
+    }
     let raf = 0
     let running = true
 
     const tick = () => {
       if (!running) return
-      const next = stepLobsterEyeOffset(current, target)
-      current.x = next.x
-      current.y = next.y
-      applyEyeOffset(current.x, current.y)
+      current.left = stepLobsterEyeOffset(current.left, target.left, LOBSTER_EYE_TRACK_FOLLOW_LEFT)
+      current.right = stepLobsterEyeOffset(current.right, target.right, LOBSTER_EYE_TRACK_FOLLOW_RIGHT)
+      applyPupilOffsets(current)
       raf = requestAnimationFrame(tick)
     }
 
     const onMove = (event: MouseEvent) => {
       const anchor = rootRef.current
       if (!anchor) return
-      const offset = computeLobsterEyeOffset(
-        event.clientX,
-        event.clientY,
-        anchor.getBoundingClientRect()
-      )
-      target.x = offset.x
-      target.y = offset.y
+      const rect = anchor.getBoundingClientRect()
+      target.left = computeLobsterPupilOffset(event.clientX, event.clientY, rect, 'left')
+      target.right = computeLobsterPupilOffset(event.clientX, event.clientY, rect, 'right')
     }
 
     raf = requestAnimationFrame(tick)
@@ -138,9 +149,9 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
       running = false
       cancelAnimationFrame(raf)
       window.removeEventListener('mousemove', onMove)
-      resetEyeOffset()
+      resetPupilOffsets()
     }
-  }, [eyeTracking, useAnimatedSvg, reducedMotion, animatedSvgMarkup, applyEyeOffset, resetEyeOffset])
+  }, [eyeTracking, useAnimatedSvg, reducedMotion, animatedSvgMarkup, applyPupilOffsets, resetPupilOffsets])
 
   const shouldPixelate = pixelated && !useAnimatedSvg
 

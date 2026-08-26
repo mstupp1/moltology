@@ -692,7 +692,7 @@ body.vfx-disabled [class*="drop-shadow-"],
 
 /* Legs stay planted — no idle animation to preserve frame stability */
 
-.lobster-avatar-animated .lobster-eye-track-layer {
+.lobster-avatar-animated .lobster-pupil-track-layer {
   transform-box: fill-box;
   transform-origin: center;
   will-change: transform;

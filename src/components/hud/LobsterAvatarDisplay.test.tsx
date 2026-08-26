@@ -114,21 +114,29 @@ describe('LobsterAvatarDisplay Component', () => {
     expect(screen.queryByTestId('avatar-character-light')).toBeNull()
   })
 
-  it('applies eased eye tracking transform on the svg eyes layer', async () => {
-    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'larva-eye-test' }, 256)
+  it('applies eased pupil tracking transform on each svg pupil layer', async () => {
+    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'eye-variant-5' }, 256)
     expect(avatarSrc).toBeTruthy()
 
     render(<LobsterAvatarDisplay src={avatarSrc!} eyeTracking animated />)
 
     const inlineSvg = screen.getByTestId('lobster-avatar-inline-svg')
+    const leftPupil = inlineSvg.querySelector('#lobster-pupil-left')
+    const rightPupil = inlineSvg.querySelector('#lobster-pupil-right')
     const eyesLayer = inlineSvg.querySelector('#lobster-eyes-layer')
+    expect(leftPupil).toBeTruthy()
+    expect(rightPupil).toBeTruthy()
     expect(eyesLayer).toBeTruthy()
 
     fireEvent.mouseMove(window, { clientX: 9999, clientY: 9999 })
 
     await waitFor(() => {
-      const transform = (eyesLayer as SVGGraphicsElement).style.transform
-      expect(transform).toMatch(/translate\(.+px, .+px\)/)
+      const leftTransform = (leftPupil as SVGGraphicsElement).style.transform
+      const rightTransform = (rightPupil as SVGGraphicsElement).style.transform
+      expect(leftTransform).toMatch(/translate\(.+px, .+px\)/)
+      expect(rightTransform).toMatch(/translate\(.+px, .+px\)/)
+      expect(leftTransform).not.toBe(rightTransform)
+      expect((eyesLayer as SVGGraphicsElement).style.transform).toBe('')
     })
   })
 })
