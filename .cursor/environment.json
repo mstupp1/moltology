@@ -1,0 +1,12 @@
+{
+  "install": "npm install",
+  "start": "npm run dev",
+  "env": {
+    "VITE_NEON_AUTH_URL": "https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech/neondb/auth",
+    "VITE_NEON_JWKS_URL": "https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech/neondb/auth/.well-known/jwks.json",
+    "AWS_ENDPOINT_URL_S3": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech",
+    "AWS_REGION": "us-east-2",
+    "AWS_S3_BUCKET": "moltology-public-assets",
+    "VITE_TURNSTILE_SITE_KEY": "0x4AAAAAAEUsuhzMDLlBTqT2"
+  }
+}
