@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   generateLobsterAvatarSvg,
   getLobsterAvatarSeededOptions,
+  hasLobsterPupilTracking,
   isValidLobsterAvatarStyle,
   LOBSTER_BACKGROUND_PATTERNS,
   LOBSTER_BACKGROUND_THEMES,
@@ -153,5 +154,37 @@ describe('lobster-avatar', () => {
 
   it('produces random larva seeds', () => {
     expect(randomLobsterSeed()).toMatch(/^larva-/)
+  })
+
+  it('splits trackable eye variants into static sclera and a pupil layer', () => {
+    const trackable = [
+      { seed: 'eye-variant-5', variant: 'round' },
+      { seed: 'eye-variant-0', variant: 'bigPupils' },
+      { seed: 'eye-variant-4', variant: 'wide' },
+      { seed: 'eye-variant-2', variant: 'wink' },
+      { seed: 'eye-variant-13', variant: 'dots' },
+    ]
+
+    for (const { seed, variant } of trackable) {
+      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
+      expect(svg, variant).toContain('id="lobster-pupil-left"')
+      expect(svg, variant).toContain('class="lobster-pupil-track-layer"')
+      expect(svg, variant).not.toContain('lobster-eye-track-layer')
+      expect(hasLobsterPupilTracking(svg!)).toBe(true)
+    }
+  })
+
+  it('tracks solid black dot eyes without a separate sclera layer', () => {
+    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'eye-variant-13' })
+    const eyesBlock = svg!.match(/<g id="lobster-eyes-layer">[\s\S]*?<\/g><use transform="translate\(36 60\)"/)?.[0]
+    expect(svg).toContain('id="lobster-pupil-left"')
+    expect(eyesBlock).toContain('fill="#1e293b"')
+    expect(eyesBlock).not.toContain('fill="#ffffff"')
+  })
+
+  it('leaves expression-only eye variants without a pupil tracking layer', () => {
+    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'eye-variant-1' })
+    expect(svg).not.toContain('lobster-pupil-track-layer')
+    expect(hasLobsterPupilTracking(svg!)).toBe(false)
   })
 })

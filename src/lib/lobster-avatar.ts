@@ -520,10 +520,98 @@ function wrapDiceBearUsesInCarapaceLayer(svg: string): string {
   const usesBlock = svg.slice(blockStart, blockEnd)
   const eyesWrappedBlock = usesBlock.replace(
     /(<use[^>]*(?:xlink:)?href="#eyes-[^"]+"[^>]*\/>)/,
-    '<g id="lobster-eyes-layer" class="lobster-eye-track-layer">$1</g>'
+    '<g id="lobster-eyes-layer">$1</g>'
   )
   const wrapped = `<g id="lobster-carapace-layer" class="lobster-idle-layer lobster-idle-carapace">${eyesWrappedBlock}</g>`
   return svg.slice(0, blockStart) + wrapped + svg.slice(blockEnd)
+}
+
+function isScleraShape(tag: string): boolean {
+  return /<(circle|ellipse)\b/i.test(tag) && /fill="#ffffff"/i.test(tag)
+}
+
+function isPupilShape(tag: string): boolean {
+  return /<circle\b/i.test(tag) && /fill="#1e293b"/i.test(tag)
+}
+
+function extractShapeElements(groupInner: string): string[] {
+  const elements: string[] = []
+  const pattern = /<(circle|ellipse|path)\b[^>]*\/?>/gi
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(groupInner)) !== null) {
+    elements.push(match[0])
+  }
+  return elements
+}
+
+export function hasLobsterPupilTracking(svg: string): boolean {
+  return svg.includes('lobster-pupil-track-layer')
+}
+
+function splitEyesForPupilTracking(svg: string): string {
+  const eyesLayerMatch = svg.match(
+    /<g id="lobster-eyes-layer">\s*(<use\b[^>]*(?:xlink:)?href="#(eyes-[^"]+)"[^>]*\/>)\s*<\/g>/
+  )
+  if (!eyesLayerMatch) return svg
+
+  const [fullEyesLayer, useTag, symbolId] = eyesLayerMatch
+  const transformMatch = useTag.match(/transform="([^"]+)"/)
+  const transform = transformMatch?.[1] ?? ''
+  const transformAttr = transform ? ` transform="${transform}"` : ''
+
+  const escapedId = symbolId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const symbolMatch = svg.match(
+    new RegExp(`<g id="${escapedId}">([\\s\\S]*?)<\\/g>(?=<g id="(?:mouth|animation)-)`)
+  )
+  if (!symbolMatch) return svg
+
+  const symbolContent = symbolMatch[1]
+  const scleraGroups: string[] = []
+  const pupilGroups: string[] = []
+
+  const eyeGroupPattern = /<g class="dbcr-eb">([\s\S]*?)<\/g>/g
+  let groupMatch: RegExpExecArray | null
+  let pupilIndex = 0
+  while ((groupMatch = eyeGroupPattern.exec(symbolContent)) !== null) {
+    const scleraElems: string[] = []
+    const pupilElems: string[] = []
+
+    for (const elem of extractShapeElements(groupMatch[1])) {
+      if (isScleraShape(elem)) {
+        scleraElems.push(elem)
+      } else if (isPupilShape(elem)) {
+        pupilElems.push(elem)
+      } else {
+        scleraElems.push(elem)
+      }
+    }
+
+    if (scleraElems.length > 0) {
+      scleraGroups.push(`<g class="dbcr-eb">${scleraElems.join('')}</g>`)
+    }
+    if (pupilElems.length > 0) {
+      const side = pupilIndex === 0 ? 'left' : 'right'
+      pupilGroups.push(
+        `<g id="lobster-pupil-${side}" class="lobster-pupil-track-layer">${pupilElems.join('')}</g>`
+      )
+      pupilIndex += 1
+    }
+  }
+
+  if (pupilGroups.length === 0) {
+    return svg
+  }
+
+  const scleraBlock =
+    scleraGroups.length > 0 ? `<g${transformAttr}>${scleraGroups.join('')}</g>` : ''
+
+  const replacement =
+    `<g id="lobster-eyes-layer">` +
+    scleraBlock +
+    `<g${transformAttr}>${pupilGroups.join('')}</g>` +
+    `</g>`
+
+  return svg.replace(fullEyesLayer, replacement)
 }
 
 interface AntennaStyle {
@@ -1072,6 +1160,7 @@ function injectLobsterChitinLayers(
   }
 
   outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg)
+  outputSvg = splitEyesForPupilTracking(outputSvg)
 
   // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
   const endGIndex = outputSvg.lastIndexOf('</g></svg>')

@@ -51,11 +51,67 @@ export function resolveIdleAnimationPhase(svg: string, seed?: string): number {
   return getIdleAnimationPhaseOffset(svg)
 }
 
-/** Max radial eye shift in CSS px when cursor is at avatar edge */
-export const LOBSTER_EYE_TRACK_RADIUS = 2
+/** Max radial pupil shift in CSS px when cursor is at avatar edge */
+export const LOBSTER_EYE_TRACK_RADIUS = 2.5
 
 /** Per-frame lerp toward cursor target — lower = more resistance/lag */
 export const LOBSTER_EYE_TRACK_FOLLOW = 0.04
+
+/** Slightly asymmetric follow so eyes do not move in perfect lockstep */
+export const LOBSTER_EYE_TRACK_FOLLOW_LEFT = 0.045
+export const LOBSTER_EYE_TRACK_FOLLOW_RIGHT = 0.038
+
+/** DiceBear eyes `<use>` placement within the expanded avatar viewBox */
+export const LOBSTER_EYE_FACE_OFFSET = { x: 27, y: 36 }
+
+/** Eye socket centers inside the eyes symbol (before face offset) */
+export const LOBSTER_EYE_SOCKETS = {
+  left: { x: 10, y: 13 },
+  right: { x: 36, y: 13 },
+} as const
+
+export type LobsterPupilSide = keyof typeof LOBSTER_EYE_SOCKETS
+
+/** Expanded avatar viewBox width/height used to map sockets to screen space */
+export const LOBSTER_AVATAR_VIEWBOX_SIZE = 230
+
+export function getLobsterEyeSocketScreenPoint(
+  anchorRect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>,
+  side: LobsterPupilSide
+): { x: number; y: number } {
+  const socket = LOBSTER_EYE_SOCKETS[side]
+  const scale = anchorRect.width / LOBSTER_AVATAR_VIEWBOX_SIZE
+  return {
+    x: anchorRect.left + (LOBSTER_EYE_FACE_OFFSET.x + socket.x) * scale,
+    y: anchorRect.top + (LOBSTER_EYE_FACE_OFFSET.y + socket.y) * scale,
+  }
+}
+
+export function computeLobsterPupilOffset(
+  clientX: number,
+  clientY: number,
+  anchorRect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>,
+  side: LobsterPupilSide
+): { x: number; y: number } {
+  const eye = getLobsterEyeSocketScreenPoint(anchorRect, side)
+  let dx = clientX - eye.x
+  let dy = clientY - eye.y
+  const distance = Math.hypot(dx, dy)
+
+  if (distance < 0.001) {
+    return { x: 0, y: 0 }
+  }
+
+  const refDistance = anchorRect.width * 0.45
+  const intensity = Math.min(1, Math.sqrt(distance / refDistance))
+
+  // Horizontal gaze is stronger than vertical — closer to natural eye scan
+  const maxR = LOBSTER_EYE_TRACK_RADIUS
+  return {
+    x: (dx / distance) * maxR * intensity,
+    y: (dy / distance) * maxR * intensity * 0.72,
+  }
+}
 
 export function computeLobsterEyeOffset(
   clientX: number,
