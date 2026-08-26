@@ -52,7 +52,7 @@ import {
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis', '/settings'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
 
 interface HUDSidebarProps {
   larvaId?: string
