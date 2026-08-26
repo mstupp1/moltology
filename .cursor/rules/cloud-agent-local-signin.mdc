@@ -1,0 +1,15 @@
+---
+description: Sign into the local app only when a test needs a session. Use CURSORAGENT_LOGIN and CURSORAGENT_PASSWORD. Never print those values.
+alwaysApply: true
+---
+
+# Local app sign-in
+
+Do not sign in by default. Sign into the **local** app only when a test or task needs a member session.
+
+`CURSORAGENT_LOGIN` and `CURSORAGENT_PASSWORD` are Cloud Agent secrets. Local Cursor usually will not have them.
+
+1. If either var is unset, skip login and say so.
+2. Open `/login` or `/auth?mode=login`.
+3. Fill email and password from those env vars, then Sign In.
+4. Never print, log, commit, or echo the values.
