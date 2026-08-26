@@ -1852,6 +1852,80 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
   .validator((data: UpdateEmailPreferencesInput) => updateEmailPreferencesSchema.parse(data))
   .handler(updateEmailPreferencesHandler)
 
+// Lobster avatar (DiceBear) preferences
+const lobsterAvatarConfigSchema = z.object({
+  style: z.string().min(1).max(64),
+  seed: z.string().min(1).max(128),
+  token: z.string().optional(),
+  userId: z.string().optional(),
+})
+
+export type SaveLobsterAvatarInput = z.input<typeof lobsterAvatarConfigSchema>
+
+export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<SaveLobsterAvatarInput>) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Authentication required to save avatar.')
+  }
+
+  const validated = lobsterAvatarConfigSchema.parse(data || {})
+  const { userId, dbClient } = auth
+
+  const { isValidLobsterAvatarStyle, LOBSTER_AVATAR_STYLE } = await import('../lobster-avatar')
+  if (!isValidLobsterAvatarStyle(validated.style)) {
+    throw new Error('Invalid avatar style.')
+  }
+
+  const avatarConfig = {
+    style: LOBSTER_AVATAR_STYLE,
+    seed: validated.seed.trim(),
+  }
+
+  const [updated] = await dbClient
+    .update(profiles)
+    .set({ avatarConfig, updatedAt: new Date() })
+    .where(eq(profiles.id, userId))
+    .returning()
+
+  return {
+    success: true,
+    avatarConfig: updated?.avatarConfig ?? avatarConfig,
+  }
+}
+
+export const saveLobsterAvatarFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: SaveLobsterAvatarInput) => lobsterAvatarConfigSchema.parse(data))
+  .handler(saveLobsterAvatarHandler)
+
+const clearLobsterAvatarSchema = z.object({
+  token: z.string().optional(),
+  userId: z.string().optional(),
+})
+
+export type ClearLobsterAvatarInput = z.input<typeof clearLobsterAvatarSchema>
+
+export async function clearLobsterAvatarHandler({ data, context }: ServerFnArgs<ClearLobsterAvatarInput>) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Authentication required to clear avatar.')
+  }
+
+  const { userId, dbClient } = auth
+
+  await dbClient
+    .update(profiles)
+    .set({ avatarConfig: null, updatedAt: new Date() })
+    .where(eq(profiles.id, userId))
+
+  return { success: true }
+}
+
+export const clearLobsterAvatarFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: ClearLobsterAvatarInput) => clearLobsterAvatarSchema.parse(data))
+  .handler(clearLobsterAvatarHandler)
+
 export interface GetDailyAlignmentInput {
   date?: string
   userId?: string

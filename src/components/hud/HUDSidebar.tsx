@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate, useLocation, useRouter } from '@tanstack/react-router'
 import {
@@ -31,6 +31,7 @@ import {
   Biohazard,
   Microscope,
   Lock,
+  Settings,
 } from 'lucide-react'
 import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -43,10 +44,15 @@ import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
+import { SidebarLobsterEmblem } from './SidebarLobsterEmblem'
+import {
+  generateLobsterAvatarDataUri,
+  parseLobsterAvatarConfig,
+} from '@/lib/lobster-avatar'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis', '/settings'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -252,18 +258,31 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const user = sessionRes?.data?.user || (sessionRes as any)?.user
   const isSessionPending = sessionRes?.isPending ?? false
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [sidebarAvatarSrc, setSidebarAvatarSrc] = useState<string | null>(null)
 
   const effectiveUserRole = getEffectiveRole(user, userRole)
+
+  const loadProfileAvatar = useCallback(async (userId: string) => {
+    try {
+      const token = await getAuthJWTToken().catch(() => null)
+      const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
+      const config = parseLobsterAvatarConfig(profile?.avatarConfig)
+      setSidebarAvatarSrc(config ? generateLobsterAvatarDataUri(config, 128) : null)
+      return profile
+    } catch {
+      setSidebarAvatarSrc(null)
+      return null
+    }
+  }, [])
 
   useEffect(() => {
     if (!user?.id) {
       setUserRole(null)
+      setSidebarAvatarSrc(null)
       return
     }
     let isSubscribed = true
-    getAuthJWTToken()
-      .catch(() => null)
-      .then((token) => getUserProfileFn({ data: { token: token ?? undefined, userId: user.id } }))
+    loadProfileAvatar(user.id)
       .then((profile) => {
         if (isSubscribed) {
           const role = getEffectiveRole(user, profile?.role)
@@ -279,9 +298,22 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     return () => {
       isSubscribed = false
     }
-  }, [user?.id, user?.email, user?.role])
+  }, [user?.id, user?.email, user?.role, loadProfileAvatar])
+
+  useEffect(() => {
+    if (!user?.id) return
+    const handleAvatarChanged = () => {
+      loadProfileAvatar(user.id)
+    }
+    window.addEventListener('profile-avatar-changed', handleAvatarChanged)
+    return () => window.removeEventListener('profile-avatar-changed', handleAvatarChanged)
+  }, [user?.id, loadProfileAvatar])
 
   const displayName = user?.name || user?.email?.split('@')[0] || larvaId
+
+  const launchWelcomeSplash = () => {
+    window.dispatchEvent(new CustomEvent('launch-welcome-splash'))
+  }
 
   const handleOpenCommandPalette = () => {
     window.dispatchEvent(new CustomEvent('open-command-palette'))
@@ -305,6 +337,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'ORACLE',
           icon: Atom,
           path: '/oracle',
+        },
+        {
+          id: 'settings',
+          label: 'SETTINGS',
+          shortLabel: 'SETTINGS',
+          icon: Settings,
+          path: '/settings',
         },
       ],
     },
@@ -863,44 +902,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] relative z-40 overflow-visible">
             {/* Lobster Emblem */}
             <div className="px-4 pb-3 pt-3 border-b border-[#1e2d37]/60 relative overflow-visible">
-              {isCollapsed ? (
-                <div
-                  className="relative group/lobster flex justify-center py-1 cursor-pointer active:scale-95 transition-transform"
-                  onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
-                >
-                  <ChromaElement
-                    src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
-                    alt="Benthic Lobster"
-                    blendMode="screen"
-                    glowColor="cyan"
-                    containerClassName="w-9 h-9"
-                    className="w-full h-full object-contain"
-                  />
-                  {/* Tooltip */}
-                  <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-[200] pointer-events-none opacity-0 group-hover/lobster:opacity-100 transition-all duration-200">
-                    <div className="bg-[#060a0b] border border-[#00c3ff]/70 text-[#00c3ff] px-2 py-1 text-[10px] font-sans font-bold shadow-[0_0_12px_rgba(0,195,255,0.4)] whitespace-nowrap chamfer-corner flex items-center gap-1.5">
-                      <span className="text-[#dfe3e3]">REPLAY INITIATION BROADCAST</span>
-                      <span className="text-[9px] text-[#ff5540]">• CARAPACE v4.2</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className="w-full relative group flex flex-col items-center justify-center py-1 cursor-pointer active:scale-95 transition-transform"
-                  onClick={() => window.dispatchEvent(new CustomEvent('launch-welcome-splash'))}
-                  title="Replay Initiation Broadcast"
-                >
-                  <ChromaElement
-                    src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
-                    alt="Benthic Lobster"
-                    blendMode="screen"
-                    glowColor="cyan"
-                    maskRadial={true}
-                    containerClassName="w-full aspect-square max-h-36 rounded-full overflow-hidden flex items-center justify-center"
-                    className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
-                  />
-                </div>
-              )}
+              <SidebarLobsterEmblem
+                avatarSrc={sidebarAvatarSrc}
+                variant={isCollapsed ? 'collapsed' : 'expanded'}
+                onClick={launchWelcomeSplash}
+              />
             </div>
 
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
@@ -1140,25 +1146,15 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
               {/* Lobster Emblem (Intact centered format as original) */}
               <div className="px-4 pb-2.5 pt-2.5 border-b border-[#1e2d37]/60">
-                <div
-                  className="w-full relative group flex flex-col items-center justify-center py-1 cursor-pointer active:scale-95 transition-transform"
+                <SidebarLobsterEmblem
+                  avatarSrc={sidebarAvatarSrc}
+                  variant="mobile"
                   onClick={() => {
                     closeMobileMenu(() => {
-                      window.dispatchEvent(new CustomEvent('launch-welcome-splash'))
+                      launchWelcomeSplash()
                     })
                   }}
-                  title="Replay Initiation Broadcast"
-                >
-                  <ChromaElement
-                    src={getAssetUrl('/images/benthic_lobster_sidebar.jpg')}
-                    alt="Benthic Lobster"
-                    blendMode="screen"
-                    glowColor="cyan"
-                    maskRadial={true}
-                    containerClassName="w-20 h-20 aspect-square rounded-full overflow-hidden flex items-center justify-center"
-                    className="w-full h-full object-contain scale-110 transition-transform duration-300 group-hover:scale-115"
-                  />
-                </div>
+                />
               </div>
 
               {/* Help & Support Nav Item (Full width row) */}

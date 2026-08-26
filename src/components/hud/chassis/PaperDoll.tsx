@@ -8,6 +8,7 @@ import {
   EQUIPMENT_CATEGORIES,
 } from '@/lib/chassis-loadout'
 import { DraggableGear } from './DraggableGear'
+import { LobsterAvatarDisplay } from '@/components/hud/LobsterAvatarDisplay'
 
 const LEFT_SLOTS: EquipmentCategory[] = ['head', 'carapace', 'antennae']
 const RIGHT_SLOTS: EquipmentCategory[] = ['claws', 'legs']
@@ -19,6 +20,9 @@ export interface PaperDollProps {
   onSelectItem: (id: string | null) => void
   onSlotActivate: (slot: EquipmentCategory) => void
   onHoverItem?: (id: string | null) => void
+  /** DiceBear data URI — replaces default lobster schematic when set */
+  avatarSrc?: string | null
+  avatarAlt?: string
 }
 
 function EquipSlot({
@@ -97,6 +101,8 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   onSelectItem,
   onSlotActivate,
   onHoverItem,
+  avatarSrc,
+  avatarAlt = 'Your avatar',
 }) => {
   const equipped = new Map(
     items
@@ -122,6 +128,30 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
     )
   }
 
+  const renderCenterUnit = (sizeClass: string, imgSizeClass: string) => (
+    <div className={`relative flex items-center justify-center ${sizeClass}`}>
+      <div className="absolute inset-0 rounded-full border border-[#00c3ff]/25" />
+      <div className="absolute inset-3 rounded-full border border-[#00c3ff]/15" />
+      {avatarSrc ? (
+        <LobsterAvatarDisplay
+          src={avatarSrc}
+          alt={avatarAlt}
+          maskRadial
+          containerClassName={`relative ${imgSizeClass} rounded-full overflow-hidden`}
+          className={`w-full h-full object-cover`}
+        />
+      ) : (
+        <ChromaElement
+          src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
+          alt="Chassis unit schematic"
+          blendMode="screen"
+          glowColor="cyan"
+          className={`relative ${imgSizeClass} object-contain`}
+        />
+      )}
+    </div>
+  )
+
   return (
     <div className="flex flex-col items-center gap-3 w-full min-w-0 flex-1 min-h-0">
       <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase self-start border-b border-[#3a4a49] pb-2 w-full mb-1 shrink-0">
@@ -135,15 +165,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
         </div>
 
         <div className="relative flex items-center justify-center w-36 h-36 md:w-48 md:h-48 shrink-0">
-          <div className="absolute inset-0 rounded-full border border-[#00c3ff]/25" />
-          <div className="absolute inset-3 rounded-full border border-[#00c3ff]/15" />
-          <ChromaElement
-            src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
-            alt="Chassis unit schematic"
-            blendMode="screen"
-            glowColor="cyan"
-            className="w-28 h-28 md:w-40 md:h-40 object-contain"
-          />
+          {renderCenterUnit('w-36 h-36 md:w-48 md:h-48', 'w-28 h-28 md:w-40 md:h-40')}
         </div>
 
         <div className="flex flex-col items-center justify-center gap-2 w-16 md:w-20">
@@ -155,14 +177,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
       {/* Mobile: lobster then 5-slot strip */}
       <div className="flex sm:hidden flex-col items-center justify-center gap-3 w-full flex-1 min-h-0">
         <div className="relative flex items-center justify-center w-28 h-28 shrink-0">
-          <div className="absolute inset-0 rounded-full border border-[#00c3ff]/25" />
-          <ChromaElement
-            src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
-            alt="Chassis unit schematic"
-            blendMode="screen"
-            glowColor="cyan"
-            className="w-24 h-24 object-contain"
-          />
+          {renderCenterUnit('w-28 h-28', 'w-24 h-24')}
         </div>
         <div className="grid grid-cols-5 gap-1.5 w-full max-w-sm mx-auto justify-items-center">
           {EQUIPMENT_CATEGORIES.map(renderSlot)}
