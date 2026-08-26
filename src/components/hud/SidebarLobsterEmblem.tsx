@@ -24,13 +24,14 @@ export const SidebarLobsterEmblem: React.FC<SidebarLobsterEmblemProps> = ({
             src={avatarSrc}
             alt="Carapace Avatar"
             pixelated={true}
-            pixelResolution={48}
-            outputSize={128}
+            pixelResolution={64}
+            outputSize={192}
             glowColor="cyan"
             maskRadial={false}
             vignette={false}
-            containerClassName="w-9 h-9"
-            className="w-full h-full object-cover"
+            containerClassName="w-11 h-14 overflow-hidden"
+            className="w-full h-full flex items-start justify-center"
+            imgClassName="scale-[1.6] origin-top object-top"
           />
         )
       }
@@ -64,6 +65,7 @@ export const SidebarLobsterEmblem: React.FC<SidebarLobsterEmblemProps> = ({
           vignette={false}
           containerClassName={containerClassName}
           className="w-full h-full object-cover scale-110 transition-transform duration-300 group-hover:scale-115"
+          imgClassName="object-[center_25%]"
         />
       )
     }
