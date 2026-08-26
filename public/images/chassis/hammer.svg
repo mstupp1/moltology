@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640" width="360" height="640" role="img" aria-label="Hammer">
+  <rect width="360" height="640" fill="#070b0b"/>
+  <rect x="16" y="16" width="328" height="608" fill="none" stroke="#1c3a3a" stroke-width="2"/>
+  <rect x="28" y="28" width="304" height="584" fill="#0a1212" stroke="#143232" stroke-width="1"/>
+  <rect x="168" y="250" width="24" height="200" rx="4" fill="#1a1610" stroke="#fbbf24" stroke-width="3"/>
+  <path d="M90 210 L270 210 L280 250 L80 250 Z" fill="#1f1810" stroke="#f59e0b" stroke-width="3"/>
+  <path d="M110 190 L250 190 L250 210 L110 210 Z" fill="#241c10" stroke="#fbbf24" stroke-width="2"/>
+  <circle cx="180" cy="230" r="6" fill="#f59e0b"/>
+</svg>

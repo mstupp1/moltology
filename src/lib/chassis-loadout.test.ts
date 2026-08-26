@@ -1,48 +1,85 @@
 import { describe, it, expect } from 'vitest'
 import {
   applyMoveUpdates,
+  chassisTypeImageUrl,
   computeLoadoutTotals,
   clearChassisLoadoutCache,
+  deriveSynapticAbilities,
   emptyTotals,
   findFirstFreeVaultIndex,
+  formatAffixLine,
   getCachedChassisLoadout,
   planGearMove,
+  planStarterGrants,
+  primaryStatLine,
   setCachedChassisLoadout,
+  VISUAL_TYPE_SLOT,
   type CatalogRef,
   type GearItemState,
 } from './chassis-loadout'
 
-const catalog: CatalogRef[] = [
-  {
-    id: 'cat-carapace',
-    slug: 'shell',
-    name: 'Shell',
+function ref(partial: Partial<CatalogRef> & Pick<CatalogRef, 'id' | 'category'>): CatalogRef {
+  const category = partial.category
+  const visualType =
+    partial.visualType ??
+    (category === 'head'
+      ? 'helm'
+      : category === 'claws'
+        ? 'pincer'
+        : category === 'legs'
+          ? 'greaves'
+          : category === 'antennae'
+            ? 'antennae'
+            : 'carapace')
+  return {
+    slug: partial.id,
+    name: partial.id,
     flavorText: 'Hard.',
-    category: 'carapace',
     rarity: 'common',
     primaryStat: 10,
+    affixes: [],
+    uniquePower: null,
     sortOrder: 1,
-  },
-  {
+    ...partial,
+    category,
+    visualType,
+  }
+}
+
+const catalog: CatalogRef[] = [
+  ref({ id: 'cat-carapace', slug: 'shell', name: 'Shell', category: 'carapace', primaryStat: 10 }),
+  ref({
     id: 'cat-claws',
     slug: 'claws',
     name: 'Claws',
-    flavorText: 'Sharp.',
     category: 'claws',
     rarity: 'rare',
     primaryStat: 25,
     sortOrder: 2,
-  },
-  {
+  }),
+  ref({
     id: 'cat-carapace-2',
     slug: 'shell-2',
     name: 'Shell II',
-    flavorText: 'Harder.',
     category: 'carapace',
     rarity: 'epic',
     primaryStat: 40,
+    affixes: [{ stat: 'perception', value: 6 }],
     sortOrder: 3,
-  },
+  }),
+  ref({
+    id: 'cat-legendary',
+    slug: 'legend',
+    name: 'Legend Plate',
+    category: 'carapace',
+    rarity: 'legendary',
+    primaryStat: 90,
+    uniquePower: {
+      name: 'Pressure Calcifies',
+      description: 'Depth hardens this plate.',
+    },
+    sortOrder: 4,
+  }),
 ]
 
 const byId = Object.fromEntries(catalog.map((c) => [c.id, c]))
@@ -60,6 +97,19 @@ describe('chassis-loadout', () => {
       intelligence: 0,
       speed: 0,
       perception: 0,
+    })
+  })
+
+  it('adds affix stats from equipped gear onto loadout totals', () => {
+    const items: GearItemState[] = [
+      { id: '1', catalogItemId: 'cat-carapace-2', equippedSlot: 'carapace', vaultIndex: null },
+    ]
+    expect(computeLoadoutTotals(items, byId)).toEqual({
+      defense: 40,
+      attack: 0,
+      intelligence: 0,
+      speed: 0,
+      perception: 6,
     })
   })
 
@@ -130,5 +180,52 @@ describe('chassis-loadout', () => {
     expect(getCachedChassisLoadout('user-b')).toBeNull()
     clearChassisLoadoutCache()
     expect(getCachedChassisLoadout('user-a')).toBeNull()
+  })
+
+  it('formats primary and affix lines for tooltips', () => {
+    expect(primaryStatLine(catalog[0])).toBe('+10 Defense')
+    expect(formatAffixLine({ stat: 'speed', value: 5 })).toBe('+5 Speed')
+  })
+
+  it('maps visual types onto type-level 9:16 image paths', () => {
+    expect(chassisTypeImageUrl('helm')).toBe('/images/chassis/helm.svg')
+    expect(chassisTypeImageUrl('hammer')).toBe('/images/chassis/hammer.svg')
+    expect(VISUAL_TYPE_SLOT.hammer).toBe('claws')
+    expect(VISUAL_TYPE_SLOT.pincer).toBe('claws')
+  })
+
+  it('lights synaptic abilities for equipped legendaries and locks vaulted ones', () => {
+    const items: GearItemState[] = [
+      { id: 'eq', catalogItemId: 'cat-legendary', equippedSlot: 'carapace', vaultIndex: null },
+      { id: 'v', catalogItemId: 'cat-carapace', equippedSlot: null, vaultIndex: 0 },
+    ]
+    const abilities = deriveSynapticAbilities(items, byId)
+    expect(abilities).toHaveLength(1)
+    expect(abilities[0].name).toBe('Pressure Calcifies')
+    expect(abilities[0].status).toBe('Ready')
+    expect(abilities[0].locked).toBe(false)
+
+    const vaulted: GearItemState[] = [
+      { id: 'eq', catalogItemId: 'cat-legendary', equippedSlot: null, vaultIndex: 1 },
+    ]
+    const locked = deriveSynapticAbilities(vaulted, byId)
+    expect(locked[0].status).toBe('Locked')
+    expect(locked[0].locked).toBe(true)
+  })
+
+  it('grants missing starter catalog rows into free vault cells', () => {
+    const existing: GearItemState[] = [
+      { id: 'owned', catalogItemId: 'starter-a', equippedSlot: null, vaultIndex: 0 },
+    ]
+    const grants = planStarterGrants(
+      existing,
+      ['starter-a', 'starter-b', 'starter-c'],
+      ['starter-a', 'starter-b', 'starter-c'],
+      4
+    )
+    expect(grants).toEqual([
+      { catalogItemId: 'starter-b', vaultIndex: 1 },
+      { catalogItemId: 'starter-c', vaultIndex: 2 },
+    ])
   })
 })

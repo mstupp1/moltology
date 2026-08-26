@@ -30,6 +30,8 @@ import {
   VAULT_SIZE,
   computeLoadoutTotals,
   planGearMove,
+  planStarterGrants,
+  resolveVisualType,
   type CatalogRef,
   type GearItemState,
   type LoadoutTotals,
@@ -2038,7 +2040,10 @@ function toCatalogRef(row: typeof equipmentCatalog.$inferSelect): CatalogRef {
     flavorText: row.flavorText,
     category: row.category,
     rarity: row.rarity,
+    visualType: resolveVisualType(row.category, row.visualType),
     primaryStat: row.primaryStat,
+    affixes: row.affixes ?? [],
+    uniquePower: row.uniquePower ?? null,
     imageUrl: row.imageUrl,
     sortOrder: row.sortOrder,
   }
@@ -2069,17 +2074,20 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
     .from(userGearItems)
     .where(eq(userGearItems.userId, userId))
 
-  if (gearRows.length === 0 && catalogRows.length > 0) {
-    const starterIds = STARTER_EQUIPMENT_CATALOG_IDS.filter((id) =>
-      catalogRows.some((c) => c.id === id)
+  if (catalogRows.length > 0) {
+    const grants = planStarterGrants(
+      gearRows.map(toGearState),
+      catalogRows.map((c) => c.id),
+      STARTER_EQUIPMENT_CATALOG_IDS,
+      VAULT_SIZE
     )
-    if (starterIds.length > 0) {
+    if (grants.length > 0) {
       await dbClient.insert(userGearItems).values(
-        starterIds.map((catalogItemId, index) => ({
+        grants.map((grant) => ({
           userId,
-          catalogItemId,
+          catalogItemId: grant.catalogItemId,
           equippedSlot: null,
-          vaultIndex: index,
+          vaultIndex: grant.vaultIndex,
         }))
       )
       gearRows = await dbClient
@@ -2097,7 +2105,7 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
   return { catalog, items, totals, vaultSize: VAULT_SIZE }
 }
 
-const getChassisLoadoutHandler = async ({
+export const getChassisLoadoutHandler = async ({
   data,
   context,
 }: ServerFnArgs<{ token?: string; userId?: string }>) => {
@@ -2136,7 +2144,7 @@ interface MoveGearItemInput {
   userId?: string
 }
 
-const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGearItemInput>) => {
+export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGearItemInput>) => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to rearrange chassis gear.')
   if (!data?.itemId || !data?.target) throw new Error('Missing gear move payload.')

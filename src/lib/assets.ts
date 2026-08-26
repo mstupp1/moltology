@@ -49,7 +49,7 @@ export function getAssetUrl(assetPath: string): string {
 
   const cleanPath = assetPath.replace(/^\/+/, '')
 
-  if (LOCAL_ASSET_WHITELIST.has(cleanPath)) {
+  if (LOCAL_ASSET_WHITELIST.has(cleanPath) || cleanPath.startsWith('images/chassis/')) {
     return `/${cleanPath}`
   }
 

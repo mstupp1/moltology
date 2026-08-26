@@ -11,6 +11,7 @@ export interface VaultGridProps {
   selectedItemId: string | null
   onSelectItem: (id: string | null) => void
   onCellActivate: (index: number) => void
+  onHoverItem?: (id: string | null) => void
 }
 
 function VaultCell({
@@ -18,50 +19,56 @@ function VaultCell({
   item,
   catalog,
   selected,
+  hasSelection,
   onSelect,
   onActivate,
+  onHoverChange,
 }: {
   index: number
   item: GearItemState | undefined
   catalog: CatalogRef | undefined
   selected: boolean
+  hasSelection: boolean
   onSelect: () => void
   onActivate: () => void
+  onHoverChange?: (hovered: boolean) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `vault:${index}`,
     data: { type: 'vault', index },
   })
 
+  const handleActivate = () => {
+    if (item) onSelect()
+    else if (hasSelection) onActivate()
+  }
+
   return (
     <div
       ref={setNodeRef}
       className={`
-        relative w-16 md:w-20 aspect-[2/3] min-h-[44px] shrink-0 rounded-sm border
+        relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
         ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-[#2a3535] bg-[#050808]/80'}
       `}
-      onClick={() => {
-        if (item) onSelect()
-        else onActivate()
-      }}
+      onClick={handleActivate}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          if (item) onSelect()
-          else onActivate()
+          handleActivate()
         }
       }}
       aria-label={`Vault cell ${index + 1}`}
     >
       {item && catalog ? (
-        <div className="absolute inset-0.5" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute inset-0.5">
           <DraggableGear
             itemId={item.id}
             catalog={catalog}
             selected={selected}
             onSelect={onSelect}
+            onHoverChange={onHoverChange}
             compact
           />
         </div>
@@ -81,6 +88,7 @@ export const VaultGrid: React.FC<VaultGridProps> = ({
   selectedItemId,
   onSelectItem,
   onCellActivate,
+  onHoverItem,
 }) => {
   const byIndex = new Map(
     items
@@ -105,8 +113,10 @@ export const VaultGrid: React.FC<VaultGridProps> = ({
                 item={item}
                 catalog={catalog}
                 selected={item?.id === selectedItemId}
+                hasSelection={Boolean(selectedItemId)}
                 onSelect={() => onSelectItem(item?.id ?? null)}
                 onActivate={() => onCellActivate(index)}
+                onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
               />
             )
           })}

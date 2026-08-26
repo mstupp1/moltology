@@ -120,6 +120,13 @@
       "when": 1787689652220,
       "tag": "0016_damp_frog_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1787770488872,
+      "tag": "0017_complete_skin",
+      "breakpoints": true
     }
   ]
 }

@@ -18,6 +18,7 @@ export interface PaperDollProps {
   selectedItemId: string | null
   onSelectItem: (id: string | null) => void
   onSlotActivate: (slot: EquipmentCategory) => void
+  onHoverItem?: (id: string | null) => void
 }
 
 function EquipSlot({
@@ -25,41 +26,46 @@ function EquipSlot({
   item,
   catalog,
   selected,
+  hasSelection,
   onSelect,
   onActivate,
+  onHoverChange,
 }: {
   slot: EquipmentCategory
   item: GearItemState | undefined
   catalog: CatalogRef | undefined
   selected: boolean
+  hasSelection: boolean
   onSelect: () => void
   onActivate: () => void
+  onHoverChange?: (hovered: boolean) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `equip:${slot}`,
     data: { type: 'equip', slot },
   })
 
+  const handleActivate = () => {
+    if (hasSelection) onActivate()
+    else if (item) onSelect()
+  }
+
   return (
     <div
       ref={setNodeRef}
       className={`
-        relative w-full aspect-[2/3] min-h-[44px] max-w-[5rem] mx-auto
-        border border-dashed rounded-sm
+        relative w-full aspect-[9/16] min-h-[44px] max-w-[5rem] mx-auto
+        border border-dashed rounded-sm cursor-pointer
         ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-[#3a4a49]/80 bg-[#050808]/60'}
         flex items-center justify-center
       `}
-      onClick={() => {
-        if (item) onSelect()
-        else onActivate()
-      }}
+      onClick={handleActivate}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          if (item) onSelect()
-          else onActivate()
+          handleActivate()
         }
       }}
       aria-label={`${CATEGORY_LABELS[slot]} slot`}
@@ -70,8 +76,14 @@ function EquipSlot({
         </span>
       )}
       {item && catalog && (
-        <div className="absolute inset-0.5" onClick={(e) => e.stopPropagation()}>
-          <DraggableGear itemId={item.id} catalog={catalog} selected={selected} onSelect={onSelect} />
+        <div className="absolute inset-0.5">
+          <DraggableGear
+            itemId={item.id}
+            catalog={catalog}
+            selected={selected}
+            onSelect={hasSelection ? onActivate : onSelect}
+            onHoverChange={onHoverChange}
+          />
         </div>
       )}
     </div>
@@ -84,6 +96,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   selectedItemId,
   onSelectItem,
   onSlotActivate,
+  onHoverItem,
 }) => {
   const equipped = new Map(
     items
@@ -101,8 +114,10 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
         item={item}
         catalog={catalog}
         selected={item?.id === selectedItemId}
+        hasSelection={Boolean(selectedItemId)}
         onSelect={() => onSelectItem(item?.id ?? null)}
         onActivate={() => onSlotActivate(slot)}
+        onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
       />
     )
   }
@@ -133,7 +148,7 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
 
         <div className="flex flex-col items-center justify-center gap-2 w-16 md:w-20">
           {RIGHT_SLOTS.map(renderSlot)}
-          <div className="w-full aspect-[2/3] opacity-0 pointer-events-none" aria-hidden />
+          <div className="w-full aspect-[9/16] opacity-0 pointer-events-none" aria-hidden />
         </div>
       </div>
 

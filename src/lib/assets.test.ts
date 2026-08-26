@@ -29,6 +29,11 @@ describe('Asset URL Resolver', () => {
     )
   })
 
+  it('keeps chassis type art local so Flow stills can drop in later', () => {
+    expect(getAssetUrl('/images/chassis/helm.svg')).toBe('/images/chassis/helm.svg')
+    expect(getAssetUrl('images/chassis/hammer.webp')).toBe('/images/chassis/hammer.webp')
+  })
+
   it('maps heavy content and quiz assets to Neon S3 CDN', () => {
     expect(getAssetUrl('/images/quiz/q01_criticism.jpg')).toBe(
       `${S3_BASE_URL}/images/quiz/q01_criticism.jpg`
