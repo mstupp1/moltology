@@ -52,7 +52,7 @@ describe('lobster-avatar', () => {
     const svg2 = generateLobsterAvatarSvg(config)
     expect(svg1).toBeTruthy()
     expect(svg1).toBe(svg2)
-    expect(svg1).toContain('viewBox="-65 -38 230 230"')
+    expect(svg1).toContain('viewBox="-65 -35 230 230"')
     expect(svg1).toContain('id="lobster-background-layer"')
     expect(svg1).toContain('id="lobster-ground-shadow"')
     expect(svg1).toContain('id="lobster-antennae-layer"')
@@ -70,6 +70,34 @@ describe('lobster-avatar', () => {
     expect(svg1).toContain('id="lobster-arm-right"')
     expect(svg1).toContain('id="lobster-claw-left"')
     expect(svg1).toContain('id="lobster-claw-right"')
+  })
+
+  it('aligns abdomen top width to match the carapace bottom width across variants', () => {
+    const seeds = {
+      round: 'seed-0', // cw = 40 (left = 10, right = 90)
+      peak: 'seed-2',  // cw = 32 (left = 18, right = 82)
+      wedge: 'seed-3', // cw = 30 (left = 20, right = 80)
+      bell: 'seed-6',  // cw = 44 (left = 6, right = 94)
+      dome: 'seed-18', // cw = 34 (left = 16, right = 84)
+    }
+
+    const expectedX = {
+      round: { left: 10, right: 90 },
+      peak: { left: 18, right: 82 },
+      wedge: { left: 20, right: 80 },
+      bell: { left: 6, right: 94 },
+      dome: { left: 16, right: 84 },
+    }
+
+    for (const [variant, seed] of Object.entries(seeds)) {
+      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
+      expect(svg).toBeTruthy()
+
+      // Somite 1 starts at Y=102 with exact left and right bounds matching the carapace bottom
+      const expected = expectedX[variant as keyof typeof expectedX]
+      const somite1Pattern = new RegExp(`M\\s*${expected.left}\\s*102[\\s\\S]*?${expected.right}\\s*102\\s*Z`)
+      expect(svg).toMatch(somite1Pattern)
+    }
   })
 
   it('computes deterministic seeded background theme and pattern', () => {

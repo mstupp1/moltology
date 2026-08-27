@@ -770,6 +770,24 @@ const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
   },
 ]
 
+export const CARAPACE_BOTTOM_HALF_WIDTHS: Readonly<Record<string, number>> = {
+  wedge: 30, // x from 20 to 80 (width 60)
+  peak: 32, // x from 18 to 82 (width 64)
+  dome: 34, // x from 16 to 84 (width 68)
+  round: 40, // x from 10 to 90 (width 80)
+  bell: 44, // x from 6 to 94 (width 88)
+  // Fallbacks
+  block: 38,
+  squat: 42,
+  blob: 36,
+  tilt: 28,
+  lean: 28,
+  tower: 22,
+  chimney: 22,
+  wedgeInv: 24,
+  steps: 36,
+}
+
 /**
  * Injects articulated lobster pincers, specular highlights, a sculpted chitin brow ridge,
  * modular antennae styles, anthropomorphic standing legs, and ground-resting fan tail
@@ -785,6 +803,12 @@ function injectLobsterChitinLayers(
   // Extract generated chitin shell fill color from SVG or fallback to canonical coral red
   const colorMatch = rawSvg.match(/fill="(#(?:c2410c|be123c|ea580c|dc2626|b91c1c|991b1b|e11d48|f97316))"/i)
   const chitinColor = colorMatch ? colorMatch[1] : '#c2410c'
+
+  // Extract generated carapace body shape to align abdomen width precisely with chest
+  const bodyMatch = rawSvg.match(/id="body-([a-zA-Z0-9]+)-/i)
+  const bodyVariant = bodyMatch ? bodyMatch[1] : 'dome'
+  const cw = CARAPACE_BOTTOM_HALF_WIDTHS[bodyVariant] ?? 34
+
   const seeded = getLobsterAvatarSeededOptions(seed)
   const pose = seeded.clawPose
   const antennaStyle = seeded.antennaStyle
@@ -829,142 +853,142 @@ function injectLobsterChitinLayers(
       ${pattern.render(theme, pattern.id)}
     </g>`
 
-  // Ground Contact Shadow Layer (Distinct pools for feet and ground-resting tail)
+  // Ground Contact Shadow Layer (Distinct pools for feet and ground-resting tail planted at y=187)
   const groundShadowLayer = `
     <g id="lobster-ground-shadow">
       <!-- Center body ground shadow -->
-      <ellipse cx="50" cy="173" rx="34" ry="4.5" fill="#020810" opacity="0.32" />
+      <ellipse cx="50" cy="187" rx="34" ry="4.5" fill="#020810" opacity="0.32" />
       <!-- Left & Right standing feet contact shadows -->
-      <ellipse cx="19" cy="173" rx="15" ry="4.5" fill="#020810" opacity="0.52" />
-      <ellipse cx="81" cy="173" rx="15" ry="4.5" fill="#020810" opacity="0.52" />
+      <ellipse cx="19" cy="187" rx="15" ry="4.5" fill="#020810" opacity="0.52" />
+      <ellipse cx="81" cy="187" rx="15" ry="4.5" fill="#020810" opacity="0.52" />
       <!-- Tail ground contact shadow -->
-      <ellipse cx="${tailShadowX}" cy="${tailPose === 'center' ? 178 : 172}" rx="${tailPose === 'center' ? 36 : 22}" ry="${tailPose === 'center' ? 6 : 5.5}" fill="#020810" opacity="0.45" />
+      <ellipse cx="${tailShadowX}" cy="${tailPose === 'center' ? 192 : 186}" rx="${tailPose === 'center' ? 36 : 22}" ry="${tailPose === 'center' ? 6 : 5.5}" fill="#020810" opacity="0.45" />
     </g>`
 
-  // Massive, Articulated Conical Tail & 5-Blade Fan (Straight Down or Side-Sweeping)
+  // Massive, Articulated Conical Tail & 5-Blade Fan (Straight Down or Side-Sweeping, lowered toward ground)
   const tailFanLayer =
     tailPose === 'center'
       ? `
     <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="center">
       <!-- Floor Shadow Layer for Straight Down Tail -->
       <g opacity="0.28" transform="translate(0, 3)">
-        <ellipse cx="50" cy="176" rx="38" ry="6" fill="#020810" />
+        <ellipse cx="50" cy="190" rx="38" ry="6" fill="#020810" />
       </g>
 
       <!-- 4 Conical Symmetrical Somites Descending Vertically Behind Legs -->
       <!-- Somite T4 (Distal segment of cone) -->
-      <path d="M 39 152 C 39 162 43 168 50 168 C 57 168 61 162 61 152 Z" fill="${chitinColor}" />
-      <path d="M 41 156 Q 50 162 59 156" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
+      <path d="M 39 166 C 39 176 43 182 50 182 C 57 182 61 176 61 166 Z" fill="${chitinColor}" />
+      <path d="M 41 170 Q 50 176 59 170" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
 
       <!-- Somite T3 -->
-      <path d="M 35 141 C 35 152 40 158 50 158 C 60 158 65 152 65 141 Z" fill="${chitinColor}" />
-      <path d="M 38 145 Q 50 152 62 145" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
+      <path d="M 35 155 C 35 166 40 172 50 172 C 60 172 65 166 65 155 Z" fill="${chitinColor}" />
+      <path d="M 38 159 Q 50 166 62 159" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
       <!-- Lateral Spines -->
-      <path d="M 35 148 L 27 145 L 34 154 Z" fill="${chitinColor}" />
-      <path d="M 65 148 L 73 145 L 66 154 Z" fill="${chitinColor}" />
+      <path d="M 35 162 L 27 159 L 34 168 Z" fill="${chitinColor}" />
+      <path d="M 65 162 L 73 159 L 66 168 Z" fill="${chitinColor}" />
 
       <!-- Somite T2 -->
-      <path d="M 31 130 C 31 142 36 148 50 148 C 64 148 69 142 69 130 Z" fill="${chitinColor}" />
-      <path d="M 34 134 Q 50 142 66 134" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
+      <path d="M 31 144 C 31 156 36 162 50 162 C 64 162 69 156 69 144 Z" fill="${chitinColor}" />
+      <path d="M 34 148 Q 50 156 66 148" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
       <!-- Lateral Spines -->
-      <path d="M 31 137 L 22 134 L 29 143 Z" fill="${chitinColor}" />
-      <path d="M 69 137 L 78 134 L 71 143 Z" fill="${chitinColor}" />
+      <path d="M 31 151 L 22 148 L 29 157 Z" fill="${chitinColor}" />
+      <path d="M 69 151 L 78 148 L 71 157 Z" fill="${chitinColor}" />
 
       <!-- Somite T1 (Fattest Conical Base emerging from Pelvis) -->
-      <path d="M 26 120 C 26 132 32 138 50 138 C 68 138 74 132 74 120 Z" fill="${chitinColor}" />
-      <path d="M 30 124 Q 50 132 70 124" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
+      <path d="M 26 134 C 26 146 32 152 50 152 C 68 152 74 146 74 134 Z" fill="${chitinColor}" />
+      <path d="M 30 138 Q 50 146 70 138" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
 
       <!-- Joint Collar Node -->
-      <ellipse cx="50" cy="166" rx="8.5" ry="5" fill="${chitinColor}" />
-      <ellipse cx="50" cy="166" rx="5.5" ry="3" fill="#ffffff" opacity="0.3" />
+      <ellipse cx="50" cy="180" rx="8.5" ry="5" fill="${chitinColor}" />
+      <ellipse cx="50" cy="180" rx="5.5" ry="3" fill="#ffffff" opacity="0.3" />
 
       <!-- 5-Blade Symmetrical Fan (Spreading wide on ground behind legs) -->
       <!-- Central Telson -->
-      <path d="M 43 165 C 44 176 46 186 50 188 C 54 186 56 176 57 165 Z" fill="${chitinColor}" />
-      <ellipse cx="50" cy="176" rx="4.5" ry="7" fill="#ffffff" opacity="0.3" />
-      <path d="M 50 166 L 50 186" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
-      <circle cx="50" cy="186" r="2" fill="#ffffff" opacity="0.9" />
+      <path d="M 43 179 C 44 190 46 200 50 202 C 54 200 56 190 57 179 Z" fill="${chitinColor}" />
+      <ellipse cx="50" cy="190" rx="4.5" ry="7" fill="#ffffff" opacity="0.3" />
+      <path d="M 50 180 L 50 200" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
+      <circle cx="50" cy="200" r="2" fill="#ffffff" opacity="0.9" />
 
       <!-- Left Inner Uropod -->
-      <path d="M 45 165 C 36 172 28 182 30 186 C 38 186 45 178 48 166 Z" fill="${chitinColor}" />
-      <path d="M 43 169 C 37 174 32 181 33 184 C 38 184 43 178 46 170" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
+      <path d="M 45 179 C 36 186 28 196 30 200 C 38 200 45 192 48 180 Z" fill="${chitinColor}" />
+      <path d="M 43 183 C 37 188 32 195 33 198 C 38 198 43 192 46 184" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
 
       <!-- Right Inner Uropod -->
-      <path d="M 55 165 C 64 172 72 182 70 186 C 62 186 55 178 52 166 Z" fill="${chitinColor}" />
-      <path d="M 57 169 C 63 174 68 181 67 184 C 62 184 57 178 54 170" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
+      <path d="M 55 179 C 64 186 72 196 70 200 C 62 200 55 192 52 180 Z" fill="${chitinColor}" />
+      <path d="M 57 183 C 63 188 68 195 67 198 C 62 198 57 192 54 184" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
 
       <!-- Left Outer Uropod -->
-      <path d="M 46 165 C 30 166 16 174 18 180 C 26 182 38 176 47 166 Z" fill="${chitinColor}" />
-      <path d="M 44 167 C 32 168 21 174 22 178 C 28 179 38 175 45 168" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
+      <path d="M 46 179 C 30 180 16 188 18 194 C 26 196 38 190 47 180 Z" fill="${chitinColor}" />
+      <path d="M 44 181 C 32 182 21 188 22 192 C 28 193 38 189 45 182" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
 
       <!-- Right Outer Uropod -->
-      <path d="M 54 165 C 70 166 84 174 82 180 C 74 182 62 176 53 166 Z" fill="${chitinColor}" />
-      <path d="M 56 167 C 68 168 79 174 78 178 C 72 179 62 175 55 168" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
+      <path d="M 54 179 C 70 180 84 188 82 194 C 74 196 62 190 53 180 Z" fill="${chitinColor}" />
+      <path d="M 56 181 C 68 182 79 188 78 192 C 72 193 62 189 55 182" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
     </g>`
       : `
     <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="${tailPose}" ${tailFlip}>
       <!-- Shadow Layer on Floor -->
       <g opacity="0.28" transform="translate(2.5, 3)">
         <!-- Conical Trunk Shadow (Fattest at body, tapering to fan) -->
-        <path d="M 34 104 C 64 108 96 124 116 144 C 122 152 126 160 126 168 L 102 178 C 84 170 60 154 40 140 C 26 130 18 122 16 120 Z" fill="#020810" />
+        <path d="M 34 118 C 64 122 96 138 116 158 C 122 166 126 174 126 182 L 102 192 C 84 184 60 168 40 154 C 26 144 18 136 16 134 Z" fill="#020810" />
         <!-- Massive Fan Blades Shadow -->
-        <path d="M 116 162 C 128 144 144 138 152 144 C 156 152 144 166 126 172 Z" fill="#020810" />
-        <path d="M 116 162 C 132 152 150 152 156 162 C 158 174 142 180 124 178 Z" fill="#020810" />
-        <path d="M 114 162 C 126 162 144 168 142 178 C 138 188 122 188 112 180 Z" fill="#020810" />
-        <path d="M 110 164 C 118 172 124 184 112 188 C 100 190 96 180 102 172 Z" fill="#020810" />
-        <path d="M 106 166 C 108 176 98 186 86 187 C 76 186 78 176 88 170 Z" fill="#020810" />
+        <path d="M 116 176 C 128 158 144 152 152 158 C 156 166 144 180 126 186 Z" fill="#020810" />
+        <path d="M 116 176 C 132 166 150 166 156 176 C 158 188 142 194 124 192 Z" fill="#020810" />
+        <path d="M 114 176 C 126 176 144 182 142 192 C 138 202 122 202 112 194 Z" fill="#020810" />
+        <path d="M 110 178 C 118 186 124 198 112 202 C 100 204 96 194 102 186 Z" fill="#020810" />
+        <path d="M 106 180 C 108 190 98 200 86 201 C 76 200 78 190 88 184 Z" fill="#020810" />
       </g>
 
       <!-- 4 Conical Segmented Tail Somites (Fattest at body root, tapering to fan) -->
-      <!-- Somite T4 (Distal segment of cone - width ~20) -->
-      <path d="M 98 140 C 108 150 118 158 122 164 L 104 174 C 96 166 88 156 82 148 Z" fill="${chitinColor}" />
-      <path d="M 100 144 Q 110 153 116 160" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
+      <!-- Somite T4 (Distal segment of cone) -->
+      <path d="M 98 154 C 108 164 118 172 122 178 L 104 188 C 96 180 88 170 82 162 Z" fill="${chitinColor}" />
+      <path d="M 100 158 Q 110 167 116 174" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
 
-      <!-- Somite T3 (Mid-distal segment of cone - width ~26) -->
-      <path d="M 80 126 C 94 136 108 148 114 156 L 94 166 C 86 158 72 146 62 134 Z" fill="${chitinColor}" />
-      <path d="M 82 130 Q 96 142 106 152" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
+      <!-- Somite T3 (Mid-distal segment of cone) -->
+      <path d="M 80 140 C 94 150 108 162 114 170 L 94 180 C 86 172 72 160 62 148 Z" fill="${chitinColor}" />
+      <path d="M 82 144 Q 96 156 106 166" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
       <!-- Lateral Spine Spur on T3 -->
-      <path d="M 104 142 L 115 138 L 110 150 Z" fill="${chitinColor}" />
+      <path d="M 104 156 L 115 152 L 110 164 Z" fill="${chitinColor}" />
 
-      <!-- Somite T2 (Mid-proximal segment of cone - width ~33) -->
-      <path d="M 58 112 C 78 122 96 136 104 144 L 82 156 C 72 146 54 134 38 122 Z" fill="${chitinColor}" />
-      <path d="M 62 116 Q 82 128 96 138" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
+      <!-- Somite T2 (Mid-proximal segment of cone) -->
+      <path d="M 58 126 C 78 136 96 150 104 158 L 82 170 C 72 160 54 148 38 136 Z" fill="${chitinColor}" />
+      <path d="M 62 130 Q 82 142 96 152" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
       <!-- Lateral Spine Spur on T2 -->
-      <path d="M 90 126 L 102 122 L 96 134 Z" fill="${chitinColor}" />
+      <path d="M 90 140 L 102 136 L 96 148 Z" fill="${chitinColor}" />
 
-      <!-- Somite T1 (Massive, Extra-Fat Conical Base emerging from Pelvis/Torso - width ~40) -->
-      <path d="M 34 104 C 58 108 82 118 94 128 L 68 144 C 52 134 34 124 16 118 Z" fill="${chitinColor}" />
-      <path d="M 38 108 Q 62 116 82 124" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
+      <!-- Somite T1 (Massive Conical Base emerging from Pelvis/Torso) -->
+      <path d="M 34 118 C 58 122 82 132 94 142 L 68 158 C 52 148 34 138 16 132 Z" fill="${chitinColor}" />
+      <path d="M 38 122 Q 62 130 82 138" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
 
       <!-- Heavy Tail Fan Joint Collar Node -->
-      <ellipse cx="116" cy="166" rx="8.5" ry="6" fill="${chitinColor}" transform="rotate(25 116 166)" />
-      <ellipse cx="116" cy="166" rx="5.5" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(25 116 166)" />
+      <ellipse cx="116" cy="180" rx="8.5" ry="6" fill="${chitinColor}" transform="rotate(25 116 180)" />
+      <ellipse cx="116" cy="180" rx="5.5" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(25 116 180)" />
 
       <!-- Massive 5-Blade Fan Tail (Flared out on the ground) -->
       <!-- 1. Upper Outer Uropod (Sweeping High Blade) -->
-      <path d="M 114 162 C 126 144 144 138 152 144 C 156 152 144 166 126 172 Z" fill="${chitinColor}" />
-      <path d="M 118 154 C 130 146 144 144 148 148 C 150 154 140 162 128 166" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
+      <path d="M 114 176 C 126 158 144 152 152 158 C 156 166 144 180 126 186 Z" fill="${chitinColor}" />
+      <path d="M 118 168 C 130 160 144 158 148 162 C 150 168 140 176 128 180" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
       <!-- Fluted Ribs -->
-      <path d="M 122 158 L 140 150 M 124 162 L 144 158" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
+      <path d="M 122 172 L 140 164 M 124 176 L 144 172" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
 
       <!-- 2. Upper Inner Uropod (Secondary Upper Blade) -->
-      <path d="M 114 162 C 130 152 150 152 156 162 C 158 174 142 180 124 178 Z" fill="${chitinColor}" />
-      <path d="M 122 164 C 136 156 148 156 150 164 C 152 170 140 176 126 176" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
-      <path d="M 124 167 L 146 167 M 124 172 L 144 173" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
+      <path d="M 114 176 C 130 166 150 166 156 176 C 158 188 142 194 124 192 Z" fill="${chitinColor}" />
+      <path d="M 122 178 C 136 170 148 170 150 178 C 152 184 140 190 126 190" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
+      <path d="M 124 181 L 146 181 M 124 186 L 144 187" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
 
       <!-- 3. Central Telson (Heroic Main Tail Blade with Dorsal Keel & Node) -->
-      <path d="M 114 162 C 126 162 144 168 142 178 C 138 188 122 188 112 180 Z" fill="${chitinColor}" />
-      <ellipse cx="128" cy="176" rx="7" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(20 128 176)" />
-      <path d="M 115 164 L 138 179" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
-      <circle cx="137" cy="179" r="2" fill="#ffffff" opacity="0.9" />
+      <path d="M 114 176 C 126 176 144 182 142 192 C 138 202 122 202 112 194 Z" fill="${chitinColor}" />
+      <ellipse cx="128" cy="190" rx="7" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(20 128 190)" />
+      <path d="M 115 178 L 138 193" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
+      <circle cx="137" cy="193" r="2" fill="#ffffff" opacity="0.9" />
 
       <!-- 4. Lower Inner Uropod (Secondary Lower Blade) -->
-      <path d="M 110 164 C 118 172 124 184 112 188 C 100 190 96 180 102 172 Z" fill="${chitinColor}" />
-      <path d="M 108 170 C 112 176 116 182 108 184 C 102 185 100 178 104 172" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
+      <path d="M 110 178 C 118 186 124 198 112 202 C 100 204 96 194 102 186 Z" fill="${chitinColor}" />
+      <path d="M 108 184 C 112 190 116 196 108 198 C 102 199 100 192 104 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
 
       <!-- 5. Lower Outer Uropod (Ground-Resting Trailing Blade) -->
-      <path d="M 106 166 C 108 176 98 186 86 187 C 76 186 78 176 88 170 Z" fill="${chitinColor}" />
-      <path d="M 100 171 C 102 177 94 182 88 182 C 82 181 84 176 90 172" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
+      <path d="M 106 180 C 108 190 98 200 86 201 C 76 200 78 190 88 184 Z" fill="${chitinColor}" />
+      <path d="M 100 185 C 102 191 94 196 88 196 C 82 195 84 190 90 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
     </g>`
 
   // Auxiliary Thoracic Flank Limbs (Folded side limbs behind thick waist)
@@ -972,108 +996,145 @@ function injectLobsterChitinLayers(
     <g id="lobster-flank-limbs">
       <!-- Shadow -->
       <g opacity="0.2" transform="translate(1.5, 2)">
-        <path d="M 24 88 Q 10 86 4 96 Q 2 104 2 110" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <path d="M 76 88 Q 90 86 96 96 Q 98 104 98 110" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <path d="M 26 102 Q 14 106 10 116 Q 8 124 8 132" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <path d="M 74 102 Q 86 106 90 116 Q 92 124 92 132" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
       </g>
       <!-- Base Chitin Flank Limbs -->
-      <path d="M 24 88 Q 10 86 4 96 Q 2 104 2 110" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="4" cy="96" r="2.2" fill="${chitinColor}" />
-      <path d="M 76 88 Q 90 86 96 96 Q 98 104 98 110" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="96" cy="96" r="2.2" fill="${chitinColor}" />
+      <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      <circle cx="4" cy="110" r="2.2" fill="${chitinColor}" />
+      <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      <circle cx="96" cy="110" r="2.2" fill="${chitinColor}" />
       
-      <path d="M 26 102 Q 14 106 10 116 Q 8 124 8 132" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="10" cy="116" r="2.2" fill="${chitinColor}" />
-      <path d="M 74 102 Q 86 106 90 116 Q 92 124 92 132" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="90" cy="116" r="2.2" fill="${chitinColor}" />
+      <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      <circle cx="10" cy="130" r="2.2" fill="${chitinColor}" />
+      <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      <circle cx="90" cy="130" r="2.2" fill="${chitinColor}" />
     </g>`
 
-  // Anthropomorphic Bipedal Standing Legs (Planted on ground line y=172 with wide muscular stance)
+  // Anthropomorphic Bipedal Standing Legs (Planted on ground line y=186 with wide muscular stance)
   const legsLayer = `
     <g id="lobster-legs-layer" class="lobster-idle-layer lobster-idle-legs">
       <!-- Legs Drop Shadow -->
       <g opacity="0.24" transform="translate(1.5, 2)">
         <!-- Left Standing Leg -->
-        <path d="M 32 122 C 26 132 18 138 16 144 L 23 147 C 27 138 34 132 39 122 Z" fill="#020810" />
-        <path d="M 16 144 L 13 164 L 20 164 L 23 147 Z" fill="#020810" />
-        <path d="M 6 172 C 6 166 13 163 19 163 C 25 163 30 166 32 172 Z" fill="#020810" />
+        <path d="M 32 136 C 26 146 18 152 16 158 L 23 161 C 27 152 34 146 39 136 Z" fill="#020810" />
+        <path d="M 16 158 L 13 178 L 20 178 L 23 161 Z" fill="#020810" />
+        <path d="M 6 186 C 6 180 13 177 19 177 C 25 177 30 180 32 186 Z" fill="#020810" />
         <!-- Right Standing Leg -->
-        <path d="M 68 122 C 74 132 82 138 84 144 L 77 147 C 73 138 66 132 61 122 Z" fill="#020810" />
-        <path d="M 84 144 L 87 164 L 80 164 L 77 147 Z" fill="#020810" />
-        <path d="M 68 172 C 70 166 75 163 81 163 C 87 163 94 166 94 172 Z" fill="#020810" />
+        <path d="M 68 136 C 74 146 82 152 84 158 L 77 161 C 73 152 66 146 61 136 Z" fill="#020810" />
+        <path d="M 84 158 L 87 178 L 80 178 L 77 161 Z" fill="#020810" />
+        <path d="M 68 186 C 70 180 75 177 81 177 C 87 177 94 180 94 186 Z" fill="#020810" />
       </g>
 
       <!-- Left Standing Leg Base Chitin -->
       <!-- Thigh -->
-      <path d="M 32 122 C 26 132 18 138 16 144 L 23 147 C 27 138 34 132 39 122 Z" fill="${chitinColor}" />
-      <path d="M 30 124 C 25 132 20 137 18 143" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
+      <path d="M 32 136 C 26 146 18 152 16 158 L 23 161 C 27 152 34 146 39 136 Z" fill="${chitinColor}" />
+      <path d="M 30 138 C 25 146 20 151 18 157" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
       <!-- Armored Knee Plate -->
-      <ellipse cx="20" cy="145" rx="5" ry="3.8" fill="${chitinColor}" />
-      <ellipse cx="20" cy="145" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
+      <ellipse cx="20" cy="159" rx="5" ry="3.8" fill="${chitinColor}" />
+      <ellipse cx="20" cy="159" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
       <!-- Shin / Crus -->
-      <path d="M 16 144 L 13 164 L 20 164 L 23 147 Z" fill="${chitinColor}" />
-      <path d="M 18 148 L 16 162" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
+      <path d="M 16 158 L 13 178 L 20 178 L 23 161 Z" fill="${chitinColor}" />
+      <path d="M 18 162 L 16 176" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
       <!-- Ankle Joint -->
-      <ellipse cx="17" cy="164" rx="4.5" ry="2.2" fill="${chitinColor}" />
+      <ellipse cx="17" cy="178" rx="4.5" ry="2.2" fill="${chitinColor}" />
       <!-- Clawed Standing Boot Foot -->
-      <path d="M 6 172 C 6 165 13 163 19 163 C 25 163 30 165 32 172 Z" fill="${chitinColor}" />
-      <path d="M 6 172 L 32 172" stroke="#020810" stroke-width="1.5" opacity="0.4" />
+      <path d="M 6 186 C 6 179 13 177 19 177 C 25 177 30 179 32 186 Z" fill="${chitinColor}" />
+      <path d="M 6 186 L 32 186" stroke="#020810" stroke-width="1.5" opacity="0.4" />
       <!-- Toe Claws -->
-      <path d="M 6 172 C 3 172 1 169 4 167 C 7 167 9 169 10 172 Z" fill="#ffffff" opacity="0.85" />
-      <path d="M 28 172 C 30 169 33 167 35 169 C 34 172 32 172 28 172 Z" fill="#ffffff" opacity="0.85" />
+      <path d="M 6 186 C 3 186 1 183 4 181 C 7 181 9 183 10 186 Z" fill="#ffffff" opacity="0.85" />
+      <path d="M 28 186 C 30 183 33 181 35 183 C 34 186 32 186 28 186 Z" fill="#ffffff" opacity="0.85" />
 
       <!-- Right Standing Leg Base Chitin -->
       <!-- Thigh -->
-      <path d="M 68 122 C 74 132 82 138 84 144 L 77 147 C 73 138 66 132 61 122 Z" fill="${chitinColor}" />
-      <path d="M 70 124 C 75 132 80 137 82 143" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
+      <path d="M 68 136 C 74 146 82 152 84 158 L 77 161 C 73 152 66 146 61 136 Z" fill="${chitinColor}" />
+      <path d="M 70 138 C 75 146 80 151 82 157" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
       <!-- Armored Knee Plate -->
-      <ellipse cx="80" cy="145" rx="5" ry="3.8" fill="${chitinColor}" />
-      <ellipse cx="80" cy="145" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
+      <ellipse cx="80" cy="159" rx="5" ry="3.8" fill="${chitinColor}" />
+      <ellipse cx="80" cy="159" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
       <!-- Shin / Crus -->
-      <path d="M 84 144 L 87 164 L 80 164 L 77 147 Z" fill="${chitinColor}" />
-      <path d="M 82 148 L 84 162" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
+      <path d="M 84 158 L 87 178 L 80 178 L 77 161 Z" fill="${chitinColor}" />
+      <path d="M 82 162 L 84 176" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
       <!-- Ankle Joint -->
-      <ellipse cx="83" cy="164" rx="4.5" ry="2.2" fill="${chitinColor}" />
+      <ellipse cx="83" cy="178" rx="4.5" ry="2.2" fill="${chitinColor}" />
       <!-- Clawed Standing Boot Foot -->
-      <path d="M 68 172 C 70 165 75 163 81 163 C 87 163 94 165 94 172 Z" fill="${chitinColor}" />
-      <path d="M 68 172 L 94 172" stroke="#020810" stroke-width="1.5" opacity="0.4" />
+      <path d="M 68 186 C 70 179 75 177 81 177 C 87 177 94 179 94 186 Z" fill="${chitinColor}" />
+      <path d="M 68 186 L 94 186" stroke="#020810" stroke-width="1.5" opacity="0.4" />
       <!-- Toe Claws -->
-      <path d="M 65 169 C 67 167 70 169 72 172 C 68 172 66 172 65 169 Z" fill="#ffffff" opacity="0.85" />
-      <path d="M 90 172 C 91 169 93 167 96 167 C 99 169 97 172 94 172 Z" fill="#ffffff" opacity="0.85" />
+      <path d="M 65 183 C 67 181 70 183 72 186 C 68 186 66 186 65 183 Z" fill="#ffffff" opacity="0.85" />
+      <path d="M 90 186 C 91 183 93 181 96 181 C 99 183 97 186 94 186 Z" fill="#ffffff" opacity="0.85" />
     </g>`
 
-  // Massive, Robust Anthropomorphic Abdominal Pleon Somites (Full-width torso)
+  // Parametric Abdomen: Somite 1 top width exactly matches the bottom width of the chest (cw * 2)
+  const w1_top = cw
+  const w1_bot = Math.round(cw * 0.94)
+  const w2_top = w1_bot
+  const w2_bot = Math.round(cw * 0.88)
+  const w3_top = w2_bot
+  const w3_bot = Math.round(cw * 0.82)
+  const w4_top = w3_bot
+  const w4_bot = Math.round(cw * 0.76)
+  const w5_top = w4_bot
+  const w5_bot = Math.round(cw * 0.7)
+
+  const s1_l_top = 50 - w1_top
+  const s1_r_top = 50 + w1_top
+  const s1_l_bot = 50 - w1_bot
+  const s1_r_bot = 50 + w1_bot
+
+  const s2_l_top = 50 - w2_top
+  const s2_r_top = 50 + w2_top
+  const s2_l_bot = 50 - w2_bot
+  const s2_r_bot = 50 + w2_bot
+
+  const s3_l_top = 50 - w3_top
+  const s3_r_top = 50 + w3_top
+  const s3_l_bot = 50 - w3_bot
+  const s3_r_bot = 50 + w3_bot
+
+  const s4_l_top = 50 - w4_top
+  const s4_r_top = 50 + w4_top
+  const s4_l_bot = 50 - w4_bot
+  const s4_r_bot = 50 + w4_bot
+
+  const s5_l_top = 50 - w5_top
+  const s5_r_top = 50 + w5_top
+  const s5_l_bot = 50 - w5_bot
+  const s5_r_bot = 50 + w5_bot
+
+  // Massive, Robust Anthropomorphic Abdominal Pleon Somites (Full-width torso matching carapace width)
   const abdomenLayer = `
     <g id="lobster-abdomen-layer" class="lobster-idle-layer lobster-idle-abdomen">
-      <!-- Somite 5 / Armored Pelvic Girdle (Broad solid base) -->
-      <path d="M 20 122 C 18 131 22 137 28 137 L 72 137 C 78 137 82 131 80 122 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M 20 122 C 18 131 22 137 28 137 L 72 137 C 78 137 82 131 80 122 Z" fill="${chitinColor}" />
-      <path d="M 24 126 C 36 133 64 133 76 126" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
-      <ellipse cx="50" cy="130" rx="9" ry="3.5" fill="#ffffff" opacity="0.2" />
+      <!-- Somite 5 / Pelvis Girdle (Y=138..151) -->
+      <path d="M ${s5_l_top} 138 C ${s5_l_top - 2} 146 ${s5_l_bot - 4} 151 ${s5_l_bot} 151 L ${s5_r_bot} 151 C ${s5_r_bot + 4} 151 ${s5_r_top + 2} 146 ${s5_r_top} 138 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s5_l_top} 138 C ${s5_l_top - 2} 146 ${s5_l_bot - 4} 151 ${s5_l_bot} 151 L ${s5_r_bot} 151 C ${s5_r_bot + 4} 151 ${s5_r_top + 2} 146 ${s5_r_top} 138 Z" fill="${chitinColor}" />
+      <path d="M ${s5_l_top + 4} 142 C 36 148 64 148 ${s5_r_top - 4} 142" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
+      <ellipse cx="50" cy="145" rx="9" ry="3.5" fill="#ffffff" opacity="0.2" />
 
-      <!-- Somite 4 (Waist / Belt somite) -->
-      <path d="M 18 113 C 16 122 20 127 25 127 L 75 127 C 80 127 84 122 82 113 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M 18 113 C 16 122 20 127 25 127 L 75 127 C 80 127 84 122 82 113 Z" fill="${chitinColor}" />
-      <path d="M 22 117 C 34 123 66 123 78 117" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
+      <!-- Somite 4 (Y=129..142) -->
+      <path d="M ${s4_l_top} 129 C ${s4_l_top - 2} 137 ${s4_l_bot - 3} 142 ${s4_l_bot} 142 L ${s4_r_bot} 142 C ${s4_r_bot + 3} 142 ${s4_r_top + 2} 137 ${s4_r_top} 129 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s4_l_top} 129 C ${s4_l_top - 2} 137 ${s4_l_bot - 3} 142 ${s4_l_bot} 142 L ${s4_r_bot} 142 C ${s4_r_bot + 3} 142 ${s4_r_top + 2} 137 ${s4_r_top} 129 Z" fill="${chitinColor}" />
+      <path d="M ${s4_l_top + 4} 133 C 34 139 66 139 ${s4_r_top - 4} 133" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
 
-      <!-- Somite 3 (Lower midsection) -->
-      <path d="M 16 104 C 14 112 18 117 23 117 L 77 117 C 82 117 86 112 84 104 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M 16 104 C 14 112 18 117 23 117 L 77 117 C 82 117 86 112 84 104 Z" fill="${chitinColor}" />
-      <path d="M 20 108 C 34 114 66 114 80 108" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
+      <!-- Somite 3 (Y=120..133) -->
+      <path d="M ${s3_l_top} 120 C ${s3_l_top - 2} 128 ${s3_l_bot - 3} 133 ${s3_l_bot} 133 L ${s3_r_bot} 133 C ${s3_r_bot + 3} 133 ${s3_r_top + 2} 128 ${s3_r_top} 120 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s3_l_top} 120 C ${s3_l_top - 2} 128 ${s3_l_bot - 3} 133 ${s3_l_bot} 133 L ${s3_r_bot} 133 C ${s3_r_bot + 3} 133 ${s3_r_top + 2} 128 ${s3_r_top} 120 Z" fill="${chitinColor}" />
+      <path d="M ${s3_l_top + 4} 124 C 34 130 66 130 ${s3_r_top - 4} 124" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
 
-      <!-- Somite 2 (Mid abdominal arch) -->
-      <path d="M 15 95 C 13 103 17 108 22 108 L 78 108 C 83 108 87 103 85 95 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M 15 95 C 13 103 17 108 22 108 L 78 108 C 83 108 87 103 85 95 Z" fill="${chitinColor}" />
-      <path d="M 19 99 C 34 105 66 105 81 99" stroke="#ffffff" stroke-width="2.8" fill="none" opacity="0.32" />
+      <!-- Somite 2 (Y=111..124) -->
+      <path d="M ${s2_l_top} 111 C ${s2_l_top - 2} 119 ${s2_l_bot - 3} 124 ${s2_l_bot} 124 L ${s2_r_bot} 124 C ${s2_r_bot + 3} 124 ${s2_r_top + 2} 119 ${s2_r_top} 111 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s2_l_top} 111 C ${s2_l_top - 2} 119 ${s2_l_bot - 3} 124 ${s2_l_bot} 124 L ${s2_r_bot} 124 C ${s2_r_bot + 3} 124 ${s2_r_top + 2} 119 ${s2_r_top} 111 Z" fill="${chitinColor}" />
+      <path d="M ${s2_l_top + 4} 115 C 34 121 66 121 ${s2_r_top - 4} 115" stroke="#ffffff" stroke-width="2.8" fill="none" opacity="0.32" />
 
-      <!-- Somite 1 (Upper thorax transition - wide robust carapace base) -->
-      <path d="M 14 86 C 12 94 16 99 22 99 L 78 99 C 84 99 88 94 86 86 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M 14 86 C 12 94 16 99 22 99 L 78 99 C 84 99 88 94 86 86 Z" fill="${chitinColor}" />
-      <path d="M 18 90 C 34 96 66 96 82 90" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
+      <!-- Somite 1 (Upper thorax transition - starts at y=102, matching chest width at y=106) -->
+      <path d="M ${s1_l_top} 102 C ${s1_l_top - 2} 110 ${s1_l_bot - 3} 115 ${s1_l_bot} 115 L ${s1_r_bot} 115 C ${s1_r_bot + 3} 115 ${s1_r_top + 2} 110 ${s1_r_top} 102 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s1_l_top} 102 C ${s1_l_top - 2} 110 ${s1_l_bot - 3} 115 ${s1_l_bot} 115 L ${s1_r_bot} 115 C ${s1_r_bot + 3} 115 ${s1_r_top + 2} 110 ${s1_r_top} 102 Z" fill="${chitinColor}" />
+      <path d="M ${s1_l_top + 4} 106 C 34 112 66 112 ${s1_r_top - 4} 106" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
 
       <!-- Central Dorsal Keel Highlight -->
-      <path d="M 50 88 L 50 134" stroke="#ffffff" stroke-width="2.4" opacity="0.28" stroke-linecap="round" />
+      <path d="M 50 104 L 50 148" stroke="#ffffff" stroke-width="2.4" opacity="0.28" stroke-linecap="round" />
     </g>`
 
   const armsLayer = `
@@ -1114,7 +1175,7 @@ function injectLobsterChitinLayers(
   let outputSvg = rawSvg
 
   // 1. Expand ViewBox from 0 0 100 100 to tightly framed square character frame (housing side tails, claws, and antennas with balanced margins)
-  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', 'viewBox="-65 -38 230 230"')
+  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', 'viewBox="-65 -35 230 230"')
   if (!outputSvg.includes('xmlns:xlink=')) {
     outputSvg = outputSvg.replace('<svg ', '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ')
   }

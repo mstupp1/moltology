@@ -620,7 +620,7 @@ body.vfx-disabled [class*="drop-shadow-"],
 
 .lobster-avatar-animated .lobster-idle-abdomen {
   transform-box: fill-box;
-  transform-origin: 50px 86px;
+  transform-origin: 50px 102px;
   animation: lobsterIdleAbdomenBreath var(--lobster-breath-duration) ease-in-out infinite;
   animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
   will-change: transform;
@@ -676,7 +676,7 @@ body.vfx-disabled [class*="drop-shadow-"],
 
 .lobster-avatar-animated .lobster-idle-tail {
   transform-box: fill-box;
-  transform-origin: 50px 122px;
+  transform-origin: 50px 134px;
   animation: lobsterIdleTailBreath var(--lobster-breath-duration) ease-in-out infinite;
   animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
   will-change: transform;
