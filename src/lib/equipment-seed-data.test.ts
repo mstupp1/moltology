@@ -13,20 +13,20 @@ import {
 describe('equipment catalog seed', () => {
   it('keeps a small original stash with at least two pieces per hardpoint', () => {
     expect(INITIAL_EQUIPMENT_CATALOG.length).toBeGreaterThanOrEqual(12)
-    expect(INITIAL_EQUIPMENT_CATALOG.length).toBeLessThanOrEqual(25)
+    expect(INITIAL_EQUIPMENT_CATALOG.length).toBeLessThanOrEqual(30)
     for (const slot of EQUIPMENT_CATEGORIES) {
       const count = INITIAL_EQUIPMENT_CATALOG.filter((item) => item.category === slot).length
       expect(count, `${slot} count`).toBeGreaterThanOrEqual(2)
     }
   })
 
-  it('mixes rarities and seats two to three legendaries with unique powers', () => {
+  it('mixes rarities and seats two to four legendaries with unique powers', () => {
     const rarities = new Set(INITIAL_EQUIPMENT_CATALOG.map((item) => item.rarity))
     expect(rarities.has('common')).toBe(true)
     expect(rarities.has('legendary')).toBe(true)
     const legendaries = INITIAL_EQUIPMENT_CATALOG.filter((item) => item.rarity === 'legendary')
     expect(legendaries.length).toBeGreaterThanOrEqual(2)
-    expect(legendaries.length).toBeLessThanOrEqual(3)
+    expect(legendaries.length).toBeLessThanOrEqual(4)
     for (const item of legendaries) {
       expect(item.uniquePower?.name).toBeTruthy()
       expect(item.uniquePower?.description).toBeTruthy()

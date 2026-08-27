@@ -303,6 +303,18 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     sortOrder: 20,
   }),
   piece({
+    id: 'a1000000-0000-4000-8000-000000000016',
+    slug: 'silt-tension-vent-sash',
+    name: 'Silt-Tension Vent Sash',
+    flavorText: 'Woven from flexible hydrothermal cords. Keeps the abdominal plates stable during rapid descent.',
+    visualType: 'belt',
+    rarity: 'uncommon',
+    primaryStat: 27,
+    affixes: [{ stat: 'defense', value: 4 }],
+    uniquePower: null,
+    sortOrder: 21,
+  }),
+  piece({
     id: 'a1000000-0000-4000-8000-000000000015',
     slug: 'abyssal-clasp-girdle',
     name: 'Abyssal Clasp Girdle',
@@ -312,7 +324,34 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     primaryStat: 46,
     affixes: [{ stat: 'speed', value: 4 }],
     uniquePower: null,
-    sortOrder: 21,
+    sortOrder: 22,
+  }),
+  piece({
+    id: 'a1000000-0000-4000-8000-000000000017',
+    slug: 'hydrostatic-girdle-lattice',
+    name: 'Hydrostatic Girdle Lattice',
+    flavorText: 'Pressure-sealed titanium ribs distribute benthic torque evenly across the chassis core.',
+    visualType: 'belt',
+    rarity: 'epic',
+    primaryStat: 70,
+    affixes: [{ stat: 'intelligence', value: 8 }],
+    uniquePower: null,
+    sortOrder: 23,
+  }),
+  piece({
+    id: 'a1000000-0000-4000-8000-000000000018',
+    slug: 'core-lock-vent-harness',
+    name: 'Core-Lock Vent Harness',
+    flavorText: 'Legendary ventral plating. The deep core does not buckle.',
+    visualType: 'belt',
+    rarity: 'legendary',
+    primaryStat: 92,
+    affixes: [{ stat: 'defense', value: 10 }],
+    uniquePower: {
+      name: 'Zero-Strain Bulkhead',
+      description: 'When abdominal torque peaks, internal pressure vents automatically. Your core never fractures under sudden load.',
+    },
+    sortOrder: 24,
   }),
 ]
 
@@ -333,6 +372,7 @@ export const STARTER_EQUIPMENT_CATALOG_IDS: string[] = [
   'a1000000-0000-4000-8000-000000000006', // synapse-shear claws (legendary)
   'a1000000-0000-4000-8000-000000000009', // oracle dome lattice (legendary)
   'a1000000-0000-4000-8000-000000000011', // hydrostatic seal plate (legendary)
+  'a1000000-0000-4000-8000-000000000018', // core-lock vent harness (legendary)
 ]
 
 export function catalogSeedInsertValues(item: EquipmentCatalogSeed) {
