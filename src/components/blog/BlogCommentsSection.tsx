@@ -85,13 +85,13 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
 
     const trimmed = commentInput.trim()
 
-    // Client-side Guardrails
+    // Validation
     if (trimmed.length < MIN_CHAR_LIMIT) {
-      setErrorMessage(`Guardrail: Comment must be at least ${MIN_CHAR_LIMIT} characters.`)
+      setErrorMessage(`Comment must be at least ${MIN_CHAR_LIMIT} characters.`)
       return
     }
     if (trimmed.length > MAX_CHAR_LIMIT) {
-      setErrorMessage(`Guardrail: Comment exceeds ${MAX_CHAR_LIMIT} character limit.`)
+      setErrorMessage(`Comment cannot exceed ${MAX_CHAR_LIMIT} characters.`)
       return
     }
 
@@ -114,13 +114,13 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
         setCommentInput('')
         setTurnstileToken(null)
         turnstileRef.current?.reset()
-        setSuccessMessage('Transmission broadcast successfully.')
+        setSuccessMessage('Comment posted successfully.')
         setTimeout(() => setSuccessMessage(null), 3500)
       }
     } catch (err: any) {
       console.error('Comment submission error:', err)
       turnstileRef.current?.reset()
-      setErrorMessage(err.message || 'Transmission failed. Verify authorization and try again.')
+      setErrorMessage(err.message || 'Failed to post comment. Please try again.')
     } finally {
       setIsSubmitting(false)
     }

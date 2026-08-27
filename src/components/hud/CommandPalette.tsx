@@ -172,18 +172,18 @@ export const CommandPalette: React.FC = () => {
       icon: <Zap className="w-4 h-4 text-yellow-400" />,
       shortcut: 'ALT P',
       action: () => {
-        alert('PURGE RITUAL INITIATED: Neural Cache purged. Synapses recalibrated.')
+        alert('Cache cleared successfully.')
         setIsOpen(false)
       },
     },
     {
       id: 'system-scan',
-      label: 'Execute Benthic Telemetry Diagnostic Scan',
+      label: 'Execute System Diagnostic Scan',
       category: 'System',
       icon: <Terminal className="w-4 h-4 text-cyan-400" />,
       shortcut: 'CTRL S',
       action: () => {
-        alert('SYSTEM DIAGNOSTIC: 100% Structural Integrity. Chitin Hardness Optimal.')
+        alert('System diagnostic complete: all systems operational.')
         setIsOpen(false)
       },
     },

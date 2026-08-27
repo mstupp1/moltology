@@ -111,10 +111,10 @@ export function useAlignmentReminders(
           }
 
           toast.hud(
-            `Upcoming alignment protocol "${task.title}" starts in ${offsetMinutes}m (at ${reminderInfo.startTimeFormatted}). Prepare chassis!`,
+            `Upcoming reminder: "${task.title}" starts in ${offsetMinutes}m (at ${reminderInfo.startTimeFormatted}).`,
             {
               id: `alignment-reminder-${key}`,
-              title: `ALIGNMENT REMINDER (${reminderInfo.reminderTimeFormatted}) 🔔`,
+              title: `Reminder (${reminderInfo.reminderTimeFormatted})`,
               duration: 8000,
             }
           )
@@ -142,7 +142,7 @@ export function useAlignmentReminders(
       const targetTask = customTask || tasks.find((t) => !t.completed) || tasks[0] || {
         id: 'test',
         time: '12:00',
-        title: 'Neural Synchronization',
+        title: 'Daily Alignment Task',
         xp: 100,
         completed: false,
       }
@@ -152,10 +152,10 @@ export function useAlignmentReminders(
       const startTimeDisplay = reminderInfo ? reminderInfo.startTimeFormatted : targetTask.time
 
       toast.hud(
-        `[TEST ALERT] "${targetTask.title}" scheduled for ${startTimeDisplay}. Reminder window active 10m prior at ${reminderTimeDisplay}.`,
+        `[Test Reminder] "${targetTask.title}" scheduled for ${startTimeDisplay}. Reminder set for ${reminderTimeDisplay}.`,
         {
           id: `test-reminder-${targetTask.id}-${now}`,
-          title: `ALIGNMENT REMINDER (${reminderTimeDisplay}) 🔔`,
+          title: `Reminder (${reminderTimeDisplay})`,
           duration: 6000,
         }
       )

@@ -14,12 +14,12 @@ function MarketRoute() {
 
   const handleBuyBundle = (gems: number, costStr: string) => {
     setChitinGems((prev) => prev + gems)
-    alert(`TRANSACTION APPROVED: Added +${gems} Chitin-Gems to your Benthic Vault. (${costStr})`)
+    alert(`Purchase complete: Added +${gems} Chitin Gems to your account. (${costStr})`)
   }
 
   const handleTransmute = (assetType: string, value: number, credits: number) => {
     setMoltCredits((prev) => prev + credits)
-    alert(`ASSET LIQUIDATED: ${assetType} ($${value.toLocaleString()}) transmuted into +${credits.toLocaleString()} Molt Credits!`)
+    alert(`Conversion complete: ${assetType} ($${value.toLocaleString()}) converted into +${credits.toLocaleString()} Molt Credits.`)
   }
 
   return (

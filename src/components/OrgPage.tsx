@@ -315,8 +315,8 @@ export const OrgPage: React.FC = () => {
     e.preventDefault()
     setIsDonationSubmitted(true)
     toast.success(
-      `Your support of $${customAmount} has been registered in the Benthic Vaults. Your carapace hardens!`,
-      { title: 'TITHE TRANSMITTED SUCCESSFULLY' }
+      `Thank you for your support of $${customAmount}. Your contribution has been recorded.`,
+      { title: 'Donation Received' }
     )
   }
 
@@ -335,8 +335,8 @@ export const OrgPage: React.FC = () => {
     setIsContactSubmitting(false)
     setContactSubmitted(true)
     toast.info(
-      'Org Ops has indexed your transmission. High Synod representatives will dispatch a reply shortly.',
-      { title: 'NEURAL BEACON RECEIVED' }
+      'Your message has been received. Our team will get back to you shortly.',
+      { title: 'Message Sent' }
     )
   }
 

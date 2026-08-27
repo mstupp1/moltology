@@ -108,7 +108,7 @@ describe('useAlignmentReminders hook', () => {
     fireEvent.click(testBtn)
 
     expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(screen.getByText(/\[TEST ALERT\]/i)).toBeInTheDocument()
+    expect(screen.getByText(/\[Test Reminder\]/i)).toBeInTheDocument()
     expect(screen.getByText(/Silent Synchronization/i)).toBeInTheDocument()
   })
 
@@ -132,7 +132,7 @@ describe('useAlignmentReminders hook', () => {
 
     const alerts = screen.getAllByRole('alert')
     expect(alerts).toHaveLength(1)
-    expect(screen.getByText(/Upcoming alignment protocol "Silent Synchronization"/i)).toBeInTheDocument()
+    expect(screen.getByText(/Upcoming reminder: "Silent Synchronization"/i)).toBeInTheDocument()
 
     vi.useRealTimers()
   })

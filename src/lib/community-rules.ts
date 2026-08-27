@@ -102,7 +102,7 @@ export function validateForumContent(
   if (secretPattern.test(trimmedContent) || (title && secretPattern.test(trimmedTitle))) {
     return {
       valid: false,
-      error: 'Security Alert: Content appears to contain API keys, passwords, or connection strings.',
+      error: 'Content appears to contain sensitive information such as API keys, passwords, or connection strings.',
     }
   }
 

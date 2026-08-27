@@ -259,11 +259,11 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
         window.dispatchEvent(new CustomEvent('user-stats-changed'))
       }
 
-      toast.success('Carapace synchronized & biometrics calibrated. Welcome to the Synaptic Core!')
+      toast.success('Welcome! Your profile has been updated.')
 
       handleDismiss()
     } catch {
-      toast.error('Telemetry synchronization encountered friction. Stored locally.')
+      toast.error('Could not sync profile online. Saved locally.')
       handleDismiss()
     } finally {
       setIsSubmitting(false)

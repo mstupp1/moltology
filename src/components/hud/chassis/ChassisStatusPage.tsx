@@ -129,7 +129,7 @@ export const ChassisStatusPage: React.FC = () => {
         }
       } catch (e) {
         if (!cancelled && !getCachedChassisLoadout(userId)) {
-          setError(e instanceof Error ? e.message : 'Chassis loadout could not be retrieved.')
+          setError(e instanceof Error ? e.message : 'Could not load equipment.')
         }
       }
     })()
@@ -168,7 +168,7 @@ export const ChassisStatusPage: React.FC = () => {
         setItems(prevItems)
         setTotals(computeLoadoutTotals(prevItems, catalogById))
         toast.warning(
-          e instanceof Error ? e.message : 'Gear could not be rearranged. Try again.',
+          e instanceof Error ? e.message : 'Could not update equipment. Please try again.',
           { position: 'bottom-center' }
         )
       } finally {

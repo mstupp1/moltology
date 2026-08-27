@@ -135,7 +135,7 @@ export function VoteButton({
       writeForumVote(userId, targetId, rollback.voted)
       toast.warning('Upvote could not be recorded. Please try again.', {
         id: 'forum-vote-sync-warning',
-        title: 'UPVOTE',
+        title: 'Upvote Failed',
         duration: 4000,
       })
     } finally {

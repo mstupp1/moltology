@@ -91,7 +91,7 @@ describe('streamOracleChat client', () => {
 
     await expect(
       streamOracleChat({ messages: [{ role: 'user', content: 'hi' }] })
-    ).rejects.toThrow('The Oracle was unable to formulate a response. Please try again.')
+    ).rejects.toThrow('No response received. Please try again.')
   })
 })
 
