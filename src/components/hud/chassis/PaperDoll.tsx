@@ -143,18 +143,22 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
             src={getAssetUrl('images/chassis/chassis_stencil.webp')}
             alt=""
             aria-hidden="true"
-            className="h-full max-h-[96%] w-auto object-contain opacity-25 filter drop-shadow-[0_0_16px_rgba(0,195,255,0.25)] pointer-events-none"
+            className="h-full max-h-[96%] w-auto object-contain opacity-25 filter drop-shadow-[0_0_16px_rgba(0,195,255,0.25)] pointer-events-none translate-y-[14%]"
           />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center gap-1.5 sm:gap-2">
+        <div className="relative z-10 flex flex-col items-center gap-1 sm:gap-1.5">
           {renderSlot('antennae')}
           {renderSlot('head')}
 
-          <div className="flex gap-1.5 sm:gap-2">
+          <div className="flex gap-1 sm:gap-1.5">
             {renderSlot('claws', { dropId: 'equip:claws-1' })}
             {renderSlot('carapace')}
             {renderSlot('claws', { dropId: 'equip:claws-2', readOnly: true })}
+          </div>
+
+          <div className="flex">
+            {renderSlot('belt')}
           </div>
 
           <div className="flex">

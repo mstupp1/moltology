@@ -13,7 +13,7 @@ import {
 describe('equipment catalog seed', () => {
   it('keeps a small original stash with at least two pieces per hardpoint', () => {
     expect(INITIAL_EQUIPMENT_CATALOG.length).toBeGreaterThanOrEqual(12)
-    expect(INITIAL_EQUIPMENT_CATALOG.length).toBeLessThanOrEqual(20)
+    expect(INITIAL_EQUIPMENT_CATALOG.length).toBeLessThanOrEqual(25)
     for (const slot of EQUIPMENT_CATEGORIES) {
       const count = INITIAL_EQUIPMENT_CATALOG.filter((item) => item.category === slot).length
       expect(count, `${slot} count`).toBeGreaterThanOrEqual(2)

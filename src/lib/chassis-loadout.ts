@@ -22,6 +22,7 @@ export const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
   'head',
   'legs',
   'antennae',
+  'belt',
 ]
 
 export const EQUIPMENT_RARITIES: EquipmentRarity[] = [
@@ -45,6 +46,7 @@ export const CATEGORY_TO_STAT: Record<EquipmentCategory, LoadoutStatKey> = {
   head: 'intelligence',
   legs: 'speed',
   antennae: 'perception',
+  belt: 'defense',
 }
 
 export const STAT_LABELS: Record<LoadoutStatKey, string> = {
@@ -61,6 +63,7 @@ export const CATEGORY_LABELS: Record<EquipmentCategory, string> = {
   head: 'Head',
   legs: 'Legs',
   antennae: 'Antennae',
+  belt: 'Belt',
 }
 
 /** One 9:16 still per visual type. Drop matching `.webp` beside the SVG placeholders. */
@@ -71,6 +74,7 @@ export const CHASSIS_VISUAL_TYPES: ChassisVisualType[] = [
   'hammer',
   'antennae',
   'greaves',
+  'belt',
 ]
 
 export const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
@@ -80,6 +84,7 @@ export const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
   hammer: 'claws',
   antennae: 'antennae',
   greaves: 'legs',
+  belt: 'belt',
 }
 
 export const VISUAL_TYPE_LABELS: Record<ChassisVisualType, string> = {
@@ -89,6 +94,7 @@ export const VISUAL_TYPE_LABELS: Record<ChassisVisualType, string> = {
   hammer: 'Hammer',
   antennae: 'Antennae',
   greaves: 'Greaves',
+  belt: 'Belt',
 }
 
 export const SLOT_DEFAULT_VISUAL: Record<EquipmentCategory, ChassisVisualType> = {
@@ -97,6 +103,7 @@ export const SLOT_DEFAULT_VISUAL: Record<EquipmentCategory, ChassisVisualType> =
   claws: 'pincer',
   antennae: 'antennae',
   legs: 'greaves',
+  belt: 'belt',
 }
 
 export function chassisTypeImageUrl(visualType: ChassisVisualType): string {

@@ -378,13 +378,13 @@ export const userAvatars = pgTable('user_avatars', {
 ])
 
 /** Chassis equipment categories (equip slots). */
-export type EquipmentCategory = 'carapace' | 'claws' | 'head' | 'legs' | 'antennae'
+export type EquipmentCategory = 'carapace' | 'claws' | 'head' | 'legs' | 'antennae' | 'belt'
 
 /** Classic rarity ladder for chassis gear. */
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
 /** Shared 9:16 art key — one image per visual type, not per catalog row. */
-export type ChassisVisualType = 'helm' | 'carapace' | 'pincer' | 'hammer' | 'antennae' | 'greaves'
+export type ChassisVisualType = 'helm' | 'carapace' | 'pincer' | 'hammer' | 'antennae' | 'greaves' | 'belt'
 
 export type EquipmentAffix = {
   stat: 'defense' | 'attack' | 'intelligence' | 'speed' | 'perception'
