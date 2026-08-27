@@ -61,7 +61,7 @@ describe('WelcomeSplash Flow Component', () => {
 
     // Verify Step 2 is now mounted
     expect(screen.getByText(/CALIBRATE LARVAL CHASSIS/i)).toBeInTheDocument()
-    expect(screen.getByText(/Re-Roll Carapace Look/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Randomize/i })).toBeInTheDocument()
     expect(screen.getByText(/Base Biometrics Roller/i)).toBeInTheDocument()
     expect(screen.getByText(/300 \/ 300 PTS/i)).toBeInTheDocument()
   })

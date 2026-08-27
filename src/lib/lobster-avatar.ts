@@ -1,6 +1,7 @@
 import { Style, Avatar } from '@dicebear/core'
 import type { StyleDefinition } from '@dicebear/core'
 import critters from '@dicebear/styles/critters.json' with { type: 'json' }
+import { S3_BASE_URL } from './assets'
 
 export const LOBSTER_AVATAR_STYLE = 'critters' as const
 
@@ -32,6 +33,88 @@ export type BackgroundMotionMode =
   | 'pulse_breathe'
   | 'static'
 
+export type PatternDensity = 'compact' | 'standard' | 'spacious'
+export type PatternGlow = 'subtle' | 'chromatic' | 'none'
+export type PatternPulse = 'pulse' | 'steady'
+export type PatternSparkles = 'subtle' | 'radiant' | 'none'
+
+export const LOBSTER_PATTERN_DENSITIES: readonly PatternDensity[] = ['compact', 'standard', 'spacious'] as const
+export const LOBSTER_PATTERN_GLOWS: readonly PatternGlow[] = ['subtle', 'chromatic', 'none'] as const
+export const LOBSTER_PATTERN_PULSES: readonly PatternPulse[] = ['pulse', 'steady'] as const
+export const LOBSTER_PATTERN_SPARKLES: readonly PatternSparkles[] = ['subtle', 'radiant', 'none'] as const
+
+export const PATTERN_DENSITY_SCALES: Record<PatternDensity, number> = {
+  compact: 0.75,
+  standard: 1.0,
+  spacious: 1.35,
+}
+
+export function getDensityScale(density?: PatternDensity): number {
+  return (density && PATTERN_DENSITY_SCALES[density]) ?? 1.0
+}
+
+export function getPatternGlowFilterDef(glow: PatternGlow, theme: BackgroundTheme): string {
+  if (glow === 'none') return ''
+  const filterId = `pat-glow-${glow}-${theme.id}`
+  if (glow === 'chromatic') {
+    return `
+      <filter id="${filterId}" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="-0.8" dy="0" stdDeviation="1.2" flood-color="#00f3ff" flood-opacity="0.45" />
+        <feDropShadow dx="0.8" dy="0" stdDeviation="1.2" flood-color="#ff0055" flood-opacity="0.38" />
+      </filter>`
+  }
+  return `
+    <filter id="${filterId}" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="${theme.accentColor}" flood-opacity="0.48" />
+    </filter>`
+}
+
+export function renderLobsterSparkles(theme: BackgroundTheme, sparkles: PatternSparkles, _seed: string): string {
+  if (sparkles === 'none') return ''
+
+  const sparkleCount = sparkles === 'radiant' ? 16 : 8
+  // Curated bioluminescent glints clustered organically around the lobster's face/eyes/rostrum & antenna halo
+  const baseSparkles = [
+    // 1. Direct facial aura & brow glints (active in both subtle and radiant modes)
+    { x: 26, y: 34, size: 2.6, dur: 2.6, delay: 0.1 }, // Left upper orbital brow
+    { x: 74, y: 34, size: 2.6, dur: 2.8, delay: 0.9 }, // Right upper orbital brow
+    { x: 19, y: 44, size: 2.2, dur: 3.1, delay: 1.4 }, // Left cheek & eye flank
+    { x: 81, y: 44, size: 2.2, dur: 3.3, delay: 0.5 }, // Right cheek & eye flank
+    { x: 50, y: 16, size: 3.0, dur: 2.9, delay: 1.8 }, // Central rostrum / crown beacon
+    { x: 36, y: 18, size: 2.0, dur: 3.4, delay: 0.3 }, // Left antenna base feeler
+    { x: 64, y: 18, size: 2.0, dur: 3.0, delay: 1.2 }, // Right antenna base feeler
+    { x: 50, y: 56, size: 2.4, dur: 2.7, delay: 0.7 }, // Rostrum tip / chin glint
+
+    // 2. Extended facial halo & antenna glints (added in radiant mode)
+    { x: 14, y: 26, size: 2.8, dur: 3.5, delay: 1.6 }, // Left antenna sweep halo
+    { x: 86, y: 26, size: 2.8, dur: 3.2, delay: 0.4 }, // Right antenna sweep halo
+    { x: 28, y: 64, size: 2.0, dur: 2.8, delay: 1.0 }, // Left mandible flank
+    { x: 72, y: 64, size: 2.0, dur: 2.8, delay: 1.5 }, // Right mandible flank
+    { x: 44, y: 8, size: 2.2, dur: 3.6, delay: 0.8 },  // High crown apex left
+    { x: 56, y: 8, size: 2.2, dur: 3.3, delay: 1.9 },  // High crown apex right
+    { x: 12, y: 54, size: 2.5, dur: 2.9, delay: 0.6 }, // Outer left pincers aura
+    { x: 88, y: 54, size: 2.5, dur: 3.1, delay: 1.3 }, // Outer right pincers aura
+  ]
+
+  const items = baseSparkles.slice(0, sparkleCount)
+
+  const elements = items.map((s, idx) => {
+    const r = s.size
+    const star = `M 0 ${-r * 1.8} Q 0 0 ${r * 1.8} 0 Q 0 0 0 ${r * 1.8} Q 0 0 ${-r * 1.8} 0 Q 0 0 0 ${-r * 1.8} Z`
+    return `
+      <g transform="translate(${s.x}, ${s.y})">
+        <animate attributeName="opacity" values="0.05;0.95;0.05" dur="${s.dur}s" begin="${s.delay}s" repeatCount="indefinite" />
+        <path d="${star}" fill="${idx % 2 === 0 ? theme.secondaryColor : theme.accentColor}" opacity="0.85" />
+        <circle cx="0" cy="0" r="${(r * 0.45).toFixed(1)}" fill="#ffffff" opacity="0.95" />
+      </g>`
+  }).join('')
+
+  return `
+    <g id="lobster-sparkles-layer" data-sparkles="${sparkles}">
+      ${elements}
+    </g>`
+}
+
 export interface BackgroundMotionConfig {
   mode: BackgroundMotionMode
   duration: number
@@ -42,7 +125,23 @@ export interface BackgroundPattern {
   id: string
   name: string
   label: string
-  render: (theme: BackgroundTheme, patternId: string, motion?: BackgroundMotionConfig) => string
+  render: (
+    theme: BackgroundTheme,
+    patternId: string,
+    motion?: BackgroundMotionConfig,
+    density?: PatternDensity,
+    glow?: PatternGlow,
+    pulse?: PatternPulse
+  ) => string
+}
+
+export interface BackgroundTexture {
+  id: string
+  name: string
+  label: string
+  assetPath: string
+  publicUrl: string
+  opacity?: number
 }
 
 export interface LobsterAvatarConfig {
@@ -50,6 +149,11 @@ export interface LobsterAvatarConfig {
   seed: string
   backgroundTheme?: string
   backgroundPattern?: string
+  backgroundTexture?: string
+  patternDensity?: PatternDensity
+  patternGlow?: PatternGlow
+  patternPulse?: PatternPulse
+  patternSparkles?: PatternSparkles
   backgroundMotion?: BackgroundMotionMode
   transparentBackground?: boolean
 }
@@ -73,6 +177,33 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   }
   if (typeof obj.backgroundPattern === 'string' && obj.backgroundPattern.trim()) {
     config.backgroundPattern = obj.backgroundPattern.trim()
+  }
+  if (typeof obj.backgroundTexture === 'string' && obj.backgroundTexture.trim()) {
+    config.backgroundTexture = obj.backgroundTexture.trim()
+  }
+  if (
+    typeof obj.patternDensity === 'string' &&
+    (obj.patternDensity === 'compact' || obj.patternDensity === 'standard' || obj.patternDensity === 'spacious')
+  ) {
+    config.patternDensity = obj.patternDensity as PatternDensity
+  }
+  if (
+    typeof obj.patternGlow === 'string' &&
+    (obj.patternGlow === 'subtle' || obj.patternGlow === 'chromatic' || obj.patternGlow === 'none')
+  ) {
+    config.patternGlow = obj.patternGlow as PatternGlow
+  }
+  if (
+    typeof obj.patternPulse === 'string' &&
+    (obj.patternPulse === 'pulse' || obj.patternPulse === 'steady')
+  ) {
+    config.patternPulse = obj.patternPulse as PatternPulse
+  }
+  if (
+    typeof obj.patternSparkles === 'string' &&
+    (obj.patternSparkles === 'subtle' || obj.patternSparkles === 'radiant' || obj.patternSparkles === 'none')
+  ) {
+    config.patternSparkles = obj.patternSparkles as PatternSparkles
   }
   if (typeof obj.backgroundMotion === 'string' && obj.backgroundMotion.trim()) {
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
@@ -293,30 +424,61 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'isometric_cubes',
     name: '3D Isometric Cubes',
     label: '3D Cubes',
-    render: (theme, patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
       const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 14
       const dir = motion?.direction === 'reverse' ? -1 : 1
       const isHorizontal = motion?.mode === 'drift_horizontal'
-      const toX = dir * 60
-      const toY = isHorizontal ? 0 : dir * 104
+      const scale = getDensityScale(density)
+      const w = (60 * scale).toFixed(2)
+      const h = (103.92 * scale).toFixed(2)
+      const toX = (dir * 60 * scale).toFixed(2)
+      const toY = (isHorizontal ? 0 : dir * 103.92 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
+        : ''
 
       const animTransform = isMoving
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
       return `<g id="pattern-isometric-cubes"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
         <defs>
-          <pattern id="${pId}" width="60" height="104" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
             ${animTransform}
-            <g stroke="${theme.secondaryColor}" stroke-width="1.2">
-              <polygon points="30,0 60,17.3 30,34.6 0,17.3" fill="${theme.secondaryColor}" fill-opacity="0.35" />
-              <polygon points="0,17.3 30,34.6 30,69.3 0,52" fill="${theme.accentColor}" fill-opacity="0.2" />
-              <polygon points="30,34.6 60,17.3 60,52 30,69.3" fill="${theme.primaryColor}" fill-opacity="0.08" />
-              <polygon points="30,52 60,69.3 30,86.6 0,69.3" fill="${theme.secondaryColor}" fill-opacity="0.35" />
-              <polygon points="0,69.3 30,86.6 30,121.3 0,104" fill="${theme.accentColor}" fill-opacity="0.2" />
-              <polygon points="30,86.6 60,69.3 60,104 30,121.3" fill="${theme.primaryColor}" fill-opacity="0.08" />
+            <g transform="scale(${scale})"${glowAttr} stroke="${theme.secondaryColor}" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">
+              <!-- Center Cube (30, 0) -->
+              <polygon points="30,0 60,17.32 30,34.64 0,17.32" fill="${theme.secondaryColor}" fill-opacity="0.38" />
+              <polygon points="0,17.32 30,34.64 30,69.28 0,51.96" fill="${theme.accentColor}" fill-opacity="0.22" />
+              <polygon points="30,34.64 60,17.32 60,51.96 30,69.28" fill="${theme.primaryColor}" fill-opacity="0.09" />
+
+              <!-- Left Staggered Cube (0, 51.96) -->
+              <polygon points="0,51.96 30,69.28 0,86.6 -30,69.28" fill="${theme.secondaryColor}" fill-opacity="0.38" />
+              <polygon points="-30,69.28 0,86.6 0,121.24 -30,103.92" fill="${theme.accentColor}" fill-opacity="0.22" />
+              <polygon points="0,86.6 30,69.28 30,103.92 0,121.24" fill="${theme.primaryColor}" fill-opacity="0.09" />
+
+              <!-- Right Staggered Cube (60, 51.96) -->
+              <polygon points="60,51.96 90,69.28 60,86.6 30,69.28" fill="${theme.secondaryColor}" fill-opacity="0.38" />
+              <polygon points="30,69.28 60,86.6 60,121.24 30,103.92" fill="${theme.accentColor}" fill-opacity="0.22" />
+              <polygon points="60,86.6 90,69.28 90,103.92 60,121.24" fill="${theme.primaryColor}" fill-opacity="0.09" />
+
+              <!-- Bottom Center Repeat (30, 103.92) -->
+              <polygon points="30,103.92 60,121.24 30,138.56 0,121.24" fill="${theme.secondaryColor}" fill-opacity="0.38" />
+              <polygon points="0,121.24 30,138.56 30,173.2 0,155.88" fill="${theme.accentColor}" fill-opacity="0.22" />
+              <polygon points="30,138.56 60,121.24 60,155.88 30,173.2" fill="${theme.primaryColor}" fill-opacity="0.09" />
+
+              <!-- Top-Left Repeat (0, -51.96) -->
+              <polygon points="0,-51.96 30,-34.64 0,-17.32 -30,-34.64" fill="${theme.secondaryColor}" fill-opacity="0.38" />
+              <polygon points="-30,-34.64 0,-17.32 0,17.32 -30,0" fill="${theme.accentColor}" fill-opacity="0.22" />
+              <polygon points="0,-17.32 30,-34.64 30,0 0,17.32" fill="${theme.primaryColor}" fill-opacity="0.09" />
+
+              <!-- Top-Right Repeat (60, -51.96) -->
+              <polygon points="60,-51.96 90,-34.64 60,-17.32 30,-34.64" fill="${theme.secondaryColor}" fill-opacity="0.38" />
+              <polygon points="30,-34.64 60,-17.32 60,17.32 30,0" fill="${theme.accentColor}" fill-opacity="0.22" />
+              <polygon points="60,-17.32 90,-34.64 90,0 60,17.32" fill="${theme.primaryColor}" fill-opacity="0.09" />
             </g>
           </pattern>
         </defs>
@@ -329,24 +491,32 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'benthic_bubbles',
     name: 'Bioluminescent Floating Bubbles',
     label: 'Bubbles',
-    render: (theme, patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
       const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 12
       const dir = motion?.direction === 'reverse' ? -1 : 1
-      const toX = dir * 30
-      const toY = -60
+      const scale = getDensityScale(density)
+      const w = (60 * scale).toFixed(2)
+      const h = (60 * scale).toFixed(2)
+      const toX = motion?.mode === 'drift_diagonal' ? (dir * 60 * scale).toFixed(2) : '0'
+      const toY = (-60 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="4.5s" repeatCount="indefinite" />`
+        : ''
 
       const animTransform = isMoving
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
       return `<g id="pattern-bubbles"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
         <defs>
-          <pattern id="${pId}" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
             ${animTransform}
             <!-- Clean floating bubbles with internal specular highlights, no satellite dots -->
-            <g stroke="${theme.secondaryColor}" fill="none">
+            <g transform="scale(${scale})"${glowAttr} stroke="${theme.secondaryColor}" fill="none">
               <!-- Bubble 1 -->
               <circle cx="15" cy="18" r="9" stroke-width="1.5" opacity="0.38" fill="${theme.secondaryColor}" fill-opacity="0.06" />
               <ellipse cx="12.5" cy="14.5" rx="2.5" ry="1.2" transform="rotate(-30 12.5 14.5)" fill="${theme.secondaryColor}" opacity="0.6" stroke="none" />
@@ -371,35 +541,46 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'circuit_board',
     name: 'Cyber Circuit Board',
     label: 'Circuits',
-    render: (theme, patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
       const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 14
       const dir = motion?.direction === 'reverse' ? -1 : 1
       const isHorizontal = motion?.mode === 'drift_horizontal'
-      const toX = dir * 100
-      const toY = isHorizontal ? 0 : dir * 100
+      const scale = getDensityScale(density)
+      const w = (100 * scale).toFixed(2)
+      const h = (100 * scale).toFixed(2)
+      const toX = (dir * 100 * scale).toFixed(2)
+      const toY = (isHorizontal ? 0 : dir * 100 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
+        : ''
 
       const animTransform = isMoving
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
       return `<g id="pattern-circuit"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
         <defs>
-          <pattern id="${pId}" width="100" height="100" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
             ${animTransform}
-            <path d="M 0 10 H 35 L 45 20 H 70 L 80 30 H 100 M 0 50 H 20 L 30 60 H 60 L 70 50 H 100 M 0 90 H 40 L 50 80 H 80 L 90 90 H 100 M 20 0 V 10 M 80 0 V 30 M 50 20 V 60 M 30 60 V 100 M 70 50 V 80 M 90 90 V 100" stroke="${theme.accentColor}" stroke-width="1.6" fill="none" opacity="0.28" />
-            <path d="M 10 0 V 100 M 90 0 V 100 M 0 35 H 100 M 0 75 H 100" stroke="${theme.secondaryColor}" stroke-width="1.0" fill="none" opacity="0.16" stroke-dasharray="8 6" />
-            <circle cx="35" cy="10" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
-            <circle cx="70" cy="20" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
-            <circle cx="20" cy="50" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
-            <circle cx="60" cy="60" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
-            <circle cx="40" cy="90" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
-            <circle cx="80" cy="80" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
-            <circle cx="50" cy="20" r="2.2" fill="${theme.secondaryColor}" opacity="0.55" />
-            <circle cx="70" cy="50" r="2.2" fill="${theme.accentColor}" opacity="0.55" />
-            <rect x="42" y="42" width="16" height="16" fill="none" stroke="${theme.secondaryColor}" stroke-width="1.4" opacity="0.4" />
-            <circle cx="50" cy="50" r="2.2" fill="${theme.secondaryColor}" opacity="0.7" />
+            <g transform="scale(${scale})"${glowAttr}>
+              <!-- Continuous PCB traces matching exactly at (0, y) <-> (100, y) and (x, 0) <-> (x, 100) -->
+              <path d="M 0 20 H 30 L 40 30 H 70 L 80 20 H 100 M 0 50 H 20 L 30 60 H 60 L 70 50 H 100 M 0 80 H 40 L 50 70 H 75 L 85 80 H 100 M 20 0 V 20 M 80 0 V 20 M 20 80 V 100 M 80 80 V 100 M 50 30 V 50 M 30 60 V 80 M 70 50 V 70" stroke="${theme.accentColor}" stroke-width="1.6" fill="none" opacity="0.28" />
+              <path d="M 10 0 V 100 M 90 0 V 100 M 0 35 H 100 M 0 65 H 100" stroke="${theme.secondaryColor}" stroke-width="1.0" fill="none" opacity="0.16" stroke-dasharray="8 6" />
+              <circle cx="30" cy="20" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
+              <circle cx="70" cy="30" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="20" cy="50" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
+              <circle cx="60" cy="60" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="40" cy="80" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
+              <circle cx="75" cy="70" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="50" cy="30" r="2.2" fill="${theme.secondaryColor}" opacity="0.55" />
+              <circle cx="70" cy="50" r="2.2" fill="${theme.accentColor}" opacity="0.55" />
+              <rect x="42" y="42" width="16" height="16" fill="none" stroke="${theme.secondaryColor}" stroke-width="1.4" opacity="0.4" />
+              <circle cx="50" cy="50" r="2.2" fill="${theme.secondaryColor}" opacity="0.7" />
+            </g>
           </pattern>
         </defs>
         <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
@@ -411,29 +592,44 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'cyber_hex_mesh',
     name: 'Cybernetic Honeycomb Mesh',
     label: 'Hexagons',
-    render: (theme, patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
       const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 14
       const dir = motion?.direction === 'reverse' ? -1 : 1
       const isHorizontal = motion?.mode === 'drift_horizontal'
-      const toX = dir * 50
-      const toY = isHorizontal ? 0 : dir * 86.6
+      const scale = getDensityScale(density)
+      const w = (48.5 * scale).toFixed(2)
+      const h = (84 * scale).toFixed(2)
+      const toX = (dir * 48.5 * scale).toFixed(2)
+      const toY = (isHorizontal ? 0 : dir * 84 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
+        : ''
 
       const animTransform = isMoving
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
       return `<g id="pattern-hex-mesh"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
         <defs>
-          <pattern id="${pId}" width="50" height="86.6" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
             ${animTransform}
-            <g stroke="${theme.accentColor}" stroke-width="1.3" fill="none" opacity="0.28">
-              <path d="M 25 0 L 50 14.43 L 50 43.3 L 25 57.73 L 0 43.3 L 0 14.43 Z" />
-              <path d="M 25 57.73 L 50 72.16 L 50 101.03 L 25 115.46 L 0 101.03 L 0 72.16 Z" />
-              <path d="M 25 10 L 41 19.24 L 41 38.49 L 25 47.73 L 9 38.49 L 9 19.24 Z" stroke="${theme.secondaryColor}" stroke-width="1.0" opacity="0.55" />
-              <circle cx="25" cy="28.86" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
-              <circle cx="25" cy="86.6" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
+            <g transform="scale(${scale})"${glowAttr} stroke="${theme.accentColor}" stroke-width="1.3" fill="none" opacity="0.32" stroke-linejoin="round" stroke-linecap="round">
+              <!-- Center Hexagon (24.25, 28) -->
+              <path d="M 24.25 0 L 48.5 14 L 48.5 42 L 24.25 56 L 0 42 L 0 14 Z" />
+              <!-- Left Staggered Hexagon (0, 70) -->
+              <path d="M 0 42 L 24.25 56 L 24.25 84 L 0 98 L -24.25 84 L -24.25 56 Z" />
+              <!-- Right Staggered Hexagon (48.5, 70) -->
+              <path d="M 48.5 42 L 72.75 56 L 72.75 84 L 48.5 98 L 24.25 84 L 24.25 56 Z" />
+              <!-- Bottom Center Repeat (24.25, 112) -->
+              <path d="M 24.25 84 L 48.5 98 L 48.5 126 L 24.25 140 L 0 126 L 0 98 Z" />
+              <!-- Top Left Repeat (0, -14) -->
+              <path d="M 0 -42 L 24.25 -28 L 24.25 0 L 0 14 L -24.25 0 L -24.25 -28 Z" />
+              <!-- Top Right Repeat (48.5, -14) -->
+              <path d="M 48.5 -42 L 72.75 -28 L 72.75 0 L 48.5 14 L 24.25 0 L 24.25 -28 Z" />
             </g>
           </pattern>
         </defs>
@@ -446,41 +642,53 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'overlapping_circles',
     name: 'Overlapping Circles Matrix',
     label: 'Overlapping Circles',
-    render: (theme, patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
       const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 14
       const dir = motion?.direction === 'reverse' ? -1 : 1
       const isSpin = motion?.mode === 'radar_sweep'
+      const scale = getDensityScale(density)
+      const w = (40 * scale).toFixed(2)
+      const h = (40 * scale).toFixed(2)
+      const toX = (dir * 40 * scale).toFixed(2)
+      const toY = (dir * 40 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
+        : ''
 
       const animTransform = isMoving
         ? isSpin
-          ? `<animateTransform attributeName="patternTransform" type="rotate" from="0 50 72" to="${dir * 360} 50 72" dur="${dur * 1.5}s" repeatCount="indefinite" />`
-          : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${dir * 40} ${dir * 40}" dur="${dur}s" repeatCount="indefinite" />`
+          ? `<animateTransform attributeName="patternTransform" type="rotate" from="0 50 50" to="${dir * 360} 50 50" dur="${dur * 1.5}s" repeatCount="indefinite" />`
+          : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
       return `<g id="pattern-overlapping-circles"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
         <defs>
-          <pattern id="${pId}" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
             ${animTransform}
             <!-- Overlapping circles -->
-            <g stroke="${theme.accentColor}" stroke-width="1.4" fill="none" opacity="0.28">
-              <circle cx="20" cy="20" r="20" />
-              <circle cx="0" cy="0" r="20" stroke="${theme.secondaryColor}" />
-              <circle cx="40" cy="0" r="20" stroke="${theme.secondaryColor}" />
-              <circle cx="0" cy="40" r="20" stroke="${theme.secondaryColor}" />
-              <circle cx="40" cy="40" r="20" stroke="${theme.secondaryColor}" />
+            <g transform="scale(${scale})"${glowAttr}>
+              <g stroke="${theme.accentColor}" stroke-width="1.4" fill="none" opacity="0.28">
+                <circle cx="20" cy="20" r="20" />
+                <circle cx="0" cy="0" r="20" stroke="${theme.secondaryColor}" />
+                <circle cx="40" cy="0" r="20" stroke="${theme.secondaryColor}" />
+                <circle cx="0" cy="40" r="20" stroke="${theme.secondaryColor}" />
+                <circle cx="40" cy="40" r="20" stroke="${theme.secondaryColor}" />
+              </g>
+              <!-- Prominent center and intersection dots -->
+              <circle cx="20" cy="20" r="2.8" fill="${theme.secondaryColor}" opacity="0.85" />
+              <circle cx="0" cy="0" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
+              <circle cx="40" cy="0" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
+              <circle cx="0" cy="40" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
+              <circle cx="40" cy="40" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
+              <circle cx="20" cy="0" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
+              <circle cx="0" cy="20" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
+              <circle cx="40" cy="20" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
+              <circle cx="20" cy="40" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
             </g>
-            <!-- Prominent center and intersection dots -->
-            <circle cx="20" cy="20" r="2.8" fill="${theme.secondaryColor}" opacity="0.85" />
-            <circle cx="0" cy="0" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-            <circle cx="40" cy="0" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-            <circle cx="0" cy="40" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-            <circle cx="40" cy="40" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-            <circle cx="20" cy="0" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-            <circle cx="0" cy="20" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-            <circle cx="40" cy="20" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-            <circle cx="20" cy="40" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
           </pattern>
         </defs>
         <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
@@ -492,46 +700,62 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'triangle_constellations',
     name: 'Triangle Constellations Network',
     label: 'Triangle Constellations',
-    render: (theme, _patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
+      const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 14
       const dir = motion?.direction === 'reverse' ? -1 : 1
-
-      const animMotion = isMoving
-        ? motion.mode === 'radar_sweep'
-          ? `<animateTransform attributeName="transform" type="rotate" from="0 50 72" to="${dir * 360} 50 72" dur="${dur * 1.5}s" repeatCount="indefinite" />`
-          : `<animateTransform attributeName="transform" type="translate" values="0 0; ${dir * 12} -10; ${dir * 6} 8; 0 0" dur="${dur}s" repeatCount="indefinite" />`
+      const isSpin = motion?.mode === 'radar_sweep'
+      const scale = getDensityScale(density)
+      const w = (60 * scale).toFixed(2)
+      const h = (51.96 * scale).toFixed(2)
+      const toX = (dir * 60 * scale).toFixed(2)
+      const toY = (dir * 51.96 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
         : ''
 
-      // Triangulated constellation node mesh
-      const nodes = [
-        { x: -40, y: -20 }, { x: 15, y: -30 }, { x: 75, y: -20 }, { x: 135, y: -15 },
-        { x: -55, y: 30 }, { x: -10, y: 20 }, { x: 45, y: 15 }, { x: 95, y: 25 }, { x: 145, y: 35 },
-        { x: -35, y: 75 }, { x: 15, y: 65 }, { x: 80, y: 70 }, { x: 135, y: 80 },
-        { x: -45, y: 125 }, { x: -5, y: 120 }, { x: 55, y: 125 }, { x: 110, y: 115 }, { x: 150, y: 130 },
-        { x: -30, y: 175 }, { x: 25, y: 170 }, { x: 80, y: 175 }, { x: 130, y: 170 }
-      ]
+      const animTransform = isMoving
+        ? isSpin
+          ? `<animateTransform attributeName="patternTransform" type="rotate" from="0 50 50" to="${dir * 360} 50 50" dur="${dur * 1.5}s" repeatCount="indefinite" />`
+          : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
+        : ''
 
-      const triangles = [
-        [0, 1, 5], [1, 2, 6], [2, 3, 7], [1, 5, 6], [2, 6, 7], [3, 7, 8],
-        [4, 5, 9], [5, 6, 10], [6, 7, 11], [7, 8, 12], [5, 9, 10], [6, 10, 11], [7, 11, 12],
-        [9, 10, 13], [10, 11, 15], [11, 12, 16], [10, 13, 14], [10, 14, 15], [11, 15, 16], [12, 16, 17],
-        [13, 14, 18], [14, 15, 19], [15, 16, 20], [16, 17, 21], [14, 18, 19], [15, 19, 20], [16, 20, 21]
-      ]
+      return `<g id="pattern-triangle-constellations"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
+        <defs>
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+            ${animTransform}
+            <g transform="scale(${scale})"${glowAttr}>
+              <!-- Subtle shaded facet polygons -->
+              <polygon points="0,0 30,25.98 0,25.98" fill="${theme.secondaryColor}" fill-opacity="0.06" />
+              <polygon points="30,0 60,0 30,25.98" fill="${theme.accentColor}" fill-opacity="0.04" />
+              <polygon points="30,25.98 60,25.98 30,51.96" fill="${theme.secondaryColor}" fill-opacity="0.06" />
+              <polygon points="0,25.98 30,51.96 0,51.96" fill="${theme.accentColor}" fill-opacity="0.04" />
 
-      const triPaths = triangles.map((tri, idx) => {
-        const p0 = nodes[tri[0]], p1 = nodes[tri[1]], p2 = nodes[tri[2]]
-        if (!p0 || !p1 || !p2) return ''
-        const isShaded = idx % 3 === 0
-        return `<polygon points="${p0.x},${p0.y} ${p1.x},${p1.y} ${p2.x},${p2.y}" fill="${isShaded ? theme.secondaryColor : 'none'}" fill-opacity="${isShaded ? '0.04' : '0'}" stroke="${theme.accentColor}" stroke-width="${idx % 2 === 0 ? 1.3 : 0.9}" opacity="${idx % 2 === 0 ? 0.32 : 0.2}" />`
-      }).join('')
+              <!-- Constellation primary triangulated network lines -->
+              <path d="M 0 0 L 30 25.98 L 60 0 M 0 25.98 L 30 0 L 60 25.98 M 0 25.98 L 30 51.96 L 60 25.98 M 0 51.96 L 30 25.98 L 60 51.96 M 0 0 H 60 M 0 25.98 H 60 M 0 51.96 H 60 M 0 0 V 51.96 M 30 0 V 51.96 M 60 0 V 51.96" stroke="${theme.accentColor}" stroke-width="1.2" fill="none" opacity="0.3" stroke-linejoin="round" stroke-linecap="round" />
+              
+              <!-- Dashed secondary constellation link rays -->
+              <path d="M 0 0 L 30 51.96 M 30 0 L 60 51.96 M 30 0 L 0 51.96 M 60 0 L 30 51.96" stroke="${theme.secondaryColor}" stroke-width="0.8" fill="none" opacity="0.18" stroke-dasharray="4 4" />
 
-      const nodeCircles = nodes.map((n, idx) => `
-        <circle cx="${n.x}" cy="${n.y}" r="${idx % 3 === 0 ? 3.2 : 2.2}" fill="${theme.secondaryColor}" opacity="${idx % 3 === 0 ? 0.85 : 0.6}" />
-        ${idx % 4 === 0 ? `<circle cx="${n.x}" cy="${n.y}" r="5.5" fill="none" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.3" />` : ''}
-      `).join('')
-
-      return `<g id="pattern-triangle-constellations"${isMoving ? ` data-motion="${motion.mode}"` : ''}>${animMotion}${triPaths}${nodeCircles}</g>`
+              <!-- Glowing constellation node stars -->
+              <circle cx="0" cy="0" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
+              <circle cx="30" cy="0" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="60" cy="0" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
+              <circle cx="0" cy="25.98" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="30" cy="25.98" r="3.0" fill="${theme.secondaryColor}" opacity="0.9" />
+              <circle cx="30" cy="25.98" r="5.5" fill="none" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.35" />
+              <circle cx="60" cy="25.98" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="0" cy="51.96" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
+              <circle cx="30" cy="51.96" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="60" cy="51.96" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
+            </g>
+          </pattern>
+        </defs>
+        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
+      </g>`
     },
   },
   // 7. Dense Lattice (Intricate Geometric Diamond & Cross Matrix)
@@ -539,34 +763,44 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
     id: 'dense_lattice',
     name: 'Dense Geometric Chitin Lattice',
     label: 'Dense Lattice',
-    render: (theme, patId, motion) => {
+    render: (theme, patId, motion, density, glow, pulse) => {
       const pId = `pat-${patId}-${theme.id}`
       const isMoving = motion && motion.mode !== 'static'
       const dur = motion?.duration ?? 14
       const dir = motion?.direction === 'reverse' ? -1 : 1
       const isHorizontal = motion?.mode === 'drift_horizontal'
-      const toX = dir * 30
-      const toY = isHorizontal ? 0 : dir * 30
+      const scale = getDensityScale(density)
+      const w = (30 * scale).toFixed(2)
+      const h = (30 * scale).toFixed(2)
+      const toX = (dir * 30 * scale).toFixed(2)
+      const toY = (isHorizontal ? 0 : dir * 30 * scale).toFixed(2)
+      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
+      const animPulse = pulse === 'pulse'
+        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
+        : ''
 
       const animTransform = isMoving
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
       return `<g id="pattern-dense-lattice"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+        ${animPulse}
         <defs>
-          <pattern id="${pId}" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
+          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
             ${animTransform}
-            <g stroke="${theme.accentColor}" stroke-width="1.1" fill="none" opacity="0.25">
-              <path d="M 0 15 L 15 0 L 30 15 L 15 30 Z" />
-              <path d="M 0 0 L 15 15 L 0 30 M 30 0 L 15 15 L 30 30" />
-              <line x1="0" y1="15" x2="30" y2="15" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.5" />
-              <line x1="15" y1="0" x2="15" y2="30" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.5" />
+            <g transform="scale(${scale})"${glowAttr}>
+              <g stroke="${theme.accentColor}" stroke-width="1.1" fill="none" opacity="0.25">
+                <path d="M 0 15 L 15 0 L 30 15 L 15 30 Z" />
+                <path d="M 0 0 L 15 15 L 0 30 M 30 0 L 15 15 L 30 30" />
+                <line x1="0" y1="15" x2="30" y2="15" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.5" />
+                <line x1="15" y1="0" x2="15" y2="30" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.5" />
+              </g>
+              <circle cx="15" cy="15" r="1.8" fill="${theme.secondaryColor}" opacity="0.75" />
+              <circle cx="0" cy="0" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="30" cy="0" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="0" cy="30" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
+              <circle cx="30" cy="30" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
             </g>
-            <circle cx="15" cy="15" r="1.8" fill="${theme.secondaryColor}" opacity="0.75" />
-            <circle cx="0" cy="0" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-            <circle cx="30" cy="0" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-            <circle cx="0" cy="30" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-            <circle cx="30" cy="30" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
           </pattern>
         </defs>
         <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
@@ -580,11 +814,83 @@ export const LOBSTER_BACKGROUND_PATTERN_MAP: Record<string, BackgroundPattern> =
 )
 
 /**
+ * 6 Canonical Homepage PBR Surface Textures (+ none)
+ * Rich material underlays that give tactile depth to UI cards, CTA buttons, and avatar backgrounds.
+ */
+export const LOBSTER_BACKGROUND_TEXTURES: readonly BackgroundTexture[] = [
+  {
+    id: 'chitin',
+    name: 'Chitin Plates',
+    label: 'Chitin Plating',
+    assetPath: '/images/chitin_texture_bg.jpg',
+    publicUrl: `${S3_BASE_URL}/images/chitin_texture_bg.jpg`,
+    opacity: 0.40,
+  },
+  {
+    id: 'hex',
+    name: 'Hex Lattice',
+    label: 'Hex Lattice',
+    assetPath: '/images/pbr_hex_lattice.jpg',
+    publicUrl: `${S3_BASE_URL}/images/pbr_hex_lattice.jpg`,
+    opacity: 0.38,
+  },
+  {
+    id: 'alloy',
+    name: 'Benthic Alloy',
+    label: 'Benthic Alloy',
+    assetPath: '/images/pbr_benthic_alloy.jpg',
+    publicUrl: `${S3_BASE_URL}/images/pbr_benthic_alloy.jpg`,
+    opacity: 0.35,
+  },
+  {
+    id: 'carbon',
+    name: 'Carbon Weave',
+    label: 'Carbon Weave',
+    assetPath: '/images/pbr_carbon_weave.jpg',
+    publicUrl: `${S3_BASE_URL}/images/pbr_carbon_weave.jpg`,
+    opacity: 0.38,
+  },
+  {
+    id: 'basalt',
+    name: 'Deep Basalt',
+    label: 'Deep Basalt',
+    assetPath: '/images/pbr_deep_basalt.jpg',
+    publicUrl: `${S3_BASE_URL}/images/pbr_deep_basalt.jpg`,
+    opacity: 0.35,
+  },
+  {
+    id: 'circuit',
+    name: 'Circuit Matrix',
+    label: 'Circuit Matrix',
+    assetPath: '/images/pbr_circuit_matrix.jpg',
+    publicUrl: `${S3_BASE_URL}/images/pbr_circuit_matrix.jpg`,
+    opacity: 0.38,
+  },
+  {
+    id: 'none',
+    name: 'None',
+    label: 'Solid Void',
+    assetPath: '',
+    publicUrl: '',
+    opacity: 0,
+  },
+]
+
+export const LOBSTER_BACKGROUND_TEXTURE_MAP: Record<string, BackgroundTexture> = Object.fromEntries(
+  LOBSTER_BACKGROUND_TEXTURES.map((tex) => [tex.id, tex])
+)
+
+/**
  * Returns the deterministic chassis & telemetry attributes computed from an avatar seed.
  */
 export function getLobsterAvatarSeededOptions(seed: string): {
   theme: BackgroundTheme
   pattern: BackgroundPattern
+  texture: BackgroundTexture
+  density: PatternDensity
+  glow: PatternGlow
+  pulse: PatternPulse
+  sparkles: PatternSparkles
   motion: BackgroundMotionConfig
   clawPose: ClawPose
   antennaStyle: AntennaStyle
@@ -595,6 +901,11 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   let hash3 = 0
   let hash4 = 0
   let hash5 = 0
+  let hash6 = 0
+  let hash7 = 0
+  let hash8 = 0
+  let hash9 = 0
+  let hash10 = 0
   for (let i = 0; i < seed.length; i++) {
     const ch = seed.charCodeAt(i)
     hash1 = (((hash1 << 5) - hash1) + ch) | 0
@@ -602,6 +913,11 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     hash3 = (((hash3 << 7) - hash3) + ch * 17 + 19) | 0
     hash4 = (((hash4 << 9) + hash4) + ch * 31 + 23) | 0
     hash5 = (((hash5 << 6) - hash5) + ch * 43 + 29) | 0
+    hash6 = (((hash6 << 8) + hash6) + ch * 53 + 37) | 0
+    hash7 = (((hash7 << 7) + hash7) + ch * 61 + 41) | 0
+    hash8 = (((hash8 << 8) - hash8) + ch * 71 + 47) | 0
+    hash9 = (((hash9 << 5) + hash9) + ch * 79 + 53) | 0
+    hash10 = (((hash10 << 6) - hash10) + ch * 83 + 59) | 0
   }
 
   const poseIndex = Math.abs(hash1) % LOBSTER_CLAW_POSES.length
@@ -618,6 +934,21 @@ export function getLobsterAvatarSeededOptions(seed: string): {
 
   const patternIndex = Math.abs(hash4) % LOBSTER_BACKGROUND_PATTERNS.length
   const pattern = LOBSTER_BACKGROUND_PATTERNS[patternIndex]
+
+  const textureIndex = Math.abs(hash6) % LOBSTER_BACKGROUND_TEXTURES.length
+  const texture = LOBSTER_BACKGROUND_TEXTURES[textureIndex]
+
+  const densityIndex = Math.abs(hash7) % LOBSTER_PATTERN_DENSITIES.length
+  const density = LOBSTER_PATTERN_DENSITIES[densityIndex]
+
+  const glowIndex = Math.abs(hash8) % LOBSTER_PATTERN_GLOWS.length
+  const glow = LOBSTER_PATTERN_GLOWS[glowIndex]
+
+  const pulseIndex = Math.abs(hash9) % LOBSTER_PATTERN_PULSES.length
+  const pulse = LOBSTER_PATTERN_PULSES[pulseIndex]
+
+  const sparkleIndex = Math.abs(hash10) % LOBSTER_PATTERN_SPARKLES.length
+  const sparkles = LOBSTER_PATTERN_SPARKLES[sparkleIndex]
 
   // Active looping motion modes for the 7 curated patterns (always moving)
   const patternMotionModes: Record<string, BackgroundMotionMode[]> = {
@@ -645,7 +976,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     direction,
   }
 
-  return { theme, pattern, motion, clawPose, antennaStyle, tailPose }
+  return { theme, pattern, texture, density, glow, pulse, sparkles, motion, clawPose, antennaStyle, tailPose }
 }
 
 export const LOBSTER_CRUSTACEAN_OPTIONS = {
@@ -1134,6 +1465,11 @@ function injectLobsterChitinLayers(
   const tailPose = seeded.tailPose
   const theme = (config.backgroundTheme && LOBSTER_BACKGROUND_THEME_MAP[config.backgroundTheme]) || seeded.theme
   const pattern = (config.backgroundPattern && LOBSTER_BACKGROUND_PATTERN_MAP[config.backgroundPattern]) || seeded.pattern
+  const texture = (config.backgroundTexture && LOBSTER_BACKGROUND_TEXTURE_MAP[config.backgroundTexture]) || seeded.texture
+  const density = config.patternDensity || seeded.density
+  const glow = config.patternGlow || seeded.glow
+  const pulse = config.patternPulse || seeded.pulse
+  const sparkles = config.patternSparkles || seeded.sparkles
   const motion = (config.backgroundMotion && {
     mode: config.backgroundMotion,
     duration: seeded.motion.duration,
@@ -1155,6 +1491,7 @@ function injectLobsterChitinLayers(
   const bgGradId = `lobster-bg-grad-${theme.id}`
   const bgGlowId = `lobster-bg-glow-${theme.id}`
   const bgFloorGlowId = `lobster-bg-floor-${theme.id}`
+  const texPatternId = `lobster-tex-${texture.id}-${theme.id}`
 
   // Compute gradient vector from configured angle
   const angleDeg = theme.gradientAngle ?? 135
@@ -1181,18 +1518,31 @@ function injectLobsterChitinLayers(
         <stop offset="60%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0.12" />
         <stop offset="100%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0" />
       </radialGradient>
+      ${getPatternGlowFilterDef(glow, theme)}
     </defs>`
 
+  const textureLayer =
+    texture.id !== 'none' && texture.publicUrl
+      ? `
+      <!-- Subtle PBR Homepage Texture Underlay Layer -->
+      <g id="lobster-texture-layer" data-texture="${texture.id}">
+        <image href="${texture.publicUrl}" xlink:href="${texture.publicUrl}" x="-80" y="-50" width="260" height="260" preserveAspectRatio="xMidYMid slice" opacity="${texture.opacity ?? 0.38}" style="mix-blend-mode: overlay; pointer-events: none;" />
+      </g>`
+      : ''
+
   const backgroundLayer = `
-    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-motion="${motion.mode}">
+    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${motion.mode}">
       <!-- Base 2-Color Angular Gradient -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGradId})" />
       <!-- Primary Ambient Radial Glow Disc -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGlowId})" />
       <!-- Secondary Floor Ambient Counter-Glow -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgFloorGlowId})" />
+      ${textureLayer}
       <!-- Seeded Animated Vector Background Pattern -->
-      ${pattern.render(theme, pattern.id, motion)}
+      ${pattern.render(theme, pattern.id, motion, density, glow, pulse)}
+      <!-- Seeded Bioluminescent Background Sparkles -->
+      ${renderLobsterSparkles(theme, sparkles, seed)}
     </g>`
 
   // Ground Contact Shadow Layer (Distinct pools for feet and ground-resting tail planted at y=187)
@@ -1333,26 +1683,35 @@ function injectLobsterChitinLayers(
       <path d="M 100 185 C 102 191 94 196 88 196 C 82 195 84 190 90 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
     </g>`
 
-  // Auxiliary Thoracic Flank Limbs (Folded side limbs behind thick waist)
+  // Auxiliary Thoracic Flank Limbs (4 Folded side limbs behind waist)
   const flankLimbsLayer = `
-    <g id="lobster-flank-limbs">
-      <!-- Shadow -->
-      <g opacity="0.2" transform="translate(1.5, 2)">
-        <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <g id="lobster-flank-limbs" class="lobster-idle-layer lobster-idle-flank-limbs">
+      <!-- Left Flank Limbs (2 thin legs) -->
+      <g id="lobster-flank-left" class="lobster-idle-layer lobster-idle-flank-left">
+        <!-- Left Shadows -->
+        <g opacity="0.2" transform="translate(1.5, 2)">
+          <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        </g>
+        <!-- Base Chitin Flank Limbs Left -->
+        <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="4" cy="110" r="2.2" fill="${chitinColor}" />
+        <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="10" cy="130" r="2.2" fill="${chitinColor}" />
       </g>
-      <!-- Base Chitin Flank Limbs -->
-      <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="4" cy="110" r="2.2" fill="${chitinColor}" />
-      <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="96" cy="110" r="2.2" fill="${chitinColor}" />
-      
-      <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="10" cy="130" r="2.2" fill="${chitinColor}" />
-      <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      <circle cx="90" cy="130" r="2.2" fill="${chitinColor}" />
+      <!-- Right Flank Limbs (2 thin legs) -->
+      <g id="lobster-flank-right" class="lobster-idle-layer lobster-idle-flank-right">
+        <!-- Right Shadows -->
+        <g opacity="0.2" transform="translate(1.5, 2)">
+          <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        </g>
+        <!-- Base Chitin Flank Limbs Right -->
+        <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="96" cy="110" r="2.2" fill="${chitinColor}" />
+        <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" fill="none" />
+        <circle cx="90" cy="130" r="2.2" fill="${chitinColor}" />
+      </g>
     </g>`
 
   // Anthropomorphic Bipedal Standing Legs (Planted on ground line y=186 with wide muscular stance)
