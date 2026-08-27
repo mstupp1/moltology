@@ -15,7 +15,7 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
         success: true,
         isExisting: false,
         email: data?.email,
-        downloadUrl: '/downloads/the-2026-moltmaxxing-protocol-guide.html',
+        downloadUrl: '/downloads/the-2026-moltmaxxing-protocol-guide.pdf',
         message: 'Decryption verified.',
       }
     }),
@@ -91,6 +91,6 @@ describe('Moltmax Guide Lead Capture Components', () => {
 
     expect(res.success).toBe(true)
     expect(res.email).toBe('test-initiate@benthic.org')
-    expect(res.downloadUrl).toBe('/downloads/the-2026-moltmaxxing-protocol-guide.html')
+    expect(res.downloadUrl).toBe('/downloads/the-2026-moltmaxxing-protocol-guide.pdf')
   })
 })

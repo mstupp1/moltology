@@ -43,7 +43,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   const [step, setStep] = useState<'claim' | 'success'>('claim')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [downloadUrl, setDownloadUrl] = useState('/downloads/the-2026-moltmaxxing-protocol-guide.html')
+  const [downloadUrl, setDownloadUrl] = useState('/downloads/the-2026-moltmaxxing-protocol-guide.pdf')
 
   useEffect(() => {
     if (isOpen) {
@@ -94,7 +94,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
       })
 
       if (res?.success) {
-        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.html'
+        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
         setDownloadUrl(url)
         setStep('success')
 
@@ -104,7 +104,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           a.href = url
           a.target = '_blank'
           a.rel = 'noopener noreferrer'
-          a.download = 'the-2026-moltmaxxing-protocol-guide.html'
+          a.download = 'the-2026-moltmaxxing-protocol-guide.pdf'
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -325,7 +325,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
                 href={downloadUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                download="the-2026-moltmaxxing-protocol-guide.html"
+                download="the-2026-moltmaxxing-protocol-guide.pdf"
                 className="inline-flex items-center gap-1.5 text-[#00c3ff] hover:underline"
               >
                 <Download className="w-3.5 h-3.5" />

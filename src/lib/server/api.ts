@@ -1755,7 +1755,7 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
     }
   }
 
-  const downloadUrl = '/downloads/the-2026-moltmaxxing-protocol-guide.html'
+  const downloadUrl = '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
 
   try {
     const db = getDb()

@@ -63,13 +63,13 @@ export const MoltmaxGuidePage: React.FC = () => {
 
       if (res?.success) {
         setIsSubmitted(true)
-        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.html'
+        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
         if (typeof window !== 'undefined') {
           const a = document.createElement('a')
           a.href = url
           a.target = '_blank'
           a.rel = 'noopener noreferrer'
-          a.download = 'the-2026-moltmaxxing-protocol-guide.html'
+          a.download = 'the-2026-moltmaxxing-protocol-guide.pdf'
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -134,7 +134,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                 </p>
                 <div className="flex flex-wrap gap-4 pt-2">
                   <a
-                    href="/downloads/the-2026-moltmaxxing-protocol-guide.html"
+                    href="/downloads/the-2026-moltmaxxing-protocol-guide.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#00c3ff] text-[#020408] font-bold font-grotesk text-xs uppercase hover:bg-[#00e5ff]"
@@ -208,7 +208,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                   onExpire={() => setTurnstileToken(null)}
                 />
                 <p className="text-[11px] text-[#839493] font-sans">
-                  🔒 Zero spam. Instant high-resolution HTML &amp; PDF download.
+                  🔒 Zero spam. Instant high-resolution PDF download.
                 </p>
               </form>
             )}

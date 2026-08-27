@@ -36,7 +36,8 @@
     "composite:render": "tsx scripts/render-composite.ts",
     "composite:capture": "tsx scripts/render-composite.ts",
     "post:create": "tsx scripts/create-instagram-post.ts",
-    "carousel:create": "tsx scripts/create-instagram-carousel.ts"
+    "carousel:create": "tsx scripts/create-instagram-carousel.ts",
+    "guide:pdf": "tsx scripts/generate-guide-pdf.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",
