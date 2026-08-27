@@ -8,7 +8,7 @@ import {
   EQUIPMENT_CATEGORIES,
 } from '@/lib/chassis-loadout'
 import { DraggableGear } from './DraggableGear'
-import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
+import { LobsterAvatarDisplay } from '@/components/hud/LobsterAvatarDisplay'
 
 const LEFT_SLOTS: EquipmentCategory[] = ['head', 'carapace', 'antennae']
 const RIGHT_SLOTS: EquipmentCategory[] = ['claws', 'legs']
@@ -131,12 +131,17 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   const renderCenterUnit = (sizeClass: string) => (
     <div className={`relative flex items-center justify-center ${sizeClass} shrink-0`}>
       {avatarSrc ? (
-        <LobsterAvatarPortrait
-          src={avatarSrc}
-          size={320}
-          alt={avatarAlt}
-          className="w-full h-full max-w-[min(100%,14rem)] max-h-[min(100%,14rem)]"
-        />
+        <div className="relative flex aspect-square w-full max-w-[min(100%,14rem)] max-h-[min(100%,14rem)] items-center justify-center rounded-2xl border-2 border-[#00c3ff]/40 bg-[#030c14] overflow-hidden shadow-[0_0_30px_rgba(0,195,255,0.18)]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none z-0" />
+          <LobsterAvatarDisplay
+            src={avatarSrc}
+            alt={avatarAlt}
+            pixelResolution={64}
+            outputSize={320}
+            containerClassName="relative z-10 w-full h-full flex items-center justify-center"
+            className="w-full h-full object-cover"
+          />
+        </div>
       ) : (
         <div className="relative flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] overflow-hidden p-3 sm:p-4 shadow-[0_0_25px_rgba(0,195,255,0.08)]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
