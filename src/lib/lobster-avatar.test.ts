@@ -26,13 +26,13 @@ describe('lobster-avatar', () => {
         style: 'critters',
         seed: 'unit-8971',
         backgroundTheme: 'bio_cyan',
-        backgroundPattern: 'matrix_grid',
+        backgroundPattern: 'circuit_board',
       })
     ).toEqual({
       style: 'critters',
       seed: 'unit-8971',
       backgroundTheme: 'bio_cyan',
-      backgroundPattern: 'matrix_grid',
+      backgroundPattern: 'circuit_board',
     })
     expect(parseLobsterAvatarConfig({ style: 'adventurer', seed: 'legacy' })).toEqual({
       style: 'critters',
@@ -41,9 +41,21 @@ describe('lobster-avatar', () => {
     expect(parseLobsterAvatarConfig(null)).toBeNull()
   })
 
-  it('has 8 canonical on-brand background themes and 8 patterns', () => {
-    expect(LOBSTER_BACKGROUND_THEMES.length).toBe(8)
-    expect(LOBSTER_BACKGROUND_PATTERNS.length).toBe(8)
+  it('has 12 canonical on-brand background themes and 7 curated vector patterns', () => {
+    expect(LOBSTER_BACKGROUND_THEMES.length).toBe(12)
+    expect(LOBSTER_BACKGROUND_PATTERNS.length).toBe(7)
+    for (const theme of LOBSTER_BACKGROUND_THEMES) {
+      expect(theme.primaryColor).toMatch(/^#[0-9a-fA-F]{6}$/)
+      expect(theme.secondaryColor).toMatch(/^#[0-9a-fA-F]{6}$/)
+      expect(theme.topColor).toBeDefined()
+      expect(theme.bottomColor).toBeDefined()
+    }
+    for (const pattern of LOBSTER_BACKGROUND_PATTERNS) {
+      const rendered = pattern.render(LOBSTER_BACKGROUND_THEMES[0], pattern.id)
+      expect(rendered).toContain('<g id="pattern-')
+      expect(rendered).not.toContain('NaN')
+      expect(rendered).not.toContain('undefined')
+    }
   })
 
   it('generates deterministic SVG for the same seed with full character and background layers', () => {
@@ -56,6 +68,8 @@ describe('lobster-avatar', () => {
     expect(svg1).toContain('id="lobster-background-layer"')
     expect(svg1).toContain('id="lobster-ground-shadow"')
     expect(svg1).toContain('id="lobster-antennae-layer"')
+    expect(svg1).toContain('id="lobster-antenna-left"')
+    expect(svg1).toContain('id="lobster-antenna-right"')
     expect(svg1).toContain('id="lobster-flank-limbs"')
     expect(svg1).toContain('id="lobster-legs-layer"')
     expect(svg1).toContain('id="lobster-abdomen-layer"')
@@ -63,6 +77,8 @@ describe('lobster-avatar', () => {
     expect(svg1).toContain('id="lobster-claws-layer"')
     expect(svg1).toContain('id="lobster-arms-layer"')
     expect(svg1).toContain('id="lobster-brow-layer"')
+    expect(svg1).toContain('id="lobster-brow-left"')
+    expect(svg1).toContain('id="lobster-brow-right"')
     expect(svg1).toContain('id="lobster-carapace-layer"')
     expect(svg1).toContain('id="lobster-eyes-layer"')
     expect(svg1).toContain('class="lobster-idle-layer lobster-idle-carapace"')
@@ -70,6 +86,22 @@ describe('lobster-avatar', () => {
     expect(svg1).toContain('id="lobster-arm-right"')
     expect(svg1).toContain('id="lobster-claw-left"')
     expect(svg1).toContain('id="lobster-claw-right"')
+  })
+
+  it('renders multi-stop 2-color angular linear gradient and dual radial spotlights in defs', () => {
+    const svg = generateLobsterAvatarSvg({
+      style: 'critters',
+      seed: 'larva-alpha',
+      backgroundTheme: 'deep_abyss',
+      backgroundPattern: 'circuit_board',
+    })
+    expect(svg).toContain('id="lobster-bg-grad-deep_abyss"')
+    expect(svg).toContain('id="lobster-bg-glow-deep_abyss"')
+    expect(svg).toContain('id="lobster-bg-floor-deep_abyss"')
+    expect(svg).toContain('stop-color="#061828"')
+    expect(svg).toContain('stop-color="#020b14"')
+    expect(svg).toContain('stop-color="#01060c"')
+    expect(svg).toContain('id="pattern-circuit"')
   })
 
   it('aligns abdomen top width to match the carapace bottom width across variants', () => {
@@ -100,46 +132,66 @@ describe('lobster-avatar', () => {
     }
   })
 
-  it('computes deterministic seeded background theme and pattern', () => {
+  it('computes deterministic seeded background theme, pattern, and motion', () => {
     const seededA = getLobsterAvatarSeededOptions('larva-crimson-vanguard')
     const seededB = getLobsterAvatarSeededOptions('larva-deep-abyssal')
 
     expect(seededA.theme).toBeDefined()
     expect(seededA.pattern).toBeDefined()
+    expect(seededA.motion).toBeDefined()
+    expect(seededA.motion.duration).toBeGreaterThan(0)
     expect(seededB.theme).toBeDefined()
     expect(seededB.pattern).toBeDefined()
+    expect(seededB.motion).toBeDefined()
 
     // Same seed always returns same options
     expect(getLobsterAvatarSeededOptions('larva-crimson-vanguard')).toEqual(seededA)
   })
 
-  it('renders different background theme and pattern variations across seeds', () => {
+  it('renders different background theme, pattern, and motion variations across seeds', () => {
     const seeds = ['larva-seed-1', 'larva-seed-2', 'larva-seed-3', 'larva-seed-4', 'larva-seed-5', 'larva-seed-6', 'larva-seed-7', 'larva-seed-8']
     const themes = new Set<string>()
     const patterns = new Set<string>()
+    const motions = new Set<string>()
 
     for (const seed of seeds) {
       const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
       const themeMatch = svg?.match(/data-theme="([^"]+)"/)
       const patternMatch = svg?.match(/data-pattern="([^"]+)"/)
+      const motionMatch = svg?.match(/data-motion="([^"]+)"/)
       if (themeMatch?.[1]) themes.add(themeMatch[1])
       if (patternMatch?.[1]) patterns.add(patternMatch[1])
+      if (motionMatch?.[1]) motions.add(motionMatch[1])
     }
 
     expect(themes.size).toBeGreaterThan(1)
     expect(patterns.size).toBeGreaterThan(1)
+    expect(motions.size).toBeGreaterThan(1)
   })
 
-  it('respects manual theme and pattern overrides in config', () => {
-    const svg = generateLobsterAvatarSvg({
+  it('respects manual theme, pattern, and motion overrides in config', () => {
+    const svgAnimated = generateLobsterAvatarSvg({
       style: 'critters',
       seed: 'larva-test',
       backgroundTheme: 'thermal_vent',
-      backgroundPattern: 'diamond_sonar',
+      backgroundPattern: 'circuit_board',
+      backgroundMotion: 'drift_diagonal',
     })
-    expect(svg).toContain('data-theme="thermal_vent"')
-    expect(svg).toContain('data-pattern="diamond_sonar"')
-    expect(svg).toContain('id="pattern-diamond-sonar"')
+    expect(svgAnimated).toContain('data-theme="thermal_vent"')
+    expect(svgAnimated).toContain('data-pattern="circuit_board"')
+    expect(svgAnimated).toContain('data-motion="drift_diagonal"')
+    expect(svgAnimated).toContain('<animate')
+    expect(svgAnimated).toContain('repeatCount="indefinite"')
+
+    const svgStatic = generateLobsterAvatarSvg({
+      style: 'critters',
+      seed: 'larva-test',
+      backgroundTheme: 'thermal_vent',
+      backgroundPattern: 'overlapping_circles',
+      backgroundMotion: 'static',
+    })
+    expect(svgStatic).toContain('data-motion="static"')
+    expect(svgStatic).not.toContain('<animateTransform')
   })
 
   it('supports transparent background when requested', () => {
@@ -153,11 +205,13 @@ describe('lobster-avatar', () => {
     expect(svg).toContain('id="lobster-claws-layer"')
   })
 
-  it('renders different antenna variations across seeds', () => {
+  it('renders different antenna variations across seeds with left and right sub-layers', () => {
     const seeds = ['larva-seed-a', 'larva-seed-b', 'larva-seed-c', 'larva-seed-d', 'larva-seed-e']
     const variants = new Set<string>()
     for (const seed of seeds) {
       const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
+      expect(svg).toContain('id="lobster-antenna-left"')
+      expect(svg).toContain('id="lobster-antenna-right"')
       const match = svg?.match(/data-antenna="([^"]+)"/)
       if (match?.[1]) {
         variants.add(match[1])
