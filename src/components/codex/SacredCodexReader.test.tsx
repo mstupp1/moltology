@@ -14,6 +14,8 @@ describe('SacredCodexReader Component', () => {
     expect(screen.getByRole('heading', { level: 1, name: /THE SACRED/i })).toBeInTheDocument()
     expect(screen.getByText(/CANONICAL CODEX VAULT/i)).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { level: 2, name: /The Prime Directive/i })[0]).toBeInTheDocument()
+    expect(screen.queryByText(/OFFICIAL CANON V4.2/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/ARCHIVAL SPEC/i)).not.toBeInTheDocument()
   })
 
   it('supports filtering scriptures by volume in the Bento stage rail', () => {
@@ -23,15 +25,19 @@ describe('SacredCodexReader Component', () => {
     expect(screen.getAllByText(/The Prime Directive/i).length).toBeGreaterThan(0)
   })
 
-  it('supports theme switching between paper, sepia, and vault dark', () => {
-    render(<SacredCodexReader />)
-    const sepiaBtn = screen.getByRole('button', { name: /^SEPIA$/i })
-    fireEvent.click(sepiaBtn)
-    expect(localStorage.getItem('moltology_codex_theme')).toBe('sepia')
+  it('locks the document sheet to paper and garamond without reading pickers', () => {
+    const { container } = render(<SacredCodexReader />)
 
-    const vaultBtn = screen.getByRole('button', { name: /^VAULT$/i })
-    fireEvent.click(vaultBtn)
-    expect(localStorage.getItem('moltology_codex_theme')).toBe('dark')
+    expect(screen.queryByRole('button', { name: /^PAPER$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^SEPIA$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^VAULT$/i })).not.toBeInTheDocument()
+    expect(screen.queryByTitle('Switch Font')).not.toBeInTheDocument()
+    expect(screen.queryByTitle('Decrease Font Size')).not.toBeInTheDocument()
+    expect(screen.queryByTitle('Increase Font Size')).not.toBeInTheDocument()
+    expect(localStorage.getItem('moltology_codex_theme')).toBeNull()
+
+    expect(container.querySelector('.codex-parchment-theme')).toBeTruthy()
+    expect(container.querySelector('.font-garamond')).toBeTruthy()
   })
 
   it('allows toggling study notes panel and saving notes', () => {
@@ -57,6 +63,19 @@ describe('SacredCodexReader Component', () => {
 
     fireEvent.click(exitBtn)
     expect(screen.queryByRole('button', { name: /Exit Fullscreen Overlay/i })).not.toBeInTheDocument()
+  })
+
+  it('opens the fullscreen drawer from an icon-only menu without index chrome', () => {
+    render(<SacredCodexReader />)
+    fireEvent.click(screen.getAllByTitle(/Fullscreen/i)[0])
+
+    expect(screen.queryByText('CANON INDEX')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Canon Table of Contents Index/i }))
+
+    expect(screen.queryByText('CANON INDEX')).not.toBeInTheDocument()
+    expect(screen.queryByText('Close Drawer')).not.toBeInTheDocument()
+    expect(screen.getAllByText(/The Prime Directive/i).length).toBeGreaterThan(0)
   })
 
   it('supports filtering by stage clearance and searching scriptures', () => {

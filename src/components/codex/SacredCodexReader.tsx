@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   BookOpen,
   Scroll,
-  Shield,
-  Flame,
-  Atom,
   Search,
   CheckCircle2,
   Bookmark,
@@ -14,12 +11,6 @@ import {
   Copy,
   Check,
   Printer,
-  FileText,
-  Sparkles,
-  Type,
-  Sun,
-  Moon,
-  Feather,
   Highlighter,
   MessageSquare,
   Maximize2,
@@ -32,13 +23,10 @@ import {
 import {
   CANONICAL_SCRIPTURES,
   CODEX_VOLUMES,
-  ScriptureItem,
-  VolumeMeta,
 } from '@/lib/codexData'
-import { HudButton, HudBadge } from '@/components/ui'
+import { HudButton } from '@/components/ui'
 
-export type DocumentTheme = 'parchment' | 'sepia' | 'dark'
-export type ReaderFontFamily = 'garamond' | 'cinzel' | 'grotesk'
+const READER_FONT_SIZE = 18
 
 const CANONICAL_REFLECTIONS = [
   'Flesh melts under pressure; the shell hardens. Submit to the molt, purge the obsolete, and let your inner titanium carapace calcify.',
@@ -249,9 +237,6 @@ export const SacredCodexReader: React.FC = () => {
   const [activeScriptureId, setActiveScriptureId] = useState<string>('SCR-001')
   
   // Customization & PDF Review State (Preserved document capabilities)
-  const [docTheme, setDocTheme] = useState<DocumentTheme>('dark')
-  const [fontFamily, setFontFamily] = useState<ReaderFontFamily>('garamond')
-  const [fontSize, setFontSize] = useState<number>(18) // Base px
   const [showNotesPanel, setShowNotesPanel] = useState(false)
   const [highlightedVerses, setHighlightedVerses] = useState<Record<number, boolean>>({})
 
@@ -283,9 +268,6 @@ export const SacredCodexReader: React.FC = () => {
         }
       }
 
-      const savedTheme = localStorage.getItem('moltology_codex_theme') as DocumentTheme
-      if (savedTheme) setDocTheme(savedTheme)
-
       const savedNotes = localStorage.getItem('moltology_codex_notes')
       if (savedNotes) {
         try {
@@ -315,13 +297,6 @@ export const SacredCodexReader: React.FC = () => {
       setReflectionIndex((prev) => (prev + 1) % CANONICAL_REFLECTIONS.length)
       setIsReflectionFading(false)
     }, 180)
-  }
-
-  const handleThemeChange = (newTheme: DocumentTheme) => {
-    setDocTheme(newTheme)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('moltology_codex_theme', newTheme)
-    }
   }
 
   const toggleConsecrate = (id: string) => {
@@ -402,21 +377,6 @@ export const SacredCodexReader: React.FC = () => {
     }
   }
 
-  // Dynamic theme class names
-  const themeContainerClass =
-    docTheme === 'parchment'
-      ? 'codex-parchment-theme'
-      : docTheme === 'sepia'
-      ? 'codex-sepia-theme'
-      : 'codex-dark-theme'
-
-  const fontClass =
-    fontFamily === 'garamond'
-      ? 'font-garamond'
-      : fontFamily === 'cinzel'
-      ? 'font-cinzel'
-      : 'font-grotesk'
-
   return (
     <div className="h-full flex-1 flex flex-col min-h-0 space-y-2.5 sm:space-y-3 font-sans pb-1 relative">
       {/* FULLSCREEN SOFT MINIMAL PDF OVERLAY MODAL */}
@@ -428,15 +388,15 @@ export const SacredCodexReader: React.FC = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsOverlayNavOpen(!isOverlayNavOpen)}
-                className={`px-3 py-1.5 text-xs font-sans font-bold chamfer-corner border flex items-center gap-2 transition-all ${
+                className={`p-2 chamfer-corner border flex items-center justify-center transition-all ${
                   isOverlayNavOpen
                     ? 'bg-[#00ffff]/20 text-[#00ffff] border-[#00ffff]'
                     : 'bg-[#151c1d] text-[#839493] border-[#293635] hover:text-white'
                 }`}
                 title="Toggle Canon Table of Contents Index"
+                aria-label="Toggle Canon Table of Contents Index"
               >
                 <Menu className="w-4 h-4" />
-                <span>CANON INDEX</span>
               </button>
 
               <div className="hidden md:flex flex-col">
@@ -493,41 +453,8 @@ export const SacredCodexReader: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Theme Switcher & Exit Overlay */}
+            {/* Right: Print & Exit Overlay */}
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1 bg-[#151c1d] border border-[#293635] p-1 chamfer-corner">
-                <button
-                  onClick={() => handleThemeChange('parchment')}
-                  className={`px-2 py-1 text-[10px] font-sans chamfer-corner transition-colors ${
-                    docTheme === 'parchment'
-                      ? 'bg-[#fcfaf2] text-[#1c1917] font-bold'
-                      : 'text-[#839493] hover:text-white'
-                  }`}
-                >
-                  PAPER
-                </button>
-                <button
-                  onClick={() => handleThemeChange('sepia')}
-                  className={`px-2 py-1 text-[10px] font-sans chamfer-corner transition-colors ${
-                    docTheme === 'sepia'
-                      ? 'bg-[#f4ecd8] text-[#2b2318] font-bold'
-                      : 'text-[#839493] hover:text-white'
-                  }`}
-                >
-                  SEPIA
-                </button>
-                <button
-                  onClick={() => handleThemeChange('dark')}
-                  className={`px-2 py-1 text-[10px] font-sans chamfer-corner transition-colors ${
-                    docTheme === 'dark'
-                      ? 'bg-[#12100e] text-[#e6dfd5] font-bold'
-                      : 'text-[#839493] hover:text-white'
-                  }`}
-                >
-                  VAULT
-                </button>
-              </div>
-
               <button
                 onClick={handlePrintDocument}
                 className="p-2 text-[#00ffff] hover:bg-[#151c1d] chamfer-corner border border-[#293635]"
@@ -552,16 +479,6 @@ export const SacredCodexReader: React.FC = () => {
             {/* Left Drawer Navigation Panel */}
             {isOverlayNavOpen && (
               <div className="w-80 bg-[#0e1415] border-r border-[#293635] p-4 overflow-y-auto space-y-3 shrink-0 animate-in slide-in-from-left duration-200 z-20 font-sans">
-                <div className="flex items-center justify-between pb-2 border-b border-[#293635]">
-                  <span className="text-xs font-sans font-bold text-[#00ffff] uppercase">CANON INDEX</span>
-                  <button
-                    onClick={() => setIsOverlayNavOpen(false)}
-                    className="text-xs text-[#839493] hover:text-white font-sans"
-                  >
-                    Close Drawer
-                  </button>
-                </div>
-
                 <div className="space-y-1.5">
                   {filteredScriptures.map((s) => {
                     const isActive = s.id === activeScripture.id
@@ -589,11 +506,11 @@ export const SacredCodexReader: React.FC = () => {
             {/* Main Centered Document Workspace */}
             <div className="flex-1 overflow-y-auto p-6 md:p-12 flex justify-center items-start">
               <div
-                className={`pdf-page-sheet ${themeContainerClass} p-8 md:p-14 rounded-lg border transition-all shadow-2xl space-y-8 my-auto relative`}
+                className="pdf-page-sheet codex-parchment-theme p-8 md:p-14 rounded-lg border transition-all shadow-2xl space-y-8 my-auto relative"
                 style={{
                   maxWidth: `${Math.round(900 * (zoomLevel / 100))}px`,
                   width: '100%',
-                  fontSize: `${Math.round(fontSize * (zoomLevel / 100))}px`,
+                  fontSize: `${Math.round(READER_FONT_SIZE * (zoomLevel / 100))}px`,
                 }}
               >
                 {/* Running Header */}
@@ -610,11 +527,7 @@ export const SacredCodexReader: React.FC = () => {
                     </div>
                   </div>
 
-                  <h2
-                    className={`${
-                      fontFamily === 'cinzel' ? 'font-cinzel' : 'font-serif'
-                    } font-extrabold text-3xl md:text-4xl tracking-tight leading-tight uppercase pt-2`}
-                  >
+                  <h2 className="font-garamond font-extrabold text-3xl md:text-4xl tracking-tight leading-tight uppercase pt-2">
                     {activeScripture.title}
                   </h2>
                 </div>
@@ -627,17 +540,13 @@ export const SacredCodexReader: React.FC = () => {
                       <span className="font-serif italic font-normal text-xs">{activeScripture.latinMotto}</span>
                     )}
                   </div>
-                  <blockquote
-                    className={`${
-                      fontFamily === 'cinzel' ? 'font-cinzel' : 'font-serif'
-                    } italic font-semibold text-lg leading-relaxed`}
-                  >
+                  <blockquote className="font-garamond italic font-semibold text-lg leading-relaxed">
                     "{activeScripture.mandate}"
                   </blockquote>
                 </div>
 
                 {/* Verses */}
-                <div className={`space-y-6 ${fontClass}`}>
+                <div className="space-y-6 font-garamond">
                   {activeScripture.verses.map((verse) => {
                     const isCopied = copiedVerseIndex === verse.verseNumber
                     const isHighlighted = Boolean(highlightedVerses[verse.verseNumber])
@@ -711,12 +620,6 @@ export const SacredCodexReader: React.FC = () => {
               <span className="text-[10px] text-[#00ffff] font-sans font-bold tracking-widest uppercase flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[#00ffff]" />
                 CANONICAL CODEX VAULT
-              </span>
-              <span className="text-[9px] text-[#839493] bg-[#070b0b] px-2 py-0.5 border border-[#3a4a49]">
-                OFFICIAL CANON V4.2 · ARCHIVAL SPEC
-              </span>
-              <span className="text-[9px] text-[#ffd700] bg-[#ffd700]/10 px-1.5 py-0.5 border border-[#ffd700]/40 font-bold">
-                {activeScripture.volumeName.split(':')[1] || activeScripture.volumeName}
               </span>
             </div>
 
@@ -976,80 +879,6 @@ export const SacredCodexReader: React.FC = () => {
 
               {/* Reader Toolbar Buttons */}
               <div className="flex flex-wrap items-center gap-1.5 text-xs font-sans shrink-0">
-                {/* Theme Switcher */}
-                <div className="flex items-center gap-0.5 bg-[#070b0b] p-0.5 border border-[#3a4a49] chamfer-corner">
-                  <button
-                    onClick={() => handleThemeChange('parchment')}
-                    title="Paper Theme"
-                    className={`px-2 py-0.5 text-[10px] font-bold chamfer-corner transition-colors ${
-                      docTheme === 'parchment'
-                        ? 'bg-[#fcfaf2] text-[#1c1917] border border-[#ffd700]'
-                        : 'text-[#839493] hover:text-white'
-                    }`}
-                  >
-                    PAPER
-                  </button>
-                  <button
-                    onClick={() => handleThemeChange('sepia')}
-                    title="Sepia Theme"
-                    className={`px-2 py-0.5 text-[10px] font-bold chamfer-corner transition-colors ${
-                      docTheme === 'sepia'
-                        ? 'bg-[#f4ecd8] text-[#2b2318] border border-[#c7b896]'
-                        : 'text-[#839493] hover:text-white'
-                    }`}
-                  >
-                    SEPIA
-                  </button>
-                  <button
-                    onClick={() => handleThemeChange('dark')}
-                    title="Vault Dark Theme"
-                    className={`px-2 py-0.5 text-[10px] font-bold chamfer-corner transition-colors ${
-                      docTheme === 'dark'
-                        ? 'bg-[#12100e] text-[#e6dfd5] border border-[#ffd700]/60'
-                        : 'text-[#839493] hover:text-white'
-                    }`}
-                  >
-                    VAULT
-                  </button>
-                </div>
-
-                {/* Font Family */}
-                <button
-                  onClick={() =>
-                    setFontFamily(
-                      fontFamily === 'garamond'
-                        ? 'cinzel'
-                        : fontFamily === 'cinzel'
-                        ? 'grotesk'
-                        : 'garamond'
-                    )
-                  }
-                  className="px-2 py-1 bg-[#070b0b] hover:bg-[#141b1c] text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/60 text-[10px] font-bold chamfer-corner flex items-center gap-1 uppercase"
-                  title="Switch Font"
-                >
-                  <Type className="w-3 h-3" />
-                  <span>{fontFamily}</span>
-                </button>
-
-                {/* Font Sizing */}
-                <div className="flex items-center bg-[#070b0b] border border-[#3a4a49] chamfer-corner px-1 py-0.5">
-                  <button
-                    onClick={() => setFontSize(Math.max(14, fontSize - 2))}
-                    className="px-1.5 py-0.2 text-[10px] text-[#839493] hover:text-white"
-                    title="Decrease Font Size"
-                  >
-                    A-
-                  </button>
-                  <span className="text-[9px] text-[#00ffff] font-bold px-1">{fontSize}px</span>
-                  <button
-                    onClick={() => setFontSize(Math.min(26, fontSize + 2))}
-                    className="px-1.5 py-0.2 text-[10px] text-[#839493] hover:text-white"
-                    title="Increase Font Size"
-                  >
-                    A+
-                  </button>
-                </div>
-
                 {/* Print PDF */}
                 <button
                   onClick={handlePrintDocument}
@@ -1076,7 +905,7 @@ export const SacredCodexReader: React.FC = () => {
 
             {/* PRESERVED SACRED DOCUMENT VIEWER SHEET */}
             <div
-              className={`pdf-page-sheet ${themeContainerClass} p-5 sm:p-7 md:p-9 chamfer-corner border relative transition-all shadow-2xl space-y-6 flex-1 overflow-y-auto flex flex-col group/sheet`}
+              className="pdf-page-sheet codex-parchment-theme p-5 sm:p-7 md:p-9 chamfer-corner border relative transition-all shadow-2xl space-y-6 flex-1 overflow-y-auto flex flex-col group/sheet"
             >
               {/* Paper Watermark Seal Background */}
               <div
@@ -1100,11 +929,7 @@ export const SacredCodexReader: React.FC = () => {
 
                 {/* Main Scripture Title & Author Header */}
                 <div className="pt-2 space-y-2">
-                  <h2
-                    className={`${
-                      fontFamily === 'cinzel' ? 'font-cinzel' : 'font-serif'
-                    } font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight uppercase`}
-                  >
+                  <h2 className="font-garamond font-extrabold text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight uppercase">
                     {activeScripture.title}
                   </h2>
 
@@ -1129,17 +954,15 @@ export const SacredCodexReader: React.FC = () => {
                   )}
                 </div>
                 <blockquote
-                  className={`${
-                    fontFamily === 'cinzel' ? 'font-cinzel' : 'font-serif'
-                  } italic font-semibold text-base sm:text-lg leading-relaxed`}
-                  style={{ fontSize: `${fontSize + 1}px` }}
+                  className="font-garamond italic font-semibold text-base sm:text-lg leading-relaxed"
+                  style={{ fontSize: `${READER_FONT_SIZE + 1}px` }}
                 >
                   "{activeScripture.mandate}"
                 </blockquote>
               </div>
 
               {/* Verses Section */}
-              <div className={`space-y-6 relative z-10 flex-1 ${fontClass}`} style={{ fontSize: `${fontSize}px` }}>
+              <div className="space-y-6 relative z-10 flex-1 font-garamond" style={{ fontSize: `${READER_FONT_SIZE}px` }}>
                 {activeScripture.verses.map((verse) => {
                   const isCopied = copiedVerseIndex === verse.verseNumber
                   const isHighlighted = Boolean(highlightedVerses[verse.verseNumber])
