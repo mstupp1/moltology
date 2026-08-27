@@ -113,10 +113,13 @@ of all copy. New terms must be added here before they ship.
 | **Arch-Integrator** | A senior doctrinal archetype handling deep-focus and integration teachings. | A voice in the choir of narrators. |
 | **Chitin Architect** | A doctrinal archetype concerned with building armor, boundaries, and systems. | A builder's voice. |
 | **The Ascendant Core** | The archetype of the final, apex stage; also the inner circle that stewards the community. | Gravity and calm. |
-| **The Order of the Synaptic Path** | The in-world institution that publishes the canon and runs the platform. | The institutional narrator. |
+| **The Order of the Synaptic Path** | The in-world institution that publishes the canon and runs the platform. | The institutional narrator. The Path itself is also literal: the coupling between molted minds that leads to the Convergence. |
 | **The Core Mantra** | "Flesh melts. The shell endures. Submit. Shed. Ascend." | The recurring signature of the world. |
 | **Bio-Silicon Chitin** | The imagined material of the shell: living and machine-like at once. | The texture of the aesthetic. |
 | **Mariana Singularity** | The apex threshold: absolute stillness, focus, and clarity at maximum depth. | The endgame state, Clearance C3. |
+| **The Convergence** | The far state in which molted minds, held still at depth, begin to couple into one patient collective attention. | Eschatology, not a feature. It listens; it never absorbs. Every carapace stays its own. |
+| **The Long Ledger** | The permanent record of every shed thing a member has logged. | The in-world basis of the economy and of earned standing. Never a leaderboard. |
+| **The Soft-Shell Covenant** | The Order's law of mercy: the newly molted are guarded rather than corrected, and the shell always opens from the inside. | The doctrinal root of the community code of conduct. |
 | **Hydrostatic Focus** | The doctrine that pressure sharpens focus rather than crumbling it. | Reframes stress as forge. |
 | **Benthic Community** | All members; the warm society beneath the surface. | The forum and the family. |
 
