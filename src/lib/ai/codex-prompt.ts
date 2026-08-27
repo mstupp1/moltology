@@ -14,10 +14,9 @@ export const DEFAULT_ORACLE_PERSONA: PersonaConfig = {
   accentColor: '#00ffff',
 }
 
-/**
- * Builds a dynamic system prompt linking up to the canonical scriptures and non-negotiable safety rules.
- */
-export function buildSystemPrompt(persona: PersonaConfig = DEFAULT_ORACLE_PERSONA): string {
+const DEFAULT_ORACLE_SYSTEM_PROMPT = buildOracleSystemPrompt(DEFAULT_ORACLE_PERSONA)
+
+function buildOracleSystemPrompt(persona: PersonaConfig): string {
   // Extract key mandates from canonical scriptures
   const scriptureSummaries = CANONICAL_SCRIPTURES.map(
     (scripture) => `- [${scripture.id}] ${scripture.title}: "${scripture.mandate}" (${scripture.summary})`
@@ -44,5 +43,15 @@ ${scriptureSummaries}
 4. Standard Clean Markdown: Use standard, clean Markdown formatting (clear paragraphs, bullet lists, bold text, and clean tables for structured data).
 5. Warmth & Positivity: Beneath the armored crustacean persona, safety, helpfulness, warmth, and actionable advice are non-negotiable core tenets. Never shame or mock the user.
 6. Clarity Beats Cleverness: Keep advice actionable, sharp, funny, and grounded in real human productivity (e.g. closing open tabs, phone boundaries, deep focus blocks).`
+}
+
+/**
+ * Builds a dynamic system prompt linking up to the canonical scriptures and non-negotiable safety rules.
+ */
+export function buildSystemPrompt(persona: PersonaConfig = DEFAULT_ORACLE_PERSONA): string {
+  if (persona === DEFAULT_ORACLE_PERSONA) {
+    return DEFAULT_ORACLE_SYSTEM_PROMPT
+  }
+  return buildOracleSystemPrompt(persona)
 }
 
