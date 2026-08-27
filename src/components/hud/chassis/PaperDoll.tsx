@@ -4,6 +4,7 @@ import type { CatalogRef, GearItemState, EquipmentCategory } from '@/lib/chassis
 import {
   CATEGORY_LABELS,
 } from '@/lib/chassis-loadout'
+import { getAssetUrl } from '@/lib/assets'
 import { DraggableGear } from './DraggableGear'
 import { GearItemCard } from './GearItemCard'
 
@@ -57,8 +58,8 @@ function EquipSlot({
       ref={setNodeRef}
       className={`
         relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
-        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-dashed border-[#3a4a49]/80 bg-[#050808]/60'}
-        flex items-center justify-center
+        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-dashed border-[#3a4a49]/80 bg-[#050808]/75 backdrop-blur-[2px]'}
+        flex items-center justify-center transition-colors
       `}
       onClick={handleActivate}
       role="button"
@@ -134,19 +135,31 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   }
 
   return (
-    <div className="flex flex-col items-center w-full min-w-0 flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
-      <div className="flex flex-col justify-center items-center gap-1.5 sm:gap-2 shrink-0 min-h-full w-full py-0.5 sm:py-1">
-        {renderSlot('antennae')}
-        {renderSlot('head')}
-
-        <div className="flex gap-1.5 sm:gap-2">
-          {renderSlot('claws', { dropId: 'equip:claws-1' })}
-          {renderSlot('carapace')}
-          {renderSlot('claws', { dropId: 'equip:claws-2', readOnly: true })}
+    <div className="flex flex-col items-center justify-center w-full min-w-0 flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative select-none">
+      <div className="relative flex flex-col justify-center items-center gap-1.5 sm:gap-2 shrink-0 min-h-full w-full py-2">
+        {/* Holographic Chassis Mannequin Blueprint Stencil */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-0">
+          <img
+            src={getAssetUrl('images/chassis/chassis_stencil.webp')}
+            alt=""
+            aria-hidden="true"
+            className="h-full max-h-[96%] w-auto object-contain opacity-25 filter drop-shadow-[0_0_16px_rgba(0,195,255,0.25)] pointer-events-none"
+          />
         </div>
 
-        <div className="flex">
-          {renderSlot('legs')}
+        <div className="relative z-10 flex flex-col items-center gap-1.5 sm:gap-2">
+          {renderSlot('antennae')}
+          {renderSlot('head')}
+
+          <div className="flex gap-1.5 sm:gap-2">
+            {renderSlot('claws', { dropId: 'equip:claws-1' })}
+            {renderSlot('carapace')}
+            {renderSlot('claws', { dropId: 'equip:claws-2', readOnly: true })}
+          </div>
+
+          <div className="flex">
+            {renderSlot('legs')}
+          </div>
         </div>
       </div>
     </div>
