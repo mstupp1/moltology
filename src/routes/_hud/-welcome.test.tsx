@@ -42,8 +42,7 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
 
     expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
 
-    const skipBtn = screen.getByText(/skip transmission/i)
-    fireEvent.click(skipBtn)
+    fireEvent.click(screen.getByRole('button', { name: /close/i }))
 
     act(() => {
       vi.advanceTimersByTime(550)
@@ -60,6 +59,12 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
     expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
   })
 
+  it('does not flash WELCOME, GUEST while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    render(<HudLayout />)
+    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+  })
+
   it('triggers welcome popup with user name for logged-in user on first visit', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-789', name: 'Commander Crustacean' } },
@@ -69,8 +74,7 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
 
     expect(screen.getByText('WELCOME, COMMANDER')).toBeInTheDocument()
 
-    const skipBtn = screen.getByText(/skip transmission/i)
-    fireEvent.click(skipBtn)
+    fireEvent.click(screen.getByRole('button', { name: /close/i }))
 
     act(() => {
       vi.advanceTimersByTime(550)

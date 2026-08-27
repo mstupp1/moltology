@@ -48,6 +48,15 @@ describe('BlogCommentsSection', () => {
     expect(screen.getByText('This transmission was profoundly enlightening.')).toBeInTheDocument()
   })
 
+  it('holds the lock box for the first-paint empty session shape', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<BlogCommentsSection postId="post-100" />)
+
+    expect(screen.getByTestId('blog-comments-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('AUTHENTICATION REQUIRED TO JOIN DISCUSSION')).not.toBeInTheDocument()
+  })
+
   it('renders interactive HUD comment form when user is authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {

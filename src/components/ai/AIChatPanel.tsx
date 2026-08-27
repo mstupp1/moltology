@@ -77,7 +77,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const oracle = useSafeOracle()
   const session = useAuthSession()
   const sessionUser = session.user
-  const user = propUser !== undefined ? propUser : sessionUser
+  const user = propUser?.id || propUser?.sub ? propUser : sessionUser
 
   const userId = propUserId ?? user?.id ?? user?.sub ?? oracle?.userId ?? session.userId ?? null
   const isAuthPending = !userId && session.isPending

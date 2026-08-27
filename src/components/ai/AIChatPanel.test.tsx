@@ -279,6 +279,16 @@ describe('AIChatPanel Chats Dropdown Window', () => {
     expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
+
+  it('does not treat an explicit parent userId of null as guest while the session is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+    render(<AIChatPanel userId={null} />)
+
+    expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
+  })
 })
 
 describe('AIChatPanel Thinking State & Error Handling', () => {

@@ -56,6 +56,16 @@ describe('Chassis Configurator HUD Route', () => {
     expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
   })
 
+  it('holds the lock overlay for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    const Component = Route.options.component!
+    render(<Component />)
+
+    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
+    expect(screen.queryByText('CHASSIS CONFIGURATOR LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
+  })
+
   it('renders chassis status page when authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },

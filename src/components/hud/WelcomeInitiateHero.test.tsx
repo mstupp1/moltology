@@ -66,6 +66,14 @@ describe('WelcomeInitiateHero Component', () => {
     expect(screen.queryByText(/100% Free/i)).not.toBeInTheDocument()
   })
 
+  it('holds the sign up CTA for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    render(<WelcomeInitiateHero />)
+
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/100% Free/i)).not.toBeInTheDocument()
+  })
+
   it('cycles inspiring wisdom messages when clicking subtle refresh button', async () => {
     vi.useFakeTimers()
     render(<WelcomeInitiateHero />)

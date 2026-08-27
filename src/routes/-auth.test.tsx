@@ -267,4 +267,13 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     expect(screen.queryByRole('heading', { name: /Create Account/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /Welcome Back/i })).not.toBeInTheDocument()
   })
+
+  it('holds the sign-up form for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    render(<AuthRoute />)
+
+    expect(screen.getByTestId('auth-session-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: /Sign Up/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Welcome Back/i })).not.toBeInTheDocument()
+  })
 })

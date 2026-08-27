@@ -303,6 +303,15 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
   })
 
+  it('holds the account pill for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<HUDSidebar />)
+
+    expect(screen.getByTestId('sidebar-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+  })
+
   it('initializes immediately in collapsed state when saved in localStorage', () => {
     localStorage.setItem('moltology_hud_sidebar_collapsed', 'true')
 

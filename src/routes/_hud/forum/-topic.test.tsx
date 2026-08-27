@@ -68,6 +68,26 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByText('Sign in to join the discussion.')).toBeInTheDocument()
   })
 
+  it('holds the sign-in prompt while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    const seed = INITIAL_FORUM_TOPICS[0]
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        ...seed,
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: null,
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByTestId('forum-reply-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('Sign in to join the discussion.')).not.toBeInTheDocument()
+  })
+
   it('shows the reply composer when the session user is authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'authed-user', name: 'Initiate' } },

@@ -274,10 +274,10 @@ function AuthRoute() {
                 <HudGhostSkeleton variant="cyan" preset="button" width="100%" height={44} />
               </HudCard>
             ) : (
-            <HudCard
-              variant="teal"
-              className="relative w-full p-5 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50"
-            >
+              <HudCard
+                variant="teal"
+                className="relative w-full p-5 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50"
+              >
               {/* Header */}
               <div className="text-center mb-5 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold font-grotesk text-white tracking-wider uppercase">
@@ -459,7 +459,7 @@ function AuthRoute() {
                   onExpire={() => setTurnstileToken(null)}
                 />
               </form>
-            </HudCard>
+              </HudCard>
             )}
 
             {/* Landing Page Trust Strip */}
