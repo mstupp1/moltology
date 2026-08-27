@@ -583,6 +583,41 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-08-26T14:07:51.006Z"
+    },
+    {
+      "id": "reel-1787839499239",
+      "topic": "The 15-Stage Moltmaxxing Audit: Discover Your Depth Clearance",
+      "hookHeadline": "ARE YOU STAGE 4 CLEARANCE?",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-2026-moltmaxxing-protocol-guide",
+      "characterArc": "Silas Trench // Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? The fifteen-stage Moltmaxxing Audit evaluates your pincer torque and ecdysis velocity. Take the exam on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787839499239.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787839499239.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 16,
+      "status": "scheduled",
+      "zernioPostId": "6a904490e44b92295282ccf3",
+      "scheduledFor": "2026-08-27T22:30:00.000Z",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#Moltmaxxing #ClearanceQuiz #AscensionAudit #Stage4Ascendant #MoltNation #Shorts",
+      "caption": "Most operators overestimate their cognitive armor. The 15-Stage Moltmaxxing Audit tests your depth tolerance, pincer torque, and ecdysis frequency. 📊🦞\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#Moltmaxxing",
+        "#ClearanceQuiz",
+        "#AscensionAudit",
+        "#Stage4Ascendant",
+        "#MoltNation",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-27T14:06:57.868Z"
     }
   ]
 }

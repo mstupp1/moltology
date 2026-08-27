@@ -412,6 +412,8 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
   const finalMascot = mascot !== undefined ? mascot : preset.mascot
   const finalBenefits = benefits || preset.benefits || CAMPAIGN_PRESETS['moltmaxxing-guide']!.benefits!
 
+  const isCodex = theme === 'sacred-codex' || theme === 'codex'
+
   return (
     <CompositeContainer
       aspectRatio={aspectRatio}
@@ -441,9 +443,23 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
       {/* 1. Header Section: Eyebrow Badge & Punchy Impact Headline */}
       <div className="z-10 shrink-0 max-w-[660px]">
         {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#ff453a] to-[#ff5540] border-2 border-[#ff6358] shadow-[0_4px_14px_rgba(255,69,58,0.4)]">
-          <span className="w-3 h-3 rounded-full bg-[#01060e]" />
-          <span className="font-mono font-black text-[15px] tracking-wider text-white uppercase">
+        <div
+          className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-xl border-2 shadow-lg ${
+            isCodex
+              ? 'bg-gradient-to-r from-[#00c3ff]/20 via-[#00ffff]/30 to-[#00c3ff]/20 border-[#00ffff] shadow-[0_0_20px_rgba(0,255,255,0.35)]'
+              : 'bg-gradient-to-r from-[#ff453a] to-[#ff5540] border-[#ff6358] shadow-[0_4px_14px_rgba(255,69,58,0.4)]'
+          }`}
+        >
+          <span
+            className={`w-3 h-3 rounded-full ${
+              isCodex ? 'bg-[#00ffff] shadow-[0_0_8px_#00ffff]' : 'bg-[#01060e]'
+            }`}
+          />
+          <span
+            className={`font-mono font-black text-[15px] tracking-wider uppercase ${
+              isCodex ? 'text-[#00ffff]' : 'text-white'
+            }`}
+          >
             {finalEyebrow}
           </span>
         </div>
@@ -456,14 +472,24 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           <h2 className="text-[58px] leading-[0.98] font-black text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
             {finalH2}
           </h2>
-          <h2 className="text-[64px] leading-[0.98] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ff5540] via-[#ff453a] to-[#cc1a10] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] tracking-tight uppercase">
+          <h2
+            className={`text-[64px] leading-[0.98] font-black text-transparent bg-clip-text tracking-tight uppercase ${
+              isCodex
+                ? 'bg-gradient-to-r from-[#00ffff] via-[#38bdf8] to-[#00e5ff] drop-shadow-[0_0_25px_rgba(0,255,255,0.65)]'
+                : 'bg-gradient-to-r from-[#ff5540] via-[#ff453a] to-[#cc1a10] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]'
+            }`}
+          >
             {finalHighlight}
           </h2>
         </div>
 
         {/* Sub-headline / Hook */}
         <div className="mt-3.5 flex items-center gap-3">
-          <div className="w-2.5 h-7 bg-[#ff453a] rounded-full shadow-sm" />
+          <div
+            className={`w-2.5 h-7 rounded-full shadow-sm ${
+              isCodex ? 'bg-[#00ffff] shadow-[0_0_12px_#00ffff]' : 'bg-[#ff453a]'
+            }`}
+          />
           <p className="text-[24px] font-bold text-slate-100 tracking-wide">
             {finalSub}
           </p>
@@ -478,12 +504,20 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           {finalBenefits.map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-4 p-5 rounded-2xl bg-[#041b30]/95 border-2 border-[#00c3ff]/50 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform"
+              className={`flex items-center gap-4 p-5 rounded-2xl bg-[#041b30]/95 border-2 shadow-[0_8px_30px_rgba(0,0,0,0.8)] backdrop-blur-md transition-transform ${
+                isCodex
+                  ? 'border-[#00ffff]/50 shadow-[0_8px_30px_rgba(0,0,0,0.8),0_0_15px_rgba(0,255,255,0.15)]'
+                  : 'border-[#00c3ff]/50'
+              }`}
             >
               {/* Circular Icon Badge */}
               <div
                 className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg ${
-                  item.badgeVariant === 'amber'
+                  isCodex
+                    ? item.badgeVariant === 'emerald'
+                      ? 'bg-gradient-to-tr from-emerald-500 to-teal-300 text-slate-950 border-2 border-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                      : 'bg-gradient-to-tr from-[#0088cc] via-[#00c3ff] to-[#00ffff] text-slate-950 border-2 border-[#00ffff]/60 shadow-[0_0_15px_rgba(0,255,255,0.4)]'
+                    : item.badgeVariant === 'amber'
                     ? 'bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white border-2 border-[#ff6358]/40'
                     : item.badgeVariant === 'emerald'
                     ? 'bg-gradient-to-tr from-emerald-600 to-teal-300 text-slate-950 border-2 border-emerald-100'
@@ -508,21 +542,53 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
         {/* Right Column (7 Cols): 3D Mockup + Trust Badge + Quote Bubble */}
         <div className="col-span-7 relative flex flex-col items-center justify-center h-full min-h-[560px]">
-          {/* Subtle Atmospheric Stage Back-Glow linking character, badge, and platter */}
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,195,255,0.14)_0%,rgba(255,69,58,0.07)_40%,transparent_72%)] pointer-events-none" />
+          {/* Atmospheric Stage Back-Glow linking character, badge, and platter */}
+          <div
+            className={`absolute inset-0 -z-10 pointer-events-none ${
+              isCodex
+                ? 'bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,255,255,0.18)_0%,rgba(0,195,255,0.08)_40%,transparent_72%)]'
+                : 'bg-[radial-gradient(ellipse_at_50%_52%,rgba(0,195,255,0.14)_0%,rgba(255,69,58,0.07)_40%,transparent_72%)]'
+            }`}
+          />
 
           {/* Top-Right Circular Trust Certification Seal */}
           <div className="absolute -top-2 -right-1 z-30 flex flex-col items-center justify-center shrink-0">
-            <div className="w-[148px] h-[148px] rounded-full bg-gradient-to-br from-[#ff6358] via-[#ff453a] to-[#991510] p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0">
-              <div className="w-full h-full rounded-full bg-[#060b12] border-2 border-[#ff453a] flex flex-col items-center justify-center text-center p-2.5">
-                <div className="flex gap-0.5 text-[#ff453a] text-[13px]">
+            <div
+              className={`w-[148px] h-[148px] rounded-full p-1.5 shadow-[0_16px_35px_rgba(0,0,0,0.95)] shrink-0 ${
+                isCodex
+                  ? 'bg-gradient-to-br from-[#00ffff] via-[#00c3ff] to-[#0284c7] shadow-[0_16px_35px_rgba(0,0,0,0.95),0_0_20px_rgba(0,255,255,0.35)]'
+                  : 'bg-gradient-to-br from-[#ff6358] via-[#ff453a] to-[#991510]'
+              }`}
+            >
+              <div
+                className={`w-full h-full rounded-full bg-[#041322] border-2 flex flex-col items-center justify-center text-center p-2.5 ${
+                  isCodex ? 'border-[#00ffff]' : 'border-[#ff453a]'
+                }`}
+              >
+                <div
+                  className={`flex gap-0.5 text-[13px] ${
+                    isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
+                  }`}
+                >
                   {'★★★★★'}
                 </div>
-                <div className="font-mono font-black text-[12.5px] uppercase text-[#ff453a] leading-tight mt-1">
+                <div
+                  className={`font-mono font-black text-[12.5px] uppercase leading-tight mt-1 ${
+                    isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
+                  }`}
+                >
                   {finalTrustText}
                 </div>
-                <div className="w-12 h-[1.5px] bg-[#ff453a] my-1" />
-                <div className="font-mono font-bold text-[10px] tracking-wider uppercase text-[#ff6358]">
+                <div
+                  className={`w-12 h-[1.5px] my-1 ${
+                    isCodex ? 'bg-[#00ffff]' : 'bg-[#ff453a]'
+                  }`}
+                />
+                <div
+                  className={`font-mono font-bold text-[10px] tracking-wider uppercase ${
+                    isCodex ? 'text-[#67e8f9]' : 'text-[#ff6358]'
+                  }`}
+                >
                   {finalTrustYear}
                 </div>
               </div>
@@ -541,7 +607,6 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
               {finalMockupType === 'device-showcase' ? (
                 /* Real App Screenshot — Desktop Safari + iPhone Mobile */
                 <div className="relative w-full flex flex-col items-stretch">
-                  {/* Desktop Safari Frame with real screenshot */}
                   <div className="w-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
                     <Safari
                       url="moltology.org/dashboard"
@@ -552,7 +617,6 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                       height={1100}
                     />
                   </div>
-                  {/* iPhone — simple clean frame overlapping bottom-right */}
                   <div className="absolute -bottom-8 right-0 z-30 -rotate-3 drop-shadow-[0_15px_40px_rgba(0,0,0,0.95)]">
                     <SimplePhoneFrame
                       className="w-[118px]"
@@ -561,7 +625,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                   </div>
                 </div>
               ) : finalMockupType === 'tablet' ? (
-                /* Diagnostic Tablet HUD Graphic (Enlarged) */
+                /* Diagnostic Tablet HUD Graphic */
                 <div
                   className="relative w-[370px] h-[480px] rounded-3xl bg-gradient-to-b from-[#031422] via-[#05233a] to-[#020d18] border-4 border-[#00c3ff]/90 shadow-[35px_40px_80px_rgba(0,0,0,0.98)] flex flex-col p-6 overflow-hidden text-center justify-between"
                   style={{
@@ -569,7 +633,6 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                     transformStyle: 'preserve-3d',
                   }}
                 >
-                  {/* Top Bezel & Camera */}
                   <div className="flex items-center justify-between pb-2 border-b border-[#00c3ff]/40">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#ff453a]" />
@@ -580,7 +643,6 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                     <div className="w-2 h-2 rounded-full bg-[#00c3ff]" />
                   </div>
 
-                  {/* Tablet Center Radar & Telemetry */}
                   <div className="my-auto flex flex-col items-center">
                     <h3 className="font-grotesk font-black text-3xl text-white uppercase tracking-tight">
                       {finalBookTitle}
@@ -589,14 +651,12 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                       {finalBookSubtitle}
                     </div>
 
-                    {/* Multi-Axis Radar Scan Graphic */}
                     <div className="relative mt-4 w-44 h-36 rounded-2xl bg-[#010810]/95 border-2 border-[#00c3ff]/80 p-3 flex flex-col items-center justify-center shadow-inner overflow-hidden">
                       <div className="absolute inset-0 bg-[#00c3ff]/10" />
                       <div className="w-28 h-28 rounded-full border border-[#00c3ff]/40 flex items-center justify-center relative">
                         <div className="w-20 h-20 rounded-full border border-[#00c3ff]/60 flex items-center justify-center">
                           <div className="w-10 h-10 rounded-full border border-[#00c3ff]" />
                         </div>
-                        {/* Radar Polygon Shape */}
                         <svg className="absolute inset-0 w-full h-full text-[#00c3ff]/80" viewBox="0 0 100 100">
                           <polygon
                             points="50,15 85,38 75,80 30,85 20,40"
@@ -610,14 +670,13 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                     </div>
                   </div>
 
-                  {/* Tablet Footer */}
                   <div className="pt-2 border-t border-[#00c3ff]/40 flex items-center justify-between text-[11px] font-mono text-slate-300">
                     <span>STAGE: APEX (C3)</span>
                     <span className="text-[#ff453a] font-bold">CLEARANCE: 99.4%</span>
                   </div>
                 </div>
               ) : (
-                /* Three.js Photorealistic 3D Hardcover Book on Oval Platter */
+                /* Three.js Photorealistic 3D Hardcover Book / Holy Codex on Oval Platter */
                 <ThreeBookCover
                   width={520}
                   height={650}
@@ -628,25 +687,44 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                   rotateX={0.05}
                   coverImageUrl={finalBookCoverUrl}
                   coverEyebrow={finalBookSubtitle}
-                  coverTitlePart1={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'MOLT'}
-                  coverTitlePart2={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'MAXXING'}
+                  coverTitlePart1={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'THE BENTHIC'}
+                  coverTitlePart2={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'CODEX'}
                   coverSubtitle="STAGE 4 CARCINIZATION"
                   coverTagline={finalBookTagline}
                   spineTitle={finalBookTitle}
-                  themeVariant={theme === 'sacred-codex' ? 'amber' : 'cyan'}
+                  themeVariant={isCodex ? 'holy-codex' : 'cyan'}
+                  isHolyBook={isCodex}
                 />
               )}
             </div>
           </div>
 
           {/* Floating Quote Callout on Lower Right */}
-          <div className="absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 border-[#ff453a] shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md">
+          <div
+            className={`absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md ${
+              isCodex
+                ? 'border-[#00ffff]/80 shadow-[0_15px_35px_rgba(0,0,0,0.95),0_0_20px_rgba(0,255,255,0.25)]'
+                : 'border-[#ff453a]'
+            }`}
+          >
             <div className="flex items-start gap-1.5">
-              <span className="text-[#ff453a] font-serif text-2xl leading-none">"</span>
+              <span
+                className={`font-serif text-2xl leading-none ${
+                  isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
+                }`}
+              >
+                "
+              </span>
               <p className="text-xs font-semibold text-slate-100 leading-snug">
                 {finalQuote}
               </p>
-              <span className="text-[#ff453a] font-serif text-2xl leading-none self-end">"</span>
+              <span
+                className={`font-serif text-2xl leading-none self-end ${
+                  isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
+                }`}
+              >
+                "
+              </span>
             </div>
           </div>
         </div>
@@ -654,25 +732,53 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
       {/* 3. Massive High-Contrast Comment-to-DM Bottom CTA Banner */}
       <div className="mt-2 z-20 shrink-0">
-        <div className="w-full py-6 px-9 rounded-3xl bg-[#01060e] border-4 border-[#ff453a] shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden">
-          {/* Subtle static crimson background accent */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#ff453a]/10 via-[#ff5540]/15 to-[#ff453a]/10 pointer-events-none" />
+        <div
+          className={`w-full py-6 px-9 rounded-3xl bg-[#01060e] border-4 shadow-[0_20px_45px_rgba(0,0,0,0.95)] flex items-center justify-between relative overflow-hidden ${
+            isCodex
+              ? 'border-[#00ffff] shadow-[0_20px_45px_rgba(0,0,0,0.95),0_0_35px_rgba(0,255,255,0.45)]'
+              : 'border-[#ff453a]'
+          }`}
+        >
+          {/* Subtle background glow */}
+          <div
+            className={`absolute inset-0 pointer-events-none ${
+              isCodex
+                ? 'bg-gradient-to-r from-[#00ffff]/10 via-[#00c3ff]/15 to-[#00ffff]/10'
+                : 'bg-gradient-to-r from-[#ff453a]/10 via-[#ff5540]/15 to-[#ff453a]/10'
+            }`}
+          />
 
           {/* Left Arrow Accents */}
-          <div className="flex items-center gap-2 text-[#ff453a] font-black text-3xl hidden sm:flex">
+          <div
+            className={`flex items-center gap-2 font-black text-3xl hidden sm:flex ${
+              isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
+            }`}
+          >
             <span>👉</span>
           </div>
 
           {/* Center Callout: Comment "KEYWORD" below */}
           <div className="flex items-center justify-center gap-4 mx-auto">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white flex items-center justify-center shadow-2xl font-black shrink-0 border-2 border-[#ff6358]/40">
-              <MessageSquare className="w-8 h-8 fill-white" />
+            <div
+              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl font-black shrink-0 border-2 ${
+                isCodex
+                  ? 'bg-gradient-to-tr from-[#00c3ff] to-[#00ffff] text-slate-950 border-[#00ffff] shadow-[0_0_20px_rgba(0,255,255,0.6)]'
+                  : 'bg-gradient-to-tr from-[#ff453a] to-[#ff5540] text-white border-[#ff6358]/40'
+              }`}
+            >
+              <MessageSquare className={`w-8 h-8 ${isCodex ? 'fill-slate-950 text-slate-950' : 'fill-white text-white'}`} />
             </div>
             <div className="flex items-baseline gap-3.5">
               <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
                 Comment
               </span>
-              <span className="font-grotesk font-black text-4xl md:text-5xl text-[#ff453a] tracking-wider uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+              <span
+                className={`font-grotesk font-black text-4xl md:text-5xl tracking-wider uppercase ${
+                  isCodex
+                    ? 'text-[#00ffff] drop-shadow-[0_0_18px_rgba(0,255,255,0.85)]'
+                    : 'text-[#ff453a] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]'
+                }`}
+              >
                 "{finalKeyword}"
               </span>
               <span className="font-grotesk font-black text-3xl md:text-4xl text-white tracking-wide uppercase drop-shadow-md">
@@ -682,7 +788,11 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           </div>
 
           {/* Right Arrow Accents */}
-          <div className="flex items-center gap-2 text-[#ff453a] font-black text-3xl hidden sm:flex">
+          <div
+            className={`flex items-center gap-2 font-black text-3xl hidden sm:flex ${
+              isCodex ? 'text-[#00ffff]' : 'text-[#ff453a]'
+            }`}
+          >
             <span>👈</span>
           </div>
         </div>

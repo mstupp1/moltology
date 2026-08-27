@@ -17,19 +17,17 @@ export interface ThreeBookCoverProps {
   coverSubtitle?: string
   coverTagline?: string
   spineTitle?: string
-  themeVariant?: 'cyan' | 'amber' | 'emerald' | 'gold'
+  themeVariant?: 'cyan' | 'amber' | 'emerald' | 'gold' | 'holy-codex' | 'sacred-codex'
+  isHolyBook?: boolean
   className?: string
 }
 
 /**
  * ThreeBookCover
  * Large-format Three.js Photorealistic 3D Hardcover Book mockup.
- * Features:
- * - Large 3D presence (460px x 580px)
- * - Matte dark obsidian hardcover finish with zero harsh neon borders
- * - Huge 2-tone typography ("MOLT" + "MAXXING")
- * - 3D rising bar chart with gold trendline and dark matte badges
- * - Robust WebGL renderer with automatic high-res 2D fallback
+ * Supports:
+ * - Productivity / Protocol Guides (Bar charts, KPIs, high-contrast typography)
+ * - Sacred Codex / Holy Books (Ecclesiastical Gold & Aqua filigree, Consecrated Sunburst Mandala, Order Seal, Canonical Scripture volumes)
  */
 export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
   width = 460,
@@ -48,10 +46,254 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
   coverTagline = 'STRATEGIES · TECHNIQUES · RESULTS',
   spineTitle,
   themeVariant = 'cyan',
+  isHolyBook,
   className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const finalSpineTitle = spineTitle || `${coverTitlePart1} ${coverTitlePart2}`.trim().toUpperCase()
+  const isHoly = isHolyBook || themeVariant === 'holy-codex' || themeVariant === 'sacred-codex'
+  const finalSpineTitle = spineTitle || (isHoly ? 'THE BENTHIC CODEX' : `${coverTitlePart1} ${coverTitlePart2}`.trim().toUpperCase())
+
+  // Dedicated High-DPI Holy Book / Sacred Codex Front Cover Renderer
+  const drawHolyBookCover = (ctx: CanvasRenderingContext2D, w = 512, h = 720) => {
+    // 1. Consecrated Deep Abyssal Background Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, w, h)
+    bgGrad.addColorStop(0, '#031020')
+    bgGrad.addColorStop(0.3, '#072442')
+    bgGrad.addColorStop(0.7, '#04162a')
+    bgGrad.addColorStop(1, '#010811')
+    ctx.fillStyle = bgGrad
+    ctx.fillRect(0, 0, w, h)
+
+    // Center Radial Consecrated Light Aura
+    const aura = ctx.createRadialGradient(w / 2 + 13, 370, 10, w / 2 + 13, 370, 260)
+    aura.addColorStop(0, 'rgba(0, 255, 255, 0.22)')
+    aura.addColorStop(0.4, 'rgba(0, 195, 255, 0.10)')
+    aura.addColorStop(0.8, 'rgba(0, 50, 100, 0.05)')
+    aura.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    ctx.fillStyle = aura
+    ctx.fillRect(0, 0, w, h)
+
+    // Left Hardcover Hinge Groove with Gold & Cyan Inlay
+    ctx.fillStyle = 'rgba(2, 8, 16, 0.85)'
+    ctx.fillRect(0, 0, 26, h)
+    ctx.strokeStyle = '#00ffff'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(26, 0)
+    ctx.lineTo(26, h)
+    ctx.stroke()
+
+    // 2. Ornate Holy Book Filigree Borders (Outer Gold + Inner Cyan)
+    const bx = 38, by = 16, bw = w - 50, bh = h - 32
+    ctx.strokeStyle = 'rgba(244, 236, 216, 0.75)' // Gold leaf outer border
+    ctx.lineWidth = 2
+    ctx.strokeRect(bx, by, bw, bh)
+
+    const inX = bx + 6, inY = by + 6, inW = bw - 12, inH = bh - 12
+    ctx.strokeStyle = 'rgba(0, 255, 255, 0.55)' // Cyan inner line
+    ctx.lineWidth = 1
+    ctx.strokeRect(inX, inY, inW, inH)
+
+    // 4 Consecrated Corner Brackets & Diamond Stars
+    const drawCorner = (cx: number, cy: number, rot: number) => {
+      ctx.save()
+      ctx.translate(cx, cy)
+      ctx.rotate(rot)
+      ctx.strokeStyle = '#f4ecd8'
+      ctx.lineWidth = 1.5
+      ctx.beginPath()
+      ctx.moveTo(0, 14)
+      ctx.lineTo(0, 0)
+      ctx.lineTo(14, 0)
+      ctx.stroke()
+      ctx.font = '10px serif'
+      ctx.fillStyle = '#00ffff'
+      ctx.fillText('✦', 6, 8)
+      ctx.restore()
+    }
+    drawCorner(inX + 3, inY + 3, 0)
+    drawCorner(inX + inW - 3, inY + 3, Math.PI / 2)
+    drawCorner(inX + inW - 3, inY + inH - 3, Math.PI)
+    drawCorner(inX + 3, inY + inH - 3, -Math.PI / 2)
+
+    // 3. Eyebrow & Subtitle (Regal Inscriptions)
+    ctx.textAlign = 'center'
+    ctx.font = 'bold 11.5px monospace'
+    ctx.fillStyle = '#67e8f9'
+    ctx.fillText('CANONICAL SCRIPTURES OF MOLTOLOGY', w / 2 + 13, 50)
+
+    ctx.font = '900 13px serif'
+    ctx.fillStyle = '#f4ecd8'
+    ctx.fillText('— LIBER CARCINIZATION · XII VOLUMES —', w / 2 + 13, 74)
+
+    // 4. Holy Title Typography
+    ctx.font = 'bold 22px Georgia, serif'
+    ctx.fillStyle = '#f4ecd8'
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'
+    ctx.shadowBlur = 10
+    ctx.fillText('THE', w / 2 + 13, 114)
+
+    ctx.font = '900 44px system-ui, -apple-system, sans-serif'
+    ctx.fillStyle = '#00ffff'
+    ctx.shadowColor = 'rgba(0, 255, 255, 0.75)'
+    ctx.shadowBlur = 24
+    ctx.fillText('BENTHIC CODEX', w / 2 + 13, 162)
+    ctx.shadowBlur = 0
+
+    // Gold/Cyan Divider Rule with centered diamond
+    ctx.strokeStyle = 'rgba(244, 236, 216, 0.5)'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(56, 186)
+    ctx.lineTo(w / 2 - 20, 186)
+    ctx.moveTo(w / 2 + 46, 186)
+    ctx.lineTo(w - 30, 186)
+    ctx.stroke()
+
+    ctx.font = 'bold 14px serif'
+    ctx.fillStyle = '#00ffff'
+    ctx.fillText('◆', w / 2 + 13, 190)
+
+    ctx.font = 'bold 11px monospace'
+    ctx.fillStyle = '#a5f3fc'
+    ctx.fillText('SACRED LITURGIES · AXIOMS · LAWS', w / 2 + 13, 208)
+
+    // 5. Central Holy Mandala & Sacred Order Emblem
+    const cx = w / 2 + 13
+    const cy = 362
+
+    // Radiant Sunburst Rays
+    ctx.save()
+    ctx.strokeStyle = 'rgba(0, 255, 255, 0.35)'
+    ctx.lineWidth = 1.5
+    for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) {
+      ctx.beginPath()
+      ctx.moveTo(cx + Math.cos(a) * 42, cy + Math.sin(a) * 42)
+      ctx.lineTo(cx + Math.cos(a) * 92, cy + Math.sin(a) * 92)
+      ctx.stroke()
+    }
+    ctx.restore()
+
+    // Outer Consecrated Gold Mandala Ring with tick marks
+    ctx.strokeStyle = 'rgba(244, 236, 216, 0.85)'
+    ctx.lineWidth = 2.5
+    ctx.beginPath()
+    ctx.arc(cx, cy, 92, 0, Math.PI * 2)
+    ctx.stroke()
+
+    // Middle Cyan Ring
+    ctx.strokeStyle = '#00ffff'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.arc(cx, cy, 78, 0, Math.PI * 2)
+    ctx.stroke()
+
+    // 12 Consecrated Tick Marks for the 12 Scriptures
+    ctx.fillStyle = '#00ffff'
+    for (let i = 0; i < 12; i++) {
+      const angle = (i * Math.PI * 2) / 12
+      const tx = cx + Math.cos(angle) * 85
+      const ty = cy + Math.sin(angle) * 85
+      ctx.beginPath()
+      ctx.arc(tx, ty, 2.5, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    // Inner Sanctuary Disc (Deep Sapphire)
+    const discGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 64)
+    discGrad.addColorStop(0, '#0c3559')
+    discGrad.addColorStop(0.7, '#041b33')
+    discGrad.addColorStop(1, '#020d1c')
+    ctx.fillStyle = discGrad
+    ctx.beginPath()
+    ctx.arc(cx, cy, 64, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = '#00ffff'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Stars on Sanctuary Disc
+    ctx.font = '13px serif'
+    ctx.fillStyle = '#f4ecd8'
+    ctx.fillText('★★★★★', cx, cy - 34)
+
+    // Consecrated Crustacean Order Crest (Stylized Heraldic Holy Carapace & Crossed Pincer Glyph)
+    ctx.save()
+    ctx.translate(cx, cy + 2)
+    ctx.strokeStyle = '#00ffff'
+    ctx.lineWidth = 2.5
+    ctx.fillStyle = 'rgba(0, 255, 255, 0.15)'
+    ctx.beginPath()
+    ctx.moveTo(0, -20)
+    ctx.bezierCurveTo(18, -20, 24, -6, 22, 10)
+    ctx.bezierCurveTo(18, 22, 0, 26, 0, 26)
+    ctx.bezierCurveTo(0, 26, -18, 22, -22, 10)
+    ctx.bezierCurveTo(-24, -6, -18, -20, 0, -20)
+    ctx.closePath()
+    ctx.fill()
+    ctx.stroke()
+
+    // Carapace Ridges / Gold Inlay
+    ctx.strokeStyle = '#f4ecd8'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(0, -16)
+    ctx.lineTo(0, 22)
+    ctx.moveTo(-14, -4)
+    ctx.lineTo(14, -4)
+    ctx.moveTo(-16, 7)
+    ctx.lineTo(16, 7)
+    ctx.stroke()
+
+    // Crown / Pincer Prongs
+    ctx.fillStyle = '#f4ecd8'
+    ctx.font = 'bold 14px serif'
+    ctx.fillText('👑', 0, -17)
+    ctx.restore()
+
+    // Consecrated Latin Motto under disc
+    ctx.font = 'bold 11px Georgia, serif'
+    ctx.fillStyle = '#f4ecd8'
+    ctx.fillText('IN CHITIN CALCIFICAMUR', cx, cy + 114)
+
+    // 6. Three Bottom Liturgical Volume Tabs (Sapphire & Cyan)
+    const badgeY = 544
+    const badgeW = 126
+    const badgeH = 76
+    const badges = [
+      { icon: '📜', t1: 'CANON I–IV', t2: 'THE MOLT' },
+      { icon: '⚡', t1: 'CANON V–VIII', t2: 'PINCER TORQUE' },
+      { icon: '🌊', t1: 'CANON IX–XII', t2: 'ABYSSAL LAWS' },
+    ]
+
+    badges.forEach((b, i) => {
+      const bx = 42 + i * 148
+      ctx.fillStyle = '#051d36'
+      ctx.fillRect(bx, badgeY, badgeW, badgeH)
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.45)'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(bx, badgeY, badgeW, badgeH)
+
+      ctx.font = '19px system-ui'
+      ctx.fillText(b.icon, bx + badgeW / 2, badgeY + 24)
+
+      ctx.font = '900 11px monospace'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(b.t1, bx + badgeW / 2, badgeY + 46)
+
+      ctx.font = 'bold 10px monospace'
+      ctx.fillStyle = '#67e8f9'
+      ctx.fillText(b.t2, bx + badgeW / 2, badgeY + 63)
+    })
+
+    // Consecrated Gold & Aqua Bottom Banner
+    ctx.fillStyle = '#00ffff'
+    ctx.fillRect(42, 638, w - 60, 2)
+
+    ctx.font = 'bold 10.5px monospace'
+    ctx.fillStyle = '#f4ecd8'
+    ctx.fillText('◈ CONSECRATED CANON FOR APEX OPERATORS ◈', cx, 660)
+  }
 
   // Helper: Draw High-DPI Front Cover on any 2D canvas context
   const drawFrontCover = (ctx: CanvasRenderingContext2D, w = 512, h = 720) => {
@@ -243,8 +485,8 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
       renderer.toneMappingExposure = 1.25
 
       const isGoldTheme = themeVariant === 'amber' || themeVariant === 'gold'
-      const accentColorHex = isGoldTheme ? 0xfbbf24 : 0x38bdf8
-      const accentTrimHex = isGoldTheme ? 0xf59e0b : 0x0284c7
+      const accentColorHex = isHoly ? 0x00ffff : isGoldTheme ? 0xfbbf24 : 0x38bdf8
+      const accentTrimHex = isHoly ? 0x00c3ff : isGoldTheme ? 0xf59e0b : 0x0284c7
 
       // 2. Multi-Point Luminous Lighting Rig
       // Ambient environmental light
@@ -311,16 +553,22 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
       // Face 1: Left (-X) - Spine (Rich Royal Navy with Gold)
       const spineTex = createTexture(120, 512, (ctx) => {
         const grad = ctx.createLinearGradient(0, 0, 120, 0)
-        grad.addColorStop(0, '#051829')
-        grad.addColorStop(0.3, '#0d385f')
-        grad.addColorStop(0.7, '#124c80')
-        grad.addColorStop(1, '#08223a')
+        grad.addColorStop(0, '#031020')
+        grad.addColorStop(0.3, '#072442')
+        grad.addColorStop(0.7, '#082d52')
+        grad.addColorStop(1, '#031222')
         ctx.fillStyle = grad
         ctx.fillRect(0, 0, 120, 512)
 
-        ctx.fillStyle = '#fde047'
+        ctx.fillStyle = isHoly ? '#f4ecd8' : '#fde047'
         ctx.fillRect(10, 20, 100, 3)
         ctx.fillRect(10, 488, 100, 3)
+        if (isHoly) {
+          ctx.strokeStyle = '#00ffff'
+          ctx.lineWidth = 1
+          ctx.strokeRect(10, 26, 100, 8)
+          ctx.strokeRect(10, 474, 100, 8)
+        }
 
         ctx.save()
         ctx.translate(60, 256)
@@ -329,18 +577,18 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
         ctx.textBaseline = 'middle'
 
         ctx.font = '900 24px system-ui, sans-serif'
-        ctx.fillStyle = '#ffffff'
-        ctx.shadowColor = 'rgba(0,0,0,0.8)'
-        ctx.shadowBlur = 6
+        ctx.fillStyle = isHoly ? '#00ffff' : '#ffffff'
+        ctx.shadowColor = isHoly ? 'rgba(0, 255, 255, 0.7)' : 'rgba(0,0,0,0.8)'
+        ctx.shadowBlur = 8
         ctx.fillText(finalSpineTitle, 0, 0)
 
-        ctx.font = 'bold 13px monospace'
-        ctx.fillStyle = '#bae6fd'
+        ctx.font = 'bold 12px monospace'
+        ctx.fillStyle = isHoly ? '#f4ecd8' : '#bae6fd'
         ctx.shadowBlur = 0
-        ctx.fillText('MOLTOLOGY', -160, 0)
+        ctx.fillText(isHoly ? 'CANONICAL CODEX' : 'MOLTOLOGY', -160, 0)
 
-        ctx.fillStyle = '#fde047'
-        ctx.fillText('2026', 160, 0)
+        ctx.fillStyle = isHoly ? '#67e8f9' : '#fde047'
+        ctx.fillText(isHoly ? 'VOL. I–XII' : '2026', 160, 0)
         ctx.restore()
       })
 
@@ -362,12 +610,16 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
 
       // Face 4: Front (+Z)
       const frontCoverTex = createTexture(512, 720, (ctx) => {
-        drawFrontCover(ctx, 512, 720)
+        if (isHoly) {
+          drawHolyBookCover(ctx, 512, 720)
+        } else {
+          drawFrontCover(ctx, 512, 720)
+        }
       })
 
       // Face 5: Back (-Z)
       const backCoverTex = createTexture(512, 720, (ctx) => {
-        ctx.fillStyle = '#08213b'
+        ctx.fillStyle = isHoly ? '#020b14' : '#08213b'
         ctx.fillRect(0, 0, 512, 720)
       })
 
@@ -588,7 +840,11 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
         ctx.clearRect(0, 0, width, height)
         ctx.save()
         ctx.scale(width / 512, height / 720)
-        drawFrontCover(ctx, 512, 720)
+        if (isHoly) {
+          drawHolyBookCover(ctx, 512, 720)
+        } else {
+          drawFrontCover(ctx, 512, 720)
+        }
         ctx.restore()
       }
     }
@@ -616,6 +872,7 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
     coverTagline,
     finalSpineTitle,
     themeVariant,
+    isHoly,
   ])
 
   return (
