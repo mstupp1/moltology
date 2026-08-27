@@ -42,7 +42,7 @@ interface BioVatSpecimen {
 const BIO_VATS: BioVatSpecimen[] = [
   {
     id: 'vat-01',
-    name: 'Specimen Alpha // Decapod Operator Prototype',
+    name: 'Specimen Alpha: Decapod Operator Prototype',
     code: 'HYBRID-89-ALPHA',
     stability: 88,
     phLevel: 3.4,
@@ -56,7 +56,7 @@ const BIO_VATS: BioVatSpecimen[] = [
   },
   {
     id: 'vat-02',
-    name: 'Specimen Beta // High-Torque Neural Mesh',
+    name: 'Specimen Beta: High-Torque Neural Mesh',
     code: 'HYBRID-104-BETA',
     stability: 72,
     phLevel: 2.8,
@@ -70,7 +70,7 @@ const BIO_VATS: BioVatSpecimen[] = [
   },
   {
     id: 'vat-03',
-    name: 'Specimen Gamma // Cephalopod-Carapace Hybrid',
+    name: 'Specimen Gamma: Cephalopod-Carapace Hybrid',
     code: 'HYBRID-212-GAMMA',
     stability: 94,
     phLevel: 4.1,
@@ -84,7 +84,7 @@ const BIO_VATS: BioVatSpecimen[] = [
   },
   {
     id: 'vat-04',
-    name: 'Specimen Delta // Cyber-Chitin Brood Pod',
+    name: 'Specimen Delta: Cyber-Chitin Brood Pod',
     code: 'HYBRID-305-DELTA',
     stability: 99,
     phLevel: 3.8,
@@ -101,7 +101,7 @@ const BIO_VATS: BioVatSpecimen[] = [
 const ARCHIVAL_LOGS = [
   {
     id: 'log-1',
-    date: 'CYCLE 894.2 // LEVEL -7',
+    date: 'CYCLE 894.2 · LEVEL -7',
     author: 'Chief Bio-Engineer V. Kael',
     title: 'Incident 89-A: Sludge Phosphorescence Shift',
     content:
@@ -109,7 +109,7 @@ const ARCHIVAL_LOGS = [
   },
   {
     id: 'log-2',
-    date: 'CYCLE 902.7 // LEVEL -7',
+    date: 'CYCLE 902.7 · LEVEL -7',
     author: 'Subterranean Specialist N. Vance',
     title: 'Observation 104: Non-Human Telemetry Emissions',
     content:
@@ -117,7 +117,7 @@ const ARCHIVAL_LOGS = [
   },
   {
     id: 'log-3',
-    date: 'CYCLE 915.1 // LEVEL -7',
+    date: 'CYCLE 915.1 · LEVEL -7',
     author: 'Order Archivist X-9',
     title: 'Warning: Lovecraftian Morphological Carcinization',
     content:

@@ -169,7 +169,7 @@ export const SocialHookSlide: React.FC<SocialHookSlideProps> = ({
       showScanlines={true}
       showCornerBrackets={false}
     >
-      {/* 1. Category Pill Badge (Clean, No '//') */}
+      {/* 1. Category Pill Badge (clean. No slash-pair.) */}
       <div className="flex items-center gap-3">
         <div className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-cyan-950/70 border border-cyan-400/80 shadow-[0_0_15px_rgba(0,195,255,0.25)]">
           <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />

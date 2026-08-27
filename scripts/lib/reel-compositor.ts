@@ -866,7 +866,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
 export interface ReelThumbnailOptions {
   backgroundVideoOrImagePath: string // Path to video clip or image
   headline: string // e.g. "WHY AI COMPUTE MOVED UNDERWATER"
-  subtitle?: string // e.g. "50 FATHOMS DEEP // SUB-BENTHIC"
+  subtitle?: string // e.g. "50 FATHOMS DEEP · SUB-BENTHIC"
   categoryBadge?: string // e.g. "TELEMETRY DISPATCH"
   outputPath: string
   seekSecond?: number // default 1.5 if input is video

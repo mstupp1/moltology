@@ -44,7 +44,7 @@ Every changelog entry must be a **high-level, plain explanation** of what was ch
 - **High-level, plain English**: Explain what the user gained in clear, simple language. Lead with the tangible benefit.
 - **No heavy jargon or pseudo-science word salad**: Avoid dense techno-babble or over-complicated lore terms (e.g. avoid *"benthic telemetry"*, *"ingestion CLI"*, *"session armor"*, *"policy siege"*, *"sub-surface scanline textures"*, *"diegetic discipline"*).
 - **No tech-stack leaks**: NEVER surface real-world framework/library names (React, TanStack, Vite, Nitro, Drizzle, Neon, PostgreSQL, JWT, RLS, S3, pgPolicy, etc.).
-- **No `//` double slashes** in titles, subtitles, or copy. Use middle dots (`·`), colons (`:`), or em-dashes (`—`).
+- **No slash-pair titles** (STYLE_GUIDE BAN 1). Use a period, a colon, or a middle dot (`·`).
 - **Keep it concise**: 1–2 sentence `summary`, and a short `content` body with 2–3 clear sections and 2–3 plain bullets each.
 - **Category & Tags**: Pick one standard primary category, and add overlapping tags to describe all areas touched by the release.
 
@@ -120,7 +120,7 @@ git log --format='%ad|%s' --date=short | grep '^<YYYY-MM-DD>|'
 
 Create `content/changelogs/<slug>.md` only for the new / missed days.
 * **Significance Check**: Verify that each day contains meaningful user-facing features or major UI additions before authoring. Do not create entries for minor tweaks.
-* **Plain English**: Use plain, high-level explanations of what the user gained (no pseudo-scientific word salad, no heavy techno-babble, no `//` double slashes in titles).
+* **Plain English**: Use plain, high-level explanations of what the user gained (no pseudo-scientific word salad, no heavy techno-babble, no slash-pair titles).
 * **Benefit-First**: Lead with what is now possible or improved for the user, followed by how it works.
 
 ### Step 3: Validate Frontmatter (Dry-Run)

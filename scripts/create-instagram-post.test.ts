@@ -5,6 +5,7 @@ import {
   DEFAULT_PROFILE_ID,
   DEFAULT_POST_QUEUE_ID,
 } from './create-instagram-post'
+import { hasSlashPair } from '../src/lib/copy-slash-pair'
 
 describe('create-instagram-post', () => {
   it('generates on-brand Moltmaxxing post content', () => {
@@ -53,5 +54,25 @@ describe('create-instagram-post', () => {
     expect(DEFAULT_PROFILE_ID).toBe('6a7f74b1839bf39ff3b6aaaa')
     expect(DEFAULT_INSTAGRAM_ACCOUNT_ID).toBe('6a7f7f0777555aae01d99b54')
     expect(DEFAULT_POST_QUEUE_ID).toBe('6a84b76d2421e968ac81f5bc')
+  })
+
+  it('keeps generated captions free of slash-pair chrome', () => {
+    const themes = [
+      'moltmaxxing-guide',
+      'moltmax-quiz',
+      'benthic-app',
+      'sacred-codex',
+      'pincer-routine',
+      'free-access',
+      'pincer-torque',
+      'ecdysis',
+      'moltmaxxing',
+    ]
+    for (const theme of themes) {
+      const post = generatePostContent(theme)
+      expect(hasSlashPair(post.caption), theme).toBe(false)
+      expect(hasSlashPair(post.hookHeadline), theme).toBe(false)
+      expect(hasSlashPair(post.title), theme).toBe(false)
+    }
   })
 })

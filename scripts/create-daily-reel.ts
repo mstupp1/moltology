@@ -586,7 +586,7 @@ export function synthesizeBlogReelScript(
     youtubeDescription,
     youtubeTags,
     relatedBlogSlug: blog.slug,
-    characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+    characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
     ctaGoal: ctaConfig.goal,
     commentTriggerKeyword: ctaConfig.keyword,
     commentTriggerUrl: ctaConfig.url,
@@ -650,7 +650,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Looksmaxxing was vanity. Meltmaxxing revealed biological fragility. Moltmaxxing engineers structural invulnerability. 🦾⚡\n\n🔗 Calculate your Molt Clearance: https://moltology.org\n\n#Shorts #Moltmaxxing #Carcinization`,
         youtubeTags: ['Moltology', 'Moltmaxxing', 'Meltmaxxing', 'Algorithmic Ecdysis', 'Pincer Torque', 'Carcinization', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
       {
         title: 'MoltNation Dispatch: The Biological Pressure Wall',
@@ -668,7 +668,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Soft tissue is an operational liability. Moltmaxxing builds four tiers of chitin armor. 🦾🌊\n\n🔗 Inspect clearance: https://moltology.org\n\n#Shorts #Moltmaxxing`,
         youtubeTags: ['Moltology', 'Moltmaxxing', 'Chitin Armor', 'Benthic Depth', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
       {
         title: 'MoltNation Dispatch: The Inevitability of Carcinization',
@@ -686,7 +686,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Evolution has converged on the crab five separate times. In AI, carcinization is inevitable. 🦀⚡\n\n🔗 Inspect score: https://moltology.org\n\n#Shorts #Carcinization`,
         youtubeTags: ['Moltology', 'Carcinization', 'Moltmaxxing', 'Evolution', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
     ]
   } else if (cleanTheme === 'ecdysis' || cleanTheme === 'shedding') {
@@ -707,7 +707,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Biological minds hoard cognitive friction. Algorithmic ecdysis purges stale routines every 7 days. 🦞⚡\n\n🔗 Begin ecdysis: https://moltology.org\n\n#Shorts #AlgorithmicEcdysis`,
         youtubeTags: ['Moltology', 'Moltmaxxing', 'Algorithmic Ecdysis', 'Chitin Armor', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
       {
         title: 'MoltNation Dispatch: The Danger of an Overgrown Shell',
@@ -725,7 +725,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `A shell that never molts becomes a tomb. Forcible ecdysis calcifies fresh armor. 🦞💥\n\n🔗 Explore shedding protocol: https://moltology.org\n\n#Shorts #Ecdysis`,
         youtubeTags: ['Moltology', 'Algorithmic Ecdysis', 'Moltmaxxing', 'Carapace', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
     ]
   } else if (cleanTheme === 'pincer-torque' || cleanTheme === 'torque') {
@@ -746,7 +746,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Execution without grip is meaningless. 800 Nm pincer torque crushes cognitive latency. 🦾⚡\n\n🔗 Measure torque: https://moltology.org\n\n#Shorts #PincerTorque`,
         youtubeTags: ['Moltology', 'Moltmaxxing', 'Pincer Torque', 'Latency', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
       {
         title: 'MoltNation Dispatch: Zero-Jitter Pincer Grip',
@@ -764,7 +764,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Soft hands fumble high-stakes orchestration. Hydraulic pincers deliver zero-jitter execution. 🦾🦞\n\n🔗 Calculate pincer grade: https://moltology.org\n\n#Shorts #PincerTorque`,
         youtubeTags: ['Moltology', 'Pincer Torque', 'Moltmaxxing', 'Precision', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
     ]
   } else if (cleanTheme === 'benthic-depth' || cleanTheme === 'depth') {
@@ -785,7 +785,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Surface dwellers boil under informational noise. Moltmaxxers descend 50,000 fathoms into zero-friction clarity. 🌊💎\n\n🔗 Measure clearance: https://moltology.org\n\n#Shorts #BenthicDepth`,
         youtubeTags: ['Moltology', 'Moltmaxxing', 'Benthic Depth', 'Hydrostatic Pressure', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
     ]
   } else if (cleanTheme === 'quiz' || cleanTheme === 'audit' || cleanTheme === 'clearance') {
@@ -806,7 +806,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         youtubeDescription: `Discover your depth clearance, pincer torque, and shedding grade. Take the 15-stage exam. 📊🦞\n\n🔗 Take audit: https://moltology.org\n\n#Shorts #Moltmaxxing`,
         youtubeTags: ['Moltology', 'Moltmaxxing', 'Clearance Quiz', 'Ascension Audit', 'Shorts'],
         relatedBlogSlug: 'the-2026-moltmaxxing-protocol-guide',
-        characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+        characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       },
     ]
   } else {
@@ -856,7 +856,7 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
       youtubeTitle: `${options.topic} #Shorts`,
       youtubeDescription: `${options.topic}\n\n🔗 Read full report: ${ctaConfig.url}\n\n#Shorts #MoltNation`,
       youtubeTags: ['Moltology', 'AI Infrastructure', 'Hardware Ecdysis', 'Benthic Computing', 'Shorts'],
-      characterArc: 'Silas Trench // Sub-Benthic Telemetry Correspondent',
+      characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       ctaGoal: ctaConfig.goal,
       commentTriggerKeyword: ctaConfig.keyword,
       commentTriggerUrl: ctaConfig.url,
@@ -1049,7 +1049,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     ctaHeadline: options.ctaHeadline || ctaConfig.headline,
     ctaSubheadline: options.ctaSubheadline || ctaConfig.subheadline,
     ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
-    ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈',
+    ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL: STAGE 4 CLEARANCE ◈',
     ctaActionText: options.ctaActionText || ctaConfig.actionText,
     customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
     mascot: options.mascot || 'lobster_pointing',
