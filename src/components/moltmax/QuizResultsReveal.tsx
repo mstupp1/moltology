@@ -40,7 +40,7 @@ export const QuizResultsReveal: React.FC<QuizResultsRevealProps> = ({
   <section className="relative mx-auto w-full max-w-7xl pb-10" aria-label="Moltmax clearance results">
     <div className="absolute left-1/2 top-20 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-[#00c3ff]/10 blur-[110px]" aria-hidden="true" />
     <div className="relative mb-7 text-center">
-      <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#00ffcc]"><Sparkles className="h-4 w-4" /> Assessment complete // Profile generated</div>
+      <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#00ffcc]"><Sparkles className="h-4 w-4" /> Assessment complete. Profile generated</div>
       <h1 className="font-grotesk text-4xl font-black uppercase tracking-tight text-white sm:text-6xl lg:text-7xl">Your shell has spoken.</h1>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#839493]">Your fifteen responses have resolved into an official profile. Review your score, trait breakdown, and personalized recommendations below.</p>
     </div>
@@ -49,7 +49,7 @@ export const QuizResultsReveal: React.FC<QuizResultsRevealProps> = ({
       <div className="relative overflow-hidden border border-[#00c3ff]/40 bg-[#050b0e]/95 p-6 shadow-[0_0_50px_rgba(0,195,255,0.14)] sm:p-9">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,195,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,195,255,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" aria-hidden="true" />
         <div className="relative z-10 flex items-start justify-between gap-4 border-b border-white/10 pb-5">
-          <div><div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#00c3ff]">Moltology // Assessment scorecard</div><div className="mt-1 text-xs text-[#839493]">15-question aptitude & personality audit · verified</div></div>
+          <div><div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#00c3ff]">Moltology: Assessment scorecard</div><div className="mt-1 text-xs text-[#839493]">15-question aptitude & personality audit · verified</div></div>
           <HudBadge variant="emerald" className={result.badgeColor}>{result.clearance}</HudBadge>
         </div>
         <div className="relative z-10 grid items-center gap-5 py-7 sm:grid-cols-[1fr_0.85fr]">

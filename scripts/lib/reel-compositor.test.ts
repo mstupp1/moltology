@@ -11,7 +11,7 @@ import {
 describe('Reel Compositor Rendering', () => {
   it('renders a valid HUD watermark PNG', async () => {
     const outPath = path.resolve(process.cwd(), 'tmp/test_hud_watermark.png')
-    const result = await renderHudWatermarkCard(outPath, 'TEST TELEMETRY', 'LIVE TEST // UNIT')
+    const result = await renderHudWatermarkCard(outPath, 'TEST TELEMETRY', 'LIVE TEST · UNIT')
 
     expect(fs.existsSync(result)).toBe(true)
     const stats = fs.statSync(result)
@@ -37,7 +37,7 @@ describe('Reel Compositor Rendering', () => {
     const result = await renderReelThumbnail({
       backgroundVideoOrImagePath: path.resolve(process.cwd(), 'public/images/benthic_abyss_hero.jpg'),
       headline: 'WHY AI COMPUTE IS MOVING UNDERWATER',
-      subtitle: '50 FATHOMS DEEP // SUB-BENTHIC',
+      subtitle: '50 FATHOMS DEEP · SUB-BENTHIC',
       categoryBadge: 'PATRIOT TELEMETRY',
       outputPath: outPath,
     })

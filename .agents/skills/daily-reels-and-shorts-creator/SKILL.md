@@ -56,7 +56,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
 ---
 
 ### Step 2: Dynamic Scriptwriting & Hook Architecture
-Synthesize a punchy 8–10 second script (26–34 words) using one of five dynamic hook formulas:
+Synthesize a punchy 8–10 second script (26–34 words) using one of five dynamic hook formulas. Kinetic captions, watermarks, and CTA badges use a colon or a period. Slash-pairs are banned (STYLE_GUIDE BAN 1).
 
 1. **The Curiosity Gap Hook**:
    - *"Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater."*

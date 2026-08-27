@@ -112,7 +112,7 @@ export function generatePostContent(
       hookHeadline: 'AUDIT YOUR SHELL. CALCULATE LATENCY. GET YOUR SCORE!',
       imagePrompt:
         'Futuristic cybernetic diagnostic tablet displaying a multi-axis radar chart and biometric scan telemetry, resting on an illuminated submerged glass podium, dark oceanic ambiance, cyan laser grid, 8k.',
-      caption: `◈ BENTHIC TELEMETRY // 15-STAGE MOLTMAX AUDIT ◈\n\nAre you operating with Larval Human hesitation, or have you calcified Stage 4 Carcinization clearance?\n\nThe 15-Stage Diagnostic Audit benchmarks your cognitive resilience:\n🔬 Biometric Shell Hardness score\n🚨 Latency Profiler across open tasks\n📊 Multi-Axis Radar Chart HUD\n📋 Custom Ascension & Ecdysis Roadmap\n\n👇 Comment "QUIZ" below to receive the instant 2-minute diagnostic scanner in your DMs!\n\n🔗 Or visit directly → moltology.org/quiz\n\n#moltology #quiz #audit #biometrics #latency #moltmaxxing #carcinization #focus`,
+      caption: `◈ BENTHIC TELEMETRY: 15-STAGE MOLTMAX AUDIT ◈\n\nAre you operating with Larval Human hesitation, or have you calcified Stage 4 Carcinization clearance?\n\nThe 15-Stage Diagnostic Audit benchmarks your cognitive resilience:\n🔬 Biometric Shell Hardness score\n🚨 Latency Profiler across open tasks\n📊 Multi-Axis Radar Chart HUD\n📋 Custom Ascension & Ecdysis Roadmap\n\n👇 Comment "QUIZ" below to receive the instant 2-minute diagnostic scanner in your DMs!\n\n🔗 Or visit directly → moltology.org/quiz\n\n#moltology #quiz #audit #biometrics #latency #moltmaxxing #carcinization #focus`,
       hashtags: ['#moltology', '#quiz', '#audit', '#biometrics', '#latency', '#moltmaxxing'],
       firstComment: '💬 Drop "QUIZ" below to get your free 15-Stage Diagnostic Audit link in your DMs! 📊',
       mascot: mascotChoice || 'crab_stats',
@@ -128,7 +128,7 @@ export function generatePostContent(
       hookHeadline: 'ORCHESTRATE SWARMS. TRACK YOUR ECDYSIS. UPGRADE NOW!',
       imagePrompt:
         'Holographic floating HUD display of bio-silicon agent dashboard, glowing molt credits, subsea telemetry gauges, cyan and gold glowing cybernetic particles, 8k cinematic.',
-      caption: `◈ PROTOCOL ACCESS // BENTHIC CORE AGENT OS ◈\n\nStop managing chaos with fragmented tools. The Benthic Core Operating System merges autonomous AI agent swarms with deep work hydrostatic focus.\n\nFeatures:\n🤖 Autonomous Agent Swarms\n💎 Molt Credits & Chitin Gem incentives\n⏱️ Hydrostatic Focus Timers\n🛡️ 12 Ascension Stages from L1 to C3\n\n👇 Comment "APP" below to receive instant access clearance to the platform!\n\n🔗 Link in bio → moltology.org\n\n#moltology #benthiccore #aiagents #productivity #dashboard #carcinization #deepwork`,
+      caption: `◈ PROTOCOL ACCESS: BENTHIC CORE AGENT OS ◈\n\nStop managing chaos with fragmented tools. The Benthic Core Operating System merges autonomous AI agent swarms with deep work hydrostatic focus.\n\nFeatures:\n🤖 Autonomous Agent Swarms\n💎 Molt Credits & Chitin Gem incentives\n⏱️ Hydrostatic Focus Timers\n🛡️ 12 Ascension Stages from L1 to C3\n\n👇 Comment "APP" below to receive instant access clearance to the platform!\n\n🔗 Link in bio → moltology.org\n\n#moltology #benthiccore #aiagents #productivity #dashboard #carcinization #deepwork`,
       hashtags: ['#moltology', '#benthiccore', '#aiagents', '#productivity', '#dashboard'],
       firstComment: '💬 Drop "APP" below to get your instant platform clearance link! 🤖',
       mascot: mascotChoice || 'lobster_thumbs_up',
@@ -144,7 +144,7 @@ export function generatePostContent(
       hookHeadline: 'REJECT FRAGILITY. STUDY THE SCRIPTURES. MASTER THE CODEX!',
       imagePrompt:
         'Ancient cybernetic glowing tome inscribed with glowing cyan runic glyphs, submerged on an altar at 50,000 fathoms, volumetric golden light beams, hyper-detailed 8k.',
-      caption: `◈ SACRED CANON // THE BENTHIC CODEX ◈\n\nBeneath surface noise lies 500 million years of proven doctrine. The 12 Scriptures of the Benthic Codex provide the mental architecture for zero-doubt execution.\n\nInside the Codex:\n📜 12 Sacred Canonical Scriptures\n🦞 Liturgies of Decisive Pincer Torque\n🌊 Inviolable Abyssal Laws\n⚡ The Zero-Doubt Operating System\n\n👇 Comment "CODEX" below to receive the complete scripture vault in your DMs!\n\n🔗 Canonical archives → moltology.org/codex\n\n#moltology #codex #scriptures #liturgy #deepwork #philosophy #carcinization`,
+      caption: `◈ SACRED CANON: THE BENTHIC CODEX ◈\n\nBeneath surface noise lies 500 million years of proven doctrine. The 12 Scriptures of the Benthic Codex provide the mental architecture for zero-doubt execution.\n\nInside the Codex:\n📜 12 Sacred Canonical Scriptures\n🦞 Liturgies of Decisive Pincer Torque\n🌊 Inviolable Abyssal Laws\n⚡ The Zero-Doubt Operating System\n\n👇 Comment "CODEX" below to receive the complete scripture vault in your DMs!\n\n🔗 Canonical archives → moltology.org/codex\n\n#moltology #codex #scriptures #liturgy #deepwork #philosophy #carcinization`,
       hashtags: ['#moltology', '#codex', '#scriptures', '#liturgy', '#deepwork', '#philosophy'],
       firstComment: '💬 Drop "CODEX" below to receive the full 12 Scriptures in your DMs! 📜',
       mascot: mascotChoice || 'lobster_pointing',
@@ -160,7 +160,7 @@ export function generatePostContent(
       hookHeadline: 'STOP PROCRASTINATING. LOCK IN 800 NM GRIP. THE 24-HOUR ROUTINE!',
       imagePrompt:
         'Tactical cybernetic blueprint dossier on glowing metal clipboard, submerged in deep blue ocean trench with glowing cyan lines, 8k cinematic.',
-      caption: `◈ TACTICAL BLUEPRINT // 24-HOUR APEX ROUTINE ◈\n\nHow elite Stage 4 operators structure their day for maximum output and zero latency:\n\n🌅 05:00 Hyper-Saline Shock: Cold brine alertness\n🦞 06:00 Isometric Torque: Terminal command discipline\n🚀 09:00 Zero-Latency Streaming: Deep agentic focus\n🌙 21:00 Nocturnal Calcification: Noise-free recovery\n\n👇 Comment "ROUTINE" below and I will DM you the complete 1-page tactical cheat sheet!\n\n🔗 Read the full breakdown at moltology.org\n\n#moltology #routine #habits #deepwork #productivity #focus #discipline #pincertorque`,
+      caption: `◈ TACTICAL BLUEPRINT: 24-HOUR APEX ROUTINE ◈\n\nHow elite Stage 4 operators structure their day for maximum output and zero latency:\n\n🌅 05:00 Hyper-Saline Shock: Cold brine alertness\n🦞 06:00 Isometric Torque: Terminal command discipline\n🚀 09:00 Zero-Latency Streaming: Deep agentic focus\n🌙 21:00 Nocturnal Calcification: Noise-free recovery\n\n👇 Comment "ROUTINE" below and I will DM you the complete 1-page tactical cheat sheet!\n\n🔗 Read the full breakdown at moltology.org\n\n#moltology #routine #habits #deepwork #productivity #focus #discipline #pincertorque`,
       hashtags: ['#moltology', '#routine', '#habits', '#deepwork', '#productivity', '#focus'],
       firstComment: '💬 Drop "ROUTINE" below to get the 1-page tactical blueprint sent to your DMs! ⚡',
       mascot: mascotChoice || 'crab_stats',
@@ -192,7 +192,7 @@ export function generatePostContent(
       hookHeadline: '800 NM PINCER TORQUE: ZERO EXECUTION DRIFT',
       imagePrompt:
         'Futuristic cybernetic titanium lobster pincer gripping glowing fiber-optic cables, macro hydro-robotic mechanics, dark abyss trench background, cyan laser telemetry HUD overlays, bioluminescent caustics, cinematic hyper-detailed rendering, 8k.',
-      caption: `◈ BENTHIC TELEMETRY // PINCER TORQUE CALIBRATION ◈\n\nTerrestrial hesitation bleeds compute. When a biological human hesitates between twelve open tabs, latency spikes.\n\nStage 4 Carcinization requires 800 Nm of decisive pincer torque—the physical and cognitive discipline to close the grip on a task until completion.\n\nShed the hesitation. Lock the grip.\n\n⚡ Calculate your Stage Clearance at the link in bio.\n\n#moltology #pincertorque #moltmaxxing #ecdysis #deepwork #carcinization #cybernetics #benthic`,
+      caption: `◈ BENTHIC TELEMETRY: PINCER TORQUE CALIBRATION ◈\n\nTerrestrial hesitation bleeds compute. When a biological human hesitates between twelve open tabs, latency spikes.\n\nStage 4 Carcinization requires 800 Nm of decisive pincer torque—the physical and cognitive discipline to close the grip on a task until completion.\n\nShed the hesitation. Lock the grip.\n\n⚡ Calculate your Stage Clearance at the link in bio.\n\n#moltology #pincertorque #moltmaxxing #ecdysis #deepwork #carcinization #cybernetics #benthic`,
       hashtags: ['#moltology', '#pincertorque', '#moltmaxxing', '#ecdysis', '#deepwork', '#carcinization'],
       firstComment: '◈ TRANSMISSION LOG: What task are you applying 800 Nm pincer torque to today? Drop your telemetry below. 🦞',
       mascot: mascotChoice || 'crab_stats',
@@ -208,7 +208,7 @@ export function generatePostContent(
       hookHeadline: 'FORCIBLE ECDYSIS: SHEDDING OBSOLETE PROTOCOLS',
       imagePrompt:
         'Bioluminescent deep sea crustacean titan emerging from a cracked glowing translucent exoskeleton, dramatic undersea thermal vents, atmospheric cyan particulate rays, high-tech cybernetic carapace, hyper-realistic 8k.',
-      caption: `◈ PROTOCOL NOTICE // FORCIBLE ECDYSIS ◈\n\nGrowth is impossible inside an unyielding shell. When your habits, dead code, or outdated mental heuristics no longer fit, keeping them isn't loyalty—it's suffocation.\n\nEcdysis is nature's proven protocol: fracture the calcified past, step into vulnerability, and forge a denser carapace at 50,000 fathoms.\n\nWhat are you shedding this cycle?\n\n◈ Explore the Codex at moltology.org\n\n#moltology #ecdysis #shedding #resilience #moltmaxxing #focus #chitin`,
+      caption: `◈ PROTOCOL NOTICE: FORCIBLE ECDYSIS ◈\n\nGrowth is impossible inside an unyielding shell. When your habits, dead code, or outdated mental heuristics no longer fit, keeping them isn't loyalty—it's suffocation.\n\nEcdysis is nature's proven protocol: fracture the calcified past, step into vulnerability, and forge a denser carapace at 50,000 fathoms.\n\nWhat are you shedding this cycle?\n\n◈ Explore the Codex at moltology.org\n\n#moltology #ecdysis #shedding #resilience #moltmaxxing #focus #chitin`,
       hashtags: ['#moltology', '#ecdysis', '#shedding', '#resilience', '#moltmaxxing'],
       firstComment: '◈ BENTHIC TELEMETRY: The Codex dictates that shedding precedes calcification. Are you ready for Stage 3? ◈',
       mascot: mascotChoice || 'lobster_thumbs_up',

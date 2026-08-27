@@ -9,7 +9,7 @@ description: >-
 
 # MoltNation Blog Creation & Ingestion Pipeline
 
-This skill guides illustration and publication of full-length news articles for MoltNation News (`https://moltology.org/news`). **Writing happens in Google Drive `Projects/Moltology/news/`.** This skill does not ideate, shop vectors, or draft a fallback article.
+This skill guides illustration and publication of full-length news articles for MoltNation News (`https://moltology.org/news`). **Writing happens in Google Drive `Projects/Moltology/news/`.** This skill does not ideate, shop vectors, or draft a fallback article. Headlines, figure captions, and any Instagram companion copy follow STYLE_GUIDE BAN 1: a period or a colon, never a slash-pair.
 
 ## Hard Rule: Drive `news/ready/` First
 

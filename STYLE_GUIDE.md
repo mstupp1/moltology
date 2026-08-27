@@ -3,7 +3,7 @@
 This is the writing knife for every human-facing string, including HUD microcopy.
 Terms live in [BRAND_BIBLE.md](BRAND_BIBLE.md). This document wins on register, comedy
 rules, and bans.
-_Last Revised: 2026-08-24_
+_Last Revised: 2026-08-27_
 
 ---
 
@@ -115,22 +115,19 @@ could sting a struggling member even once, soften it.
 Every banned pattern gets a **Don't** (what has historically shipped and been corrected)
 and a **Do** (the replacement). If your draft contains a "Don't," stop and rewrite.
 
-### BAN 1 · Tacky double forward-slashes
+### BAN 1 · Slash-pair titles
 
-Pseudo-code slashes in titles, eyebrows, badges, and captions. It reads dated and cheap,
-and it is the single most-repeated correction on record.
+A title glued to a dek with a slash-pair. Dated HUD chrome. Do not write it. Do not
+show it, even as a warning. The guard in `src/lib/copy-slash-pair.test.ts` fails the
+suite if a slash-pair re-enters copy, skills, or guides.
 
-**Don't:** MOLTMAXXING slash THE 2026 PROTOCOL slash GO FULL CRAB
-**Don't:** ecdysis protocol slash shed your dead code
+**Don't:** Sacred Canon glued to The Benthic Codex with a slash-pair.
+**Do:** Sacred Canon. The Benthic Codex.
+**Do:** Sacred Canon: the Benthic Codex.
 
-**Do:** Replace with clean typography — middle dots, colons, or em-dashes.
-MOLTMAXXING · THE 2026 PROTOCOL
-MOLTMAXXING — GO FULL CRAB
-Ecdysis protocol: shed your dead code.
-
-**Check:** No slash-pair appears anywhere in a headline, eyebrow, badge, caption, image
-overlay, HUD string, or UI string. Search the draft for the two-slashes string before you
-ship.
+**Check:** No slash-pair in a headline, eyebrow, badge, caption, overlay, HUD string, or
+guide example. Prefer a period, a colon, or a line break. Middle dot is fine. Em dash is
+last resort.
 
 ---
 
@@ -343,8 +340,8 @@ the practical instruction.
 
 ### 4.4 HUD microcopy (buttons, toasts, empty states, tooltips, readouts)
 
-- Clearance-style label, then a phrase, separated by an em-dash or colon. Never two
-  forward slashes in a row.
+- Clearance-style label, then a phrase, separated by a colon or a period. Never a
+  slash-pair.
 - Buttons name the action plainly, in the world: "Engage Isolation Shell", "Start the
   Molt", "Shed This", "Harden".
 - Toasts confirm in the world: "Shell reinforced. Surface noise deflected."
@@ -366,7 +363,7 @@ pressure. Signup is free.
 
 ### 4.7 Formatting and Hygiene Rules for All Copy
 
-- Separators: middle dot, colon, or em-dash. Never double slashes.
+- Separators: period, colon, or middle dot. Em dash is last resort. Never a slash-pair.
 - Case: keep one style per surface. Clearance codes stay uppercase (L1, S2, E3, C1).
 - Tone check: if the line sounds like a real company or a shouting salesman, rewrite it.
   If it breaks character, cut it.
