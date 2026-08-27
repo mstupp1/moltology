@@ -102,6 +102,24 @@ export const routineCompletions = pgTable('routine_completions', {
   })
 ])
 
+/** Per-member HUD activity stream. Empty table → empty stream. Never seed canned rows. */
+export const activityEvents = pgTable('activity_events', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  kind: text('kind').notNull(),
+  title: text('title').notNull(),
+  detail: text('detail').notNull(),
+  valueBadge: text('valueBadge'),
+  sourceKey: text('sourceKey').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('activity_events_user_source_unique').on(table.userId, table.sourceKey),
+  pgPolicy('activity_events_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
 // Public System Transmutation Changelogs Table
 export const changelogs = pgTable('changelogs', {
   id: uuid('id').defaultRandom().primaryKey(),
