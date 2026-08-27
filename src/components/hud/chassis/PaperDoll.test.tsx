@@ -53,6 +53,7 @@ describe('PaperDoll', () => {
     expect(screen.getByRole('button', { name: 'Head slot' })).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Claws slot' }).length).toBe(2)
     expect(screen.getByRole('button', { name: 'Carapace slot' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Belt slot' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Legs slot' })).toBeInTheDocument()
   })
 })

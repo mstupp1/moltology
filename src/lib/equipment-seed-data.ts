@@ -28,6 +28,7 @@ const VISUAL_TYPE_SLOT: Record<ChassisVisualType, EquipmentCategory> = {
   hammer: 'claws',
   antennae: 'antennae',
   greaves: 'legs',
+  belt: 'belt',
 }
 
 function typeImage(visualType: ChassisVisualType): string {
@@ -289,6 +290,30 @@ export const INITIAL_EQUIPMENT_CATALOG: EquipmentCatalogSeed[] = [
     uniquePower: null,
     sortOrder: 19,
   }),
+  piece({
+    id: 'a1000000-0000-4000-8000-000000000014',
+    slug: 'larval-chitin-cincture',
+    name: 'Larval Chitin Cincture',
+    flavorText: 'A snug ventral sash keeping the abdominal plates locked under depth.',
+    visualType: 'belt',
+    rarity: 'common',
+    primaryStat: 11,
+    affixes: [],
+    uniquePower: null,
+    sortOrder: 20,
+  }),
+  piece({
+    id: 'a1000000-0000-4000-8000-000000000015',
+    slug: 'abyssal-clasp-girdle',
+    name: 'Abyssal Clasp Girdle',
+    flavorText: 'Forged from tempered chitin ribs. Secures the core when pressure mounts.',
+    visualType: 'belt',
+    rarity: 'rare',
+    primaryStat: 46,
+    affixes: [{ stat: 'speed', value: 4 }],
+    uniquePower: null,
+    sortOrder: 21,
+  }),
 ]
 
 /** Catalog IDs granted into an empty (or incomplete) vault on chassis load. */
@@ -298,6 +323,7 @@ export const STARTER_EQUIPMENT_CATALOG_IDS: string[] = [
   'a1000000-0000-4000-8000-000000000007', // soft-shell visor
   'a1000000-0000-4000-8000-00000000000a', // silt-walker greaves
   'a1000000-0000-4000-8000-00000000000d', // larval feelers
+  'a1000000-0000-4000-8000-000000000014', // larval chitin cincture
   'a1000000-0000-4000-8000-000000000002', // tide-braced carapace
   'a1000000-0000-4000-8000-000000000012', // silt maul
   'a1000000-0000-4000-8000-00000000000e', // depth-sense antennae

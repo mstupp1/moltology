@@ -30,7 +30,9 @@ function ref(partial: Partial<CatalogRef> & Pick<CatalogRef, 'id' | 'category'>)
           ? 'greaves'
           : category === 'antennae'
             ? 'antennae'
-            : 'carapace')
+            : category === 'belt'
+              ? 'belt'
+              : 'carapace')
   return {
     slug: partial.id,
     name: partial.id,
