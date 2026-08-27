@@ -14,6 +14,10 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/jwt', () => ({
+  getAuthJWTToken: vi.fn().mockResolvedValue('mock-jwt'),
+}))
+
 vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
   streamOracleChat: vi.fn().mockImplementation(async ({ userId, onChunk, onThreadId }) => {
     if (!userId) {
@@ -37,6 +41,7 @@ vi.mock('@/lib/server/api', async (importOriginal) => {
     ...actual,
     getAIMessagesFn: vi.fn().mockResolvedValue([]),
     getAIThreadsFn: vi.fn().mockResolvedValue([]),
+    getUserProfileFn: vi.fn().mockResolvedValue({ role: 'user' }),
   }
 })
 
@@ -55,7 +60,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument()
   })
 
-  it('renders authenticated new chat screen without guest CTA or canned message when userId is provided', () => {
+  it('renders authenticated new chat screen without guest CTA or canned message when userId is provided', async () => {
     render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
 
     expect(screen.queryByText(/Welcome! I am the/i)).not.toBeInTheDocument()
@@ -63,6 +68,23 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Sign up free to unlock/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
+  })
+
+  it('shows model picker for admin users', async () => {
+    const { getUserProfileFn } = await import('@/lib/server/api')
+    ;(getUserProfileFn as any).mockResolvedValueOnce({ role: 'admin' })
+
+    render(
+      <AIChatPanel
+        userId="usr_admin"
+        user={{ email: 'admin@example.com', role: 'admin' }}
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Select Cognition Model/i })).toBeInTheDocument()
+    })
   })
 
   it('submits a shortcut in guest mode and ensures conversation starts with user message and no canned message before it', async () => {

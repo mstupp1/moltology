@@ -56,4 +56,49 @@ describe('PaperDoll', () => {
     expect(screen.getByRole('button', { name: 'Belt slot' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Legs slot' })).toBeInTheDocument()
   })
+
+  it('mirrors weapon art on the off-hand claw hardpoint', () => {
+    const catalogByIdWithClaw = new Map<string, CatalogRef>([
+      ...catalogById,
+      [
+        'c-claws',
+        {
+          id: 'c-claws',
+          slug: 'pincer',
+          name: 'Test Pincer',
+          category: 'claws',
+          imageUrl: '/images/chassis/pincer.webp',
+          rarity: 'common',
+          visualType: 'pincer',
+          primaryStat: 10,
+          affixes: [],
+          uniquePower: null,
+          flavorText: 'Sharp.',
+          sortOrder: 2,
+        },
+      ],
+    ])
+
+    const clawItems: GearItemState[] = [
+      {
+        id: 'item-claw',
+        catalogItemId: 'c-claws',
+        equippedSlot: 'claws-2',
+        vaultIndex: null,
+      },
+    ]
+
+    const { container } = render(
+      <PaperDoll
+        items={clawItems}
+        catalogById={catalogByIdWithClaw}
+        selectedItemId={null}
+        onSelectItem={vi.fn()}
+        onSlotActivate={vi.fn()}
+      />
+    )
+
+    const flipped = container.querySelector('img.scale-x-\\[-1\\]')
+    expect(flipped).toBeInTheDocument()
+  })
 })

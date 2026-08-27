@@ -9,6 +9,7 @@ export interface DraggableGearProps {
   itemId: string
   catalog: CatalogRef
   selected?: boolean
+  flipped?: boolean
   onSelect?: () => void
   onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
   compact?: boolean
@@ -18,6 +19,7 @@ export const DraggableGear: React.FC<DraggableGearProps> = ({
   itemId,
   catalog,
   selected,
+  flipped,
   onSelect,
   onHoverChange,
   compact,
@@ -38,6 +40,7 @@ export const DraggableGear: React.FC<DraggableGearProps> = ({
       <GearItemCard
         catalog={catalog}
         selected={selected}
+        flipped={flipped}
         compact={compact}
         onClick={onSelect}
         onHoverChange={onHoverChange}

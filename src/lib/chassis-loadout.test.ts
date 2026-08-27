@@ -90,7 +90,7 @@ describe('chassis-loadout', () => {
   it('computes loadout totals from equipped gear only', () => {
     const items: GearItemState[] = [
       { id: '1', catalogItemId: 'cat-carapace', equippedSlot: 'carapace', vaultIndex: null },
-      { id: '2', catalogItemId: 'cat-claws', equippedSlot: 'claws', vaultIndex: null },
+      { id: '2', catalogItemId: 'cat-claws', equippedSlot: 'claws-1', vaultIndex: null },
       { id: '3', catalogItemId: 'cat-carapace-2', equippedSlot: null, vaultIndex: 0 },
     ]
     expect(computeLoadoutTotals(items, byId)).toEqual({
@@ -129,6 +129,34 @@ describe('chassis-loadout', () => {
     ]
     const plan = planGearMove(items, byId, '1', { type: 'equip', slot: 'carapace' })
     expect(plan.ok).toBe(false)
+  })
+
+  it('equips claws into the second hardpoint while the first stays occupied', () => {
+    const items: GearItemState[] = [
+      { id: '1', catalogItemId: 'cat-claws', equippedSlot: 'claws-1', vaultIndex: null },
+      { id: '2', catalogItemId: 'cat-claws', equippedSlot: null, vaultIndex: 0 },
+    ]
+    const plan = planGearMove(items, byId, '2', { type: 'equip', slot: 'claws-2' })
+    expect(plan.ok).toBe(true)
+    if (!plan.ok) return
+    expect(plan.updates).toEqual([
+      { id: '2', equippedSlot: 'claws-2', vaultIndex: null },
+    ])
+    const totals = computeLoadoutTotals(applyMoveUpdates(items, plan.updates), byId)
+    expect(totals.attack).toBe(50)
+  })
+
+  it('swaps between dual claw hardpoints', () => {
+    const items: GearItemState[] = [
+      { id: '1', catalogItemId: 'cat-claws', equippedSlot: 'claws-1', vaultIndex: null },
+      { id: '2', catalogItemId: 'cat-claws', equippedSlot: 'claws-2', vaultIndex: null },
+    ]
+    const plan = planGearMove(items, byId, '1', { type: 'equip', slot: 'claws-2' })
+    expect(plan.ok).toBe(true)
+    if (!plan.ok) return
+    const next = applyMoveUpdates(items, plan.updates)
+    expect(next.find((i) => i.id === '1')?.equippedSlot).toBe('claws-2')
+    expect(next.find((i) => i.id === '2')?.equippedSlot).toBe('claws-1')
   })
 
   it('equips into an empty matching slot', () => {

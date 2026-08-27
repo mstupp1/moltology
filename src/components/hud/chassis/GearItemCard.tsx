@@ -13,6 +13,8 @@ export interface GearItemCardProps {
   selected?: boolean
   dimmed?: boolean
   compact?: boolean
+  /** Horizontal mirror for off-hand weapon hardpoints. */
+  flipped?: boolean
   onClick?: () => void
   onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
   className?: string
@@ -25,6 +27,7 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
   selected = false,
   dimmed = false,
   compact = false,
+  flipped = false,
   onClick,
   onHoverChange,
   className = '',
@@ -69,7 +72,7 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
         <img
           src={imageSrc}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${flipped ? 'scale-x-[-1]' : ''}`}
           draggable={false}
         />
       </div>

@@ -29,7 +29,7 @@ import {
   type MoveTarget,
   VAULT_SIZE,
 } from '@/lib/chassis-loadout'
-import type { EquipmentCategory } from '@/db/schema'
+import type { EquipSlotId } from '@/lib/chassis-loadout'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { GearDetail } from './GearDetail'
 import { GearItemCard } from './GearItemCard'
@@ -43,8 +43,7 @@ import { VaultGrid } from './VaultGrid'
 function parseDropTarget(overId: string | number): MoveTarget | null {
   const id = String(overId)
   if (id.startsWith('equip:')) {
-    const raw = id.slice('equip:'.length)
-    const slot = (raw === 'claws-1' || raw === 'claws-2' ? 'claws' : raw) as EquipmentCategory
+    const slot = id.slice('equip:'.length) as EquipSlotId
     return { type: 'equip', slot }
   }
   if (id.startsWith('vault:')) {
@@ -192,7 +191,7 @@ export const ChassisStatusPage: React.FC = () => {
   )
 
   const handleSlotActivate = useCallback(
-    (slot: EquipmentCategory) => {
+    (slot: EquipSlotId) => {
       if (!selectedItemId) return
       void persistMove(selectedItemId, { type: 'equip', slot })
       setSelectedItemId(null)

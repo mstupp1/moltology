@@ -25,6 +25,42 @@ export const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
   'belt',
 ]
 
+/** Dual claw hardpoints — character's right arm (screen left) and left arm (screen right). */
+export type ClawEquipSlot = 'claws-1' | 'claws-2'
+
+export const CLAW_EQUIP_SLOTS: ClawEquipSlot[] = ['claws-1', 'claws-2']
+
+/** Paper-doll hardpoint ids. Claws gear uses `claws-1` / `claws-2` instead of `claws`. */
+export type EquipSlotId = Exclude<EquipmentCategory, 'claws'> | ClawEquipSlot
+
+export const EQUIP_SLOT_IDS: EquipSlotId[] = [
+  'head',
+  'carapace',
+  'claws-1',
+  'claws-2',
+  'belt',
+  'legs',
+  'antennae',
+]
+
+export function equipSlotCategory(slot: EquipSlotId): EquipmentCategory {
+  if (slot === 'claws-1' || slot === 'claws-2') return 'claws'
+  return slot
+}
+
+/** Legacy rows may still store `claws`; map to the primary claw hardpoint. */
+export function normalizeEquipSlot(
+  slot: EquipSlotId | EquipmentCategory | string | null | undefined
+): EquipSlotId | null {
+  if (!slot) return null
+  if (slot === 'claws') return 'claws-1'
+  return slot as EquipSlotId
+}
+
+export function isClawEquipSlot(slot: EquipSlotId): slot is ClawEquipSlot {
+  return slot === 'claws-1' || slot === 'claws-2'
+}
+
 export const EQUIPMENT_RARITIES: EquipmentRarity[] = [
   'common',
   'uncommon',
@@ -180,7 +216,7 @@ export interface CatalogRef {
 export interface GearItemState {
   id: string
   catalogItemId: string
-  equippedSlot: EquipmentCategory | null
+  equippedSlot: EquipSlotId | null
   vaultIndex: number | null
 }
 
@@ -210,7 +246,7 @@ export function computeLoadoutTotals(
     if (!item.equippedSlot) continue
     const cat = lookup(item.catalogItemId)
     if (!cat) continue
-    const stat = CATEGORY_TO_STAT[item.equippedSlot]
+    const stat = CATEGORY_TO_STAT[equipSlotCategory(item.equippedSlot)]
     totals[stat] += cat.primaryStat
     for (const affix of cat.affixes ?? []) {
       if (affix.stat in totals) totals[affix.stat] += affix.value
@@ -286,12 +322,12 @@ export function findFirstFreeVaultIndex(
 }
 
 export type MoveTarget =
-  | { type: 'equip'; slot: EquipmentCategory }
+  | { type: 'equip'; slot: EquipSlotId }
   | { type: 'vault'; index: number }
 
 export interface MovePlanUpdate {
   id: string
-  equippedSlot: EquipmentCategory | null
+  equippedSlot: EquipSlotId | null
   vaultIndex: number | null
 }
 
@@ -327,10 +363,11 @@ export function planGearMove(
   if (!movingCatalog) return { ok: false, error: 'Catalog entry missing for gear.' }
 
   if (target.type === 'equip') {
-    if (movingCatalog.category !== target.slot) {
+    const targetCategory = equipSlotCategory(target.slot)
+    if (movingCatalog.category !== targetCategory) {
       return {
         ok: false,
-        error: `${CATEGORY_LABELS[movingCatalog.category]} gear cannot occupy the ${CATEGORY_LABELS[target.slot]} slot.`,
+        error: `${CATEGORY_LABELS[movingCatalog.category]} gear cannot occupy the ${CATEGORY_LABELS[targetCategory]} slot.`,
       }
     }
 

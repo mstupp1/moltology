@@ -37,13 +37,14 @@ import {
   planGearMove,
   planStarterGrants,
   resolveVisualType,
+  normalizeEquipSlot,
+  EQUIP_SLOT_IDS,
   type CatalogRef,
   type GearItemState,
   type LoadoutTotals,
   type MoveTarget,
-  EQUIPMENT_CATEGORIES,
+  type EquipSlotId,
 } from '../chassis-loadout'
-import type { EquipmentCategory } from '../../db/schema'
 
 
 import { getPresignedViewUrl } from '../s3-client'
@@ -2182,7 +2183,7 @@ function toGearState(row: typeof userGearItems.$inferSelect): GearItemState {
   return {
     id: row.id,
     catalogItemId: row.catalogItemId,
-    equippedSlot: row.equippedSlot ?? null,
+    equippedSlot: normalizeEquipSlot(row.equippedSlot),
     vaultIndex: row.vaultIndex ?? null,
   }
 }
@@ -2240,6 +2241,20 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
     .from(userGearItems)
     .where(eq(userGearItems.userId, userId))
 
+  const legacyClaws = gearRows.filter((row) => row.equippedSlot === 'claws')
+  if (legacyClaws.length > 0) {
+    for (const row of legacyClaws) {
+      await dbClient
+        .update(userGearItems)
+        .set({ equippedSlot: 'claws-1', updatedAt: new Date() })
+        .where(and(eq(userGearItems.id, row.id), eq(userGearItems.userId, userId)))
+    }
+    gearRows = await dbClient
+      .select()
+      .from(userGearItems)
+      .where(eq(userGearItems.userId, userId))
+  }
+
   if (catalogRows.length > 0) {
     const grants = planStarterGrants(
       gearRows.map(toGearState),
@@ -2295,7 +2310,7 @@ export const getChassisLoadoutFn = createServerFn({ method: 'POST' })
 const moveGearTargetSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('equip'),
-    slot: z.enum(EQUIPMENT_CATEGORIES as [EquipmentCategory, ...EquipmentCategory[]]),
+    slot: z.enum(EQUIP_SLOT_IDS as [EquipSlotId, ...EquipSlotId[]]),
   }),
   z.object({
     type: z.literal('vault'),

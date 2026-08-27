@@ -1,8 +1,9 @@
 import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import type { CatalogRef, GearItemState, EquipmentCategory } from '@/lib/chassis-loadout'
+import type { CatalogRef, GearItemState, EquipSlotId } from '@/lib/chassis-loadout'
 import {
   CATEGORY_LABELS,
+  equipSlotCategory,
 } from '@/lib/chassis-loadout'
 import { getAssetUrl } from '@/lib/assets'
 import { DraggableGear } from './DraggableGear'
@@ -14,44 +15,51 @@ export interface PaperDollProps {
   catalogById: Map<string, CatalogRef>
   selectedItemId: string | null
   onSelectItem: (id: string | null) => void
-  onSlotActivate: (slot: EquipmentCategory) => void
+  onSlotActivate: (slot: EquipSlotId) => void
   onHoverItem?: (target: GearHoverTarget | null) => void
 }
 
+const SLOT_LABELS: Record<EquipSlotId, string> = {
+  head: 'Head',
+  carapace: 'Carapace',
+  'claws-1': 'Claws',
+  'claws-2': 'Claws',
+  belt: 'Belt',
+  legs: 'Legs',
+  antennae: 'Antennae',
+}
+
 function EquipSlot({
-  slot,
-  dropId,
+  equipSlot,
   item,
   catalog,
   selected,
   hasSelection,
+  flipped = false,
   onSelect,
   onActivate,
   onHoverChange,
-  readOnly = false,
 }: {
-  slot: EquipmentCategory
-  /** Unique droppable id — use when rendering duplicate visuals for one slot (e.g. dual claws). */
-  dropId?: string
+  equipSlot: EquipSlotId
   item: GearItemState | undefined
   catalog: CatalogRef | undefined
   selected: boolean
   hasSelection: boolean
+  /** Mirror weapon art on the character's left arm (screen-right hardpoint). */
+  flipped?: boolean
   onSelect: () => void
   onActivate: () => void
   onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
-  /** Mirror slot — accepts drops but does not host its own drag source. */
-  readOnly?: boolean
 }) {
-  const droppableId = dropId ?? `equip:${slot}`
+  const category = equipSlotCategory(equipSlot)
   const { setNodeRef, isOver } = useDroppable({
-    id: droppableId,
-    data: { type: 'equip', slot },
+    id: `equip:${equipSlot}`,
+    data: { type: 'equip', slot: equipSlot },
   })
 
   const handleActivate = () => {
     if (hasSelection) onActivate()
-    else if (item && !readOnly) onSelect()
+    else if (item) onSelect()
   }
 
   return (
@@ -71,27 +79,24 @@ function EquipSlot({
           handleActivate()
         }
       }}
-      aria-label={`${CATEGORY_LABELS[slot]} slot`}
+      aria-label={`${SLOT_LABELS[equipSlot]} slot`}
     >
-      {!item && !readOnly && (
+      {!item && (
         <span className="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#4a5a59] text-center px-1 pointer-events-none">
-          {CATEGORY_LABELS[slot]}
+          {CATEGORY_LABELS[category]}
         </span>
       )}
       {item && catalog && (
         <div className="absolute inset-0.5">
-          {readOnly ? (
-            <GearItemCard catalog={catalog} compact className="h-full pointer-events-none opacity-90" />
-          ) : (
-            <DraggableGear
-              itemId={item.id}
-              catalog={catalog}
-              selected={selected}
-              onSelect={hasSelection ? onActivate : onSelect}
-              onHoverChange={onHoverChange}
-              compact
-            />
-          )}
+          <DraggableGear
+            itemId={item.id}
+            catalog={catalog}
+            selected={selected}
+            flipped={flipped}
+            onSelect={hasSelection ? onActivate : onSelect}
+            onHoverChange={onHoverChange}
+            compact
+          />
         </div>
       )}
     </div>
@@ -109,32 +114,28 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   const equipped = new Map(
     items
       .filter((i) => i.equippedSlot)
-      .map((i) => [i.equippedSlot as EquipmentCategory, i])
+      .map((i) => [i.equippedSlot as EquipSlotId, i])
   )
 
-  const renderSlot = (
-    slot: EquipmentCategory,
-    options?: { dropId?: string; readOnly?: boolean }
-  ) => {
-    const item = equipped.get(slot)
+  const renderSlot = (equipSlot: EquipSlotId, options?: { flipped?: boolean }) => {
+    const item = equipped.get(equipSlot)
     const catalog = item ? catalogById.get(item.catalogItemId) : undefined
     return (
       <EquipSlot
-        key={options?.dropId ?? slot}
-        slot={slot}
-        dropId={options?.dropId}
+        key={equipSlot}
+        equipSlot={equipSlot}
         item={item}
         catalog={catalog}
         selected={item?.id === selectedItemId}
         hasSelection={Boolean(selectedItemId)}
+        flipped={options?.flipped}
         onSelect={() => onSelectItem(item?.id ?? null)}
-        onActivate={() => onSlotActivate(slot)}
+        onActivate={() => onSlotActivate(equipSlot)}
         onHoverChange={(hovered, anchor) =>
           onHoverItem?.(
             hovered && item && anchor ? { itemId: item.id, anchor } : null
           )
         }
-        readOnly={options?.readOnly}
       />
     )
   }
@@ -157,9 +158,9 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
           {renderSlot('head')}
 
           <div className="flex gap-1 sm:gap-1.5">
-            {renderSlot('claws', { dropId: 'equip:claws-1' })}
+            {renderSlot('claws-1')}
             {renderSlot('carapace')}
-            {renderSlot('claws', { dropId: 'equip:claws-2', readOnly: true })}
+            {renderSlot('claws-2', { flipped: true })}
           </div>
 
           <div className="flex">
