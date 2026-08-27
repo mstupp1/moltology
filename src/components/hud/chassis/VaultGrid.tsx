@@ -97,30 +97,25 @@ export const VaultGrid: React.FC<VaultGridProps> = ({
   )
 
   return (
-    <div className="w-full min-w-0 space-y-2">
-      <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase border-b border-[#3a4a49] pb-2">
-        Equipment Vault
-      </h2>
-      <div className="flex justify-center w-full">
-        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-1.5 sm:gap-2 justify-items-center mx-auto w-fit max-w-full">
-          {Array.from({ length: vaultSize }, (_, index) => {
-            const item = byIndex.get(index)
-            const catalog = item ? catalogById.get(item.catalogItemId) : undefined
-            return (
-              <VaultCell
-                key={index}
-                index={index}
-                item={item}
-                catalog={catalog}
-                selected={item?.id === selectedItemId}
-                hasSelection={Boolean(selectedItemId)}
-                onSelect={() => onSelectItem(item?.id ?? null)}
-                onActivate={() => onCellActivate(index)}
-                onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
-              />
-            )
-          })}
-        </div>
+    <div className="w-full min-w-0 overflow-x-auto overflow-y-hidden">
+      <div className="flex gap-1.5 sm:gap-2 w-max min-w-full py-0.5">
+        {Array.from({ length: vaultSize }, (_, index) => {
+          const item = byIndex.get(index)
+          const catalog = item ? catalogById.get(item.catalogItemId) : undefined
+          return (
+            <VaultCell
+              key={index}
+              index={index}
+              item={item}
+              catalog={catalog}
+              selected={item?.id === selectedItemId}
+              hasSelection={Boolean(selectedItemId)}
+              onSelect={() => onSelectItem(item?.id ?? null)}
+              onActivate={() => onCellActivate(index)}
+              onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
+            />
+          )
+        })}
       </div>
     </div>
   )
