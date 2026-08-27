@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { useToast } from '@/components/ui/ToastProvider'
 import {
@@ -37,11 +37,11 @@ export interface AlignmentContextValue {
 const AlignmentContext = createContext<AlignmentContextValue | null>(null)
 
 export function AlignmentProvider({ children }: { children: React.ReactNode }) {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
-  const isAuthPending = sessionRes?.isPending ?? false
-  const isGuest = !userId && !isAuthPending
+  const session = useAuthSession()
+  const user = session.user
+  const userId = session.userId
+  const isAuthPending = session.isPending
+  const isGuest = session.isGuest
   const persist = useHudPersist()
 
   let toast: {

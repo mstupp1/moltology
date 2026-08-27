@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { RefreshCw, UserPlus } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
 import { AuthModal } from '@/components/AuthModal'
 import { HudButton } from '@/components/ui'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 const SERENE_MESSAGES = [
   'In the quiet depths beneath the surface noise, true clarity emerges. Release the weight of hesitation, breathe into the stillness, and let your inner strength take form.',
@@ -17,9 +17,8 @@ export function WelcomeInitiateHero() {
   const [isFading, setIsFading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const isGuest = !user
+  const session = useAuthSession()
+  const isGuest = session.isGuest
 
   // Cycle inspiring wisdom messages
   const handleNextMessage = () => {

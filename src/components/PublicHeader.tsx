@@ -21,11 +21,11 @@ import {
   Activity,
   MessageSquare,
 } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
 import { HeaderBrand } from '@/components/ui'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { UserAvatarMenu } from '@/components/UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 export interface PublicHeaderProps {
   activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax' | 'forum'
@@ -65,9 +65,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     navigate({ to: path })
     setMobileOpen(false)
   }
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const isSessionPending = sessionRes?.isPending ?? false
+  const session = useAuthSession()
+  const user = session.user
+  const isSessionPending = session.isPending
 
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
   const targetTab = hoveredTab || currentTab

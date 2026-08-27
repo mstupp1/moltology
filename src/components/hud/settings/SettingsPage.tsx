@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Mail, Radio, Settings, Shuffle } from 'lucide-react'
 import { toast } from 'sonner'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getUserProfileFn,
@@ -19,9 +19,9 @@ import {
 import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 
 export const SettingsPage: React.FC = () => {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
+  const session = useAuthSession()
+  const user = session.user
+  const userId = session.userId
   const persist = useHudPersist()
 
   const [emailOptIn, setEmailOptIn] = useState(false)

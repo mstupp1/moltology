@@ -14,7 +14,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signOut: vi.fn(),
   },
 }))
@@ -22,7 +22,7 @@ vi.mock('@/lib/auth-client', () => ({
 describe('DashboardMarketingShowcase Component', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders both laptop and smartphone live device frames with screenshot previews and big launch CTA', () => {
@@ -63,5 +63,24 @@ describe('DashboardMarketingShowcase Component', () => {
     const launchDemoBtn = screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })
     fireEvent.click(launchDemoBtn)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+  })
+
+  it('holds the guest demo CTA while the session is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+    render(<DashboardMarketingShowcase />)
+
+    expect(screen.getByTestId('showcase-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /LAUNCH GUEST DEMO/i })).not.toBeInTheDocument()
+  })
+
+  it('shows the member dashboard CTA after the session hydrates', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'usr_member', name: 'Initiate' } },
+      isPending: false,
+    } as any)
+    render(<DashboardMarketingShowcase />)
+
+    expect(screen.getByRole('button', { name: /ENTER SYSTEM DASHBOARD/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /LAUNCH GUEST DEMO/i })).not.toBeInTheDocument()
   })
 })

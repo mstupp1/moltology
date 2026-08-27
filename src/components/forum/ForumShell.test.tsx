@@ -16,12 +16,20 @@ vi.mock('@/components/AuthModal', () => ({
 }))
 
 function AuthProbe() {
-  const { isAuthenticated, userId } = useForumAuth()
+  const { isAuthenticated, isPending, userId } = useForumAuth()
   return (
     <div>
-      <span data-testid="auth-state">{isAuthenticated ? 'authed' : 'guest'}</span>
+      <span data-testid="auth-state">
+        {isPending ? 'pending' : isAuthenticated ? 'authed' : 'guest'}
+      </span>
       <span data-testid="user-id">{userId || 'none'}</span>
-      {isAuthenticated ? <span>Post Reply Ready</span> : <span>Sign in to join the discussion.</span>}
+      {isPending ? (
+        <span>Holding session</span>
+      ) : isAuthenticated ? (
+        <span>Post Reply Ready</span>
+      ) : (
+        <span>Sign in to join the discussion.</span>
+      )}
     </div>
   )
 }
@@ -32,7 +40,7 @@ describe('ForumShell', () => {
   })
 
   it('treats users as guests when session is empty', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
       <ForumShell>
@@ -76,5 +84,19 @@ describe('ForumShell', () => {
     expect(screen.getByTestId('auth-state')).toHaveTextContent('authed')
     expect(screen.getByTestId('user-id')).toHaveTextContent('user-from-root')
     expect(screen.getByText('Post Reply Ready')).toBeInTheDocument()
+  })
+
+  it('holds chrome instead of guest copy while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(
+      <ForumShell>
+        <AuthProbe />
+      </ForumShell>
+    )
+
+    expect(screen.getByTestId('auth-state')).toHaveTextContent('pending')
+    expect(screen.getByText('Holding session')).toBeInTheDocument()
+    expect(screen.queryByText('Sign in to join the discussion.')).not.toBeInTheDocument()
   })
 })

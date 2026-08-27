@@ -10,7 +10,7 @@ import {
   Sparkles,
   Terminal,
 } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getBlogCommentsFn,
@@ -26,8 +26,8 @@ interface BlogCommentsSectionProps {
 }
 
 export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId }) => {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const session = useAuthSession()
+  const user = session.user
 
   const [comments, setComments] = useState<BlogCommentEntry[]>([])
   const [loadingComments, setLoadingComments] = useState(true)
@@ -181,7 +181,11 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
 
       {/* Input Box / Auth Lock */}
       <div className="mb-8 sm:mb-12">
-        {user ? (
+        {session.isPending ? (
+          <div className="chitin-card p-4 sm:p-5 border border-cyan-900/60 chamfer-corner bg-[#080d0f]/90 space-y-3" data-testid="blog-comments-auth-skeleton">
+            <HudGhostCard lines={2} />
+          </div>
+        ) : user ? (
           <form onSubmit={handleSubmit} className="chitin-card p-4 sm:p-5 border border-cyan-900/60 chamfer-corner space-y-4 shadow-hud-cyan bg-[#080d0f]/90">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-900/40 pb-3">
               <div className="flex items-center gap-2.5 min-w-0">

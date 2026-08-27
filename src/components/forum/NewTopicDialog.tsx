@@ -19,7 +19,7 @@ export function NewTopicDialog({
   onClose,
   onCreated,
 }: NewTopicDialogProps) {
-  const { isAuthenticated, userId, openAuth } = useForumAuth()
+  const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
   const persist = useHudPersist()
   const [categoryId, setCategoryId] = useState(initialCategoryId || categories[0]?.id || '')
   const [title, setTitle] = useState('')
@@ -29,6 +29,7 @@ export function NewTopicDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isPending) return
     if (!isAuthenticated) {
       openAuth('signup')
       return

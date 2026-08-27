@@ -40,7 +40,6 @@ import {
   Layers,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
-import { authClient } from '@/lib/auth-client'
 import { MainFooter } from '@/components/MainFooter'
 import { getAssetUrl } from '@/lib/assets'
 import { RollingNumber } from '@/components/ui/RollingNumber'
@@ -54,8 +53,6 @@ export const OrgPage: React.FC = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
   const onNavigate = (path: string) => navigate({ to: path })
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')

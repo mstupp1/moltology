@@ -33,7 +33,7 @@ describe('BlogCommentsSection', () => {
   })
 
   it('renders guest authorization lock box when user is unauthenticated', async () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(<BlogCommentsSection postId="post-100" />)
 
@@ -46,6 +46,15 @@ describe('BlogCommentsSection', () => {
     expect(screen.getByRole('button', { name: /SIGN IN/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /REGISTER INITIATE/i })).toBeInTheDocument()
     expect(screen.getByText('This transmission was profoundly enlightening.')).toBeInTheDocument()
+  })
+
+  it('holds the lock box for the first-paint empty session shape', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<BlogCommentsSection postId="post-100" />)
+
+    expect(screen.getByTestId('blog-comments-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('AUTHENTICATION REQUIRED TO JOIN DISCUSSION')).not.toBeInTheDocument()
   })
 
   it('renders interactive HUD comment form when user is authenticated', async () => {

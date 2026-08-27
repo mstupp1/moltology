@@ -10,9 +10,9 @@ import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
 import { HudPersistIndicator } from '@/components/hud/HudPersistIndicator'
-import { authClient } from '@/lib/auth-client'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 
 function HudContent() {
@@ -23,12 +23,12 @@ function HudContent() {
   const isSubterranean = location.pathname.startsWith('/subterranean')
   const isFullscreenRoute =
     location.pathname.startsWith('/isolation') || location.pathname.startsWith('/oracle')
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
+  const session = useAuthSession()
+  const user = session.user
+  const userId = session.userId
   const { heavyVfxDisabled } = useHeavyVfx()
 
-  const isPending = sessionRes?.isPending
+  const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
 
   // Show welcome splash once per user or guest on first visit (bypassed in preview mode)

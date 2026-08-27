@@ -16,7 +16,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signOut: vi.fn(),
   },
 }))
@@ -38,7 +38,7 @@ describe('MoltMaxPage', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
     mockUpdateUserStats.mockClear()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders a commanding audit hero and five-vector promise', () => {

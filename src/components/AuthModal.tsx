@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
+import { useAuthSession } from '../hooks/useAuthSession'
 import { getAuthJWTToken } from '../lib/jwt'
 import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
@@ -20,8 +21,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onSuccess,
   initialMode = 'signup',
 }) => {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const session = useAuthSession()
+  const user = session.user
 
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
   const [name, setName] = useState('')
