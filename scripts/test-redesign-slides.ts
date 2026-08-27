@@ -95,7 +95,7 @@ function drawMoltNationWatermark(ctx: any, x: number, y: number, scale = 1.0) {
   ctx.fillStyle = '#94a3b8'
   ctx.font = '600 9px monospace'
   ctx.letterSpacing = '1px'
-  ctx.fillText('ONE NATION UNDER CHITIN // PATRIOT TELEMETRY', -180, 12)
+  ctx.fillText('ONE NATION UNDER CHITIN: PATRIOT TELEMETRY', -180, 12)
 
   ctx.restore()
 }
@@ -417,7 +417,7 @@ async function renderSlide2(): Promise<string> {
 
   ctx.fillStyle = '#ef4444'
   ctx.font = 'bold 16px monospace'
-  ctx.fillText('01 // TERRESTRIAL DENSE ATTENTION (LEGACY)', 95, startY + 45)
+  ctx.fillText('01. TERRESTRIAL DENSE ATTENTION (LEGACY)', 95, startY + 45)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = '900 40px monospace'
@@ -442,7 +442,7 @@ async function renderSlide2(): Promise<string> {
 
   ctx.fillStyle = '#00ffe6'
   ctx.font = 'bold 16px monospace'
-  ctx.fillText('02 // SUB-BENTHIC MULTI-HEAD LATENT ATTENTION (MLA)', 95, c2Y + 45)
+  ctx.fillText('02. SUB-BENTHIC MULTI-HEAD LATENT ATTENTION (MLA)', 95, c2Y + 45)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = '900 40px monospace'
@@ -467,7 +467,7 @@ async function renderSlide2(): Promise<string> {
 
   ctx.fillStyle = '#38bdf8'
   ctx.font = 'bold 16px monospace'
-  ctx.fillText('03 // TIERED CONTEXT MEMORY (CMX)', 95, c3Y + 45)
+  ctx.fillText('03. TIERED CONTEXT MEMORY (CMX)', 95, c3Y + 45)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = '900 38px monospace'

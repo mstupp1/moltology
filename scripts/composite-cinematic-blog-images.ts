@@ -124,7 +124,7 @@ async function compositeCoverHero(): Promise<string> {
 
   ctx.fillStyle = '#00ffe6'
   ctx.font = 'bold 13px monospace'
-  ctx.fillText('SUB-BENTHIC REASONING CLUSTER // 50 FATHOMS', 68, 76)
+  ctx.fillText('SUB-BENTHIC REASONING CLUSTER: 50 FATHOMS', 68, 76)
   ctx.fillStyle = '#94a3b8'
   ctx.font = '11px monospace'
   ctx.fillText('TEST-TIME COMPUTE LATTICE • 100X DELIBERATION SEARCH', 68, 98)
@@ -282,7 +282,7 @@ async function compositeFigure2(): Promise<string> {
 
   ctx.fillStyle = '#00ffe6'
   ctx.font = 'bold 22px monospace'
-  ctx.fillText('SUB-BENTHIC POD CLUSTER // TIERED CONTEXT STORAGE (CMX)', 90, 88)
+  ctx.fillText('SUB-BENTHIC POD CLUSTER: TIERED CONTEXT STORAGE (CMX)', 90, 88)
   ctx.fillStyle = '#94a3b8'
   ctx.font = '14px monospace'
   ctx.fillText('50 FATHOMS HYDROSTATIC PRESSURE HULL • ZERO-STALL OPTICAL KV PAGING', 90, 114)

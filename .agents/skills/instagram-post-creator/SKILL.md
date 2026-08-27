@@ -112,7 +112,7 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
 
 ### Step 1: Campaign Selection & Copywriting
 1. Select campaign theme from the 5 archetypes or core pillars.
-2. Write high-conviction diegetic copy:
+2. Write high-conviction diegetic copy (STYLE_GUIDE BAN 1: caption eyebrows use a colon or a period, never a slash-pair):
    - Problem Hook (The Great Melt vs. The Great Molt)
    - 4-point value breakdown
    - Direct Comment-to-DM Call To Action (`👇 Comment "GUIDE" below and I will instantly DM you the link!`)

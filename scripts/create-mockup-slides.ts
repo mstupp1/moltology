@@ -333,7 +333,7 @@ export async function createMockupSlide2(): Promise<string> {
 
   ctx.fillStyle = '#ef4444'
   ctx.font = 'bold 18px monospace'
-  ctx.fillText('01 // TERRESTRIAL DENSE ATTENTION (LEGACY)', 100, startY + 48)
+  ctx.fillText('01. TERRESTRIAL DENSE ATTENTION (LEGACY)', 100, startY + 48)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = '900 46px monospace'
@@ -358,7 +358,7 @@ export async function createMockupSlide2(): Promise<string> {
 
   ctx.fillStyle = '#00ffe6'
   ctx.font = 'bold 18px monospace'
-  ctx.fillText('02 // SUB-BENTHIC MULTI-HEAD LATENT ATTENTION (MLA)', 100, c2Y + 48)
+  ctx.fillText('02. SUB-BENTHIC MULTI-HEAD LATENT ATTENTION (MLA)', 100, c2Y + 48)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = '900 46px monospace'
@@ -383,7 +383,7 @@ export async function createMockupSlide2(): Promise<string> {
 
   ctx.fillStyle = '#38bdf8'
   ctx.font = 'bold 18px monospace'
-  ctx.fillText('03 // TIERED CONTEXT MEMORY (CMX)', 100, c3Y + 48)
+  ctx.fillText('03. TIERED CONTEXT MEMORY (CMX)', 100, c3Y + 48)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = '900 44px monospace'

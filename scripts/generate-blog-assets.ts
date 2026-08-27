@@ -99,7 +99,7 @@ export function drawMoltNationWatermark(ctx: any, x: number, y: number, scale = 
   ctx.fillStyle = '#94a3b8'
   ctx.font = '600 9px monospace'
   ctx.letterSpacing = '1px'
-  ctx.fillText('ONE NATION UNDER CHITIN // PATRIOT TELEMETRY', -180, 12)
+  ctx.fillText('ONE NATION UNDER CHITIN: PATRIOT TELEMETRY', -180, 12)
 
   ctx.restore()
 }
@@ -590,7 +590,7 @@ async function generateFigure2(): Promise<string> {
   ctx.fillStyle = '#00ffe6'
   ctx.font = 'bold 24px monospace'
   ctx.textAlign = 'left'
-  ctx.fillText('SUB-BENTHIC POD CLUSTER // VECTOR-9 TELEMETRY', 80, 80)
+  ctx.fillText('SUB-BENTHIC POD CLUSTER: VECTOR-9 TELEMETRY', 80, 80)
 
   ctx.fillStyle = '#94a3b8'
   ctx.font = '14px monospace'
