@@ -1866,6 +1866,11 @@ const lobsterAvatarConfigSchema = z.object({
   seed: z.string().min(1).max(128),
   backgroundTheme: z.string().max(64).optional(),
   backgroundPattern: z.string().max(64).optional(),
+  backgroundTexture: z.string().max(64).optional(),
+  patternDensity: z.enum(['compact', 'standard', 'spacious']).optional(),
+  patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
+  patternPulse: z.enum(['pulse', 'steady']).optional(),
+  patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
   token: z.string().optional(),
   userId: z.string().optional(),
 })
@@ -1891,6 +1896,11 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     seed: string
     backgroundTheme?: string
     backgroundPattern?: string
+    backgroundTexture?: string
+    patternDensity?: 'compact' | 'standard' | 'spacious'
+    patternGlow?: 'subtle' | 'chromatic' | 'none'
+    patternPulse?: 'pulse' | 'steady'
+    patternSparkles?: 'subtle' | 'radiant' | 'none'
   } = {
     style: LOBSTER_AVATAR_STYLE,
     seed: validated.seed.trim(),
@@ -1901,6 +1911,21 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
   }
   if (validated.backgroundPattern?.trim()) {
     avatarConfig.backgroundPattern = validated.backgroundPattern.trim()
+  }
+  if (validated.backgroundTexture?.trim()) {
+    avatarConfig.backgroundTexture = validated.backgroundTexture.trim()
+  }
+  if (validated.patternDensity) {
+    avatarConfig.patternDensity = validated.patternDensity
+  }
+  if (validated.patternGlow) {
+    avatarConfig.patternGlow = validated.patternGlow
+  }
+  if (validated.patternPulse) {
+    avatarConfig.patternPulse = validated.patternPulse
+  }
+  if (validated.patternSparkles) {
+    avatarConfig.patternSparkles = validated.patternSparkles
   }
 
   const [updated] = await dbClient

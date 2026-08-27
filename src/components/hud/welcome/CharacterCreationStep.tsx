@@ -62,7 +62,7 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   }
 
   // Handle avatar re-roll
-  const handleRandomizeCarapace = () => {
+  const handleRandomize = () => {
     setIsSpinningSeed(true)
     const newSeed = randomLobsterSeed()
     setSeed(newSeed)
@@ -141,24 +141,19 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
               interactive
               animationSeed={seed}
             />
-
-            {/* Badge Tag */}
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-30 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-[#00ffff]/40 text-[9px] font-mono tracking-widest text-[#00ffff] uppercase whitespace-nowrap">
-              CHASSIS VERIFIED
-            </div>
           </div>
 
           {/* Avatar Actions */}
           <div className="w-full max-w-[260px] space-y-2.5">
-            {/* Re-Roll Carapace Button */}
+            {/* Re-Roll Avatar Button */}
             <button
-              onClick={handleRandomizeCarapace}
+              onClick={handleRandomize}
               className="w-full py-2.5 px-3 rounded-xl border border-[#00ffff]/40 bg-[#00ffff]/10 hover:bg-[#00ffff]/20 hover:border-[#00ffff] text-[#00ffff] text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 shadow-[0_0_15px_rgba(0,255,255,0.15)]"
             >
               <RotateCw
                 className={`w-3.5 h-3.5 ${isSpinningSeed ? 'animate-spin' : ''}`}
               />
-              Randomize Carapace
+              Randomize
             </button>
           </div>
         </div>

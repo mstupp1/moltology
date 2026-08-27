@@ -139,4 +139,21 @@ describe('LobsterAvatarDisplay Component', () => {
       expect((eyesLayer as SVGGraphicsElement).style.transform).toBe('')
     })
   })
+
+  it('renders PBR surface texture underlay when texture prop is provided', () => {
+    render(<LobsterAvatarDisplay src={testSrc} texture="carbon" />)
+
+    const textureEl = screen.getByTestId('avatar-pbr-texture')
+    expect(textureEl).toBeInTheDocument()
+    expect(textureEl).toHaveClass('pbr-underlay-carbon')
+  })
+
+  it('extracts and renders PBR surface texture underlay from SVG data-texture', () => {
+    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'test-seed', backgroundTexture: 'hex' }, 256)
+    render(<LobsterAvatarDisplay src={avatarSrc!} />)
+
+    const textureEl = screen.getByTestId('avatar-pbr-texture')
+    expect(textureEl).toBeInTheDocument()
+    expect(textureEl).toHaveClass('pbr-underlay-hex')
+  })
 })

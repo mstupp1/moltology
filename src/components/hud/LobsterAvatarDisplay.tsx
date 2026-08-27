@@ -36,6 +36,8 @@ export interface LobsterAvatarDisplayProps extends PixelateOptions {
   animationSeed?: string
   /** Subtle cursor-following eye shift with eased resistance (default on) */
   eyeTracking?: boolean
+  /** Contextual Homepage PBR Surface Texture Underlay */
+  texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
 }
 
 /**
@@ -62,6 +64,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
   animated = true,
   animationSeed,
   eyeTracking = true,
+  texture,
 }) => {
   const rootRef = useRef<HTMLDivElement>(null)
   const animatedRef = useRef<HTMLDivElement>(null)
@@ -87,6 +90,12 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
     () => resolveIdleAnimationPhase(src, animationSeed),
     [src, animationSeed]
   )
+
+  const resolvedTexture = useMemo(() => {
+    if (texture) return texture
+    const match = src.match(/data-texture="([^"]+)"/) || (animatedSvgMarkup ? animatedSvgMarkup.match(/data-texture="([^"]+)"/) : null)
+    return match?.[1] ?? null
+  }, [texture, src, animatedSvgMarkup])
 
   const idleStyle = useAnimatedSvg
     ? ({ '--lobster-idle-phase': idlePhase } as React.CSSProperties)
@@ -267,6 +276,14 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
         <div
           data-testid="avatar-vignette"
           className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.45)_65%,rgba(1,4,7,0.85)_100%)] pointer-events-none z-0"
+        />
+      )}
+
+      {/* 4.5. PBR Surface Texture Underlay (from Homepage) */}
+      {resolvedTexture && resolvedTexture !== 'none' && (
+        <div
+          data-testid="avatar-pbr-texture"
+          className={`pbr-underlay pbr-underlay-${resolvedTexture} opacity-40 pointer-events-none z-0`}
         />
       )}
 
