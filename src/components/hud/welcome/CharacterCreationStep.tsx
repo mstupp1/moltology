@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useId } from 'react'
+import React, { useState, useId } from 'react'
 import {
   Dices,
   RotateCw,
@@ -16,7 +16,6 @@ import {
   Grid,
 } from 'lucide-react'
 import {
-  generateLobsterAvatarDataUri,
   getLobsterAvatarSeededOptions,
   LOBSTER_AVATAR_STYLE,
   LOBSTER_BACKGROUND_THEMES,
@@ -24,7 +23,7 @@ import {
   randomLobsterSeed,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import { LobsterAvatarDisplay } from '../LobsterAvatarDisplay'
+import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 import {
   adjustStat,
   calculateStatSum,
@@ -65,7 +64,6 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
 }) => {
   const seedInputId = useId()
   const [seed, setSeed] = useState(() => initialSeed || randomLobsterSeed())
-  const [avatarDataUri, setAvatarDataUri] = useState<string | null>(null)
   const [isSpinningSeed, setIsSpinningSeed] = useState(false)
   const [selectedThemeId, setSelectedThemeId] = useState<string>('auto')
   const [selectedPatternId, setSelectedPatternId] = useState<string>('auto')
@@ -83,17 +81,12 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
     ? (LOBSTER_BACKGROUND_PATTERNS.find((p) => p.id === selectedPatternId) ?? seededDetails.pattern)
     : seededDetails.pattern
 
-  // Update avatar data URI whenever seed, theme, or pattern changes
-  useEffect(() => {
-    const config: LobsterAvatarConfig = {
-      style: LOBSTER_AVATAR_STYLE,
-      seed: seed.trim() || 'larva-initiate',
-      ...(selectedThemeId !== 'auto' ? { backgroundTheme: selectedThemeId } : {}),
-      ...(selectedPatternId !== 'auto' ? { backgroundPattern: selectedPatternId } : {}),
-    }
-    const uri = generateLobsterAvatarDataUri(config, 320)
-    setAvatarDataUri(uri)
-  }, [seed, selectedThemeId, selectedPatternId])
+  const previewConfig: LobsterAvatarConfig = {
+    style: LOBSTER_AVATAR_STYLE,
+    seed: seed.trim() || 'larva-initiate',
+    ...(selectedThemeId !== 'auto' ? { backgroundTheme: selectedThemeId } : {}),
+    ...(selectedPatternId !== 'auto' ? { backgroundPattern: selectedPatternId } : {}),
+  }
 
   // Handle avatar re-roll
   const handleRandomizeCarapace = () => {
@@ -169,28 +162,19 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
       <div className="p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 overflow-y-auto flex-1">
         {/* LEFT COLUMN: Avatar Selection (5 cols) */}
         <div className="lg:col-span-5 flex flex-col items-center space-y-3.5">
-          {/* Avatar Hologram Card (Clean full-bleed profile pic) */}
-          <div
-            className="relative w-full max-w-[240px] sm:max-w-[260px] aspect-square rounded-2xl border-2 border-[#00ffff]/40 bg-[#030c14] overflow-hidden group shrink-0 shadow-[0_0_30px_rgba(0,255,255,0.18)]"
-          >
-            {/* Subtle ambient spotlight behind character */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,255,255,0.12),transparent_70%)] pointer-events-none z-0" />
-
-            {/* Live Pixelated Avatar Preview with Full-Bleed On-Brand Background & Pattern */}
-            {avatarDataUri ? (
-              <LobsterAvatarDisplay
-                src={avatarDataUri}
-                alt="Carapace Avatar Preview"
-                containerClassName="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                className="w-full h-full object-cover"
-                pixelResolution={64}
-              />
-            ) : (
-              <div className="w-full h-full bg-[#051520] animate-pulse" />
-            )}
+          {/* Circular portrait preview */}
+          <div className="relative shrink-0">
+            <LobsterAvatarPortrait
+              config={previewConfig}
+              size={320}
+              alt="Carapace Avatar Preview"
+              className="w-full max-w-[240px] sm:max-w-[260px]"
+              interactive
+              animationSeed={seed}
+            />
 
             {/* Badge Tag */}
-            <div className="absolute bottom-2.5 z-30 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-[#00ffff]/40 text-[9px] font-mono tracking-widest text-[#00ffff] uppercase">
+            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-30 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-[#00ffff]/40 text-[9px] font-mono tracking-widest text-[#00ffff] uppercase whitespace-nowrap">
               CHASSIS VERIFIED
             </div>
           </div>

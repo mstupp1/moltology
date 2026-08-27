@@ -6,8 +6,8 @@ import {
 } from '@/lib/lobster-avatar'
 import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
 
-/** Face-focused crop tuned for critters full-body sprites in a circular frame */
-const PORTRAIT_FACE_CLASSES = 'scale-[1.9] origin-[center_20%] object-[center_22%]'
+/** Upper-body crop for critters full-body sprites in a circular frame */
+const PORTRAIT_FACE_CLASSES = 'scale-[1.3] origin-[center_38%] object-[center_42%]'
 
 export interface LobsterAvatarPortraitProps {
   /** Pre-generated DiceBear data URI (e.g. from profile) */
