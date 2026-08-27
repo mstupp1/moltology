@@ -380,6 +380,12 @@ export const userAvatars = pgTable('user_avatars', {
 /** Chassis equipment categories (equip slots). */
 export type EquipmentCategory = 'carapace' | 'claws' | 'head' | 'legs' | 'antennae' | 'belt'
 
+/** Paper-doll hardpoint ids — claws use dual sub-slots. */
+export type EquipSlotId =
+  | Exclude<EquipmentCategory, 'claws'>
+  | 'claws-1'
+  | 'claws-2'
+
 /** Classic rarity ladder for chassis gear. */
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
@@ -423,7 +429,7 @@ export const userGearItems = pgTable('user_gear_items', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   catalogItemId: uuid('catalogItemId').notNull().references(() => equipmentCatalog.id, { onDelete: 'restrict' }),
-  equippedSlot: text('equippedSlot').$type<EquipmentCategory>(),
+  equippedSlot: text('equippedSlot').$type<EquipSlotId | 'claws'>(),
   vaultIndex: integer('vaultIndex'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),

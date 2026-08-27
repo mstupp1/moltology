@@ -30,7 +30,7 @@ describe('NewChatScreen Component', () => {
 
     // Main prompt card
     expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Select Cognition Model/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add Context/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Voice Dictation/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Transmit Query/i })).toBeInTheDocument()
@@ -59,24 +59,25 @@ describe('NewChatScreen Component', () => {
     expect(screen.getByText('benthic-vault')).toBeInTheDocument()
   })
 
-  it('allows switching model via cognition model dropdown', () => {
+  it('allows switching model via cognition model dropdown when showModelPicker is enabled', () => {
     render(
       <NewChatScreen
         userId="usr_test"
         selectedModel={getOracleModel()}
         onSelectModel={mockOnSelectModel}
         onSubmit={mockOnSubmit}
+        showModelPicker
       />
     )
 
     const modelBtn = screen.getByRole('button', { name: /Select Cognition Model/i })
     fireEvent.click(modelBtn)
 
-    expect(screen.getAllByText('Qwen 3.7 Flash').length).toBeGreaterThan(0)
-    const qwenOptions = screen.getAllByRole('button', { name: /Qwen 3.7 Flash/i })
-    fireEvent.click(qwenOptions[qwenOptions.length - 1])
+    expect(screen.getAllByText('GLM 5.3 Flash').length).toBeGreaterThan(0)
+    const glmOptions = screen.getAllByRole('button', { name: /GLM 5.3 Flash/i })
+    fireEvent.click(glmOptions[glmOptions.length - 1])
 
-    expect(mockOnSelectModel).toHaveBeenCalledWith('alibaba/qwen3.7-flash')
+    expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
   })
 
   it('submits typed prompt on submit click and Enter key press', () => {

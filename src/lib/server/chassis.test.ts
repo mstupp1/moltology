@@ -29,7 +29,7 @@ describe('Chassis loadout handlers', () => {
       moveGearItemHandler({
         data: {
           itemId: '11111111-1111-4111-8111-111111111111',
-          target: { type: 'equip', slot: 'claws' },
+          target: { type: 'equip', slot: 'claws-1' },
         },
         context: {},
       })

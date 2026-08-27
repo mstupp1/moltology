@@ -50,6 +50,8 @@ export interface NewChatScreenProps {
   onOpenAuthModal?: () => void
   shortcuts?: PromptShortcut[]
   className?: string
+  /** When false, the cognition model picker is hidden (default). Admins only. */
+  showModelPicker?: boolean
 }
 
 export const NewChatScreen: React.FC<NewChatScreenProps> = ({
@@ -63,6 +65,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   onOpenAuthModal,
   shortcuts = DEFAULT_PROMPT_SHORTCUTS,
   className = '',
+  showModelPicker = false,
 }) => {
   const [inputText, setInputText] = useState('')
   const [selectedWorkspace, setSelectedWorkspace] = useState('moltology')
@@ -305,7 +308,8 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                   )}
                 </div>
 
-                {/* Model Selector Dropdown */}
+                {/* Model Selector Dropdown (admin only) */}
+                {showModelPicker && (
                 <div className="relative">
                   <button
                     type="button"
@@ -327,7 +331,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                       <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
                       <div className="absolute left-0 bottom-full mb-2 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-56 text-xs">
                         <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-[#32364a]/60">
-                          Cognition Core
+                          Model
                         </div>
                         {ORACLE_MODELS.map((m) => (
                           <button
@@ -351,6 +355,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                     </>
                   )}
                 </div>
+                )}
               </div>
 
               {/* Right Action Buttons */}

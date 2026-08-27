@@ -144,7 +144,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                       <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
                       <div className="absolute left-0 bottom-full mb-2 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-52 text-xs">
                         <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-[#32364a]/60">
-                          Cognition Core
+                          Model
                         </div>
                         {ORACLE_MODELS.map((m) => (
                           <button

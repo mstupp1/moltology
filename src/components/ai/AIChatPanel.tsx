@@ -16,7 +16,7 @@ import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse, MessageThinkingDots } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
-import { getAIMessagesFn, getAIThreadsFn } from '../../lib/server/api'
+import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
@@ -24,6 +24,8 @@ import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { getAssetUrl } from '../../lib/assets'
+import { isAdminOrSuperAdmin } from '../../lib/permissions'
+import { getAuthJWTToken } from '../../lib/jwt'
 
 export interface AIChatPanelProps {
   user?: {
@@ -32,6 +34,7 @@ export interface AIChatPanelProps {
     image?: string | null
     avatar?: string | null
     picture?: string | null
+    role?: string | null
   } | null
   userId?: string | null
   threadId?: string | null
@@ -98,7 +101,36 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [isMounted, setIsMounted] = useState(false)
   const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [profileRole, setProfileRole] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
+
+  const canPickModel = isAdminOrSuperAdmin(user, profileRole)
+
+  useEffect(() => {
+    if (!userId) {
+      setProfileRole(null)
+      return
+    }
+
+    let isSubscribed = true
+    ;(async () => {
+      try {
+        const token = await getAuthJWTToken().catch(() => null)
+        const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
+        if (isSubscribed) {
+          setProfileRole(profile?.role ?? null)
+        }
+      } catch {
+        if (isSubscribed) {
+          setProfileRole(null)
+        }
+      }
+    })()
+
+    return () => {
+      isSubscribed = false
+    }
+  }, [userId, user?.email, user?.role])
 
   useEffect(() => {
     setIsMounted(true)
@@ -598,6 +630,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             isGuest={isGuest}
             selectedModel={selectedModel}
             onSelectModel={(id) => setSelectedModelId(id)}
+            showModelPicker={canPickModel}
             onSubmit={handlePromptSubmit}
             isSending={isSending}
             personaName={personaName}
@@ -654,8 +687,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <PromptInput
               onSubmit={handlePromptSubmit}
               status={isSending ? 'streaming' : 'ready'}
-              selectedModel={selectedModel}
-              onSelectModel={(id) => setSelectedModelId(id)}
+              selectedModel={canPickModel ? selectedModel : undefined}
+              onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
             />
           </div>
         </div>

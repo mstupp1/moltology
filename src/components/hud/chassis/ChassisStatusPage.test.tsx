@@ -104,9 +104,9 @@ describe('ChassisStatusPage', () => {
       )
       const totals = {
         defense: data.target.slot === 'carapace' ? 12 : 0,
-        attack: data.target.slot === 'claws' ? 96 : 0,
+        attack: data.target.slot === 'claws-1' || data.target.slot === 'claws-2' ? 96 : 0,
         intelligence: 0,
-        speed: data.target.slot === 'claws' ? 8 : 0,
+        speed: data.target.slot === 'claws-1' || data.target.slot === 'claws-2' ? 8 : 0,
         perception: 0,
       }
       return { catalog, items: nextItems, totals, vaultSize: 20 }
@@ -137,7 +137,7 @@ describe('ChassisStatusPage', () => {
     })
     const call = vi.mocked(moveGearItemFn).mock.calls[0][0] as { data: { itemId: string; target: { type: string; slot: string } } }
     expect(call.data.itemId).toBe('22222222-2222-4222-8222-222222222222')
-    expect(call.data.target).toEqual({ type: 'equip', slot: 'claws' })
+    expect(call.data.target).toEqual({ type: 'equip', slot: 'claws-1' })
     expect((await screen.findAllByText('96')).length).toBeGreaterThan(0)
     expect(screen.getAllByText('Ready').length).toBeGreaterThan(0)
   })

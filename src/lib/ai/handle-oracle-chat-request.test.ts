@@ -82,7 +82,7 @@ describe('handleOracleChatRequest', () => {
       makeRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
         userId: 'usr_test',
-        model: 'alibaba/qwen3.7-flash',
+        model: 'zai/glm-5.3-flash',
       })
     )
 
