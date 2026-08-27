@@ -3,13 +3,14 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import type { CatalogRef } from '@/lib/chassis-loadout'
 import { GearItemCard } from './GearItemCard'
+import type { TooltipAnchor } from './gear-tooltip-position'
 
 export interface DraggableGearProps {
   itemId: string
   catalog: CatalogRef
   selected?: boolean
   onSelect?: () => void
-  onHoverChange?: (hovered: boolean) => void
+  onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
   compact?: boolean
 }
 

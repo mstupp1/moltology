@@ -33,7 +33,8 @@ import type { EquipmentCategory } from '@/db/schema'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { GearDetail } from './GearDetail'
 import { GearItemCard } from './GearItemCard'
-import { GearTooltip } from './GearTooltip'
+import { GearTooltipFloating } from './GearTooltip'
+import type { GearHoverTarget } from './gear-tooltip-position'
 import { LoadoutStatsPanel } from './LoadoutStatsPanel'
 import { AbilitiesPanel } from './AbilitiesPanel'
 import { PaperDoll } from './PaperDoll'
@@ -68,7 +69,7 @@ export const ChassisStatusPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [detailItemId, setDetailItemId] = useState<string | null>(null)
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null)
+  const [hoverTarget, setHoverTarget] = useState<GearHoverTarget | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -238,10 +239,10 @@ export const ChassisStatusPage: React.FC = () => {
   }, [items, detailItemId, catalogById])
 
   const hoverCatalog = useMemo(() => {
-    const item = items.find((i) => i.id === hoveredItemId)
+    const item = items.find((i) => i.id === hoverTarget?.itemId)
     if (!item) return null
     return catalogById.get(item.catalogItemId) ?? null
-  }, [items, hoveredItemId, catalogById])
+  }, [items, hoverTarget, catalogById])
 
   const dragCatalog = useMemo(() => {
     const item = items.find((i) => i.id === activeDragId)
@@ -281,7 +282,7 @@ export const ChassisStatusPage: React.FC = () => {
                   selectedItemId={selectedItemId}
                   onSelectItem={handleSelectItem}
                   onSlotActivate={handleSlotActivate}
-                  onHoverItem={setHoveredItemId}
+                  onHoverItem={setHoverTarget}
                 />
               </div>
 
@@ -298,7 +299,7 @@ export const ChassisStatusPage: React.FC = () => {
                   selectedItemId={selectedItemId}
                   onSelectItem={handleSelectItem}
                   onCellActivate={handleCellActivate}
-                  onHoverItem={setHoveredItemId}
+                  onHoverItem={setHoverTarget}
                 />
               </div>
             </div>
@@ -309,10 +310,8 @@ export const ChassisStatusPage: React.FC = () => {
           </div>
         </div>
 
-        {hoverCatalog && (
-          <div className="hidden md:block pointer-events-none fixed top-24 right-4 z-50 w-72 max-w-[calc(100vw-2rem)]">
-            <GearTooltip catalog={hoverCatalog} />
-          </div>
+        {hoverCatalog && hoverTarget && (
+          <GearTooltipFloating catalog={hoverCatalog} anchor={hoverTarget.anchor} />
         )}
 
         <DragOverlay dropAnimation={null}>

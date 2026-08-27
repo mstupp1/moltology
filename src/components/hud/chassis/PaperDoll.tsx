@@ -7,6 +7,7 @@ import {
 import { getAssetUrl } from '@/lib/assets'
 import { DraggableGear } from './DraggableGear'
 import { GearItemCard } from './GearItemCard'
+import type { GearHoverTarget, TooltipAnchor } from './gear-tooltip-position'
 
 export interface PaperDollProps {
   items: GearItemState[]
@@ -14,7 +15,7 @@ export interface PaperDollProps {
   selectedItemId: string | null
   onSelectItem: (id: string | null) => void
   onSlotActivate: (slot: EquipmentCategory) => void
-  onHoverItem?: (id: string | null) => void
+  onHoverItem?: (target: GearHoverTarget | null) => void
 }
 
 function EquipSlot({
@@ -38,7 +39,7 @@ function EquipSlot({
   hasSelection: boolean
   onSelect: () => void
   onActivate: () => void
-  onHoverChange?: (hovered: boolean) => void
+  onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
   /** Mirror slot — accepts drops but does not host its own drag source. */
   readOnly?: boolean
 }) {
@@ -128,7 +129,11 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
         hasSelection={Boolean(selectedItemId)}
         onSelect={() => onSelectItem(item?.id ?? null)}
         onActivate={() => onSlotActivate(slot)}
-        onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
+        onHoverChange={(hovered, anchor) =>
+          onHoverItem?.(
+            hovered && item && anchor ? { itemId: item.id, anchor } : null
+          )
+        }
         readOnly={options?.readOnly}
       />
     )
