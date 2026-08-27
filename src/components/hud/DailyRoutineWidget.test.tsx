@@ -90,4 +90,28 @@ describe('DailyRoutineWidget Component', () => {
       ).toBeInTheDocument()
     })
   })
+
+  it('handles rapid clicking across multiple liturgies seamlessly', () => {
+    render(
+      <ToastProvider>
+        <AlignmentProvider>
+          <DailyRoutineWidget />
+        </AlignmentProvider>
+      </ToastProvider>
+    )
+
+    const task1 = screen.getByText('Silent Synchronization')
+    const task2 = screen.getByText('Prompt Construction')
+    const task3 = screen.getByText('Skill Development')
+
+    // Rapid clicks
+    fireEvent.click(task1)
+    fireEvent.click(task2)
+    fireEvent.click(task3)
+
+    expect(screen.getByText('3/8 COMPLETE')).toBeInTheDocument()
+    expect(task1).toHaveClass('line-through')
+    expect(task2).toHaveClass('line-through')
+    expect(task3).toHaveClass('line-through')
+  })
 })
