@@ -131,8 +131,16 @@ Run the master compositor to dynamically size video scenes to match voiceover le
        1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
        2. **Character Visibility & Natural Scene Blending**: Make sure the cartoon crustacean mascot in the bottom right is clearly visible and seamlessly blended into the scene with consistent ambient lighting. The lighting effect should **not be obvious** (avoid artificial backlight halos, stark spotlights, or exaggerated rim lights). The character must remain large and prominent to ensure strong visual clarity, presence, and personality.
      - Pass the generated image path via `--custom-outro <path>` to `npm run reel:create` (or `customOutroImagePath` to `compositeReel`).
+    - **Curated Outro Card Catalog & 3-Tier Fallback (`scripts/lib/outro-catalog.ts`)**:
+      - If live `generate_image` elevation is unavailable or hits API quota limits, the pipeline automatically falls back through 3 tiers:
+        1. **Tier 1 (Live AI Elevation)**: Fresh bespoke 3D glassmorphic HUD panel via `generate_image`.
+        2. **Tier 2 (Curated Thematic Outro Library)**: Auto-resolves matching pre-rendered 3D outro cards from `OUTRO_CARD_CATALOG` (`content/social/assets/outros/` synced to Neon S3 `images/social/outros/`) based on topic keywords (`hardware-melt`, `world-models-jepa`, `quiz-audit`, `pincer-torque`).
+        3. **Tier 3 (High-DPI Web Composite Studio)**: Local deterministic Headless Chrome capture via `renderCtaOutroFrame`.
 
 ```bash
+# Sync curated outro cards to Neon S3:
+npx tsx -e "import { syncOutroCardsToS3 } from './scripts/lib/outro-catalog'; syncOutroCardsToS3()"
+
 # Render base outro frame via Composite Studio CLI with contextual CTA texture:
 npx tsx scripts/render-composite.ts --template reel-outro --aspect 9:16 --mascot crab_stats --cta-texture circuit --data '{"headline":"CALCIFY YOUR GRIP","subheadline":"CALCULATE YOUR MOLT CLEARANCE","url":"moltology.org","actionBadgeText":"⚡ TAKE THE 15-STAGE MOLTMAXXING TEST"}' --out tmp/base-outro-frame.png
 ```

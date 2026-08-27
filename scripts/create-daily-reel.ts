@@ -6,6 +6,7 @@ import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
 import { compositeReel, ColorGradingPreset } from './lib/reel-compositor'
 import { generateVeoVideo } from './generate-video'
+import { resolveThematicOutroCard } from './lib/outro-catalog'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 
@@ -1028,6 +1029,15 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     options.colorGrading
   )
 
+  const resolvedOutroPath = await resolveThematicOutroCard({
+    theme: options.theme,
+    topic: scriptData.topic,
+    customImagePath: options.customOutroImagePath,
+  })
+  if (resolvedOutroPath) {
+    console.log(`   💎 Resolved curated thematic outro card: ${path.basename(resolvedOutroPath)}`)
+  }
+
   const compositeResult = await compositeReel({
     videoClips: sceneVideoPaths,
     voiceoverPath: ttsResult.audioPath,
@@ -1041,7 +1051,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
     ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL // STAGE 4 CLEARANCE ◈',
     ctaActionText: options.ctaActionText || ctaConfig.actionText,
-    customOutroImagePath: options.customOutroImagePath,
+    customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
     mascot: options.mascot || 'lobster_pointing',
     backgroundAudioVolume: options.bgAudioVolume,
     backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
