@@ -25,7 +25,11 @@ import {
   localDateString,
   type AlignmentTaskItem,
 } from '../alignment-tasks'
-import { STARTER_EQUIPMENT_CATALOG_IDS } from '../equipment-seed-data'
+import {
+  INITIAL_EQUIPMENT_CATALOG,
+  STARTER_EQUIPMENT_CATALOG_IDS,
+  catalogSeedInsertValues,
+} from '../equipment-seed-data'
 import {
   VAULT_SIZE,
   chassisTypeImageUrl,
@@ -2189,10 +2193,47 @@ async function loadChassisPayload(dbClient: Db, userId: string): Promise<{
   totals: LoadoutTotals
   vaultSize: number
 }> {
-  const catalogRows = await dbClient
+  let catalogRows = await dbClient
     .select()
     .from(equipmentCatalog)
     .orderBy(asc(equipmentCatalog.sortOrder))
+
+  // Auto-sync any seed catalog entries missing from the database
+  const existingIds = new Set(catalogRows.map((r) => r.id))
+  const missingSeeds = INITIAL_EQUIPMENT_CATALOG.filter((item) => !existingIds.has(item.id))
+
+  if (missingSeeds.length > 0) {
+    try {
+      for (const item of missingSeeds) {
+        const values = catalogSeedInsertValues(item)
+        await dbClient
+          .insert(equipmentCatalog)
+          .values(values)
+          .onConflictDoUpdate({
+            target: equipmentCatalog.id,
+            set: {
+              slug: values.slug,
+              name: values.name,
+              flavorText: values.flavorText,
+              category: values.category,
+              rarity: values.rarity,
+              visualType: values.visualType,
+              primaryStat: values.primaryStat,
+              affixes: values.affixes,
+              uniquePower: values.uniquePower,
+              imageUrl: values.imageUrl,
+              sortOrder: values.sortOrder,
+            },
+          })
+      }
+      catalogRows = await dbClient
+        .select()
+        .from(equipmentCatalog)
+        .orderBy(asc(equipmentCatalog.sortOrder))
+    } catch (e) {
+      console.warn('[loadChassisPayload] Auto-sync catalog warning:', e)
+    }
+  }
 
   let gearRows = await dbClient
     .select()
