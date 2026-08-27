@@ -9,11 +9,10 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { Atom } from 'lucide-react'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { getChassisLoadoutFn, getUserProfileFn, moveGearItemFn } from '@/lib/server/api'
+import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import {
   applyMoveUpdates,
@@ -30,10 +29,6 @@ import {
   type MoveTarget,
   VAULT_SIZE,
 } from '@/lib/chassis-loadout'
-import {
-  generateLobsterAvatarDataUri,
-  parseLobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
 import type { EquipmentCategory } from '@/db/schema'
 import { HudBottomSheet } from '@/components/ui/HudBottomSheet'
 import { GearDetail } from './GearDetail'
@@ -47,7 +42,8 @@ import { VaultGrid } from './VaultGrid'
 function parseDropTarget(overId: string | number): MoveTarget | null {
   const id = String(overId)
   if (id.startsWith('equip:')) {
-    const slot = id.slice('equip:'.length) as EquipmentCategory
+    const raw = id.slice('equip:'.length)
+    const slot = (raw === 'claws-1' || raw === 'claws-2' ? 'claws' : raw) as EquipmentCategory
     return { type: 'equip', slot }
   }
   if (id.startsWith('vault:')) {
@@ -75,7 +71,6 @@ export const ChassisStatusPage: React.FC = () => {
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
@@ -142,36 +137,6 @@ export const ChassisStatusPage: React.FC = () => {
       cancelled = true
     }
   }, [userId, applyPayload])
-
-  useEffect(() => {
-    let cancelled = false
-    const loadAvatar = async () => {
-      if (!userId) {
-        setAvatarSrc(null)
-        return
-      }
-      try {
-        const token = await getAuthJWTToken()
-        const profile = await getUserProfileFn({
-          data: { userId, token: token ?? undefined },
-        })
-        if (cancelled) return
-        const config = parseLobsterAvatarConfig(profile?.avatarConfig)
-        setAvatarSrc(config ? generateLobsterAvatarDataUri(config, 256) : null)
-      } catch {
-        if (!cancelled) setAvatarSrc(null)
-      }
-    }
-    loadAvatar()
-    const handleAvatarChanged = () => {
-      loadAvatar()
-    }
-    window.addEventListener('profile-avatar-changed', handleAvatarChanged)
-    return () => {
-      cancelled = true
-      window.removeEventListener('profile-avatar-changed', handleAvatarChanged)
-    }
-  }, [userId])
 
   const persistMove = useCallback(
     async (itemId: string, target: MoveTarget) => {
@@ -303,30 +268,13 @@ export const ChassisStatusPage: React.FC = () => {
         onDragCancel={onDragCancel}
       >
         <div className="flex flex-col flex-1 min-h-0 h-full font-sans relative min-w-0 w-full">
-          {/* Top header banner — matches pipeline / forum page chrome */}
-          <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-[#0b1011]/85 via-[#0f1616]/85 to-[#0b1011]/85 backdrop-blur-md border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3.5 sm:p-4 md:p-5 chamfer-corner shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
-            <div className="space-y-1 max-w-2xl">
-              <div className="text-[10px] text-[#00ffff] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
-                <Atom className="w-3.5 h-3.5 text-[#00ffff]" />
-                Hardware & Armor
-              </div>
-              <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase">
-                Chassis Status
-              </h1>
-              <p className="text-xs text-[#839493] font-sans mt-0.5">
-                Equip plating across five hardpoints. Drag gear between the vault and your slots, or tap
-                to select and tap a target to seat it.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:grid md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_minmax(0,14rem)] flex-1 min-h-0 gap-3.5 sm:gap-5 min-w-0 mt-3.5 sm:mt-5">
+          <div className="flex flex-col md:grid md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_minmax(0,14rem)] flex-1 min-h-0 gap-3.5 sm:gap-5 min-w-0">
             <div className="order-2 md:order-1 hidden md:flex md:flex-col md:min-h-0">
               <LoadoutStatsPanel totals={totals} variant="panel" />
             </div>
 
             <div className="order-1 md:order-2 flex flex-col flex-1 min-h-0 gap-3.5 sm:gap-5 min-w-0">
-              <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl flex flex-col flex-1 min-h-[12rem] md:min-h-0">
+              <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl flex flex-col flex-1 min-h-[12rem] md:min-h-0 overflow-hidden">
                 <PaperDoll
                   items={items}
                   catalogById={catalogById}
@@ -334,8 +282,6 @@ export const ChassisStatusPage: React.FC = () => {
                   onSelectItem={handleSelectItem}
                   onSlotActivate={handleSlotActivate}
                   onHoverItem={setHoveredItemId}
-                  avatarSrc={avatarSrc}
-                  avatarAlt={user?.name ? `${user.name}'s avatar` : 'Your avatar'}
                 />
               </div>
 
@@ -344,7 +290,7 @@ export const ChassisStatusPage: React.FC = () => {
                 <AbilitiesPanel abilities={abilities} variant="strip" />
               </div>
 
-              <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl shrink-0">
+              <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl shrink-0 overflow-hidden min-w-0">
                 <VaultGrid
                   items={items}
                   catalogById={catalogById}

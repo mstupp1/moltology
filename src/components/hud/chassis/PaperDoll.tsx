@@ -1,17 +1,11 @@
 import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { ChromaElement } from '@/components/ui'
-import { getAssetUrl } from '@/lib/assets'
 import type { CatalogRef, GearItemState, EquipmentCategory } from '@/lib/chassis-loadout'
 import {
   CATEGORY_LABELS,
-  EQUIPMENT_CATEGORIES,
 } from '@/lib/chassis-loadout'
 import { DraggableGear } from './DraggableGear'
-import { LobsterAvatarDisplay } from '@/components/hud/LobsterAvatarDisplay'
-
-const LEFT_SLOTS: EquipmentCategory[] = ['head', 'carapace', 'antennae']
-const RIGHT_SLOTS: EquipmentCategory[] = ['claws', 'legs']
+import { GearItemCard } from './GearItemCard'
 
 export interface PaperDollProps {
   items: GearItemState[]
@@ -20,13 +14,11 @@ export interface PaperDollProps {
   onSelectItem: (id: string | null) => void
   onSlotActivate: (slot: EquipmentCategory) => void
   onHoverItem?: (id: string | null) => void
-  /** DiceBear data URI — replaces default lobster schematic when set */
-  avatarSrc?: string | null
-  avatarAlt?: string
 }
 
 function EquipSlot({
   slot,
+  dropId,
   item,
   catalog,
   selected,
@@ -34,8 +26,11 @@ function EquipSlot({
   onSelect,
   onActivate,
   onHoverChange,
+  readOnly = false,
 }: {
   slot: EquipmentCategory
+  /** Unique droppable id — use when rendering duplicate visuals for one slot (e.g. dual claws). */
+  dropId?: string
   item: GearItemState | undefined
   catalog: CatalogRef | undefined
   selected: boolean
@@ -43,24 +38,26 @@ function EquipSlot({
   onSelect: () => void
   onActivate: () => void
   onHoverChange?: (hovered: boolean) => void
+  /** Mirror slot — accepts drops but does not host its own drag source. */
+  readOnly?: boolean
 }) {
+  const droppableId = dropId ?? `equip:${slot}`
   const { setNodeRef, isOver } = useDroppable({
-    id: `equip:${slot}`,
+    id: droppableId,
     data: { type: 'equip', slot },
   })
 
   const handleActivate = () => {
     if (hasSelection) onActivate()
-    else if (item) onSelect()
+    else if (item && !readOnly) onSelect()
   }
 
   return (
     <div
       ref={setNodeRef}
       className={`
-        relative w-full aspect-[9/16] min-h-[44px] max-w-[5rem] mx-auto
-        border border-dashed rounded-sm cursor-pointer
-        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-[#3a4a49]/80 bg-[#050808]/60'}
+        relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
+        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-dashed border-[#3a4a49]/80 bg-[#050808]/60'}
         flex items-center justify-center
       `}
       onClick={handleActivate}
@@ -74,20 +71,25 @@ function EquipSlot({
       }}
       aria-label={`${CATEGORY_LABELS[slot]} slot`}
     >
-      {!item && (
+      {!item && !readOnly && (
         <span className="text-[8px] sm:text-[9px] uppercase tracking-wider text-[#4a5a59] text-center px-1 pointer-events-none">
           {CATEGORY_LABELS[slot]}
         </span>
       )}
       {item && catalog && (
         <div className="absolute inset-0.5">
-          <DraggableGear
-            itemId={item.id}
-            catalog={catalog}
-            selected={selected}
-            onSelect={hasSelection ? onActivate : onSelect}
-            onHoverChange={onHoverChange}
-          />
+          {readOnly ? (
+            <GearItemCard catalog={catalog} compact className="h-full pointer-events-none opacity-90" />
+          ) : (
+            <DraggableGear
+              itemId={item.id}
+              catalog={catalog}
+              selected={selected}
+              onSelect={hasSelection ? onActivate : onSelect}
+              onHoverChange={onHoverChange}
+              compact
+            />
+          )}
         </div>
       )}
     </div>
@@ -101,8 +103,6 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
   onSelectItem,
   onSlotActivate,
   onHoverItem,
-  avatarSrc,
-  avatarAlt = 'Your avatar',
 }) => {
   const equipped = new Map(
     items
@@ -110,13 +110,17 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
       .map((i) => [i.equippedSlot as EquipmentCategory, i])
   )
 
-  const renderSlot = (slot: EquipmentCategory) => {
+  const renderSlot = (
+    slot: EquipmentCategory,
+    options?: { dropId?: string; readOnly?: boolean }
+  ) => {
     const item = equipped.get(slot)
     const catalog = item ? catalogById.get(item.catalogItemId) : undefined
     return (
       <EquipSlot
-        key={slot}
+        key={options?.dropId ?? slot}
         slot={slot}
+        dropId={options?.dropId}
         item={item}
         catalog={catalog}
         selected={item?.id === selectedItemId}
@@ -124,65 +128,25 @@ export const PaperDoll: React.FC<PaperDollProps> = ({
         onSelect={() => onSelectItem(item?.id ?? null)}
         onActivate={() => onSlotActivate(slot)}
         onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
+        readOnly={options?.readOnly}
       />
     )
   }
 
-  const renderCenterUnit = (sizeClass: string) => (
-    <div className={`relative flex items-center justify-center ${sizeClass} shrink-0`}>
-      {avatarSrc ? (
-        <div className="relative flex aspect-square w-full max-w-[min(100%,14rem)] max-h-[min(100%,14rem)] items-center justify-center rounded-2xl border-2 border-[#00c3ff]/40 bg-[#030c14] overflow-hidden shadow-[0_0_30px_rgba(0,195,255,0.18)]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none z-0" />
-          <LobsterAvatarDisplay
-            src={avatarSrc}
-            alt={avatarAlt}
-            pixelResolution={64}
-            outputSize={320}
-            containerClassName="relative z-10 w-full h-full flex items-center justify-center"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ) : (
-        <div className="relative flex aspect-[4/5] w-full items-center justify-center rounded-2xl border border-[#00c3ff]/30 bg-gradient-to-b from-[#071624]/90 via-[#030c14]/95 to-[#01050a] overflow-hidden p-3 sm:p-4 shadow-[0_0_25px_rgba(0,195,255,0.08)]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,195,255,0.12),transparent_70%)] pointer-events-none" />
-          <ChromaElement
-            src={getAssetUrl('/images/extracted/cyber_lobster_3d_chroma.jpg')}
-            alt="Chassis unit schematic"
-            blendMode="screen"
-            glowColor="cyan"
-            terminalEffects={false}
-            className="relative z-10 w-full h-full object-contain"
-          />
-        </div>
-      )}
-    </div>
-  )
-
   return (
-    <div className="flex flex-col items-center gap-3 w-full min-w-0 flex-1 min-h-0">
-      <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase self-start border-b border-[#3a4a49] pb-2 w-full mb-1 shrink-0">
-        Chassis Doll
-      </h2>
+    <div className="flex flex-col items-center w-full min-w-0 flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+      <div className="flex flex-col justify-center items-center gap-1.5 sm:gap-2 shrink-0 min-h-full w-full py-0.5 sm:py-1">
+        {renderSlot('antennae')}
+        {renderSlot('head')}
 
-      {/* Desktop / tablet: columns around lobster */}
-      <div className="hidden sm:flex flex-1 min-h-0 w-full items-center justify-center gap-3 md:gap-5">
-        <div className="flex flex-col items-center justify-center gap-2 w-16 md:w-20">
-          {LEFT_SLOTS.map(renderSlot)}
+        <div className="flex gap-1.5 sm:gap-2">
+          {renderSlot('claws', { dropId: 'equip:claws-1' })}
+          {renderSlot('carapace')}
+          {renderSlot('claws', { dropId: 'equip:claws-2', readOnly: true })}
         </div>
 
-        {renderCenterUnit('w-48 md:w-56 aspect-square max-h-[350px]')}
-
-        <div className="flex flex-col items-center justify-center gap-2 w-16 md:w-20">
-          {RIGHT_SLOTS.map(renderSlot)}
-          <div className="w-full aspect-[9/16] opacity-0 pointer-events-none" aria-hidden />
-        </div>
-      </div>
-
-      {/* Mobile: lobster then 5-slot strip */}
-      <div className="flex sm:hidden flex-col items-center justify-center gap-3 w-full flex-1 min-h-0">
-        {renderCenterUnit('w-44 aspect-square max-h-[260px]')}
-        <div className="grid grid-cols-5 gap-1.5 w-full max-w-sm mx-auto justify-items-center">
-          {EQUIPMENT_CATEGORIES.map(renderSlot)}
+        <div className="flex">
+          {renderSlot('legs')}
         </div>
       </div>
     </div>

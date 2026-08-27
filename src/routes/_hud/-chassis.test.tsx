@@ -63,7 +63,6 @@ describe('Chassis Configurator HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByText('Chassis Status')).toBeInTheDocument()
-    expect(screen.getByText(/Equip plating across five hardpoints/i)).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Antennae slot' })).toBeInTheDocument()
   })
 })
