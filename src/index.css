@@ -598,6 +598,18 @@ body.vfx-disabled [class*="drop-shadow-"],
   50% { transform: translate3d(0.4px, -1.8px, 0) rotate(-4deg); }
 }
 
+/* Eyelids micro-breath/perk in sync with brows and breath cycle */
+@keyframes lobsterIdleEyelidLeftBreath {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-0.2px, -0.6px, 0) rotate(1.5deg); }
+}
+
+/* Right eyelid micro-breath/perk in sync with brows and breath cycle */
+@keyframes lobsterIdleEyelidRightBreath {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0.2px, -0.6px, 0) rotate(-1.5deg); }
+}
+
 /* Limbs open slightly on inhale — mirrors chest expansion */
 @keyframes lobsterIdleArmLeftBreath {
   0%, 100% { transform: rotate(0deg); }
@@ -697,6 +709,28 @@ body.vfx-disabled [class*="drop-shadow-"],
   transform-box: fill-box;
   transform-origin: 0% 60%;
   animation: lobsterIdleBrowRightBreath var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
+  will-change: transform;
+}
+
+.lobster-avatar-animated .lobster-idle-eyelids {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.lobster-avatar-animated .lobster-idle-eyelid-left {
+  transform-box: fill-box;
+  transform-origin: 100% 60%;
+  animation: lobsterIdleEyelidLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
+  will-change: transform;
+}
+
+.lobster-avatar-animated .lobster-idle-eyelid-right {
+  transform-box: fill-box;
+  transform-origin: 0% 60%;
+  animation: lobsterIdleEyelidRightBreath var(--lobster-breath-duration) ease-in-out infinite;
   animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
   will-change: transform;
 }

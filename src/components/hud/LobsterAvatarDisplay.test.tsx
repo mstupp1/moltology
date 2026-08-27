@@ -115,7 +115,7 @@ describe('LobsterAvatarDisplay Component', () => {
   })
 
   it('applies eased pupil tracking transform on each svg pupil layer', async () => {
-    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'eye-variant-5' }, 256)
+    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'seed-eye-6' }, 256)
     expect(avatarSrc).toBeTruthy()
 
     render(<LobsterAvatarDisplay src={avatarSrc!} eyeTracking animated />)

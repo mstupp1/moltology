@@ -37,11 +37,21 @@ export type PatternDensity = 'compact' | 'standard' | 'spacious'
 export type PatternGlow = 'subtle' | 'chromatic' | 'none'
 export type PatternPulse = 'pulse' | 'steady'
 export type PatternSparkles = 'subtle' | 'radiant' | 'none'
+export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried'
 
 export const LOBSTER_PATTERN_DENSITIES: readonly PatternDensity[] = ['compact', 'standard', 'spacious'] as const
 export const LOBSTER_PATTERN_GLOWS: readonly PatternGlow[] = ['subtle', 'chromatic', 'none'] as const
 export const LOBSTER_PATTERN_PULSES: readonly PatternPulse[] = ['pulse', 'steady'] as const
 export const LOBSTER_PATTERN_SPARKLES: readonly PatternSparkles[] = ['subtle', 'radiant', 'none'] as const
+export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
+  'open',
+  'relaxed',
+  'cheerful_squint',
+  'focused',
+  'chill',
+  'angry',
+  'worried',
+] as const
 
 export const PATTERN_DENSITY_SCALES: Record<PatternDensity, number> = {
   compact: 0.75,
@@ -154,6 +164,7 @@ export interface LobsterAvatarConfig {
   patternGlow?: PatternGlow
   patternPulse?: PatternPulse
   patternSparkles?: PatternSparkles
+  eyelidStyle?: EyelidStyle
   backgroundMotion?: BackgroundMotionMode
   transparentBackground?: boolean
 }
@@ -204,6 +215,12 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
     (obj.patternSparkles === 'subtle' || obj.patternSparkles === 'radiant' || obj.patternSparkles === 'none')
   ) {
     config.patternSparkles = obj.patternSparkles as PatternSparkles
+  }
+  if (
+    typeof obj.eyelidStyle === 'string' &&
+    (LOBSTER_EYELID_STYLES as readonly string[]).includes(obj.eyelidStyle)
+  ) {
+    config.eyelidStyle = obj.eyelidStyle as EyelidStyle
   }
   if (typeof obj.backgroundMotion === 'string' && obj.backgroundMotion.trim()) {
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
@@ -891,6 +908,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   glow: PatternGlow
   pulse: PatternPulse
   sparkles: PatternSparkles
+  eyelidStyle: EyelidStyle
   motion: BackgroundMotionConfig
   clawPose: ClawPose
   antennaStyle: AntennaStyle
@@ -950,6 +968,9 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   const sparkleIndex = Math.abs(hash10) % LOBSTER_PATTERN_SPARKLES.length
   const sparkles = LOBSTER_PATTERN_SPARKLES[sparkleIndex]
 
+  const eyelidStyleIndex = Math.abs(hash7 ^ hash8) % LOBSTER_EYELID_STYLES.length
+  const eyelidStyle = LOBSTER_EYELID_STYLES[eyelidStyleIndex]
+
   // Active looping motion modes for the 7 curated patterns (always moving)
   const patternMotionModes: Record<string, BackgroundMotionMode[]> = {
     isometric_cubes: ['drift_diagonal', 'drift_horizontal'],
@@ -976,7 +997,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     direction,
   }
 
-  return { theme, pattern, texture, density, glow, pulse, sparkles, motion, clawPose, antennaStyle, tailPose }
+  return { theme, pattern, texture, density, glow, pulse, sparkles, eyelidStyle, motion, clawPose, antennaStyle, tailPose }
 }
 
 export const LOBSTER_CRUSTACEAN_OPTIONS = {
@@ -1013,7 +1034,7 @@ export const LOBSTER_CRUSTACEAN_OPTIONS = {
   patternProbability: 95,
 
   // 🦞 6. Pixar-style Friendly Eyes (Filter out alien/multi-eye variants)
-  eyesVariant: ['round', 'bigPupils', 'happy', 'dots', 'wink', 'wide'] as const,
+  eyesVariant: ['round', 'bigPupils', 'happy', 'dots', 'wide'] as const,
 
   // 🦞 7. Warm, expressive smiles
   mouthVariant: ['smile', 'tinySmile', 'grin', 'laugh', 'teeth', 'open'] as const,
@@ -1150,7 +1171,164 @@ export function hasLobsterPupilTracking(svg: string): boolean {
   return svg.includes('lobster-pupil-track-layer')
 }
 
-function splitEyesForPupilTracking(svg: string): string {
+export function hasLobsterEyelids(svg: string): boolean {
+  return svg.includes('lobster-eyelids-layer')
+}
+
+function renderEyelidElement(
+  side: 'left' | 'right',
+  style: EyelidStyle,
+  chitinColor: string
+): string {
+  if (side === 'left') {
+    switch (style) {
+      case 'open':
+        // Subtle upper orbital rim covering top ~10% of sclera (Alert & Open gaze)
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="open">
+            <path d="M 2.5 9 C 2.5 5.5 6 4.2 10 4.2 C 14 4.2 17.5 5.5 17.5 9 Q 10 7.8 2.5 9 Z" fill="${chitinColor}" />
+            <path d="M 2.5 9 Q 10 7.8 17.5 9" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 6.2 Q 10 4.8 14.5 6.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'relaxed':
+        // Classic gentle ~25% hood for a calm, friendly, natural cartoon expression
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="relaxed">
+            <path d="M 2.5 11 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 11 Q 10 9.8 2.5 11 Z" fill="${chitinColor}" />
+            <path d="M 2.5 11 Q 10 9.8 17.5 11" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 7.2 Q 10 5.2 14.5 7.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'cheerful_squint':
+        // Upper rim + sculpted lower eyelid curving upward (Joyful smiling squint)
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="cheerful_squint">
+            <!-- Upper Lid Hood -->
+            <path d="M 2.5 9.5 C 2.5 5.5 6 4.2 10 4.2 C 14 4.2 17.5 5.5 17.5 9.5 Q 10 8.2 2.5 9.5 Z" fill="${chitinColor}" />
+            <path d="M 2.5 9.5 Q 10 8.2 17.5 9.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 6.5 Q 10 5.0 14.5 6.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+            <!-- Lower Smiling Eyelid -->
+            <path d="M 2.5 16.5 Q 10 15.5 17.5 16.5 C 17.5 19.5 14 21.8 10 21.8 C 6 21.8 2.5 19.5 2.5 16.5 Z" fill="${chitinColor}" />
+            <path d="M 2.5 16.5 Q 10 15.5 17.5 16.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 19.5 Q 10 20.8 14.5 19.5" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'focused':
+        // Tilted angled upper eyelid sloping toward rostrum (Sharp, determined gaze)
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="focused">
+            <path d="M 2.5 9.5 C 2.5 5.5 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 11.2 Q 10 9.2 2.5 9.5 Z" fill="${chitinColor}" />
+            <path d="M 2.5 9.5 Q 10 9.2 17.5 11.2" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 6.5 Q 10 5.0 14.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'chill':
+        // Deeper ~35% half-lidded hood (Super chill, cozy, wise elder benthic mood)
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="chill">
+            <path d="M 2.5 12.5 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 12.5 Q 10 11.2 2.5 12.5 Z" fill="${chitinColor}" />
+            <path d="M 2.5 12.5 Q 10 11.2 17.5 12.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 7.5 Q 10 5.5 14.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'angry':
+        // Steeper inward-sloping brow & lid for fierce, stern, determined expression
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="angry">
+            <path d="M 2.5 7.5 C 2.5 5 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 12.8 Q 10 9 2.5 7.5 Z" fill="${chitinColor}" />
+            <path d="M 2.5 7.5 Q 10 9 17.5 12.8" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
+            <path d="M 5 6 Q 10 4.8 14.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'worried':
+        // Inverted-sloping hood (high at center, drooping outer edges) for sad, concerned, empathetic expression
+        return `
+          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="worried">
+            <path d="M 2.5 12.8 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 5 17.5 7.5 Q 10 9 2.5 12.8 Z" fill="${chitinColor}" />
+            <path d="M 2.5 12.8 Q 10 9 17.5 7.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 5.5 7.5 Q 10 4.8 15 6" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+    }
+  } else {
+    // Right Eye
+    switch (style) {
+      case 'open':
+        // Subtle upper orbital rim covering top ~10% of sclera (Alert & Open gaze)
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="open">
+            <path d="M 28.5 9 C 28.5 5.5 32 4.2 36 4.2 C 40 4.2 43.5 5.5 43.5 9 Q 36 7.8 28.5 9 Z" fill="${chitinColor}" />
+            <path d="M 28.5 9 Q 36 7.8 43.5 9" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 6.2 Q 36 4.8 40.5 6.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'relaxed':
+        // Classic gentle ~25% hood for a calm, friendly, natural cartoon expression
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="relaxed">
+            <path d="M 28.5 11 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 6 43.5 11 Q 36 9.8 28.5 11 Z" fill="${chitinColor}" />
+            <path d="M 28.5 11 Q 36 9.8 43.5 11" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 7.2 Q 36 5.2 40.5 7.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'cheerful_squint':
+        // Upper rim + sculpted lower eyelid curving upward (Joyful smiling squint)
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="cheerful_squint">
+            <!-- Upper Lid Hood -->
+            <path d="M 28.5 9.5 C 28.5 5.5 32 4.2 36 4.2 C 40 4.2 43.5 5.5 43.5 9.5 Q 36 8.2 28.5 9.5 Z" fill="${chitinColor}" />
+            <path d="M 28.5 9.5 Q 36 8.2 43.5 9.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 6.5 Q 36 5.0 40.5 6.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+            <!-- Lower Smiling Eyelid -->
+            <path d="M 28.5 16.5 Q 36 15.5 43.5 16.5 C 43.5 19.5 40 21.8 36 21.8 C 32 21.8 28.5 19.5 28.5 16.5 Z" fill="${chitinColor}" />
+            <path d="M 28.5 16.5 Q 36 15.5 43.5 16.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 19.5 Q 36 20.8 40.5 19.5" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'focused':
+        // Tilted angled upper eyelid sloping toward rostrum (Sharp, determined gaze)
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="focused">
+            <path d="M 28.5 11.2 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 5.5 43.5 9.5 Q 36 9.2 28.5 11.2 Z" fill="${chitinColor}" />
+            <path d="M 28.5 11.2 Q 36 9.2 43.5 9.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 7.5 Q 36 5.0 40.5 6.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'chill':
+        // Deeper ~35% half-lidded hood (Super chill, cozy, wise elder benthic mood)
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="chill">
+            <path d="M 28.5 12.5 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 6 43.5 12.5 Q 36 11.2 28.5 12.5 Z" fill="${chitinColor}" />
+            <path d="M 28.5 12.5 Q 36 11.2 43.5 12.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 7.5 Q 36 5.5 40.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'angry':
+        // Steeper inward-sloping brow & lid for fierce, stern, determined expression
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="angry">
+            <path d="M 28.5 12.8 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 5 43.5 7.5 Q 36 9 28.5 12.8 Z" fill="${chitinColor}" />
+            <path d="M 28.5 12.8 Q 36 9 43.5 7.5" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
+            <path d="M 31.5 7.5 Q 36 4.8 41 6" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+
+      case 'worried':
+        // Inverted-sloping hood (high at center, drooping outer edges) for sad, concerned, empathetic expression
+        return `
+          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="worried">
+            <path d="M 28.5 7.5 C 28.5 5 32 4.2 36 4.2 C 40 4.2 43.5 6 43.5 12.8 Q 36 9 28.5 7.5 Z" fill="${chitinColor}" />
+            <path d="M 28.5 7.5 Q 36 9 43.5 12.8" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M 31 6 Q 36 4.8 40.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          </g>`
+    }
+  }
+}
+
+function splitEyesForPupilTracking(
+  svg: string,
+  chitinColor = '#c2410c',
+  eyelidStyle: EyelidStyle = 'relaxed'
+): string {
   const eyesLayerMatch = svg.match(
     /<g id="lobster-eyes-layer">\s*(<use\b[^>]*(?:xlink:)?href="#(eyes-[^"]+)"[^>]*\/>)\s*<\/g>/
   )
@@ -1170,17 +1348,20 @@ function splitEyesForPupilTracking(svg: string): string {
   const symbolContent = symbolMatch[1]
   const scleraGroups: string[] = []
   const pupilGroups: string[] = []
+  const eyelidGroups: string[] = []
 
   const eyeGroupPattern = /<g class="dbcr-eb">([\s\S]*?)<\/g>/g
   let groupMatch: RegExpExecArray | null
-  let pupilIndex = 0
+  let eyeIndex = 0
   while ((groupMatch = eyeGroupPattern.exec(symbolContent)) !== null) {
     const scleraElems: string[] = []
     const pupilElems: string[] = []
+    let hasSclera = false
 
     for (const elem of extractShapeElements(groupMatch[1])) {
       if (isScleraShape(elem)) {
         scleraElems.push(elem)
+        hasSclera = true
       } else if (isPupilShape(elem)) {
         pupilElems.push(elem)
       } else {
@@ -1192,25 +1373,41 @@ function splitEyesForPupilTracking(svg: string): string {
       scleraGroups.push(`<g class="dbcr-eb">${scleraElems.join('')}</g>`)
     }
     if (pupilElems.length > 0) {
-      const side = pupilIndex === 0 ? 'left' : 'right'
+      const side = eyeIndex === 0 ? 'left' : 'right'
       pupilGroups.push(
         `<g id="lobster-pupil-${side}" class="lobster-pupil-track-layer">${pupilElems.join('')}</g>`
       )
-      pupilIndex += 1
     }
+
+    // Render sculpted cartoon eyelid hood for eyes with open white sclera
+    if (hasSclera) {
+      if (eyeIndex === 0) {
+        eyelidGroups.push(renderEyelidElement('left', eyelidStyle, chitinColor))
+      } else if (eyeIndex === 1) {
+        eyelidGroups.push(renderEyelidElement('right', eyelidStyle, chitinColor))
+      }
+    }
+
+    eyeIndex += 1
   }
 
-  if (pupilGroups.length === 0) {
+  if (pupilGroups.length === 0 && eyelidGroups.length === 0) {
     return svg
   }
 
   const scleraBlock =
     scleraGroups.length > 0 ? `<g${transformAttr}>${scleraGroups.join('')}</g>` : ''
 
+  const eyelidsBlock =
+    eyelidGroups.length > 0
+      ? `<g id="lobster-eyelids-layer" class="lobster-idle-layer lobster-idle-eyelids" data-eyelid-style="${eyelidStyle}"${transformAttr}>${eyelidGroups.join('')}</g>`
+      : ''
+
   const replacement =
     `<g id="lobster-eyes-layer">` +
     scleraBlock +
     `<g${transformAttr}>${pupilGroups.join('')}</g>` +
+    eyelidsBlock +
     `</g>`
 
   return svg.replace(fullEyesLayer, replacement)
@@ -1470,6 +1667,7 @@ function injectLobsterChitinLayers(
   const glow = config.patternGlow || seeded.glow
   const pulse = config.patternPulse || seeded.pulse
   const sparkles = config.patternSparkles || seeded.sparkles
+  const eyelidStyle = config.eyelidStyle || seeded.eyelidStyle
   const motion = (config.backgroundMotion && {
     mode: config.backgroundMotion,
     duration: seeded.motion.duration,
@@ -1927,7 +2125,7 @@ function injectLobsterChitinLayers(
   }
 
   outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg)
-  outputSvg = splitEyesForPupilTracking(outputSvg)
+  outputSvg = splitEyesForPupilTracking(outputSvg, chitinColor, eyelidStyle)
 
   // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
   const endGIndex = outputSvg.lastIndexOf('</g></svg>')
