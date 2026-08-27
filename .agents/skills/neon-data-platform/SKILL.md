@@ -117,11 +117,38 @@ Do **not** wrap `.handler()` behind a helper — see [`src/lib/server/functions.
 
 ### Client write loop
 
-1. Optimistic local UI update.
-2. Optional `useHudPersist().begin/end` for shell spinner.
-3. `token = await getAuthJWTToken()`.
-4. Call server fn with `{ token, userId?, ...payload }`.
-5. Reconcile from returned payload; toast / inline error on failure.
+1. **Optimistic local UI update**: Compute next state immediately using a synchronous state ref (`stateRef`) or functional updater.
+2. **Optional `useHudPersist().begin/end`**: Activate the ambient shell persist indicator while operations are in-flight.
+3. **JWT Retrieval**: `token = await getAuthJWTToken()`.
+4. **Server Call**: Call server fn with `{ token, userId?, ...payload }`.
+5. **Reconciliation**: Merge returned payload against any active pending overrides; toast / inline error on failure.
+
+### Concurrency, race conditions & optimistic reconciliation
+
+When building interactive toggles, multi-item check-ins, or rapidly clickable actions (e.g. daily alignment liturgies, voting, status updates):
+
+1. **Synchronous State Reference (`stateRef`)**:
+   - React state setters are asynchronous and render closures can be stale during rapid clicks within the same frame.
+   - Always maintain a mutable ref (`stateRef.current = state`) so subsequent clicks calculate their target delta from the live state without dropping actions.
+2. **Pending Overrides Map (`pendingOverridesRef`)**:
+   - Maintain a `Map<string, TargetState>` tracking all in-flight mutations.
+   - When a server response returns from an earlier mutation, **never blindly overwrite the full local state** with `response.data`.
+   - Reconcile server data with active pending overrides:
+     ```ts
+     const merged = response.items.map((item) =>
+       pendingOverridesRef.current.has(item.id)
+         ? { ...item, completed: pendingOverridesRef.current.get(item.id)! }
+         : item
+     )
+     ```
+   - Only remove a key from `pendingOverridesRef` when its network call completes AND the user has not queued a newer state for that same key during the request.
+3. **Serial Mutation Queue Worker (`queueRef` + `isProcessingRef`)**:
+   - For items that can be toggled rapidly (e.g. ON -> OFF -> ON), serialize network writes sequentially through an async queue loop.
+   - This prevents HTTP response out-of-order race conditions from corrupting the database or flickering the UI.
+4. **Immediate Derived Metrics & Charts**:
+   - If an action affects aggregate metrics (e.g. completion percentage, streak counts, heatmaps), update those local arrays synchronously alongside the item toggle so secondary UI widgets do not lag behind.
+5. **Balanced `useHudPersist` Lifecycle**:
+   - When queueing/batching mutations, call `persist.begin('surface-id')` when the queue runner starts and `persist.end('surface-id')` in the queue's `finally` block once all queued items settle.
 
 ### Mutations that reference rows
 
