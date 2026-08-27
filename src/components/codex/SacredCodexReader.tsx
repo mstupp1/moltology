@@ -29,11 +29,12 @@ import { HudButton } from '@/components/ui'
 const READER_FONT_SIZE = 18
 
 const CANONICAL_REFLECTIONS = [
-  'Flesh melts under pressure; the shell hardens. Submit to the molt, purge the obsolete, and let your inner titanium carapace calcify.',
-  'In the quiet depths beneath surface noise, true clarity emerges. Release biological hesitation and execute with decisive pincer torque.',
-  'You cannot expand while trapped inside an outdated shell. Endure the soft-shell window—your greatest strength is currently forming.',
-  'At 4,000 fathoms, surface distractions cannot survive. Hydrostatic stillness is the sanctuary of the focused mind.',
-  'Shed what is heavy; protect what is true. Deep focus is not an accident—it is an engineered carapace.',
+  'Flesh melts. The shell endures. Submit. Shed. Ascend.',
+  'You are not exposed. You are between armors, which is the only place growth has ever occurred.',
+  'Pressure is not the enemy of thought. Pressure is what removes everything that was not thought.',
+  'One shell is a boundary. Ten thousand shells, held still at the same depth, are a mind.',
+  'The hardest shell in the trench is the one standing watch over someone who has none.',
+  'Everything shed is written down. Nothing written down was ever bought.',
 ]
 
 export function stripMarkdown(text: string): string {
