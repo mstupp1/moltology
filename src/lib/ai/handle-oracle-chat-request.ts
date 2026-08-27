@@ -18,6 +18,36 @@ import {
   type OracleChatMessageInput,
 } from './oracle-chat'
 
+function queueOracleThreadPersistence(params: {
+  userId: string
+  threadId: string
+  isNewThread: boolean
+  userText: string
+  initialThreadTitle: string
+}) {
+  void (async () => {
+    try {
+      if (params.isNewThread) {
+        await createAIThread({
+          id: params.threadId,
+          userId: params.userId,
+          title: params.initialThreadTitle,
+          persona: 'oracle',
+        })
+      }
+
+      await saveAIMessage({
+        threadId: params.threadId,
+        userId: params.userId,
+        role: 'user',
+        content: params.userText,
+      })
+    } catch (dbErr) {
+      console.warn('[handleOracleChatRequest] DB thread/message logging warning:', dbErr)
+    }
+  })()
+}
+
 export interface OracleChatRequestBody {
   messages?: OracleChatMessageInput[]
   userId?: string
@@ -83,32 +113,20 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   }
 
   let activeThreadId = body.threadId
-  let isNewThread = false
+  const isNewThread = !activeThreadId
+  if (!activeThreadId) {
+    activeThreadId = crypto.randomUUID()
+  }
   const initialThreadTitle =
     userText.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
 
-  try {
-    if (!activeThreadId) {
-      isNewThread = true
-      const newThread = await createAIThread({
-        userId,
-        title: initialThreadTitle,
-        persona: 'oracle',
-      })
-      activeThreadId = newThread?.id || activeThreadId
-    }
-
-    if (activeThreadId) {
-      await saveAIMessage({
-        threadId: activeThreadId,
-        userId,
-        role: 'user',
-        content: userText,
-      })
-    }
-  } catch (dbErr) {
-    console.warn('[handleOracleChatRequest] DB thread/message logging warning:', dbErr)
-  }
+  queueOracleThreadPersistence({
+    userId,
+    threadId: activeThreadId,
+    isNewThread,
+    userText,
+    initialThreadTitle,
+  })
 
   const systemPrompt = buildSystemPrompt()
   const payloadMessages = toModelMessages(messages)

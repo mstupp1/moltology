@@ -1,4 +1,4 @@
-export type OracleProvider = 'alibaba' | 'zai'
+export type OracleProvider = 'alibaba' | 'minimax' | 'zai'
 
 export interface OracleModel {
   id: string
@@ -8,7 +8,24 @@ export interface OracleModel {
 }
 
 export const ORACLE_MODELS: OracleModel[] = [
-  { id: 'zai/glm-5.3-flash', label: 'GLM 5.3 Flash', shortLabel: 'Flash', provider: 'zai' },
+  {
+    id: 'minimax/minimax-m3-free',
+    label: 'MiniMax M3',
+    shortLabel: 'M3',
+    provider: 'minimax',
+  },
+  {
+    id: 'zai/glm-5.3-flash',
+    label: 'GLM 5.3 Flash',
+    shortLabel: 'GLM',
+    provider: 'zai',
+  },
+  {
+    id: 'alibaba/qwen3.8-flash',
+    label: 'Qwen 3.8 Flash',
+    shortLabel: 'Qwen',
+    provider: 'alibaba',
+  },
 ]
 
 export const DEFAULT_ORACLE_MODEL_ID = ORACLE_MODELS[0].id

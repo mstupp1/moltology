@@ -6,6 +6,8 @@ import { ensureUserProfile } from '../user-sync'
 import { ORACLE_TITLE_MODEL_ID } from './oracle-models'
 
 export interface CreateThreadInput {
+  /** Pre-assigned thread id so clients can receive the header before insert completes. */
+  id?: string
   userId: string
   title?: string
   persona?: string
@@ -66,6 +68,7 @@ export async function createAIThread(input: CreateThreadInput) {
   const [thread] = await dbClient
     .insert(aiThreads)
     .values({
+      ...(input.id ? { id: input.id } : {}),
       userId: input.userId,
       title: input.title || 'Ascendance Consultation',
       persona: input.persona || 'oracle',

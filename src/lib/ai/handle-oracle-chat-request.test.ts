@@ -44,9 +44,12 @@ function makeRequest(body: unknown, init?: RequestInit) {
   })
 }
 
+const TEST_THREAD_ID = '11111111-1111-4111-8111-111111111111'
+
 describe('handleOracleChatRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue(TEST_THREAD_ID)
   })
 
   it('returns guest JSON when unauthenticated', async () => {
@@ -87,11 +90,48 @@ describe('handleOracleChatRequest', () => {
     )
 
     expect(res.status).toBe(200)
-    expect(res.headers.get(ORACLE_THREAD_ID_HEADER)).toBe('thread-1')
+    expect(res.headers.get(ORACLE_THREAD_ID_HEADER)).toBe(TEST_THREAD_ID)
     expect(res.headers.get('content-type')).toMatch(/text\/plain/)
     expect(streamTextMock).toHaveBeenCalled()
     const text = await res.text()
     expect(text).toBe('Hello initiate')
+  })
+
+  it('streams before slow DB persistence completes', async () => {
+    const { createAIThread, saveAIMessage } = await import('./service')
+    let resolveCreate: (() => void) | undefined
+    vi.mocked(createAIThread).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveCreate = () => resolve({ id: 'thread-1' } as any)
+        })
+    )
+
+    const encoder = new TextEncoder()
+    const fakeStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode('Fast '))
+        controller.close()
+      },
+    })
+    streamTextMock.mockReturnValueOnce({ stream: fakeStream })
+
+    const requestPromise = handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Speed test' }],
+        userId: 'usr_test',
+      })
+    )
+
+    await vi.waitFor(() => {
+      expect(streamTextMock).toHaveBeenCalled()
+    })
+    expect(saveAIMessage).not.toHaveBeenCalled()
+
+    resolveCreate?.()
+    const res = await requestPromise
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('Fast ')
   })
 
   it('returns 400 when messages are missing', async () => {

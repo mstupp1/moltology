@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import {
   X,
   Pencil,
@@ -102,7 +102,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [profileRole, setProfileRole] = useState<string | null>(null)
-  const endRef = useRef<HTMLDivElement>(null)
+  const conversationRef = useRef<HTMLDivElement>(null)
+  const hadUserMessagesRef = useRef(false)
 
   const canPickModel = isAdminOrSuperAdmin(user, profileRole)
 
@@ -206,7 +207,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   useEffect(() => {
     if (!activeThreadId) {
       loadedThreadIdRef.current = null
-      setMessages([])
       return
     }
 
@@ -244,12 +244,27 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       })
   }, [activeThreadId, userId, isMounted, isGuest, selectedModelId])
 
-  // Auto scroll to bottom
-  useEffect(() => {
-    if (hasUserMessages) {
-      endRef.current?.scrollIntoView({ behavior: 'smooth' })
+  // Keep the message pane pinned to the latest turn without scrolling outer HUD containers.
+  const scrollConversationToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
+    const el = conversationRef.current
+    if (!el) return
+    if (typeof el.scrollTo === 'function') {
+      el.scrollTo({ top: el.scrollHeight, behavior })
+    } else {
+      el.scrollTop = el.scrollHeight
     }
-  }, [messages, isSending, hasUserMessages])
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!hasUserMessages) {
+      hadUserMessagesRef.current = false
+      return
+    }
+
+    const justEnteredConversation = !hadUserMessagesRef.current
+    hadUserMessagesRef.current = true
+    scrollConversationToBottom(justEnteredConversation || isSending ? 'auto' : 'smooth')
+  }, [messages, isSending, hasUserMessages, scrollConversationToBottom])
 
   const handlePromptSubmit = async ({ text }: { text: string }) => {
     setErrorMessage(null)
@@ -273,6 +288,22 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       },
     ])
     setIsSending(true)
+
+    let pendingStreamText = ''
+    let streamFrameId: number | null = null
+    const flushStreamText = () => {
+      streamFrameId = null
+      const text = pendingStreamText
+      setMessages((prev) =>
+        prev.map((m) => (m.id === assistantId ? { ...m, content: text } : m))
+      )
+    }
+    const queueStreamText = (fullText: string) => {
+      pendingStreamText = fullText
+      if (streamFrameId == null) {
+        streamFrameId = requestAnimationFrame(flushStreamText)
+      }
+    }
 
     const applyThreadId = (newThreadId: string) => {
       if (!newThreadId || newThreadId === activeThreadId) return
@@ -305,11 +336,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         threadId: activeThreadId || undefined,
         model: selectedModelId,
         onThreadId: applyThreadId,
-        onChunk: (fullText) => {
-          setMessages((prev) =>
-            prev.map((m) => (m.id === assistantId ? { ...m, content: fullText } : m))
-          )
-        },
+        onChunk: queueStreamText,
       })
 
       if (res.threadId) {
@@ -331,6 +358,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       setMessages((prev) => prev.filter((m) => !(m.id === assistantId && !m.content)))
       setErrorMessage(err.message || 'Something went wrong sending your message. Please try again.')
     } finally {
+      if (streamFrameId != null) {
+        cancelAnimationFrame(streamFrameId)
+      }
       setIsSending(false)
     }
   }
@@ -641,7 +671,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       ) : (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative z-10">
           {/* Message Canvas */}
-          <Conversation className="flex-1 min-h-0">
+          <Conversation ref={conversationRef} className="flex-1 min-h-0">
             <ConversationContent>
               {messages.map((msg) => (
                 <Message
@@ -678,7 +708,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   </MessageContent>
                 </Message>
               ))}
-              <div ref={endRef} />
             </ConversationContent>
           </Conversation>
 

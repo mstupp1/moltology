@@ -6,7 +6,7 @@ import {
   pickGuestOracleResponse,
   toModelMessages,
 } from './oracle-chat'
-import { DEFAULT_ORACLE_MODEL_ID } from './oracle-models'
+import { ORACLE_MODELS } from './oracle-models'
 
 describe('oracle-chat helpers', () => {
   it('picks a stable guest response from the message fingerprint', () => {
@@ -16,9 +16,11 @@ describe('oracle-chat helpers', () => {
     expect(a).toMatch(/Guest|account|Sign up/i)
   })
 
-  it('returns the default model as the first cascade candidate', () => {
-    expect(getOracleCandidateModelIds()).toEqual([DEFAULT_ORACLE_MODEL_ID])
-    expect(getOracleCandidateModelIds('unknown-model')).toEqual([DEFAULT_ORACLE_MODEL_ID])
+  it('returns the default model first in the cascade candidate list', () => {
+    const expected = ORACLE_MODELS.map((m) => m.id)
+    expect(getOracleCandidateModelIds()).toEqual(expected)
+    expect(getOracleCandidateModelIds('unknown-model')).toEqual(expected)
+    expect(getOracleCandidateModelIds('zai/glm-5.3-flash')[0]).toBe('zai/glm-5.3-flash')
   })
 
   it('formats plain unavailable messages with optional gateway detail', () => {
