@@ -13,7 +13,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signOut: vi.fn(),
   },
 }))
@@ -173,7 +173,7 @@ describe('PublicHeader Navigation Component', () => {
 
   it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', () => {
     const onOpenAuth = vi.fn()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
 
@@ -223,5 +223,15 @@ describe('PublicHeader Navigation Component', () => {
 
     expect(screen.getByTestId('public-header-auth-skeleton')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /LOG IN/i })).not.toBeInTheDocument()
+  })
+
+  it('holds header chrome for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<PublicHeader activePage="home" />)
+
+    expect(screen.getByTestId('public-header-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /LOG IN/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /JOIN PATH/i })).not.toBeInTheDocument()
   })
 })

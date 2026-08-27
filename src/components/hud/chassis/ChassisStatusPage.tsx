@@ -10,7 +10,7 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { toast } from 'sonner'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
@@ -54,9 +54,9 @@ function parseDropTarget(overId: string | number): MoveTarget | null {
 }
 
 export const ChassisStatusPage: React.FC = () => {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
+  const session = useAuthSession()
+  const user = session.user
+  const userId = session.userId
   const persist = useHudPersist()
 
   const cached = userId ? getCachedChassisLoadout(userId) : null

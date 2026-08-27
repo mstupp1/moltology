@@ -16,7 +16,7 @@ describe('Isolation HUD Route', () => {
   })
 
   it('renders guest lock screen when unauthenticated', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     const Component = Route.options.component!
     render(<Component />)
 

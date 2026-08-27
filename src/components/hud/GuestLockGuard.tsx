@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Lock, UserPlus, LogIn } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
 import { AuthModal } from '@/components/AuthModal'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 export interface GuestLockGuardProps {
   children: React.ReactNode
@@ -21,11 +21,10 @@ export const GuestLockGuard: React.FC<GuestLockGuardProps> = ({
   bypass = false,
   skeleton,
 }) => {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
-  const isPending = sessionRes?.isPending ?? false
-  const isGuest = !userId && !bypass
+  const session = useAuthSession()
+  const userId = session.userId
+  const isPending = session.isPending
+  const isGuest = session.isGuest && !bypass
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup')

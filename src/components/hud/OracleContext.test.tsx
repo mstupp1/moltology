@@ -14,7 +14,10 @@ let mockUser: any = null
 // Mock authClient
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: () => ({ data: mockUser ? { user: mockUser } : null }),
+    useSession: () =>
+      mockUser
+        ? { data: { user: mockUser }, isPending: false }
+        : { data: null, isPending: false },
   },
 }))
 

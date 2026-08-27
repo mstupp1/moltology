@@ -14,7 +14,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     getSession: vi.fn().mockResolvedValue({ data: null }),
     signOut: vi.fn(),
   },
@@ -296,6 +296,15 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       data: null,
       isPending: true,
     } as any)
+
+    render(<HUDSidebar />)
+
+    expect(screen.getByTestId('sidebar-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+  })
+
+  it('holds the account pill for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
 
     render(<HUDSidebar />)
 

@@ -11,7 +11,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signOut: vi.fn(),
   },
 }))

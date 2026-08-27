@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Route } from './oracle'
 
+import { authClient } from '@/lib/auth-client'
+
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 let mockUser: any = null
@@ -17,7 +19,7 @@ vi.mock('@tanstack/react-router', () => ({
 // Mock authClient
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: () => ({ data: mockUser ? { user: mockUser } : null }),
+    useSession: vi.fn(),
   },
 }))
 
@@ -45,6 +47,10 @@ describe('Oracle Route Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUser = null
+    vi.mocked(authClient.useSession).mockImplementation(() => ({
+      data: mockUser ? { user: mockUser } : null,
+      isPending: false,
+    }) as any)
   })
 
   it('renders guest mode benefits box and create account CTA when unauthenticated', () => {
@@ -135,6 +141,35 @@ describe('Oracle Route Component', () => {
     expect(head.links ?? []).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ rel: 'canonical' })]),
     )
+  })
+
+  it('holds chrome instead of GUEST MODE while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    const Component = (Route as any).component
+    render(<Component />)
+
+    expect(screen.getAllByTestId('oracle-auth-skeleton').length).toBeGreaterThan(0)
+    expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+  })
+
+  it('does not flash guest chrome when a pending session hydrates to a member', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+    const Component = (Route as any).component
+    const { rerender } = render(<Component />)
+
+    expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'usr_hydrated', name: 'QA Initiate' } },
+      isPending: false,
+    } as any)
+    rerender(<Component />)
+
+    expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText('CHATS').length).toBeGreaterThan(0)
   })
 })
 

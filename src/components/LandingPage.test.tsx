@@ -14,7 +14,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signOut: vi.fn(),
   },
 }))
@@ -22,7 +22,7 @@ vi.mock('@/lib/auth-client', () => ({
 describe('LandingPage Component', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders high-impact hero header text for guest users', () => {
@@ -53,6 +53,16 @@ describe('LandingPage Component', () => {
     expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
     expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
     expect(screen.queryByText('ENTER SYSTEM DASHBOARD')).not.toBeInTheDocument()
+  })
+
+  it('holds guest CTAs for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+
+    render(<LandingPage />)
+
+    expect(screen.getByTestId('hero-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
+    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
   })
 
   it('renders "ENTER SYSTEM DASHBOARD" button for authenticated users', () => {

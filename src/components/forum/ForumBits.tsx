@@ -71,7 +71,7 @@ export function VoteButton({
   onResult,
   size = 'md',
 }: VoteButtonProps) {
-  const { isAuthenticated, userId, openAuth } = useForumAuth()
+  const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
   const persist = useHudPersist()
   const [local, setLocal] = useState(() => ({
     count,
@@ -102,7 +102,7 @@ export function VoteButton({
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (busy) return
+    if (busy || isPending) return
     if (!isAuthenticated) {
       openAuth('signup')
       return

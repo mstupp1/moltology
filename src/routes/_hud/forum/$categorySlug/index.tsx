@@ -6,7 +6,7 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { INITIAL_FORUM_CATEGORIES, getCategoryBgImage } from '@/lib/forum-seed-data'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -55,9 +55,8 @@ function ForumBoardPage() {
   const { categorySlug } = Route.useParams()
   const loader = Route.useLoaderData()
   const navigate = useNavigate()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id ?? user?.sub ?? null
+  const session = useAuthSession()
+  const userId = session.userId
   const [category, setCategory] = useState<ForumCategoryEntry | null>(loader.category)
   const [topics, setTopics] = useState<ForumTopicEntry[]>(loader.topics || [])
   const [sortBy, setSortBy] = useState<SortKey>('hot')

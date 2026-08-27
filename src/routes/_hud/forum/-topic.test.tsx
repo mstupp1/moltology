@@ -31,7 +31,7 @@ vi.mock('@/lib/jwt', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
   },
 }))
 
@@ -44,7 +44,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseParams.mockReturnValue({ categorySlug: 'rules-announcements', topicSlug: 'welcome-to-community-core-directives' })
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders the post title, body, comments, and sign-in prompt', () => {
@@ -66,6 +66,26 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByText(/Greetings Initiates/)).toBeInTheDocument()
     expect(screen.getByText(/0 Comments/)).toBeInTheDocument()
     expect(screen.getByText('Sign in to join the discussion.')).toBeInTheDocument()
+  })
+
+  it('holds the sign-in prompt while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    const seed = INITIAL_FORUM_TOPICS[0]
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        ...seed,
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: null,
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByTestId('forum-reply-auth-skeleton')).toBeInTheDocument()
+    expect(screen.queryByText('Sign in to join the discussion.')).not.toBeInTheDocument()
   })
 
   it('shows the reply composer when the session user is authenticated', async () => {

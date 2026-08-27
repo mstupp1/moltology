@@ -42,7 +42,7 @@ describe('Chassis Configurator HUD Route', () => {
   })
 
   it('renders guest lock screen when unauthenticated', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     const Component = Route.options.component!
     render(<Component />)
 
@@ -54,6 +54,16 @@ describe('Chassis Configurator HUD Route', () => {
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
+  })
+
+  it('holds the lock overlay for the first-paint empty session shape', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    const Component = Route.options.component!
+    render(<Component />)
+
+    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
+    expect(screen.queryByText('CHASSIS CONFIGURATOR LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP TO UNLOCK/i })).not.toBeInTheDocument()
   })
 
   it('renders chassis status page when authenticated', async () => {

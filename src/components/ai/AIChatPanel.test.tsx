@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AIChatPanel } from './AIChatPanel'
 import { sendChatMessageHandler } from '@/lib/server/api'
+import { authClient } from '@/lib/auth-client'
 
 // Mock scrollIntoView for test environment
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
@@ -10,7 +11,7 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn()
 // Mock authClient
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: () => ({ data: null }),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
   },
 }))
 
@@ -267,6 +268,26 @@ describe('AIChatPanel Chats Dropdown Window', () => {
     expect(screen.getAllByText(/GUEST MODE/i).length).toBeGreaterThan(0)
     expect(screen.getByText(/Chats in guest mode are temporary/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN UP FREE/i })).toBeInTheDocument()
+  })
+
+  it('does not paint guest chrome while the session is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+    render(<AIChatPanel />)
+
+    expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
+  })
+
+  it('does not treat an explicit parent userId of null as guest while the session is pending', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+    render(<AIChatPanel userId={null} />)
+
+    expect(screen.queryByText(/GUEST MODE/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP FREE/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Sign Up$/i })).not.toBeInTheDocument()
   })
 })
 

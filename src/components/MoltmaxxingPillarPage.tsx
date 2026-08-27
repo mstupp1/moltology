@@ -31,7 +31,6 @@ import {
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
-import { authClient } from '@/lib/auth-client'
 import { HudCard, HudBadge } from '@/components/ui'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
 import { MoltmaxGuideCard } from '@/components/guide/MoltmaxGuideCard'
@@ -40,8 +39,6 @@ import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatin
 
 export const MoltmaxxingPillarPage: React.FC = () => {
   const navigate = useNavigate()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
