@@ -5,8 +5,9 @@
 
 const URL_PROTOCOL = /\b[a-z][a-z0-9+.-]*:\/\//gi
 
-/** Spaced title-dek chrome, or a tight alphanumeric pair. */
-const SLASH_PAIR = /[A-Za-z0-9.)\]]\s+\/\/\s+\S|[A-Za-z0-9]\/\/[A-Za-z0-9]/g
+/** Title-dek chrome: a word or numeric label, then a slash-pair, then a capitalised label. */
+const SLASH_PAIR =
+  /(?:^|[^A-Za-z0-9_])(?:[A-Za-z]{3,}|\d{1,3}(?:\.\d+)?)\s+\/\/\s+[A-Z]|(?:^|[^A-Za-z0-9_])[A-Za-z]{3,}\/\/[A-Z][A-Za-z]{2,}/g
 
 export interface SlashPairHit {
   index: number
@@ -83,9 +84,18 @@ function extractDoubleQuotedCopy(text: string, chunks: string[]) {
   }
 }
 
-/** Quoted strings plus JSX text nodes. Line comments contribute only double-quoted examples. */
-export function extractQuotedAndJsxCopy(source: string): string[] {
+function blankRange(mask: string[], start: number, end: number) {
+  for (let i = start; i < end && i < mask.length; i += 1) {
+    mask[i] = mask[i] === '\n' ? '\n' : ' '
+  }
+}
+
+export function extractQuotedAndJsxCopy(
+  source: string,
+  options: { jsx?: boolean } = {}
+): string[] {
   const chunks: string[] = []
+  const mask = source.split('')
   let i = 0
   while (i < source.length) {
     const char = source[i]
@@ -93,30 +103,36 @@ export function extractQuotedAndJsxCopy(source: string): string[] {
 
     if (char === '/' && next === '/') {
       const lineEnd = source.indexOf('\n', i)
-      const comment = source.slice(i + 2, lineEnd === -1 ? source.length : lineEnd)
-      extractDoubleQuotedCopy(comment, chunks)
-      i = lineEnd === -1 ? source.length : lineEnd
+      const end = lineEnd === -1 ? source.length : lineEnd
+      extractDoubleQuotedCopy(source.slice(i + 2, end), chunks)
+      blankRange(mask, i, end)
+      i = end
       continue
     }
     if (char === '/' && next === '*') {
       const blockEnd = source.indexOf('*/', i + 2)
-      const comment = source.slice(i + 2, blockEnd === -1 ? source.length : blockEnd)
-      extractDoubleQuotedCopy(comment, chunks)
-      i = blockEnd === -1 ? source.length : blockEnd + 2
+      const end = blockEnd === -1 ? source.length : blockEnd + 2
+      extractDoubleQuotedCopy(source.slice(i + 2, blockEnd === -1 ? source.length : blockEnd), chunks)
+      blankRange(mask, i, end)
+      i = end
       continue
     }
     if (char === '"' || char === "'" || char === '`') {
       const { raw, end } = readQuotedString(source, i)
       chunks.push(raw)
+      blankRange(mask, i, end)
       i = end
       continue
     }
     i += 1
   }
 
-  for (const match of source.matchAll(/>([^<>{}]+)</g)) {
-    const text = match[1].trim()
-    if (text) chunks.push(text)
+  if (options.jsx) {
+    const masked = mask.join('')
+    for (const match of masked.matchAll(/>([^<>{}]+)</g)) {
+      const text = match[1].replace(/\s+/g, ' ').trim()
+      if (/[A-Za-z]/.test(text)) chunks.push(text)
+    }
   }
 
   return chunks
@@ -126,13 +142,16 @@ export function stripMarkdownFences(markdown: string): string {
   return markdown.replace(/```[\s\S]*?```/g, '\n')
 }
 
-export function copySurfacesForPath(filePath: string, source: string): string {
-  const lower = filePath.replaceAll('\\', '/').toLowerCase()
+export function copySurfacesForPath(filePath: string, source: string): string[] {
+  const lower = filePath.replace(/\\/g, '/').toLowerCase()
   if (lower.endsWith('.md') || lower.endsWith('.mdx')) {
-    return stripMarkdownFences(source)
+    return [stripMarkdownFences(source)]
   }
-  if (/\.(ts|tsx|js|jsx)$/.test(lower)) {
-    return extractQuotedAndJsxCopy(source).join('\n')
+  if (/\.(tsx|jsx)$/.test(lower)) {
+    return extractQuotedAndJsxCopy(source, { jsx: true })
   }
-  return source
+  if (/\.(ts|js)$/.test(lower)) {
+    return extractQuotedAndJsxCopy(source)
+  }
+  return [source]
 }

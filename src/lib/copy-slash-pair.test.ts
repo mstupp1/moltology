@@ -63,6 +63,9 @@ describe('slash-pair copy detector', () => {
     expect(hasSlashPair('http://example.com')).toBe(false)
     expect(hasSlashPair('postgres://admin:password@db.neon.tech/main')).toBe(false)
     expect(hasSlashPair('// a line comment about telemetry')).toBe(false)
+    expect(hasSlashPair(['returning()', 'Update thread'].join(' // '))).toBe(false)
+    expect(hasSlashPair(['rawSvg', '1. Expand ViewBox'].join(' // '))).toBe(false)
+    expect(hasSlashPair(['w5_bot', 'Massive, Robust'].join(' // '))).toBe(false)
     expect(maskCopyUrls('see https://moltology.org/news')).not.toContain('//')
   })
 
@@ -75,10 +78,18 @@ describe('slash-pair copy detector', () => {
       '<div>Assessment complete. Profile generated</div>',
     ].join('\n')
     const chunks = extractQuotedAndJsxCopy(source)
-    expect(chunks.join('\n')).toContain('Specimen Alpha: Decapod Operator Prototype')
-    expect(chunks.join('\n')).toContain('https://moltology.org/codex')
+    expect(chunks).toContain('Specimen Alpha: Decapod Operator Prototype')
+    expect(chunks).toContain('https://moltology.org/codex')
     expect(chunks.join('\n')).not.toContain('strictly highest')
-    expect(hasSlashPair(chunks.join('\n'))).toBe(false)
+    expect(chunks.every((chunk) => !hasSlashPair(chunk))).toBe(true)
+  })
+
+  it('extracts tsx text nodes after masking strings and comments', () => {
+    const tsx = '<p className="hud">Assessment complete. Profile generated</p>'
+    const chunks = extractQuotedAndJsxCopy(tsx, { jsx: true })
+    expect(chunks.some((chunk) => chunk.includes('Assessment complete. Profile generated'))).toBe(
+      true
+    )
   })
 
   it('fails if slash-pair chrome re-enters copy, skills, or guides', () => {
@@ -88,12 +99,11 @@ describe('slash-pair copy detector', () => {
 
     for (const file of files) {
       const source = fs.readFileSync(file, 'utf8')
-      const surface = copySurfacesForPath(file, source)
-      const hits = findSlashPairs(surface)
-      if (hits.length === 0) continue
       const rel = path.relative(root, file)
-      for (const hit of hits) {
-        violations.push(`${rel}: ${hit.excerpt}`)
+      for (const surface of copySurfacesForPath(file, source)) {
+        for (const hit of findSlashPairs(surface)) {
+          violations.push(`${rel}: ${hit.excerpt}`)
+        }
       }
     }
 
