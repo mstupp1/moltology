@@ -15,7 +15,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signOut: vi.fn(),
   },
 }))
@@ -23,7 +23,7 @@ vi.mock('@/lib/auth-client', () => ({
 describe('MoltmaxxingPillarPage Component', () => {
   beforeEach(() => {
     mockNavigate.mockClear()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders manifesto headline and core sections', () => {

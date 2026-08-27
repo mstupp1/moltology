@@ -33,9 +33,9 @@ import {
   Lock,
 
 } from 'lucide-react'
-import { authClient } from '../../lib/auth-client'
 import { getUserProfileFn } from '../../lib/server/api'
 import { getAuthJWTToken } from '../../lib/jwt'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
@@ -249,9 +249,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     }
   }, [isMobileOpen])
 
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const isSessionPending = sessionRes?.isPending ?? false
+  const session = useAuthSession()
+  const user = session.user
+  const isSessionPending = session.isPending
   const [userRole, setUserRole] = useState<string | null>(null)
   const effectiveUserRole = getEffectiveRole(user, userRole)
 

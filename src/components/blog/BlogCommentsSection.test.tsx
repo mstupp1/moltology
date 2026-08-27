@@ -33,7 +33,7 @@ describe('BlogCommentsSection', () => {
   })
 
   it('renders guest authorization lock box when user is unauthenticated', async () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(<BlogCommentsSection postId="post-100" />)
 

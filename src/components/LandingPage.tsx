@@ -25,7 +25,6 @@ import {
   Youtube,
 } from 'lucide-react'
 import { AuthModal } from '@/components/AuthModal'
-import { authClient } from '@/lib/auth-client'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
@@ -36,15 +35,16 @@ import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatin
 import { MainFooter } from '@/components/MainFooter'
 import { DashboardMarketingShowcase } from '@/components/hud/DashboardMarketingShowcase'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
   const onNavigate = (path: string) => navigate({ to: path })
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const isSessionPending = sessionRes?.isPending ?? false
+  const session = useAuthSession()
+  const user = session.user
+  const isSessionPending = session.isPending
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)

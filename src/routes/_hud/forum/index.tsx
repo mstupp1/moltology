@@ -18,7 +18,7 @@ import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getCategoryBgImage } from '@/lib/forum-seed-data'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -59,9 +59,8 @@ export const Route = createFileRoute('/_hud/forum/')({
 function ForumIndexPage() {
   const { categories, topics } = Route.useLoaderData()
   const navigate = useNavigate()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id ?? user?.sub ?? null
+  const session = useAuthSession()
+  const userId = session.userId
   const [showNew, setShowNew] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(topics)

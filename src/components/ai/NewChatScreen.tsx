@@ -56,7 +56,7 @@ export interface NewChatScreenProps {
 
 export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   userId,
-  isGuest = !userId,
+  isGuest = false,
   selectedModel,
   onSelectModel,
   onSubmit,

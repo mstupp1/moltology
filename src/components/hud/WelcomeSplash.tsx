@@ -12,7 +12,7 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { saveLobsterAvatarFn, updateUserStatsFn } from '@/lib/server/api'
 import {
@@ -32,9 +32,9 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
   const [step, setStep] = useState<1 | 2>(initialStep)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
+  const session = useAuthSession()
+  const user = session.user
+  const userId = session.userId
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const animFrameRef = useRef<number | null>(null)

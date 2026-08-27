@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAIThreadsFn } from '@/lib/server/api'
 
 export type OracleMode = 'closed' | 'popout' | 'sidebar' | 'page'
@@ -34,9 +34,8 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const navigate = useNavigate()
   const currentPath = location.pathname
 
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
+  const session = useAuthSession()
+  const userId = session.userId
 
   const [mode, setModeState] = useState<OracleMode>(() =>
     currentPath === '/oracle' ? 'page' : 'closed'
@@ -98,8 +97,9 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   useEffect(() => {
+    if (session.isPending && !userId) return
     refreshThreads()
-  }, [userId])
+  }, [userId, session.isPending])
 
   const setMode = (newMode: OracleMode) => {
     // If mobile and sidebar mode is requested, redirect to dedicated page mode

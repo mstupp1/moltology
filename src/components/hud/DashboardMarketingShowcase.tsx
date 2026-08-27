@@ -3,11 +3,14 @@ import { useNavigate } from '@tanstack/react-router'
 import { Cpu, ArrowRight } from 'lucide-react'
 import { Safari } from '@/components/ui/magicui/safari'
 import { Iphone15Pro } from '@/components/ui/magicui/iphone-15-pro'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { BenthicCTAButton } from './BenthicCTAButton'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 
 export function DashboardMarketingShowcase() {
   const navigate = useNavigate()
+  const session = useAuthSession()
 
   const handleLaunchDemo = () => {
     navigate({ to: '/dashboard' })
@@ -76,18 +79,41 @@ export function DashboardMarketingShowcase() {
 
       {/* Big Centered Launch Demo CTA Button at the Bottom */}
       <div className="flex items-center justify-center mt-8 sm:mt-12 lg:mt-14 relative z-20">
-        <BenthicCTAButton
-          size="lg"
-          variant="cyan"
-          className="px-8 sm:px-12 py-4 sm:py-5 min-h-[54px] sm:min-h-[60px] text-sm sm:text-base font-grotesk font-bold tracking-widest shadow-hud-cyan-lg"
-          onClick={handleLaunchDemo}
-        >
-          <span className="flex items-center justify-center gap-3 leading-none">
-            <Cpu className="w-5 h-5 shrink-0" />
-            <span>LAUNCH GUEST DEMO</span>
-            <ArrowRight className="w-5 h-5 shrink-0" />
-          </span>
-        </BenthicCTAButton>
+        {session.isPending ? (
+          <HudGhostSkeleton
+            variant="cyan"
+            preset="button"
+            cornerCut
+            className="w-[240px] min-h-[54px]"
+            data-testid="showcase-auth-skeleton"
+          />
+        ) : session.isAuthenticated ? (
+          <BenthicCTAButton
+            size="lg"
+            variant="cyan"
+            className="px-8 sm:px-12 py-4 sm:py-5 min-h-[54px] sm:min-h-[60px] text-sm sm:text-base font-grotesk font-bold tracking-widest shadow-hud-cyan-lg"
+            onClick={handleLaunchDemo}
+          >
+            <span className="flex items-center justify-center gap-3 leading-none">
+              <Cpu className="w-5 h-5 shrink-0" />
+              <span>ENTER SYSTEM DASHBOARD</span>
+              <ArrowRight className="w-5 h-5 shrink-0" />
+            </span>
+          </BenthicCTAButton>
+        ) : (
+          <BenthicCTAButton
+            size="lg"
+            variant="cyan"
+            className="px-8 sm:px-12 py-4 sm:py-5 min-h-[54px] sm:min-h-[60px] text-sm sm:text-base font-grotesk font-bold tracking-widest shadow-hud-cyan-lg"
+            onClick={handleLaunchDemo}
+          >
+            <span className="flex items-center justify-center gap-3 leading-none">
+              <Cpu className="w-5 h-5 shrink-0" />
+              <span>LAUNCH GUEST DEMO</span>
+              <ArrowRight className="w-5 h-5 shrink-0" />
+            </span>
+          </BenthicCTAButton>
+        )}
       </div>
     </div>
   )

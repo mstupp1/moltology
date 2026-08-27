@@ -13,7 +13,7 @@ vi.mock('@/lib/auth-client', () => ({
 describe('WelcomeInitiateHero Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders the simplified serene welcome initiate section in guest mode with free notice and red sign up button', () => {
@@ -50,6 +50,15 @@ describe('WelcomeInitiateHero Component', () => {
       data: { user: { id: 'user-123', name: 'Commander Pinch' } },
     } as any)
 
+    render(<WelcomeInitiateHero />)
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/WELCOME,\s+INITIATE/i)
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/100% Free/i)).not.toBeInTheDocument()
+  })
+
+  it('holds the sign up CTA while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
     render(<WelcomeInitiateHero />)
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/WELCOME,\s+INITIATE/i)

@@ -21,8 +21,9 @@ import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { validateForumContent } from '@/lib/community-rules'
 import { relativeTime } from '@/lib/forum-utils'
 import { useHudPersist } from '@/hooks/useHudPersist'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
@@ -70,7 +71,7 @@ function ReplyComposer({
   topicId: string
   onPosted: (post: ForumPostEntry) => void
 }) {
-  const { isAuthenticated, userId, openAuth } = useForumAuth()
+  const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
   const persist = useHudPersist()
   const [content, setContent] = useState('')
   const [posting, setPosting] = useState(false)
@@ -78,6 +79,7 @@ function ReplyComposer({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isPending) return
     if (!isAuthenticated) {
       openAuth('signup')
       return
@@ -103,6 +105,15 @@ function ReplyComposer({
       persist.end('forum-reply')
       setPosting(false)
     }
+  }
+
+  if (isPending) {
+    return (
+      <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-2.5" data-testid="forum-reply-auth-skeleton">
+        <HudGhostSkeleton variant="neutral" preset="text" width="60%" height={14} />
+        <HudGhostSkeleton variant="cyan" preset="button" width={140} height={32} />
+      </div>
+    )
   }
 
   if (!isAuthenticated) {
@@ -163,9 +174,8 @@ function ReplyComposer({
 function ForumThreadPage() {
   const { categorySlug, topicSlug } = Route.useParams()
   const loader = Route.useLoaderData()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id ?? user?.sub ?? null
+  const session = useAuthSession()
+  const userId = session.userId
   const [detail, setDetail] = useState(loader)
 
   useEffect(() => {

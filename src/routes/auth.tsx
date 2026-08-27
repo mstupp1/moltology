@@ -14,11 +14,13 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
@@ -30,8 +32,8 @@ const authSearchSchema = z.object({
 function AuthRoute() {
   const navigate = useNavigate()
   const search = Route.useSearch()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const session = useAuthSession()
+  const user = session.user
 
   const initialMode = search.mode === 'signup' ? 'signup' : 'login'
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
@@ -260,6 +262,18 @@ function AuthRoute() {
           </div>
 
           <div className="w-full max-w-md my-auto relative z-10">
+            {session.isPending ? (
+              <HudCard
+                variant="teal"
+                className="relative w-full p-5 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50 space-y-4"
+                data-testid="auth-session-skeleton"
+              >
+                <HudGhostSkeleton variant="cyan" preset="heading" width="55%" height={28} className="mx-auto" />
+                <HudGhostSkeleton variant="neutral" preset="text" width="70%" height={14} className="mx-auto" />
+                <HudGhostSkeleton variant="neutral" preset="button" width="100%" height={44} />
+                <HudGhostSkeleton variant="cyan" preset="button" width="100%" height={44} />
+              </HudCard>
+            ) : (
             <HudCard
               variant="teal"
               className="relative w-full p-5 sm:p-8 shadow-2xl bg-[#0a1012] border border-[#00c3ff]/50"
@@ -446,6 +460,7 @@ function AuthRoute() {
                 />
               </form>
             </HudCard>
+            )}
 
             {/* Landing Page Trust Strip */}
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] text-gray-400 text-center">

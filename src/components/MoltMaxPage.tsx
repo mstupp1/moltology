@@ -4,7 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { PublicHeader } from '@/components/PublicHeader'
 import { AuthModal } from '@/components/AuthModal'
 import { MoltNationFooter } from '@/components/news/MoltNationFooter'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -178,8 +178,8 @@ const fannedCards = [
 export const MoltMaxPage: React.FC = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const session = useAuthSession()
+  const user = session.user
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
   const [mode, setMode] = useState<PageMode>('hero')
@@ -993,11 +993,19 @@ export const MoltMaxPage: React.FC = () => {
             isCopied={isCopied}
             isGeneratingImage={isGeneratingImage}
             isSaved={isSaved}
-            isAuthenticated={Boolean(user)}
+            isAuthenticated={session.isAuthenticated}
             onShare={handleShare}
             onCopy={handleCopy}
             onDownload={handleDownload}
-            onSave={user ? handleSave : () => { setAuthMode('signup'); setIsAuthModalOpen(true) }}
+            onSave={() => {
+              if (session.isPending) return
+              if (user) {
+                handleSave()
+                return
+              }
+              setAuthMode('signup')
+              setIsAuthModalOpen(true)
+            }}
             onReset={() => {
               setMode('hero')
               setResult(null)

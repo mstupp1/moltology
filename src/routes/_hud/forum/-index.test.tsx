@@ -27,7 +27,7 @@ vi.mock('@/lib/server/api', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: () => ({ data: null }),
+    useSession: () => ({ data: null, isPending: false }),
   },
 }))
 

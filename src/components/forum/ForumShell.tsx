@@ -1,16 +1,18 @@
 import React, { useState, useMemo, useCallback, createContext, useContext } from 'react'
 import { AuthModal } from '@/components/AuthModal'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 interface ForumAuthContextValue {
   openAuth: (mode?: 'login' | 'signup') => void
   isAuthenticated: boolean
+  isPending: boolean
   userId: string | null
 }
 
 const ForumAuthContext = createContext<ForumAuthContextValue>({
   openAuth: () => {},
   isAuthenticated: false,
+  isPending: true,
   userId: null,
 })
 
@@ -21,8 +23,7 @@ interface ForumShellProps {
 }
 
 export function ForumShell({ children }: ForumShellProps) {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
+  const session = useAuthSession()
 
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
@@ -35,10 +36,11 @@ export function ForumShell({ children }: ForumShellProps) {
   const value = useMemo<ForumAuthContextValue>(
     () => ({
       openAuth,
-      isAuthenticated: !!user,
-      userId: user?.id ?? user?.sub ?? null,
+      isAuthenticated: session.isAuthenticated,
+      isPending: session.isPending,
+      userId: session.userId,
     }),
-    [openAuth, user]
+    [openAuth, session.isAuthenticated, session.isPending, session.userId]
   )
 
   return (

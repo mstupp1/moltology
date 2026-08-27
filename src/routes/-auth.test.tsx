@@ -26,7 +26,7 @@ const AuthRoute = Route.options.component!
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     signIn: {
       social: vi.fn(),
       email: vi.fn(),
@@ -47,7 +47,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSearch = { mode: 'login' }
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   it('renders shared HeaderBrand and prominent value propositions on left side', () => {
@@ -256,5 +256,15 @@ describe('Auth Split Landing Page Component (/auth)', () => {
       expect.arrayContaining([expect.objectContaining({ rel: 'canonical' })]),
     )
     expect(head.meta?.some((entry) => entry && 'property' in entry && entry.property === 'og:url')).toBe(false)
+  })
+
+  it('holds the sign-up form while the session is unresolved', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: true } as any)
+    render(<AuthRoute />)
+
+    expect(screen.getByTestId('auth-session-skeleton')).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: /Sign Up/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Create Account/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /Welcome Back/i })).not.toBeInTheDocument()
   })
 })

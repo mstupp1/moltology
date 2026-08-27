@@ -4,14 +4,16 @@ import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useSafeOracle } from '@/components/hud/OracleContext'
-import { authClient } from '@/lib/auth-client'
 import { getAIThreadsFn } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 interface OracleSidebarContentProps {
   userId: string | null
+  isAuthPending?: boolean
   threads: any[]
   activeThreadId: string | null
   isLoadingThreads: boolean
@@ -23,6 +25,7 @@ interface OracleSidebarContentProps {
 
 function OracleSidebarContent({
   userId,
+  isAuthPending = false,
   threads,
   activeThreadId,
   isLoadingThreads,
@@ -31,6 +34,24 @@ function OracleSidebarContent({
   onOpenAuthModal,
   hideHeader = false,
 }: OracleSidebarContentProps) {
+  if (isAuthPending && !userId) {
+    return (
+      <div className="flex flex-col h-full space-y-3 font-sans" data-testid="oracle-auth-skeleton">
+        {!hideHeader && (
+          <div className="flex items-center justify-between border-b border-cyan-950 pb-1.5 shrink-0">
+            <HudGhostSkeleton variant="cyan" preset="badge" width={64} height={12} />
+            <HudGhostSkeleton variant="neutral" preset="button" width={72} height={20} />
+          </div>
+        )}
+        <div className="space-y-1.5 flex-1">
+          <HudGhostSkeleton variant="neutral" preset="text" width="90%" height={28} />
+          <HudGhostSkeleton variant="neutral" preset="text" width="80%" height={28} />
+          <HudGhostSkeleton variant="neutral" preset="text" width="70%" height={28} />
+        </div>
+      </div>
+    )
+  }
+
   if (userId) {
     return (
       <div className="flex flex-col h-full space-y-3 font-sans">
@@ -135,15 +156,9 @@ function OracleSidebarContent({
 
 function OracleRouteComponent() {
   const oracle = useSafeOracle()
-
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = propOrContextUserId(user, oracle?.userId)
-
-  function propOrContextUserId(u: any, contextId?: string | null) {
-    if (contextId !== undefined) return contextId
-    return u?.id || u?.sub || null
-  }
+  const session = useAuthSession()
+  const userId = session.userId || oracle?.userId || null
+  const isAuthPending = session.isPending && !userId
 
   const [localThreads, setLocalThreads] = useState<any[]>([])
   const [localActiveThreadId, setLocalActiveThreadId] = useState<string | null>(null)
@@ -204,6 +219,7 @@ function OracleRouteComponent() {
         <aside className="hidden md:flex w-64 lg:w-72 bg-[#050809]/75 backdrop-blur-md border-r border-cyan-900/40 p-3 flex-col shrink-0 overflow-y-auto z-10">
           <OracleSidebarContent
             userId={userId}
+            isAuthPending={isAuthPending}
             threads={threads}
             activeThreadId={activeThreadId}
             isLoadingThreads={isLoadingThreads}
@@ -282,6 +298,7 @@ function OracleRouteComponent() {
           <div className="flex-1 p-3 overflow-y-auto flex flex-col">
             <OracleSidebarContent
               userId={userId}
+              isAuthPending={isAuthPending}
               threads={threads}
               activeThreadId={activeThreadId}
               isLoadingThreads={isLoadingThreads}

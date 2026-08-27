@@ -14,7 +14,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
-    useSession: vi.fn(() => ({ data: null })),
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
     getSession: vi.fn(() => Promise.resolve({ data: null })),
   },
 }))
@@ -23,7 +23,7 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     localStorage.clear()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   afterEach(() => {

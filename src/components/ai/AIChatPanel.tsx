@@ -20,15 +20,18 @@ import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/ser
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
 import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
-import { authClient } from '../../lib/auth-client'
 import { AuthModal } from '../AuthModal'
+import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { getAssetUrl } from '../../lib/assets'
 import { isAdminOrSuperAdmin } from '../../lib/permissions'
 import { getAuthJWTToken } from '../../lib/jwt'
+import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 
 export interface AIChatPanelProps {
   user?: {
+    id?: string
+    sub?: string
     name?: string | null
     email?: string | null
     image?: string | null
@@ -72,15 +75,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   onToggleConversations,
 }) => {
   const oracle = useSafeOracle()
-  const sessionRes = authClient.useSession()
-  const sessionUser = sessionRes?.data?.user || (sessionRes as any)?.user
+  const session = useAuthSession()
+  const sessionUser = session.user
   const user = propUser !== undefined ? propUser : sessionUser
 
-  const userId =
-    propUserId !== undefined
-      ? propUserId
-      : user?.id || user?.sub || oracle?.userId || null
-  const isGuest = !userId
+  const userId = propUserId ?? user?.id ?? user?.sub ?? oracle?.userId ?? session.userId ?? null
+  const isAuthPending = !userId && session.isPending
+  const isGuest = !userId && !isAuthPending
 
   const [localActiveThreadId, setLocalActiveThreadId] = useState<string | null>(propThreadId || null)
   const activeThreadId =
@@ -565,7 +566,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               isCompact ? 'max-h-40 sm:max-h-48' : 'max-h-60 sm:max-h-72'
             }`}
           >
-            {userId ? (
+            {isAuthPending ? (
+              <div className="p-3 space-y-2 font-sans" data-testid="oracle-chats-auth-skeleton">
+                <HudGhostSkeleton variant="cyan" preset="badge" width={88} height={14} />
+                <HudGhostSkeleton variant="neutral" preset="text" width="100%" height={24} />
+                <HudGhostSkeleton variant="neutral" preset="text" width="80%" height={24} />
+              </div>
+            ) : userId ? (
               isLoadingThreads ? (
                 <div className="py-6 text-center text-xs text-gray-400 flex flex-col items-center justify-center gap-2">
                   <img

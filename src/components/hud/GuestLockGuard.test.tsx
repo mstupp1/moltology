@@ -16,7 +16,7 @@ describe('GuestLockGuard Component', () => {
   })
 
   it('renders locked overlay, dim screen, lock icon, and sign up CTA for guest users', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
       <GuestLockGuard
@@ -39,7 +39,7 @@ describe('GuestLockGuard Component', () => {
   })
 
   it('opens AuthModal in signup mode when clicking SIGN UP TO UNLOCK', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
       <GuestLockGuard featureName="Podcasts">
@@ -54,7 +54,7 @@ describe('GuestLockGuard Component', () => {
   })
 
   it('opens AuthModal in login mode when clicking Sign In link', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
       <GuestLockGuard featureName="Isolation Protocols">
