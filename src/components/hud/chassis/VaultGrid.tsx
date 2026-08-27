@@ -3,6 +3,7 @@ import { useDroppable } from '@dnd-kit/core'
 import type { CatalogRef, GearItemState } from '@/lib/chassis-loadout'
 import { VAULT_SIZE } from '@/lib/chassis-loadout'
 import { DraggableGear } from './DraggableGear'
+import type { GearHoverTarget, TooltipAnchor } from './gear-tooltip-position'
 
 export interface VaultGridProps {
   items: GearItemState[]
@@ -11,7 +12,7 @@ export interface VaultGridProps {
   selectedItemId: string | null
   onSelectItem: (id: string | null) => void
   onCellActivate: (index: number) => void
-  onHoverItem?: (id: string | null) => void
+  onHoverItem?: (target: GearHoverTarget | null) => void
 }
 
 function VaultCell({
@@ -31,7 +32,7 @@ function VaultCell({
   hasSelection: boolean
   onSelect: () => void
   onActivate: () => void
-  onHoverChange?: (hovered: boolean) => void
+  onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `vault:${index}`,
@@ -112,7 +113,11 @@ export const VaultGrid: React.FC<VaultGridProps> = ({
               hasSelection={Boolean(selectedItemId)}
               onSelect={() => onSelectItem(item?.id ?? null)}
               onActivate={() => onCellActivate(index)}
-              onHoverChange={(hovered) => onHoverItem?.(hovered ? item?.id ?? null : null)}
+              onHoverChange={(hovered, anchor) =>
+                onHoverItem?.(
+                  hovered && item && anchor ? { itemId: item.id, anchor } : null
+                )
+              }
             />
           )
         })}

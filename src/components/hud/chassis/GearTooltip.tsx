@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 import type { CatalogRef } from '@/lib/chassis-loadout'
 import {
   CATEGORY_LABELS,
@@ -9,10 +9,19 @@ import {
   formatAffixLine,
   primaryStatLine,
 } from '@/lib/chassis-loadout'
+import {
+  computeGearTooltipPosition,
+  type TooltipAnchor,
+} from './gear-tooltip-position'
 
 export interface GearTooltipProps {
   catalog: CatalogRef
   className?: string
+}
+
+export interface GearTooltipFloatingProps {
+  catalog: CatalogRef
+  anchor: TooltipAnchor
 }
 
 export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '' }) => {
@@ -59,6 +68,39 @@ export const GearTooltip: React.FC<GearTooltipProps> = ({ catalog, className = '
       <p className="px-3 pb-3 text-xs sm:text-sm italic text-[#9aa8a7] leading-relaxed">
         {catalog.flavorText}
       </p>
+    </div>
+  )
+}
+
+export const GearTooltipFloating: React.FC<GearTooltipFloatingProps> = ({ catalog, anchor }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el || typeof window === 'undefined') return
+
+    const rect = el.getBoundingClientRect()
+    setPosition(
+      computeGearTooltipPosition(anchor, rect, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      })
+    )
+  }, [anchor, catalog])
+
+  return (
+    <div
+      ref={ref}
+      className="hidden md:block pointer-events-none fixed z-50 w-72 max-w-[calc(100vw-2rem)]"
+      style={{
+        top: position?.top ?? anchor.top,
+        left: position?.left ?? anchor.right + 12,
+        visibility: position ? 'visible' : 'hidden',
+      }}
+      data-testid="gear-tooltip-floating"
+    >
+      <GearTooltip catalog={catalog} />
     </div>
   )
 }

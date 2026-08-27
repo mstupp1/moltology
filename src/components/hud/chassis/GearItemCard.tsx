@@ -6,6 +6,7 @@ import {
   chassisTypeImageUrl,
 } from '@/lib/chassis-loadout'
 import { getAssetUrl } from '@/lib/assets'
+import { anchorFromElement, type TooltipAnchor } from './gear-tooltip-position'
 
 export interface GearItemCardProps {
   catalog: CatalogRef
@@ -13,7 +14,7 @@ export interface GearItemCardProps {
   dimmed?: boolean
   compact?: boolean
   onClick?: () => void
-  onHoverChange?: (hovered: boolean) => void
+  onHoverChange?: (hovered: boolean, anchor?: TooltipAnchor) => void
   className?: string
   dragHandleProps?: React.HTMLAttributes<HTMLElement>
   style?: React.CSSProperties
@@ -46,9 +47,9 @@ export const GearItemCard: React.FC<GearItemCardProps> = ({
         event.stopPropagation()
         onClick?.()
       }}
-      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseEnter={(event) => onHoverChange?.(true, anchorFromElement(event.currentTarget))}
       onMouseLeave={() => onHoverChange?.(false)}
-      onFocus={() => onHoverChange?.(true)}
+      onFocus={(event) => onHoverChange?.(true, anchorFromElement(event.currentTarget))}
       onBlur={() => onHoverChange?.(false)}
       className={`
         relative flex flex-col items-stretch justify-between w-full
