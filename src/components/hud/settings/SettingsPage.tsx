@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Mail, Radio, Settings, Shuffle, Trash2 } from 'lucide-react'
+import { Mail, Radio, Settings, Shuffle } from 'lucide-react'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
-  clearLobsterAvatarFn,
   getUserProfileFn,
   saveLobsterAvatarFn,
   updateEmailPreferencesFn,
@@ -26,20 +25,15 @@ export const SettingsPage: React.FC = () => {
   const persist = useHudPersist()
 
   const [emailOptIn, setEmailOptIn] = useState(false)
-  const [savedConfig, setSavedConfig] = useState<LobsterAvatarConfig | null>(null)
   const [draftSeed, setDraftSeed] = useState('')
-  const [draftTheme, setDraftTheme] = useState<string>('auto')
-  const [draftPattern, setDraftPattern] = useState<string>('auto')
   const [loading, setLoading] = useState(true)
 
   const draftConfig = useMemo((): LobsterAvatarConfig => {
     return {
       style: LOBSTER_AVATAR_STYLE,
       seed: draftSeed,
-      ...(draftTheme !== 'auto' ? { backgroundTheme: draftTheme } : {}),
-      ...(draftPattern !== 'auto' ? { backgroundPattern: draftPattern } : {}),
     }
-  }, [draftSeed, draftTheme, draftPattern])
+  }, [draftSeed])
 
   const loadProfile = useCallback(async () => {
     if (!userId) return
@@ -53,10 +47,7 @@ export const SettingsPage: React.FC = () => {
         setEmailOptIn(profile.emailOptIn)
       }
       const parsed = parseLobsterAvatarConfig(profile?.avatarConfig)
-      setSavedConfig(parsed)
       setDraftSeed(parsed?.seed ?? randomLobsterSeed())
-      setDraftTheme(parsed?.backgroundTheme ?? 'auto')
-      setDraftPattern(parsed?.backgroundPattern ?? 'auto')
     } catch {
       toast.error('Could not load settings.')
     } finally {
@@ -92,8 +83,6 @@ export const SettingsPage: React.FC = () => {
 
   const handleRandomize = () => {
     setDraftSeed(randomLobsterSeed())
-    setDraftTheme('auto')
-    setDraftPattern('auto')
   }
 
   const handleSaveAvatar = async () => {
@@ -101,17 +90,13 @@ export const SettingsPage: React.FC = () => {
     const config: LobsterAvatarConfig = {
       style: LOBSTER_AVATAR_STYLE,
       seed: draftSeed.trim(),
-      ...(draftTheme !== 'auto' ? { backgroundTheme: draftTheme } : {}),
-      ...(draftPattern !== 'auto' ? { backgroundPattern: draftPattern } : {}),
     }
     try {
       await persist.run('settings-avatar', async () => {
         const token = await getAuthJWTToken()
-        const res = await saveLobsterAvatarFn({
+        await saveLobsterAvatarFn({
           data: { ...config, userId, token: token ?? undefined },
         })
-        const parsed = parseLobsterAvatarConfig(res?.avatarConfig)
-        setSavedConfig(parsed)
         clearCachedProfileAvatarUrl(userId)
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
@@ -120,25 +105,6 @@ export const SettingsPage: React.FC = () => {
       toast.success('Avatar saved.')
     } catch {
       toast.error('Could not save avatar.')
-    }
-  }
-
-  const handleClearAvatar = async () => {
-    if (!userId) return
-    try {
-      await persist.run('settings-avatar', async () => {
-        const token = await getAuthJWTToken()
-        await clearLobsterAvatarFn({ data: { userId, token: token ?? undefined } })
-        setSavedConfig(null)
-        setDraftSeed(randomLobsterSeed())
-        clearCachedProfileAvatarUrl(userId)
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
-        }
-      })
-      toast.success('Avatar removed.')
-    } catch {
-      toast.error('Could not remove avatar.')
     }
   }
 
@@ -195,7 +161,7 @@ export const SettingsPage: React.FC = () => {
                 alt="Avatar preview"
               />
 
-              <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                 <button
                   type="button"
                   onClick={handleRandomize}
@@ -212,16 +178,6 @@ export const SettingsPage: React.FC = () => {
                 >
                   Save Avatar
                 </button>
-                {savedConfig && (
-                  <button
-                    type="button"
-                    onClick={handleClearAvatar}
-                    className="px-4 py-2 bg-[#ff5540]/10 hover:bg-[#ff5540]/20 border border-[#ff5540]/40 text-[#ff5540] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors inline-flex items-center gap-1.5"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Remove
-                  </button>
-                )}
               </div>
             </div>
           </div>

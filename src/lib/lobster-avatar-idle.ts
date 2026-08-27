@@ -7,12 +7,16 @@ export const LOBSTER_IDLE_LAYER_IDS = [
   'lobster-carapace-layer',
   'lobster-abdomen-layer',
   'lobster-brow-layer',
+  'lobster-brow-left',
+  'lobster-brow-right',
   'lobster-arm-left',
   'lobster-arm-right',
   'lobster-claw-left',
   'lobster-claw-right',
   'lobster-tail-fan-layer',
   'lobster-antennae-layer',
+  'lobster-antenna-left',
+  'lobster-antenna-right',
   'lobster-legs-layer',
 ] as const
 

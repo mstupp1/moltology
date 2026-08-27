@@ -19,6 +19,12 @@ describe('lobster-avatar-idle', () => {
     expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-carapace-layer')
     expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-claw-left')
     expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-claw-right')
+    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-antennae-layer')
+    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-antenna-left')
+    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-antenna-right')
+    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-brow-layer')
+    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-brow-left')
+    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-brow-right')
   })
 
   it('decodes percent-encoded svg data uris', () => {
