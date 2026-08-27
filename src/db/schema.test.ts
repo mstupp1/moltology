@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, routines, routineCompletions, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -8,6 +8,7 @@ describe('Database Schema & RLS Policies', () => {
     expect(userStats).toBeDefined()
     expect(routines).toBeDefined()
     expect(routineCompletions).toBeDefined()
+    expect(activityEvents).toBeDefined()
     expect(changelogs).toBeDefined()
     expect(neonAuthUser).toBeDefined()
     expect(galleryPins).toBeDefined()
@@ -68,6 +69,17 @@ describe('Database Schema & RLS Policies', () => {
     expect(routineCompletions.taskKey).toBeDefined()
     expect(routineCompletions.completedOn).toBeDefined()
     expect(routineCompletions.completedAt).toBeDefined()
+  })
+
+  it('defines a per-member activity event log with unique source keys', () => {
+    expect(activityEvents.id).toBeDefined()
+    expect(activityEvents.userId).toBeDefined()
+    expect(activityEvents.kind).toBeDefined()
+    expect(activityEvents.title).toBeDefined()
+    expect(activityEvents.detail).toBeDefined()
+    expect(activityEvents.valueBadge).toBeDefined()
+    expect(activityEvents.sourceKey).toBeDefined()
+    expect(activityEvents.createdAt).toBeDefined()
   })
 
   it('defines required fields on changelogs table', () => {

@@ -56,6 +56,11 @@ import {
   toModelMessages,
 } from '../ai/oracle-chat'
 import { verifyTurnstileToken } from './turnstile'
+import {
+  deleteRoutineCompletedEvent,
+  listActivityEventsForUser,
+  recordRoutineCompletedEvent,
+} from './activity-log'
 
 type Db = ReturnType<typeof getDb>
 
@@ -2132,6 +2137,11 @@ export const toggleDailyAlignmentTaskHandler = async ({
         completedOn: date,
       })
       .onConflictDoNothing()
+    try {
+      await recordRoutineCompletedEvent(dbClient, userId, taskKey, date)
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] activity event write warning:', err)
+    }
   } else {
     await dbClient
       .delete(routineCompletions)
@@ -2142,6 +2152,11 @@ export const toggleDailyAlignmentTaskHandler = async ({
           eq(routineCompletions.completedOn, date)
         )
       )
+    try {
+      await deleteRoutineCompletedEvent(dbClient, userId, taskKey, date)
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] activity event delete warning:', err)
+    }
   }
 
   return await getDailyAlignmentData(dbClient, userId, date)
@@ -2156,6 +2171,38 @@ export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: ToggleDailyAlignmentInput) => toggleDailyAlignmentSchema.parse(data))
   .handler(toggleDailyAlignmentTaskHandler)
+
+export interface GetActivityEventsInput {
+  userId?: string
+  token?: string
+  limit?: number
+}
+
+const getActivityEventsSchema = z.object({
+  userId: z.string().optional(),
+  token: z.string().optional(),
+  limit: z.number().int().min(1).max(40).optional(),
+})
+
+export const getActivityEventsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetActivityEventsInput>) => {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return []
+  const parsed = getActivityEventsSchema.parse(data || {})
+  try {
+    return await listActivityEventsForUser(auth.dbClient, auth.userId, parsed.limit)
+  } catch (error) {
+    console.error('[ServerFn getActivityEventsFn] DB query failed:', error)
+    return []
+  }
+}
+
+export const getActivityEventsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: GetActivityEventsInput) => getActivityEventsSchema.parse(data || {}))
+  .handler(getActivityEventsHandler)
 
 // ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 

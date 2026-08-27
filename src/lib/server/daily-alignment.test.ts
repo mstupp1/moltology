@@ -108,7 +108,7 @@ describe('Daily Alignment Server Handlers', () => {
       },
     })
 
-    expect(insertMock).toHaveBeenCalled()
+    expect(insertMock).toHaveBeenCalledTimes(2)
     expect(toggleOnRes.date).toBe('2026-08-24')
 
     // Test Toggle OFF
@@ -124,6 +124,6 @@ describe('Daily Alignment Server Handlers', () => {
       },
     })
 
-    expect(deleteMock).toHaveBeenCalled()
+    expect(deleteMock).toHaveBeenCalledTimes(2)
   })
 })
