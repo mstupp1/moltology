@@ -21,10 +21,11 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS user_stats ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routines ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS routine_completions ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS activity_events ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS equipment_catalog ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_gear_items ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, user_avatars, equipment_catalog, user_gear_items')
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
@@ -32,6 +33,7 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS user_stats_isolation_policy ON user_stats;`
     await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
     await sql`DROP POLICY IF EXISTS routine_completions_isolation_policy ON routine_completions;`
+    await sql`DROP POLICY IF EXISTS activity_events_isolation_policy ON activity_events;`
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
     await sql`DROP POLICY IF EXISTS equipment_catalog_public_read_policy ON equipment_catalog;`
     await sql`DROP POLICY IF EXISTS user_gear_items_isolation_policy ON user_gear_items;`
@@ -66,6 +68,15 @@ async function applyRLS() {
 
     await sql`
       CREATE POLICY routine_completions_isolation_policy ON routine_completions
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY activity_events_isolation_policy ON activity_events
       FOR ALL
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
