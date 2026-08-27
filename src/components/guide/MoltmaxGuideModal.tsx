@@ -75,7 +75,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !email.includes('@')) {
-      setError('Please enter a valid email transmission address.')
+      setError('Please enter a valid email address.')
       return
     }
 
@@ -110,7 +110,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
           document.body.removeChild(a)
         }
       } else {
-        setError('Transmission disrupted. Please verify telemetry and try again.')
+        setError('Could not submit request. Please try again.')
         turnstileRef.current?.reset()
       }
     } catch (err: any) {

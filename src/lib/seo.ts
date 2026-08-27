@@ -47,9 +47,9 @@ export function privatePageSeo(
 
 export function notFoundSeo(): MetaElement[] {
   return seo({
-    title: 'Sector Void \u2014 Trench Uncharted | Moltology',
+    title: 'Page Not Found | Moltology',
     description:
-      'The requested synaptic coordinate does not exist within the active Benthic Lattice. Return to the Synaptic Path or MoltNation News.',
+      'The requested page could not be found. Return to the home page or dashboard.',
     robots: NOINDEX_ROBOTS,
   })
 }

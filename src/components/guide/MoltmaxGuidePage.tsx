@@ -75,7 +75,7 @@ export const MoltmaxGuidePage: React.FC = () => {
           document.body.removeChild(a)
         }
       } else {
-        setError('Transmission disrupted. Please try again.')
+        setError('Could not submit request. Please try again.')
         turnstileRef.current?.reset()
       }
     } catch {

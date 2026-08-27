@@ -65,7 +65,7 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   }
 
   if (!res.body) {
-    throw new Error('Empty response from Oracle chat.')
+    throw new Error('Empty response from chat server.')
   }
 
   const reader = res.body.getReader()
@@ -82,7 +82,7 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
   params.onChunk?.(fullText)
 
   if (!fullText.trim()) {
-    throw new Error('The Oracle was unable to formulate a response. Please try again.')
+    throw new Error('No response received. Please try again.')
   }
 
   return {

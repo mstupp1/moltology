@@ -52,12 +52,12 @@ describe('SEO Meta Tag Generator', () => {
     expect(meta.some((entry) => entry.property === 'og:url')).toBe(false)
   })
 
-  it('emits a unique noindex title for uncharted sectors', () => {
+  it('emits a unique noindex title for not found pages', () => {
     const meta = notFoundSeo()
     expect(meta).toEqual(
       expect.arrayContaining([
         { name: 'robots', content: 'noindex, nofollow' },
-        { title: 'Sector Void — Trench Uncharted | Moltology' },
+        { title: 'Page Not Found | Moltology' },
       ]),
     )
     expect(meta.some((entry) => entry.property === 'og:url')).toBe(false)

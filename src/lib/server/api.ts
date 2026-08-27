@@ -795,19 +795,19 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
   // Guardrail 1: Clean & sanitize input
   const sanitizedContent = data.content.trim().replace(/<[^>]*>?/gm, '')
 
-  // Guardrail 2: Length validation
+  // Validation: Length
   if (sanitizedContent.length < 3) {
-    throw new Error('Guardrail trigger: Comment must be at least 3 characters long.')
+    throw new Error('Comment must be at least 3 characters long.')
   }
   if (sanitizedContent.length > 1000) {
-    throw new Error('Guardrail trigger: Comment exceeds maximum limit of 1000 characters.')
+    throw new Error('Comment cannot exceed 1000 characters.')
   }
 
-  // Guardrail 3: Basic toxicity / link spam filter
+  // Toxicity / link spam filter
   const prohibitedPatterns = [/http:\/\//i, /https:\/\//i, /free money/i, /crypto scam/i]
   for (const pattern of prohibitedPatterns) {
     if (pattern.test(sanitizedContent)) {
-      throw new Error('Guardrail trigger: Your transmission contained restricted external links or promotional content.')
+      throw new Error('Your comment contains restricted external links or promotional content.')
     }
   }
 
@@ -1367,10 +1367,10 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error('Invalid input: Category, title, and content are required.')
   }
 
-  // Guardrail Validation
+  // Content Validation
   const validation = validateForumContent(data.title, data.content)
   if (!validation.valid) {
-    throw new Error(`Guardrail Trigger: ${validation.error}`)
+    throw new Error(validation.error || 'Invalid content.')
   }
 
   const [userProfile] = await dbClient
@@ -1467,10 +1467,10 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error('Invalid input: Topic ID and content are required.')
   }
 
-  // Guardrail Validation
+  // Content Validation
   const validation = validateForumContent(undefined, data.content)
   if (!validation.valid) {
-    throw new Error(`Guardrail Trigger: ${validation.error}`)
+    throw new Error(validation.error || 'Invalid content.')
   }
 
   const [userProfile] = await dbClient
@@ -2117,7 +2117,7 @@ export const toggleDailyAlignmentTaskHandler = async ({
 }: ServerFnArgs<ToggleDailyAlignmentInput>): Promise<DailyAlignmentResponse> => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) {
-    throw new Error('Unauthenticated: Identity verification required to update daily alignment.')
+    throw new Error('Unauthenticated: Authentication required to update daily alignment.')
   }
 
   const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
@@ -2338,7 +2338,7 @@ export const getChassisLoadoutHandler = async ({
   context,
 }: ServerFnArgs<{ token?: string; userId?: string }>) => {
   const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to inspect chassis loadout.')
+  if (!auth) throw new Error('Unauthenticated: Authentication required to inspect equipment.')
   return loadChassisPayload(auth.dbClient, auth.userId)
 }
 
@@ -2374,7 +2374,7 @@ interface MoveGearItemInput {
 
 export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGearItemInput>) => {
   const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to rearrange chassis gear.')
+  if (!auth) throw new Error('Unauthenticated: Authentication required to update equipment.')
   if (!data?.itemId || !data?.target) throw new Error('Missing gear move payload.')
   const { userId, dbClient } = auth
 

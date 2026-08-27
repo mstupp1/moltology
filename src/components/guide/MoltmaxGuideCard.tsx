@@ -69,7 +69,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
           document.body.removeChild(a)
         }
       } else {
-        setError('Transmission error. Please try again.')
+        setError('Could not submit request. Please try again.')
       }
     } catch {
       setIsSubmitted(true)

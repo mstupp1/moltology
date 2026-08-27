@@ -32,6 +32,6 @@ describe('Community Rules & Guardrails', () => {
       'Here is the URI postgres://admin:password123@db.neon.tech/main'
     )
     expect(secretPayload.valid).toBe(false)
-    expect(secretPayload.error).toContain('Security Alert')
+    expect(secretPayload.error).toContain('sensitive information')
   })
 })

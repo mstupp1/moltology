@@ -71,7 +71,7 @@ describe('ToastProvider & useToast', () => {
 
     fireEvent.click(screen.getByText('Trigger Info Toast'))
 
-    expect(screen.getByText('SYSTEM NOTICE')).toBeInTheDocument()
+    expect(screen.getByText('INFO')).toBeInTheDocument()
     expect(screen.getByText('Notice Title')).toBeInTheDocument()
     expect(screen.getByText('Info notice message')).toBeInTheDocument()
   })
@@ -84,17 +84,17 @@ describe('ToastProvider & useToast', () => {
     )
 
     fireEvent.click(screen.getByText('Trigger Success Toast'))
-    expect(screen.getByText('ASCENSION CONFIRMED')).toBeInTheDocument()
+    expect(screen.getByText('SUCCESS')).toBeInTheDocument()
     expect(screen.getByText('Transformation success!')).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Trigger Warning Toast'))
-    expect(screen.getByText('WARNING DETECTED')).toBeInTheDocument()
+    expect(screen.getByText('WARNING')).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Trigger Error Toast'))
-    expect(screen.getByText('ANOMALY ALERT')).toBeInTheDocument()
+    expect(screen.getByText('ERROR')).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Trigger HUD Toast'))
-    expect(screen.getByText('NEURAL SIGNAL')).toBeInTheDocument()
+    expect(screen.getByText('NOTICE')).toBeInTheDocument()
   })
 
   it('allows manual dismissal of a toast notification', () => {

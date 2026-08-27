@@ -60,7 +60,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       })
     } catch (err: any) {
       console.error('Google OAuth Error:', err)
-      setError(err?.message || 'Neural link with Google could not be established. Please try again.')
+      setError(err?.message || 'Could not sign in with Google. Please try again.')
     }
   }
 
@@ -77,7 +77,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           name: name || email.split('@')[0],
         })
         if (res?.error) {
-          setError(res.error.message || 'Initiation unconfirmed. Please verify credentials.')
+          setError(res.error.message || 'Could not create account. Please check your details and try again.')
         } else {
           if (emailOptIn) {
             const createdUser = (res as any)?.data?.user || (res as any)?.user
@@ -102,7 +102,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           password,
         })
         if (res?.error) {
-          setError(res.error.message || 'Credentials unrecognized. Please check your transmission.')
+          setError(res.error.message || 'Invalid email or password. Please try again.')
         } else {
           await getUserProfileFn().catch(() => {})
           if (onSuccess) onSuccess()
@@ -111,7 +111,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     } catch (err: any) {
       console.error('Neon Auth Error:', err)
-      setError(err?.message || 'Neural authentication disrupted. Please re-engage.')
+      setError(err?.message || 'Authentication failed. Please try again.')
     } finally {
       setLoading(false)
     }

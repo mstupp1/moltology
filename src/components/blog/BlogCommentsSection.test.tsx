@@ -134,7 +134,7 @@ describe('BlogCommentsSection', () => {
         },
       })
       expect(screen.getByText('A thrilling bio-silicon perspective!')).toBeInTheDocument()
-      expect(screen.getByText('Transmission broadcast successfully.')).toBeInTheDocument()
+      expect(screen.getByText('Comment posted successfully.')).toBeInTheDocument()
     })
   })
 })

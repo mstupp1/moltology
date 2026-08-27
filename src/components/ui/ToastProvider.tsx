@@ -242,7 +242,7 @@ function getToastStyles(type: ToastType) {
   switch (type) {
     case 'success':
       return {
-        label: 'ASCENSION CONFIRMED',
+        label: 'SUCCESS',
         icon: <CheckCircle2 className="w-4 h-4 text-[#00ff88]" />,
         borderClass: 'border-[#00ff88]/50 shadow-[0_0_20px_rgba(0,255,136,0.2)]',
         bgClass: 'bg-[#020d08]/95',
@@ -251,7 +251,7 @@ function getToastStyles(type: ToastType) {
       }
     case 'warning':
       return {
-        label: 'WARNING DETECTED',
+        label: 'WARNING',
         icon: <AlertTriangle className="w-4 h-4 text-[#ffb700]" />,
         borderClass: 'border-[#ffb700]/50 shadow-[0_0_20px_rgba(255,183,0,0.2)]',
         bgClass: 'bg-[#120d02]/95',
@@ -260,7 +260,7 @@ function getToastStyles(type: ToastType) {
       }
     case 'error':
       return {
-        label: 'ANOMALY ALERT',
+        label: 'ERROR',
         icon: <ShieldAlert className="w-4 h-4 text-[#ff453a]" />,
         borderClass: 'border-[#ff453a]/60 shadow-[0_0_20px_rgba(255,69,58,0.25)]',
         bgClass: 'bg-[#150404]/95',
@@ -269,7 +269,7 @@ function getToastStyles(type: ToastType) {
       }
     case 'hud':
       return {
-        label: 'NEURAL SIGNAL',
+        label: 'NOTICE',
         icon: <Terminal className="w-4 h-4 text-[#ff0055]" />,
         borderClass: 'border-[#ff0055]/60 shadow-[0_0_20px_rgba(255,0,85,0.25)]',
         bgClass: 'bg-[#12030a]/95',
@@ -279,7 +279,7 @@ function getToastStyles(type: ToastType) {
     case 'info':
     default:
       return {
-        label: 'SYSTEM NOTICE',
+        label: 'INFO',
         icon: <Info className="w-4 h-4 text-[#00c3ff]" />,
         borderClass: 'border-[#00c3ff]/50 shadow-[0_0_20px_rgba(0,195,255,0.2)]',
         bgClass: 'bg-[#03090d]/95',

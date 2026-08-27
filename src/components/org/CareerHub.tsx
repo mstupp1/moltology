@@ -395,8 +395,8 @@ export const CareerHub: React.FC<CareerHubProps> = ({ onScrollToLair, onScrollTo
       setIsSubmittingApp(false)
       setAppSubmitted(true)
       toast.success(
-        `Neural beacon logged for ${activeJobModal?.title}! Sister Vane and Synod Recruiters will reach out shortly.`,
-        { title: 'APPLICATION TRANSMITTED' }
+        `Application submitted for ${activeJobModal?.title}! Our team will review your application and reach out shortly.`,
+        { title: 'Application Submitted' }
       )
     }, 1000)
   }

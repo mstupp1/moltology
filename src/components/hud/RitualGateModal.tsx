@@ -25,7 +25,7 @@ export const RitualGateModal: React.FC<RitualGateModalProps> = ({ isOpen, onClos
         setStep(2)
       }, 1200)
     } else {
-      setError('LITURGICAL MISALIGNMENT: Recite sacred vow "FLESH DIES. THE SHELL ENDURES."')
+      setError('Incorrect passphrase. Please enter "FLESH DIES. THE SHELL ENDURES."')
     }
   }
 

@@ -74,7 +74,7 @@ function AuthRoute() {
       })
     } catch (err: any) {
       console.error('Google OAuth Error:', err)
-      setError(err?.message || 'Google OAuth failed. Ensure Google OAuth is enabled in Neon Console.')
+      setError(err?.message || 'Could not sign in with Google. Please try again.')
     }
   }
 
