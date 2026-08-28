@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Biohazard,
-  Skull,
   Activity,
   AlertTriangle,
   FlaskConical,
@@ -12,13 +11,13 @@ import {
   Terminal,
   Database,
   Flame,
-  Zap,
   Eye,
   ShieldAlert,
 } from 'lucide-react'
 import { SubterraneanHubGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 
 export const Route = createFileRoute('/_hud/subterranean')({
   component: SubterraneanRoute,
@@ -182,40 +181,22 @@ function SubterraneanRoute() {
       )}
 
       {/* Subterranean Header Banner */}
-      <div className="bg-[#030a05] border border-[#1b3b24] p-3.5 sm:p-6 chamfer-corner shadow-2xl relative flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
-        <div>
-          <div className="text-xs text-[#39ff14] font-sans tracking-widest uppercase flex flex-wrap items-center gap-2 font-bold">
-            <Biohazard className="w-4 h-4 text-[#39ff14] animate-pulse" />
+      <HudTitlePanel
+        accent="green"
+        eyebrow={
+          <>
+            <Biohazard className="w-4 h-4 animate-pulse" />
             <span>SUBTERRANEAN DEPTHS · LEVEL -7 BIO-VAT VAULT</span>
-          </div>
-          <h1 className="font-grotesk font-bold text-2xl text-[#39ff14] tracking-wider uppercase mt-1 drop-shadow-[0_0_12px_rgba(57,255,20,0.4)]">
-            MUTAGENIC HYBRID RESEARCH CHAMBERS
-          </h1>
-          <p className="text-xs text-[#8ca393] font-sans mt-1 max-w-3xl">
+          </>
+        }
+        title="MUTAGENIC HYBRID RESEARCH CHAMBERS"
+        description={
+          <>
             "In the lower subterranean depths, flesh and chitin fuse under high-pressure nuclear green sludge.
             Here reside the un-shed deformed hybrids of our early carcinization experiments."
-          </p>
-        </div>
-
-        {/* Quick Level Status Pills */}
-        <div className="flex flex-wrap gap-2 text-xs font-bold">
-          <div className="bg-[#030c06] border border-[#39ff14]/40 px-3 py-1.5 chamfer-corner flex items-center gap-2">
-            <Skull className="w-3.5 h-3.5 text-[#39ff14]" />
-            <span className="text-[#8ca393]">DEPTH:</span>
-            <span className="text-[#39ff14]">-2,340M</span>
-          </div>
-          <div className="bg-[#030c06] border border-[#39ff14]/40 px-3 py-1.5 chamfer-corner flex items-center gap-2">
-            <Biohazard className="w-3.5 h-3.5 text-[#39ff14]" />
-            <span className="text-[#8ca393]">SLUDGE PH:</span>
-            <span className="text-[#39ff14]">{acidPh.toFixed(1)}</span>
-          </div>
-          <div className="bg-[#030c06] border border-[#39ff14]/40 px-3 py-1.5 chamfer-corner flex items-center gap-2">
-            <Zap className="w-3.5 h-3.5 text-[#39ff14]" />
-            <span className="text-[#8ca393]">RAD:</span>
-            <span className="text-[#39ff14]">{radiationOutput} mSv/h</span>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Main Grid: Vat Selector & Live Biometrics Console */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 lg:gap-6">

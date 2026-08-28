@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Mail, Radio, Settings, Shuffle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getUserProfileFn,
@@ -125,20 +126,17 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#0b1011]/85 via-[#0f1616]/85 to-[#0b1011]/85 backdrop-blur-md border-l-4 border-l-[#00c3ff] border border-[#3a4a49] p-3.5 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
-        <div className="space-y-1 max-w-2xl">
-          <div className="text-[10px] text-[#00c3ff] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
-            <Settings className="w-3.5 h-3.5 text-[#00c3ff]" />
+      <HudTitlePanel
+        accent="teal"
+        eyebrow={
+          <>
+            <Settings className="w-3.5 h-3.5" />
             Account
-          </div>
-          <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase">
-            Settings
-          </h1>
-          <p className="text-xs text-[#839493] font-sans mt-0.5">
-            Choose your avatar and email preferences.
-          </p>
-        </div>
-      </div>
+          </>
+        }
+        title="Settings"
+        description="Choose your avatar and email preferences."
+      />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">

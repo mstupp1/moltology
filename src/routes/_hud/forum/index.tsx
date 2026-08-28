@@ -13,6 +13,7 @@ import {
   Search,
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
@@ -112,37 +113,38 @@ function ForumIndexPage() {
     <ForumShell>
       <div className="space-y-3.5 sm:space-y-5 font-sans relative pb-8">
         {/* Bento Hero / Header Banner */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-[#0b1011]/85 via-[#0f1616]/85 to-[#0b1011]/85 backdrop-blur-md border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3.5 sm:p-4 md:p-5 chamfer-corner shadow-2xl transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
-          <div className="space-y-1 max-w-2xl">
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#00ffff]">
+        <HudTitlePanel
+          eyebrow={
+            <>
               <Users className="w-3.5 h-3.5" />
               <span>Moltology Community</span>
-            </div>
-            <h1 className="font-grotesk font-extrabold text-xl sm:text-2xl text-[#dfe3e3] tracking-wider uppercase">
+            </>
+          }
+          title={
+            <>
               COMMUNITY <span className="text-[#00ffff]">FORUMS</span>
-            </h1>
-            <p className="text-xs text-[#839493] leading-relaxed">
-              Discussions, questions, and ideas across every stage of the Order.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5 pt-2 md:pt-0 border-t border-[#3a4a49]/50 md:border-t-0 md:border-l md:border-l-[#3a4a49]/50 md:pl-5 shrink-0">
-            <button
-              onClick={() => setShowRules(true)}
-              className="px-3.5 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#3a4a49] hover:border-[#00ffff]/50 text-[#dfe3e3] text-xs font-bold uppercase tracking-wider chamfer-corner transition-all flex items-center gap-1.5"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#00ffff]" />
-              <span>Rules</span>
-            </button>
-            <button
-              onClick={() => setShowNew(true)}
-              className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>New Post</span>
-            </button>
-          </div>
-        </div>
+            </>
+          }
+          description="Discussions, questions, and ideas across every stage of the Order."
+          actions={
+            <>
+              <button
+                onClick={() => setShowRules(true)}
+                className="px-3.5 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#3a4a49] hover:border-[#00ffff]/50 text-[#dfe3e3] text-xs font-bold uppercase tracking-wider chamfer-corner transition-all flex items-center gap-1.5"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-[#00ffff]" />
+                <span>Rules</span>
+              </button>
+              <button
+                onClick={() => setShowNew(true)}
+                className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span>New Post</span>
+              </button>
+            </>
+          }
+        />
 
         {/* Bento Discussion Boards Grid */}
         <section className="space-y-2.5">

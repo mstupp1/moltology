@@ -15,11 +15,11 @@ import {
   Heart,
   Volume2,
   FileText,
-  Zap,
   ShieldCheck,
   Cpu,
 } from 'lucide-react'
 import { PodcastPlayer } from '../../components/podcast/PodcastPlayer'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { INITIAL_PODCASTS } from '../../lib/podcast-data'
 import type { PodcastEpisode } from '../../lib/podcast-data'
 import { getPodcastsFn } from '../../lib/server/api'
@@ -103,35 +103,23 @@ function PodcastsPage() {
     >
       <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       {/* MoltNation Page Header */}
-      <div className="bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3 sm:space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <MoltNationLogo size="sm" theme="dark" />
-              <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-sans font-bold uppercase tracking-widest chamfer-corner">
-                ★ MOLTNATION PATRIOT FREQUENCY ★
-              </span>
-            </div>
-            <h1 className="text-xl sm:text-3xl font-grotesk font-extrabold text-[#dfe3e3] tracking-wider uppercase">
-              MOLTNATION PODCASTS
-            </h1>
-            <p className="text-xs font-sans text-[#839493] mt-1 max-w-2xl leading-relaxed">
-              Listen to sacrosanct doctrine, ecdysis mechanics, and bio-silicon transmutations. All patriot broadcasts default to <span className="text-[#00ffff] font-bold">1.2x playback speed</span> for high-density cognitive absorption.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="px-3 py-1.5 bg-[#030606] border border-[#00ffff]/40 text-[#00ffff] font-sans text-xs font-bold flex items-center gap-2 chamfer-corner shadow-md">
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>DEFAULT SPEED: 1.2X</span>
-            </div>
-            <div className="px-3 py-1.5 bg-[#030606] border border-red-500/50 text-red-400 font-sans text-xs font-bold flex items-center gap-2 chamfer-corner shadow-md">
-              <Radio className="w-4 h-4 text-red-500 animate-pulse" />
-              <span>PATRIOT FREQUENCY</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <HudTitlePanel
+        accent="cyan"
+        eyebrow={
+          <>
+            <MoltNationLogo size="sm" theme="dark" />
+            <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-sans font-bold uppercase tracking-widest chamfer-corner">
+              ★ MOLTNATION PATRIOT FREQUENCY ★
+            </span>
+          </>
+        }
+        title="MOLTNATION PODCASTS"
+        description={
+          <>
+            Listen to sacrosanct doctrine, ecdysis mechanics, and bio-silicon transmutations. All patriot broadcasts default to <span className="text-[#00ffff] font-bold">1.2x playback speed</span> for high-density cognitive absorption.
+          </>
+        }
+      />
 
       {/* Active Podcast Player Hero */}
       <div className="space-y-3">

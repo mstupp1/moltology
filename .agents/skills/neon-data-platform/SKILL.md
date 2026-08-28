@@ -3,8 +3,9 @@ name: neon-data-platform
 description: >-
   Neon + Drizzle schema/migration workflow (dev branch → GitHub Actions on prod main),
   seeding rules (no ghost seed IDs), RLS, TanStack Start authenticated write patterns
-  (createServerFn, JWT, resolveWriteAuth), and HUD UI conventions (chitin-card page chrome,
-  route-level HudWorkspaceGhost only). Use when editing schema.ts, drizzle
+  (createServerFn, JWT, resolveWriteAuth), and HUD UI conventions (shared components
+  first, HudTitlePanel page banners, chitin-card page chrome, route-level
+  HudWorkspaceGhost only). Use when editing schema.ts, drizzle
   migrations, db:seed / seed scripts, forum or HUD mutations, Neon branches, DATABASE_URL,
   RLS, createServerFn write handlers, or building authenticated HUD pages/widgets that
   load Neon data.
@@ -158,10 +159,11 @@ Before insert/vote/update that FKs to another table, verify the parent row exist
 
 When building or redoing authenticated HUD routes/widgets that load Neon data, match existing HUD chrome — do not invent a narrower one-off layout.
 
-### Page shell (copy from dashboard / forum / pipeline / chassis)
+### Page shell (shared components first)
 
+- **Check for a shared component before writing one-off markup.** Scan `src/components/ui/` and `src/components/hud/` (e.g. `HudTitlePanel`, `HudButton`, `HudCard`, `HudBadge`, `HudInput`, `HudSelect`, `ToastProvider`) and reuse what exists. Do **not** copy-paste panel/card/button markup from another page — copied markup is how pages drifted apart. If a visual pattern repeats across pages and no shared component covers it yet, extract one instead of duplicating it again; preserve intentional per-page variations via props or a `className` override, not a forked copy.
 - Full-width page body: `space-y-3.5 sm:space-y-5 font-sans relative` (no `max-w-* mx-auto` unless the page already uses a deliberate content column).
-- Top banner: gradient + `border-l-4` accent + `border border-[#3a4a49]` + `chamfer-corner` + `shadow-2xl` (see forum index / pipeline / chassis).
+- Top title banner: use [`HudTitlePanel`](../../../src/components/hud/HudTitlePanel.tsx) (`title` / `eyebrow` / `description` / `actions` / `accent`). Do **not** hand-roll the gradient + `border-l-4` + `chamfer-corner` banner markup. Note: the accent color class must be applied outside `cn()` (see component) or tailwind-merge strips `border-l-4`.
 - Content panels: `chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl` (and `chitin-card-inset` for nested cells).
 - Section titles: `font-grotesk text-sm font-bold … tracking-wider uppercase` with a short `text-xs text-[#839493]` subtitle when helpful.
 - Guest-locked features: wrap in `GuestLockGuard`; route `pendingComponent: HudWorkspaceGhost`.
@@ -207,3 +209,5 @@ Primitives: [`HudGhostLoader.tsx`](../../../src/components/ui/HudGhostLoader.tsx
 | `.github/workflows/migrate.yml` | Prod migrate + RLS |
 | `src/components/ui/HudGhostLoader.tsx` | Ghost loader primitives + `HudGhostWidget` |
 | `src/components/hud/HudGhostSkeletons.tsx` | Page/widget ghost composites |
+| `src/components/hud/HudTitlePanel.tsx` | Shared page title banner (use for every new HUD page header) |
+| `src/components/ui/` | Shared HUD primitives (`HudButton`, `HudCard`, `HudBadge`, …) — reuse before writing new markup |

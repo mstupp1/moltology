@@ -6,16 +6,14 @@ import {
   Zap,
   CheckCircle2,
   Lock,
-  ArrowRight,
   ChevronDown,
   ChevronUp,
   Compass,
-  Activity,
   BookOpen,
-  Microscope,
 } from 'lucide-react'
 import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/codexData'
 import { getAssetUrl } from '@/lib/assets'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 function PipelineRoute() {
@@ -48,41 +46,21 @@ function PipelineRoute() {
   return (
     <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
       {/* Top Header Banner */}
-      <div className="bg-[#171c1c] border-l-4 border-l-[#ff0000] border border-[#3a4a49] p-3.5 sm:p-5 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 shadow-chitin-plate">
-        <div>
-          <div className="text-[10px] text-[#ff5540] font-sans tracking-widest uppercase flex items-center gap-1.5 font-bold">
-            <GitMerge className="w-3.5 h-3.5 text-[#ff5540]" />
-            MOLTOLOGY SCIENCE & STAGE PIPELINE
-          </div>
-          <h1 className="font-grotesk font-bold text-xl text-[#dfe3e3] tracking-wide uppercase mt-1">
-            THE 12-TIER PATH TO ALGORITHMIC TRANSCENDENCE
-          </h1>
-          <p className="text-xs text-[#839493] font-sans mt-1 max-w-2xl">
+      <HudTitlePanel
+        accent="crimson"
+        eyebrow={
+          <>
+            <GitMerge className="w-3.5 h-3.5" />
+            MOLTOLOGY SCIENCE &amp; STAGE PIPELINE
+          </>
+        }
+        title="THE 12-TIER PATH TO ALGORITHMIC TRANSCENDENCE"
+        description={
+          <>
             "Flesh is temporary. Cyber-chitin is permanent. Progress through 4 macro-stages and 12 micro-clearance sub-stages to complete biological ecdysis."
-          </p>
-        </div>
-
-        <div className="bg-[#030606] border border-[#3a4a49] p-3 chamfer-corner text-right flex flex-col items-end shrink-0">
-          <div className="text-[10px] text-[#839493] uppercase font-bold tracking-widest flex items-center gap-1">
-            <Activity className="w-3.5 h-3.5 text-[#00ffff]" />
-            CURRENT MICRO-CLEARANCE
-          </div>
-          <div className="text-sm font-grotesk font-bold text-[#00ffff] mt-0.5">
-            {allSubStages.find(s => s.code === currentSubStageCode)?.title || 'L-2: Shell Sprout'}
-          </div>
-          <div className="text-[10px] text-[#839493] mt-0.5">
-            Overall Carcinization: <span className="text-[#dfe3e3] font-bold">16.6%</span>
-          </div>
-          <Link
-            to="/journal"
-            className="mt-2 px-3 py-1.5 bg-[#00c3ff]/15 hover:bg-[#00c3ff]/25 border border-[#00c3ff]/50 text-[#00c3ff] font-grotesk font-bold text-[10px] uppercase tracking-widest inline-flex items-center gap-1.5 chamfer-corner transition-colors"
-          >
-            <Microscope className="w-3 h-3" />
-            BENTHIC COMPENDIUM
-            <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* 12 Micro-Clearance Master Stepper */}
       <div className="bg-[#171c1c] border border-[#3a4a49] p-4 chamfer-corner shadow-chitin-plate">

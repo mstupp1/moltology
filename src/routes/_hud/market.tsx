@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ShoppingBag, Lock, ShieldAlert, Clock, ArrowRight } from 'lucide-react'
 import { AssetTransmutationModal } from '@/components/hud/AssetTransmutationModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -29,6 +30,19 @@ function MarketRoute() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onTransmute={handleTransmute}
+      />
+
+      {/* Market Title Panel */}
+      <HudTitlePanel
+        accent="cyan"
+        eyebrow={
+          <>
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>CHITIN GEMS · MOLT CREDITS</span>
+          </>
+        }
+        title="ASCENSION MARKET"
+        description="Transmute terrestrial assets and upgrade chitinous carapaces with sovereign benthic compute credits."
       />
 
       {/* Main Grid Layout matching Reference Screenshot 2 */}

@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { Search, Users, Inbox, Send, Loader2 } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   listConnectionsFn,
@@ -97,14 +98,11 @@ export const ConnectionsPage: React.FC = () => {
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
-      <div className="relative overflow-hidden rounded-sm border border-[#3a4a49] border-l-4 border-l-[#00c3ff] bg-gradient-to-br from-[#0a1214] via-[#071012] to-[#050808] p-4 sm:p-5 shadow-2xl chamfer-corner">
-        <h1 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] tracking-wider uppercase">
-          Connections
-        </h1>
-        <p className="text-xs text-[#839493] mt-1 max-w-xl">
-          Find members, send friend requests, and keep your circle close.
-        </p>
-      </div>
+      <HudTitlePanel
+        accent="teal"
+        title="Connections"
+        description="Find members, send friend requests, and keep your circle close."
+      />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
         <div className="border-b border-[#3a4a49] pb-3">
