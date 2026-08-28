@@ -61,6 +61,31 @@ export function resolveAuthSession(
     }
   }
 
+  // If in preview / mockup capture mode and unauthenticated, provide canonical logged-in operative session
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.search.includes('preview=true') ||
+      window.location.search.includes('view=main') ||
+      window.location.search.includes('preview=main') ||
+      window.location.search.includes('auth=true') ||
+      window.location.search.includes('mockAuth=true'))
+  ) {
+    const previewUser: AuthSessionUser = {
+      id: '00000000-0000-0000-0000-000000000001',
+      name: 'Operative Unit #8971',
+      email: 'operative8971@moltology.org',
+      role: 'member',
+      image: '/images/order_emblem.png',
+    }
+    return {
+      user: previewUser,
+      userId: previewUser.id!,
+      isPending: false,
+      isGuest: false,
+      isAuthenticated: true,
+    }
+  }
+
   const hookPending = (sessionRes as { isPending?: boolean } | null)?.isPending
   const clientReady = options?.clientReady ?? true
   const isPending = !clientReady || hookPending !== false

@@ -28,13 +28,41 @@ function HudContent() {
   const userId = session.userId
   const { heavyVfxDisabled } = useHeavyVfx()
 
+  // Check if main-only view is requested (hides sidebar & top header for core feature mockups)
+  const isMainOnly =
+    (typeof window !== 'undefined' &&
+      (window.location.search.includes('view=main') ||
+        window.location.search.includes('preview=main') ||
+        window.location.search.includes('mainOnly=true') ||
+        window.location.search.includes('main_only=true'))) ||
+    Boolean(
+      location.search &&
+        (typeof location.search === 'object'
+          ? (location.search as Record<string, any>)?.view === 'main' ||
+            (location.search as Record<string, any>)?.preview === 'main' ||
+            (location.search as Record<string, any>)?.mainOnly === true ||
+            (location.search as Record<string, any>)?.main_only === true
+          : typeof location.search === 'string' &&
+            ((location.search as string).includes('view=main') ||
+              (location.search as string).includes('preview=main') ||
+              (location.search as string).includes('mainOnly=true') ||
+              (location.search as string).includes('main_only=true')))
+    )
+
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
 
-  // Show welcome splash once per user or guest on first visit (bypassed in preview mode)
+  // Show welcome splash once per user or guest on first visit (bypassed in preview mode or main-only mode)
   useEffect(() => {
     if (!targetId) return
-    if (typeof window !== 'undefined' && window.location.search.includes('preview=true')) {
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.search.includes('preview=true') ||
+        window.location.search.includes('view=main') ||
+        window.location.search.includes('preview=main') ||
+        window.location.search.includes('mainOnly=true') ||
+        window.location.search.includes('main_only=true'))
+    ) {
       return
     }
     const key = `moltology:welcomed:${targetId}`
@@ -152,26 +180,30 @@ function HudContent() {
 
       {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative">
-        {/* Full Height Glassmorphic Sidebar spanning top-to-bottom */}
-        <HUDSidebar />
+        {/* Full Height Glassmorphic Sidebar spanning top-to-bottom (hidden in main-only mode) */}
+        {!isMainOnly && <HUDSidebar />}
 
         {/* Workspace Column & Optional Right AI Drawer */}
         <div className="flex-1 min-w-0 flex h-full overflow-hidden">
           {/* Main Workspace */}
           <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
-            {/* Portal Top Bar */}
-            <HUDHeader />
+            {/* Portal Top Bar (hidden in main-only mode) */}
+            {!isMainOnly && <HUDHeader />}
 
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute ? 'p-0 overflow-hidden' : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto'
-              } bg-[#070b0b]/10 backdrop-blur-[1px] border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl flex flex-col`}
+              } bg-[#070b0b]/10 backdrop-blur-[1px] ${
+                isMainOnly
+                  ? 'border-0 shadow-none'
+                  : 'border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl'
+              } flex flex-col`}
             >
               <Outlet />
             </main>
 
-            <HudPersistIndicator />
+            {!isMainOnly && <HudPersistIndicator />}
           </div>
 
           {/* Right-Hand Dockable AI Sidebar Drawer */}
@@ -183,8 +215,8 @@ function HudContent() {
         </div>
       </div>
 
-      {/* Floating AI Oracle Assistant */}
-      <SynapticOracleWidget userId={userId} />
+      {/* Floating AI Oracle Assistant (hidden in main-only mode) */}
+      {!isMainOnly && <SynapticOracleWidget userId={userId} />}
     </div>
   )
 }

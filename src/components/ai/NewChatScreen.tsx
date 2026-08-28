@@ -154,7 +154,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
               onClick={() => handleShortcutClick(currentThought.prompt)}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              className={`group inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#181a26]/40 hover:bg-[#202438]/80 border border-[#32364a]/30 hover:border-cyan-500/40 text-xs text-gray-400 hover:text-cyan-200 cursor-pointer select-none backdrop-blur-xs transition-all ${
+              className={`group inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-benthic-surface/70 hover:bg-benthic-container border border-benthic-border/40 hover:border-cyan-500/40 text-xs text-gray-400 hover:text-cyan-200 cursor-pointer select-none backdrop-blur-xs transition-all ${
                 animPhase === 'entering'
                   ? 'opacity-0 translate-y-2 duration-0'
                   : animPhase === 'exiting'
@@ -185,20 +185,20 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                 setModelMenuOpen(false)
                 setPlusMenuOpen(false)
               }}
-              className="flex items-center gap-1 text-[#8f94a8] hover:text-[#d1d5db] text-xs font-medium px-1.5 py-0.5 rounded transition-colors group cursor-pointer"
+              className="flex items-center gap-1 text-gray-400 hover:text-white text-xs font-medium px-1.5 py-0.5 rounded transition-colors group cursor-pointer"
               title="Select Workspace Context"
               aria-label="Workspace Context"
             >
-              <Folder className="w-3.5 h-3.5 text-[#8f94a8] group-hover:text-[#d1d5db] transition-colors" />
-              <span className="tracking-wide text-[#c3c7d5] group-hover:text-white">{currentWorkspace.label}</span>
-              <ChevronDown className="w-3 h-3 text-[#8f94a8] group-hover:text-[#d1d5db] transition-colors" />
+              <Folder className="w-3.5 h-3.5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
+              <span className="tracking-wide text-gray-300 group-hover:text-white">{currentWorkspace.label}</span>
+              <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-white transition-colors" />
             </button>
 
             {workspaceMenuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setWorkspaceMenuOpen(false)} />
-                <div className="absolute left-0 top-full mt-1 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-56 text-xs">
-                  <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-[#32364a]/60">
+                <div className="absolute left-0 top-full mt-1 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 min-w-56 text-xs">
+                  <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-benthic-border/60">
                     Target Workspace
                   </div>
                   {WORKSPACE_OPTIONS.map((w) => (
@@ -211,8 +211,8 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                       }}
                       className={`w-full text-left px-3 py-1.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${
                         w.id === selectedWorkspace
-                          ? 'bg-[#2e3146] text-white font-medium'
-                          : 'text-gray-300 hover:bg-[#282a3d] hover:text-white'
+                          ? 'bg-benthic-high text-white font-medium'
+                          : 'text-gray-300 hover:bg-benthic-high/70 hover:text-white'
                       }`}
                     >
                       <div className="flex flex-col">
@@ -236,7 +236,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
         </div>
 
         {/* Centered Main Prompt Card */}
-        <div className="relative bg-[#202231]/90 backdrop-blur-md border border-[#32364a]/60 rounded-xl p-2 sm:p-2.5 shadow-2xl shadow-black/40">
+        <div className="relative bg-benthic-surface/90 backdrop-blur-md border border-benthic-border/60 rounded-xl p-2 sm:p-2.5 shadow-2xl shadow-black/40">
           <form onSubmit={handleSubmit} className="flex flex-col">
             {/* Multiline Textarea Input */}
             <textarea
@@ -265,7 +265,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                       setModelMenuOpen(false)
                       setWorkspaceMenuOpen(false)
                     }}
-                    className="p-1 text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60 rounded-lg transition-colors cursor-pointer"
+                    className="p-1 text-gray-400 hover:text-white hover:bg-benthic-high/60 rounded-lg transition-colors cursor-pointer"
                     title="Add Context / Attachment"
                     aria-label="Add Context"
                   >
@@ -275,14 +275,14 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                   {plusMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setPlusMenuOpen(false)} />
-                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-52 text-xs">
-                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-[#32364a]/60">
+                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 min-w-52 text-xs">
+                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-benthic-border/60">
                           Add Directives & Data
                         </div>
                         <button
                           type="button"
                           onClick={() => handleAttachDirective('Consult Scripture & Codex')}
-                          className="w-full text-left px-3 py-2 flex items-center gap-2 text-xs text-gray-300 hover:bg-[#282a3d] hover:text-white transition-colors"
+                          className="w-full text-left px-3 py-2 flex items-center gap-2 text-xs text-gray-300 hover:bg-benthic-high/70 hover:text-white transition-colors"
                         >
                           <FileText className="w-3.5 h-3.5 text-cyan-400" />
                           <span>Attach Codex Scripture</span>
@@ -290,7 +290,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                         <button
                           type="button"
                           onClick={() => handleAttachDirective('Ascension & Shell Hardening Analysis')}
-                          className="w-full text-left px-3 py-2 flex items-center gap-2 text-xs text-gray-300 hover:bg-[#282a3d] hover:text-white transition-colors"
+                          className="w-full text-left px-3 py-2 flex items-center gap-2 text-xs text-gray-300 hover:bg-benthic-high/70 hover:text-white transition-colors"
                         >
                           <Zap className="w-3.5 h-3.5 text-amber-400" />
                           <span>Ascension Hardening Guide</span>
@@ -298,7 +298,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                         <button
                           type="button"
                           onClick={() => handleAttachDirective('Abyssal Deep Telemetry')}
-                          className="w-full text-left px-3 py-2 flex items-center gap-2 text-xs text-gray-300 hover:bg-[#282a3d] hover:text-white transition-colors"
+                          className="w-full text-left px-3 py-2 flex items-center gap-2 text-xs text-gray-300 hover:bg-benthic-high/70 hover:text-white transition-colors"
                         >
                           <Radio className="w-3.5 h-3.5 text-purple-400" />
                           <span>Inject Biometric Telemetry</span>
@@ -318,19 +318,19 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                       setPlusMenuOpen(false)
                       setWorkspaceMenuOpen(false)
                     }}
-                    className="flex items-center gap-1 text-[11px] sm:text-xs text-[#c3c7d5] hover:text-white bg-[#282a3a]/70 hover:bg-[#32354a]/80 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] sm:text-xs text-gray-300 hover:text-white bg-benthic-container/80 hover:bg-benthic-high/80 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
                     title="Select Cognition Model"
                     aria-label="Select Cognition Model"
                   >
                     <span className="truncate max-w-[140px] sm:max-w-none font-medium">{selectedModel.label}</span>
-                    <ChevronDown className="w-3 h-3 text-[#8f94a8] shrink-0" />
+                    <ChevronDown className="w-3 h-3 text-gray-400 shrink-0" />
                   </button>
 
                   {modelMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
-                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-56 text-xs">
-                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-[#32364a]/60">
+                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 min-w-56 text-xs">
+                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-benthic-border/60">
                           Model
                         </div>
                         {ORACLE_MODELS.map((m) => (
@@ -343,8 +343,8 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                             }}
                             className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs transition-colors cursor-pointer ${
                               m.id === selectedModel.id
-                                ? 'bg-[#2e3146] text-white font-medium'
-                                : 'text-gray-300 hover:bg-[#282a3d] hover:text-white'
+                                ? 'bg-benthic-high text-white font-medium'
+                                : 'text-gray-300 hover:bg-benthic-high/70 hover:text-white'
                             }`}
                           >
                             <span className="truncate">{m.label}</span>
@@ -367,7 +367,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                   className={`p-1 rounded-lg transition-colors cursor-pointer ${
                     isRecording
                       ? 'text-red-400 bg-red-950/60 animate-pulse'
-                      : 'text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60'
+                      : 'text-gray-400 hover:text-white hover:bg-benthic-high/60'
                   }`}
                   title={isRecording ? 'Listening... Click to stop' : 'Voice Dictation'}
                   aria-label="Voice Dictation"

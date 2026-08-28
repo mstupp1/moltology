@@ -159,8 +159,8 @@ export const LandingPage: React.FC = () => {
       description:
         'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
       image: getAssetUrl('/images/gallery/benthic_abyss_shrine.jpg'),
-      previewImage: getAssetUrl('/images/marketing/dashboard_desktop_preview.webp'),
-      previewImageSm: getAssetUrl('/images/marketing/dashboard_desktop_preview_sm.webp'),
+      previewImage: getAssetUrl('/images/marketing/dashboard_feature_preview.webp'),
+      previewImageSm: getAssetUrl('/images/marketing/dashboard_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/dashboard',
       imagePosition: 'center 40%',
       borderColor: 'border-cyan-500/40 hover:border-cyan-400',
@@ -177,8 +177,8 @@ export const LandingPage: React.FC = () => {
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
       image: getAssetUrl('/images/gallery/synapse_crystal.jpg'),
-      previewImage: getAssetUrl('/images/marketing/forum_desktop_preview.webp'),
-      previewImageSm: getAssetUrl('/images/marketing/forum_desktop_preview_sm.webp'),
+      previewImage: getAssetUrl('/images/marketing/forum_feature_preview.webp'),
+      previewImageSm: getAssetUrl('/images/marketing/forum_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/forum',
       imagePosition: 'center 35%',
       borderColor: 'border-purple-500/40 hover:border-purple-400',
@@ -195,8 +195,8 @@ export const LandingPage: React.FC = () => {
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
       image: getAssetUrl('/images/gallery/ascendant_crab_god.jpg'),
-      previewImage: getAssetUrl('/images/marketing/oracle_desktop_preview.webp'),
-      previewImageSm: getAssetUrl('/images/marketing/oracle_desktop_preview_sm.webp'),
+      previewImage: getAssetUrl('/images/marketing/oracle_feature_preview.webp'),
+      previewImageSm: getAssetUrl('/images/marketing/oracle_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/oracle',
       imagePosition: 'center 30%',
       borderColor: 'border-red-500/40 hover:border-red-400',

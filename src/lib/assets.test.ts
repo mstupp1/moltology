@@ -27,6 +27,15 @@ describe('Asset URL Resolver', () => {
     expect(getAssetUrl('/images/marketing/dashboard_mobile_preview.webp')).toBe(
       '/images/marketing/dashboard_mobile_preview.webp',
     )
+    expect(getAssetUrl('/images/marketing/dashboard_feature_preview.webp')).toBe(
+      '/images/marketing/dashboard_feature_preview.webp',
+    )
+    expect(getAssetUrl('/images/marketing/forum_feature_preview.webp')).toBe(
+      '/images/marketing/forum_feature_preview.webp',
+    )
+    expect(getAssetUrl('/images/marketing/oracle_feature_preview.webp')).toBe(
+      '/images/marketing/oracle_feature_preview.webp',
+    )
   })
 
   it('keeps chassis type art local so Flow stills can drop in later', () => {
