@@ -59,6 +59,7 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
 
 | Campaign | Lead Magnet Asset | Comment Trigger | Mockup Visual | Target Link |
 | :--- | :--- | :--- | :--- | :--- |
+| **Oracle Prompts** | 100+ Synaptic Prompts Vault | `PROMPTS` or `ORACLE` | 3D Extruded HUD & Terminal Cards | `https://moltology.org/oracle` |
 | **Moltmaxxing Guide** | 2026 Protocol Doctrine | `GUIDE` or `MOLT` | 3D Hardcover Benthic Manual | `https://moltology.org/news/the-2026-moltmaxxing-protocol-guide` |
 | **15-Stage Quiz** | Biometric Diagnostic Scan | `QUIZ` or `AUDIT` | 3D Diagnostic Tablet & Radar HUD | `https://moltology.org/quiz` |
 | **Benthic Core App** | Bio-Silicon Agentic OS | `APP` or `INITIATE` | 3D Holographic Terminal & Dashboard | `https://moltology.org` |
@@ -158,6 +159,7 @@ This seeds the comment section for algorithmic engagement and comment-to-DM auto
 
 ```bash
 # 1. Generate Composite Scaffolding & Google Flow Prompt:
+npm run post:create -- --theme oracle-prompts --mascot lobster_pointing
 npm run post:create -- --theme moltmaxxing-guide --mascot lobster_pointing
 npm run post:create -- --theme moltmax-quiz --mascot crab_stats
 npm run post:create -- --theme benthic-app --mascot lobster_thumbs_up
@@ -166,9 +168,11 @@ npm run post:create -- --theme pincer-routine --mascot crab_stats
 npm run post:create -- --theme free-access --mascot lobster_thumbs_up
 
 # 2. Ingest Polished Google Flow Image & Stage to Zernio Queue:
+npm run post:create -- --theme oracle-prompts --polished-image tmp/post_polished.png
 npm run post:create -- --theme moltmaxxing-guide --polished-image tmp/post_polished.png
 
 # 3. Dry Run Preview (Generates scaffolding locally in tmp/ without S3 upload):
+npm run post:create -- --theme oracle-prompts --dry-run
 npm run post:create -- --theme moltmaxxing-guide --dry-run
 npm run post:create -- --theme free-access --dry-run
 ```
