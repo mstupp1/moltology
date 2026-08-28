@@ -567,6 +567,9 @@ body.vfx-disabled [class*="drop-shadow-"],
 .lobster-avatar-animated {
   --lobster-breath-duration: 4.4s;
   --lobster-drift-duration: 8.8s;
+  contain: layout paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Inhale peak @ 50% — torso expands from fixed waist/feet anchors */

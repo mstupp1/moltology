@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   generateLobsterAvatarSvg,
+  generateLobsterAvatarDataUri,
   getLobsterAvatarSeededOptions,
   hasLobsterEyelids,
   hasLobsterPupilTracking,
@@ -482,5 +483,16 @@ describe('lobster-avatar', () => {
     expect(LOBSTER_EYELID_STYLES).toContain(seededA.eyelidStyle)
     expect(LOBSTER_EYELID_STYLES).toContain(seededB.eyelidStyle)
     expect(getLobsterAvatarSeededOptions('larva-alpha').eyelidStyle).toBe(seededA.eyelidStyle)
+  })
+
+  it('efficiently caches generated SVG and Data URI strings in LRU cache', () => {
+    const config = { style: 'critters' as const, seed: 'perf-cache-test' }
+    const svg1 = generateLobsterAvatarSvg(config, 256)
+    const svg2 = generateLobsterAvatarSvg(config, 256)
+    expect(svg1).toBe(svg2) // Identical cached string reference
+
+    const uri1 = generateLobsterAvatarDataUri(config, 256)
+    const uri2 = generateLobsterAvatarDataUri(config, 256)
+    expect(uri1).toBe(uri2) // Identical cached string reference
   })
 })

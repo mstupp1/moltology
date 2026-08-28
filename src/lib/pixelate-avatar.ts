@@ -19,9 +19,22 @@ export interface PixelateOptions {
 
 const DEFAULT_PIXEL_RESOLUTION = 64
 const DEFAULT_OUTPUT_SIZE = 256
+const MAX_PIXELATE_CACHE = 64
 
-/** In-memory cache for pixelated avatar data URIs */
+/** In-memory LRU cache for pixelated avatar data URIs */
 const pixelateCache = new Map<string, string>()
+
+function setPixelateCache(key: string, val: string): void {
+  if (pixelateCache.has(key)) {
+    pixelateCache.delete(key)
+  } else if (pixelateCache.size >= MAX_PIXELATE_CACHE) {
+    const oldestKey = pixelateCache.keys().next().value
+    if (oldestKey !== undefined) {
+      pixelateCache.delete(oldestKey)
+    }
+  }
+  pixelateCache.set(key, val)
+}
 
 function getCacheKey(src: string, resolution: number, outputSize: number): string {
   return `${src}::${resolution}::${outputSize}`
@@ -37,7 +50,14 @@ export function getCachedPixelatedImage(
   if (!src) return null
   const resolution = options.pixelResolution ?? DEFAULT_PIXEL_RESOLUTION
   const outputSize = options.outputSize ?? DEFAULT_OUTPUT_SIZE
-  return pixelateCache.get(getCacheKey(src, resolution, outputSize)) ?? null
+  const key = getCacheKey(src, resolution, outputSize)
+  const cached = pixelateCache.get(key)
+  if (cached !== undefined) {
+    pixelateCache.delete(key)
+    pixelateCache.set(key, cached)
+    return cached
+  }
+  return null
 }
 
 /**
@@ -133,7 +153,7 @@ export function pixelateImage(
 
         if (!outCtx) {
           const fallbackDataUri = smallCanvas.toDataURL('image/png')
-          pixelateCache.set(cacheKey, fallbackDataUri)
+          setPixelateCache(cacheKey, fallbackDataUri)
           finish(fallbackDataUri)
           return
         }
@@ -150,7 +170,7 @@ export function pixelateImage(
         outCtx.drawImage(smallCanvas, 0, 0, gridW, gridH, 0, 0, outW, outH)
 
         const resultDataUri = outCanvas.toDataURL('image/png')
-        pixelateCache.set(cacheKey, resultDataUri)
+        setPixelateCache(cacheKey, resultDataUri)
         finish(resultDataUri)
       } catch {
         // Fallback gracefully to original src on any canvas security/taint issue

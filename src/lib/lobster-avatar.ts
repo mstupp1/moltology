@@ -2136,26 +2136,73 @@ function injectLobsterChitinLayers(
   return outputSvg
 }
 
+function getAvatarCacheKey(config: LobsterAvatarConfig, size: number): string {
+  return `${config.seed}|${size}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
+}
+
+const MAX_GENERATED_AVATAR_CACHE = 128
+const generatedSvgCache = new Map<string, string>()
+const generatedDataUriCache = new Map<string, string>()
+
+export function clearGeneratedAvatarCache(): void {
+  generatedSvgCache.clear()
+  generatedDataUriCache.clear()
+}
+
 export function generateLobsterAvatarSvg(
   config: LobsterAvatarConfig,
   size = 256
 ): string | null {
+  const key = getAvatarCacheKey(config, size)
+  const cached = generatedSvgCache.get(key)
+  if (cached !== undefined) {
+    generatedSvgCache.delete(key)
+    generatedSvgCache.set(key, cached)
+    return cached
+  }
+
   const avatar = new Avatar(crittersStyle, {
     seed: config.seed,
     size,
     ...LOBSTER_CRUSTACEAN_OPTIONS,
   })
   const rawSvg = avatar.toString()
-  return injectLobsterChitinLayers(rawSvg, config)
+  const svg = injectLobsterChitinLayers(rawSvg, config)
+
+  if (svg) {
+    if (generatedSvgCache.size >= MAX_GENERATED_AVATAR_CACHE) {
+      const oldest = generatedSvgCache.keys().next().value
+      if (oldest !== undefined) generatedSvgCache.delete(oldest)
+    }
+    generatedSvgCache.set(key, svg)
+  }
+
+  return svg
 }
 
 export function generateLobsterAvatarDataUri(
   config: LobsterAvatarConfig,
   size = 256
 ): string | null {
+  const key = getAvatarCacheKey(config, size)
+  const cached = generatedDataUriCache.get(key)
+  if (cached !== undefined) {
+    generatedDataUriCache.delete(key)
+    generatedDataUriCache.set(key, cached)
+    return cached
+  }
+
   const svg = generateLobsterAvatarSvg(config, size)
   if (!svg) return null
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+  const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+
+  if (generatedDataUriCache.size >= MAX_GENERATED_AVATAR_CACHE) {
+    const oldest = generatedDataUriCache.keys().next().value
+    if (oldest !== undefined) generatedDataUriCache.delete(oldest)
+  }
+  generatedDataUriCache.set(key, dataUri)
+
+  return dataUri
 }
 
 const profileAvatarCache = new Map<string, string | null>()
