@@ -22,12 +22,11 @@ describe('Podcasts HUD Route & PodcastPlayer', () => {
     vi.clearAllMocks()
   })
 
-  it('renders episode metadata and default 1.2x playback rate indicator', () => {
+  it('renders episode metadata and default 1.2x playback rate selector', () => {
     const episode = INITIAL_PODCASTS[0]
     render(<PodcastPlayer episode={episode} />)
 
     expect(screen.getByText(episode.title)).toBeDefined()
-    expect(screen.getByText('1.2X PATRIOT SPEED')).toBeDefined()
     expect(screen.getByText('1.2x')).toBeDefined()
   })
 

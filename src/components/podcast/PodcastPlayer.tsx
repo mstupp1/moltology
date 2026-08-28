@@ -235,10 +235,6 @@ export const PodcastPlayer: React.FC<PodcastPlayerProps> = ({
                 <span className="bg-[#00ffff]/15 text-[#00ffff] px-2 py-0.5 border border-[#00ffff]/40 text-[10px] font-sans font-bold uppercase tracking-wider chamfer-corner">
                   {theme === 'moltnation' ? '★ MOLTNATION RADIO ★' : episode.category}
                 </span>
-                <span className="text-[10px] font-sans text-[#ff5540] font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#ff5540] animate-ping" />
-                  1.2X PATRIOT SPEED
-                </span>
               </div>
               <h3 className="font-grotesk font-extrabold text-base sm:text-lg text-[#dfe3e3] truncate tracking-wider uppercase">
                 {episode.title}

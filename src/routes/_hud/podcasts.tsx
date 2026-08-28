@@ -5,8 +5,6 @@ import {
   Headphones,
   Search,
   Sparkles,
-  Database,
-  Cloud,
   Layers,
   Play,
   Clock,
@@ -105,20 +103,9 @@ function PodcastsPage() {
       {/* MoltNation Page Header */}
       <HudTitlePanel
         accent="cyan"
-        eyebrow={
-          <>
-            <MoltNationLogo size="sm" theme="dark" />
-            <span className="px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 text-[10px] font-sans font-bold uppercase tracking-widest chamfer-corner">
-              ★ MOLTNATION PATRIOT FREQUENCY ★
-            </span>
-          </>
-        }
+        eyebrow={<MoltNationLogo size="sm" theme="dark" />}
         title="MOLTNATION PODCASTS"
-        description={
-          <>
-            Listen to sacrosanct doctrine, ecdysis mechanics, and bio-silicon transmutations. All patriot broadcasts default to <span className="text-[#00ffff] font-bold">1.2x playback speed</span> for high-density cognitive absorption.
-          </>
-        }
+        description="Listen to sacrosanct doctrine, ecdysis mechanics, and bio-silicon transmutations."
       />
 
       {/* Active Podcast Player Hero */}
@@ -128,44 +115,9 @@ function PodcastsPage() {
             <Headphones className="w-4 h-4 text-[#00ffff]" />
             <span>NOW PLAYING TRANSMISSION</span>
           </h2>
-          <span className="text-xs font-sans text-red-400 font-bold">
-            1.2X PATRIOT RATE ACTIVE
-          </span>
         </div>
 
         <PodcastPlayer episode={activeEpisode} theme="moltnation" />
-      </div>
-
-      {/* Database & S3 Storage Architecture Info Card */}
-      <div className="chitin-card border border-[#3a4a49] p-4 sm:p-5 chamfer-corner space-y-3 shadow-xl">
-        <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
-          <div className="flex items-center gap-2">
-            <Database className="w-4 h-4 text-[#00ffff]" />
-            <h3 className="text-xs font-sans font-bold text-[#00ffff] uppercase tracking-wider">
-              STORAGE ARCHITECTURE: NEON POSTGRES + AWS S3 / CLOUDFLARE R2
-            </h3>
-          </div>
-          <span className="px-2 py-0.5 bg-[#00ffff]/15 text-[#00ffff] text-[10px] font-sans font-bold border border-[#00ffff]/40 chamfer-corner">
-            DUAL STORAGE MODEL
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans text-[#839493]">
-          <div className="flex items-start gap-2.5 bg-[#070b0b]/80 border border-[#3a4a49] p-3 chamfer-corner">
-            <Database className="w-4 h-4 text-[#00ffff] shrink-0 mt-0.5" />
-            <div>
-              <span className="text-[#dfe3e3] font-bold block mb-0.5">Database Layer (Neon Postgres)</span>
-              Stores structured episode metadata: titles, descriptions, transcripts, tags, published dates, duration, play counts, and likes.
-            </div>
-          </div>
-          <div className="flex items-start gap-2.5 bg-[#070b0b]/80 border border-[#3a4a49] p-3 chamfer-corner">
-            <Cloud className="w-4 h-4 text-[#00ffff] shrink-0 mt-0.5" />
-            <div>
-              <span className="text-[#dfe3e3] font-bold block mb-0.5">Media Storage Layer (Public Static / S3 R2 CDN)</span>
-              Binary audio files (`.m4a`, `.mp3`) stream from the Neon S3 CDN via `s3Key` URLs on every front.
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Episode Filters & Search */}
@@ -284,7 +236,7 @@ function PodcastsPage() {
                     }`}
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>{isActive ? 'PLAYING (1.2X)' : 'LISTEN NOW'}</span>
+                    <span>{isActive ? 'PLAYING' : 'LISTEN NOW'}</span>
                   </button>
                 </div>
               </div>
