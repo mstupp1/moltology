@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "channel": "instagram",
+  "account": "silas.trench",
+  "accountId": "6a7f7f0777555aae01d99b54",
+  "youtubeChannel": "moltology",
+  "youtubeAccountId": "6a7fd9bd77555aae01ebea63",
+  "queueId": "6a84b7702421e968ac81f5bd",
+  "description": "Continuity ledger for Moltology high-production episodic Instagram Reels series, tracking seasons, episodes, Google Flow prompt directives, and telemetry.",
+  "seriesCatalog": {
+    "audit": {
+      "id": "audit",
+      "name": "The Moltmaxxing Field Audit",
+      "shortBadge": "FIELD AUDIT",
+      "currentSeason": 1,
+      "latestEpisode": 0,
+      "defaultMascot": "crab_stats",
+      "defaultCtaGoal": "quiz",
+      "description": "Biomechanical diagnostic field reports comparing terrestrial human workplace melt (posture, fatigue, 460ms hesitation) with sub-benthic calcification and pincer torque."
+    },
+    "incidents": {
+      "id": "incidents",
+      "name": "Sub-Benthic Incident Files",
+      "shortBadge": "INCIDENT FILE",
+      "currentSeason": 1,
+      "latestEpisode": 0,
+      "defaultMascot": "lobster_action",
+      "defaultCtaGoal": "demo",
+      "description": "Investigation files documenting real-world datacenter grid meltdowns, copper wire bottlenecks, and 60Hz robotic limitations resolved via subsea hydrothermal computing."
+    },
+    "heresies": {
+      "id": "heresies",
+      "name": "Silicon Heresies & Subculture Ecdysis",
+      "shortBadge": "SILICON HERESY",
+      "currentSeason": 1,
+      "latestEpisode": 0,
+      "defaultMascot": "lobster_pointing",
+      "defaultCtaGoal": "guide",
+      "description": "Satirical dismantling of modern tech culture, RTO mandates, biohacking fads, and soft biology through unapologetic crustacean doctrine."
+    },
+    "mysteries": {
+      "id": "mysteries",
+      "name": "Abyssal Telemetry & Deep Lore Mysteries",
+      "shortBadge": "ABYSSAL LORE",
+      "currentSeason": 1,
+      "latestEpisode": 0,
+      "defaultMascot": "lobster_peaceful",
+      "defaultCtaGoal": "codex",
+      "description": "Exploration of 50,000 fathoms subsea compute pods, hydrodynamic zero-resistance cooling, titanium-chitin metallurgical secrets, and ancient benthic scriptures."
+    },
+    "ascension": {
+      "id": "ascension",
+      "name": "The 15-Stage Ascension Trials",
+      "shortBadge": "ASCENSION TRIAL",
+      "currentSeason": 1,
+      "latestEpisode": 0,
+      "defaultMascot": "lobster_thumbs_up",
+      "defaultCtaGoal": "quiz",
+      "description": "Stage-by-stage initiate training drills and biometric challenges testing shell hardness, pincer torque, and neural reaction latency."
+    }
+  },
+  "episodes": []
+}
