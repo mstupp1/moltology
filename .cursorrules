@@ -1,0 +1,50 @@
+# Moltology Project Intelligence
+
+Cross-reference: [AGENTS.md](AGENTS.md) for full system rules.
+
+## Verification priority (default)
+
+Use headless terminal checks only. Never default to browser or GUI verification.
+
+- **Single file**: `npx vitest run path/to/file.test.ts` or `npm run test:file -- path/to/file.test.ts` (~0.4s)
+- **Typecheck**: `npm run typecheck` for TS validation without a production build
+- **Follow AGENTS.md tiers**:
+  - **Tier 1** (scoped/feature): touched file(s) or `npm run test:changed` + `npm run typecheck`
+  - **Tier 2** (lib/db/auth/ingest): `npm run test:core` (~9s) or `npm run test:scripts`
+  - **Tier 3** (major refactor/release): `npm run test` + `npm run build` only
+
+## Verification commands
+
+| Command | Scope | Approx. cost |
+|---------|-------|--------------|
+| `npx vitest run src/lib/foo.test.ts` | Single file | ~0.4s |
+| `npm run test:changed` | Git-changed tests | varies |
+| `npm run test:core` | `src/lib` + `src/db` | 51 files, ~9s |
+| `npm run test:ui` | components, routes, hooks | ~86 files |
+| `npm run test:scripts` | `scripts/` | ~10 files |
+| `npm run test` | Full suite | 147 files, ~21s |
+| `npm run typecheck` | TS only | fast |
+| `npm run build` | Production bundle | heavy — Tier 3 only |
+
+Vitest runs headless in jsdom ([vite.config.ts](vite.config.ts)); TanStack Start/Nitro plugins are disabled during tests.
+
+## Forbidden unless user explicitly asks
+
+- Browser MCP automation (`browser_navigate`, screenshot loops, visual QA)
+- Starting `npm run dev` or `npm run preview` for verification
+- Heavy GUI/Chrome pipelines: `mockups:capture`, `composite:render`, `post:create`, video/reel scripts
+- Full suite (`npm run test`) or `npm run build` for localized edits
+- Re-running `npm install` when `node_modules` exists and lockfile is unchanged
+
+## Allowed when user requests
+
+- Visual QA, mockup capture, or "check in browser"
+- Skill-driven pipelines (mockup-capture, instagram-post-creator, etc.)
+
+## Dependency caching (Cloud Agents)
+
+Cloud Builds run `install` in [.cursor/environment.json](.cursor/environment.json) and persist `node_modules`. No dev server auto-starts — agents must not boot `npm run dev` unless the user asks.
+
+- Skip `npm install` unless `package.json` / `package-lock.json` changed or install errors occur
+- Do not delete `node_modules`
+- Ensure Cloud Agent Builds are enabled in the Cursor dashboard

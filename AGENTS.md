@@ -41,6 +41,7 @@ Full workflow lives in [`.agents/skills/neon-data-platform/SKILL.md`](.agents/sk
   - **Tier 1 (Scoped / Component / Feature Changes)**: Run targeted tests for the specific file(s) touched (e.g., `npx vitest run path/to/file.test.ts` or `npm run test:changed`) and use `npm run typecheck` (`tsc --noEmit`) for fast type validation. **Do NOT run the entire 100+ test suite or full `npm run build` for localized edits.**
   - **Tier 2 (Core Logic / Backend / Schema / Ingest / Tooling)**: When changing shared libraries (`src/lib/`), database schemas (`src/db/`), auth, security, or ingestion, run `npm run test:core` (`src/lib` + `src/db` in ~2s) or `npm run test:scripts`.
   - **Tier 3 (Major Architecture / Migrations / Full Release Readiness)**: Run the full test suite (`npm run test`) and production build (`npm run build`) ONLY for major cross-cutting refactors, database schema migrations, or when preparing final full-system delivery.
+- Cloud/local agents: see `.cursorrules` and `.cursor/rules/fast-verification.mdc` for forbidden browser/GUI verification defaults.
 
 ## Asset Storage & Media Best Practices
 
