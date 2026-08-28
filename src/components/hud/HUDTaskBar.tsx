@@ -53,6 +53,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     }
   }, [])
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const headerIslandRef = useRef<HTMLDivElement>(null)
 
   // Safe access to ToastProvider context for notification telemetry
   let toastsList: any[] = []
@@ -113,7 +114,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     if (!isScheduleOpen) return
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      const insideDropdown = dropdownRef.current?.contains(target)
+      const insideIsland = headerIslandRef.current?.contains(target)
+      if (!insideDropdown && !insideIsland) {
         setIsScheduleOpen(false)
       }
     }
@@ -606,10 +610,13 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   // ══════════════════════════════════════════════════════════════════════════════
   if (variant === 'header') {
     return (
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className}`} ref={headerIslandRef}>
         {/* Dynamic Island style header pill button */}
         <button
-          onClick={() => setIsScheduleOpen((prev) => !prev)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setIsScheduleOpen((prev) => !prev)
+          }}
           className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full bg-[#03090b]/90 hover:bg-[#061417] border border-[#00c3ff]/40 hover:border-[#00c3ff] text-[#dfe3e3] shadow-[0_0_12px_rgba(0,195,255,0.2)] transition-all select-none group"
           title="Open Activity Center & Liturgy Schedule"
           aria-label="Daily alignment tasks schedule"
