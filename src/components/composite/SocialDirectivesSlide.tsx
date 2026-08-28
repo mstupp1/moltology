@@ -102,31 +102,23 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
         ))}
       </div>
 
-      {/* 4. Hero CTA Card & Pointing Lobster */}
-      <div className="mt-6 relative flex-1 flex items-start">
-        <div className="w-[62%] h-fit p-7 rounded-3xl bg-[#041a26]/95 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,230,0.25)] flex flex-col">
-          <div className="font-mono font-bold text-base text-sky-400 uppercase tracking-wider mb-3">
+      {/* 4. Hero CTA Card */}
+      <div className="mt-5 relative">
+        <div className="w-[66%] h-fit p-6 rounded-3xl bg-[#041a26]/95 border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,230,0.25)] flex flex-col">
+          <div className="font-mono font-bold text-sm text-sky-400 uppercase tracking-wider mb-2.5">
             {ctaHeader}
           </div>
-          <div className="w-full py-5 px-7 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-[#020b10] font-mono font-black text-[24px] uppercase tracking-tight flex items-center justify-between shadow-[0_0_20px_rgba(0,255,230,0.4)] cursor-pointer">
+          <div className="w-full py-4 px-6 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-[#020b10] font-mono font-black text-[22px] uppercase tracking-tight flex items-center justify-between shadow-[0_0_20px_rgba(0,255,230,0.4)] cursor-pointer">
             <span>{ctaButtonText}</span>
-            <ArrowUpRight className="w-8 h-8 stroke-[3.5]" />
+            <ArrowUpRight className="w-7 h-7 stroke-[3.5]" />
           </div>
 
           {ctaSubtitle && (
-            <div className="text-[16px] font-medium text-slate-300 font-sans pt-3.5">
+            <div className="text-[15px] font-medium text-slate-300 font-sans pt-2.5">
               {ctaSubtitle}
             </div>
           )}
         </div>
-
-        {/* Mascot */}
-        <MascotOverlay
-          mascot={mascot}
-          position="bottom-right"
-          width={390}
-          className="bottom-10 right-2"
-        />
       </div>
 
       {/* 5. Bottom Logo & Watermark */}
@@ -137,6 +129,14 @@ export const SocialDirectivesSlide: React.FC<SocialDirectivesSlideProps> = ({
 
         <MoltNationLogo size="md" theme="dark" />
       </div>
+
+      {/* 6. Mascot - Positioned down in the bottom-right corner below Directive 03 */}
+      <MascotOverlay
+        mascot={mascot}
+        position="bottom-right"
+        width={300}
+        className="bottom-8 right-4"
+      />
     </CompositeContainer>
   )
 }

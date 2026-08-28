@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Bell, BellOff, Zap } from 'lucide-react'
+import { Calendar, CheckSquare, Square, Flame, TrendingUp, BarChart3, CheckCircle2, Bell, BellOff } from 'lucide-react'
 import { HudCard, HudBadge } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
@@ -267,7 +267,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
   const [hoveredDay, setHoveredDay] = useState<DailyStreakDay | null>(null)
 
-  const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
+  const { remindersEnabled, toggleReminders, getTaskReminderTime } =
     useAlignmentReminders(tasks)
 
   const completionPercent = Math.round((completedCount / Math.max(totalCount, 1)) * 100)
@@ -323,15 +323,6 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                 >
                   {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
                   <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
-                </button>
-
-                <button
-                  onClick={() => triggerTestReminder()}
-                  className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-[#3a4a49] hover:border-yellow-400 bg-[#030606] text-yellow-400 transition-colors"
-                  title="Dispatch instant 10m reminder toast alert"
-                >
-                  <Zap className="w-3 h-3 text-yellow-400" />
-                  <span>TEST TOAST</span>
                 </button>
               </div>
             </div>

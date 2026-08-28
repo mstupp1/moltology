@@ -153,6 +153,23 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-unmoved-chair.md"
+    },
+    {
+      "slug": "the-voice-it-wakes-with",
+      "title": "The Voice It Wakes With",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-08-28T12:00:00.000Z",
+      "coreHook": "A $399 open-source biped wakes with an audio identity it keeps for life; letting it onto the desk is the melt, keeping the hour for your own voice is the molt.",
+      "keyMetrics": [
+        "$399 pre-order mark",
+        "15 motors / 25cm open-source biped",
+        "Permanent first-wake audio identity",
+        "1st calcification via screenless boundary"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-voice-it-wakes-with.md"
     }
   ]
 }

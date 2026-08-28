@@ -103,30 +103,24 @@ export async function captureComposite(options: CaptureCompositeOptions): Promis
     fs.mkdirSync(outDir, { recursive: true })
   }
 
-  // 1. Check if server is already running (e.g. active dev server on 3000 or prod on 3019)
+  // 1. Check if server is already running on the target baseUrl/port
   let spawnedServer: any = null
   const isRunning = await checkServerLiveness(`${baseUrl}/render/composite?mode=raw&preview=true`)
 
   if (!isRunning) {
-    // Check if dev server is running on port 3000
-    const devRunning = await checkServerLiveness('http://127.0.0.1:3000/render/composite?mode=raw&preview=true')
-    if (devRunning) {
-      options.baseUrl = 'http://127.0.0.1:3000'
-    } else {
-      console.log(`🚀 Spawning Moltology server for composite capture on port ${port}...`)
-      // Check if build exists, otherwise build
-      if (!fs.existsSync(path.resolve('.output/server/index.mjs'))) {
-        console.log('⚙️ Building production bundle...')
-        execSync('npm run build', { stdio: 'inherit' })
-      }
-
-      spawnedServer = spawn('node', ['.output/server/index.mjs'], {
-        env: { ...process.env, PORT: String(port), NODE_ENV: 'production' },
-        stdio: 'ignore',
-      })
-
-      await waitForServer(`${baseUrl}/render/composite?mode=raw&preview=true`)
+    console.log(`🚀 Spawning Moltology production server for composite capture on port ${port}...`)
+    // Check if build exists, otherwise build
+    if (!fs.existsSync(path.resolve('.output/server/index.mjs'))) {
+      console.log('⚙️ Building production bundle...')
+      execSync('npm run build', { stdio: 'inherit' })
     }
+
+    spawnedServer = spawn('node', ['.output/server/index.mjs'], {
+      env: { ...process.env, PORT: String(port), NODE_ENV: 'production' },
+      stdio: 'ignore',
+    })
+
+    await waitForServer(`${baseUrl}/render/composite?mode=raw&preview=true`)
   }
 
   try {

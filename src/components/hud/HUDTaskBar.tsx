@@ -76,7 +76,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
 
   const localTasks: AlignmentTask[] = localPropTasks || alignment.tasks
 
-  const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
+  const { remindersEnabled, toggleReminders, getTaskReminderTime } =
     useAlignmentReminders(localTasks)
 
   // SSR hydration safety
@@ -453,15 +453,6 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         >
           {remindersEnabled ? <Bell className="w-2.5 h-2.5 text-[#00c3ff]" /> : <BellOff className="w-2.5 h-2.5 text-[#ff453a]" />}
           <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
-        </button>
-
-        <button
-          onClick={() => triggerTestReminder()}
-          className="flex items-center gap-1 px-2 py-0.5 border border-[#3a4a49] hover:border-yellow-400 bg-[#030606] text-yellow-400 transition-colors rounded text-[9px] font-bold"
-          title="Dispatch instant 10m reminder toast alert"
-        >
-          <Zap className="w-2.5 h-2.5 text-yellow-400" />
-          <span>TEST TOAST</span>
         </button>
       </div>
     </>

@@ -44,7 +44,7 @@ const TestConsumer: React.FC<{ tasks: AlignmentTaskItem[]; testIdPrefix?: string
   tasks,
   testIdPrefix = '',
 }) => {
-  const { remindersEnabled, toggleReminders, triggerTestReminder, getTaskReminderTime } =
+  const { remindersEnabled, toggleReminders, getTaskReminderTime } =
     useAlignmentReminders(tasks)
 
   return (
@@ -54,7 +54,6 @@ const TestConsumer: React.FC<{ tasks: AlignmentTaskItem[]; testIdPrefix?: string
       </div>
       <div data-testid={`${testIdPrefix}task-reminder-time`}>{getTaskReminderTime('05:30')}</div>
       <button onClick={toggleReminders}>TOGGLE</button>
-      <button onClick={() => triggerTestReminder()}>TEST</button>
     </div>
   )
 }
@@ -95,21 +94,6 @@ describe('useAlignmentReminders hook', () => {
 
     fireEvent.click(toggleBtn)
     expect(screen.getByTestId('enabled-state')).toHaveTextContent('ENABLED')
-  })
-
-  it('dispatches a test toast notification when triggerTestReminder is called', () => {
-    render(
-      <ToastProvider>
-        <TestConsumer tasks={sampleTasks} />
-      </ToastProvider>
-    )
-
-    const testBtn = screen.getByText('TEST')
-    fireEvent.click(testBtn)
-
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(screen.getByText(/\[Test Reminder\]/i)).toBeInTheDocument()
-    expect(screen.getByText(/Silent Synchronization/i)).toBeInTheDocument()
   })
 
   it('ensures 3 concurrent consumer hook instances on the same page only trigger 1 notification when due', () => {

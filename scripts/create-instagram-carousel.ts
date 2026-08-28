@@ -74,12 +74,20 @@ export function generateCarouselCopy(theme: string = 'moltmaxxing', customTopic?
 /**
  * Build Google Flow prompt directives for each slide
  */
-export function buildSlideGoogleFlowPrompt(slideNum: number, template: string, theme: string): string {
+export function buildSlideGoogleFlowPrompt(slideNum: number, template: string, theme: string, mascotKey?: string): string {
   const narrativeRoles: Record<number, string> = {
     1: 'Stage 1 Hook & Bottleneck: Expose legacy friction with subtle dark glitch and crimson alert accents (#ef4444).',
     2: 'Stage 2 Breakthrough Mechanism: Showcase pristine cybernetic flowchart/spec matrix with luminous cyan (#00ffff) and amber traces.',
     3: 'Stage 3 Action Directives & CTA: Clean hero victory console with prominent action badge and official MoltNation seal.',
   }
+
+  const mascotDescriptions: Record<number, string> = {
+    1: 'The cheerful thumbs-up lobster in the bottom corner (Slide 1)',
+    2: 'The energetic crab mascot pointing up at the telemetry cards (Slide 2)',
+    3: 'The hero lobster pointing directly at the action CTA button (Slide 3)',
+  }
+
+  const mascotDesc = mascotDescriptions[slideNum] || 'The cartoon crustacean mascot in the corner'
 
   return `[SLIDE ${slideNum} - GOOGLE FLOW AI ENHANCEMENT DIRECTIVES]
 Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
@@ -89,12 +97,13 @@ Narrative Phase: ${narrativeRoles[slideNum] || 'Benthic cybernetic telemetry vis
 Key Enhancement Directives:
 1. Photorealistic 3D Glassmorphic HUD Panels:
    - Transform flat cards into thick, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing neon borders.
-   - Keep text razor-sharp and legible while giving headlines a subtle 3D luminous emboss.
+   - Keep all text razor-sharp, unobstructed, and legible while giving headlines a subtle 3D luminous emboss.
 2. NO WASTED SPACE & Dense Composition:
    - Ensure dense, purposeful visual composition with zero dead or empty negative space.
    - Fill background voids with subsea volumetric god rays, dark abyssal water (#030712), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces.
-3. Seamless Mascot & Character Integration:
-   - The cartoon crustacean mascot in the corner must be rendered in rich 3D Pixar/DreamWorks style with soft matte chitin texture.
+3. Seamless Unique Mascot & Character Integration:
+   - ${mascotDesc} must be rendered in rich 3D Pixar/DreamWorks style with soft matte chitin texture.
+   - Ensure the mascot sits naturally beside the HUD elements without obscuring any text or metrics.
    - Cast natural ambient underwater lighting, gentle caustic reflections, and soft contact shadows without harsh backlights or artificial halo outlines.
 
 Aspect Ratio: 4:5 (1080x1350)
@@ -184,10 +193,32 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   // PATH B: Generate 3-Slide Composite Scaffolding via Web-Native Composite Studio
   console.log(`1️⃣ Generating 3-Slide Web-Native Composite Scaffolding (Headless Chrome)...`)
 
+  // Mascot rotation: ensure unique, theme-appropriate characters per slide (never duplicate across slides)
+  const defaultMascotRotation: Record<number, CharacterKey> = {
+    1: 'lobster_thumbs_up',   // Slide 1: Hook / Attention
+    2: 'crab_stats',          // Slide 2: Metrics / Spec Showdown / Breakdown
+    3: 'lobster_pointing',    // Slide 3: Action Directives / Pointing CTA
+  }
+
   const slideConfigs = [
-    { num: 1, template: 'hook' as const, file: `carousel_${timestamp}_slide1_hook.png` },
-    { num: 2, template: 'spec-showdown' as const, file: `carousel_${timestamp}_slide2_spec.png` },
-    { num: 3, template: 'directives' as const, file: `carousel_${timestamp}_slide3_directives.png` },
+    {
+      num: 1,
+      template: 'hook' as const,
+      file: `carousel_${timestamp}_slide1_hook.png`,
+      mascot: mascot === 'none' ? 'none' : (mascot === 'lobster_pointing' ? 'lobster_thumbs_up' : (mascot || defaultMascotRotation[1])),
+    },
+    {
+      num: 2,
+      template: 'spec-showdown' as const,
+      file: `carousel_${timestamp}_slide2_spec.png`,
+      mascot: mascot === 'none' ? 'none' : defaultMascotRotation[2],
+    },
+    {
+      num: 3,
+      template: 'directives' as const,
+      file: `carousel_${timestamp}_slide3_directives.png`,
+      mascot: mascot === 'none' ? 'none' : defaultMascotRotation[3],
+    },
   ]
 
   const compositePaths: string[] = []
@@ -195,17 +226,17 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
 
   for (const config of slideConfigs) {
     const outPath = path.join(tempDir, config.file)
-    console.log(`   📸 Capturing Slide ${config.num} (${config.template})...`)
+    console.log(`   📸 Capturing Slide ${config.num} (${config.template} with mascot: ${config.mascot})...`)
     await captureComposite({
       template: config.template,
       theme,
       aspectRatio: '4:5',
-      mascot: mascot as any,
+      mascot: config.mascot as any,
       outputPath: outPath,
       scaleFactor: 2,
     })
     compositePaths.push(outPath)
-    flowPrompts.push(buildSlideGoogleFlowPrompt(config.num, config.template, theme))
+    flowPrompts.push(buildSlideGoogleFlowPrompt(config.num, config.template, theme, config.mascot))
   }
 
   console.log(`\n✅ All 3 Composite Scaffolding Slides Captured in tmp/!`)
