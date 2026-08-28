@@ -4,6 +4,7 @@ import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
 import { SocialDirectivesSlide } from './SocialDirectivesSlide'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
+import { SocialPromptVaultSlide } from './SocialPromptVaultSlide'
 import { ReelOutroCard, CtaTextureKey } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
@@ -28,6 +29,7 @@ import {
 
 export type CompositeTemplateType =
   | 'marketing-leadmagnet'
+  | 'prompt-vault'
   | 'hook'
   | 'spec-showdown'
   | 'directives'
@@ -148,10 +150,33 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
   )
   const [commentKeyword, setCommentKeyword] = useState('GUIDE')
 
+  // Prompt Vault Specific Fields
+  const [heroNumber, setHeroNumber] = useState('100+')
+  const [heroHighlight, setHeroHighlight] = useState('ORACLE')
+  const [heroSubject, setHeroSubject] = useState('PROMPTS')
+  const [heroSubPill, setHeroSubPill] = useState('For Moltmaxxing, Ecdysis & Ascension')
+  const [promptCard1, setPromptCard1] = useState(
+    'Audit my open task latency and calculate my Stage 2 ecdysis schedule.'
+  )
+  const [promptCard2, setPromptCard2] = useState(
+    'Formulate a 24-hour isometric pincer routine to eliminate surface distraction.'
+  )
+
   // Theme presets
   const applyThemePreset = (selectedTheme: string) => {
     setTheme(selectedTheme)
-    if (selectedTheme === 'moltmaxxing-guide') {
+    if (selectedTheme === 'oracle-prompts' || selectedTheme === 'prompts') {
+      setTemplate('prompt-vault')
+      setCategoryBadge('CANONICAL VAULT · ZERO-LATENCY SYNAPTIC DIRECTIVES')
+      setHeroNumber('100+')
+      setHeroHighlight('ORACLE')
+      setHeroSubject('PROMPTS')
+      setHeroSubPill('For Moltmaxxing, Ecdysis & Ascension')
+      setPromptCard1('Audit my open task latency and calculate my Stage 2 ecdysis schedule.')
+      setPromptCard2('Formulate a 24-hour isometric pincer routine to eliminate surface distraction.')
+      setCommentKeyword('PROMPTS')
+      setMascot('lobster_pointing')
+    } else if (selectedTheme === 'moltmaxxing-guide') {
       setCategoryBadge('STOP MELTING · 10X COGNITIVE OUTPUT · ZERO DRIFT')
       setHeadlinePart1('STOP MELTING.')
       setHeadlinePart2('CALCIFY YOUR GRIP.')
@@ -327,7 +352,8 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { id: 'marketing-leadmagnet', label: '⭐ Marketing Lead Magnet (3D Book)' },
+                { id: 'marketing-leadmagnet', label: '⭐ Lead Magnet (3D Book)' },
+                { id: 'prompt-vault', label: '⚡ Oracle Prompt Vault (3D)' },
                 { id: 'hook', label: 'Hook Slide (4:5)' },
                 { id: 'spec-showdown', label: 'Spec Showdown' },
                 { id: 'directives', label: 'Directives / CTA' },
@@ -394,6 +420,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
+                { id: 'oracle-prompts', label: '🔮 Oracle AI Prompts' },
                 { id: 'moltmaxxing-guide', label: '📖 Moltmaxxing Guide' },
                 { id: 'moltmax-quiz', label: '🔬 15-Stage Quiz' },
                 { id: 'benthic-app', label: '🤖 Benthic Core App' },
@@ -512,6 +539,86 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                 <textarea
                   value={quoteText}
                   onChange={(e) => setQuoteText(e.target.value)}
+                  rows={2}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400 resize-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Prompt Vault Specific Controls */}
+          {template === 'prompt-vault' && (
+            <div className="space-y-3 pt-2 border-t border-slate-800/80">
+              <label className="block text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+                Oracle Prompt Vault Controls
+              </label>
+
+              <div>
+                <span className="text-[10px] font-mono text-amber-300">Comment Trigger Keyword</span>
+                <input
+                  type="text"
+                  value={commentKeyword}
+                  onChange={(e) => setCommentKeyword(e.target.value)}
+                  placeholder='e.g. "PROMPTS", "ORACLE"'
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-amber-500/50 text-xs text-amber-300 font-bold focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">3D Hero Number</span>
+                <input
+                  type="text"
+                  value={heroNumber}
+                  onChange={(e) => setHeroNumber(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-amber-400">Glowing 3D Highlight Word</span>
+                <input
+                  type="text"
+                  value={heroHighlight}
+                  onChange={(e) => setHeroHighlight(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-amber-500/40 text-xs text-amber-300 focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">Hero Subject</span>
+                <input
+                  type="text"
+                  value={heroSubject}
+                  onChange={(e) => setHeroSubject(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">Sub-Pill Text</span>
+                <input
+                  type="text"
+                  value={heroSubPill}
+                  onChange={(e) => setHeroSubPill(e.target.value)}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">Prompt Preview Card 1</span>
+                <textarea
+                  value={promptCard1}
+                  onChange={(e) => setPromptCard1(e.target.value)}
+                  rows={2}
+                  className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400 resize-none"
+                />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-mono text-slate-400">Prompt Preview Card 2</span>
+                <textarea
+                  value={promptCard2}
+                  onChange={(e) => setPromptCard2(e.target.value)}
                   rows={2}
                   className="w-full mt-1 p-2 rounded bg-[#081016] border border-slate-800 text-xs text-white focus:border-cyan-400 resize-none"
                 />
@@ -674,6 +781,24 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                   trustBadgeText={trustBadgeText}
                   trustBadgeYear={trustBadgeYear}
                   quoteText={quoteText}
+                  commentKeyword={commentKeyword}
+                  mascot={mascot}
+                />
+              )}
+
+              {template === 'prompt-vault' && (
+                <SocialPromptVaultSlide
+                  aspectRatio={aspect}
+                  theme={theme}
+                  eyebrowBadge={categoryBadge}
+                  heroNumber={heroNumber}
+                  heroHighlight={heroHighlight}
+                  heroSubject={heroSubject}
+                  heroSubPill={heroSubPill}
+                  promptCards={[
+                    { icon: 'chat', badge: 'ORACLE PROMPT', prompt: promptCard1 },
+                    { icon: 'search', badge: 'ORACLE PROMPT', prompt: promptCard2 },
+                  ]}
                   commentKeyword={commentKeyword}
                   mascot={mascot}
                 />

@@ -9,6 +9,7 @@ import { ReelOutroCard } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
+import { SocialPromptVaultSlide } from './SocialPromptVaultSlide'
 
 describe('Composite UI Components', () => {
   it('renders CompositeContainer with correct dimensions and scanlines', () => {
@@ -121,11 +122,11 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('READ THE FULL DISPATCH')).toBeInTheDocument()
     expect(screen.getByText('VISIT MOLTOLOGY')).toBeInTheDocument()
 
-    // Verify CTA card has h-fit and w-[62%]
-    const ctaCard = screen.getByText('READ THE FULL DISPATCH').closest('.w-\\[62\\%\\]')
+    // Verify CTA card has h-fit and w-[66%]
+    const ctaCard = screen.getByText('READ THE FULL DISPATCH').closest('.w-\\[66\\%\\]')
     expect(ctaCard).toBeInTheDocument()
     expect(ctaCard).toHaveClass('h-fit')
-    expect(ctaCard).toHaveClass('w-[62%]')
+    expect(ctaCard).toHaveClass('w-[66%]')
   })
 
   it('renders ReelOutroCard with brand emblem, headline, CTA button, and removes zero latency telemetry and tap to audit', () => {
@@ -205,6 +206,56 @@ describe('Composite UI Components', () => {
     expect(mascotWrapper).toBeInTheDocument()
     expect(mascotWrapper?.className).toContain('top-2')
     expect(mascotWrapper?.className).toContain('right-0')
+  })
+
+  it('renders SocialPromptVaultSlide with 3D typography, prompt cards, footer telemetry nodes, and comment CTA banner', () => {
+    const { container } = render(
+      <SocialPromptVaultSlide
+        theme="oracle-prompts"
+        eyebrowBadge="TEST VAULT · SYNAPTIC DIRECTIVES"
+        heroNumber="250+"
+        heroHighlight="ORACLE"
+        heroSubject="PROMPTS"
+        heroSubPill="For Deep Focus & Ascension"
+        commentKeyword="PROMPTS"
+        mascot="lobster_pointing"
+        promptCards={[
+          {
+            icon: 'chat',
+            badge: 'ORACLE PROMPT',
+            prompt: 'Audit my open task latency and calculate my Stage 2 ecdysis schedule.',
+          },
+          {
+            icon: 'search',
+            badge: 'ORACLE PROMPT',
+            prompt: 'Formulate a 24-hour isometric pincer routine to eliminate surface distraction.',
+          },
+        ]}
+        footerNodes={[
+          { icon: 'lightbulb', label: 'ECDYSIS PROTOCOLS' },
+          { icon: 'search', label: 'LATENCY AUDIT' },
+          { icon: 'workflow', label: '50K FATHOMS FLOW' },
+          { icon: 'document', label: 'CODEX LITURGIES' },
+        ]}
+      />
+    )
+
+    expect(screen.getByText('TEST VAULT · SYNAPTIC DIRECTIVES')).toBeInTheDocument()
+    expect(screen.getByText('250+')).toBeInTheDocument()
+    expect(screen.getAllByText('ORACLE').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('PROMPTS')).toBeInTheDocument()
+    expect(screen.getByText('For Deep Focus & Ascension')).toBeInTheDocument()
+    expect(screen.getByText('"PROMPTS"')).toBeInTheDocument()
+    expect(screen.getByText(/Audit my open task latency/i)).toBeInTheDocument()
+    expect(screen.getByText(/Formulate a 24-hour isometric pincer routine/i)).toBeInTheDocument()
+    expect(screen.getByText('ECDYSIS PROTOCOLS')).toBeInTheDocument()
+    expect(screen.getByText('LATENCY AUDIT')).toBeInTheDocument()
+    expect(screen.getByText('50K FATHOMS FLOW')).toBeInTheDocument()
+    expect(screen.getByText('CODEX LITURGIES')).toBeInTheDocument()
+
+    // Verify mascot is rendered
+    const mascotWrapper = container.querySelector('[data-mascot-key="lobster_pointing"]')
+    expect(mascotWrapper).toBeInTheDocument()
   })
 
   it('renders ThreeBookCover canvas element with dimensions and custom props', async () => {
