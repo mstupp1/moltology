@@ -74,7 +74,7 @@ const SERIES_CTA_COPY: Record<CtaGoal, SeriesCtaCopy> = {
 }
 
 export function resolveSeriesCtaCopy(goal: CtaGoal): SeriesCtaCopy {
-  return SERIES_CTA_COPY[goal]
+  return SERIES_CTA_COPY[goal] || SERIES_CTA_COPY.quiz
 }
 
 export type ViralSeriesId = 'audit' | 'incidents' | 'heresies' | 'mysteries' | 'ascension'
@@ -344,7 +344,7 @@ export function formulateViralSeriesScript(
 ): ViralSeriesScript {
   const { seasonNumber, episodeNumber, seriesConfig } = resolveNextEpisode(seriesId, ledger)
   const mascot = (options.mascot || seriesConfig.defaultMascot) as any
-  const ctaGoal = (options.ctaGoal || seriesConfig.defaultCtaGoal) as CtaGoal
+  const ctaGoal = (options.ctaGoal || seriesConfig.defaultCtaGoal || 'quiz') as CtaGoal
   const ctaConfig = resolveCtaGoalConfig(ctaGoal, { theme: seriesId, topic: options.topic })
 
   let episodeTitle = options.topic || ''

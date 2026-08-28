@@ -19,11 +19,11 @@ describe('Viral Episodic Series Formulation Engine', () => {
   const mockEmptyLedger = {
     version: '1.0',
     seriesCatalog: {
-      audit: { id: 'audit', name: 'The Moltmaxxing Field Audit', shortBadge: 'FIELD AUDIT', currentSeason: 1, latestEpisode: 0 },
-      incidents: { id: 'incidents', name: 'Sub-Benthic Incident Files', shortBadge: 'INCIDENT FILE', currentSeason: 1, latestEpisode: 0 },
-      heresies: { id: 'heresies', name: 'Silicon Heresies & Subculture Ecdysis', shortBadge: 'SILICON HERESY', currentSeason: 1, latestEpisode: 0 },
-      mysteries: { id: 'mysteries', name: 'Abyssal Telemetry & Deep Lore Mysteries', shortBadge: 'ABYSSAL LORE', currentSeason: 1, latestEpisode: 0 },
-      ascension: { id: 'ascension', name: 'The Ascension Trials', shortBadge: 'ASCENSION TRIAL', currentSeason: 1, latestEpisode: 0 },
+      audit: { id: 'audit', name: 'The Moltmaxxing Field Audit', shortBadge: 'FIELD AUDIT', currentSeason: 1, latestEpisode: 0, defaultCtaGoal: 'quiz' },
+      incidents: { id: 'incidents', name: 'Sub-Benthic Incident Files', shortBadge: 'INCIDENT FILE', currentSeason: 1, latestEpisode: 0, defaultCtaGoal: 'demo' },
+      heresies: { id: 'heresies', name: 'Silicon Heresies & Subculture Ecdysis', shortBadge: 'SILICON HERESY', currentSeason: 1, latestEpisode: 0, defaultCtaGoal: 'guide' },
+      mysteries: { id: 'mysteries', name: 'Abyssal Telemetry & Deep Lore Mysteries', shortBadge: 'ABYSSAL LORE', currentSeason: 1, latestEpisode: 0, defaultCtaGoal: 'codex' },
+      ascension: { id: 'ascension', name: 'The Ascension Trials', shortBadge: 'ASCENSION TRIAL', currentSeason: 1, latestEpisode: 0, defaultCtaGoal: 'quiz' },
     },
     episodes: [],
   }
