@@ -111,7 +111,7 @@ Run the master compositor to dynamically size video scenes to match voiceover le
 
 1. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
 2. **Seamless Forward Scene Playback & Atmospheric Color Grading**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops, and receive tasteful, cinematic contextual color grading (`benthic-cyan`, `thermal-melt`, `photonics-matrix`, `calcified-armor`, or 2-scene `ecdysis-transmute` auto progression).
-3. **Composite Studio Base Frame Generation & Thematic AI Outro Staging (`generate_image`)**:
+3. **Composite Studio Base Frame Generation & Thematic AI Outro Staging (`generate_image` / Google Flow)**:
    - **Base Outro Generation via Composite Studio**: Render the deterministic base structural frame via **Composite Studio** (`npm run composite:render -- --template reel-outro ...` or `renderCtaOutroFrame('tmp/base-outro-frame.png', ...)`). The web-rendered frame delivers:
      - 1080×1920 (9:16 vertical standard)
      - Strict center alignment matching site fonts (`Space Grotesk`, `Inter`, `font-mono`) and theme tokens (`#00c3ff`, `#38bdf8`, `#f59e0b`)
@@ -125,17 +125,21 @@ Run the master compositor to dynamically size video scenes to match voiceover le
        - `hex` (Hex Lattice) — For cellular optimization, sacred geometry, bio-synthetic architecture.
        - `none` (Solid HUD) — Clean dark cyan gradient without texture.
      - Prominent, large cartoon crustacean mascot (~520px) anchored with natural soft contact shadow
-   - **Thematic AI Post-Processing Elevation (`generate_image`)**:
-     - Pass the base frame as a reference image to Antigravity's built-in `generate_image` tool with topic-specific prompt instructions (e.g. *800 Nm Hydraulic Pincer Torque, Silicon Photonics Lasers, Memristive Tactile E-Skins, or Subsea Datacenters*).
-     - **Strict Rules**:
-       1. Instruct the model to restyle typography into luminous 3D sci-fi lettering without adding any extra hallucinated text or fake labels.
-       2. **Character Visibility & Natural Scene Blending**: Make sure the cartoon crustacean mascot in the bottom right is clearly visible and seamlessly blended into the scene with consistent ambient lighting. The lighting effect should **not be obvious** (avoid artificial backlight halos, stark spotlights, or exaggerated rim lights). The character must remain large and prominent to ensure strong visual clarity, presence, and personality.
-     - Pass the generated image path via `--custom-outro <path>` to `npm run reel:create` (or `customOutroImagePath` to `compositeReel`).
-    - **Curated Outro Card Catalog & 3-Tier Fallback (`scripts/lib/outro-catalog.ts`)**:
-      - If live `generate_image` elevation is unavailable or hits API quota limits, the pipeline automatically falls back through 3 tiers:
-        1. **Tier 1 (Live AI Elevation)**: Fresh bespoke 3D glassmorphic HUD panel via `generate_image`.
-        2. **Tier 2 (Curated Thematic Outro Library)**: Auto-resolves matching pre-rendered 3D outro cards from `OUTRO_CARD_CATALOG` (`content/social/assets/outros/` synced to Neon S3 `images/social/outros/`) based on topic keywords (`hardware-melt`, `world-models-jepa`, `quiz-audit`, `pincer-torque`).
-        3. **Tier 3 (High-DPI Web Composite Studio)**: Local deterministic Headless Chrome capture via `renderCtaOutroFrame`.
+   - **Mandatory Final Slide AI Elevation**:
+     - The final CTA outro slide **MUST ALWAYS** pass through AI elevation (either via Antigravity `generate_image` or user Google Flow polish) to elevate the 2D layout into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics and subtle ambient mascot lighting.
+     - **Path A: Direct Agent Elevation (`generate_image`)**:
+       - Pass the base frame as a reference image to Antigravity's `generate_image` tool with topic-specific prompt instructions.
+       - Restyle typography into luminous 3D sci-fi lettering without adding hallucinated text or fake labels.
+       - Ensure the cartoon crustacean mascot is clearly visible with natural ambient lighting and soft contact shadows (no harsh spotlights or artificial halos).
+     - **Path B: User Google Flow Handoff (Rate Limits / Quota Exceeded / Fallback)**:
+       - **Strict Rule**: If `generate_image` hits API rate limits, quota restrictions, or fails, **DO NOT silently fall back** to an un-elevated flat canvas frame or generic catalog placeholder.
+       - **Prompt the USER immediately** with:
+         1. The local path to the rendered 9:16 base composite frame in `tmp/` (e.g. `tmp/base-outro-frame.png`).
+         2. Rich, ready-to-copy **Google Flow AI Prompt Directives** tailored to the topic, headline, and mascot.
+         3. A request for the user to run the base frame through Google Flow and drop the polished 3D asset into `tmp/` (e.g. `tmp/themed-outro-card.png`).
+         4. Resume compositing with `npm run reel:create -- --custom-outro "tmp/themed-outro-card.png"` once the user provides the elevated asset.
+   - **Curated Outro Card Catalog Reference (`scripts/lib/outro-catalog.ts`)**:
+     - Pre-rendered 3D outro cards in `OUTRO_CARD_CATALOG` (`content/social/assets/outros/`) serve as reference designs and quick testing assets. In daily production runs, prioritize bespoke AI elevation matching the day's specific topic.
 
 ```bash
 # Sync curated outro cards to Neon S3:
@@ -285,4 +289,6 @@ npm run reel:create -- --dry-run --no-veo
    - If Veo 3.1 video generation fails or credentials are missing during a production run, **the pipeline must halt immediately and throw an error**. Never silently fall back to reusing homepage video assets.
 3. **Async Task Etiquette**:
    - Long-running commands (e.g. Veo scene generation, master FFmpeg compositing) run as background tasks. Do not poll `manage_task` in a tight loop; end turn and allow the system's reactive notification to signal task completion.
+4. **Outro AI Elevation & User Handoff on Rate Limits**:
+   - The final CTA outro slide must never remain a flat 2D frame or un-elevated catalog fallback. If Antigravity `generate_image` is rate-limited or quota-restricted, the agent **MUST** halt before final video stitching, output the 9:16 base composite frame path, and prompt the USER with formatted Google Flow prompt directives to elevate the asset. Once the user drops the polished image back into `tmp/`, resume compositing with `--custom-outro`.
 

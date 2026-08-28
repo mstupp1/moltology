@@ -618,6 +618,43 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-08-27T14:06:57.868Z"
+    },
+    {
+      "id": "reel-1787925864275",
+      "topic": "The Voice It Wakes With",
+      "hookHeadline": "THE VOICE IT WAKES WITH",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-voice-it-wakes-with",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Why did you clear a patch of desk for a robot duck? A permanent voice is not a shell you grew—it is a presence you admitted. Stop melting and start molting on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1787925864275.mp4",
+      "s3Key": "videos/social/reels/master-reel-1787925864275.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 14.633333,
+      "status": "scheduled",
+      "zernioPostId": "6a9195d0424c83b88f58f540",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "scheduledFor": "2026-08-28T22:30:00.000Z",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "A voice that arrives on first wake and stays for life is not a shell you grew. It is a presence you admitted. Letting in is the melt. Keeping the hour is the molt. ⚡🌊\n\nA $399 duck wakes with a voice it will keep for life. You let it into the room because it is sold as a creature.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-28T14:06:03.491Z"
     }
   ]
 }

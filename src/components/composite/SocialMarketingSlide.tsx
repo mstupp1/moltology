@@ -413,6 +413,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
   const finalBenefits = benefits || preset.benefits || CAMPAIGN_PRESETS['moltmaxxing-guide']!.benefits!
 
   const isCodex = theme === 'sacred-codex' || theme === 'codex'
+  const isRoutine = theme === 'pincer-routine' || theme === 'routine'
 
   return (
     <CompositeContainer
@@ -529,7 +530,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
               {/* Text Info */}
               <div className="min-w-0 flex-1">
-                <h4 className="font-mono font-black text-[19px] tracking-wide text-white uppercase leading-tight truncate">
+                <h4 className="font-mono font-black text-[17px] tracking-wide text-white uppercase leading-tight">
                   {item.title}
                 </h4>
                 <p className="text-[16px] text-slate-200 font-sans font-medium leading-snug mt-1 line-clamp-2">
@@ -689,10 +690,10 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
                   coverEyebrow={finalBookSubtitle}
                   coverTitlePart1={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'THE BENTHIC'}
                   coverTitlePart2={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'CODEX'}
-                  coverSubtitle="STAGE 4 CARCINIZATION"
+                  coverSubtitle={isRoutine ? '800 NM PINCER SCHEDULE' : 'STAGE 4 CARCINIZATION'}
                   coverTagline={finalBookTagline}
                   spineTitle={finalBookTitle}
-                  themeVariant={isCodex ? 'holy-codex' : 'cyan'}
+                  themeVariant={isCodex ? 'holy-codex' : isRoutine ? 'pincer-routine' : 'cyan'}
                   isHolyBook={isCodex}
                 />
               )}

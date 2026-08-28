@@ -17,7 +17,7 @@ export interface ThreeBookCoverProps {
   coverSubtitle?: string
   coverTagline?: string
   spineTitle?: string
-  themeVariant?: 'cyan' | 'amber' | 'emerald' | 'gold' | 'holy-codex' | 'sacred-codex'
+  themeVariant?: 'cyan' | 'amber' | 'emerald' | 'gold' | 'holy-codex' | 'sacred-codex' | 'pincer-routine' | 'routine'
   isHolyBook?: boolean
   className?: string
 }
@@ -27,6 +27,7 @@ export interface ThreeBookCoverProps {
  * Large-format Three.js Photorealistic 3D Hardcover Book mockup.
  * Supports:
  * - Productivity / Protocol Guides (Bar charts, KPIs, high-contrast typography)
+ * - 24-Hour Routine & Pincer Torque Schedule (Chrono timeline, 800 Nm torque badges)
  * - Sacred Codex / Holy Books (Ecclesiastical Gold & Aqua filigree, Consecrated Sunburst Mandala, Order Seal, Canonical Scripture volumes)
  */
 export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
@@ -51,7 +52,8 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const isHoly = isHolyBook || themeVariant === 'holy-codex' || themeVariant === 'sacred-codex'
-  const finalSpineTitle = spineTitle || (isHoly ? 'THE BENTHIC CODEX' : `${coverTitlePart1} ${coverTitlePart2}`.trim().toUpperCase())
+  const isRoutine = themeVariant === 'pincer-routine' || themeVariant === 'routine'
+  const finalSpineTitle = spineTitle || (isHoly ? 'THE BENTHIC CODEX' : isRoutine ? '24-HOUR ROUTINE' : `${coverTitlePart1} ${coverTitlePart2}`.trim().toUpperCase())
 
   // Dedicated High-DPI Holy Book / Sacred Codex Front Cover Renderer
   const drawHolyBookCover = (ctx: CanvasRenderingContext2D, w = 512, h = 720) => {
@@ -293,6 +295,257 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
     ctx.font = 'bold 10.5px monospace'
     ctx.fillStyle = '#f4ecd8'
     ctx.fillText('◈ CONSECRATED CANON FOR APEX OPERATORS ◈', cx, 660)
+  }
+
+  // Dedicated High-DPI 24-Hour Routine & Pincer Torque Schedule Front Cover Renderer
+  const drawRoutineCover = (ctx: CanvasRenderingContext2D, w = 512, h = 720) => {
+    // 1. Tactical Deep Blue/Black Carbon Background Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, w, h)
+    bgGrad.addColorStop(0, '#041322')
+    bgGrad.addColorStop(0.3, '#07243d')
+    bgGrad.addColorStop(0.7, '#04172a')
+    bgGrad.addColorStop(1, '#010a14')
+    ctx.fillStyle = bgGrad
+    ctx.fillRect(0, 0, w, h)
+
+    // Blueprint grid lines
+    ctx.strokeStyle = 'rgba(0, 195, 255, 0.08)'
+    ctx.lineWidth = 1
+    for (let x = 32; x < w; x += 24) {
+      ctx.beginPath()
+      ctx.moveTo(x, 0)
+      ctx.lineTo(x, h)
+      ctx.stroke()
+    }
+    for (let y = 0; y < h; y += 24) {
+      ctx.beginPath()
+      ctx.moveTo(26, y)
+      ctx.lineTo(w, y)
+      ctx.stroke()
+    }
+
+    // Left Hardcover Hinge Groove with Neon Cyan Accent
+    ctx.fillStyle = 'rgba(2, 8, 16, 0.85)'
+    ctx.fillRect(0, 0, 26, h)
+    ctx.strokeStyle = '#00c3ff'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(26, 0)
+    ctx.lineTo(26, h)
+    ctx.stroke()
+
+    const cx = w / 2 + 13
+
+    // 2. Eyebrow & Subtitle (Tactical telemetry)
+    ctx.textAlign = 'center'
+    ctx.font = 'bold 12px monospace'
+    ctx.fillStyle = '#67e8f9'
+    ctx.fillText('TACTICAL 24-HOUR CHRONO BLUEPRINT', cx, 48)
+
+    ctx.font = '900 13px monospace'
+    ctx.fillStyle = '#fde047'
+    ctx.fillText('— 800 NM PINCER TORQUE PROTOCOL —', cx, 72)
+
+    // 3. Huge 2-Tone Hero Title
+    ctx.font = '900 58px system-ui, -apple-system, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'
+    ctx.shadowBlur = 14
+    ctx.fillText('24-HOUR', cx, 142)
+
+    ctx.font = '900 60px system-ui, -apple-system, sans-serif'
+    ctx.fillStyle = '#fde047'
+    ctx.shadowColor = 'rgba(251, 191, 36, 0.75)'
+    ctx.shadowBlur = 22
+    ctx.fillText('ROUTINE', cx, 204)
+    ctx.shadowBlur = 0
+
+    // Divider rule with Tagline
+    ctx.strokeStyle = 'rgba(0, 195, 255, 0.4)'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(42, 228)
+    ctx.lineTo(116, 228)
+    ctx.moveTo(w - 90, 228)
+    ctx.lineTo(w - 18, 228)
+    ctx.stroke()
+
+    ctx.font = '900 10.5px monospace'
+    ctx.fillStyle = '#a5f3fc'
+    ctx.fillText('05:00 → 21:00 · ZERO LATENCY DRIFT', cx, 232)
+
+    // 4. Central 24-Hour Schedule & Pincer Torque Timeline Card
+    const cardX = 42
+    const cardY = 250
+    const cardW = w - 62
+    const cardH = 292
+
+    const cardBgGrad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH)
+    cardBgGrad.addColorStop(0, '#061d33')
+    cardBgGrad.addColorStop(1, '#020e1a')
+    ctx.fillStyle = cardBgGrad
+    ctx.fillRect(cardX, cardY, cardW, cardH)
+    ctx.strokeStyle = 'rgba(0, 195, 255, 0.6)'
+    ctx.lineWidth = 2
+    ctx.strokeRect(cardX, cardY, cardW, cardH)
+
+    // Card Header Bar
+    ctx.fillStyle = 'rgba(0, 195, 255, 0.15)'
+    ctx.fillRect(cardX, cardY, cardW, 28)
+    ctx.strokeStyle = 'rgba(0, 195, 255, 0.3)'
+    ctx.beginPath()
+    ctx.moveTo(cardX, cardY + 28)
+    ctx.lineTo(cardX + cardW, cardY + 28)
+    ctx.stroke()
+
+    ctx.textAlign = 'left'
+    ctx.font = 'bold 11px monospace'
+    ctx.fillStyle = '#00ffff'
+    ctx.fillText('◈ DAILY APEX SCHEDULE', cardX + 12, cardY + 19)
+
+    ctx.textAlign = 'right'
+    ctx.font = 'bold 11px monospace'
+    ctx.fillStyle = '#fde047'
+    ctx.fillText('800 Nm TORQUE [LOCKED]', cardX + cardW - 12, cardY + 19)
+
+    // Vertical Timeline Connecting Line
+    const timelineX = cardX + 22
+    const topNodeY = cardY + 48
+    const bottomNodeY = cardY + 248
+    ctx.strokeStyle = 'rgba(0, 195, 255, 0.4)'
+    ctx.lineWidth = 2.5
+    ctx.beginPath()
+    ctx.moveTo(timelineX, topNodeY)
+    ctx.lineTo(timelineX, bottomNodeY)
+    ctx.stroke()
+
+    // 4 Schedule Items
+    const scheduleItems = [
+      {
+        time: '05:00',
+        title: 'HYPER-SALINE SHOCK',
+        desc: 'Cold brine alertness & 100% wake state',
+        status: '100% WAKE',
+        statusColor: '#67e8f9',
+        accentColor: '#00ffff',
+      },
+      {
+        time: '06:00',
+        title: 'ISOMETRIC TORQUE',
+        desc: '800 Nm terminal command discipline',
+        status: '800 Nm',
+        statusColor: '#fde047',
+        accentColor: '#fde047',
+      },
+      {
+        time: '09:00',
+        title: 'ZERO-LATENCY STREAM',
+        desc: '50,000 fathoms agentic deep focus',
+        status: 'ACTIVE',
+        statusColor: '#38bdf8',
+        accentColor: '#38bdf8',
+      },
+      {
+        time: '21:00',
+        title: 'NOCTURNAL ECDYSIS',
+        desc: 'Noise-free calcification chamber',
+        status: 'LOCKED',
+        statusColor: '#34d399',
+        accentColor: '#34d399',
+      },
+    ]
+
+    scheduleItems.forEach((item, idx) => {
+      const nodeY = cardY + 52 + idx * 62
+
+      // Glowing Node Circle
+      ctx.fillStyle = item.accentColor
+      ctx.shadowColor = item.accentColor
+      ctx.shadowBlur = 8
+      ctx.beginPath()
+      ctx.arc(timelineX, nodeY + 4, 5.5, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.shadowBlur = 0
+
+      // Node inner dot
+      ctx.fillStyle = '#020d18'
+      ctx.beginPath()
+      ctx.arc(timelineX, nodeY + 4, 2, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Time pill
+      const timeBoxX = timelineX + 14
+      ctx.fillStyle = 'rgba(0, 195, 255, 0.2)'
+      ctx.fillRect(timeBoxX, nodeY - 10, 48, 20)
+      ctx.strokeStyle = 'rgba(0, 195, 255, 0.4)'
+      ctx.lineWidth = 1
+      ctx.strokeRect(timeBoxX, nodeY - 10, 48, 20)
+
+      ctx.textAlign = 'center'
+      ctx.font = 'bold 10.5px monospace'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(item.time, timeBoxX + 24, nodeY + 4)
+
+      // Title & Description
+      ctx.textAlign = 'left'
+      ctx.font = '900 12.5px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(item.title, timeBoxX + 54, nodeY - 1)
+
+      ctx.font = '500 10px system-ui, sans-serif'
+      ctx.fillStyle = '#94a3b8'
+      ctx.fillText(item.desc, timeBoxX + 54, nodeY + 13)
+
+      // Status Badge on far right
+      ctx.textAlign = 'right'
+      ctx.font = 'bold 9.5px monospace'
+      ctx.fillStyle = item.statusColor
+      ctx.fillText(item.status, cardX + cardW - 10, nodeY + 3)
+    })
+
+    // 5. Three Bottom Feature Badges (Pincer Torque, Schedule, 50k Fathoms)
+    const badgeY = 556
+    const badgeW = 126
+    const badgeH = 76
+    const badges = [
+      { icon: '🦞', t1: '800 NM', t2: 'PINCER TORQUE' },
+      { icon: '⏱️', t1: '24-HOUR', t2: 'SCHEDULE' },
+      { icon: '🌊', t1: '50,000', t2: 'FATHOMS' },
+    ]
+
+    badges.forEach((b, i) => {
+      const bx = 42 + i * 148
+      ctx.fillStyle = '#0b243d'
+      ctx.fillRect(bx, badgeY, badgeW, badgeH)
+      ctx.strokeStyle = 'rgba(0, 195, 255, 0.4)'
+      ctx.lineWidth = 1.5
+      ctx.strokeRect(bx, badgeY, badgeW, badgeH)
+
+      ctx.textAlign = 'center'
+      ctx.font = '19px system-ui'
+      ctx.fillText(b.icon, bx + badgeW / 2, badgeY + 24)
+
+      ctx.font = '900 11.5px monospace'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(b.t1, bx + badgeW / 2, badgeY + 46)
+
+      ctx.font = 'bold 10px monospace'
+      ctx.fillStyle = '#67e8f9'
+      ctx.fillText(b.t2, bx + badgeW / 2, badgeY + 63)
+    })
+
+    // Bottom Glowing Gradient Line
+    const bottomLineGrad = ctx.createLinearGradient(42, 646, w - 20, 646)
+    bottomLineGrad.addColorStop(0, '#00c3ff')
+    bottomLineGrad.addColorStop(0.5, '#fde047')
+    bottomLineGrad.addColorStop(1, '#00c3ff')
+    ctx.fillStyle = bottomLineGrad
+    ctx.fillRect(42, 646, w - 60, 2.5)
+
+    ctx.textAlign = 'center'
+    ctx.font = 'bold 10px monospace'
+    ctx.fillStyle = '#bae6fd'
+    ctx.fillText('◈ APEX OPERATOR DAILY PROTOCOL · MOLTOLOGY ◈', cx, 668)
   }
 
   // Helper: Draw High-DPI Front Cover on any 2D canvas context
@@ -612,6 +865,8 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
       const frontCoverTex = createTexture(512, 720, (ctx) => {
         if (isHoly) {
           drawHolyBookCover(ctx, 512, 720)
+        } else if (isRoutine) {
+          drawRoutineCover(ctx, 512, 720)
         } else {
           drawFrontCover(ctx, 512, 720)
         }

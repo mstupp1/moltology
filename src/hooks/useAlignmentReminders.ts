@@ -52,7 +52,6 @@ export function useAlignmentReminders(
   }
 
   const [remindersEnabled, setRemindersEnabled] = useState<boolean>(enabledInitially)
-  const lastTestTriggerRef = useRef<number>(0)
 
   // Sync state with localStorage post-hydration on client side
   useEffect(() => {
@@ -130,39 +129,6 @@ export function useAlignmentReminders(
     return () => clearInterval(interval)
   }, [checkReminders, checkIntervalMs])
 
-  // Dispatch an instant test reminder toast
-  const triggerTestReminder = useCallback(
-    (customTask?: AlignmentTaskItem) => {
-      const now = Date.now()
-      if (now - lastTestTriggerRef.current < 1000) {
-        return
-      }
-      lastTestTriggerRef.current = now
-
-      const targetTask = customTask || tasks.find((t) => !t.completed) || tasks[0] || {
-        id: 'test',
-        time: '12:00',
-        title: 'Daily Alignment Task',
-        xp: 100,
-        completed: false,
-      }
-
-      const reminderInfo = calculateReminderTime(targetTask.time, offsetMinutes)
-      const reminderTimeDisplay = reminderInfo ? reminderInfo.reminderTimeFormatted : '11:50'
-      const startTimeDisplay = reminderInfo ? reminderInfo.startTimeFormatted : targetTask.time
-
-      toast.hud(
-        `[Test Reminder] "${targetTask.title}" scheduled for ${startTimeDisplay}. Reminder set for ${reminderTimeDisplay}.`,
-        {
-          id: `test-reminder-${targetTask.id}-${now}`,
-          title: `Reminder (${reminderTimeDisplay})`,
-          duration: 6000,
-        }
-      )
-    },
-    [tasks, offsetMinutes, toast]
-  )
-
   // Helper to format reminder time string for UI badges
   const getTaskReminderTime = useCallback(
     (timeStr: string) => {
@@ -175,7 +141,6 @@ export function useAlignmentReminders(
   return {
     remindersEnabled,
     toggleReminders,
-    triggerTestReminder,
     getTaskReminderTime,
   }
 }

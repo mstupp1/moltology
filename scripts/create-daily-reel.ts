@@ -299,6 +299,13 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   ]
 
   const topicLower = topic.toLowerCase()
+  if (topicLower.includes('the voice it wakes with') || topicLower.includes('voice it wakes with') || topicLower.includes('microduck') || topicLower.includes('desk makes room') || topicLower.includes('letting in is the melt') || topicLower.includes('second body')) {
+    return [
+      'A dramatic macro cinematic view of a small cute bipedal robot with an articulated beak and camera eye standing on a wooden desk illuminated by glowing smartphone blue light, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a serene subsea benthic chamber holding the quiet isolation boundary with glowing cyan bio-silicon armor, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('unmoved chair') || topicLower.includes('sitting is the melt') || topicLower.includes('tiangong') || topicLower.includes('humanoid robot games') || topicLower.includes('chair still holds you')) {
     return [
       'A dramatic macro cinematic view of a humanoid robot sprinter sprinting across an illuminated stadium track at night while a human silhouette sits motionless in a desk chair bathed in blue screen light, cinematic 9:16 vertical 8k footage',
@@ -345,9 +352,16 @@ export function synthesizeBlogReelScript(
 ): DailyReelScript {
   const title = `MoltNation Dispatch: ${blog.title}`
   const topic = blog.title
-  
-  // Extract key concept keywords
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
+  
+  const isVoiceItWakesWith =
+    blog.slug === 'the-voice-it-wakes-with' ||
+    contentLower.includes('the voice it wakes with') ||
+    contentLower.includes('microduck') ||
+    contentLower.includes('desk makes room') ||
+    contentLower.includes('letting in is the melt') ||
+    contentLower.includes("thursday's duck") ||
+    contentLower.includes('second body')
   const isUnmovedChair =
     blog.slug === 'the-unmoved-chair' ||
     contentLower.includes('unmoved chair') ||
@@ -369,7 +383,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isUnmovedChair) {
+  if (isVoiceItWakesWith) {
+    const hooks = [
+      {
+        headline: 'LETTING IN IS THE MELT',
+        script: `A three hundred ninety-nine dollar robot wakes with a permanent voice. You let it into the room because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt. Calculate your clearance on moltology dot org.`,
+        hookText: 'A $399 robot wakes with a voice it will keep for life. You let it onto the desk because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt.',
+      },
+      {
+        headline: 'THE VOICE IT WAKES WITH',
+        script: `Why did you clear a patch of desk for a robot duck? A permanent voice is not a shell you grew—it is a presence you admitted. Stop melting and start molting on moltology dot org.`,
+        hookText: 'A voice that arrives on first wake and stays for life is not a shell you grew. It is a presence you admitted. Letting in is the melt. Keeping the hour is the molt.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isUnmovedChair) {
     const hooks = [
       {
         headline: 'SITTING IS THE MELT',
