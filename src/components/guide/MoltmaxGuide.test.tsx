@@ -91,6 +91,6 @@ describe('Moltmax Guide Lead Capture Components', () => {
 
     expect(res.success).toBe(true)
     expect(res.email).toBe('test-initiate@benthic.org')
-    expect(res.downloadUrl).toBe('/downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+    expect(res.downloadUrl).toContain('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
   })
 })

@@ -63,7 +63,7 @@ export const MoltmaxGuidePage: React.FC = () => {
 
       if (res?.success) {
         setIsSubmitted(true)
-        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
+        const url = res.downloadUrl || getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
         if (typeof window !== 'undefined') {
           const a = document.createElement('a')
           a.href = url
@@ -134,7 +134,7 @@ export const MoltmaxGuidePage: React.FC = () => {
                 </p>
                 <div className="flex flex-wrap gap-4 pt-2">
                   <a
-                    href="/downloads/the-2026-moltmaxxing-protocol-guide.pdf"
+                    href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded bg-[#00c3ff] text-[#020408] font-bold font-grotesk text-xs uppercase hover:bg-[#00e5ff]"

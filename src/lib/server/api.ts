@@ -15,6 +15,7 @@ import { getCategoryBgImage } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
 import { slugifyForumTitle, compareHot } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
+import { getAssetUrl } from '../assets'
 import type { PodcastEpisode } from '../podcast-data'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -1830,7 +1831,9 @@ export const getPodcastsHandler = async ({ context }: ServerFnArgs) => {
         title: r.title,
         subtitle: r.subtitle || '',
         description: r.description,
-        audioUrl: r.audioUrl,
+        audioUrl: (r.audioUrl && /^https?:/.test(r.audioUrl))
+          ? r.audioUrl
+          : getAssetUrl(r.s3Key || (r.audioUrl || '').replace(/^\/+/, '')),
         s3Key: r.s3Key || undefined,
         durationSeconds: r.durationSeconds,
         fileSizeBytes: r.fileSizeBytes || undefined,
@@ -1888,7 +1891,7 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
     }
   }
 
-  const downloadUrl = '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
+  const downloadUrl = getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
 
   try {
     const db = getDb()

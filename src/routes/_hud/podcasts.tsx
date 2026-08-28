@@ -162,7 +162,7 @@ function PodcastsPage() {
             <Cloud className="w-4 h-4 text-[#00ffff] shrink-0 mt-0.5" />
             <div>
               <span className="text-[#dfe3e3] font-bold block mb-0.5">Media Storage Layer (Public Static / S3 R2 CDN)</span>
-              Binary audio files (`.m4a`, `.mp3`) are served via local static paths during dev (`public/audio/`) and `s3Key` CDN URLs in production.
+              Binary audio files (`.m4a`, `.mp3`) stream from the Neon S3 CDN via `s3Key` URLs on every front.
             </div>
           </div>
         </div>

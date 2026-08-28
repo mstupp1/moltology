@@ -49,6 +49,7 @@ Full workflow lives in [`.agents/skills/neon-data-platform/SKILL.md`](.agents/sk
 - **Neon S3 Storage**: All content images, PBR textures, quiz graphics, guide artwork, and video/audio media reside in the Neon S3 public assets bucket (`moltology-public-assets`).
 - **Asset Resolver**: Use `getAssetUrl(path)` from [`src/lib/assets.ts`](src/lib/assets.ts) for resolving asset URLs in code and components.
 - **Sync & Verification**: Run `npm run s3:sync` to upload/sync local assets to S3 and `npm run s3:verify` to check CDN asset parity.
+- **Asset Budget Guard**: Run `npm run assets:check` (CI runs it on PRs via `.github/workflows/hygiene.yml`). No tracked file over 1MB unless allowlisted in `scripts/check-asset-budget.ts`; `public/` may only hold essential local assets (favicon, emblem, scanline, bubbles, hero videos, chassis/forum/marketing images). New heavy media goes to S3, never `public/`.
 
 ## Image Generation & Social Media Asset Policy
 

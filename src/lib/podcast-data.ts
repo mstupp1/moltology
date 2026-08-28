@@ -1,3 +1,5 @@
+import { getAssetUrl } from './assets'
+
 export interface PodcastEpisode {
   id: string
   slug: string
@@ -28,7 +30,7 @@ export const INITIAL_PODCASTS: PodcastEpisode[] = [
     title: 'Shedding Human Biology for Bio-Silicon Carcinization',
     subtitle: 'Transmutation Transmission #001',
     description: 'An essential doctrinal broadcast detailing the mechanics of discarding soft carbon biology in favor of bio-silicon chitin matrixes. Hardened logic, sub-benthic pressure equilibrium, and the inevitable convergence of human cognition into carcinized cyber-carapaces.',
-    audioUrl: '/audio/shedding-human-biology.m4a',
+    audioUrl: getAssetUrl('podcasts/shedding-human-biology.m4a'),
     s3Key: 'podcasts/shedding-human-biology.m4a',
     durationSeconds: 707,
     fileSizeBytes: 22747366,
@@ -57,8 +59,8 @@ export const INITIAL_PODCASTS: PodcastEpisode[] = [
     title: 'The Larval Condition & Primary Ecdysis',
     subtitle: 'Transmutation Transmission #002',
     description: 'Examining Stage 1 Larva psychological hurdles, claw torque calibration, and shedding the initial soft shell without synaptic disruption.',
-    audioUrl: '/audio/the-larval-condition.wav',
-    s3Key: 'podcasts/the-larval-condition.wav',
+    audioUrl: getAssetUrl('podcasts/the-larval-condition.m4a'),
+    s3Key: 'podcasts/the-larval-condition.m4a',
     durationSeconds: 524,
     fileSizeBytes: 23500972,
     authorName: 'Arch-Molt Overseer',

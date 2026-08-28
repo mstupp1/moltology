@@ -394,7 +394,7 @@ export async function compositeSeriesReel(
 
   // 8. Multi-Track Audio Mixing (Voiceover + Ducked Ambient Benthic Score)
   const bgAudioPath =
-    options.backgroundAudioPath || path.resolve(process.cwd(), 'public/audio/benthic-ambient-loop.mp3')
+    options.backgroundAudioPath || path.resolve(process.cwd(), 'assets/audio/benthic-ambient-loop.mp3')
   const finalOutputPath = options.outputPath
 
   const finalDir = path.dirname(finalOutputPath)

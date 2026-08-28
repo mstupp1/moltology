@@ -43,7 +43,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
   const [step, setStep] = useState<'claim' | 'success'>('claim')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [downloadUrl, setDownloadUrl] = useState('/downloads/the-2026-moltmaxxing-protocol-guide.pdf')
+  const [downloadUrl, setDownloadUrl] = useState(getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf'))
 
   useEffect(() => {
     if (isOpen) {
@@ -94,7 +94,7 @@ export const MoltmaxGuideModal: React.FC<MoltmaxGuideModalProps> = ({
       })
 
       if (res?.success) {
-        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
+        const url = res.downloadUrl || getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
         setDownloadUrl(url)
         setStep('success')
 

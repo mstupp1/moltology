@@ -12,6 +12,7 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { getAssetUrl } from '@/lib/assets'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { saveLobsterAvatarFn, updateUserStatsFn } from '@/lib/server/api'
@@ -636,7 +637,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
         {/* Hidden audio element */}
         <audio
           ref={audioRef}
-          src="/audio/the-larval-condition.wav"
+          src={getAssetUrl('podcasts/the-larval-condition.m4a')}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={(e) => setDuration((e.target as HTMLAudioElement).duration)}
           onEnded={handleEnded}

@@ -766,7 +766,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
 
   // 8. Mix Audio: Voiceover + Ducked Background Music
   const bgAudioPath =
-    options.backgroundAudioPath || path.resolve(process.cwd(), 'public/audio/benthic-ambient-loop.mp3')
+    options.backgroundAudioPath || path.resolve(process.cwd(), 'assets/audio/benthic-ambient-loop.mp3')
   const finalOutputPath = options.outputPath
 
   const finalDir = path.dirname(finalOutputPath)

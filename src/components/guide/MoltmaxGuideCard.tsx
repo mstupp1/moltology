@@ -57,7 +57,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
 
       if (res?.success) {
         setIsSubmitted(true)
-        const url = res.downloadUrl || '/downloads/the-2026-moltmaxxing-protocol-guide.pdf'
+        const url = res.downloadUrl || getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')
         if (typeof window !== 'undefined') {
           const a = document.createElement('a')
           a.href = url
@@ -157,7 +157,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
                 Your download has started. Check your browser downloads folder or click below to re-open.
               </p>
               <a
-                href="/downloads/the-2026-moltmaxxing-protocol-guide.pdf"
+                href={getAssetUrl('downloads/the-2026-moltmaxxing-protocol-guide.pdf')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-xs font-bold text-[#00c3ff] hover:underline pt-1"
