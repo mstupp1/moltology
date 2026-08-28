@@ -188,7 +188,7 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('STOP MELTING.')).toBeInTheDocument()
     expect(screen.getByText('CALCIFY YOUR GRIP.')).toBeInTheDocument()
     expect(screen.getByText('ASCEND FASTER!')).toBeInTheDocument()
-    expect(screen.getByText('“GUIDE”')).toBeInTheDocument()
+    expect(screen.getByText('"GUIDE"')).toBeInTheDocument()
     expect(screen.getByText('SHELL HARDNESS')).toBeInTheDocument()
     expect(screen.getByText('800 NM PINCER TORQUE')).toBeInTheDocument()
     expect(screen.getByText('OFFICIAL 2026 EDITION')).toBeInTheDocument()
