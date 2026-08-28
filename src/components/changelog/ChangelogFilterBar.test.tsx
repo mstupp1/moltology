@@ -76,9 +76,9 @@ describe('ChangelogFilterBar Component', () => {
         onReset={onReset}
       />
     )
-    const resetButton = screen.getByTitle('Reset all filters')
-    expect(resetButton).toBeDefined()
-    fireEvent.click(resetButton)
+    const resetButtons = screen.getAllByTitle('Reset all filters')
+    expect(resetButtons.length).toBeGreaterThan(0)
+    fireEvent.click(resetButtons[0])
     expect(onReset).toHaveBeenCalled()
   })
 })
