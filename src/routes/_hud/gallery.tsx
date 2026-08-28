@@ -17,6 +17,7 @@ import { getGalleryPinsFn } from '@/lib/server/api'
 import { INITIAL_GALLERY_PINS } from '@/lib/gallery-data'
 import type { GalleryPin } from '@/lib/gallery-data'
 import { MasonryGrid } from '@/components/gallery/MasonryGrid'
+import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { GalleryPinModal } from '@/components/gallery/GalleryPinModal'
 import { UploadPinModal } from '@/components/gallery/UploadPinModal'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -159,28 +160,18 @@ function GalleryRoute() {
       )}
 
       {/* Top Banner Header */}
-      <div className="relative rounded-2xl overflow-hidden border border-[#00c3ff]/40 bg-[#070b0d]/90 p-3.5 sm:p-6 md:p-8 backdrop-blur-md shadow-2xl">
-        <div className="absolute inset-0 bg-sacred-grid opacity-30 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-[#00c3ff]/10 to-transparent pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#00c3ff]/15 border border-[#00c3ff]/50 rounded-full text-[#00c3ff] text-xs font-sans font-bold tracking-widest uppercase shadow-md">
-              <Grid className="w-3.5 h-3.5" />
-              <span>CARAPACE VISUAL MATRIX</span>
-            </div>
-
-            <h1 className="text-2xl md:text-4xl font-grotesk font-black text-white tracking-wider uppercase drop-shadow-md">
-              MOLT PIN VAULT
-            </h1>
-
-            <p className="text-xs md:text-sm font-sans text-[#a0b0c0] max-w-2xl leading-relaxed">
-              Explore the Pinterest-style gallery of sacred relics, cybernetic carapaces, ecdysis telemetry, and abyssal manifestations derived from the Moltology Codex.
-            </p>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="flex items-center gap-3 shrink-0">
+      <HudTitlePanel
+        accent="teal"
+        eyebrow={
+          <>
+            <Grid className="w-3.5 h-3.5" />
+            <span>CARAPACE VISUAL MATRIX</span>
+          </>
+        }
+        title="MOLT PIN VAULT"
+        description="Explore the Pinterest-style gallery of sacred relics, cybernetic carapaces, ecdysis telemetry, and abyssal manifestations derived from the Moltology Codex."
+        actions={
+          <>
             <button
               onClick={() => setShowSavedOnly(!showSavedOnly)}
               className={`px-4 py-2.5 rounded-xl font-sans font-bold text-xs flex items-center gap-2 transition-all shadow-md active:scale-95 ${
@@ -200,9 +191,9 @@ function GalleryRoute() {
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>TRANSMUTE NEW PIN</span>
             </button>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Filter & Search Toolbar */}
       <div className="p-4 bg-[#060a0c]/80 border border-[#1e2d37] rounded-2xl backdrop-blur-md space-y-4 shadow-xl">
