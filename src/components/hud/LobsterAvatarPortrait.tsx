@@ -35,7 +35,7 @@ export interface LobsterAvatarPortraitProps {
  * Features an authentic benthic porthole frame with inner shadow depth, optical lens vignette,
  * and convex glass specular arc.
  */
-export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = ({
+export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React.memo(({
   src,
   config,
   size = 320,
@@ -153,4 +153,6 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = ({
       />
     </div>
   )
-}
+})
+
+LobsterAvatarPortrait.displayName = 'LobsterAvatarPortrait'

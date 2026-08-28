@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import {
   Dices,
   RotateCw,
@@ -56,21 +56,21 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   const [displayStats, setDisplayStats] = useState<BaseStats>(() => initialStats || DEFAULT_BASE_STATS)
   const [isRolling, setIsRolling] = useState(false)
 
-  const previewConfig: LobsterAvatarConfig = {
+  const previewConfig = useMemo((): LobsterAvatarConfig => ({
     style: LOBSTER_AVATAR_STYLE,
     seed: seed.trim() || 'larva-initiate',
-  }
+  }), [seed])
 
   // Handle avatar re-roll
-  const handleRandomize = () => {
+  const handleRandomize = useCallback(() => {
     setIsSpinningSeed(true)
     const newSeed = randomLobsterSeed()
     setSeed(newSeed)
     setTimeout(() => setIsSpinningSeed(false), 400)
-  }
+  }, [])
 
   // Handle dice stat rolling with cyber rolling animation
-  const handleRollStats = () => {
+  const handleRollStats = useCallback(() => {
     if (isRolling) return
     setIsRolling(true)
 
@@ -88,26 +88,28 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
         setIsRolling(false)
       }
     }, 80)
-  }
+  }, [isRolling])
 
   // Nudge individual stat
-  const handleNudgeStat = (key: StatKey, delta: number) => {
+  const handleNudgeStat = useCallback((key: StatKey, delta: number) => {
     if (isRolling) return
-    const updated = adjustStat(stats, key, delta)
-    setStats(updated)
-    setDisplayStats(updated)
-  }
+    setStats((prev) => {
+      const updated = adjustStat(prev, key, delta)
+      setDisplayStats(updated)
+      return updated
+    })
+  }, [isRolling])
 
-  const archetype = getDominantArchetype(displayStats)
-  const totalSum = calculateStatSum(displayStats)
+  const archetype = useMemo(() => getDominantArchetype(displayStats), [displayStats])
+  const totalSum = useMemo(() => calculateStatSum(displayStats), [displayStats])
 
-  const handleFinish = () => {
+  const handleFinish = useCallback(() => {
     const avatarConfig: LobsterAvatarConfig = {
       style: LOBSTER_AVATAR_STYLE,
       seed: seed.trim() || 'larva-initiate',
     }
     onComplete(avatarConfig, stats)
-  }
+  }, [seed, stats, onComplete])
 
   return (
     <div className="flex flex-col h-full font-sans text-[#dfe3e3]">

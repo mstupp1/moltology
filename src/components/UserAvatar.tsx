@@ -24,7 +24,7 @@ export interface UserAvatarProps {
  * Supports SSO profile images (Google avatar) with automatic onError fallback
  * to a high-tech HUD styled letter avatar (or clean corporate light-mode avatar).
  */
-export const UserAvatar: React.FC<UserAvatarProps> = ({
+export const UserAvatar: React.FC<UserAvatarProps> = React.memo(({
   user,
   src,
   name,
@@ -119,4 +119,6 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
       <span className="select-none leading-none">{initial}</span>
     </div>
   )
-}
+})
+
+UserAvatar.displayName = 'UserAvatar'

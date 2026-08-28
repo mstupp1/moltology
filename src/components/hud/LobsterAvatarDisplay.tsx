@@ -46,7 +46,7 @@ export interface LobsterAvatarDisplayProps extends PixelateOptions {
  * so any scale, translation, or zoom transform applies uniformly to both the sprite and its overlays,
  * preventing ghosting/misalignment.
  */
-export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
+export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.memo(({
   src,
   alt = 'Your avatar',
   containerClassName = '',
@@ -454,4 +454,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = ({
       </div>
     </div>
   )
-}
+})
+
+LobsterAvatarDisplay.displayName = 'LobsterAvatarDisplay'
