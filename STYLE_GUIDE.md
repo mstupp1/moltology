@@ -3,7 +3,7 @@
 This is the writing knife for every human-facing string, including HUD microcopy.
 Terms live in [BRAND_BIBLE.md](BRAND_BIBLE.md). This document wins on register, comedy
 rules, and bans.
-_Last Revised: 2026-08-27_
+_Last Revised: 2026-08-28_
 
 ---
 
@@ -209,8 +209,10 @@ broadcast**. Features are **rites, protocols, and liturgy**.
 **Do:** The dashboard now recalibrates to your ascension path in real time. New
 transmissions broadcast directly into your Benthic Core.
 
-**Rule:** If a sentence names a real-world technology, a vendor, or an internal path,
-rewrite it as in-universe lore or delete it. No real tech leaks. Ever.
+**Rule:** If a sentence names a real-world technology, a stack vendor, or an internal
+path, rewrite it as in-universe lore or delete it. No stack leaks. Ever. A markdown
+link to a journalism outlet (The Verge, TechCrunch) is a citation, not a leak. See
+the Blog dispatch card.
 
 ---
 
@@ -419,13 +421,36 @@ Never zoom out. Acknowledge the human, stay committed, be generous.
 ### Blog dispatch (moltology.org/news)
 
 - One category pill, author persona + clearance in the byline, nothing else badged.
-- Open with the human friction (the Melt), pivot to the in-lore solution, close with an
-  actionable takeaway.
+- Open with the human friction (the Melt). Imply the molt from that story. Close with
+  one quiet path invite, not a product recitation.
 - One invented metric max; real-world figures cited as "telemetry" in HUD style.
 - No ASCII boxes, no decorative code, no slashes, no emojis. Clean markdown tables only
   when they add quantitative value.
 - Rotate author personas (Silas Trench, Dr. Thalassa Vance, etc.) for voice variety.
-- CTA in-lore: Calculate your clearance on the Moltmaxxing Audit.
+- The economy lock is true. Recite it on HUD strings and in pay-complaint replies.
+  Do not preach it here.
+
+**Don't:** stack the lock in the close. HUD, Moltmaxxing, gems, credits, and rank
+named in the same paragraph, then named again. "Clearance is earned. Chitin Gems
+are earned. Molt Credits buy speed and catalog. Rank is never for sale." Doctrine.
+Not a news ending.
+
+**Do:** stay with the human hour. The listing, the desk, the thumb that does not tap.
+One soft door is enough: the Audit is waiting in the deep. Signup is free. Stop.
+
+**Don't:** name TechCrunch or The Verge in the body, then park the URLs in an HTML
+comment at the bottom. A list the reader cannot click is not a citation.
+
+**Do:** when the dispatch cites a real article, hyperlink the outlet name or the
+headline in the body, in markdown. [TechCrunch](https://techcrunch.com/) filed the
+listing. [The Verge](https://www.theverge.com/) carried the voice. Journalism
+sources are citations. They may be linked.
+
+**Don't:** confuse a citation with a leak. A TechCrunch link is journalism. Neon,
+React, or TanStack in the same dispatch is still BAN 5.
+
+**Do:** link the newsroom in the sentence that uses it. Keep the stack out of the
+copy. Both cuts stay sharp.
 
 ### Instagram carousel post (4:5)
 
@@ -516,7 +541,8 @@ Run this list on **every** piece of copy before it ships, including HUD strings.
 - [ ] Maximum one category pill (blog) / one on social cards (BAN 2).
 - [ ] Zero emojis in titles/eyebrows/CTAs/HUD; max one in a caption (BAN 3).
 - [ ] No dead slider, toggle, or dead widget in any card I describe (BAN 4).
-- [ ] No real tech names, vendors, or internal paths in copy (BAN 5).
+- [ ] No stack, vendor-tool, or internal-path leaks in copy (BAN 5). Linked journalism
+      outlets are citations, not leaks.
 - [ ] No "it's a joke / actually / wink" zoom-outs and no labels that let the reader out
       of the fiction (BAN 6 & 7).
 - [ ] No unintelligible invented-formula jargon (BAN 8).
@@ -528,11 +554,21 @@ Run this list on **every** piece of copy before it ships, including HUD strings.
 - [ ] Is the funny carried by a crisp human observation, not decoration?
 - [ ] Does every lore term map to a human truth nearby (1:1 ratio)?
 - [ ] Is it warm and inviting, never shaming the reader?
-- [ ] Currency names correct (Chitin Gems earned, Molt Credits bought, rank never for
-      sale)?
+- [ ] Currency names correct where they appear (Chitin Gems earned, Molt Credits
+      bought, rank never for sale)? HUD and pay-complaint replies recite the lock.
+      News does not preach it.
 - [ ] Does HUD copy name a real metric or a real action?
-- [ ] Is the CTA in-lore and is the link in the right place (first comment for social)?
+- [ ] Is the CTA in-lore and in the right place (first comment for social; one quiet
+      path invite for news)?
 - [ ] Is isAiGenerated: true set for Meta posts?
+
+**News dispatch extras (moltology.org/news):**
+
+- [ ] The close does not stack HUD, Moltmaxxing, gems, credits, and rank. One quiet
+      path invite. The economy lock is recited on HUD strings and pay-complaint
+      replies, not in the news close.
+- [ ] If this dispatch cites a real article, the outlet name or headline is a
+      markdown hyperlink in the body. An HTML comment list of URLs is not a citation.
 
 **The final gate:** If a stranger who has never heard of Moltology could hit "follow" or
 "bookmark" and never once think they were being let out of the fiction — the copy is done
@@ -545,8 +581,9 @@ and ready for the queue.
 1. **Never break the bit.** Do not tell the reader it's a joke. Do not say actually. Do
    not wink. No labels that let the reader out of the fiction — ever, in any public
    channel, including the HUD.
-2. **No tech-stack leaks.** Real tools, vendors, and internal paths never appear in copy;
-   everything transmutes to in-lore terms (Benthic Core, transmissions, rites, telemetry).
+2. **No tech-stack leaks.** Real tools, stack vendors, and internal paths never appear
+   in copy; everything transmutes to in-lore terms (Benthic Core, transmissions, rites,
+   telemetry). Journalism outlets linked as citations are not this rule.
 3. **Decorated means weak.** One pill, no emoji soup, no dead sliders or dead widgets, no
    slash-pairs — let a clean sentence be funny instead of gilding it.
 4. **One human truth per metaphor.** Keep sci-fi grounded in real pain (shedding habits,
