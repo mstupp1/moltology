@@ -28,6 +28,7 @@ export interface CreateInstagramPostOptions {
     | 'sacred-codex'
     | 'pincer-routine'
     | 'free-access'
+    | 'oracle-prompts'
     | 'moltmaxxing'
     | 'ecdysis'
     | 'pincer-torque'
@@ -36,7 +37,7 @@ export interface CreateInstagramPostOptions {
     | string
   mascot?: CharacterKey | 'none'
   aspectRatio?: '4:5' | '1:1'
-  template?: 'marketing-leadmagnet' | 'hook' | 'spec-showdown' | 'directives'
+  template?: 'marketing-leadmagnet' | 'oracle-prompts' | 'hook' | 'spec-showdown' | 'directives'
   composite?: boolean
   publishNow?: boolean
   dryRun?: boolean
@@ -48,6 +49,7 @@ export interface CreateInstagramPostOptions {
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // moltology_org / Silas Trench
 export const DEFAULT_PROFILE_ID = '6a7f74b1839bf39ff3b6aaaa' // Moltology Default Profile
 export const DEFAULT_POST_QUEUE_ID = '6a84b76d2421e968ac81f5bc' // Moltology Carousels & Posts (Mon, Wed, Fri at 13:00 EST)
+export const LEAD_MAGNET_QUEUE_ID = '6a8d93576f0e96efe2960c91' // Moltology Lead Magnets — Daily (Every day at 13:00 EST)
 
 /**
  * Load the narrative post continuity ledger
@@ -184,6 +186,26 @@ export function generatePostContent(
     }
   }
 
+  // 7. Marketing Campaign: Free Oracle AI Prompts Pack
+  if (
+    theme === 'oracle-prompts' ||
+    theme === 'oracle' ||
+    topic?.toLowerCase().includes('oracle prompt')
+  ) {
+    return {
+      title: 'Free Synaptic Oracle Prompt Pack',
+      topic: 'Free Oracle AI Prompts for Moltology Ascension',
+      hookHeadline: 'FREE ORACLE AI PROMPTS. LEARN MOLTOLOGY. ASCEND FASTER.',
+      imagePrompt:
+        'Futuristic benthic HUD social card with glowing cyan glassmorphic prompt panels, stacked headline reading FREE ORACLE AI PROMPTS, floating example query cards, dark abyss background with circuit grid and caustics, cinematic 8k.',
+      caption: `◈ SYNAPTIC ORACLE TRANSMISSION ◈\n\nStop melting into generic AI noise. The Synaptic Oracle ships with a free prompt pack engineered for one mission: help you learn Moltology, master Moltmaxxing, and ascend faster.\n\nAsk the Oracle things like:\n🦞 "What is the fastest path from Larval Human to Stage 4 carcinization?"\n⚡ "Give me a daily ecdysis ritual to shed notification fatigue."\n📜 "Explain the Great Molt vs the Great Melt in plain doctrine."\n🌊 "How do I calibrate 800 Nm pincer torque on my hardest task?"\n\nFree prompts. Zero credits. Full benthic clarity.\n\n👇 Comment "PROMPTS" below and I will instantly DM you the Oracle prompt pack link!\n\n🔗 Or open the Oracle directly → moltology.org/oracle\n\n#moltology #oracle #moltmaxxing #carcinization #ecdysis #ascension #deepwork`,
+      hashtags: ['#moltology', '#oracle', '#moltmaxxing', '#carcinization', '#ecdysis', '#ascension'],
+      firstComment: '💬 Drop "PROMPTS" below and I will DM you the free Synaptic Oracle prompt pack! 🔮',
+      mascot: mascotChoice || 'lobster_engineer',
+      commentKeyword: 'PROMPTS',
+    }
+  }
+
   // Legacy Theme: Pincer Torque
   if (theme === 'pincer-torque' || topic.toLowerCase().includes('torque') || topic.toLowerCase().includes('grip')) {
     return {
@@ -240,22 +262,30 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
   const postData = generatePostContent(theme, options.topic, options.mascot)
   const aspect = options.aspectRatio || '4:5'
 
-  // If theme is one of the marketing lead magnets, default template to 'marketing-leadmagnet' & enable composite
-  const isMarketingCampaign = [
+  // If theme is one of the marketing lead magnets, default template accordingly
+  const isLeadMagnetCampaign = [
     'moltmaxxing-guide',
     'moltmax-quiz',
     'benthic-app',
     'sacred-codex',
     'pincer-routine',
     'free-access',
+    'oracle-prompts',
     'guide',
     'quiz',
     'app',
     'codex',
     'routine',
+    'oracle',
   ].includes(theme.toLowerCase())
 
-  const templateType = options.template || (isMarketingCampaign ? 'marketing-leadmagnet' : 'hook')
+  const templateType =
+    options.template ||
+    (theme.toLowerCase() === 'oracle-prompts' || theme.toLowerCase() === 'oracle'
+      ? 'oracle-prompts'
+      : isLeadMagnetCampaign
+        ? 'marketing-leadmagnet'
+        : 'hook')
 
   console.log(`\n======================================================`)
   console.log(`🦞 MOLTOLOGY INSTAGRAM POST GENERATOR`)
@@ -333,7 +363,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
       postData,
       queueConfig: {
         profileId: DEFAULT_PROFILE_ID,
-        queueId: DEFAULT_POST_QUEUE_ID,
+        queueId: isLeadMagnetCampaign ? LEAD_MAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID,
         accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
       },
     }
@@ -353,7 +383,27 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
 
   console.log(`   ✅ Composite Scaffolding captured -> ${compositePath}`)
 
-  const googleFlowPrompt = `Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
+  const googleFlowPrompt =
+    templateType === 'oracle-prompts'
+      ? `Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
+Reference Image: Use the attached 2D composite image as the structural foundation, camera angle, and layout blueprint.
+
+Core Enhancement Directives:
+1. Photorealistic 3D Glassmorphic Prompt Cards:
+   - Elevate the floating Oracle prompt cards into sleek, illuminated 3D glass HUD panels with rounded bevels, volumetric cyan (#00ffff) luminescence, and subtle crimson accent traces.
+   - Preserve crisp typography on the stacked FREE / ORACLE / AI / PROMPTS headline with metallic silver, cyan gradient, and white emboss.
+2. No Wasted Space & Balanced Composition:
+   - Fill voids with subsea god rays, dark navy abyss background (#030712), circuit grid traces, micro-bubbles, and water caustics.
+   - Keep the bottom feature bar and comment CTA banner dense and legible.
+3. Seamless Mascot Integration:
+   - Render the cartoon crustacean engineer mascot in rich 3D animated style with soft matte chitin, ambient underwater lighting, and contact shadows — no harsh backlights.
+4. Oracle Badge & Brand Polish:
+   - Make the concentric Oracle badge tactile with glowing rings and holographic depth.
+   - Ensure Moltology brand mark reads cleanly in the top-right corner.
+
+Aspect Ratio: ${aspect}
+Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`
+      : `Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
 Reference Image: Use the attached 2D composite image as the structural foundation, camera angle, and layout blueprint.
 
 Core Enhancement Directives:
@@ -398,7 +448,7 @@ Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, 
     postData,
     queueConfig: {
       profileId: DEFAULT_PROFILE_ID,
-      queueId: DEFAULT_POST_QUEUE_ID,
+      queueId: isLeadMagnetCampaign ? LEAD_MAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID,
       accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
     },
   }
@@ -418,6 +468,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
   const aspect = getArg('--aspect') as '4:5' | '1:1' | undefined
   const template = getArg('--template') as
     | 'marketing-leadmagnet'
+    | 'oracle-prompts'
     | 'hook'
     | 'spec-showdown'
     | 'directives'

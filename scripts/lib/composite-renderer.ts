@@ -10,7 +10,11 @@ export { COMPOSITE_DIMENSIONS }
 export type { CompositeAspectRatio, CompositeTemplateType, MascotKey }
 
 export const DEFAULT_PORT = 3019
-export const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+export const CHROME_PATH =
+  process.env.CHROME_PATH ||
+  (process.platform === 'darwin'
+    ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    : '/usr/local/bin/google-chrome')
 
 export interface CaptureCompositeOptions {
   template?: CompositeTemplateType

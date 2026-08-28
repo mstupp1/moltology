@@ -8,6 +8,7 @@ import {
   SocialSpecShowdownSlide,
   SocialDirectivesSlide,
   SocialMarketingSlide,
+  SocialOraclePromptsSlide,
   ReelOutroCard,
   ReelThumbnailCard,
   BlogSchematicCard,
@@ -75,6 +76,25 @@ function CompositeRenderRoute() {
   if (isRaw) {
     return (
       <div className="w-screen h-screen m-0 p-0 overflow-hidden bg-[#02080c] flex items-start justify-start">
+        {template === 'oracle-prompts' && (
+          <SocialOraclePromptsSlide
+            aspectRatio={aspect}
+            theme={theme}
+            countBadge={customData.countBadge}
+            headlinePart1={customData.headlinePart1}
+            headlinePart2={customData.headlinePart2}
+            headlinePart3={customData.headlinePart3}
+            categoryPill={customData.categoryPill || customData.categoryBadge}
+            promptCards={customData.promptCards}
+            features={customData.features}
+            commentKeyword={customData.commentKeyword}
+            commentCtaText={customData.commentCtaText}
+            oracleBadgeText={customData.oracleBadgeText}
+            mascot={mascot}
+            backgroundImageUrl={customData.backgroundImageUrl}
+          />
+        )}
+
         {template === 'marketing-leadmagnet' && (
           <SocialMarketingSlide
             aspectRatio={aspect}

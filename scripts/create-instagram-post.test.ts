@@ -50,6 +50,15 @@ describe('create-instagram-post', () => {
     expect(post.mascot).toBe('lobster_thumbs_up')
   })
 
+  it('generates Oracle Prompts marketing post content', () => {
+    const post = generatePostContent('oracle-prompts')
+    expect(post.title).toContain('Oracle')
+    expect(post.commentKeyword).toBe('PROMPTS')
+    expect(post.caption).toContain('Comment "PROMPTS"')
+    expect(post.caption.toLowerCase()).toContain('moltmaxxing')
+    expect(post.mascot).toBe('lobster_engineer')
+  })
+
   it('has valid default Zernio queue and profile identifiers', () => {
     expect(DEFAULT_PROFILE_ID).toBe('6a7f74b1839bf39ff3b6aaaa')
     expect(DEFAULT_INSTAGRAM_ACCOUNT_ID).toBe('6a7f7f0777555aae01d99b54')
@@ -64,6 +73,7 @@ describe('create-instagram-post', () => {
       'sacred-codex',
       'pincer-routine',
       'free-access',
+      'oracle-prompts',
       'pincer-torque',
       'ecdysis',
       'moltmaxxing',

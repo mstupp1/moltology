@@ -9,6 +9,7 @@ import { ReelOutroCard } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
+import { SocialOraclePromptsSlide } from './SocialOraclePromptsSlide'
 
 describe('Composite UI Components', () => {
   it('renders CompositeContainer with correct dimensions and scanlines', () => {
@@ -173,6 +174,23 @@ describe('Composite UI Components', () => {
 
     expect(screen.getByText('SUB-BENTHIC POD')).toBeInTheDocument()
     expect(screen.getByText('LATENT ATTENTION SCHEMATIC')).toBeInTheDocument()
+  })
+
+  it('renders SocialOraclePromptsSlide with headline stack, prompt cards, and comment CTA', () => {
+    render(
+      <SocialOraclePromptsSlide
+        theme="oracle-prompts"
+        commentKeyword="PROMPTS"
+      />
+    )
+
+    expect(screen.getByText('FREE')).toBeInTheDocument()
+    expect(screen.getAllByText('ORACLE').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('PROMPTS')).toBeInTheDocument()
+    expect(screen.getByText('"PROMPTS"')).toBeInTheDocument()
+    expect(screen.getByText('ASCENSION TIPS')).toBeInTheDocument()
+    expect(screen.getByText('MOLTMAXXING')).toBeInTheDocument()
+    expect(screen.getByText(/fastest path from Larval Human/i)).toBeInTheDocument()
   })
 
   it('renders SocialMarketingSlide with 3D book mockup, benefit items, and comment CTA banner', () => {

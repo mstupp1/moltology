@@ -4,6 +4,7 @@ import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
 import { SocialDirectivesSlide } from './SocialDirectivesSlide'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
+import { SocialOraclePromptsSlide } from './SocialOraclePromptsSlide'
 import { ReelOutroCard, CtaTextureKey } from './ReelOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
@@ -28,6 +29,7 @@ import {
 
 export type CompositeTemplateType =
   | 'marketing-leadmagnet'
+  | 'oracle-prompts'
   | 'hook'
   | 'spec-showdown'
   | 'directives'
@@ -221,6 +223,14 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
       setQuoteText('Stop wasting mornings. The exact 24-hour routine of elite Stage 4 operators!')
       setCommentKeyword('ROUTINE')
       setMascot('crab_stats')
+    } else if (selectedTheme === 'oracle-prompts') {
+      setCategoryBadge('FREE SYNAPTIC ORACLE · ZERO CREDITS REQUIRED')
+      setHeadlinePart1('ORACLE')
+      setHeadlinePart2('AI')
+      setHeadlineHighlight('PROMPTS')
+      setSubHeadline('For Moltology · Moltmaxxing · Ascend Faster')
+      setCommentKeyword('PROMPTS')
+      setMascot('lobster_engineer')
     } else if (selectedTheme === 'pincer-torque') {
       setCategoryBadge('DECISIVE EXECUTION')
       setHeadlinePart1('800 NM PINCER TORQUE')
@@ -328,6 +338,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             <div className="grid grid-cols-2 gap-2">
               {[
                 { id: 'marketing-leadmagnet', label: '⭐ Marketing Lead Magnet (3D Book)' },
+                { id: 'oracle-prompts', label: '🔮 Oracle Prompts (Lead Magnet)' },
                 { id: 'hook', label: 'Hook Slide (4:5)' },
                 { id: 'spec-showdown', label: 'Spec Showdown' },
                 { id: 'directives', label: 'Directives / CTA' },
@@ -399,6 +410,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                 { id: 'benthic-app', label: '🤖 Benthic Core App' },
                 { id: 'sacred-codex', label: '📜 Sacred Codex' },
                 { id: 'pincer-routine', label: '⚡ 24h Routine' },
+                { id: 'oracle-prompts', label: '🔮 Oracle Prompts' },
                 { id: 'pincer-torque', label: '🦞 Pincer Torque' },
                 { id: 'ecdysis', label: '🛡️ Ecdysis' },
                 { id: 'benthic-depth', label: '🌊 Benthic Depth' },
@@ -659,6 +671,19 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                 transformOrigin: 'top left',
               }}
             >
+              {template === 'oracle-prompts' && (
+                <SocialOraclePromptsSlide
+                  aspectRatio={aspect}
+                  theme={theme === 'oracle-prompts' ? theme : 'oracle-prompts'}
+                  headlinePart1={headlinePart1}
+                  headlinePart2={headlinePart2}
+                  headlinePart3={headlineHighlight}
+                  categoryPill={subHeadline}
+                  commentKeyword={commentKeyword}
+                  mascot={mascot}
+                />
+              )}
+
               {template === 'marketing-leadmagnet' && (
                 <SocialMarketingSlide
                   aspectRatio={aspect}
