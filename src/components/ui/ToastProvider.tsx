@@ -44,6 +44,10 @@ export function useToast(): ToastContextType {
   return context
 }
 
+export function useOptionalToast(): ToastContextType | undefined {
+  return useContext(ToastContext)
+}
+
 const DEFAULT_DURATION = 5000
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

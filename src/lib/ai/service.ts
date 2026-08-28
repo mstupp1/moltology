@@ -1,4 +1,4 @@
-import { eq, desc, asc } from 'drizzle-orm'
+import { eq, desc, asc, and, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
 import { aiThreads, aiMessages } from '../../db/schema'
 import { ensureUserProfile } from '../user-sync'
@@ -80,6 +80,8 @@ export async function createAIThread(input: CreateThreadInput) {
 
 /**
  * Fetches all AI conversation threads for a specific user.
+ * Pinned threads sort first (most recently pinned first), then by last activity.
+ * Includes archived threads — clients partition them out for the Archived section.
  */
 export async function getUserAIThreads(userId: string) {
   const dbClient = getDb()
@@ -87,7 +89,7 @@ export async function getUserAIThreads(userId: string) {
     .select()
     .from(aiThreads)
     .where(eq(aiThreads.userId, userId))
-    .orderBy(desc(aiThreads.updatedAt))
+    .orderBy(sql`${aiThreads.pinnedAt} DESC NULLS LAST`, desc(aiThreads.updatedAt))
 }
 
 /**
@@ -140,4 +142,65 @@ export async function updateAIThreadTitle(threadId: string, title: string) {
     .returning()
 
   return updated
+}
+
+/**
+ * Pins or unpins an AI thread. Owner-scoped on top of RLS.
+ * Pinning stamps `pinnedAt`; unpinning clears it.
+ */
+export async function pinAIThread(userId: string, threadId: string, pinned: boolean) {
+  if (!userId || !threadId) return null
+  const dbClient = getDb()
+  const [updated] = await dbClient
+    .update(aiThreads)
+    .set({ pinnedAt: pinned ? new Date() : null })
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
+    .returning()
+
+  return updated || null
+}
+
+/**
+ * Archives or unarchives an AI thread. Owner-scoped on top of RLS.
+ * Archiving stamps `archivedAt`; unarchiving clears it.
+ */
+export async function archiveAIThread(userId: string, threadId: string, archived: boolean) {
+  if (!userId || !threadId) return null
+  const dbClient = getDb()
+  const [updated] = await dbClient
+    .update(aiThreads)
+    .set({ archivedAt: archived ? new Date() : null })
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
+    .returning()
+
+  return updated || null
+}
+
+/**
+ * Renames an AI thread with owner scoping (RLS defense-in-depth).
+ */
+export async function renameAIThread(userId: string, threadId: string, title: string) {
+  if (!userId || !threadId || !title || !title.trim()) return null
+  const dbClient = getDb()
+  const [updated] = await dbClient
+    .update(aiThreads)
+    .set({ title: title.trim().slice(0, 120), updatedAt: new Date() })
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
+    .returning()
+
+  return updated || null
+}
+
+/**
+ * Permanently deletes an AI thread and its messages (FK cascade). Owner-scoped on top of RLS.
+ */
+export async function deleteAIThread(userId: string, threadId: string) {
+  if (!userId || !threadId) return false
+  const dbClient = getDb()
+  const deleted = await dbClient
+    .delete(aiThreads)
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
+    .returning({ id: aiThreads.id })
+
+  return deleted.length > 0
 }

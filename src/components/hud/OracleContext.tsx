@@ -12,6 +12,8 @@ export interface OracleThread {
   title: string
   createdAt?: string | Date
   updatedAt?: string | Date
+  pinnedAt?: string | Date | null
+  archivedAt?: string | Date | null
 }
 
 interface OracleContextType {
@@ -24,6 +26,9 @@ interface OracleContextType {
   threads: OracleThread[]
   isLoadingThreads: boolean
   refreshThreads: () => Promise<void>
+  patchThreadLocally: (threadId: string, patch: Partial<OracleThread>) => void
+  removeThreadLocally: (threadId: string) => void
+  restoreThreadLocally: (thread: OracleThread) => void
   userId: string | null
 }
 
@@ -101,6 +106,18 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     refreshThreads()
   }, [userId, session.isPending])
 
+  const patchThreadLocally = (threadId: string, patch: Partial<OracleThread>) => {
+    setThreads((prev) => prev.map((t) => (t.id === threadId ? { ...t, ...patch } : t)))
+  }
+
+  const removeThreadLocally = (threadId: string) => {
+    setThreads((prev) => prev.filter((t) => t.id !== threadId))
+  }
+
+  const restoreThreadLocally = (thread: OracleThread) => {
+    setThreads((prev) => (prev.some((t) => t.id === thread.id) ? prev : [...prev, thread]))
+  }
+
   const setMode = (newMode: OracleMode) => {
     // If mobile and sidebar mode is requested, redirect to dedicated page mode
     let targetMode = newMode
@@ -172,6 +189,9 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         threads,
         isLoadingThreads,
         refreshThreads,
+        patchThreadLocally,
+        removeThreadLocally,
+        restoreThreadLocally,
         userId,
       }}
     >

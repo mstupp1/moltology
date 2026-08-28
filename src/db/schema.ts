@@ -202,6 +202,8 @@ export const aiThreads = pgTable('ai_threads', {
   userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   title: text('title').default('Ascendance Consultation').notNull(),
   persona: text('persona').default('oracle').notNull(),
+  pinnedAt: timestamp('pinnedAt'),
+  archivedAt: timestamp('archivedAt'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 }, (table) => [
