@@ -159,6 +159,10 @@ export const LandingPage: React.FC = () => {
       description:
         'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
       image: getAssetUrl('/images/gallery/benthic_abyss_shrine.jpg'),
+      previewImage: getAssetUrl('/images/marketing/dashboard_desktop_preview.webp'),
+      previewImageSm: getAssetUrl('/images/marketing/dashboard_desktop_preview_sm.webp'),
+      previewUrl: 'moltology.org/dashboard',
+      imagePosition: 'center 40%',
       borderColor: 'border-cyan-500/40 hover:border-cyan-400',
       shadowColor: 'shadow-[0_0_20px_rgba(0,255,255,0.12)] hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]',
       dotColor: 'bg-cyan-400',
@@ -173,6 +177,10 @@ export const LandingPage: React.FC = () => {
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
       image: getAssetUrl('/images/gallery/synapse_crystal.jpg'),
+      previewImage: getAssetUrl('/images/marketing/forum_desktop_preview.webp'),
+      previewImageSm: getAssetUrl('/images/marketing/forum_desktop_preview_sm.webp'),
+      previewUrl: 'moltology.org/forum',
+      imagePosition: 'center 35%',
       borderColor: 'border-purple-500/40 hover:border-purple-400',
       shadowColor: 'shadow-[0_0_20px_rgba(168,85,247,0.12)] hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
       dotColor: 'bg-purple-400',
@@ -187,7 +195,10 @@ export const LandingPage: React.FC = () => {
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
       image: getAssetUrl('/images/gallery/ascendant_crab_god.jpg'),
-      imagePosition: 'center 25%',
+      previewImage: getAssetUrl('/images/marketing/oracle_desktop_preview.webp'),
+      previewImageSm: getAssetUrl('/images/marketing/oracle_desktop_preview_sm.webp'),
+      previewUrl: 'moltology.org/oracle',
+      imagePosition: 'center 30%',
       borderColor: 'border-red-500/40 hover:border-red-400',
       shadowColor: 'shadow-[0_0_20px_rgba(239,68,68,0.12)] hover:shadow-[0_0_30px_rgba(239,68,68,0.25)]',
       dotColor: 'bg-red-400',
@@ -493,47 +504,99 @@ export const LandingPage: React.FC = () => {
                     durationMs={700}
                   >
                     <div
-                      className={`chitin-card border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden bg-[#060b0e]/95 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
+                      className={`border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden !bg-[#020508] flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
                     >
-                      {/* Top Hero Image Banner with Vignette & Atmospheric HUD Fades */}
-                      <div className="relative h-64 sm:h-80 md:h-72 lg:h-96 overflow-hidden border-b border-white/10 z-10">
+                      {/* ── 1. 100% SOLID BLACK CARD BASE (ZERO TRANSPARENCY / ZERO SEE-THROUGH) ── */}
+                      <div className="absolute inset-0 bg-[#020508] pointer-events-none" />
+
+                      {/* ── 2. TOP SCREENSHOT STAGE (SOLID BLACK WITH THEMED AMBIENT GLOW) ── */}
+                      <div
+                        className={`absolute top-6 left-1/2 -translate-x-1/2 w-72 h-44 rounded-full blur-[85px] opacity-25 group-hover:opacity-40 transition-opacity pointer-events-none ${
+                          idx === 0
+                            ? 'bg-cyan-500'
+                            : idx === 1
+                            ? 'bg-purple-500'
+                            : 'bg-red-500'
+                        }`}
+                      />
+
+                      {/* ── 3. LOWER BACKGROUND ARTWORK (SEAMLESSLY BLENDED INTO SOLID BLACK TOP) ── */}
+                      <div className="absolute inset-x-0 bottom-0 h-[68%] overflow-hidden pointer-events-none">
                         <img
                           src={pillar.image}
                           alt={pillar.title}
-                          style={pillar.imagePosition ? { objectPosition: pillar.imagePosition } : undefined}
+                          style={pillar.imagePosition ? { objectPosition: pillar.imagePosition } : { objectPosition: 'center 40%' }}
                           {...lazyImageProps}
-                          className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-105"
+                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-[0.48] contrast-[1.12] group-hover:brightness-[0.58] [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)]"
                         />
-
-                        {/* Peripheral Radial Vignette */}
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(6,11,14,0.75)_100%)] pointer-events-none" />
-
-                        {/* Top & Bottom Atmospheric Fades */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#060b0e] via-[#060b0e]/30 to-transparent pointer-events-none" />
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#060b0e]/50 via-transparent to-transparent pointer-events-none" />
-
-                        {/* Subtle HUD Scanline Overlay */}
-                        <div className="absolute inset-0 pointer-events-none opacity-15 bg-[linear-gradient(rgba(0,255,255,0.12)_1px,transparent_1px)] bg-[size:100%_4px]" />
+                        {/* Top-edge gradient blend into solid black */}
+                        <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-[#020508] via-[#020508]/80 to-transparent pointer-events-none" />
+                        {/* Bottom & middle readability scrim */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#020508]/98 via-[#020508]/85 to-[#020508]/40 pointer-events-none" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,transparent_20%,rgba(2,5,8,0.85)_100%)] pointer-events-none" />
                       </div>
 
-                      {/* Card Body Content */}
-                      <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10">
-                        <div>
-                          <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider mb-2 sm:mb-2.5 group-hover:text-cyan-200 transition-colors">
+                      {/* ── CARD-WIDE SUBTLE SCANLINES & GRID ── */}
+                      <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(0,255,255,0.12)_1px,transparent_1px)] bg-[size:100%_4px]" />
+                      <div className="absolute inset-0 bg-sacred-grid opacity-10 pointer-events-none" />
+
+                      {/* ── TOP SECTION: 3D Perspective Floating UI Screenshot Slate ── */}
+                      <div className="relative z-10 pt-5 sm:pt-6 px-3.5 sm:px-5 pb-2 flex items-center justify-center min-h-[200px] sm:min-h-[240px] md:min-h-[220px] lg:min-h-[280px]">
+                        <div
+                          className={`relative w-full max-w-[96%] sm:max-w-[92%] transition-all duration-500 drop-shadow-[0_20px_40px_rgba(0,0,0,0.95)] ${
+                            idx === 0
+                              ? 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(-7deg)_rotateZ(1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
+                              : idx === 1
+                              ? 'lg:[transform:perspective(1100px)_rotateX(11deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.02)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.05)]'
+                              : 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(7deg)_rotateZ(-1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
+                          }`}
+                        >
+                          <div className={`relative overflow-hidden chamfer-corner border-2 ${pillar.borderColor} bg-[#030708] shadow-2xl aspect-[16/10]`}>
+                            {/* High-DPI Screenshot */}
+                            <picture>
+                              <source
+                                type="image/webp"
+                                media="(max-width: 767px)"
+                                srcSet={pillar.previewImageSm}
+                              />
+                              <source
+                                type="image/webp"
+                                media="(min-width: 768px)"
+                                srcSet={pillar.previewImage}
+                              />
+                              <img
+                                src={pillar.previewImage}
+                                alt={`${pillar.title} Screenshot Preview`}
+                                {...lazyImageProps}
+                                className="w-full h-full object-cover object-top filter brightness-95 group-hover:brightness-105 transition-all duration-500"
+                              />
+                            </picture>
+
+                            {/* Subtle Glass Sheen & Scanlines */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none opacity-30 group-hover:opacity-60 transition-opacity" />
+                            <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:100%_3px]" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── CARD BODY CONTENT (CRYSTAL CLEAR LEGIBILITY OVER FROSTED GLASS ARTWORK) ── */}
+                      <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10 bg-gradient-to-t from-[#020508]/96 via-[#020508]/80 to-transparent backdrop-blur-md">
+                        <div className="space-y-2">
+                          <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider group-hover:text-cyan-200 transition-colors drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
                             {pillar.title}
                           </h3>
-                          <p className="text-xs sm:text-sm text-gray-300 font-sans leading-relaxed">
+                          <p className="text-xs sm:text-sm text-gray-200 font-sans leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.95)]">
                             {pillar.description}
                           </p>
                         </div>
 
                         <div className="space-y-3.5 pt-2">
                           {/* Feature Specs */}
-                          <div className="space-y-1.5 pt-3 border-t border-white/10">
+                          <div className="space-y-1.5 pt-3 border-t border-white/15">
                             {pillar.specs.map((spec, i) => (
-                              <div key={i} className="flex items-center gap-2 text-xs font-sans text-gray-300">
-                                <div className={`w-1.5 h-1.5 rounded-full ${pillar.dotColor} shrink-0`} />
-                                <span>{spec}</span>
+                              <div key={i} className="flex items-center gap-2 text-xs font-sans text-gray-200 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+                                <div className={`w-1.5 h-1.5 rounded-full ${pillar.dotColor} shrink-0 shadow-[0_0_8px_currentColor]`} />
+                                <span className="font-medium">{spec}</span>
                               </div>
                             ))}
                           </div>
@@ -541,7 +604,7 @@ export const LandingPage: React.FC = () => {
                           {/* Action CTA Button */}
                           <button
                             onClick={() => onNavigate(pillar.actionRoute)}
-                            className={`w-full py-2.5 px-4 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border flex items-center justify-center gap-2 transition-all duration-300 group/btn ${pillar.btnGlow}`}
+                            className={`w-full py-2.5 px-4 text-xs font-grotesk font-bold uppercase tracking-wider rounded chamfer-corner border flex items-center justify-center gap-2 transition-all duration-300 group/btn shadow-lg ${pillar.btnGlow}`}
                           >
                             <span>{pillar.actionText}</span>
                             <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
