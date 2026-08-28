@@ -66,6 +66,13 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
     return () => clearInterval(t)
   }, [hasListened, step])
 
+  const stopWaveform = useCallback(() => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current)
+      animFrameRef.current = null
+    }
+  }, [])
+
   // Waveform visualizer on canvas
   const drawWaveform = useCallback(() => {
     const analyser = analyserRef.current
@@ -77,6 +84,11 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
 
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
+
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current)
+      animFrameRef.current = null
+    }
 
     const draw = () => {
       animFrameRef.current = requestAnimationFrame(draw)
@@ -141,12 +153,14 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
     if (isPlaying) {
       audio.pause()
       setIsPlaying(false)
+      stopWaveform()
     } else {
       await audio.play()
       setIsPlaying(true)
       setHasListened(true)
+      drawWaveform()
     }
-  }, [isPlaying, setupAudioContext])
+  }, [isPlaying, setupAudioContext, drawWaveform, stopWaveform])
 
   const handleMute = useCallback(() => {
     if (!audioRef.current) return
@@ -174,7 +188,8 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
     setProgress(0)
     setCurrentTime(0)
     if (audioRef.current) audioRef.current.currentTime = 0
-  }, [])
+    stopWaveform()
+  }, [stopWaveform])
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
@@ -194,6 +209,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
     if (audioRef.current) {
       audioRef.current.pause()
     }
+    stopWaveform()
     setLeaving(true)
     setTimeout(() => onDismiss(), 300)
   }
@@ -203,6 +219,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
       audioRef.current.pause()
       setIsPlaying(false)
     }
+    stopWaveform()
     setStep(2)
   }
 

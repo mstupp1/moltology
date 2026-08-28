@@ -579,7 +579,7 @@ export const LandingPage: React.FC = () => {
                       </div>
 
                       {/* ── CARD BODY CONTENT (CRYSTAL CLEAR LEGIBILITY OVER CRISP ARTWORK) ── */}
-                      <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10 bg-gradient-to-t from-[#020508]/90 via-[#020508]/60 to-transparent backdrop-blur-[2px]">
+                      <div className="p-5 sm:p-6 lg:p-7 space-y-4 flex-1 flex flex-col justify-between relative z-10 bg-gradient-to-t from-[#020508]/90 via-[#020508]/60 to-transparent">
                         <div className="space-y-2">
                           <h3 className="font-grotesk font-black text-xl sm:text-2xl text-white uppercase tracking-wider group-hover:text-cyan-200 transition-colors drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
                             {pillar.title}
