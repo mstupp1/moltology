@@ -28,12 +28,14 @@ export interface LobsterAvatarPortraitProps {
   vignette?: boolean
   /** Enable convex optical glass specular glint (default true) */
   specularSheen?: boolean
+  /** Enable spherical fisheye lens curvature & chromatic refraction (default true) */
+  fisheyeLens?: boolean
 }
 
 /**
  * Circular, face-focused lobster avatar — canonical portrait for settings, chassis, and HUD surfaces.
- * Features an authentic benthic porthole frame with inner shadow depth, optical lens vignette,
- * and convex glass specular arc.
+ * Features an authentic benthic porthole frame with spherical fisheye lens barrel distortion,
+ * chromatic optical ring, inner shadow depth, optical lens vignette, and convex glass specular arc.
  */
 export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React.memo(({
   src,
@@ -46,6 +48,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   eyeTracking = true,
   vignette = true,
   specularSheen = true,
+  fisheyeLens = true,
 }) => {
   const resolvedSeed = animationSeed ?? config?.seed
   const configSeed = config?.seed
@@ -93,23 +96,30 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
       {/* 1. Internal Radial Light Gathering (Benthic Core Flare) */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(0,195,255,0.2)_0%,rgba(0,195,255,0.05)_55%,transparent_75%)] pointer-events-none z-0" />
 
-      {/* 2. Character Display (Sprite + Idle Animation + Eye Tracking) */}
+      {/* 2. Character Display (Sprite + Idle Animation + Eye Tracking + Fisheye Curvature) */}
       {dataUri ? (
-        <LobsterAvatarDisplay
-          src={dataUri}
-          alt={alt}
-          pixelResolution={64}
-          outputSize={size}
-          maskRadial={false}
-          animationSeed={resolvedSeed}
-          eyeTracking={eyeTracking}
-          texture={configTexture}
-          containerClassName={`relative z-10 w-full h-full flex items-start justify-center overflow-hidden ${
-            interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
+        <div
+          data-testid="portrait-fisheye-container"
+          className={`relative z-10 w-full h-full flex items-center justify-center overflow-hidden ${
+            fisheyeLens ? 'scale-[1.06] [filter:url(#benthic-fisheye-disp)]' : ''
           }`}
-          className="w-full h-full overflow-hidden"
-          imgClassName={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] ${PORTRAIT_FACE_CLASSES}`}
-        />
+        >
+          <LobsterAvatarDisplay
+            src={dataUri}
+            alt={alt}
+            pixelResolution={64}
+            outputSize={size}
+            maskRadial={false}
+            animationSeed={resolvedSeed}
+            eyeTracking={eyeTracking}
+            texture={configTexture}
+            containerClassName={`relative w-full h-full flex items-start justify-center overflow-hidden ${
+              interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
+            }`}
+            className="w-full h-full overflow-hidden"
+            imgClassName={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] ${PORTRAIT_FACE_CLASSES}`}
+          />
+        </div>
       ) : (
         <div
           className="relative z-10 flex h-full w-full items-center justify-center"
@@ -121,11 +131,27 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
         </div>
       )}
 
+      {/* 2.5. Optical Fisheye Barrel Distortion & Chromatic Ring (Spherical Lens Curvature) */}
+      {fisheyeLens && (
+        <>
+          {/* Spherical Bulge / Optical Dome Magnification Ring */}
+          <div
+            data-testid="portrait-fisheye-dome"
+            className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.06)_0%,rgba(0,195,255,0.04)_42%,transparent_68%)] pointer-events-none z-15 mix-blend-screen"
+          />
+          {/* Chromatic Edge Aberration Fringe (Cyan / Magenta Lens Dispersion Ring) */}
+          <div
+            data-testid="portrait-fisheye-chromatic"
+            className="absolute inset-0 rounded-full border-[1.5px] border-cyan-400/20 shadow-[inset_0_0_18px_rgba(0,195,255,0.22),0_0_14px_rgba(255,0,128,0.14)] pointer-events-none z-15 mix-blend-screen"
+          />
+        </>
+      )}
+
       {/* 3. Spherical Lens Vignette (Darkens sprite perimeter inside glass bubble) */}
       {vignette && (
         <div
           data-testid="portrait-lens-vignette"
-          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_38%,transparent_48%,rgba(2,8,14,0.45)_75%,rgba(1,4,7,0.85)_100%)] pointer-events-none z-20"
+          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_38%,transparent_45%,rgba(2,8,14,0.5)_72%,rgba(1,4,7,0.92)_100%)] pointer-events-none z-20"
         />
       )}
 
@@ -135,10 +161,10 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
           {/* Top Crescent Specular Reflection */}
           <div
             data-testid="portrait-lens-sheen"
-            className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.28)_0%,rgba(0,195,255,0.12)_35%,transparent_70%)] pointer-events-none z-20"
+            className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.32)_0%,rgba(0,195,255,0.15)_35%,transparent_70%)] pointer-events-none z-20"
           />
           {/* Crisp Hairline Specular Reflection (Top Crest) */}
-          <div className="absolute top-0 inset-x-8 sm:inset-x-12 h-[1.5px] rounded-t-full bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none z-30" />
+          <div className="absolute top-0 inset-x-8 sm:inset-x-12 h-[1.5px] rounded-t-full bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none z-30" />
         </>
       )}
 
