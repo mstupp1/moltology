@@ -25,7 +25,10 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS user_avatars ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS equipment_catalog ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS user_gear_items ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items')
+    await sql`ALTER TABLE IF EXISTS friend_requests ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS friendships ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS notifications ENABLE ROW LEVEL SECURITY;`
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, notifications')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
@@ -37,6 +40,15 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
     await sql`DROP POLICY IF EXISTS equipment_catalog_public_read_policy ON equipment_catalog;`
     await sql`DROP POLICY IF EXISTS user_gear_items_isolation_policy ON user_gear_items;`
+    await sql`DROP POLICY IF EXISTS friend_requests_party_select_policy ON friend_requests;`
+    await sql`DROP POLICY IF EXISTS friend_requests_sender_insert_policy ON friend_requests;`
+    await sql`DROP POLICY IF EXISTS friend_requests_party_update_policy ON friend_requests;`
+    await sql`DROP POLICY IF EXISTS friendships_party_select_policy ON friendships;`
+    await sql`DROP POLICY IF EXISTS friendships_party_insert_policy ON friendships;`
+    await sql`DROP POLICY IF EXISTS friendships_party_delete_policy ON friendships;`
+    await sql`DROP POLICY IF EXISTS notifications_owner_select_policy ON notifications;`
+    await sql`DROP POLICY IF EXISTS notifications_owner_update_policy ON notifications;`
+    await sql`DROP POLICY IF EXISTS notifications_insert_policy ON notifications;`
 
     // 3. Create RLS policies for user isolation against Neon Auth JWT 'sub' claim
     await sql`
@@ -107,6 +119,93 @@ async function applyRLS() {
         OR (current_setting('request.jwt.claims', true) IS NULL)
       );
     `
+
+    await sql`
+      CREATE POLICY friend_requests_party_select_policy ON friend_requests
+      FOR SELECT
+      USING (
+        "senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR "recipientId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY friend_requests_sender_insert_policy ON friend_requests
+      FOR INSERT
+      WITH CHECK (
+        "senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY friend_requests_party_update_policy ON friend_requests
+      FOR UPDATE
+      USING (
+        "senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR "recipientId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      )
+      WITH CHECK (
+        "senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR "recipientId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY friendships_party_select_policy ON friendships
+      FOR SELECT
+      USING (
+        "userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY friendships_party_insert_policy ON friendships
+      FOR INSERT
+      WITH CHECK (
+        "userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY friendships_party_delete_policy ON friendships
+      FOR DELETE
+      USING (
+        "userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY notifications_owner_select_policy ON notifications
+      FOR SELECT
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY notifications_owner_update_policy ON notifications
+      FOR UPDATE
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      )
+      WITH CHECK (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY notifications_insert_policy ON notifications
+      FOR INSERT
+      WITH CHECK (true);
+    `
+    console.log('✓ RLS policies configured for friend_requests, friendships, notifications')
 
     // 4. Create trigger to auto-populate public.profiles on neon_auth.user creation
     try {

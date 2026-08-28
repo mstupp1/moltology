@@ -47,7 +47,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis', '/connections', '/member'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -408,6 +408,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'FORUM',
           icon: Users,
           path: '/forum',
+        },
+        {
+          id: 'connections',
+          label: 'CONNECTIONS',
+          shortLabel: 'LINKS',
+          icon: UserCheck,
+          path: '/connections',
         },
       ],
     },

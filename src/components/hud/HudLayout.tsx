@@ -9,6 +9,7 @@ import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanva
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
+import { NotificationsProvider } from '@/hooks/useNotifications'
 import { HudPersistIndicator } from '@/components/hud/HudPersistIndicator'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -226,7 +227,9 @@ export function HudLayout() {
     <OracleProvider>
       <HudPersistProvider>
         <AlignmentProvider>
-          <HudContent />
+          <NotificationsProvider>
+            <HudContent />
+          </NotificationsProvider>
         </AlignmentProvider>
       </HudPersistProvider>
     </OracleProvider>

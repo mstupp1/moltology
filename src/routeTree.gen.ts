@@ -34,6 +34,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
+import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudGalleryRouteImport } from './routes/_hud/gallery'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
@@ -58,6 +59,7 @@ import { Route as RenderCompositeRouteImport } from './routes/render/composite'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
 import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
+import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
 
@@ -185,6 +187,11 @@ const HudCodexRoute = HudCodexRouteImport.update({
   path: '/codex',
   getParentRoute: () => HudRoute,
 } as any)
+const HudConnectionsRoute = HudConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudDashboardRoute = HudDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -306,6 +313,11 @@ const HudJournalSlugRoute = HudJournalSlugRouteImport.update({
   path: '/journal/$slug',
   getParentRoute: () => HudRoute,
 } as any)
+const HudMemberProfileIdRoute = HudMemberProfileIdRouteImport.update({
+  id: '/member/$profileId',
+  path: '/member/$profileId',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudForumCategorySlugIndexRoute =
   HudForumCategorySlugIndexRouteImport.update({
     id: '/forum/$categorySlug/',
@@ -344,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/terms.md': typeof TermsDotmdRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
+  '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
   '/gallery': typeof HudGalleryRoute
   '/hud': typeof HudHudRoute
@@ -366,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
+  '/member/$profileId': typeof HudMemberProfileIdRoute
   '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
@@ -396,6 +410,7 @@ export interface FileRoutesByTo {
   '/terms.md': typeof TermsDotmdRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
+  '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
   '/gallery': typeof HudGalleryRoute
   '/hud': typeof HudHudRoute
@@ -418,6 +433,7 @@ export interface FileRoutesByTo {
   '/changelog': typeof ChangelogIndexRoute
   '/news': typeof NewsIndexRoute
   '/journal/$slug': typeof HudJournalSlugRoute
+  '/member/$profileId': typeof HudMemberProfileIdRoute
   '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
@@ -450,6 +466,7 @@ export interface FileRoutesById {
   '/terms.md': typeof TermsDotmdRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/codex': typeof HudCodexRoute
+  '/_hud/connections': typeof HudConnectionsRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/gallery': typeof HudGalleryRoute
   '/_hud/hud': typeof HudHudRoute
@@ -472,6 +489,7 @@ export interface FileRoutesById {
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
+  '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
   '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
@@ -504,6 +522,7 @@ export interface FileRouteTypes {
     | '/terms.md'
     | '/chassis'
     | '/codex'
+    | '/connections'
     | '/dashboard'
     | '/gallery'
     | '/hud'
@@ -526,6 +545,7 @@ export interface FileRouteTypes {
     | '/changelog/'
     | '/news/'
     | '/journal/$slug'
+    | '/member/$profileId'
     | '/forum/'
     | '/journal/'
     | '/forum/$categorySlug/$topicSlug'
@@ -556,6 +576,7 @@ export interface FileRouteTypes {
     | '/terms.md'
     | '/chassis'
     | '/codex'
+    | '/connections'
     | '/dashboard'
     | '/gallery'
     | '/hud'
@@ -578,6 +599,7 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/news'
     | '/journal/$slug'
+    | '/member/$profileId'
     | '/forum'
     | '/journal'
     | '/forum/$categorySlug/$topicSlug'
@@ -609,6 +631,7 @@ export interface FileRouteTypes {
     | '/terms.md'
     | '/_hud/chassis'
     | '/_hud/codex'
+    | '/_hud/connections'
     | '/_hud/dashboard'
     | '/_hud/gallery'
     | '/_hud/hud'
@@ -631,6 +654,7 @@ export interface FileRouteTypes {
     | '/changelog/'
     | '/news/'
     | '/_hud/journal/$slug'
+    | '/_hud/member/$profileId'
     | '/_hud/forum/'
     | '/_hud/journal/'
     | '/_hud/forum/$categorySlug/$topicSlug'
@@ -849,6 +873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudCodexRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/connections': {
+      id: '/_hud/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof HudConnectionsRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/dashboard': {
       id: '/_hud/dashboard'
       path: '/dashboard'
@@ -1017,6 +1048,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudJournalSlugRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/member/$profileId': {
+      id: '/_hud/member/$profileId'
+      path: '/member/$profileId'
+      fullPath: '/member/$profileId'
+      preLoaderRoute: typeof HudMemberProfileIdRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/forum/$categorySlug/': {
       id: '/_hud/forum/$categorySlug/'
       path: '/forum/$categorySlug'
@@ -1037,6 +1075,7 @@ declare module '@tanstack/react-router' {
 interface HudRouteChildren {
   HudChassisRoute: typeof HudChassisRoute
   HudCodexRoute: typeof HudCodexRoute
+  HudConnectionsRoute: typeof HudConnectionsRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudGalleryRoute: typeof HudGalleryRoute
   HudHudRoute: typeof HudHudRoute
@@ -1050,6 +1089,7 @@ interface HudRouteChildren {
   HudSubterraneanRoute: typeof HudSubterraneanRoute
   HudSupportRoute: typeof HudSupportRoute
   HudJournalSlugRoute: typeof HudJournalSlugRoute
+  HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
   HudJournalIndexRoute: typeof HudJournalIndexRoute
   HudForumCategorySlugTopicSlugRoute: typeof HudForumCategorySlugTopicSlugRoute
@@ -1059,6 +1099,7 @@ interface HudRouteChildren {
 const HudRouteChildren: HudRouteChildren = {
   HudChassisRoute: HudChassisRoute,
   HudCodexRoute: HudCodexRoute,
+  HudConnectionsRoute: HudConnectionsRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudGalleryRoute: HudGalleryRoute,
   HudHudRoute: HudHudRoute,
@@ -1072,6 +1113,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudSubterraneanRoute: HudSubterraneanRoute,
   HudSupportRoute: HudSupportRoute,
   HudJournalSlugRoute: HudJournalSlugRoute,
+  HudMemberProfileIdRoute: HudMemberProfileIdRoute,
   HudForumIndexRoute: HudForumIndexRoute,
   HudJournalIndexRoute: HudJournalIndexRoute,
   HudForumCategorySlugTopicSlugRoute: HudForumCategorySlugTopicSlugRoute,

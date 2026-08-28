@@ -55,14 +55,34 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
 
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 pt-1 text-[11px] text-[#839493]">
           <span className="flex items-center gap-1.5 min-w-0">
-            <img
-              src={topic.authorAvatar}
-              alt=""
-              className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
-            />
-            <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px]">
-              {topic.authorName}
-            </span>
+            {topic.userId ? (
+              <Link
+                to="/member/$profileId"
+                params={{ profileId: topic.userId }}
+                className="flex items-center gap-1.5 min-w-0 hover:opacity-90"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={topic.authorAvatar}
+                  alt=""
+                  className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                />
+                <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px] hover:text-[#00c3ff] transition-colors">
+                  {topic.authorName}
+                </span>
+              </Link>
+            ) : (
+              <>
+                <img
+                  src={topic.authorAvatar}
+                  alt=""
+                  className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                />
+                <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px]">
+                  {topic.authorName}
+                </span>
+              </>
+            )}
             <StageBadge stage={topic.authorStage} />
           </span>
           <span className="text-[#3a4a49]">·</span>

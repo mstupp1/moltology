@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, galleryPins, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, notifications } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -17,6 +17,21 @@ describe('Database Schema & RLS Policies', () => {
     expect(blogPosts).toBeDefined()
     expect(blogComments).toBeDefined()
     expect(leads).toBeDefined()
+    expect(friendRequests).toBeDefined()
+    expect(friendships).toBeDefined()
+    expect(notifications).toBeDefined()
+  })
+
+  it('defines required fields on friend_requests, friendships, and notifications', () => {
+    expect(friendRequests.senderId).toBeDefined()
+    expect(friendRequests.recipientId).toBeDefined()
+    expect(friendRequests.status).toBeDefined()
+    expect(friendships.userAId).toBeDefined()
+    expect(friendships.userBId).toBeDefined()
+    expect(notifications.userId).toBeDefined()
+    expect(notifications.kind).toBeDefined()
+    expect(notifications.sourceKey).toBeDefined()
+    expect(notifications.readAt).toBeDefined()
   })
 
   it('defines required fields on the leads table', () => {
