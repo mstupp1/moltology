@@ -35,6 +35,16 @@ describe('LobsterAvatarPortrait Component', () => {
     expect(screen.getByTestId('portrait-lens-vignette')).toBeInTheDocument()
     expect(screen.getByTestId('portrait-lens-sheen')).toBeInTheDocument()
     expect(screen.getByTestId('portrait-lens-bezel')).toBeInTheDocument()
+    expect(screen.getByTestId('portrait-fisheye-dome')).toBeInTheDocument()
+    expect(screen.getByTestId('portrait-fisheye-chromatic')).toBeInTheDocument()
+    expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
+  })
+
+  it('allows disabling fisheye lens effect', () => {
+    render(<LobsterAvatarPortrait src={testSrc} fisheyeLens={false} />)
+
+    expect(screen.queryByTestId('portrait-fisheye-dome')).toBeNull()
+    expect(screen.queryByTestId('portrait-fisheye-chromatic')).toBeNull()
     expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
   })
 
