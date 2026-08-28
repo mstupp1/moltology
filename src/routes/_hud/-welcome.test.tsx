@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { HudLayout } from '@/components/hud/HudLayout'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 
 vi.mock('@tanstack/react-router', () => ({
@@ -20,6 +21,13 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
+  const renderHud = () =>
+    render(
+      <ToastProvider>
+        <HudLayout />
+      </ToastProvider>
+    )
+
   beforeEach(() => {
     vi.useFakeTimers()
     localStorage.clear()
@@ -31,14 +39,14 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
   })
 
   it('triggers welcome popup for guest demo mode on first visit', () => {
-    render(<HudLayout />)
+    renderHud()
 
     expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
     expect(screen.getByText('⬡ MOLTOLOGY SIGNAL RECEIVED ⬡')).toBeInTheDocument()
   })
 
   it('dismisses welcome popup for guest demo mode and sets localStorage key', () => {
-    render(<HudLayout />)
+    renderHud()
 
     expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
 
@@ -54,14 +62,14 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
   it('does not show welcome popup if guest demo user was already welcomed', () => {
     localStorage.setItem('moltology:welcomed:guest', '1')
 
-    render(<HudLayout />)
+    renderHud()
 
     expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
   })
 
   it('does not flash WELCOME, GUEST while the session is unresolved', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
-    render(<HudLayout />)
+    renderHud()
     expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
   })
 
@@ -70,7 +78,7 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
       data: { user: { id: 'user-789', name: 'Commander Crustacean' } },
     } as any)
 
-    render(<HudLayout />)
+    renderHud()
 
     expect(screen.getByText('WELCOME, COMMANDER')).toBeInTheDocument()
 
