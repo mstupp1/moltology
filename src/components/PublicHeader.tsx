@@ -24,7 +24,6 @@ import {
 import { HeaderBrand } from '@/components/ui'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { UserAvatarMenu } from '@/components/UserAvatarMenu'
-import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
 
 export interface PublicHeaderProps {
@@ -448,24 +447,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           </button>
 
           <div className="hidden lg:flex items-center gap-3 sm:gap-4">
-            {isSessionPending ? (
-              <div className="flex items-center gap-3" data-testid="public-header-auth-skeleton">
-                <HudGhostSkeleton
-                  variant={isCorporate ? 'neutral' : 'cyan'}
-                  preset="button"
-                  width={108}
-                  height={34}
-                  cornerCut={!isCorporate}
-                  className={isCorporate ? 'rounded-full' : ''}
-                />
-                <HudGhostSkeleton
-                  variant={isCorporate ? 'neutral' : 'cyan'}
-                  preset="avatar"
-                  width={34}
-                  height={34}
-                />
-              </div>
-            ) : user ? (
+            {user ? (
               <div className="flex items-center gap-3">
                 {isCorporate ? (
                   <button
@@ -656,15 +638,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             }`}
           />
 
-          {isSessionPending ? (
-            <div className="py-2 space-y-2" data-testid="mobile-header-auth-skeleton">
-              <HudGhostSkeleton
-                variant={isCorporate ? 'neutral' : 'cyan'}
-                preset="button"
-                className="w-full h-11 rounded-xl"
-              />
-            </div>
-          ) : user ? (
+          {user ? (
             <div className="space-y-2 pt-1">
               <button
                 onClick={() => onNavigate('/dashboard')}

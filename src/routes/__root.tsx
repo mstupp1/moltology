@@ -28,6 +28,8 @@ export const Route = createRootRoute({
         { rel: 'sitemap', type: 'application/xml', title: 'Sitemap', href: `${SITE_ORIGIN}/sitemap.xml` },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+        { rel: 'preconnect', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech', crossOrigin: 'anonymous' },
+        { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap',

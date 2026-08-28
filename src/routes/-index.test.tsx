@@ -27,7 +27,13 @@ describe('Homepage route head', () => {
     expect(head.links).toEqual(
       expect.arrayContaining([
         { rel: 'canonical', href: SITE_ORIGIN },
-        { rel: 'preload', as: 'image', href: getAssetUrl('/images/hero_widescreen_bg.jpg') },
+        {
+          rel: 'preload',
+          as: 'image',
+          type: 'image/webp',
+          href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+          fetchpriority: 'high',
+        },
       ]),
     )
 

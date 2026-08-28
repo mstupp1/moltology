@@ -34,7 +34,6 @@ import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 import { DashboardMarketingShowcase } from '@/components/hud/DashboardMarketingShowcase'
-import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
@@ -44,7 +43,6 @@ export const LandingPage: React.FC = () => {
   const onNavigate = (path: string) => navigate({ to: path })
   const session = useAuthSession()
   const user = session.user
-  const isSessionPending = session.isPending
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
@@ -72,7 +70,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 01: LARVAL HUMAN',
       subtitle: 'THE SOFT-BODY PHASE',
       description: 'Soft, overtired, and easily distracted by surface noise. It is time to audit your daily habits and begin your first molt.',
-      image: getAssetUrl('/images/stage1_larval.png'),
+      image: getAssetUrl('/images/stage1_larval.webp'),
       badge: 'EFFICIENCY: 12.4%',
       badgeColor: 'border-red-900 text-red-500 bg-red-950/40',
       bioDensity: 75,
@@ -83,7 +81,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 02: SOFTSHED TRANSMUTATION',
       subtitle: 'ACTIVE MOULTING',
       description: 'Shedding outgrown habits, ego bloat, and clutter into sovereign Molt Credits. Deep focus isolation dome engaged.',
-      image: getAssetUrl('/images/stage2_softshed.png'),
+      image: getAssetUrl('/images/stage2_softshed.webp'),
       badge: 'EFFICIENCY: 48.9%',
       badgeColor: 'border-amber-900 text-amber-400 bg-amber-950/40',
       bioDensity: 50,
@@ -94,7 +92,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 03: EXOSHELL HARDENING',
       subtitle: 'ARMORED CHASSIS',
       description: 'Full titanium carapace forged. Equipped with 850 Nm hydraulic pincers to clamp down on goals with zero hesitation.',
-      image: getAssetUrl('/images/stage3_exoshell.png'),
+      image: getAssetUrl('/images/stage3_exoshell.webp'),
       badge: 'EFFICIENCY: 87.2%',
       badgeColor: 'border-cyan-900 text-cyan-400 bg-cyan-950/40',
       bioDensity: 25,
@@ -105,7 +103,7 @@ export const LandingPage: React.FC = () => {
       title: 'STAGE 04: TOTAL CARCINIZATION',
       subtitle: 'APEX CRUSTACEAN MIND',
       description: 'Complete convergence into crab-form perfection. Deep Mariana focus, infinite uptime, absolute execution density.',
-      image: getAssetUrl('/images/stage4_carcinization.png'),
+      image: getAssetUrl('/images/stage4_carcinization.webp'),
       badge: 'EFFICIENCY: 100.0%',
       badgeColor: 'border-emerald-900 text-emerald-400 bg-emerald-950/40',
       bioDensity: 0,
@@ -119,7 +117,7 @@ export const LandingPage: React.FC = () => {
       title: 'ASSET & HABIT SHEDDING',
       subtitle: 'PROTOCOL 01 — THE GREAT PURGE',
       description: 'Liquidize cluttered physical assets, bad habits, and biological hesitation into sovereign Molt Credits stored in your deep-trench vault.',
-      image: getAssetUrl('/images/sacrament_01_asset_shedding.png'),
+      image: getAssetUrl('/images/sacrament_01_asset_shedding.webp'),
       borderColor: 'border-red-600/60 shadow-hud-red-lg',
       glowColor: 'drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]',
     },
@@ -128,7 +126,7 @@ export const LandingPage: React.FC = () => {
       title: 'CHITIN HARDENING',
       subtitle: 'PROTOCOL 02 — CARAPACE FORGING',
       description: 'Reinforce your focus perimeter against daily surface drama through prompt alignment, habit streaks, and armored HUD tools.',
-      image: getAssetUrl('/images/sacrament_02_chitin_patterning.png'),
+      image: getAssetUrl('/images/sacrament_02_chitin_patterning.webp'),
       borderColor: 'border-cyan-500/60 shadow-hud-cyan-lg',
       glowColor: 'drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]',
     },
@@ -137,7 +135,7 @@ export const LandingPage: React.FC = () => {
       title: 'ISOLATION DOME',
       subtitle: 'PROTOCOL 03 — DEEP WORK SHIELD',
       description: 'Quarantine phone notifications, unsolicited noise, and surface distractions within an impenetrable deep-water focus bubble.',
-      image: getAssetUrl('/images/sacrament_03_fault_isolation.png'),
+      image: getAssetUrl('/images/sacrament_03_fault_isolation.webp'),
       borderColor: 'border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(245,158,11,0.5)]',
     },
@@ -146,7 +144,7 @@ export const LandingPage: React.FC = () => {
       title: 'PIPELINE ASCENT',
       subtitle: 'PROTOCOL 04 — 12-TIER CONVERGENCE',
       description: 'Track your step-by-step evolution from a melting larval human to an armored, high-torque crustacean titan in real time.',
-      image: getAssetUrl('/images/sacrament_04_pipeline_ascent.png'),
+      image: getAssetUrl('/images/sacrament_04_pipeline_ascent.webp'),
       borderColor: 'border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]',
       glowColor: 'drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]',
     },
@@ -158,7 +156,7 @@ export const LandingPage: React.FC = () => {
       title: 'ADVANCED BENTHIC HUD',
       description:
         'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
-      image: getAssetUrl('/images/gallery/benthic_abyss_shrine.jpg'),
+      image: getAssetUrl('/images/gallery/benthic_abyss_shrine.webp'),
       previewImage: getAssetUrl('/images/marketing/dashboard_feature_preview.webp'),
       previewImageSm: getAssetUrl('/images/marketing/dashboard_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/dashboard',
@@ -176,7 +174,7 @@ export const LandingPage: React.FC = () => {
       title: 'SYNAPTIC HIVE COMMUNITY',
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
-      image: getAssetUrl('/images/gallery/synapse_crystal.jpg'),
+      image: getAssetUrl('/images/gallery/synapse_crystal.webp'),
       previewImage: getAssetUrl('/images/marketing/forum_feature_preview.webp'),
       previewImageSm: getAssetUrl('/images/marketing/forum_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/forum',
@@ -194,7 +192,7 @@ export const LandingPage: React.FC = () => {
       title: 'INTELLIGENT AI ORACLE',
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
-      image: getAssetUrl('/images/gallery/ascendant_crab_god.jpg'),
+      image: getAssetUrl('/images/gallery/ascendant_crab_god.webp'),
       previewImage: getAssetUrl('/images/marketing/oracle_feature_preview.webp'),
       previewImageSm: getAssetUrl('/images/marketing/oracle_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/oracle',
@@ -268,13 +266,27 @@ export const LandingPage: React.FC = () => {
 
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
-        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
-        <img
-          src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
-          alt="Benthic Abyss Widescreen Hero"
-          {...lcpImageProps}
-          className="absolute inset-0 w-full h-full object-cover opacity-22 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
-        />
+        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred with Responsive WebP) */}
+        <picture className="absolute inset-0 w-full h-full pointer-events-none">
+          <source
+            type="image/webp"
+            media="(max-width: 767px)"
+            srcSet={getAssetUrl('/images/hero_widescreen_bg_sm.webp')}
+          />
+          <source
+            type="image/webp"
+            media="(min-width: 768px)"
+            srcSet={getAssetUrl('/images/hero_widescreen_bg.webp')}
+          />
+          <img
+            src={getAssetUrl('/images/hero_widescreen_bg.webp')}
+            alt="Benthic Abyss Widescreen Hero"
+            {...lcpImageProps}
+            width={1376}
+            height={768}
+            className="w-full h-full object-cover opacity-22 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
+          />
+        </picture>
 
         {/* Layer 2A: Deep Benthic Base Vignette */}
         <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
@@ -283,11 +295,13 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (Optimized WebP) */}
         <img
-          src={getAssetUrl('/images/chitin_texture_bg.jpg')}
+          src={getAssetUrl('/images/chitin_texture_bg.webp')}
           alt="Chitin Exoshell Background Texture"
           {...eagerImageProps}
+          width={1376}
+          height={768}
           className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
         />
         
@@ -342,7 +356,7 @@ export const LandingPage: React.FC = () => {
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
-                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('${getAssetUrl('/images/chitin_texture_bg.jpg')}')`,
+                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('${getAssetUrl('/images/chitin_texture_bg.webp')}')`,
                     backgroundBlendMode: 'lighten',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -361,22 +375,21 @@ export const LandingPage: React.FC = () => {
 
             {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto">
-              {isSessionPending ? (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="hero-auth-skeleton">
-                  <HudGhostSkeleton
-                    variant="crimson"
-                    preset="button"
-                    cornerCut
-                    className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px]"
-                  />
-                  <HudGhostSkeleton
-                    variant="cyan"
-                    preset="button"
-                    cornerCut
-                    className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px]"
-                  />
-                </div>
-              ) : !user ? (
+              {user ? (
+                <BenthicCTAButton
+                  size="lg"
+                  variant="cyan"
+                  containerClassName="w-full sm:w-auto"
+                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
+                  onClick={() => onNavigate('/dashboard')}
+                >
+                  <span className="flex items-center justify-center gap-2.5 leading-none">
+                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                    <span>ENTER SYSTEM DASHBOARD</span>
+                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                  </span>
+                </BenthicCTAButton>
+              ) : (
                 <>
                   <BenthicCTAButton
                     size="lg"
@@ -402,20 +415,6 @@ export const LandingPage: React.FC = () => {
                     </span>
                   </BenthicCTAButton>
                 </>
-              ) : (
-                <BenthicCTAButton
-                  size="lg"
-                  variant="cyan"
-                  containerClassName="w-full sm:w-auto"
-                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                  onClick={() => onNavigate('/dashboard')}
-                >
-                  <span className="flex items-center justify-center gap-2.5 leading-none">
-                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                    <span>ENTER SYSTEM DASHBOARD</span>
-                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                  </span>
-                </BenthicCTAButton>
               )}
             </div>
 
@@ -649,22 +648,21 @@ export const LandingPage: React.FC = () => {
 
             {/* Action Call to Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
-              {isSessionPending ? (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="pillars-auth-skeleton">
-                  <HudGhostSkeleton
-                    variant="crimson"
-                    preset="button"
-                    cornerCut
-                    className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px]"
-                  />
-                  <HudGhostSkeleton
-                    variant="cyan"
-                    preset="button"
-                    cornerCut
-                    className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px]"
-                  />
-                </div>
-              ) : !user ? (
+              {user ? (
+                <BenthicCTAButton
+                  size="lg"
+                  variant="cyan"
+                  containerClassName="w-full sm:w-auto"
+                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
+                  onClick={() => onNavigate('/dashboard')}
+                >
+                  <span className="flex items-center justify-center gap-2.5 leading-none">
+                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                    <span>ENTER SYSTEM DASHBOARD</span>
+                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                  </span>
+                </BenthicCTAButton>
+              ) : (
                 <>
                   <BenthicCTAButton
                     size="lg"
@@ -691,20 +689,6 @@ export const LandingPage: React.FC = () => {
                     </span>
                   </BenthicCTAButton>
                 </>
-              ) : (
-                <BenthicCTAButton
-                  size="lg"
-                  variant="cyan"
-                  containerClassName="w-full sm:w-auto"
-                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                  onClick={() => onNavigate('/dashboard')}
-                >
-                  <span className="flex items-center justify-center gap-2.5 leading-none">
-                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                    <span>ENTER SYSTEM DASHBOARD</span>
-                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                  </span>
-                </BenthicCTAButton>
               )}
             </div>
           </ScrollReveal>
@@ -715,9 +699,11 @@ export const LandingPage: React.FC = () => {
           <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] group">
             <div className="pbr-underlay pbr-underlay-basalt opacity-35" />
             <img
-              src={getAssetUrl('/images/underwater_looking_up.jpg')}
+              src={getAssetUrl('/images/underwater_looking_up.webp')}
               alt="Sub-Benthic Abyss Scroll Reveal"
               {...lazyImageProps}
+              width={1376}
+              height={768}
               className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/70 to-[#070b0b] z-0" />
@@ -1186,28 +1172,7 @@ export const LandingPage: React.FC = () => {
                 </p>
                 
                 <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
-                  {isSessionPending ? (
-                    <div className="flex items-center justify-center w-full sm:w-auto" data-testid="bottom-auth-skeleton">
-                      <HudGhostSkeleton
-                        variant="crimson"
-                        preset="button"
-                        cornerCut
-                        className="w-full sm:w-[240px] min-h-[50px] sm:min-h-[54px]"
-                      />
-                    </div>
-                  ) : !user ? (
-                    <BenthicCTAButton
-                      size="lg"
-                      containerClassName="w-full sm:w-auto"
-                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-8 sm:px-10 tracking-wider"
-                      onClick={() => openAuth('signup')}
-                    >
-                      <span className="flex items-center justify-center gap-2.5 leading-none">
-                        <span>INITIATE ASCENSION</span>
-                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      </span>
-                    </BenthicCTAButton>
-                  ) : (
+                  {user ? (
                     <BenthicCTAButton
                       size="lg"
                       variant="cyan"
@@ -1218,6 +1183,18 @@ export const LandingPage: React.FC = () => {
                       <span className="flex items-center justify-center gap-2.5 leading-none">
                         <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                         <span>ENTER SYSTEM DASHBOARD</span>
+                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
+                      </span>
+                    </BenthicCTAButton>
+                  ) : (
+                    <BenthicCTAButton
+                      size="lg"
+                      containerClassName="w-full sm:w-auto"
+                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-8 sm:px-10 tracking-wider"
+                      onClick={() => openAuth('signup')}
+                    >
+                      <span className="flex items-center justify-center gap-2.5 leading-none">
+                        <span>INITIATE ASCENSION</span>
                         <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                       </span>
                     </BenthicCTAButton>

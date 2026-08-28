@@ -36,7 +36,7 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
   })
 
-  it('renders graceful skeleton loaders while session resolution is pending without flashing guest buttons', () => {
+  it('renders guest CTA buttons immediately while session resolution is pending for zero-flicker first paint', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: null,
       isPending: true,
@@ -44,25 +44,19 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    // Skeletons are rendered in place of CTA buttons to prevent flash of unauthenticated state
-    expect(screen.getByTestId('hero-auth-skeleton')).toBeInTheDocument()
-    expect(screen.getByTestId('pillars-auth-skeleton')).toBeInTheDocument()
-    expect(screen.getByTestId('bottom-auth-skeleton')).toBeInTheDocument()
-
-    // Non-logged in CTAs should NOT be visible during pending state
-    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
-    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
-    expect(screen.queryByText('ENTER SYSTEM DASHBOARD')).not.toBeInTheDocument()
+    // Primary marketing CTAs are immediately visible on SSR and client first paint
+    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('TRY GUEST DEMO').length).toBeGreaterThan(0)
+    expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
   })
 
-  it('holds guest CTAs for the first-paint empty session shape', () => {
+  it('renders guest CTAs directly for the first-paint empty session shape', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
 
     render(<LandingPage />)
 
-    expect(screen.getByTestId('hero-auth-skeleton')).toBeInTheDocument()
-    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
-    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
+    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
+    expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
   })
 
   it('renders "ENTER SYSTEM DASHBOARD" button for authenticated users', () => {
