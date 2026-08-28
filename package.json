@@ -13,6 +13,7 @@
     "test:ui": "vitest run src/components src/routes src/hooks",
     "test:scripts": "vitest run scripts/",
     "test:changed": "vitest run --changed",
+    "test:file": "vitest run",
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",

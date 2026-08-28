@@ -1,0 +1,28 @@
+---
+description: Prefer headless Vitest + typecheck; forbid browser/GUI verification unless explicitly requested
+alwaysApply: true
+---
+
+# Fast verification (default)
+
+Use headless terminal checks only. See [AGENTS.md](../../AGENTS.md) tiers and [.cursorrules](../../.cursorrules) for full command matrix.
+
+## Default commands
+
+- Single file: `npx vitest run path/to/file.test.ts` or `npm run test:file -- path/to/file.test.ts`
+- Typecheck: `npm run typecheck`
+- Tier 1: touched file(s) or `npm run test:changed`
+- Tier 2: `npm run test:core` or `npm run test:scripts`
+- Tier 3 only: `npm run test` + `npm run build`
+
+## Forbidden unless user explicitly asks
+
+- Browser MCP loops (`browser_navigate`, screenshots, visual QA)
+- `npm run dev` / `npm run preview` for verification
+- `mockups:capture`, `composite:render`, `post:create`, video/reel scripts
+- Full suite or production build for localized edits
+- `npm install` when `node_modules` exists and lockfile unchanged
+
+## Allowed when requested
+
+Visual QA, mockup capture, browser checks, or skill-driven media pipelines the user invoked.
