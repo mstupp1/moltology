@@ -9,7 +9,7 @@ import { MascotKey } from '../../src/components/composite/MascotOverlay'
 export { COMPOSITE_DIMENSIONS }
 export type { CompositeAspectRatio, CompositeTemplateType, MascotKey }
 
-export const DEFAULT_PORT = 3019
+export const DEFAULT_PORT = 3088
 export const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 export interface CaptureCompositeOptions {
@@ -31,7 +31,7 @@ export interface CaptureCompositeOptions {
 export function checkServerLiveness(url: string, timeoutMs = 2000): Promise<boolean> {
   return new Promise((resolve) => {
     const req = http.get(url, (res) => {
-      resolve(Boolean(res.statusCode && res.statusCode < 500))
+      resolve(Boolean(res.statusCode && res.statusCode < 400))
     })
     req.on('error', () => resolve(false))
     req.setTimeout(timeoutMs, () => {
