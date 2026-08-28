@@ -16,6 +16,8 @@ import { Conversation, ConversationContent } from '../ai-elements/conversation'
 import { Message, MessageContent, MessageResponse, MessageThinkingDots } from '../ai-elements/message'
 import { PromptInput } from '../ai-elements/prompt-input'
 import { NewChatScreen, DEFAULT_PROMPT_SHORTCUTS } from './NewChatScreen'
+import { ThreadList } from './ThreadList'
+import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
@@ -167,6 +169,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     if (!isChatsOpen) return
 
     const handleClickOutside = (e: MouseEvent | PointerEvent) => {
+      const target = e.target as Element | null
+      if (
+        target &&
+        (target.closest('[data-radix-popper-content-wrapper]') ||
+          target.closest('[data-hud-bottom-sheet]') ||
+          target.closest('[data-hud-modal-root]'))
+      ) {
+        return
+      }
       if (
         chatsDropdownRef.current &&
         !chatsDropdownRef.current.contains(e.target as Node) &&
@@ -203,6 +214,68 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   // Check if current conversation has active user messages
   const hasUserMessages = messages.some((m) => m.role === 'user')
+
+  const getThreadsForActions = useCallback(
+    () => (oracle ? oracle.threads : localThreads),
+    [oracle, localThreads]
+  )
+
+  const applyThreadPatch = useCallback(
+    (threadId: string, patch: ThreadPatch) => {
+      if (oracle) {
+        oracle.patchThreadLocally(threadId, patch)
+      } else {
+        setLocalThreads((prev) => prev.map((t) => (t.id === threadId ? { ...t, ...patch } : t)))
+      }
+    },
+    [oracle]
+  )
+
+  const removeThreadLocally = useCallback(
+    (threadId: string) => {
+      if (oracle) {
+        oracle.removeThreadLocally(threadId)
+      } else {
+        setLocalThreads((prev) => prev.filter((t) => t.id !== threadId))
+      }
+    },
+    [oracle]
+  )
+
+  const restoreThreadLocally = useCallback(
+    (thread: any) => {
+      if (oracle) {
+        oracle.restoreThreadLocally(thread)
+      } else {
+        setLocalThreads((prev) => (prev.some((t) => t.id === thread.id) ? prev : [...prev, thread]))
+      }
+    },
+    [oracle]
+  )
+
+  const handleActiveThreadRemoved = useCallback(
+    (removedThreadId: string) => {
+      const current = oracle ? oracle.activeThreadId : localActiveThreadId
+      if (current === removedThreadId) {
+        if (oracle) {
+          oracle.setActiveThreadId(null)
+        } else {
+          setLocalActiveThreadId(null)
+        }
+        setMessages([])
+      }
+    },
+    [oracle, localActiveThreadId]
+  )
+
+  const { pinThread, archiveThread, renameThread, deleteThread } = useThreadActions({
+    userId,
+    getThreads: getThreadsForActions,
+    applyLocalPatch: applyThreadPatch,
+    removeLocalThread: removeThreadLocally,
+    restoreLocalThread: restoreThreadLocally,
+    onActiveThreadRemoved: handleActiveThreadRemoved,
+  })
 
   // Reset to empty messages when activeThreadId is null, or fetch thread messages if set
   useEffect(() => {
@@ -587,34 +660,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   <p className="text-[11px] text-gray-400">No recorded chats yet.</p>
                 </div>
               ) : (
-                threads.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => handleSelectThread(t.id)}
-                    title={t.title}
-                    className={`w-full text-left px-2 py-1.5 text-xs block transition-all chamfer-corner cursor-pointer border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none ${
-                      activeThreadId === t.id
-                        ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
-                        : 'bg-[#080d0e]/50 hover:bg-cyan-950/40 text-gray-400 backdrop-blur-xs'
-                    }`}
-                    style={{ outline: 'none', WebkitTapHighlightColor: 'transparent' }}
-                  >
-                    <span className="block truncate select-none">
-                      {t.title || 'Untitled Consultation'}
-                    </span>
-                    {t.createdAt && (
-                      <span className="block text-[9px] text-gray-500 font-mono mt-0.5 select-none">
-                        {new Date(t.createdAt).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    )}
-                  </button>
-                ))
+                <ThreadList
+                  threads={threads}
+                  activeThreadId={activeThreadId}
+                  isLoadingThreads={false}
+                  onSelectThread={handleSelectThread}
+                  onPin={pinThread}
+                  onArchive={archiveThread}
+                  onRename={renameThread}
+                  onDelete={deleteThread}
+                />
               )
             ) : (
               /* Guest Mode Notice */

@@ -148,6 +148,13 @@
       "when": 1787930220510,
       "tag": "0020_low_annihilus",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1787946206265,
+      "tag": "0021_lovely_silverclaw",
+      "breakpoints": true
     }
   ]
 }

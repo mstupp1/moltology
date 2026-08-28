@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
+import { ThreadList } from '@/components/ai/ThreadList'
+import { useThreadActions, type ThreadPatch } from '@/components/ai/useThreadActions'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { getAIThreadsFn } from '@/lib/server/api'
 import { AuthModal } from '@/components/AuthModal'
@@ -20,6 +22,10 @@ interface OracleSidebarContentProps {
   onSelectThread: (id: string | null) => void
   onNewChat?: () => void
   onOpenAuthModal: () => void
+  onPin: (threadId: string, pinned: boolean) => void
+  onArchive: (threadId: string, archived: boolean) => void
+  onRename: (threadId: string, title: string) => void
+  onDelete: (threadId: string) => void
   hideHeader?: boolean
 }
 
@@ -32,6 +38,10 @@ function OracleSidebarContent({
   onSelectThread,
   onNewChat,
   onOpenAuthModal,
+  onPin,
+  onArchive,
+  onRename,
+  onDelete,
   hideHeader = false,
 }: OracleSidebarContentProps) {
   if (isAuthPending && !userId) {
@@ -82,35 +92,17 @@ function OracleSidebarContent({
         ) : threads.length === 0 ? (
           <div className="text-xs text-gray-500 py-4 text-center">No recorded threads yet.</div>
         ) : (
-          <div className="space-y-1.5 flex-1 overflow-y-auto pr-0.5">
-            {threads.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => onSelectThread(t.id)}
-                title={t.title}
-                className={`w-full text-left px-2 py-1.5 text-xs block transition-all chamfer-corner cursor-pointer border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 active:outline-none select-none ${
-                  activeThreadId === t.id
-                    ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
-                    : 'bg-[#080d0e]/50 hover:bg-cyan-950/40 text-gray-400 backdrop-blur-xs'
-                }`}
-                style={{ outline: 'none', WebkitTapHighlightColor: 'transparent' }}
-              >
-                <span className="block truncate select-none">
-                  {t.title || 'Untitled Consultation'}
-                </span>
-                {t.createdAt && (
-                  <span className="block text-[9px] text-gray-500 font-mono mt-0.5 select-none">
-                    {new Date(t.createdAt).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                )}
-              </button>
-            ))}
+          <div className="flex-1 overflow-y-auto pr-0.5">
+            <ThreadList
+              threads={threads}
+              activeThreadId={activeThreadId}
+              isLoadingThreads={false}
+              onSelectThread={(id) => onSelectThread(id)}
+              onPin={onPin}
+              onArchive={onArchive}
+              onRename={onRename}
+              onDelete={onDelete}
+            />
           </div>
         )}
       </div>
@@ -178,6 +170,61 @@ function OracleRouteComponent() {
     }
   }
 
+  const getThreadsForActions = useCallback(
+    () => (oracle ? oracle.threads : localThreads),
+    [oracle, localThreads]
+  )
+
+  const applyThreadPatch = useCallback(
+    (threadId: string, patch: ThreadPatch) => {
+      if (oracle) {
+        oracle.patchThreadLocally(threadId, patch)
+      } else {
+        setLocalThreads((prev) => prev.map((t) => (t.id === threadId ? { ...t, ...patch } : t)))
+      }
+    },
+    [oracle]
+  )
+
+  const removeThreadLocally = useCallback(
+    (threadId: string) => {
+      if (oracle) {
+        oracle.removeThreadLocally(threadId)
+      } else {
+        setLocalThreads((prev) => prev.filter((t) => t.id !== threadId))
+      }
+    },
+    [oracle]
+  )
+
+  const restoreThreadLocally = useCallback(
+    (thread: any) => {
+      if (oracle) {
+        oracle.restoreThreadLocally(thread)
+      } else {
+        setLocalThreads((prev) => (prev.some((t) => t.id === thread.id) ? prev : [...prev, thread]))
+      }
+    },
+    [oracle]
+  )
+
+  const handleActiveThreadRemoved = useCallback(
+    (threadId: string) => {
+      const current = oracle ? oracle.activeThreadId : localActiveThreadId
+      if (current === threadId) setActiveThreadId(null)
+    },
+    [oracle, localActiveThreadId]
+  )
+
+  const { pinThread, archiveThread, renameThread, deleteThread } = useThreadActions({
+    userId,
+    getThreads: getThreadsForActions,
+    applyLocalPatch: applyThreadPatch,
+    removeLocalThread: removeThreadLocally,
+    restoreLocalThread: restoreThreadLocally,
+    onActiveThreadRemoved: handleActiveThreadRemoved,
+  })
+
   useEffect(() => {
     if (oracle || !userId) return
     setLocalIsLoading(true)
@@ -226,6 +273,10 @@ function OracleRouteComponent() {
             onSelectThread={(id) => setActiveThreadId(id)}
             onNewChat={handleCreateNewThread}
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
+            onPin={pinThread}
+            onArchive={archiveThread}
+            onRename={renameThread}
+            onDelete={deleteThread}
           />
         </aside>
 
@@ -314,6 +365,10 @@ function OracleRouteComponent() {
                 setIsAuthModalOpen(true)
                 setIsMobileDrawerOpen(false)
               }}
+              onPin={pinThread}
+              onArchive={archiveThread}
+              onRename={renameThread}
+              onDelete={deleteThread}
               hideHeader={true}
             />
           </div>

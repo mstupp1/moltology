@@ -457,6 +457,114 @@ export const createAIThreadFn = createServerFn({ method: 'POST' })
   })
   .handler(createAIThreadHandler)
 
+const serializeAIThread = (thread: any) =>
+  thread
+    ? {
+        id: thread.id,
+        title: thread.title,
+        pinnedAt: thread.pinnedAt ?? null,
+        archivedAt: thread.archivedAt ?? null,
+        createdAt: thread.createdAt,
+        updatedAt: thread.updatedAt,
+      }
+    : null
+
+interface MutateAIThreadInput {
+  threadId: string
+  token?: string
+}
+
+/**
+ * Server Function: Pin or unpin an AI conversation thread.
+ */
+export const pinAIThreadFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: MutateAIThreadInput & { pinned: boolean }) => {
+    return z
+      .object({
+        threadId: z.string().min(1),
+        pinned: z.boolean(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(async ({ data, context }) => {
+    const auth = await resolveWriteAuth({ data, context })
+    if (!auth) throw new Error('Unauthenticated')
+    const { pinAIThread } = await import('../ai/service')
+    const thread = await pinAIThread(auth.userId, data.threadId, data.pinned)
+    if (!thread) throw new Error('Thread not found')
+    return { thread: serializeAIThread(thread) }
+  })
+
+/**
+ * Server Function: Archive or unarchive an AI conversation thread.
+ */
+export const archiveAIThreadFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: MutateAIThreadInput & { archived: boolean }) => {
+    return z
+      .object({
+        threadId: z.string().min(1),
+        archived: z.boolean(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(async ({ data, context }) => {
+    const auth = await resolveWriteAuth({ data, context })
+    if (!auth) throw new Error('Unauthenticated')
+    const { archiveAIThread } = await import('../ai/service')
+    const thread = await archiveAIThread(auth.userId, data.threadId, data.archived)
+    if (!thread) throw new Error('Thread not found')
+    return { thread: serializeAIThread(thread) }
+  })
+
+/**
+ * Server Function: Rename an AI conversation thread.
+ */
+export const renameAIThreadFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: MutateAIThreadInput & { title: string }) => {
+    return z
+      .object({
+        threadId: z.string().min(1),
+        title: z.string().min(1).max(120),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(async ({ data, context }) => {
+    const auth = await resolveWriteAuth({ data, context })
+    if (!auth) throw new Error('Unauthenticated')
+    const { renameAIThread } = await import('../ai/service')
+    const thread = await renameAIThread(auth.userId, data.threadId, data.title)
+    if (!thread) throw new Error('Thread not found')
+    return { thread: serializeAIThread(thread) }
+  })
+
+/**
+ * Server Function: Permanently delete an AI conversation thread (messages cascade).
+ */
+export const deleteAIThreadFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: MutateAIThreadInput) => {
+    return z
+      .object({
+        threadId: z.string().min(1),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(async ({ data, context }) => {
+    const auth = await resolveWriteAuth({ data, context })
+    if (!auth) throw new Error('Unauthenticated')
+    const { deleteAIThread } = await import('../ai/service')
+    const ok = await deleteAIThread(auth.userId, data.threadId)
+    if (!ok) throw new Error('Thread not found')
+    return { ok: true }
+  })
+
 interface SendChatMessageInput {
   messages: Array<{ role: string; content?: string; text?: string }>
   userId?: string
