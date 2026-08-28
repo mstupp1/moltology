@@ -5,6 +5,8 @@ import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useToast } from '@/components/ui/ToastProvider'
+import { useNotifications } from '@/hooks/useNotifications'
+import { Link } from '@tanstack/react-router'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
 
 export interface AlignmentTask {
@@ -51,6 +53,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     }
   }, [])
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const headerIslandRef = useRef<HTMLDivElement>(null)
 
   // Safe access to ToastProvider context for notification telemetry
   let toastsList: any[] = []
@@ -64,6 +67,19 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   } catch {
     // Render safely without ToastContext
   }
+
+  const {
+    notifications: dbNotifications,
+    unreadCount: notificationUnread,
+    markAllRead,
+    acceptFriendRequest,
+    declineFriendRequest,
+    markRead,
+  } = useNotifications()
+
+  const actionableNotifications = dbNotifications.filter((n) => n.actionable)
+  const recentNotifications = dbNotifications.filter((n) => !n.actionable)
+  const alertsBadgeCount = notificationUnread + toastHistoryList.length
 
   // Use propTasks if passed (e.g. in tests/custom usage), otherwise use global alignment tasks
   const [localPropTasks, setLocalPropTasks] = useState<AlignmentTask[] | null>(propTasks || null)
@@ -98,7 +114,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     if (!isScheduleOpen) return
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      const insideDropdown = dropdownRef.current?.contains(target)
+      const insideIsland = headerIslandRef.current?.contains(target)
+      if (!insideDropdown && !insideIsland) {
         setIsScheduleOpen(false)
       }
     }
@@ -266,8 +285,8 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           }`}
         >
           <Radio className="w-3 h-3 text-[#ff5540]" />
-          <span>ALERTS ({toastHistoryList.length})</span>
-          {toastsList.length > 0 && (
+          <span>ALERTS ({alertsBadgeCount})</span>
+          {(toastsList.length > 0 || notificationUnread > 0) && (
             <span className="w-2 h-2 rounded-full bg-[#ff5540] animate-pulse" />
           )}
         </button>
@@ -402,45 +421,164 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       {activeTab === 'transmissions' && (
         <div className="space-y-2.5 animate-in fade-in duration-150">
           <div className="flex items-center justify-between text-[10px] text-[#839493]">
-            <span>RECENT NEURAL DISPATCHES</span>
-            {toastHistoryList.length > 0 && (
-              <button
-                onClick={(e) => { e.stopPropagation(); clearToastsFn(); }}
-                className="text-[#ff453a] hover:text-[#ff6b6b] flex items-center gap-1 font-bold"
-              >
-                <Trash2 className="w-2.5 h-2.5" /> CLEAR
-              </button>
-            )}
+            <span>FRIEND REQUESTS & ALERTS</span>
+            <div className="flex items-center gap-2">
+              {notificationUnread > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    void markAllRead()
+                  }}
+                  className="text-[#00c3ff] hover:text-[#00ffff] font-bold"
+                >
+                  MARK ALL READ
+                </button>
+              )}
+              {toastHistoryList.length > 0 && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); clearToastsFn(); }}
+                  className="text-[#ff453a] hover:text-[#ff6b6b] flex items-center gap-1 font-bold"
+                >
+                  <Trash2 className="w-2.5 h-2.5" /> CLEAR
+                </button>
+              )}
+            </div>
           </div>
 
-          {toastHistoryList.length === 0 ? (
-            <div className="p-6 text-center text-xs text-[#839493] space-y-1">
-              <Radio className="w-6 h-6 text-[#3a4a49] mx-auto animate-pulse" />
-              <div>ALL FREQUENCIES QUIET</div>
-              <div className="text-[10px] text-[#839493]/60">System telemetry clear. No active alerts.</div>
-            </div>
-          ) : (
-            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
-              {toastHistoryList.map((t) => (
-                <div
-                  key={t.id}
-                  className="p-2 rounded-lg bg-[#040a0d] border border-[#00c3ff]/20 flex items-start gap-2 text-xs"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] mt-1.5 shrink-0" />
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    {t.title && (
-                      <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
-                        {t.title}
-                      </div>
-                    )}
-                    <div className="text-[#dfe3e3] text-[11px] leading-tight">
-                      {t.message}
+          {actionableNotifications.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-[9px] font-bold tracking-wider text-[#00ffff] uppercase">
+                Action Required
+              </div>
+              <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                {actionableNotifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className="p-2 rounded-lg bg-[#040a0d] border border-[#00ff9d]/30 space-y-2"
+                  >
+                    <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                      {n.title}
+                    </div>
+                    <div className="text-[#dfe3e3] text-[11px] leading-tight">{n.detail}</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {n.payload.requestId && (
+                        <>
+                          <button
+                            type="button"
+                            className="px-2 py-1 text-[9px] font-bold uppercase border border-[#00ff9d]/50 text-[#00ff9d] rounded"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              void acceptFriendRequest(n.payload.requestId!, n.id)
+                            }}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            type="button"
+                            className="px-2 py-1 text-[9px] font-bold uppercase border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] rounded"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              void declineFriendRequest(n.payload.requestId!, n.id)
+                            }}
+                          >
+                            Decline
+                          </button>
+                        </>
+                      )}
+                      {n.payload.profileId && (
+                        <Link
+                          to="/member/$profileId"
+                          params={{ profileId: n.payload.profileId }}
+                          className="px-2 py-1 text-[9px] font-bold uppercase border border-[#00c3ff]/40 text-[#00c3ff] rounded"
+                          onClick={() => setIsScheduleOpen(false)}
+                        >
+                          View Profile
+                        </Link>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
+
+          {recentNotifications.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-[9px] font-bold tracking-wider text-[#839493] uppercase">
+                Recent Transmissions
+              </div>
+              <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                {recentNotifications.map((n) => (
+                  <button
+                    key={n.id}
+                    type="button"
+                    className={`w-full text-left p-2 rounded-lg bg-[#040a0d] border flex items-start gap-2 text-xs ${
+                      n.readAt ? 'border-[#3a4a49]/60 opacity-80' : 'border-[#00c3ff]/30'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!n.readAt) void markRead(n.id)
+                    }}
+                  >
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                        n.readAt ? 'bg-[#3a4a49]' : 'bg-[#00c3ff]'
+                      }`}
+                    />
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                        {n.title}
+                      </div>
+                      <div className="text-[#dfe3e3] text-[11px] leading-tight">{n.detail}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <div className="text-[9px] font-bold tracking-wider text-[#839493] uppercase">
+              Ephemeral Toasts
+            </div>
+            {toastHistoryList.length === 0 ? (
+              <div className="p-4 text-center text-xs text-[#839493] space-y-1">
+                {dbNotifications.length === 0 && (
+                  <>
+                    <Radio className="w-6 h-6 text-[#3a4a49] mx-auto animate-pulse" />
+                    <div>ALL FREQUENCIES QUIET</div>
+                    <div className="text-[10px] text-[#839493]/60">
+                      No friend requests or alerts right now.
+                    </div>
+                  </>
+                )}
+                {dbNotifications.length > 0 && (
+                  <div className="text-[10px] text-[#839493]/60">No recent toast alerts.</div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                {toastHistoryList.map((t) => (
+                  <div
+                    key={t.id}
+                    className="p-2 rounded-lg bg-[#040a0d] border border-[#00c3ff]/20 flex items-start gap-2 text-xs"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] mt-1.5 shrink-0" />
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      {t.title && (
+                        <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                          {t.title}
+                        </div>
+                      )}
+                      <div className="text-[#dfe3e3] text-[11px] leading-tight">
+                        {t.message}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -463,10 +601,13 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   // ══════════════════════════════════════════════════════════════════════════════
   if (variant === 'header') {
     return (
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className}`} ref={headerIslandRef}>
         {/* Dynamic Island style header pill button */}
         <button
-          onClick={() => setIsScheduleOpen((prev) => !prev)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setIsScheduleOpen((prev) => !prev)
+          }}
           className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full bg-[#03090b]/90 hover:bg-[#061417] border border-[#00c3ff]/40 hover:border-[#00c3ff] text-[#dfe3e3] shadow-[0_0_12px_rgba(0,195,255,0.2)] transition-all select-none group"
           title="Open Activity Center & Liturgy Schedule"
           aria-label="Daily alignment tasks schedule"
@@ -481,6 +622,12 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/30">
             {completedCount}/{localTasks.length}
           </span>
+
+          {notificationUnread > 0 && (
+            <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#ff5540]/20 text-[#ff5540] border border-[#ff5540]/40 animate-pulse">
+              {notificationUnread}
+            </span>
+          )}
 
           {/* Chevron Indicator */}
           {isScheduleOpen ? (

@@ -496,6 +496,111 @@ export const podcasts = pgTable('podcasts', {
   })
 ])
 
+/** Friend request lifecycle statuses. */
+export type FriendRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled'
+
+/** Notification kinds for the Activity Center. */
+export type NotificationKind = 'friend_request' | 'friend_accepted' | 'friend_rejected'
+
+export type NotificationPayload = {
+  requestId?: string
+  profileId?: string
+}
+
+// Friend requests between members
+export const friendRequests = pgTable('friend_requests', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  senderId: text('senderId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  recipientId: text('recipientId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  status: text('status').$type<FriendRequestStatus>().default('pending').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  respondedAt: timestamp('respondedAt'),
+}, (table) => [
+  uniqueIndex('friend_requests_pending_pair_uidx')
+    .on(table.senderId, table.recipientId)
+    .where(sql`status = 'pending'`),
+  pgPolicy('friend_requests_party_select_policy', {
+    for: 'select',
+    using: sql`"senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "recipientId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('friend_requests_sender_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('friend_requests_party_update_policy', {
+    for: 'update',
+    using: sql`"senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "recipientId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+    withCheck: sql`"senderId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "recipientId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/** Normalized friendship pairs — always store userAId < userBId lexicographically. */
+export const friendships = pgTable('friendships', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userAId: text('userAId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  userBId: text('userBId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('friendships_pair_uidx').on(table.userAId, table.userBId),
+  pgPolicy('friendships_party_select_policy', {
+    for: 'select',
+    using: sql`"userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('friendships_party_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('friendships_party_delete_policy', {
+    for: 'delete',
+    using: sql`"userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+// Persistent Activity Center notifications
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  kind: text('kind').$type<NotificationKind>().notNull(),
+  actorUserId: text('actorUserId').references(() => profiles.id, { onDelete: 'set null' }),
+  title: text('title').notNull(),
+  detail: text('detail').notNull(),
+  payload: jsonb('payload').$type<NotificationPayload>().default({}).notNull(),
+  readAt: timestamp('readAt'),
+  sourceKey: text('sourceKey').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('notifications_user_source_unique').on(table.userId, table.sourceKey),
+  pgPolicy('notifications_owner_select_policy', {
+    for: 'select',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('notifications_owner_update_policy', {
+    for: 'update',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('notifications_insert_policy', {
+    for: 'insert',
+    withCheck: sql`true`,
+  }),
+])
+
 // Top-of-Funnel Leads & Guide Downloads Table
 export const leads = pgTable('leads', {
   id: uuid('id').defaultRandom().primaryKey(),
