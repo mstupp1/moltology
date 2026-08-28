@@ -50,6 +50,16 @@ describe('create-instagram-post', () => {
     expect(post.mascot).toBe('lobster_thumbs_up')
   })
 
+  it('generates Synaptic Oracle Prompts marketing post content', () => {
+    const post = generatePostContent('oracle-prompts')
+    expect(post.title).toContain('Synaptic Oracle')
+    expect(post.hookHeadline).toContain('UNLOCK THE ORACLE')
+    expect(post.commentKeyword).toBe('PROMPTS')
+    expect(post.caption).toContain('Comment "PROMPTS"')
+    expect(post.firstComment).toContain('PROMPTS')
+    expect(post.mascot).toBe('lobster_pointing')
+  })
+
   it('has valid default Zernio queue and profile identifiers', () => {
     expect(DEFAULT_PROFILE_ID).toBe('6a7f74b1839bf39ff3b6aaaa')
     expect(DEFAULT_INSTAGRAM_ACCOUNT_ID).toBe('6a7f7f0777555aae01d99b54')
@@ -58,6 +68,7 @@ describe('create-instagram-post', () => {
 
   it('keeps generated captions free of slash-pair chrome', () => {
     const themes = [
+      'oracle-prompts',
       'moltmaxxing-guide',
       'moltmax-quiz',
       'benthic-app',

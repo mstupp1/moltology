@@ -8,6 +8,7 @@ import {
   SocialSpecShowdownSlide,
   SocialDirectivesSlide,
   SocialMarketingSlide,
+  SocialPromptVaultSlide,
   ReelOutroCard,
   ReelThumbnailCard,
   BlogSchematicCard,
@@ -91,6 +92,28 @@ function CompositeRenderRoute() {
             trustBadgeYear={customData.trustBadgeYear}
             quoteText={customData.quoteText}
             benefits={customData.benefits}
+            commentKeyword={customData.commentKeyword}
+            commentCtaText={customData.commentCtaText}
+            mascot={mascot}
+            backgroundImageUrl={customData.backgroundImageUrl}
+          />
+        )}
+
+        {template === 'prompt-vault' && (
+          <SocialPromptVaultSlide
+            aspectRatio={aspect}
+            theme={theme}
+            eyebrowBadge={customData.eyebrowBadge || customData.categoryBadge}
+            heroNumber={customData.heroNumber}
+            heroHighlight={customData.heroHighlight}
+            heroSubject={customData.heroSubject}
+            heroSubPill={customData.heroSubPill}
+            brandTitle={customData.brandTitle}
+            brandSubtitle={customData.brandSubtitle}
+            promptCards={customData.promptCards}
+            footerNodes={customData.footerNodes}
+            orbBadgeText={customData.orbBadgeText}
+            orbBadgeSubtext={customData.orbBadgeSubtext}
             commentKeyword={customData.commentKeyword}
             commentCtaText={customData.commentCtaText}
             mascot={mascot}

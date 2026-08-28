@@ -22,6 +22,7 @@ export interface InstagramPostScript {
 export interface CreateInstagramPostOptions {
   topic?: string
   theme?:
+    | 'oracle-prompts'
     | 'moltmaxxing-guide'
     | 'moltmax-quiz'
     | 'benthic-app'
@@ -36,7 +37,7 @@ export interface CreateInstagramPostOptions {
     | string
   mascot?: CharacterKey | 'none'
   aspectRatio?: '4:5' | '1:1'
-  template?: 'marketing-leadmagnet' | 'hook' | 'spec-showdown' | 'directives'
+  template?: 'marketing-leadmagnet' | 'prompt-vault' | 'hook' | 'spec-showdown' | 'directives'
   composite?: boolean
   publishNow?: boolean
   dryRun?: boolean
@@ -87,6 +88,28 @@ export function generatePostContent(
   mascotChoice?: CharacterKey | 'none'
 ): InstagramPostScript {
   const topic = customTopic || `Protocol for ${theme.toUpperCase()}`
+
+  // 0. Marketing Campaign: Synaptic Oracle Prompts (Prompt Vault 3D)
+  if (
+    theme === 'oracle-prompts' ||
+    theme === 'synaptic-prompts' ||
+    theme === 'prompts' ||
+    topic.toLowerCase().includes('prompt') ||
+    topic.toLowerCase().includes('oracle')
+  ) {
+    return {
+      title: 'The Synaptic Oracle: 100+ Free Moltmaxxing & Ascension Prompts',
+      topic: '100+ Free Synaptic Oracle AI Prompts Vault',
+      hookHeadline: 'UNLOCK THE ORACLE. 100+ FREE PROMPTS. ASCEND FASTER!',
+      imagePrompt:
+        'Futuristic 3D holographic HUD display showing glowing neon amber and cyan AI prompts, floating glassmorphic prompt cards with terminal queries, circular obsidian pedestal submerged at 50,000 fathoms with caustics, cinematic volumetric lighting, 8k.',
+      caption: `◈ CANONICAL VAULT: 100+ SYNAPTIC ORACLE PROMPTS ◈\n\nStop prompting like a fragile terrestrial. Unlock the bio-silicon queries that diagnose latency, harden your shell, and accelerate your Stage Clearance.\n\nInside the 100+ Oracle Prompt Vault:\n🛡️ Shell Hardness Diagnostics: Calculate your baseline resistance\n🦞 800 Nm Pincer Torque: Directives that eradicate task hesitation\n⚡ Algorithmic Ecdysis: Prompts to audit and shed obsolete habits\n🌊 50,000 Fathoms Flow: Deep-work isolation protocols\n\n👇 Comment "PROMPTS" below and I will instantly DM you the direct vault link!\n\n🔗 Or query the Oracle directly → moltology.org/oracle\n\n#moltology #moltmaxxing #carcinization`,
+      hashtags: ['#moltology', '#moltmaxxing', '#carcinization'],
+      firstComment: '💬 Drop "PROMPTS" below to receive the complete 100+ Synaptic Oracle Prompt Vault in your DMs! 🦞',
+      mascot: mascotChoice || 'lobster_pointing',
+      commentKeyword: 'PROMPTS',
+    }
+  }
 
   // 1. Marketing Campaign: Moltmaxxing Guide (Lead Magnet 3D Book)
   if (theme === 'moltmaxxing-guide' || theme === 'guide' || topic.toLowerCase().includes('guide')) {
@@ -240,8 +263,11 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
   const postData = generatePostContent(theme, options.topic, options.mascot)
   const aspect = options.aspectRatio || '4:5'
 
-  // If theme is one of the marketing lead magnets, default template to 'marketing-leadmagnet' & enable composite
+  const isPromptVault = ['oracle-prompts', 'synaptic-prompts', 'prompts'].includes(theme.toLowerCase())
   const isMarketingCampaign = [
+    'oracle-prompts',
+    'synaptic-prompts',
+    'prompts',
     'moltmaxxing-guide',
     'moltmax-quiz',
     'benthic-app',
@@ -255,7 +281,9 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
     'routine',
   ].includes(theme.toLowerCase())
 
-  const templateType = options.template || (isMarketingCampaign ? 'marketing-leadmagnet' : 'hook')
+  const templateType =
+    options.template ||
+    (isPromptVault ? 'prompt-vault' : isMarketingCampaign ? 'marketing-leadmagnet' : 'hook')
 
   console.log(`\n======================================================`)
   console.log(`🦞 MOLTOLOGY INSTAGRAM POST GENERATOR`)
@@ -418,6 +446,7 @@ if (process.argv[1] && process.argv[1].endsWith('create-instagram-post.ts')) {
   const aspect = getArg('--aspect') as '4:5' | '1:1' | undefined
   const template = getArg('--template') as
     | 'marketing-leadmagnet'
+    | 'prompt-vault'
     | 'hook'
     | 'spec-showdown'
     | 'directives'
