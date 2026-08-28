@@ -1,8 +1,14 @@
-import { describe, it, expect } from 'vitest'
-import { resolveAuthSession } from './auth-session'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { resolveAuthSession, setCachedUser, clearCachedUser, getCachedUser } from './auth-session'
 
 describe('resolveAuthSession', () => {
-  it('treats a missing session object as pending, not guest', () => {
+  beforeEach(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.clear()
+    }
+  })
+
+  it('treats a missing session object as pending, not guest, when no cached user is present', () => {
     const state = resolveAuthSession(undefined)
     expect(state.isPending).toBe(true)
     expect(state.isGuest).toBe(false)
@@ -18,7 +24,7 @@ describe('resolveAuthSession', () => {
     expect(state.userId).toBeNull()
   })
 
-  it('holds chrome when the hook explicitly reports isPending', () => {
+  it('holds chrome when the hook explicitly reports isPending and no cached user', () => {
     const state = resolveAuthSession({ data: null, isPending: true })
     expect(state.isPending).toBe(true)
     expect(state.isGuest).toBe(false)
@@ -33,7 +39,7 @@ describe('resolveAuthSession', () => {
     expect(state.userId).toBeNull()
   })
 
-  it('reads the user from session data.user', () => {
+  it('reads the user from session data.user and synchronizes to local session cache', () => {
     const state = resolveAuthSession({
       data: { user: { id: 'usr_1', name: 'Initiate' } },
       isPending: true,
@@ -43,6 +49,29 @@ describe('resolveAuthSession', () => {
     expect(state.isAuthenticated).toBe(true)
     expect(state.userId).toBe('usr_1')
     expect(state.user?.name).toBe('Initiate')
+    expect(getCachedUser()?.id).toBe('usr_1')
+  })
+
+  it('instantly returns cached user while hook is pending on client to prevent non-logged-in flash on refresh', () => {
+    setCachedUser({ id: 'usr_cached_42', name: 'Cached Operative', email: 'op42@moltology.org' })
+
+    // Simulate page refresh where client hook starts as pending
+    const state = resolveAuthSession({ data: null, isPending: true })
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.isPending).toBe(false)
+    expect(state.userId).toBe('usr_cached_42')
+    expect(state.user?.name).toBe('Cached Operative')
+  })
+
+  it('clears cached user when session explicitly settles as logged out', () => {
+    setCachedUser({ id: 'usr_cached_42', name: 'Cached Operative' })
+    expect(getCachedUser()).not.toBeNull()
+
+    // Hook returns settled null session
+    const state = resolveAuthSession({ data: null, isPending: false })
+    expect(state.isAuthenticated).toBe(false)
+    expect(state.isGuest).toBe(true)
+    expect(getCachedUser()).toBeNull()
   })
 
   it('falls back to a root user when data.user is absent', () => {

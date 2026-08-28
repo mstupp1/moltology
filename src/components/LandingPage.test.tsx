@@ -36,7 +36,7 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
   })
 
-  it('renders guest CTA buttons immediately while session resolution is pending for zero-flicker first paint', () => {
+  it('renders graceful subtle skeleton while session resolution is pending without flashing wrong guest buttons', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: null,
       isPending: true,
@@ -44,19 +44,24 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    // Primary marketing CTAs are immediately visible on SSR and client first paint
-    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('TRY GUEST DEMO').length).toBeGreaterThan(0)
-    expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
+    // Skeletons are rendered in place of CTA buttons to prevent flash of wrong unauthenticated state
+    expect(screen.getByTestId('hero-auth-skeleton')).toBeInTheDocument()
+    expect(screen.getByTestId('pillars-auth-skeleton')).toBeInTheDocument()
+    expect(screen.getByTestId('bottom-auth-skeleton')).toBeInTheDocument()
+
+    // Non-logged in CTAs should NOT be visible during pending state
+    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
+    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
   })
 
-  it('renders guest CTAs directly for the first-paint empty session shape', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+  it('renders settled guest CTAs once session settles with no user', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(<LandingPage />)
 
     expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
     expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
+    expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
   })
 
   it('renders "ENTER SYSTEM DASHBOARD" button for authenticated users', () => {
@@ -77,6 +82,32 @@ describe('LandingPage Component', () => {
 
     fireEvent.click(dashboardButtons[0])
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+  })
+
+  it('renders "ENTER SYSTEM DASHBOARD" immediately on page refresh when a cached user session exists without flashing guest CTAs', () => {
+    // Simulate localStorage containing a cached active session from previous visit
+    localStorage.setItem(
+      'moltology:session:user',
+      JSON.stringify({
+        id: 'test-user-cached',
+        name: 'Cached Operative Unit',
+        email: 'operative@moltology.org',
+      })
+    )
+
+    // Simulate page refresh where initial hook status is still pending
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: null,
+      isPending: true,
+    } as any)
+
+    render(<LandingPage />)
+
+    // Authenticated dashboard button is immediately available on Frame 0
+    expect(screen.getAllByText('ENTER SYSTEM DASHBOARD').length).toBeGreaterThan(0)
+    // Non-logged in CTAs are NEVER flashed
+    expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
+    expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
   })
 
   it('renders all 3 synaptic ecosystem core features as image-based cards and handles navigation', () => {

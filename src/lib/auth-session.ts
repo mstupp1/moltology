@@ -38,6 +38,40 @@ export interface ResolveAuthSessionOptions {
   clientReady?: boolean
 }
 
+const SESSION_STORAGE_KEY = 'moltology:session:user'
+
+export function getCachedUser(): AuthSessionUser | null {
+  if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && (parsed.id || parsed.sub)) {
+      return parsed as AuthSessionUser
+    }
+  } catch {
+    // Ignore JSON parse errors in restricted/corrupted localStorage
+  }
+  return null
+}
+
+export function setCachedUser(user: AuthSessionUser | null): void {
+  if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') return
+  try {
+    if (user && (user.id || user.sub)) {
+      window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user))
+    } else {
+      window.localStorage.removeItem(SESSION_STORAGE_KEY)
+    }
+  } catch {
+    // Ignore localStorage write errors (e.g. quota/privacy mode)
+  }
+}
+
+export function clearCachedUser(): void {
+  setCachedUser(null)
+}
+
 function readSessionUser(sessionRes: unknown): AuthSessionUser | null {
   if (!sessionRes || typeof sessionRes !== 'object') return null
   const res = sessionRes as Record<string, any>
@@ -52,6 +86,8 @@ export function resolveAuthSession(
   const userId = (user?.id || user?.sub || null) as string | null
 
   if (userId) {
+    // Sync active verified user into local session cache
+    setCachedUser(user)
     return {
       user,
       userId,
@@ -88,6 +124,28 @@ export function resolveAuthSession(
 
   const hookPending = (sessionRes as { isPending?: boolean } | null)?.isPending
   const clientReady = options?.clientReady ?? true
+
+  // If the hook is pending on the client (before async session check finishes),
+  // check if we have a valid cached user from the active session to avoid flashing unauthenticated state
+  if (clientReady && hookPending !== false) {
+    const cached = getCachedUser()
+    const cachedId = (cached?.id || cached?.sub || null) as string | null
+    if (cachedId) {
+      return {
+        user: cached,
+        userId: cachedId,
+        isPending: false,
+        isGuest: false,
+        isAuthenticated: true,
+      }
+    }
+  }
+
+  // If hook explicitly settled with no user, purge any stale session cache
+  if (hookPending === false) {
+    clearCachedUser()
+  }
+
   const isPending = !clientReady || hookPending !== false
 
   return {

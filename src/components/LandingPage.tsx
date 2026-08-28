@@ -43,6 +43,7 @@ export const LandingPage: React.FC = () => {
   const onNavigate = (path: string) => navigate({ to: path })
   const session = useAuthSession()
   const user = session.user
+  const isSessionPending = session.isPending
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
@@ -389,6 +390,11 @@ export const LandingPage: React.FC = () => {
                     <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                   </span>
                 </BenthicCTAButton>
+              ) : isSessionPending ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="hero-auth-skeleton">
+                  <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+                  <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+                </div>
               ) : (
                 <>
                   <BenthicCTAButton
@@ -417,7 +423,6 @@ export const LandingPage: React.FC = () => {
                 </>
               )}
             </div>
-
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
@@ -662,6 +667,11 @@ export const LandingPage: React.FC = () => {
                     <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                   </span>
                 </BenthicCTAButton>
+              ) : isSessionPending ? (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="pillars-auth-skeleton">
+                  <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+                  <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+                </div>
               ) : (
                 <>
                   <BenthicCTAButton
@@ -1186,6 +1196,10 @@ export const LandingPage: React.FC = () => {
                         <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
                       </span>
                     </BenthicCTAButton>
+                  ) : isSessionPending ? (
+                    <div className="flex items-center justify-center w-full sm:w-auto" data-testid="bottom-auth-skeleton">
+                      <div className="w-full sm:w-[240px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+                    </div>
                   ) : (
                     <BenthicCTAButton
                       size="lg"
