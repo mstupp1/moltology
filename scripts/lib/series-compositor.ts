@@ -89,8 +89,8 @@ async function getMediaDuration(mediaPath: string): Promise<number> {
 }
 
 /**
- * Render Episodic HUD Badge Overlay (Top Center / Upper-Third Safe Zone)
- * e.g. "MOLTMAXXING FIELD AUDIT // S01 EP.04"
+ * Render Episodic HUD Badge Overlay (Top Center / Upper-Third Safe Zone).
+ * Series name and episode code are two separate fields (FIELD AUDIT · S01 EP.04).
  */
 export async function renderEpisodicBadgeCard(
   outputPath: string,

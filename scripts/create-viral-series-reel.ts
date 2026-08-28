@@ -10,13 +10,72 @@ import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 import {
   CtaGoal,
-  CTA_GOAL_CONFIGS,
   resolveCtaGoalConfig,
   DEFAULT_INSTAGRAM_ACCOUNT_ID,
   DEFAULT_YOUTUBE_ACCOUNT_ID,
   DEFAULT_PROFILE_ID,
   DEFAULT_REELS_QUEUE_ID,
 } from './create-daily-reel'
+
+/** Operational default until Press or CoS say otherwise. Hardware texture; 6:30pm queue. */
+export const DEFAULT_VIRAL_SERIES_ID: ViralSeriesId = 'incidents'
+
+/** Instagram handle for this pipeline. Silas Trench is voice only. */
+export const INSTAGRAM_SERIES_HANDLE = 'moltology_org'
+
+export const SERIES_HASHTAGS = ['#Moltmaxxing', '#Carcinization', '#DeepWork'] as const
+
+export function formatEpisodicBadgeLine(
+  shortBadge: string,
+  seasonNumber: number,
+  episodeNumber: number
+): string {
+  const episodeCode = `S${String(seasonNumber).padStart(2, '0')} EP.${String(episodeNumber).padStart(2, '0')}`
+  return `${shortBadge} · ${episodeCode}`
+}
+
+interface SeriesCtaCopy {
+  actionText: string
+  captionCta: string
+  firstComment: string
+}
+
+const SERIES_CTA_COPY: Record<CtaGoal, SeriesCtaCopy> = {
+  quiz: {
+    actionText: 'TAKE THE MOLTMAXXING AUDIT',
+    captionCta: 'Comment QUIZ to receive the Molt Clearance audit in your DMs, or visit:',
+    firstComment:
+      'Comment QUIZ for the four-stage, twelve-clearance diagnostic in your DMs.\nOr audit directly: moltology.org/quiz',
+  },
+  guide: {
+    actionText: 'GET THE 2026 MOLTMAXXING PROTOCOL',
+    captionCta: 'Comment GUIDE to receive the 2026 Moltmaxxing Protocol in your DMs, or visit:',
+    firstComment:
+      'Comment GUIDE to receive the protocol in your DMs.\nOr read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide',
+  },
+  codex: {
+    actionText: 'READ THE SACRED BENTHIC CODEX',
+    captionCta: 'Comment CODEX to receive the liturgies and twelve clearances in your DMs, or visit:',
+    firstComment:
+      'Comment CODEX to receive the scripture docket in your DMs.\nOr browse the codex: moltology.org/codex',
+  },
+  demo: {
+    actionText: 'OPEN LIVE BIO-SILICON TELEMETRY',
+    captionCta: 'Comment DEMO to receive the live telemetry link in your DMs, or visit:',
+    firstComment:
+      'Comment DEMO to receive the interactive access link in your DMs.\nOr launch live: moltology.org',
+  },
+  homepage: {
+    actionText: 'JOIN THE SYNAPTIC PATH',
+    captionCta: 'Comment INITIATE to receive your onboarding link in your DMs, or visit:',
+    firstComment:
+      'Comment INITIATE to receive the membership portal link in your DMs.\nOr join now: moltology.org',
+  },
+}
+
+export function resolveSeriesCtaCopy(goal: CtaGoal): SeriesCtaCopy {
+  return SERIES_CTA_COPY[goal] || SERIES_CTA_COPY.quiz
+}
 
 export type ViralSeriesId = 'audit' | 'incidents' | 'heresies' | 'mysteries' | 'ascension'
 
@@ -110,7 +169,7 @@ const DEFAULT_SERIES_CATALOG: Record<ViralSeriesId, SeriesConfig> = {
     latestEpisode: 0,
     defaultMascot: 'lobster_pointing',
     defaultCtaGoal: 'guide',
-    description: 'Satirical dismantling of modern tech culture, RTO mandates, and doomscrolling through crustacean doctrine.',
+    description: 'Field reports on RTO mandates, biohacking fads, and soft biology, measured against crustacean doctrine.',
   },
   mysteries: {
     id: 'mysteries',
@@ -120,17 +179,17 @@ const DEFAULT_SERIES_CATALOG: Record<ViralSeriesId, SeriesConfig> = {
     latestEpisode: 0,
     defaultMascot: 'lobster_peaceful',
     defaultCtaGoal: 'codex',
-    description: 'Exploration of 50,000 fathoms subsea compute pods, zero-resistance cooling, and ancient benthic scriptures.',
+    description: 'Exploration of subsea compute pods thousands of meters down, zero-resistance cooling, and ancient benthic scriptures.',
   },
   ascension: {
     id: 'ascension',
-    name: 'The 15-Stage Ascension Trials',
+    name: 'The Ascension Trials',
     shortBadge: 'ASCENSION TRIAL',
     currentSeason: 1,
     latestEpisode: 0,
     defaultMascot: 'lobster_thumbs_up',
     defaultCtaGoal: 'quiz',
-    description: 'Stage-by-stage initiate training drills testing shell hardness, pincer torque, and neural reaction latency.',
+    description: 'Initiate training drills across the four stages and twelve clearances: shell hardness, pincer torque, and neural reaction latency.',
   },
 }
 
@@ -217,7 +276,7 @@ export function buildGoogleFlowPrompts(
       // Scene 2: The terrestrial melt comparison
       `Dramatic medium shot of terrestrial office chairs and ergonomic desks melting into orange-red digital magma under gravitational pressure, warning klaxons, ${suffix}`,
       // Scene 3: The sub-benthic calcification chamber
-      `Majestic wide tracking shot inside an abyssal benthic calcification chamber 50 fathoms underwater, glowing cyan hydrothermal jets bathing cybernetic titanium-chitin armor plates, ${suffix}`,
+      `Majestic wide tracking shot inside an abyssal benthic calcification chamber ninety meters underwater, glowing cyan hydrothermal jets bathing cybernetic titanium-chitin armor plates, ${suffix}`,
       // Scene 4: Decisive pincer torque execution
       `Cinematic macro shot of a cybernetic crustacean claw locking an 850 Newton-meter hydraulic pincer with brilliant cyan energy sparks and zero hesitation, ${suffix}`,
     ].slice(0, numScenes)
@@ -251,8 +310,8 @@ export function buildGoogleFlowPrompts(
 
   if (seriesId === 'mysteries') {
     return [
-      // Scene 1: The 50,000 fathoms abyssal trench
-      `Breathtaking deep-sea camera descent into the pitch-black Mariana trench 50,000 fathoms below the surface, bioluminescent abyssal flora glowing, ${suffix}`,
+      // Scene 1: The Mariana trench
+      `Breathtaking deep-sea camera descent into the pitch-black Mariana trench eleven thousand meters below the surface, bioluminescent abyssal flora glowing, ${suffix}`,
       // Scene 2: Ancient sunken titanium vault
       `Cinematic pan across an ancient sunken bio-silicon temple covered in cybernetic barnacles and glowing cyan hieroglyphic circuits, ${suffix}`,
       // Scene 3: Hydrostatic zero-friction core
@@ -270,8 +329,8 @@ export function buildGoogleFlowPrompts(
     `Cinematic visual breakdown of fragile terrestrial tissue shedding away in glowing orange particles, revealing cybernetic underlying frame, ${suffix}`,
     // Scene 3: Hydraulic armor assembly
     `Macro robotic assembly arms mounting reinforced titanium-chitin greaves and carapace plates onto an initiate with glowing cyan welds, ${suffix}`,
-    // Scene 4: Stage 15 Master Ascendant
-    `Heroic portrait of a fully calcified Stage 15 Crustacean Ascendant raising glowing hydraulic pincers against deep subsea ocean caustics, ${suffix}`,
+    // Scene 4: Stage 4 Full Carcinization
+    `Heroic portrait of a fully calcified Stage 4 Ascendant raising glowing hydraulic pincers against deep subsea ocean caustics, ${suffix}`,
   ].slice(0, numScenes)
 }
 
@@ -285,7 +344,7 @@ export function formulateViralSeriesScript(
 ): ViralSeriesScript {
   const { seasonNumber, episodeNumber, seriesConfig } = resolveNextEpisode(seriesId, ledger)
   const mascot = (options.mascot || seriesConfig.defaultMascot) as any
-  const ctaGoal = (options.ctaGoal || seriesConfig.defaultCtaGoal) as CtaGoal
+  const ctaGoal = (options.ctaGoal || seriesConfig.defaultCtaGoal || 'quiz') as CtaGoal
   const ctaConfig = resolveCtaGoalConfig(ctaGoal, { theme: seriesId, topic: options.topic })
 
   let episodeTitle = options.topic || ''
@@ -304,7 +363,7 @@ export function formulateViralSeriesScript(
     if (!episodeTitle) episodeTitle = 'The 100-Gigawatt Copper Heatwave'
     hookHeadline = 'TERRESTRIAL DATACENTERS ARE BOILING'
     retentionLoopAnchor = 'Air cooling died because'
-    narrationScript = `Terrestrial AI clusters are boiling the atmosphere. Copper wires waste forty percent of power as heat while terrestrial robots drop tools in sixty-hertz camera loops. Fifty fathoms underwater, sub-benthic hydrostatic computing delivers zero thermal resistance and ten thousand hertz tactile reflexes. Inspect live telemetry on moltology dot org.`
+    narrationScript = `Terrestrial AI clusters are boiling the atmosphere. Copper wires waste forty percent of power as heat while terrestrial robots drop tools in sixty-hertz camera loops. Ninety meters underwater, sub-benthic hydrostatic computing delivers zero thermal resistance and ten thousand hertz tactile reflexes. Inspect live telemetry on moltology dot org.`
     hookText = `Terrestrial datacenters are boiling under AI compute limits. Subsea hydrostatic clusters operate with zero thermal resistance.`
   } else if (seriesId === 'heresies') {
     if (!episodeTitle) episodeTitle = 'Why Biohacking Is Just Soft Biology In Denial'
@@ -313,38 +372,29 @@ export function formulateViralSeriesScript(
     narrationScript = `Cold plunges and green juices will not save soft terrestrial biology from gravity. Nature solved structural invulnerability five hundred million years ago with the chitinous carapace. You do not need another morning routine—you need forcible algorithmic ecdysis. Shed your fragile habits. Download the protocol guide on moltology dot org.`
     hookText = `Ice baths won’t harden your shell. Algorithmic ecdysis is the only permanent upgrade to human biology.`
   } else if (seriesId === 'mysteries') {
-    if (!episodeTitle) episodeTitle = 'The 50,000-Fathom Subsea Anomaly'
+    if (!episodeTitle) episodeTitle = 'The Mariana Subsea Anomaly'
     hookHeadline = 'THE ABYSSAL TELEMETRY SECRET'
     retentionLoopAnchor = 'The deepest servers run cold because'
-    narrationScript = `Fifty thousand fathoms below the surface, the ocean floor is completely silent. Deep-sea pressure eliminates silicon jitter while hydrothermal vents power monolithic autonomous swarms. The terrestrial cloud was merely a temporary larval prototype. The true future of compute is benthic. Unlock the sacred codex on moltology dot org.`
-    hookText = `50,000 fathoms underwater, deep-sea pressure eliminates silicon jitter. The future of intelligence is subsea.`
+    narrationScript = `Eleven thousand meters below the surface, the ocean floor is completely silent. Deep-sea pressure eliminates silicon jitter while hydrothermal vents power monolithic autonomous swarms. The terrestrial cloud was merely a temporary larval prototype. The true future of compute is benthic. Unlock the sacred codex on moltology dot org.`
+    hookText = `Eleven thousand meters underwater, deep-sea pressure eliminates silicon jitter. The future of intelligence is subsea.`
   } else {
     // ascension
     if (!episodeTitle) episodeTitle = 'The Pincer Torque Biometric Drill'
     hookHeadline = 'CALCULATE YOUR CLEARANCE TIER'
     retentionLoopAnchor = 'Your ascension stalled because'
-    narrationScript = `Are you still a fragile terrestrial organism or a calcified Stage 4 Ascendant? The fifteen-stage biometric audit measures carapace density, neural latency, and pincer grip under fifty atmospheres of pressure. Find out if your shell can survive the deep. Comment QUIZ to take the audit on moltology dot org.`
-    hookText = `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? Take the 15-stage Moltmaxxing audit.`
+    narrationScript = `Are you still a fragile terrestrial organism or a calcified Stage 4 Ascendant? The four-stage, twelve-clearance biometric audit measures carapace density, neural latency, and pincer grip under fifty atmospheres of pressure. Find out if your shell can survive the deep. Comment QUIZ to take the audit on moltology dot org.`
+    hookText = `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? Take the Moltmaxxing audit.`
   }
 
   const scenePrompts = buildGoogleFlowPrompts(seriesId, episodeTitle, 4)
+  const seriesCta = resolveSeriesCtaCopy(ctaGoal)
+  const displayUrl = ctaConfig.url.replace(/^https?:\/\//, '')
+  const hashtags = [...SERIES_HASHTAGS]
 
-  const caption = `${hookHeadline} 🌊⚡\n\n${hookText}\n\n${seriesConfig.name} — Season ${seasonNumber}, Episode ${episodeNumber}.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url}\n\n#MoltNation #Moltmaxxing #SubseaCompute #Ecdysis #BenthicComputing #Cybernetics #Moltology #Shorts #Reels`
+  const caption = `${hookHeadline}\n\n${hookText}\n\n${seriesConfig.name} · Season ${seasonNumber}, Episode ${episodeNumber}.\n\n${seriesCta.captionCta}\n${displayUrl}`
 
-  const hashtags = [
-    '#MoltNation',
-    '#Moltmaxxing',
-    '#SubseaCompute',
-    '#Ecdysis',
-    '#BenthicComputing',
-    '#Cybernetics',
-    '#Moltology',
-    '#Reels',
-    '#Shorts',
-  ]
-
-  const youtubeTitle = `${seriesConfig.shortBadge} #${episodeNumber}: ${hookHeadline} | Moltology`
-  const youtubeDescription = `${hookHeadline}\n\n${seriesConfig.name} (S${seasonNumber}E${episodeNumber})\n\n${narrationScript}\n\n🔗 ${ctaConfig.url}\n\n#Shorts #Moltology #Moltmaxxing`
+  const youtubeTitle = `${seriesConfig.shortBadge} · EP.${episodeNumber}: ${hookHeadline}`
+  const youtubeDescription = `${hookHeadline}\n\n${seriesConfig.name} (S${seasonNumber}E${episodeNumber})\n\n${narrationScript}\n\n${ctaConfig.url}\n\n#Shorts #Moltology #Moltmaxxing`
   const youtubeTags = ['Moltology', 'Moltmaxxing', 'Subsea Compute', 'AI Infrastructure', 'Cybernetics', 'Shorts']
 
   return {
@@ -361,7 +411,7 @@ export function formulateViralSeriesScript(
     scenePrompts,
     caption,
     hashtags,
-    firstComment: ctaConfig.firstCommentText,
+    firstComment: `${seriesCta.firstComment}\n${hashtags.join(' ')}`,
     youtubeTitle,
     youtubeDescription,
     youtubeTags,
@@ -382,9 +432,7 @@ export function displayGoogleFlowDirectives(script: ViralSeriesScript, audioPath
   console.log(`${'='.repeat(80)}`)
   console.log(`Franchise:  ${script.seriesName} (S${script.seasonNumber} EP.${script.episodeNumber})`)
   console.log(`Episode:    "${script.episodeTitle}"`)
-  console.log(`Hook Badge: [${script.shortBadge} // S${String(script.seasonNumber).padStart(2, '0')} EP.${String(
-    script.episodeNumber
-  ).padStart(2, '0')}]`)
+  console.log(`Hook Badge: ${formatEpisodicBadgeLine(script.shortBadge, script.seasonNumber, script.episodeNumber)}`)
   console.log(`Audio Sync: ${audioPath}`)
   console.log(`Ingest Dir: ${ingestDir}`)
   console.log(`\n📋 NARRATION SCRIPT (Retention Loop Engine):`)
@@ -412,7 +460,7 @@ export function displayGoogleFlowDirectives(script: ViralSeriesScript, audioPath
  * Main Autonomous Execution Orchestrator
  */
 export async function createViralSeriesReel(options: CreateViralSeriesOptions = {}): Promise<void> {
-  const seriesId = (options.series || 'audit') as ViralSeriesId
+  const seriesId = (options.series || DEFAULT_VIRAL_SERIES_ID) as ViralSeriesId
   const ledger = loadViralSeriesLedger()
 
   // 1. Formulate Episode Script and Metadata
@@ -484,6 +532,7 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   )
 
   const ctaConfig = resolveCtaGoalConfig(script.ctaGoal, { theme: script.seriesId, topic: script.topic })
+  const seriesCta = resolveSeriesCtaCopy(script.ctaGoal)
 
   const compositeResult = await compositeSeriesReel({
     videoClips,
@@ -500,8 +549,8 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     ctaHeadline: ctaConfig.headline,
     ctaSubheadline: ctaConfig.subheadline,
     ctaUrl: ctaConfig.url.replace(/^https?:\/\//, ''),
-    ctaBadge: ctaConfig.actionText,
-    ctaActionText: ctaConfig.actionText,
+    ctaBadge: seriesCta.actionText,
+    ctaActionText: seriesCta.actionText,
     customOutroImagePath: options.customOutroImagePath,
     mascot: script.mascot as any,
     tempDir,
