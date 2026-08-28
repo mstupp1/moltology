@@ -28,8 +28,23 @@ export const LOBSTER_IDLE_LAYER_IDS = [
 
 export const LOBSTER_IDLE_LAYER_CLASS = 'lobster-idle-layer'
 
+const MAX_DECODED_SVG_CACHE = 64
+const decodedSvgCache = new Map<string, string>()
+
+export function clearDecodedSvgCache(): void {
+  decodedSvgCache.clear()
+}
+
 export function decodeSvgDataUri(src: string): string | null {
   if (!src.startsWith('data:image/svg+xml')) return null
+
+  const cached = decodedSvgCache.get(src)
+  if (cached !== undefined) {
+    // Refresh LRU order
+    decodedSvgCache.delete(src)
+    decodedSvgCache.set(src, cached)
+    return cached
+  }
 
   const commaIndex = src.indexOf(',')
   if (commaIndex === -1) return null
@@ -38,11 +53,24 @@ export function decodeSvgDataUri(src: string): string | null {
   const isBase64 = src.includes(';base64,')
 
   try {
+    let decoded: string | null = null
     if (isBase64) {
       if (typeof atob === 'undefined') return null
-      return atob(payload)
+      decoded = atob(payload)
+    } else {
+      decoded = decodeURIComponent(payload)
     }
-    return decodeURIComponent(payload)
+
+    if (decoded) {
+      if (decodedSvgCache.size >= MAX_DECODED_SVG_CACHE) {
+        const oldestKey = decodedSvgCache.keys().next().value
+        if (oldestKey !== undefined) {
+          decodedSvgCache.delete(oldestKey)
+        }
+      }
+      decodedSvgCache.set(src, decoded)
+    }
+    return decoded
   } catch {
     return null
   }

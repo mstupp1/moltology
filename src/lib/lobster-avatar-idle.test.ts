@@ -109,4 +109,11 @@ describe('lobster-avatar-idle', () => {
 
     expect(Math.abs(farStep.x)).toBeGreaterThan(Math.abs(nearStep.x - (LOBSTER_EYE_TRACK_RADIUS - 0.1)))
   })
+
+  it('caches decoded SVG data URIs in memory', () => {
+    const res1 = decodeSvgDataUri(SAMPLE_URI)
+    const res2 = decodeSvgDataUri(SAMPLE_URI)
+    expect(res1).toBe(SAMPLE_SVG)
+    expect(res1).toBe(res2) // Identical cached reference
+  })
 })

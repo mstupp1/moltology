@@ -47,7 +47,6 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = ({
   vignette = true,
   specularSheen = true,
 }) => {
-  const [dataUri, setDataUri] = useState<string | null>(src ?? null)
   const resolvedSeed = animationSeed ?? config?.seed
   const configSeed = config?.seed
   const configTheme = config?.backgroundTheme
@@ -59,31 +58,23 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = ({
   const configSparkles = config?.patternSparkles
   const configTransparent = config?.transparentBackground
 
-  useEffect(() => {
-    if (src) {
-      setDataUri(src)
-      return
-    }
-    if (!configSeed) {
-      setDataUri(null)
-      return
-    }
-    setDataUri(
-      generateLobsterAvatarDataUri(
-        {
-          style: LOBSTER_AVATAR_STYLE,
-          seed: configSeed,
-          ...(configTheme ? { backgroundTheme: configTheme } : {}),
-          ...(configPattern ? { backgroundPattern: configPattern } : {}),
-          ...(configTexture ? { backgroundTexture: configTexture } : {}),
-          ...(configDensity ? { patternDensity: configDensity } : {}),
-          ...(configGlow ? { patternGlow: configGlow } : {}),
-          ...(configPulse ? { patternPulse: configPulse } : {}),
-          ...(configSparkles ? { patternSparkles: configSparkles } : {}),
-          ...(configTransparent ? { transparentBackground: configTransparent } : {}),
-        },
-        size
-      )
+  const dataUri = useMemo(() => {
+    if (src) return src
+    if (!configSeed) return null
+    return generateLobsterAvatarDataUri(
+      {
+        style: LOBSTER_AVATAR_STYLE,
+        seed: configSeed,
+        ...(configTheme ? { backgroundTheme: configTheme } : {}),
+        ...(configPattern ? { backgroundPattern: configPattern } : {}),
+        ...(configTexture ? { backgroundTexture: configTexture } : {}),
+        ...(configDensity ? { patternDensity: configDensity } : {}),
+        ...(configGlow ? { patternGlow: configGlow } : {}),
+        ...(configPulse ? { patternPulse: configPulse } : {}),
+        ...(configSparkles ? { patternSparkles: configSparkles } : {}),
+        ...(configTransparent ? { transparentBackground: configTransparent } : {}),
+      },
+      size
     )
   }, [src, configSeed, configTheme, configPattern, configTexture, configDensity, configGlow, configPulse, configSparkles, configTransparent, size])
 

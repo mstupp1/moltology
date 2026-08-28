@@ -84,4 +84,51 @@ describe('pixelate-avatar', () => {
 
     global.Image = originalImage
   })
+
+  it('evicts oldest entries when cache exceeds capacity', async () => {
+    const mockToDataURL = vi.fn().mockImplementation(() => `data:image/png;base64,mock_${Math.random()}`)
+    const mockContext = {
+      drawImage: vi.fn(),
+      imageSmoothingEnabled: true,
+    }
+
+    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      if (tagName === 'canvas') {
+        return {
+          width: 0,
+          height: 0,
+          getContext: vi.fn().mockReturnValue(mockContext),
+          toDataURL: mockToDataURL,
+        } as unknown as HTMLCanvasElement
+      }
+      return document.createElement(tagName)
+    })
+
+    const originalImage = global.Image
+    // @ts-expect-error test mock
+    global.Image = class MockImage {
+      width = 100
+      height = 100
+      onload: (() => void) | null = null
+      onerror: (() => void) | null = null
+      set src(_val: string) {
+        setTimeout(() => {
+          if (this.onload) this.onload()
+        }, 1)
+      }
+    }
+
+    // Insert 66 entries (capacity is 64)
+    for (let i = 0; i < 66; i++) {
+      await pixelateImage(`data:image/svg+xml;base64,item_${i}`)
+    }
+
+    // Oldest items (0 and 1) should be evicted
+    expect(getCachedPixelatedImage('data:image/svg+xml;base64,item_0')).toBeNull()
+    expect(getCachedPixelatedImage('data:image/svg+xml;base64,item_1')).toBeNull()
+    // Most recent items should be cached
+    expect(getCachedPixelatedImage('data:image/svg+xml;base64,item_65')).not.toBeNull()
+
+    global.Image = originalImage
+  })
 })
