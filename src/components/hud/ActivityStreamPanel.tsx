@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Activity, CheckCircle2, Clock } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getActivityEventsFn } from '@/lib/server/api'
 import {
@@ -16,10 +16,10 @@ function eventIcon() {
 }
 
 export function ActivityStreamPanel() {
-  const sessionRes = authClient.useSession()
-  const user = sessionRes?.data?.user || (sessionRes as any)?.user
-  const userId = user?.id || user?.sub || null
-  const isAuthPending = sessionRes?.isPending ?? false
+  const session = useAuthSession()
+  const user = session.user
+  const userId = session.userId
+  const isAuthPending = session.isPending
 
   const [events, setEvents] = useState<ActivityEventView[]>([])
   const [isLoading, setIsLoading] = useState(true)

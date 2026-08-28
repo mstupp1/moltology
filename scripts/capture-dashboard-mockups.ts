@@ -74,6 +74,7 @@ interface CaptureTarget {
 }
 
 const REGISTERED_TARGETS: Record<string, CaptureTarget> = {
+  // ── Multi-Device Interactive Showcase (Full Browser & Mobile) ──
   dashboard_desktop: {
     name: 'dashboard_desktop',
     route: '/dashboard',
@@ -89,6 +90,31 @@ const REGISTERED_TARGETS: Record<string, CaptureTarget> = {
     isMobile: true,
     outputBase: 'dashboard_mobile_preview',
   },
+
+  // ── 3 Core Features (Main Hub Area Only — No Sidebar or Top Bar) ──
+  dashboard_feature: {
+    name: 'dashboard_feature',
+    route: '/dashboard?view=main',
+    windowSize: '1760,1100',
+    scaleFactor: 2,
+    outputBase: 'dashboard_feature_preview',
+  },
+  forum_feature: {
+    name: 'forum_feature',
+    route: '/forum?view=main',
+    windowSize: '1760,1100',
+    scaleFactor: 2,
+    outputBase: 'forum_feature_preview',
+  },
+  oracle_feature: {
+    name: 'oracle_feature',
+    route: '/oracle?view=main',
+    windowSize: '1760,1100',
+    scaleFactor: 2,
+    outputBase: 'oracle_feature_preview',
+  },
+
+  // ── Full Desktop Sector Previews ──
   forum_desktop: {
     name: 'forum_desktop',
     route: '/forum',
@@ -110,6 +136,13 @@ const REGISTERED_TARGETS: Record<string, CaptureTarget> = {
     scaleFactor: 2,
     outputBase: 'market_desktop_preview',
   },
+  market_feature: {
+    name: 'market_feature',
+    route: '/market?view=main',
+    windowSize: '1760,1100',
+    scaleFactor: 2,
+    outputBase: 'market_feature_preview',
+  },
   chassis_desktop: {
     name: 'chassis_desktop',
     route: '/chassis',
@@ -117,12 +150,26 @@ const REGISTERED_TARGETS: Record<string, CaptureTarget> = {
     scaleFactor: 2,
     outputBase: 'chassis_desktop_preview',
   },
+  chassis_feature: {
+    name: 'chassis_feature',
+    route: '/chassis?view=main',
+    windowSize: '1760,1100',
+    scaleFactor: 2,
+    outputBase: 'chassis_feature_preview',
+  },
   codex_desktop: {
     name: 'codex_desktop',
     route: '/codex',
     windowSize: '1760,1100',
     scaleFactor: 2,
     outputBase: 'codex_desktop_preview',
+  },
+  codex_feature: {
+    name: 'codex_feature',
+    route: '/codex?view=main',
+    windowSize: '1760,1100',
+    scaleFactor: 2,
+    outputBase: 'codex_feature_preview',
   },
 }
 
@@ -157,12 +204,13 @@ async function main() {
     }
     activeTargets = keys.map((k) => REGISTERED_TARGETS[k])
   } else {
-    // Default: capture the core marketing set (dashboard, forum, oracle)
+    // Default: capture the multi-device showcase set AND 3 core features set
     activeTargets = [
       REGISTERED_TARGETS.dashboard_desktop,
       REGISTERED_TARGETS.dashboard_mobile,
-      REGISTERED_TARGETS.forum_desktop,
-      REGISTERED_TARGETS.oracle_desktop,
+      REGISTERED_TARGETS.dashboard_feature,
+      REGISTERED_TARGETS.forum_feature,
+      REGISTERED_TARGETS.oracle_feature,
     ]
   }
 

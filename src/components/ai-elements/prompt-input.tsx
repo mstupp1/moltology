@@ -59,7 +59,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   return (
     <div className={`p-2.5 sm:p-3 bg-[#070c0e]/85 backdrop-blur-md border-t border-cyan-900/40 select-none ${className}`}>
-      <div className="bg-[#202231]/90 border border-[#32364a]/60 rounded-2xl p-2 sm:p-2.5 shadow-xl transition-all">
+      <div className="bg-benthic-surface/90 border border-benthic-border/60 rounded-2xl p-2 sm:p-2.5 shadow-xl transition-all">
         <form onSubmit={handleSubmit} className="flex flex-col">
           <textarea
             ref={textareaRef}
@@ -83,7 +83,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                     setPlusMenuOpen((v) => !v)
                     setModelMenuOpen(false)
                   }}
-                  className="p-1 text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60 rounded-lg transition-colors cursor-pointer"
+                  className="p-1 text-gray-400 hover:text-white hover:bg-benthic-high/60 rounded-lg transition-colors cursor-pointer"
                   title="Add Context / Attachment"
                   aria-label="Add Context"
                 >
@@ -93,11 +93,11 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                 {plusMenuOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setPlusMenuOpen(false)} />
-                    <div className="absolute left-0 bottom-full mb-2 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-48 text-xs">
+                    <div className="absolute left-0 bottom-full mb-2 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 min-w-48 text-xs">
                       <button
                         type="button"
                         onClick={() => handleAttachDirective('Consult Scripture & Codex')}
-                        className="w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs text-gray-300 hover:bg-[#282a3d] hover:text-white transition-colors"
+                        className="w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs text-gray-300 hover:bg-benthic-high/70 hover:text-white transition-colors"
                       >
                         <FileText className="w-3.5 h-3.5 text-cyan-400" />
                         <span>Attach Codex Scripture</span>
@@ -105,7 +105,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAttachDirective('Ascension & Shell Hardening Analysis')}
-                        className="w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs text-gray-300 hover:bg-[#282a3d] hover:text-white transition-colors"
+                        className="w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs text-gray-300 hover:bg-benthic-high/70 hover:text-white transition-colors"
                       >
                         <Zap className="w-3.5 h-3.5 text-amber-400" />
                         <span>Ascension Guide</span>
@@ -113,7 +113,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAttachDirective('Abyssal Deep Telemetry')}
-                        className="w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs text-gray-300 hover:bg-[#282a3d] hover:text-white transition-colors"
+                        className="w-full text-left px-3 py-1.5 flex items-center gap-2 text-xs text-gray-300 hover:bg-benthic-high/70 hover:text-white transition-colors"
                       >
                         <Radio className="w-3.5 h-3.5 text-purple-400" />
                         <span>Biometric Telemetry</span>
@@ -132,18 +132,18 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                       setModelMenuOpen((v) => !v)
                       setPlusMenuOpen(false)
                     }}
-                    className="flex items-center gap-1.5 text-[11px] text-[#c3c7d5] hover:text-white bg-[#282a3a]/70 hover:bg-[#32354a]/80 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 text-[11px] text-gray-300 hover:text-white bg-benthic-container/80 hover:bg-benthic-high/80 px-2 py-0.5 rounded-lg transition-colors cursor-pointer"
                     title="Select Cognition Model"
                   >
                     <span className="truncate max-w-[130px] sm:max-w-none font-medium">{selectedModel.shortLabel || selectedModel.label}</span>
-                    <ChevronDown className="w-3 h-3 text-[#8f94a8] shrink-0" />
+                    <ChevronDown className="w-3 h-3 text-gray-400 shrink-0" />
                   </button>
 
                   {modelMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
-                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-[#1e202d] border border-[#32364a] shadow-2xl rounded-xl py-1 min-w-52 text-xs">
-                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-[#32364a]/60">
+                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 min-w-52 text-xs">
+                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-benthic-border/60">
                           Model
                         </div>
                         {ORACLE_MODELS.map((m) => (
@@ -156,8 +156,8 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                             }}
                             className={`w-full text-left px-3 py-1.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${
                               m.id === selectedModel.id
-                                ? 'bg-[#2e3146] text-white font-medium'
-                                : 'text-gray-300 hover:bg-[#282a3d] hover:text-white'
+                                ? 'bg-benthic-high text-white font-medium'
+                                : 'text-gray-300 hover:bg-benthic-high/70 hover:text-white'
                             }`}
                           >
                             <span className="truncate">{m.label}</span>
@@ -179,7 +179,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                   isRecording
                     ? 'text-red-400 bg-red-950/60 animate-pulse'
-                    : 'text-[#8f94a8] hover:text-[#d1d5db] hover:bg-[#2e3144]/60'
+                    : 'text-gray-400 hover:text-white hover:bg-benthic-high/60'
                 }`}
                 title={isRecording ? 'Listening... Click to stop' : 'Voice Dictation'}
                 aria-label="Voice Dictation"
