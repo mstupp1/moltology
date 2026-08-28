@@ -91,6 +91,8 @@ export function DashboardMarketingShowcase() {
               <ArrowRight className="w-5 h-5 shrink-0" />
             </span>
           </BenthicCTAButton>
+        ) : session.isPending ? (
+          <div data-testid="showcase-auth-skeleton" className="w-full sm:w-[260px] min-h-[54px] sm:min-h-[60px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
         ) : (
           <BenthicCTAButton
             size="lg"

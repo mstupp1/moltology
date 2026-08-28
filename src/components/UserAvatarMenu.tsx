@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { LogOut, EyeOff, Sparkles, ChevronDown, Settings } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { clearCachedUser } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { getEffectiveRole } from '@/lib/permissions'
@@ -53,6 +54,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
   const handleSignOut = async () => {
     handleClose()
+    clearCachedUser()
     await authClient.signOut()
     if (onNavigate) {
       onNavigate('/')

@@ -32,7 +32,7 @@ describe('Homepage route head', () => {
           as: 'image',
           type: 'image/webp',
           href: getAssetUrl('/images/hero_widescreen_bg.webp'),
-          fetchpriority: 'high',
+          fetchPriority: 'high',
         },
       ]),
     )
