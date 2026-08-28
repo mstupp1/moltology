@@ -8,7 +8,13 @@ export const Route = createFileRoute('/')({
     meta: [...seo(HOMEPAGE_SEO)],
     links: [
       canonicalLink(SITE_ORIGIN),
-      { rel: 'preload', as: 'image', href: getAssetUrl('/images/hero_widescreen_bg.jpg') },
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
+        href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+        fetchpriority: 'high',
+      },
     ],
   }),
   component: LandingPage,

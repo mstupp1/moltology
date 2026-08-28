@@ -5,7 +5,6 @@ import { Safari } from '@/components/ui/magicui/safari'
 import { Iphone15Pro } from '@/components/ui/magicui/iphone-15-pro'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { BenthicCTAButton } from './BenthicCTAButton'
-import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 
 export function DashboardMarketingShowcase() {
@@ -79,15 +78,7 @@ export function DashboardMarketingShowcase() {
 
       {/* Big Centered Launch Demo CTA Button at the Bottom */}
       <div className="flex items-center justify-center mt-8 sm:mt-12 lg:mt-14 relative z-20">
-        {session.isPending ? (
-          <HudGhostSkeleton
-            variant="cyan"
-            preset="button"
-            cornerCut
-            className="w-[240px] min-h-[54px]"
-            data-testid="showcase-auth-skeleton"
-          />
-        ) : session.isAuthenticated ? (
+        {session.isAuthenticated ? (
           <BenthicCTAButton
             size="lg"
             variant="cyan"

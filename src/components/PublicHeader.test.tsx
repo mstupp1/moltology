@@ -213,7 +213,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(headerEl.className).toContain('translate-y-0')
   })
 
-  it('renders auth skeleton placeholder when session is pending', () => {
+  it('renders guest auth buttons directly without skeleton flicker when session is pending', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: null,
       isPending: true,
@@ -221,17 +221,17 @@ describe('PublicHeader Navigation Component', () => {
 
     render(<PublicHeader activePage="home" />)
 
-    expect(screen.getByTestId('public-header-auth-skeleton')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /LOG IN/i })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /LOG IN/i }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /JOIN PATH/i }).length).toBeGreaterThan(0)
+    expect(screen.queryByTestId('public-header-auth-skeleton')).not.toBeInTheDocument()
   })
 
-  it('holds header chrome for the first-paint empty session shape', () => {
+  it('renders guest auth buttons for the first-paint empty session shape', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
 
     render(<PublicHeader activePage="home" />)
 
-    expect(screen.getByTestId('public-header-auth-skeleton')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /LOG IN/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /JOIN PATH/i })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /LOG IN/i }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /JOIN PATH/i }).length).toBeGreaterThan(0)
   })
 })
