@@ -2,6 +2,12 @@
   "name": "moltology",
   "private": true,
   "type": "module",
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true,
+    "msedge-tts": false
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit && node scripts/prune-vercel-function.mjs",
