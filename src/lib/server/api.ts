@@ -2,9 +2,9 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, notifications } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc, like, or, sql, and, asc } from 'drizzle-orm'
+import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
@@ -61,6 +61,26 @@ import {
   listActivityEventsForUser,
   recordRoutineCompletedEvent,
 } from './activity-log'
+import {
+  assertCanSendFriendRequest,
+  buildFriendNotificationCopy,
+  canTransitionFriendRequest,
+  getStageLabel,
+  normalizeFriendPair,
+  toMemberSummary,
+  type ConnectionsListView,
+  type MemberSearchResult,
+  type PublicProfileView,
+  type RelationshipState,
+} from '../connections'
+import {
+  countUnreadNotifications,
+  friendAcceptedSourceKey,
+  friendRejectedSourceKey,
+  friendRequestSourceKey,
+  isActionableFriendRequest,
+  type NotificationView,
+} from '../notifications'
 
 type Db = ReturnType<typeof getDb>
 
@@ -2432,4 +2452,710 @@ export const moveGearItemFn = createServerFn({ method: 'POST' })
       .parse(data)
   )
   .handler(moveGearItemHandler)
+
+// ─── Public profiles & connections ───────────────────────────────────────────
+
+async function loadMemberEquippedLoadout(dbClient: Db, targetUserId: string) {
+  const catalogRows = await dbClient
+    .select()
+    .from(equipmentCatalog)
+    .orderBy(asc(equipmentCatalog.sortOrder))
+
+  const gearRows = await dbClient
+    .select()
+    .from(userGearItems)
+    .where(eq(userGearItems.userId, targetUserId))
+
+  const catalog = catalogRows.map(toCatalogRef)
+  const items = gearRows
+    .map(toGearState)
+    .filter((item) => item.equippedSlot != null)
+  const catalogById = new Map(catalog.map((c) => [c.id, c]))
+  const totals = computeLoadoutTotals(items, catalogById)
+
+  return {
+    catalog: catalog.filter((c) => items.some((item) => item.catalogItemId === c.id)),
+    items,
+    totals,
+  }
+}
+
+async function resolveRelationship(
+  dbClient: Db,
+  viewerId: string,
+  targetId: string
+): Promise<{ relationship: RelationshipState; pendingRequestId: string | null }> {
+  if (viewerId === targetId) {
+    return { relationship: 'self', pendingRequestId: null }
+  }
+
+  const [userAId, userBId] = normalizeFriendPair(viewerId, targetId)
+  const [friendship] = await dbClient
+    .select({ id: friendships.id })
+    .from(friendships)
+    .where(and(eq(friendships.userAId, userAId), eq(friendships.userBId, userBId)))
+    .limit(1)
+
+  if (friendship) {
+    return { relationship: 'friends', pendingRequestId: null }
+  }
+
+  const pending = await dbClient
+    .select({
+      id: friendRequests.id,
+      senderId: friendRequests.senderId,
+      recipientId: friendRequests.recipientId,
+    })
+    .from(friendRequests)
+    .where(
+      and(
+        eq(friendRequests.status, 'pending'),
+        or(
+          and(eq(friendRequests.senderId, viewerId), eq(friendRequests.recipientId, targetId)),
+          and(eq(friendRequests.senderId, targetId), eq(friendRequests.recipientId, viewerId))
+        )
+      )
+    )
+    .limit(1)
+
+  if (pending[0]) {
+    if (pending[0].senderId === viewerId) {
+      return { relationship: 'pending_sent', pendingRequestId: pending[0].id }
+    }
+    return { relationship: 'pending_received', pendingRequestId: pending[0].id }
+  }
+
+  return { relationship: 'none', pendingRequestId: null }
+}
+
+async function insertNotification(
+  dbClient: Db,
+  input: {
+    userId: string
+    kind: 'friend_request' | 'friend_accepted' | 'friend_rejected'
+    actorUserId: string
+    title: string
+    detail: string
+    payload: { requestId?: string; profileId?: string }
+    sourceKey: string
+  }
+) {
+  await dbClient
+    .insert(notifications)
+    .values({
+      userId: input.userId,
+      kind: input.kind,
+      actorUserId: input.actorUserId,
+      title: input.title,
+      detail: input.detail,
+      payload: input.payload,
+      sourceKey: input.sourceKey,
+    })
+    .onConflictDoNothing()
+}
+
+export const getPublicProfileHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ profileId: string; token?: string; userId?: string }>): Promise<PublicProfileView | null> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to view member profiles.')
+  if (!data?.profileId) throw new Error('Missing profile id.')
+
+  const [profile] = await auth.dbClient
+    .select({
+      id: profiles.id,
+      larvaId: profiles.larvaId,
+      stage: profiles.stage,
+      avatarConfig: profiles.avatarConfig,
+      createdAt: profiles.createdAt,
+    })
+    .from(profiles)
+    .where(eq(profiles.id, data.profileId))
+    .limit(1)
+
+  if (!profile) return null
+
+  const [stats] = await auth.dbClient
+    .select()
+    .from(userStats)
+    .where(eq(userStats.userId, profile.id))
+    .limit(1)
+
+  const { relationship, pendingRequestId } = await resolveRelationship(
+    auth.dbClient,
+    auth.userId,
+    profile.id
+  )
+
+  return {
+    id: profile.id,
+    larvaId: profile.larvaId,
+    stage: profile.stage,
+    stageLabel: getStageLabel(profile.stage),
+    avatarConfig: (profile.avatarConfig as PublicProfileView['avatarConfig']) ?? null,
+    memberSince: profile.createdAt.toISOString(),
+    stats: stats
+      ? {
+          pincerTorque: stats.pincerTorque,
+          shellHardness: stats.shellHardness,
+          processingPower: stats.processingPower,
+          durability: stats.durability,
+          clawStrength: stats.clawStrength,
+          socialDetachmentIndex: stats.socialDetachmentIndex,
+          submergenceDepthRating: stats.submergenceDepthRating,
+        }
+      : null,
+    moltmax: stats
+      ? {
+          score: stats.moltmaxScore,
+          clearance: stats.moltmaxClearance,
+          stage: stats.moltmaxStage,
+        }
+      : null,
+    relationship,
+    pendingRequestId,
+  }
+}
+
+export const getPublicProfileFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { profileId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        profileId: z.string().min(1),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(getPublicProfileHandler)
+
+export const getMemberLoadoutHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ profileId: string; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to view member loadouts.')
+  if (!data?.profileId) throw new Error('Missing profile id.')
+
+  const [exists] = await auth.dbClient
+    .select({ id: profiles.id })
+    .from(profiles)
+    .where(eq(profiles.id, data.profileId))
+    .limit(1)
+  if (!exists) throw new Error('Member profile not found.')
+
+  return loadMemberEquippedLoadout(auth.dbClient, data.profileId)
+}
+
+export const getMemberLoadoutFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { profileId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        profileId: z.string().min(1),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(getMemberLoadoutHandler)
+
+export const searchMembersHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ query: string; token?: string; userId?: string }>): Promise<MemberSearchResult[]> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to search members.')
+
+  const query = (data?.query || '').trim()
+  if (query.length < 2) return []
+
+  const rows = await auth.dbClient
+    .select({
+      id: profiles.id,
+      larvaId: profiles.larvaId,
+      stage: profiles.stage,
+      avatarConfig: profiles.avatarConfig,
+    })
+    .from(profiles)
+    .where(and(ne(profiles.id, auth.userId), ilike(profiles.larvaId, `%${query}%`)))
+    .orderBy(asc(profiles.larvaId))
+    .limit(20)
+
+  return rows.map((row) => ({
+    id: row.id,
+    larvaId: row.larvaId,
+    stage: row.stage,
+    stageLabel: getStageLabel(row.stage),
+    avatarConfig: (row.avatarConfig as MemberSearchResult['avatarConfig']) ?? null,
+  }))
+}
+
+export const searchMembersFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { query: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        query: z.string().min(1).max(80),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(searchMembersHandler)
+
+export const sendFriendRequestHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ recipientId: string; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to send friend requests.')
+  if (!data?.recipientId) throw new Error('Missing recipient.')
+
+  assertCanSendFriendRequest(auth.userId, data.recipientId)
+
+  const [recipient] = await auth.dbClient
+    .select({ id: profiles.id, larvaId: profiles.larvaId })
+    .from(profiles)
+    .where(eq(profiles.id, data.recipientId))
+    .limit(1)
+  if (!recipient) throw new Error('That member could not be found.')
+
+  const { relationship } = await resolveRelationship(auth.dbClient, auth.userId, data.recipientId)
+  if (relationship === 'friends') throw new Error('You are already friends with this member.')
+  if (relationship === 'pending_sent') throw new Error('Friend request already sent.')
+  if (relationship === 'pending_received') {
+    throw new Error('This member already sent you a friend request. Accept it from Connections or Activity Center.')
+  }
+
+  const [sender] = await auth.dbClient
+    .select({ larvaId: profiles.larvaId })
+    .from(profiles)
+    .where(eq(profiles.id, auth.userId))
+    .limit(1)
+
+  const [created] = await auth.dbClient
+    .insert(friendRequests)
+    .values({
+      senderId: auth.userId,
+      recipientId: data.recipientId,
+      status: 'pending',
+    })
+    .returning()
+
+  const copy = buildFriendNotificationCopy('friend_request', sender?.larvaId || 'A member')
+  await insertNotification(auth.dbClient, {
+    userId: data.recipientId,
+    kind: 'friend_request',
+    actorUserId: auth.userId,
+    title: copy.title,
+    detail: copy.detail,
+    payload: { requestId: created.id, profileId: auth.userId },
+    sourceKey: friendRequestSourceKey(created.id),
+  })
+
+  return { requestId: created.id, status: created.status as string }
+}
+
+export const sendFriendRequestFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { recipientId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        recipientId: z.string().min(1),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(sendFriendRequestHandler)
+
+export const respondFriendRequestHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ requestId: string; action: 'accept' | 'reject'; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to respond to friend requests.')
+  if (!data?.requestId || !data?.action) throw new Error('Missing request response payload.')
+
+  const [request] = await auth.dbClient
+    .select()
+    .from(friendRequests)
+    .where(eq(friendRequests.id, data.requestId))
+    .limit(1)
+
+  if (!request) throw new Error('Friend request not found.')
+  if (request.recipientId !== auth.userId) {
+    throw new Error('Only the recipient can accept or decline this request.')
+  }
+  if (!canTransitionFriendRequest(request.status as 'pending', data.action === 'accept' ? 'accepted' : 'rejected')) {
+    throw new Error('This friend request can no longer be updated.')
+  }
+
+  const nextStatus = data.action === 'accept' ? 'accepted' : 'rejected'
+  await auth.dbClient
+    .update(friendRequests)
+    .set({ status: nextStatus, respondedAt: new Date() })
+    .where(eq(friendRequests.id, request.id))
+
+  const [actor] = await auth.dbClient
+    .select({ larvaId: profiles.larvaId })
+    .from(profiles)
+    .where(eq(profiles.id, auth.userId))
+    .limit(1)
+
+  if (data.action === 'accept') {
+    const [userAId, userBId] = normalizeFriendPair(request.senderId, request.recipientId)
+    await auth.dbClient
+      .insert(friendships)
+      .values({ userAId, userBId })
+      .onConflictDoNothing()
+
+    const copy = buildFriendNotificationCopy('friend_accepted', actor?.larvaId || 'A member')
+    await insertNotification(auth.dbClient, {
+      userId: request.senderId,
+      kind: 'friend_accepted',
+      actorUserId: auth.userId,
+      title: copy.title,
+      detail: copy.detail,
+      payload: { requestId: request.id, profileId: auth.userId },
+      sourceKey: friendAcceptedSourceKey(request.id),
+    })
+  } else {
+    const copy = buildFriendNotificationCopy('friend_rejected', actor?.larvaId || 'A member')
+    await insertNotification(auth.dbClient, {
+      userId: request.senderId,
+      kind: 'friend_rejected',
+      actorUserId: auth.userId,
+      title: copy.title,
+      detail: copy.detail,
+      payload: { requestId: request.id, profileId: auth.userId },
+      sourceKey: friendRejectedSourceKey(request.id),
+    })
+  }
+
+  // Mark the recipient's actionable notification as read
+  await auth.dbClient
+    .update(notifications)
+    .set({ readAt: new Date() })
+    .where(
+      and(
+        eq(notifications.userId, auth.userId),
+        eq(notifications.sourceKey, friendRequestSourceKey(request.id)),
+        isNull(notifications.readAt)
+      )
+    )
+
+  return { requestId: request.id, status: nextStatus }
+}
+
+export const respondFriendRequestFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { requestId: string; action: 'accept' | 'reject'; token?: string; userId?: string }) =>
+    z
+      .object({
+        requestId: z.string().uuid(),
+        action: z.enum(['accept', 'reject']),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(respondFriendRequestHandler)
+
+export const cancelFriendRequestHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ requestId: string; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to cancel friend requests.')
+  if (!data?.requestId) throw new Error('Missing request id.')
+
+  const [request] = await auth.dbClient
+    .select()
+    .from(friendRequests)
+    .where(eq(friendRequests.id, data.requestId))
+    .limit(1)
+
+  if (!request) throw new Error('Friend request not found.')
+  if (request.senderId !== auth.userId) {
+    throw new Error('Only the sender can cancel this request.')
+  }
+  if (!canTransitionFriendRequest(request.status as 'pending', 'cancelled')) {
+    throw new Error('This friend request can no longer be cancelled.')
+  }
+
+  await auth.dbClient
+    .update(friendRequests)
+    .set({ status: 'cancelled', respondedAt: new Date() })
+    .where(eq(friendRequests.id, request.id))
+
+  return { requestId: request.id, status: 'cancelled' as const }
+}
+
+export const cancelFriendRequestFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { requestId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        requestId: z.string().uuid(),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(cancelFriendRequestHandler)
+
+export const removeConnectionHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ friendId: string; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to remove a connection.')
+  if (!data?.friendId) throw new Error('Missing friend id.')
+  if (data.friendId === auth.userId) throw new Error('Cannot remove yourself.')
+
+  const [userAId, userBId] = normalizeFriendPair(auth.userId, data.friendId)
+  await auth.dbClient
+    .delete(friendships)
+    .where(and(eq(friendships.userAId, userAId), eq(friendships.userBId, userBId)))
+
+  return { ok: true as const }
+}
+
+export const removeConnectionFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { friendId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        friendId: z.string().min(1),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(removeConnectionHandler)
+
+export const listConnectionsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ token?: string; userId?: string }>): Promise<ConnectionsListView> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to list connections.')
+
+  const friendshipRows = await auth.dbClient
+    .select()
+    .from(friendships)
+    .where(or(eq(friendships.userAId, auth.userId), eq(friendships.userBId, auth.userId)))
+
+  const friendIds = friendshipRows.map((row) =>
+    row.userAId === auth.userId ? row.userBId : row.userAId
+  )
+
+  const friendProfiles =
+    friendIds.length === 0
+      ? []
+      : await auth.dbClient
+          .select({
+            id: profiles.id,
+            larvaId: profiles.larvaId,
+            stage: profiles.stage,
+            avatarConfig: profiles.avatarConfig,
+          })
+          .from(profiles)
+          .where(inArray(profiles.id, friendIds))
+
+  const friendSinceById = new Map(
+    friendshipRows.map((row) => [
+      row.userAId === auth.userId ? row.userBId : row.userAId,
+      row.createdAt,
+    ])
+  )
+
+  const pendingRows = await auth.dbClient
+    .select()
+    .from(friendRequests)
+    .where(
+      and(
+        eq(friendRequests.status, 'pending'),
+        or(eq(friendRequests.senderId, auth.userId), eq(friendRequests.recipientId, auth.userId))
+      )
+    )
+    .orderBy(desc(friendRequests.createdAt))
+
+  const relatedIds = [
+    ...new Set(pendingRows.flatMap((row) => [row.senderId, row.recipientId])),
+  ].filter((id) => id !== auth.userId)
+
+  const relatedProfiles =
+    relatedIds.length === 0
+      ? []
+      : await auth.dbClient
+          .select({
+            id: profiles.id,
+            larvaId: profiles.larvaId,
+            stage: profiles.stage,
+            avatarConfig: profiles.avatarConfig,
+          })
+          .from(profiles)
+          .where(inArray(profiles.id, relatedIds))
+
+  const profileById = new Map(relatedProfiles.map((p) => [p.id, p]))
+
+  const incoming = pendingRows
+    .filter((row) => row.recipientId === auth.userId)
+    .map((row) => {
+      const other = profileById.get(row.senderId)
+      if (!other) return null
+      return toMemberSummary({
+        ...other,
+        avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
+        requestId: row.id,
+      })
+    })
+    .filter(Boolean) as ConnectionsListView['incoming']
+
+  const outgoing = pendingRows
+    .filter((row) => row.senderId === auth.userId)
+    .map((row) => {
+      const other = profileById.get(row.recipientId)
+      if (!other) return null
+      return toMemberSummary({
+        ...other,
+        avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
+        requestId: row.id,
+      })
+    })
+    .filter(Boolean) as ConnectionsListView['outgoing']
+
+  return {
+    friends: friendProfiles.map((p) =>
+      toMemberSummary({
+        ...p,
+        avatarConfig: (p.avatarConfig as { style: string; seed: string } | null) ?? null,
+        since: friendSinceById.get(p.id) ?? null,
+      })
+    ),
+    incoming,
+    outgoing,
+  }
+}
+
+export const listConnectionsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data ?? {})
+  )
+  .handler(listConnectionsHandler)
+
+export const getNotificationsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ token?: string; userId?: string; limit?: number }>): Promise<{
+  notifications: NotificationView[]
+  unreadCount: number
+}> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to load notifications.')
+
+  const limit = Math.min(Math.max(data?.limit ?? 30, 1), 50)
+  const rows = await auth.dbClient
+    .select({
+      id: notifications.id,
+      kind: notifications.kind,
+      title: notifications.title,
+      detail: notifications.detail,
+      actorUserId: notifications.actorUserId,
+      payload: notifications.payload,
+      readAt: notifications.readAt,
+      createdAt: notifications.createdAt,
+      actorLarvaId: profiles.larvaId,
+    })
+    .from(notifications)
+    .leftJoin(profiles, eq(notifications.actorUserId, profiles.id))
+    .where(eq(notifications.userId, auth.userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit)
+
+  const views: NotificationView[] = rows.map((row) => {
+    const payload = (row.payload || {}) as { requestId?: string; profileId?: string }
+    const readAt = row.readAt ? row.readAt.toISOString() : null
+    return {
+      id: row.id,
+      kind: row.kind as NotificationView['kind'],
+      title: row.title,
+      detail: row.detail,
+      actorUserId: row.actorUserId,
+      actorLarvaId: row.actorLarvaId ?? null,
+      payload,
+      readAt,
+      createdAt: row.createdAt.toISOString(),
+      actionable: isActionableFriendRequest(row.kind as NotificationView['kind'], readAt, payload),
+    }
+  })
+
+  return {
+    notifications: views,
+    unreadCount: countUnreadNotifications(views),
+  }
+}
+
+export const getNotificationsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string; limit?: number }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+        limit: z.number().int().min(1).max(50).optional(),
+      })
+      .parse(data ?? {})
+  )
+  .handler(getNotificationsHandler)
+
+export const markNotificationReadHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ notificationId?: string; all?: boolean; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to mark notifications read.')
+
+  const now = new Date()
+  if (data?.all) {
+    await auth.dbClient
+      .update(notifications)
+      .set({ readAt: now })
+      .where(and(eq(notifications.userId, auth.userId), isNull(notifications.readAt)))
+    return { ok: true as const }
+  }
+
+  if (!data?.notificationId) throw new Error('Missing notification id.')
+  await auth.dbClient
+    .update(notifications)
+    .set({ readAt: now })
+    .where(and(eq(notifications.id, data.notificationId), eq(notifications.userId, auth.userId)))
+
+  return { ok: true as const }
+}
+
+export const markNotificationReadFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { notificationId?: string; all?: boolean; token?: string; userId?: string }) =>
+    z
+      .object({
+        notificationId: z.string().uuid().optional(),
+        all: z.boolean().optional(),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(markNotificationReadHandler)
 

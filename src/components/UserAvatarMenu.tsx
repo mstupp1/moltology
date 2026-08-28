@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, EyeOff, Sparkles, ChevronDown, Settings } from 'lucide-react'
+import { LogOut, EyeOff, Sparkles, ChevronDown, Settings, User } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { clearCachedUser } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -64,6 +64,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const handleOpenSettings = () => {
     handleClose()
     onNavigate?.('/settings')
+  }
+
+  const handleOpenProfile = () => {
+    handleClose()
+    if (user.id) {
+      onNavigate?.(`/member/${user.id}`)
+    }
   }
 
   const displayName = user.name || user.email?.split('@')[0] || 'Operative'
@@ -277,6 +284,20 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                     isCorporate ? 'border-sky-100' : 'border-cyan-950/80'
                   }`}
                 >
+                  {user.id && (
+                    <button
+                      type="button"
+                      onClick={handleOpenProfile}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
+                        isCorporate
+                          ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
+                          : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
+                      }`}
+                    >
+                      <User className="w-4 h-4 shrink-0" />
+                      <span>YOUR PROFILE</span>
+                    </button>
+                  )}
                   {/* Settings Link */}
                   <button
                     type="button"
@@ -492,6 +513,24 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
           {/* Account Actions Section: Settings & Sign Out */}
           <div className="pt-2 space-y-1.5">
+            {user.id && (
+              <button
+                type="button"
+                onClick={handleOpenProfile}
+                className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
+                  isCorporate
+                    ? 'text-sky-700 hover:bg-sky-50 border border-sky-200/80 hover:border-sky-300'
+                    : 'text-[#00c3ff] hover:bg-[#00c3ff]/10 border border-cyan-900/40 hover:border-[#00c3ff]/40'
+                }`}
+              >
+                <User
+                  className={`w-4 h-4 shrink-0 ${
+                    isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
+                  }`}
+                />
+                <span>YOUR PROFILE</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={handleOpenSettings}
