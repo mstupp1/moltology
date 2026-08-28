@@ -49,7 +49,11 @@ export function getAssetUrl(assetPath: string): string {
 
   const cleanPath = assetPath.replace(/^\/+/, '')
 
-  if (LOCAL_ASSET_WHITELIST.has(cleanPath) || cleanPath.startsWith('images/chassis/')) {
+  if (
+    LOCAL_ASSET_WHITELIST.has(cleanPath) ||
+    cleanPath.startsWith('images/chassis/') ||
+    cleanPath.startsWith('images/marketing/')
+  ) {
     return `/${cleanPath}`
   }
 

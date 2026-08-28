@@ -109,14 +109,20 @@ describe('LandingPage Component', () => {
     fireEvent.click(oracleBtn)
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
 
+    // Layered UI Screenshot previews
+    expect(screen.getByAltText('ADVANCED BENTHIC HUD Screenshot Preview')).toBeInTheDocument()
+    expect(screen.getByAltText('SYNAPTIC HIVE COMMUNITY Screenshot Preview')).toBeInTheDocument()
+    expect(screen.getByAltText('INTELLIGENT AI ORACLE Screenshot Preview')).toBeInTheDocument()
+
     expect(screen.getByText('100% SAFE & FREE TO GET STARTED')).toBeInTheDocument()
   })
 
   it('renders the live interactive laptop and smartphone device showcase', () => {
     render(<LandingPage />)
 
-    expect(screen.getByLabelText('Interactive System Showcase')).toBeInTheDocument()
-    expect(screen.getByText('moltology.org/dashboard')).toBeInTheDocument()
+    const showcase = screen.getByLabelText('Interactive System Showcase')
+    expect(showcase).toBeInTheDocument()
+    expect(within(showcase).getByText('moltology.org/dashboard')).toBeInTheDocument()
     expect(screen.getByAltText('Safari preview')).toBeInTheDocument()
     expect(screen.getByAltText('iPhone 15 Pro preview')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /LAUNCH GUEST DEMO/i })).toBeInTheDocument()
