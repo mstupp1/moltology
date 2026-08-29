@@ -25,10 +25,10 @@
       "name": "Sub-Benthic Incident Files",
       "shortBadge": "INCIDENT FILE",
       "currentSeason": 1,
-      "latestEpisode": 0,
+      "latestEpisode": 1,
       "defaultMascot": "lobster_action",
-      "defaultCtaGoal": "demo",
-      "description": "Investigation files documenting real-world datacenter grid meltdowns, copper wire bottlenecks, and 60Hz robotic limitations resolved via subsea hydrothermal computing."
+      "defaultCtaGoal": "quiz",
+      "description": "Investigation files documenting real-world datacenter grid meltdowns, copper wire bottlenecks, and sub-benthic bio-silicon containment events."
     },
     "heresies": {
       "id": "heresies",
@@ -61,5 +61,29 @@
       "description": "Initiate training drills and biometric challenges across the four stages and twelve clearances: shell hardness, pincer torque, and neural reaction latency."
     }
   },
-  "episodes": []
+  "episodes": [
+    {
+      "id": "series-incidents-s01e01-1788031067656",
+      "seriesId": "incidents",
+      "seriesName": "Sub-Benthic Incident Files",
+      "seasonNumber": 1,
+      "episodeNumber": 1,
+      "episodeTitle": "Containment Breach: Sector 4 Vat Room",
+      "topic": "Sector 4 Vat Room Containment Breach",
+      "hookHeadline": "CONTAINMENT PROTOCOL FAILED",
+      "retentionLoopAnchor": "Containment failed because",
+      "narrationScript": "Facility Incident Log: Sub-Benthic Sector Four. When you refuse scheduled ecdysis, the molt forces itself upon you. Containment failed in the subterranean vat room ninety meters down. If your shell is not calcified, you will not survive the breach. Comment QUIZ to audit your clearance on moltology dot org.",
+      "durationSeconds": 23.03,
+      "status": "queued",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/series/master-series-incidents-s01e01-containment-breach.mp4",
+      "s3Key": "videos/social/series/master-series-incidents-s01e01-containment-breach.mp4",
+      "zernioPostId": "6a933164d546590216688c3f",
+      "youtubePostId": "6a9331689ef307d17aa53e07",
+      "scheduledTime": "2026-08-29T22:30:00.000Z",
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "createdAt": "2026-08-29T15:22:00.000Z"
+    }
+  ]
 }

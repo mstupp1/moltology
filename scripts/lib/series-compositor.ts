@@ -11,6 +11,7 @@ import {
   renderHudWatermarkCard,
   renderKineticCaptionCard,
   renderCtaOutroVideo,
+  hasAudioStream,
 } from './reel-compositor'
 
 const execFileAsync = promisify(execFile)
@@ -28,6 +29,9 @@ export interface CompositeSeriesReelOptions {
   colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string | string[]
   transitionType?: 'fade' | 'fadeblack' | 'dissolve' | 'none'
   transitionDuration?: number
+  showEpisodicBadge?: boolean // default false (keep frame clean and immersive)
+  preserveNativeAudio?: boolean // default true (mix original video sound effects)
+  nativeAudioVolume?: number // default 0.85
   backgroundAudioPath?: string
   backgroundAudioVolume?: number // default 0.14
   backgroundAudioOffsetSeconds?: number
@@ -227,9 +231,13 @@ export async function stitchClipsWithTransitions(
     inputs.push('-i', c)
   })
 
+  // Check if clips have audio to preserve native SFX during transition
+  const hasAudio = await hasAudioStream(clipPaths[0])
+
   let filterGraph = ''
   let currentOffset = 0
   let lastOutputTag = '0:v'
+  let lastAudioTag = '0:a'
 
   for (let i = 1; i < clipPaths.length; i++) {
     currentOffset += durations[i - 1] - (i > 1 ? transitionDuration : 0)
@@ -239,9 +247,19 @@ export async function stitchClipsWithTransitions(
 
     filterGraph += `[${lastOutputTag}][${i}:v]xfade=transition=${actualTransition}:duration=${transitionDuration}:offset=${offset.toFixed(3)}[${nextOutputTag}];`
     lastOutputTag = nextOutputTag
+
+    if (hasAudio) {
+      const nextAudioTag = i === clipPaths.length - 1 ? 'aout' : `a${i}`
+      filterGraph += `[${lastAudioTag}][${i}:a]acrossfade=d=${transitionDuration}:c1=tri:c2=tri[${nextAudioTag}];`
+      lastAudioTag = nextAudioTag
+    }
   }
 
   filterGraph = filterGraph.replace(/;$/, '')
+
+  const mapArgs = hasAudio
+    ? ['-map', `[${lastOutputTag}]`, '-map', `[${lastAudioTag}]`, '-c:a', 'aac', '-b:a', '192k']
+    : ['-map', `[${lastOutputTag}]`]
 
   try {
     await runFfmpeg([
@@ -249,8 +267,7 @@ export async function stitchClipsWithTransitions(
       ...inputs,
       '-filter_complex',
       filterGraph,
-      '-map',
-      `[${lastOutputTag}]`,
+      ...mapArgs,
       '-c:v',
       'libx264',
       '-pix_fmt',
@@ -272,6 +289,8 @@ export async function stitchClipsWithTransitions(
       concatListPath,
       '-c:v',
       'libx264',
+      '-c:a',
+      'aac',
       '-pix_fmt',
       'yuv420p',
       outputPath,
@@ -381,14 +400,18 @@ export async function compositeSeriesReel(
   const totalVideoDuration = await getMediaDuration(baseVideoPath)
   console.log(`   • Stitched timeline duration: ${totalVideoDuration.toFixed(2)}s`)
 
-  // 5. Render Episodic Badge Overlay & Brand Watermark Overlay
-  const badgePngPath = path.join(tempDir, 'episodic-badge.png')
-  const badgeLabel = options.seriesShortBadge || options.seriesName
-  const epFormatted = `S${String(options.seasonNumber).padStart(2, '0')} EP.${String(options.episodeNumber).padStart(
-    2,
-    '0'
-  )}`
-  await renderEpisodicBadgeCard(badgePngPath, badgeLabel, epFormatted)
+  // 5. Render Brand Watermark Overlay (and optional Episodic Badge Overlay)
+  const showBadge = options.showEpisodicBadge === true
+  let badgePngPath: string | null = null
+  if (showBadge) {
+    badgePngPath = path.join(tempDir, 'episodic-badge.png')
+    const badgeLabel = options.seriesShortBadge || options.seriesName
+    const epFormatted = `S${String(options.seasonNumber).padStart(2, '0')} EP.${String(options.episodeNumber).padStart(
+      2,
+      '0'
+    )}`
+    await renderEpisodicBadgeCard(badgePngPath, badgeLabel, epFormatted)
+  }
 
   const watermarkPngPath = path.join(tempDir, 'hud-watermark.png')
   await renderHudWatermarkCard(watermarkPngPath, {
@@ -440,8 +463,8 @@ export async function compositeSeriesReel(
   // 7. Assemble FFmpeg filter graph:
   // Input 0: base video
   // Input 1: watermark PNG
-  // Input 2: episodic badge PNG
-  // Inputs 3...N: caption PNGs
+  // (Optional Input 2: episodic badge PNG)
+  // Inputs 2/3...N: caption PNGs
   const ffmpegInputs: string[] = [
     '-y',
     '-i',
@@ -450,22 +473,22 @@ export async function compositeSeriesReel(
     '1',
     '-i',
     watermarkPngPath,
-    '-loop',
-    '1',
-    '-i',
-    badgePngPath,
   ]
 
-  overlayEvents.forEach((ev) => {
-    ffmpegInputs.push('-loop', '1', '-i', ev.pngPath)
-  })
+  let filterStr = `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v_wm]`
+  let lastOut = 'v_wm'
+  let captionStartIdx = 2
 
-  // Filter complex: watermark and episodic badge stay active across scene footage
-  let filterStr = `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v_wm];[v_wm][2:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v_badge]`
-  let lastOut = 'v_badge'
+  if (showBadge && badgePngPath) {
+    ffmpegInputs.push('-loop', '1', '-i', badgePngPath)
+    filterStr += `;[${lastOut}][2:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v_badge]`
+    lastOut = 'v_badge'
+    captionStartIdx = 3
+  }
 
   overlayEvents.forEach((ev, idx) => {
-    const inStreamIndex = idx + 3
+    const inStreamIndex = idx + captionStartIdx
+    ffmpegInputs.push('-loop', '1', '-i', ev.pngPath)
     const currentOut = `v_cap_${idx}`
     filterStr += `;[${lastOut}][${inStreamIndex}:v]overlay=0:0:enable='between(t,${ev.startSec.toFixed(
       3
@@ -474,7 +497,7 @@ export async function compositeSeriesReel(
   })
 
   const videoWithOverlaysPath = path.join(tempDir, 'video-with-overlays.mp4')
-  console.log(`   • Compositing episodic badges, watermark & kinetic captions onto video...`)
+  console.log(`   • Compositing brand watermark & kinetic captions onto video...`)
 
   await runFfmpeg([
     ...ffmpegInputs,
@@ -482,10 +505,14 @@ export async function compositeSeriesReel(
     filterStr,
     '-map',
     `[${lastOut}]`,
+    '-map',
+    '0:a?',
     '-t',
     totalVideoDuration.toString(),
     '-c:v',
     'libx264',
+    '-c:a',
+    'copy',
     '-pix_fmt',
     'yuv420p',
     '-r',
@@ -493,7 +520,7 @@ export async function compositeSeriesReel(
     videoWithOverlaysPath,
   ])
 
-  // 8. Multi-Track Audio Mixing (Voiceover + Ducked Ambient Benthic Score)
+  // 8. Multi-Track Audio Mixing (Native Video SFX + Voiceover + Ducked Ambient Benthic Score)
   const bgAudioPath =
     options.backgroundAudioPath || path.resolve(process.cwd(), 'assets/audio/benthic-ambient-loop.mp3')
   const finalOutputPath = options.outputPath
@@ -503,7 +530,13 @@ export async function compositeSeriesReel(
     fs.mkdirSync(finalDir, { recursive: true })
   }
 
-  console.log(`   • Mixing neural voiceover and ducked ambient benthic soundtrack...`)
+  const hasNativeSfx =
+    options.preserveNativeAudio !== false && (await hasAudioStream(videoWithOverlaysPath))
+  const nativeSfxVolume = options.nativeAudioVolume ?? 0.85
+
+  console.log(
+    `   • Mixing multi-track audio (Native SFX: ${hasNativeSfx ? `volume=${nativeSfxVolume}` : 'none'}, Voiceover, and Ducked Benthic Score)...`
+  )
 
   if (fs.existsSync(bgAudioPath)) {
     const curatedOffsets = [0, 18, 36, 54, 72, 95, 120, 145]
@@ -523,6 +556,17 @@ export async function compositeSeriesReel(
     const fadeOutDuration = 1.5
     const fadeOutStart = Math.max(0, totalVideoDuration - fadeOutDuration)
 
+    let audioFilter: string
+    if (hasNativeSfx) {
+      audioFilter = `[0:a]volume=${nativeSfxVolume}[sfx];[1:a]apad=pad_dur=3,volume=1.0[vo];[2:a]volume=${bgVolume},afade=t=in:ss=0:d=${fadeInDuration},afade=t=out:st=${fadeOutStart.toFixed(
+        3
+      )}:d=${fadeOutDuration}[bg];[sfx][vo][bg]amix=inputs=3:duration=first:dropout_transition=0[aout]`
+    } else {
+      audioFilter = `[1:a]apad=pad_dur=3,volume=1.0[vo];[2:a]volume=${bgVolume},afade=t=in:ss=0:d=${fadeInDuration},afade=t=out:st=${fadeOutStart.toFixed(
+        3
+      )}:d=${fadeOutDuration}[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`
+    }
+
     await runFfmpeg([
       '-y',
       '-i',
@@ -535,9 +579,7 @@ export async function compositeSeriesReel(
       '-i',
       bgAudioPath,
       '-filter_complex',
-      `[1:a]apad=pad_dur=3[vo];[2:a]volume=${bgVolume},afade=t=in:ss=0:d=${fadeInDuration},afade=t=out:st=${fadeOutStart.toFixed(
-        3
-      )}:d=${fadeOutDuration}[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
+      audioFilter,
       '-map',
       '0:v',
       '-map',
@@ -555,12 +597,25 @@ export async function compositeSeriesReel(
       finalOutputPath,
     ])
   } else {
+    let audioFilter: string
+    if (hasNativeSfx) {
+      audioFilter = `[0:a]volume=${nativeSfxVolume}[sfx];[1:a]apad=pad_dur=3,volume=1.0[vo];[sfx][vo]amix=inputs=2:duration=first:dropout_transition=0[aout]`
+    } else {
+      audioFilter = `[1:a]apad=pad_dur=3,volume=1.0[vo];[vo]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo[aout]`
+    }
+
     await runFfmpeg([
       '-y',
       '-i',
       videoWithOverlaysPath,
       '-i',
       options.voiceoverPath,
+      '-filter_complex',
+      audioFilter,
+      '-map',
+      '0:v',
+      '-map',
+      '[aout]',
       '-c:v',
       'copy',
       '-c:a',

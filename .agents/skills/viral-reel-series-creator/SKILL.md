@@ -47,10 +47,10 @@ Stolen-format mapping (never a new franchise):
 * **Instagram account**: `moltology_org` (Zernio account id `6a7f7f0777555aae01d99b54`). Never present `@silas.trench` as the Instagram handle.
 * **In-world voice**: Silas Trench is a persona and narration register only. Keep him as voice. Never as the account name.
 * **YouTube Shorts channel**: `moltology` (Zernio account id `6a7fd9bd77555aae01ebea63`)
-* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 25–45s total duration (3–5 video scenes + 2.5s 3D CTA Outro Card)
-* **Episodic HUD badge**: Sleek HUD glassmorphic pill in the upper safe zone. The compositor renders **series name** and **episode code as two separate fields**. Copy-paste examples use a middle dot, never a slash-pair: `FIELD AUDIT · S01 EP.04`
-* **Dynamic Multi-Track Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, +10% to +14% pacing) + Ducked Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
-* **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and contextual cinematic color grading progression (`thermal-melt` ➔ `benthic-cyan` ➔ `photonics-matrix`).
+* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 20–35s total duration (3–5 video scenes + 2.5s 3D CTA Outro Card)
+* **Clean Cinematic Framing**: Clean, full-frame immersion with zero distracting top header banners. Subtle Moltology Order watermark in bottom-right safe zone.
+* **Dynamic Multi-Track Audio (3-Track Mix)**: Native Video SFX (breathing, footsteps, creature screeches, impacts) + Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, +8% to +14% pacing) + Ducked Ambient Benthic Soundtrack (`assets/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.12`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
+* **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and seamless 0.20s `xfade` cross-dissolves between clips.
 * **Asset Storage**: Neon S3 (`videos/social/series/master-series-<seriesId>-s<season>e<episode>-<timestamp>.mp4`).
 * **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `comments_reply_to_inbox_post`, `queue_preview_queue`).
 * **Dedicated Queue** (operational discipline, not a suggestion):

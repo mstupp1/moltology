@@ -502,21 +502,30 @@ export async function renderCtaOutroVideo(
     await renderCtaOutroFrame(outroFramePath, headline, subheadline, url, options)
   }
 
-  // Convert Frame to MP4 video with smooth fade-in
+  // Convert Frame to MP4 video with smooth fade-in, guaranteed 1080x1920 scaling, and stereo audio stream
   await runFfmpeg([
     '-y',
     '-loop',
     '1',
     '-i',
     outroFramePath,
+    '-f',
+    'lavfi',
+    '-i',
+    'anullsrc=channel_layout=stereo:sample_rate=48000',
     '-vf',
-    'fade=t=in:st=0:d=0.25',
+    'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p,fade=t=in:st=0:d=0.25',
     '-t',
     durationSeconds.toString(),
     '-c:v',
     'libx264',
+    '-c:a',
+    'aac',
+    '-b:a',
+    '192k',
     '-pix_fmt',
     'yuv420p',
+    '-shortest',
     '-r',
     '30',
     outputPath,
@@ -534,19 +543,44 @@ export async function renderCtaOutroVideo(
 }
 
 /**
+ * Check if a media file contains an audio stream
+ */
+export async function hasAudioStream(mediaPath: string): Promise<boolean> {
+  try {
+    const { stdout } = await execFileAsync('ffprobe', [
+      '-v',
+      'error',
+      '-select_streams',
+      'a',
+      '-show_entries',
+      'stream=codec_type',
+      '-of',
+      'csv=p=0',
+      mediaPath,
+    ])
+    return stdout.trim().length > 0
+  } catch {
+    return false
+  }
+}
+
+/**
  * Normalize and standard-scale a video clip to 1080x1920 9:16 30fps with continuous forward playback and optional atmospheric color grading
  */
 export async function normalizeVideoClip(
   inputPath: string,
   outputPath: string,
   targetDuration?: number,
-  colorPreset?: ColorGradingPreset | string
+  colorPreset?: ColorGradingPreset | string,
+  preserveAudio = true
 ): Promise<string> {
   const gradeFilter = getColorGradingFilter(colorPreset)
   const baseVf = gradeFilter
     ? `scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p,${gradeFilter}`
     : 'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p'
   const args = ['-y']
+
+  const hasAudio = preserveAudio ? await hasAudioStream(inputPath) : false
 
   if (targetDuration && targetDuration > 0) {
     let inputDuration = targetDuration
@@ -560,13 +594,25 @@ export async function normalizeVideoClip(
       // Video is shorter than target slot: stretch seamlessly with cinematic slow-motion instead of jarring jump-loop
       const ptsFactor = (targetDuration / inputDuration).toFixed(4)
       const slowVf = `setpts=${ptsFactor}*PTS,${baseVf}`
-      args.push('-i', inputPath, '-vf', slowVf, '-c:v', 'libx264', '-an', '-t', targetDuration.toFixed(3))
+      if (hasAudio) {
+        args.push('-i', inputPath, '-vf', slowVf, '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k', '-t', targetDuration.toFixed(3))
+      } else {
+        args.push('-i', inputPath, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-vf', slowVf, '-c:v', 'libx264', '-c:a', 'aac', '-shortest', '-t', targetDuration.toFixed(3))
+      }
     } else {
       // Video is equal or longer: smoothly forward play and trim cleanly at target duration
-      args.push('-i', inputPath, '-vf', baseVf, '-c:v', 'libx264', '-an', '-t', targetDuration.toFixed(3))
+      if (hasAudio) {
+        args.push('-i', inputPath, '-vf', baseVf, '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k', '-t', targetDuration.toFixed(3))
+      } else {
+        args.push('-i', inputPath, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-vf', baseVf, '-c:v', 'libx264', '-c:a', 'aac', '-shortest', '-t', targetDuration.toFixed(3))
+      }
     }
   } else {
-    args.push('-i', inputPath, '-vf', baseVf, '-c:v', 'libx264', '-an')
+    if (hasAudio) {
+      args.push('-i', inputPath, '-vf', baseVf, '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k')
+    } else {
+      args.push('-i', inputPath, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-vf', baseVf, '-c:v', 'libx264', '-c:a', 'aac', '-shortest')
+    }
   }
 
   args.push(outputPath)
