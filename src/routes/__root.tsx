@@ -9,6 +9,7 @@ import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBou
 import { HUDNotFound } from '@/components/hud/HUDNotFound'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SpeedInsights } from '@vercel/speed-insights/react'
+import { Analytics } from '@vercel/analytics/react'
 
 function isNotFoundMatch(match: { status?: string; globalNotFound?: boolean }) {
   return match.status === 'notFound' || match.globalNotFound === true
@@ -105,6 +106,7 @@ function RootDocument() {
         </HUDErrorBoundary>
         <Scripts />
         <SpeedInsights />
+        <Analytics />
       </body>
 
 
