@@ -8,6 +8,7 @@ import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
 import { HUDNotFound } from '@/components/hud/HUDNotFound'
 import { ToastProvider } from '@/components/ui/ToastProvider'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 function isNotFoundMatch(match: { status?: string; globalNotFound?: boolean }) {
   return match.status === 'notFound' || match.globalNotFound === true
@@ -103,6 +104,7 @@ function RootDocument() {
           </ToastProvider>
         </HUDErrorBoundary>
         <Scripts />
+        <SpeedInsights />
       </body>
 
 
