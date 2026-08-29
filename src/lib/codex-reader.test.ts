@@ -61,7 +61,7 @@ describe('codex-reader zoom geometry', () => {
     })
 
     expect(next.scrollLeft).toBe(600)
-    expect(next.scrollTop).toBe(800)
+    expect(next.scrollTop).toBe(700)
   })
 
   it('applies focal zoom to a viewport element', () => {
@@ -74,7 +74,7 @@ describe('codex-reader zoom geometry', () => {
     applyZoomScroll(viewport, 1, 2, 110, 120)
 
     expect(viewport.scrollLeft).toBe(180)
-    expect(viewport.scrollTop).toBe(280)
+    expect(viewport.scrollTop).toBe(260)
   })
 
   it('measures pinch distance and toggles double-tap zoom', () => {

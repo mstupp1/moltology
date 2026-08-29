@@ -225,7 +225,7 @@ export function CodexFullscreenReader({
 
   return (
     <div
-      className="codex-reader-overlay fixed inset-0 z-[100000] bg-[#050708] flex flex-col overflow-hidden animate-in fade-in duration-200"
+      className="codex-reader-overlay fixed inset-0 z-[100000] h-dvh w-dvw bg-[#050708] flex flex-col overflow-hidden animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Immersive Codex reader"
