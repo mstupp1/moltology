@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isBrowser } from '@/lib/pwa'
 import {
   disableSystemNotifications,
   enableSystemNotifications,
   getSystemNotificationPermission,
-  isBrowser,
   isSystemNotificationSupported,
   readSystemNotificationsEnabled,
   type SystemNotificationPermission,
