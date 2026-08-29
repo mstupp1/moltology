@@ -77,7 +77,7 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
                                        ▼ (Agent Prompts User)
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  STAGE 2: User Generates Veo Video Clips in Google Flow & Ingests           │
-│  - User generates the 3-5 video scenes in Google Flow (Veo 3.1 - 9:16)      │
+│  - User generates or extends video scenes in Google Flow (Veo 3.1)          │
 │  - User drops the MP4 files into tmp/flow-video-ingest/                     │
 │    (scene1.mp4, scene2.mp4, scene3.mp4, scene4.mp4)                         │
 └──────────────────────────────────────┬──────────────────────────────────────┘
@@ -103,6 +103,14 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 │  - Appends full episode record to content/social/viral-series-ledger.json   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### ◈ Google Flow Prompting & "Extend Clip" Workflow Best Practices
+
+1. **Aspect Ratio via UI Selector**: The 9:16 aspect ratio is selected in Google Flow's UI dropdown. Omit redundant `9:16 vertical` phrases in prompt text to maximize token budget for cinematography and motion.
+2. **"Extend Clip" Continuity vs. Standalone Cuts**:
+   - **Scene 1 (Master Setup)**: Establishes the full world, lighting, camera angle, textures, and atmosphere.
+   - **Scenes 2+ (Clip Extensions / Continuations)**: When extending a previous clip in Google Flow, prompts do not need to re-describe the static room from scratch. Instead, focus the prompt strictly on the **action delta, camera whip/pan, sudden event, or character movement**.
+3. **Mascot Styling in Incident & Horror Contexts**: When staging incident containment breaches or analog-horror scenarios, maintain the signature **3D Pixar-style cartoon crustacean look** (glossy red chitin, large expressive eyes, articulated limbs, hydraulic pincers) juxtaposed against dark volumetric steam, flickering emergency lights, and green bioluminescent containment vats.
 
 ---
 

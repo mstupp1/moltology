@@ -131,12 +131,12 @@ describe('Viral Episodic Series Formulation Engine', () => {
     expect(script.episodeTitle).not.toMatch(/fathom/i)
   })
 
-  it('builds high-definition 9:16 Google Flow Veo 3.1 prompts with dynamic cinematography', () => {
+  it('builds high-definition Google Flow Veo 3.1 prompts with dynamic cinematography', () => {
     const prompts = buildGoogleFlowPrompts('audit', 'Desk Slumping Analysis', 4)
 
     expect(prompts.length).toBe(4)
     prompts.forEach((prompt) => {
-      expect(prompt).toContain('Cinematic 9:16 vertical 8k footage')
+      expect(prompt).toContain('Cinematic 8k footage')
       expect(prompt.length).toBeGreaterThan(50)
       expect(prompt).not.toMatch(BANNED_COPY)
     })

@@ -267,7 +267,7 @@ export function buildGoogleFlowPrompts(
   numScenes = 4
 ): string[] {
   const suffix =
-    'Cinematic 9:16 vertical 8k footage, photorealistic Octane render, subsea volumetric lighting, vibrant cyan HUD telemetry readouts, natural contact shadows, zero wasted space.'
+    'Cinematic 8k footage, photorealistic Octane render, subsea volumetric lighting, vibrant cyan HUD telemetry readouts, natural contact shadows, zero wasted space.'
 
   if (seriesId === 'audit') {
     return [
@@ -438,18 +438,22 @@ export function displayGoogleFlowDirectives(script: ViralSeriesScript, audioPath
   console.log(`\n📋 NARRATION SCRIPT (Retention Loop Engine):`)
   console.log(`"${script.narrationScript}"`)
   console.log(`\n${'-'.repeat(80)}`)
-  console.log(`🚀 COPY & RUN THESE ${script.scenePrompts.length} PROMPTS IN GOOGLE FLOW (VEO 3.1 - 9:16 VERTICAL):`)
+  console.log(`🚀 GOOGLE FLOW VEO 3.1 PROMPT DIRECTIVES (Select 9:16 in Flow UI):`)
   console.log(`${'-'.repeat(80)}`)
 
   script.scenePrompts.forEach((prompt, idx) => {
     console.log(`\n[SCENE ${idx + 1} / ${script.scenePrompts.length}] ➔ Save as: tmp/flow-video-ingest/scene${idx + 1}.mp4`)
-    console.log(`PROMPT:`)
+    if (idx === 0) {
+      console.log(`STANDALONE MASTER PROMPT:`)
+    } else {
+      console.log(`STANDALONE OR EXTEND PROMPT (Focus on action delta / motion):`)
+    }
     console.log(prompt)
   })
 
   console.log(`\n${'='.repeat(80)}`)
   console.log(`📥 HOW TO RESUME & FINISH COMPOSITING:`)
-  console.log(`1. Generate the ${script.scenePrompts.length} video scenes in Google Flow (Veo 3.1).`)
+  console.log(`1. Generate or extend the ${script.scenePrompts.length} video scenes in Google Flow (Veo 3.1).`)
   console.log(`2. Drop them into: tmp/flow-video-ingest/ as scene1.mp4, scene2.mp4, scene3.mp4, scene4.mp4`)
   console.log(`3. Run the completion command:`)
   console.log(`   npm run series:create -- --series ${script.seriesId} --ingest-dir tmp/flow-video-ingest`)

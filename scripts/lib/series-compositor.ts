@@ -26,6 +26,8 @@ export interface CompositeSeriesReelOptions {
   episodeNumber: number
   episodeTitle?: string
   colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string | string[]
+  transitionType?: 'fade' | 'fadeblack' | 'dissolve' | 'none'
+  transitionDuration?: number
   backgroundAudioPath?: string
   backgroundAudioVolume?: number // default 0.14
   backgroundAudioOffsetSeconds?: number
@@ -175,6 +177,116 @@ export async function renderEpisodicBadgeCard(
 }
 
 /**
+ * Stitch multiple normalized video clips with smooth transitions (xfade cross-dissolve / dip)
+ */
+export async function stitchClipsWithTransitions(
+  clipPaths: string[],
+  outputPath: string,
+  options: {
+    transitionDuration?: number
+    transitionType?: 'fade' | 'fadeblack' | 'dissolve' | 'none'
+  } = {}
+): Promise<string> {
+  const transitionDuration = options.transitionDuration ?? 0.20
+  const transitionType = options.transitionType ?? 'fade'
+
+  if (clipPaths.length <= 1 || transitionType === 'none') {
+    const concatListPath = outputPath.replace(/\.mp4$/, '-concat-list.txt')
+    const concatLines = clipPaths.map((c) => `file '${c}'`).join('\n')
+    fs.writeFileSync(concatListPath, concatLines, 'utf8')
+    await runFfmpeg([
+      '-y',
+      '-f',
+      'concat',
+      '-safe',
+      '0',
+      '-i',
+      concatListPath,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      outputPath,
+    ])
+    try {
+      fs.unlinkSync(concatListPath)
+    } catch {
+      // Non-fatal
+    }
+    return outputPath
+  }
+
+  // Get durations of each clip to compute xfade offsets
+  const durations: number[] = []
+  for (const c of clipPaths) {
+    durations.push(await getMediaDuration(c))
+  }
+
+  const inputs: string[] = []
+  clipPaths.forEach((c) => {
+    inputs.push('-i', c)
+  })
+
+  let filterGraph = ''
+  let currentOffset = 0
+  let lastOutputTag = '0:v'
+
+  for (let i = 1; i < clipPaths.length; i++) {
+    currentOffset += durations[i - 1] - (i > 1 ? transitionDuration : 0)
+    const offset = Math.max(0.1, currentOffset - transitionDuration)
+    const nextOutputTag = i === clipPaths.length - 1 ? 'vout' : `v${i}`
+    const actualTransition = transitionType === 'dissolve' ? 'fade' : transitionType
+
+    filterGraph += `[${lastOutputTag}][${i}:v]xfade=transition=${actualTransition}:duration=${transitionDuration}:offset=${offset.toFixed(3)}[${nextOutputTag}];`
+    lastOutputTag = nextOutputTag
+  }
+
+  filterGraph = filterGraph.replace(/;$/, '')
+
+  try {
+    await runFfmpeg([
+      '-y',
+      ...inputs,
+      '-filter_complex',
+      filterGraph,
+      '-map',
+      `[${lastOutputTag}]`,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      outputPath,
+    ])
+  } catch (err: any) {
+    console.warn(`   ⚠️ Smooth xfade transition fallback (${err.message}). Using standard concat list...`)
+    const concatListPath = outputPath.replace(/\.mp4$/, '-concat-list.txt')
+    const concatLines = clipPaths.map((c) => `file '${c}'`).join('\n')
+    fs.writeFileSync(concatListPath, concatLines, 'utf8')
+    await runFfmpeg([
+      '-y',
+      '-f',
+      'concat',
+      '-safe',
+      '0',
+      '-i',
+      concatListPath,
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      outputPath,
+    ])
+    try {
+      fs.unlinkSync(concatListPath)
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  return outputPath
+}
+
+/**
  * Composite Multi-Scene Episodic Viral Reel Timeline
  */
 export async function compositeSeriesReel(
@@ -255,27 +367,16 @@ export async function compositeSeriesReel(
   )
   normalizedClips.push(outroVideoPath)
 
-  // 4. Concatenate all normalized scenes + outro
-  const concatListPath = path.join(tempDir, 'concat-list.txt')
-  const concatLines = normalizedClips.map((c) => `file '${c}'`).join('\n')
-  fs.writeFileSync(concatListPath, concatLines, 'utf8')
-
+  // 4. Stitch narrative scenes with smooth quick transitions, then append CTA outro
   const baseVideoPath = path.join(tempDir, 'base-stitched-video.mp4')
-  console.log(`   • Stitching ${normalizedClips.length} scenes into base timeline...`)
-  await runFfmpeg([
-    '-y',
-    '-f',
-    'concat',
-    '-safe',
-    '0',
-    '-i',
-    concatListPath,
-    '-c:v',
-    'libx264',
-    '-pix_fmt',
-    'yuv420p',
-    baseVideoPath,
-  ])
+  const transitionType = options.transitionType ?? 'fade'
+  const transitionDuration = options.transitionDuration ?? 0.20
+
+  console.log(`   • Stitching ${normalizedClips.length} scenes into base timeline (Transition: ${transitionType}, ${transitionDuration}s)...`)
+  await stitchClipsWithTransitions(normalizedClips, baseVideoPath, {
+    transitionDuration,
+    transitionType,
+  })
 
   const totalVideoDuration = await getMediaDuration(baseVideoPath)
   console.log(`   • Stitched timeline duration: ${totalVideoDuration.toFixed(2)}s`)
