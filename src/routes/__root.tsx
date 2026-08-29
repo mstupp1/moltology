@@ -20,10 +20,17 @@ export const Route = createRootRoute({
       meta: [
         { charSet: 'UTF-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1.0, viewport-fit=cover' },
+        { name: 'theme-color', content: '#0a1212' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'Moltology' },
         ...(notFound ? notFoundSeo() : []),
       ],
       links: [
         { rel: 'icon', type: 'image/png', href: '/images/order_emblem.png' },
+        { rel: 'apple-touch-icon', href: '/images/pwa/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'alternate', type: 'application/rss+xml', title: 'MoltNation News RSS Feed', href: `${SITE_ORIGIN}/rss.xml` },
         { rel: 'sitemap', type: 'application/xml', title: 'Sitemap', href: `${SITE_ORIGIN}/sitemap.xml` },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

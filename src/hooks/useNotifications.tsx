@@ -17,6 +17,10 @@ import {
 import type { NotificationView } from '@/lib/notifications'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useToast } from '@/components/ui/ToastProvider'
+import {
+  hubUrlForNotificationKind,
+  showSystemNotification,
+} from '@/lib/system-notifications'
 
 const POLL_MS = 60_000
 
@@ -89,6 +93,20 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       window.removeEventListener('focus', onFocus)
     }
   }, [userId, refresh])
+
+  // Bridge Activity Center rows to OS surface alerts when the hub is backgrounded.
+  useEffect(() => {
+    if (!userId) return
+    for (const item of notifications) {
+      if (item.readAt) continue
+      void showSystemNotification({
+        title: item.title,
+        body: item.detail,
+        tag: `activity-${item.id}`,
+        url: hubUrlForNotificationKind(item.kind),
+      })
+    }
+  }, [notifications, userId])
 
   const markRead = useCallback(
     async (notificationId: string) => {
