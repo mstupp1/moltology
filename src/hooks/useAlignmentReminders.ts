@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { calculateReminderTime, isReminderDue } from '@/lib/alignment-reminders'
+import { showSystemNotification } from '@/lib/system-notifications'
 
 export interface AlignmentTaskItem {
   id: string
@@ -117,6 +118,14 @@ export function useAlignmentReminders(
               duration: 8000,
             }
           )
+
+          void showSystemNotification({
+            title: `Reminder (${reminderInfo.reminderTimeFormatted})`,
+            body: `"${task.title}" starts in ${offsetMinutes}m (at ${reminderInfo.startTimeFormatted}).`,
+            tag: `alignment-${key}`,
+            url: '/dashboard',
+            force: true,
+          })
         }
       }
     })

@@ -38,6 +38,9 @@ const PUBLIC_ALLOWED_ROOT_FILES = new Set([
   'public/robots.txt',
   'public/llms.txt',
   'public/llms-full.txt',
+  'public/manifest.webmanifest',
+  'public/sw.js',
+  'public/offline.html',
 ])
 
 function listTrackedFiles(): string[] {
@@ -58,7 +61,8 @@ function isEssentialPublicAsset(relPath: string): boolean {
       PUBLIC_IMAGE_ALLOW_PREFIXES.some((prefix) => relPath.startsWith(prefix)) ||
       relPath === 'public/images/order_emblem.png' ||
       relPath === 'public/images/scanline_pattern.png' ||
-      relPath.startsWith('public/images/bubble_variant_')
+      relPath.startsWith('public/images/bubble_variant_') ||
+      relPath.startsWith('public/images/pwa/')
     )
   }
   return false

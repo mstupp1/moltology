@@ -3,6 +3,7 @@ import { Mail, Radio, Settings, Shuffle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getUserProfileFn,
@@ -135,8 +136,20 @@ export const SettingsPage: React.FC = () => {
           </>
         }
         title="Settings"
-        description="Choose your avatar and email preferences."
+        description="Choose your avatar, email preferences, and command surface options."
       />
+
+      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
+        <div>
+          <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
+            Command Surface
+          </h2>
+          <p className="text-xs text-[#839493] font-sans mt-0.5">
+            Install the hub shell and arm surface alerts for Activity Center transmissions.
+          </p>
+        </div>
+        <HubSurfaceControls dense />
+      </div>
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">

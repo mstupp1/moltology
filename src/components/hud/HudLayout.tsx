@@ -12,7 +12,10 @@ import { HudPersistProvider } from '@/hooks/useHudPersist'
 import { NotificationsProvider } from '@/hooks/useNotifications'
 import { HudPersistIndicator } from '@/components/hud/HudPersistIndicator'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
+import { PwaInstallBanner } from '@/components/hud/PwaInstallBanner'
+import { PwaNotificationBridge } from '@/components/hud/PwaNotificationBridge'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
+import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 
@@ -28,6 +31,8 @@ function HudContent() {
   const user = session.user
   const userId = session.userId
   const { heavyVfxDisabled } = useHeavyVfx()
+  // Register service worker + track install prompt for the whole hub (guest + member).
+  usePwaInstall()
 
   // Check if main-only view is requested (hides sidebar & top header for core feature mockups)
   const isMainOnly =
@@ -218,6 +223,12 @@ function HudContent() {
 
       {/* Floating AI Oracle Assistant (hidden in main-only mode) */}
       {!isMainOnly && <SynapticOracleWidget userId={userId} />}
+
+      {!isMainOnly && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[45] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <PwaInstallBanner />
+        </div>
+      )}
     </div>
   )
 }
@@ -228,6 +239,7 @@ export function HudLayout() {
       <HudPersistProvider>
         <AlignmentProvider>
           <NotificationsProvider>
+            <PwaNotificationBridge />
             <HudContent />
           </NotificationsProvider>
         </AlignmentProvider>
