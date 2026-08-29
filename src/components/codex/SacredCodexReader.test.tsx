@@ -65,6 +65,21 @@ describe('SacredCodexReader Component', () => {
     expect(screen.queryByRole('button', { name: /Exit Fullscreen Overlay/i })).not.toBeInTheDocument()
   })
 
+  it('scales the immersive leaf like a PDF instead of restyling type', () => {
+    const { container } = render(<SacredCodexReader />)
+    fireEvent.click(screen.getAllByTitle(/Fullscreen/i)[0])
+
+    const page = container.querySelector('[data-codex-pdf-page]') as HTMLElement
+    expect(page).toBeTruthy()
+    expect(page.style.transform).toBe('scale(1)')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom In' }))
+    expect(page.style.transform).toBe('scale(1.15)')
+
+    fireEvent.click(screen.getByRole('button', { name: /Reset to fit width/i }))
+    expect(page.style.transform).toBe('scale(1)')
+  })
+
   it('opens the fullscreen drawer from an icon-only menu without index chrome', () => {
     render(<SacredCodexReader />)
     fireEvent.click(screen.getAllByTitle(/Fullscreen/i)[0])

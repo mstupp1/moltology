@@ -6,7 +6,7 @@ import { seo } from '@/lib/seo'
 
 function CodexRoute() {
   return (
-    <div className="h-full flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div className="flex flex-col">
       <SacredCodexReader />
     </div>
   )

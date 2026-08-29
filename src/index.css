@@ -441,6 +441,34 @@ body.vfx-disabled [class*="drop-shadow-"],
   background-size: 16px 16px;
 }
 
+/* Immersive Codex e-reader overlay */
+.codex-reader-overlay {
+  overscroll-behavior: none;
+}
+
+.codex-reader-viewport {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 255, 255, 0.05), transparent 42%),
+    #050708;
+}
+
+.codex-reader-chrome {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.codex-reader-chrome[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+
+.codex-reader-chrome-bottom[data-hidden='true'] {
+  transform: translateY(6px);
+}
+
 .codex-dark-theme.pdf-page-sheet {
   background-image: radial-gradient(#3a3129 0.5px, transparent 0.5px);
   background-size: 16px 16px;
@@ -452,7 +480,7 @@ body.vfx-disabled [class*="drop-shadow-"],
     background-color: #ffffff !important;
     color: #000000 !important;
   }
-  .hud-sidebar, .hud-header, .no-print {
+  .hud-sidebar, .hud-header, .no-print, .codex-reader-chrome {
     display: none !important;
   }
   .pdf-page-sheet {
