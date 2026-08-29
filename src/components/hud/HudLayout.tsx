@@ -5,7 +5,7 @@ import { HUDSidebar } from '@/components/hud/HUDSidebar'
 import { CommandPalette } from '@/components/hud/CommandPalette'
 import { SynapticOracleWidget } from '@/components/hud/SynapticOracleWidget'
 import { AISidebarDrawer } from '@/components/hud/AISidebarDrawer'
-import { UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
+import { BUBBLE_VARIANT_SRCS, UnderwaterBubblesCanvas } from '@/components/hud/UnderwaterBubblesCanvas'
 import { OracleProvider, useSafeOracle } from '@/components/hud/OracleContext'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { HudPersistProvider } from '@/hooks/useHudPersist'
@@ -141,11 +141,7 @@ function HudContent() {
         {/* 3D Hydro Dynamic Bubbling Effect with Custom Chroma-Keyed Bubble Variants */}
         <UnderwaterBubblesCanvas
           bubbleCount={90}
-          customBubbleSrcs={[
-            '/images/bubble_variant_1.jpg',
-            '/images/bubble_variant_2.jpg',
-            '/images/bubble_variant_3.jpg',
-          ]}
+          customBubbleSrcs={BUBBLE_VARIANT_SRCS}
           chromaKeyMode="black"
           disabled={heavyVfxDisabled}
           className="absolute inset-0 pointer-events-none z-[1] opacity-85"

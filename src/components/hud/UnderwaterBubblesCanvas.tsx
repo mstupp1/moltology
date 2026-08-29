@@ -39,11 +39,138 @@ export interface UnderwaterBubblesCanvasProps {
   disabled?: boolean
 }
 
-const DEFAULT_BUBBLE_VARIANTS = [
+/**
+ * Stable module-level variant source list. Sharing one array identity between
+ * callers (e.g. HudLayout) and the component prevents effect churn from fresh
+ * inline literals on every parent re-render.
+ */
+export const BUBBLE_VARIANT_SRCS: string[] = [
   '/images/bubble_variant_1.jpg',
   '/images/bubble_variant_2.jpg',
   '/images/bubble_variant_3.jpg',
 ]
+
+// ---------------------------------------------------------------------------
+// ADAPTIVE FPS GOVERNOR
+// ---------------------------------------------------------------------------
+// Pure, testable frame-budget monitor. Samples real per-frame render cost and
+// rAF cadence, and steps the target FPS down through tiers only when a device
+// provably cannot hold the current tier (sustained breach, not transient
+// spikes). Upgrades back after sustained headroom (hysteresis prevents
+// oscillation). Healthy devices never leave tier 0.
+
+export interface FpsTierSample {
+  tierIndex: number
+  intervalMs: number
+  downgraded: boolean
+  upgraded: boolean
+  cullRequested: boolean
+}
+
+export interface FpsGovernor {
+  readonly tierIndex: number
+  readonly intervalMs: number
+  /**
+   * @param renderMs    measured duration of the actual draw work for this frame
+   * @param rafDeltaMs  timestamp delta between consecutive rAF callbacks
+   */
+  sample: (renderMs: number, rafDeltaMs: number) => FpsTierSample
+}
+
+const GOVERNOR_EMA_ALPHA = 0.12
+const GOVERNOR_WARMUP_SAMPLES = 10
+const GOVERNOR_DOWNGRADE_AFTER = 45 // ~1.25s of sustained struggle at 36fps
+const GOVERNOR_UPGRADE_AFTER = 180 // ~5s of sustained headroom
+const GOVERNOR_RENDER_BREACH_FACTOR = 1.2
+const GOVERNOR_CADENCE_BREACH_FACTOR = 2.2
+const GOVERNOR_CADENCE_CALM_FACTOR = 1.6
+const GOVERNOR_RENDER_CALM_FACTOR = 0.5
+const GOVERNOR_MIN_VSYNC_MS = 4
+const GOVERNOR_MAX_VSYNC_MS = 50
+const GOVERNOR_RAF_STALL_MS = 500
+
+export function createFpsGovernor(tiers: number[]): FpsGovernor {
+  let tierIndex = 0
+  let renderEma = 0
+  let cadenceEma = 0
+  let vsyncFloorMs = 0
+  let breachStreak = 0
+  let calmStreak = 0
+  let samples = 0
+
+  const currentIntervalMs = () => 1000 / tiers[tierIndex]
+
+  const sample = (renderMs: number, rafDeltaMs: number): FpsTierSample => {
+    samples++
+
+    renderEma = samples === 1 ? renderMs : renderEma + (renderMs - renderEma) * GOVERNOR_EMA_ALPHA
+
+    if (rafDeltaMs > 0 && rafDeltaMs < GOVERNOR_RAF_STALL_MS) {
+      cadenceEma =
+        samples === 1 || cadenceEma === 0
+          ? rafDeltaMs
+          : cadenceEma + (rafDeltaMs - cadenceEma) * GOVERNOR_EMA_ALPHA
+      if (vsyncFloorMs === 0 || rafDeltaMs < vsyncFloorMs) {
+        vsyncFloorMs = Math.min(Math.max(rafDeltaMs, GOVERNOR_MIN_VSYNC_MS), GOVERNOR_MAX_VSYNC_MS)
+      }
+    }
+
+    let downgraded = false
+    let upgraded = false
+    let cullRequested = false
+
+    if (samples > GOVERNOR_WARMUP_SAMPLES) {
+      const interval = currentIntervalMs()
+      const renderBreach = renderEma > interval * GOVERNOR_RENDER_BREACH_FACTOR
+      const cadenceBreach =
+        cadenceEma > 0 && cadenceEma > Math.max(interval, vsyncFloorMs * GOVERNOR_CADENCE_BREACH_FACTOR)
+
+      if (renderBreach || cadenceBreach) {
+        breachStreak++
+      } else {
+        breachStreak = 0
+      }
+
+      if (tierIndex < tiers.length - 1 && breachStreak >= GOVERNOR_DOWNGRADE_AFTER) {
+        tierIndex++
+        breachStreak = 0
+        calmStreak = 0
+        downgraded = true
+        cullRequested = tierIndex === tiers.length - 1
+      } else if (tierIndex > 0 && breachStreak === 0) {
+        const higherInterval = 1000 / tiers[tierIndex - 1]
+        const cadenceCalm =
+          vsyncFloorMs > 0 && cadenceEma > 0 && cadenceEma < vsyncFloorMs * GOVERNOR_CADENCE_CALM_FACTOR
+        const renderCalm = renderEma > 0 && renderEma < higherInterval * GOVERNOR_RENDER_CALM_FACTOR
+
+        if (cadenceCalm && renderCalm) {
+          calmStreak++
+        } else {
+          calmStreak = 0
+        }
+
+        if (calmStreak >= GOVERNOR_UPGRADE_AFTER) {
+          tierIndex--
+          calmStreak = 0
+          breachStreak = 0
+          upgraded = true
+        }
+      }
+    }
+
+    return { tierIndex, intervalMs: currentIntervalMs(), downgraded, upgraded, cullRequested }
+  }
+
+  return {
+    get tierIndex() {
+      return tierIndex
+    },
+    get intervalMs() {
+      return currentIntervalMs()
+    },
+    sample,
+  }
+}
 
 /**
  * Creates a chroma-keyed transparent offscreen canvas from a source image or canvas.
@@ -230,6 +357,27 @@ function createFizzBubbleSprite(size = 32): HTMLCanvasElement {
 let globalParticles: Particle[] | null = null
 let globalCustomSpritesCache: Record<string, HTMLCanvasElement> = {}
 
+interface ProceduralSpriteSet {
+  standard: HTMLCanvasElement
+  bokeh: HTMLCanvasElement
+  fizz: HTMLCanvasElement
+}
+
+// Procedural sprites are deterministic: bake them once per session and reuse
+// across effect re-runs instead of re-rendering gradients on every mount.
+let globalProceduralSprites: ProceduralSpriteSet | null = null
+
+function getProceduralSprites(): ProceduralSpriteSet {
+  if (!globalProceduralSprites) {
+    globalProceduralSprites = {
+      standard: createStandardBubbleSprite(128),
+      bokeh: createBokehBubbleSprite(128),
+      fizz: createFizzBubbleSprite(32),
+    }
+  }
+  return globalProceduralSprites
+}
+
 export function UnderwaterBubblesCanvas({
   bubbleCount = 90,
   className = 'absolute inset-0 pointer-events-none z-0',
@@ -259,15 +407,13 @@ export function UnderwaterBubblesCanvas({
     // -------------------------------------------------------------------
     // PRE-RENDERED HARDWARE-ACCELERATED SPRITE TEXTURE CACHE
     // -------------------------------------------------------------------
-    const standardSprite = createStandardBubbleSprite(128)
-    const bokehSprite = createBokehBubbleSprite(128)
-    const fizzSprite = createFizzBubbleSprite(32)
+    const { standard: standardSprite, bokeh: bokehSprite, fizz: fizzSprite } = getProceduralSprites()
 
     const targetSources = customBubbleSrcs
       ? customBubbleSrcs
       : customBubbleSrc
       ? [customBubbleSrc]
-      : DEFAULT_BUBBLE_VARIANTS
+      : BUBBLE_VARIANT_SRCS
 
     const customSprites: HTMLCanvasElement[] = []
 
@@ -287,21 +433,54 @@ export function UnderwaterBubblesCanvas({
       })
     }
 
-    let cachedSunGlow: CanvasGradient | string | null = null
+    // -------------------------------------------------------------------
+    // BAKED SUN GLOW BITMAP
+    // -------------------------------------------------------------------
+    // The sun glow is static between resizes; re-filling a huge radial
+    // gradient every frame is the most expensive op in the loop. Bake it
+    // once into an offscreen canvas cropped to its on-screen region, then
+    // blit with a single drawImage per frame (pixel-identical output).
+    let cachedSunGlowSprite: HTMLCanvasElement | null = null
+    let sunGlowDestX = 0
+    let sunGlowDestY = 0
     const updateSunGlowCache = () => {
       const sunX = width * 0.5
       const sunY = -20
       const sunGlowRadius = Math.max(width * 0.45, 380)
 
-      if (typeof ctx.createRadialGradient === 'function') {
-        const glow = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, sunGlowRadius)
-        glow.addColorStop(0, 'rgba(0, 255, 255, 0.18)')
-        glow.addColorStop(0.4, 'rgba(0, 195, 255, 0.08)')
-        glow.addColorStop(1, 'rgba(0, 255, 255, 0)')
-        cachedSunGlow = glow
-      } else {
-        cachedSunGlow = 'rgba(0, 255, 255, 0.08)'
+      const glowLeft = Math.max(0, sunX - sunGlowRadius)
+      const glowTop = Math.max(0, sunY - sunGlowRadius)
+      const glowRight = Math.min(width, sunX + sunGlowRadius)
+      const glowBottom = Math.min(height, sunY + sunGlowRadius)
+      const glowWidth = Math.max(1, Math.ceil(glowRight - glowLeft))
+      const glowHeight = Math.max(1, Math.ceil(glowBottom - glowTop))
+
+      const glowCanvas = document.createElement('canvas')
+      glowCanvas.width = glowWidth
+      glowCanvas.height = glowHeight
+      const glowCtx = glowCanvas.getContext('2d', { alpha: true })
+
+      if (glowCtx) {
+        const localX = sunX - glowLeft
+        const localY = sunY - glowTop
+
+        if (typeof glowCtx.createRadialGradient === 'function') {
+          const glow = glowCtx.createRadialGradient(localX, localY, 10, localX, localY, sunGlowRadius)
+          glow.addColorStop(0, 'rgba(0, 255, 255, 0.18)')
+          glow.addColorStop(0.4, 'rgba(0, 195, 255, 0.08)')
+          glow.addColorStop(1, 'rgba(0, 255, 255, 0)')
+          glowCtx.fillStyle = glow
+        } else {
+          glowCtx.fillStyle = 'rgba(0, 255, 255, 0.08)'
+        }
+        glowCtx.beginPath()
+        glowCtx.arc(localX, localY, sunGlowRadius, 0, Math.PI * 2)
+        glowCtx.fill()
       }
+
+      cachedSunGlowSprite = glowCanvas
+      sunGlowDestX = glowLeft
+      sunGlowDestY = glowTop
     }
     updateSunGlowCache()
 
@@ -335,7 +514,7 @@ export function UnderwaterBubblesCanvas({
     }
     updateClusterCenters()
 
-    const createParticle = (initialY?: number): Particle => {
+    const createParticle = (initialY?: number, zOverride?: number): Particle => {
       const roll = Math.random()
 
       let type: ParticleType
@@ -347,7 +526,7 @@ export function UnderwaterBubblesCanvas({
         type = 'bokeh'
       }
 
-      const z = Math.random() * 0.92 + 0.08
+      const z = zOverride ?? Math.random() * 0.92 + 0.08
       const isClustered = Math.random() < 0.88
 
       let x: number
@@ -417,15 +596,50 @@ export function UnderwaterBubblesCanvas({
       globalParticles = particles
     }
 
+    const applyParticle = (target: Particle, src: Particle) => {
+      target.type = src.type
+      target.x = src.x
+      target.y = src.y
+      target.z = src.z
+      target.radius = src.radius
+      target.speed = src.speed
+      target.wobbleSpeed = src.wobbleSpeed
+      target.wobbleAmount = src.wobbleAmount
+      target.wobbleOffset = src.wobbleOffset
+      target.opacity = src.opacity
+      target.variantIndex = src.variantIndex
+      target.clusterCenterX = src.clusterCenterX
+      target.bokehRingWidth = src.bokehRingWidth
+    }
+
+    // One-time overdraw relief for the lowest FPS tier: near-invisible far
+    // fizz is recycled into visible mid/near bubbles so perceived density
+    // stays constant while tiny high-churn sprites disappear.
+    let farFizzCulled = false
+    const cullFarFizz = () => {
+      if (farFizzCulled) return
+      farFizzCulled = true
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        if (p.type === 'fizz' && p.z < 0.25) {
+          applyParticle(p, createParticle(height + Math.random() * 50 + 10, 0.45 + Math.random() * 0.5))
+        }
+      }
+    }
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isPaused = true
         if (animationFrameId) cancelAnimationFrame(animationFrameId)
       } else {
         isPaused = false
-        lastTime = performance.now()
-        lastFrameTime = performance.now()
-        animationFrameId = requestAnimationFrame(render)
+        const now = performance.now()
+        lastTime = now
+        lastFrameTime = now
+        lastRafTimestamp = now
+        if (!prefersReducedMotion) {
+          animationFrameId = requestAnimationFrame(render)
+        }
       }
     }
 
@@ -434,35 +648,33 @@ export function UnderwaterBubblesCanvas({
     const startTime = performance.now()
     let lastTime = startTime
     let lastFrameTime = startTime
-    const TARGET_FPS = isMobile ? 30 : 36
-    const FRAME_INTERVAL = 1000 / TARGET_FPS
+    let lastRafTimestamp = startTime
+    const governor = createFpsGovernor(isMobile ? [30, 24, 18] : [36, 24, 18])
+    let frameInterval = governor.intervalMs
 
     const render = (now: number = performance.now()) => {
       if (isPaused) return
 
+      const rafDelta = now - lastRafTimestamp
+      lastRafTimestamp = now
+
       const elapsed = now - lastFrameTime
-      if (elapsed < FRAME_INTERVAL) {
+      if (elapsed < frameInterval) {
         if (!prefersReducedMotion && !isPaused) {
           animationFrameId = requestAnimationFrame(render)
         }
         return
       }
 
+      const workStart = performance.now()
       const dt = Math.min((now - lastTime) / 1000, 0.1)
       lastTime = now
-      lastFrameTime = now - (elapsed % FRAME_INTERVAL)
+      lastFrameTime = now - (elapsed % frameInterval)
 
       ctx.clearRect(0, 0, width, height)
 
-      if (cachedSunGlow) {
-        const sunX = width * 0.5
-        const sunY = -20
-        const sunGlowRadius = Math.max(width * 0.45, 380)
-
-        ctx.fillStyle = cachedSunGlow
-        ctx.beginPath()
-        ctx.arc(sunX, sunY, sunGlowRadius, 0, Math.PI * 2)
-        ctx.fill()
+      if (cachedSunGlowSprite) {
+        ctx.drawImage(cachedSunGlowSprite, sunGlowDestX, sunGlowDestY)
       }
 
       // Set blend mode ONCE for particle sprites to avoid context flushing
@@ -483,20 +695,7 @@ export function UnderwaterBubblesCanvas({
         const renderY = p.y
 
         if (renderY < -60) {
-          const newP = createParticle(height + Math.random() * 50 + 10)
-          p.type = newP.type
-          p.x = newP.x
-          p.y = newP.y
-          p.z = newP.z
-          p.radius = newP.radius
-          p.speed = newP.speed
-          p.wobbleSpeed = newP.wobbleSpeed
-          p.wobbleAmount = newP.wobbleAmount
-          p.wobbleOffset = newP.wobbleOffset
-          p.opacity = newP.opacity
-          p.variantIndex = newP.variantIndex
-          p.clusterCenterX = newP.clusterCenterX
-          p.bokehRingWidth = newP.bokehRingWidth
+          applyParticle(p, createParticle(height + Math.random() * 50 + 10))
         }
 
         let edgeAlpha = 1
@@ -527,6 +726,13 @@ export function UnderwaterBubblesCanvas({
       // Reset canvas context state ONCE after draw loop finishes
       ctx.globalCompositeOperation = 'source-over'
       ctx.globalAlpha = 1.0
+
+      const renderMs = performance.now() - workStart
+      const tierSample = governor.sample(renderMs, rafDelta)
+      frameInterval = tierSample.intervalMs
+      if (tierSample.cullRequested) {
+        cullFarFizz()
+      }
 
       if (!prefersReducedMotion && !isPaused) {
         animationFrameId = requestAnimationFrame(render)
