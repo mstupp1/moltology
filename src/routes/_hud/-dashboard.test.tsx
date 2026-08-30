@@ -11,5 +11,6 @@ describe('Dashboard activity stream source', () => {
     expect(src).not.toMatch(/Pincer Torque recalibrated/)
     expect(src).not.toMatch(/INITIAL_ACTIVITIES/)
     expect(src).toMatch(/ActivityStreamPanel/)
+    expect(src).toMatch(/ResumeOracleConsultation/)
   })
 })

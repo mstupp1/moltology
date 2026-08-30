@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
@@ -12,6 +12,7 @@ import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { parseOracleThreadSearch, validateOracleSearch } from '@/lib/ai/last-oracle-thread'
 
 interface OracleSidebarContentProps {
   userId: string | null
@@ -149,6 +150,8 @@ function OracleSidebarContent({
 function OracleRouteComponent() {
   const oracle = useSafeOracle()
   const session = useAuthSession()
+  const search = useSearch({ strict: false }) as Record<string, unknown>
+  const requestedThreadId = parseOracleThreadSearch(search)
   const userId = session.userId || oracle?.userId || null
   const isAuthPending = session.isPending && !userId
 
@@ -157,6 +160,7 @@ function OracleRouteComponent() {
   const [localIsLoading, setLocalIsLoading] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
+  const appliedSearchThreadRef = useRef<string | undefined>(undefined)
 
   const threads = oracle ? oracle.threads : localThreads
   const activeThreadId = oracle ? oracle.activeThreadId : localActiveThreadId
@@ -237,6 +241,22 @@ function OracleRouteComponent() {
       .catch((err) => console.warn('Failed to load user AI threads:', err))
       .finally(() => setLocalIsLoading(false))
   }, [userId, oracle])
+
+  useEffect(() => {
+    if (!requestedThreadId || appliedSearchThreadRef.current === requestedThreadId) return
+
+    const exists = threads.some((thread) => thread.id === requestedThreadId)
+    if (exists) {
+      appliedSearchThreadRef.current = requestedThreadId
+      setActiveThreadId(requestedThreadId)
+      return
+    }
+
+    if (isLoadingThreads) return
+    if (threads.length > 0) {
+      appliedSearchThreadRef.current = requestedThreadId
+    }
+  }, [requestedThreadId, isLoadingThreads, threads])
 
   const handleCreateNewThread = () => {
     setActiveThreadId(null)
@@ -386,6 +406,7 @@ function OracleRouteComponent() {
 }
 
 export const Route = createFileRoute('/_hud/oracle')({
+  validateSearch: validateOracleSearch,
   headers: () => xRobotsNoindexHeaders(),
   head: () => ({
     meta: [
