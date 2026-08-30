@@ -215,7 +215,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           >
             <div className="overflow-hidden">
               <div className="pt-2 pb-1 space-y-2">
-                {/* Heavy VFX Toggle Row */}
+                {/* Underwater Bubbles Toggle Row */}
                 <div
                   className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl ${
                     isCorporate
@@ -243,36 +243,36 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                           isCorporate ? 'text-slate-800' : 'text-gray-200'
                         }`}
                       >
-                        Disable Heavy VFX
+                        Underwater Bubbles
                       </span>
                       <span
                         className={`text-[10px] truncate font-sans ${
                           isCorporate ? 'text-slate-500' : 'text-gray-400'
                         }`}
                       >
-                        {heavyVfxDisabled ? 'Performance Mode' : 'Full Graphics Active'}
+                        {heavyVfxDisabled ? 'Off' : 'Active'}
                       </span>
                     </div>
                   </div>
                   <button
                     type="button"
                     role="switch"
-                    aria-checked={heavyVfxDisabled}
-                    aria-label="Disable heavy vfx toggle"
+                    aria-checked={!heavyVfxDisabled}
+                    aria-label="Underwater bubbles toggle"
                     onClick={toggleHeavyVfx}
                     className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
                       isCorporate
-                        ? heavyVfxDisabled
-                          ? 'bg-slate-200 border-slate-300 focus:ring-sky-400'
-                          : 'bg-sky-500 focus:ring-sky-400'
-                        : heavyVfxDisabled
-                        ? 'bg-cyan-950 border-cyan-800 focus:ring-[#00c3ff]'
-                        : 'bg-[#00c3ff] focus:ring-[#00c3ff]'
+                        ? !heavyVfxDisabled
+                          ? 'bg-sky-500 focus:ring-sky-400'
+                          : 'bg-slate-200 border-slate-300 focus:ring-sky-400'
+                        : !heavyVfxDisabled
+                        ? 'bg-[#00c3ff] focus:ring-[#00c3ff]'
+                        : 'bg-cyan-950 border-cyan-800 focus:ring-[#00c3ff]'
                     }`}
                   >
                     <span
                       className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                        heavyVfxDisabled ? 'translate-x-0 bg-slate-300' : 'translate-x-4 bg-white'
+                        !heavyVfxDisabled ? 'translate-x-4 bg-white' : 'translate-x-0 bg-slate-300'
                       }`}
                     />
                   </button>
@@ -441,13 +441,13 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
 
-          {/* Display & Performance Section: Heavy VFX */}
+          {/* Display & Ambience Section: Underwater Bubbles */}
           <div
             className={`py-2 px-0.5 border-b ${
               isCorporate ? 'border-sky-100' : 'border-[#121c1d]'
             }`}
           >
-            {/* Heavy VFX */}
+            {/* Underwater Bubbles */}
             <div
               className={`flex items-center justify-between gap-2 p-2 rounded-xl transition-all ${
                 isCorporate
@@ -475,36 +475,36 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                       isCorporate ? 'text-slate-800' : 'text-[#dfe3e3]'
                     }`}
                   >
-                    Disable Heavy VFX
+                    Underwater Bubbles
                   </span>
                   <span
                     className={`text-[9px] truncate font-sans ${
                       isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
                     }`}
                   >
-                    {heavyVfxDisabled ? 'VFX Off (Performance Mode)' : 'VFX Active (Full Graphics)'}
+                    {heavyVfxDisabled ? 'Off' : 'Active'}
                   </span>
                 </div>
               </div>
               <button
                 type="button"
                 role="switch"
-                aria-checked={heavyVfxDisabled}
-                aria-label="Disable heavy vfx toggle"
+                aria-checked={!heavyVfxDisabled}
+                aria-label="Underwater bubbles toggle"
                 onClick={toggleHeavyVfx}
                 className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
                   isCorporate
-                    ? heavyVfxDisabled
-                      ? 'bg-slate-200 border-slate-300 focus:ring-sky-400'
-                      : 'bg-sky-500 focus:ring-sky-400'
-                    : heavyVfxDisabled
-                    ? 'bg-cyan-950/80 border-cyan-700/50 focus:ring-[#00c3ff]'
-                    : 'bg-[#00c3ff] focus:ring-[#00c3ff]'
+                    ? !heavyVfxDisabled
+                      ? 'bg-sky-500 focus:ring-sky-400'
+                      : 'bg-slate-200 border-slate-300 focus:ring-sky-400'
+                    : !heavyVfxDisabled
+                    ? 'bg-[#00c3ff] focus:ring-[#00c3ff]'
+                    : 'bg-cyan-950/80 border-cyan-700/50 focus:ring-[#00c3ff]'
                 }`}
               >
                 <span
                   className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    heavyVfxDisabled ? 'translate-x-0 bg-slate-300' : 'translate-x-4 bg-white'
+                    !heavyVfxDisabled ? 'translate-x-4 bg-white' : 'translate-x-0 bg-slate-300'
                   }`}
                 />
               </button>

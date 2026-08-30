@@ -358,7 +358,6 @@ export const MoltMaxPage: React.FC = () => {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
       <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
       <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-40" />
-      <div className="fixed inset-0 crt-grain pointer-events-none z-0 opacity-35 mix-blend-overlay" />
 
       <PublicHeader activePage="moltmax" onOpenAuth={(auth) => { setAuthMode(auth); setIsAuthModalOpen(true) }} />
       {mode === 'hero' && <main className="relative z-10">

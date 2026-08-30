@@ -137,7 +137,7 @@ describe('PublicHeader Navigation Component', () => {
     // Clicking the mobile accordion button opens the account drawer with settings and sign out
     fireEvent.click(mobileAvatarBtn)
     expect(screen.getAllByText('neo@moltology.org').length).toBeGreaterThan(0)
-    expect(screen.getByText('Disable Heavy VFX')).toBeInTheDocument()
+    expect(screen.getByText('Underwater Bubbles')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 

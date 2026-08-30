@@ -89,13 +89,11 @@ describe('LobsterAvatarDisplay Component', () => {
     expect(screen.queryByTestId('crt-avatar-scanlines')).toBeNull()
   })
 
-  it('renders ambient glow aura, grain overlay, light source, and vignette by default', () => {
+  it('renders ambient glow aura, scanline overlay, light source, and vignette by default', () => {
     render(<LobsterAvatarDisplay src={testSrc} glowColor="cyan" terminalEffects={true} />)
 
     expect(screen.getByTestId('avatar-glow-aura')).toBeInTheDocument()
-    expect(screen.getByTestId('crt-avatar-grain')).toBeInTheDocument()
     expect(screen.getByTestId('crt-bg-scanlines')).toBeInTheDocument()
-    expect(screen.getByTestId('crt-bg-grain')).toBeInTheDocument()
     expect(screen.getByTestId('avatar-light-source')).toBeInTheDocument()
     expect(screen.getByTestId('avatar-character-light')).toBeInTheDocument()
     expect(screen.getByTestId('avatar-vignette')).toBeInTheDocument()

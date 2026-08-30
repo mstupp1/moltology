@@ -357,30 +357,6 @@ input[type="range"].stat-slider::-moz-range-thumb {
     linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 1px, transparent 1px);
   background-size: 4px 4px;
   background-repeat: repeat;
-}
-
-.crt-grain {
-  background-image: radial-gradient(rgba(0, 255, 255, 0.5) 1px, transparent 1px);
-  background-size: 4px 4px;
-}
-
-/* Global VFX Disabled Performance Mode Overrides */
-body.vfx-disabled .crt-grain,
-.vfx-disabled .crt-grain {
-  display: none !important;
-}
-
-body.vfx-disabled *,
-.vfx-disabled * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-body.vfx-disabled [class*="drop-shadow-"],
-.vfx-disabled [class*="drop-shadow-"] {
-  filter: none !important;
-}
-
 /* Horizontal Stock Ticker Marquee Animation */
 @keyframes hud-marquee {
   0% { transform: translateX(0%); }
@@ -531,11 +507,6 @@ body.vfx-disabled [class*="drop-shadow-"],
     radial-gradient(ellipse 75% 45% at 50% -5%, rgba(57, 255, 20, 0.25), transparent 75%),
     radial-gradient(circle at 15% 85%, rgba(0, 255, 65, 0.12), transparent 50%),
     radial-gradient(ellipse 100% 100% at 50% 50%, transparent 25%, rgba(2, 8, 4, 0.92) 100%);
-}
-
-.theme-subterranean .crt-grain {
-  background-image: radial-gradient(rgba(57, 255, 20, 0.5) 1px, transparent 1px);
-  background-size: 4px 4px;
 }
 
 .theme-subterranean ::-webkit-scrollbar-thumb:hover {

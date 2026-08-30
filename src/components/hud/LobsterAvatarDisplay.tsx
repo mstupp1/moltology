@@ -356,18 +356,12 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
       className={`relative inline-flex items-center justify-center overflow-hidden [contain:paint] ${containerClassName}`}
       style={radialMaskStyle}
     >
-      {/* 1. Background CRT Scanlines & Cyber Grain across entire card */}
+      {/* 1. Background CRT Scanlines across entire card */}
       {terminalEffects && (
-        <>
-          <div
-            data-testid="crt-bg-scanlines"
-            className="absolute inset-0 crt-scanlines opacity-30 pointer-events-none z-0"
-          />
-          <div
-            data-testid="crt-bg-grain"
-            className="absolute inset-0 crt-grain opacity-20 mix-blend-overlay pointer-events-none z-0"
-          />
-        </>
+        <div
+          data-testid="crt-bg-scanlines"
+          className="absolute inset-0 crt-scanlines opacity-30 pointer-events-none z-0"
+        />
       )}
 
       {/* 2. Overhead Spotlight Cone Light Source */}
@@ -443,14 +437,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
           />
         )}
 
-        {/* CRT Cyber Grain Overlay masked to the character silhouette */}
-        {terminalEffects && (
-          <div
-            data-testid="crt-avatar-grain"
-            className="absolute inset-0 crt-grain opacity-25 mix-blend-overlay pointer-events-none z-20"
-            style={characterMaskStyle}
-          />
-        )}
       </div>
     </div>
   )

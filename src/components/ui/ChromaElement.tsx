@@ -75,12 +75,9 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
         } ${glowStyles} ${className}`}
       />
 
-      {/* CRT Terminal Overlays: Static Scanlines & Grain */}
+      {/* CRT Terminal Overlays: Static Scanlines */}
       {terminalEffects && (
-        <>
-          <div className="absolute inset-0 rounded-2xl crt-scanlines pointer-events-none z-20" />
-          <div className="absolute inset-0 rounded-2xl crt-grain opacity-25 mix-blend-overlay pointer-events-none z-20" />
-        </>
+        <div className="absolute inset-0 rounded-2xl crt-scanlines pointer-events-none z-20" />
       )}
     </div>
   )

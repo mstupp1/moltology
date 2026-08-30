@@ -164,9 +164,6 @@ function HudContent() {
         {/* High-Contrast CRT Scanlines Overlay on Background Image */}
         <div className="absolute inset-0 crt-scanlines opacity-90 pointer-events-none" />
 
-        {/* Micro-Grain Noise Texture on Background Image */}
-        <div className="absolute inset-0 crt-grain opacity-75 pointer-events-none" />
-
         {/* Sacred Grid Overlay */}
         <div className="absolute inset-0 bg-sacred-grid opacity-35 pointer-events-none" />
 
