@@ -411,10 +411,14 @@ describe('Forum Server Handlers', () => {
       },
     })
 
-    expect(insertedValues?.userId).toBe(memberB)
-    expect(insertedValues?.authorName).toBe(expectedB)
-    expect(insertedValues?.authorName).not.toBe(PLACEHOLDER_LARVA_ID)
-    expect(insertedValues?.authorName).not.toBe(expectedA)
+    expect(insertedValues).toEqual(
+      expect.objectContaining({
+        userId: memberB,
+        authorName: expectedB,
+      }),
+    )
+    expect(insertedValues).not.toEqual(expect.objectContaining({ authorName: PLACEHOLDER_LARVA_ID }))
+    expect(insertedValues).not.toEqual(expect.objectContaining({ authorName: expectedA }))
     expect(res.userId).toBe(memberB)
     expect(res.authorName).toBe(expectedB)
     expect(res.authorName).not.toBe(expectedA)
