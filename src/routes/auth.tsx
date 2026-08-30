@@ -246,7 +246,7 @@ function AuthRoute() {
           <div className="absolute inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-70" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.14)_0%,transparent_75%)] pointer-events-none z-0" />
           <div className="absolute inset-0 bg-sacred-grid pointer-events-none z-0 opacity-20" />
-          <div className="absolute inset-0 crt-scanlines pointer-events-none z-0 opacity-20 sm:opacity-30" />
+          <div className="absolute inset-0 crt-scanlines pointer-events-none z-0 opacity-35 sm:opacity-45" />
 
           {/* Quick Back-to-Home Top Right Control */}
           <div className="w-full max-w-md mb-3 sm:mb-4 flex justify-end items-center z-10">

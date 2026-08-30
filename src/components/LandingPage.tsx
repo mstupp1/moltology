@@ -252,7 +252,7 @@ export const LandingPage: React.FC = () => {
       <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
       <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
-      <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-20 sm:opacity-30" />
+      <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-35 sm:opacity-45" />
 
       <AuthModal
         isOpen={isAuthModalOpen}

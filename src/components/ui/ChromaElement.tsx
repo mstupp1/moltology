@@ -77,7 +77,7 @@ export const ChromaElement: React.FC<ChromaElementProps> = ({
 
       {/* CRT Terminal Overlays: Static Scanlines */}
       {terminalEffects && (
-        <div className="absolute inset-0 rounded-2xl crt-scanlines opacity-25 pointer-events-none z-20" />
+        <div className="absolute inset-0 rounded-2xl crt-scanlines opacity-35 pointer-events-none z-20" />
       )}
     </div>
   )

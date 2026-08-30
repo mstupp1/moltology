@@ -323,7 +323,7 @@ export const IsolationVideoFeed: React.FC<IsolationVideoFeedProps> = ({
 
         {/* CRT Scanlines Filter Overlay */}
         {settings.showScanlines && (
-          <div className="absolute inset-0 crt-scanlines pointer-events-none z-10 opacity-25 sm:opacity-35" />
+          <div className="absolute inset-0 crt-scanlines pointer-events-none z-10 opacity-45 sm:opacity-55" />
         )}
 
         {/* Video Player Controls Toolbar */}

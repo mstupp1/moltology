@@ -161,8 +161,8 @@ function HudContent() {
           }`}
         />
 
-        {/* Subtle Ambient CRT Scanlines Overlay on Background Image */}
-        <div className="absolute inset-0 crt-scanlines opacity-25 sm:opacity-35 pointer-events-none" />
+        {/* High-Tech CRT Scanlines Overlay on Background Image */}
+        <div className="absolute inset-0 crt-scanlines opacity-55 sm:opacity-65 pointer-events-none" />
 
         {/* Sacred Grid Overlay */}
         <div className="absolute inset-0 bg-sacred-grid opacity-35 pointer-events-none" />
