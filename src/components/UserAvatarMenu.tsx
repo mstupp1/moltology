@@ -23,6 +23,7 @@ export interface UserAvatarMenuProps {
   inline?: boolean
   className?: string
   variant?: 'benthic' | 'corporate'
+  displayName?: string | null
 }
 
 /**
@@ -41,6 +42,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   inline = false,
   className = '',
   variant = 'benthic',
+  displayName: displayNameProp,
 }) => {
   const isCorporate = variant === 'corporate'
   const [isOpen, setIsOpen] = useState(false)
@@ -73,7 +75,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
     }
   }
 
-  const displayName = user.name || user.email?.split('@')[0] || 'Operative'
+  const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
   const effectiveRole = getEffectiveRole(user, userRole)
 
   // Handle click outside & keyboard escape to close dropdown

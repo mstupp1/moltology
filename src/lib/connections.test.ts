@@ -56,6 +56,7 @@ describe('connections helpers', () => {
     const summary = toMemberSummary({
       id: 'u1',
       larvaId: 'LARVA UNIT #9',
+      handle: 'claw_lord',
       stage: 2,
       avatarConfig: { style: 'critters', seed: 'abc' },
       requestId: 'req-1',
@@ -64,6 +65,9 @@ describe('connections helpers', () => {
     expect(summary.stageLabel).toBe('Soft-Shed')
     expect(summary.requestId).toBe('req-1')
     expect(summary.since).toBe('2024-01-01T00:00:00.000Z')
+    expect(summary.handle).toBe('claw_lord')
+    expect(summary.displayName).toBe('claw_lord')
+    expect(summary.larvaId).toBe('LARVA UNIT #9')
   })
 })
 

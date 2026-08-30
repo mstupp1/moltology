@@ -41,6 +41,7 @@ vi.mock('@/lib/auth-client', () => ({
 vi.mock('@/lib/server/api', () => ({
   getUserProfileFn: vi.fn().mockResolvedValue({ id: 'user-1' }),
   updateEmailPreferencesFn: vi.fn().mockResolvedValue({ success: true, emailOptIn: true }),
+  claimMemberHandleFn: vi.fn().mockResolvedValue({ handle: 'ascendant_unit', displayName: 'ascendant_unit' }),
 }))
 
 describe('Auth Split Landing Page Component (/auth)', () => {
@@ -147,25 +148,47 @@ describe('Auth Split Landing Page Component (/auth)', () => {
 
     render(<AuthRoute />)
 
-    const nameInput = screen.getByPlaceholderText('Your Name')
+    const nameInput = screen.getByPlaceholderText('your_designation')
     const emailInput = screen.getByPlaceholderText('name@example.com')
     const passwordInput = screen.getByPlaceholderText('••••••••')
 
-    fireEvent.change(nameInput, { target: { value: 'Ascendant Unit' } })
+    fireEvent.change(nameInput, { target: { value: 'ascendant_unit' } })
     fireEvent.change(emailInput, { target: { value: 'unit@example.com' } })
     fireEvent.change(passwordInput, { target: { value: 'securepwd123' } })
 
     const submitBtn = screen.getByRole('button', { name: /^Create Account$/i })
     fireEvent.click(submitBtn)
 
+    const { claimMemberHandleFn } = await import('@/lib/server/api')
     await waitFor(() => {
       expect(authClient.signUp.email).toHaveBeenCalledWith({
-        name: 'Ascendant Unit',
+        name: 'ascendant_unit',
         email: 'unit@example.com',
         password: 'securepwd123',
       })
+      expect(claimMemberHandleFn).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          handle: 'ascendant_unit',
+          userId: 'user-456',
+        }),
+      })
       expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmax' })
     })
+  })
+
+  it('rejects a reserved designation on signup instead of creating the account', async () => {
+    mockSearch = { mode: 'signup' }
+    render(<AuthRoute />)
+
+    fireEvent.change(screen.getByPlaceholderText('your_designation'), { target: { value: 'oracle' } })
+    fireEvent.change(screen.getByPlaceholderText('name@example.com'), { target: { value: 'unit@example.com' } })
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'securepwd123' } })
+    fireEvent.click(screen.getByRole('button', { name: /^Create Account$/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText(/reserved for the Order/i)).toBeInTheDocument()
+    })
+    expect(authClient.signUp.email).not.toHaveBeenCalled()
   })
 
   it('displays error alerts when authentication fails', async () => {
@@ -225,7 +248,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     expect(checkbox).toBeChecked()
 
     // Fill in and submit
-    fireEvent.change(screen.getByPlaceholderText('Your Name'), { target: { value: 'Subscriber Unit' } })
+    fireEvent.change(screen.getByPlaceholderText('your_designation'), { target: { value: 'subscriber_unit' } })
     fireEvent.change(screen.getByPlaceholderText('name@example.com'), { target: { value: 'sub@example.com' } })
     fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'password123' } })
 

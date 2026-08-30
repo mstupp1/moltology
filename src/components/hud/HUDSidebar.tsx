@@ -39,6 +39,7 @@ import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
 import { getEffectiveRole } from '../../lib/permissions'
+import { resolveMemberPublicName } from '../../lib/member-handle'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
@@ -252,6 +253,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const user = session.user
   const isSessionPending = session.isPending
   const [userRole, setUserRole] = useState<string | null>(null)
+  const [memberHandle, setMemberHandle] = useState<string | null>(null)
+  const [memberLarvaId, setMemberLarvaId] = useState(larvaId)
   const effectiveUserRole = getEffectiveRole(user, userRole)
 
   const loadUserProfile = useCallback(async (userId: string) => {
@@ -266,28 +269,36 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   useEffect(() => {
     if (!user?.id) {
       setUserRole(null)
+      setMemberHandle(null)
+      setMemberLarvaId(larvaId)
       return
     }
     let isSubscribed = true
+    const applyProfile = (profile: { role?: string | null; handle?: string | null; larvaId?: string | null } | null) => {
+      if (!isSubscribed) return
+      const role = getEffectiveRole(user, profile?.role)
+      setUserRole(role)
+      setMemberHandle(profile?.handle ?? null)
+      setMemberLarvaId(profile?.larvaId ?? larvaId)
+    }
     loadUserProfile(user.id)
-      .then((profile) => {
-        if (isSubscribed) {
-          const role = getEffectiveRole(user, profile?.role)
-          setUserRole(role)
-        }
-      })
-      .catch(() => {
-        if (isSubscribed) {
-          const role = getEffectiveRole(user, null)
-          setUserRole(role)
-        }
-      })
+      .then(applyProfile)
+      .catch(() => applyProfile(null))
+    const onHandleChanged = () => {
+      loadUserProfile(user.id).then(applyProfile).catch(() => applyProfile(null))
+    }
+    window.addEventListener('member-handle-changed', onHandleChanged)
     return () => {
       isSubscribed = false
+      window.removeEventListener('member-handle-changed', onHandleChanged)
     }
-  }, [user?.id, user?.email, user?.role, loadUserProfile])
+  }, [user?.id, user?.email, user?.role, loadUserProfile, larvaId])
 
-  const displayName = user?.name || user?.email?.split('@')[0] || larvaId
+  const displayName = resolveMemberPublicName({
+    userId: user?.id,
+    handle: memberHandle,
+    larvaId: memberLarvaId,
+  })
 
   const handleOpenCommandPalette = () => {
     window.dispatchEvent(new CustomEvent('open-command-palette'))
@@ -954,6 +965,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       <UserAvatarMenu
                         user={user}
                         userRole={effectiveUserRole}
+                        displayName={displayName}
                         onNavigate={(path) => navigate({ to: path })}
                         align="left"
                         openDirection="up"
@@ -1025,6 +1037,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       <UserAvatarMenu
                         user={user}
                         userRole={effectiveUserRole}
+                        displayName={displayName}
                         onNavigate={(path) => navigate({ to: path })}
                         align="right"
                         openDirection="up"
@@ -1155,6 +1168,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <UserAvatarMenu
                     user={user}
                     userRole={effectiveUserRole}
+                    displayName={displayName}
                     onNavigate={(path) => handleNavClick(path)}
                     inline={true}
                   />

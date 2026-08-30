@@ -16,15 +16,15 @@ describe('Message Component Avatar Rendering', () => {
     }
 
     render(
-      <Message from="user" user={user}>
+      <Message from="user" user={user} senderLabel="claw_lord">
         <div>Testing user message</div>
       </Message>
     )
 
-    const img = screen.getByRole('img', { name: /carcinus unit/i })
+    const img = screen.getByRole('img', { name: /claw_lord/i })
     expect(img).toBeInTheDocument()
     expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg')
-    expect(screen.getByText('CARCINUS UNIT')).toBeInTheDocument()
+    expect(screen.getByText('claw_lord')).toBeInTheDocument()
   })
 
   it('renders UserAvatar with fallback letter for user message when user has no image', () => {
@@ -34,13 +34,13 @@ describe('Message Component Avatar Rendering', () => {
     }
 
     render(
-      <Message from="user" user={user}>
+      <Message from="user" user={user} senderLabel="pincer_prime">
         <div>Testing fallback letter</div>
       </Message>
     )
 
-    expect(screen.getByText('D')).toBeInTheDocument()
-    expect(screen.getByText('DEEP ZEALOT')).toBeInTheDocument()
+    expect(screen.getByText('p')).toBeInTheDocument()
+    expect(screen.getByText('pincer_prime')).toBeInTheDocument()
   })
 
   it('renders letter fallback for user message when no profile image is set', () => {
@@ -52,6 +52,17 @@ describe('Message Component Avatar Rendering', () => {
 
     expect(screen.getByText('I')).toBeInTheDocument()
     expect(screen.getByText('INITIATE')).toBeInTheDocument()
+  })
+
+  it('does not use the auth display name when no designation is provided', () => {
+    render(
+      <Message from="user" user={{ name: 'Ellis', email: 'ellis@example.com' }}>
+        <div>Oracle should not inherit Ellis</div>
+      </Message>
+    )
+
+    expect(screen.getByText('INITIATE')).toBeInTheDocument()
+    expect(screen.queryByText('ELLIS')).not.toBeInTheDocument()
   })
 
   it('renders custom avatar if avatar prop is supplied', () => {

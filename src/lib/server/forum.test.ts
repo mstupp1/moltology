@@ -608,4 +608,177 @@ describe('Forum Server Handlers', () => {
     expect(res?.posts[0].authorName).toBe('Architect Vaelen')
     expect(res?.posts[0].authorStage).toBe(3)
   })
+
+  it('prefers a claimed handle over the larva unit on write and read', async () => {
+    const memberA = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const memberB = '753a434e-b4c6-4681-9f6c-db3e5e5ca284'
+    const topicId = '20000000-0000-0000-0000-000000000009'
+
+    let insertedValues: Record<string, unknown> | null = null
+    const writeDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              return Promise.resolve([{ handle: 'claw_lord', larvaId: PLACEHOLDER_LARVA_ID, stage: 1 }])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          insertedValues = values
+          return {
+            returning: vi.fn().mockResolvedValue([
+              {
+                id: 'topic-handle',
+                categoryId: '10000000-0000-0000-0000-000000000005',
+                userId: memberA,
+                authorName: values.authorName,
+                authorAvatar: values.authorAvatar,
+                authorStage: values.authorStage,
+                title: 'Handle attribution thread',
+                slug: 'handle-attribution-thread',
+                content: 'This is enough content for a forum topic.',
+                isPinned: false,
+                isLocked: false,
+                views: 0,
+                repliesCount: 0,
+                upvotes: 0,
+                lastReplyAt: new Date('2026-08-30T12:00:00.000Z'),
+                createdAt: new Date('2026-08-30T12:00:00.000Z'),
+              },
+            ]),
+          }
+        }),
+      })),
+    }
+
+    writeDb.select = vi.fn()
+      .mockImplementationOnce(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockResolvedValue([{ handle: 'claw_lord', larvaId: PLACEHOLDER_LARVA_ID, stage: 1 }]),
+          })),
+        })),
+      }))
+      .mockImplementationOnce(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockResolvedValue([
+              {
+                id: '10000000-0000-0000-0000-000000000005',
+                slug: 'general-discussion',
+                name: 'General Discussion',
+                color: '#00ffff',
+              },
+            ]),
+          })),
+        })),
+      }))
+
+    const created = await createForumTopicHandler({
+      data: {
+        categoryId: '10000000-0000-0000-0000-000000000005',
+        title: 'Handle attribution thread',
+        content: 'This is enough content for a forum topic.',
+      },
+      context: { user: { sub: memberA }, db: writeDb as any },
+    })
+
+    expect(insertedValues).toEqual(expect.objectContaining({ authorName: 'claw_lord' }))
+    expect(created.authorName).toBe('claw_lord')
+    expect(created.authorName).not.toBe(PLACEHOLDER_LARVA_ID)
+
+    let selectCall = 0
+    const readDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: topicId,
+                        categoryId: '10000000-0000-0000-0000-000000000004',
+                        categorySlug: 'moltmaxxing-biometrics',
+                        categoryName: 'Moltmaxxing & Biometrics',
+                        categoryColor: '#00ffff',
+                        userId: memberA,
+                        authorName: PLACEHOLDER_LARVA_ID,
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 1,
+                        title: 'Handle attribution thread',
+                        slug: 'handle-attribution-thread',
+                        content: 'Thread body from a named member.',
+                        isPinned: false,
+                        isLocked: false,
+                        views: 1,
+                        repliesCount: 1,
+                        upvotes: 0,
+                        lastReplyAt: new Date('2026-08-30T12:00:00.000Z'),
+                        createdAt: new Date('2026-08-30T12:00:00.000Z'),
+                        profileHandle: 'claw_lord',
+                        profileLarvaId: PLACEHOLDER_LARVA_ID,
+                        profileStage: 1,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        if (selectCall === 2) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                where: vi.fn().mockReturnValue({
+                  orderBy: vi.fn().mockResolvedValue([
+                    {
+                      id: 'post-b',
+                      topicId,
+                      userId: memberB,
+                      authorName: PLACEHOLDER_LARVA_ID,
+                      authorAvatar: '/images/stage1_larva.png',
+                      authorStage: 1,
+                      content: 'Reply from the second designation.',
+                      upvotes: 0,
+                      createdAt: new Date('2026-08-30T12:05:00.000Z'),
+                      profileHandle: 'pincer_prime',
+                      profileLarvaId: PLACEHOLDER_LARVA_ID,
+                      profileStage: 1,
+                    },
+                  ]),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([]),
+          }),
+        }
+      }),
+      update: vi.fn(),
+    }
+
+    const detail = await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'handle-attribution-thread',
+        categorySlug: 'moltmaxxing-biometrics',
+        trackView: false,
+      },
+      context: { db: readDb as any },
+    })
+
+    expect(detail?.topic.authorName).toBe('claw_lord')
+    expect(detail?.posts[0].authorName).toBe('pincer_prime')
+    expect(detail?.posts[0].authorName).not.toBe(detail?.topic.authorName)
+    expect(detail?.topic.authorName).not.toBe(PLACEHOLDER_LARVA_ID)
+  })
 })

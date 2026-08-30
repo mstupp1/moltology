@@ -208,4 +208,49 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(replyCard).toHaveTextContent('LARVA UNIT #2468')
     expect(replyCard).not.toHaveTextContent('LARVA UNIT #1111')
   })
+
+  it('shows claimed designations on the original post and reply', () => {
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'moltmaxxing-biometrics',
+        categoryName: 'Moltmaxxing & Biometrics',
+        categoryColor: '#00ffff',
+        userId: 'member-a',
+        authorName: 'claw_lord',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 1,
+        title: 'BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS',
+        slug: 'shell-hardness-pincer-torque-gains-tips',
+        content: 'Thread body from member A.',
+        isPinned: false,
+        isLocked: false,
+        views: 10,
+        repliesCount: 1,
+        upvotes: 0,
+        lastReplyAt: '2026-08-28T19:37:07.000Z',
+        createdAt: '2026-08-03T08:30:00.000Z',
+      },
+      posts: [
+        {
+          id: 'post-b',
+          topicId: 'topic-a',
+          userId: 'member-b',
+          authorName: 'pincer_prime',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 2,
+          content: 'Reply body from member B, long enough to count.',
+          upvotes: 0,
+          createdAt: '2026-08-28T19:37:07.000Z',
+        },
+      ],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByText('claw_lord')).toBeInTheDocument()
+    expect(screen.getByText('pincer_prime')).toBeInTheDocument()
+    expect(screen.queryByText('LARVA UNIT #8971')).not.toBeInTheDocument()
+  })
 })

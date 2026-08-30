@@ -7,7 +7,12 @@ import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
-import { resolveMemberLarvaId } from '../larva-id'
+import {
+  HANDLE_TAKEN_MESSAGE,
+  isUniqueViolation,
+  parseMemberHandle,
+  resolveMemberPublicName,
+} from '../member-handle'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
@@ -199,6 +204,77 @@ export const getUserProfileFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data?: { token?: string; userId?: string }) => data ?? {})
   .handler(getUserProfileHandler)
+
+const claimMemberHandleSchema = z.object({
+  handle: z.string(),
+  token: z.string().optional(),
+  userId: z.string().optional(),
+})
+
+export type ClaimMemberHandleInput = z.input<typeof claimMemberHandleSchema>
+
+export async function claimMemberHandleHandler({
+  data,
+  context,
+}: ServerFnArgs<ClaimMemberHandleInput>) {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required to claim a designation.')
+  }
+
+  const parsed = parseMemberHandle(data?.handle)
+  if (!parsed.ok) {
+    throw new Error(parsed.message)
+  }
+
+  const { userId, dbClient } = auth
+  const [taken] = await dbClient
+    .select({ id: profiles.id })
+    .from(profiles)
+    .where(
+      and(
+        sql`lower(${profiles.handle}) = ${parsed.handle.toLowerCase()}`,
+        ne(profiles.id, userId),
+      ),
+    )
+    .limit(1)
+
+  if (taken) {
+    throw new Error(HANDLE_TAKEN_MESSAGE)
+  }
+
+  try {
+    const [updated] = await dbClient
+      .update(profiles)
+      .set({ handle: parsed.handle, updatedAt: new Date() })
+      .where(eq(profiles.id, userId))
+      .returning()
+
+    if (!updated) {
+      throw new Error('Could not seal that designation. Try again.')
+    }
+
+    return {
+      handle: updated.handle,
+      displayName: resolveMemberPublicName({
+        userId,
+        handle: updated.handle,
+        larvaId: updated.larvaId,
+      }),
+      larvaId: updated.larvaId,
+    }
+  } catch (error) {
+    if (isUniqueViolation(error)) {
+      throw new Error(HANDLE_TAKEN_MESSAGE)
+    }
+    throw error
+  }
+}
+
+export const claimMemberHandleFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: ClaimMemberHandleInput) => claimMemberHandleSchema.parse(data))
+  .handler(claimMemberHandleHandler)
 
 /**
  * Server Function: Get authenticated user stats.
@@ -899,7 +975,11 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = userProfile?.larvaId || (payload as any)?.name || 'Ascendant Initiate'
+  const authorName = resolveMemberPublicName({
+    userId,
+    handle: userProfile?.handle,
+    larvaId: userProfile?.larvaId,
+  })
   const authorAvatar = '/images/stage1_larva.png'
 
   const [inserted] = await dbClient
@@ -1175,9 +1255,12 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         upvotes: forumTopics.upvotes,
         lastReplyAt: forumTopics.lastReplyAt,
         createdAt: forumTopics.createdAt,
+        profileHandle: profiles.handle,
+        profileLarvaId: profiles.larvaId,
       })
       .from(forumTopics)
       .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
+      .leftJoin(profiles, eq(forumTopics.userId, profiles.id))
 
     // Apply conditions
     const conditions = []
@@ -1220,7 +1303,11 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         categoryName: r.categoryName || 'General Discussion',
         categoryColor: r.categoryColor || '#00ffff',
         userId: r.userId,
-        authorName: r.authorName,
+        authorName: resolveMemberPublicName({
+          userId: r.userId,
+          handle: r.profileHandle,
+          larvaId: r.profileLarvaId ?? r.authorName,
+        }),
         authorAvatar: r.authorAvatar,
         authorStage: r.authorStage,
         title: r.title,
@@ -1313,6 +1400,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         upvotes: forumTopics.upvotes,
         lastReplyAt: forumTopics.lastReplyAt,
         createdAt: forumTopics.createdAt,
+        profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
         profileStage: profiles.stage,
       })
@@ -1351,6 +1439,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           content: forumPosts.content,
           upvotes: forumPosts.upvotes,
           createdAt: forumPosts.createdAt,
+          profileHandle: profiles.handle,
           profileLarvaId: profiles.larvaId,
           profileStage: profiles.stage,
         })
@@ -1367,7 +1456,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         id: p.id,
         topicId: p.topicId,
         userId: p.userId,
-        authorName: resolveMemberLarvaId(p.userId, p.profileLarvaId ?? p.authorName),
+        authorName: resolveMemberPublicName({
+          userId: p.userId,
+          handle: p.profileHandle,
+          larvaId: p.profileLarvaId ?? p.authorName,
+        }),
         authorAvatar: p.authorAvatar,
         authorStage: p.profileStage ?? p.authorStage,
         content: p.content,
@@ -1388,7 +1481,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           categoryName: t.categoryName || 'General Discussion',
           categoryColor: t.categoryColor || '#00ffff',
           userId: t.userId,
-          authorName: resolveMemberLarvaId(t.userId, t.profileLarvaId ?? t.authorName),
+          authorName: resolveMemberPublicName({
+            userId: t.userId,
+            handle: t.profileHandle,
+            larvaId: t.profileLarvaId ?? t.authorName,
+          }),
           authorAvatar: t.authorAvatar,
           authorStage: t.profileStage ?? t.authorStage,
           title: t.title,
@@ -1467,7 +1564,11 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = resolveMemberLarvaId(userId, userProfile?.larvaId)
+  const authorName = resolveMemberPublicName({
+    userId,
+    handle: userProfile?.handle,
+    larvaId: userProfile?.larvaId,
+  })
   const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
@@ -1567,7 +1668,11 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = resolveMemberLarvaId(userId, userProfile?.larvaId)
+  const authorName = resolveMemberPublicName({
+    userId,
+    handle: userProfile?.handle,
+    larvaId: userProfile?.larvaId,
+  })
   const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
@@ -2636,6 +2741,7 @@ export const getPublicProfileHandler = async ({
     .select({
       id: profiles.id,
       larvaId: profiles.larvaId,
+      handle: profiles.handle,
       stage: profiles.stage,
       avatarConfig: profiles.avatarConfig,
       createdAt: profiles.createdAt,
@@ -2661,6 +2767,12 @@ export const getPublicProfileHandler = async ({
   return {
     id: profile.id,
     larvaId: profile.larvaId,
+    handle: profile.handle?.trim() || null,
+    displayName: resolveMemberPublicName({
+      userId: profile.id,
+      handle: profile.handle,
+      larvaId: profile.larvaId,
+    }),
     stage: profile.stage,
     stageLabel: getStageLabel(profile.stage),
     avatarConfig: (profile.avatarConfig as PublicProfileView['avatarConfig']) ?? null,
@@ -2746,17 +2858,29 @@ export const searchMembersHandler = async ({
     .select({
       id: profiles.id,
       larvaId: profiles.larvaId,
+      handle: profiles.handle,
       stage: profiles.stage,
       avatarConfig: profiles.avatarConfig,
     })
     .from(profiles)
-    .where(and(ne(profiles.id, auth.userId), ilike(profiles.larvaId, `%${query}%`)))
+    .where(
+      and(
+        ne(profiles.id, auth.userId),
+        or(ilike(profiles.handle, `%${query}%`), ilike(profiles.larvaId, `%${query}%`)),
+      ),
+    )
     .orderBy(asc(profiles.larvaId))
     .limit(20)
 
   return rows.map((row) => ({
     id: row.id,
     larvaId: row.larvaId,
+    handle: row.handle?.trim() || null,
+    displayName: resolveMemberPublicName({
+      userId: row.id,
+      handle: row.handle,
+      larvaId: row.larvaId,
+    }),
     stage: row.stage,
     stageLabel: getStageLabel(row.stage),
     avatarConfig: (row.avatarConfig as MemberSearchResult['avatarConfig']) ?? null,
@@ -2801,7 +2925,7 @@ export const sendFriendRequestHandler = async ({
   }
 
   const [sender] = await auth.dbClient
-    .select({ larvaId: profiles.larvaId })
+    .select({ id: profiles.id, larvaId: profiles.larvaId, handle: profiles.handle })
     .from(profiles)
     .where(eq(profiles.id, auth.userId))
     .limit(1)
@@ -2815,7 +2939,14 @@ export const sendFriendRequestHandler = async ({
     })
     .returning()
 
-  const copy = buildFriendNotificationCopy('friend_request', sender?.larvaId || 'A member')
+  const copy = buildFriendNotificationCopy(
+    'friend_request',
+    resolveMemberPublicName({
+      userId: auth.userId,
+      handle: sender?.handle,
+      larvaId: sender?.larvaId,
+    }),
+  )
   await insertNotification(auth.dbClient, {
     userId: data.recipientId,
     kind: 'friend_request',
@@ -2871,7 +3002,7 @@ export const respondFriendRequestHandler = async ({
     .where(eq(friendRequests.id, request.id))
 
   const [actor] = await auth.dbClient
-    .select({ larvaId: profiles.larvaId })
+    .select({ id: profiles.id, larvaId: profiles.larvaId, handle: profiles.handle })
     .from(profiles)
     .where(eq(profiles.id, auth.userId))
     .limit(1)
@@ -2883,7 +3014,14 @@ export const respondFriendRequestHandler = async ({
       .values({ userAId, userBId })
       .onConflictDoNothing()
 
-    const copy = buildFriendNotificationCopy('friend_accepted', actor?.larvaId || 'A member')
+    const copy = buildFriendNotificationCopy(
+      'friend_accepted',
+      resolveMemberPublicName({
+        userId: auth.userId,
+        handle: actor?.handle,
+        larvaId: actor?.larvaId,
+      }),
+    )
     await insertNotification(auth.dbClient, {
       userId: request.senderId,
       kind: 'friend_accepted',
@@ -2894,7 +3032,14 @@ export const respondFriendRequestHandler = async ({
       sourceKey: friendAcceptedSourceKey(request.id),
     })
   } else {
-    const copy = buildFriendNotificationCopy('friend_rejected', actor?.larvaId || 'A member')
+    const copy = buildFriendNotificationCopy(
+      'friend_rejected',
+      resolveMemberPublicName({
+        userId: auth.userId,
+        handle: actor?.handle,
+        larvaId: actor?.larvaId,
+      }),
+    )
     await insertNotification(auth.dbClient, {
       userId: request.senderId,
       kind: 'friend_rejected',
@@ -3031,6 +3176,7 @@ export const listConnectionsHandler = async ({
           .select({
             id: profiles.id,
             larvaId: profiles.larvaId,
+            handle: profiles.handle,
             stage: profiles.stage,
             avatarConfig: profiles.avatarConfig,
           })
@@ -3066,6 +3212,7 @@ export const listConnectionsHandler = async ({
           .select({
             id: profiles.id,
             larvaId: profiles.larvaId,
+            handle: profiles.handle,
             stage: profiles.stage,
             avatarConfig: profiles.avatarConfig,
           })

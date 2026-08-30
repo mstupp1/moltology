@@ -157,7 +157,7 @@ export const ConnectionsPage: React.FC = () => {
                     params={{ profileId: member.id }}
                     className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
                   >
-                    {member.larvaId}
+                    {member.displayName}
                   </Link>
                   <div className="text-[10px] uppercase tracking-wider text-[#839493]">
                     Stage {member.stage} · {member.stageLabel}
@@ -225,7 +225,7 @@ export const ConnectionsPage: React.FC = () => {
                     params={{ profileId: member.id }}
                     className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
                   >
-                    {member.larvaId}
+                    {member.displayName}
                   </Link>
                   <div className="text-[10px] uppercase tracking-wider text-[#839493]">
                     Stage {member.stage} · {member.stageLabel}

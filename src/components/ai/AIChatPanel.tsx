@@ -27,6 +27,7 @@ import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 import { getAssetUrl } from '../../lib/assets'
 import { isAdminOrSuperAdmin } from '../../lib/permissions'
+import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 
@@ -105,6 +106,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const [selectedModelId, setSelectedModelId] = useState<string>(DEFAULT_ORACLE_MODEL_ID)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [profileRole, setProfileRole] = useState<string | null>(null)
+  const [memberHandle, setMemberHandle] = useState<string | null>(null)
+  const [memberLarvaId, setMemberLarvaId] = useState<string | null>(null)
   const conversationRef = useRef<HTMLDivElement>(null)
   const hadUserMessagesRef = useRef(false)
 
@@ -113,6 +116,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   useEffect(() => {
     if (!userId) {
       setProfileRole(null)
+      setMemberHandle(null)
+      setMemberLarvaId(null)
       return
     }
 
@@ -123,10 +128,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
         if (isSubscribed) {
           setProfileRole(profile?.role ?? null)
+          setMemberHandle(profile?.handle ?? null)
+          setMemberLarvaId(profile?.larvaId ?? null)
         }
       } catch {
         if (isSubscribed) {
           setProfileRole(null)
+          setMemberHandle(null)
+          setMemberLarvaId(null)
         }
       }
     })()
@@ -740,6 +749,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   key={msg.id}
                   from={msg.role === 'user' ? 'user' : 'assistant'}
                   timestamp={msg.timestamp}
+                  senderLabel={
+                    msg.role === 'user'
+                      ? resolveMemberPublicName({
+                          userId,
+                          handle: memberHandle,
+                          larvaId: memberLarvaId,
+                        })
+                      : undefined
+                  }
                   user={msg.role === 'user' ? user : undefined}
                 >
                   <MessageContent>
