@@ -15,6 +15,7 @@ import {
   toggleForumPostVoteHandler,
   getForumTopicDetailHandler,
 } from './api'
+import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 
 describe('Forum Server Handlers', () => {
   beforeEach(() => {
@@ -268,45 +269,51 @@ describe('Forum Server Handlers', () => {
       select: vi.fn().mockImplementation(() => {
         selectCall += 1
         if (selectCall === 1) {
-          // topic + category join
+          // topic + category + profile joins
           return {
             from: vi.fn().mockReturnValue({
               leftJoin: vi.fn().mockReturnValue({
-                where: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([
-                    {
-                      id: '20000000-0000-0000-0000-000000000001',
-                      categoryId: '10000000-0000-0000-0000-000000000001',
-                      categorySlug: 'rules-announcements',
-                      categoryName: 'Rules & Directives',
-                      categoryColor: '#ff5540',
-                      userId: null,
-                      authorName: 'Author',
-                      authorAvatar: '/images/stage1_larva.png',
-                      authorStage: 1,
-                      title: 'Welcome',
-                      slug: 'welcome-to-community-core-directives',
-                      content: 'Body content here.',
-                      isPinned: true,
-                      isLocked: false,
-                      views: 100,
-                      repliesCount: 0,
-                      upvotes: 88,
-                      lastReplyAt: new Date('2026-08-03T20:30:00.000Z'),
-                      createdAt: new Date('2026-08-01T12:00:00.000Z'),
-                    },
-                  ]),
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: '20000000-0000-0000-0000-000000000001',
+                        categoryId: '10000000-0000-0000-0000-000000000001',
+                        categorySlug: 'rules-announcements',
+                        categoryName: 'Rules & Directives',
+                        categoryColor: '#ff5540',
+                        userId: null,
+                        authorName: 'Author',
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 1,
+                        title: 'Welcome',
+                        slug: 'welcome-to-community-core-directives',
+                        content: 'Body content here.',
+                        isPinned: true,
+                        isLocked: false,
+                        views: 100,
+                        repliesCount: 0,
+                        upvotes: 88,
+                        lastReplyAt: new Date('2026-08-03T20:30:00.000Z'),
+                        createdAt: new Date('2026-08-01T12:00:00.000Z'),
+                        profileLarvaId: null,
+                        profileStage: null,
+                      },
+                    ]),
+                  }),
                 }),
               }),
             }),
           }
         }
         if (selectCall === 2) {
-          // posts
+          // posts + profile join
           return {
             from: vi.fn().mockReturnValue({
-              where: vi.fn().mockReturnValue({
-                orderBy: vi.fn().mockResolvedValue([]),
+              leftJoin: vi.fn().mockReturnValue({
+                where: vi.fn().mockReturnValue({
+                  orderBy: vi.fn().mockResolvedValue([]),
+                }),
               }),
             }),
           }
@@ -338,5 +345,267 @@ describe('Forum Server Handlers', () => {
     expect(res?.topic.voted).toBe(true)
     expect(res?.topic.views).toBe(100)
     expect(updateMock).not.toHaveBeenCalled()
+  })
+
+  it('stamps a reply with member B unit label, not thread author A, when both still have the placeholder', async () => {
+    const memberA = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const memberB = '753a434e-b4c6-4681-9f6c-db3e5e5ca284'
+    const topicId = '20000000-0000-0000-0000-000000000003'
+    const expectedB = resolveMemberLarvaId(memberB, PLACEHOLDER_LARVA_ID)
+    const expectedA = resolveMemberLarvaId(memberA, PLACEHOLDER_LARVA_ID)
+
+    let selectCall = 0
+    let insertedValues: Record<string, unknown> | null = null
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) {
+                return Promise.resolve([{ larvaId: PLACEHOLDER_LARVA_ID, stage: 1 }])
+              }
+              if (selectCall === 2) {
+                return Promise.resolve([{ id: topicId }])
+              }
+              return Promise.resolve([{ repliesCount: 2 }])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          insertedValues = values
+          return {
+            returning: vi.fn().mockResolvedValue([
+              {
+                id: 'post-b',
+                topicId,
+                userId: memberB,
+                authorName: values.authorName,
+                authorAvatar: values.authorAvatar,
+                authorStage: values.authorStage,
+                content: values.content,
+                upvotes: 0,
+                createdAt: new Date('2026-08-28T19:37:07.000Z'),
+              },
+            ]),
+          }
+        }),
+      })),
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+    }
+
+    const res = await createForumPostHandler({
+      data: {
+        topicId,
+        content: 'New initiate here, so no numbers worth bragging about yet.',
+      },
+      context: {
+        user: { sub: memberB },
+        db: mockDb as any,
+      },
+    })
+
+    expect(insertedValues).toEqual(
+      expect.objectContaining({
+        userId: memberB,
+        authorName: expectedB,
+      }),
+    )
+    expect(insertedValues).not.toEqual(expect.objectContaining({ authorName: PLACEHOLDER_LARVA_ID }))
+    expect(insertedValues).not.toEqual(expect.objectContaining({ authorName: expectedA }))
+    expect(res.userId).toBe(memberB)
+    expect(res.authorName).toBe(expectedB)
+    expect(res.authorName).not.toBe(expectedA)
+  })
+
+  it('lists member B reply as B, not thread author A, when both stored names are the placeholder', async () => {
+    const memberA = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const memberB = '753a434e-b4c6-4681-9f6c-db3e5e5ca284'
+    const topicId = '20000000-0000-0000-0000-000000000003'
+    const expectedA = resolveMemberLarvaId(memberA, PLACEHOLDER_LARVA_ID)
+    const expectedB = resolveMemberLarvaId(memberB, PLACEHOLDER_LARVA_ID)
+
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: topicId,
+                        categoryId: '10000000-0000-0000-0000-000000000004',
+                        categorySlug: 'moltmaxxing-biometrics',
+                        categoryName: 'Moltmaxxing & Biometrics',
+                        categoryColor: '#00ffff',
+                        userId: memberA,
+                        authorName: PLACEHOLDER_LARVA_ID,
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 1,
+                        title: 'BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS',
+                        slug: 'shell-hardness-pincer-torque-gains-tips',
+                        content: 'My current Moltmaxxing metrics read.',
+                        isPinned: false,
+                        isLocked: false,
+                        views: 520,
+                        repliesCount: 3,
+                        upvotes: 35,
+                        lastReplyAt: new Date('2026-08-28T19:37:07.000Z'),
+                        createdAt: new Date('2026-08-03T08:30:00.000Z'),
+                        profileLarvaId: PLACEHOLDER_LARVA_ID,
+                        profileStage: 1,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        if (selectCall === 2) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                where: vi.fn().mockReturnValue({
+                  orderBy: vi.fn().mockResolvedValue([
+                    {
+                      id: 'post-b',
+                      topicId,
+                      userId: memberB,
+                      authorName: PLACEHOLDER_LARVA_ID,
+                      authorAvatar: '/images/stage1_larva.png',
+                      authorStage: 1,
+                      content: 'New initiate here, so no numbers worth bragging about yet.',
+                      upvotes: 0,
+                      createdAt: new Date('2026-08-28T19:37:07.000Z'),
+                      profileLarvaId: PLACEHOLDER_LARVA_ID,
+                      profileStage: 1,
+                    },
+                  ]),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([]),
+          }),
+        }
+      }),
+      update: vi.fn(),
+    }
+
+    const res = await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'shell-hardness-pincer-torque-gains-tips',
+        categorySlug: 'moltmaxxing-biometrics',
+        trackView: false,
+      },
+      context: {
+        db: mockDb as any,
+      },
+    })
+
+    expect(res?.topic.userId).toBe(memberA)
+    expect(res?.topic.authorName).toBe(expectedA)
+    expect(res?.posts).toHaveLength(1)
+    expect(res?.posts[0].userId).toBe(memberB)
+    expect(res?.posts[0].authorName).toBe(expectedB)
+    expect(res?.posts[0].authorName).not.toBe(res?.topic.authorName)
+    expect(res?.posts[0].authorName).not.toBe(PLACEHOLDER_LARVA_ID)
+  })
+
+  it('keeps seed reply attribution when the row has no member id', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: '20000000-0000-0000-0000-000000000003',
+                        categoryId: '10000000-0000-0000-0000-000000000004',
+                        categorySlug: 'moltmaxxing-biometrics',
+                        categoryName: 'Moltmaxxing & Biometrics',
+                        categoryColor: '#00ffff',
+                        userId: null,
+                        authorName: 'Larva Unit #8971',
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 1,
+                        title: 'BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS',
+                        slug: 'shell-hardness-pincer-torque-gains-tips',
+                        content: 'Seed thread body.',
+                        isPinned: false,
+                        isLocked: false,
+                        views: 520,
+                        repliesCount: 1,
+                        upvotes: 35,
+                        lastReplyAt: new Date('2026-08-03T16:10:00.000Z'),
+                        createdAt: new Date('2026-08-03T08:30:00.000Z'),
+                        profileLarvaId: null,
+                        profileStage: null,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockResolvedValue([
+                  {
+                    id: '30000000-0000-0000-0000-000000000006',
+                    topicId: '20000000-0000-0000-0000-000000000003',
+                    userId: null,
+                    authorName: 'Architect Vaelen',
+                    authorAvatar: '/images/stage1_larva.png',
+                    authorStage: 3,
+                    content: 'Focus on completing the morning lock.',
+                    upvotes: 21,
+                    createdAt: new Date('2026-08-03T16:10:00.000Z'),
+                    profileLarvaId: null,
+                    profileStage: null,
+                  },
+                ]),
+              }),
+            }),
+          }),
+        }
+      }),
+      update: vi.fn(),
+    }
+
+    const res = await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'shell-hardness-pincer-torque-gains-tips',
+        categorySlug: 'moltmaxxing-biometrics',
+        trackView: false,
+      },
+      context: { db: mockDb as any },
+    })
+
+    expect(res?.topic.authorName).toBe('Larva Unit #8971')
+    expect(res?.posts[0].authorName).toBe('Architect Vaelen')
+    expect(res?.posts[0].authorStage).toBe(3)
   })
 })

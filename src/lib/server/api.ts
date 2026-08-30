@@ -7,6 +7,7 @@ import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
+import { resolveMemberLarvaId } from '../larva-id'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
@@ -1312,9 +1313,12 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         upvotes: forumTopics.upvotes,
         lastReplyAt: forumTopics.lastReplyAt,
         createdAt: forumTopics.createdAt,
+        profileLarvaId: profiles.larvaId,
+        profileStage: profiles.stage,
       })
       .from(forumTopics)
       .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
+      .leftJoin(profiles, eq(forumTopics.userId, profiles.id))
       .where(isUuid ? eq(forumTopics.id, slugOrId) : eq(forumTopics.slug, slugOrId))
       .limit(1)
 
@@ -1347,8 +1351,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           content: forumPosts.content,
           upvotes: forumPosts.upvotes,
           createdAt: forumPosts.createdAt,
+          profileLarvaId: profiles.larvaId,
+          profileStage: profiles.stage,
         })
         .from(forumPosts)
+        .leftJoin(profiles, eq(forumPosts.userId, profiles.id))
         .where(eq(forumPosts.topicId, t.id))
         .orderBy(forumPosts.createdAt)
 
@@ -1360,9 +1367,9 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         id: p.id,
         topicId: p.topicId,
         userId: p.userId,
-        authorName: p.authorName,
+        authorName: resolveMemberLarvaId(p.userId, p.profileLarvaId ?? p.authorName),
         authorAvatar: p.authorAvatar,
-        authorStage: p.authorStage,
+        authorStage: p.profileStage ?? p.authorStage,
         content: p.content,
         upvotes: p.upvotes,
         createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : new Date().toISOString(),
@@ -1381,9 +1388,9 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           categoryName: t.categoryName || 'General Discussion',
           categoryColor: t.categoryColor || '#00ffff',
           userId: t.userId,
-          authorName: t.authorName,
+          authorName: resolveMemberLarvaId(t.userId, t.profileLarvaId ?? t.authorName),
           authorAvatar: t.authorAvatar,
-          authorStage: t.authorStage,
+          authorStage: t.profileStage ?? t.authorStage,
           title: t.title,
           slug: t.slug,
           content: t.content,
@@ -1460,7 +1467,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = userProfile?.larvaId || (payload as any)?.name || 'Ascendant Initiate'
+  const authorName = resolveMemberLarvaId(userId, userProfile?.larvaId)
   const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
@@ -1560,7 +1567,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  const authorName = userProfile?.larvaId || (payload as any)?.name || 'Ascendant Initiate'
+  const authorName = resolveMemberLarvaId(userId, userProfile?.larvaId)
   const authorAvatar = (payload as any)?.image || '/images/stage1_larva.png'
   const authorStage = userProfile?.stage ?? 1
 
