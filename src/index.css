@@ -357,6 +357,7 @@ input[type="range"].stat-slider::-moz-range-thumb {
     linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 1px, transparent 1px);
   background-size: 4px 4px;
   background-repeat: repeat;
+}
 /* Horizontal Stock Ticker Marquee Animation */
 @keyframes hud-marquee {
   0% { transform: translateX(0%); }
