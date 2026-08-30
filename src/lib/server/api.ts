@@ -2,13 +2,11 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, galleryPins, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, notifications } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, notifications } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
-import { INITIAL_GALLERY_PINS, S3_BASE_URL } from '../gallery-data'
-import type { GalleryPin } from '../gallery-data'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
@@ -313,52 +311,6 @@ export const getS3AssetUrlFn = createServerFn({ method: 'POST' })
       .parse(data)
   })
   .handler(getS3AssetUrlHandler)
-
-/**
- * Server Function: Get gallery pins from DB or return preloaded initial catalog.
- */
-const getGalleryPinsHandler = async ({ context }: ServerFnArgs): Promise<GalleryPin[]> => {
-  const dbClient = context?.db || getDb()
-  try {
-    const records = await dbClient
-      .select()
-      .from(galleryPins)
-      .orderBy(desc(galleryPins.createdAt))
-
-    if (records && records.length > 0) {
-      return records.map((r: any) => ({
-        id: r.id,
-        userId: r.userId,
-        title: r.title,
-        description: r.description,
-        prompt: r.prompt || undefined,
-        s3Key: r.s3Key,
-        imageUrl: (r.imageUrl && r.imageUrl.startsWith('http'))
-          ? r.imageUrl
-          : `${S3_BASE_URL}/${r.s3Key ? r.s3Key.replace(/^\//, '') : ''}`,
-        aspectRatio: r.aspectRatio as GalleryPin['aspectRatio'],
-        category: r.category as GalleryPin['category'],
-        tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
-        authorName: r.authorName,
-        authorAvatar: r.authorAvatar,
-        authorStage: r.authorStage,
-        pinCount: r.pinCount,
-        views: r.views,
-        likes: r.likes,
-        isPreloaded: r.isPreloaded,
-        createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
-      }))
-    }
-  } catch (error) {
-    console.warn('[ServerFn getGalleryPinsFn] DB query failed, using preloaded gallery fallback:', error)
-  }
-
-  return INITIAL_GALLERY_PINS
-}
-
-export const getGalleryPinsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .handler(getGalleryPinsHandler)
 
 interface GetAIThreadsInput {
   userId?: string

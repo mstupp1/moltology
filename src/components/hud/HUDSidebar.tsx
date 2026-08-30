@@ -26,7 +26,6 @@ import {
   ChevronRight,
   Plus,
   Minus,
-  LayoutGrid,
   Radio,
   Biohazard,
   Microscope,
@@ -392,16 +391,9 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       ],
     },
     {
-      id: 'community_vault',
-      title: 'COMMUNITY & VAULT',
+      id: 'community',
+      title: 'COMMUNITY',
       items: [
-        {
-          id: 'gallery',
-          label: 'MOLT PIN VAULT',
-          shortLabel: 'VAULT',
-          icon: LayoutGrid,
-          path: '/gallery',
-        },
         {
           id: 'forum',
           label: 'COMMUNITY FORUMS',

@@ -169,33 +169,6 @@ export const changelogs = pgTable('changelogs', {
   })
 ])
 
-// Pinterest Style Gallery Pins Table
-export const galleryPins = pgTable('gallery_pins', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  prompt: text('prompt'),
-  s3Key: text('s3Key').notNull().unique(),
-  imageUrl: text('imageUrl').notNull(),
-  aspectRatio: text('aspectRatio').default('3:4').notNull(), // '3:4', '1:1', '9:16', '4:3', '2:3'
-  category: text('category').default('SACRED DOCTRINE').notNull(), // 'SACRED DOCTRINE', 'BIOMECHANICAL', 'CARCINIZATION', 'LARVAL STAGES', 'DEEP ABYSS', 'SYNAPTIC HARDWARE'
-  tags: jsonb('tags').$type<string[]>().default([]).notNull(),
-  authorName: text('authorName').default('High Ascendant Carcinus').notNull(),
-  authorAvatar: text('authorAvatar').default('/images/order_emblem.png').notNull(),
-  authorStage: text('authorStage').default('Stage 4 Ascendant').notNull(),
-  pinCount: integer('pinCount').default(42).notNull(),
-  views: integer('views').default(128).notNull(),
-  likes: integer('likes').default(19).notNull(),
-  isPreloaded: boolean('isPreloaded').default(true).notNull(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-}, (table) => [
-  pgPolicy('gallery_pins_public_read_policy', {
-    for: 'select',
-    using: sql`true`
-  })
-])
-
 // Generic AI Conversations & Threads Table
 export const aiThreads = pgTable('ai_threads', {
   id: uuid('id').defaultRandom().primaryKey(),

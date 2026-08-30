@@ -36,7 +36,6 @@ import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
-import { Route as HudGalleryRouteImport } from './routes/_hud/gallery'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
 import { Route as HudIsolationRouteImport } from './routes/_hud/isolation'
 import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
@@ -197,11 +196,6 @@ const HudDashboardRoute = HudDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => HudRoute,
 } as any)
-const HudGalleryRoute = HudGalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => HudRoute,
-} as any)
 const HudHudRoute = HudHudRouteImport.update({
   id: '/hud',
   path: '/hud',
@@ -358,7 +352,6 @@ export interface FileRoutesByFullPath {
   '/codex': typeof HudCodexRoute
   '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
-  '/gallery': typeof HudGalleryRoute
   '/hud': typeof HudHudRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
@@ -412,7 +405,6 @@ export interface FileRoutesByTo {
   '/codex': typeof HudCodexRoute
   '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
-  '/gallery': typeof HudGalleryRoute
   '/hud': typeof HudHudRoute
   '/isolation': typeof HudIsolationRoute
   '/lectures': typeof HudLecturesRoute
@@ -468,7 +460,6 @@ export interface FileRoutesById {
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/connections': typeof HudConnectionsRoute
   '/_hud/dashboard': typeof HudDashboardRoute
-  '/_hud/gallery': typeof HudGalleryRoute
   '/_hud/hud': typeof HudHudRoute
   '/_hud/isolation': typeof HudIsolationRoute
   '/_hud/lectures': typeof HudLecturesRoute
@@ -524,7 +515,6 @@ export interface FileRouteTypes {
     | '/codex'
     | '/connections'
     | '/dashboard'
-    | '/gallery'
     | '/hud'
     | '/isolation'
     | '/lectures'
@@ -578,7 +568,6 @@ export interface FileRouteTypes {
     | '/codex'
     | '/connections'
     | '/dashboard'
-    | '/gallery'
     | '/hud'
     | '/isolation'
     | '/lectures'
@@ -633,7 +622,6 @@ export interface FileRouteTypes {
     | '/_hud/codex'
     | '/_hud/connections'
     | '/_hud/dashboard'
-    | '/_hud/gallery'
     | '/_hud/hud'
     | '/_hud/isolation'
     | '/_hud/lectures'
@@ -887,13 +875,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudDashboardRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/gallery': {
-      id: '/_hud/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof HudGalleryRouteImport
-      parentRoute: typeof HudRoute
-    }
     '/_hud/hud': {
       id: '/_hud/hud'
       path: '/hud'
@@ -1077,7 +1058,6 @@ interface HudRouteChildren {
   HudCodexRoute: typeof HudCodexRoute
   HudConnectionsRoute: typeof HudConnectionsRoute
   HudDashboardRoute: typeof HudDashboardRoute
-  HudGalleryRoute: typeof HudGalleryRoute
   HudHudRoute: typeof HudHudRoute
   HudIsolationRoute: typeof HudIsolationRoute
   HudLecturesRoute: typeof HudLecturesRoute
@@ -1101,7 +1081,6 @@ const HudRouteChildren: HudRouteChildren = {
   HudCodexRoute: HudCodexRoute,
   HudConnectionsRoute: HudConnectionsRoute,
   HudDashboardRoute: HudDashboardRoute,
-  HudGalleryRoute: HudGalleryRoute,
   HudHudRoute: HudHudRoute,
   HudIsolationRoute: HudIsolationRoute,
   HudLecturesRoute: HudLecturesRoute,

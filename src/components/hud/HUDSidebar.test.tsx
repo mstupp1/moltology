@@ -33,7 +33,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('CORE COMMAND')).toBeInTheDocument()
     expect(screen.getByText('KNOWLEDGE & DOCTRINE')).toBeInTheDocument()
     expect(screen.getByText('OPERATIONS & GEAR')).toBeInTheDocument()
-    expect(screen.getByText('COMMUNITY & VAULT')).toBeInTheDocument()
+    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
 
     expect(screen.getAllByText('COMMAND HUB').length).toBeGreaterThan(0)
     expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
@@ -143,7 +143,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('CHASSIS')).toBeInTheDocument()
     expect(screen.getByText('ISOLATION')).toBeInTheDocument()
     expect(screen.getByText('VATS')).toBeInTheDocument()
-    expect(screen.getByText('VAULT')).toBeInTheDocument()
+    expect(screen.getByText('LINKS')).toBeInTheDocument()
     expect(screen.getByText('FORUM')).toBeInTheDocument()
     expect(screen.getByText('SUPPORT')).toBeInTheDocument()
   })
