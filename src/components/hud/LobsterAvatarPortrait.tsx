@@ -83,7 +83,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
 
   const portraitClassName = useMemo(
     () =>
-      `relative aspect-square rounded-full border border-white/[0.18] bg-[#081419]/75 bg-gradient-to-b from-white/[0.14] via-white/[0.04] to-transparent overflow-hidden shrink-0 backdrop-blur-2xl shadow-[0_8px_32px_-4px_rgba(0,0,0,0.8),0_2px_8px_rgba(0,0,0,0.6),inset_0_1.5px_0_0_rgba(255,255,255,0.45),inset_0_-1.5px_0_0_rgba(0,195,255,0.25),0_0_28px_rgba(0,195,255,0.2)] ${
+      `relative aspect-square rounded-full border border-white/[0.18] bg-[#081419]/90 bg-gradient-to-b from-white/[0.14] via-white/[0.04] to-transparent overflow-hidden shrink-0 shadow-[0_8px_32px_-4px_rgba(0,0,0,0.8),0_2px_8px_rgba(0,0,0,0.6),inset_0_1.5px_0_0_rgba(255,255,255,0.45),inset_0_-1.5px_0_0_rgba(0,195,255,0.25),0_0_28px_rgba(0,195,255,0.2)] ${
         interactive
           ? 'group transition-all duration-300 hover:border-white/[0.3] hover:shadow-[0_12px_40px_-2px_rgba(0,0,0,0.85),0_2px_10px_rgba(0,0,0,0.6),inset_0_2px_0_0_rgba(255,255,255,0.65),inset_0_-2px_0_0_rgba(0,195,255,0.4),0_0_35px_rgba(0,195,255,0.32)]'
           : ''

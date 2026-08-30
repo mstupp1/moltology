@@ -300,7 +300,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
       {/* Backdrop (click to dismiss) */}
       <div
         onClick={handleDismiss}
-        className="absolute inset-0 bg-[#030708]/95 backdrop-blur-md"
+        className="absolute inset-0 bg-[#030708]/98"
         style={{
           backgroundImage: `
             radial-gradient(ellipse at 50% 30%, rgba(0,255,255,0.08) 0%, transparent 60%),

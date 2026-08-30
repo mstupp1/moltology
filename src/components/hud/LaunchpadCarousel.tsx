@@ -402,15 +402,16 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                 <div className="absolute bottom-0 inset-x-0 z-20 h-1 bg-[#030606]/80 overflow-hidden pointer-events-none">
                   <div
                     key={`${currentIndex}-${isAutoPlay && !isHovered}`}
-                    className={`h-full transition-all ${
+                    className={`h-full w-full origin-left transition-all ${
                       isAutoPlay && !isHovered
                         ? 'bg-gradient-to-r from-[#00ffff]/70 via-[#00ffff] to-[#00ffff] shadow-[0_0_10px_#00ffff]'
-                        : 'w-full bg-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.7)]'
+                        : 'bg-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.7)]'
                     }`}
                     style={
                       isAutoPlay && !isHovered
                         ? {
                             animation: 'carouselProgress 6000ms linear forwards',
+                            willChange: 'transform',
                           }
                         : undefined
                     }

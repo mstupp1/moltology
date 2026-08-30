@@ -82,31 +82,25 @@
 
 /* Dark Biomorphic Panels & Chitin Glass - Translucent Glassmorphic HUD Panels */
 .chitin-card {
-  background: rgba(10, 16, 18, 0.55);
+  background: rgba(10, 16, 18, 0.88);
   border: 1px solid rgba(0, 195, 255, 0.35);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .chitin-card-pbr {
   background: 
-    linear-gradient(135deg, rgba(14, 22, 25, 0.72) 0%, rgba(8, 13, 15, 0.88) 100%),
+    linear-gradient(135deg, rgba(14, 22, 25, 0.92) 0%, rgba(8, 13, 15, 0.96) 100%),
     url('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/pbr_chitin_plates.jpg');
   background-size: cover, 360px 360px;
   background-repeat: no-repeat, repeat;
   border: 1px solid rgba(0, 195, 255, 0.35);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .chitin-card-inset {
-  background: rgba(5, 10, 12, 0.5);
+  background: rgba(5, 10, 12, 0.85);
   box-shadow: inset 1px 1px 6px rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 .chitin-card-interactive {
@@ -899,31 +893,31 @@ body.vfx-disabled [class*="drop-shadow-"],
   animation: deckSlideInPrev 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Carousel Segmented Progress Fill Animation */
+/* Carousel Segmented Progress Fill Animation - GPU Accelerated */
 @keyframes carouselProgress {
   0% {
-    width: 0%;
+    transform: scaleX(0);
   }
   100% {
-    width: 100%;
+    transform: scaleX(1);
   }
 }
 
-/* HUD Progress Bar & Header Animations */
+/* HUD Progress Bar & Header Animations - GPU Accelerated translateY */
 @keyframes hudScan {
   0% {
-    top: -2rem;
+    transform: translateY(-100%);
   }
   100% {
-    top: 100%;
+    transform: translateY(600%);
   }
 }
 
 @keyframes shimmerSweep {
   0% {
-    background-position: -100% 0;
+    transform: translateX(-100%);
   }
   100% {
-    background-position: 250% 0;
+    transform: translateX(250%);
   }
 }

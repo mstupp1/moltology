@@ -31,7 +31,7 @@ export function HudTitlePanel({
   return (
     <div
       className={`${cn(
-        'relative overflow-hidden bg-gradient-to-r from-[#0b1011]/85 via-[#0f1616]/85 to-[#0b1011]/85 backdrop-blur-md border border-[#3a4a49] p-3.5 sm:p-4 md:p-5 chamfer-corner shadow-2xl transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4',
+        'relative overflow-hidden bg-gradient-to-r from-[#0b1011]/95 via-[#0f1616]/95 to-[#0b1011]/95 border border-[#3a4a49] p-3.5 sm:p-4 md:p-5 chamfer-corner shadow-2xl transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4',
         className
       )} border-l-4 ${accentClasses.border}`}
       {...props}

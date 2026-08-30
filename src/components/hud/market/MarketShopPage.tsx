@@ -116,7 +116,7 @@ export function MarketShopPage() {
         }
       />
 
-      <div className="sticky top-0 z-20 -mx-0.5 px-0.5 pt-0.5 pb-1 bg-[#070b0b]/90 backdrop-blur-md">
+      <div className="sticky top-0 z-20 -mx-0.5 px-0.5 pt-0.5 pb-1 bg-[#070b0b]">
         <MarketShopTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 

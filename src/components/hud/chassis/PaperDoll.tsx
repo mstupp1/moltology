@@ -67,7 +67,7 @@ function EquipSlot({
       ref={setNodeRef}
       className={`
         relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border cursor-pointer
-        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-dashed border-[#3a4a49]/80 bg-[#050808]/75 backdrop-blur-[2px]'}
+        ${isOver ? 'border-[#00c3ff] bg-[#00c3ff]/10' : 'border-dashed border-[#3a4a49]/80 bg-[#050808]/90'}
         flex items-center justify-center transition-colors
       `}
       onClick={handleActivate}

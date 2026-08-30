@@ -689,10 +689,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             />
             {isMobileHeaderOpen && (
               <div
-                className="absolute left-0 right-0 h-6 pointer-events-none"
+                className="absolute top-0 left-0 right-0 h-6 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(to bottom, transparent 0%, rgba(0,195,255,0.05) 50%, transparent 100%)',
+                  background: 'linear-gradient(to bottom, transparent 0%, rgba(0,195,255,0.06) 50%, transparent 100%)',
                   animation: 'hudScan 4s linear infinite',
+                  willChange: 'transform',
                 }}
               />
             )}

@@ -89,17 +89,17 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
                 boxShadow: '0 0 10px rgba(255,69,58,0.7), inset 0 1px 0 rgba(255,255,255,0.25)',
               }}
             >
-              {/* Shimmer sweep */}
+              {/* Shimmer sweep - Hardware Accelerated GPU Transform */}
               <div
-                className="absolute inset-0"
+                className="absolute inset-y-0 w-1/2 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
-                  backgroundSize: '60% 100%',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%)',
                   animation: 'shimmerSweep 2.2s ease-in-out infinite',
+                  willChange: 'transform',
                 }}
               />
               {/* Top specular stripe */}
-              <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-b from-white/30 to-transparent" />
+              <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
             </div>
 
             {/* ── TICK MARKS ── */}

@@ -56,7 +56,7 @@ export function HUDNotFound() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(0,195,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,195,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
         {/* HUD Frame */}
-        <div className="relative z-10 w-full max-w-3xl border border-[#232d30] bg-[#0c1214]/90 backdrop-blur-md p-6 sm:p-8 rounded-lg shadow-2xl shadow-black/80">
+        <div className="relative z-10 w-full max-w-3xl border border-[#232d30] bg-[#0c1214] p-6 sm:p-8 rounded-lg shadow-2xl shadow-black/80">
           {/* Status Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#1c272a] mb-6">
             <div className="flex items-center gap-2.5">

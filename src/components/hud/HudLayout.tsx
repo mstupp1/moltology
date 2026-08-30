@@ -129,7 +129,7 @@ function HudContent() {
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
         {/* Full-Bleed Default Aqua Underwater Background */}
         <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-screen filter drop-shadow-[0_0_45px_rgba(0,255,255,0.65)] transition-opacity duration-150 ${
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
             isSubterranean ? 'opacity-0' : 'opacity-95'
           }`}
           style={{ backgroundImage: `url('${getAssetUrl('/images/underwater_looking_up.jpg')}')` }}
@@ -137,7 +137,7 @@ function HudContent() {
 
         {/* Full-Bleed Nuclear Subterranean Vats Background */}
         <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat mix-blend-screen filter drop-shadow-[0_0_55px_rgba(57,255,20,0.8)] transition-opacity duration-150 ${
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
             isSubterranean ? 'opacity-95' : 'opacity-0'
           }`}
           style={{ backgroundImage: `url('${getAssetUrl('/images/subterranean_vats_bg.jpg')}')` }}
@@ -154,7 +154,7 @@ function HudContent() {
 
         {/* Phosphor Ambient Radial Glow (Electric Cyan or Nuclear Scary Green) */}
         <div
-          className={`absolute inset-0 z-[2] transition-opacity duration-150 ${
+          className={`absolute inset-0 z-[2] transition-opacity duration-150 pointer-events-none ${
             isSubterranean
               ? 'bg-[radial-gradient(circle_at_center,rgba(57,255,20,0.45)_0%,rgba(16,185,129,0.22)_55%,transparent_85%)]'
               : 'bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.45)_0%,rgba(0,195,255,0.2)_55%,transparent_85%)]'
@@ -162,19 +162,19 @@ function HudContent() {
         />
 
         {/* High-Contrast CRT Scanlines Overlay on Background Image */}
-        <div className="absolute inset-0 crt-scanlines opacity-90" />
+        <div className="absolute inset-0 crt-scanlines opacity-90 pointer-events-none" />
 
         {/* Micro-Grain Noise Texture on Background Image */}
-        <div className="absolute inset-0 crt-grain opacity-75 mix-blend-overlay" />
+        <div className="absolute inset-0 crt-grain opacity-75 pointer-events-none" />
 
         {/* Sacred Grid Overlay */}
-        <div className="absolute inset-0 bg-sacred-grid opacity-35" />
+        <div className="absolute inset-0 bg-sacred-grid opacity-35 pointer-events-none" />
 
         {/* Deep Benthic Blue Pro Vignette Overlay */}
-        <div className="absolute inset-0 bg-benthic-vignette opacity-70" />
+        <div className="absolute inset-0 bg-benthic-vignette opacity-70 pointer-events-none" />
 
         {/* Smooth Bottom Fade Gradient into Deep Benthic Teal (#030708) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030708]/80 pointer-events-none" />
       </div>
 
       {/* Experimental Navigation Command Palette */}
@@ -196,7 +196,7 @@ function HudContent() {
             <main
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute ? 'p-0 overflow-hidden' : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto'
-              } bg-[#070b0b]/10 backdrop-blur-[1px] ${
+              } bg-[#070b0b]/50 ${
                 isMainOnly
                   ? 'border-0 shadow-none'
                   : 'border-t md:border-t-0 md:border-l border-[#3a4a49]/40 shadow-2xl'

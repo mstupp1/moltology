@@ -90,7 +90,7 @@ function heatmapColor(count: number, isFuture: boolean, isToday: boolean): strin
   if (count <= 6) return 'bg-emerald-600/80 border-emerald-500/70'
   // 7–8: full or near-full — bright green at the peak
   return isToday
-    ? 'bg-gradient-to-br from-emerald-400 to-[#00ff88] border-emerald-300 animate-pulse'
+    ? 'bg-gradient-to-br from-emerald-400 to-[#00ff88] border-emerald-300 shadow-[0_0_8px_#00ff88]'
     : 'bg-emerald-400 border-emerald-300/80'
 }
 
@@ -279,7 +279,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
         <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#3a4a49]/80 pb-4 gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-[#00c3ff] animate-pulse" />
+              <Calendar className="w-5 h-5 text-[#00c3ff]" />
               <h2 className="font-grotesk text-base sm:text-lg font-bold tracking-wider text-[#dfe3e3] uppercase">
                 DAILY ALIGNMENT ROUTINE
               </h2>
@@ -415,7 +415,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                           <div
                             className={`w-full transition-all duration-500 relative ${
                               item.isToday
-                                ? 'bg-gradient-to-t from-[#00c3ff] to-emerald-400 animate-pulse'
+                                ? 'bg-gradient-to-t from-[#00c3ff] to-emerald-400 shadow-[0_0_8px_#00c3ff]'
                                 : isFull
                                 ? 'bg-[#00c3ff]'
                                 : 'bg-emerald-500/80'
@@ -444,7 +444,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                       className="h-full bg-gradient-to-r from-[#00c3ff] via-emerald-400 to-[#00ff88] transition-all duration-500 relative"
                       style={{ width: `${completionPercent}%` }}
                     >
-                      <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-white animate-pulse" />
+                      <div className="absolute top-0 right-0 bottom-0 w-1.5 bg-white shadow-[0_0_6px_#fff]" />
                     </div>
                   </div>
                 </div>

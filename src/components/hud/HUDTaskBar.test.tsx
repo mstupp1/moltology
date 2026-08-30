@@ -74,7 +74,7 @@ describe('HUDTaskBar', () => {
     // Test Tab Switching to ALERTS / TRANSMISSIONS
     const alertsTab = screen.getByText(/ALERTS/i)
     fireEvent.click(alertsTab)
-    expect(screen.getByText('RECENT NEURAL DISPATCHES')).toBeInTheDocument()
+    expect(screen.getByText('FRIEND REQUESTS & ALERTS')).toBeInTheDocument()
 
     // Switch back to LITURGIES
     const liturgiesTab = screen.getByText(/LITURGIES/i)

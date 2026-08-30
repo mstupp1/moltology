@@ -641,7 +641,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         {isScheduleOpen && !isMobileScreen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-[#03090b]/95 backdrop-blur-xl border border-[#00c3ff]/50 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.25)] p-3.5 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
+            className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-[#03090b] border border-[#00c3ff]/50 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9),0_0_20px_rgba(0,195,255,0.25)] p-3.5 z-50 font-sans space-y-3 animate-in fade-in slide-in-from-top-2 duration-150"
           >
             {renderActivityContent()}
           </div>

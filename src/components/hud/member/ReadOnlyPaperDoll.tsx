@@ -34,7 +34,7 @@ function ReadOnlySlot({
 
   return (
     <div
-      className="relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border border-dashed border-[#3a4a49]/80 bg-[#050808]/75 backdrop-blur-[2px] flex items-center justify-center"
+      className="relative w-16 md:w-20 aspect-[9/16] min-h-[44px] shrink-0 rounded-sm border border-dashed border-[#3a4a49]/80 bg-[#050808]/90 flex items-center justify-center"
       aria-label={`${SLOT_LABELS[equipSlot]} slot`}
     >
       {!item && (
