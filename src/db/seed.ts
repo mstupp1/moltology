@@ -8,7 +8,6 @@ import * as schema from './schema'
 import { parseContentFile } from '../lib/ingest/parser'
 import { ingestContentItem } from '../lib/ingest/handlers'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
-import { INITIAL_GALLERY_PINS } from '../lib/gallery-data'
 import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
 import { INITIAL_PODCASTS } from '../lib/podcast-data'
@@ -268,34 +267,7 @@ export async function seedDatabase(databaseUrl?: string) {
         })
       }
     }
-    // 6. Seed Gallery Pins
-    console.log('[SEED] Seeding gallery pins...')
-    for (const pin of INITIAL_GALLERY_PINS) {
-      await db
-        .insert(schema.galleryPins)
-        .values({
-          title: pin.title,
-          description: pin.description,
-          prompt: pin.prompt,
-          s3Key: pin.s3Key,
-          imageUrl: pin.imageUrl,
-          aspectRatio: pin.aspectRatio,
-          category: pin.category,
-          tags: pin.tags,
-          authorName: pin.authorName,
-          authorAvatar: pin.authorAvatar,
-          authorStage: pin.authorStage,
-          pinCount: pin.pinCount,
-          views: pin.views,
-          likes: pin.likes,
-          isPreloaded: true,
-          createdAt: new Date(pin.createdAt),
-        })
-        .onConflictDoNothing({ target: schema.galleryPins.s3Key })
-    }
-    console.log(`✓ Seeded ${INITIAL_GALLERY_PINS.length} gallery pin entries`)
-
-    // 7. Seed Blog Posts
+    // 6. Seed Blog Posts
     console.log('[SEED] Seeding blog posts...')
     for (const post of INITIAL_BLOG_POSTS) {
       await db

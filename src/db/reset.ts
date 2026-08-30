@@ -22,7 +22,6 @@ export async function resetDatabase(databaseUrl?: string) {
         user_stats, 
         profiles, 
         changelogs,
-        gallery_pins,
         ai_messages,
         ai_threads
       RESTART IDENTITY CASCADE;
@@ -34,7 +33,6 @@ export async function resetDatabase(databaseUrl?: string) {
     try {
       await sql`DROP TABLE IF EXISTS ai_messages CASCADE;`
       await sql`DROP TABLE IF EXISTS ai_threads CASCADE;`
-      await sql`DROP TABLE IF EXISTS gallery_pins CASCADE;`
       await sql`DROP TABLE IF EXISTS routine_completions CASCADE;`
       await sql`DROP TABLE IF EXISTS routines CASCADE;`
       await sql`DROP TABLE IF EXISTS user_stats CASCADE;`
