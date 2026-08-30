@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { AlertTriangle } from 'lucide-react'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { useToast } from '@/components/ui/ToastProvider'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { IsolationVideoFeed } from '@/components/hud/IsolationVideoFeed'
 import {
@@ -25,14 +25,7 @@ const DEFAULT_SETTINGS: IsolationSettings = {
 function IsolationRoute() {
   const [settings, setSettings] = useState<IsolationSettings>(DEFAULT_SETTINGS)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg)
-    setTimeout(() => {
-      setToastMessage(null)
-    }, 3000)
-  }
+  const { toast } = useToast()
 
   const handleUpdateSettings = (updater: Partial<IsolationSettings>) => {
     setSettings((prev) => ({
@@ -49,7 +42,10 @@ function IsolationRoute() {
       socialNoiseSuppression: 100,
       empathyDampening: 10,
     }))
-    showToast('FORCE PRIVATE ENGAGED: EXTERNAL CONNECTIONS SHROUDED')
+    toast.hud('FORCE PRIVATE ENGAGED: EXTERNAL CONNECTIONS SHROUDED', {
+      id: 'isolation-force-private',
+      title: 'Isolation Protocols',
+    })
   }
 
   return (
@@ -58,14 +54,6 @@ function IsolationRoute() {
       message="Benthic isolation shielding feeds and telemetric privacy controls require an authorized initiate account."
     >
       <div className="w-full h-full flex-1 flex flex-col font-sans min-h-0">
-        {/* Toast Notification */}
-        {toastMessage && (
-          <div className="fixed top-20 right-6 z-50 bg-[#0e1315] border-2 border-[#ff453a] text-[#ff5540] p-3 shadow-[0_0_25px_rgba(255,69,58,0.5)] chamfer-corner flex items-center gap-2 text-xs font-bold animate-fadeIn">
-            <AlertTriangle className="w-4 h-4 text-[#ff5540]" />
-            <span>{toastMessage}</span>
-          </div>
-        )}
-
         {/* Main Full-Height Video Viewport */}
         <div className="w-full h-full flex-1 flex flex-col min-h-0">
           <IsolationVideoFeed

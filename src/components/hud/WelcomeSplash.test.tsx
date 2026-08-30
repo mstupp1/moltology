@@ -2,6 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { WelcomeSplash } from './WelcomeSplash'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 // Mock auth client
 vi.mock('@/lib/auth-client', () => ({
@@ -40,7 +41,7 @@ describe('WelcomeSplash Flow Component', () => {
 
   it('renders Step 1 (Initial Transmission) by default', () => {
     const onDismiss = vi.fn()
-    render(<WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} />)
+    render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} /></ToastProvider>)
 
     // Check step 1 banner and title
     expect(screen.getByText(/01 · TRANSMISSION/i)).toBeInTheDocument()
@@ -54,7 +55,7 @@ describe('WelcomeSplash Flow Component', () => {
 
   it('advances to Step 2 (Character Creation) when clicking proceed button', () => {
     const onDismiss = vi.fn()
-    render(<WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} />)
+    render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} /></ToastProvider>)
 
     const proceedBtn = screen.getByText(/Proceed to Carapace Registration/i)
     fireEvent.click(proceedBtn)
@@ -68,7 +69,7 @@ describe('WelcomeSplash Flow Component', () => {
 
   it('advances to Step 2 when clicking skip transmission', () => {
     const onDismiss = vi.fn()
-    render(<WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} />)
+    render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} /></ToastProvider>)
 
     const skipBtn = screen.getByText(/Skip Transmission/i)
     fireEvent.click(skipBtn)
@@ -78,7 +79,7 @@ describe('WelcomeSplash Flow Component', () => {
 
   it('allows switching between steps via the top navigation pills', () => {
     const onDismiss = vi.fn()
-    render(<WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} />)
+    render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} /></ToastProvider>)
 
     // Click Step 2 pill
     const step2Pill = screen.getByRole('button', { name: /02 · CARAPACE & STATS/i })
@@ -93,7 +94,7 @@ describe('WelcomeSplash Flow Component', () => {
 
   it('allows re-rolling base stats and maintaining fixed total sum', async () => {
     const onDismiss = vi.fn()
-    render(<WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} initialStep={2} />)
+    render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} initialStep={2} /></ToastProvider>)
 
     expect(screen.getByText(/Base Biometrics Roller/i)).toBeInTheDocument()
     const rollStatsBtn = screen.getByRole('button', { name: /Roll Base Stats/i })
@@ -111,7 +112,7 @@ describe('WelcomeSplash Flow Component', () => {
 
   it('completes the welcome flow, persists avatar and stats, and calls onDismiss', async () => {
     const onDismiss = vi.fn()
-    render(<WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} initialStep={2} />)
+    render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} initialStep={2} /></ToastProvider>)
 
     const confirmBtn = screen.getByRole('button', { name: /Confirm & Enter Synaptic Core/i })
     fireEvent.click(confirmBtn)

@@ -33,6 +33,19 @@ Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js
 
 Full workflow lives in [`.agents/skills/neon-data-platform/SKILL.md`](.agents/skills/neon-data-platform/SKILL.md): Neon `dev`/`main` branches, Drizzle generate → migrate on dev, prod via `.github/workflows/migrate.yml`, seeding (no ghost seed IDs), and TanStack `createServerFn` + JWT write patterns. Read that skill before schema, migration, seed, or authenticated mutation work.
 
+## Notifications & Toasts
+
+One toast system, one persistent notification system, one OS bridge. Never `alert()`/`confirm()`, never hand-rolled toast markup or local toast state, never a second toast library.
+
+- **Ephemeral feedback (toasts)**: `useToast()` from [`src/components/ui/ToastProvider.tsx`](src/components/ui/ToastProvider.tsx) (mounted in `__root.tsx`). API: `toast.info/success/warning/error/hud(message, { title?, duration?, id? })`. When the provider may be absent (hooks, guest-embedded widgets), use `useOptionalToast()` and no-op gracefully — never `try/catch` around `useToast()`.
+- **Types**: `success` = confirmations, `error` = failures, `warning` = reversals/limits, `info` = neutral notices, `hud` = in-world system events (system voice, not general UI feedback).
+- **Scope**: Action confirmations and async failures go to toasts. Form validation and field-level feedback stay inline next to the form. Optimistic-mutation failures toast after rollback (see `useThreadActions` for the pattern).
+- **Defaults**: 5s duration, no title unless it adds meaning. Pass `id:` for dedupe on repeatable actions. Extend duration only for scheduled reminders (8s max).
+- **Persistent notifications**: `NotificationsProvider` ([`src/hooks/useNotifications.tsx`](src/hooks/useNotifications.tsx)) + the `notifications` table — never for ephemeral feedback.
+- **OS notifications**: only via [`src/lib/system-notifications.ts`](src/lib/system-notifications.ts).
+- **HUD telemetry**: read toast history from provider context (`HUDTaskBar` pattern); do not keep parallel toast logs.
+- **Copy**: toasts follow STYLE_GUIDE §4.4 (clearance-style label + phrase, world voice, gentle errors).
+
 ## Tests, SSR, and verification
 
 - **Tests**: Write Vitest unit tests (`*.test.ts`) for logic/helpers.

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useToast } from '@/components/ui/ToastProvider'
 import {
   Search,
   Terminal,
@@ -33,6 +34,7 @@ export const CommandPalette: React.FC = () => {
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -172,7 +174,10 @@ export const CommandPalette: React.FC = () => {
       icon: <Zap className="w-4 h-4 text-yellow-400" />,
       shortcut: 'ALT P',
       action: () => {
-        alert('Cache cleared successfully.')
+        toast.success('Neural cache purged. The deep is quiet.', {
+          id: 'command-palette-purge',
+          title: 'Purge Complete',
+        })
         setIsOpen(false)
       },
     },
@@ -183,7 +188,10 @@ export const CommandPalette: React.FC = () => {
       icon: <Terminal className="w-4 h-4 text-cyan-400" />,
       shortcut: 'CTRL S',
       action: () => {
-        alert('System diagnostic complete: all systems operational.')
+        toast.success('All systems operational. Shell integrity holding.', {
+          id: 'command-palette-diagnostic',
+          title: 'Diagnostic Complete',
+        })
         setIsOpen(false)
       },
     },

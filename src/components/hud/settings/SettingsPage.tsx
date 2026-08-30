@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Mail, Radio, Settings, Shuffle } from 'lucide-react'
-import { toast } from 'sonner'
+import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
@@ -25,6 +25,7 @@ export const SettingsPage: React.FC = () => {
   const user = session.user
   const userId = session.userId
   const persist = useHudPersist()
+  const { toast } = useToast()
 
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [draftSeed, setDraftSeed] = useState('')

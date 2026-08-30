@@ -4,7 +4,7 @@ import { Clock, Calendar, RefreshCw, Sparkles, CheckCircle2, ChevronDown, Chevro
 import { HudCard, HudBadge, HudBottomSheet } from '@/components/ui'
 import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
-import { useToast } from '@/components/ui/ToastProvider'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
@@ -55,18 +55,11 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const headerIslandRef = useRef<HTMLDivElement>(null)
 
-  // Safe access to ToastProvider context for notification telemetry
-  let toastsList: any[] = []
-  let toastHistoryList: any[] = []
-  let clearToastsFn = () => {}
-  try {
-    const toastCtx = useToast()
-    toastsList = toastCtx.toasts || []
-    toastHistoryList = toastCtx.toastHistory || toastCtx.toasts || []
-    clearToastsFn = toastCtx.clearToasts
-  } catch {
-    // Render safely without ToastContext
-  }
+  // ToastProvider context for notification telemetry (optional-safe)
+  const toastCtx = useOptionalToast()
+  const toastsList: any[] = toastCtx?.toasts || []
+  const toastHistoryList: any[] = toastCtx?.toastHistory || toastCtx?.toasts || []
+  const clearToastsFn = toastCtx?.clearToasts ?? (() => {})
 
   const {
     notifications: dbNotifications,

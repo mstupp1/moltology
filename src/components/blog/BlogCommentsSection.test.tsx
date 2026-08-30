@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { BlogCommentsSection } from './BlogCommentsSection'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { getBlogCommentsFn, createBlogCommentFn } from '@/lib/server/api'
 
@@ -35,7 +36,7 @@ describe('BlogCommentsSection', () => {
   it('renders guest authorization lock box when user is unauthenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
-    render(<BlogCommentsSection postId="post-100" />)
+    render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
     expect(screen.getByText('COMMUNICATIONS LOG')).toBeInTheDocument()
 
@@ -51,7 +52,7 @@ describe('BlogCommentsSection', () => {
   it('holds the lock box for the first-paint empty session shape', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
 
-    render(<BlogCommentsSection postId="post-100" />)
+    render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
     expect(screen.getByTestId('blog-comments-auth-skeleton')).toBeInTheDocument()
     expect(screen.queryByText('AUTHENTICATION REQUIRED TO JOIN DISCUSSION')).not.toBeInTheDocument()
@@ -64,7 +65,7 @@ describe('BlogCommentsSection', () => {
       },
     } as any)
 
-    render(<BlogCommentsSection postId="post-100" />)
+    render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Ascendant Pilot')).toBeInTheDocument()
@@ -80,7 +81,7 @@ describe('BlogCommentsSection', () => {
       },
     } as any)
 
-    render(<BlogCommentsSection postId="post-100" />)
+    render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(/Log your thoughts/i)).toBeInTheDocument()
@@ -111,7 +112,7 @@ describe('BlogCommentsSection', () => {
       createdAt: new Date().toISOString(),
     })
 
-    render(<BlogCommentsSection postId="post-100" />)
+    render(<ToastProvider><BlogCommentsSection postId="post-100" /></ToastProvider>)
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText(/Log your thoughts/i)).toBeInTheDocument()
@@ -134,7 +135,7 @@ describe('BlogCommentsSection', () => {
         },
       })
       expect(screen.getByText('A thrilling bio-silicon perspective!')).toBeInTheDocument()
-      expect(screen.getByText('Comment posted successfully.')).toBeInTheDocument()
+      expect(screen.getByText('Comment posted. Your voice carries in the deep.')).toBeInTheDocument()
     })
   })
 })

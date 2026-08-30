@@ -11,6 +11,7 @@ import {
   Terminal,
 } from 'lucide-react'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useToast } from '@/components/ui/ToastProvider'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   getBlogCommentsFn,
@@ -36,11 +37,11 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Auth modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup')
+  const { toast } = useToast()
 
   const MAX_CHAR_LIMIT = 1000
   const MIN_CHAR_LIMIT = 3
@@ -76,7 +77,6 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
     e.preventDefault()
     if (!postId) return
     setErrorMessage(null)
-    setSuccessMessage(null)
 
     if (!user) {
       handleOpenAuth('login')
@@ -114,8 +114,10 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
         setCommentInput('')
         setTurnstileToken(null)
         turnstileRef.current?.reset()
-        setSuccessMessage('Comment posted successfully.')
-        setTimeout(() => setSuccessMessage(null), 3500)
+        toast.success('Comment posted. Your voice carries in the deep.', {
+          id: 'blog-comment-posted',
+          title: 'Comment Received',
+        })
       }
     } catch (err: any) {
       console.error('Comment submission error:', err)
@@ -220,13 +222,6 @@ export const BlogCommentsSection: React.FC<BlogCommentsSectionProps> = ({ postId
               <div className="flex items-center gap-2 text-xs font-sans text-red-400 bg-red-950/40 border border-red-800/40 p-2.5 chamfer-corner">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span className="break-words">{errorMessage}</span>
-              </div>
-            )}
-
-            {successMessage && (
-              <div className="flex items-center gap-2 text-xs font-sans text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 p-2.5 chamfer-corner">
-                <Sparkles className="w-4 h-4 shrink-0" />
-                <span>{successMessage}</span>
               </div>
             )}
 

@@ -4,7 +4,7 @@ import { toggleForumTopicVoteFn, toggleForumPostVoteFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { peekForumVote, resolveForumVoted, writeForumVote } from '@/lib/forum-vote-cache'
 import { useHudPersist } from '@/hooks/useHudPersist'
-import { useToast } from '@/components/ui/ToastProvider'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useForumAuth } from './ForumShell'
 
 const STAGE_COLORS: Record<number, string> = {
@@ -79,12 +79,7 @@ export function VoteButton({
   }))
   const [busy, setBusy] = useState(false)
 
-  let toast: { warning: (m: string, o?: any) => string }
-  try {
-    toast = useToast().toast
-  } catch {
-    toast = { warning: () => '' }
-  }
+  const toastContext = useOptionalToast()
 
   useEffect(() => {
     if (typeof voted === 'boolean') {
@@ -133,7 +128,7 @@ export function VoteButton({
       console.error('Vote failed:', err)
       setLocal(rollback)
       writeForumVote(userId, targetId, rollback.voted)
-      toast.warning('Upvote could not be recorded. Please try again.', {
+      toastContext?.toast.warning('Upvote could not be recorded. Please try again.', {
         id: 'forum-vote-sync-warning',
         title: 'Upvote Failed',
         duration: 4000,

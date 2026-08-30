@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { BellRing, Download, MonitorSmartphone } from 'lucide-react'
-import { toast } from 'sonner'
+import { useToast } from '@/components/ui/ToastProvider'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 import { useSystemNotifications } from '@/hooks/useSystemNotifications'
 
@@ -16,11 +16,12 @@ type HubSurfaceControlsProps = {
 export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
   const { isStandalone, canPromptInstall, install } = usePwaInstall()
   const { supported, enabled, permission, enable, disable } = useSystemNotifications()
+  const { toast } = useToast()
 
   const handleToggleAlerts = useCallback(async () => {
     if (enabled) {
       disable()
-      toast.message('Surface alerts quieted.')
+      toast.info('Surface alerts quieted.')
       return
     }
     const next = await enable()
@@ -31,22 +32,22 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
     } else if (next === 'unsupported') {
       toast.error('This vessel cannot raise system alerts.')
     } else {
-      toast.message('Surface alerts need permission to continue.')
+      toast.info('Surface alerts need permission to continue.')
     }
-  }, [disable, enable, enabled])
+  }, [disable, enable, enabled, toast])
 
   const handleInstall = useCallback(async () => {
     const outcome = await install()
     if (outcome === 'accepted') {
       toast.success('Command Hub installed.')
     } else if (outcome === 'unavailable') {
-      toast.message(
+      toast.info(
         isStandalone
           ? 'Command Hub is already installed on this vessel.'
           : 'Use your browser install menu if the prompt is hidden.'
       )
     }
-  }, [install, isStandalone])
+  }, [install, isStandalone, toast])
 
   const alertStatus =
     !supported

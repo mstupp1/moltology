@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useToast } from '@/components/ui/ToastProvider'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { calculateReminderTime, isReminderDue } from '@/lib/alignment-reminders'
 import { showSystemNotification } from '@/lib/system-notifications'
 
@@ -30,26 +30,14 @@ export function useAlignmentReminders(
 ) {
   const { checkIntervalMs = 5000, offsetMinutes = 10, enabledInitially = true } = options
 
-  // Safely attempt to access ToastProvider context, fallback to no-op if omitted
-  let toast: {
-    info: (m: string, o?: any) => string
-    success: (m: string, o?: any) => string
-    warning: (m: string, o?: any) => string
-    error: (m: string, o?: any) => string
-    hud: (m: string, o?: any) => string
-  }
-
-  try {
-    const toastCtx = useToast()
-    toast = toastCtx.toast
-  } catch {
-    toast = {
-      info: () => '',
-      success: () => '',
-      warning: () => '',
-      error: () => '',
-      hud: () => '',
-    }
+  // Safely access ToastProvider context, fallback to no-op if omitted
+  const toastCtx = useOptionalToast()
+  const toast = toastCtx?.toast ?? {
+    info: () => '',
+    success: () => '',
+    warning: () => '',
+    error: () => '',
+    hud: () => '',
   }
 
   const [remindersEnabled, setRemindersEnabled] = useState<boolean>(enabledInitially)

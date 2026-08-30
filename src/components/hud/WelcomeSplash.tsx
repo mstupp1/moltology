@@ -11,7 +11,7 @@ import {
   RadioTower,
   UserCheck,
 } from 'lucide-react'
-import { toast } from 'sonner'
+import { useToast } from '@/components/ui/ToastProvider'
 import { getAssetUrl } from '@/lib/assets'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -32,6 +32,7 @@ interface WelcomeSplashProps {
 export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeSplashProps) {
   const [step, setStep] = useState<1 | 2>(initialStep)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
 
   const session = useAuthSession()
   const user = session.user

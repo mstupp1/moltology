@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ChassisStatusPage } from './ChassisStatusPage'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
 import { clearChassisLoadoutCache } from '@/lib/chassis-loadout'
@@ -114,7 +115,7 @@ describe('ChassisStatusPage', () => {
   })
 
   it('shows vaulted gear, zeroed stats, and locked legendary powers', async () => {
-    render(<ChassisStatusPage />)
+    render(<ToastProvider><ChassisStatusPage /></ToastProvider>)
     expect(await screen.findByText('Larval Plate Vest')).toBeInTheDocument()
     expect(screen.getByText('Synapse-Shear Claws')).toBeInTheDocument()
     expect(screen.getAllByText('Zero-Latency Clamp').length).toBeGreaterThan(0)
@@ -123,7 +124,7 @@ describe('ChassisStatusPage', () => {
   })
 
   it('equips a selected vault piece onto a matching hardpoint on desktop without opening bottom modal', async () => {
-    render(<ChassisStatusPage />)
+    render(<ToastProvider><ChassisStatusPage /></ToastProvider>)
     const claw = await screen.findByRole('button', { name: /Synapse-Shear Claws/i })
     fireEvent.click(claw)
 
@@ -154,7 +155,7 @@ describe('ChassisStatusPage', () => {
       dispatchEvent: vi.fn(),
     })))
 
-    render(<ChassisStatusPage />)
+    render(<ToastProvider><ChassisStatusPage /></ToastProvider>)
     const claw = await screen.findByRole('button', { name: /Synapse-Shear Claws/i })
     fireEvent.click(claw)
 

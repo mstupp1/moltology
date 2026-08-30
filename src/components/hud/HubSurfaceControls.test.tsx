@@ -2,14 +2,7 @@ import React from 'react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { HubSurfaceControls } from './HubSurfaceControls'
-
-vi.mock('sonner', () => ({
-  toast: {
-    message: vi.fn(),
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}))
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 const install = vi.fn().mockResolvedValue('unavailable')
 const enable = vi.fn().mockResolvedValue('granted')
@@ -44,13 +37,13 @@ describe('HubSurfaceControls', () => {
   })
 
   it('renders surface alert and install controls', () => {
-    render(<HubSurfaceControls />)
+    render(<ToastProvider><HubSurfaceControls /></ToastProvider>)
     expect(screen.getByText('Surface Alerts')).toBeInTheDocument()
     expect(screen.getByText('Install Command Hub')).toBeInTheDocument()
   })
 
   it('requests system permission when arming surface alerts', async () => {
-    render(<HubSurfaceControls />)
+    render(<ToastProvider><HubSurfaceControls /></ToastProvider>)
     fireEvent.click(screen.getByRole('switch', { name: 'Toggle surface alerts' }))
     await waitFor(() => {
       expect(enable).toHaveBeenCalled()
@@ -58,7 +51,7 @@ describe('HubSurfaceControls', () => {
   })
 
   it('triggers install prompt', async () => {
-    render(<HubSurfaceControls />)
+    render(<ToastProvider><HubSurfaceControls /></ToastProvider>)
     fireEvent.click(screen.getByRole('button', { name: 'Install' }))
     await waitFor(() => {
       expect(install).toHaveBeenCalled()

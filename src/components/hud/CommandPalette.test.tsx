@@ -2,6 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { CommandPalette } from './CommandPalette'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 const mockNavigate = vi.fn()
 
@@ -15,12 +16,12 @@ describe('CommandPalette Component', () => {
   })
 
   it('is initially closed', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
   })
 
   it('opens on Meta+K or Ctrl+K shortcut', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
     expect(screen.getByTestId('command-palette-overlay')).toBeInTheDocument()
@@ -32,14 +33,14 @@ describe('CommandPalette Component', () => {
   })
 
   it('opens on custom open-command-palette event', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     expect(screen.getByTestId('command-palette-overlay')).toBeInTheDocument()
   })
 
   it('closes on Escape key press', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     expect(screen.getByTestId('command-palette-overlay')).toBeInTheDocument()
@@ -49,7 +50,7 @@ describe('CommandPalette Component', () => {
   })
 
   it('closes when clicking outside (on the overlay backdrop)', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     const overlay = screen.getByTestId('command-palette-overlay')
@@ -61,7 +62,7 @@ describe('CommandPalette Component', () => {
   })
 
   it('does NOT close when clicking inside the modal content', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     const modal = screen.getByTestId('command-palette-modal')
@@ -78,7 +79,7 @@ describe('CommandPalette Component', () => {
   })
 
   it('closes when clicking the close (X) button', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     const closeBtn = screen.getByRole('button', { name: '' }) // The X icon button
@@ -88,7 +89,7 @@ describe('CommandPalette Component', () => {
   })
 
   it('filters commands when typing in the search input', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
@@ -99,7 +100,7 @@ describe('CommandPalette Component', () => {
   })
 
   it('executes command action and navigates on click', () => {
-    render(<CommandPalette />)
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
 
     fireEvent(window, new CustomEvent('open-command-palette'))
     const codexOption = screen.getByText('Open Sacred Codex & Canonical Scriptures')

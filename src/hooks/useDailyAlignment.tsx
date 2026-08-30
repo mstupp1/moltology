@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { useToast } from '@/components/ui/ToastProvider'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import {
   CANONICAL_ALIGNMENT_TASKS,
   TOTAL_ALIGNMENT_TASKS,
@@ -44,24 +44,13 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const isGuest = session.isGuest
   const persist = useHudPersist()
 
-  let toast: {
-    success: (m: string, o?: any) => string
-    error: (m: string, o?: any) => string
-    warning: (m: string, o?: any) => string
-    info: (m: string, o?: any) => string
-    hud: (m: string, o?: any) => string
-  }
-  try {
-    const toastCtx = useToast()
-    toast = toastCtx.toast
-  } catch {
-    toast = {
-      success: () => '',
-      error: () => '',
-      warning: () => '',
-      info: () => '',
-      hud: () => '',
-    }
+  const toastCtx = useOptionalToast()
+  const toast = toastCtx?.toast ?? {
+    success: () => '',
+    error: () => '',
+    warning: () => '',
+    info: () => '',
+    hud: () => '',
   }
 
   const [currentDate, setCurrentDate] = useState<string>(() => localDateString())

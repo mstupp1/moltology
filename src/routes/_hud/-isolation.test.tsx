@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Route } from './isolation'
 import { authClient } from '@/lib/auth-client'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -18,7 +19,7 @@ describe('Isolation HUD Route', () => {
   it('renders guest lock screen when unauthenticated', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     const Component = Route.options.component!
-    render(<Component />)
+    render(<ToastProvider><Component /></ToastProvider>)
 
     expect(screen.getByText('ISOLATION PROTOCOLS LOCKED')).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
@@ -30,7 +31,7 @@ describe('Isolation HUD Route', () => {
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const Component = Route.options.component!
-    render(<Component />)
+    render(<ToastProvider><Component /></ToastProvider>)
 
     expect(screen.getByText('ISOLATION PROTOCOLS')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /pause feed/i })).toBeInTheDocument()
@@ -42,7 +43,7 @@ describe('Isolation HUD Route', () => {
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const Component = Route.options.component!
-    render(<Component />)
+    render(<ToastProvider><Component /></ToastProvider>)
 
     const settingsBtn = screen.getByRole('button', { name: /open protocol settings/i })
     fireEvent.click(settingsBtn)
@@ -57,7 +58,7 @@ describe('Isolation HUD Route', () => {
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const Component = Route.options.component!
-    render(<Component />)
+    render(<ToastProvider><Component /></ToastProvider>)
 
     // Open settings modal from video controls
     const settingsBtn = screen.getByRole('button', { name: /open protocol settings/i })
