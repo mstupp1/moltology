@@ -11,7 +11,6 @@ import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { ActivityStreamPanel } from '@/components/hud/ActivityStreamPanel'
-import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -108,18 +107,6 @@ function DashboardRoute() {
 
       {/* Serene & Inspiring Welcome Initiate Hero Section */}
       <WelcomeInitiateHero />
-
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-        <div>
-          <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
-            Command Surface
-          </h2>
-          <p className="text-xs text-[#839493] font-sans mt-0.5">
-            Install the hub shell and arm surface alerts. Works in guest mode.
-          </p>
-        </div>
-        <HubSurfaceControls />
-      </div>
 
       {/* Comprehensive Bento Box (6-Directive Rotating Carousel + MoltNation News) */}
       <LaunchpadCarousel />

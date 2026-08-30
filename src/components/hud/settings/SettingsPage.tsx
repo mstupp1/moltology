@@ -139,18 +139,6 @@ export const SettingsPage: React.FC = () => {
         description="Choose your avatar, email preferences, and command surface options."
       />
 
-      <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
-        <div>
-          <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase">
-            Command Surface
-          </h2>
-          <p className="text-xs text-[#839493] font-sans mt-0.5">
-            Install the hub shell and arm surface alerts for Activity Center transmissions.
-          </p>
-        </div>
-        <HubSurfaceControls dense />
-      </div>
-
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Left: Avatar */}
@@ -250,6 +238,18 @@ export const SettingsPage: React.FC = () => {
                   </span>
                 </div>
               </button>
+
+              <div className="pt-2 border-t border-[#3a4a49]/60 space-y-2">
+                <div>
+                  <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] tracking-wider uppercase">
+                    Command Surface
+                  </h3>
+                  <p className="text-xs text-[#839493] font-sans mt-0.5">
+                    Install the hub shell and arm surface alerts for Activity Center transmissions.
+                  </p>
+                </div>
+                <HubSurfaceControls dense />
+              </div>
             </div>
           </div>
         </div>
