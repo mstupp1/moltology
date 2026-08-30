@@ -310,7 +310,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
       />
 
       {/* Scanlines */}
-      <div className="absolute inset-0 pointer-events-none crt-scanlines opacity-30" />
+      <div className="absolute inset-0 pointer-events-none crt-scanlines opacity-20 sm:opacity-30" />
 
       {/* Content Panel (Even taller viewport height with wide max-w-4xl frame) */}
       <div
