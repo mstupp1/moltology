@@ -10,6 +10,7 @@ import {
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
+import { ResumeOracleConsultation } from '@/components/hud/ResumeOracleConsultation'
 import { ActivityStreamPanel } from '@/components/hud/ActivityStreamPanel'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
@@ -107,6 +108,8 @@ function DashboardRoute() {
 
       {/* Serene & Inspiring Welcome Initiate Hero Section */}
       <WelcomeInitiateHero />
+
+      <ResumeOracleConsultation />
 
       {/* Comprehensive Bento Box (6-Directive Rotating Carousel + MoltNation News) */}
       <LaunchpadCarousel />

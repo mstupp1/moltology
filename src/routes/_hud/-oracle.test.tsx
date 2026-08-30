@@ -8,12 +8,14 @@ import { authClient } from '@/lib/auth-client'
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 let mockUser: any = null
+let mockOracleSearch: Record<string, unknown> = {}
 
 // Mock TanStack Router
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => config,
   useLocation: () => ({ pathname: '/oracle' }),
   useNavigate: () => vi.fn(),
+  useSearch: () => mockOracleSearch,
 }))
 
 // Mock authClient
@@ -31,7 +33,8 @@ vi.mock('@/components/hud/OracleContext', () => ({
 // Mock server API
 vi.mock('@/lib/server/api', () => ({
   getAIThreadsFn: vi.fn().mockResolvedValue([
-    { id: 'thread-1', title: 'Carcinization Inquiries' },
+    { id: 'thread-1', title: 'Carcinization Inquiries', updatedAt: '2026-08-30T16:00:00.000Z' },
+    { id: 'thread-2', title: 'Older trench notes', updatedAt: '2026-08-20T12:00:00.000Z' },
   ]),
   getAIMessagesFn: vi.fn().mockResolvedValue([]),
 }))
@@ -47,6 +50,7 @@ describe('Oracle Route Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUser = null
+    mockOracleSearch = {}
     vi.mocked(authClient.useSession).mockImplementation(() => ({
       data: mockUser ? { user: mockUser } : null,
       isPending: false,
@@ -120,6 +124,43 @@ describe('Oracle Route Component', () => {
 
     // Drawer should close
     expect(drawer).toHaveClass('-translate-x-full')
+  })
+
+  it('opens the requested thread from hub search instead of a blank consultation', async () => {
+    mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
+    mockOracleSearch = { thread: 'thread-1' }
+    const { getAIMessagesFn } = await import('@/lib/server/api')
+    vi.mocked(getAIMessagesFn).mockResolvedValue([
+      { id: 'msg-1', role: 'user', content: 'How do I keep the last molt from melting?' },
+      { id: 'msg-2', role: 'assistant', content: 'Hold the line. The shell you started is still yours.' },
+    ] as any)
+
+    const Component = (Route as any).component
+    render(<Component />)
+
+    await waitFor(() => {
+      expect(getAIMessagesFn).toHaveBeenCalledWith({
+        data: { threadId: 'thread-1', userId: 'usr_oracle_initiate' },
+      })
+      expect(screen.getByText(/How do I keep the last molt from melting/i)).toBeInTheDocument()
+      expect(screen.getByText(/Hold the line/i)).toBeInTheDocument()
+    })
+    expect(screen.queryByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).not.toBeInTheDocument()
+  })
+
+  it('does not invent a consultation when the requested thread is gone', async () => {
+    mockUser = { id: 'usr_oracle_initiate', name: 'Lobster initiate' }
+    mockOracleSearch = { thread: 'thread-missing' }
+    const { getAIMessagesFn } = await import('@/lib/server/api')
+
+    const Component = (Route as any).component
+    render(<Component />)
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Carcinization Inquiries/i).length).toBeGreaterThan(0)
+    })
+    expect(getAIMessagesFn).not.toHaveBeenCalled()
+    expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
   })
 
   it('shows the new chat screen initially when opened, even if user has existing threads', async () => {
