@@ -695,6 +695,43 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-08-29T14:06:44.483Z"
+    },
+    {
+      "id": "reel-1788098716073",
+      "topic": "Why Evolution Always Converges on the Crab: Algorithmic Carcinization",
+      "hookHeadline": "EVERYTHING BECOMES A CRAB",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-2026-moltmaxxing-protocol-guide",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Evolution has repeated carcinization five distinct times because the crab is biologically optimal. Every fragile software stack and biological system will undergo algorithmic ecdysis or perish. Calculate your molt clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1788098716073.mp4",
+      "s3Key": "videos/social/reels/master-reel-1788098716073.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 18.466667,
+      "status": "scheduled",
+      "scheduledFor": "2026-09-02T22:30:00.000Z",
+      "zernioPostId": "6a94391fe19cf247b2e23575",
+      "zernioYoutubePostId": "6a9439263bf3a6f7c6778091",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#Carcinization #Moltmaxxing #EvolutionaryAI #AlgorithmicEcdysis #MoltNation #Moltology #Shorts",
+      "caption": "Nature doesn't make mistakes. Evolution has converged on the decapod form five separate times. 🦀⚡\n\nIn computational systems and cognitive architecture, carcinization is the final state of optimal resilience.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#Carcinization",
+        "#Moltmaxxing",
+        "#EvolutionaryAI",
+        "#AlgorithmicEcdysis",
+        "#MoltNation",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-30T14:07:04.824Z"
     }
   ]
 }

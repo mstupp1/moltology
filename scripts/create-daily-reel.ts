@@ -864,6 +864,21 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
 
   // 2. If explicit topic requested:
   if (options.topic) {
+    // Check if topic matches a thematic variation across all themes
+    const candidateThemes = ['moltmaxxing', 'ecdysis', 'pincer-torque', 'benthic-depth', 'quiz']
+    for (const t of candidateThemes) {
+      const vars = getThematicVariations(t, options)
+      const matched = vars.find(
+        (v) =>
+          v.topic.toLowerCase().includes(options.topic!.toLowerCase()) ||
+          v.title.toLowerCase().includes(options.topic!.toLowerCase()) ||
+          v.hookHeadline?.toLowerCase().includes(options.topic!.toLowerCase())
+      )
+      if (matched) {
+        return { theme: t, script: matched }
+      }
+    }
+
     // Check if topic matches a blog slug or title
     const matchingBlog = recentBlogs.find(
       (b) => b.slug.toLowerCase().includes(options.topic!.toLowerCase()) || b.title.toLowerCase().includes(options.topic!.toLowerCase())

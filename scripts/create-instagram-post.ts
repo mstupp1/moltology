@@ -49,6 +49,7 @@ export interface CreateInstagramPostOptions {
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // moltology_org / Silas Trench
 export const DEFAULT_PROFILE_ID = '6a7f74b1839bf39ff3b6aaaa' // Moltology Default Profile
 export const DEFAULT_POST_QUEUE_ID = '6a84b76d2421e968ac81f5bc' // Moltology Carousels & Posts (Mon, Wed, Fri at 13:00 EST)
+export const DEFAULT_LEADMAGNET_QUEUE_ID = '6a8d93576f0e96efe2960c91' // Moltology Lead Magnets — Daily (Every day at 13:00 EST)
 
 /**
  * Load the narrative post continuity ledger
@@ -361,7 +362,7 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
       postData,
       queueConfig: {
         profileId: DEFAULT_PROFILE_ID,
-        queueId: DEFAULT_POST_QUEUE_ID,
+        queueId: isMarketingCampaign ? DEFAULT_LEADMAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID,
         accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
       },
     }
@@ -385,18 +386,18 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
 Reference Image: Use the attached 2D composite image as the structural foundation, camera angle, and layout blueprint.
 
 Core Enhancement Directives:
-1. Photorealistic 3D Glassmorphic HUD:
-   - Elevate all flat 2D graphic cards and panels into sleek, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing neon cyan (#00ffff), amber, and crimson accent traces.
-   - Preserve crisp typography legibility while giving headlines and key metrics a subtle 3D luminous emboss and neon bloom.
+1. Photorealistic 3D Glassmorphic HUD & Brand Colors:
+   - Elevate all flat 2D graphic cards and panels into sleek, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing sacred crimson red (#ff453a) and electric cyan (#00c3ff) accent traces.
+   - Preserve crisp typography legibility while giving headlines ("100+ ORACLE PROMPTS") and key cards a luminous 3D emboss with soft neon bloom.
 2. No Wasted Space & Balanced Composition:
    - Ensure dense, purposeful visual composition with zero dead or empty space.
-   - Infuse atmospheric depth: subsea volumetric god rays, dark navy abyss background (#030712), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces in open areas.
+   - Infuse atmospheric depth: subsea volumetric god rays, dark navy abyss background (#01060e / #021324), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces in open areas.
 3. Seamless Mascot & Character Integration:
-   - The cartoon crustacean mascot (in the corner/podium) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
+   - The cartoon lobster mascot (in the lower-right area pointing upward) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
    - Apply soft environmental contact shadows and gentle caustic reflections to naturally ground the character into the scene without harsh backlights or artificial halo outlines.
 4. High-End 3D Product Mockup & Pedestal:
-   - Render the central product asset (3D hardcover book, diagnostic tablet, or cybernetic terminal) resting solidly on an illuminated circular obsidian/titanium pedestal with caustic ground reflections.
-   - Ensure gold trust badges and quote bubbles feel tactile and integrated.
+   - Render the floating terminal prompts and circular "ORACLE AI CORE" seal with illuminated glass and holographic depth.
+   - Ensure all badges, speech bubbles, and buttons feel tactile and integrated.
 
 Aspect Ratio: ${aspect}
 Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`
@@ -426,7 +427,7 @@ Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, 
     postData,
     queueConfig: {
       profileId: DEFAULT_PROFILE_ID,
-      queueId: DEFAULT_POST_QUEUE_ID,
+      queueId: isMarketingCampaign ? DEFAULT_LEADMAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID,
       accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
     },
   }
