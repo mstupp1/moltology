@@ -160,4 +160,52 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     expect(screen.getByText('Post Not Found')).toBeInTheDocument()
   })
+
+  it('shows member B on the reply and member A on the original post', () => {
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'moltmaxxing-biometrics',
+        categoryName: 'Moltmaxxing & Biometrics',
+        categoryColor: '#00ffff',
+        userId: 'member-a',
+        authorName: 'LARVA UNIT #1111',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 1,
+        title: 'BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS',
+        slug: 'shell-hardness-pincer-torque-gains-tips',
+        content: 'Thread body from member A.',
+        isPinned: false,
+        isLocked: false,
+        views: 10,
+        repliesCount: 1,
+        upvotes: 0,
+        lastReplyAt: '2026-08-28T19:37:07.000Z',
+        createdAt: '2026-08-03T08:30:00.000Z',
+      },
+      posts: [
+        {
+          id: 'post-b',
+          topicId: 'topic-a',
+          userId: 'member-b',
+          authorName: 'LARVA UNIT #2468',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 2,
+          content: 'Reply body from member B, long enough to count.',
+          upvotes: 0,
+          createdAt: '2026-08-28T19:37:07.000Z',
+        },
+      ],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByText('LARVA UNIT #1111')).toBeInTheDocument()
+    expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
+    expect(screen.getByText('Reply body from member B, long enough to count.')).toBeInTheDocument()
+    const replyCard = screen.getByText('Reply body from member B, long enough to count.').closest('div')
+    expect(replyCard).toHaveTextContent('LARVA UNIT #2468')
+    expect(replyCard).not.toHaveTextContent('LARVA UNIT #1111')
+  })
 })
