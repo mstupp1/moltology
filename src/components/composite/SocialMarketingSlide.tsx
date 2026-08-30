@@ -702,7 +702,7 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
 
           {/* Floating Quote Callout on Lower Right */}
           <div
-            className={`absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/98 border-2 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md ${
+            className={`absolute -bottom-2 right-1 z-30 max-w-[245px] p-3.5 rounded-2xl bg-[#031522]/[0.98] border-2 shadow-[0_15px_35px_rgba(0,0,0,0.95)] backdrop-blur-md ${
               isCodex
                 ? 'border-[#00ffff]/80 shadow-[0_15px_35px_rgba(0,0,0,0.95),0_0_20px_rgba(0,255,255,0.25)]'
                 : 'border-[#ff453a]'
