@@ -273,6 +273,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       setMemberLarvaId(larvaId)
       return
     }
+    const profileUserId = user.id
+    if (!profileUserId) return
     let isSubscribed = true
     const applyProfile = (profile: { role?: string | null; handle?: string | null; larvaId?: string | null } | null) => {
       if (!isSubscribed) return
@@ -281,11 +283,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       setMemberHandle(profile?.handle ?? null)
       setMemberLarvaId(profile?.larvaId ?? larvaId)
     }
-    loadUserProfile(user.id)
+    loadUserProfile(profileUserId)
       .then(applyProfile)
       .catch(() => applyProfile(null))
     const onHandleChanged = () => {
-      loadUserProfile(user.id).then(applyProfile).catch(() => applyProfile(null))
+      loadUserProfile(profileUserId).then(applyProfile).catch(() => applyProfile(null))
     }
     window.addEventListener('member-handle-changed', onHandleChanged)
     return () => {

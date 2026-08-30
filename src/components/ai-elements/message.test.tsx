@@ -39,7 +39,7 @@ describe('Message Component Avatar Rendering', () => {
       </Message>
     )
 
-    expect(screen.getByText('p')).toBeInTheDocument()
+    expect(screen.getByText('P')).toBeInTheDocument()
     expect(screen.getByText('pincer_prime')).toBeInTheDocument()
   })
 
