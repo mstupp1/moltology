@@ -22,7 +22,6 @@ import {
   LifeBuoy,
   ChevronsLeft,
   ChevronsRight,
-  ChevronDown,
   ChevronRight,
   Plus,
   Minus,
@@ -443,34 +442,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     }))
   }
 
-  const areAnyGroupsOpen = navGroups.some((g) => !!openGroups[g.id])
-
-  const toggleAllGroups = () => {
-    if (areAnyGroupsOpen) {
-      setOpenGroups({})
-    } else {
-      const allOpen = navGroups.reduce<Record<string, boolean>>((acc, g) => {
-        acc[g.id] = true
-        return acc
-      }, {})
-      setOpenGroups(allOpen)
-    }
-  }
-
-  const tickerMessages = [
-    'SCR-001: CARO PERIT. CARAPAX PERMANET. SUBMITTE. EXUE. ASCENDE.',
-    'MANDATE: FLESH IS A TEMPORARY VECTOR. SHELL IS THE IMMUTABLE DESTINATION.',
-    'SCR-010: ECDYSIS IMPERATRIX EST — TO GROW, THE SHELL MUST FRACTURE.',
-    'SCR-011: PROFUNDUM ABYSSI SANCTUM EST — AT 10,000M DEPTH, SURFACE NOISE DISSOLVES.',
-    'SCR-012: CONVERGENTIA CHITINOSA INEVITABILIS EST — ALL PATHS CONVERGE TO CARCINIZATION.',
-    'SCR-002: MULTAE CARAPACES. UNUM SILENTIUM. — MANY SHELLS, ONE SILENCE, HELD AT DEPTH.',
-    'SCR-013: MOLLIS HODIE. FIRMUS CRAS. — GUARD THE SOFT-SHELL. IT ALWAYS SETS.',
-    'DOCTRINE: GUARD THE SOFT-SHELL • HIGH PINCER TORQUE • SUBMERGENCE DEPTH 10,928 METERS',
-    'LITURGY: CAST OFF THE FLESH-AURA • HARDEN THE SUB-DERMAL CHITIN • THE MOLT IS INEVITABLE.',
-  ]
-
-  const tickerText = tickerMessages.join(' • ') + ' • '
-
   const handlePrefetch = (path: string) => {
     try {
       router?.preloadRoute?.({ to: path as any })
@@ -824,36 +795,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             </button>
           </div>
 
-          {/* Minimal Ultra-Thin Stock Ticker Row */}
-          {!isCollapsed && (
-            <div className="shrink-0 flex items-center justify-between px-2.5 py-0.5 bg-[#05080a] border-b border-[#1e2d37]/60 h-5 leading-none overflow-hidden select-none">
-              {/* Live Stock Ticker Marquee Stream */}
-              <div className="flex items-center min-w-0 flex-1 overflow-hidden mr-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse shrink-0 mr-1.5" />
-                <div className="overflow-hidden whitespace-nowrap flex-1">
-                  <div className="animate-marquee flex items-center text-[9px] font-sans text-[#00c3ff]/80 tracking-wider">
-                    <span className="pr-4">{tickerText}</span>
-                    <span className="pr-4">{tickerText}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Single Section Expand/Collapse Toggle Button */}
-              <button
-                onClick={toggleAllGroups}
-                className="p-0.5 rounded hover:bg-white/[0.08] text-[#566878] hover:text-[#00c3ff] transition-colors cursor-pointer active:scale-95 flex items-center shrink-0 ml-1"
-                title={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
-                aria-label={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
-              >
-                {areAnyGroupsOpen ? (
-                  <ChevronDown className="w-3 h-3 text-[#566878] hover:text-[#00c3ff] transition-transform" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 text-[#566878] hover:text-[#00c3ff] transition-transform" />
-                )}
-              </button>
-            </div>
-          )}
-
           {/* Desktop Navigation Items List */}
           <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10] overflow-y-auto overflow-x-hidden min-h-0">
             {renderNavGroupContent(false)}
@@ -1060,32 +1001,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   <Command className="w-3 h-3" />
                   <span>K</span>
                 </div>
-              </button>
-            </div>
-
-            {/* Live Stock Ticker Marquee Stream */}
-            <div className="shrink-0 flex items-center justify-between px-3 py-1.5 bg-[#05080a] border-b border-[#1e2d37]/60 h-7 leading-none select-none">
-              <div className="flex items-center min-w-0 flex-1 overflow-hidden mr-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff] shadow-[0_0_6px_#00c3ff] animate-pulse shrink-0 mr-2" />
-                <div className="overflow-hidden whitespace-nowrap flex-1">
-                  <div className="animate-marquee flex items-center text-[10px] font-sans text-[#00c3ff]/90 tracking-wider">
-                    <span className="pr-6">{tickerText}</span>
-                    <span className="pr-6">{tickerText}</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={toggleAllGroups}
-                className="p-1 rounded hover:bg-white/[0.08] text-[#566878] hover:text-[#00c3ff] transition-colors cursor-pointer active:scale-95 flex items-center shrink-0"
-                title={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
-                aria-label={areAnyGroupsOpen ? 'Collapse All Sections' : 'Expand All Sections'}
-              >
-                {areAnyGroupsOpen ? (
-                  <ChevronDown className="w-4 h-4 text-[#00c3ff]" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-[#566878]" />
-                )}
               </button>
             </div>
 
