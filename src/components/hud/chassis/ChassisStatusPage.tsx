@@ -9,7 +9,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useToast } from '@/components/ui/ToastProvider'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getChassisLoadoutFn, moveGearItemFn } from '@/lib/server/api'
@@ -58,7 +58,8 @@ export const ChassisStatusPage: React.FC = () => {
   const user = session.user
   const userId = session.userId
   const persist = useHudPersist()
-  const { toast } = useToast()
+  const optionalToast = useOptionalToast()
+  const toast = optionalToast?.toast
 
   const cached = userId ? getCachedChassisLoadout(userId) : null
 
@@ -143,7 +144,7 @@ export const ChassisStatusPage: React.FC = () => {
     async (itemId: string, target: MoveTarget) => {
       const plan = planGearMove(items, catalogById, itemId, target, vaultSize)
       if (!plan.ok) {
-        toast.warning(plan.error, { title: 'Vault Limits' })
+        toast?.warning(plan.error, { title: 'Vault Limits' })
         return
       }
       if (plan.updates.length === 0) return
@@ -168,7 +169,7 @@ export const ChassisStatusPage: React.FC = () => {
       } catch (e) {
         setItems(prevItems)
         setTotals(computeLoadoutTotals(prevItems, catalogById))
-        toast.warning(
+        toast?.warning(
           e instanceof Error ? e.message : 'Could not update equipment. Please try again.',
           { title: 'Equipment Sync' }
         )

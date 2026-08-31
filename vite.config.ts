@@ -39,6 +39,11 @@ export default defineConfig({
             router: {
               routeFileIgnorePattern: '.*\\.test\\..*',
             },
+            server: {
+              build: {
+                inlineCss: true,
+              },
+            },
           }),
           nitro(),
         ]),

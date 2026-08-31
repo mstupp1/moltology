@@ -38,7 +38,6 @@ export const Route = createRootRoute({
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
-        { rel: 'preconnect', href: 'https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech', crossOrigin: 'anonymous' },
         { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
         {
           rel: 'preload',
