@@ -219,7 +219,7 @@ export const MoltmaxGuidePage: React.FC = () => {
             <div className="relative group max-w-sm">
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] opacity-25 blur-2xl group-hover:opacity-40 transition duration-500" />
               <img
-                src={getAssetUrl('/images/moltmax_guide_3d_mockup.jpg')}
+                src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
                 alt="The 2026 Moltmaxxing Protocol Tactical Field Manual 3D Mockup"
                 className="relative rounded-2xl shadow-2xl border border-white/20 object-cover w-full"
               />

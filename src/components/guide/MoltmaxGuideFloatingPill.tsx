@@ -90,7 +90,7 @@ export const MoltmaxGuideFloatingPill: React.FC<MoltmaxGuideFloatingPillProps> =
         {/* Thumbnail Image */}
         <div className="relative shrink-0 w-12 h-14 rounded-md overflow-hidden border border-white/20 shadow-md">
           <img
-            src={getAssetUrl('/images/moltmax_guide_3d_mockup.jpg')}
+            src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
             alt="Moltmaxxing Guide 3D Thumbnail"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
           />

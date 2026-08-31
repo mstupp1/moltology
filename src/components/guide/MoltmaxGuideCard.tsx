@@ -89,7 +89,7 @@ export const MoltmaxGuideCard: React.FC<MoltmaxGuideCardProps> = ({
           <div className="relative group max-w-[280px]">
             <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-[#00c3ff] via-[#00ffcc] to-[#38bdf8] opacity-30 blur-lg group-hover:opacity-60 transition duration-500" />
             <img
-              src={getAssetUrl('/images/moltmax_guide_3d_mockup.jpg')}
+              src={getAssetUrl('/images/moltmax_guide_3d_mockup.webp')}
               alt="The 2026 Moltmaxxing Protocol Field Manual"
               className="relative w-full rounded-xl shadow-2xl border border-white/20 object-cover"
             />

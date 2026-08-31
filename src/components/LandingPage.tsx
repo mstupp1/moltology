@@ -304,7 +304,7 @@ export const LandingPage: React.FC = () => {
         <img
           src={getAssetUrl('/images/chitin_texture_bg.webp')}
           alt="Chitin Exoshell Background Texture"
-          {...eagerImageProps}
+          {...lazyImageProps}
           width={1376}
           height={768}
           className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"

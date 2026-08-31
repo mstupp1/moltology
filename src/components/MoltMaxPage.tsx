@@ -734,7 +734,7 @@ export const MoltMaxPage: React.FC = () => {
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
-                    src={getAssetUrl('/images/pbr_circuit_matrix.jpg')}
+                    src={getAssetUrl('/images/pbr_circuit_matrix.webp')}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay pointer-events-none z-0"
                   />
@@ -803,7 +803,7 @@ export const MoltMaxPage: React.FC = () => {
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
-                    src={getAssetUrl('/images/pbr_carbon_weave.jpg')}
+                    src={getAssetUrl('/images/pbr_carbon_weave.webp')}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay pointer-events-none z-0"
                   />

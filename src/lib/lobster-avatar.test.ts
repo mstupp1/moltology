@@ -264,7 +264,7 @@ describe('lobster-avatar', () => {
     expect(svgAnimated).toContain('data-sparkles="radiant"')
     expect(svgAnimated).toContain('id="lobster-sparkles-layer"')
     expect(svgAnimated).toContain('id="lobster-texture-layer"')
-    expect(svgAnimated).toContain('pbr_carbon_weave.jpg')
+    expect(svgAnimated).toContain('pbr_carbon_weave.webp')
     expect(svgAnimated).toContain('feDropShadow')
     expect(svgAnimated).toContain('data-motion="drift_diagonal"')
     expect(svgAnimated).toContain('<animate')

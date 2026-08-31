@@ -50,8 +50,8 @@ describe('Asset URL Resolver', () => {
     expect(getAssetUrl('images/characters/char_lobster_thumbs_up.png')).toBe(
       `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png`
     )
-    expect(getAssetUrl('/images/pbr_circuit_matrix.jpg')).toBe(
-      `${S3_BASE_URL}/images/pbr_circuit_matrix.jpg`
+    expect(getAssetUrl('/images/pbr_circuit_matrix.webp')).toBe(
+      `${S3_BASE_URL}/images/pbr_circuit_matrix.webp`
     )
   })
 })

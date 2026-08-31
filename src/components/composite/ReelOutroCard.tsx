@@ -7,12 +7,12 @@ import { ArrowRight, Sparkles } from 'lucide-react'
 export type CtaTextureKey = 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none'
 
 export const CTA_TEXTURE_MAP: Record<CtaTextureKey, string> = {
-  chitin: '/images/chitin_texture_bg.jpg',
-  hex: '/images/pbr_hex_lattice.jpg',
-  alloy: '/images/pbr_benthic_alloy.jpg',
-  carbon: '/images/pbr_carbon_weave.jpg',
-  basalt: '/images/pbr_deep_basalt.jpg',
-  circuit: '/images/pbr_circuit_matrix.jpg',
+  chitin: '/images/chitin_texture_bg.webp',
+  hex: '/images/pbr_hex_lattice.webp',
+  alloy: '/images/pbr_benthic_alloy.webp',
+  carbon: '/images/pbr_carbon_weave.webp',
+  basalt: '/images/pbr_deep_basalt.webp',
+  circuit: '/images/pbr_circuit_matrix.webp',
   none: '',
 }
 
