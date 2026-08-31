@@ -149,7 +149,7 @@ export const HeroShuffleDeck: React.FC = () => {
     }
     const onLoad = () => setPlaybackReady(true)
     // Fallback so slow-loading pages never leave the hero frozen on its poster
-    const fallback = window.setTimeout(() => setPlaybackReady(true), 3000)
+    const fallback = window.setTimeout(() => setPlaybackReady(true), 1500)
     window.addEventListener('load', onLoad)
     return () => {
       window.removeEventListener('load', onLoad)

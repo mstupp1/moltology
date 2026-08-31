@@ -453,7 +453,7 @@ export const LandingPage: React.FC = () => {
           {/* Playful Corner Peeking Lobster Character Over Top Bezel */}
           <div className="absolute -top-10 sm:-top-16 right-8 sm:right-16 lg:right-24 z-30 pointer-events-none select-none">
             <img
-              src={getAssetUrl('/images/characters/char_lobster_corner_peek.webp')}
+              src={getAssetUrl('/images/characters/char_lobster_corner_peek_sm.webp')}
               alt="Hero Lobster Peeking Over Card"
               {...lazyImageProps}
               width={128}
@@ -726,14 +726,21 @@ export const LandingPage: React.FC = () => {
         <ScrollReveal animation="fade-in" durationMs={900}>
           <div className="w-full relative py-12 sm:py-16 border-y border-cyan-900/50 bg-[#030607] group">
             <div className="pbr-underlay pbr-underlay-basalt opacity-35" />
-            <img
-              src={getAssetUrl('/images/underwater_looking_up.webp')}
-              alt="Sub-Benthic Abyss Scroll Reveal"
-              {...lazyImageProps}
-              width={1376}
-              height={768}
-              className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
-            />
+            <picture className="absolute inset-0 w-full h-full pointer-events-none">
+              <source
+                type="image/webp"
+                media="(max-width: 767px)"
+                srcSet={getAssetUrl('/images/underwater_looking_up_sm.webp')}
+              />
+              <img
+                src={getAssetUrl('/images/underwater_looking_up.webp')}
+                alt="Sub-Benthic Abyss Scroll Reveal"
+                {...lazyImageProps}
+                width={1376}
+                height={768}
+                className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity scale-105 group-hover:scale-110 transition-transform duration-1000 pointer-events-none"
+              />
+            </picture>
             <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b] via-[#070b0b]/70 to-[#070b0b] z-0" />
             <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 text-center space-y-2 sm:space-y-3">
               <div className="text-cyan-400 text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase flex items-center justify-center gap-2">
