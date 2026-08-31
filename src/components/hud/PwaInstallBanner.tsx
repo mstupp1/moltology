@@ -15,7 +15,7 @@ export function PwaInstallBanner() {
     <div
       role="region"
       aria-label="Install Command Hub"
-      className="pointer-events-auto mx-3 mb-2 sm:mx-4 rounded-sm border border-[#00c3ff]/35 bg-[#0a1212] shadow-[0_0_24px_rgba(0,195,255,0.12)]"
+      className="pointer-events-auto mx-3 mb-2 sm:mx-4 md:mx-auto md:mb-4 md:w-full md:max-w-md rounded-sm border border-[#00c3ff]/35 bg-[#0a1212] shadow-[0_0_24px_rgba(0,195,255,0.12)]"
     >
       <div className="flex items-start gap-3 p-3 sm:p-3.5">
         <div className="mt-0.5 shrink-0 text-[#00c3ff]">
