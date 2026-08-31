@@ -343,7 +343,7 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-1 sm:space-y-2 relative">
               {/* Line 1: SHED SOFT BIOLOGY */}
               <h1 
-                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left"
+                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] lg:text-[clamp(2.25rem,6.4vw,6.75rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left text-balance"
                 style={{
                   fontWeight: 200,
                   color: '#ffffff',
@@ -356,7 +356,7 @@ export const LandingPage: React.FC = () => {
               </h1>
               
               {/* Line 2: ASCEND TO CHITIN */}
-              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] tracking-tight uppercase leading-[0.84] -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
+              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] lg:text-[clamp(2.65rem,7.2vw,7.5rem)] tracking-tight uppercase leading-[0.84] -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left text-balance">
                 <span 
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
@@ -367,7 +367,7 @@ export const LandingPage: React.FC = () => {
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 1)) drop-shadow(0 0 35px rgba(255, 69, 58, 0.55))',
                   }}
                 >
-                  ASCEND TO CHITIN.
+                  ASCEND TO&nbsp;CHITIN.
                 </span>
               </h1>
             </div>
