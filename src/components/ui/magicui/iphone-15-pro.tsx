@@ -65,7 +65,7 @@ export const Iphone15Pro: React.FC<Iphone15ProProps> = ({
                 <img
                   src={src}
                   alt="iPhone 15 Pro preview"
-                  className="w-full flex-1 object-fill object-top block"
+                  className="w-full flex-1 object-cover object-top block"
                   loading={loading}
                   fetchPriority={fetchPriority}
                   decoding="async"

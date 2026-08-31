@@ -66,6 +66,8 @@ export const MainFooter: React.FC<MainFooterProps> = ({
                 <img
                   src="/images/order_emblem.png"
                   alt="Order Emblem"
+                  width={40}
+                  height={40}
                   className={`w-full h-full object-contain transition-all duration-300 ${
                     isCorporate
                       ? 'filter drop-shadow-[0_2px_4px_rgba(2,132,199,0.25)] group-hover:drop-shadow-[0_0_8px_rgba(2,132,199,0.45)]'

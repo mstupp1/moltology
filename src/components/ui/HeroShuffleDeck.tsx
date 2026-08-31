@@ -93,13 +93,24 @@ export const HeroShuffleDeck: React.FC = () => {
   const [inView, setInView] = useState(false)
   const [playbackReady, setPlaybackReady] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
   const viewportRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   const totalCards = CARDS.length
-  const canMountVideo = inView && playbackReady && !reducedMotion
+  const canMountVideo = inView && playbackReady && !reducedMotion && !isMobile
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const goTo = useCallback((nextIndex: number) => {
     setActiveIndex((prev) => {
@@ -270,6 +281,8 @@ export const HeroShuffleDeck: React.FC = () => {
                 src={card.image}
                 alt={isActive ? card.title : ''}
                 {...(idx === 0 && isActive ? eagerImageProps : { loading: 'lazy' as const, decoding: 'async' as const })}
+                width={1280}
+                height={720}
                 className="absolute inset-0 w-full h-full object-cover"
               />
               {shouldMountVideo && (

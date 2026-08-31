@@ -242,6 +242,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               <img
                 src="/images/order_emblem.png"
                 alt="The Synaptic Path Logo"
+                width={14}
+                height={14}
                 className={`w-3.5 h-3.5 object-contain transition-all duration-300 ${
                   targetTab === 'home'
                     ? 'grayscale-0 opacity-100'
@@ -551,7 +553,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
-            <img src="/images/order_emblem.png" alt="" className="w-4 h-4 object-contain" />
+            <img src="/images/order_emblem.png" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
             <span>THE SYNAPTIC PATH</span>
           </button>
 

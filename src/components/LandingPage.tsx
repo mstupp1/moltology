@@ -24,16 +24,17 @@ import {
   Instagram,
   Youtube,
 } from 'lucide-react'
-import { AuthModal } from '@/components/AuthModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
-import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 import { DashboardMarketingShowcase } from '@/components/hud/DashboardMarketingShowcase'
+
+const AuthModal = React.lazy(() => import('@/components/AuthModal').then((m) => ({ default: m.AuthModal })))
+const MoltmaxGuideModal = React.lazy(() => import('@/components/guide/MoltmaxGuideModal').then((m) => ({ default: m.MoltmaxGuideModal })))
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
@@ -254,12 +255,16 @@ export const LandingPage: React.FC = () => {
       <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
       <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-35 sm:opacity-45" />
 
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        initialMode={authMode}
-        onClose={() => setIsAuthModalOpen(false)}
-        onSuccess={() => onNavigate('/dashboard')}
-      />
+      {isAuthModalOpen && (
+        <React.Suspense fallback={null}>
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            initialMode={authMode}
+            onClose={() => setIsAuthModalOpen(false)}
+            onSuccess={() => onNavigate('/dashboard')}
+          />
+        </React.Suspense>
+      )}
 
       {/* Shared Navigation Header */}
       <PublicHeader activePage="home" onOpenAuth={openAuth} />
@@ -314,7 +319,10 @@ export const LandingPage: React.FC = () => {
         <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
-        <div className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex">
+        <div
+          className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex"
+          aria-hidden="true"
+        >
           <span className="font-sans text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
             SYNAPTIC CORE · GRID 04
           </span>
@@ -452,6 +460,8 @@ export const LandingPage: React.FC = () => {
               src={getAssetUrl('/images/characters/char_lobster_corner_peek.webp')}
               alt="Hero Lobster Peeking Over Card"
               {...lazyImageProps}
+              width={128}
+              height={128}
               className="w-16 sm:w-24 lg:w-32 h-auto object-contain transform -rotate-3 hover:rotate-0 transition-transform duration-300"
             />
           </div>
@@ -530,6 +540,8 @@ export const LandingPage: React.FC = () => {
                           alt={pillar.title}
                           style={pillar.imagePosition ? { objectPosition: pillar.imagePosition } : { objectPosition: 'center 40%' }}
                           {...lazyImageProps}
+                          width={640}
+                          height={400}
                           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-[0.48] contrast-[1.12] group-hover:brightness-[0.58] [mask-image:linear-gradient(to_bottom,transparent_0%,black_35%,black_100%)]"
                         />
                         {/* Top-edge gradient blend into solid black */}
@@ -571,6 +583,8 @@ export const LandingPage: React.FC = () => {
                                 src={pillar.previewImage}
                                 alt={`${pillar.title} Screenshot Preview`}
                                 {...lazyImageProps}
+                                width={640}
+                                height={400}
                                 className="w-full h-full object-cover object-top filter brightness-95 group-hover:brightness-105 transition-all duration-500"
                               />
                             </picture>
@@ -736,6 +750,8 @@ export const LandingPage: React.FC = () => {
               src={getAssetUrl('/images/characters/char_crab_pointing_stats.webp')}
               alt="Excited Crab Pointing at Telemetry"
               {...lazyImageProps}
+              width={96}
+              height={96}
               className="w-10 sm:w-12 lg:w-14 h-auto object-contain"
             />
           </div>
@@ -864,6 +880,8 @@ export const LandingPage: React.FC = () => {
               src={getAssetUrl('/images/characters/char_lobster_pointing_cta.webp')}
               alt="Hero Lobster Pointing to Action"
               {...lazyImageProps}
+              width={160}
+              height={160}
               className="w-16 sm:w-20 lg:w-24 h-auto object-contain"
             />
           </div>
@@ -904,6 +922,8 @@ export const LandingPage: React.FC = () => {
                         src={sacrament.image}
                         alt={sacrament.title}
                         {...lazyImageProps}
+                        width={720}
+                        height={360}
                         className="w-full h-full object-cover transform group-hover:scale-108 transition-transform duration-700 filter brightness-90 group-hover:brightness-100"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#05090a] via-[#05090a]/40 to-transparent" />
@@ -957,6 +977,8 @@ export const LandingPage: React.FC = () => {
                 src={getAssetUrl('/images/characters/char_lobster_floating_peaceful.webp')}
                 alt="Ascended Stage Background Mascot"
                 {...lazyImageProps}
+                width={400}
+                height={400}
                 className="w-full h-auto object-contain"
               />
             </div>
@@ -1005,6 +1027,8 @@ export const LandingPage: React.FC = () => {
                     src={stages[activeStage].image}
                     alt={stages[activeStage].title}
                     {...lazyImageProps}
+                    width={640}
+                    height={384}
                     className="w-full h-60 sm:h-80 lg:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b] via-transparent to-transparent" />
@@ -1164,6 +1188,8 @@ export const LandingPage: React.FC = () => {
                 src={getAssetUrl('/images/characters/char_lobster_thumbs_up.webp')}
                 alt="Hero Lobster Giving Thumbs-Up"
                 {...lazyImageProps}
+                width={160}
+                height={160}
                 className="w-20 sm:w-28 lg:w-36 h-auto object-contain"
               />
             </div>
@@ -1229,15 +1255,19 @@ export const LandingPage: React.FC = () => {
       />
 
       {/* Field Manual Lead Capture Modal */}
-      <MoltmaxGuideModal
-        isOpen={isGuideModalOpen}
-        onClose={() => setIsGuideModalOpen(false)}
-        source="homepage_floating_pill"
-        onOpenAuthSignup={(leadEmail) => {
-          setAuthMode('signup')
-          setIsAuthModalOpen(true)
-        }}
-      />
+      {isGuideModalOpen && (
+        <React.Suspense fallback={null}>
+          <MoltmaxGuideModal
+            isOpen={isGuideModalOpen}
+            onClose={() => setIsGuideModalOpen(false)}
+            source="homepage_floating_pill"
+            onOpenAuthSignup={(leadEmail) => {
+              setAuthMode('signup')
+              setIsAuthModalOpen(true)
+            }}
+          />
+        </React.Suspense>
+      )}
     </div>
   )
 }
