@@ -1,9 +1,8 @@
 import React from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, FileText } from 'lucide-react'
-import { getJournalPaperBySlug, JOURNAL_META } from '@/lib/journal-data'
-import { JournalMasthead } from '@/components/journal/JournalMasthead'
-import { JournalPaperReader } from '@/components/journal/JournalPaperReader'
+import { getJournalPaperBySlug, INITIAL_JOURNAL_PAPERS } from '@/lib/journal-data'
+import { JournalReaderWorkspace } from '@/components/journal/JournalReaderWorkspace'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 
 export const Route = createFileRoute('/_hud/journal/$slug')({
@@ -13,50 +12,38 @@ export const Route = createFileRoute('/_hud/journal/$slug')({
 
 function JournalPaperPage() {
   const { slug } = Route.useParams()
+  const navigate = useNavigate()
   const paper = getJournalPaperBySlug(slug)
 
   if (!paper) {
     return (
-      <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
-        <JournalMasthead variant="compact" />
-        <div className="bg-[#0f1414] border border-[#ff5540]/60 p-6 sm:p-12 chamfer-corner text-center">
+      <div className="font-sans">
+        <div className="chitin-card border border-[#ff5540]/60 p-6 sm:p-12 chamfer-corner shadow-2xl text-center">
           <FileText className="w-10 h-10 text-[#ff5540] mx-auto mb-4" />
           <h2 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">
             PAPER NOT FOUND
           </h2>
           <p className="text-xs text-[#839493] mt-2 mb-6 font-sans">
-            The requested transmission is not present in the canonical archive.
+            The requested transmission is not present in the canonical archive. The deep keeps
+            only what has been peer-certified.
           </p>
-          <Link
-            to="/journal"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00c3ff] text-[#030606] font-grotesk font-bold text-xs uppercase chamfer-corner"
+          <button
+            onClick={() => navigate({ to: '/journal' })}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00c3ff] text-[#030606] font-grotesk font-bold text-xs uppercase chamfer-corner hover:bg-[#38bdf8] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Return to Journal Archive
-          </Link>
+            Return to The Benthic Compendium
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans">
-      <JournalMasthead variant="compact" />
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <Link
-          to="/journal"
-          className="inline-flex items-center gap-2 text-[11px] font-sans font-bold text-[#00c3ff] hover:text-[#38bdf8] uppercase tracking-wider transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back to The Benthic Compendium
-        </Link>
-        <span className="text-[9px] font-sans text-[#5f7a7a] uppercase tracking-widest">
-          {JOURNAL_META.name} • {paper.paperNumber} • {paper.readTimeMinutes} MIN READ
-        </span>
-      </div>
-
-      <JournalPaperReader paper={paper} />
-    </div>
+    <JournalReaderWorkspace
+      papers={INITIAL_JOURNAL_PAPERS}
+      activeSlug={paper.slug}
+      onNavigate={(nextSlug) => navigate({ to: '/journal/$slug', params: { slug: nextSlug } })}
+    />
   )
 }

@@ -14,6 +14,29 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-08-31-oracle-quick-resume-phosphor-scanlines-unified-notifications',
+    version: '2026.08.31',
+    title: 'Oracle Quick Resume, Phosphor Scanlines & Unified Notifications',
+    category: 'Improvement',
+    tags: ['Improvement', 'Feature', 'UI/UX', 'AI', 'Performance'],
+    summary: 'Resume your most recent Oracle consultation with a single click from the Command Hub, enjoy silky GPU-accelerated phosphor scanlines with balanced contrast, and experience streamlined system-wide notification alerts.',
+    content: `### Oracle Quick Resume from Command Hub
+- Jump right back into your most recent AI Oracle discussion directly from the Command Hub dashboard without opening your thread archives.
+- View real-time status and active conversation topics on your personal consultation card.
+- Saved consultation links automatically preserve your session context across devices.
+
+### Phosphor Display Upgrades & GPU Acceleration
+- Refined the retro-futuristic CRT monitor effect with high-performance scanlines and authentic phosphor depth.
+- Eliminated background blur lag and GPU thrashing for silky 60 FPS scrolling and responsive animations.
+- Relocated display adjustments and environmental settings into your account preferences deck for a cleaner main navigation.
+
+### Unified Notifications & Discussion Attribution
+- Replaced fragmented alerts with a unified system notification engine providing clear, gentle confirmations for all actions.
+- Ensured community forum replies instantly attribute to the correct member profile and handle.
+- Centered installation banners and refined responsive layouts across desktop and mobile screens.`,
+    releasedAt: '2026-08-31T23:59:00Z',
+  },
+  {
     slug: '2026-08-30-ascension-market-zoomable-codex-hub-alerts',
     version: '2026.08.30',
     title: 'Ascension Market Shop, Zoomable Codex E-Reader & Installable Hub Alerts',

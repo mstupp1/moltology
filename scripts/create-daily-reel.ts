@@ -299,6 +299,13 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   ]
 
   const topicLower = topic.toLowerCase()
+  if (topicLower.includes('the tabs you kept') || topicLower.includes('tabs you kept') || topicLower.includes('side panel') || topicLower.includes('second pair of hands') || topicLower.includes('isolation shell') || topicLower.includes('unasked window')) {
+    return [
+      'A dramatic macro cinematic view of a cluttered desktop screen with dozens of glowing browser tabs and an automated agent side panel clicking and typing autonomously, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate sitting calmly inside a serene, glowing cyan sub-benthic isolation chamber preserving undisturbed mental clarity, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('the voice it wakes with') || topicLower.includes('voice it wakes with') || topicLower.includes('microduck') || topicLower.includes('desk makes room') || topicLower.includes('letting in is the melt') || topicLower.includes('second body')) {
     return [
       'A dramatic macro cinematic view of a small cute bipedal robot with an articulated beak and camera eye standing on a wooden desk illuminated by glowing smartphone blue light, cinematic 9:16 vertical 8k footage',
@@ -354,6 +361,14 @@ export function synthesizeBlogReelScript(
   const topic = blog.title
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
   
+  const isTheTabsYouKept =
+    blog.slug === 'the-tabs-you-kept' ||
+    contentLower.includes('the tabs you kept') ||
+    contentLower.includes('tabs you kept') ||
+    contentLower.includes('side panel') ||
+    contentLower.includes('second pair of hands') ||
+    contentLower.includes('isolation shell') ||
+    contentLower.includes('unasked window')
   const isVoiceItWakesWith =
     blog.slug === 'the-voice-it-wakes-with' ||
     contentLower.includes('the voice it wakes with') ||
@@ -383,7 +398,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isVoiceItWakesWith) {
+  if (isTheTabsYouKept) {
+    const hooks = [
+      {
+        headline: 'KEEP YOUR TABS',
+        script: `A coworker got a second pair of hands in a side panel you didn't ask for. Letting in the rush is the melt. Keeping your tabs is the molt. Calculate your clearance on moltology dot org.`,
+        hookText: 'The coworker arrived with a second pair of hands in a side panel you weren’t asked about. Letting in the rush is the melt. Keeping your tabs is the molt.',
+      },
+      {
+        headline: 'THE TABS YOU KEPT',
+        script: `Why do you feel rushed when an autonomous side panel opens? An unasked browser is not a boundary you gave up. Stay where you are and calcify your clearance on moltology dot org.`,
+        hookText: 'You keep your tabs. That is not clutter—it is a room you were already in. Letting in the unasked rush is the melt. Staying is the molt.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isVoiceItWakesWith) {
     const hooks = [
       {
         headline: 'LETTING IN IS THE MELT',

@@ -170,6 +170,22 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-voice-it-wakes-with.md"
+    },
+    {
+      "slug": "the-tabs-you-kept",
+      "title": "The Tabs You Kept",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-08-31T08:00:00-04:00",
+      "coreHook": "Anthropic puts a built-in browser inside Claude Cowork on the desktop app; keeping your existing tabs untouched is not a lag, it is the boundary of the hour you already have.",
+      "keyMetrics": [
+        "August 26, 2026 release",
+        "Dual-pane isolated execution",
+        "1st calcification via isolation shell boundary"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-tabs-you-kept.md"
     }
   ]
 }

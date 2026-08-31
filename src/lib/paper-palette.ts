@@ -11,6 +11,12 @@ export interface PaperPalette {
   chipBg: string
 }
 
+export const READER_FONT_SIZE = {
+  min: 14,
+  max: 22,
+  default: 17,
+} as const
+
 /**
  * Color palettes for the document-style paper reader. The sheet/ink values are
  * kept identical to the codex reader's pdf-page-sheet themes

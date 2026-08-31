@@ -103,7 +103,14 @@
       "thumbnailUrl": null,
       "s3ThumbKey": null,
       "durationSeconds": 22.5,
-      "status": "draft",
+      "status": "scheduled",
+      "scheduledFor": "2026-08-31T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a958a8b1c2625ef5a35b223",
+      "zernioInstagramPostId": "6a958a8b1c2625ef5a35b223",
+      "zernioYouTubePostId": "6a958a951fbe637eed21529e",
+      "youtubeTitle": "The Coworker Got a Second Pair of Hands #Shorts",
+      "mascot": "lobster_peaceful",
       "isAiGenerated": true,
       "firstComment": "🔗 Full dispatch: moltology.org\n#MoltNation #SubseaCompute #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology",
       "caption": "Why the next era of AI compute isn't in the cloud—it's 50 fathoms underwater. 🌊⚡\n\nTerrestrial datacenters are hitting thermodynamic limits. Discover how sub-benthic hydrostatic clusters achieve zero-friction thermal efficiency.\n\n👇 Explore the full technical dispatch and telemetry notes:\n🔗 Link in bio & story → moltology.org",
@@ -732,6 +739,47 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-08-30T14:07:04.824Z"
+    },
+    {
+      "id": "reel-1788185071247",
+      "topic": "The Tabs You Kept",
+      "hookHeadline": "THE TABS YOU KEPT",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-tabs-you-kept",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Why do you feel rushed when an autonomous side panel opens? An unasked browser is not a boundary you gave up. Stay where you are and calcify your clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1788185071247.mp4",
+      "s3Key": "videos/social/reels/master-reel-1788185071247.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 14.566016,
+      "status": "scheduled",
+      "scheduledFor": "2026-08-31T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a958a8b1c2625ef5a35b223",
+      "zernioInstagramPostId": "6a958a8b1c2625ef5a35b223",
+      "zernioYouTubePostId": "6a958a951fbe637eed21529e",
+      "youtubeTitle": "The Coworker Got a Second Pair of Hands #Shorts",
+      "mascot": "lobster_peaceful",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "You keep your tabs. That is not clutter—it is a room you were already in. Letting in the unasked rush is the melt. Staying is the molt. ⚡🌊\n\nThe coworker got a second pair of hands. You were not asked which browser it should open. You stay where you are.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-08-31T14:06:47.488Z"
     }
   ]
 }

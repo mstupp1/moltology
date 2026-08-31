@@ -1,10 +1,14 @@
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, beforeEach } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { JournalPaperReader } from './JournalPaperReader'
 import { INITIAL_JOURNAL_PAPERS } from '@/lib/journal-data'
 
 describe('JournalPaperReader', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
   it('renders the paper as a document sheet', () => {
     const paper = INITIAL_JOURNAL_PAPERS[0]
     render(<JournalPaperReader paper={paper} />)
