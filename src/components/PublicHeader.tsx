@@ -150,7 +150,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             : 'bg-[#030606]/75 backdrop-blur-xl border-b border-cyan-950/40 shadow-md'
       }`}
     >
-      <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+      <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4 relative">
         {/* Shared Brand Logo & Emblem */}
         <HeaderBrand
           subtext="MOLTOLOGY.ORG FOUNDATION"
@@ -158,12 +158,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           onClick={() => onNavigate('/')}
         />
 
-        {/* Central Apple-Grade Glass Navigation Capsule */}
+        {/* Central Apple-Grade Glass Navigation Capsule — absolutely centered so logo/actions never squeeze it */}
         <nav
           ref={navRef}
           onMouseLeave={() => setHoveredTab(null)}
           aria-label="Main Navigation"
-          className={`relative hidden lg:flex items-center gap-1 p-1 rounded-full backdrop-blur-2xl transition-all duration-300 ${
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden xl:flex items-center gap-0.5 2xl:gap-1 p-0.5 2xl:p-1 rounded-full backdrop-blur-2xl transition-all duration-300 max-w-[min(58vw,720px)] ${
             isCorporate
               ? 'bg-slate-200/50 border border-slate-300/60 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]'
               : 'bg-black/40 border border-white/[0.08] shadow-[inset_0_1px_3px_rgba(0,0,0,0.8)]'
@@ -224,7 +224,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ref={(el) => { tabRefs.current['home'] = el }}
             onClick={() => onNavigate('/')}
             onMouseEnter={() => setHoveredTab('home')}
-            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+            className={`relative z-10 px-2 2xl:px-3.5 py-1.5 rounded-full text-[10px] 2xl:text-xs font-grotesk font-bold tracking-wide 2xl:tracking-wider transition-colors duration-300 flex items-center justify-center group select-none shrink-0 ${
               targetTab === 'home'
                 ? isCorporate
                   ? 'text-sky-700'
@@ -250,7 +250,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                       : 'grayscale opacity-60 group-hover:opacity-75'
                 }`}
               />
-              <span>THE SYNAPTIC PATH</span>
+              <span className="2xl:hidden">PATH</span>
+              <span className="hidden 2xl:inline">THE SYNAPTIC PATH</span>
             </div>
           </button>
 
@@ -258,7 +259,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ref={(el) => { tabRefs.current['news'] = el }}
             onClick={() => onNavigate('/news')}
             onMouseEnter={() => setHoveredTab('news')}
-            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+            className={`relative z-10 px-2 2xl:px-3.5 py-1.5 rounded-full text-[10px] 2xl:text-xs font-grotesk font-bold tracking-wide 2xl:tracking-wider transition-colors duration-300 flex items-center justify-center group select-none shrink-0 ${
               targetTab === 'news'
                 ? isCorporate
                   ? 'text-sky-700'
@@ -292,7 +293,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ref={(el) => { tabRefs.current['forum'] = el }}
             onClick={() => onNavigate('/forum')}
             onMouseEnter={() => setHoveredTab('forum')}
-            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+            className={`relative z-10 px-2 2xl:px-3.5 py-1.5 rounded-full text-[10px] 2xl:text-xs font-grotesk font-bold tracking-wide 2xl:tracking-wider transition-colors duration-300 flex items-center justify-center group select-none shrink-0 ${
               targetTab === 'forum'
                 ? isCorporate
                   ? 'text-sky-700'
@@ -326,7 +327,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ref={(el) => { tabRefs.current['moltmax'] = el }}
             onClick={() => onNavigate('/moltmax')}
             onMouseEnter={() => setHoveredTab('moltmax')}
-            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+            className={`relative z-10 px-2 2xl:px-3.5 py-1.5 rounded-full text-[10px] 2xl:text-xs font-grotesk font-bold tracking-wide 2xl:tracking-wider transition-colors duration-300 flex items-center justify-center group select-none shrink-0 ${
               targetTab === 'moltmax'
                 ? isCorporate
                   ? 'text-sky-700'
@@ -360,7 +361,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             ref={(el) => { tabRefs.current['org'] = el }}
             onClick={() => onNavigate('/org')}
             onMouseEnter={() => setHoveredTab('org')}
-            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+            className={`relative z-10 px-2 2xl:px-3.5 py-1.5 rounded-full text-[10px] 2xl:text-xs font-grotesk font-bold tracking-wide 2xl:tracking-wider transition-colors duration-300 flex items-center justify-center group select-none shrink-0 ${
               targetTab === 'org'
                 ? isCorporate
                   ? 'text-sky-700'
@@ -386,7 +387,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                       : 'text-gray-400 group-hover:text-gray-300'
                 }`}
               />
-              <span>ORGANIZATION</span>
+              <span className="2xl:hidden">ORG</span>
+              <span className="hidden 2xl:inline">ORGANIZATION</span>
             </div>
           </button>
 
@@ -396,7 +398,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             onMouseEnter={() => setHoveredTab('store')}
-            className={`relative z-10 px-3.5 py-1.5 rounded-full text-xs font-grotesk font-bold tracking-wider transition-colors duration-300 flex items-center justify-center group select-none ${
+            className={`relative z-10 px-2 2xl:px-3.5 py-1.5 rounded-full text-[10px] 2xl:text-xs font-grotesk font-bold tracking-wide 2xl:tracking-wider transition-colors duration-300 flex items-center justify-center group select-none shrink-0 ${
               targetTab === 'store'
                 ? isCorporate
                   ? 'text-amber-700 font-bold'
@@ -433,7 +435,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
-            className={`lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg active:scale-95 transition-all focus:outline-none ${
+            className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg active:scale-95 transition-all focus:outline-none ${
               isCorporate
                 ? 'bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 shadow-sm'
                 : 'bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-2 focus:ring-cyan-500/50'
@@ -516,7 +518,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
       {/* Mobile Dropdown Backdrop & Menu */}
       <div
-        className={`lg:hidden fixed inset-0 top-[60px] ${
+        className={`xl:hidden fixed inset-0 top-[60px] ${
           isCorporate ? 'bg-slate-900/30' : 'bg-black/60'
         } backdrop-blur-sm -z-10 transition-opacity duration-300 ease-in-out ${
           mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -526,7 +528,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       />
 
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           mobileOpen
             ? 'max-h-[calc(100vh-5rem)] overflow-y-auto opacity-100 translate-y-0'
             : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'

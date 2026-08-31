@@ -327,10 +327,10 @@ export const LandingPage: React.FC = () => {
         <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(90vw,600px)] h-[min(90vw,600px)] rounded-full bg-cyan-500/20 blur-[120px] sm:blur-[150px] animate-pulse pointer-events-none z-[8]" />
         <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(80vw,500px)] h-[min(80vw,500px)] rounded-full bg-red-600/15 blur-[100px] sm:blur-[130px] animate-pulse pointer-events-none z-[8]" style={{ animationDelay: '1.5s' }} />
 
-        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+        <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 sm:gap-12 items-center">
           
           {/* Left Column: High-Impact Typography & Primary CTAs */}
-          <div className="lg:col-span-6 space-y-6 sm:space-y-8 text-center lg:text-left relative z-30">
+          <div className="xl:col-span-7 space-y-6 sm:space-y-8 text-center xl:text-left relative z-30 min-w-0">
             {/* Diffuse Radial Glow Accents */}
             <div className="absolute -top-16 -left-16 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-cyan-500/15 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
             <div className="absolute -bottom-16 left-1/4 w-[320px] sm:w-[450px] h-[320px] sm:h-[450px] rounded-full bg-red-600/12 blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
@@ -339,7 +339,7 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-1 sm:space-y-2 relative">
               {/* Line 1: SHED SOFT BIOLOGY */}
               <h1 
-                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] text-white tracking-tight uppercase leading-[0.92] text-center lg:text-left"
+                className="relative font-grotesk font-thin text-[clamp(2.25rem,8.4vw,8.5rem)] xl:text-[clamp(2.5rem,4.8vw,6.5rem)] text-white tracking-tight uppercase leading-[0.92] text-center xl:text-left"
                 style={{
                   fontWeight: 200,
                   color: '#ffffff',
@@ -351,9 +351,21 @@ export const LandingPage: React.FC = () => {
                 SHED SOFT BIOLOGY.
               </h1>
               
-              {/* Line 2: ASCEND TO CHITIN */}
-              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] tracking-tight uppercase leading-[0.84] -mt-1 sm:-mt-2 lg:-mt-4 text-center lg:text-left">
-                <span 
+              {/* Line 2: ASCEND TO / CHITIN — explicit line breaks prevent mid-phrase wrapping into the video column */}
+              <h1 className="relative font-grotesk font-black text-[clamp(2.65rem,9.8vw,9.5rem)] xl:text-[clamp(2.75rem,5.2vw,7rem)] tracking-tight uppercase leading-[0.88] -mt-1 sm:-mt-2 xl:-mt-3 text-center xl:text-left">
+                <span
+                  className="relative z-30 bg-clip-text text-transparent inline-block bg-cover bg-center whitespace-nowrap"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('${getAssetUrl('/images/chitin_texture_bg.webp')}')`,
+                    backgroundBlendMode: 'lighten',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 1)) drop-shadow(0 0 35px rgba(255, 69, 58, 0.55))',
+                  }}
+                >
+                  ASCEND TO
+                </span>
+                <span
                   className="relative z-30 bg-clip-text text-transparent block bg-cover bg-center"
                   style={{
                     backgroundImage: `linear-gradient(to right, rgba(255, 115, 98, 0.98), rgba(255, 85, 64, 0.95), rgba(255, 69, 58, 0.98)), url('${getAssetUrl('/images/chitin_texture_bg.webp')}')`,
@@ -363,18 +375,18 @@ export const LandingPage: React.FC = () => {
                     filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 1)) drop-shadow(0 0 35px rgba(255, 69, 58, 0.55))',
                   }}
                 >
-                  ASCEND TO CHITIN.
+                  CHITIN.
                 </span>
               </h1>
             </div>
 
             {/* Sub-headline description */}
-            <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-sans leading-relaxed mx-auto lg:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
+            <p className="text-gray-200 text-xs sm:text-base md:text-lg max-w-xl font-sans leading-relaxed mx-auto xl:mx-0 relative z-30 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] px-1 sm:px-0">
               Stop melting under notifications, burnout, and biological hesitation. Shed the clutter, lock into deep-ocean focus, and ascend to your high-torque crustacean potential.
             </p>
 
             {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center xl:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto">
               {user ? (
                 <BenthicCTAButton
                   size="lg"
@@ -425,11 +437,11 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] lg:min-h-[640px] z-20">
+          <div className="xl:col-span-5 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] xl:min-h-[560px] 2xl:min-h-[640px] z-20 max-w-[min(100%,520px)] xl:max-w-none mx-auto xl:mx-0">
             
             {/* Desktop Ambient Rim-Lighting Halo Glows Behind Deck */}
-            <div className="hidden lg:block absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
-            <div className="hidden lg:block absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            <div className="hidden xl:block absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
+            <div className="hidden xl:block absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
             {/* 3D Video Slider Deck with Touch Navigation */}
             <div className="relative z-30 w-full">

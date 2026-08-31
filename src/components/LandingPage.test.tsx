@@ -29,7 +29,8 @@ describe('LandingPage Component', () => {
     render(<LandingPage />)
 
     expect(screen.getByText('SHED SOFT BIOLOGY.')).toBeInTheDocument()
-    expect(screen.getByText('ASCEND TO CHITIN.')).toBeInTheDocument()
+    expect(screen.getByText('ASCEND TO')).toBeInTheDocument()
+    expect(screen.getByText('CHITIN.')).toBeInTheDocument()
 
     // Guest CTA buttons present
     expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
