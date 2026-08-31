@@ -15,6 +15,7 @@ scratch
 content/drafts
 tmp
 *.mp4
+!public/videos/*.mp4
 *.webm
 *.mov
 

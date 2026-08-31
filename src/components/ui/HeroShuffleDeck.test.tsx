@@ -60,7 +60,7 @@ describe('HeroShuffleDeck Component', () => {
     expect(container.querySelectorAll('img')).toHaveLength(1)
   })
 
-  it('mounts a single in-view clip with poster and preload=none', () => {
+  it('mounts the active clip and pre-buffers the next one', () => {
     const { container } = render(<HeroShuffleDeck />)
 
     act(() => {
@@ -68,11 +68,21 @@ describe('HeroShuffleDeck Component', () => {
     })
 
     const videos = container.querySelectorAll('video')
-    expect(videos).toHaveLength(1)
-    expect(videos[0].getAttribute('preload')).toBe('none')
-    expect((videos[0] as HTMLVideoElement).muted).toBe(true)
-    expect(videos[0].getAttribute('poster')).toBeTruthy()
-    expect(videos[0].getAttribute('src')).toBe('/videos/hero_benthic_core.mp4')
+    expect(videos).toHaveLength(2)
+    const activeVideo = videos[0]
+    expect(activeVideo.getAttribute('preload')).toBe('none')
+    expect(activeVideo.getAttribute('autoplay')).toBe('')
+    expect((activeVideo as HTMLVideoElement).muted).toBe(true)
+    expect(activeVideo.getAttribute('poster')).toBeTruthy()
+    const sources = activeVideo.querySelectorAll('source')
+    expect(sources).toHaveLength(2)
+    expect(sources[0].getAttribute('media')).toBe('(max-width: 767px)')
+    expect(sources[0].getAttribute('src')).toBe('/videos/hero_benthic_core_sm.mp4')
+    expect(sources[1].getAttribute('src')).toBe('/videos/hero_benthic_core.mp4')
+
+    const preloadedVideo = videos[1]
+    expect(preloadedVideo.getAttribute('preload')).toBe('auto')
+    expect(preloadedVideo.getAttribute('autoplay')).toBeNull()
   })
 
   it('does not mount every transmission when advancing the deck', () => {
@@ -83,11 +93,11 @@ describe('HeroShuffleDeck Component', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
-    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(2)
+    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(3)
 
     fireEvent.click(screen.getByRole('button', { name: /jump to total carcinization/i }))
-    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(2)
-    expect(container.querySelector('video[src="/videos/hero_total_carcinization.mp4"]')).toBeTruthy()
+    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(3)
+    expect(container.querySelector('source[src="/videos/hero_total_carcinization.mp4"]')).toBeTruthy()
     expect(container.querySelectorAll('video').length).toBeLessThan(6)
   })
 
@@ -100,14 +110,16 @@ describe('HeroShuffleDeck Component', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
-    expect(container.querySelectorAll('video').length).toBe(2)
+    expect(container.querySelectorAll('video').length).toBe(3)
 
     act(() => {
       vi.advanceTimersByTime(HERO_DECK_CROSSFADE_MS + 20)
     })
 
-    expect(container.querySelectorAll('video')).toHaveLength(1)
-    expect(container.querySelector('video')?.getAttribute('src')).toBe('/videos/hero_asset_shedding.mp4')
+    const videos = container.querySelectorAll('video')
+    expect(videos.length).toBe(2)
+    const activeSources = videos[0].querySelectorAll('source')
+    expect(activeSources[activeSources.length - 1].getAttribute('src')).toBe('/videos/hero_asset_shedding.mp4')
   })
 
   it('renders minimal video container with hover-only controls', () => {

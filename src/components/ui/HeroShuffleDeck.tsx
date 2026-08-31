@@ -7,7 +7,8 @@ export interface HeroCard {
   id: string
   title: string
   image: string
-  video?: string
+  video: string
+  videoSm?: string
   accentColor: 'cyan' | 'amber' | 'emerald' | 'purple' | 'red'
 }
 
@@ -19,6 +20,7 @@ const CARDS: HeroCard[] = [
     title: 'CYBER-BENTHIC ASCENSION',
     image: getAssetUrl('/images/hero_card_benthic_core.webp'),
     video: '/videos/hero_benthic_core.mp4',
+    videoSm: '/videos/hero_benthic_core_sm.mp4',
     accentColor: 'cyan',
   },
   {
@@ -26,6 +28,7 @@ const CARDS: HeroCard[] = [
     title: 'ASSET TRANSMUTATION',
     image: getAssetUrl('/images/hero_card_asset_shedding.webp'),
     video: '/videos/hero_asset_shedding.mp4',
+    videoSm: '/videos/hero_asset_shedding_sm.mp4',
     accentColor: 'amber',
   },
   {
@@ -33,6 +36,7 @@ const CARDS: HeroCard[] = [
     title: 'EXOSKELETAL HARDENING',
     image: getAssetUrl('/images/hero_card_chitin_hardening.webp'),
     video: '/videos/hero_chitin_hardening.mp4',
+    videoSm: '/videos/hero_chitin_hardening_sm.mp4',
     accentColor: 'emerald',
   },
   {
@@ -40,6 +44,7 @@ const CARDS: HeroCard[] = [
     title: 'TOTAL CARCINIZATION',
     image: getAssetUrl('/images/hero_card_total_carcinization.webp'),
     video: '/videos/hero_total_carcinization.mp4',
+    videoSm: '/videos/hero_total_carcinization_sm.mp4',
     accentColor: 'purple',
   },
   {
@@ -47,6 +52,7 @@ const CARDS: HeroCard[] = [
     title: 'VIRTUAL FARADAY SHELL',
     image: getAssetUrl('/images/hero_card_fault_isolation.webp'),
     video: '/videos/hero_fault_isolation.mp4',
+    videoSm: '/videos/hero_fault_isolation_sm.mp4',
     accentColor: 'red',
   },
   {
@@ -54,6 +60,7 @@ const CARDS: HeroCard[] = [
     title: 'JOIN THE SYNAPTIC PATH',
     image: getAssetUrl('/images/hero_card_synaptic_path.webp'),
     video: '/videos/hero_synaptic_path.mp4',
+    videoSm: '/videos/hero_synaptic_path_sm.mp4',
     accentColor: 'cyan',
   },
 ]
@@ -141,8 +148,13 @@ export const HeroShuffleDeck: React.FC = () => {
       return
     }
     const onLoad = () => setPlaybackReady(true)
+    // Fallback so slow-loading pages never leave the hero frozen on its poster
+    const fallback = window.setTimeout(() => setPlaybackReady(true), 3000)
     window.addEventListener('load', onLoad)
-    return () => window.removeEventListener('load', onLoad)
+    return () => {
+      window.removeEventListener('load', onLoad)
+      window.clearTimeout(fallback)
+    }
   }, [])
 
   useEffect(() => {
@@ -220,9 +232,16 @@ export const HeroShuffleDeck: React.FC = () => {
 
   const activeCard = CARDS[activeIndex]
   const activeTheme = COLOR_MAPS[activeCard.accentColor]
+  const nextIndex = (activeIndex + 1) % totalCards
   const visibleIndexes = [activeIndex]
   if (outgoingIndex !== null && outgoingIndex !== activeIndex) {
     visibleIndexes.push(outgoingIndex)
+  }
+  // Pre-buffer the next transmission so card advances start playing instantly
+  // instead of lingering on a still poster while the clip downloads.
+  const renderIndexes = [...visibleIndexes]
+  if (canMountVideo && !visibleIndexes.includes(nextIndex)) {
+    renderIndexes.push(nextIndex)
   }
 
   return (
@@ -255,15 +274,21 @@ export const HeroShuffleDeck: React.FC = () => {
         className={`relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-[#070b0e] border ${activeTheme.border} ${activeTheme.glow} shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-700`}
       >
         {/* Crossfading Media Stack — posters always, clips only when in view */}
-        {visibleIndexes.map((idx) => {
+        {renderIndexes.map((idx) => {
           const card = CARDS[idx]
           const isActive = idx === activeIndex
+          const isOutgoing = !isActive && idx === outgoingIndex
+          const isPreloading = !isActive && !isOutgoing && idx === nextIndex
           const shouldMountVideo = Boolean(canMountVideo && card.video)
           return (
             <div
               key={card.id}
               className={`absolute inset-0 transition-opacity duration-[700ms] ease-in-out ${
-                isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-20 pointer-events-none'
+                isActive
+                  ? 'opacity-100 visible z-10 pointer-events-auto'
+                  : isOutgoing
+                  ? 'opacity-0 visible z-20 pointer-events-none'
+                  : 'invisible z-0 pointer-events-none'
               }`}
             >
               <img
@@ -279,14 +304,18 @@ export const HeroShuffleDeck: React.FC = () => {
                   ref={(el) => {
                     videoRefs.current[card.id] = el
                   }}
-                  src={card.video}
                   poster={card.image}
                   muted
                   playsInline
-                  autoPlay
-                  preload="none"
+                  autoPlay={!isPreloading}
+                  preload={isPreloading ? 'auto' : 'none'}
                   className="absolute inset-0 w-full h-full object-cover"
-                />
+                >
+                  {card.videoSm && (
+                    <source src={card.videoSm} type="video/mp4" media="(max-width: 767px)" />
+                  )}
+                  <source src={card.video} type="video/mp4" />
+                </video>
               )}
             </div>
           )
