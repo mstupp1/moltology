@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { seo, privatePageSeo, notFoundSeo, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
+import { seo, privatePageSeo, notFoundSeo, MEMBER_PROFILE_SEO, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
 
 describe('SEO Meta Tag Generator', () => {
   it('generates standard metadata including default robots and ogType', () => {
@@ -50,6 +50,19 @@ describe('SEO Meta Tag Generator', () => {
       ]),
     )
     expect(meta.some((entry) => entry.property === 'og:url')).toBe(false)
+  })
+
+  it('emits a real member dossier title that is never blank or not-found', () => {
+    const meta = privatePageSeo(MEMBER_PROFILE_SEO)
+    expect(MEMBER_PROFILE_SEO.title).toBe('Member Dossier | Moltology')
+    expect(meta).toEqual(
+      expect.arrayContaining([
+        { name: 'robots', content: 'noindex, nofollow' },
+        { title: 'Member Dossier | Moltology' },
+      ]),
+    )
+    expect(MEMBER_PROFILE_SEO.title).not.toBe('')
+    expect(MEMBER_PROFILE_SEO.title).not.toMatch(/Page Not Found/i)
   })
 
   it('emits a unique noindex title for not found pages', () => {

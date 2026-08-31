@@ -5,6 +5,7 @@ import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { LoadoutStatsPanel } from '@/components/hud/chassis/LoadoutStatsPanel'
 import { ReadOnlyPaperDoll } from './ReadOnlyPaperDoll'
 import { FriendRequestButton } from './FriendRequestButton'
+import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
@@ -64,7 +65,10 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({ profileId 
 
   if (!loaded) {
     return (
-      <div className="space-y-3.5 sm:space-y-5 font-sans relative min-h-[40vh]" aria-busy="true" />
+      <div aria-busy="true" aria-live="polite">
+        <span className="sr-only">Retrieving member dossier.</span>
+        <HudWorkspaceGhost />
+      </div>
     )
   }
 

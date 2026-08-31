@@ -181,4 +181,15 @@ describe('UserAvatarMenu Component', () => {
     fireEvent.click(settingsBtn)
     expect(onNavigate).toHaveBeenCalledWith('/settings')
   })
+
+  it('navigates to the own-profile alias from YOUR PROFILE', () => {
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^your profile$/i }))
+
+    expect(onNavigate).toHaveBeenCalledWith('/profile')
+    expect(onNavigate).not.toHaveBeenCalledWith('/member/user-123')
+  })
 })

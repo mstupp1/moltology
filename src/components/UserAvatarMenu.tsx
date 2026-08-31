@@ -71,7 +71,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const handleOpenProfile = () => {
     handleClose()
     if (user.id) {
-      onNavigate?.(`/member/${user.id}`)
+      onNavigate?.('/profile')
     }
   }
 
