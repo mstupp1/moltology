@@ -902,14 +902,6 @@ input[type="range"].stat-slider::-moz-range-thumb {
 }
 
 /* HUD Progress Bar & Header Animations - GPU Accelerated translateY */
-@keyframes hudScan {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(600%);
-  }
-}
 
 @keyframes shimmerSweep {
   0% {

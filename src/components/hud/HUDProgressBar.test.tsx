@@ -2,7 +2,6 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { HUDProgressBar } from './HUDProgressBar'
-import { getAssetUrl } from '@/lib/assets'
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
@@ -41,14 +40,6 @@ describe('HUDProgressBar Component', () => {
     expect(screen.getByLabelText('Level 4 Badge')).toBeInTheDocument()
     expect(screen.getByLabelText('Apex Level Badge')).toBeInTheDocument()
     expect(screen.getByText('APEX')).toBeInTheDocument()
-  })
-
-  it('renders crab claw indicator image with correct asset path', () => {
-    render(<HUDProgressBar />)
-
-    const clawImg = screen.getByRole('img', { name: 'Exoshell Claw' })
-    expect(clawImg).toBeInTheDocument()
-    expect(clawImg).toHaveAttribute('src', getAssetUrl('/images/crab_claw.png'))
   })
 
   it('conditionally hides task bar when showTaskBar is false', () => {

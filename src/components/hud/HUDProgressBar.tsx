@@ -1,6 +1,5 @@
 import React from 'react'
 import { HUDTaskBar } from './HUDTaskBar'
-import { getAssetUrl } from '@/lib/assets'
 
 export interface HUDProgressBarProps {
   stage?: number
@@ -10,7 +9,7 @@ export interface HUDProgressBarProps {
   showClock?: boolean
 }
 
-const PROGRESS = 0.68
+const PROGRESS = 0
 
 export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
   stage = 1,
@@ -19,8 +18,6 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
   showClock = true,
 }) => {
   const isTaskBarVisible = showTaskBar !== undefined ? showTaskBar : showClock
-  // Segment tick count for the bar
-  const TICK_COUNT = 16
   const nextStage = Math.min(stage + 1, 4)
   const isMaxStage = stage >= 4
 
@@ -102,51 +99,19 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
             </div>
 
-            {/* ── TICK MARKS ── */}
-            <div className="absolute inset-0 flex items-center pointer-events-none">
-              {Array.from({ length: TICK_COUNT - 1 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute top-0 bottom-0"
-                  style={{
-                    left: `${((i + 1) / TICK_COUNT) * 100}%`,
-                    width: '1px',
-                    background: i % 4 === 3 ? 'rgba(0,195,255,0.35)' : 'rgba(0,195,255,0.08)',
-                  }}
-                />
-              ))}
-            </div>
-
             {/* ── GLOWING PROGRESS EDGE ── */}
-            <div
-              className="absolute top-0 h-full pointer-events-none"
-              style={{
-                left: `calc(${PROGRESS * 100}% - 1.5px)`,
-                width: '3px',
-                background: 'white',
-                boxShadow: '0 0 8px 2px rgba(255,255,255,0.9), 0 0 14px 4px rgba(255,100,50,0.8)',
-                borderRadius: '1px',
-              }}
-            />
-
-            {/* ── CRAB CLAW INDICATOR ── */}
-            <div
-              className="absolute top-1/2 pointer-events-none z-20 w-6 h-6 sm:w-8 sm:h-8"
-              style={{
-                left: `calc(${PROGRESS * 100}% - 2px)`,
-                transform: 'translateY(-50%) translateX(0)',
-              }}
-            >
-              <img
-                src={getAssetUrl('/images/crab_claw.png')}
-                alt="Exoshell Claw"
-                className="w-full h-full object-contain"
+            {PROGRESS > 0 && (
+              <div
+                className="absolute top-0 h-full pointer-events-none"
                 style={{
-                  filter: 'drop-shadow(0 0 6px rgba(255,80,30,0.95)) drop-shadow(0 0 12px rgba(255,80,30,0.6)) brightness(0.95) saturate(1.4)',
+                  left: `calc(${PROGRESS * 100}% - 1.5px)`,
+                  width: '3px',
+                  background: 'white',
+                  boxShadow: '0 0 8px 2px rgba(255,255,255,0.9), 0 0 14px 4px rgba(255,100,50,0.8)',
+                  borderRadius: '1px',
                 }}
-                draggable={false}
               />
-            </div>
+            )}
 
           </div>{/* end track */}
 

@@ -687,16 +687,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.5) 2px, rgba(0,255,255,0.5) 3px)',
               }}
             />
-            {isMobileHeaderOpen && (
-              <div
-                className="absolute top-0 left-0 right-0 h-6 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(to bottom, transparent 0%, rgba(0,195,255,0.06) 50%, transparent 100%)',
-                  animation: 'hudScan 4s linear infinite',
-                  willChange: 'transform',
-                }}
-              />
-            )}
           </div>
 
           {/* Left Brand Area (Visible when menu is closed, slides smoothly back into view when closing) */}
