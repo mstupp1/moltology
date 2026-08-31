@@ -23,10 +23,12 @@ vi.mock('@/lib/auth-client', () => ({
 // Mock server API functions
 const mockSaveLobsterAvatar = vi.fn().mockResolvedValue({ success: true })
 const mockUpdateUserStats = vi.fn().mockResolvedValue({ success: true })
+const mockClaimHandle = vi.fn().mockResolvedValue({ handle: 'claw_lord', displayName: 'claw_lord' })
 
 vi.mock('@/lib/server/api', () => ({
   saveLobsterAvatarFn: (...args: any[]) => mockSaveLobsterAvatar(...args),
   updateUserStatsFn: (...args: any[]) => mockUpdateUserStats(...args),
+  claimMemberHandleFn: (...args: any[]) => mockClaimHandle(...args),
 }))
 
 vi.mock('@/lib/jwt', () => ({
@@ -114,10 +116,14 @@ describe('WelcomeSplash Flow Component', () => {
     const onDismiss = vi.fn()
     render(<ToastProvider><WelcomeSplash userName="Initiate 42" onDismiss={onDismiss} initialStep={2} /></ToastProvider>)
 
+    fireEvent.change(screen.getByPlaceholderText('your_designation'), { target: { value: 'claw_lord' } })
     const confirmBtn = screen.getByRole('button', { name: /Confirm & Enter Synaptic Core/i })
     fireEvent.click(confirmBtn)
 
     await waitFor(() => {
+      expect(mockClaimHandle).toHaveBeenCalledWith({
+        data: expect.objectContaining({ handle: 'claw_lord', userId: 'test-user-123' }),
+      })
       expect(mockSaveLobsterAvatar).toHaveBeenCalled()
       expect(mockUpdateUserStats).toHaveBeenCalled()
       expect(localStorage.getItem('moltology:welcomed:test-user-123')).toBe('1')

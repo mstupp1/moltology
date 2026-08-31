@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react'
+import { X, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
 import { useAuthSession } from '../hooks/useAuthSession'
 import { getAuthJWTToken } from '../lib/jwt'
-import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
+import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
+import { parseMemberHandle } from '../lib/member-handle'
+import { DesignationField } from './hud/DesignationField'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
@@ -25,7 +27,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const user = session.user
 
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
-  const [name, setName] = useState('')
+  const [designation, setDesignation] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailOptIn, setEmailOptIn] = useState(false)
@@ -71,17 +73,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (mode === 'signup') {
+        const parsed = parseMemberHandle(designation)
+        if (!parsed.ok) {
+          setError(parsed.message)
+          setLoading(false)
+          return
+        }
         const res = await authClient.signUp.email({
           email,
           password,
-          name: name || email.split('@')[0],
+          name: parsed.handle,
         })
         if (res?.error) {
           setError(res.error.message || 'Could not create account. Please check your details and try again.')
         } else {
+          const createdUser = (res as any)?.data?.user || (res as any)?.user
+          const token = await getAuthJWTToken()
+          await claimMemberHandleFn({
+            data: {
+              handle: parsed.handle,
+              userId: createdUser?.id,
+              token: token ?? undefined,
+            },
+          }).catch((err: unknown) => {
+            setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
+          })
           if (emailOptIn) {
-            const createdUser = (res as any)?.data?.user || (res as any)?.user
-            const token = await getAuthJWTToken()
             await updateEmailPreferencesFn({
               data: {
                 emailOptIn: true,
@@ -91,8 +108,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               },
             }).catch(() => {})
           }
-          const token = await getAuthJWTToken()
-          await getUserProfileFn({ data: { token: token ?? undefined, userId: (res as any)?.data?.user?.id || (res as any)?.user?.id } }).catch(() => {})
+          await getUserProfileFn({ data: { token: token ?? undefined, userId: createdUser?.id } }).catch(() => {})
           if (onSuccess) onSuccess()
           onClose()
         }
@@ -228,15 +244,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'signup' && (
-            <HudInput
-              label="Full Name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your Name"
-              startIcon={<User className="w-4 h-4 text-[#00c3ff]" />}
-            />
+            <DesignationField value={designation} onChange={setDesignation} />
           )}
 
           <HudInput

@@ -16,6 +16,8 @@ export const profiles = pgTable('profiles', {
   id: text('id').primaryKey(),
   role: text('role').default('user').notNull(), // 'user' | 'admin' | 'super_admin'
   larvaId: text('larvaId').default('LARVA UNIT #8971').notNull(),
+  /** Chosen public designation. Unique case-insensitive. Null until claimed. */
+  handle: text('handle'),
   stage: integer('stage').default(1).notNull(), // 1: Larva, 2: Soft-Shed, 3: Architect, 4: Ascendant
   moltCredits: decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull(),
   chitinGems: integer('chitinGems').default(250).notNull(),
@@ -33,6 +35,7 @@ export const profiles = pgTable('profiles', {
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
+  uniqueIndex('profiles_handle_lower_uidx').on(sql`lower(${table.handle})`),
   pgPolicy('profiles_isolation_policy', {
     for: 'all',
     using: sql`id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`

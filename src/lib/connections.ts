@@ -1,5 +1,6 @@
 import type { FriendRequestStatus, NotificationKind } from '../db/schema'
 import { STAGE_PIPELINE_DATA } from './codexData'
+import { resolveMemberPublicName } from './member-handle'
 
 export type RelationshipState =
   | 'none'
@@ -27,6 +28,8 @@ export type PublicMoltmaxSummary = {
 export type PublicProfileView = {
   id: string
   larvaId: string
+  handle: string | null
+  displayName: string
   stage: number
   stageLabel: string
   avatarConfig: { style: string; seed: string } | null
@@ -40,6 +43,8 @@ export type PublicProfileView = {
 export type ConnectionMemberSummary = {
   id: string
   larvaId: string
+  handle: string | null
+  displayName: string
   stage: number
   stageLabel: string
   avatarConfig: { style: string; seed: string } | null
@@ -56,6 +61,8 @@ export type ConnectionsListView = {
 export type MemberSearchResult = {
   id: string
   larvaId: string
+  handle: string | null
+  displayName: string
   stage: number
   stageLabel: string
   avatarConfig: { style: string; seed: string } | null
@@ -139,14 +146,22 @@ export function buildFriendNotificationCopy(
 export function toMemberSummary(row: {
   id: string
   larvaId: string
+  handle?: string | null
   stage: number
   avatarConfig: { style: string; seed: string } | null
   requestId?: string
   since?: string | Date | null
 }): ConnectionMemberSummary {
+  const handle = row.handle?.trim() || null
   return {
     id: row.id,
     larvaId: row.larvaId,
+    handle,
+    displayName: resolveMemberPublicName({
+      userId: row.id,
+      handle,
+      larvaId: row.larvaId,
+    }),
     stage: row.stage,
     stageLabel: getStageLabel(row.stage),
     avatarConfig: row.avatarConfig ?? null,

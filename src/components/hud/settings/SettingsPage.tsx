@@ -6,10 +6,13 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
+  claimMemberHandleFn,
   getUserProfileFn,
   saveLobsterAvatarFn,
   updateEmailPreferencesFn,
 } from '@/lib/server/api'
+import { parseMemberHandle } from '@/lib/member-handle'
+import { DesignationField } from '../DesignationField'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import {
   LOBSTER_AVATAR_STYLE,
@@ -29,6 +32,8 @@ export const SettingsPage: React.FC = () => {
 
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [draftSeed, setDraftSeed] = useState('')
+  const [designation, setDesignation] = useState('')
+  const [savedDesignation, setSavedDesignation] = useState('')
   const [loading, setLoading] = useState(true)
 
   const draftConfig = useMemo((): LobsterAvatarConfig => {
@@ -49,6 +54,9 @@ export const SettingsPage: React.FC = () => {
       if (profile && typeof profile.emailOptIn === 'boolean') {
         setEmailOptIn(profile.emailOptIn)
       }
+      const nextHandle = profile?.handle?.trim() || ''
+      setDesignation(nextHandle)
+      setSavedDesignation(nextHandle)
       const parsed = parseLobsterAvatarConfig(profile?.avatarConfig)
       setDraftSeed(parsed?.seed ?? randomLobsterSeed())
     } catch {
@@ -108,6 +116,31 @@ export const SettingsPage: React.FC = () => {
       toast.success('Avatar saved.')
     } catch {
       toast.error('Could not save avatar.')
+    }
+  }
+
+  const handleSaveDesignation = async () => {
+    if (!userId) return
+    const parsed = parseMemberHandle(designation)
+    if (!parsed.ok) {
+      toast.error(parsed.message)
+      return
+    }
+    try {
+      await persist.run('settings-designation', async () => {
+        const token = await getAuthJWTToken()
+        await claimMemberHandleFn({
+          data: { handle: parsed.handle, userId, token: token ?? undefined },
+        })
+      })
+      setSavedDesignation(parsed.handle)
+      setDesignation(parsed.handle)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('member-handle-changed'))
+      }
+      toast.success('Designation sealed. The community will know you by it.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not seal that designation.')
     }
   }
 
@@ -194,6 +227,24 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             <div className="space-y-3">
+              <div className="chitin-card-inset p-3 sm:p-4 space-y-3 rounded-sm">
+                <div>
+                  <h3 className="text-sm font-grotesk font-bold text-[#dfe3e3]">Designation</h3>
+                  <p className="text-xs text-[#839493] font-sans mt-0.5">
+                    Your public name on the hub and forum. Your larva unit stays on file.
+                  </p>
+                </div>
+                <DesignationField value={designation} onChange={setDesignation} />
+                <button
+                  type="button"
+                  onClick={handleSaveDesignation}
+                  disabled={!parseMemberHandle(designation).ok || designation === savedDesignation}
+                  className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Seal designation
+                </button>
+              </div>
+
               <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
                 <div className="flex items-center gap-3 min-w-0">
                   <Mail className="w-5 h-5 shrink-0 text-[#00c3ff]" />

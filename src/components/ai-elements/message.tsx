@@ -69,7 +69,7 @@ export const Message: React.FC<MessageProps> = ({
   }
 
   const effectiveSenderLabel =
-    senderLabel || (isUser ? user?.name?.toUpperCase() || 'INITIATE' : 'SYNAPTIC ORACLE')
+    senderLabel || (isUser ? 'INITIATE' : 'SYNAPTIC ORACLE')
 
   return (
     <div

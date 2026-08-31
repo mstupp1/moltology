@@ -15,7 +15,7 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { getAssetUrl } from '@/lib/assets'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { saveLobsterAvatarFn, updateUserStatsFn } from '@/lib/server/api'
+import { claimMemberHandleFn, saveLobsterAvatarFn, updateUserStatsFn } from '@/lib/server/api'
 import {
   clearCachedProfileAvatarUrl,
   type LobsterAvatarConfig,
@@ -226,7 +226,11 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
   }
 
   // Complete Character Creation (Step 2)
-  const handleCompleteCreation = async (avatarConfig: LobsterAvatarConfig, stats: BaseStats) => {
+  const handleCompleteCreation = async (
+    avatarConfig: LobsterAvatarConfig,
+    stats: BaseStats,
+    handle: string | null,
+  ) => {
     setIsSubmitting(true)
 
     try {
@@ -243,6 +247,11 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
       if (userId) {
         const token = await getAuthJWTToken()
         await Promise.allSettled([
+          handle
+            ? claimMemberHandleFn({
+                data: { handle, userId, token: token ?? undefined },
+              })
+            : Promise.resolve(),
           saveLobsterAvatarFn({
             data: {
               ...avatarConfig,
@@ -276,6 +285,9 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('profile-avatar-changed'))
         window.dispatchEvent(new CustomEvent('user-stats-changed'))
+        if (handle) {
+          window.dispatchEvent(new CustomEvent('member-handle-changed'))
+        }
       }
 
       toast.success('Welcome! Your profile has been updated.')

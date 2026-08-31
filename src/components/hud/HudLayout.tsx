@@ -12,6 +12,10 @@ import { HudPersistProvider } from '@/hooks/useHudPersist'
 import { NotificationsProvider } from '@/hooks/useNotifications'
 import { HudPersistIndicator } from '@/components/hud/HudPersistIndicator'
 import { WelcomeSplash } from '@/components/hud/WelcomeSplash'
+import { ClaimDesignationGate } from '@/components/hud/ClaimDesignationGate'
+import { getUserProfileFn } from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
+import { resolveMemberLarvaId } from '@/lib/larva-id'
 import { PwaInstallBanner } from '@/components/hud/PwaInstallBanner'
 import { PwaNotificationBridge } from '@/components/hud/PwaNotificationBridge'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -22,6 +26,8 @@ import { getAssetUrl } from '@/lib/assets'
 function HudContent() {
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false)
   const [showWelcome, setShowWelcome] = useState(false)
+  const [handleStatus, setHandleStatus] = useState<'unknown' | 'missing' | 'set' | 'deferred'>('unknown')
+  const [larvaUnit, setLarvaUnit] = useState('LARVA UNIT')
   const oracle = useSafeOracle()
   const location = useLocation()
   const isSubterranean = location.pathname.startsWith('/subterranean')
@@ -84,6 +90,57 @@ function HudContent() {
   }
 
   useEffect(() => {
+    if (!userId) {
+      setHandleStatus('unknown')
+      return
+    }
+    let cancelled = false
+    const deferredKey = `moltology:designation-deferred:${userId}`
+    const refresh = () => {
+      if (cancelled || !userId) return
+      void (async () => {
+        try {
+          const token = await getAuthJWTToken().catch(() => null)
+          const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
+          if (cancelled) return
+          setLarvaUnit(resolveMemberLarvaId(userId, profile?.larvaId))
+          if (profile?.handle?.trim()) {
+            setHandleStatus('set')
+            return
+          }
+          if (typeof window !== 'undefined' && localStorage.getItem(deferredKey)) {
+            setHandleStatus('deferred')
+            return
+          }
+          setHandleStatus('missing')
+        } catch {
+          if (!cancelled) setHandleStatus('unknown')
+        }
+      })()
+    }
+    refresh()
+    window.addEventListener('member-handle-changed', refresh)
+    return () => {
+      cancelled = true
+      window.removeEventListener('member-handle-changed', refresh)
+    }
+  }, [userId])
+
+  const handleDesignationClaimed = () => {
+    setHandleStatus('set')
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('member-handle-changed'))
+    }
+  }
+
+  const handleDeferDesignation = () => {
+    if (userId && typeof window !== 'undefined') {
+      localStorage.setItem(`moltology:designation-deferred:${userId}`, '1')
+    }
+    setHandleStatus('deferred')
+  }
+
+  useEffect(() => {
     const handleToggle = () => {
       if (oracle) {
         oracle.toggleMode('sidebar')
@@ -123,6 +180,14 @@ function HudContent() {
         <WelcomeSplash
           userName={user?.name || user?.email || 'Guest'}
           onDismiss={handleDismissWelcome}
+        />
+      )}
+      {!showWelcome && userId && handleStatus === 'missing' && (
+        <ClaimDesignationGate
+          userId={userId}
+          larvaUnit={larvaUnit}
+          onClaimed={handleDesignationClaimed}
+          onDefer={handleDeferDesignation}
         />
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}

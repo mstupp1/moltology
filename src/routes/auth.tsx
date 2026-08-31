@@ -4,7 +4,6 @@ import { z } from 'zod'
 import {
   Lock,
   Mail,
-  User,
   AlertCircle,
   Loader2,
   Activity,
@@ -16,7 +15,9 @@ import {
 import { authClient } from '@/lib/auth-client'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
+import { parseMemberHandle } from '@/lib/member-handle'
+import { DesignationField } from '@/components/hud/DesignationField'
 import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
@@ -37,7 +38,7 @@ function AuthRoute() {
 
   const initialMode = search.mode === 'signup' ? 'signup' : 'login'
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
-  const [name, setName] = useState('')
+  const [designation, setDesignation] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailOptIn, setEmailOptIn] = useState(false)
@@ -85,17 +86,32 @@ function AuthRoute() {
 
     try {
       if (mode === 'signup') {
+        const parsed = parseMemberHandle(designation)
+        if (!parsed.ok) {
+          setError(parsed.message)
+          setLoading(false)
+          return
+        }
         const res = await authClient.signUp.email({
           email,
           password,
-          name: name || email.split('@')[0],
+          name: parsed.handle,
         })
         if (res?.error) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
         } else {
+          const createdUser = (res as any)?.data?.user || (res as any)?.user
+          const token = await getAuthJWTToken()
+          await claimMemberHandleFn({
+            data: {
+              handle: parsed.handle,
+              userId: createdUser?.id,
+              token: token ?? undefined,
+            },
+          }).catch((err: unknown) => {
+            setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
+          })
           if (emailOptIn) {
-            const createdUser = (res as any)?.data?.user || (res as any)?.user
-            const token = await getAuthJWTToken()
             await updateEmailPreferencesFn({
               data: {
                 emailOptIn: true,
@@ -105,7 +121,6 @@ function AuthRoute() {
               },
             }).catch(() => {})
           }
-          const token = await getAuthJWTToken()
           await getUserProfileFn({ data: { token: token ?? undefined } }).catch(() => {})
           const destination = search.redirect || '/dashboard'
           navigate({ to: destination as any })
@@ -378,15 +393,7 @@ function AuthRoute() {
               {/* Auth Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {mode === 'signup' && (
-                  <HudInput
-                    label="Full Name"
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Your Name"
-                    startIcon={<User className="w-4 h-4 text-[#00c3ff]" />}
-                  />
+                  <DesignationField value={designation} onChange={setDesignation} />
                 )}
 
                 <HudInput

@@ -100,12 +100,17 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({ profileId 
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-grotesk text-lg sm:text-xl font-bold text-[#dfe3e3] tracking-wider uppercase truncate">
-                {profile.larvaId}
+                {profile.displayName}
               </h1>
               <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] bg-[#00c3ff]/10 chamfer-corner">
                 Stage {profile.stage} · {profile.stageLabel}
               </span>
             </div>
+            {profile.handle && profile.displayName !== profile.larvaId && (
+              <p className="text-xs text-[#839493] font-mono tracking-wider">
+                {profile.larvaId}
+              </p>
+            )}
             <p className="text-xs text-[#839493] flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               Member since {memberSinceLabel}

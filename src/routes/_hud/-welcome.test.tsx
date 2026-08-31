@@ -20,6 +20,11 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/server/api', () => ({
+  getUserProfileFn: vi.fn().mockResolvedValue({ handle: null, larvaId: 'LARVA UNIT #2468' }),
+  claimMemberHandleFn: vi.fn(),
+}))
+
 describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
   const renderHud = () =>
     render(

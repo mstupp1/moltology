@@ -33,23 +33,30 @@ import {
   type BaseStats,
   type StatKey,
 } from '@/lib/stats-roller'
+import { parseMemberHandle } from '@/lib/member-handle'
+import { DesignationField } from '../DesignationField'
 
 export interface CharacterCreationStepProps {
   initialSeed?: string
   initialStats?: BaseStats
+  initialHandle?: string
+  requireHandle?: boolean
   onBack: () => void
-  onComplete: (config: LobsterAvatarConfig, stats: BaseStats) => void
+  onComplete: (config: LobsterAvatarConfig, stats: BaseStats, handle: string | null) => void
   isSubmitting?: boolean
 }
 
 export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   initialSeed,
   initialStats,
+  initialHandle = '',
+  requireHandle = true,
   onBack,
   onComplete,
   isSubmitting = false,
 }) => {
   const [seed, setSeed] = useState(() => initialSeed || randomLobsterSeed())
+  const [handle, setHandle] = useState(initialHandle)
   const [isSpinningSeed, setIsSpinningSeed] = useState(false)
 
   const [stats, setStats] = useState<BaseStats>(() => initialStats || DEFAULT_BASE_STATS)
@@ -103,13 +110,17 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   const archetype = useMemo(() => getDominantArchetype(displayStats), [displayStats])
   const totalSum = useMemo(() => calculateStatSum(displayStats), [displayStats])
 
+  const parsedHandle = useMemo(() => parseMemberHandle(handle), [handle])
+  const handleReady = !requireHandle || parsedHandle.ok
+
   const handleFinish = useCallback(() => {
+    if (requireHandle && !parsedHandle.ok) return
     const avatarConfig: LobsterAvatarConfig = {
       style: LOBSTER_AVATAR_STYLE,
       seed: seed.trim() || 'larva-initiate',
     }
-    onComplete(avatarConfig, stats)
-  }, [seed, stats, onComplete])
+    onComplete(avatarConfig, stats, parsedHandle.ok ? parsedHandle.handle : handle.trim() || null)
+  }, [seed, stats, onComplete, requireHandle, parsedHandle, handle])
 
   return (
     <div className="flex flex-col h-full font-sans text-[#dfe3e3]">
@@ -143,6 +154,10 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
               interactive
               animationSeed={seed}
             />
+          </div>
+
+          <div className="w-full max-w-[260px]">
+            <DesignationField value={handle} onChange={setHandle} disabled={isSubmitting} />
           </div>
 
           {/* Avatar Actions */}
@@ -316,7 +331,7 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
 
         <button
           onClick={handleFinish}
-          disabled={isSubmitting || isRolling}
+          disabled={isSubmitting || isRolling || !handleReady}
           className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#00ffff]/25 via-[#00e5ff]/20 to-[#00c8ff]/25 hover:from-[#00ffff]/40 hover:to-[#00c8ff]/40 border border-[#00ffff]/60 text-[#00ffff] text-xs sm:text-sm font-bold tracking-widest uppercase flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-[0_0_25px_rgba(0,255,255,0.25)] disabled:opacity-60"
         >
           {isSubmitting ? (
