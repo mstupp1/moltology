@@ -257,6 +257,36 @@
       "status": "scheduled",
       "isAiGenerated": true,
       "createdAt": "2026-08-30T13:59:25.729Z"
+    },
+    {
+      "id": "carousel-1788189308013",
+      "type": "carousel",
+      "topic": "Architecture of ECDYSIS",
+      "theme": "ecdysis",
+      "mascot": "lobster_pointing",
+      "slideUrls": [
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788189308013/slide1.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788189308013/slide2.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788189308013/slide3.png"
+      ],
+      "slideCount": 3,
+      "aspectRatio": "4:5",
+      "caption": "◈ THE 3-STAGE BENTHIC ARCHITECTURE ◈\n\nTerrestrial software stacks leak attention and throttle under memory pressure.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck (Latency & Memory Walls)\n👉 Slide 2: The Sub-Benthic Solution (Latent Attention & 800 Nm Torque)\n👉 Slide 3: Evolutionary Directives (Action Checklist)\n\n👇 Read the full unredacted engineering breakdown at moltology.org/news\n🔗 Link in bio & live story telemetry feed\n\n#moltology #carcinization #deepwork #ecdysis #pincertorque #softwareengineering",
+      "hashtags": [
+        "#moltology",
+        "#carcinization",
+        "#deepwork",
+        "#ecdysis",
+        "#pincertorque",
+        "#softwareengineering"
+      ],
+      "firstComment": "💬 Explore the full technical manual & blueprints on moltology.org/news! 🦞",
+      "zernioPostId": "6a959aaaa034add76b6fdc76",
+      "scheduledAt": "2026-08-31T17:00:00.000Z",
+      "firstCommentStatus": "pending_publish",
+      "status": "scheduled",
+      "isAiGenerated": true,
+      "createdAt": "2026-08-31T15:15:09.474Z"
     }
   ]
 }
