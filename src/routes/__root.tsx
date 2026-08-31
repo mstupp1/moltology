@@ -35,14 +35,22 @@ export const Route = createRootRoute({
         { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'alternate', type: 'application/rss+xml', title: 'MoltNation News RSS Feed', href: `${SITE_ORIGIN}/rss.xml` },
         { rel: 'sitemap', type: 'application/xml', title: 'Sitemap', href: `${SITE_ORIGIN}/sitemap.xml` },
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+        {
+          rel: 'preload',
+          as: 'font',
+          type: 'font/woff2',
+          href: '/fonts/space-grotesk-latin.woff2',
+          crossOrigin: 'anonymous',
+        },
+        {
+          rel: 'preload',
+          as: 'font',
+          type: 'font/woff2',
+          href: '/fonts/inter-latin.woff2',
+          crossOrigin: 'anonymous',
+        },
         { rel: 'preconnect', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
         { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700;900&display=swap',
-        },
       ],
     }
   },

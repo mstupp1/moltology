@@ -56,6 +56,7 @@ function isAllowed(relPath: string): boolean {
 function isEssentialPublicAsset(relPath: string): boolean {
   if (PUBLIC_ALLOWED_ROOT_FILES.has(relPath)) return true
   if (relPath.startsWith('public/videos/')) return true
+  if (relPath.startsWith('public/fonts/')) return true
   if (relPath.startsWith('public/images/')) {
     return (
       PUBLIC_IMAGE_ALLOW_PREFIXES.some((prefix) => relPath.startsWith(prefix)) ||
