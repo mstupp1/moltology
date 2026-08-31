@@ -327,10 +327,6 @@ export const LandingPage: React.FC = () => {
           </span>
         </div>
 
-        {/* Mobile-Exclusive Ambient Rim-Lighting Halo Glows Behind Video Deck */}
-        <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(90vw,600px)] h-[min(90vw,600px)] rounded-full bg-cyan-500/20 blur-[120px] sm:blur-[150px] animate-pulse pointer-events-none z-[8]" />
-        <div className="lg:hidden absolute right-0 sm:right-6 top-[28%] sm:top-1/3 -translate-y-1/2 w-[min(80vw,500px)] h-[min(80vw,500px)] rounded-full bg-red-600/15 blur-[100px] sm:blur-[130px] animate-pulse pointer-events-none z-[8]" style={{ animationDelay: '1.5s' }} />
-
         <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
           
           {/* Left Column: High-Impact Typography & Primary CTAs */}
@@ -431,9 +427,9 @@ export const LandingPage: React.FC = () => {
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
           <div className="lg:col-span-6 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] lg:min-h-[640px] z-20">
             
-            {/* Desktop Ambient Rim-Lighting Halo Glows Behind Deck */}
-            <div className="hidden lg:block absolute w-[min(90vw,750px)] h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse pointer-events-none" />
-            <div className="hidden lg:block absolute w-[min(80vw,650px)] h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
+            {/* Ambient Rim-Lighting Halo Glows Behind Deck */}
+            <div className="absolute w-[min(90vw,600px)] lg:w-[min(90vw,750px)] h-[min(90vw,600px)] lg:h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[120px] sm:blur-[150px] lg:blur-[170px] animate-pulse pointer-events-none" />
+            <div className="absolute w-[min(80vw,500px)] lg:w-[min(80vw,650px)] h-[min(80vw,500px)] lg:h-[min(80vw,650px)] rounded-full bg-red-600/15 blur-[100px] sm:blur-[130px] lg:blur-[150px] animate-pulse pointer-events-none" style={{ animationDelay: '1.5s' }} />
 
             {/* 3D Video Slider Deck with Touch Navigation */}
             <div className="relative z-30 w-full">
