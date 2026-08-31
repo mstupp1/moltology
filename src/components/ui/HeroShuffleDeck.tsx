@@ -98,15 +98,15 @@ export const HeroShuffleDeck: React.FC = () => {
   const [outgoingIndex, setOutgoingIndex] = useState<number | null>(null)
   const [isPaused, setIsPaused] = useState(false)
   const [inView, setInView] = useState(false)
-  const [playbackReady, setPlaybackReady] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const [activeVideoReady, setActiveVideoReady] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
   const viewportRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   const totalCards = CARDS.length
-  const canMountVideo = inView && playbackReady && !reducedMotion
+  const canMountVideo = inView && !reducedMotion
 
   const goTo = useCallback((nextIndex: number) => {
     setActiveIndex((prev) => {
@@ -141,21 +141,15 @@ export const HeroShuffleDeck: React.FC = () => {
     return () => media.removeEventListener?.('change', sync)
   }, [])
 
+  // The active transmission must be buffered before we spend bandwidth
+  // pre-buffering the next one, so downloads never compete mid-load.
   useEffect(() => {
-    if (typeof document === 'undefined') return
-    if (document.readyState === 'complete') {
-      setPlaybackReady(true)
-      return
+    setActiveVideoReady(false)
+    const videoEl = videoRefs.current[CARDS[activeIndex]?.id ?? '']
+    if (videoEl && videoEl.readyState >= 3) {
+      setActiveVideoReady(true)
     }
-    const onLoad = () => setPlaybackReady(true)
-    // Fallback so slow-loading pages never leave the hero frozen on its poster
-    const fallback = window.setTimeout(() => setPlaybackReady(true), 1500)
-    window.addEventListener('load', onLoad)
-    return () => {
-      window.removeEventListener('load', onLoad)
-      window.clearTimeout(fallback)
-    }
-  }, [])
+  }, [activeIndex, canMountVideo])
 
   useEffect(() => {
     const node = viewportRef.current
@@ -237,10 +231,10 @@ export const HeroShuffleDeck: React.FC = () => {
   if (outgoingIndex !== null && outgoingIndex !== activeIndex) {
     visibleIndexes.push(outgoingIndex)
   }
-  // Pre-buffer the next transmission so card advances start playing instantly
-  // instead of lingering on a still poster while the clip downloads.
+  // Pre-buffer the next transmission only once the active clip is buffered,
+  // so card advances play instantly without competing for bandwidth early.
   const renderIndexes = [...visibleIndexes]
-  if (canMountVideo && !visibleIndexes.includes(nextIndex)) {
+  if (canMountVideo && activeVideoReady && !visibleIndexes.includes(nextIndex)) {
     renderIndexes.push(nextIndex)
   }
 
@@ -308,7 +302,10 @@ export const HeroShuffleDeck: React.FC = () => {
                   muted
                   playsInline
                   autoPlay={!isPreloading}
-                  preload={isPreloading ? 'auto' : 'none'}
+                  preload="auto"
+                  onCanPlay={() => {
+                    if (isActive) setActiveVideoReady(true)
+                  }}
                   className="absolute inset-0 w-full h-full object-cover"
                 >
                   {card.videoSm && (

@@ -48,14 +48,24 @@ export const Route = createRootRoute({
       ],
       scripts: [
         {
-          children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700;900&display=swap';document.head.appendChild(l);})()`,
+          // Non-blocking stylesheet (media=print → all): @font-face rules must
+          // never hold up first paint; font-display=swap handles the fallback.
+          children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.media='print';l.onload=function(){l.media='all'};l.href='https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700;900&display=swap';document.head.appendChild(l);})()`,
         },
       ],
     }
   },
-  headers: ({ matches }) => {
+  headers: ({ matches }): Record<string, string> => {
     if (matches.some(isNotFoundMatch)) {
       return xRobotsNoindexHeaders()
+    }
+    // The landing page renders identically for every guest (session is
+    // client-side) — serve it from the CDN edge instead of re-running SSR
+    // per request, eliminating cold-start TTFB variance on real users.
+    if (matches.some((match) => match.pathname === '/')) {
+      return {
+        'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=600, stale-while-revalidate=3600',
+      }
     }
     return {}
   },

@@ -60,17 +60,18 @@ describe('HeroShuffleDeck Component', () => {
     expect(container.querySelectorAll('img')).toHaveLength(1)
   })
 
-  it('mounts the active clip and pre-buffers the next one', () => {
+  it('mounts the active clip and pre-buffers the next one after it can play', () => {
     const { container } = render(<HeroShuffleDeck />)
 
     act(() => {
       MockIntersectionObserver.instance?.trigger(true)
     })
 
+    // Only the active clip mounts until it can actually play
     const videos = container.querySelectorAll('video')
-    expect(videos).toHaveLength(2)
+    expect(videos).toHaveLength(1)
     const activeVideo = videos[0]
-    expect(activeVideo.getAttribute('preload')).toBe('none')
+    expect(activeVideo.getAttribute('preload')).toBe('auto')
     expect(activeVideo.getAttribute('autoplay')).toBe('')
     expect((activeVideo as HTMLVideoElement).muted).toBe(true)
     expect(activeVideo.getAttribute('poster')).toBeTruthy()
@@ -80,7 +81,12 @@ describe('HeroShuffleDeck Component', () => {
     expect(sources[0].getAttribute('src')).toBe('/videos/hero_benthic_core_sm.mp4')
     expect(sources[1].getAttribute('src')).toBe('/videos/hero_benthic_core.mp4')
 
-    const preloadedVideo = videos[1]
+    // Once the active clip can play, the next one is pre-buffered
+    act(() => {
+      activeVideo.dispatchEvent(new Event('canplay'))
+    })
+
+    const preloadedVideo = container.querySelectorAll('video')[1]
     expect(preloadedVideo.getAttribute('preload')).toBe('auto')
     expect(preloadedVideo.getAttribute('autoplay')).toBeNull()
   })
@@ -90,6 +96,9 @@ describe('HeroShuffleDeck Component', () => {
 
     act(() => {
       MockIntersectionObserver.instance?.trigger(true)
+    })
+    act(() => {
+      container.querySelector('video')?.dispatchEvent(new Event('canplay'))
     })
 
     fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
@@ -108,8 +117,17 @@ describe('HeroShuffleDeck Component', () => {
     act(() => {
       MockIntersectionObserver.instance?.trigger(true)
     })
+    act(() => {
+      container.querySelector('video')?.dispatchEvent(new Event('canplay'))
+    })
 
     fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
+    // Pre-buffer resets until the new active clip can play
+    expect(container.querySelectorAll('video').length).toBe(2)
+
+    act(() => {
+      container.querySelectorAll('video')[0].dispatchEvent(new Event('canplay'))
+    })
     expect(container.querySelectorAll('video').length).toBe(3)
 
     act(() => {
