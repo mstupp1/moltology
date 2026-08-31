@@ -40,16 +40,8 @@ export const Route = createRootRoute({
         { rel: 'preconnect', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
         { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
         {
-          rel: 'preload',
-          as: 'style',
+          rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700;900&display=swap',
-        },
-      ],
-      scripts: [
-        {
-          // Non-blocking stylesheet (media=print → all): @font-face rules must
-          // never hold up first paint; font-display=swap handles the fallback.
-          children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.media='print';l.onload=function(){l.media='all'};l.href='https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700;900&display=swap';document.head.appendChild(l);})()`,
         },
       ],
     }

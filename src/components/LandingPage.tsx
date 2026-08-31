@@ -374,7 +374,7 @@ export const LandingPage: React.FC = () => {
             </p>
 
             {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto min-h-[114px] sm:min-h-[54px]">
               {user ? (
                 <BenthicCTAButton
                   size="lg"
@@ -390,7 +390,7 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </BenthicCTAButton>
               ) : isSessionPending ? (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="hero-auth-skeleton">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto min-h-[114px] sm:min-h-[54px]" data-testid="hero-auth-skeleton">
                   <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
                   <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
                 </div>
@@ -425,7 +425,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Right Column: Layered 3D Interactive Shuffling Card Deck */}
-          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[300px] sm:min-h-[460px] lg:min-h-[640px] z-20">
+          <div className="lg:col-span-6 relative flex items-center justify-center min-h-[200px] sm:min-h-[460px] lg:min-h-[640px] z-20">
             
             {/* Ambient Rim-Lighting Halo Glows Behind Deck */}
             <div className="absolute w-[min(90vw,600px)] lg:w-[min(90vw,750px)] h-[min(90vw,600px)] lg:h-[min(90vw,750px)] rounded-full bg-cyan-500/20 blur-[120px] sm:blur-[150px] lg:blur-[170px] animate-pulse pointer-events-none" />
