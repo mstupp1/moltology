@@ -453,7 +453,7 @@ export const LandingPage: React.FC = () => {
               alt="Hero Lobster Peeking Over Card"
               {...lazyImageProps}
               width={128}
-              height={128}
+              height={248}
               className="w-16 sm:w-24 lg:w-32 h-auto object-contain transform -rotate-3 hover:rotate-0 transition-transform duration-300"
             />
           </div>

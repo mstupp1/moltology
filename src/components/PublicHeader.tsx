@@ -272,7 +272,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       >
         {tab.id === 'home' ? (
           <img
-            src="/images/order_emblem.png"
+            src="/images/order_emblem.webp"
             alt="The Synaptic Path Logo"
             width={14}
             height={14}
@@ -350,7 +350,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       <>
         {tab.id === 'home' ? (
           <img
-            src="/images/order_emblem.png"
+            src="/images/order_emblem.webp"
             alt=""
             width={16}
             height={16}
@@ -652,7 +652,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
             }`}
           >
-            <img src="/images/order_emblem.png" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
+            <img src="/images/order_emblem.webp" alt="" width={16} height={16} className="w-4 h-4 object-contain" />
             <span>THE SYNAPTIC PATH</span>
           </button>
 

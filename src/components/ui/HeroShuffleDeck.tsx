@@ -7,6 +7,7 @@ export interface HeroCard {
   id: string
   title: string
   image: string
+  imageSm?: string
   video: string
   videoSm?: string
   accentColor: 'cyan' | 'amber' | 'emerald' | 'purple' | 'red'
@@ -19,6 +20,7 @@ const CARDS: HeroCard[] = [
     id: 'benthic-core',
     title: 'CYBER-BENTHIC ASCENSION',
     image: getAssetUrl('/images/hero_card_benthic_core.webp'),
+    imageSm: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
     video: '/videos/hero_benthic_core.mp4',
     videoSm: '/videos/hero_benthic_core_sm.mp4',
     accentColor: 'cyan',
@@ -27,6 +29,7 @@ const CARDS: HeroCard[] = [
     id: 'asset-shedding',
     title: 'ASSET TRANSMUTATION',
     image: getAssetUrl('/images/hero_card_asset_shedding.webp'),
+    imageSm: getAssetUrl('/images/hero_card_asset_shedding_sm.webp'),
     video: '/videos/hero_asset_shedding.mp4',
     videoSm: '/videos/hero_asset_shedding_sm.mp4',
     accentColor: 'amber',
@@ -35,6 +38,7 @@ const CARDS: HeroCard[] = [
     id: 'chitin-hardening',
     title: 'EXOSKELETAL HARDENING',
     image: getAssetUrl('/images/hero_card_chitin_hardening.webp'),
+    imageSm: getAssetUrl('/images/hero_card_chitin_hardening_sm.webp'),
     video: '/videos/hero_chitin_hardening.mp4',
     videoSm: '/videos/hero_chitin_hardening_sm.mp4',
     accentColor: 'emerald',
@@ -43,6 +47,7 @@ const CARDS: HeroCard[] = [
     id: 'total-carcinization',
     title: 'TOTAL CARCINIZATION',
     image: getAssetUrl('/images/hero_card_total_carcinization.webp'),
+    imageSm: getAssetUrl('/images/hero_card_total_carcinization_sm.webp'),
     video: '/videos/hero_total_carcinization.mp4',
     videoSm: '/videos/hero_total_carcinization_sm.mp4',
     accentColor: 'purple',
@@ -51,6 +56,7 @@ const CARDS: HeroCard[] = [
     id: 'fault-isolation',
     title: 'VIRTUAL FARADAY SHELL',
     image: getAssetUrl('/images/hero_card_fault_isolation.webp'),
+    imageSm: getAssetUrl('/images/hero_card_fault_isolation_sm.webp'),
     video: '/videos/hero_fault_isolation.mp4',
     videoSm: '/videos/hero_fault_isolation_sm.mp4',
     accentColor: 'red',
@@ -59,6 +65,7 @@ const CARDS: HeroCard[] = [
     id: 'synaptic-path',
     title: 'JOIN THE SYNAPTIC PATH',
     image: getAssetUrl('/images/hero_card_synaptic_path.webp'),
+    imageSm: getAssetUrl('/images/hero_card_synaptic_path_sm.webp'),
     video: '/videos/hero_synaptic_path.mp4',
     videoSm: '/videos/hero_synaptic_path_sm.mp4',
     accentColor: 'cyan',
@@ -285,20 +292,26 @@ export const HeroShuffleDeck: React.FC = () => {
                   : 'invisible z-0 pointer-events-none'
               }`}
             >
-              <img
-                src={card.image}
-                alt={isActive ? card.title : ''}
-                {...(idx === 0 && isActive ? eagerImageProps : { loading: 'lazy' as const, decoding: 'async' as const })}
-                width={1280}
-                height={720}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              <picture className="absolute inset-0 w-full h-full">
+                {card.imageSm && (
+                  <source media="(max-width: 767px)" srcSet={card.imageSm} type="image/webp" />
+                )}
+                <source media="(min-width: 768px)" srcSet={card.image} type="image/webp" />
+                <img
+                  src={card.image}
+                  alt={isActive ? card.title : ''}
+                  {...(idx === 0 && isActive ? eagerImageProps : { loading: 'lazy' as const, decoding: 'async' as const })}
+                  width={1280}
+                  height={720}
+                  className="w-full h-full object-cover"
+                />
+              </picture>
               {shouldMountVideo && (
                 <video
                   ref={(el) => {
                     videoRefs.current[card.id] = el
                   }}
-                  poster={card.image}
+                  poster={card.imageSm || card.image}
                   muted
                   playsInline
                   autoPlay={!isPreloading}

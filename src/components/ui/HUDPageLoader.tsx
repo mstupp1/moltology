@@ -36,8 +36,10 @@ export function HUDPageLoader() {
 
         {/* Muted Emblem Logo */}
         <img
-          src={getAssetUrl('/images/order_emblem.png')}
+          src={getAssetUrl('/images/order_emblem.webp')}
           alt="Loading"
+          width={36}
+          height={36}
           className="relative z-10 w-9 h-9 object-contain opacity-60 transition-opacity duration-300"
           style={{ animation: 'hud-logo-breathe 3s ease-in-out infinite' }}
         />

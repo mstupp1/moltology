@@ -64,7 +64,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
               {/* Emblem Logo */}
               <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
                 <img
-                  src="/images/order_emblem.png"
+                  src="/images/order_emblem.webp"
                   alt="Order Emblem"
                   width={40}
                   height={40}

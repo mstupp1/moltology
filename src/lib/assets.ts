@@ -22,6 +22,7 @@ const LOCAL_ASSET_WHITELIST = new Set([
   'favicon.ico',
   'favicon.png',
   'images/order_emblem.png',
+  'images/order_emblem.webp',
   'images/scanline_pattern.png',
   'images/bubble_variant_1.jpg',
   'images/bubble_variant_2.jpg',
