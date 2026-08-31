@@ -94,13 +94,14 @@ export const HeroShuffleDeck: React.FC = () => {
   const [playbackReady, setPlaybackReady] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [userInteracted, setUserInteracted] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
   const viewportRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   const totalCards = CARDS.length
-  const canMountVideo = inView && playbackReady && !reducedMotion && !isMobile
+  const canMountVideo = inView && playbackReady && !reducedMotion && (!isMobile || userInteracted)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -113,6 +114,7 @@ export const HeroShuffleDeck: React.FC = () => {
   }, [])
 
   const goTo = useCallback((nextIndex: number) => {
+    setUserInteracted(true)
     setActiveIndex((prev) => {
       if (nextIndex === prev) return prev
       setOutgoingIndex(prev)
@@ -121,6 +123,7 @@ export const HeroShuffleDeck: React.FC = () => {
   }, [])
 
   const handleNext = useCallback(() => {
+    setUserInteracted(true)
     setActiveIndex((prev) => {
       const next = (prev + 1) % totalCards
       setOutgoingIndex(prev)
@@ -129,6 +132,7 @@ export const HeroShuffleDeck: React.FC = () => {
   }, [totalCards])
 
   const handlePrev = useCallback(() => {
+    setUserInteracted(true)
     setActiveIndex((prev) => {
       const next = (prev - 1 + totalCards) % totalCards
       setOutgoingIndex(prev)
@@ -209,6 +213,7 @@ export const HeroShuffleDeck: React.FC = () => {
   }
 
   const onTouchStart = (e: React.TouchEvent) => {
+    setUserInteracted(true)
     touchEndX.current = null
     touchStartX.current = e.targetTouches[0].clientX
   }

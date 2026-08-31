@@ -300,15 +300,8 @@ export const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (Optimized WebP) */}
-        <img
-          src={getAssetUrl('/images/chitin_texture_bg.webp')}
-          alt="Chitin Exoshell Background Texture"
-          {...lazyImageProps}
-          width={1376}
-          height={768}
-          className="absolute inset-0 w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
-        />
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (Lightweight WebP CSS Tile) */}
+        <div className="absolute inset-0 opacity-40 mix-blend-overlay scale-105 pointer-events-none z-0 pbr-underlay-chitin" />
         
         {/* Layer 2D: Balanced Edge Vignettes & Sacred Geometry Grid */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#030608]/80 via-transparent to-[#030608]/80 z-0 pointer-events-none opacity-55" />
