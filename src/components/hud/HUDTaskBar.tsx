@@ -84,6 +84,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   }, [propTasks])
 
   const localTasks: AlignmentTask[] = localPropTasks || alignment.tasks
+  const countReady = Boolean(localPropTasks) || !alignment.isLoading
 
   const { remindersEnabled, toggleReminders, getTaskReminderTime } =
     useAlignmentReminders(localTasks)
@@ -234,6 +235,20 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
   const nextTask = localTasks.find(t => !t.completed) || localTasks[localTasks.length - 1]
   const allTasksCompleted = localTasks.length > 0 && localTasks.every(t => t.completed)
   const completedCount = localTasks.filter(t => t.completed).length
+  const liturgyCountText = `${completedCount}/${localTasks.length}`
+
+  const renderLiturgyCount = (className: string) =>
+    countReady ? (
+      <span className={className}>{liturgyCountText}</span>
+    ) : (
+      <span
+        className={`${className} inline-flex items-center justify-center min-w-[2.25rem]`}
+        aria-label="Alignment liturgy count resolving"
+        title="Alignment liturgy count resolving"
+      >
+        <span className="inline-block h-2 w-4 rounded-full bg-[#00c3ff]/40 animate-pulse" />
+      </span>
+    )
 
   // Sub-renderer for Activity Center content (shared across desktop dropdown & mobile bottom sheet)
   const renderActivityContent = () => (
@@ -266,7 +281,9 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           }`}
         >
           <Zap className="w-3 h-3 text-[#00c3ff]" />
-          <span>LITURGIES ({completedCount}/{localTasks.length})</span>
+          <span>
+            {countReady ? `LITURGIES (${liturgyCountText})` : 'LITURGIES'}
+          </span>
         </button>
 
         <button
@@ -333,16 +350,29 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           {/* Progress bar */}
           <div className="space-y-1">
             <div className="flex justify-between text-[10px] text-[#839493]">
-              <span>PROGRESS: {completedCount}/{localTasks.length} COMPLETED</span>
-              <span className="text-[#00ffff] font-bold">
-                {Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%
-              </span>
+              {countReady ? (
+                <>
+                  <span>PROGRESS: {liturgyCountText} COMPLETED</span>
+                  <span className="text-[#00ffff] font-bold">
+                    {Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%
+                  </span>
+                </>
+              ) : (
+                <span
+                  className="inline-block h-2 w-28 rounded-full bg-[#00c3ff]/25 animate-pulse"
+                  aria-label="Alignment liturgy count resolving"
+                />
+              )}
             </div>
             <div className="w-full h-1.5 bg-[#020608] rounded-full overflow-hidden border border-[#00c3ff]/30">
               <div
-                className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] transition-all duration-300"
+                className={`h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] ${
+                  countReady ? 'transition-all duration-300' : 'animate-pulse opacity-40'
+                }`}
                 style={{
-                  width: `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`,
+                  width: countReady
+                    ? `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`
+                    : '35%',
                 }}
               />
             </div>
@@ -608,13 +638,19 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
         >
           {/* Next Task Indicator (Hidden on extra small screens) */}
           <span className="text-[10px] text-[#839493] hidden md:inline truncate max-w-[130px] font-sans">
-            NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
+            {countReady ? (
+              <>
+                NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
+              </>
+            ) : (
+              <span className="inline-block h-2 w-20 rounded-full bg-[#839493]/30 animate-pulse align-middle" />
+            )}
           </span>
 
           {/* Liturgy Count Badge */}
-          <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/30">
-            {completedCount}/{localTasks.length}
-          </span>
+          {renderLiturgyCount(
+            'text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#00c3ff]/15 text-[#00ffff] border border-[#00c3ff]/30',
+          )}
 
           {notificationUnread > 0 && (
             <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded-full bg-[#ff5540]/20 text-[#ff5540] border border-[#ff5540]/40 animate-pulse">
@@ -841,7 +877,14 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 <span className="font-bold text-[#dfe3e3] uppercase">FULL DAY LITURGY SCHEDULE</span>
               </div>
               <div className="text-[11px] text-[#00ffff] font-sans">
-                {localTasks.filter(t => t.completed).length} of {localTasks.length} COMPLETED
+                {countReady ? (
+                  `${completedCount} of ${localTasks.length} COMPLETED`
+                ) : (
+                  <span
+                    className="inline-block h-2 w-24 rounded-full bg-[#00c3ff]/40 animate-pulse"
+                    aria-label="Alignment liturgy count resolving"
+                  />
+                )}
               </div>
             </div>
 
@@ -850,7 +893,9 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               <div
                 className="h-full bg-gradient-to-r from-[#0099cc] via-[#00c3ff] to-[#00ff88] transition-all duration-300"
                 style={{
-                  width: `${Math.round((localTasks.filter(t => t.completed).length / Math.max(localTasks.length, 1)) * 100)}%`,
+                  width: countReady
+                    ? `${Math.round((completedCount / Math.max(localTasks.length, 1)) * 100)}%`
+                    : '35%',
                 }}
               />
             </div>
