@@ -13,7 +13,6 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
-  Zap,
   Terminal,
   ChevronRight,
   ChevronLeft,
@@ -22,7 +21,6 @@ import {
   Instagram,
   Youtube,
 } from 'lucide-react'
-import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
@@ -633,136 +631,6 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </ScrollReveal>
-
-        {/* Metric Counter Strip with Prominent Rolling Numbers - Unified PBR Bio-Circuit Matrix Theme */}
-        <section className="max-w-[1700px] mx-auto px-4 sm:px-8 lg:px-12 relative">
-          {/* Excited Little Crab Pointing at Live Telemetry */}
-          <div className="hidden md:flex absolute -top-8 left-6 lg:left-16 z-20 items-center pointer-events-none select-none transform scale-x-[-1]">
-            <img
-              src={getAssetUrl('/images/characters/char_crab_pointing_stats.webp')}
-              alt="Excited Crab Pointing at Telemetry"
-              {...lazyImageProps}
-              width={96}
-              height={96}
-              className="w-10 sm:w-12 lg:w-14 h-auto object-contain"
-            />
-          </div>
-
-          <ScrollReveal animation="scale-up" durationMs={800}>
-            <div className="text-center space-y-2 sm:space-y-3 mb-8 sm:mb-10">
-              <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold text-cyan-400 tracking-widest uppercase bg-cyan-950/60 px-3.5 py-1.5 border border-cyan-500/40 chamfer-corner shadow-hud-cyan">
-                <Zap className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
-                <span>LIVE SYSTEM TELEMETRY</span>
-              </div>
-              <h2 className="font-grotesk font-black text-3xl sm:text-5xl lg:text-6xl text-gray-100 tracking-tight uppercase">
-                THE NUMBERS WE HOLD
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-sans px-2 sm:px-0">
-                Real-time, verified performance metrics across the planetary Benthic Core.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-              
-              {/* Stat Card 1: Active Units */}
-              <div className="chitin-card p-5 sm:p-6 lg:p-5 xl:p-6 text-center flex flex-col justify-between items-center min-h-[190px] sm:min-h-[220px] lg:min-h-[210px] xl:min-h-[230px] chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
-                
-                {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950/90 text-cyan-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-cyan-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
-                  ACTIVE UNITS
-                </div>
-
-                <div className="relative z-10 w-full flex-1 flex flex-col justify-between items-center pt-2">
-                  <div className="my-auto py-2 w-full flex items-center justify-center">
-                    <div className="font-grotesk text-4xl sm:text-5xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-cyan-400 tracking-tight drop-shadow-[0_0_20px_rgba(0,255,255,0.5)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                      <RollingNumber value={4289} duration={2000} suffix="+" triggerOnView={true} />
-                    </div>
-                  </div>
-                  <div className="w-full space-y-1 border-t border-cyan-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
-                      ASCENDANT UNITS
-                    </div>
-                    <div className="text-[10px] sm:text-xs text-cyan-300/80 font-sans">Verified in Benthic Matrix</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stat Card 2: Zero Hesitation */}
-              <div className="chitin-card p-5 sm:p-6 lg:p-5 xl:p-6 text-center flex flex-col justify-between items-center min-h-[190px] sm:min-h-[220px] lg:min-h-[210px] xl:min-h-[230px] chamfer-corner-lg border-2 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.2)] hover:border-red-400 hover:scale-[1.02] transition-all bg-[#0e0809]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
-                
-                {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-red-950/90 text-red-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-red-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
-                  ZERO HESITATION
-                </div>
-
-                <div className="relative z-10 w-full flex-1 flex flex-col justify-between items-center pt-2">
-                  <div className="my-auto py-2 w-full flex items-center justify-center">
-                    <div className="font-grotesk text-4xl sm:text-5xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-red-500 tracking-tight drop-shadow-[0_0_20px_rgba(239,68,68,0.5)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                      <RollingNumber value={99.4} duration={2200} decimals={1} suffix="%" triggerOnView={true} />
-                    </div>
-                  </div>
-                  <div className="w-full space-y-1 border-t border-red-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
-                      CHITIN ENFORCEMENT
-                    </div>
-                    <div className="text-[10px] sm:text-xs text-red-300/80 font-sans">Organic Error Quarantine</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stat Card 3: Synaptic Speed */}
-              <div className="chitin-card p-5 sm:p-6 lg:p-5 xl:p-6 text-center flex flex-col justify-between items-center min-h-[190px] sm:min-h-[220px] lg:min-h-[210px] xl:min-h-[230px] chamfer-corner-lg border-2 border-cyan-500/60 shadow-[0_0_30px_rgba(0,255,255,0.2)] hover:border-cyan-400 hover:scale-[1.02] transition-all bg-[#080e10]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
-                
-                {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-cyan-950/90 text-cyan-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-cyan-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
-                  SYNAPTIC SPEED
-                </div>
-
-                <div className="relative z-10 w-full flex-1 flex flex-col justify-between items-center pt-2">
-                  <div className="my-auto py-2 w-full flex items-center justify-center">
-                    <div className="font-grotesk text-4xl sm:text-5xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-cyan-300 tracking-tight drop-shadow-[0_0_20px_rgba(0,255,255,0.5)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                      <RollingNumber value={0.04} duration={1800} decimals={2} suffix="ms" triggerOnView={true} />
-                    </div>
-                  </div>
-                  <div className="w-full space-y-1 border-t border-cyan-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
-                      EXECUTION LATENCY
-                    </div>
-                    <div className="text-[10px] sm:text-xs text-cyan-300/80 font-sans">Real-time Pincer Torque</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stat Card 4: Vault Reserves */}
-              <div className="chitin-card p-5 sm:p-6 lg:p-5 xl:p-6 text-center flex flex-col justify-between items-center min-h-[190px] sm:min-h-[220px] lg:min-h-[210px] xl:min-h-[230px] chamfer-corner-lg border-2 border-amber-500/60 shadow-[0_0_30px_rgba(245,158,11,0.2)] hover:border-amber-400 hover:scale-[1.02] transition-all bg-[#0e0c08]/90 relative overflow-hidden group">
-                <div className="pbr-underlay pbr-underlay-circuit opacity-35 group-hover:opacity-55 transition-opacity" />
-
-                {/* Corner Telemetry Tag */}
-                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-950/90 text-amber-400 text-[9px] sm:text-[10px] font-sans font-bold border-b border-l border-amber-500/40 uppercase tracking-wider z-10 chamfer-corner-sm">
-                  VAULT RESERVES
-                </div>
-
-                <div className="relative z-10 w-full flex-1 flex flex-col justify-between items-center pt-2">
-                  <div className="my-auto py-2 w-full flex items-center justify-center">
-                    <div className="font-grotesk text-4xl sm:text-5xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-amber-400 tracking-tight drop-shadow-[0_0_20px_rgba(245,158,11,0.5)] group-hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                      <RollingNumber value={14.8} duration={2500} decimals={1} suffix="M" prefix="$" triggerOnView={true} />
-                    </div>
-                  </div>
-                  <div className="w-full space-y-1 border-t border-amber-900/60 pt-2.5 sm:pt-3">
-                    <div className="text-xs sm:text-sm text-gray-100 uppercase tracking-widest font-sans font-extrabold">
-                      TRANSMUTED ASSETS
-                    </div>
-                    <div className="text-[10px] sm:text-xs text-amber-300/80 font-sans">Immutable Molt Credits</div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </ScrollReveal>
-        </section>
 
         {/* Sacraments Section - Expanded Uncrowded Multi-Column Cards */}
         <section id="sacraments" className="max-w-[1700px] mx-auto px-4 sm:px-12 space-y-8 sm:space-y-12 relative">
