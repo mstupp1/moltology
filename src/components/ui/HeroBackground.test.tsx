@@ -1,14 +1,16 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { HeroBackground } from './HeroBackground'
 
 describe('HeroBackground', () => {
-  it('renders chitin texture as CSS backgrounds without an LCP img', () => {
+  it('mounts deferred chitin textures (idle-ready in tests) without an LCP img', async () => {
     const { container } = render(<HeroBackground />)
     expect(screen.queryByAltText('Chitin Exoshell Background Texture')).not.toBeInTheDocument()
-    const textured = container.querySelectorAll('[style*="chitin_texture_bg"]')
-    expect(textured.length).toBeGreaterThanOrEqual(1)
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="hero-chitin-texture-sm"]')).toBeTruthy()
+    })
+    expect(container.querySelector('[style*="chitin_texture_bg"]')).toBeTruthy()
   })
 
   it('renders custom watermarks when enabled', () => {
