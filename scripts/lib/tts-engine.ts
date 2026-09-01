@@ -1,6 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
+import { edgeProvider } from './tts-providers/edge'
+import { fishProvider, isFishConfigured } from './tts-providers/fish-audio'
+import type { ProviderGenerationOptions } from './tts-providers/types'
+
+export type TTSProviderName = 'auto' | 'fish' | 'edge'
 
 export interface WordBoundaryEvent {
   word: string
@@ -18,6 +22,9 @@ export interface TTSGenerationOptions {
   pitch?: string // e.g. "+0Hz", "-5Hz"
   outputDir?: string
   outputFilename?: string
+  provider?: TTSProviderName
+  referenceId?: string // Fish voice model id (overrides env default)
+  model?: string // Fish model, default s2.1-pro
 }
 
 export interface TTSGenerationResult {
@@ -26,6 +33,7 @@ export interface TTSGenerationResult {
   words: WordBoundaryEvent[]
   assSubtitlesPath?: string
   srtSubtitlesPath?: string
+  providerUsed?: 'fish' | 'edge'
 }
 
 /**
@@ -55,7 +63,7 @@ export function formatSrtTime(ms: number): string {
 }
 
 /**
- * Align raw word boundary events from Edge TTS with original script text to preserve punctuation and sentence boundaries
+ * Align raw word boundary events with original script text to preserve punctuation and sentence boundaries
  */
 export function alignWordsWithOriginalText(
   words: WordBoundaryEvent[],
@@ -114,12 +122,10 @@ function partitionSentenceWords(sentenceWords: WordBoundaryEvent[], maxWordsPerC
   if (n === 0) return []
   if (n <= maxWordsPerChunk) return [sentenceWords]
 
-  // If 4 words: balanced 2 + 2
   if (n === 4) {
     return [sentenceWords.slice(0, 2), sentenceWords.slice(2, 4)]
   }
 
-  // If 5 words: check if clause break at index 1 or 2, else 3 + 2
   if (n === 5) {
     if (sentenceWords[1]?.isClauseEnd) {
       return [sentenceWords.slice(0, 2), sentenceWords.slice(2, 5)]
@@ -127,12 +133,10 @@ function partitionSentenceWords(sentenceWords: WordBoundaryEvent[], maxWordsPerC
     return [sentenceWords.slice(0, 3), sentenceWords.slice(3, 5)]
   }
 
-  // If 6 words: 3 + 3
   if (n === 6) {
     return [sentenceWords.slice(0, 3), sentenceWords.slice(3, 6)]
   }
 
-  // General balanced partition
   const chunks: WordBoundaryEvent[][] = []
   let i = 0
 
@@ -165,7 +169,6 @@ function partitionSentenceWords(sentenceWords: WordBoundaryEvent[], maxWordsPerC
 export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChunk = 3): WordBoundaryEvent[][] {
   if (words.length === 0) return []
 
-  // 1. Group words into distinct sentences
   const sentences: WordBoundaryEvent[][] = []
   let currentSentence: WordBoundaryEvent[] = []
 
@@ -186,7 +189,6 @@ export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChu
     }
   }
 
-  // 2. Partition each sentence into balanced chunks
   const allChunks: WordBoundaryEvent[][] = []
   for (const sentence of sentences) {
     const sentenceChunks = partitionSentenceWords(sentence, maxWordsPerChunk)
@@ -198,7 +200,6 @@ export function chunkWordsIntoPhrases(words: WordBoundaryEvent[], maxWordsPerChu
 
 /**
  * Generate ASS subtitle file with dynamic active word highlights
- * Note: ASS colors are hex &HAABBGGRR (e.g., Cyan #00ffff is &H00FFFF00&, Amber #f59e0b is &H000B9EF5&)
  */
 export function generateAssSubtitles(words: WordBoundaryEvent[], outputPath: string): string {
   const header = `[Script Info]
@@ -221,8 +222,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
   for (const phrase of phrases) {
     if (phrase.length === 0) continue
-    const phraseStart = phrase[0].startMs
-    const phraseEnd = phrase[phrase.length - 1].endMs + 300 // Slight hold
+    const phraseEnd = phrase[phrase.length - 1].endMs + 300
 
     for (let i = 0; i < phrase.length; i++) {
       const activeWord = phrase[i]
@@ -232,7 +232,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
       const styledWords = phrase.map((w, idx) => {
         const text = w.word.toUpperCase()
         if (idx === i) {
-          // Highlight active word in glowing cyan with scale
           return `{\\c&H00FFFF&\\fscx110\\fscy110}${text}{\\r}`
         }
         return `{\\c&H00FFFFFF&}${text}{\\r}`
@@ -269,98 +268,81 @@ export function generateSrtSubtitles(words: WordBoundaryEvent[], outputPath: str
   return outputPath
 }
 
+function resolveProviderMode(options: TTSGenerationOptions): TTSProviderName {
+  if (options.provider) return options.provider
+  const fromEnv = (process.env.TTS_PROVIDER || 'auto').toLowerCase()
+  if (fromEnv === 'fish' || fromEnv === 'edge') return fromEnv
+  return 'auto'
+}
+
+function toProviderOptions(options: TTSGenerationOptions, outputDir: string): ProviderGenerationOptions {
+  return {
+    voice: options.voice,
+    rate: options.rate,
+    pitch: options.pitch,
+    outputDir,
+    outputFilename: options.outputFilename,
+    referenceId: options.referenceId,
+    model: options.model,
+  }
+}
+
 /**
- * Synthesize voiceover audio and generate word boundaries
+ * Synthesize voiceover audio and generate word boundaries.
+ * Primary: Fish Audio S2 (hosted). Fallback: Edge TTS.
  */
 export async function generateVoiceover(text: string, options: TTSGenerationOptions = {}): Promise<TTSGenerationResult> {
-  const voice = options.voice || 'en-US-ChristopherNeural' // Default crisp broadcaster voice
-  const rate = options.rate || '+8%' // Slightly accelerated for social retention
-  const pitch = options.pitch || '+0Hz'
   const outputDir = options.outputDir || path.resolve(process.cwd(), 'tmp')
   const timestamp = Date.now()
+  const mode = resolveProviderMode(options)
+  const providerOptions = toProviderOptions(options, outputDir)
 
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true })
   }
 
-  const tts = new MsEdgeTTS()
-  await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3, {
-    wordBoundaryEnabled: true,
-  })
+  let providerResult: Awaited<ReturnType<typeof edgeProvider.synthesize>>
+  let providerUsed: 'fish' | 'edge'
 
-  // Format SSML or prosody
-  const prosodyOptions = {
-    rate,
-    pitch,
-  }
-
-  const sessionDir = path.join(outputDir, `tts-${timestamp}`)
-  fs.mkdirSync(sessionDir, { recursive: true })
-
-  const result = await tts.toFile(sessionDir, text, prosodyOptions)
-  const rawAudioPath = result.audioFilePath
-  const metadataPath = result.metadataFilePath
-
-  // Parse word boundaries
-  let words: WordBoundaryEvent[] = []
-  if (metadataPath && fs.existsSync(metadataPath)) {
-    try {
-      const metaJson = JSON.parse(fs.readFileSync(metadataPath, 'utf8'))
-      const metadataList = metaJson.Metadata || []
-
-      for (const item of metadataList) {
-        if (item.Type === 'WordBoundary' && item.Data) {
-          const offset100ns = item.Data.Offset || 0
-          const duration100ns = item.Data.Duration || 0
-          const wordText = item.Data.text?.Text || ''
-
-          const startMs = Math.round(offset100ns / 10000)
-          const durationMs = Math.round(duration100ns / 10000)
-          const endMs = startMs + durationMs
-
-          if (wordText.trim()) {
-            words.push({
-              word: wordText,
-              startMs,
-              endMs,
-              durationMs,
-            })
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('⚠️ Failed to parse metadata file for word boundaries:', err)
+  if (mode === 'edge') {
+    providerResult = await edgeProvider.synthesize(text, providerOptions)
+    providerUsed = 'edge'
+  } else if (mode === 'fish') {
+    if (!isFishConfigured(providerOptions)) {
+      throw new Error(
+        'TTS_PROVIDER=fish requires FISH_API_KEY and FISH_VOICE_REFERENCE_ID (or referenceId option)'
+      )
     }
+    providerResult = await fishProvider.synthesize(text, providerOptions)
+    providerUsed = 'fish'
+  } else if (isFishConfigured(providerOptions)) {
+    try {
+      providerResult = await fishProvider.synthesize(text, providerOptions)
+      providerUsed = 'fish'
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      console.warn(`⚠️ Fish Audio TTS failed, falling back to Edge TTS: ${message}`)
+      providerResult = await edgeProvider.synthesize(text, providerOptions)
+      providerUsed = 'edge'
+    }
+  } else {
+    console.warn('⚠️ Fish Audio not configured (FISH_API_KEY missing); using Edge TTS')
+    providerResult = await edgeProvider.synthesize(text, providerOptions)
+    providerUsed = 'edge'
   }
 
-  // Align raw words with original text to preserve punctuation, clause boundaries, and sentence ends
-  words = alignWordsWithOriginalText(words, text)
-
-  // Calculate approximate audio duration
-  let durationSeconds = 0
-  if (words.length > 0) {
-    durationSeconds = (words[words.length - 1].endMs + 300) / 1000
-  }
-
-  // Rename audio to unique target if requested
-  const finalAudioPath = options.outputFilename
-    ? path.join(outputDir, options.outputFilename)
-    : path.join(outputDir, `voiceover-${timestamp}.mp3`)
-
-  fs.copyFileSync(rawAudioPath, finalAudioPath)
-
-  // Generate ASS and SRT subtitle files
   const assPath = path.join(outputDir, `subtitles-${timestamp}.ass`)
   const srtPath = path.join(outputDir, `subtitles-${timestamp}.srt`)
 
-  generateAssSubtitles(words, assPath)
-  generateSrtSubtitles(words, srtPath)
+  generateAssSubtitles(providerResult.words, assPath)
+  generateSrtSubtitles(providerResult.words, srtPath)
 
   return {
-    audioPath: finalAudioPath,
-    durationSeconds,
-    words,
+    audioPath: providerResult.audioPath,
+    durationSeconds: providerResult.durationSeconds,
+    words: providerResult.words,
     assSubtitlesPath: assPath,
     srtSubtitlesPath: srtPath,
+    providerUsed,
   }
 }

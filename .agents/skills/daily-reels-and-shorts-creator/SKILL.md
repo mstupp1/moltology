@@ -28,7 +28,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
 * **YouTube Shorts Channel**: Moltology (`@moltology`, Account ID: `6a7fd9bd77555aae01ebea63`)
 * **Core Narrative Vector**: **Moltmaxxing, Algorithmic Ecdysis & Benthic AI** (parody of looksmaxxing/meltmaxxing, bio-silicon structural invulnerability, 800 Nm pincer torque, 50,000 fathom depth clearance)
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 12–18s total duration (automatically loops on YouTube Shorts and Instagram Reels)
-* **Dynamic Audio**: Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, with `+8%` to `+14%` rate) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
+* **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, preset library voice via `FISH_VOICE_REFERENCE_ID`, `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
 * **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
 * **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `queue_preview_queue`, `queue_get_next_queue_slot`).
@@ -72,15 +72,23 @@ Synthesize a punchy 8–10 second script (26–34 words) using one of five dynam
 ---
 
 ### Step 3: Neural Voiceover & Kinetic Timestamp Extraction
-Synthesize audio and generate word-level synchronization using Edge TTS:
+Synthesize audio and generate word-level synchronization using **Fish Audio S2** (primary) with **Edge TTS** fallback:
+
+**Environment** (`.env`):
+- `FISH_API_KEY` — Fish Audio API key
+- `FISH_VOICE_REFERENCE_ID` — preset library voice id (`npm run tts:voices` to browse)
+- `FISH_TTS_MODEL` — default `s2.1-pro` (or `s2.1-pro-free` for dev)
+- `TTS_PROVIDER` — `auto` (default), `fish`, or `edge`
 
 ```typescript
 import { generateVoiceover } from 'scripts/lib/tts-engine'
 
 const ttsResult = await generateVoiceover(script, {
-  voice: 'en-US-ChristopherNeural', // Options: Christopher, Guy, Brian, Andrew, Ryan
-  rate: '+12%',                     // Optimized social pacing
+  rate: '+12%', // maps to Fish prosody.speed 1.12; Edge fallback uses same rate string
+  // voice: only applies when Edge fallback is used
+  // voice: 'en-US-ChristopherNeural',
 })
+console.log(ttsResult.providerUsed) // 'fish' | 'edge'
 ```
 
 ---
