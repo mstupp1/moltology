@@ -476,13 +476,15 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   const tempDir = path.resolve(process.cwd(), 'tmp/series-episode', `${Date.now()}`)
   fs.mkdirSync(tempDir, { recursive: true })
 
-  console.log(`\n🎙️ Synthesizing Neural Voiceover Audio (Edge TTS)...`)
+  console.log(`\n🎙️ Synthesizing Neural Voiceover Audio (Fish Audio S2, Edge fallback)...`)
   const voice = options.voice || 'en-US-ChristopherNeural'
   const ttsResult = await generateVoiceover(script.narrationScript, {
     voice,
     rate: '+12%',
-    tempDir,
+    outputDir: tempDir,
   })
+
+  console.log(`   • TTS provider: ${ttsResult.providerUsed ?? 'unknown'}`)
 
   console.log(`   • Audio generated: ${ttsResult.audioPath}`)
   console.log(`   • Synchronized words: ${ttsResult.words.length} boundary events`)

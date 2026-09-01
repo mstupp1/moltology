@@ -1001,7 +1001,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   console.log(`   • Narration: "${scriptData.narrationScript}"`)
 
   // 2. Synthesize Voiceover & Word Boundaries
-  console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps...`)
+  console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps (Fish Audio S2, Edge fallback)...`)
   const voice = options.voice || 'en-US-ChristopherNeural'
   const ttsResult = await generateVoiceover(scriptData.narrationScript, {
     voice,
@@ -1009,6 +1009,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     outputDir: tempDir,
     outputFilename: 'narration.mp3',
   })
+  console.log(`   • TTS provider: ${ttsResult.providerUsed ?? 'unknown'}`)
   console.log(`   • Voiceover Duration: ${ttsResult.durationSeconds.toFixed(2)}s`)
   console.log(`   • Word Count: ${ttsResult.words.length}`)
 
@@ -1213,7 +1214,7 @@ Options:
   --schedule-best-time      Schedule for optimal audience engagement time via Zernio
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without uploading to S3 or Zernio
-  --voice <name>            TTS Voice (default: en-US-ChristopherNeural)
+  --voice <name>            Edge TTS voice when Fish fallback is used (default: en-US-ChristopherNeural)
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
