@@ -278,14 +278,14 @@ export const LandingPage: React.FC = () => {
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
         {/* Layer 2A: Deep Benthic Base Vignette */}
-        <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none" />
 
         {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
-        <picture className="absolute inset-0 w-full h-full pointer-events-none">
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (GPU Composited) */}
+        <picture className="absolute inset-0 w-full h-full pointer-events-none transform-gpu">
           <source
             type="image/webp"
             media="(max-width: 767px)"

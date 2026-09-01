@@ -5,7 +5,7 @@
 export const lcpImageProps = {
   loading: 'eager' as const,
   fetchPriority: 'high' as const,
-  decoding: 'async' as const,
+  decoding: 'sync' as const,
 }
 
 export const eagerImageProps = {
