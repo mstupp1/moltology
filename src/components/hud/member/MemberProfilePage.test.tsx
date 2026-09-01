@@ -57,4 +57,15 @@ describe('MemberProfilePage', () => {
     expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
     expect(screen.queryByText('LARVA UNIT #8971')).not.toBeInTheDocument()
   })
+
+  it('shows a workspace ghost while the dossier hydrates', () => {
+    mockGetPublicProfile.mockReturnValue(new Promise(() => {}))
+    mockGetMemberLoadout.mockReturnValue(new Promise(() => {}))
+
+    render(<MemberProfilePage profileId="member-a" />)
+
+    expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
+    expect(screen.getByText('Retrieving member dossier.')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'claw_lord' })).not.toBeInTheDocument()
+  })
 })

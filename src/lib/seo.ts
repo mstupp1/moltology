@@ -36,6 +36,12 @@ export function canonicalLink(href: string) {
   return { rel: 'canonical' as const, href }
 }
 
+export const MEMBER_PROFILE_SEO = {
+  title: 'Member Dossier | Moltology',
+  description:
+    'Public member dossier, chassis readings, and equipped loadout for authenticated units.',
+} as const
+
 export function privatePageSeo(
   options: Pick<SEOOptions, 'title' | 'description' | 'keywords' | 'ogImage' | 'twitterSite' | 'siteName'>,
 ): MetaElement[] {
