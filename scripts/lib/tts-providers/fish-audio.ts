@@ -1,8 +1,60 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { alignWordsWithOriginalText, type WordBoundaryEvent } from '../tts-engine'
 import { timeStretchMp3 } from '../time-stretch'
 import type { ProviderGenerationOptions, ProviderGenerationResult, TTSProvider } from './types'
+
+const execFileAsync = promisify(execFile)
+
+/**
+ * Linear loudness normalization — a pure gain to a target integrated loudness
+ * (no dynamics compression), with true-peak capped. Fish output measures
+ * ~2 LU quieter than the Edge fallback; this levels them out.
+ */
+async function normalizeLoudness(mp3Path: string, targetLUFS = -20, maxPeakDBFS = -1): Promise<void> {
+  const { stderr } = await execFileAsync('ffmpeg', [
+    '-hide_banner',
+    '-i',
+    mp3Path,
+    '-filter_complex',
+    'ebur128=peak=true',
+    '-f',
+    'null',
+    '-',
+  ])
+
+  const summary = stderr.split('Summary:')[1] ?? stderr
+  const iMatch = summary.match(/I:\s*(-?[\d.]+) LUFS/)
+  const peakMatch = summary.match(/Peak:\s*(-?[\d.]+) dBFS/)
+  const integrated = iMatch ? Number.parseFloat(iMatch[1]) : Number.NaN
+  const peak = peakMatch ? Number.parseFloat(peakMatch[1]) : Number.NaN
+
+  if (!Number.isFinite(integrated)) return
+
+  let gain = targetLUFS - integrated
+  if (Number.isFinite(peak)) {
+    const maxGain = maxPeakDBFS - peak
+    if (gain > maxGain) gain = maxGain
+  }
+  if (Math.abs(gain) < 0.3) return
+
+  const tmpPath = `${mp3Path}.norm.mp3`
+  await execFileAsync('ffmpeg', [
+    '-y',
+    '-i',
+    mp3Path,
+    '-af',
+    `volume=${gain.toFixed(2)}dB`,
+    '-c:a',
+    'libmp3lame',
+    '-b:a',
+    '192k',
+    tmpPath,
+  ])
+  fs.renameSync(tmpPath, mp3Path)
+}
 
 /** Fish Audio Voice Library preset — English male broadcaster (overridable via env). */
 export const DEFAULT_FISH_VOICE_REFERENCE_ID = '9a9cf47702da476aa4629e2506d4a857'
@@ -278,6 +330,8 @@ export async function synthesizeWithFish(
   } else {
     fs.writeFileSync(finalAudioPath, audio)
   }
+
+  await normalizeLoudness(finalAudioPath)
 
   return { audioPath: finalAudioPath, durationSeconds, words }
 }
