@@ -18,8 +18,8 @@ export interface HeroBackgroundProps {
 export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   className = '',
   showWatermarks = true,
-  leftWatermark = 'SYS.CORE // TRANSMUTATION_PIPELINE',
-  rightWatermark = 'MARIANA_DEPTH_DATUM // 10984M',
+  leftWatermark = 'SYS.CORE · TRANSMUTATION_PIPELINE',
+  rightWatermark = 'MARIANA_DEPTH_DATUM · 10984M',
 }) => {
   return (
     <div className={`absolute inset-0 w-full h-full pointer-events-none overflow-hidden select-none z-0 ${className}`} aria-hidden="true">

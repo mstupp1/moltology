@@ -8,7 +8,7 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { getActivityEventsHandler } from './api'
+import { getActivityEventsHandler } from './db-services'
 
 describe('getActivityEventsHandler', () => {
   beforeEach(() => {

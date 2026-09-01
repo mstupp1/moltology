@@ -8,7 +8,7 @@ import {
   getChangelogBySlugHandler,
   getS3AssetUrlHandler,
   toggleDailyAlignmentTaskHandler,
-} from './api'
+} from './db-services'
 import type { ChangelogEntry } from '../changelogs-data'
 
 describe('Server Error & Formatting', () => {

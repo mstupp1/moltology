@@ -15,23 +15,23 @@ describe('HeroBackground', () => {
     render(
       <HeroBackground
         showWatermarks={true}
-        leftWatermark="TEST // LEFT_BEACON"
-        rightWatermark="TEST // RIGHT_DATUM"
+        leftWatermark="TEST · LEFT_BEACON"
+        rightWatermark="TEST · RIGHT_DATUM"
       />,
     )
-    expect(screen.getByText('TEST // LEFT_BEACON')).toBeInTheDocument()
-    expect(screen.getByText('TEST // RIGHT_DATUM')).toBeInTheDocument()
+    expect(screen.getByText('TEST · LEFT_BEACON')).toBeInTheDocument()
+    expect(screen.getByText('TEST · RIGHT_DATUM')).toBeInTheDocument()
   })
 
   it('hides watermarks when showWatermarks is false', () => {
     render(
       <HeroBackground
         showWatermarks={false}
-        leftWatermark="SECRET // LEFT"
-        rightWatermark="SECRET // RIGHT"
+        leftWatermark="SECRET · LEFT"
+        rightWatermark="SECRET · RIGHT"
       />,
     )
-    expect(screen.queryByText('SECRET // LEFT')).not.toBeInTheDocument()
-    expect(screen.queryByText('SECRET // RIGHT')).not.toBeInTheDocument()
+    expect(screen.queryByText('SECRET · LEFT')).not.toBeInTheDocument()
+    expect(screen.queryByText('SECRET · RIGHT')).not.toBeInTheDocument()
   })
 })

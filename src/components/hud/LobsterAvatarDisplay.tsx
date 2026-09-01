@@ -13,6 +13,7 @@ import {
   stepLobsterEyeOffset,
   type LobsterPupilSide,
 } from '@/lib/lobster-avatar-idle'
+import './avatar-animations.css'
 
 const PUPIL_SIDES: LobsterPupilSide[] = ['left', 'right']
 

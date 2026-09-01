@@ -16,7 +16,6 @@ import {
   ShieldCheck,
   Cpu,
 } from 'lucide-react'
-import { PodcastPlayer } from '../../components/podcast/PodcastPlayer'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { INITIAL_PODCASTS } from '../../lib/podcast-data'
 import type { PodcastEpisode } from '../../lib/podcast-data'
@@ -25,6 +24,10 @@ import { MoltNationLogo } from '../../components/news/MoltNationLogo'
 import { seo } from '@/lib/seo'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+
+const LazyPodcastPlayer = React.lazy(() =>
+  import('../../components/podcast/PodcastPlayer').then((m) => ({ default: m.PodcastPlayer }))
+)
 
 export const Route = createFileRoute('/_hud/podcasts')({
   head: () => ({
@@ -117,7 +120,9 @@ function PodcastsPage() {
           </h2>
         </div>
 
-        <PodcastPlayer episode={activeEpisode} theme="moltnation" />
+        <React.Suspense fallback={<div className="h-36 bg-[#060a0c] border border-cyan-900/40 rounded animate-pulse" />}>
+          <LazyPodcastPlayer episode={activeEpisode} theme="moltnation" />
+        </React.Suspense>
       </div>
 
       {/* Episode Filters & Search */}

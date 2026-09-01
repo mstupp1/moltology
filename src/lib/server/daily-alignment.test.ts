@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   getDailyAlignmentHandler,
   toggleDailyAlignmentTaskHandler,
-} from './api'
+} from './db-services'
 
 describe('Daily Alignment Server Handlers', () => {
   it('returns default empty alignment when called without user context in getDailyAlignmentHandler', async () => {

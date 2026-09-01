@@ -14,7 +14,7 @@ import {
   toggleForumTopicVoteHandler,
   toggleForumPostVoteHandler,
   getForumTopicDetailHandler,
-} from './api'
+} from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 
 describe('Forum Server Handlers', () => {

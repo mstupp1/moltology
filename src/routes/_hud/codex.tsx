@@ -1,13 +1,18 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { SacredCodexReader } from '@/components/codex/SacredCodexReader'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
+
+const LazySacredCodexReader = lazy(() =>
+  import('@/components/codex/SacredCodexReader').then((m) => ({ default: m.SacredCodexReader }))
+)
 
 function CodexRoute() {
   return (
     <div className="flex flex-col">
-      <SacredCodexReader />
+      <Suspense fallback={<HudWorkspaceGhost />}>
+        <LazySacredCodexReader />
+      </Suspense>
     </div>
   )
 }

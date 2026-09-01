@@ -8,7 +8,7 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { getChassisLoadoutHandler, moveGearItemHandler } from './api'
+import { getChassisLoadoutHandler, moveGearItemHandler } from './db-services'
 
 describe('Chassis loadout handlers', () => {
   beforeEach(() => {

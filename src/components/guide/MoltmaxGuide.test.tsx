@@ -4,7 +4,7 @@ import React from 'react'
 import { MoltmaxGuideCard } from '@/components/guide/MoltmaxGuideCard'
 import { MoltmaxGuideModal } from '@/components/guide/MoltmaxGuideModal'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
-import { submitLeadHandler } from '@/lib/server/api'
+import { submitLeadHandler } from '@/lib/server/db-services'
 
 vi.mock('@/lib/server/api', async (importOriginal) => {
   const actual: any = await importOriginal()

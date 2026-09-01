@@ -8,7 +8,7 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { claimMemberHandleHandler } from './api'
+import { claimMemberHandleHandler } from './db-services'
 import { HANDLE_MESSAGES, HANDLE_TAKEN_MESSAGE } from '../member-handle'
 
 const MEMBER_A = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'

@@ -368,8 +368,8 @@ export const MoltMaxPage: React.FC = () => {
           style={{ minHeight: '100svh' }}
         >
           <HeroBackground
-            leftWatermark="MOLTMAX // BIOMETRIC_SCANNER"
-            rightWatermark="CARCINIZATION // CLEARANCE_AUDIT"
+            leftWatermark="MOLTMAX · BIOMETRIC_SCANNER"
+            rightWatermark="CARCINIZATION · CLEARANCE_AUDIT"
           />
 
           <div className="relative z-10 mx-auto grid w-full max-w-[1700px] items-center gap-8 lg:grid-cols-12 xl:gap-14">

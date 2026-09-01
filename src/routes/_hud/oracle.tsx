@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { Lock, UserPlus, Shield, X, Pencil } from 'lucide-react'
-import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { ThreadList } from '@/components/ai/ThreadList'
 import { useThreadActions, type ThreadPatch } from '@/components/ai/useThreadActions'
 import { useSafeOracle } from '@/components/hud/OracleContext'
@@ -13,6 +12,10 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { parseOracleThreadSearch, validateOracleSearch } from '@/lib/ai/last-oracle-thread'
+
+const LazyAIChatPanel = React.lazy(() =>
+  import('@/components/ai/AIChatPanel').then((m) => ({ default: m.AIChatPanel }))
+)
 
 interface OracleSidebarContentProps {
   userId: string | null
@@ -302,14 +305,16 @@ function OracleRouteComponent() {
 
         {/* Seamless Chat Panel with Borderless Integration */}
         <div className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
-          <AIChatPanel
-            userId={userId}
-            threadId={activeThreadId}
-            onThreadCreated={handleThreadCreated}
-            personaName="SYNAPTIC ORACLE"
-            className="h-full border-none shadow-none bg-transparent"
-            onToggleConversations={() => setIsMobileDrawerOpen(true)}
-          />
+          <React.Suspense fallback={<HudWorkspaceGhost />}>
+            <LazyAIChatPanel
+              userId={userId}
+              threadId={activeThreadId}
+              onThreadCreated={handleThreadCreated}
+              personaName="SYNAPTIC ORACLE"
+              className="h-full border-none shadow-none bg-transparent"
+              onToggleConversations={() => setIsMobileDrawerOpen(true)}
+            />
+          </React.Suspense>
         </div>
 
         {/* Mobile Slide-Over Overlay Backdrop */}

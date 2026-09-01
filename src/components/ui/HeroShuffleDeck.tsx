@@ -107,13 +107,26 @@ export const HeroShuffleDeck: React.FC = () => {
   const [inView, setInView] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [activeVideoReady, setActiveVideoReady] = useState(false)
+  const [videosEnabled, setVideosEnabled] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
   const viewportRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
   const totalCards = CARDS.length
-  const canMountVideo = inView && !reducedMotion
+  const canMountVideo = inView && !reducedMotion && videosEnabled
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    // Defer video network activity until after the initial paint / LCP window
+    if ('requestIdleCallback' in window) {
+      const handle = (window as any).requestIdleCallback(() => setVideosEnabled(true), { timeout: 2000 })
+      return () => (window as any).cancelIdleCallback(handle)
+    } else {
+      const timer = globalThis.setTimeout(() => setVideosEnabled(true), 1200)
+      return () => globalThis.clearTimeout(timer)
+    }
+  }, [])
 
   const goTo = useCallback((nextIndex: number) => {
     setActiveIndex((prev) => {
@@ -314,8 +327,8 @@ export const HeroShuffleDeck: React.FC = () => {
                   poster={card.imageSm || card.image}
                   muted
                   playsInline
-                  autoPlay={!isPreloading}
-                  preload="auto"
+                  autoPlay={isActive}
+                  preload={isActive ? 'auto' : 'none'}
                   onCanPlay={() => {
                     if (isActive) setActiveVideoReady(true)
                   }}
