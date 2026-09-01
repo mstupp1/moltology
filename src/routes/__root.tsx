@@ -52,14 +52,9 @@ export const Route = createRootRoute({
         {
           rel: 'preconnect',
           href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech',
-          crossOrigin: 'anonymous',
         },
         { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
-        {
-          rel: 'preconnect',
-          href: 'https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech',
-          crossOrigin: 'anonymous',
-        },
+        // Auth is deferred until idle/interaction — dns-prefetch only (CORS preconnect would sit unused on first paint).
         { rel: 'dns-prefetch', href: 'https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech' },
       ],
     }

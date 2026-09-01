@@ -16,7 +16,7 @@ vi.mock('@/components/LandingPage', () => ({
 import { Route } from './index'
 
 describe('Homepage route head', () => {
-  it('preloads the chitin LCP still per breakpoint', async () => {
+  it('preloads hero LCP high and demotes decorative chitin overlays', async () => {
     const headFn = Route.options.head
     expect(headFn).toBeTypeOf('function')
     if (typeof headFn !== 'function') {
@@ -41,7 +41,6 @@ describe('Homepage route head', () => {
           type: 'image/webp',
           media: '(max-width: 767px)',
           href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
-          fetchPriority: 'high',
         },
         {
           rel: 'preload',
@@ -49,12 +48,15 @@ describe('Homepage route head', () => {
           type: 'image/webp',
           media: '(min-width: 768px)',
           href: getAssetUrl('/images/chitin_texture_bg.webp'),
-          fetchPriority: 'high',
         },
       ]),
     )
 
     const preloads = (head.links ?? []).filter((link) => link && 'rel' in link && link.rel === 'preload')
     expect(preloads).toHaveLength(3)
+    const highPriority = preloads.filter(
+      (link) => link && 'fetchPriority' in link && link.fetchPriority === 'high',
+    )
+    expect(highPriority).toHaveLength(1)
   })
 })

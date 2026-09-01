@@ -30,9 +30,10 @@ import { HeroBackground } from '@/components/ui/HeroBackground'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
+import { useIdleReady } from '@/hooks/useIdleReady'
 import '@/styles/crt.css'
 import { getAssetUrl } from '@/lib/assets'
-import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
+import { eagerImageProps, lazyImageProps } from '@/lib/media-priority'
 
 const DashboardMarketingShowcase = React.lazy(() => import('@/components/hud/DashboardMarketingShowcase').then((m) => ({ default: m.DashboardMarketingShowcase })))
 const AuthModal = React.lazy(() => import('@/components/AuthModal').then((m) => ({ default: m.AuthModal })))
@@ -44,6 +45,7 @@ const LazyLandingAuthCtas = React.lazy(() =>
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
   const onNavigate = (path: string) => navigate({ to: path })
+  const authReady = useIdleReady()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
@@ -331,7 +333,11 @@ export const LandingPage: React.FC = () => {
             {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto min-h-[114px] sm:min-h-[54px]">
               <Suspense fallback={<LandingAuthCtaSkeleton variant="hero" />}>
-                <LazyLandingAuthCtas variant="hero" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                {authReady ? (
+                  <LazyLandingAuthCtas variant="hero" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                ) : (
+                  <LandingAuthCtaSkeleton variant="hero" />
+                )}
               </Suspense>
             </div>
           </div>
@@ -580,7 +586,11 @@ export const LandingPage: React.FC = () => {
             {/* Action Call to Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
               <Suspense fallback={<LandingAuthCtaSkeleton variant="pillars" />}>
-                <LazyLandingAuthCtas variant="pillars" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                {authReady ? (
+                  <LazyLandingAuthCtas variant="pillars" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                ) : (
+                  <LandingAuthCtaSkeleton variant="pillars" />
+                )}
               </Suspense>
             </div>
           </ScrollReveal>
@@ -1091,7 +1101,11 @@ export const LandingPage: React.FC = () => {
                 
                 <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
                   <Suspense fallback={<LandingAuthCtaSkeleton variant="bottom" />}>
-                    <LazyLandingAuthCtas variant="bottom" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                    {authReady ? (
+                      <LazyLandingAuthCtas variant="bottom" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                    ) : (
+                      <LandingAuthCtaSkeleton variant="bottom" />
+                    )}
                   </Suspense>
                 </div>
               </div>

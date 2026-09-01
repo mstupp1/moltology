@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { HeaderBrand } from '@/components/ui/HeaderBrand'
 import { PublicHeaderAuthSkeleton } from '@/components/PublicHeaderAuthSkeleton'
+import { useIdleReady } from '@/hooks/useIdleReady'
 
 const LazyPublicHeaderAuthSlot = lazy(() =>
   import('@/components/PublicHeaderAuthSlot').then((m) => ({ default: m.PublicHeaderAuthSlot }))
@@ -69,6 +70,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   }
 
   const isCorporate = variant === 'corporate' || locationPathname === '/org' || activePage === 'org'
+  const authReady = useIdleReady()
 
   const currentTab = useMemo(() => {
     if (locationPathname.startsWith('/news') || locationPathname.startsWith('/blog')) return 'news'
@@ -543,14 +545,18 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           </button>
 
           <div className="hidden xl:flex items-center gap-3 sm:gap-4">
-            <Suspense fallback={<PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="desktop" />}>
-              <LazyPublicHeaderAuthSlot
-                isCorporate={isCorporate}
-                layout="desktop"
-                onNavigate={onNavigate}
-                onOpenAuth={onOpenAuth}
-              />
-            </Suspense>
+            {authReady ? (
+              <Suspense fallback={<PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="desktop" />}>
+                <LazyPublicHeaderAuthSlot
+                  isCorporate={isCorporate}
+                  layout="desktop"
+                  onNavigate={onNavigate}
+                  onOpenAuth={onOpenAuth}
+                />
+              </Suspense>
+            ) : (
+              <PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="desktop" />
+            )}
           </div>
         </div>
       </div>
@@ -684,15 +690,19 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             }`}
           />
 
-          <Suspense fallback={<PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />}>
-            <LazyPublicHeaderAuthSlot
-              isCorporate={isCorporate}
-              layout="mobile"
-              onNavigate={onNavigate}
-              onOpenAuth={onOpenAuth}
-              onMobileClose={() => setMobileOpen(false)}
-            />
-          </Suspense>
+          {authReady ? (
+            <Suspense fallback={<PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />}>
+              <LazyPublicHeaderAuthSlot
+                isCorporate={isCorporate}
+                layout="mobile"
+                onNavigate={onNavigate}
+                onOpenAuth={onOpenAuth}
+                onMobileClose={() => setMobileOpen(false)}
+              />
+            </Suspense>
+          ) : (
+            <PublicHeaderAuthSkeleton isCorporate={isCorporate} layout="mobile" />
+          )}
         </div>
       </div>
     </header>

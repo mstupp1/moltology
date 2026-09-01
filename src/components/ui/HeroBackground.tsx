@@ -1,6 +1,6 @@
 import React from 'react'
 import { getAssetUrl } from '@/lib/assets'
-import { lcpImageProps } from '@/lib/media-priority'
+import { eagerImageProps } from '@/lib/media-priority'
 
 export interface HeroBackgroundProps {
   className?: string
@@ -51,7 +51,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
         <img
           src={getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')}
           alt="Chitin Exoshell Background Texture"
-          {...lcpImageProps}
+          {...eagerImageProps}
           width={1376}
           height={768}
           className="w-full h-full object-cover opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"

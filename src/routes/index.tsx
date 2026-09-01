@@ -21,13 +21,13 @@ export const Route = createFileRoute('/')({
         href: getAssetUrl('/images/hero_widescreen_bg.webp'),
         fetchPriority: 'high',
       },
+      // Decorative chitin overlay — preload without competing for LCP priority
       {
         rel: 'preload',
         as: 'image',
         type: 'image/webp',
         media: '(max-width: 767px)',
         href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
-        fetchPriority: 'high',
       },
       {
         rel: 'preload',
@@ -35,7 +35,6 @@ export const Route = createFileRoute('/')({
         type: 'image/webp',
         media: '(min-width: 768px)',
         href: getAssetUrl('/images/chitin_texture_bg.webp'),
-        fetchPriority: 'high',
       },
     ],
   }),

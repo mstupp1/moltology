@@ -9,6 +9,7 @@ describe('HeroBackground', () => {
     const textureImg = screen.getByAltText('Chitin Exoshell Background Texture')
     expect(textureImg).toBeInTheDocument()
     expect(textureImg.getAttribute('src')).toContain('chitin_texture_bg')
+    expect(textureImg.getAttribute('fetchpriority')?.toLowerCase() || textureImg.getAttribute('fetchPriority')).not.toBe('high')
   })
 
   it('renders custom watermarks when enabled', () => {
