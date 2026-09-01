@@ -243,8 +243,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
     ) : (
       <span
         className={`${className} inline-flex items-center justify-center min-w-[2.25rem]`}
-        aria-label="Alignment liturgy count resolving"
-        title="Alignment liturgy count resolving"
+        aria-hidden
       >
         <span className="inline-block h-2 w-4 rounded-full bg-[#00c3ff]/40 animate-pulse" />
       </span>
@@ -360,7 +359,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
               ) : (
                 <span
                   className="inline-block h-2 w-28 rounded-full bg-[#00c3ff]/25 animate-pulse"
-                  aria-label="Alignment liturgy count resolving"
+                  aria-hidden
                 />
               )}
             </div>
@@ -635,6 +634,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           title="Open Activity Center & Liturgy Schedule"
           aria-label="Daily alignment tasks schedule"
           aria-expanded={isScheduleOpen}
+          aria-busy={!countReady}
         >
           {/* Next Task Indicator (Hidden on extra small screens) */}
           <span className="text-[10px] text-[#839493] hidden md:inline truncate max-w-[130px] font-sans">
@@ -643,7 +643,10 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
               </>
             ) : (
-              <span className="inline-block h-2 w-20 rounded-full bg-[#839493]/30 animate-pulse align-middle" />
+              <span
+                className="inline-block h-2 w-20 rounded-full bg-[#839493]/30 animate-pulse align-middle"
+                aria-hidden
+              />
             )}
           </span>
 
@@ -882,7 +885,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 ) : (
                   <span
                     className="inline-block h-2 w-24 rounded-full bg-[#00c3ff]/40 animate-pulse"
-                    aria-label="Alignment liturgy count resolving"
+                    aria-hidden
                   />
                 )}
               </div>

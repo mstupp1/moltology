@@ -42,7 +42,8 @@ describe('HUDTaskBar alignment count first paint', () => {
 
     expect(screen.queryByText('0/8')).not.toBeInTheDocument()
     expect(screen.queryByText(/0\/8/)).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Alignment liturgy count resolving')).toBeInTheDocument()
+    expect(screen.queryByText(/resolving/i)).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Daily alignment tasks schedule')).toHaveAttribute('aria-busy', 'true')
     expect(screen.queryByText(/NEXT:/i)).not.toBeInTheDocument()
   })
 
@@ -57,7 +58,7 @@ describe('HUDTaskBar alignment count first paint', () => {
     render(<HUDTaskBar variant="header" />)
 
     expect(screen.getByText('4/8')).toBeInTheDocument()
-    expect(screen.queryByLabelText('Alignment liturgy count resolving')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Daily alignment tasks schedule')).toHaveAttribute('aria-busy', 'false')
     expect(screen.getByText(/NEXT:/i)).toBeInTheDocument()
     expect(screen.queryByText('0/8')).not.toBeInTheDocument()
   })
