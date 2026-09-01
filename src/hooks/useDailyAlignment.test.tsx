@@ -3,8 +3,10 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AlignmentProvider, useDailyAlignment } from './useDailyAlignment'
 import { ToastProvider } from '@/components/ui/ToastProvider'
-import { CANONICAL_ALIGNMENT_TASKS, mergeCompletions } from '@/lib/alignment-tasks'
+import { CANONICAL_ALIGNMENT_TASKS, mergeCompletions, localDateString, shiftDays } from '@/lib/alignment-tasks'
+import { getCachedAlignmentSnapshot, setCachedAlignmentSnapshot } from '@/lib/alignment-snapshot'
 import * as serverApi from '@/lib/server/api'
+import { getAuthJWTToken } from '@/lib/jwt'
 
 // Mock authClient
 const mockAuthClient = {
@@ -29,6 +31,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    localStorage.clear()
+    vi.mocked(getAuthJWTToken).mockResolvedValue('mock-jwt-token')
     mockAuthClient.useSession.mockReturnValue({
       data: { user: { id: 'test-user-123' } },
       isPending: false,
@@ -258,5 +262,108 @@ describe('useDailyAlignment Hook Optimistic State & Rapid Clicks', () => {
     expect(result.current.tasks[1].completed).toBe(true)
     expect(result.current.completedCount).toBe(2)
     expect(toggleSpy).not.toHaveBeenCalled()
+  })
+
+  it('paints last-known liturgy count before the server fetch resolves', async () => {
+    const today = localDateString()
+    const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 4).map((t) => t.key)
+    setCachedAlignmentSnapshot('test-user-123', { date: today, completedKeys })
+
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockImplementation(
+      () => new Promise(() => {}),
+    )
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.completedCount).toBe(4)
+    expect(result.current.tasks.filter((t) => t.completed).map((t) => t.key)).toEqual(completedKeys)
+  })
+
+  it('holds a signed-in count as pending instead of treating empty tasks as 0/8', () => {
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockImplementation(
+      () => new Promise(() => {}),
+    )
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+
+    expect(result.current.isLoading).toBe(true)
+    expect(result.current.completedCount).toBe(0)
+  })
+
+  it('does not inherit yesterday liturgies as today progress', () => {
+    const today = localDateString()
+    const yesterday = shiftDays(today, -1)
+    setCachedAlignmentSnapshot('test-user-123', {
+      date: yesterday,
+      completedKeys: CANONICAL_ALIGNMENT_TASKS.slice(0, 4).map((t) => t.key),
+    })
+
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockImplementation(
+      () => new Promise(() => {}),
+    )
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+
+    expect(result.current.isLoading).toBe(true)
+    expect(result.current.completedCount).toBe(0)
+  })
+
+  it('writes last-known liturgies after a trusted server payload', async () => {
+    const today = localDateString()
+    const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 4).map((t) => t.key)
+
+    vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: today,
+      tasks: mergeCompletions(completedKeys),
+      completedKeys,
+      completedCount: 4,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [{ date: today, completedCount: 4 }],
+      streakDays: 1,
+    })
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.completedCount).toBe(4)
+    expect(getCachedAlignmentSnapshot('test-user-123')).toEqual({
+      date: today,
+      completedKeys,
+    })
+  })
+
+  it('keeps last-known progress when the JWT is not ready yet', async () => {
+    const today = localDateString()
+    const completedKeys = CANONICAL_ALIGNMENT_TASKS.slice(0, 4).map((t) => t.key)
+    setCachedAlignmentSnapshot('test-user-123', { date: today, completedKeys })
+    vi.mocked(getAuthJWTToken).mockResolvedValueOnce(null)
+
+    const fetchSpy = vi.spyOn(serverApi, 'getDailyAlignmentFn').mockResolvedValue({
+      date: today,
+      tasks: mergeCompletions([]),
+      completedKeys: [],
+      completedCount: 0,
+      totalCount: 8,
+      isAllCompleted: false,
+      history: [],
+      streakDays: 0,
+    })
+
+    const { result } = renderHook(() => useDailyAlignment(), { wrapper })
+
+    expect(result.current.completedCount).toBe(4)
+    expect(result.current.isLoading).toBe(false)
+
+    await waitFor(() => {
+      expect(vi.mocked(getAuthJWTToken)).toHaveBeenCalled()
+    })
+
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(result.current.completedCount).toBe(4)
   })
 })

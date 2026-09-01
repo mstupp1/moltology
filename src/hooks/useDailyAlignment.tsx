@@ -1,9 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import {
-  CANONICAL_ALIGNMENT_TASKS,
   TOTAL_ALIGNMENT_TASKS,
   mergeCompletions,
   computeStreak,
@@ -13,10 +21,18 @@ import {
   type DailyStreakDay,
 } from '@/lib/alignment-tasks'
 import {
+  getFreshAlignmentSnapshot,
+  setCachedAlignmentSnapshot,
+  snapshotFromCompletedKeys,
+} from '@/lib/alignment-snapshot'
+import {
   getDailyAlignmentFn,
   toggleDailyAlignmentTaskFn,
 } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
+
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 export interface AlignmentContextValue {
   tasks: AlignmentTaskItem[]
@@ -38,7 +54,6 @@ const AlignmentContext = createContext<AlignmentContextValue | null>(null)
 
 export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const session = useAuthSession()
-  const user = session.user
   const userId = session.userId
   const isAuthPending = session.isPending
   const isGuest = session.isGuest
@@ -77,12 +92,32 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   persistRef.current = persist
 
   const initialFetchDoneRef = useRef(false)
+  const snapshotUserRef = useRef<string | null>(null)
+  const hasTrustworthyCountRef = useRef(false)
 
   // Track pending optimistic target states per task key to prevent server responses from stomping in-flight clicks
   const pendingOverridesRef = useRef<Map<string, boolean>>(new Map())
   // Serial queue of task keys to persist sequentially to the backend
   const queueRef = useRef<string[]>([])
   const isProcessingRef = useRef<boolean>(false)
+
+  const persistSnapshot = useCallback((date: string, nextTasks: AlignmentTaskItem[]) => {
+    const id = userIdRef.current
+    if (!id) return
+    setCachedAlignmentSnapshot(
+      id,
+      snapshotFromCompletedKeys(
+        date,
+        nextTasks.filter((t) => t.completed).map((t) => t.key),
+      ),
+    )
+  }, [])
+
+  const markCountReady = useCallback((nextTasks: AlignmentTaskItem[], date: string) => {
+    hasTrustworthyCountRef.current = true
+    persistSnapshot(date, nextTasks)
+    setIsLoading(false)
+  }, [persistSnapshot])
 
   const applyPendingOverrides = useCallback((serverTasks: AlignmentTaskItem[]): AlignmentTaskItem[] => {
     if (pendingOverridesRef.current.size === 0) return serverTasks
@@ -100,23 +135,30 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   // Fetch alignment from backend for authenticated users
   const fetchAlignment = useCallback(async (targetDate: string, isSilent = false) => {
     if (!userId) {
+      hasTrustworthyCountRef.current = true
       setIsLoading(false)
       return
     }
 
-    if (!isSilent) {
+    if (!isSilent && !hasTrustworthyCountRef.current) {
       setIsLoading(true)
     }
 
     try {
       const token = await getAuthJWTToken()
+      if (!token) {
+        // Signed-in chrome with no JWT yet: do not paint the unauthenticated empty stub as 0/8.
+        return
+      }
+
       const data = await getDailyAlignmentFn({
-        data: { date: targetDate, token: token ?? undefined },
+        data: { date: targetDate, token },
       })
       if (data) {
         const mergedTasks = applyPendingOverrides(data.tasks)
         tasksRef.current = mergedTasks
         setTasks(mergedTasks)
+        markCountReady(mergedTasks, targetDate)
 
         if (pendingOverridesRef.current.size === 0) {
           setHistory(data.history || [])
@@ -132,10 +174,36 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.warn('[useDailyAlignment] Failed to fetch alignment from server:', err)
     } finally {
-      setIsLoading(false)
+      if (hasTrustworthyCountRef.current) {
+        setIsLoading(false)
+      }
       initialFetchDoneRef.current = true
     }
-  }, [userId, applyPendingOverrides])
+  }, [userId, applyPendingOverrides, markCountReady])
+
+  // Seed last-known liturgies before paint so the header never flashes a fake 0/8
+  useIsomorphicLayoutEffect(() => {
+    if (!userId) {
+      snapshotUserRef.current = null
+      if (!isAuthPending) {
+        hasTrustworthyCountRef.current = true
+        setIsLoading(false)
+      }
+      return
+    }
+
+    if (snapshotUserRef.current === userId && hasTrustworthyCountRef.current) return
+    snapshotUserRef.current = userId
+
+    const today = localDateString()
+    const snapshot = getFreshAlignmentSnapshot(userId, today)
+    if (!snapshot) return
+
+    const merged = applyPendingOverrides(mergeCompletions(snapshot.completedKeys))
+    tasksRef.current = merged
+    setTasks(merged)
+    markCountReady(merged, today)
+  }, [userId, isAuthPending, applyPendingOverrides, markCountReady])
 
   // Re-fetch on user login or date change
   useEffect(() => {
@@ -144,8 +212,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     currentDateRef.current = today
 
     if (userId) {
-      fetchAlignment(today)
+      fetchAlignment(today, hasTrustworthyCountRef.current)
     } else if (!isAuthPending) {
+      hasTrustworthyCountRef.current = true
       setIsLoading(false)
     }
   }, [userId, isAuthPending, fetchAlignment])
@@ -160,18 +229,31 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         setCurrentDate(today)
         currentDateRef.current = today
         if (userId) {
-          fetchAlignment(today, true)
+          const snapshot = getFreshAlignmentSnapshot(userId, today)
+          if (snapshot) {
+            const merged = applyPendingOverrides(mergeCompletions(snapshot.completedKeys))
+            tasksRef.current = merged
+            setTasks(merged)
+            markCountReady(merged, today)
+            fetchAlignment(today, true)
+          } else {
+            hasTrustworthyCountRef.current = false
+            setIsLoading(true)
+            fetchAlignment(today, false)
+          }
         } else {
           const fresh = mergeCompletions([])
           tasksRef.current = fresh
           setTasks(fresh)
+          hasTrustworthyCountRef.current = true
+          setIsLoading(false)
         }
       }
     }
 
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
-  }, [currentDate, userId, fetchAlignment])
+  }, [currentDate, userId, fetchAlignment, applyPendingOverrides, markCountReady])
 
   // Serial queue worker to process mutations sequentially without race conditions
   const triggerQueueProcessing = useCallback(() => {
@@ -219,6 +301,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
 
               tasksRef.current = merged
               setTasks(merged)
+              persistSnapshot(currentDateRef.current, merged)
 
               const remainingOverridesCount = pendingOverridesRef.current.size
               if (remainingOverridesCount > 0) {
@@ -294,6 +377,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
       // Synchronously update ref & React state
       tasksRef.current = nextTasks
       setTasks(nextTasks)
+      persistSnapshot(currentDateRef.current, nextTasks)
 
       // Synchronously update local history for instant streak/heatmap alignment
       setHistory((prev) => {
@@ -318,7 +402,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         triggerQueueProcessing()
       }
     },
-    [triggerQueueProcessing]
+    [triggerQueueProcessing, persistSnapshot]
   )
 
   const refetch = useCallback(async () => {
