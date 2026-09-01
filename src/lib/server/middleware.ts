@@ -1,7 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start'
 import { looksLikeJwt, verifyNeonJWT } from '../jwt'
-import { getDb } from '../../db'
-import { ensureUserProfile } from '../user-sync'
 import { ServerError } from './error'
 
 /**
@@ -65,6 +63,8 @@ export const authMiddleware = createMiddleware().server(async ({ request, next, 
   }
 
   const user = verification.payload
+  const { getDb } = await import('../../db')
+  const { ensureUserProfile } = await import('../user-sync')
   const db = getDb()
   await ensureUserProfile(user.sub)
 
@@ -85,13 +85,15 @@ export const optionalAuthMiddleware = createMiddleware().server(async ({ request
   const headerToken = extractAuthToken(request)
   const dataToken = typeof data?.token === 'string' && looksLikeJwt(data.token) ? data.token : null
   const token = headerToken || dataToken
-  let ctx: { user: any; token: string | null; db: ReturnType<typeof getDb> }
+  const { getDb } = await import('../../db')
+  let ctx: { user: any; token: string | null; db: any }
 
   if (!token) {
     ctx = { user: null, token: null, db: getDb() }
   } else {
     const verification = await verifyNeonJWT(token)
     if (verification.valid && verification.payload) {
+      const { ensureUserProfile } = await import('../user-sync')
       await ensureUserProfile(verification.payload.sub)
       ctx = { user: verification.payload, token, db: getDb() }
     } else {

@@ -1,8 +1,5 @@
 import React from 'react'
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import { NeonAuthUIProvider } from '@neondatabase/neon-js/auth/react'
-import '@neondatabase/neon-js/ui/css'
-import { authClient } from '@/lib/auth'
 import '@/index.css'
 import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
@@ -115,9 +112,7 @@ function RootDocument() {
       <body className="bg-[#0f1414] text-[#dfe3e3] font-sans antialiased selection:bg-[#00ffff] selection:text-[#000a0a]">
         <HUDErrorBoundary>
           <ToastProvider>
-            <NeonAuthUIProvider emailOTP authClient={authClient}>
-              <Outlet />
-            </NeonAuthUIProvider>
+            <Outlet />
           </ToastProvider>
         </HUDErrorBoundary>
         <Scripts />

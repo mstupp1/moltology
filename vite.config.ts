@@ -38,6 +38,7 @@ export default defineConfig({
           tanstackStart({
             router: {
               routeFileIgnorePattern: '.*\\.test\\..*',
+              autoCodeSplitting: true,
             },
             server: {
               build: {
