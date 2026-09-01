@@ -11,6 +11,7 @@ import {
   renderHudWatermarkCard,
   renderKineticCaptionCard,
   renderCtaOutroVideo,
+  renderSimpleCtaOutroVideo,
   hasAudioStream,
 } from './reel-compositor'
 
@@ -45,6 +46,7 @@ export interface CompositeSeriesReelOptions {
   ctaActionText?: string
   ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
   customOutroImagePath?: string
+  useSimpleOutro?: boolean // default true (sleek, minimalist fade-in: logo, Moltology, Synaptic Path, moltology.org)
   mascot?:
     | 'lobster_pointing'
     | 'lobster_thumbs_up'
@@ -366,24 +368,38 @@ export async function compositeSeriesReel(
     normalizedClips.push(normPath)
   }
 
-  // 3. Render CTA Outro Card Video
+  // 3. Render CTA Outro Card Video (Simplified fade-in ending by default for viral series)
   const ctaDuration = options.ctaDurationSeconds || 2.5
   const outroVideoPath = path.join(tempDir, 'cta-outro.mp4')
-  console.log(`   • Rendering 3D CTA Outro Card (${ctaDuration}s)...`)
-  await renderCtaOutroVideo(
-    outroVideoPath,
-    ctaDuration,
-    options.ctaHeadline,
-    options.ctaSubheadline,
-    options.ctaUrl,
-    {
-      mascot: options.mascot,
-      ctaBadge: options.ctaBadge,
-      ctaActionText: options.ctaActionText,
-      ctaTexture: options.ctaTexture,
-      customImagePath: options.customOutroImagePath,
-    }
-  )
+  const useSimple = options.useSimpleOutro !== false
+
+  if (useSimple) {
+    console.log(`   • Rendering Simplified CTA Outro Card (${ctaDuration}s, clean moltology.org fade-in)...`)
+    await renderSimpleCtaOutroVideo(
+      outroVideoPath,
+      ctaDuration,
+      options.ctaUrl || 'moltology.org',
+      {
+        customImagePath: options.customOutroImagePath,
+      }
+    )
+  } else {
+    console.log(`   • Rendering 3D CTA Outro Card (${ctaDuration}s)...`)
+    await renderCtaOutroVideo(
+      outroVideoPath,
+      ctaDuration,
+      options.ctaHeadline,
+      options.ctaSubheadline,
+      options.ctaUrl,
+      {
+        mascot: options.mascot,
+        ctaBadge: options.ctaBadge,
+        ctaActionText: options.ctaActionText,
+        ctaTexture: options.ctaTexture,
+        customImagePath: options.customOutroImagePath,
+      }
+    )
+  }
   normalizedClips.push(outroVideoPath)
 
   // 4. Stitch narrative scenes with smooth quick transitions, then append CTA outro

@@ -6,6 +6,8 @@ import {
   renderKineticCaptionCard,
   renderReelThumbnail,
   renderCtaOutroVideo,
+  renderSimpleCtaOutroFrame,
+  renderSimpleCtaOutroVideo,
 } from './reel-compositor'
 
 describe('Reel Compositor Rendering', () => {
@@ -63,6 +65,26 @@ describe('Reel Compositor Rendering', () => {
     expect(fs.existsSync(result)).toBe(true)
     const stats = fs.statSync(result)
     expect(stats.size).toBeGreaterThan(10000)
+  })
+
+  it('renders the simplified CTA outro card frame (Moltology emblem, THE SYNAPTIC PATH, clean moltology.org CTA)', async () => {
+    const outPath = path.resolve(process.cwd(), 'tmp/test_simple_cta_outro_frame.png')
+    const result = await renderSimpleCtaOutroFrame(outPath, 'moltology.org', { useCanvasOnly: true })
+
+    expect(fs.existsSync(result)).toBe(true)
+    const stats = fs.statSync(result)
+    expect(stats.size).toBeGreaterThan(1000)
+    if (fs.existsSync(result)) fs.unlinkSync(result)
+  })
+
+  it('renders the simplified CTA outro card video with smooth fade-in', async () => {
+    const outPath = path.resolve(process.cwd(), 'tmp/test_simple_cta_outro.mp4')
+    const result = await renderSimpleCtaOutroVideo(outPath, 1.0, 'moltology.org', { useCanvasOnly: true })
+
+    expect(fs.existsSync(result)).toBe(true)
+    const stats = fs.statSync(result)
+    expect(stats.size).toBeGreaterThan(10000)
+    if (fs.existsSync(result)) fs.unlinkSync(result)
   })
 
   it('resolves valid FFmpeg video filter strings for color grading presets', async () => {

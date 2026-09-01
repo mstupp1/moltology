@@ -9,6 +9,7 @@ import {
   SocialMarketingSlide,
   SocialPromptVaultSlide,
   ReelOutroCard,
+  ReelSimpleOutroCard,
   ReelThumbnailCard,
   BlogSchematicCard,
   MascotKey,
@@ -148,6 +149,13 @@ export default function CompositeRenderView({ search }: CompositeRenderProps) {
             linkInBioText={customData.linkInBioText}
             ctaTexture={customData.ctaTexture}
             mascot={mascot}
+            backgroundImageUrl={customData.backgroundImageUrl}
+          />
+        )}
+
+        {template === 'reel-simple-outro' && (
+          <ReelSimpleOutroCard
+            url={customData.url || 'moltology.org'}
             backgroundImageUrl={customData.backgroundImageUrl}
           />
         )}

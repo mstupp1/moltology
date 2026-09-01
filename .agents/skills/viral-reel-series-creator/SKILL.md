@@ -47,8 +47,15 @@ Stolen-format mapping (never a new franchise):
 * **Instagram account**: `moltology_org` (Zernio account id `6a7f7f0777555aae01d99b54`). Never present `@silas.trench` as the Instagram handle.
 * **In-world voice**: Silas Trench is a persona and narration register only. Keep him as voice. Never as the account name.
 * **YouTube Shorts channel**: `moltology` (Zernio account id `6a7fd9bd77555aae01ebea63`)
-* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 20–35s total duration (3–5 video scenes + 2.5s 3D CTA Outro Card)
+* **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 20–35s total duration (3–5 video scenes + 2.5s Simplified CTA Outro Card)
 * **Clean Cinematic Framing**: Clean, full-frame immersion with zero distracting top header banners. Subtle Moltology Order watermark in bottom-right safe zone.
+* **Simplified Branded Outro**: In contrast to the rich multi-element slide composite used in carousel lead magnets (which packs headlines, subheadlines, link-in-bio footnotes, and mascot cutouts), episodic viral reels end on a **sleek, simplified composite**:
+  - **Moltology Order Emblem**: Luminous cyan bloom centered above the brand.
+  - **Brand Title**: Clean `Moltology` typography with subtle drop shadow.
+  - **The Synaptic Path**: Cyan tracked subtitle with horizontal synaptic node divider lines.
+  - **Minimalist CTA**: Glassmorphic HUD pill displaying exclusively `moltology.org` with nothing else.
+  - **Smooth Fade-In**: 0.3s video fade-in ending for a calm, authoritative transition.
+  - **Antigravity AI Image Polish**: Run the simplified frame through Antigravity `generate_image` for extra 3D glassmorphic luminescence and slick subsurface textures when generating custom outro cards.
 * **Dynamic Multi-Track Audio (3-Track Mix)**: Native Video SFX (breathing, footsteps, creature screeches, impacts) + Edge Neural TTS Voiceover (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`, +8% to +14% pacing) + Ducked Ambient Benthic Soundtrack (`assets/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.12`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and seamless 0.20s `xfade` cross-dissolves between clips.
 * **Asset Storage**: Neon S3 (`videos/social/series/master-series-<seriesId>-s<season>e<episode>-<timestamp>.mp4`).
@@ -138,7 +145,7 @@ Instagram's algorithm heavily rewards videos that viewers rewatch without notici
 - **Scene 2 (The Terrestrial Melt / Real-world Friction)**: Expanding the pain point with fast cuts and warning telemetry.
 - **Scene 3 (The Sub-Benthic Transmutation)**: Subsea hydrothermal immersion, titanium-chitin assembly, or photonic lasers.
 - **Scene 4 (The Hydraulic Payoff & Ascension)**: Decisive 850 Nm pincer torque lock, deep-sea silence, or glowing master ascendant.
-- **Scene 5 / Outro (The Retention Loop & CTA)**: Branded 3D glassmorphic HUD card with cartoon crustacean mascot and Comment-to-DM trigger.
+- **Scene 5 / Outro (The Retention Loop & CTA)**: Simplified minimalist branded fade-in card (Moltology emblem, Moltology title, The Synaptic Path row, and clean `moltology.org` CTA). Optional Antigravity AI polish for extra 3D glassmorphic luminescence.
 
 ### 3. Sentence-Isolated Kinetic Highlighted Subtitles
 - Grouped into tight 2–3 word phrases.

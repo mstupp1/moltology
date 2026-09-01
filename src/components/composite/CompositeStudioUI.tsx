@@ -6,6 +6,7 @@ import { SocialDirectivesSlide } from './SocialDirectivesSlide'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
 import { SocialPromptVaultSlide } from './SocialPromptVaultSlide'
 import { ReelOutroCard, CtaTextureKey } from './ReelOutroCard'
+import { ReelSimpleOutroCard } from './ReelSimpleOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
 import { MascotKey, MASCOT_REGISTRY } from './MascotOverlay'
@@ -34,6 +35,7 @@ export type CompositeTemplateType =
   | 'spec-showdown'
   | 'directives'
   | 'reel-outro'
+  | 'reel-simple-outro'
   | 'reel-thumbnail'
   | 'blog-schematic'
 
@@ -358,6 +360,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                 { id: 'spec-showdown', label: 'Spec Showdown' },
                 { id: 'directives', label: 'Directives / CTA' },
                 { id: 'reel-outro', label: 'Reel Outro (9:16)' },
+                { id: 'reel-simple-outro', label: '⚡ Simple Outro (9:16)' },
                 { id: 'reel-thumbnail', label: 'Reel Cover (9:16)' },
                 { id: 'blog-schematic', label: 'Blog Figure (16:9)' },
               ].map((t) => (
@@ -365,7 +368,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                   key={t.id}
                   onClick={() => {
                     setTemplate(t.id as CompositeTemplateType)
-                    if (t.id === 'reel-outro' || t.id === 'reel-thumbnail') setAspect('9:16')
+                    if (t.id === 'reel-outro' || t.id === 'reel-simple-outro' || t.id === 'reel-thumbnail') setAspect('9:16')
                     else if (t.id === 'blog-schematic') setAspect('16:9')
                     else if (aspect === '9:16' || aspect === '16:9') setAspect('4:5')
                   }}
@@ -856,6 +859,12 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
                   actionBadgeText={trustBadgeText || (commentKeyword ? `⚡ COMMENT "${commentKeyword}" TO AUDIT` : '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST')}
                   ctaTexture={ctaTexture}
                   mascot={mascot}
+                />
+              )}
+
+              {template === 'reel-simple-outro' && (
+                <ReelSimpleOutroCard
+                  url="moltology.org"
                 />
               )}
 

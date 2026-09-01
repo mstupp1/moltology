@@ -543,6 +543,224 @@ export async function renderCtaOutroVideo(
 }
 
 /**
+ * Generate Minimal Frame for the Branded CTA Outro Card via Composite Studio (Headless Chrome) with Canvas Fallback
+ * Features exclusively: Moltology emblem, brand title, Synaptic Path row, and minimalist moltology.org button.
+ */
+export async function renderSimpleCtaOutroFrame(
+  outputPath: string,
+  url = 'moltology.org',
+  options: {
+    useCanvasOnly?: boolean
+    backgroundImageUrl?: string
+  } = {}
+): Promise<string> {
+  // 1. Primary: High-DPI Web Composite Studio Capture via Headless Chrome
+  if (!options.useCanvasOnly) {
+    try {
+      const outDir = path.dirname(outputPath)
+      if (!fs.existsSync(outDir)) {
+        fs.mkdirSync(outDir, { recursive: true })
+      }
+
+      await captureComposite({
+        template: 'reel-simple-outro' as any,
+        aspectRatio: '9:16',
+        scaleFactor: 1, // 1080x1920 native vertical resolution
+        data: {
+          url,
+          backgroundImageUrl: options.backgroundImageUrl,
+        },
+        outputPath,
+      })
+
+      if (fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+        return outputPath
+      }
+    } catch (e: any) {
+      console.warn(`   ⚠️ Headless Chrome Simple Outro capture fallback: ${e.message}`)
+    }
+  }
+
+  // 2. Resilient Canvas Fallback
+  const canvas = createCanvas(1080, 1920)
+  const ctx = canvas.getContext('2d')
+
+  // 1. Homepage Benthic Dark Background (#070b0b base)
+  ctx.fillStyle = '#070b0b'
+  ctx.fillRect(0, 0, 1080, 1920)
+
+  // 2. Ambient Cyan Spotlight (Center / Subsurface Glow)
+  const centerSpotlight = ctx.createRadialGradient(540, 960, 20, 540, 960, 800)
+  centerSpotlight.addColorStop(0, 'rgba(0, 195, 255, 0.16)')
+  centerSpotlight.addColorStop(0.5, 'rgba(0, 195, 255, 0.04)')
+  centerSpotlight.addColorStop(1, 'rgba(7, 11, 11, 0)')
+  ctx.fillStyle = centerSpotlight
+  ctx.fillRect(0, 0, 1080, 1920)
+
+  // 3. Scanline Background Pattern
+  const scanlinePath = path.resolve(process.cwd(), 'public/images/scanline_pattern.png')
+  if (fs.existsSync(scanlinePath)) {
+    try {
+      const scanlineImg = await loadImage(scanlinePath)
+      const pattern = ctx.createPattern(scanlineImg, 'repeat')
+      if (pattern) {
+        ctx.save()
+        ctx.globalAlpha = 0.25
+        ctx.fillStyle = pattern
+        ctx.fillRect(0, 0, 1080, 1920)
+        ctx.restore()
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  // 4. Center Order Emblem (Exact match with renderCtaOutroFrame)
+  const centerX = 540
+  const centerY = 740
+  const emblemPath = path.resolve(process.cwd(), 'public/images/order_emblem.png')
+  if (fs.existsSync(emblemPath)) {
+    try {
+      const emblemImg = await loadImage(emblemPath)
+      ctx.save()
+      ctx.shadowColor = 'rgba(0, 195, 255, 0.45)'
+      ctx.shadowBlur = 24
+      ctx.shadowOffsetY = 4
+      const emblemSize = 190
+      ctx.drawImage(emblemImg, centerX - emblemSize / 2, centerY - emblemSize / 2, emblemSize, emblemSize)
+      ctx.restore()
+    } catch {}
+  }
+
+  // 5. Two-Line Brand Title (Moltology / THE SYNAPTIC PATH - Exact match)
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+
+  // Line 1: Moltology
+  ctx.font = '900 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
+  ctx.shadowBlur = 10
+  ctx.fillText('Moltology', centerX, 900)
+
+  // Line 2: THE SYNAPTIC PATH (Clean cyan uppercase tracking)
+  ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#38bdf8'
+  ctx.shadowColor = 'rgba(0, 195, 255, 0.5)'
+  ctx.shadowBlur = 10
+  ctx.fillText('THE SYNAPTIC PATH', centerX, 950)
+  ctx.shadowBlur = 0
+
+  // 7. Minimalist Canonical App-Style CTA Button (Just moltology.org)
+  const btnW = 580
+  const btnH = 100
+  const btnX = centerX - btnW / 2
+  const btnY = 1050
+  const btnRadius = 14
+
+  const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH)
+  btnGrad.addColorStop(0, '#05222b')
+  btnGrad.addColorStop(0.5, '#093d4a')
+  btnGrad.addColorStop(1, '#062833')
+
+  ctx.save()
+  ctx.fillStyle = btnGrad
+  ctx.beginPath()
+  ctx.roundRect(btnX, btnY, btnW, btnH, btnRadius)
+  ctx.fill()
+
+  ctx.strokeStyle = '#00c3ff'
+  ctx.lineWidth = 2
+  ctx.shadowColor = 'rgba(0, 195, 255, 0.55)'
+  ctx.shadowBlur = 20
+  ctx.stroke()
+  ctx.restore()
+
+  // Top highlight inset
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'
+  ctx.fillRect(btnX + 6, btnY + 2, btnW - 12, 1.5)
+
+  // Primary URL text
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.font = '900 44px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)'
+  ctx.shadowBlur = 10
+  ctx.fillText(url, centerX, btnY + btnH / 2)
+
+  const outDir = path.dirname(outputPath)
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true })
+  }
+
+  fs.writeFileSync(outputPath, canvas.toBuffer('image/png'))
+  return outputPath
+}
+
+/**
+ * Generate Simple Cybernetic Benthic CTA Outro Video with smooth fade-in
+ */
+export async function renderSimpleCtaOutroVideo(
+  outputPath: string,
+  durationSeconds = 2.5,
+  url = 'moltology.org',
+  options: {
+    customImagePath?: string
+    useCanvasOnly?: boolean
+  } = {}
+): Promise<string> {
+  let outroFramePath = options.customImagePath && fs.existsSync(options.customImagePath)
+    ? options.customImagePath
+    : ''
+  let isTempFrame = false
+
+  if (!outroFramePath) {
+    outroFramePath = outputPath.replace(/\.mp4$/, '-simple-frame.png')
+    isTempFrame = true
+    await renderSimpleCtaOutroFrame(outroFramePath, url, options)
+  }
+
+  await runFfmpeg([
+    '-y',
+    '-loop',
+    '1',
+    '-i',
+    outroFramePath,
+    '-f',
+    'lavfi',
+    '-i',
+    'anullsrc=channel_layout=stereo:sample_rate=48000',
+    '-vf',
+    'scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p,fade=t=in:st=0:d=0.30',
+    '-t',
+    durationSeconds.toString(),
+    '-c:v',
+    'libx264',
+    '-c:a',
+    'aac',
+    '-b:a',
+    '192k',
+    '-pix_fmt',
+    'yuv420p',
+    '-shortest',
+    '-r',
+    '30',
+    outputPath,
+  ])
+
+  if (isTempFrame) {
+    try {
+      fs.unlinkSync(outroFramePath)
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  return outputPath
+}
+
+/**
  * Check if a media file contains an audio stream
  */
 export async function hasAudioStream(mediaPath: string): Promise<boolean> {

@@ -136,6 +136,7 @@ export interface CreateViralSeriesOptions {
   voice?: string
   mascot?: string
   customOutroImagePath?: string
+  useSimpleOutro?: boolean
   colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string
   bgAudioOffsetSeconds?: number
 }
@@ -556,6 +557,7 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     ctaBadge: seriesCta.actionText,
     ctaActionText: seriesCta.actionText,
     customOutroImagePath: options.customOutroImagePath,
+    useSimpleOutro: options.useSimpleOutro,
     mascot: script.mascot as any,
     tempDir,
   })

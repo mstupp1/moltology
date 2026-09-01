@@ -6,6 +6,7 @@ import { SocialHookSlide } from './SocialHookSlide'
 import { SocialSpecShowdownSlide } from './SocialSpecShowdownSlide'
 import { SocialDirectivesSlide } from './SocialDirectivesSlide'
 import { ReelOutroCard } from './ReelOutroCard'
+import { ReelSimpleOutroCard } from './ReelSimpleOutroCard'
 import { ReelThumbnailCard } from './ReelThumbnailCard'
 import { BlogSchematicCard } from './BlogSchematicCard'
 import { SocialMarketingSlide } from './SocialMarketingSlide'
@@ -149,6 +150,25 @@ describe('Composite UI Components', () => {
     expect(screen.getByText('LINK IN BIO')).toBeInTheDocument()
     expect(screen.queryByText(/TAP TO AUDIT/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/ZERO LATENCY TELEMETRY/i)).not.toBeInTheDocument()
+  })
+
+  it('renders ReelSimpleOutroCard with minimalist brand emblem, Moltology title, Synaptic Path row, and clean moltology.org CTA', () => {
+    render(
+      <ReelSimpleOutroCard
+        url="moltology.org"
+      />
+    )
+
+    expect(screen.getByAltText('Moltology Order Emblem')).toBeInTheDocument()
+    expect(screen.getByText('Moltology')).toBeInTheDocument()
+    expect(screen.getByText('THE SYNAPTIC PATH')).toBeInTheDocument()
+    expect(screen.getByText('moltology.org')).toBeInTheDocument()
+
+    // Verify extraneous elements from full outro are absent
+    expect(screen.queryByText('SUBMIT. SHED. ASCEND.')).not.toBeInTheDocument()
+    expect(screen.queryByText(/CALCULATE YOUR MOLT CLEARANCE/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/TAKE THE 15-STAGE/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/LINK IN BIO/i)).not.toBeInTheDocument()
   })
 
   it('renders ReelThumbnailCard with 1:1 safe-zone center hook', () => {

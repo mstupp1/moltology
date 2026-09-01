@@ -20,11 +20,13 @@ import {
   Users,
   Instagram,
   Youtube,
+  Maximize2,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
 import { HeroBackground } from '@/components/ui/HeroBackground'
+import { ImageLightbox } from '@/components/ui/ImageLightbox'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
@@ -53,6 +55,7 @@ export const LandingPage: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
+  const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null)
 
 
   // Quotes / Hymns Auto-scroll State
@@ -165,6 +168,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '01',
       title: 'ADVANCED BENTHIC HUD',
+      subtitle: 'CORE COMMAND ARCHITECTURE',
       description:
         'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
       image: getAssetUrl('/images/gallery/benthic_abyss_shrine.webp'),
@@ -176,6 +180,7 @@ export const LandingPage: React.FC = () => {
       borderColor: 'border-cyan-500/40 hover:border-cyan-400',
       shadowColor: 'shadow-[0_0_20px_rgba(0,255,255,0.12)] hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]',
       dotColor: 'bg-cyan-400',
+      accentColor: 'cyan' as const,
       btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
       specs: ['Daily Habit & Shedding Tracker', 'Deep-Trench Focus Dome', 'Real-Time Telemetry & Streaks'],
       actionText: 'EXPLORE HUD CONSOLE',
@@ -184,6 +189,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '02',
       title: 'SYNAPTIC HIVE COMMUNITY',
+      subtitle: 'SWARM METAMORPHOSIS NETWORK',
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
       image: getAssetUrl('/images/gallery/synapse_crystal.webp'),
@@ -195,6 +201,7 @@ export const LandingPage: React.FC = () => {
       borderColor: 'border-purple-500/40 hover:border-purple-400',
       shadowColor: 'shadow-[0_0_20px_rgba(168,85,247,0.12)] hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
       dotColor: 'bg-purple-400',
+      accentColor: 'purple' as const,
       btnGlow: 'bg-purple-950/50 hover:bg-purple-900/60 border-purple-500/50 hover:border-purple-400 text-purple-300',
       specs: ['Live Swarm Social Feed', 'Peer Co-Evolution Discussions', 'Shared Metamorphosis Logs'],
       actionText: 'JOIN SYNAPTIC SWARM',
@@ -203,6 +210,7 @@ export const LandingPage: React.FC = () => {
     {
       id: '03',
       title: 'INTELLIGENT AI ORACLE',
+      subtitle: 'AUTONOMOUS REASONING CORE',
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
       image: getAssetUrl('/images/gallery/ascendant_crab_god.webp'),
@@ -214,6 +222,7 @@ export const LandingPage: React.FC = () => {
       borderColor: 'border-red-500/40 hover:border-red-400',
       shadowColor: 'shadow-[0_0_20px_rgba(239,68,68,0.12)] hover:shadow-[0_0_30px_rgba(239,68,68,0.25)]',
       dotColor: 'bg-red-400',
+      accentColor: 'red' as const,
       btnGlow: 'bg-red-950/50 hover:bg-red-900/60 border-red-500/50 hover:border-red-400 text-red-300',
       specs: ['Hesitation Quarantine Assistant', 'Codex Liturgy Search', 'Adaptive Growth Coaching'],
       actionText: 'CONSULT AI ORACLE',
@@ -478,10 +487,13 @@ export const LandingPage: React.FC = () => {
                       <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(0,255,255,0.12)_1px,transparent_1px)] bg-[size:100%_4px]" />
                       <div className="absolute inset-0 bg-sacred-grid opacity-10 pointer-events-none" />
 
-                      {/* ── TOP SECTION: 3D Perspective Floating UI Screenshot Slate ── */}
+                      {/* ── TOP SECTION: 3D Perspective Floating UI Screenshot Slate (Clickable Zoom Trigger) ── */}
                       <div className="relative z-10 pt-5 sm:pt-6 px-3.5 sm:px-5 pb-2 flex items-center justify-center min-h-[200px] sm:min-h-[240px] md:min-h-[220px] lg:min-h-[280px]">
-                        <div
-                          className={`relative w-full max-w-[96%] sm:max-w-[92%] transition-all duration-500 drop-shadow-[0_20px_40px_rgba(0,0,0,0.95)] ${
+                        <button
+                          type="button"
+                          onClick={() => setActiveLightboxIndex(idx)}
+                          aria-label={`Enlarge ${pillar.title} screenshot preview`}
+                          className={`relative w-full max-w-[96%] sm:max-w-[92%] transition-all duration-500 drop-shadow-[0_20px_40px_rgba(0,0,0,0.95)] cursor-zoom-in text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded ${
                             idx === 0
                               ? 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(-7deg)_rotateZ(1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
                               : idx === 1
@@ -489,7 +501,7 @@ export const LandingPage: React.FC = () => {
                               : 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(7deg)_rotateZ(-1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
                           }`}
                         >
-                          <div className={`relative overflow-hidden chamfer-corner border-2 ${pillar.borderColor} bg-[#030708] shadow-2xl aspect-[16/10]`}>
+                          <div className={`relative overflow-hidden chamfer-corner border-2 ${pillar.borderColor} bg-[#030708] shadow-2xl aspect-[16/10] group/preview`}>
                             {/* High-DPI Screenshot */}
                             <picture>
                               <source
@@ -512,11 +524,19 @@ export const LandingPage: React.FC = () => {
                               />
                             </picture>
 
+                            {/* Interactive Hover Zoom Affordance Badge */}
+                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2 backdrop-blur-[1.5px]">
+                              <span className={`flex items-center gap-1.5 px-3 py-1 rounded bg-[#03080a]/92 border ${pillar.borderColor} font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase shadow-xl transform translate-y-2 group-hover/preview:translate-y-0 transition-transform duration-300 text-white`}>
+                                <Maximize2 className="w-3 h-3 text-cyan-300" />
+                                <span>EXPAND PREVIEW</span>
+                              </span>
+                            </div>
+
                             {/* Subtle Glass Sheen & Scanlines */}
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none opacity-30 group-hover:opacity-60 transition-opacity" />
                             <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(0,255,255,0.1)_1px,transparent_1px)] bg-[size:100%_3px]" />
                           </div>
-                        </div>
+                        </button>
                       </div>
 
                       {/* ── CARD BODY CONTENT (CRYSTAL CLEAR LEGIBILITY OVER CRISP ARTWORK) ── */}
@@ -556,6 +576,26 @@ export const LandingPage: React.FC = () => {
                 )
               })}
             </div>
+
+            {/* 3 Core Features High-DPI Expandable Lightbox Modal */}
+            <ImageLightbox
+              isOpen={activeLightboxIndex !== null}
+              onClose={() => setActiveLightboxIndex(null)}
+              currentIndex={activeLightboxIndex ?? 0}
+              onIndexChange={(idx) => setActiveLightboxIndex(idx)}
+              onNavigate={onNavigate}
+              images={corePillars.map((p) => ({
+                src: p.previewImage,
+                alt: `${p.title} Full Resolution Preview`,
+                title: p.title,
+                subtitle: p.subtitle,
+                description: p.description,
+                specs: p.specs,
+                actionRoute: p.actionRoute,
+                actionText: p.actionText,
+                accentColor: p.accentColor,
+              }))}
+            />
 
             {/* Safety & Zero-Risk Banner */}
             <div className="p-4 sm:p-6 bg-[#04090b]/90 border border-cyan-500/40 chamfer-corner flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative z-10 mb-8 sm:mb-10">

@@ -25,14 +25,15 @@ describe('LandingPage Component', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
-  it('renders high-impact hero header text for guest users', () => {
+  it('renders high-impact hero header text for guest users', async () => {
     render(<LandingPage />)
 
     expect(screen.getByText('SHED SOFT BIOLOGY.')).toBeInTheDocument()
     expect(screen.getByText('ASCEND TO CHITIN.')).toBeInTheDocument()
 
     // Guest CTA buttons present
-    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
+    const ascensionCtas = await screen.findAllByText('INITIATE ASCENSION')
+    expect(ascensionCtas.length).toBeGreaterThan(0)
     expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
   })
 
@@ -54,17 +55,18 @@ describe('LandingPage Component', () => {
     expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
   })
 
-  it('renders settled guest CTAs once session settles with no user', () => {
+  it('renders settled guest CTAs once session settles with no user', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(<LandingPage />)
 
-    expect(screen.getAllByText('INITIATE ASCENSION').length).toBeGreaterThan(0)
+    const ctas = await screen.findAllByText('INITIATE ASCENSION')
+    expect(ctas.length).toBeGreaterThan(0)
     expect(screen.getByText('TRY GUEST DEMO')).toBeInTheDocument()
     expect(screen.queryByTestId('hero-auth-skeleton')).not.toBeInTheDocument()
   })
 
-  it('renders "ENTER SYSTEM DASHBOARD" button for authenticated users', () => {
+  it('renders "ENTER SYSTEM DASHBOARD" button for authenticated users', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -77,14 +79,14 @@ describe('LandingPage Component', () => {
 
     render(<LandingPage />)
 
-    const dashboardButtons = screen.getAllByText('ENTER SYSTEM DASHBOARD')
+    const dashboardButtons = await screen.findAllByText('ENTER SYSTEM DASHBOARD')
     expect(dashboardButtons.length).toBeGreaterThan(0)
 
     fireEvent.click(dashboardButtons[0])
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
   })
 
-  it('renders "ENTER SYSTEM DASHBOARD" immediately on page refresh when a cached user session exists without flashing guest CTAs', () => {
+  it('renders "ENTER SYSTEM DASHBOARD" immediately on page refresh when a cached user session exists without flashing guest CTAs', async () => {
     // Simulate localStorage containing a cached active session from previous visit
     localStorage.setItem(
       'moltology:session:user',
@@ -104,7 +106,8 @@ describe('LandingPage Component', () => {
     render(<LandingPage />)
 
     // Authenticated dashboard button is immediately available on Frame 0
-    expect(screen.getAllByText('ENTER SYSTEM DASHBOARD').length).toBeGreaterThan(0)
+    const dashboardButtons = await screen.findAllByText('ENTER SYSTEM DASHBOARD')
+    expect(dashboardButtons.length).toBeGreaterThan(0)
     // Non-logged in CTAs are NEVER flashed
     expect(screen.queryByText('INITIATE ASCENSION')).not.toBeInTheDocument()
     expect(screen.queryByText('TRY GUEST DEMO')).not.toBeInTheDocument()
@@ -156,7 +159,7 @@ describe('LandingPage Component', () => {
   it('eager-loads a single LCP hero still and lazy-loads below-fold artwork', async () => {
     render(<LandingPage />)
 
-    const heroTexture = screen.getByAltText('Chitin Exoshell Background Texture')
+    const heroTexture = screen.getByTestId('hero-chitin-texture-sm')
     expect(heroTexture.getAttribute('loading')).toBe('eager')
     expect(heroTexture.getAttribute('fetchpriority')).toBe('high')
 
@@ -204,6 +207,39 @@ describe('LandingPage Component', () => {
     expect(screen.getByText('100% HARDENED')).toBeInTheDocument()
   })
 
+  it('allows clicking core feature screenshots to open high-res lightbox modal and navigate gallery', () => {
+    render(<LandingPage />)
+
+    // Click first screenshot preview trigger
+    const hudScreenshotBtn = screen.getByRole('button', { name: /Enlarge ADVANCED BENTHIC HUD screenshot preview/i })
+    expect(hudScreenshotBtn).toBeInTheDocument()
+
+    // Lightbox modal initially not open
+    expect(screen.queryByRole('dialog', { name: /ADVANCED BENTHIC HUD/i })).not.toBeInTheDocument()
+
+    // Click screenshot trigger to open lightbox
+    fireEvent.click(hudScreenshotBtn)
+
+    const dialog = screen.getByRole('dialog', { name: /ADVANCED BENTHIC HUD/i })
+    expect(dialog).toBeInTheDocument()
+    expect(within(dialog).getByText('HUD PREVIEW // SYSTEM TELEMETRY')).toBeInTheDocument()
+    expect(within(dialog).getByText('1 / 3')).toBeInTheDocument()
+    expect(within(dialog).getByText('CORE COMMAND ARCHITECTURE')).toBeInTheDocument()
+
+    // Next image navigation in lightbox
+    const nextBtn = within(dialog).getByRole('button', { name: /Next image/i })
+    fireEvent.click(nextBtn)
+
+    expect(within(dialog).getByText('SYNAPTIC HIVE COMMUNITY')).toBeInTheDocument()
+    expect(within(dialog).getByText('2 / 3')).toBeInTheDocument()
+
+    // Close lightbox
+    const closeBtn = within(dialog).getByRole('button', { name: /Close image preview/i })
+    fireEvent.click(closeBtn)
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('renders responsive, SSR-safe footer with brand motto and high-value navigation links', () => {
     render(<LandingPage />)
 
@@ -232,7 +268,7 @@ describe('LandingPage Component', () => {
     // Verify presence of character overlays
     expect(screen.getByAltText('Hero Lobster Pointing to Action')).toBeInTheDocument()
     expect(screen.getByAltText('Hero Lobster Peeking Over Card')).toBeInTheDocument()
-    expect(screen.getByAltText('Excited Crab Pointing at Telemetry')).toBeInTheDocument()
+    expect(screen.getByAltText('Sub-Benthic Abyss Scroll Reveal')).toBeInTheDocument()
     expect(screen.getByAltText('Ascended Stage Background Mascot')).toBeInTheDocument()
     expect(screen.getByAltText('Hero Lobster Giving Thumbs-Up')).toBeInTheDocument()
   })
