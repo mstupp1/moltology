@@ -31,7 +31,7 @@ import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatin
 import { MainFooter } from '@/components/MainFooter'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { useIdleReady } from '@/hooks/useIdleReady'
-import '@/styles/crt.css'
+import { useDeferredStylesheet } from '@/hooks/useDeferredStylesheet'
 import '@/styles/pbr-textures.css'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lazyImageProps } from '@/lib/media-priority'
@@ -43,10 +43,15 @@ const LazyLandingAuthCtas = React.lazy(() =>
   import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
 )
 
+function loadLandingCrtStyles() {
+  return import('@/styles/crt.css')
+}
+
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
   const onNavigate = (path: string) => navigate({ to: path })
   const authReady = useIdleReady()
+  useDeferredStylesheet(loadLandingCrtStyles)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
