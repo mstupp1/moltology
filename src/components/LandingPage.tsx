@@ -6,14 +6,12 @@
  * 3. ALL copy and messaging must strictly embody the in-universe lore of Moltology, the Benthic Core, and the Synaptic Path.
  * ============================================================================
  */
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, Suspense } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   Shield,
   Sparkles,
   ArrowRight,
-  UserPlus,
-  Cpu,
   CheckCircle2,
   Zap,
   Terminal,
@@ -24,7 +22,6 @@ import {
   Instagram,
   Youtube,
 } from 'lucide-react'
-import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
@@ -32,19 +29,21 @@ import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
 import { HeroBackground } from '@/components/ui/HeroBackground'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
+import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
+import '@/styles/crt.css'
+import { getAssetUrl } from '@/lib/assets'
+import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
+
 const DashboardMarketingShowcase = React.lazy(() => import('@/components/hud/DashboardMarketingShowcase').then((m) => ({ default: m.DashboardMarketingShowcase })))
 const AuthModal = React.lazy(() => import('@/components/AuthModal').then((m) => ({ default: m.AuthModal })))
 const MoltmaxGuideModal = React.lazy(() => import('@/components/guide/MoltmaxGuideModal').then((m) => ({ default: m.MoltmaxGuideModal })))
-import { useAuthSession } from '@/hooks/useAuthSession'
-import { getAssetUrl } from '@/lib/assets'
-import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
+const LazyLandingAuthCtas = React.lazy(() =>
+  import('@/components/LandingAuthCtas').then((m) => ({ default: m.LandingAuthCtas }))
+)
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate()
   const onNavigate = (path: string) => navigate({ to: path })
-  const session = useAuthSession()
-  const user = session.user
-  const isSessionPending = session.isPending
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
@@ -331,52 +330,9 @@ export const LandingPage: React.FC = () => {
 
             {/* CTA Buttons Group - Mobile Responsive Full Width & Desktop Flush Alignment */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-3 relative z-30 w-full sm:w-auto min-h-[114px] sm:min-h-[54px]">
-              {user ? (
-                <BenthicCTAButton
-                  size="lg"
-                  variant="cyan"
-                  containerClassName="w-full sm:w-auto"
-                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                  onClick={() => onNavigate('/dashboard')}
-                >
-                  <span className="flex items-center justify-center gap-2.5 leading-none">
-                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                    <span>ENTER SYSTEM DASHBOARD</span>
-                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                  </span>
-                </BenthicCTAButton>
-              ) : isSessionPending ? (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto min-h-[114px] sm:min-h-[54px]" data-testid="hero-auth-skeleton">
-                  <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-                  <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-                </div>
-              ) : (
-                <>
-                  <BenthicCTAButton
-                    size="lg"
-                    containerClassName="w-full sm:w-auto"
-                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                    onClick={() => openAuth('signup')}
-                  >
-                    <span className="flex items-center justify-center gap-2.5 leading-none">
-                      <span>INITIATE ASCENSION</span>
-                      <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                    </span>
-                  </BenthicCTAButton>
-                  <BenthicCTAButton
-                    size="lg"
-                    variant="cyan"
-                    containerClassName="w-full sm:w-auto"
-                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                    onClick={() => onNavigate('/dashboard')}
-                  >
-                    <span className="flex items-center justify-center gap-2.5 leading-none">
-                      <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      <span>TRY GUEST DEMO</span>
-                    </span>
-                  </BenthicCTAButton>
-                </>
-              )}
+              <Suspense fallback={<LandingAuthCtaSkeleton variant="hero" />}>
+                <LazyLandingAuthCtas variant="hero" onNavigate={onNavigate} onOpenAuth={openAuth} />
+              </Suspense>
             </div>
           </div>
 
@@ -623,53 +579,9 @@ export const LandingPage: React.FC = () => {
 
             {/* Action Call to Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
-              {user ? (
-                <BenthicCTAButton
-                  size="lg"
-                  variant="cyan"
-                  containerClassName="w-full sm:w-auto"
-                  className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                  onClick={() => onNavigate('/dashboard')}
-                >
-                  <span className="flex items-center justify-center gap-2.5 leading-none">
-                    <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                    <span>ENTER SYSTEM DASHBOARD</span>
-                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                  </span>
-                </BenthicCTAButton>
-              ) : isSessionPending ? (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto" data-testid="pillars-auth-skeleton">
-                  <div className="w-full sm:w-[220px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-                  <div className="w-full sm:w-[180px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-                </div>
-              ) : (
-                <>
-                  <BenthicCTAButton
-                    size="lg"
-                    containerClassName="w-full sm:w-auto"
-                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                    onClick={() => openAuth('signup')}
-                  >
-                    <span className="flex items-center justify-center gap-2.5 leading-none">
-                      <UserPlus className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      <span>SIGN UP TODAY (FREE)</span>
-                      <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                    </span>
-                  </BenthicCTAButton>
-                  <BenthicCTAButton
-                    size="lg"
-                    variant="cyan"
-                    containerClassName="w-full sm:w-auto"
-                    className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-6 sm:px-8 tracking-wider"
-                    onClick={() => onNavigate('/dashboard')}
-                  >
-                    <span className="flex items-center justify-center gap-2.5 leading-none">
-                      <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      <span>TRY THE DEMO NOW</span>
-                    </span>
-                  </BenthicCTAButton>
-                </>
-              )}
+              <Suspense fallback={<LandingAuthCtaSkeleton variant="pillars" />}>
+                <LazyLandingAuthCtas variant="pillars" onNavigate={onNavigate} onOpenAuth={openAuth} />
+              </Suspense>
             </div>
           </ScrollReveal>
         </section>
@@ -1178,37 +1090,9 @@ export const LandingPage: React.FC = () => {
                 </p>
                 
                 <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
-                  {user ? (
-                    <BenthicCTAButton
-                      size="lg"
-                      variant="cyan"
-                      containerClassName="w-full sm:w-auto"
-                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-8 sm:px-10 tracking-wider"
-                      onClick={() => onNavigate('/dashboard')}
-                    >
-                      <span className="flex items-center justify-center gap-2.5 leading-none">
-                        <Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                        <span>ENTER SYSTEM DASHBOARD</span>
-                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      </span>
-                    </BenthicCTAButton>
-                  ) : isSessionPending ? (
-                    <div className="flex items-center justify-center w-full sm:w-auto" data-testid="bottom-auth-skeleton">
-                      <div className="w-full sm:w-[240px] min-h-[50px] sm:min-h-[54px] rounded-xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
-                    </div>
-                  ) : (
-                    <BenthicCTAButton
-                      size="lg"
-                      containerClassName="w-full sm:w-auto"
-                      className="w-full sm:w-auto min-h-[50px] sm:min-h-[54px] text-xs sm:text-sm px-8 sm:px-10 tracking-wider"
-                      onClick={() => openAuth('signup')}
-                    >
-                      <span className="flex items-center justify-center gap-2.5 leading-none">
-                        <span>INITIATE ASCENSION</span>
-                        <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0" />
-                      </span>
-                    </BenthicCTAButton>
-                  )}
+                  <Suspense fallback={<LandingAuthCtaSkeleton variant="bottom" />}>
+                    <LazyLandingAuthCtas variant="bottom" onNavigate={onNavigate} onOpenAuth={openAuth} />
+                  </Suspense>
                 </div>
               </div>
             </div>

@@ -1,5 +1,7 @@
 import React from 'react'
 
+import '@/styles/crt.css'
+
 export interface ChromaElementProps {
   src: string
   alt: string

@@ -1,0 +1,89 @@
+/* Codex Professional PDF & Scripture Review Themes */
+.codex-parchment-theme {
+  background-color: #fcfaf2;
+  color: #1c1917;
+  border-color: #d6ceb8;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.codex-sepia-theme {
+  background-color: #f4ecd8;
+  color: #2b2318;
+  border-color: #c7b896;
+  box-shadow: 0 10px 30px rgba(43, 35, 24, 0.2);
+}
+
+.codex-dark-theme {
+  background-color: #12100e;
+  color: #e6dfd5;
+  border-color: #4a3e35;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+}
+
+/* Sacred Paper Drop Cap & PDF Watermarks */
+.drop-cap-illuminated {
+  float: left;
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  font-weight: 700;
+  line-height: 0.8;
+  padding-right: 0.35rem;
+  padding-top: 0.15rem;
+}
+
+/* Document Paper Texture & Double Margin Line */
+.pdf-page-sheet {
+  background-image: radial-gradient(#d6ceb8 0.5px, transparent 0.5px);
+  background-size: 16px 16px;
+}
+
+/* Immersive Codex e-reader overlay */
+.codex-reader-overlay {
+  overscroll-behavior: none;
+}
+
+.codex-reader-viewport {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 255, 255, 0.05), transparent 42%),
+    #050708;
+}
+
+.codex-reader-chrome {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.codex-reader-chrome[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+
+.codex-reader-chrome-bottom[data-hidden='true'] {
+  transform: translateY(6px);
+}
+
+.codex-dark-theme.pdf-page-sheet {
+  background-image: radial-gradient(#3a3129 0.5px, transparent 0.5px);
+  background-size: 16px 16px;
+}
+
+/* Media Print Rules for Professional PDF Output */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  .hud-sidebar, .hud-header, .no-print, .codex-reader-chrome {
+    display: none !important;
+  }
+  .pdf-page-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+}

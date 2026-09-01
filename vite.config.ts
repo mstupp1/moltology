@@ -15,6 +15,20 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (
+            id.includes('node_modules/@neondatabase/') ||
+            id.includes('node_modules/better-auth') ||
+            id.includes('node_modules/@better-auth/') ||
+            id.includes('node_modules/@supabase/auth-js')
+          ) {
+            return 'auth-vendor'
+          }
+        },
+      },
+    },
   },
   server: {
     port: 3000,

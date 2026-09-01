@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { lazy } from 'react'
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import '@/index.css'
 import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
-import { HUDNotFound } from '@/components/hud/HUDNotFound'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
+
+const LazyHUDNotFound = lazy(() =>
+  import('@/components/hud/HUDNotFound').then((m) => ({ default: m.HUDNotFound }))
+)
 
 function isNotFoundMatch(match: { status?: string; globalNotFound?: boolean }) {
   return match.status === 'notFound' || match.globalNotFound === true
@@ -46,8 +49,18 @@ export const Route = createRootRoute({
           href: '/fonts/inter-latin.woff2',
           crossOrigin: 'anonymous',
         },
-        { rel: 'preconnect', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
+        {
+          rel: 'preconnect',
+          href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech',
+          crossOrigin: 'anonymous',
+        },
         { rel: 'dns-prefetch', href: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech' },
+        {
+          rel: 'preconnect',
+          href: 'https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech',
+          crossOrigin: 'anonymous',
+        },
+        { rel: 'dns-prefetch', href: 'https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech' },
       ],
     }
   },
@@ -65,7 +78,7 @@ export const Route = createRootRoute({
     }
     return {}
   },
-  notFoundComponent: HUDNotFound,
+  notFoundComponent: LazyHUDNotFound,
   errorComponent: HUDErrorFallback,
   component: RootDocument,
 })

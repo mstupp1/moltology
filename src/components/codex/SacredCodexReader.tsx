@@ -17,6 +17,7 @@ import {
   CODEX_VOLUMES,
 } from '@/lib/codexData'
 import { HudButton } from '@/components/ui'
+import '@/styles/codex.css'
 import { CodexDocumentSheet, stripMarkdown } from './CodexDocumentSheet'
 import { CodexFullscreenReader } from './CodexFullscreenReader'
 

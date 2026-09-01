@@ -10,7 +10,7 @@ import {
   Terminal,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
-import { HudButton } from '@/components/ui'
+import { HudButton } from '@/components/ui/HudButton'
 
 export function HUDNotFound() {
   const [currentPath, setCurrentPath] = useState<string>('')

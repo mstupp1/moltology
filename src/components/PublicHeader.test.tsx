@@ -56,19 +56,18 @@ describe('PublicHeader Navigation Component', () => {
     expect(orgBtn.className).toContain('text-sky-700')
   })
 
-  it('renders corporate variant with clean light header, sky accents, and JOIN FAMILY CTA', () => {
+  it('renders corporate variant with clean light header, sky accents, and JOIN FAMILY CTA', async () => {
     const onOpenAuth = vi.fn()
     const { container } = render(<PublicHeader activePage="org" variant="corporate" onOpenAuth={onOpenAuth} />)
 
     const header = container.querySelector('header')!
     expect(header.className).toContain('bg-white')
 
-    const joinBtns = screen.getAllByRole('button', { name: /JOIN FAMILY/i })
-    expect(joinBtns.length).toBeGreaterThan(0)
-    const joinBtn = joinBtns[0]
-    expect(joinBtn.className).toContain('bg-sky-500')
+    const joinBtn = await screen.findAllByRole('button', { name: /JOIN FAMILY/i })
+    expect(joinBtn.length).toBeGreaterThan(0)
+    expect(joinBtn[0].className).toContain('bg-sky-500')
 
-    fireEvent.click(joinBtn)
+    fireEvent.click(joinBtn[0])
     expect(onOpenAuth).toHaveBeenCalledWith('signup')
   })
 
@@ -80,16 +79,16 @@ describe('PublicHeader Navigation Component', () => {
     expect(blogBtn.className).toContain('text-cyan-300')
   })
 
-  it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', () => {
+  it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', async () => {
     const onOpenAuth = vi.fn()
     render(<PublicHeader activePage="home" onOpenAuth={onOpenAuth} />)
 
-    const loginBtn = screen.getAllByRole('button', { name: /LOG IN/i })[0]
+    const loginBtn = (await screen.findAllByRole('button', { name: /LOG IN/i }))[0]
     fireEvent.click(loginBtn)
     expect(onOpenAuth).toHaveBeenCalledWith('login')
   })
 
-  it('renders user SSO avatar menu when user is signed in', () => {
+  it('renders user SSO avatar menu when user is signed in', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -103,7 +102,7 @@ describe('PublicHeader Navigation Component', () => {
 
     render(<PublicHeader activePage="home" />)
 
-    const avatarBtns = screen.getAllByRole('button', { name: /user account menu/i })
+    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu/i })
     expect(avatarBtns.length).toBeGreaterThan(0)
 
     const avatarBtn = avatarBtns[0]
@@ -113,7 +112,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 
-  it('renders mobile-friendly operative account accordion in hamburger menu when signed in', () => {
+  it('renders mobile-friendly operative account accordion in hamburger menu when signed in', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -130,7 +129,7 @@ describe('PublicHeader Navigation Component', () => {
     const toggle = screen.getByRole('button', { name: /toggle navigation menu/i })
     fireEvent.click(toggle)
 
-    const avatarBtns = screen.getAllByRole('button', { name: /user account menu/i })
+    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu/i })
     const mobileAvatarBtn = avatarBtns[avatarBtns.length - 1]
     expect(mobileAvatarBtn).toBeInTheDocument()
 
@@ -141,7 +140,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
   })
 
-  it('renders corporate light mode user avatar menu when variant="corporate"', () => {
+  it('renders corporate light mode user avatar menu when variant="corporate"', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -155,7 +154,7 @@ describe('PublicHeader Navigation Component', () => {
 
     const { container } = render(<PublicHeader activePage="org" variant="corporate" />)
 
-    const avatarBtns = screen.getAllByRole('button', { name: /user account menu/i })
+    const avatarBtns = await screen.findAllByRole('button', { name: /user account menu/i })
     expect(avatarBtns.length).toBeGreaterThan(0)
 
     const desktopAvatarBtn = avatarBtns[0]
@@ -171,7 +170,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(execNames[0].className).toContain('text-slate-800')
   })
 
-  it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', () => {
+  it('opens mobile menu with nav links and auth actions via hamburger toggle without badges', async () => {
     const onOpenAuth = vi.fn()
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
@@ -187,7 +186,7 @@ describe('PublicHeader Navigation Component', () => {
     const moltmaxMobileBtn = screen.getAllByRole('button', { name: /^MOLTMAX$/i })
     expect(moltmaxMobileBtn.length).toBeGreaterThanOrEqual(2) // 1 desktop, 1 mobile
 
-    const mobileLogin = screen.getAllByRole('button', { name: /LOG IN/i }).at(-1)!
+    const mobileLogin = (await screen.findAllByRole('button', { name: /LOG IN/i })).at(-1)!
     fireEvent.click(mobileLogin)
     expect(onOpenAuth).toHaveBeenCalledWith('login')
     // closing menu on auth open
@@ -213,7 +212,7 @@ describe('PublicHeader Navigation Component', () => {
     expect(headerEl.className).toContain('translate-y-0')
   })
 
-  it('renders subtle auth placeholder without flashing guest buttons when session is pending', () => {
+  it('renders subtle auth placeholder without flashing guest buttons when session is pending', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: null,
       isPending: true,
@@ -221,16 +220,16 @@ describe('PublicHeader Navigation Component', () => {
 
     render(<PublicHeader activePage="home" />)
 
-    expect(screen.getByTestId('public-header-auth-skeleton')).toBeInTheDocument()
+    expect(await screen.findByTestId('public-header-auth-skeleton')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /LOG IN/i })).not.toBeInTheDocument()
   })
 
-  it('renders guest auth buttons once session settles with no user', () => {
+  it('renders guest auth buttons once session settles with no user', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(<PublicHeader activePage="home" />)
 
-    expect(screen.getAllByRole('button', { name: /LOG IN/i }).length).toBeGreaterThan(0)
+    expect((await screen.findAllByRole('button', { name: /LOG IN/i })).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('button', { name: /JOIN PATH/i }).length).toBeGreaterThan(0)
     expect(screen.queryByTestId('public-header-auth-skeleton')).not.toBeInTheDocument()
   })

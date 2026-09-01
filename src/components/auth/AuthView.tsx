@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import '@/styles/crt.css'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 import { parseMemberHandle } from '@/lib/member-handle'
