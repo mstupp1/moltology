@@ -1,7 +1,12 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { LandingPage } from '@/components/LandingPage'
 import { HOMEPAGE_SEO, SITE_ORIGIN, canonicalLink, seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyLandingPage = lazy(() =>
+  import('@/components/LandingPage').then((m) => ({ default: m.LandingPage }))
+)
 
 export const Route = createFileRoute('/')({
   head: () => ({
@@ -34,5 +39,10 @@ export const Route = createFileRoute('/')({
       },
     ],
   }),
-  component: LandingPage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyLandingPage />
+    </Suspense>
+  ),
 })
+

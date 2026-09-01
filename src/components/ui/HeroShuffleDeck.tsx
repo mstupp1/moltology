@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps } from '@/lib/media-priority'
 
@@ -106,26 +106,22 @@ export const HeroShuffleDeck: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false)
   const [inView, setInView] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const [videosEnabled, setVideosEnabled] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(true)
   const [activeVideoReady, setActiveVideoReady] = useState(false)
-  const [videosEnabled, setVideosEnabled] = useState(false)
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({})
   const viewportRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchEndX = useRef<number | null>(null)
 
+  const [isMobile, setIsMobile] = useState(false)
   const totalCards = CARDS.length
   const canMountVideo = inView && !reducedMotion && videosEnabled
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    // Defer video network activity until after the initial paint / LCP window
-    if ('requestIdleCallback' in window) {
-      const handle = (window as any).requestIdleCallback(() => setVideosEnabled(true), { timeout: 2000 })
-      return () => (window as any).cancelIdleCallback(handle)
-    } else {
-      const timer = globalThis.setTimeout(() => setVideosEnabled(true), 1200)
-      return () => globalThis.clearTimeout(timer)
-    }
+    const mobile = window.innerWidth < 768
+    setIsMobile(mobile)
   }, [])
 
   const goTo = useCallback((nextIndex: number) => {
@@ -203,19 +199,48 @@ export const HeroShuffleDeck: React.FC = () => {
     return () => clearInterval(interval)
   }, [isPaused, inView, handleNext])
 
+  const handleTogglePlay = useCallback((e?: React.MouseEvent) => {
+    if (e) e.stopPropagation()
+    const currentCard = CARDS[activeIndex]
+    const videoEl = videoRefs.current[currentCard?.id]
+    if (!videoEl) return
+
+    if (videoEl.paused) {
+      try {
+        const playPromise = videoEl.play()
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise
+            .then(() => setIsPlaying(true))
+            .catch(() => setIsPlaying(false))
+        } else {
+          setIsPlaying(true)
+        }
+      } catch {
+        setIsPlaying(false)
+      }
+    } else {
+      videoEl.pause()
+      setIsPlaying(false)
+    }
+  }, [activeIndex])
+
   useEffect(() => {
     if (!canMountVideo) return
     const currentCard = CARDS[activeIndex]
-    const videoEl = videoRefs.current[currentCard.id]
+    const videoEl = videoRefs.current[currentCard?.id]
     if (!videoEl) return
     try {
       videoEl.currentTime = 0
       const playPromise = videoEl.play()
       if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {})
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            setIsPlaying(false)
+          })
       }
     } catch {
-      // Ignore playback errors in headless or restricted browser environments
+      setIsPlaying(false)
     }
   }, [activeIndex, canMountVideo])
 
@@ -292,7 +317,6 @@ export const HeroShuffleDeck: React.FC = () => {
           const card = CARDS[idx]
           const isActive = idx === activeIndex
           const isOutgoing = !isActive && idx === outgoingIndex
-          const isPreloading = !isActive && !isOutgoing && idx === nextIndex
           const shouldMountVideo = Boolean(canMountVideo && card.video)
           return (
             <div
@@ -319,30 +343,44 @@ export const HeroShuffleDeck: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               </picture>
-              {shouldMountVideo && (
+              {shouldMountVideo && isActive && (
                 <video
                   ref={(el) => {
                     videoRefs.current[card.id] = el
                   }}
+                  src={isMobile && card.videoSm ? card.videoSm : card.video}
                   poster={card.imageSm || card.image}
                   muted
                   playsInline
-                  autoPlay={isActive}
-                  preload={isActive ? 'auto' : 'none'}
+                  autoPlay
+                  loop
+                  preload="auto"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
                   onCanPlay={() => {
-                    if (isActive) setActiveVideoReady(true)
+                    setActiveVideoReady(true)
                   }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                >
-                  {card.videoSm && (
-                    <source src={card.videoSm} type="video/mp4" media="(max-width: 767px)" />
-                  )}
-                  <source src={card.video} type="video/mp4" />
-                </video>
+                  onClick={handleTogglePlay}
+                  className="absolute inset-0 w-full h-full object-cover cursor-pointer"
+                />
               )}
             </div>
           )
         })}
+
+        {/* Centered Cyber-Benthic Play Button when paused or if autoplay blocked */}
+        {!isPlaying && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+            <button
+              type="button"
+              onClick={handleTogglePlay}
+              aria-label="Play video transmission"
+              className="pointer-events-auto p-4 sm:p-5 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-cyan-400/50 hover:border-cyan-400 text-cyan-400 transition-colors flex items-center justify-center"
+            >
+              <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-cyan-400 text-cyan-400 translate-x-0.5" />
+            </button>
+          </div>
+        )}
 
         {/* Minimal Subtle Bottom Gradient on Hover */}
         <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

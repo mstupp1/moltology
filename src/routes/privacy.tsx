@@ -1,6 +1,11 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { PrivacyPolicyPage } from '@/components/PrivacyPolicyPage'
 import { seo } from '@/lib/seo'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyPrivacyPolicyPage = lazy(() =>
+  import('@/components/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage }))
+)
 
 export const Route = createFileRoute('/privacy')({
   head: () => ({
@@ -17,5 +22,10 @@ export const Route = createFileRoute('/privacy')({
       { rel: 'canonical', href: 'https://moltology.org/privacy' },
     ],
   }),
-  component: PrivacyPolicyPage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyPrivacyPolicyPage />
+    </Suspense>
+  ),
 })
+

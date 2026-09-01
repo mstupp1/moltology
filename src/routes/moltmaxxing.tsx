@@ -1,6 +1,11 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { MoltmaxxingPillarPage } from '@/components/MoltmaxxingPillarPage'
 import { seo, buildJsonLd, buildMoltmaxxingJsonLd } from '@/lib/seo'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyMoltmaxxingPillarPage = lazy(() =>
+  import('@/components/MoltmaxxingPillarPage').then((m) => ({ default: m.MoltmaxxingPillarPage }))
+)
 
 export const Route = createFileRoute('/moltmaxxing')({
   head: () => ({
@@ -26,5 +31,10 @@ export const Route = createFileRoute('/moltmaxxing')({
       },
     ],
   }),
-  component: MoltmaxxingPillarPage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyMoltmaxxingPillarPage />
+    </Suspense>
+  ),
 })
+

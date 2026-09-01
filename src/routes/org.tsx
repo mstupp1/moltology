@@ -1,6 +1,11 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { OrgPage } from '@/components/OrgPage'
 import { seo } from '@/lib/seo'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyOrgPage = lazy(() =>
+  import('@/components/OrgPage').then((m) => ({ default: m.OrgPage }))
+)
 
 export const Route = createFileRoute('/org')({
   head: () => ({
@@ -18,5 +23,10 @@ export const Route = createFileRoute('/org')({
       { rel: 'canonical', href: 'https://moltology.org/org' },
     ],
   }),
-  component: OrgPage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyOrgPage />
+    </Suspense>
+  ),
 })
+

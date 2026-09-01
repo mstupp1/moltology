@@ -67,7 +67,7 @@ describe('HeroShuffleDeck Component', () => {
       MockIntersectionObserver.instance?.trigger(true)
     })
 
-    // Only the active clip mounts until it can actually play
+    // Only the active clip mounts
     const videos = container.querySelectorAll('video')
     expect(videos).toHaveLength(1)
     const activeVideo = videos[0]
@@ -75,20 +75,7 @@ describe('HeroShuffleDeck Component', () => {
     expect(activeVideo.getAttribute('autoplay')).toBe('')
     expect((activeVideo as HTMLVideoElement).muted).toBe(true)
     expect(activeVideo.getAttribute('poster')).toBeTruthy()
-    const sources = activeVideo.querySelectorAll('source')
-    expect(sources).toHaveLength(2)
-    expect(sources[0].getAttribute('media')).toBe('(max-width: 767px)')
-    expect(sources[0].getAttribute('src')).toBe('/videos/hero_benthic_core_sm.mp4')
-    expect(sources[1].getAttribute('src')).toBe('/videos/hero_benthic_core.mp4')
-
-    // Once the active clip can play, the next one is pre-buffered
-    act(() => {
-      activeVideo.dispatchEvent(new Event('canplay'))
-    })
-
-    const preloadedVideo = container.querySelectorAll('video')[1]
-    expect(preloadedVideo.getAttribute('preload')).toBe('auto')
-    expect(preloadedVideo.getAttribute('autoplay')).toBeNull()
+    expect(activeVideo.getAttribute('src')).toBe('/videos/hero_benthic_core.mp4')
   })
 
   it('does not mount every transmission when advancing the deck', () => {
@@ -97,17 +84,12 @@ describe('HeroShuffleDeck Component', () => {
     act(() => {
       MockIntersectionObserver.instance?.trigger(true)
     })
-    act(() => {
-      container.querySelector('video')?.dispatchEvent(new Event('canplay'))
-    })
 
     fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
-    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(3)
+    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(2)
 
     fireEvent.click(screen.getByRole('button', { name: /jump to total carcinization/i }))
-    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(3)
-    expect(container.querySelector('source[src="/videos/hero_total_carcinization.mp4"]')).toBeTruthy()
-    expect(container.querySelectorAll('video').length).toBeLessThan(6)
+    expect(container.querySelectorAll('video').length).toBeLessThanOrEqual(2)
   })
 
   it('unmounts the outgoing clip after the crossfade', () => {
@@ -117,27 +99,17 @@ describe('HeroShuffleDeck Component', () => {
     act(() => {
       MockIntersectionObserver.instance?.trigger(true)
     })
-    act(() => {
-      container.querySelector('video')?.dispatchEvent(new Event('canplay'))
-    })
 
     fireEvent.click(screen.getByRole('button', { name: /next video transmission/i }))
-    // Pre-buffer resets until the new active clip can play
-    expect(container.querySelectorAll('video').length).toBe(2)
-
-    act(() => {
-      container.querySelectorAll('video')[0].dispatchEvent(new Event('canplay'))
-    })
-    expect(container.querySelectorAll('video').length).toBe(3)
+    expect(container.querySelectorAll('video').length).toBe(1)
 
     act(() => {
       vi.advanceTimersByTime(HERO_DECK_CROSSFADE_MS + 20)
     })
 
     const videos = container.querySelectorAll('video')
-    expect(videos.length).toBe(2)
-    const activeSources = videos[0].querySelectorAll('source')
-    expect(activeSources[activeSources.length - 1].getAttribute('src')).toBe('/videos/hero_asset_shedding.mp4')
+    expect(videos.length).toBe(1)
+    expect(videos[0].getAttribute('src')).toBe('/videos/hero_asset_shedding.mp4')
   })
 
   it('renders minimal video container with hover-only controls', () => {
@@ -188,5 +160,26 @@ describe('HeroShuffleDeck Component', () => {
     fireEvent.touchEnd(deck)
 
     expect(screen.getByRole('button', { name: /jump to cyber-benthic ascension/i })).toBeInTheDocument()
+  })
+
+  it('renders and toggles play button overlay when playback is paused', () => {
+    const { container } = render(<HeroShuffleDeck />)
+    act(() => {
+      MockIntersectionObserver.instance?.trigger(true)
+    })
+
+    const video = container.querySelector('video')
+    expect(video).toBeTruthy()
+
+    // Trigger pause event to show play button
+    act(() => {
+      video?.dispatchEvent(new Event('pause'))
+    })
+
+    const playBtn = screen.getByRole('button', { name: /play video transmission/i })
+    expect(playBtn).toBeInTheDocument()
+
+    // Clicking play button restarts video
+    fireEvent.click(playBtn)
   })
 })

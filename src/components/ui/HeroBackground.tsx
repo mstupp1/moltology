@@ -23,9 +23,9 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
 }) => {
   return (
     <div className={`absolute inset-0 w-full h-full pointer-events-none overflow-hidden select-none z-0 ${className}`} aria-hidden="true">
-      {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Blurred) */}
+      {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Blurred, Desktop only) */}
       <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-25 sm:opacity-30 mix-blend-luminosity scale-105 pointer-events-none blur-[12px] z-0"
+        className="hidden md:block absolute inset-0 w-full h-full bg-cover bg-center opacity-25 sm:opacity-30 mix-blend-luminosity scale-105 pointer-events-none blur-[12px] z-0"
         style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
       />
 
@@ -49,7 +49,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
           srcSet={getAssetUrl('/images/chitin_texture_bg.webp')}
         />
         <img
-          src={getAssetUrl('/images/chitin_texture_bg.webp')}
+          src={getAssetUrl('/images/chitin_texture_bg_sm.webp')}
           alt="Chitin Exoshell Background Texture"
           {...lcpImageProps}
           width={1376}

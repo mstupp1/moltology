@@ -1,11 +1,18 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { MarketShopPage } from '@/components/hud/market/MarketShopPage'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 
+const LazyMarketShopPage = lazy(() =>
+  import('@/components/hud/market/MarketShopPage').then((m) => ({ default: m.MarketShopPage }))
+)
+
 function MarketRoute() {
-  return <MarketShopPage />
+  return (
+    <Suspense fallback={<HudWorkspaceGhost />}>
+      <LazyMarketShopPage />
+    </Suspense>
+  )
 }
 
 export const Route = createFileRoute('/_hud/market')({

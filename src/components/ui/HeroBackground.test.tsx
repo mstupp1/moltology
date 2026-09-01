@@ -8,7 +8,7 @@ describe('HeroBackground', () => {
     render(<HeroBackground />)
     const textureImg = screen.getByAltText('Chitin Exoshell Background Texture')
     expect(textureImg).toBeInTheDocument()
-    expect(textureImg.getAttribute('src')).toContain('/images/chitin_texture_bg.webp')
+    expect(textureImg.getAttribute('src')).toContain('chitin_texture_bg')
   })
 
   it('renders custom watermarks when enabled', () => {

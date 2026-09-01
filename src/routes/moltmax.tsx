@@ -1,20 +1,24 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { MoltMaxPage } from '@/components/MoltMaxPage'
 import { seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyMoltMaxPage = lazy(() =>
+  import('@/components/MoltMaxPage').then((m) => ({ default: m.MoltMaxPage }))
+)
 
 export const Route = createFileRoute('/moltmax')({
   head: () => ({
     meta: [
       ...seo({
         title: 'Moltmax Clearance Audit | Measure the Shell, Meet the Depth',
-        description: 'Complete the official 15-vector Moltmax clearance audit. Observe your shell hardness, pincer torque, neural flow, ecdysis discipline, and pressure tolerance.',
-        keywords: 'moltmaxxing, moltmax audit, shell hardness, pincer torque, ecdysis, carcinization stage, benthic clearance',
-        ogImage: 'https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/cyber_lobster_hero.jpg',
+        description: 'Complete the official 12-vector biometric clearance audit. Calculate your carapace hardness, pincer torque, and benthic readiness index.',
         canonical: 'https://moltology.org/moltmax',
-        siteName: 'Moltology',
-        twitterCard: 'summary_large_image',
+        siteName: 'Moltmax Audit',
         twitterSite: '@moltology',
+        ogImage: getAssetUrl('/images/social/share_card_v2.webp'),
+        keywords: 'Moltmax, Clearance Audit, Carcinization Quiz, Bio-Silicon Assessment, Exoskeleton Hardness, Pincer Torque, Benthic Depth Rating',
       }),
     ],
     links: [
@@ -44,5 +48,9 @@ export const Route = createFileRoute('/moltmax')({
       },
     ],
   }),
-  component: MoltMaxPage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyMoltMaxPage />
+    </Suspense>
+  ),
 })

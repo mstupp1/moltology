@@ -1,6 +1,11 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { TermsOfServicePage } from '@/components/TermsOfServicePage'
 import { seo } from '@/lib/seo'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyTermsOfServicePage = lazy(() =>
+  import('@/components/TermsOfServicePage').then((m) => ({ default: m.TermsOfServicePage }))
+)
 
 export const Route = createFileRoute('/terms')({
   head: () => ({
@@ -17,5 +22,10 @@ export const Route = createFileRoute('/terms')({
       { rel: 'canonical', href: 'https://moltology.org/terms' },
     ],
   }),
-  component: TermsOfServicePage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyTermsOfServicePage />
+    </Suspense>
+  ),
 })
+

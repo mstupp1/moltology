@@ -1,7 +1,12 @@
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { MoltmaxGuidePage } from '@/components/guide/MoltmaxGuidePage'
 import { seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
+import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+
+const LazyMoltmaxGuidePage = lazy(() =>
+  import('@/components/guide/MoltmaxGuidePage').then((m) => ({ default: m.MoltmaxGuidePage }))
+)
 
 export const Route = createFileRoute('/guide')({
   head: () => ({
@@ -21,5 +26,10 @@ export const Route = createFileRoute('/guide')({
       { rel: 'canonical', href: 'https://moltology.org/guide' },
     ],
   }),
-  component: MoltmaxGuidePage,
+  component: () => (
+    <Suspense fallback={<HUDPageLoader />}>
+      <LazyMoltmaxGuidePage />
+    </Suspense>
+  ),
 })
+

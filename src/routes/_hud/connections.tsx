@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ConnectionsPage } from '@/components/hud/connections/ConnectionsPage'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+
+const LazyConnectionsPage = lazy(() =>
+  import('@/components/hud/connections/ConnectionsPage').then((m) => ({ default: m.ConnectionsPage }))
+)
 
 function ConnectionsRoute() {
   return (
@@ -10,7 +13,9 @@ function ConnectionsRoute() {
       featureName="Connections"
       message="Connections, friend requests, and member search require a signed-in account."
     >
-      <ConnectionsPage />
+      <Suspense fallback={<HudWorkspaceGhost />}>
+        <LazyConnectionsPage />
+      </Suspense>
     </GuestLockGuard>
   )
 }

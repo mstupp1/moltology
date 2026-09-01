@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { SettingsPage } from '@/components/hud/settings/SettingsPage'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+
+const LazySettingsPage = lazy(() =>
+  import('@/components/hud/settings/SettingsPage').then((m) => ({ default: m.SettingsPage }))
+)
 
 function SettingsRoute() {
   return (
@@ -10,7 +13,9 @@ function SettingsRoute() {
       featureName="Settings"
       message="Avatar and account preferences require a signed-in account."
     >
-      <SettingsPage />
+      <Suspense fallback={<HudWorkspaceGhost />}>
+        <LazySettingsPage />
+      </Suspense>
     </GuestLockGuard>
   )
 }
