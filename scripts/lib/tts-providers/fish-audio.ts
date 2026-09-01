@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { alignWordsWithOriginalText, type WordBoundaryEvent } from '../tts-engine'
+import { timeStretchMp3 } from '../time-stretch'
 import type { ProviderGenerationOptions, ProviderGenerationResult, TTSProvider } from './types'
 
 /** Fish Audio Voice Library preset — English male broadcaster (overridable via env). */
@@ -182,10 +183,11 @@ export async function synthesizeWithFish(
   const speed = parseEdgeRate(options.rate, 1)
   const timestamp = Date.now()
 
-  // Use the streaming /v1/tts/stream/with-timestamp endpoint. At normal speed
-  // (1.0) with full-quality settings its audio matches the plain /v1/tts
-  // endpoint the website uses, while also returning real word-boundary
-  // alignment for kinetic captions.
+  // Use the streaming /v1/tts/stream/with-timestamp endpoint. Always synthesize
+  // at normal speed (1.0) for full site-quality audio with real word-boundary
+  // alignment. If a faster pacing was requested (rate), apply a high-quality
+  // Rubber Band time-stretch afterwards instead of Fish's prosody speed, which
+  // preserves audio quality.
   const response = await fetch(FISH_TTS_STREAM_URL, {
     method: 'POST',
     headers: {
@@ -200,7 +202,7 @@ export async function synthesizeWithFish(
       sample_rate: 44100,
       mp3_bitrate: 128,
       latency: 'normal',
-      prosody: { speed, volume: 0, normalize_loudness: true },
+      prosody: { speed: 1, volume: 0, normalize_loudness: true },
       temperature: 0.7,
       top_p: 0.7,
       repetition_penalty: 1.2,
@@ -242,7 +244,20 @@ export async function synthesizeWithFish(
     ? path.join(options.outputDir, options.outputFilename)
     : path.join(options.outputDir, `voiceover-fish-${timestamp}.mp3`)
 
-  fs.writeFileSync(finalAudioPath, audio)
+  if (speed !== 1) {
+    // Rubber Band time-stretch to target pacing, keeping pitch/formants clean.
+    const durationRatio = 1 / speed
+    await timeStretchMp3(audio, finalAudioPath, durationRatio)
+    words = words.map((w) => ({
+      ...w,
+      startMs: Math.round(w.startMs * durationRatio),
+      endMs: Math.round(w.endMs * durationRatio),
+      durationMs: Math.round(w.durationMs * durationRatio),
+    }))
+    durationSeconds = durationSeconds * durationRatio
+  } else {
+    fs.writeFileSync(finalAudioPath, audio)
+  }
 
   return { audioPath: finalAudioPath, durationSeconds, words }
 }
