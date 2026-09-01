@@ -179,9 +179,13 @@ export async function synthesizeWithFish(
     throw new Error('FISH_VOICE_REFERENCE_ID is not set')
   }
 
-  const speed = parseEdgeRate(options.rate)
+  const speed = parseEdgeRate(options.rate, 1)
   const timestamp = Date.now()
 
+  // Use the streaming /v1/tts/stream/with-timestamp endpoint. At normal speed
+  // (1.0) with full-quality settings its audio matches the plain /v1/tts
+  // endpoint the website uses, while also returning real word-boundary
+  // alignment for kinetic captions.
   const response = await fetch(FISH_TTS_STREAM_URL, {
     method: 'POST',
     headers: {
@@ -193,8 +197,19 @@ export async function synthesizeWithFish(
       text,
       reference_id: referenceId,
       format: 'mp3',
-      latency: 'balanced',
-      prosody: { speed, volume: 0 },
+      sample_rate: 44100,
+      mp3_bitrate: 128,
+      latency: 'normal',
+      prosody: { speed, volume: 0, normalize_loudness: true },
+      temperature: 0.7,
+      top_p: 0.7,
+      repetition_penalty: 1.2,
+      chunk_length: 300,
+      min_chunk_length: 50,
+      normalize: true,
+      max_new_tokens: 1024,
+      condition_on_previous_chunks: true,
+      early_stop_threshold: 1,
     }),
   })
 
