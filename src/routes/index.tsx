@@ -12,6 +12,13 @@ export const Route = createFileRoute('/')({
         rel: 'preload',
         as: 'image',
         type: 'image/webp',
+        href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+        fetchPriority: 'high',
+      },
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
         media: '(max-width: 767px)',
         href: getAssetUrl('/images/chitin_texture_bg_sm.webp'),
         fetchPriority: 'high',

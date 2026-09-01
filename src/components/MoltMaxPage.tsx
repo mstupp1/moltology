@@ -10,6 +10,7 @@ import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
 import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult } from '@/lib/moltmax-quiz'
 import { getAssetUrl } from '@/lib/assets'
+import { lcpImageProps } from '@/lib/media-priority'
 import { QuizQuestionCard } from './moltmax/QuizQuestionCard'
 import { QuizResultsReveal } from './moltmax/QuizResultsReveal'
 
@@ -366,10 +367,10 @@ export const MoltMaxPage: React.FC = () => {
           style={{ minHeight: '100svh' }}
         >
           {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
-          <img
-            src={getAssetUrl('/images/hero_widescreen_bg.jpg')}
-            alt="Benthic Abyss Widescreen Hero"
-            className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px]"
+          <div
+            className="absolute inset-0 w-full h-full bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px] z-0"
+            style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
+            aria-hidden="true"
           />
           {/* Layer 2A: Deep Benthic Base Vignette */}
           <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
@@ -378,8 +379,9 @@ export const MoltMaxPage: React.FC = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.14)_0%,transparent_65%)] pointer-events-none z-0" />
           {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
           <img
-            src={getAssetUrl('/images/chitin_texture_bg.jpg')}
+            src={getAssetUrl('/images/chitin_texture_bg.webp')}
             alt="Chitin Exoshell Background Texture"
+            {...lcpImageProps}
             className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
           />
           {/* Layer 2D: Sacred Grid & Balanced Edge Vignettes */}

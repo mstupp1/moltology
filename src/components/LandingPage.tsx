@@ -277,12 +277,11 @@ export const LandingPage: React.FC = () => {
 
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
-        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
-        <img
-          src={getAssetUrl('/images/hero_widescreen_bg.webp')}
-          alt="Benthic Abyss Widescreen Hero"
-          {...lazyImageProps}
-          className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px] z-0"
+        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred CSS Layer) */}
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px] z-0"
+          style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
+          aria-hidden="true"
         />
 
         {/* Layer 2A: Deep Benthic Base Vignette */}

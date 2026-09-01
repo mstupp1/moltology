@@ -315,7 +315,7 @@ export const HeroShuffleDeck: React.FC = () => {
                   muted
                   playsInline
                   autoPlay={!isPreloading}
-                  preload="metadata"
+                  preload="auto"
                   onCanPlay={() => {
                     if (isActive) setActiveVideoReady(true)
                   }}
