@@ -1,5 +1,5 @@
 ---
-title: "Article Title Here"
+title: "Article Title Here: The Supporting Subtitle"
 slug: "article-title-here"
 summary: "A concise 1-2 sentence overview of the article."
 category: "SYNAPTIC DOCTRINE"

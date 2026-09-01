@@ -21,7 +21,7 @@ When an agent is asked to **"run blog creation process"**, it follows this loop:
    - Copy the ready markdown to `content/news/<slug>.md`. Keep that prose. Point frontmatter and figure slots at the generated images:
      ```markdown
      ---
-     title: "Article Title"
+     title: "Article Title: The Supporting Subtitle"
      category: "SWARM ARCHITECTURE" # or SACRED DOCTRINE, DEEP RESEARCH, TELEMETRY
      tags: ["Sub-Benthic", "Agentic Systems", "AI Hardware"]
      authorName: "High Ascendant Carcinus"
@@ -110,7 +110,7 @@ npx tsx scripts/ingest.ts content/news/my-article.md --db "postgresql://user:pas
 ### 1. Blog / News (`content/news/*.md`)
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `title` | string | **Yes** | Article headline |
+| `title` | string | **Yes** | `Title: Subtitle` (colon). The news HUD splits at the first colon. No separate subtitle field. |
 | `slug` | string | No | URL slug (auto-generated from title if omitted) |
 | `summary` | string | No | Brief excerpt (auto-extracted from body if omitted) |
 | `category` | string | No | Default: `SACRED DOCTRINE` |

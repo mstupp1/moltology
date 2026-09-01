@@ -3,7 +3,7 @@
 This is the writing knife for every human-facing string, including HUD microcopy.
 Terms live in [BRAND_BIBLE.md](BRAND_BIBLE.md). This document wins on register, comedy
 rules, and bans.
-_Last Revised: 2026-08-28_
+_Last Revised: 2026-09-01_
 
 ---
 
@@ -420,6 +420,12 @@ Never zoom out. Acknowledge the human, stay committed, be generous.
 
 ### Blog dispatch (moltology.org/news)
 
+- **Headline lock:** every news post has a title AND a subtitle. Write them as one
+  colon headline: `Title: Subtitle`. Example: `The Tabs You Kept: A Browser That
+  Never Leaves`. Put the full string in the ingest `title` field. News ingest has
+  no separate subtitle field. The article H1 and dek come from that one string,
+  split at the first colon. Title-only does not ship. Slash-pair is BAN 1. Colon
+  is the separator. Em dash is not the default.
 - One category pill, author persona + clearance in the byline, nothing else badged.
 - Open with the human friction (the Melt). Imply the molt from that story. Close with
   one quiet path invite, not a product recitation.
@@ -564,6 +570,9 @@ Run this list on **every** piece of copy before it ships, including HUD strings.
 
 **News dispatch extras (moltology.org/news):**
 
+- [ ] Headline is `Title: Subtitle` (colon). Both halves present. The full string
+      lives in ingest `title`. Title-only does not ship. Slash-pair is BAN 1.
+      Em dash is not the default separator.
 - [ ] The close does not stack HUD, Moltmaxxing, gems, credits, and rank. One quiet
       path invite. The economy lock is recited on HUD strings and pay-complaint
       replies, not in the news close.
