@@ -277,14 +277,22 @@ export const LandingPage: React.FC = () => {
 
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
+        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
+        <img
+          src={getAssetUrl('/images/hero_widescreen_bg.webp')}
+          alt="Benthic Abyss Widescreen Hero"
+          {...lazyImageProps}
+          className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px] z-0"
+        />
+
         {/* Layer 2A: Deep Benthic Base Vignette */}
-        <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-[#020608]/60 z-0 pointer-events-none backdrop-blur-sm" />
 
         {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.19)_0%,transparent_65%)] pointer-events-none z-0" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.16)_0%,transparent_65%)] pointer-events-none z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.18)_0%,transparent_65%)] pointer-events-none z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.14)_0%,transparent_65%)] pointer-events-none z-0" />
 
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (GPU Composited) */}
+        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (GPU Composited, Dimmed) */}
         <picture className="absolute inset-0 w-full h-full pointer-events-none transform-gpu">
           <source
             type="image/webp"
@@ -302,17 +310,19 @@ export const LandingPage: React.FC = () => {
             {...lcpImageProps}
             width={1376}
             height={768}
-            className="w-full h-full object-cover opacity-55 mix-blend-overlay scale-105 pointer-events-none z-0"
+            className="w-full h-full object-cover opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
           />
         </picture>
         
-        {/* Layer 2D: Balanced Edge Vignettes & Sacred Geometry Grid */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030608]/80 via-transparent to-[#030608]/80 z-0 pointer-events-none opacity-55" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#030608]/70 via-transparent to-[#030608]/70 z-0 pointer-events-none opacity-50" />
+        {/* Layer 2D: Sacred Grid, Deepening Dimmer & Balanced Edge Vignettes */}
+        <div className="absolute inset-0 bg-[#020608]/35 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,#020608_95%)] opacity-85 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-60" />
         <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
 
         {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
-        <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#020608] via-[#020608]/95 via-45% to-transparent z-[1] pointer-events-none" />
 
         {/* Layer 3: Subtle Technical HUD Watermark Accent */}
         <div

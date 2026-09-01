@@ -40,11 +40,6 @@ export default defineConfig({
               routeFileIgnorePattern: '.*\\.test\\..*',
               autoCodeSplitting: true,
             },
-            server: {
-              build: {
-                inlineCss: true,
-              },
-            },
           }),
           nitro(),
         ]),
