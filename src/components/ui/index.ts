@@ -43,3 +43,4 @@ export {
   type HudDropdownMenuContentProps,
   type HudDropdownMenuItemProps,
 } from './HudDropdownMenu'
+export { HeroBackground, type HeroBackgroundProps } from './HeroBackground'

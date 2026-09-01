@@ -31,6 +31,13 @@ describe('Homepage route head', () => {
           rel: 'preload',
           as: 'image',
           type: 'image/webp',
+          href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+          fetchPriority: 'high',
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          type: 'image/webp',
           media: '(max-width: 767px)',
           href: getAssetUrl('/images/chitin_texture_bg_sm.webp'),
           fetchPriority: 'high',
@@ -47,6 +54,6 @@ describe('Homepage route head', () => {
     )
 
     const preloads = (head.links ?? []).filter((link) => link && 'rel' in link && link.rel === 'preload')
-    expect(preloads).toHaveLength(2)
+    expect(preloads).toHaveLength(3)
   })
 })

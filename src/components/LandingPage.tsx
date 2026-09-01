@@ -29,6 +29,7 @@ import { RollingNumber } from '@/components/ui/RollingNumber'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { HeroShuffleDeck } from '@/components/ui/HeroShuffleDeck'
+import { HeroBackground } from '@/components/ui/HeroBackground'
 import { MoltmaxGuideFloatingPill } from '@/components/guide/MoltmaxGuideFloatingPill'
 import { MainFooter } from '@/components/MainFooter'
 const DashboardMarketingShowcase = React.lazy(() => import('@/components/hud/DashboardMarketingShowcase').then((m) => ({ default: m.DashboardMarketingShowcase })))
@@ -256,7 +257,7 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#070b0b] text-gray-200 font-sans relative flex flex-col justify-between overflow-x-hidden">
       {/* Ambient Sci-Fi Vignette, CRT Scanlines & Cyan Glow Backdrops */}
-      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
+      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-70" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
       <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
       <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-35 sm:opacity-45" />
@@ -277,64 +278,10 @@ export const LandingPage: React.FC = () => {
 
       {/* 3D LAYERED HERO SECTION (Optimized for Colossal Mobile Impact) */}
       <section className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]" style={{ minHeight: '100svh' }}>
-        {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred CSS Layer) */}
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px] z-0"
-          style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
-          aria-hidden="true"
+        <HeroBackground
+          leftWatermark="SYNAPTIC CORE · GRID 04"
+          rightWatermark="CARCINIZATION MATRIX v4.2"
         />
-
-        {/* Layer 2A: Deep Benthic Base Vignette */}
-        <div className="absolute inset-0 bg-[#020608]/60 z-0 pointer-events-none backdrop-blur-sm" />
-
-        {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.18)_0%,transparent_65%)] pointer-events-none z-0" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.14)_0%,transparent_65%)] pointer-events-none z-0" />
-
-        {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (GPU Composited, Dimmed) */}
-        <picture className="absolute inset-0 w-full h-full pointer-events-none transform-gpu">
-          <source
-            type="image/webp"
-            media="(max-width: 767px)"
-            srcSet={getAssetUrl('/images/chitin_texture_bg_sm.webp')}
-          />
-          <source
-            type="image/webp"
-            media="(min-width: 768px)"
-            srcSet={getAssetUrl('/images/chitin_texture_bg.webp')}
-          />
-          <img
-            src={getAssetUrl('/images/chitin_texture_bg.webp')}
-            alt="Chitin Exoshell Background Texture"
-            {...lcpImageProps}
-            width={1376}
-            height={768}
-            className="w-full h-full object-cover opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
-          />
-        </picture>
-        
-        {/* Layer 2D: Sacred Grid, Deepening Dimmer & Balanced Edge Vignettes */}
-        <div className="absolute inset-0 bg-[#020608]/35 z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,#020608_95%)] opacity-85 z-0 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-60" />
-        <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
-
-        {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
-        <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#020608] via-[#020608]/95 via-45% to-transparent z-[1] pointer-events-none" />
-
-        {/* Layer 3: Subtle Technical HUD Watermark Accent */}
-        <div
-          className="absolute inset-0 pointer-events-none select-none z-0 opacity-10 flex items-center justify-between px-8 hidden lg:flex"
-          aria-hidden="true"
-        >
-          <span className="font-sans text-[10px] tracking-[0.4em] text-cyan-400/50 uppercase -rotate-90">
-            SYNAPTIC CORE · GRID 04
-          </span>
-          <span className="font-sans text-[10px] tracking-[0.4em] text-red-500/50 uppercase rotate-90">
-            CARCINIZATION MATRIX v4.2
-          </span>
-        </div>
 
         <div className="relative z-10 max-w-[1700px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
           

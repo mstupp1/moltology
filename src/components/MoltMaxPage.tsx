@@ -8,6 +8,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { updateUserStatsFn } from '@/lib/server/api'
 import { useToast } from '@/components/ui/ToastProvider'
+import { HeroBackground } from '@/components/ui/HeroBackground'
 import { type QuizAnswers, computeMoltmaxResult, MOLTMAX_QUESTIONS, type MoltmaxResult } from '@/lib/moltmax-quiz'
 import { getAssetUrl } from '@/lib/assets'
 import { lcpImageProps } from '@/lib/media-priority'
@@ -355,7 +356,7 @@ export const MoltMaxPage: React.FC = () => {
   return (
     <div className="min-h-screen overflow-hidden bg-[#070b0b] font-sans text-[#dfe3e3] selection:bg-[#00c3ff]/30 selection:text-white relative">
       {/* Ambient Sci-Fi Vignette, CRT Scanlines & Glow Backdrops from Homepage */}
-      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-80" />
+      <div className="fixed inset-0 bg-benthic-vignette pointer-events-none z-0 opacity-70" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,rgba(0,195,255,0.16)_0%,transparent_75%)] pointer-events-none z-0" />
       <div className="fixed inset-0 bg-sacred-grid pointer-events-none z-0 opacity-30" />
       <div className="fixed inset-0 crt-scanlines pointer-events-none z-0 opacity-35 sm:opacity-45" />
@@ -366,29 +367,10 @@ export const MoltMaxPage: React.FC = () => {
           className="w-full relative overflow-hidden pt-20 sm:pt-28 pb-8 sm:pb-12 px-4 sm:px-12 border-b border-cyan-900/40 min-h-screen flex items-center justify-center bg-[#030608]"
           style={{ minHeight: '100svh' }}
         >
-          {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Deeply Blurred) */}
-          <div
-            className="absolute inset-0 w-full h-full bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 pointer-events-none blur-[15px] z-0"
-            style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
-            aria-hidden="true"
+          <HeroBackground
+            leftWatermark="MOLTMAX // BIOMETRIC_SCANNER"
+            rightWatermark="CARCINIZATION // CLEARANCE_AUDIT"
           />
-          {/* Layer 2A: Deep Benthic Base Vignette */}
-          <div className="absolute inset-0 bg-[#030608]/50 z-0 pointer-events-none backdrop-blur-sm" />
-          {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.18)_0%,transparent_65%)] pointer-events-none z-0" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.14)_0%,transparent_65%)] pointer-events-none z-0" />
-          {/* Layer 2C: Chitin Exoshell Texture Pattern Layer */}
-          <img
-            src={getAssetUrl('/images/chitin_texture_bg.webp')}
-            alt="Chitin Exoshell Background Texture"
-            {...lcpImageProps}
-            className="absolute inset-0 w-full h-full object-cover opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
-          />
-          {/* Layer 2D: Sacred Grid & Balanced Edge Vignettes */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#020608] via-transparent to-[#020608] z-0 pointer-events-none opacity-60" />
-          <div className="absolute inset-0 bg-sacred-grid opacity-25 z-0 pointer-events-none" />
-          {/* Layer 2E: Dedicated Top Header Offset Vignette Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-36 sm:h-64 bg-gradient-to-b from-[#030608] via-[#030608]/90 via-45% to-transparent z-[1] pointer-events-none" />
 
           <div className="relative z-10 mx-auto grid w-full max-w-[1700px] items-center gap-8 lg:grid-cols-12 xl:gap-14">
             

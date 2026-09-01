@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { MoltMaxPage } from '@/components/MoltMaxPage'
 import { seo } from '@/lib/seo'
+import { getAssetUrl } from '@/lib/assets'
 
 export const Route = createFileRoute('/moltmax')({
   head: () => ({
@@ -18,6 +19,29 @@ export const Route = createFileRoute('/moltmax')({
     ],
     links: [
       { rel: 'canonical', href: 'https://moltology.org/moltmax' },
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
+        href: getAssetUrl('/images/hero_widescreen_bg.webp'),
+        fetchPriority: 'high',
+      },
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
+        media: '(max-width: 767px)',
+        href: getAssetUrl('/images/chitin_texture_bg_sm.webp'),
+        fetchPriority: 'high',
+      },
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
+        media: '(min-width: 768px)',
+        href: getAssetUrl('/images/chitin_texture_bg.webp'),
+        fetchPriority: 'high',
+      },
     ],
   }),
   component: MoltMaxPage,
