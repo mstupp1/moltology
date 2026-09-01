@@ -7,6 +7,25 @@ import type { ProviderGenerationOptions, ProviderGenerationResult, TTSProvider }
 /** Fish Audio Voice Library preset — English male broadcaster (overridable via env). */
 export const DEFAULT_FISH_VOICE_REFERENCE_ID = '9a9cf47702da476aa4629e2506d4a857'
 
+/**
+ * Curated Fish Audio voice catalog, selectable by name via `voice` on the TTS
+ * options (or `--voice <name>` on the reel scripts). The default — and the
+ * current FISH_VOICE_REFERENCE_ID in .env — is Ethan.
+ */
+export const FISH_VOICE_CATALOG = {
+  Ethan: '536d3a5e000945adb7038665781a4aca',
+  Mommy: '5233336f5f44460ea0902b0802375451',
+  'Just Many': '52a238a0e70c4e589bd41561d26e7a08',
+  'Twilight Sparkle': 'aaf2e6c3410d40d0b3d4bd9c242e5486',
+  'Young Creative Voice': '08b7e97e3dcb46daa0c3d9fbff48ab83',
+  'Friendly Young Woman': '30161b23154c4d2ab4c629aa8c9e415a',
+  Laura: 'e3cd384158934cc9a01029cd7d278634',
+  'BOOK RECORD REGULAR': 'f8dfe9c83081432386f143e2fe9767ef',
+  'Friendly Young Female': '1b1286fcf2f44d8ba1405e0b71abca22',
+} as const
+
+export type FishVoiceName = keyof typeof FISH_VOICE_CATALOG
+
 export const FISH_TTS_STREAM_URL = 'https://api.fish.audio/v1/tts/stream/with-timestamp'
 
 interface FishAlignmentSegment {
@@ -155,6 +174,7 @@ export function resolveFishConfig(options: ProviderGenerationOptions): {
   const apiKey = process.env.FISH_API_KEY || process.env.FISH_AUDIO_API_KEY || ''
   const referenceId =
     options.referenceId ||
+    (options.voice ? FISH_VOICE_CATALOG[options.voice as FishVoiceName] : undefined) ||
     process.env.FISH_VOICE_REFERENCE_ID ||
     DEFAULT_FISH_VOICE_REFERENCE_ID
   const model = options.model || process.env.FISH_TTS_MODEL || 's2.1-pro'

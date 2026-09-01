@@ -1214,7 +1214,7 @@ Options:
   --schedule-best-time      Schedule for optimal audience engagement time via Zernio
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without uploading to S3 or Zernio
-  --voice <name>            Edge TTS voice when Fish fallback is used (default: en-US-ChristopherNeural)
+  --voice <name>            Fish Audio catalog voice (default: env FISH_VOICE_REFERENCE_ID) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)

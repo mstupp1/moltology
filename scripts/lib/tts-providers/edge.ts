@@ -4,11 +4,18 @@ import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts'
 import { alignWordsWithOriginalText, type WordBoundaryEvent } from '../tts-engine'
 import type { ProviderGenerationOptions, ProviderGenerationResult, TTSProvider } from './types'
 
+const EDGE_VOICE_PATTERN = /^[a-z]{2}(?:-[A-Z]{2})?-?[A-Za-z-]*Neural$/i
+
+function resolveEdgeVoice(voice?: string): string {
+  if (voice && EDGE_VOICE_PATTERN.test(voice)) return voice
+  return 'en-US-ChristopherNeural'
+}
+
 export async function synthesizeWithEdge(
   text: string,
   options: ProviderGenerationOptions
 ): Promise<ProviderGenerationResult> {
-  const voice = options.voice || 'en-US-ChristopherNeural'
+  const voice = resolveEdgeVoice(options.voice)
   const rate = options.rate || '+8%'
   const pitch = options.pitch || '+0Hz'
   const timestamp = Date.now()
