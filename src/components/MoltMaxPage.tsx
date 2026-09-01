@@ -718,7 +718,7 @@ export const MoltMaxPage: React.FC = () => {
                     className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
                   <img
-                    src={getAssetUrl('/images/pbr_circuit_matrix.webp')}
+                    src={getAssetUrl('/images/pbr_circuit_matrix.webp?v=2')}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-overlay pointer-events-none z-0"
                   />

@@ -35,7 +35,7 @@ export const Route = createFileRoute('/moltmax')({
         as: 'image',
         type: 'image/webp',
         media: '(max-width: 767px)',
-        href: getAssetUrl('/images/chitin_texture_bg_sm.webp'),
+        href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
         fetchPriority: 'high',
       },
       {

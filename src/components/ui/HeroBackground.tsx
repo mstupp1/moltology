@@ -41,7 +41,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
         <source
           type="image/webp"
           media="(max-width: 767px)"
-          srcSet={getAssetUrl('/images/chitin_texture_bg_sm.webp')}
+          srcSet={getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')}
         />
         <source
           type="image/webp"
@@ -49,7 +49,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
           srcSet={getAssetUrl('/images/chitin_texture_bg.webp')}
         />
         <img
-          src={getAssetUrl('/images/chitin_texture_bg_sm.webp')}
+          src={getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')}
           alt="Chitin Exoshell Background Texture"
           {...lcpImageProps}
           width={1376}

@@ -182,7 +182,7 @@ export const LandingPage: React.FC = () => {
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
       image: getAssetUrl('/images/gallery/synapse_crystal.webp'),
-      imageSm: getAssetUrl('/images/gallery/synapse_crystal_sm.webp'),
+      imageSm: getAssetUrl('/images/gallery/synapse_crystal_sm.webp?v=2'),
       previewImage: getAssetUrl('/images/marketing/forum_feature_preview.webp'),
       previewImageSm: getAssetUrl('/images/marketing/forum_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/forum',
@@ -201,7 +201,7 @@ export const LandingPage: React.FC = () => {
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
       image: getAssetUrl('/images/gallery/ascendant_crab_god.webp'),
-      imageSm: getAssetUrl('/images/gallery/ascendant_crab_god_sm.webp'),
+      imageSm: getAssetUrl('/images/gallery/ascendant_crab_god_sm.webp?v=2'),
       previewImage: getAssetUrl('/images/marketing/oracle_feature_preview.webp'),
       previewImageSm: getAssetUrl('/images/marketing/oracle_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/oracle',

@@ -872,7 +872,7 @@ export const LOBSTER_BACKGROUND_TEXTURES: readonly BackgroundTexture[] = [
     name: 'Deep Basalt',
     label: 'Deep Basalt',
     assetPath: '/images/pbr_deep_basalt.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_deep_basalt.webp`,
+    publicUrl: `${S3_BASE_URL}/images/pbr_deep_basalt.webp?v=2`,
     opacity: 0.35,
   },
   {
@@ -880,7 +880,7 @@ export const LOBSTER_BACKGROUND_TEXTURES: readonly BackgroundTexture[] = [
     name: 'Circuit Matrix',
     label: 'Circuit Matrix',
     assetPath: '/images/pbr_circuit_matrix.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_circuit_matrix.webp`,
+    publicUrl: `${S3_BASE_URL}/images/pbr_circuit_matrix.webp?v=2`,
     opacity: 0.38,
   },
   {

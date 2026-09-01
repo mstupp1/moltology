@@ -31,6 +31,7 @@ describe('Homepage route head', () => {
           rel: 'preload',
           as: 'image',
           type: 'image/webp',
+          media: '(min-width: 768px)',
           href: getAssetUrl('/images/hero_widescreen_bg.webp'),
           fetchPriority: 'high',
         },
@@ -39,7 +40,7 @@ describe('Homepage route head', () => {
           as: 'image',
           type: 'image/webp',
           media: '(max-width: 767px)',
-          href: getAssetUrl('/images/chitin_texture_bg_sm.webp'),
+          href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
           fetchPriority: 'high',
         },
         {
