@@ -158,3 +158,33 @@
     transform: translateX(250%);
   }
 }
+
+/* Custom Red-to-Cyan Range Slider (HUD / studio only) */
+input[type="range"].stat-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #030606;
+  height: 6px;
+  border: 1px solid #3a4a49;
+  border-radius: 0px;
+}
+
+input[type="range"].stat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #ff453a;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 8px #ff453a;
+}
+
+input[type="range"].stat-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #ff453a;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 8px #ff453a;
+}

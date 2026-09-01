@@ -1,5 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
+import '@/styles/pbr-textures.css'
 
 export interface HudCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'cyan' | 'teal' | 'crimson' | 'dark' | 'ghost'

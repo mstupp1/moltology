@@ -1,5 +1,6 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
+import '@/styles/pbr-textures.css'
 
 export interface HudButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'cyan' | 'crimson' | 'sacred' | 'dark' | 'ghost'

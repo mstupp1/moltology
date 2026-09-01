@@ -16,7 +16,7 @@ vi.mock('@/components/LandingPage', () => ({
 import { Route } from './index'
 
 describe('Homepage route head', () => {
-  it('preloads deck poster as mobile LCP and desktop hero widescreen', async () => {
+  it('preloads mobile chitin as LCP and desktop hero widescreen', async () => {
     const headFn = Route.options.head
     expect(headFn).toBeTypeOf('function')
     if (typeof headFn !== 'function') {
@@ -32,8 +32,15 @@ describe('Homepage route head', () => {
           as: 'image',
           type: 'image/webp',
           media: '(max-width: 767px)',
-          href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
+          href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
           fetchPriority: 'high',
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          type: 'image/webp',
+          media: '(max-width: 767px)',
+          href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
         },
         {
           rel: 'preload',
@@ -54,7 +61,7 @@ describe('Homepage route head', () => {
     )
 
     const preloads = (head.links ?? []).filter((link) => link && 'rel' in link && link.rel === 'preload')
-    expect(preloads).toHaveLength(3)
+    expect(preloads).toHaveLength(4)
     const highPriority = preloads.filter(
       (link) => link && 'fetchPriority' in link && link.fetchPriority === 'high',
     )

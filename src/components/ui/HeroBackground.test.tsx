@@ -1,16 +1,16 @@
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { HeroBackground } from './HeroBackground'
 
 describe('HeroBackground', () => {
-  it('mounts deferred chitin textures (idle-ready in tests) without an LCP img', async () => {
+  it('paints mobile chitin as an eager high-priority img on first render', () => {
     const { container } = render(<HeroBackground />)
-    expect(screen.queryByAltText('Chitin Exoshell Background Texture')).not.toBeInTheDocument()
-    await waitFor(() => {
-      expect(container.querySelector('[data-testid="hero-chitin-texture-sm"]')).toBeTruthy()
-    })
-    expect(container.querySelector('[style*="chitin_texture_bg"]')).toBeTruthy()
+    const mobileChitin = screen.getByTestId('hero-chitin-texture-sm')
+    expect(mobileChitin.tagName).toBe('IMG')
+    expect(mobileChitin).toHaveAttribute('fetchpriority', 'high')
+    expect(mobileChitin).toHaveAttribute('loading', 'eager')
+    expect(container.querySelector('[data-testid="hero-chitin-texture-lg"]')).toBeTruthy()
   })
 
   it('renders custom watermarks when enabled', () => {

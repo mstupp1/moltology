@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { getAssetUrl } from '@/lib/assets'
-import { useIdleReady } from '@/hooks/useIdleReady'
+import { lcpImageProps } from '@/lib/media-priority'
 
 export interface HeroBackgroundProps {
   className?: string
@@ -11,9 +11,7 @@ export interface HeroBackgroundProps {
 
 /**
  * Shared Hero Background Component
- * First paint is solid benthic color + ambient glows (fast LCP path).
- * Decorative image layers (chitin grain, desktop widescreen) mount after idle
- * and fade in so they do not win Largest Contentful Paint.
+ * Mobile chitin WebP is the intentional LCP (preloaded on `/`); deck poster stays eager-low.
  */
 export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   className = '',
@@ -21,57 +19,40 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   leftWatermark = 'SYS.CORE · TRANSMUTATION_PIPELINE',
   rightWatermark = 'MARIANA_DEPTH_DATUM · 10984M',
 }) => {
-  // Short idle window: texture arrives soon after FCP without fighting LCP.
-  const textureReady = useIdleReady(700)
-  const [textureFadedIn, setTextureFadedIn] = useState(false)
-
-  useEffect(() => {
-    if (!textureReady) {
-      setTextureFadedIn(false)
-      return
-    }
-    const id = requestAnimationFrame(() => setTextureFadedIn(true))
-    return () => cancelAnimationFrame(id)
-  }, [textureReady])
-
   const chitinSm = getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')
   const chitinLg = getAssetUrl('/images/chitin_texture_bg.webp')
-  const textureOpacity = textureFadedIn ? 'opacity-40 sm:opacity-45' : 'opacity-0'
 
   return (
     <div className={`absolute inset-0 w-full h-full pointer-events-none overflow-hidden select-none z-0 ${className}`} aria-hidden="true">
-      {/* Layer 1: Desktop widescreen — deferred with other decorative media */}
-      {textureReady && (
-        <div
-          className={`hidden md:block absolute inset-0 w-full h-full bg-cover bg-center mix-blend-luminosity scale-105 pointer-events-none blur-[12px] z-0 transition-opacity duration-300 ease-out ${
-            textureFadedIn ? 'opacity-25 sm:opacity-30' : 'opacity-0'
-          }`}
-          style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
-        />
-      )}
+      {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Blurred, Desktop only) */}
+      <div
+        className="hidden md:block absolute inset-0 w-full h-full bg-cover bg-center opacity-25 sm:opacity-30 mix-blend-luminosity scale-105 pointer-events-none blur-[12px] z-0"
+        style={{ backgroundImage: `url(${getAssetUrl('/images/hero_widescreen_bg.webp')})` }}
+      />
 
-      {/* Layer 2A: Deep Benthic Base Layer (first paint) */}
+      {/* Layer 2A: Deep Benthic Base Layer */}
       <div className="absolute inset-0 bg-[#020608]/50 z-0 pointer-events-none backdrop-blur-[2px]" />
 
-      {/* Layer 2B: Ambient glows (first paint — no network) */}
+      {/* Layer 2B: Balanced Dual Cyan & Red Ambient Background Color Glows */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.20)_0%,transparent_65%)] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.15)_0%,transparent_65%)] pointer-events-none z-0" />
 
-      {/* Layer 2C: Chitin grain — after idle so deck/headline can own LCP */}
-      {textureReady && (
-        <>
-          <div
-            className={`absolute inset-0 w-full h-full mix-blend-overlay scale-105 pointer-events-none z-0 transform-gpu bg-cover bg-center md:hidden transition-opacity duration-300 ease-out ${textureOpacity}`}
-            style={{ backgroundImage: `url(${chitinSm})` }}
-            data-testid="hero-chitin-texture-sm"
-          />
-          <div
-            className={`absolute inset-0 w-full h-full mix-blend-overlay scale-105 pointer-events-none z-0 transform-gpu bg-cover bg-center hidden md:block transition-opacity duration-300 ease-out ${textureOpacity}`}
-            style={{ backgroundImage: `url(${chitinLg})` }}
-            data-testid="hero-chitin-texture-lg"
-          />
-        </>
-      )}
+      {/* Layer 2C: Chitin grain — mobile img is route LCP; desktop stays decorative CSS */}
+      <img
+        src={chitinSm}
+        alt=""
+        role="presentation"
+        {...lcpImageProps}
+        width={640}
+        height={640}
+        className="absolute inset-0 w-full h-full object-cover opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0 transform-gpu md:hidden"
+        data-testid="hero-chitin-texture-sm"
+      />
+      <div
+        className="absolute inset-0 w-full h-full opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0 transform-gpu bg-cover bg-center hidden md:block"
+        style={{ backgroundImage: `url(${chitinLg})` }}
+        data-testid="hero-chitin-texture-lg"
+      />
 
       {/* Layer 2D: Sacred Grid & Balanced Mid-Tone Vignettes */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(2,6,8,0.85)_95%)] opacity-72 z-0 pointer-events-none" />

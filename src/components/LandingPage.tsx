@@ -32,6 +32,7 @@ import { MainFooter } from '@/components/MainFooter'
 import { LandingAuthCtaSkeleton } from '@/components/LandingAuthCtaSkeleton'
 import { useIdleReady } from '@/hooks/useIdleReady'
 import '@/styles/crt.css'
+import '@/styles/pbr-textures.css'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lazyImageProps } from '@/lib/media-priority'
 

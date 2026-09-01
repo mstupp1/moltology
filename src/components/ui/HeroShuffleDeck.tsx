@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
-import { lcpImageProps } from '@/lib/media-priority'
+import { eagerImageProps } from '@/lib/media-priority'
 
 export interface HeroCard {
   id: string
@@ -338,7 +338,7 @@ export const HeroShuffleDeck: React.FC = () => {
                   src={card.image}
                   alt={isActive ? card.title : ''}
                   {...(idx === 0 && isActive
-                    ? lcpImageProps
+                    ? eagerImageProps
                     : { loading: 'lazy' as const, decoding: 'async' as const, fetchPriority: 'low' as const })}
                   width={1280}
                   height={720}

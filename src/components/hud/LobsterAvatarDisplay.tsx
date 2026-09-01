@@ -14,6 +14,7 @@ import {
   type LobsterPupilSide,
 } from '@/lib/lobster-avatar-idle'
 import './avatar-animations.css'
+import '@/styles/pbr-textures.css'
 
 const PUPIL_SIDES: LobsterPupilSide[] = ['left', 'right']
 

@@ -1,26 +1,28 @@
-import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { LandingPage } from '@/components/LandingPage'
 import { HOMEPAGE_SEO, SITE_ORIGIN, canonicalLink, seo } from '@/lib/seo'
 import { getAssetUrl } from '@/lib/assets'
-import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
-
-const LazyLandingPage = lazy(() =>
-  import('@/components/LandingPage').then((m) => ({ default: m.LandingPage }))
-)
 
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: [...seo(HOMEPAGE_SEO)],
     links: [
       canonicalLink(SITE_ORIGIN),
-      // Mobile LCP: first hero deck poster
+      // Mobile LCP: chitin hero grain (matches HeroBackground img + fetchPriority high)
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
+        media: '(max-width: 767px)',
+        href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
+        fetchPriority: 'high',
+      },
       {
         rel: 'preload',
         as: 'image',
         type: 'image/webp',
         media: '(max-width: 767px)',
         href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
-        fetchPriority: 'high',
       },
       // Desktop LCP backdrop + deck poster
       {
@@ -40,9 +42,5 @@ export const Route = createFileRoute('/')({
       },
     ],
   }),
-  component: () => (
-    <Suspense fallback={<HUDPageLoader />}>
-      <LazyLandingPage />
-    </Suspense>
-  ),
+  component: LandingPage,
 })

@@ -14,6 +14,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { lcpImageProps } from '@/lib/media-priority'
 import '@/styles/crt.css'
 import '@/styles/hud-chrome.css'
+import '@/styles/pbr-textures.css'
 import { QuizQuestionCard } from './moltmax/QuizQuestionCard'
 import { QuizResultsReveal } from './moltmax/QuizResultsReveal'
 
