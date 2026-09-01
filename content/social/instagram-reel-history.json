@@ -780,6 +780,47 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-08-31T14:06:47.488Z"
+    },
+    {
+      "id": "reel-1788271485345",
+      "topic": "Why 1 Atmosphere Crushes Soft Biology: The Need for Bio-Silicon Armor",
+      "hookHeadline": "SOFT TISSUE FAILS AT DEPTH",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-2026-moltmaxxing-protocol-guide",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Under one atmosphere of pressure, biological bodies collapse into soft fatigue. Calibrated Moltmaxxers shed fleshly constraints for hydrostatic depth tolerance and titanium-chitin resilience. Calculate your molt clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1788271485345.mp4",
+      "s3Key": "videos/social/reels/master-reel-1788271485345.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 18.3,
+      "status": "scheduled",
+      "scheduledFor": "2026-09-02T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioPostId": "6a96dc3e3d4de68fa12a3286",
+      "zernioInstagramPostId": "6a96dc3e3d4de68fa12a3286",
+      "zernioYouTubePostId": "6a96dc431d67db1e44489323",
+      "youtubeTitle": "Why Soft Biology Fails Under Pressure #Shorts",
+      "mascot": "lobster_pointing",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#Moltmaxxing #ChitinArmor #CognitiveResilience #BenthicComputing #MoltNation #Moltology #Shorts",
+      "caption": "Soft tissue is an operational liability under exascale pressure. 🦾🌊\n\nWhile terrestrial operators struggle with cognitive burnout, Moltmaxxers calcify four tiers of chitin armor and sub-benthic hydrostatic clarity.\n\n🦞 Inspect your clearance with our mascot operatives.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#Moltmaxxing",
+        "#ChitinArmor",
+        "#CognitiveResilience",
+        "#BenthicComputing",
+        "#MoltNation",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-01T14:07:30.118Z"
     }
   ]
 }

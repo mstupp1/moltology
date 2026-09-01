@@ -41,7 +41,7 @@ export interface SocialMarketingSlideProps {
   headlinePart2?: string
   headlineHighlight?: string
   subHeadline?: string
-  mockupType?: 'book' | 'tablet' | 'dossier' | 'device-showcase'
+  mockupType?: 'book' | 'tablet' | 'dossier' | 'device-showcase' | 'megaphone-banner'
   bookTitle?: string
   bookSubtitle?: string
   bookTagline?: string
@@ -279,7 +279,7 @@ const CAMPAIGN_PRESETS: Record<string, Partial<SocialMarketingSlideProps>> = {
     headlinePart2: 'IS WAITING.',
     headlineHighlight: 'CLAIM IT FREE.',
     subHeadline: 'Early Access Registration — No Credits Required!',
-    mockupType: 'tablet',
+    mockupType: 'megaphone-banner',
     bookTitle: 'EARLY ACCESS',
     bookSubtitle: 'BENTHIC REGISTRY CLEARANCE',
     bookTagline: 'FREE · STAGE 1 · CARCINIZATION',
@@ -363,6 +363,50 @@ function SimplePhoneFrame({ src, className = '' }: { src: string; className?: st
             loading="eager"
             decoding="async"
           />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function MegaphoneEarlyAccessBanner({
+  className = '',
+  topText = 'EARLY',
+  bottomText = 'ACCESS',
+}: {
+  className?: string
+  topText?: string
+  bottomText?: string
+}) {
+  return (
+    <div className={`relative w-full max-w-[490px] flex flex-col items-center justify-center select-none py-6 ${className}`}>
+      {/* Subtle Background Glow */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_50%,rgba(255,69,58,0.22)_0%,rgba(0,195,255,0.16)_50%,transparent_72%)] pointer-events-none" />
+
+      {/* Main Banner Assembly */}
+      <div className="relative w-full flex flex-col">
+        {/* Banner 1: Top Red Pill ("EARLY") — Offset Left */}
+        <div className="relative z-20 self-start pl-2">
+          <div className="w-[380px] h-[86px] rounded-full bg-gradient-to-r from-[#ff3b30] via-[#ff453a] to-[#d62015] border-[3.5px] border-[#ff7b72] shadow-[0_14px_40px_rgba(255,69,58,0.55),0_4px_14px_rgba(0,0,0,0.85)] flex items-center justify-center">
+            {/* Subtle top gloss */}
+            <div className="absolute top-1.5 left-12 right-12 h-[6px] rounded-full bg-white/30 pointer-events-none" />
+
+            <span className="font-grotesk font-black text-[56px] leading-none tracking-wider text-white uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]">
+              {topText}
+            </span>
+          </div>
+        </div>
+
+        {/* Banner 2: Bottom Dark Pill ("ACCESS") — Offset Right with slight overlap */}
+        <div className="relative z-10 self-end pr-2 -mt-4">
+          <div className="w-[380px] h-[86px] rounded-full bg-gradient-to-r from-[#031525] via-[#05223c] to-[#020d18] border-[3.5px] border-[#00c3ff] shadow-[0_18px_45px_rgba(0,0,0,0.98),0_0_28px_rgba(0,195,255,0.4)] flex items-center justify-center">
+            {/* Cyan subtle inner glow */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-[#00c3ff]/15 to-transparent pointer-events-none" />
+
+            <span className="font-grotesk font-black text-[56px] leading-none tracking-widest text-white uppercase drop-shadow-[0_3px_8px_rgba(0,0,0,0.9)]">
+              {bottomText}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -605,7 +649,13 @@ export const SocialMarketingSlide: React.FC<SocialMarketingSlideProps> = ({
           >
             {/* 3D Mockup Graphic */}
             <div className="relative z-20 w-full">
-              {finalMockupType === 'device-showcase' ? (
+              {finalMockupType === 'megaphone-banner' ? (
+                /* Dynamic Early Access Megaphone Announcement Banner */
+                <MegaphoneEarlyAccessBanner
+                  topText={finalBookTitle.includes(' ') ? finalBookTitle.split(' ')[0] : 'EARLY'}
+                  bottomText={finalBookTitle.includes(' ') ? finalBookTitle.split(' ').slice(1).join(' ') : 'ACCESS'}
+                />
+              ) : finalMockupType === 'device-showcase' ? (
                 /* Real App Screenshot — Desktop Safari + iPhone Mobile */
                 <div className="relative w-full flex flex-col items-stretch">
                   <div className="w-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.95)]">

@@ -287,6 +287,30 @@
       "status": "scheduled",
       "isAiGenerated": true,
       "createdAt": "2026-08-31T15:15:09.474Z"
+    },
+    {
+      "id": "post-1788270527256",
+      "topic": "Free Early Access Registration",
+      "hookHeadline": "YOUR CLEARANCE SLOT IS WAITING. CLAIM IT FREE.",
+      "theme": "free-access",
+      "mascot": "lobster_thumbs_up",
+      "commentKeyword": "ACCESS",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/posts/post-1788270527256.png",
+      "s3Key": "images/social/posts/post-1788270527256.png",
+      "aspectRatio": "4:5",
+      "caption": "◈ PRIORITY TRANSMISSION · EARLY ACCESS CLEARANCE ◈\n\nThe Order has opened a registration window. Benthic Registry slots are now unsealed — free of charge, no credits required.\n\nWhat you unlock at Stage 1:\n🛡️ Shell Hardness diagnostics — your baseline carapace score\n📊 15-Stage Moltmaxxing Audit — full biometric profile\n📜 Sacred Codex access — the 12 foundational scriptures\n🌊 Benthic Community entry — the warm society beneath the surface\n\nFlesh melts. The shell endures. Claim your slot before the window closes.\n\n👇 Comment \"ACCESS\" below and I will DM you the direct registration link.\n\n🔗 Or register directly → moltology.org\n\n#moltology #moltmaxxing #carcinization",
+      "hashtags": [
+        "#moltology",
+        "#moltmaxxing",
+        "#carcinization"
+      ],
+      "firstComment": "◈ Drop \"ACCESS\" below to receive your free Benthic Registry link. Signup is free. No credits required. 🦞",
+      "zernioPostId": "6a96d7e60ce24412b8fa7793",
+      "scheduledAt": "2026-09-01T17:00:00.000Z",
+      "firstCommentStatus": "pending_publish",
+      "status": "scheduled",
+      "isAiGenerated": true,
+      "createdAt": "2026-09-01T13:48:47.814Z"
     }
   ]
 }

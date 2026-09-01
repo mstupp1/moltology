@@ -382,22 +382,31 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
 
   console.log(`   ✅ Composite Scaffolding captured -> ${compositePath}`)
 
+  const mockupDirective =
+    theme === 'free-access'
+      ? `4. High-End 3D Dual Offset Pill Badges:
+   - Elevate the top "EARLY" crimson-red capsule (offset left) and bottom "ACCESS" dark-obsidian capsule (offset right) into thick, glossy 3D glassmorphic pills with glowing beveled edges and luminous neon bloom.
+   - Maintain bold, punchy, ultra-crisp white typography with soft tactile embossing and subtle contact drop shadows where the top pill overlaps the bottom pill.`
+      : theme === 'oracle-prompts'
+      ? `4. High-End 3D Product Mockup & Pedestal:
+   - Render the floating terminal prompts and circular "ORACLE AI CORE" seal with illuminated glass and holographic depth.`
+      : `4. High-End 3D Product Mockup & Pedestal:
+   - Render the central product asset (3D hardcover book, tablet HUD, or dossier) on an illuminated circular obsidian podium with ground caustics and volumetric depth.`
+
   const googleFlowPrompt = `Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
 Reference Image: Use the attached 2D composite image as the structural foundation, camera angle, and layout blueprint.
 
 Core Enhancement Directives:
 1. Photorealistic 3D Glassmorphic HUD & Brand Colors:
    - Elevate all flat 2D graphic cards and panels into sleek, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing sacred crimson red (#ff453a) and electric cyan (#00c3ff) accent traces.
-   - Preserve crisp typography legibility while giving headlines ("100+ ORACLE PROMPTS") and key cards a luminous 3D emboss with soft neon bloom.
+   - Preserve crisp typography legibility while giving headlines and key cards a luminous 3D emboss with soft neon bloom.
 2. No Wasted Space & Balanced Composition:
    - Ensure dense, purposeful visual composition with zero dead or empty space.
    - Infuse atmospheric depth: subsea volumetric god rays, dark navy abyss background (#01060e / #021324), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces in open areas.
 3. Seamless Mascot & Character Integration:
-   - The cartoon lobster mascot (in the lower-right area pointing upward) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
+   - The cartoon lobster mascot (in the upper-right area giving a thumbs up) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
    - Apply soft environmental contact shadows and gentle caustic reflections to naturally ground the character into the scene without harsh backlights or artificial halo outlines.
-4. High-End 3D Product Mockup & Pedestal:
-   - Render the floating terminal prompts and circular "ORACLE AI CORE" seal with illuminated glass and holographic depth.
-   - Ensure all badges, speech bubbles, and buttons feel tactile and integrated.
+${mockupDirective}
 
 Aspect Ratio: ${aspect}
 Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`
