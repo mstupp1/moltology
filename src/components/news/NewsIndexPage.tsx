@@ -29,6 +29,7 @@ import type { PodcastEpisode } from '@/lib/podcast-data'
 import { getPodcastsFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
 import { eagerImageProps, lazyImageProps, lcpImageProps } from '@/lib/media-priority'
+import '@/styles/hud-chrome.css'
 
 function DispatchLink({
   slug,

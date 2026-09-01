@@ -16,7 +16,7 @@ vi.mock('@/components/LandingPage', () => ({
 import { Route } from './index'
 
 describe('Homepage route head', () => {
-  it('preloads hero LCP high and demotes decorative chitin overlays', async () => {
+  it('preloads deck poster as mobile LCP and desktop hero widescreen', async () => {
     const headFn = Route.options.head
     expect(headFn).toBeTypeOf('function')
     if (typeof headFn !== 'function') {
@@ -31,6 +31,14 @@ describe('Homepage route head', () => {
           rel: 'preload',
           as: 'image',
           type: 'image/webp',
+          media: '(max-width: 767px)',
+          href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
+          fetchPriority: 'high',
+        },
+        {
+          rel: 'preload',
+          as: 'image',
+          type: 'image/webp',
           media: '(min-width: 768px)',
           href: getAssetUrl('/images/hero_widescreen_bg.webp'),
           fetchPriority: 'high',
@@ -39,15 +47,8 @@ describe('Homepage route head', () => {
           rel: 'preload',
           as: 'image',
           type: 'image/webp',
-          media: '(max-width: 767px)',
-          href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
-        },
-        {
-          rel: 'preload',
-          as: 'image',
-          type: 'image/webp',
           media: '(min-width: 768px)',
-          href: getAssetUrl('/images/chitin_texture_bg.webp'),
+          href: getAssetUrl('/images/hero_card_benthic_core.webp'),
         },
       ]),
     )
@@ -57,6 +58,6 @@ describe('Homepage route head', () => {
     const highPriority = preloads.filter(
       (link) => link && 'fetchPriority' in link && link.fetchPriority === 'high',
     )
-    expect(highPriority).toHaveLength(1)
+    expect(highPriority).toHaveLength(2)
   })
 })

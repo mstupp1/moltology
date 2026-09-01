@@ -23,6 +23,7 @@ import { ReaderPdfPage } from '@/components/reader/ReaderPdfPage'
 import { JournalPaperSheet } from './JournalPaperSheet'
 import { JournalPaperReader } from './JournalPaperReader'
 import { JournalFeedTag } from './ScientificTable'
+import '@/styles/editorial-fonts.css'
 import { cn } from '@/lib/utils'
 
 interface JournalReaderWorkspaceProps {

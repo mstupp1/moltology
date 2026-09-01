@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { PublicHeader } from '@/components/PublicHeader'
 import { HudButton } from '@/components/ui/HudButton'
+import '@/styles/editorial-fonts.css'
 
 export function HUDNotFound() {
   const [currentPath, setCurrentPath] = useState<string>('')

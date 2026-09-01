@@ -1,6 +1,5 @@
 import React from 'react'
 import { getAssetUrl } from '@/lib/assets'
-import { eagerImageProps } from '@/lib/media-priority'
 
 export interface HeroBackgroundProps {
   className?: string
@@ -14,6 +13,8 @@ export interface HeroBackgroundProps {
  * Provides a unified 3D-layered benthic background for public hero banners (Landing page, Moltmax, etc.)
  * Includes darkened widescreen hero artwork, ambient cyan/red lighting, chitin texture overlay,
  * soft grid, reduced edge vignette, and optional technical HUD watermarks.
+ *
+ * Chitin texture uses CSS background-image (not an img tag) so it cannot become the LCP element.
  */
 export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   className = '',
@@ -21,6 +22,9 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   leftWatermark = 'SYS.CORE · TRANSMUTATION_PIPELINE',
   rightWatermark = 'MARIANA_DEPTH_DATUM · 10984M',
 }) => {
+  const chitinSm = getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')
+  const chitinLg = getAssetUrl('/images/chitin_texture_bg.webp')
+
   return (
     <div className={`absolute inset-0 w-full h-full pointer-events-none overflow-hidden select-none z-0 ${className}`} aria-hidden="true">
       {/* Layer 1: Background Widescreen Hero Artwork (Darkened & Blurred, Desktop only) */}
@@ -36,27 +40,15 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_35%,rgba(0,195,255,0.20)_0%,transparent_65%)] pointer-events-none z-0" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_65%,rgba(255,69,58,0.15)_0%,transparent_65%)] pointer-events-none z-0" />
 
-      {/* Layer 2C: Chitin Exoshell Texture Pattern Layer (GPU Composited, Responsive WebP) */}
-      <picture className="absolute inset-0 w-full h-full pointer-events-none transform-gpu">
-        <source
-          type="image/webp"
-          media="(max-width: 767px)"
-          srcSet={getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')}
-        />
-        <source
-          type="image/webp"
-          media="(min-width: 768px)"
-          srcSet={getAssetUrl('/images/chitin_texture_bg.webp')}
-        />
-        <img
-          src={getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2')}
-          alt="Chitin Exoshell Background Texture"
-          {...eagerImageProps}
-          width={1376}
-          height={768}
-          className="w-full h-full object-cover opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0"
-        />
-      </picture>
+      {/* Layer 2C: Chitin texture as CSS background — decorative only, not an LCP img candidate */}
+      <div
+        className="absolute inset-0 w-full h-full opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0 transform-gpu bg-cover bg-center md:hidden"
+        style={{ backgroundImage: `url(${chitinSm})` }}
+      />
+      <div
+        className="absolute inset-0 w-full h-full opacity-40 sm:opacity-45 mix-blend-overlay scale-105 pointer-events-none z-0 transform-gpu bg-cover bg-center hidden md:block"
+        style={{ backgroundImage: `url(${chitinLg})` }}
+      />
 
       {/* Layer 2D: Sacred Grid & Balanced Mid-Tone Vignettes */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(2,6,8,0.85)_95%)] opacity-72 z-0 pointer-events-none" />

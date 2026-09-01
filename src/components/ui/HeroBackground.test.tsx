@@ -4,12 +4,11 @@ import { describe, it, expect } from 'vitest'
 import { HeroBackground } from './HeroBackground'
 
 describe('HeroBackground', () => {
-  it('renders chitin texture and background layers', () => {
-    render(<HeroBackground />)
-    const textureImg = screen.getByAltText('Chitin Exoshell Background Texture')
-    expect(textureImg).toBeInTheDocument()
-    expect(textureImg.getAttribute('src')).toContain('chitin_texture_bg')
-    expect(textureImg.getAttribute('fetchpriority')?.toLowerCase() || textureImg.getAttribute('fetchPriority')).not.toBe('high')
+  it('renders chitin texture as CSS backgrounds without an LCP img', () => {
+    const { container } = render(<HeroBackground />)
+    expect(screen.queryByAltText('Chitin Exoshell Background Texture')).not.toBeInTheDocument()
+    const textured = container.querySelectorAll('[style*="chitin_texture_bg"]')
+    expect(textured.length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders custom watermarks when enabled', () => {

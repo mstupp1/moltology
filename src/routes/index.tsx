@@ -13,6 +13,16 @@ export const Route = createFileRoute('/')({
     meta: [...seo(HOMEPAGE_SEO)],
     links: [
       canonicalLink(SITE_ORIGIN),
+      // Mobile LCP: first hero deck poster
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/webp',
+        media: '(max-width: 767px)',
+        href: getAssetUrl('/images/hero_card_benthic_core_sm.webp'),
+        fetchPriority: 'high',
+      },
+      // Desktop LCP backdrop + deck poster
       {
         rel: 'preload',
         as: 'image',
@@ -21,20 +31,12 @@ export const Route = createFileRoute('/')({
         href: getAssetUrl('/images/hero_widescreen_bg.webp'),
         fetchPriority: 'high',
       },
-      // Decorative chitin overlay — preload without competing for LCP priority
-      {
-        rel: 'preload',
-        as: 'image',
-        type: 'image/webp',
-        media: '(max-width: 767px)',
-        href: getAssetUrl('/images/chitin_texture_bg_sm.webp?v=2'),
-      },
       {
         rel: 'preload',
         as: 'image',
         type: 'image/webp',
         media: '(min-width: 768px)',
-        href: getAssetUrl('/images/chitin_texture_bg.webp'),
+        href: getAssetUrl('/images/hero_card_benthic_core.webp'),
       },
     ],
   }),
@@ -44,4 +46,3 @@ export const Route = createFileRoute('/')({
     </Suspense>
   ),
 })
-
