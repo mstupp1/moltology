@@ -8,6 +8,7 @@ export type CharacterKey =
   | 'lobster_peek'
   | 'lobster_thumbs_up'
   | 'lobster_peaceful'
+  | 'lobster_navigator'
   | 'lobster_action'
   | 'crab_stats'
   | 'lobster_engineer'
@@ -50,12 +51,12 @@ export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = {
     publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_floating_peaceful.webp`,
     description: 'Calm cyber-lobster floating peacefully in deep benthic waters',
   },
-  lobster_action: {
-    key: 'lobster_action',
-    filename: 'char_lobster_speed_action.webp',
-    s3Path: 'images/characters/char_lobster_speed_action.webp',
-    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_speed_action.webp`,
-    description: 'Dynamic speed-action lobster dashing forward with propulsion glow',
+  lobster_navigator: {
+    key: 'lobster_navigator',
+    filename: 'char_lobster_navigator.webp',
+    s3Path: 'images/characters/char_lobster_navigator.webp',
+    publicUrl: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=1`,
+    description: 'Adventurous lobster navigator wearing benthic goggles with holographic depth compass',
   },
   crab_stats: {
     key: 'crab_stats',
@@ -86,7 +87,7 @@ export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo 
     raw === 'lobster_pointing_cta' || raw === 'pointing' ? 'lobster_pointing' :
     raw === 'lobster_corner_peek' || raw === 'peek' ? 'lobster_peek' :
     raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' ? 'crab_stats' :
-    raw === 'lobster_speed_action' || raw === 'action' ? 'lobster_action' :
+    raw === 'lobster_navigator' || raw === 'navigator' || raw === 'explorer' || raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'action' ? 'lobster_navigator' :
     raw === 'lobster_floating_peaceful' || raw === 'peaceful' ? 'lobster_peaceful' :
     raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' ? 'lobster_engineer' :
     raw === 'thumbs_up' ? 'lobster_thumbs_up' :

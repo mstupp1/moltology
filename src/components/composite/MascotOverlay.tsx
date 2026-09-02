@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 export type MascotKey =
   | 'lobster_pointing'
   | 'lobster_thumbs_up'
+  | 'lobster_navigator'
   | 'lobster_action'
   | 'crab_stats'
   | 'lobster_peek'
@@ -36,12 +37,12 @@ export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
     s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.webp?v=4`,
     description: 'Cheerful lobster giving a thumbs-up approval sign',
   },
-  lobster_action: {
-    key: 'lobster_action',
-    name: 'Lobster Speed Action (Kinetic)',
-    filename: 'char_lobster_speed_action.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_speed_action.webp`,
-    description: 'Dynamic speed-action lobster dashing forward with propulsion glow',
+  lobster_navigator: {
+    key: 'lobster_navigator',
+    name: 'Lobster Navigator (Benthic Explorer)',
+    filename: 'char_lobster_navigator.webp',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=1`,
+    description: 'Adventurous lobster navigator wearing benthic goggles with holographic depth compass',
   },
   crab_stats: {
     key: 'crab_stats',
@@ -90,7 +91,7 @@ export function normalizeMascotKey(rawKey: string): string {
   if (raw === 'lobster_pointing_cta' || raw === 'pointing' || raw === 'cta' || raw === 'lobster_cta') return 'lobster_pointing'
   if (raw === 'lobster_corner_peek' || raw === 'peek' || raw === 'corner_peek') return 'lobster_peek'
   if (raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' || raw === 'pointing_stats') return 'crab_stats'
-  if (raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'action' || raw === 'speed') return 'lobster_action'
+  if (raw === 'lobster_navigator' || raw === 'navigator' || raw === 'explorer' || raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'lobster_action' || raw === 'action' || raw === 'speed') return 'lobster_navigator'
   if (raw === 'lobster_floating_peaceful' || raw === 'floating_peaceful' || raw === 'peaceful' || raw === 'zen' || raw === 'floating') return 'lobster_peaceful'
   if (raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' || raw === 'hardhat') return 'lobster_engineer'
   if (raw === 'thumbs_up' || raw === 'thumbs' || raw === 'approval' || raw === 'lobster_thumbs') return 'lobster_thumbs_up'

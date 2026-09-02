@@ -7,7 +7,7 @@ describe('Character Overlay & Registry', () => {
       'lobster_peek',
       'lobster_thumbs_up',
       'lobster_peaceful',
-      'lobster_action',
+      'lobster_navigator',
       'crab_stats',
       'lobster_engineer',
     ]

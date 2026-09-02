@@ -303,7 +303,8 @@ describe('Composite UI Components', () => {
 
     expect(normalizeMascotKey('pointing')).toBe('lobster_pointing')
     expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_pointing')
-    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_action')
+    expect(normalizeMascotKey('char_lobster_speed_action.png')).toBe('lobster_navigator')
+    expect(normalizeMascotKey('navigator')).toBe('lobster_navigator')
     expect(normalizeMascotKey('stats')).toBe('crab_stats')
     expect(normalizeMascotKey('peek')).toBe('lobster_peek')
     expect(normalizeMascotKey('peaceful')).toBe('lobster_peaceful')

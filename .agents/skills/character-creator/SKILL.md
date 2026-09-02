@@ -182,68 +182,151 @@ await overlayCharacterOnImage(baseImagePath, outputImagePath, {
 
 ---
 
-## ◈ 4. Effortless In-Place Character Replacement Protocol (Zero Code Refactoring)
+## ◈ 4. Mascot Lifecycle Playbooks (Add, Replace, Refresh, Remove)
 
-When refining, re-rendering, or replacing an existing mascot in the character roster (e.g. updating `char_lobster_thumbs_up.webp` or `char_lobster_pointing_cta.webp`), follow this exact 5-step workflow to update the asset everywhere in seconds without touching any components or references across the codebase:
+Follow these exact copy-paste protocols for managing crustacean mascots across the platform:
 
-```mermaid
-flowchart LR
-    A[1. Generate 3D Chroma Cutout] --> B[2. Run Chroma Key with --webp]
-    B --> C[3. Overwrite Local References]
-    C --> D[4. In-Place S3 Upload]
-    D --> E[5. Bump Cache-Buster in MascotOverlay]
-```
+---
 
-### 1. Generate & Extract Cutout
-Synthesize the new 3D character render on flat solid hot pink (`#FF00FF`) with attached eyebrows, then run the chroma key engine with `--webp`:
+### Protocol A: Add a Brand New Character
+
+Use this when introducing an entirely new character persona to the roster (e.g. `char_lobster_scholar`):
+
+1. **Synthesize Cutout**:
+   Generate 3D character on solid hot pink (`#FF00FF`) with attached eyebrows, natural eyes, and specular sheen using `generate_image`.
+2. **Extract Alpha with `--webp`**:
+   ```bash
+   python3 scripts/chroma_key.py \
+     <path_to_generated_image.jpg> \
+     scratch/characters/char_<name>.png \
+     --color auto \
+     --tolerance 48 \
+     --smoothness 28 \
+     --despill-strength 0.85 \
+     --trim \
+     --margin 24 \
+     --webp
+   ```
+3. **Copy to Reference Vault**:
+   ```bash
+   cp scratch/characters/char_<name>.png scratch/character_refs/char_<name>.png
+   cp scratch/characters/char_<name>.webp scratch/character_refs/char_<name>.webp
+   ```
+4. **Upload Both Files to Neon S3**:
+   ```bash
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.webp --key images/characters/char_<name>.webp
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.png --key images/characters/char_<name>.png
+   ```
+5. **Register in Code**:
+   * Add key to `MascotKey` and `MASCOT_REGISTRY` in [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx).
+   * Add key to `CharacterKey` and `CHARACTER_REGISTRY` in [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts).
+   * Add `<option value="<key>">Name (Role)</option>` to the mascot dropdown in [`src/components/composite/CompositeStudioUI.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/CompositeStudioUI.tsx).
+6. **Fast Verification**:
+   ```bash
+   npx vitest run scripts/lib/character-overlay.test.ts src/components/composite/CompositeComponents.test.tsx
+   npm run typecheck
+   ```
+
+---
+
+### Protocol B: Replace / Rename an Existing Character (Dual-Key S3 Ingestion + Aliasing)
+
+Use this when replacing a character concept with a new design or name (e.g. replacing `lobster_action` with `lobster_navigator`):
+
+1. **Synthesize & Extract**:
+   Generate and run `scripts/chroma_key.py --webp` to produce `scratch/characters/char_<new_name>.webp` and `.png`.
+2. **Copy Local References**:
+   ```bash
+   cp scratch/characters/char_<new_name>.png scratch/character_refs/char_<new_name>.png
+   cp scratch/characters/char_<new_name>.webp scratch/character_refs/char_<new_name>.webp
+   ```
+3. **Dual-Key S3 Upload (Zero-Breakage Guarantee)**:
+   Upload to **both** the new S3 key and the legacy S3 key so historical slides and external links never 404:
+   ```bash
+   # Primary new keys
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<new_name>.webp --key images/characters/char_<new_name>.webp
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<new_name>.png --key images/characters/char_<new_name>.png
+   # Legacy in-place backward compatibility keys
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<new_name>.webp --key images/characters/char_<old_name>.webp
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<new_name>.png --key images/characters/char_<old_name>.png
+   ```
+4. **Update Registries & Route Aliases**:
+   * In [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx), set `MASCOT_REGISTRY[<new_name>]` with `?v=1` cache-buster, and map `<old_name>` in `normalizeMascotKey()` to `<new_name>`.
+   * In [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts), set `CHARACTER_REGISTRY[<new_name>]` and map `<old_name>` in `getCharacterInfo()`.
+   * In [`src/components/composite/CompositeStudioUI.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/CompositeStudioUI.tsx), update the `<option>` label and value to `<new_name>`.
+5. **Run Verification**:
+   ```bash
+   npx vitest run scripts/lib/character-overlay.test.ts src/components/composite/CompositeComponents.test.tsx
+   npm run typecheck
+   ```
+
+---
+
+### Protocol C: In-Place Visual Refresh / Re-Render (Zero Code Changes)
+
+Use this when polishing, touching up, or re-rendering an existing character without changing its key or filename (e.g. updating `char_lobster_thumbs_up.webp`):
+
+1. **Synthesize & Extract**:
+   Generate and extract new render to `scratch/characters/char_<name>.png` and `.webp`.
+2. **Update Local References**:
+   ```bash
+   cp scratch/characters/char_<name>.png scratch/character_refs/char_<name>.png
+   cp scratch/characters/char_<name>.webp scratch/character_refs/char_<name>.webp
+   ```
+3. **Overwrite S3 Keys In-Place**:
+   ```bash
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.webp --key images/characters/char_<name>.webp
+   npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.png --key images/characters/char_<name>.png
+   ```
+4. **Bump Cache-Buster in MascotOverlay**:
+   Increment version query parameter (e.g. `?v=5`) in [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx).
+5. **Verify**:
+   ```bash
+   npx vitest run scripts/lib/character-overlay.test.ts src/components/composite/CompositeComponents.test.tsx
+   ```
+
+---
+
+### Protocol D: Remove / Deprecate a Character Safely
+
+Use this when retiring an active mascot without breaking historical content:
+
+1. **Retain S3 Asset**: Keep the existing `.webp` and `.png` on S3 so past rendered posts or book covers do not break.
+2. **Remove from Active UI**:
+   Remove the character option from [`src/components/composite/CompositeStudioUI.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/CompositeStudioUI.tsx).
+3. **Graceful Redirection via Aliasing**:
+   In `normalizeMascotKey()` ([`MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx)) and `getCharacterInfo()` ([`character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts)), map the deprecated key to its designated successor or default (`lobster_thumbs_up` / `lobster_pointing`).
+4. **Update Test Key Sets**:
+   Ensure `scripts/lib/character-overlay.test.ts` and `src/components/composite/CompositeComponents.test.tsx` reflect the active registry keys.
+5. **Verify**:
+   ```bash
+   npx vitest run scripts/lib/character-overlay.test.ts src/components/composite/CompositeComponents.test.tsx
+   npm run typecheck
+   ```
+
+---
+
+## ◈ 5. Troubleshooting & The Silent Fallback Trap
+
+> [!WARNING]
+> **The Silent Fallback Trap**: If any mascot asset 404s on S3 (or has not been uploaded yet), [`MascotOverlay`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx#L161-L167) catches the `onError` event and silently falls back to `lobster_thumbs_up`.
+> If a character appears as `lobster_thumbs_up` when selecting another mascot in the UI, check whether the WebP file exists on S3:
+> ```bash
+> node -e "fetch('https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/char_<name>.webp').then(r => console.log(r.status))"
+> ```
+> If the status is `404`, run `npx tsx scripts/upload-asset.ts scratch/characters/char_<name>.webp --key images/characters/char_<name>.webp`.
+
+---
+
+## ◈ 6. Fast-Feedback Verification Policy
+
+After modifying any mascot assets, registries, or overlays:
+
 ```bash
-python3 scripts/chroma_key.py \
-  <path_to_generated_image.jpg> \
-  scratch/characters/char_<name>.png \
-  --color auto \
-  --tolerance 48 \
-  --smoothness 28 \
-  --despill-strength 0.85 \
-  --trim \
-  --margin 24 \
-  --webp
-```
-
-### 2. Overwrite Local Reference
-Keep the local character reference vault in sync for fast local/offline script execution:
-```bash
-cp scratch/characters/char_<name>.png scratch/character_refs/char_<name>.png
-cp scratch/characters/char_<name>.webp scratch/character_refs/char_<name>.webp
-```
-
-### 3. In-Place Overwrite on Neon S3
-Upload the new cutouts directly over the existing S3 keys:
-```bash
-npx tsx scripts/upload-asset.ts \
-  scratch/characters/char_<name>.webp \
-  --key images/characters/char_<name>.webp
-
-npx tsx scripts/upload-asset.ts \
-  scratch/characters/char_<name>.png \
-  --key images/characters/char_<name>.png
-```
-Because the S3 keys remain identical, all existing routes, Landing Page components, video pipelines, and social generators automatically point to the new asset without changing code paths.
-
-### 4. Bump Cache-Buster Version in MascotOverlay
-To prevent browser HTTP/CDN cache latency for users viewing Composite Studio or web routes, increment the version query parameter (e.g. `?v=4`) in [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx):
-```typescript
-  lobster_thumbs_up: {
-    key: 'lobster_thumbs_up',
-    name: 'Lobster Thumbs Up (Approval)',
-    filename: 'char_lobster_thumbs_up.png',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_thumbs_up.png?v=4`,
-    description: 'Cheerful lobster giving a thumbs-up approval sign',
-  },
-```
-
-### 5. Fast Verification
-Run targeted tests to verify overlays and types:
-```bash
+# 1. Run targeted character & composite tests (< 2s)
 npx vitest run scripts/lib/character-overlay.test.ts src/components/composite/CompositeComponents.test.tsx
+
+# 2. Run TypeScript typecheck
 npm run typecheck
 ```
+*(Do NOT run the entire full test suite for character asset edits).*
