@@ -39,9 +39,9 @@ export default function IsolationView() {
       socialNoiseSuppression: 100,
       empathyDampening: 10,
     }))
-    toast.hud('FORCE PRIVATE ENGAGED: EXTERNAL CONNECTIONS SHROUDED', {
+    toast.hud('Isolation mode enabled. Notifications silenced.', {
       id: 'isolation-force-private',
-      title: 'Isolation Protocols',
+      title: 'Isolation Mode',
     })
   }
 

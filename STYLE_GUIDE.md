@@ -105,8 +105,10 @@ could sting a struggling member even once, soften it.
    treated with warmth.
 5. **Restraint on the heaviness.** Not every screen needs to be funny. A diagnostic flow or
    a moment of encouragement can be purely warm and plain. Comedy is a color, not a cover.
-6. **One voice, everywhere.** The narrator does not change register when moving from a blog
-   post to a toast notification to a forum reply. The voice is the brand.
+6. **One voice in narrative, clarity in utility.** The narrator carries the world across
+   blog posts, dispatches, guides, and forum interactions. However, functional UI utilities
+   (error messages, form validation, permission prompts, system alerts, and toasts) must be
+   plain, clear, and direct. Never force users to decipher a riddle when an operation fails.
 
 ---
 
@@ -213,6 +215,8 @@ transmissions broadcast directly into your Benthic Core.
 path, rewrite it as in-universe lore or delete it. No stack leaks. Ever. A markdown
 link to a journalism outlet (The Verge, TechCrunch) is a citation, not a leak. See
 the Blog dispatch card.
+
+**Utility Boundary:** BAN 5 prevents mentioning software stacks and internal infrastructure in marketing copy, newsletters, and blogs. It does NOT ban standard user interface concepts (usernames, settings, notifications, permissions, downloads, network errors, device settings). Never replace functional UI labels, browser permission prompts, form validations, or technical error messages with dense sci-fi jargon.
 
 ---
 
@@ -342,13 +346,13 @@ the practical instruction.
 
 ### 4.4 HUD microcopy (buttons, toasts, empty states, tooltips, readouts)
 
-- Clearance-style label, then a phrase, separated by a colon or a period. Never a
+- Clearance-style label or standard title, then a phrase, separated by a colon or a period. Never a
   slash-pair.
-- Buttons name the action plainly, in the world: "Engage Isolation Shell", "Start the
-  Molt", "Shed This", "Harden".
-- Toasts confirm in the world: "Shell reinforced. Surface noise deflected."
+- Buttons name the action plainly and directly: "Start the Molt", "Shed This", "Harden", "Save username".
+- Toasts confirm concisely and clearly: "Profile saved.", "Link copied to clipboard.", "Notifications enabled."
 - Empty states are warm, not empty: "No distractions here. The deep is quiet and waiting."
-- Errors are gentle: "The tide is strong. Loose grip noted. The work is still yours."
+- Errors and warnings must be actionable and plain English. Never speak in riddles or obscure failure reasons (e.g. "Could not save changes. Please try again.", "Notifications blocked by browser or system settings.", not "The tide is strong. Loose grip noted.").
+- Form validation must state the exact constraint directly (e.g. "Username must be 3 to 20 characters", not "Designations run 3 to 20 marks").
 - Readouts are honest instruments: SHELL HARDNESS · 61% · EXOSHELL BORN. No dead sliders.
 
 ### 4.5 The Changelog / Release Note Pattern
@@ -587,12 +591,13 @@ and ready for the queue.
 
 ## Top 5 Rules for Day-to-Day Posting
 
-1. **Never break the bit.** Do not tell the reader it's a joke. Do not say actually. Do
-   not wink. No labels that let the reader out of the fiction — ever, in any public
-   channel, including the HUD.
+1. **Never break the bit in narrative and public copy.** Do not tell the reader it's a
+   joke. Do not say actually. Do not wink. Public copy never labels the bit. Functional UI
+   utilities (errors, toasts, forms) prioritize plain English and usability over lore.
 2. **No tech-stack leaks.** Real tools, stack vendors, and internal paths never appear
-   in copy; everything transmutes to in-lore terms (Benthic Core, transmissions, rites,
-   telemetry). Journalism outlets linked as citations are not this rule.
+   in marketing copy; everything transmutes to in-lore terms (Benthic Core, transmissions, rites,
+   telemetry). Standard UI terms (settings, usernames, permissions, downloads) are not leaks.
+   Journalism outlets linked as citations are not this rule.
 3. **Decorated means weak.** One pill, no emoji soup, no dead sliders or dead widgets, no
    slash-pairs — let a clean sentence be funny instead of gilding it.
 4. **One human truth per metaphor.** Keep sci-fi grounded in real pain (shedding habits,

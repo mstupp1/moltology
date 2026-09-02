@@ -23,7 +23,7 @@ vi.mock('@/lib/ai/stream-oracle-chat-client', () => ({
   streamOracleChat: vi.fn().mockImplementation(async ({ userId, onChunk, onThreadId }) => {
     if (!userId) {
       const text =
-        'The abyssal waters stir around your uncalibrated signal... Your inquiry ripples into the deep trench, but your neural frequency remains in unregistered Guest Drift. Transmute your biological hesitation and initialize an initiate account.'
+        "You're browsing as a guest. Create a free account to unlock full answers."
       onChunk?.(text)
       return { text, threadId: null, isGuest: true }
     }
@@ -96,7 +96,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/The abyssal waters stir around your uncalibrated signal/i)
+        screen.getByText(/You're browsing as a guest/i)
       ).toBeInTheDocument()
     })
 

@@ -174,7 +174,7 @@ export const CommandPalette: React.FC = () => {
       icon: <Zap className="w-4 h-4 text-yellow-400" />,
       shortcut: 'ALT P',
       action: () => {
-        toast.success('Neural cache purged. The deep is quiet.', {
+        toast.success('Cache cleared successfully.', {
           id: 'command-palette-purge',
           title: 'Purge Complete',
         })
@@ -188,7 +188,7 @@ export const CommandPalette: React.FC = () => {
       icon: <Terminal className="w-4 h-4 text-cyan-400" />,
       shortcut: 'CTRL S',
       action: () => {
-        toast.success('All systems operational. Shell integrity holding.', {
+        toast.success('All systems operational.', {
           id: 'command-palette-diagnostic',
           title: 'Diagnostic Complete',
         })

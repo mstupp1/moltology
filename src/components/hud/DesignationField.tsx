@@ -21,9 +21,9 @@ export function DesignationField({
   const parsed = useMemo(() => (value ? parseMemberHandle(value) : null), [value])
   const hint =
     !showLiveHint || !value
-      ? 'Letters, numbers, and underscore. 3 to 20 marks. The Benthic Community will know you by this.'
+      ? 'Letters, numbers, and underscores (3 to 20 characters).'
       : parsed?.ok
-        ? 'This designation is well-formed. Uniqueness is sealed when you confirm.'
+        ? 'Username format is valid.'
         : parsed?.message
 
   return (

@@ -21,18 +21,18 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
   const handleToggleAlerts = useCallback(async () => {
     if (enabled) {
       disable()
-      toast.info('Surface alerts quieted.')
+      toast.info('Notifications disabled.')
       return
     }
     const next = await enable()
     if (next === 'granted') {
-      toast.success('Surface alerts armed.')
+      toast.success('Notifications enabled.')
     } else if (next === 'denied') {
-      toast.error('System blocked surface alerts. Check device permission settings.')
+      toast.error('Notifications blocked by browser or system settings.')
     } else if (next === 'unsupported') {
-      toast.error('This vessel cannot raise system alerts.')
+      toast.error('This browser or device does not support notifications.')
     } else {
-      toast.info('Surface alerts need permission to continue.')
+      toast.info('Notification permission required.')
     }
   }, [disable, enable, enabled, toast])
 
@@ -43,7 +43,7 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
     } else if (outcome === 'unavailable') {
       toast.info(
         isStandalone
-          ? 'Command Hub is already installed on this vessel.'
+          ? 'Command Hub is already installed on this device.'
           : 'Use your browser install menu if the prompt is hidden.'
       )
     }
@@ -51,12 +51,12 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
 
   const alertStatus =
     !supported
-      ? 'Unavailable on this vessel'
+      ? 'Unavailable on this device'
       : permission === 'denied'
-        ? 'Blocked by the system'
+        ? 'Blocked in browser settings'
         : enabled
-          ? 'Armed for Activity Center alerts'
-          : 'Off — Activity Center only'
+          ? 'Enabled'
+          : 'Disabled'
 
   return (
     <div className={dense ? 'space-y-3' : 'space-y-2.5'}>
@@ -104,9 +104,9 @@ export function HubSurfaceControls({ dense = false }: HubSurfaceControlsProps) {
             </span>
             <span className="text-xs text-[#839493] font-sans">
               {isStandalone
-                ? 'Running as a standalone shell on this vessel'
+                ? 'Running as a standalone app on this device'
                 : canPromptInstall
-                  ? 'Add a home-screen shell for faster return'
+                  ? 'Add to home screen or desktop for quick access'
                   : 'Available when your browser offers install'}
             </span>
           </div>

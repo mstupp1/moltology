@@ -2,7 +2,7 @@
 
 ## Hard list
 
-1. Stay in the bit. Never break diegesis. Never label the bit.
+1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs) prioritize clarity, usability, and plain English over diegesis. Never write cryptic errors.
 2. No tech-stack leaks and no // in user-facing copy.
 3. Warmth, safety, and positivity under the HUD.
 4. Signup is free. Chitin Gems are earned. Molt Credits are the paid layer. Rank, clearance, stage, and forum authority are never for sale.
@@ -44,7 +44,7 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
 - **Persistent notifications**: `NotificationsProvider` ([`src/hooks/useNotifications.tsx`](src/hooks/useNotifications.tsx)) + the `notifications` table — never for ephemeral feedback.
 - **OS notifications**: only via [`src/lib/system-notifications.ts`](src/lib/system-notifications.ts).
 - **HUD telemetry**: read toast history from provider context (`HUDTaskBar` pattern); do not keep parallel toast logs.
-- **Copy**: toasts follow STYLE_GUIDE §4.4 (clearance-style label + phrase, world voice, gentle errors).
+- **Copy**: Toasts, error alerts, and form validation must be plain, human-friendly, and actionable English (e.g. 'Could not save username', not 'Could not seal that designation'). Toasts exist to inform the user what happened, not to recite liturgical lore or enforce diegesis on system operations. Follow STYLE_GUIDE §4.4.
 
 ## Tests, SSR, and verification
 

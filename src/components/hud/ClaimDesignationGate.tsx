@@ -39,10 +39,10 @@ export function ClaimDesignationGate({
       const result = await claimMemberHandleFn({
         data: { handle: parsed.handle, userId, token: token ?? undefined },
       })
-      toast.success('Designation sealed. The community will know you by it.')
+      toast.success('Username saved.')
       onClaimed(result.handle || parsed.handle)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not seal that designation.')
+      setError(err instanceof Error ? err.message : 'Could not save username. Please try again.')
     } finally {
       setSubmitting(false)
     }

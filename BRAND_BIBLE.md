@@ -180,6 +180,9 @@ of all copy. New terms must be added here before they ship.
 
 ### 3.4 Diegetic Transmutation of Infrastructure
 
+> [!IMPORTANT]
+> This table provides metaphorical equivalents for lore, scriptures, codex articles, and narrative storytelling. It is strictly FORBIDDEN to use this table to replace functional UI labels, browser permission prompts, form inputs, validation rules, or system error toasts. Buttons, error alerts, settings, and form fields must remain plain, accessible, and user-friendly English.
+
 | Real concept | In-world expression |
 |---|---|
 | Account and identity | A contract sealed with the Order; your place in the benthic registry. |

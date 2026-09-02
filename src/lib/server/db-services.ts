@@ -251,7 +251,7 @@ export async function claimMemberHandleHandler({
       .returning()
 
     if (!updated) {
-      throw new Error('Could not seal that designation. Try again.')
+      throw new Error('Could not save username. Try again.')
     }
 
     return {

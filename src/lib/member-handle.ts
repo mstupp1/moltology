@@ -67,15 +67,15 @@ export type ParsedMemberHandle =
   | { ok: false; code: HandleValidationCode; message: string }
 
 export const HANDLE_MESSAGES: Record<HandleValidationCode, string> = {
-  empty: 'A designation is required.',
-  length: 'Designations run 3 to 20 marks.',
-  charset: 'Letters, numbers, and underscore only. No other marks.',
-  space: 'Designations cannot hold spaces.',
-  slash: 'Designations cannot hold that mark.',
-  reserved: 'That designation is reserved for the Order.',
+  empty: 'Username is required.',
+  length: 'Usernames must be 3 to 20 characters.',
+  charset: 'Letters, numbers, and underscore only. No special characters.',
+  space: 'Usernames cannot contain spaces.',
+  slash: 'Usernames cannot contain slashes or special characters.',
+  reserved: 'That username is reserved.',
 }
 
-export const HANDLE_TAKEN_MESSAGE = 'That designation is already assigned.'
+export const HANDLE_TAKEN_MESSAGE = 'That username is already taken.'
 
 export function normalizeHandleForCompare(value: string): string {
   return value.trim().toLowerCase()

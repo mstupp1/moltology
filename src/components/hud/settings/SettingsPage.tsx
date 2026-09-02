@@ -138,9 +138,9 @@ export const SettingsPage: React.FC = () => {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('member-handle-changed'))
       }
-      toast.success('Designation sealed. The community will know you by it.')
+      toast.success('Username saved.')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Could not seal that designation.')
+      toast.error(err instanceof Error ? err.message : 'Could not save username. Please try again.')
     }
   }
 
