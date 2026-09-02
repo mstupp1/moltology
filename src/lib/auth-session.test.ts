@@ -1,8 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { resolveAuthSession, setCachedUser, clearCachedUser, getCachedUser } from './auth-session'
+import {
+  resolveAuthSession,
+  setCachedUser,
+  clearCachedUser,
+  getCachedUser,
+  beginSignOut,
+  endSignOut,
+  isSignOutInFlight,
+} from './auth-session'
 
 describe('resolveAuthSession', () => {
   beforeEach(() => {
+    endSignOut()
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.clear()
     }
@@ -111,5 +120,51 @@ describe('resolveAuthSession', () => {
     expect(state.isAuthenticated).toBe(true)
     expect(state.isPending).toBe(false)
     expect(state.isGuest).toBe(false)
+  })
+
+  it('does not resurrect member chrome from a stale hook user after beginSignOut', () => {
+    setCachedUser({ id: 'usr_1', name: 'Initiate' })
+    beginSignOut()
+    expect(getCachedUser()).toBeNull()
+    expect(isSignOutInFlight()).toBe(true)
+
+    const state = resolveAuthSession({
+      data: { user: { id: 'usr_1', name: 'Initiate' } },
+      isPending: false,
+    })
+    expect(state.isAuthenticated).toBe(false)
+    expect(state.isGuest).toBe(true)
+    expect(state.userId).toBeNull()
+    expect(getCachedUser()).toBeNull()
+    expect(isSignOutInFlight()).toBe(true)
+  })
+
+  it('releases the sign-out latch once the session hook settles as guest', () => {
+    beginSignOut()
+    const state = resolveAuthSession({ data: null, isPending: false })
+    expect(state.isGuest).toBe(true)
+    expect(isSignOutInFlight()).toBe(false)
+  })
+
+  it('allows a new session after the sign-out latch settles', () => {
+    beginSignOut()
+    resolveAuthSession({ data: null, isPending: false })
+
+    const state = resolveAuthSession({
+      data: { user: { id: 'usr_2', name: 'Returned' } },
+      isPending: false,
+    })
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.userId).toBe('usr_2')
+    expect(getCachedUser()?.id).toBe('usr_2')
+  })
+
+  it('stays guest while sign-out is in flight even if the hook is still pending', () => {
+    beginSignOut()
+    const state = resolveAuthSession({ data: null, isPending: true })
+    expect(state.isGuest).toBe(true)
+    expect(state.isPending).toBe(false)
+    expect(state.isAuthenticated).toBe(false)
+    expect(isSignOutInFlight()).toBe(true)
   })
 })

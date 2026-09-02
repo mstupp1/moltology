@@ -72,10 +72,40 @@ export function clearCachedUser(): void {
   setCachedUser(null)
 }
 
+/**
+ * Sign-out latch. `clearCachedUser()` alone is not enough: the next
+ * `resolveAuthSession` pass can still see the live hook user and write
+ * them back into the cache, which keeps member chrome after Sign Out.
+ */
+let signOutInFlight = false
+
+export function beginSignOut(): void {
+  signOutInFlight = true
+  clearCachedUser()
+}
+
+export function endSignOut(): void {
+  signOutInFlight = false
+}
+
+export function isSignOutInFlight(): boolean {
+  return signOutInFlight
+}
+
 function readSessionUser(sessionRes: unknown): AuthSessionUser | null {
   if (!sessionRes || typeof sessionRes !== 'object') return null
   const res = sessionRes as Record<string, any>
   return (res.data?.user ?? res.user ?? null) as AuthSessionUser | null
+}
+
+function guestState(): AuthSessionState {
+  return {
+    user: null,
+    userId: null,
+    isPending: false,
+    isGuest: true,
+    isAuthenticated: false,
+  }
 }
 
 export function resolveAuthSession(
@@ -84,6 +114,15 @@ export function resolveAuthSession(
 ): AuthSessionState {
   const user = readSessionUser(sessionRes)
   const userId = (user?.id || user?.sub || null) as string | null
+  const hookPending = (sessionRes as { isPending?: boolean } | null)?.isPending
+
+  if (signOutInFlight) {
+    clearCachedUser()
+    if (!userId && hookPending === false) {
+      signOutInFlight = false
+    }
+    return guestState()
+  }
 
   if (userId) {
     // Sync active verified user into local session cache
@@ -122,7 +161,6 @@ export function resolveAuthSession(
     }
   }
 
-  const hookPending = (sessionRes as { isPending?: boolean } | null)?.isPending
   const clientReady = options?.clientReady ?? true
 
   // If the hook is pending on the client (before async session check finishes),
