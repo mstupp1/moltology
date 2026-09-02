@@ -55,14 +55,23 @@ const clawLord = {
 function renderSearch(props?: Partial<React.ComponentProps<typeof SearchPage>>) {
   return render(
     <ToastProvider>
-      <SearchPage
-        query={props?.query ?? ''}
-        type={props?.type ?? 'people'}
-        onQueryChange={props?.onQueryChange ?? onQueryChange}
-        onTypeChange={props?.onTypeChange ?? onTypeChange}
-      />
+      <div>
+        <aside data-testid="hud-sidebar">
+          <a href="/dashboard">Command Hub</a>
+        </aside>
+        <SearchPage
+          query={props?.query ?? ''}
+          type={props?.type ?? 'people'}
+          onQueryChange={props?.onQueryChange ?? onQueryChange}
+          onTypeChange={props?.onTypeChange ?? onTypeChange}
+        />
+      </div>
     </ToastProvider>,
   )
+}
+
+function queryViewportLock() {
+  return document.querySelector('.fixed.inset-0.z-50')
 }
 
 describe('SearchPage', () => {
@@ -100,6 +109,7 @@ describe('SearchPage', () => {
     expect(screen.getByText(/Stage 2/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Request' })).toBeInTheDocument()
     expect(screen.getByText('claw_lord').closest('a')).toHaveAttribute('data-profile', 'claw_lord')
+    expect(screen.queryByTestId('people-search-guest-lock')).not.toBeInTheDocument()
     expect(searchMembersFn).toHaveBeenCalled()
   })
 
@@ -114,12 +124,53 @@ describe('SearchPage', () => {
   it('locks people search for guests while pages stay reachable', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     renderSearch({ query: 'claw', type: 'people' })
+    expect(screen.getByTestId('people-search-guest-lock')).toBeInTheDocument()
     expect(screen.getByText('MEMBER SEARCH LOCKED')).toBeInTheDocument()
+    expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('avatar')).not.toBeInTheDocument()
+    expect(queryViewportLock()).toBeNull()
     expect(searchMembersFn).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: /Pages/i }))
+    expect(onTypeChange).toHaveBeenCalledWith('pages')
+
+    const sidebarLink = screen.getByRole('link', { name: 'Command Hub' })
+    expect(sidebarLink).toBeVisible()
+    fireEvent.click(sidebarLink)
+    expect(sidebarLink).toHaveAttribute('href', '/dashboard')
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search query' }), {
+      target: { value: 'Codex' },
+    })
+    expect(onQueryChange).toHaveBeenCalledWith('Codex')
 
     renderSearch({ query: 'Codex', type: 'pages' })
     expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
     expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
+    expect(queryViewportLock()).toBeNull()
+  })
+
+  it('holds people results while the session is pending and keeps chrome clickable', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null } as any)
+    renderSearch({ query: 'claw', type: 'people' })
+    expect(screen.getByTestId('people-search-pending')).toBeInTheDocument()
+    expect(screen.queryByText('MEMBER SEARCH LOCKED')).not.toBeInTheDocument()
+    expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
+    expect(queryViewportLock()).toBeNull()
+    expect(searchMembersFn).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: /Pages/i }))
+    expect(onTypeChange).toHaveBeenCalledWith('pages')
+    expect(screen.getByRole('link', { name: 'Command Hub' })).toBeVisible()
+  })
+
+  it('opens sign-in from the inline people lock without covering the tabs', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+    renderSearch({ query: 'claw', type: 'people' })
+    fireEvent.click(screen.getByRole('button', { name: /Already have an account\? Sign In/i }))
+    expect(screen.getByRole('heading', { name: /WELCOME BACK/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Pages/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Command Hub' })).toBeVisible()
   })
 
   it('uses warm empty copy when no people surface', async () => {
