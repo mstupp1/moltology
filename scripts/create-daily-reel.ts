@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
+import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
 import { compositeReel, ColorGradingPreset } from './lib/reel-compositor'
 import { generateVeoVideo } from './generate-video'
 import { resolveThematicOutroCard } from './lib/outro-catalog'
@@ -1002,7 +1003,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
 
   // 2. Synthesize Voiceover & Word Boundaries
   console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps (Fish Audio S2, Edge fallback)...`)
-  const voice = options.voice || 'en-US-ChristopherNeural'
+  const voice = options.voice || getRandomFishVoice()
+  console.log(`   • Voice Persona: "${voice}"`)
   const ttsResult = await generateVoiceover(scriptData.narrationScript, {
     voice,
     rate: '+12%',

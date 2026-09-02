@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
+import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
 import { compositeSeriesReel } from './lib/series-compositor'
 import { ColorGradingPreset } from './lib/reel-compositor'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
@@ -477,7 +478,8 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   fs.mkdirSync(tempDir, { recursive: true })
 
   console.log(`\n🎙️ Synthesizing Neural Voiceover Audio (Fish Audio S2, Edge fallback)...`)
-  const voice = options.voice || 'en-US-ChristopherNeural'
+  const voice = options.voice || getRandomFishVoice()
+  console.log(`   • Voice Persona: "${voice}"`)
   const ttsResult = await generateVoiceover(script.narrationScript, {
     voice,
     rate: '+12%',

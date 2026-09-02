@@ -16,7 +16,10 @@ import {
   parseFishSseStream,
   segmentsToWordBoundaries,
   buildGlobalTimeline,
+  getRandomFishVoice,
+  FISH_VOICE_ROTATION_LIST,
 } from './tts-providers/fish-audio'
+import { getRandomEdgeVoice, EDGE_VOICE_ROSTER } from './tts-providers/edge'
 
 describe('TTS Engine Utilities', () => {
   it('correctly formats ASS timestamps', () => {
@@ -355,5 +358,26 @@ describe('generateVoiceover provider routing', () => {
     expect(result.providerUsed).toBe('edge')
     expect(warnSpy).toHaveBeenCalled()
     expect(result.words[0].word).toBe('fallback')
+  })
+
+  it('rotates across Fish Audio voice catalog personas dynamically', () => {
+    const pickedVoices = new Set<string>()
+    for (let i = 0; i < 30; i++) {
+      const voice = getRandomFishVoice()
+      expect(FISH_VOICE_ROTATION_LIST).toContain(voice)
+      pickedVoices.add(voice)
+    }
+    // With 30 picks across 7 personas, we should select multiple distinct voices
+    expect(pickedVoices.size).toBeGreaterThan(1)
+  })
+
+  it('rotates across Edge TTS voice roster personas dynamically', () => {
+    const pickedEdgeVoices = new Set<string>()
+    for (let i = 0; i < 30; i++) {
+      const voice = getRandomEdgeVoice()
+      expect(EDGE_VOICE_ROSTER).toContain(voice)
+      pickedEdgeVoices.add(voice)
+    }
+    expect(pickedEdgeVoices.size).toBeGreaterThan(1)
   })
 })

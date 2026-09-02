@@ -65,6 +65,7 @@ export const DEFAULT_FISH_VOICE_REFERENCE_ID = '9a9cf47702da476aa4629e2506d4a857
  * current FISH_VOICE_REFERENCE_ID in .env — is Ethan.
  */
 export const FISH_VOICE_CATALOG = {
+  Hannah: '9a9cf47702da476aa4629e2506d4a857',
   Ethan: '536d3a5e000945adb7038665781a4aca',
   Mommy: '5233336f5f44460ea0902b0802375451',
   'Just Many': '52a238a0e70c4e589bd41561d26e7a08',
@@ -77,6 +78,30 @@ export const FISH_VOICE_CATALOG = {
 } as const
 
 export type FishVoiceName = keyof typeof FISH_VOICE_CATALOG
+
+export const FISH_VOICE_ROTATION_LIST: FishVoiceName[] = [
+  'Hannah',
+  'Ethan',
+  'Young Creative Voice',
+  'Friendly Young Woman',
+  'Laura',
+  'BOOK RECORD REGULAR',
+  'Friendly Young Female',
+  'Just Many',
+  'Mommy',
+  'Twilight Sparkle',
+]
+
+/**
+ * Pick a random dynamic voice from the curated Fish Audio catalog.
+ */
+export function getRandomFishVoice(exclude?: string): FishVoiceName {
+  const candidates = exclude
+    ? FISH_VOICE_ROTATION_LIST.filter((v) => v.toLowerCase() !== exclude.toLowerCase())
+    : FISH_VOICE_ROTATION_LIST
+  const pool = candidates.length > 0 ? candidates : FISH_VOICE_ROTATION_LIST
+  return pool[Math.floor(Math.random() * pool.length)]
+}
 
 export const FISH_TTS_STREAM_URL = 'https://api.fish.audio/v1/tts/stream/with-timestamp'
 
@@ -222,16 +247,27 @@ export function resolveFishConfig(options: ProviderGenerationOptions): {
   apiKey: string
   referenceId: string
   model: string
+  voiceName?: string
 } {
   const apiKey = process.env.FISH_API_KEY || process.env.FISH_AUDIO_API_KEY || ''
-  const referenceId =
-    options.referenceId ||
-    (options.voice ? FISH_VOICE_CATALOG[options.voice as FishVoiceName] : undefined) ||
-    process.env.FISH_VOICE_REFERENCE_ID ||
-    DEFAULT_FISH_VOICE_REFERENCE_ID
+  let voiceName: string | undefined = options.voice
+  let referenceId = options.referenceId
+
+  if (!referenceId) {
+    if (voiceName && FISH_VOICE_CATALOG[voiceName as FishVoiceName]) {
+      referenceId = FISH_VOICE_CATALOG[voiceName as FishVoiceName]
+    } else if (process.env.FISH_VOICE_REFERENCE_ID) {
+      referenceId = process.env.FISH_VOICE_REFERENCE_ID
+    } else {
+      const picked = getRandomFishVoice()
+      voiceName = picked
+      referenceId = FISH_VOICE_CATALOG[picked]
+    }
+  }
+
   const model = options.model || process.env.FISH_TTS_MODEL || 's2.1-pro'
 
-  return { apiKey, referenceId, model }
+  return { apiKey, referenceId, model, voiceName }
 }
 
 export function isFishConfigured(options: ProviderGenerationOptions = { outputDir: '' }): boolean {

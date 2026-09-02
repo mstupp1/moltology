@@ -6,9 +6,23 @@ import type { ProviderGenerationOptions, ProviderGenerationResult, TTSProvider }
 
 const EDGE_VOICE_PATTERN = /^[a-z]{2}(?:-[A-Z]{2})?-?[A-Za-z-]*Neural$/i
 
+export const EDGE_VOICE_ROSTER = [
+  'en-US-ChristopherNeural',
+  'en-US-GuyNeural',
+  'en-US-BrianNeural',
+  'en-GB-RyanNeural',
+  'en-US-AndrewNeural',
+  'en-US-EricNeural',
+]
+
+export function getRandomEdgeVoice(exclude?: string): string {
+  const candidates = exclude ? EDGE_VOICE_ROSTER.filter((v) => v !== exclude) : EDGE_VOICE_ROSTER
+  return candidates[Math.floor(Math.random() * candidates.length)]
+}
+
 function resolveEdgeVoice(voice?: string): string {
   if (voice && EDGE_VOICE_PATTERN.test(voice)) return voice
-  return 'en-US-ChristopherNeural'
+  return getRandomEdgeVoice()
 }
 
 export async function synthesizeWithEdge(
