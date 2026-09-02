@@ -1,5 +1,5 @@
-/** Canonical paper width for the Sacred Codex reading sheet, in CSS pixels. */
-export const CODEX_PAGE_WIDTH = 720
+/** Canonical paper width for the Sacred Codex reading sheet, in CSS pixels (matches max-w-3xl / 48rem). */
+export const CODEX_PAGE_WIDTH = 768
 export const CODEX_PAGE_MIN_WIDTH = 300
 export const CODEX_MOBILE_GUTTER = 20
 export const CODEX_DESKTOP_GUTTER = 96

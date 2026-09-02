@@ -1,5 +1,4 @@
 import React from 'react'
-import { Check, Copy, Highlighter } from 'lucide-react'
 import { CANONICAL_SCRIPTURES, type ScriptureItem } from '@/lib/codexData'
 import { cn } from '@/lib/utils'
 
@@ -194,10 +193,10 @@ export interface CodexDocumentSheetProps {
   scripture: ScriptureItem
   pageIndex: number
   pageCount: number
-  highlightedVerses: Record<number, boolean>
-  copiedVerseIndex: number | null
-  onToggleHighlight: (verseNumber: number) => void
-  onCopyVerse: (verseNumber: number, text: string) => void
+  highlightedVerses?: Record<number, boolean>
+  copiedVerseIndex?: number | null
+  onToggleHighlight?: (verseNumber: number) => void
+  onCopyVerse?: (verseNumber: number, text: string) => void
   onPrev: () => void
   onNext: () => void
   onSelectScripture: (id: string) => void
@@ -208,10 +207,6 @@ export function CodexDocumentSheet({
   scripture,
   pageIndex,
   pageCount,
-  highlightedVerses,
-  copiedVerseIndex,
-  onToggleHighlight,
-  onCopyVerse,
   onPrev,
   onNext,
   onSelectScripture,
@@ -219,25 +214,12 @@ export function CodexDocumentSheet({
 }: CodexDocumentSheetProps) {
   return (
     <div className={cn('relative space-y-6', compact ? 'space-y-5' : 'space-y-6')}>
-      <div
-        className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-[0.03] pointer-events-none scale-75"
-        style={{ backgroundImage: `url('/images/order_emblem.png')` }}
-      />
-
       <div className="border-b-2 border-current/20 pb-4 space-y-3 relative z-10">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs font-sans tracking-widest uppercase opacity-75 gap-2">
+        <div className="text-xs font-sans tracking-widest uppercase opacity-75">
           <div className="flex items-center gap-2 font-bold">
             <span>MOLTOLOGY CANONICAL CODEX</span>
             <span>•</span>
             <span>{scripture.volumeName}</span>
-          </div>
-          <div className="flex items-center gap-3 text-[11px]">
-            <span>
-              CLEARANCE TIER: <strong>0{scripture.stageClearance}</strong>
-            </span>
-            <span>
-              CANON ID: <strong>{scripture.id}</strong>
-            </span>
           </div>
         </div>
 
@@ -246,21 +228,13 @@ export function CodexDocumentSheet({
             {scripture.title}
           </h2>
 
-          <div className="flex flex-wrap items-center justify-between text-xs font-serif opacity-80 pt-1 border-t border-current/10 gap-2">
-            <div className="flex flex-wrap items-center gap-4">
-              <span>
-                AUTHOR: <strong className="font-sans">{scripture.authorUnit}</strong>
-              </span>
-              <span>
-                REVISED: <strong className="font-sans">{scripture.lastRevised}</strong>
-              </span>
-            </div>
-            <div>
-              <span>
-                SYNAPTIC WEIGHT:{' '}
-                <strong className="font-sans">{scripture.synapticWeight.toFixed(1)} / 5.0</strong>
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center gap-4 text-xs font-serif opacity-80 pt-1 border-t border-current/10">
+            <span>
+              AUTHOR: <strong className="font-sans">{scripture.authorUnit}</strong>
+            </span>
+            <span>
+              REVISED: <strong className="font-sans">{scripture.lastRevised}</strong>
+            </span>
           </div>
         </div>
       </div>
@@ -277,66 +251,17 @@ export function CodexDocumentSheet({
         </blockquote>
       </div>
 
-      <div className="space-y-6 relative z-10 font-garamond text-[18px]">
-        {scripture.verses.map((verse) => {
-          const isCopied = copiedVerseIndex === verse.verseNumber
-          const isHighlighted = Boolean(highlightedVerses[verse.verseNumber])
-
-          return (
-            <div
-              key={verse.verseNumber}
-              className={`p-4 rounded border transition-all relative group ${
-                isHighlighted
-                  ? 'bg-amber-500/15 border-amber-500/40 shadow-sm'
-                  : 'border-current/10 hover:border-current/30 bg-current/[0.02]'
-              }`}
-            >
-              <div className="flex items-center justify-between border-b border-current/10 pb-1.5 mb-2 font-sans text-xs opacity-75 gap-2">
-                <span className="font-bold flex items-center gap-2 min-w-0">
-                  <span className="w-2 h-2 rounded-full bg-current opacity-70 shrink-0" />
-                  <span className="truncate">
-                    VERSE §{verse.verseNumber} {verse.heading && `— ${verse.heading.toUpperCase()}`}
-                  </span>
-                </span>
-
-                <div className="flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity no-print shrink-0">
-                  <button
-                    onClick={() => onToggleHighlight(verse.verseNumber)}
-                    className={`px-2 py-1 text-[10px] rounded border flex items-center gap-1 transition-all min-h-[32px] ${
-                      isHighlighted
-                        ? 'bg-amber-500 text-stone-900 border-amber-500 font-bold'
-                        : 'border-current/30 hover:bg-current/10'
-                    }`}
-                    title="Highlight Verse"
-                  >
-                    <Highlighter className="w-3 h-3" />
-                    <span>{isHighlighted ? 'HIGHLIGHTED' : 'HIGHLIGHT'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => onCopyVerse(verse.verseNumber, verse.text)}
-                    className="px-2 py-1 text-[10px] rounded border border-current/30 hover:bg-current/10 flex items-center gap-1 transition-all min-h-[32px]"
-                    title="Copy Formatted Verse Citation"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-3 h-3 text-emerald-600" />
-                        <span className="text-emerald-600 font-bold">COPIED</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        <span>CITE</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <CodexVerseBody text={verse.text} />
-            </div>
-          )
-        })}
+      <div className="space-y-8 relative z-10 font-garamond text-[18px]">
+        {scripture.verses.map((verse) => (
+          <section key={verse.verseNumber} className="space-y-3">
+            {verse.heading && (
+              <h3 className="font-sans font-bold text-xs uppercase tracking-widest opacity-80 pt-2 border-b border-current/10 pb-1">
+                {verse.heading}
+              </h3>
+            )}
+            <CodexVerseBody text={verse.text} />
+          </section>
+        ))}
       </div>
 
       {scripture.crossReferences.length > 0 && (

@@ -460,7 +460,7 @@ export const SacredCodexReader: React.FC = () => {
               </div>
             </div>
 
-            <div className="pdf-page-sheet codex-parchment-theme p-5 sm:p-7 md:p-9 chamfer-corner border relative shadow-2xl mt-3 mx-auto w-full max-w-[720px] group/sheet">
+            <div className="pdf-page-sheet codex-parchment-theme p-5 sm:p-7 md:p-9 chamfer-corner border relative shadow-2xl mt-3 mx-auto w-full max-w-3xl group/sheet">
               <CodexDocumentSheet
                 scripture={activeScripture}
                 pageIndex={Math.max(0, activeIndex)}

@@ -11,6 +11,7 @@ import {
   ZoomOut,
 } from 'lucide-react'
 import {
+  CODEX_PAGE_WIDTH,
   applyZoomScroll,
   clampCodexZoom,
   formatCodexZoom,
@@ -77,7 +78,7 @@ export function FullscreenDocumentReader({
 
   const fitPage = useCallback((nextZoom = 1) => {
     const viewport = viewportRef.current
-    const width = viewport?.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 720)
+    const width = viewport?.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : CODEX_PAGE_WIDTH)
     setPageWidth(resolveCodexPageWidth(width))
     setZoom(clampCodexZoom(nextZoom))
   }, [])
