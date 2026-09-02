@@ -15,7 +15,11 @@ vi.mock('@tanstack/react-router', () => ({
   }),
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/forum/general-discussion/some-topic' }),
-  Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
+  Link: ({ children, to, params, ...props }: any) => (
+    <a href={params?.profileId ? `/member/${params.profileId}` : to} {...props}>
+      {children}
+    </a>
+  ),
 }))
 
 vi.mock('@/lib/server/api', () => ({
@@ -219,6 +223,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
         categoryColor: '#00ffff',
         userId: 'member-a',
         authorName: 'claw_lord',
+        authorHandle: 'claw_lord',
         authorAvatar: '/images/stage1_larva.png',
         authorStage: 1,
         title: 'BEST PRACTICES FOR SHELL HARDNESS & PINCER TORQUE GAINS',
@@ -238,6 +243,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
           topicId: 'topic-a',
           userId: 'member-b',
           authorName: 'pincer_prime',
+          authorHandle: 'pincer_prime',
           authorAvatar: '/images/stage1_larva.png',
           authorStage: 2,
           content: 'Reply body from member B, long enough to count.',
@@ -251,6 +257,8 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     expect(screen.getByText('claw_lord')).toBeInTheDocument()
     expect(screen.getByText('pincer_prime')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'claw_lord' })).toHaveAttribute('href', '/member/claw_lord')
+    expect(screen.getByRole('link', { name: 'pincer_prime' })).toHaveAttribute('href', '/member/pincer_prime')
     expect(screen.queryByText('LARVA UNIT #8971')).not.toBeInTheDocument()
   })
 })

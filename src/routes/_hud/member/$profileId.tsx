@@ -16,7 +16,7 @@ function MemberProfileRoute() {
       message="Member profiles, loadouts, and friend requests require a signed-in account."
     >
       <Suspense fallback={<HudWorkspaceGhost />}>
-        <LazyMemberProfilePage profileId={profileId} />
+        <LazyMemberProfilePage profileId={profileId} canonicalizePath />
       </Suspense>
     </GuestLockGuard>
   )

@@ -3,7 +3,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemberProfilePage } from './MemberProfilePage'
 
+const mockNavigate = vi.fn()
+
 vi.mock('@tanstack/react-router', () => ({
+  useNavigate: () => mockNavigate,
   Link: ({ children, to, ...props }: any) => (
     <a href={typeof to === 'string' ? to : '/connections'} {...props}>
       {children}
@@ -28,26 +31,28 @@ vi.mock('./FriendRequestButton', () => ({
 }))
 
 describe('MemberProfilePage', () => {
+  const claimedProfile = {
+    id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    larvaId: 'LARVA UNIT #2468',
+    handle: 'claw_lord',
+    displayName: 'claw_lord',
+    stage: 1,
+    stageLabel: 'Larval Initiate',
+    avatarConfig: null,
+    memberSince: '2026-08-01T00:00:00.000Z',
+    stats: null,
+    moltmax: null,
+    relationship: 'none',
+    pendingRequestId: null,
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetMemberLoadout.mockResolvedValue({ catalog: [], items: [], totals: {} })
   })
 
   it('shows the claimed designation, not the shared placeholder', async () => {
-    mockGetPublicProfile.mockResolvedValue({
-      id: 'member-a',
-      larvaId: 'LARVA UNIT #2468',
-      handle: 'claw_lord',
-      displayName: 'claw_lord',
-      stage: 1,
-      stageLabel: 'Larval Initiate',
-      avatarConfig: null,
-      memberSince: '2026-08-01T00:00:00.000Z',
-      stats: null,
-      moltmax: null,
-      relationship: 'none',
-      pendingRequestId: null,
-    })
+    mockGetPublicProfile.mockResolvedValue(claimedProfile)
 
     render(<MemberProfilePage profileId="member-a" />)
 
@@ -67,5 +72,35 @@ describe('MemberProfilePage', () => {
     expect(screen.getByTestId('hud-workspace-ghost')).toBeInTheDocument()
     expect(screen.getByText('Retrieving member dossier.')).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'claw_lord' })).not.toBeInTheDocument()
+  })
+
+  it('canonicalizes a uuid public URL to the stored designation', async () => {
+    mockGetPublicProfile.mockResolvedValue(claimedProfile)
+
+    render(
+      <MemberProfilePage
+        profileId="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+        canonicalizePath
+      />,
+    )
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith({
+        to: '/member/$profileId',
+        params: { profileId: 'claw_lord' },
+        replace: true,
+      })
+    })
+  })
+
+  it('does not rewrite /profile self-dossier even when a designation is claimed', async () => {
+    mockGetPublicProfile.mockResolvedValue(claimedProfile)
+
+    render(<MemberProfilePage profileId="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'claw_lord' })).toBeInTheDocument()
+    })
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

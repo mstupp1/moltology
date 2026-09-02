@@ -195,7 +195,7 @@ describe('CommandPalette Component', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/member/$profileId',
-      params: { profileId: 'member-claw' },
+      params: { profileId: 'claw_lord' },
     })
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
   })

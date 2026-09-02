@@ -149,3 +149,64 @@ export function resolveMemberPublicName(input: {
   if (handle) return handle
   return resolveMemberLarvaId(input.userId, input.larvaId)
 }
+
+/** Neon Auth / profile ids are UUID strings. Handles are 3–20 `[A-Za-z0-9_]`. */
+export const MEMBER_PROFILE_UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export function isMemberProfileUuid(value: string): boolean {
+  return MEMBER_PROFILE_UUID_RE.test(value.trim())
+}
+
+/**
+ * Canonical `/member/$profileId` param: stored designation when claimed,
+ * otherwise the member id. Never invents a handle.
+ */
+export function resolveMemberPublicParam(input: {
+  id: string
+  handle?: string | null
+}): string {
+  const handle = input.handle?.trim()
+  return handle || input.id
+}
+
+export function memberDossierLocation(input: {
+  id: string
+  handle?: string | null
+}): { to: '/member/$profileId'; params: { profileId: string } } {
+  return {
+    to: '/member/$profileId',
+    params: { profileId: resolveMemberPublicParam(input) },
+  }
+}
+
+/**
+ * Prefer an exact id match, then a case-insensitive designation match.
+ * Callers should query `id = key OR lower(handle) = lower(key)`.
+ */
+export function pickProfileForRouteKey<T extends { id: string; handle?: string | null }>(
+  routeKey: string,
+  rows: T[],
+): T | null {
+  const trimmed = routeKey.trim()
+  if (!trimmed) return null
+  const byId = rows.find((row) => row.id === trimmed)
+  if (byId) return byId
+  const normalized = normalizeHandleForCompare(trimmed)
+  if (!normalized) return null
+  return (
+    rows.find((row) => row.handle && normalizeHandleForCompare(row.handle) === normalized) ?? null
+  )
+}
+
+/**
+ * When a designation is claimed, any other URL key (uuid, other id, or
+ * different casing) redirects to the stored spelling.
+ */
+export function resolveMemberDossierRedirect(
+  routeKey: string,
+  member: { id: string; handle?: string | null },
+): string | null {
+  const canonical = resolveMemberPublicParam(member)
+  return routeKey.trim() === canonical ? null : canonical
+}

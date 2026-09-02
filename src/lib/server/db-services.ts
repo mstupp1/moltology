@@ -16,7 +16,9 @@ import {
 import {
   HANDLE_TAKEN_MESSAGE,
   isUniqueViolation,
+  normalizeHandleForCompare,
   parseMemberHandle,
+  pickProfileForRouteKey,
   resolveMemberPublicName,
 } from '../member-handle'
 import { INITIAL_BLOG_POSTS } from '../blog-data'
@@ -1051,6 +1053,7 @@ export interface ForumTopicEntry {
   categoryColor?: string
   userId: string | null
   authorName: string
+  authorHandle?: string | null
   authorAvatar: string
   authorStage: number
   title: string
@@ -1071,6 +1074,7 @@ export interface ForumPostEntry {
   topicId: string
   userId: string | null
   authorName: string
+  authorHandle?: string | null
   authorAvatar: string
   authorStage: number
   content: string
@@ -1314,6 +1318,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
           handle: r.profileHandle,
           larvaId: r.profileLarvaId ?? r.authorName,
         }),
+        authorHandle: (r.profileHandle as string | null | undefined)?.trim() || null,
         authorAvatar: r.authorAvatar,
         authorStage: r.authorStage,
         title: r.title,
@@ -1467,6 +1472,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           handle: p.profileHandle,
           larvaId: p.profileLarvaId ?? p.authorName,
         }),
+        authorHandle: (p.profileHandle as string | null | undefined)?.trim() || null,
         authorAvatar: p.authorAvatar,
         authorStage: p.profileStage ?? p.authorStage,
         content: p.content,
@@ -1492,6 +1498,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
             handle: t.profileHandle,
             larvaId: t.profileLarvaId ?? t.authorName,
           }),
+          authorHandle: (t.profileHandle as string | null | undefined)?.trim() || null,
           authorAvatar: t.authorAvatar,
           authorStage: t.profileStage ?? t.authorStage,
           title: t.title,
@@ -1611,6 +1618,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     categoryColor: cat?.color || '#00ffff',
     userId: inserted.userId,
     authorName: inserted.authorName,
+    authorHandle: userProfile?.handle?.trim() || null,
     authorAvatar: inserted.authorAvatar,
     authorStage: inserted.authorStage,
     title: inserted.title,
@@ -1730,6 +1738,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     topicId: inserted.topicId,
     userId: inserted.userId,
     authorName: inserted.authorName,
+    authorHandle: userProfile?.handle?.trim() || null,
     authorAvatar: inserted.authorAvatar,
     authorStage: inserted.authorStage,
     content: inserted.content,
@@ -2760,15 +2769,10 @@ async function insertNotification(
     .onConflictDoNothing()
 }
 
-export const getPublicProfileHandler = async ({
-  data,
-  context,
-}: ServerFnArgs<{ profileId: string; token?: string; userId?: string }>): Promise<PublicProfileView | null> => {
-  const auth = await resolveWriteAuth({ data, context })
-  if (!auth) throw new Error('Unauthenticated: Authentication required to view member profiles.')
-  if (!data?.profileId) throw new Error('Missing profile id.')
-
-  const [profile] = await auth.dbClient
+async function findMemberProfileByRouteKey(dbClient: Db, routeKey: string) {
+  const key = routeKey.trim()
+  if (!key) return null
+  const rows = await dbClient
     .select({
       id: profiles.id,
       larvaId: profiles.larvaId,
@@ -2778,8 +2782,25 @@ export const getPublicProfileHandler = async ({
       createdAt: profiles.createdAt,
     })
     .from(profiles)
-    .where(eq(profiles.id, data.profileId))
-    .limit(1)
+    .where(
+      or(
+        eq(profiles.id, key),
+        sql`lower(${profiles.handle}) = ${normalizeHandleForCompare(key)}`,
+      ),
+    )
+    .limit(2)
+  return pickProfileForRouteKey(key, rows)
+}
+
+export const getPublicProfileHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ profileId: string; token?: string; userId?: string }>): Promise<PublicProfileView | null> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to view member profiles.')
+  if (!data?.profileId) throw new Error('Missing profile id.')
+
+  const profile = await findMemberProfileByRouteKey(auth.dbClient, data.profileId)
 
   if (!profile) return null
 
@@ -2852,14 +2873,10 @@ export const getMemberLoadoutHandler = async ({
   if (!auth) throw new Error('Unauthenticated: Authentication required to view member loadouts.')
   if (!data?.profileId) throw new Error('Missing profile id.')
 
-  const [exists] = await auth.dbClient
-    .select({ id: profiles.id })
-    .from(profiles)
-    .where(eq(profiles.id, data.profileId))
-    .limit(1)
+  const exists = await findMemberProfileByRouteKey(auth.dbClient, data.profileId)
   if (!exists) throw new Error('Member profile not found.')
 
-  return loadMemberEquippedLoadout(auth.dbClient, data.profileId)
+  return loadMemberEquippedLoadout(auth.dbClient, exists.id)
 }
 
 export const getMemberLoadoutFn = createServerFn({ method: 'POST' })
@@ -3338,6 +3355,7 @@ export const getNotificationsHandler = async ({
       readAt: notifications.readAt,
       createdAt: notifications.createdAt,
       actorLarvaId: profiles.larvaId,
+      actorHandle: profiles.handle,
     })
     .from(notifications)
     .leftJoin(profiles, eq(notifications.actorUserId, profiles.id))
@@ -3355,6 +3373,7 @@ export const getNotificationsHandler = async ({
       detail: row.detail,
       actorUserId: row.actorUserId,
       actorLarvaId: row.actorLarvaId ?? null,
+      actorHandle: row.actorHandle?.trim() || null,
       payload,
       readAt,
       createdAt: row.createdAt.toISOString(),

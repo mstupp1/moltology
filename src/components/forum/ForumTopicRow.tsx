@@ -4,6 +4,7 @@ import { MessageSquare, Eye, Clock } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
 import { relativeTime } from '@/lib/forum-utils'
 import { VoteButton, StageBadge, PinBadge } from './ForumBits'
+import { resolveMemberPublicParam } from '@/lib/member-handle'
 
 interface ForumTopicRowProps {
   topic: ForumTopicEntry
@@ -58,7 +59,12 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             {topic.userId ? (
               <Link
                 to="/member/$profileId"
-                params={{ profileId: topic.userId }}
+                params={{
+                  profileId: resolveMemberPublicParam({
+                    id: topic.userId,
+                    handle: topic.authorHandle,
+                  }),
+                }}
                 className="flex items-center gap-1.5 min-w-0 hover:opacity-90"
                 onClick={(e) => e.stopPropagation()}
               >

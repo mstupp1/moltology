@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Users, Shield, Calendar } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { LoadoutStatsPanel } from '@/components/hud/chassis/LoadoutStatsPanel'
@@ -11,6 +11,7 @@ import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
 import type { CatalogRef, GearItemState, LoadoutTotals } from '@/lib/chassis-loadout'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { resolveMemberDossierRedirect } from '@/lib/member-handle'
 
 const STAT_ROWS: Array<{ key: keyof NonNullable<PublicProfileView['stats']>; label: string }> = [
   { key: 'pincerTorque', label: 'Pincer Torque' },
@@ -24,9 +25,15 @@ const STAT_ROWS: Array<{ key: keyof NonNullable<PublicProfileView['stats']>; lab
 
 export interface MemberProfilePageProps {
   profileId: string
+  /** Public `/member/$profileId` only. `/profile` stays the signed-in self dossier. */
+  canonicalizePath?: boolean
 }
 
-export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({ profileId }) => {
+export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
+  profileId,
+  canonicalizePath = false,
+}) => {
+  const navigate = useNavigate()
   const [profile, setProfile] = useState<PublicProfileView | null>(null)
   const [loadout, setLoadout] = useState<{
     catalog: CatalogRef[]
@@ -56,6 +63,17 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({ profileId 
   useEffect(() => {
     void load()
   }, [load])
+
+  useEffect(() => {
+    if (!canonicalizePath || !profile) return
+    const dest = resolveMemberDossierRedirect(profileId, profile)
+    if (!dest) return
+    void navigate({
+      to: '/member/$profileId',
+      params: { profileId: dest },
+      replace: true,
+    })
+  }, [canonicalizePath, navigate, profile, profileId])
 
   const catalogById = useMemo(() => {
     const map = new Map<string, CatalogRef>()

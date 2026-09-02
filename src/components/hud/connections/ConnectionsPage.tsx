@@ -15,6 +15,7 @@ import { relationshipForMember, type ConnectionsListView } from '@/lib/connectio
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 
@@ -167,7 +168,7 @@ export const ConnectionsPage: React.FC = () => {
                 <div className="min-w-0 flex-1">
                   <Link
                     to="/member/$profileId"
-                    params={{ profileId: member.id }}
+                    params={{ profileId: resolveMemberPublicParam(member) }}
                     className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
                   >
                     {member.displayName}
@@ -255,7 +256,7 @@ export const ConnectionsPage: React.FC = () => {
                   )}
                   <Link
                     to="/member/$profileId"
-                    params={{ profileId: member.id }}
+                    params={{ profileId: resolveMemberPublicParam(member) }}
                     className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] chamfer-corner"
                   >
                     View

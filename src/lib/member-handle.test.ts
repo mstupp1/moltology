@@ -5,7 +5,12 @@ import {
   isReservedHandle,
   isUniqueViolation,
   parseMemberHandle,
+  isMemberProfileUuid,
+  memberDossierLocation,
+  pickProfileForRouteKey,
+  resolveMemberDossierRedirect,
   resolveMemberPublicName,
+  resolveMemberPublicParam,
 } from './member-handle'
 import { PLACEHOLDER_LARVA_ID, deriveLarvaUnitNumber, formatLarvaUnit } from './larva-id'
 
@@ -122,6 +127,53 @@ describe('resolveMemberPublicName', () => {
     expect(expectedA).not.toBe(PLACEHOLDER_LARVA_ID)
     expect(expectedB).not.toBe(PLACEHOLDER_LARVA_ID)
     expect(expectedA).not.toBe(expectedB)
+  })
+})
+
+describe('member dossier public path', () => {
+  it('uses the stored designation as the public param when claimed', () => {
+    expect(resolveMemberPublicParam({ id: MEMBER_A, handle: 'mstupp' })).toBe('mstupp')
+    expect(resolveMemberPublicParam({ id: MEMBER_A, handle: '  Mstupp  ' })).toBe('Mstupp')
+    expect(memberDossierLocation({ id: MEMBER_A, handle: 'mstupp' })).toEqual({
+      to: '/member/$profileId',
+      params: { profileId: 'mstupp' },
+    })
+  })
+
+  it('keeps the member id when no designation is claimed', () => {
+    expect(resolveMemberPublicParam({ id: MEMBER_A, handle: null })).toBe(MEMBER_A)
+    expect(resolveMemberPublicParam({ id: MEMBER_A, handle: '  ' })).toBe(MEMBER_A)
+    expect(memberDossierLocation({ id: MEMBER_A })).toEqual({
+      to: '/member/$profileId',
+      params: { profileId: MEMBER_A },
+    })
+  })
+
+  it('recognizes profile uuids and never treats a designation as a uuid', () => {
+    expect(isMemberProfileUuid(MEMBER_A)).toBe(true)
+    expect(isMemberProfileUuid(MEMBER_A.toUpperCase())).toBe(true)
+    expect(isMemberProfileUuid('mstupp')).toBe(false)
+    expect(isMemberProfileUuid('member-a')).toBe(false)
+  })
+
+  it('prefers an exact id match over a case-insensitive designation match', () => {
+    const byHandle = { id: MEMBER_B, handle: 'mstupp' }
+    const byId = { id: MEMBER_A, handle: 'Other' }
+    expect(pickProfileForRouteKey(MEMBER_A, [byHandle, byId])).toEqual(byId)
+    expect(pickProfileForRouteKey('MSTUPP', [byHandle, byId])).toEqual(byHandle)
+    expect(pickProfileForRouteKey('nobody', [byHandle, byId])).toBeNull()
+  })
+
+  it('redirects uuid and mismatched casing to the stored designation', () => {
+    const claimed = { id: MEMBER_A, handle: 'mstupp' }
+    expect(resolveMemberDossierRedirect(MEMBER_A, claimed)).toBe('mstupp')
+    expect(resolveMemberDossierRedirect('MSTUPP', claimed)).toBe('mstupp')
+    expect(resolveMemberDossierRedirect('mstupp', claimed)).toBeNull()
+  })
+
+  it('does not redirect a uuid dossier when the member never claimed a designation', () => {
+    expect(resolveMemberDossierRedirect(MEMBER_A, { id: MEMBER_A, handle: null })).toBeNull()
+    expect(resolveMemberDossierRedirect(MEMBER_A, { id: MEMBER_A, handle: '  ' })).toBeNull()
   })
 })
 

@@ -13,6 +13,7 @@ import {
   type SearchTab,
 } from '@/lib/command-catalog'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
+import { memberDossierLocation } from '@/lib/member-handle'
 import type { MemberSearchResult } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 
@@ -106,7 +107,7 @@ export const CommandPalette: React.FC = () => {
       return
     }
     if (row.kind === 'person') {
-      navigate({ to: '/member/$profileId', params: { profileId: row.member.id } })
+      navigate(memberDossierLocation(row.member))
       close()
       return
     }
