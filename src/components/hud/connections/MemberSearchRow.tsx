@@ -4,6 +4,7 @@ import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
 import type { MemberSearchResult, RelationshipState } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import { resolveMemberPublicParam } from '@/lib/member-handle'
 
 export function MemberSearchRow({
   member,
@@ -26,7 +27,7 @@ export function MemberSearchRow({
       <div className="min-w-0 flex-1">
         <Link
           to="/member/$profileId"
-          params={{ profileId: member.id }}
+          params={{ profileId: resolveMemberPublicParam(member) }}
           className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
         >
           {member.displayName}

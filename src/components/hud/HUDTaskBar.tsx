@@ -8,6 +8,7 @@ import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
+import { resolveMemberPublicParam } from '@/lib/member-handle'
 
 export interface AlignmentTask {
   id: string
@@ -510,7 +511,12 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                       {n.payload.profileId && (
                         <Link
                           to="/member/$profileId"
-                          params={{ profileId: n.payload.profileId }}
+                          params={{
+                            profileId: resolveMemberPublicParam({
+                              id: n.payload.profileId,
+                              handle: n.actorHandle,
+                            }),
+                          }}
                           className="px-2 py-1 text-[9px] font-bold uppercase border border-[#00c3ff]/40 text-[#00c3ff] rounded"
                           onClick={() => setIsScheduleOpen(false)}
                         >

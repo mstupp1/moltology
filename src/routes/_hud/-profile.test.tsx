@@ -5,6 +5,14 @@ import { Route } from './profile'
 import { authClient } from '@/lib/auth-client'
 import { MEMBER_PROFILE_SEO } from '@/lib/seo'
 
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/react-router')>()
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  }
+})
+
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     useSession: vi.fn(),

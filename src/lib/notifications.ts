@@ -11,6 +11,7 @@ export type NotificationView = {
   detail: string
   actorUserId: string | null
   actorLarvaId: string | null
+  actorHandle: string | null
   payload: NotificationPayload
   readAt: string | null
   createdAt: string

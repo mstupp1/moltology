@@ -99,6 +99,7 @@ describe('SearchPage', () => {
     })
     expect(screen.getByText(/Stage 2/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Request' })).toBeInTheDocument()
+    expect(screen.getByText('claw_lord').closest('a')).toHaveAttribute('data-profile', 'claw_lord')
     expect(searchMembersFn).toHaveBeenCalled()
   })
 

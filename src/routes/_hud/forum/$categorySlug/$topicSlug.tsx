@@ -25,6 +25,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { seo } from '@/lib/seo'
+import { resolveMemberPublicParam } from '@/lib/member-handle'
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   loader: async ({ params }) => {
@@ -306,7 +307,22 @@ function ForumThreadPage() {
                     alt=""
                     className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
                   />
-                  <span className="text-[#dfe3e3] font-bold">{topic.authorName}</span>
+                  {topic.userId ? (
+                    <Link
+                      to="/member/$profileId"
+                      params={{
+                        profileId: resolveMemberPublicParam({
+                          id: topic.userId,
+                          handle: topic.authorHandle,
+                        }),
+                      }}
+                      className="text-[#dfe3e3] font-bold hover:text-[#00c3ff] transition-colors"
+                    >
+                      {topic.authorName}
+                    </Link>
+                  ) : (
+                    <span className="text-[#dfe3e3] font-bold">{topic.authorName}</span>
+                  )}
                   <StageBadge stage={topic.authorStage} />
                 </span>
                 <span className="text-[#3a4a49]">·</span>
@@ -369,9 +385,24 @@ function ForumThreadPage() {
                             alt=""
                             className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
                           />
-                          <span className="text-[#dfe3e3] font-bold truncate">
-                            {post.authorName}
-                          </span>
+                          {post.userId ? (
+                            <Link
+                              to="/member/$profileId"
+                              params={{
+                                profileId: resolveMemberPublicParam({
+                                  id: post.userId,
+                                  handle: post.authorHandle,
+                                }),
+                              }}
+                              className="text-[#dfe3e3] font-bold truncate hover:text-[#00c3ff] transition-colors"
+                            >
+                              {post.authorName}
+                            </Link>
+                          ) : (
+                            <span className="text-[#dfe3e3] font-bold truncate">
+                              {post.authorName}
+                            </span>
+                          )}
                           <StageBadge stage={post.authorStage} />
                         </span>
                         <span className="text-[10px] text-[#839493] flex items-center gap-1">
