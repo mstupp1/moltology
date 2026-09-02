@@ -42,6 +42,20 @@ export const MEMBER_PROFILE_SEO = {
     'Public member dossier, chassis readings, and equipped loadout for authenticated units.',
 } as const
 
+export const SEARCH_PAGE_SEO = {
+  title: 'Search | Moltology',
+  description:
+    'Find fellow members by designation, larva unit, or name, and jump to HUD pages from one search.',
+} as const
+
+export function searchPageSeo(query?: string) {
+  const trimmed = query?.trim() ?? ''
+  return privatePageSeo({
+    title: trimmed ? `Search · ${trimmed} | Moltology` : SEARCH_PAGE_SEO.title,
+    description: SEARCH_PAGE_SEO.description,
+  })
+}
+
 export function privatePageSeo(
   options: Pick<SEOOptions, 'title' | 'description' | 'keywords' | 'ogImage' | 'twitterSite' | 'siteName'>,
 ): MetaElement[] {

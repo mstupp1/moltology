@@ -68,6 +68,29 @@ export type MemberSearchResult = {
   avatarConfig: { style: string; seed: string } | null
 }
 
+export function relationshipForMember(
+  connections: ConnectionsListView | null | undefined,
+  memberId: string,
+): { relationship: RelationshipState; pendingRequestId: string | null } {
+  if (!connections) return { relationship: 'none', pendingRequestId: null }
+
+  if (connections.friends.some((row) => row.id === memberId)) {
+    return { relationship: 'friends', pendingRequestId: null }
+  }
+
+  const incoming = connections.incoming.find((row) => row.id === memberId)
+  if (incoming) {
+    return { relationship: 'pending_received', pendingRequestId: incoming.requestId ?? null }
+  }
+
+  const outgoing = connections.outgoing.find((row) => row.id === memberId)
+  if (outgoing) {
+    return { relationship: 'pending_sent', pendingRequestId: outgoing.requestId ?? null }
+  }
+
+  return { relationship: 'none', pendingRequestId: null }
+}
+
 const STAGE_SHORT_LABELS: Record<number, string> = {
   1: 'Larval Initiate',
   2: 'Soft-Shed',

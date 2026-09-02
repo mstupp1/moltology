@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import {
   normalizeFriendPair,
@@ -6,6 +8,8 @@ import {
   buildFriendNotificationCopy,
   getStageLabel,
   toMemberSummary,
+  relationshipForMember,
+  type ConnectionsListView,
 } from './connections'
 import {
   countUnreadNotifications,
@@ -68,6 +72,76 @@ describe('connections helpers', () => {
     expect(summary.handle).toBe('claw_lord')
     expect(summary.displayName).toBe('claw_lord')
     expect(summary.larvaId).toBe('LARVA UNIT #9')
+  })
+
+  it('maps connection lists onto friend CTA state for shared member rows', () => {
+    const connections: ConnectionsListView = {
+      friends: [
+        {
+          id: 'f1',
+          larvaId: 'LARVA UNIT #1',
+          handle: 'friend',
+          displayName: 'friend',
+          stage: 2,
+          stageLabel: 'Soft-Shed',
+          avatarConfig: null,
+        },
+      ],
+      incoming: [
+        {
+          id: 'i1',
+          larvaId: 'LARVA UNIT #2',
+          handle: null,
+          displayName: 'LARVA UNIT #2',
+          stage: 1,
+          stageLabel: 'Larval Initiate',
+          avatarConfig: null,
+          requestId: 'req-in',
+        },
+      ],
+      outgoing: [
+        {
+          id: 'o1',
+          larvaId: 'LARVA UNIT #3',
+          handle: 'sent',
+          displayName: 'sent',
+          stage: 1,
+          stageLabel: 'Larval Initiate',
+          avatarConfig: null,
+          requestId: 'req-out',
+        },
+      ],
+    }
+    expect(relationshipForMember(connections, 'f1')).toEqual({
+      relationship: 'friends',
+      pendingRequestId: null,
+    })
+    expect(relationshipForMember(connections, 'i1')).toEqual({
+      relationship: 'pending_received',
+      pendingRequestId: 'req-in',
+    })
+    expect(relationshipForMember(connections, 'o1')).toEqual({
+      relationship: 'pending_sent',
+      pendingRequestId: 'req-out',
+    })
+    expect(relationshipForMember(connections, 'unknown')).toEqual({
+      relationship: 'none',
+      pendingRequestId: null,
+    })
+  })
+})
+
+describe('connections search copy', () => {
+  it('asks for designation, larva unit, or name instead of larva ids only', () => {
+    const src = readFileSync(
+      resolve(process.cwd(), 'src/components/hud/connections/ConnectionsPage.tsx'),
+      'utf8',
+    )
+    expect(src).not.toMatch(/search by larva ids/i)
+    expect(src).not.toMatch(/Search larva ids/)
+    expect(src).toMatch(/designation, larva unit, or name/)
+    expect(src).toMatch(/useMemberSearch/)
+    expect(src).toMatch(/MemberSearchRow/)
   })
 })
 
