@@ -191,24 +191,17 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('SUPER ADMIN')).toBeInTheDocument()
   })
 
-  it('renders Underwater Bubbles toggle switch inside dropdown menu and toggles state', () => {
-    localStorage.clear()
+  it('does not render Underwater Bubbles toggle in the avatar menu', () => {
     render(<UserAvatarMenu user={mockUser} />)
 
     const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
     fireEvent.click(avatarBtn)
 
-    expect(screen.getByText('Underwater Bubbles')).toBeInTheDocument()
-    expect(screen.getByText('Active')).toBeInTheDocument()
-
-    const toggleBtn = screen.getByRole('switch', { name: /underwater bubbles toggle/i })
-    expect(toggleBtn).toHaveAttribute('aria-checked', 'true')
-
-    fireEvent.click(toggleBtn)
-
-    expect(toggleBtn).toHaveAttribute('aria-checked', 'false')
-    expect(screen.getByText('Off')).toBeInTheDocument()
-    expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
+    expect(screen.queryByText('Underwater Bubbles')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('switch', { name: /underwater bubbles/i }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
   })
 
   it('renders inline mobile mode and smoothly expands on click', async () => {
@@ -225,7 +218,7 @@ describe('UserAvatarMenu Component', () => {
     fireEvent.click(triggerBtn)
     expect(triggerBtn).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
-    expect(screen.getByText('Underwater Bubbles')).toBeInTheDocument()
+    expect(screen.queryByText('Underwater Bubbles')).not.toBeInTheDocument()
 
     // Click trigger again to collapse
     fireEvent.click(triggerBtn)

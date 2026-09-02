@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Mail, Radio, Settings, Shuffle } from 'lucide-react'
+import { EyeOff, Mail, Radio, Settings, Shuffle, Sparkles } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HubSurfaceControls } from '@/components/hud/HubSurfaceControls'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -25,10 +26,10 @@ import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 
 export const SettingsPage: React.FC = () => {
   const session = useAuthSession()
-  const user = session.user
   const userId = session.userId
   const persist = useHudPersist()
   const { toast } = useToast()
+  const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
 
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [draftSeed, setDraftSeed] = useState('')
@@ -170,7 +171,7 @@ export const SettingsPage: React.FC = () => {
           </>
         }
         title="Settings"
-        description="Choose your avatar, email preferences, and command surface options."
+        description="Choose your avatar, email preferences, display ambience, and command surface options."
       />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
@@ -222,7 +223,7 @@ export const SettingsPage: React.FC = () => {
                 Preferences
               </h2>
               <p className="text-xs text-[#839493] font-sans mt-0.5">
-                Communication and onboarding options.
+                Communication, display, and onboarding options.
               </p>
             </div>
 
@@ -270,6 +271,42 @@ export const SettingsPage: React.FC = () => {
                   <span
                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
                       emailOptIn ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
+                <div className="flex items-center gap-3 min-w-0">
+                  {heavyVfxDisabled ? (
+                    <EyeOff className="w-5 h-5 shrink-0 text-amber-400" />
+                  ) : (
+                    <Sparkles className="w-5 h-5 shrink-0 text-[#00c3ff]" />
+                  )}
+                  <div className="min-w-0">
+                    <span className="text-sm font-grotesk font-bold text-[#dfe3e3] block">
+                      Underwater Bubbles
+                    </span>
+                    <span className="text-xs text-[#839493] font-sans">
+                      {heavyVfxDisabled
+                        ? 'Hidden — reduces motion and battery use'
+                        : 'Visible across the hub'}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={!heavyVfxDisabled}
+                  aria-label="Toggle underwater bubbles"
+                  onClick={toggleHeavyVfx}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#00c3ff] ${
+                    !heavyVfxDisabled ? 'bg-[#00c3ff]' : 'bg-cyan-950 border-cyan-800'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                      !heavyVfxDisabled ? 'translate-x-5' : 'translate-x-0 bg-slate-300'
                     }`}
                   />
                 </button>
