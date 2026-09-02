@@ -145,7 +145,7 @@ describe('Oracle Route Component', () => {
       expect(screen.getByText(/How do I keep the last molt from melting/i)).toBeInTheDocument()
       expect(screen.getByText(/Hold the line/i)).toBeInTheDocument()
     })
-    expect(screen.queryByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Workspace Context/i })).not.toBeInTheDocument()
   })
 
   it('does not invent a consultation when the requested thread is gone', async () => {
@@ -160,7 +160,7 @@ describe('Oracle Route Component', () => {
       expect(screen.getAllByText(/Carcinization Inquiries/i).length).toBeGreaterThan(0)
     })
     expect(getAIMessagesFn).not.toHaveBeenCalled()
-    expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
   })
 
   it('shows the new chat screen initially when opened, even if user has existing threads', async () => {
@@ -169,7 +169,7 @@ describe('Oracle Route Component', () => {
     render(<Component />)
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+      expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
       expect(screen.getAllByText('Carcinization Inquiries').length).toBeGreaterThan(0)
     })
   })

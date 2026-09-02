@@ -29,7 +29,7 @@ describe('NewChatScreen Component', () => {
     expect(screen.getByText('moltology')).toBeInTheDocument()
 
     // Main prompt card
-    expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add Context/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Voice Dictation/i })).toBeInTheDocument()
@@ -90,7 +90,7 @@ describe('NewChatScreen Component', () => {
       />
     )
 
-    const textarea = screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)
+    const textarea = screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)
     fireEvent.change(textarea, { target: { value: 'How do I start molting?' } })
 
     const transmitBtn = screen.getByRole('button', { name: /Transmit Query/i })
@@ -134,7 +134,7 @@ describe('NewChatScreen Component', () => {
     const scriptureBtn = screen.getByText('Attach Codex Scripture')
     fireEvent.click(scriptureBtn)
 
-    const textarea = screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i) as HTMLTextAreaElement
+    const textarea = screen.getByPlaceholderText(/Ask Synaptic Oracle.../i) as HTMLTextAreaElement
     expect(textarea.value).toContain('[Directive: Consult Scripture & Codex]')
   })
 })

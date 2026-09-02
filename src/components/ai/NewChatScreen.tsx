@@ -14,7 +14,7 @@ import {
   Zap,
   Sparkles,
 } from 'lucide-react'
-import { ORACLE_MODELS, OracleModel } from '@/lib/ai/oracle-models'
+import { ORACLE_MODELS, OracleModel, DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
 
 export interface PromptShortcut {
@@ -50,6 +50,7 @@ export interface NewChatScreenProps {
   onOpenAuthModal?: () => void
   shortcuts?: PromptShortcut[]
   className?: string
+  placeholder?: string
   /** When false, the cognition model picker is hidden (default). Admins only. */
   showModelPicker?: boolean
 }
@@ -62,6 +63,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
   onSubmit,
   isSending = false,
   personaName = 'SYNAPTIC ORACLE',
+  placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   onOpenAuthModal,
   shortcuts = DEFAULT_PROMPT_SHORTCUTS,
   className = '',
@@ -251,7 +253,7 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`Ask the ${personaName}...`}
+              placeholder={placeholder}
               disabled={isSending}
               rows={1}
               className="w-full bg-transparent text-gray-100 placeholder-gray-400 text-xs sm:text-sm focus:outline-none resize-none min-h-[36px] max-h-[180px] leading-relaxed font-sans px-1 py-0.5"

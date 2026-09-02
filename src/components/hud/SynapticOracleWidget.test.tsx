@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SynapticOracleWidget } from './SynapticOracleWidget'
 import { OracleProvider, useSafeOracle } from './OracleContext'
+import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 
 // Mock scrollIntoView for test environment
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
@@ -60,7 +61,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
 
     const btn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
     expect(btn).toBeInTheDocument()
-    expect(screen.getByText('ORACLE AI')).toBeInTheDocument()
+    expect(btn).toHaveTextContent(DEFAULT_ORACLE_PLACEHOLDER)
   })
 
   it('opens popout window on simple click (no drag)', () => {
@@ -210,7 +211,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()
   })
 
-  it('docks to bottom and sides with no resize handles on mobile viewport', () => {
+  it('docks to bottom as interactive prompt pill tray with no resize handles on mobile viewport', () => {
     window.innerWidth = 375
     window.innerHeight = 667
 
@@ -222,15 +223,19 @@ describe('SynapticOracleWidget Drag & Resize', () => {
       </OracleProvider>
     )
 
-    // Open popout (advance past 20ms enter delay)
-    const btn = screen.getByRole('button', { name: /Open Oracle AI Popout/i })
-    fireEvent.pointerDown(btn, { clientX: 100, clientY: 100, pointerId: 1, button: 0 })
-    fireEvent.pointerUp(btn, { clientX: 100, clientY: 100, pointerId: 1 })
+    // Mobile prompt pill dock should be rendered with prompt text
+    const btn = screen.getByRole('button', { name: /Open Oracle AI Tray/i })
+    expect(btn).toBeInTheDocument()
+    expect(screen.getByText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
+
+    // Tap to open tray
+    fireEvent.click(btn)
     act(() => { vi.advanceTimersByTime(50) })
 
-    // Mobile popout is rendered into document.body via portal — look there
-    const mobileSheet = document.body.querySelector('[role="dialog"][aria-label="Oracle AI"]')
+    // Mobile sheet is rendered via HudBottomSheet into document.body
+    const mobileSheet = document.body.querySelector('[role="dialog"][aria-label="Synaptic Oracle AI Assistant"]')
     expect(mobileSheet).not.toBeNull()
+    expect(screen.getByLabelText('Drag handle to close')).toBeInTheDocument()
 
     // Resize handles should NOT exist anywhere (neither in container nor body)
     expect(document.body.querySelector('.cursor-se-resize')).toBeNull()
@@ -308,6 +313,70 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     expect(localStorage.getItem('moltology:oracle_popout_size')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_popout_pos')).toBeNull()
     expect(localStorage.getItem('moltology:oracle_button_pos')).toBeNull()
+  })
+
+  it('supports mobile swipe-up to open and swipe-down handle gesture to dismiss tray', () => {
+    window.innerWidth = 375
+    window.innerHeight = 667
+
+    vi.useFakeTimers()
+
+    render(
+      <OracleProvider>
+        <SynapticOracleWidget />
+      </OracleProvider>
+    )
+
+    const pillBtn = screen.getByRole('button', { name: /Open Oracle AI Tray/i })
+    expect(pillBtn).toBeInTheDocument()
+
+    // Simulate swipe up by 30px (touchStartY: 600, changedTouches clientY: 570)
+    fireEvent.touchStart(pillBtn, {
+      touches: [{ clientY: 600 }],
+    })
+    fireEvent.touchEnd(pillBtn, {
+      changedTouches: [{ clientY: 570 }],
+    })
+
+    act(() => { vi.advanceTimersByTime(50) })
+
+    // Tray is now open
+    const handle = screen.getByLabelText('Drag handle to close')
+    expect(handle).toBeInTheDocument()
+
+    // Swipe down on the handle past threshold (50px to 180px, delta = 130px)
+    fireEvent.touchStart(handle, {
+      touches: [{ clientY: 50 }],
+    })
+    fireEvent.touchMove(handle, {
+      touches: [{ clientY: 180 }],
+    })
+    fireEvent.touchEnd(handle)
+
+    // Advance past exit animation
+    act(() => { vi.advanceTimersByTime(350) })
+
+    // Mobile prompt pill dock should re-appear
+    expect(screen.getByRole('button', { name: /Open Oracle AI Tray/i })).toBeInTheDocument()
+
+    vi.useRealTimers()
+  })
+
+  it('renders realistic thin and tall blinking caret cursors with shared pill styling', () => {
+    render(
+      <OracleProvider>
+        <SynapticOracleWidget />
+      </OracleProvider>
+    )
+
+    const cursors = screen.getAllByTestId('oracle-caret-cursor')
+    expect(cursors.length).toBeGreaterThan(0)
+    for (const cursor of cursors) {
+      expect(cursor).toHaveClass('animate-caret-blink')
+      expect(cursor).toHaveClass('w-[1.5px]')
+      expect(cursor).toHaveClass('h-3.5')
+      expect(cursor).toHaveClass('bg-[#00c3ff]')
+    }
   })
 })
 

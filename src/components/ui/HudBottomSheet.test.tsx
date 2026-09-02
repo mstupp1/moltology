@@ -131,4 +131,16 @@ describe('HudBottomSheet Component', () => {
     expect(onClose).toHaveBeenCalled()
     vi.useRealTimers()
   })
+
+  it('renders fill layout without default scroll/padding classes', () => {
+    render(
+      <HudBottomSheet isOpen={true} onClose={vi.fn()} contentLayout="fill" title="Fill Modal">
+        <div data-testid="fill-content">Full height content</div>
+      </HudBottomSheet>
+    )
+
+    const dialog = screen.getByRole('dialog', { name: /Fill Modal/i })
+    expect(dialog.className).toContain('flex flex-col p-0 overflow-hidden')
+    expect(screen.getByTestId('fill-content')).toBeInTheDocument()
+  })
 })

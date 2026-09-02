@@ -31,6 +31,12 @@ export const ORACLE_MODELS: OracleModel[] = [
 export const DEFAULT_ORACLE_MODEL_ID = ORACLE_MODELS[0].id
 
 /**
+ * Shared standard placeholder text for Oracle AI prompt inputs across all surfaces
+ * (mobile bottom tray, popout window, sidebar drawer, dedicated /oracle page).
+ */
+export const DEFAULT_ORACLE_PLACEHOLDER = 'Ask Synaptic Oracle...'
+
+/**
  * Dedicated model used for summarizing conversation titles on first message dispatch.
  * Configured separately from interactive chat models.
  */

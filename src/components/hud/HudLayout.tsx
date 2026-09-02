@@ -259,7 +259,9 @@ function HudContent() {
             {/* Main Panel Content Workspace with Ultra-Translucent Glass Backdrop */}
             <main
               className={`flex-1 min-h-0 ${
-                isFullscreenRoute ? 'p-0 overflow-hidden' : 'p-2.5 sm:p-4 md:p-6 overflow-y-auto'
+                isFullscreenRoute
+                  ? 'p-0 overflow-hidden'
+                  : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto'
               } bg-[#070b0b]/50 ${
                 isMainOnly
                   ? 'border-0 shadow-none'

@@ -10,9 +10,11 @@ export interface HudBottomSheetProps {
   className?: string
   dragThreshold?: number
   showHandle?: boolean
+  height?: string
   maxHeight?: string
   overlayClassName?: string
   containerClassName?: string
+  contentLayout?: 'default' | 'fill'
 }
 
 export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
@@ -24,9 +26,11 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
   className = '',
   dragThreshold = 70,
   showHandle = true,
+  height,
   maxHeight = '85dvh',
   overlayClassName = '',
   containerClassName = '',
+  contentLayout = 'default',
 }) => {
   const [mounted, setMounted] = useState(false)
   const [isRendered, setIsRendered] = useState(false)
@@ -159,11 +163,16 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
         aria-modal="true"
         aria-label={title || ariaLabel}
         style={{
+          height,
           maxHeight,
           transform: isVisible ? `translateY(${Math.max(0, dragOffset)}px)` : 'translateY(100%)',
           transition: isDragging ? 'none' : 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1), opacity 250ms ease-out',
         }}
-        className={`relative z-[99991] w-full rounded-t-3xl bg-[#03090cfb] border-t-2 border-t-[#00c3ff]/70 border-x-0 border-b-0 shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-2xl p-4 pb-8 space-y-3 overflow-y-auto text-xs text-[#dfe3e3] ${
+        className={`relative z-[99991] w-full rounded-t-3xl bg-[#03090cfb] border-t-2 border-t-[#00c3ff]/70 border-x-0 border-b-0 shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.25)] backdrop-blur-2xl text-xs text-[#dfe3e3] ${
+          contentLayout === 'fill'
+            ? 'flex flex-col p-0 overflow-hidden'
+            : 'p-4 pb-8 space-y-3 overflow-y-auto'
+        } ${
           isVisible ? 'opacity-100' : 'opacity-0'
         } ${className}`}
       >
@@ -177,14 +186,22 @@ export const HudBottomSheet: React.FC<HudBottomSheetProps> = ({
             onMouseMove={handleTouchMove}
             onMouseUp={handleTouchEnd}
             aria-label="Drag handle to close"
-            className="w-full py-2 -mt-2 mb-1 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none"
+            className={`w-full ${
+              contentLayout === 'fill' ? 'py-2.5 pt-3 pb-2 shrink-0' : 'py-2 -mt-2 mb-1'
+            } flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none`}
           >
             <div className="w-12 h-1 rounded-full bg-[#00c3ff]/40 hover:bg-[#00c3ff]/80 transition-colors" />
           </div>
         )}
 
         {/* Content */}
-        {children}
+        {contentLayout === 'fill' ? (
+          <div className="flex-1 min-h-0 w-full flex flex-col overflow-hidden">
+            {children}
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </div>,
     document.body

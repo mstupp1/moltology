@@ -21,7 +21,7 @@ import { useThreadActions, type ThreadPatch } from './useThreadActions'
 import { getAIMessagesFn, getAIThreadsFn, getUserProfileFn } from '../../lib/server/api'
 import { streamOracleChat } from '../../lib/ai/stream-oracle-chat-client'
 import { useSafeOracle, OracleMode } from '../hud/OracleContext'
-import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel } from '../../lib/ai/oracle-models'
+import { ORACLE_MODELS, DEFAULT_ORACLE_MODEL_ID, getOracleModel, DEFAULT_ORACLE_PLACEHOLDER } from '../../lib/ai/oracle-models'
 import { AuthModal } from '../AuthModal'
 import { useAuthSession } from '../../hooks/useAuthSession'
 import { BenthicCTAButton } from '../hud/BenthicCTAButton'
@@ -53,6 +53,7 @@ export interface AIChatPanelProps {
   headerDragProps?: React.HTMLAttributes<HTMLDivElement>
   isDraggable?: boolean
   onToggleConversations?: () => void
+  placeholder?: string
 }
 
 interface ChatMessage {
@@ -68,6 +69,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   userId: propUserId,
   threadId: propThreadId,
   personaName = 'SYNAPTIC ORACLE',
+  placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   onClose,
   onThreadCreated,
   isCompact = false,
@@ -735,6 +737,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             onSubmit={handlePromptSubmit}
             isSending={isSending}
             personaName={personaName}
+            placeholder={placeholder}
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             shortcuts={DEFAULT_PROMPT_SHORTCUTS}
           />
@@ -796,6 +799,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <PromptInput
               onSubmit={handlePromptSubmit}
               status={isSending ? 'streaming' : 'ready'}
+              placeholder={placeholder}
               selectedModel={canPickModel ? selectedModel : undefined}
               onSelectModel={canPickModel ? (id) => setSelectedModelId(id) : undefined}
             />

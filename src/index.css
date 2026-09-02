@@ -190,3 +190,17 @@
 ::-webkit-scrollbar-corner {
   background: #030606;
 }
+
+/* Realistic terminal/input caret blink (sharp 50% on, 50% off cycle) */
+@keyframes caret-blink {
+  0%, 49.9% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-caret-blink {
+  animation: caret-blink 1s infinite;
+}

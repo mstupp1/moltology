@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { createPortal } from 'react-dom'
+import { ChevronUp } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
+import { DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 import { AIChatPanel } from '../ai/AIChatPanel'
+import { HudBottomSheet } from '../ui/HudBottomSheet'
 import { useSafeOracle } from './OracleContext'
 
 export interface SynapticOracleWidgetProps {
@@ -21,6 +23,42 @@ type ResizeDirection = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
 function clamp(val: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, val))
+}
+
+/**
+ * Shared styling classes for the rounded pill launcher (both mobile dock and desktop floating button).
+ */
+export const ORACLE_PILL_BASE_CLASSES =
+  'bg-[#060b0ef2] backdrop-blur-xl border border-[#00c3ff]/40 hover:border-[#00c3ff]/80 shadow-[0_8px_32px_rgba(0,0,0,0.85),0_0_20px_rgba(0,195,255,0.2)] hover:shadow-[0_8px_36px_rgba(0,0,0,0.9),0_0_25px_rgba(0,195,255,0.35)] rounded-full px-4 py-2.5 flex items-center justify-between gap-3 group select-none text-left'
+
+/**
+ * Shared interior content for the Oracle launcher pill (emblem, placeholder, realistic caret, chevron).
+ */
+export function OracleLauncherPillContent() {
+  return (
+    <>
+      <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
+        <div className="relative shrink-0 flex items-center justify-center">
+          <img
+            src={getAssetUrl('/images/order_emblem.png')}
+            alt="Oracle AI"
+            className="w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(0,195,255,0.6)] group-hover:scale-105 transition-transform"
+          />
+        </div>
+        <div className="flex items-center min-w-0">
+          <span className="text-xs tracking-wide text-cyan-200/90 font-medium group-hover:text-cyan-100 transition-colors truncate">
+            {DEFAULT_ORACLE_PLACEHOLDER}
+          </span>
+          <span
+            data-testid="oracle-caret-cursor"
+            aria-hidden="true"
+            className="inline-block w-[1.5px] h-3.5 ml-1 bg-[#00c3ff] shadow-[0_0_4px_#00c3ff] animate-caret-blink shrink-0"
+          />
+        </div>
+      </div>
+      <ChevronUp className="w-4 h-4 text-cyan-400/60 group-hover:text-cyan-300 transition-transform group-hover:-translate-y-0.5 shrink-0 ml-auto pointer-events-none" />
+    </>
+  )
 }
 
 export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ userId }) => {
@@ -90,8 +128,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const getSafeButtonCoords = useCallback(
     (pos: { x: number; y: number } | null) => {
       if (typeof window === 'undefined') return { x: 0, y: 0 }
-      const btnW = buttonRef.current?.offsetWidth || 150
-      const btnH = buttonRef.current?.offsetHeight || 48
+      const btnW = buttonRef.current?.offsetWidth || 230
+      const btnH = buttonRef.current?.offsetHeight || 44
       const maxX = Math.max(8, window.innerWidth - btnW - 8)
       const maxY = Math.max(8, window.innerHeight - btnH - 8)
       if (!pos) {
@@ -145,8 +183,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const btnPosToPopoutPos = useCallback(
     (btnPos: { x: number; y: number } | null, size: { width: number; height: number }) => {
       if (typeof window === 'undefined' || !btnPos) return getSafePopoutCoords(null, size)
-      const btnW = buttonRef.current?.offsetWidth || 150
-      const btnH = buttonRef.current?.offsetHeight || 48
+      const btnW = buttonRef.current?.offsetWidth || 230
+      const btnH = buttonRef.current?.offsetHeight || 44
       const centerX = window.innerWidth / 2
       const centerY = window.innerHeight / 2
       const btnCenterX = btnPos.x + btnW / 2
@@ -164,8 +202,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const popoutPosToBtnPos = useCallback(
     (popPos: { x: number; y: number } | null, size: { width: number; height: number }) => {
       if (typeof window === 'undefined' || !popPos) return getSafeButtonCoords(null)
-      const btnW = buttonRef.current?.offsetWidth || 150
-      const btnH = buttonRef.current?.offsetHeight || 48
+      const btnW = buttonRef.current?.offsetWidth || 230
+      const btnH = buttonRef.current?.offsetHeight || 44
       const centerX = window.innerWidth / 2
       const centerY = window.innerHeight / 2
       const popCenterX = popPos.x + size.width / 2
@@ -391,6 +429,31 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         setLocalIsOpen(false)
       }
     }, 280)
+  }
+
+  const handleMobileClose = useCallback(() => {
+    if (oracle) {
+      oracle.setMode('closed')
+    } else {
+      setLocalIsOpen(false)
+    }
+  }, [oracle])
+
+  const mobilePillTouchStartYRef = useRef<number | null>(null)
+
+  const handleMobilePillTouchStart = (e: React.TouchEvent) => {
+    mobilePillTouchStartYRef.current = e.touches[0]?.clientY ?? null
+  }
+
+  const handleMobilePillTouchEnd = (e: React.TouchEvent) => {
+    if (mobilePillTouchStartYRef.current !== null && e.changedTouches[0]) {
+      const deltaY = mobilePillTouchStartYRef.current - e.changedTouches[0].clientY
+      mobilePillTouchStartYRef.current = null
+      // If swiped up by > 15px, open the tray
+      if (deltaY > 15) {
+        handleToggle()
+      }
+    }
   }
 
   const handleResetLayout = () => {
@@ -627,10 +690,51 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
   return (
     <>
-      {!isPopoutActive && !isRendered ? (
+      {/* ── Mobile: Bottom Pull-Up Prompt Pill Dock ── */}
+      {!isPopoutActive && (
+        <div className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 max-w-md mx-auto sm:hidden font-sans select-none pointer-events-auto">
+          <button
+            type="button"
+            onClick={handleToggle}
+            onTouchStart={handleMobilePillTouchStart}
+            onTouchEnd={handleMobilePillTouchEnd}
+            className={`${ORACLE_PILL_BASE_CLASSES} w-full cursor-pointer transition-all duration-200 active:scale-[0.98]`}
+            aria-label="Open Oracle AI Tray"
+            title="Tap or swipe up to consult Oracle AI"
+          >
+            <OracleLauncherPillContent />
+          </button>
+        </div>
+      )}
+
+      {/* ── Mobile: Gesture-driven Pull-Up Bottom Sheet Tray ── */}
+      {isMobile && (
+        <HudBottomSheet
+          isOpen={isPopoutActive}
+          onClose={handleMobileClose}
+          contentLayout="fill"
+          height="80dvh"
+          maxHeight="85dvh"
+          ariaLabel="Synaptic Oracle AI Assistant"
+          containerClassName="sm:hidden font-sans"
+          className="bg-[#080d0d] border-t border-cyan-500/40 rounded-t-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.15)]"
+        >
+          <AIChatPanel
+            userId={userId}
+            isCompact={true}
+            onClose={handleMobileClose}
+            personaName="SYNAPTIC ORACLE"
+            isDraggable={false}
+            className="h-full w-full border-none shadow-none"
+          />
+        </HudBottomSheet>
+      )}
+
+      {/* ── Desktop: Draggable Floating Launcher Button ── */}
+      {!isMobile && !isPopoutActive && !isRendered && (
         <div
-          className={`fixed z-40 font-sans select-none ${
-            isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4'
+          className={`hidden sm:block fixed z-40 font-sans select-none ${
+            isMounted ? '' : 'sm:right-6 sm:bottom-4'
           }`}
           style={
             currentBtnPos
@@ -648,199 +752,139 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             onPointerMove={handleButtonPointerMove}
             onPointerUp={handleButtonPointerUp}
             onPointerCancel={handleButtonPointerUp}
-            className={`bg-[#0f1414]/95 text-cyan-400 border border-cyan-500/60 p-2.5 sm:p-3 shadow-xl shadow-cyan-950/80 hover:border-cyan-400 flex items-center space-x-2 chamfer-corner group cursor-grab active:cursor-grabbing ${
+            className={`${ORACLE_PILL_BASE_CLASSES} cursor-grab active:cursor-grabbing ${
               isDraggingButton ? 'scale-105' : 'hover:scale-105 transition-transform'
             }`}
             title="Drag to Move • Click to Open Oracle AI"
             aria-label="Open Oracle AI Popout"
           >
-            <div className="relative pointer-events-none flex items-center justify-center">
-              <img
-                src={getAssetUrl('/images/order_emblem.png')}
-                alt="Oracle AI"
-                className="w-5 h-5 object-contain drop-shadow-[0_0_6px_rgba(0,195,255,0.4)] transition-transform"
-              />
-            </div>
-            <span className="text-xs tracking-wider text-cyan-300 font-bold pointer-events-none">
-              ORACLE AI
-            </span>
+            <OracleLauncherPillContent />
           </button>
         </div>
-      ) : isRendered ? (
-        isMobile ? (
-          // ── Mobile: Portal with dimming backdrop + slide-up sheet ──
-          isMounted && typeof document !== 'undefined'
-            ? createPortal(
-                <div className="fixed inset-0 z-[99990] flex flex-col justify-end font-sans select-none">
-                  {/* Dimming backdrop */}
-                  <div
-                    onClick={handleClose}
-                    aria-hidden="true"
-                    className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-                    style={{
-                      opacity: isVisible ? 1 : 0,
-                      transition: 'opacity 280ms ease-out',
-                      pointerEvents: isVisible ? 'auto' : 'none',
-                    }}
-                  />
+      )}
 
-                  {/* Slide-up sheet */}
-                  <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Oracle AI"
-                    className="relative z-[99991] w-full overflow-hidden bg-[#080d0d] border-t border-cyan-500/40 rounded-t-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,195,255,0.15)]"
-                    style={{
-                      height: '80dvh',
-                      maxHeight: '85dvh',
-                      transform: isVisible ? 'translateY(0)' : 'translateY(100%)',
-                      transition: 'transform 280ms cubic-bezier(0.16, 1, 0.3, 1)',
-                    }}
-                  >
-                    {/* Drag handle */}
-                    <div
-                      className="w-full pt-3 pb-1 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
-                      aria-label="Drag handle"
-                    >
-                      <div className="w-12 h-1 rounded-full bg-cyan-500/40" />
-                    </div>
-
-                    <AIChatPanel
-                      userId={userId}
-                      isCompact={true}
-                      onClose={handleClose}
-                      personaName="SYNAPTIC ORACLE"
-                      isDraggable={false}
-                      className="h-[calc(100%-2rem)] w-full border-none shadow-none"
-                    />
-                  </div>
-                </div>,
-                document.body
-              )
-            : null
-        ) : (
-          // ── Desktop: Fixed positioned panel with fade + scale-in ──
-          <div
-            className={`fixed z-40 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] chamfer-corner border border-cyan-900/80 rounded-none ${
-              isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
-            } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`}
-            style={{
-              ...(currentPopoutPos
-                ? {
-                    left: `${currentPopoutPos.x}px`,
-                    top: `${currentPopoutPos.y}px`,
-                    width: `${popoutSize.width}px`,
-                    height: `${popoutSize.height}px`,
-                    minWidth: `${MIN_WIDTH}px`,
-                    minHeight: `${MIN_HEIGHT}px`,
-                    touchAction: 'none',
-                  }
-                : {}),
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
-              transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
-              transformOrigin: 'bottom right',
-            }}
-          >
-            {/* Resize handles only rendered on desktop / non-mobile */}
-            <>
-              {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'n')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
-                title="Double-click to reset window position & size"
-              />
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 's')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute bottom-0 left-3 right-3 h-2 cursor-s-resize z-30"
-                title="Double-click to reset window position & size"
-              />
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'w')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
-                title="Double-click to reset window position & size"
-              />
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'e')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute top-3 bottom-3 right-0 w-2 cursor-e-resize z-30"
-                title="Double-click to reset window position & size"
-              />
-
-              {/* Corner Resize Handles */}
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
-                title="Double-click to reset window position & size"
-              />
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'ne')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
-                title="Double-click to reset window position & size"
-              />
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'sw')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
-                title="Double-click to reset window position & size"
-              />
-              <div
-                onPointerDown={(e) => handleResizePointerDown(e, 'se')}
-                onPointerMove={handleResizePointerMove}
-                onPointerUp={handleResizePointerUp}
-                onPointerCancel={handleResizePointerUp}
-                onDoubleClick={handleResetLayout}
-                className="absolute bottom-0 right-0 w-3.5 h-3.5 cursor-se-resize z-40"
-                title="Double-click to reset window position & size"
-              />
-            </>
-
-            {/* Main Chat Panel */}
-            <AIChatPanel
-              userId={userId}
-              isCompact={true}
-              onClose={handleClose}
-              personaName="SYNAPTIC ORACLE"
-              isDraggable={true}
-              headerDragProps={{
-                onPointerDown: handleHeaderPointerDown,
-                onPointerMove: handleHeaderPointerMove,
-                onPointerUp: handleHeaderPointerUp,
-                onPointerCancel: handleHeaderPointerUp,
-                onDoubleClick: handleResetLayout,
-                title: 'Drag header to move chat window (double-click edge or header to reset)',
-              }}
-              className="h-full w-full border-none shadow-none"
+      {/* ── Desktop: Fixed positioned panel with fade + scale-in ── */}
+      {!isMobile && isRendered && (
+        <div
+          className={`fixed z-40 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] chamfer-corner border border-cyan-900/80 rounded-none hidden sm:block ${
+            isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
+          } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`}
+          style={{
+            ...(currentPopoutPos
+              ? {
+                  left: `${currentPopoutPos.x}px`,
+                  top: `${currentPopoutPos.y}px`,
+                  width: `${popoutSize.width}px`,
+                  height: `${popoutSize.height}px`,
+                  minWidth: `${MIN_WIDTH}px`,
+                  minHeight: `${MIN_HEIGHT}px`,
+                  touchAction: 'none',
+                }
+              : {}),
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
+            transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+            transformOrigin: 'bottom right',
+          }}
+        >
+          {/* Resize handles only rendered on desktop / non-mobile */}
+          <>
+            {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'n')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
+              title="Double-click to reset window position & size"
             />
-          </div>
-        )
-      ) : null}
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 's')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute bottom-0 left-3 right-3 h-2 cursor-s-resize z-30"
+              title="Double-click to reset window position & size"
+            />
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'w')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
+              title="Double-click to reset window position & size"
+            />
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'e')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute top-3 bottom-3 right-0 w-2 cursor-e-resize z-30"
+              title="Double-click to reset window position & size"
+            />
+
+            {/* Corner Resize Handles */}
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
+              title="Double-click to reset window position & size"
+            />
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'ne')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
+              title="Double-click to reset window position & size"
+            />
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'sw')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
+              title="Double-click to reset window position & size"
+            />
+            <div
+              onPointerDown={(e) => handleResizePointerDown(e, 'se')}
+              onPointerMove={handleResizePointerMove}
+              onPointerUp={handleResizePointerUp}
+              onPointerCancel={handleResizePointerUp}
+              onDoubleClick={handleResetLayout}
+              className="absolute bottom-0 right-0 w-3.5 h-3.5 cursor-se-resize z-40"
+              title="Double-click to reset window position & size"
+            />
+          </>
+
+          {/* Main Chat Panel */}
+          <AIChatPanel
+            userId={userId}
+            isCompact={true}
+            onClose={handleClose}
+            personaName="SYNAPTIC ORACLE"
+            isDraggable={true}
+            headerDragProps={{
+              onPointerDown: handleHeaderPointerDown,
+              onPointerMove: handleHeaderPointerMove,
+              onPointerUp: handleHeaderPointerUp,
+              onPointerCancel: handleHeaderPointerUp,
+              onDoubleClick: handleResetLayout,
+              title: 'Drag header to move chat window (double-click edge or header to reset)',
+            }}
+            className="h-full w-full border-none shadow-none"
+          />
+        </div>
+      )}
     </>
   )
 }

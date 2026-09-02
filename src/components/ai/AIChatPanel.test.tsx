@@ -68,7 +68,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(screen.queryByText(/Welcome back!/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Sign up free to unlock/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/You're currently exploring in Guest Mode/i)).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Select Cognition Model/i })).not.toBeInTheDocument()
   })
 
@@ -145,7 +145,7 @@ describe('AIChatPanel Guest Mode Gating', () => {
     await waitFor(() => {
       expect(screen.queryByText(/Stage 3 Exoshell requires complete chitin hardening/i)).not.toBeInTheDocument()
       expect(screen.queryByText(/What is Moltology and why should I molt?/i)).not.toBeInTheDocument()
-      expect(screen.getByPlaceholderText(/Ask the SYNAPTIC ORACLE.../i)).toBeInTheDocument()
+      expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
     })
   })
 

@@ -79,6 +79,10 @@ export default {
         pingSlow: {
           '0%': { transform: 'translate(-50%, -50%) scale(1)', opacity: '0.7' },
           '70%, 100%': { transform: 'translate(-50%, -50%) scale(2.2)', opacity: '0' }
+        },
+        caretBlink: {
+          '0%, 49.9%': { opacity: '1' },
+          '50%, 100%': { opacity: '0' }
         }
       },
       animation: {
@@ -87,7 +91,8 @@ export default {
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
         'sacred-pulse': 'sacredPulse 4s ease-in-out infinite',
         'spin-slow': 'spinSlow 25s linear infinite',
-        'ping-slow': 'pingSlow 2.5s cubic-bezier(0,0,0.2,1) infinite'
+        'ping-slow': 'pingSlow 2.5s cubic-bezier(0,0,0.2,1) infinite',
+        'caret-blink': 'caretBlink 1s infinite'
       }
     },
   },

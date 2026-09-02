@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { ArrowRight, Mic, Plus, Loader2, ChevronDown, Check, FileText, Zap, Radio } from 'lucide-react'
-import { OracleModel, ORACLE_MODELS } from '@/lib/ai/oracle-models'
+import { OracleModel, ORACLE_MODELS, DEFAULT_ORACLE_PLACEHOLDER } from '@/lib/ai/oracle-models'
 
 export interface PromptInputProps {
   onSubmit: (message: { text: string }) => void
@@ -15,7 +15,7 @@ export interface PromptInputProps {
 export const PromptInput: React.FC<PromptInputProps> = ({
   onSubmit,
   status = 'ready',
-  placeholder = 'Ask the Oracle...',
+  placeholder = DEFAULT_ORACLE_PLACEHOLDER,
   disabled = false,
   className = '',
   selectedModel,
