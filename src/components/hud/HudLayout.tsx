@@ -173,7 +173,7 @@ function HudContent() {
 
   return (
     <div
-      className={`h-screen w-full text-[#dfe3e3] flex flex-col font-sans relative overflow-hidden bg-[#030708] ${
+      className={`fixed inset-0 w-full h-full h-[100dvh] max-h-[100dvh] text-[#dfe3e3] flex flex-col font-sans overflow-hidden bg-[#030708] overscroll-none select-none ${
         isSubterranean ? 'theme-subterranean' : ''
       }`}
     >
@@ -261,7 +261,7 @@ function HudContent() {
               className={`flex-1 min-h-0 ${
                 isFullscreenRoute
                   ? 'p-0 overflow-hidden'
-                  : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto'
+                  : 'p-2.5 pb-16 sm:p-4 sm:pb-4 md:p-6 md:pb-6 overflow-y-auto overscroll-y-contain'
               } bg-[#070b0b]/50 ${
                 isMainOnly
                   ? 'border-0 shadow-none'

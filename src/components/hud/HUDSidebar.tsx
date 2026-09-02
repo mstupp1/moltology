@@ -657,7 +657,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
         suppressHydrationWarning
         className={`w-full ${
           isCollapsed ? 'md:w-[72px]' : 'md:w-72'
-        } h-auto md:h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
+        } h-auto md:h-full md:min-h-0 md:max-h-full bg-[#060a0b] border-b md:border-b-0 md:border-r border-[#3a4a49]/65 flex flex-col select-none relative z-40 md:z-50 shrink-0 shadow-2xl ${
           isMounted ? 'transition-all duration-300 ease-in-out' : ''
         } group/sidebar overflow-visible`}
       >
@@ -809,7 +809,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </div>
 
           {/* Desktop Navigation Items List */}
-          <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10] overflow-y-auto overflow-x-hidden min-h-0">
+          <nav className="flex-1 divide-y divide-[#1e2d37]/80 bg-[#080d10] overflow-y-auto overflow-x-hidden min-h-0 overscroll-y-contain">
             {renderNavGroupContent(false)}
           </nav>
 

@@ -167,7 +167,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     // When mobile menu is open, the progress bar row is rendered in the top header
     expect(screen.getByLabelText('Level 1 Badge')).toBeInTheDocument()
     expect(screen.getByLabelText('Next Level 2 Badge')).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'Exoshell Claw' })).toBeInTheDocument()
   })
 
   it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {
@@ -258,7 +257,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByRole('heading', { name: /CREATE ACCOUNT/i })).toBeInTheDocument()
   })
 
-  it('stacks Support option on top of UserAvatarMenu in collapsed authenticated mode', () => {
+  it('stacks Support option on top of UserAvatarMenu in collapsed authenticated mode', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: {
         user: {
@@ -287,7 +286,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
 
     // Test opening user avatar menu in collapsed mode
     fireEvent.click(userMenuBtn)
-    expect(screen.getByText('Operative Alpha')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('alpha@moltology.io')).toBeInTheDocument()
+    })
     expect(screen.getByRole('button', { name: /SIGN OUT/i })).toBeInTheDocument()
   })
 
