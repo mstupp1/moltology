@@ -8,6 +8,12 @@ import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'd
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import {
+  MEMBER_SEARCH_LIMIT,
+  MEMBER_SEARCH_MIN_CHARS,
+  rankMemberSearchResults,
+  sanitizeMemberSearchQuery,
+} from '../member-search'
+import {
   HANDLE_TAKEN_MESSAGE,
   isUniqueViolation,
   parseMemberHandle,
@@ -2851,8 +2857,11 @@ export const searchMembersHandler = async ({
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to search members.')
 
-  const query = (data?.query || '').trim()
-  if (query.length < 2) return []
+  const query = sanitizeMemberSearchQuery(data?.query || '')
+  if (query.length < MEMBER_SEARCH_MIN_CHARS) return []
+
+  const contains = `%${query}%`
+  const prefix = `${query}%`
 
   const rows = await auth.dbClient
     .select({
@@ -2866,13 +2875,21 @@ export const searchMembersHandler = async ({
     .where(
       and(
         ne(profiles.id, auth.userId),
-        or(ilike(profiles.handle, `%${query}%`), ilike(profiles.larvaId, `%${query}%`)),
+        or(ilike(profiles.handle, contains), ilike(profiles.larvaId, contains)),
       ),
     )
-    .orderBy(asc(profiles.larvaId))
-    .limit(20)
+    .orderBy(
+      sql`CASE
+        WHEN lower(coalesce(${profiles.handle}, '')) LIKE lower(${prefix}) THEN 0
+        WHEN lower(coalesce(${profiles.handle}, '')) LIKE lower(${contains}) THEN 1
+        WHEN lower(${profiles.larvaId}) LIKE lower(${prefix}) THEN 2
+        ELSE 3
+      END`,
+      asc(profiles.larvaId),
+    )
+    .limit(MEMBER_SEARCH_LIMIT)
 
-  return rows.map((row) => ({
+  const mapped: MemberSearchResult[] = rows.map((row) => ({
     id: row.id,
     larvaId: row.larvaId,
     handle: row.handle?.trim() || null,
@@ -2885,6 +2902,8 @@ export const searchMembersHandler = async ({
     stageLabel: getStageLabel(row.stage),
     avatarConfig: (row.avatarConfig as MemberSearchResult['avatarConfig']) ?? null,
   }))
+
+  return rankMemberSearchResults(query, mapped)
 }
 
 export const searchMembersFn = createServerFn({ method: 'POST' })

@@ -1,21 +1,22 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Search, Users, Inbox, Send, Loader2 } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
-import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
+import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
 import { getAuthJWTToken } from '@/lib/jwt'
 import {
   listConnectionsFn,
-  searchMembersFn,
   respondFriendRequestFn,
   cancelFriendRequestFn,
   removeConnectionFn,
 } from '@/lib/server/api'
-import type { ConnectionsListView, MemberSearchResult } from '@/lib/connections'
+import { relationshipForMember, type ConnectionsListView } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import { useMemberSearch } from '@/hooks/useMemberSearch'
+import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 
 type TabId = 'friends' | 'incoming' | 'sent'
 
@@ -23,12 +24,10 @@ export const ConnectionsPage: React.FC = () => {
   const [tab, setTab] = useState<TabId>('friends')
   const [connections, setConnections] = useState<ConnectionsListView | null>(null)
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<MemberSearchResult[]>([])
-  const [searching, setSearching] = useState(false)
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
   const persist = useHudPersist()
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { results, searching } = useMemberSearch(query, true)
 
   const refresh = useCallback(async () => {
     try {
@@ -45,31 +44,6 @@ export const ConnectionsPage: React.FC = () => {
   useEffect(() => {
     void refresh()
   }, [refresh])
-
-  useEffect(() => {
-    if (searchTimer.current) clearTimeout(searchTimer.current)
-    const q = query.trim()
-    if (q.length < 2) {
-      setResults([])
-      setSearching(false)
-      return
-    }
-    setSearching(true)
-    searchTimer.current = setTimeout(async () => {
-      try {
-        const token = await getAuthJWTToken()
-        const next = await searchMembersFn({ data: { query: q, token: token ?? undefined } })
-        setResults(next)
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Search failed.')
-      } finally {
-        setSearching(false)
-      }
-    }, 280)
-    return () => {
-      if (searchTimer.current) clearTimeout(searchTimer.current)
-    }
-  }, [query, toast])
 
   const withPersist = async (fn: () => Promise<void>) => {
     persist.begin('connections')
@@ -110,7 +84,9 @@ export const ConnectionsPage: React.FC = () => {
             <Search className="w-4 h-4 text-[#00c3ff]" />
             Search Members
           </h2>
-          <p className="text-xs text-[#839493] mt-0.5">Search by larva id (at least 2 characters).</p>
+          <p className="text-xs text-[#839493] mt-0.5">
+            Search by designation, larva unit, or name (at least {MEMBER_SEARCH_MIN_CHARS} characters).
+          </p>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#839493]" />
@@ -118,7 +94,7 @@ export const ConnectionsPage: React.FC = () => {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search larva ids…"
+            placeholder="Search designations, larva units, or names…"
             className="w-full pl-10 pr-3 py-2.5 bg-[#050808] border border-[#3a4a49] text-sm text-[#dfe3e3] placeholder:text-[#4a5a59] focus:outline-none focus:border-[#00c3ff] chamfer-corner"
           />
           {searching && (
@@ -128,54 +104,23 @@ export const ConnectionsPage: React.FC = () => {
         {results.length > 0 && (
           <ul className="space-y-2">
             {results.map((member) => {
-              const isFriend = connections?.friends.some((f) => f.id === member.id)
-              const incoming = connections?.incoming.find((f) => f.id === member.id)
-              const outgoing = connections?.outgoing.find((f) => f.id === member.id)
-              const relationship = isFriend
-                ? 'friends'
-                : incoming
-                  ? 'pending_received'
-                  : outgoing
-                    ? 'pending_sent'
-                    : 'none'
-              const pendingRequestId =
-                incoming?.requestId ?? outgoing?.requestId ?? null
-
+              const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
               return (
-              <li
-                key={member.id}
-                className="chitin-card-inset p-3 border border-[#3a4a49] flex items-center gap-3 chamfer-corner"
-              >
-                <LobsterAvatarPortrait
-                  config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
-                  className="w-12 h-12 shrink-0"
-                  size={128}
-                />
-                <div className="min-w-0 flex-1">
-                  <Link
-                    to="/member/$profileId"
-                    params={{ profileId: member.id }}
-                    className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
-                  >
-                    {member.displayName}
-                  </Link>
-                  <div className="text-[10px] uppercase tracking-wider text-[#839493]">
-                    Stage {member.stage} · {member.stageLabel}
-                  </div>
-                </div>
-                <FriendRequestButton
-                  profileId={member.id}
+                <MemberSearchRow
+                  key={member.id}
+                  member={member}
                   relationship={relationship}
                   pendingRequestId={pendingRequestId}
                   onRelationshipChange={() => void refresh()}
                 />
-              </li>
               )
             })}
           </ul>
         )}
-        {query.trim().length >= 2 && !searching && results.length === 0 && (
-          <p className="text-xs text-[#839493] text-center py-3">No members matched that search.</p>
+        {query.trim().length >= MEMBER_SEARCH_MIN_CHARS && !searching && results.length === 0 && (
+          <p className="text-xs text-[#839493] text-center py-3">
+            The trench stayed quiet. No designation, larva unit, or name surfaced for that call.
+          </p>
         )}
       </div>
 
