@@ -51,5 +51,4 @@ export {
   type ImageLightboxProps,
   type ZoomableImageProps,
   type LightboxImageItem,
-  type LightboxAccentColor,
 } from './ImageLightbox'

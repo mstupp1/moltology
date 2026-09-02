@@ -168,7 +168,6 @@ export const LandingPage: React.FC = () => {
     {
       id: '01',
       title: 'ADVANCED BENTHIC HUD',
-      subtitle: 'CORE COMMAND ARCHITECTURE',
       description:
         'A centralized command dashboard featuring daily habit routines, deep-trench modules, and focus tracking built for daily high-density execution.',
       image: getAssetUrl('/images/gallery/benthic_abyss_shrine.webp'),
@@ -177,10 +176,9 @@ export const LandingPage: React.FC = () => {
       previewImageSm: getAssetUrl('/images/marketing/dashboard_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/dashboard',
       imagePosition: 'center 40%',
-      borderColor: 'border-cyan-500/40 hover:border-cyan-400',
-      shadowColor: 'shadow-[0_0_20px_rgba(0,255,255,0.12)] hover:shadow-[0_0_30px_rgba(0,255,255,0.25)]',
+      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
+      shadowColor: 'shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
       dotColor: 'bg-cyan-400',
-      accentColor: 'cyan' as const,
       btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
       specs: ['Daily Habit & Shedding Tracker', 'Deep-Trench Focus Dome', 'Real-Time Telemetry & Streaks'],
       actionText: 'EXPLORE HUD CONSOLE',
@@ -189,7 +187,6 @@ export const LandingPage: React.FC = () => {
     {
       id: '02',
       title: 'SYNAPTIC HIVE COMMUNITY',
-      subtitle: 'SWARM METAMORPHOSIS NETWORK',
       description:
         'Connect with an active network of ascendant operators. Share routines, exchange insights, and co-evolve alongside a supportive, global collective.',
       image: getAssetUrl('/images/gallery/synapse_crystal.webp'),
@@ -198,11 +195,10 @@ export const LandingPage: React.FC = () => {
       previewImageSm: getAssetUrl('/images/marketing/forum_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/forum',
       imagePosition: 'center 35%',
-      borderColor: 'border-purple-500/40 hover:border-purple-400',
-      shadowColor: 'shadow-[0_0_20px_rgba(168,85,247,0.12)] hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
-      dotColor: 'bg-purple-400',
-      accentColor: 'purple' as const,
-      btnGlow: 'bg-purple-950/50 hover:bg-purple-900/60 border-purple-500/50 hover:border-purple-400 text-purple-300',
+      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
+      shadowColor: 'shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
+      dotColor: 'bg-cyan-400',
+      btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
       specs: ['Live Swarm Social Feed', 'Peer Co-Evolution Discussions', 'Shared Metamorphosis Logs'],
       actionText: 'JOIN SYNAPTIC SWARM',
       actionRoute: '/forum',
@@ -210,7 +206,6 @@ export const LandingPage: React.FC = () => {
     {
       id: '03',
       title: 'INTELLIGENT AI ORACLE',
-      subtitle: 'AUTONOMOUS REASONING CORE',
       description:
         'Leverage specialized AI mentors designed to eliminate overthinking, answer doctrine questions, and guide your daily molts with pinpoint precision.',
       image: getAssetUrl('/images/gallery/ascendant_crab_god.webp'),
@@ -219,11 +214,10 @@ export const LandingPage: React.FC = () => {
       previewImageSm: getAssetUrl('/images/marketing/oracle_feature_preview_sm.webp'),
       previewUrl: 'moltology.org/oracle',
       imagePosition: 'center 30%',
-      borderColor: 'border-red-500/40 hover:border-red-400',
-      shadowColor: 'shadow-[0_0_20px_rgba(239,68,68,0.12)] hover:shadow-[0_0_30px_rgba(239,68,68,0.25)]',
-      dotColor: 'bg-red-400',
-      accentColor: 'red' as const,
-      btnGlow: 'bg-red-950/50 hover:bg-red-900/60 border-red-500/50 hover:border-red-400 text-red-300',
+      borderColor: 'border-cyan-500/50 hover:border-cyan-400',
+      shadowColor: 'shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)]',
+      dotColor: 'bg-cyan-400',
+      btnGlow: 'bg-cyan-950/50 hover:bg-cyan-900/60 border-cyan-500/50 hover:border-cyan-400 text-cyan-300',
       specs: ['Hesitation Quarantine Assistant', 'Codex Liturgy Search', 'Adaptive Growth Coaching'],
       actionText: 'CONSULT AI ORACLE',
       actionRoute: '/oracle',
@@ -442,20 +436,14 @@ export const LandingPage: React.FC = () => {
                     durationMs={700}
                   >
                     <div
-                      className={`border-2 ${pillar.borderColor} ${pillar.shadowColor} chamfer-corner-lg overflow-hidden !bg-[#020508] flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative`}
+                      className="border-2 border-cyan-500/50 hover:border-cyan-400 shadow-[0_0_30px_rgba(0,195,255,0.12)] hover:shadow-[0_0_40px_rgba(0,195,255,0.22)] chamfer-corner-lg overflow-hidden !bg-[#020508] flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-1.5 group relative"
                     >
                       {/* ── 1. 100% SOLID BLACK CARD BASE (ZERO TRANSPARENCY / ZERO SEE-THROUGH) ── */}
                       <div className="absolute inset-0 bg-[#020508] pointer-events-none" />
 
                       {/* ── 2. TOP SCREENSHOT STAGE (SOLID BLACK WITH THEMED AMBIENT GLOW) ── */}
                       <div
-                        className={`absolute top-6 left-1/2 -translate-x-1/2 w-72 h-44 rounded-full blur-[85px] opacity-25 group-hover:opacity-40 transition-opacity pointer-events-none ${
-                          idx === 0
-                            ? 'bg-cyan-500'
-                            : idx === 1
-                            ? 'bg-purple-500'
-                            : 'bg-red-500'
-                        }`}
+                        className="absolute top-6 left-1/2 -translate-x-1/2 w-72 h-44 rounded-full blur-[85px] opacity-25 group-hover:opacity-40 transition-opacity pointer-events-none bg-cyan-500"
                       />
 
                       {/* ── 3. LOWER BACKGROUND ARTWORK (SEAMLESSLY BLENDED INTO SOLID BLACK TOP) ── */}
@@ -501,7 +489,7 @@ export const LandingPage: React.FC = () => {
                               : 'lg:[transform:perspective(1100px)_rotateX(9deg)_rotateY(7deg)_rotateZ(-1.5deg)] group-hover:lg:[transform:perspective(1100px)_rotateX(0deg)_rotateY(0deg)_rotateZ(0deg)_scale(1.04)]'
                           }`}
                         >
-                          <div className={`relative overflow-hidden chamfer-corner border-2 ${pillar.borderColor} bg-[#030708] shadow-2xl aspect-[16/10] group/preview`}>
+                          <div className="relative overflow-hidden chamfer-corner border border-cyan-500/40 group-hover/preview:border-cyan-400/80 bg-[#030708] shadow-2xl aspect-[16/10] group/preview">
                             {/* High-DPI Screenshot */}
                             <picture>
                               <source
@@ -525,10 +513,10 @@ export const LandingPage: React.FC = () => {
                             </picture>
 
                             {/* Interactive Hover Zoom Affordance Badge */}
-                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 flex items-center justify-center p-2 backdrop-blur-[1.5px]">
-                              <span className={`flex items-center gap-1.5 px-3 py-1 rounded bg-[#03080a]/92 border ${pillar.borderColor} font-mono text-[10px] sm:text-xs font-bold tracking-wider uppercase shadow-xl transform translate-y-2 group-hover/preview:translate-y-0 transition-transform duration-300 text-white`}>
-                                <Maximize2 className="w-3 h-3 text-cyan-300" />
-                                <span>EXPAND PREVIEW</span>
+                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200 flex items-center justify-center p-2 backdrop-blur-[1px]">
+                              <span className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#03080a]/92 border border-cyan-500/50 font-sans text-xs font-bold tracking-wider uppercase shadow-xl transform translate-y-1 group-hover/preview:translate-y-0 transition-transform duration-200 text-cyan-300">
+                                <Maximize2 className="w-3.5 h-3.5 text-cyan-300" />
+                                <span>Click to expand</span>
                               </span>
                             </div>
 
@@ -588,12 +576,10 @@ export const LandingPage: React.FC = () => {
                 src: p.previewImage,
                 alt: `${p.title} Full Resolution Preview`,
                 title: p.title,
-                subtitle: p.subtitle,
                 description: p.description,
                 specs: p.specs,
                 actionRoute: p.actionRoute,
                 actionText: p.actionText,
-                accentColor: p.accentColor,
               }))}
             />
 

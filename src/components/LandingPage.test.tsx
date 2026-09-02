@@ -222,9 +222,7 @@ describe('LandingPage Component', () => {
 
     const dialog = screen.getByRole('dialog', { name: /ADVANCED BENTHIC HUD/i })
     expect(dialog).toBeInTheDocument()
-    expect(within(dialog).getByText('HUD PREVIEW // SYSTEM TELEMETRY')).toBeInTheDocument()
     expect(within(dialog).getByText('1 / 3')).toBeInTheDocument()
-    expect(within(dialog).getByText('CORE COMMAND ARCHITECTURE')).toBeInTheDocument()
 
     // Next image navigation in lightbox
     const nextBtn = within(dialog).getByRole('button', { name: /Next image/i })
