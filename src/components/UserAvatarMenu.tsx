@@ -73,7 +73,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
     } catch {
       endSignOut()
       signOutLock.current = false
-      toastApi?.toast.error('HATCH SEALED. Sign out did not complete.', { id: 'sign-out' })
+      toastApi?.toast.error('Could not sign out. Please try again.', { id: 'sign-out' })
       return
     }
 

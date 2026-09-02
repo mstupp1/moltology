@@ -138,8 +138,8 @@ describe('UserAvatarMenu Component', () => {
     })
   })
 
-  it('releases the latch and stays aboard when sign-out fails', async () => {
-    vi.mocked(authClient.signOut).mockRejectedValueOnce(new Error('hatch jammed'))
+  it('releases the latch and does not navigate when sign-out fails', async () => {
+    vi.mocked(authClient.signOut).mockRejectedValueOnce(new Error('sign out failed'))
     const onNavigate = vi.fn()
     render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
 
