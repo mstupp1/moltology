@@ -1,8 +1,9 @@
 import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { UserAvatarMenu } from './UserAvatarMenu'
 import { authClient } from '@/lib/auth-client'
+import { isSignOutInFlight } from '@/lib/auth-session'
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -21,6 +22,11 @@ describe('UserAvatarMenu Component', () => {
     email: 'carcinus@moltology.org',
     image: 'https://lh3.googleusercontent.com/avatar.jpg',
   }
+
+  beforeEach(() => {
+    vi.mocked(authClient.signOut).mockClear()
+    vi.mocked(authClient.signOut).mockResolvedValue({} as never)
+  })
 
   it('renders avatar button without menu open initially', () => {
     render(<UserAvatarMenu user={mockUser} />)
@@ -55,9 +61,95 @@ describe('UserAvatarMenu Component', () => {
     fireEvent.click(signOutBtn)
 
     expect(authClient.signOut).toHaveBeenCalled()
+    expect(isSignOutInFlight()).toBe(true)
     await waitFor(() => {
       expect(onNavigate).toHaveBeenCalledWith('/')
     })
+  })
+
+  it('does not collapse the menu on mousedown outside, so Sign Out can still fire', async () => {
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    const signOutBtn = screen.getByRole('button', { name: /^sign out$/i })
+    expect(screen.getByRole('button', { name: /user account menu/i })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+
+    fireEvent.mouseDown(document.body)
+    expect(screen.getByRole('button', { name: /user account menu/i })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(signOutBtn).toBeInTheDocument()
+
+    fireEvent.click(signOutBtn)
+    expect(authClient.signOut).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(onNavigate).toHaveBeenCalledWith('/')
+    })
+  })
+
+  it('starts sign-out on pointerdown so a later dismiss cannot swallow the action', async () => {
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    const signOutBtn = screen.getByRole('button', { name: /^sign out$/i })
+
+    fireEvent.pointerDown(signOutBtn)
+    expect(authClient.signOut).toHaveBeenCalledTimes(1)
+    expect(isSignOutInFlight()).toBe(true)
+
+    fireEvent.mouseDown(document.body)
+    fireEvent.click(signOutBtn)
+    expect(authClient.signOut).toHaveBeenCalledTimes(1)
+
+    await waitFor(() => {
+      expect(onNavigate).toHaveBeenCalledWith('/')
+    })
+  })
+
+  it('signs out from the inline mobile accordion on one Sign Out activation', async () => {
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} inline />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    fireEvent.pointerDown(screen.getByRole('button', { name: /^sign out$/i }))
+
+    expect(authClient.signOut).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(onNavigate).toHaveBeenCalledWith('/')
+    })
+  })
+
+  it('closes the menu on click outside', async () => {
+    render(<UserAvatarMenu user={mockUser} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    fireEvent.click(document.body)
+    await waitFor(() => {
+      expect(screen.queryByText('Carcinus Ascendant')).not.toBeInTheDocument()
+    })
+  })
+
+  it('releases the latch and stays aboard when sign-out fails', async () => {
+    vi.mocked(authClient.signOut).mockRejectedValueOnce(new Error('hatch jammed'))
+    const onNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^sign out$/i }))
+
+    await waitFor(() => {
+      expect(isSignOutInFlight()).toBe(false)
+    })
+    expect(onNavigate).not.toHaveBeenCalled()
   })
 
   it('closes dropdown menu when pressing Escape', async () => {

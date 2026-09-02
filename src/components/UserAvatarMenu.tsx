@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { LogOut, EyeOff, Sparkles, ChevronDown, Settings, User } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
-import { clearCachedUser } from '@/lib/auth-session'
+import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { getEffectiveRole } from '@/lib/permissions'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 
 export interface UserAvatarMenuProps {
   user: {
@@ -49,18 +50,45 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const [shouldRender, setShouldRender] = useState(isOpen)
   const [isExpanded, setIsExpanded] = useState(isOpen)
   const menuRef = useRef<HTMLDivElement>(null)
+  const signOutLock = useRef(false)
   const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
+  const toastApi = useOptionalToast()
 
   const handleToggle = () => setIsOpen((prev) => !prev)
   const handleClose = () => setIsOpen(false)
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (event?: React.SyntheticEvent) => {
+    event?.preventDefault()
+    event?.stopPropagation()
+    if (signOutLock.current) return
+    signOutLock.current = true
+
+    // Start the auth call before shedding chrome so a re-render cannot swallow it.
+    const signingOut = authClient.signOut()
+    beginSignOut()
     handleClose()
-    clearCachedUser()
-    await authClient.signOut()
-    if (onNavigate) {
-      onNavigate('/')
+
+    try {
+      await signingOut
+    } catch {
+      endSignOut()
+      signOutLock.current = false
+      toastApi?.toast.error('HATCH SEALED. Sign out did not complete.', { id: 'sign-out' })
+      return
     }
+
+    onNavigate?.('/')
+  }
+
+  const signOutButtonProps = {
+    type: 'button' as const,
+    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (event.button > 0) return
+      void handleSignOut(event)
+    },
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+      void handleSignOut(event)
+    },
   }
 
   const handleOpenSettings = () => {
@@ -78,8 +106,12 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const displayName = displayNameProp || user.name || user.email?.split('@')[0] || 'Operative'
   const effectiveRole = getEffectiveRole(user, userRole)
 
-  // Handle click outside & keyboard escape to close dropdown
+  // Handle click outside & keyboard escape to close dropdown.
+  // Listen for `click` (not `mousedown`) so Sign Out pointerdown can start
+  // first. Attach on the next tick so the opening click cannot dismiss.
   useEffect(() => {
+    if (!isOpen) return
+
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         handleClose()
@@ -91,13 +123,14 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
       }
     }
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      document.addEventListener('keydown', handleKeyDown)
-    }
+    const attachId = window.setTimeout(() => {
+      document.addEventListener('click', handleClickOutside)
+    }, 0)
+    document.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      window.clearTimeout(attachId)
+      document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isOpen])
@@ -212,7 +245,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
               isExpanded
                 ? 'grid-rows-[1fr] opacity-100'
-                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                : `grid-rows-[0fr] opacity-0${isOpen ? '' : ' pointer-events-none'}`
             }`}
           >
             <div className="overflow-hidden">
@@ -316,8 +349,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
                   {/* Sign Out Action Button */}
                   <button
-                    type="button"
-                    onClick={handleSignOut}
+                    {...signOutButtonProps}
                     className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
                       isCorporate
                         ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
@@ -385,8 +417,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             isExpanded
               ? 'opacity-100 scale-100 translate-y-0'
               : openDirection === 'up'
-              ? 'opacity-0 scale-95 translate-y-2 pointer-events-none'
-              : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+              ? `opacity-0 scale-95 translate-y-2${isOpen ? '' : ' pointer-events-none'}`
+              : `opacity-0 scale-95 -translate-y-2${isOpen ? '' : ' pointer-events-none'}`
           }`}
         >
           {/* Top User Header Info Section */}
@@ -552,8 +584,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
 
             {/* Sign Out Action Button */}
             <button
-              type="button"
-              onClick={handleSignOut}
+              {...signOutButtonProps}
               className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
                 isCorporate
                   ? 'text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200 hover:border-rose-300'
