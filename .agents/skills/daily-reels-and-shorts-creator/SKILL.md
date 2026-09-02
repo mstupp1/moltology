@@ -31,7 +31,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
 * **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, preset library voice via `FISH_VOICE_REFERENCE_ID`, `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
 * **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `queue_preview_queue`, `queue_get_next_queue_slot`).
+* **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Integrated directly into `npm run reel:create` — **no manual MCP tool calls required**.
 * **Queue Configuration**:
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
   - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — Daily at 6:30 PM EST / 18:30 `America/New_York`)
@@ -191,24 +191,24 @@ await compositeReel({
 
 ---
 
-### Step 6: S3 Upload & Zernio MCP Multi-Platform Staging
+### Step 6: S3 Upload & Deterministic Zernio API Multi-Platform Queueing
+
+When running `npm run reel:create`, Step 6 executes **deterministically and automatically**:
 
 1. **Upload Master Reel to Neon S3**:
    * Video: `videos/social/reels/master-reel-<timestamp>.mp4`
 
-2. **Mandatory Zernio Queue Routing**:
-   * **Strict Queue Rule**: All reels/shorts MUST ALWAYS be routed into the designated Zernio queue (`queued_from_profile: '6a7f74b1839bf39ff3b6aaaa'`, `queue_id: '6a84b7702421e968ac81f5bd'`).
+2. **Deterministic Zernio Queue Staging via REST API**:
+   * **Automatic Queue Dispatch**: The CLI directly calls the Zernio REST API (`POST /v1/posts`) with `queuedFromProfile: '6a7f74b1839bf39ff3b6aaaa'` and `queueId: '6a84b7702421e968ac81f5bd'`.
+   * **Dual Broadcast**: Automatically provisions:
+     - **Instagram Reel**: Account ID `6a7f7f0777555aae01d99b54` (with `isAiGenerated: true` and `contentType: 'reel'`).
+     - **YouTube Short**: Account ID `6a7fd9bd77555aae01ebea63` (with `title`, `description`, `tags`).
+   * **Automatic First Comment**: The CLI immediately posts the algorithmic first comment with the keyword DM trigger link via the Zernio Inbox API (`POST /v1/inbox/comments/{postId}`).
    * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly and unequivocally commands an immediate live broadcast.
-   * **Queue Configuration**:
-     - Profile ID: `6a7f74b1839bf39ff3b6aaaa`
-     - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — Slots daily at 6:30 PM EST / 18:30 `America/New_York`)
-     - Dual broadcast to Instagram (`6a7f7f0777555aae01d99b54`) and YouTube Shorts (`6a7fd9bd77555aae01ebea63`).
-     - Set `isAiGenerated: true` for Meta/Instagram.
-   * **Draft Mode (`is_draft: true`)**:
-     - Save without scheduling when manual human sign-off is requested.
+   * **DO NOT invoke Zernio MCP tools (`posts_create`, etc.) manually**: The script deterministically handles queue assignment and first comment chaining.
 
 3. **Update Narrative History Ledger**:
-   * Append record to `content/social/instagram-reel-history.json` with `s3Url`, `s3Key`, `durationSeconds`, `isAiGenerated`, `ctaGoal`, `commentTriggerKeyword`, `commentTriggerUrl`, and platform IDs (`status: "queued"`, `"published"`, or `"draft"`).
+   * The CLI automatically appends the completed record to `content/social/instagram-reel-history.json` with `s3Url`, `s3Key`, `durationSeconds`, `status: "queued"`, `scheduledFor` slot, `queueId`, `zernioInstagramPostId`, `zernioYouTubePostId`, `zernioCommentId`, and conversion triggers.
 
 ---
 

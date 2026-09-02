@@ -17,6 +17,7 @@ import {
   DEFAULT_PROFILE_ID,
   DEFAULT_REELS_QUEUE_ID,
 } from './create-daily-reel'
+import { queueDualReelAndShort, QueueDualReelAndShortResult } from './lib/zernio-client'
 
 /** Operational default until Press or CoS say otherwise. Hardware texture; 6:30pm queue. */
 export const DEFAULT_VIRAL_SERIES_ID: ViralSeriesId = 'incidents'
@@ -608,40 +609,39 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   console.log(`   • Public CDN S3 URL: ${s3Upload.publicUrl}`)
 
   // Zernio Queue Staging
-  console.log(`\n📡 Staging Episodic Reel into Zernio Queue (ID: ${DEFAULT_REELS_QUEUE_ID})...`)
-  let zernioPostId: string | null = null
-  let youtubePostId: string | null = null
+  let queueResult: QueueDualReelAndShortResult | null = null
 
-  try {
-    const postPayload = {
-      profile_id: DEFAULT_PROFILE_ID,
-      queue_id: DEFAULT_REELS_QUEUE_ID,
-      platforms: [
-        {
-          platform: 'instagram',
-          account_id: DEFAULT_INSTAGRAM_ACCOUNT_ID,
-          post_type: 'reel',
-          caption: script.caption,
-          media_urls: [s3Upload.publicUrl],
-          is_ai_generated: true,
-        },
-        {
-          platform: 'youtube',
-          account_id: DEFAULT_YOUTUBE_ACCOUNT_ID,
-          post_type: 'short',
-          title: script.youtubeTitle,
-          description: script.youtubeDescription,
-          tags: script.youtubeTags,
-          media_urls: [s3Upload.publicUrl],
-        },
-      ],
-      publish_now: options.publishNow || false,
-    }
-
-    console.log(`   • Staged to Instagram (${DEFAULT_INSTAGRAM_ACCOUNT_ID}) & YouTube (${DEFAULT_YOUTUBE_ACCOUNT_ID})`)
-    zernioPostId = `mock-zernio-series-post-${Date.now()}`
-  } catch (err: any) {
-    console.warn(`⚠️ Warning: Zernio MCP call error: ${err.message}`)
+  if (!options.dryRun && s3Upload?.publicUrl) {
+    queueResult = await queueDualReelAndShort({
+      videoUrl: s3Upload.publicUrl,
+      instagramCaption: script.caption,
+      youtubeTitle: script.youtubeTitle,
+      youtubeDescription: script.youtubeDescription,
+      youtubeTags: script.youtubeTags,
+      firstComment: script.firstComment,
+      queueId: DEFAULT_REELS_QUEUE_ID,
+      profileId: DEFAULT_PROFILE_ID,
+      instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+      youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
+      isAiGenerated: true,
+      publishNow: options.publishNow,
+    })
+  } else if (options.dryRun) {
+    queueResult = await queueDualReelAndShort({
+      videoUrl: `https://placeholder.storage.neon.tech/moltology-public-assets/${s3Key}`,
+      instagramCaption: script.caption,
+      youtubeTitle: script.youtubeTitle,
+      youtubeDescription: script.youtubeDescription,
+      youtubeTags: script.youtubeTags,
+      firstComment: script.firstComment,
+      queueId: DEFAULT_REELS_QUEUE_ID,
+      profileId: DEFAULT_PROFILE_ID,
+      instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+      youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
+      isAiGenerated: true,
+      dryRun: true,
+      publishNow: options.publishNow,
+    })
   }
 
   // Update Continuity Ledger
@@ -657,10 +657,15 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
     retentionLoopAnchor: script.retentionLoopAnchor,
     narrationScript: script.narrationScript,
     durationSeconds: compositeResult.durationSeconds,
-    status: options.publishNow ? 'published' : 'queued',
-    s3Url: s3Upload.publicUrl,
+    status: options.publishNow ? 'published' : (options.dryRun ? 'dry-run' : 'queued'),
+    scheduledFor: queueResult?.scheduledFor || null,
+    queueId: DEFAULT_REELS_QUEUE_ID,
+    s3Url: s3Upload?.publicUrl || null,
     s3Key,
-    zernioPostId,
+    zernioInstagramPostId: queueResult?.instagramPostId || null,
+    zernioYouTubePostId: queueResult?.youtubePostId || null,
+    zernioPostId: queueResult?.instagramPostId || null,
+    zernioCommentId: queueResult?.commentId || null,
     caption: script.caption,
     hashtags: script.hashtags,
     firstComment: script.firstComment,
@@ -670,6 +675,9 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   })
 
   console.log(`\n🎉 Viral Series Episode Successfully Completed & Staged!`)
+  if (queueResult?.instagramPostId) console.log(`   • Instagram Reel ID: ${queueResult.instagramPostId}`)
+  if (queueResult?.youtubePostId) console.log(`   • YouTube Short ID: ${queueResult.youtubePostId}`)
+  if (queueResult?.scheduledFor) console.log(`   • Scheduled Slot: ${queueResult.scheduledFor}`)
 }
 
 // CLI Execution entrypoint

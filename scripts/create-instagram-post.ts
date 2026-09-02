@@ -6,6 +6,13 @@ import { overlayCharacterOnImage, CharacterKey, getRandomCharacterKey, getCharac
 import { captureComposite } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import {
+  queueInstagramPost,
+  QueueInstagramPostResult,
+  QUEUE_IDS,
+  DEFAULT_PROFILE_ID as CANONICAL_PROFILE_ID,
+  DEFAULT_INSTAGRAM_ACCOUNT_ID as CANONICAL_INSTAGRAM_ACCOUNT_ID,
+} from './lib/zernio-client'
 
 export interface InstagramPostScript {
   title: string
@@ -46,10 +53,10 @@ export interface CreateInstagramPostOptions {
   inputImage?: string
 }
 
-export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // moltology_org / Silas Trench
-export const DEFAULT_PROFILE_ID = '6a7f74b1839bf39ff3b6aaaa' // Moltology Default Profile
-export const DEFAULT_POST_QUEUE_ID = '6a84b76d2421e968ac81f5bc' // Moltology Carousels & Posts (Mon, Wed, Fri at 13:00 EST)
-export const DEFAULT_LEADMAGNET_QUEUE_ID = '6a8d93576f0e96efe2960c91' // Moltology Lead Magnets — Daily (Every day at 13:00 EST)
+export const DEFAULT_INSTAGRAM_ACCOUNT_ID = CANONICAL_INSTAGRAM_ACCOUNT_ID // moltology_org / Silas Trench
+export const DEFAULT_PROFILE_ID = CANONICAL_PROFILE_ID // Moltology Default Profile
+export const DEFAULT_POST_QUEUE_ID = QUEUE_IDS.CAROUSELS_AND_POSTS // Moltology Carousels & Posts (Mon, Wed, Fri at 13:00 EST)
+export const DEFAULT_LEADMAGNET_QUEUE_ID = QUEUE_IDS.LEAD_MAGNETS_DAILY // Moltology Lead Magnets — Daily (Every day at 13:00 EST)
 
 /**
  * Load the narrative post continuity ledger
@@ -325,12 +332,29 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
     let publicUrl: string | undefined
     let s3Key: string | undefined
 
+    const targetQueueId = isMarketingCampaign ? DEFAULT_LEADMAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID
+    let queueResult: QueueInstagramPostResult | null = null
+
     if (!options.dryRun) {
       console.log(`\n1️⃣ Uploading Polished Post Image to Neon S3...`)
       s3Key = `images/social/posts/post-${timestamp}.png`
       const s3Result = await uploadLocalFileToS3(finalImagePath, s3Key, DEFAULT_BUCKET)
       publicUrl = s3Result.publicUrl
       console.log(`   🚀 Public S3 Image URL: ${publicUrl}`)
+
+      // 2️⃣ Deterministically Queue to Zernio & Post Algorithmic First Comment
+      if (publicUrl) {
+        queueResult = await queueInstagramPost({
+          mediaUrl: publicUrl,
+          caption: postData.caption,
+          firstComment: postData.firstComment,
+          queueId: targetQueueId,
+          profileId: DEFAULT_PROFILE_ID,
+          accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+          isAiGenerated: true,
+          publishNow: options.publishNow,
+        })
+      }
 
       // Record to Continuity Ledger
       recordPostInHistory({
@@ -347,17 +371,34 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
         hashtags: postData.hashtags,
         firstComment: postData.firstComment,
         status: options.publishNow ? 'published' : 'queued',
+        scheduledFor: queueResult?.scheduledFor || null,
+        queueId: targetQueueId,
+        zernioPostId: queueResult?.postId || null,
+        zernioCommentId: queueResult?.commentId || null,
         isAiGenerated: true,
       })
     } else {
       console.log(`\n1️⃣ [Dry Run] Skipped S3 upload. Polished image saved at: ${finalImagePath}`)
+      queueResult = await queueInstagramPost({
+        mediaUrl: `https://placeholder.storage.neon.tech/moltology-public-assets/images/social/posts/post-${timestamp}.png`,
+        caption: postData.caption,
+        firstComment: postData.firstComment,
+        queueId: targetQueueId,
+        profileId: DEFAULT_PROFILE_ID,
+        accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+        isAiGenerated: true,
+        dryRun: true,
+        publishNow: options.publishNow,
+      })
     }
 
     console.log(`\n======================================================`)
-    console.log(`✨ INSTAGRAM POST READY FOR PUBLISHING / QUEUEING!`)
+    console.log(`✨ INSTAGRAM POST PUBLISHED / QUEUED DETERMINISTICALLY!`)
     console.log(`======================================================`)
     console.log(`🖼️  Final Image: ${finalImagePath}`)
     if (publicUrl) console.log(`🔗 Public CDN URL: ${publicUrl}`)
+    if (queueResult?.postId) console.log(`📡 Zernio Post ID: ${queueResult.postId}`)
+    if (queueResult?.scheduledFor) console.log(`⏰ Scheduled Slot: ${queueResult.scheduledFor}`)
     console.log(`\n📝 CAPTION:\n${postData.caption}`)
     console.log(`\n💬 FIRST COMMENT:\n${postData.firstComment}`)
     console.log(`======================================================\n`)
@@ -367,9 +408,10 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
       publicUrl,
       s3Key,
       postData,
+      queueResult,
       queueConfig: {
         profileId: DEFAULT_PROFILE_ID,
-        queueId: isMarketingCampaign ? DEFAULT_LEADMAGNET_QUEUE_ID : DEFAULT_POST_QUEUE_ID,
+        queueId: targetQueueId,
         accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
       },
     }

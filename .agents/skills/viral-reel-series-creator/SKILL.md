@@ -59,7 +59,7 @@ Stolen-format mapping (never a new franchise):
 * **Dynamic Multi-Track Audio (3-Track Mix)**: Native Video SFX (breathing, footsteps, creature screeches, impacts) + Fish Audio S2 Neural TTS Voiceover (primary, `s2.1-pro` via `FISH_VOICE_REFERENCE_ID`, +8% to +14% pacing) with Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ducked Ambient Benthic Soundtrack (`assets/audio/benthic-ambient-loop.mp3`, dynamic harmonic offset rotation `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, volume `0.12`, smooth 0.8s entrance fade, and 1.5s musical outro fade)
 * **Visual Polish**: Minimalist Moltology Emblem watermark (`110x110`, `opacity=0.40`), sentence-isolated kinetic subtitles (word-by-word active glow in neon cyan `#00ffff` or amber `#f59e0b`), and seamless 0.20s `xfade` cross-dissolves between clips.
 * **Asset Storage**: Neon S3 (`videos/social/series/master-series-<seriesId>-s<season>e<episode>-<timestamp>.mp4`).
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `comments_reply_to_inbox_post`, `queue_preview_queue`).
+* **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Built directly into `npm run series:create` — **no manual MCP tool calls required**.
 * **Dedicated Queue** (operational discipline, not a suggestion):
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
   - Dedicated Reels Queue ID: `6a84b7702421e968ac81f5bd` (**Moltology Reels & Shorts** — daily at 6:30pm `America/New_York`)
@@ -67,7 +67,7 @@ Stolen-format mapping (never a new franchise):
 
 ---
 
-## 2. 4-Stage Production Workflow (Google Flow ➔ Drop-in Ingest ➔ Zernio)
+## 2. 4-Stage Production Workflow (Google Flow ➔ Drop-in Ingest ➔ Zernio API)
 
 Google Flow stays a **human handoff**. The agent writes scene directives. The user generates 9:16 Veo clips in Flow and drops MP4s into `tmp/flow-video-ingest/` (`scene1.mp4`, `scene2.mp4`, …). **Never** log into Flow. **Never** drive Flow via API, cookies, or browser automation.
 
@@ -103,11 +103,13 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
                                        │
                                        ▼ (Autonomous Publishing & Telemetry)
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  STAGE 4: Neon S3 Ingestion, Zernio Queueing & First Comment                │
-│  - Uploads master video to Neon S3                                          │
-│  - Routes post to Zernio Reels Queue (6a84b7702421e968ac81f5bd)             │
-│  - Posts instant algorithmic First Comment with DM trigger link             │
+│  STAGE 4: S3 Ingestion, Deterministic Zernio Queueing & 1st Comment (CLI)   │
+│  - CLI uploads master video to Neon S3                                      │
+│  - CLI queues dual broadcast (Instagram Reel + YouTube Short) via Zernio API│
+│  - Deterministically routes into Reels Queue (6a84b7702421e968ac81f5bd)     │
+│  - Posts instant algorithmic First Comment on Instagram via Zernio API       │
 │  - Appends full episode record to content/social/viral-series-ledger.json   │
+│  - NO MANUAL MCP CALLS REQUIRED                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -206,10 +208,11 @@ npm run series:create -- --series incidents --ingest-dir tmp/flow-video-ingest -
    - When running as an agent and generating prompts, always provide the user with the clear Google Flow prompt list, the audio sync path, and the drop-in folder path (`tmp/flow-video-ingest/`).
 2. **Never Invent False Video Assets**:
    - Do not fake video files. If the ingest folder is empty during a production run, present the formatted prompt directives to the user and halt cleanly.
-3. **Queue Discipline** (not a suggestion):
-   - Every episode stages into Zernio queue `6a84b7702421e968ac81f5bd` (Reels & Shorts, 6:30pm America/New_York).
-   - Do not bypass the queue. Do not call `publish_now` / `--publish-now` unless the user explicitly commands an immediate live broadcast in this turn. Do not offer it. Do not "just this once."
+3. **Queue Discipline & Deterministic Automation** (not a suggestion):
+   - Every episode stages into Zernio queue `6a84b7702421e968ac81f5bd` (Reels & Shorts, 6:30pm America/New_York) automatically via `npm run series:create`.
+   - Do NOT invoke Zernio MCP tools (`posts_create`, etc.) manually. The CLI directly invokes the Zernio REST API.
+   - Do not bypass the queue. Do not call `publish_now` / `--publish-now` unless the user explicitly commands an immediate live broadcast in this turn.
 4. **Mandatory First Comment**:
-   - Always seed the algorithmic first comment containing the keyword trigger link immediately after staging.
+   - The CLI script automatically posts the algorithmic first comment containing the keyword trigger link immediately after staging via the Zernio Inbox API.
 5. **One franchise until it loops**:
    - Default `--series incidents`. Keep the other four in the catalog. Do not rotate for variety. Do not mint a sixth franchise.

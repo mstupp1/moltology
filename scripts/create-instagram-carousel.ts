@@ -6,6 +6,13 @@ import { captureComposite } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 import { CharacterKey, getRandomCharacterRotation, getCharacterInfo } from './lib/character-overlay'
+import {
+  queueInstagramCarousel,
+  QueueInstagramCarouselResult,
+  QUEUE_IDS,
+  DEFAULT_PROFILE_ID as CANONICAL_PROFILE_ID,
+  DEFAULT_INSTAGRAM_ACCOUNT_ID as CANONICAL_INSTAGRAM_ACCOUNT_ID,
+} from './lib/zernio-client'
 
 export interface CarouselSlideConfig {
   slideNumber: number
@@ -32,9 +39,9 @@ export interface CarouselCopy {
   firstComment: string
 }
 
-export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // moltology_org / Silas Trench
-export const DEFAULT_PROFILE_ID = '6a7f74b1839bf39ff3b6aaaa' // Moltology Default Profile
-export const DEFAULT_CAROUSEL_QUEUE_ID = '6a84b76d2421e968ac81f5bc' // Moltology Carousels (Mon, Wed, Fri at 13:00 EST)
+export const DEFAULT_INSTAGRAM_ACCOUNT_ID = CANONICAL_INSTAGRAM_ACCOUNT_ID // moltology_org / Silas Trench
+export const DEFAULT_PROFILE_ID = CANONICAL_PROFILE_ID // Moltology Default Profile
+export const DEFAULT_CAROUSEL_QUEUE_ID = QUEUE_IDS.CAROUSELS_AND_POSTS // Moltology Carousels (Mon, Wed, Fri at 13:00 EST)
 
 /**
  * Load history ledger
@@ -149,6 +156,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
 
     console.log(`💎 Using ${slidePaths.length} User Polished Slides (Google Flow)...`)
     const publicUrls: string[] = []
+    let queueResult: QueueInstagramCarouselResult | null = null
 
     if (!options.dryRun) {
       console.log(`\n1️⃣ Uploading Polished Slides to Neon S3...`)
@@ -157,6 +165,20 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
         const res = await uploadLocalFileToS3(slidePaths[i], s3Key, DEFAULT_BUCKET)
         publicUrls.push(res.publicUrl)
         console.log(`   🚀 Slide ${i + 1} S3 URL: ${res.publicUrl}`)
+      }
+
+      // 2️⃣ Deterministically Queue Carousel to Zernio & Post Algorithmic First Comment
+      if (publicUrls.length > 0) {
+        queueResult = await queueInstagramCarousel({
+          mediaUrls: publicUrls,
+          caption: copy.caption,
+          firstComment: copy.firstComment,
+          queueId: DEFAULT_CAROUSEL_QUEUE_ID,
+          profileId: DEFAULT_PROFILE_ID,
+          accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+          isAiGenerated: true,
+          publishNow: options.publishNow,
+        })
       }
 
       // Record to Continuity Ledger
@@ -173,15 +195,39 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
         hashtags: copy.hashtags,
         firstComment: copy.firstComment,
         status: options.publishNow ? 'published' : 'queued',
+        scheduledFor: queueResult?.scheduledFor || null,
+        queueId: DEFAULT_CAROUSEL_QUEUE_ID,
+        zernioPostId: queueResult?.postId || null,
+        zernioCommentId: queueResult?.commentId || null,
         isAiGenerated: true,
       })
     } else {
       console.log(`\n1️⃣ [Dry Run] Skipped S3 upload for ${slidePaths.length} slides.`)
+      const mockUrls = slidePaths.map(
+        (_, i) =>
+          `https://placeholder.storage.neon.tech/moltology-public-assets/images/social/carousels/carousel-${timestamp}/slide${i + 1}.png`
+      )
+      queueResult = await queueInstagramCarousel({
+        mediaUrls: mockUrls,
+        caption: copy.caption,
+        firstComment: copy.firstComment,
+        queueId: DEFAULT_CAROUSEL_QUEUE_ID,
+        profileId: DEFAULT_PROFILE_ID,
+        accountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+        isAiGenerated: true,
+        dryRun: true,
+        publishNow: options.publishNow,
+      })
     }
 
     console.log(`\n======================================================`)
-    console.log(`✨ INSTAGRAM CAROUSEL READY FOR PUBLISHING / QUEUEING!`)
+    console.log(`✨ INSTAGRAM CAROUSEL PUBLISHED / QUEUED DETERMINISTICALLY!`)
     console.log(`======================================================`)
+    if (publicUrls.length > 0) {
+      console.log(`🔗 Slide URLs (${publicUrls.length}):\n${publicUrls.map((u, idx) => `   [Slide ${idx + 1}] ${u}`).join('\n')}`)
+    }
+    if (queueResult?.postId) console.log(`📡 Zernio Post ID: ${queueResult.postId}`)
+    if (queueResult?.scheduledFor) console.log(`⏰ Scheduled Slot: ${queueResult.scheduledFor}`)
     console.log(`\n📝 CAPTION:\n${copy.caption}`)
     console.log(`\n💬 FIRST COMMENT:\n${copy.firstComment}`)
     console.log(`======================================================\n`)
@@ -190,6 +236,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
       slidePaths,
       publicUrls,
       copy,
+      queueResult,
       queueConfig: {
         profileId: DEFAULT_PROFILE_ID,
         queueId: DEFAULT_CAROUSEL_QUEUE_ID,

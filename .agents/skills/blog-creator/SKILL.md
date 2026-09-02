@@ -233,11 +233,11 @@ Append the newly published article into `content/news/blog-history.json`:
 
 ---
 
-### Step 6: Multi-Channel Social Distribution (Web Composite ➔ Google Flow ➔ Zernio)
+### Step 6: Multi-Channel Social Distribution (Web Composite ➔ Google Flow ➔ Zernio API Queue)
 
 Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) and publish them to Instagram via Zernio. Base the carousel on the **selected ready article**, not on a newly invented topic.
 
-#### 1. The Core Mental Model: Composite Scaffolding ➔ Google Flow Polish ➔ Zernio
+#### 1. The Core Mental Model: Composite Scaffolding ➔ Google Flow Polish ➔ Zernio API
 
 To maintain consistent visual mastery across all social carousels:
 
@@ -275,10 +275,13 @@ To maintain consistent visual mastery across all social carousels:
                                │
                                ▼ (User Drops Assets Back)
 ┌──────────────────────────────────────────────────────────────┐
-│  STAGE 3: S3 Ingestion & Zernio Carousel Queueing            │
-│  - Agent uploads polished slides to Neon S3                  │
-│  - Stages carousel into dedicated Zernio Queue (6a84b76d...) │
+│  STAGE 3: Deterministic S3 Ingest, Zernio Queue & 1st Comment│
+│  - Agent runs npm run carousel:create with --polished-slides │
+│  - CLI uploads polished slides to Neon S3                    │
+│  - CLI queues carousel via Zernio REST API (6a84b76d2421e968)│
+│  - CLI automatically posts algorithmic First Comment         │
 │  - Updates narrative continuity ledger                       │
+│  - NO MANUAL MCP CALLS REQUIRED                              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -338,8 +341,8 @@ To maintain consistent visual mastery across all social carousels:
 2. **Step 2: User Runs Google Flow & Drops Polished Slides**:
    User generates the 3 polished slides in Google Flow and drops them into `tmp/` (e.g. `tmp/polished_slide1.png`, `tmp/polished_slide2.png`, `tmp/polished_slide3.png`).
 
-3. **Step 3: Resume S3 Upload & Zernio Queue Staging**:
+3. **Step 3: Resume S3 Upload & Deterministic Zernio Queueing (All-In-One)**:
    ```bash
    npm run carousel:create -- --theme <theme> --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png
    ```
-   *(This automatically uploads the 3 polished slides to Neon S3 `images/social/carousels/...`, stages the multi-slide carousel into the dedicated Zernio Queue `6a84b76d2421e968ac81f5bc`, and appends the record to `content/social/instagram-post-history.json`).*
+   *(This automatically uploads the 3 polished slides to Neon S3 `images/social/carousels/...`, deterministically stages the carousel into the dedicated Zernio Queue `6a84b76d2421e968ac81f5bc` via the Zernio REST API, posts the algorithmic first comment, and appends the post ID and slot time to `content/social/instagram-post-history.json`. Never invoke Zernio MCP tools manually).*

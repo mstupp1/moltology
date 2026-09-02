@@ -3,13 +3,13 @@ name: instagram-post-creator
 description: >-
   Automated end-to-end pipeline for generating Web-Native High-DPI composite scaffolding, prompting the user
   with Google Flow AI visual enhancement directives, ingesting user-polished assets to Neon S3, and scheduling
-  high-conversion Instagram posts and marketing lead magnets for Moltology via Zernio MCP.
+  high-conversion Instagram posts and marketing lead magnets for Moltology via deterministic Zernio REST API queueing.
   Use whenever the user asks to create, draft, illustrate, or queue an Instagram post, lead magnet, or social graphic.
 ---
 
-# Instagram Post Creator Pipeline (Web Composite ➔ Google Flow ➔ Zernio)
+# Instagram Post Creator Pipeline (Web Composite ➔ Google Flow ➔ Zernio API Queue)
 
-This skill automates the complete lifecycle of Moltology static Instagram posts (4:5 Portrait `1080x1350` / 1:1 Square `1080x1080`) and **high-converting direct-response lead magnets** using the **Web-Native High-DPI Composite Studio**, structured **Google Flow AI visual polish prompt handoff**, Neon S3 storage, and staging into the **Zernio queue**.
+This skill automates the complete lifecycle of Moltology static Instagram posts (4:5 Portrait `1080x1350` / 1:1 Square `1080x1080`) and **high-converting direct-response lead magnets** using the **Web-Native High-DPI Composite Studio**, structured **Google Flow AI visual polish prompt handoff**, Neon S3 storage, and deterministic staging into the **Zernio queue via REST API**.
 
 ---
 
@@ -32,7 +32,7 @@ Transparent WebP/PNG character cutouts reside in the Neon S3 public assets bucke
   - **Stage 1 (Scaffolding)**: Web-Native High-DPI Composite Studio via Headless Chrome 2x Retina rendering (`scripts/lib/composite-renderer.ts`)
   - **Stage 2 (Visual Polish Pass)**: User-facing AI (**Google Flow**) using rich, structured prompt directives
 * **Asset Storage**: Neon S3 (`images/social/posts/post-<timestamp>.png`)
-* **Publishing Engine**: Zernio MCP (`posts_create`, `posts_publish_now`, `comments_reply_to_inbox_post`, `queue_preview_queue`)
+* **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Built directly into the CLI script (`npm run post:create`). **Never rely on MCP tools (`posts_create`, etc.) to schedule or queue.**
 * **Queue Configuration**:
   - Profile ID: `6a7f74b1839bf39ff3b6aaaa` (Default Profile)
   - Carousels & Editorial Queue ID: `6a84b76d2421e968ac81f5bc` (**Moltology Carousels & Posts** — Mon, Wed, Fri at 13:00 EST / `America/New_York`)
@@ -93,22 +93,15 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
                                │
                                ▼ (User Drops Asset Back)
 ┌──────────────────────────────────────────────────────────────┐
-│  STAGE 3: S3 Ingestion & Zernio Publish / Queue Staging      │
+│  STAGE 3: Deterministic S3 Ingest, Zernio Queue & 1st Comment│
 │  - Resize image to exact 4:5 (1080×1350) if needed          │
-│  - Agent uploads polished image to Neon S3                   │
-│  - Lead magnet themes → Daily Queue (6a8d93576f0e96efe2960c91)│
-│  - Editorial/carousel themes → MWF Queue (6a84b76d2421e968ac81f5bc)│
-│  - Appends record to narrative continuity ledger             │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                               ▼ (Mandatory — Always)
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 4: First Comment (Algorithmic Seed)                   │
-│  - Agent calls comments_reply_to_inbox_post via Zernio MCP  │
-│  - Posts postData.firstComment immediately after publish     │
-│  - Account ID: 6a7f7f0777555aae01d99b54                     │
-│  - This step is NEVER skipped — even for scheduled posts     │
-│    (for scheduled posts, note it in the ledger for follow-up)│
+│  - CLI uploads polished image to Neon S3                     │
+│  - CLI deterministically queues post via Zernio REST API:    │
+│    * Lead magnet themes → Daily Queue (6a8d93576f0e96efe2960c91)
+│    * Editorial themes → MWF Queue (6a84b76d2421e968ac81f5bc) │
+│  - CLI automatically posts algorithmic First Comment         │
+│  - Appends real Zernio post ID & slot to continuity ledger   │
+│  - NO MANUAL MCP CALLS REQUIRED                              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -137,22 +130,23 @@ When executing this pipeline as an agent, **always present the user with a struc
    - **3D Product Mockup**: Central asset on illuminated circular pedestal with ground caustics.
 3. The resumption command or drop-in path.
 
-### Step 4: Resume S3 Upload & Zernio Queue Staging
+### Step 4: Resume S3 Upload & Deterministic Zernio Queueing (All-In-One)
 Once the user saves the polished image (e.g. `tmp/post_polished.png`):
 1. Check image dimensions — if not exactly `1080×1350` (4:5), crop/resize with `sips` before uploading.
-2. Run ingestion: `npm run post:create -- --theme <theme> --polished-image tmp/post_polished.png`
-3. This uploads to Neon S3 (`images/social/posts/post-<timestamp>.png`) and updates the ledger.
-4. Call `posts_create` or `posts_publish_now` via Zernio MCP:
-   - **Lead magnet archetypes** (guide, quiz, app, codex, routine) → use queue ID `6a8d93576f0e96efe2960c91` (Daily, any day 13:00 EST)
-   - **Editorial / carousel posts** → use queue ID `6a84b76d2421e968ac81f5bc` (Mon, Wed, Fri 13:00 EST)
+2. Run the deterministic ingestion CLI:
+   ```bash
+   npm run post:create -- --theme <theme> --polished-image tmp/post_polished.png
+   ```
+3. **What happens deterministically under the hood:**
+   - Uploads to Neon S3 (`images/social/posts/post-<timestamp>.png`).
+   - Automatically calls Zernio REST API (`POST /v1/posts`) with `queuedFromProfile: 6a7f74b1839bf39ff3b6aaaa` and the designated queue ID:
+     * **Lead magnet archetypes** (guide, quiz, app, codex, routine) → Daily Queue `6a8d93576f0e96efe2960c91` (Daily 13:00 EST)
+     * **Editorial posts** → MWF Queue `6a84b76d2421e968ac81f5bc` (Mon, Wed, Fri 13:00 EST)
+   - Automatically seeds the algorithmic first comment via Zernio Inbox API (`POST /v1/inbox/comments/{postId}`) with `postData.firstComment`.
+   - Records the confirmed `zernioPostId`, `scheduledFor` slot, and metadata into `content/social/instagram-post-history.json`.
 
-### Step 5: Post First Comment (MANDATORY — Never Skip)
-Immediately after the post is published or queued, call `comments_reply_to_inbox_post`:
-- `post_id`: the Zernio post ID returned by `posts_create` / `posts_publish_now`
-- `account_id`: `6a7f7f0777555aae01d99b54`
-- `message`: `postData.firstComment` (the pre-written algorithmic seed comment)
-
-This seeds the comment section for algorithmic engagement and comment-to-DM automation. **Always execute this step — do not wait for user instruction.**
+> [!IMPORTANT]
+> **Strict Operational Rule**: Do NOT call Zernio MCP tools (`posts_create`, `posts_publish_now`, `comments_reply_to_inbox_post`, etc.) manually. The CLI script deterministically handles queueing and comment posting using direct API requests.
 
 ---
 
