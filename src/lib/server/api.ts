@@ -455,6 +455,8 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
 const lobsterAvatarConfigSchema = z.object({
   style: z.string().min(1).max(64),
   seed: z.string().min(1).max(128),
+  height: z.union([z.enum(['short', 'regular', 'tall', 'towering']), z.number().min(0.75).max(1.4)]).optional(),
+  armScale: z.number().min(0.7).max(1.4).optional(),
   backgroundTheme: z.string().max(64).optional(),
   backgroundPattern: z.string().max(64).optional(),
   backgroundTexture: z.string().max(64).optional(),
@@ -462,6 +464,9 @@ const lobsterAvatarConfigSchema = z.object({
   patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
   patternPulse: z.enum(['pulse', 'steady']).optional(),
   patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
+  eyelidStyle: z.string().max(64).optional(),
+  backgroundMotion: z.string().max(64).optional(),
+  transparentBackground: z.boolean().optional(),
   token: z.string().optional(),
   userId: z.string().optional(),
 })

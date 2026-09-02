@@ -52,6 +52,8 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
 }) => {
   const resolvedSeed = animationSeed ?? config?.seed
   const configSeed = config?.seed
+  const configHeight = config?.height
+  const configArmScale = config?.armScale
   const configTheme = config?.backgroundTheme
   const configPattern = config?.backgroundPattern
   const configTexture = config?.backgroundTexture
@@ -59,6 +61,8 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   const configGlow = config?.patternGlow
   const configPulse = config?.patternPulse
   const configSparkles = config?.patternSparkles
+  const configEyelidStyle = config?.eyelidStyle
+  const configMotion = config?.backgroundMotion
   const configTransparent = config?.transparentBackground
 
   const dataUri = useMemo(() => {
@@ -68,6 +72,8 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
       {
         style: LOBSTER_AVATAR_STYLE,
         seed: configSeed,
+        ...(configHeight ? { height: configHeight } : {}),
+        ...(configArmScale ? { armScale: configArmScale } : {}),
         ...(configTheme ? { backgroundTheme: configTheme } : {}),
         ...(configPattern ? { backgroundPattern: configPattern } : {}),
         ...(configTexture ? { backgroundTexture: configTexture } : {}),
@@ -75,11 +81,13 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
         ...(configGlow ? { patternGlow: configGlow } : {}),
         ...(configPulse ? { patternPulse: configPulse } : {}),
         ...(configSparkles ? { patternSparkles: configSparkles } : {}),
+        ...(configEyelidStyle ? { eyelidStyle: configEyelidStyle } : {}),
+        ...(configMotion ? { backgroundMotion: configMotion } : {}),
         ...(configTransparent ? { transparentBackground: configTransparent } : {}),
       },
       size
     )
-  }, [src, configSeed, configTheme, configPattern, configTexture, configDensity, configGlow, configPulse, configSparkles, configTransparent, size])
+  }, [src, configSeed, configHeight, configArmScale, configTheme, configPattern, configTexture, configDensity, configGlow, configPulse, configSparkles, configEyelidStyle, configMotion, configTransparent, size])
 
   const portraitClassName = useMemo(
     () =>

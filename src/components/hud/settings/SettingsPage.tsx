@@ -17,10 +17,14 @@ import { DesignationField } from '../DesignationField'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import {
   LOBSTER_AVATAR_STYLE,
+  LOBSTER_HEIGHTS,
+  LOBSTER_HEIGHT_LABELS,
   clearCachedProfileAvatarUrl,
+  getLobsterAvatarSeededOptions,
   parseLobsterAvatarConfig,
   randomLobsterSeed,
   type LobsterAvatarConfig,
+  type LobsterHeight,
 } from '@/lib/lobster-avatar'
 import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 
@@ -33,6 +37,7 @@ export const SettingsPage: React.FC = () => {
 
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [draftSeed, setDraftSeed] = useState('')
+  const [draftHeight, setDraftHeight] = useState<LobsterHeight>('regular')
   const [designation, setDesignation] = useState('')
   const [savedDesignation, setSavedDesignation] = useState('')
   const [loading, setLoading] = useState(true)
@@ -41,8 +46,9 @@ export const SettingsPage: React.FC = () => {
     return {
       style: LOBSTER_AVATAR_STYLE,
       seed: draftSeed,
+      height: draftHeight,
     }
-  }, [draftSeed])
+  }, [draftSeed, draftHeight])
 
   const loadProfile = useCallback(async () => {
     if (!userId) return
@@ -59,7 +65,13 @@ export const SettingsPage: React.FC = () => {
       setDesignation(nextHandle)
       setSavedDesignation(nextHandle)
       const parsed = parseLobsterAvatarConfig(profile?.avatarConfig)
-      setDraftSeed(parsed?.seed ?? randomLobsterSeed())
+      const nextSeed = parsed?.seed ?? randomLobsterSeed()
+      setDraftSeed(nextSeed)
+      if (parsed?.height && typeof parsed.height === 'string' && (LOBSTER_HEIGHTS as readonly string[]).includes(parsed.height)) {
+        setDraftHeight(parsed.height as LobsterHeight)
+      } else {
+        setDraftHeight('regular')
+      }
     } catch {
       toast.error('Could not load settings.')
     } finally {
@@ -94,7 +106,10 @@ export const SettingsPage: React.FC = () => {
   }
 
   const handleRandomize = () => {
-    setDraftSeed(randomLobsterSeed())
+    const nextSeed = randomLobsterSeed()
+    setDraftSeed(nextSeed)
+    const seeded = getLobsterAvatarSeededOptions(nextSeed)
+    setDraftHeight(seeded.height)
   }
 
   const handleSaveAvatar = async () => {
@@ -102,6 +117,7 @@ export const SettingsPage: React.FC = () => {
     const config: LobsterAvatarConfig = {
       style: LOBSTER_AVATAR_STYLE,
       seed: draftSeed.trim(),
+      height: draftHeight,
     }
     try {
       await persist.run('settings-avatar', async () => {
@@ -194,6 +210,33 @@ export const SettingsPage: React.FC = () => {
                 interactive
                 alt="Avatar preview"
               />
+
+              {/* Height dimension segmented control */}
+              <div className="w-full max-w-xs space-y-1.5 pt-1">
+                <div className="flex items-center justify-between text-[11px] font-grotesk tracking-wider uppercase">
+                  <span className="text-[#839493]">Chassis Height</span>
+                  <span className="text-[#00c3ff] font-bold">{LOBSTER_HEIGHT_LABELS[draftHeight]}</span>
+                </div>
+                <div className="grid grid-cols-4 gap-1 p-1 bg-[#020810]/60 border border-[#3a4a49]/40 rounded-sm">
+                  {LOBSTER_HEIGHTS.map((h) => {
+                    const active = draftHeight === h
+                    return (
+                      <button
+                        key={h}
+                        type="button"
+                        onClick={() => setDraftHeight(h)}
+                        className={`py-1 text-[10px] font-grotesk font-bold uppercase tracking-wider rounded-xs transition-colors ${
+                          active
+                            ? 'bg-[#00c3ff]/25 text-[#00c3ff] border border-[#00c3ff]/60 shadow-[0_0_10px_rgba(0,195,255,0.25)]'
+                            : 'text-[#839493] hover:text-[#dfe3e3] hover:bg-white/[0.04] border border-transparent'
+                        }`}
+                      >
+                        {h}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
 
               <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                 <button

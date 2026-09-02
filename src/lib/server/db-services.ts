@@ -2075,6 +2075,8 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
 const lobsterAvatarConfigSchema = z.object({
   style: z.string().min(1).max(64),
   seed: z.string().min(1).max(128),
+  height: z.union([z.enum(['short', 'regular', 'tall', 'towering']), z.number().min(0.75).max(1.4)]).optional(),
+  armScale: z.number().min(0.7).max(1.4).optional(),
   backgroundTheme: z.string().max(64).optional(),
   backgroundPattern: z.string().max(64).optional(),
   backgroundTexture: z.string().max(64).optional(),
@@ -2082,6 +2084,9 @@ const lobsterAvatarConfigSchema = z.object({
   patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
   patternPulse: z.enum(['pulse', 'steady']).optional(),
   patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
+  eyelidStyle: z.string().max(64).optional(),
+  backgroundMotion: z.string().max(64).optional(),
+  transparentBackground: z.boolean().optional(),
   token: z.string().optional(),
   userId: z.string().optional(),
 })
@@ -2105,6 +2110,8 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
   const avatarConfig: {
     style: string
     seed: string
+    height?: 'short' | 'regular' | 'tall' | 'towering' | number
+    armScale?: number
     backgroundTheme?: string
     backgroundPattern?: string
     backgroundTexture?: string
@@ -2112,11 +2119,20 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     patternGlow?: 'subtle' | 'chromatic' | 'none'
     patternPulse?: 'pulse' | 'steady'
     patternSparkles?: 'subtle' | 'radiant' | 'none'
+    eyelidStyle?: string
+    backgroundMotion?: string
+    transparentBackground?: boolean
   } = {
     style: LOBSTER_AVATAR_STYLE,
     seed: validated.seed.trim(),
   }
 
+  if (validated.height !== undefined) {
+    avatarConfig.height = validated.height
+  }
+  if (typeof validated.armScale === 'number') {
+    avatarConfig.armScale = validated.armScale
+  }
   if (validated.backgroundTheme?.trim()) {
     avatarConfig.backgroundTheme = validated.backgroundTheme.trim()
   }
@@ -2137,6 +2153,15 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
   }
   if (validated.patternSparkles) {
     avatarConfig.patternSparkles = validated.patternSparkles
+  }
+  if (validated.eyelidStyle?.trim()) {
+    avatarConfig.eyelidStyle = validated.eyelidStyle.trim()
+  }
+  if (validated.backgroundMotion?.trim()) {
+    avatarConfig.backgroundMotion = validated.backgroundMotion.trim()
+  }
+  if (typeof validated.transparentBackground === 'boolean') {
+    avatarConfig.transparentBackground = validated.transparentBackground
   }
 
   const [updated] = await dbClient

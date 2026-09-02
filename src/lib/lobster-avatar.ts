@@ -63,6 +63,137 @@ export function getDensityScale(density?: PatternDensity): number {
   return (density && PATTERN_DENSITY_SCALES[density]) ?? 1.0
 }
 
+export type LobsterHeight = 'short' | 'regular' | 'tall' | 'towering'
+
+export const LOBSTER_HEIGHTS: readonly LobsterHeight[] = ['short', 'regular', 'tall', 'towering'] as const
+
+export const LOBSTER_HEIGHT_MAP: Readonly<Record<string, LobsterHeight>> = {
+  short: 'short',
+  compact: 'short',
+  regular: 'regular',
+  medium: 'regular',
+  standard: 'regular',
+  tall: 'tall',
+  towering: 'towering',
+  giant: 'towering',
+  colossal: 'towering',
+}
+
+export const LOBSTER_HEIGHT_LABELS: Readonly<Record<LobsterHeight, string>> = {
+  short: 'Compact (Shorter)',
+  regular: 'Standard (Baseline)',
+  tall: 'Elongated (Tall)',
+  towering: 'Towering (Colossal)',
+}
+
+export const LOBSTER_HEIGHT_SCALES: Readonly<Record<LobsterHeight, number>> = {
+  short: 0.88,
+  regular: 1.0,
+  tall: 1.14,
+  towering: 1.25,
+}
+
+export function resolveHeightScale(height?: LobsterHeight | string | number): number {
+  if (typeof height === 'number' && Number.isFinite(height)) {
+    const normalized = height > 2 ? height / 100 : height
+    return Math.min(1.4, Math.max(0.75, normalized))
+  }
+  if (typeof height === 'string') {
+    const mapped = LOBSTER_HEIGHT_MAP[height.toLowerCase().trim()]
+    if (mapped) return LOBSTER_HEIGHT_SCALES[mapped]
+  }
+  return 1.0
+}
+
+export interface LobsterTorsoMetrics {
+  torsoDelta: number
+  headYOffset: number
+  frameShift: number
+  armScale: number
+  s1_top: number
+  s1_bot: number
+  s2_top: number
+  s2_bot: number
+  s3_top: number
+  s3_bot: number
+  s4_top: number
+  s4_bot: number
+  s5_top: number
+  s5_bot: number
+  keelTop: number
+  keelBot: number
+  flankY1: number
+  flankY2: number
+}
+
+/**
+ * Computes parametric torso somite coordinates and position compensation offsets
+ * for all attached anatomical layers based on character height.
+ */
+export function getLobsterTorsoMetrics(height?: LobsterHeight | string | number): LobsterTorsoMetrics {
+  const scale = resolveHeightScale(height)
+  // Baseline torso somites span 49 units (from s1_top=102 to s5_bot=151).
+  // torsoDelta represents the delta length added to the torso.
+  // When scale = 1.0 -> torsoDelta = 0.
+  // When scale = 0.88 ('short') -> torsoDelta = -6.
+  // When scale = 1.14 ('tall') -> torsoDelta = +6.
+  // When scale = 1.25 ('towering') -> torsoDelta = +12.
+  const torsoDelta = Math.min(14, Math.max(-8, Math.round((scale - 1.0) * 48)))
+
+  // Arm scale compensation: arms lengthen on tall/towering to match elongated torso,
+  // and shorten on compact/short to keep claws comfortably above ground/knees.
+  const armScale = scale === 1.0 ? 1.0 : Number((1.0 + (scale - 1.0) * 0.85).toFixed(2))
+
+  // Pelvis anchor line is at Y = 151
+  const pelvisBot = 151
+  // Baseline somite stepping was 9 units across 4 intervals (36 units)
+  const step = (36 + torsoDelta) / 4
+  const plateHeight = Math.round(step + 4)
+
+  const s5_bot = pelvisBot
+  const s5_top = s5_bot - plateHeight
+
+  const s4_bot = Math.round(s5_bot - step)
+  const s4_top = s4_bot - plateHeight
+
+  const s3_bot = Math.round(s5_bot - 2 * step)
+  const s3_top = s3_bot - plateHeight
+
+  const s2_bot = Math.round(s5_bot - 3 * step)
+  const s2_top = s2_bot - plateHeight
+
+  const s1_bot = Math.round(s5_bot - 4 * step)
+  const s1_top = s1_bot - plateHeight
+
+  // Upward translation needed for the upper body (carapace, arms, claws, brow, antennae)
+  // Baseline s1_top was 102. When s1_top is 90, headYOffset is -12 (moves up by 12).
+  const headYOffset = s1_top - 102
+
+  // Frame compensation to keep full character gracefully framed within the 230x230 viewBox
+  const frameShift = Math.round(Math.max(0, torsoDelta - 4) * 0.4)
+
+  return {
+    torsoDelta,
+    headYOffset,
+    frameShift,
+    armScale,
+    s1_top,
+    s1_bot,
+    s2_top,
+    s2_bot,
+    s3_top,
+    s3_bot,
+    s4_top,
+    s4_bot,
+    s5_top,
+    s5_bot,
+    keelTop: s1_top + 2,
+    keelBot: s5_top + 10,
+    flankY1: s1_top,
+    flankY2: s2_bot,
+  }
+}
+
 export function getPatternGlowFilterDef(glow: PatternGlow, theme: BackgroundTheme): string {
   if (glow === 'none') return ''
   const filterId = `pat-glow-${glow}-${theme.id}`
@@ -157,6 +288,8 @@ export interface BackgroundTexture {
 export interface LobsterAvatarConfig {
   style: typeof LOBSTER_AVATAR_STYLE
   seed: string
+  height?: LobsterHeight | number
+  armScale?: number
   backgroundTheme?: string
   backgroundPattern?: string
   backgroundTexture?: string
@@ -183,6 +316,17 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (!seed || seed.length > 128) return null
 
   const config: LobsterAvatarConfig = { style: LOBSTER_AVATAR_STYLE, seed }
+  if (typeof obj.height === 'string') {
+    const norm = obj.height.toLowerCase().trim()
+    if (norm in LOBSTER_HEIGHT_MAP) {
+      config.height = LOBSTER_HEIGHT_MAP[norm]
+    }
+  } else if (typeof obj.height === 'number' && Number.isFinite(obj.height)) {
+    config.height = obj.height
+  }
+  if (typeof obj.armScale === 'number' && Number.isFinite(obj.armScale)) {
+    config.armScale = Math.min(1.4, Math.max(0.7, Number(obj.armScale.toFixed(2))))
+  }
   if (typeof obj.backgroundTheme === 'string' && obj.backgroundTheme.trim()) {
     config.backgroundTheme = obj.backgroundTheme.trim()
   }
@@ -909,6 +1053,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   pulse: PatternPulse
   sparkles: PatternSparkles
   eyelidStyle: EyelidStyle
+  height: LobsterHeight
   motion: BackgroundMotionConfig
   clawPose: ClawPose
   antennaStyle: AntennaStyle
@@ -924,6 +1069,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   let hash8 = 0
   let hash9 = 0
   let hash10 = 0
+  let hash11 = 0
   for (let i = 0; i < seed.length; i++) {
     const ch = seed.charCodeAt(i)
     hash1 = (((hash1 << 5) - hash1) + ch) | 0
@@ -936,6 +1082,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     hash8 = (((hash8 << 8) - hash8) + ch * 71 + 47) | 0
     hash9 = (((hash9 << 5) + hash9) + ch * 79 + 53) | 0
     hash10 = (((hash10 << 6) - hash10) + ch * 83 + 59) | 0
+    hash11 = (((hash11 << 7) - hash11) + ch * 89 + 67) | 0
   }
 
   const poseIndex = Math.abs(hash1) % LOBSTER_CLAW_POSES.length
@@ -971,6 +1118,9 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   const eyelidStyleIndex = Math.abs(hash7 ^ hash8) % LOBSTER_EYELID_STYLES.length
   const eyelidStyle = LOBSTER_EYELID_STYLES[eyelidStyleIndex]
 
+  const heightIndex = Math.abs(hash11) % LOBSTER_HEIGHTS.length
+  const height = LOBSTER_HEIGHTS[heightIndex]
+
   // Active looping motion modes for the 7 curated patterns (always moving)
   const patternMotionModes: Record<string, BackgroundMotionMode[]> = {
     isometric_cubes: ['drift_diagonal', 'drift_horizontal'],
@@ -997,7 +1147,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     direction,
   }
 
-  return { theme, pattern, texture, density, glow, pulse, sparkles, eyelidStyle, motion, clawPose, antennaStyle, tailPose }
+  return { theme, pattern, texture, density, glow, pulse, sparkles, eyelidStyle, height, motion, clawPose, antennaStyle, tailPose }
 }
 
 export const LOBSTER_CRUSTACEAN_OPTIONS = {
@@ -1038,6 +1188,49 @@ export const LOBSTER_CRUSTACEAN_OPTIONS = {
 
   // 🦞 7. Warm, expressive smiles
   mouthVariant: ['smile', 'tinySmile', 'grin', 'laugh', 'teeth', 'open'] as const,
+}
+
+export interface ChitinGradientPalette {
+  /** Upper / outer highlight tone (adjacent warm/luminous hue) */
+  highlight: string
+  /** Mid-body primary tone */
+  primary: string
+  /** Lower / inner shadow tone (adjacent deep benthic hue) */
+  anchor: string
+}
+
+/**
+ * Curated adjacent-color (analogous) palettes for each canonical chitin tone.
+ * Creates an organic, volumetric 3D studio sheen without flat plastic coloring.
+ */
+export const LOBSTER_CHITIN_GRADIENT_PALETTES: Readonly<Record<string, ChitinGradientPalette>> = {
+  // 1. Coral Red / Lobster Tangerine -> Molten Amber Gold highlight & Sub-Benthic Carmine shadow
+  '#c2410c': { highlight: '#f59e0b', primary: '#c2410c', anchor: '#991b1b' },
+  // 2. Crimson Shell -> Solar Rose highlight & Deep Velvet Amethyst shadow
+  '#be123c': { highlight: '#fb7185', primary: '#be123c', anchor: '#881337' },
+  // 3. Terracotta Red -> Warm Apricot highlight & Burnished Iron Rust shadow
+  '#ea580c': { highlight: '#fb923c', primary: '#ea580c', anchor: '#9a3412' },
+  // 4. Vibrant Scarlet Red -> Fiery Magma Orange highlight & Deep Trench Crimson shadow
+  '#dc2626': { highlight: '#f97316', primary: '#dc2626', anchor: '#991b1b' },
+  // 5. Deep Crimson -> Radiant Ruby Flame highlight & Abyssal Maroon shadow
+  '#b91c1c': { highlight: '#ef4444', primary: '#b91c1c', anchor: '#7f1d1d' },
+  // 6. Sub-Benthic Dark Red -> Smoldering Carmine highlight & Hadal Trench Wine shadow
+  '#991b1b': { highlight: '#dc2626', primary: '#991b1b', anchor: '#450a0a' },
+  // 7. Ruby Rose -> Solar Peach highlight & Royal Benthic Magenta shadow
+  '#e11d48': { highlight: '#fb7185', primary: '#e11d48', anchor: '#9f1239' },
+  // 8. Sunset Orange-Red -> Sunlit Amber Gold highlight & Deep Terracotta shadow
+  '#f97316': { highlight: '#fbbf24', primary: '#f97316', anchor: '#ea580c' },
+}
+
+export function getChitinGradientPalette(primaryColor: string): ChitinGradientPalette {
+  const norm = primaryColor.toLowerCase()
+  return (
+    LOBSTER_CHITIN_GRADIENT_PALETTES[norm] ?? {
+      highlight: '#f59e0b',
+      primary: primaryColor,
+      anchor: '#991b1b',
+    }
+  )
 }
 
 interface ClawPose {
@@ -1117,7 +1310,7 @@ function renderClawElement(
     </g>`
 }
 
-function wrapDiceBearUsesInCarapaceLayer(svg: string): string {
+function wrapDiceBearUsesInCarapaceLayer(svg: string, headYOffset = 0): string {
   const bodyPeakIndex = svg.search(/<use[^>]+#body-/)
   const startIndex = bodyPeakIndex !== -1 ? bodyPeakIndex : svg.indexOf('<use')
   if (startIndex === -1) return svg
@@ -1145,7 +1338,11 @@ function wrapDiceBearUsesInCarapaceLayer(svg: string): string {
     /(<use[^>]*(?:xlink:)?href="#eyes-[^"]+"[^>]*\/>)/,
     '<g id="lobster-eyes-layer">$1</g>'
   )
-  const wrapped = `<g id="lobster-carapace-layer" class="lobster-idle-layer lobster-idle-carapace">${eyesWrappedBlock}</g>`
+  const innerCarapace = `<g id="lobster-carapace-layer" class="lobster-idle-layer lobster-idle-carapace">${eyesWrappedBlock}</g>`
+  const wrapped =
+    headYOffset !== 0
+      ? `<g id="lobster-carapace-offset" transform="translate(0, ${headYOffset})">${innerCarapace}</g>`
+      : innerCarapace
   return svg.slice(0, blockStart) + wrapped + svg.slice(blockEnd)
 }
 
@@ -1327,8 +1524,10 @@ function renderEyelidElement(
 function splitEyesForPupilTracking(
   svg: string,
   chitinColor = '#c2410c',
-  eyelidStyle: EyelidStyle = 'relaxed'
+  eyelidStyle: EyelidStyle = 'relaxed',
+  chitinFill?: string
 ): string {
+  const fillToUse = chitinFill || chitinColor
   const eyesLayerMatch = svg.match(
     /<g id="lobster-eyes-layer">\s*(<use\b[^>]*(?:xlink:)?href="#(eyes-[^"]+)"[^>]*\/>)\s*<\/g>/
   )
@@ -1382,9 +1581,9 @@ function splitEyesForPupilTracking(
     // Render sculpted cartoon eyelid hood for eyes with open white sclera
     if (hasSclera) {
       if (eyeIndex === 0) {
-        eyelidGroups.push(renderEyelidElement('left', eyelidStyle, chitinColor))
+        eyelidGroups.push(renderEyelidElement('left', eyelidStyle, fillToUse))
       } else if (eyeIndex === 1) {
-        eyelidGroups.push(renderEyelidElement('right', eyelidStyle, chitinColor))
+        eyelidGroups.push(renderEyelidElement('right', eyelidStyle, fillToUse))
       }
     }
 
@@ -1650,6 +1849,10 @@ function injectLobsterChitinLayers(
   // Extract generated chitin shell fill color from SVG or fallback to canonical coral red
   const colorMatch = rawSvg.match(/fill="(#(?:c2410c|be123c|ea580c|dc2626|b91c1c|991b1b|e11d48|f97316))"/i)
   const chitinColor = colorMatch ? colorMatch[1] : '#c2410c'
+  const chitinPalette = getChitinGradientPalette(chitinColor)
+  const safeSeed = seed.replace(/[^a-zA-Z0-9_-]/g, '') || 'default'
+  const chitinGradId = `lobster-chitin-grad-${safeSeed}`
+  const chitinFill = `url(#${chitinGradId})`
 
   // Extract generated carapace body shape to align abdomen width precisely with chest
   const bodyMatch = rawSvg.match(/id="body-([a-zA-Z0-9]+)-/i)
@@ -1657,6 +1860,34 @@ function injectLobsterChitinLayers(
   const cw = CARAPACE_BOTTOM_HALF_WIDTHS[bodyVariant] ?? 34
 
   const seeded = getLobsterAvatarSeededOptions(seed)
+  const height = config.height ?? 'regular'
+  const metrics = getLobsterTorsoMetrics(height)
+  const {
+    torsoDelta,
+    headYOffset,
+    frameShift,
+    armScale: defaultArmScale,
+    s1_top,
+    s1_bot,
+    s2_top,
+    s2_bot,
+    s3_top,
+    s3_bot,
+    s4_top,
+    s4_bot,
+    s5_top,
+    s5_bot,
+    keelTop,
+    keelBot,
+    flankY1,
+    flankY2,
+  } = metrics
+
+  const armScale =
+    typeof config.armScale === 'number' && Number.isFinite(config.armScale)
+      ? Math.min(1.4, Math.max(0.7, Number(config.armScale.toFixed(2))))
+      : defaultArmScale
+
   const pose = seeded.clawPose
   const antennaStyle = seeded.antennaStyle
   const tailPose = seeded.tailPose
@@ -1679,8 +1910,8 @@ function injectLobsterChitinLayers(
   const leftEyebrow = 'M 31 35 Q 37 31 43 35'
   const rightEyebrow = 'M 57 35 Q 63 31 69 35'
 
-  // Render modular antenna variant
-  const antennaeLayer = antennaStyle.render(chitinColor)
+  // Render modular antenna variant with crisp primary chitin tone
+  const antennaeLayer = antennaStyle.render(chitinPalette.primary)
 
   const tailFlip = tailPose === 'left' ? 'transform="translate(100, 0) scale(-1, 1)"' : ''
   const tailShadowX = tailPose === 'right' ? 108 : tailPose === 'left' ? -8 : 50
@@ -1699,8 +1930,16 @@ function injectLobsterChitinLayers(
   const x2 = Math.round(50 + Math.cos(rad) * 50)
   const y2 = Math.round(50 + Math.sin(rad) * 50)
 
+  const chitinGradientDef = `
+      <linearGradient id="${chitinGradId}" x1="25%" y1="0%" x2="75%" y2="100%">
+        <stop offset="0%" stop-color="${chitinPalette.highlight}" />
+        <stop offset="42%" stop-color="${chitinPalette.primary}" />
+        <stop offset="100%" stop-color="${chitinPalette.anchor}" />
+      </linearGradient>`
+
   const defsLayer = `
     <defs>
+      ${chitinGradientDef}
       <linearGradient id="${bgGradId}" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
         <stop offset="0%" stop-color="${theme.topColor}" />
         <stop offset="45%" stop-color="${theme.primaryColor}" />
@@ -1728,6 +1967,12 @@ function injectLobsterChitinLayers(
       </g>`
       : ''
 
+  const sparklesMarkup = renderLobsterSparkles(theme, sparkles, seed)
+  const renderedSparkles =
+    headYOffset !== 0
+      ? `<g id="lobster-sparkles-offset" transform="translate(0, ${headYOffset})">${sparklesMarkup}</g>`
+      : sparklesMarkup
+
   const backgroundLayer = `
     <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${motion.mode}">
       <!-- Base 2-Color Angular Gradient -->
@@ -1740,11 +1985,11 @@ function injectLobsterChitinLayers(
       <!-- Seeded Animated Vector Background Pattern -->
       ${pattern.render(theme, pattern.id, motion, density, glow, pulse)}
       <!-- Seeded Bioluminescent Background Sparkles -->
-      ${renderLobsterSparkles(theme, sparkles, seed)}
+      ${renderedSparkles}
     </g>`
 
   // Ground Contact Shadow Layer (Distinct pools for feet and ground-resting tail planted at y=187)
-  const groundShadowLayer = `
+  const rawGroundShadow = `
     <g id="lobster-ground-shadow">
       <!-- Center body ground shadow -->
       <ellipse cx="50" cy="187" rx="34" ry="4.5" fill="#020810" opacity="0.32" />
@@ -1755,8 +2000,13 @@ function injectLobsterChitinLayers(
       <ellipse cx="${tailShadowX}" cy="${tailPose === 'center' ? 192 : 186}" rx="${tailPose === 'center' ? 36 : 22}" ry="${tailPose === 'center' ? 6 : 5.5}" fill="#020810" opacity="0.45" />
     </g>`
 
+  const groundShadowLayer =
+    frameShift !== 0
+      ? `<g id="lobster-ground-shadow-offset" transform="translate(0, ${frameShift})">${rawGroundShadow}</g>`
+      : rawGroundShadow
+
   // Massive, Articulated Conical Tail & 5-Blade Fan (Straight Down or Side-Sweeping, lowered toward ground)
-  const tailFanLayer =
+  const rawTailFanLayer =
     tailPose === 'center'
       ? `
     <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="center">
@@ -1767,52 +2017,52 @@ function injectLobsterChitinLayers(
 
       <!-- 4 Conical Symmetrical Somites Descending Vertically Behind Legs -->
       <!-- Somite T4 (Distal segment of cone) -->
-      <path d="M 39 166 C 39 176 43 182 50 182 C 57 182 61 176 61 166 Z" fill="${chitinColor}" />
+      <path d="M 39 166 C 39 176 43 182 50 182 C 57 182 61 176 61 166 Z" fill="${chitinFill}" />
       <path d="M 41 170 Q 50 176 59 170" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
 
       <!-- Somite T3 -->
-      <path d="M 35 155 C 35 166 40 172 50 172 C 60 172 65 166 65 155 Z" fill="${chitinColor}" />
+      <path d="M 35 155 C 35 166 40 172 50 172 C 60 172 65 166 65 155 Z" fill="${chitinFill}" />
       <path d="M 38 159 Q 50 166 62 159" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
       <!-- Lateral Spines -->
-      <path d="M 35 162 L 27 159 L 34 168 Z" fill="${chitinColor}" />
-      <path d="M 65 162 L 73 159 L 66 168 Z" fill="${chitinColor}" />
+      <path d="M 35 162 L 27 159 L 34 168 Z" fill="${chitinFill}" />
+      <path d="M 65 162 L 73 159 L 66 168 Z" fill="${chitinFill}" />
 
       <!-- Somite T2 -->
-      <path d="M 31 144 C 31 156 36 162 50 162 C 64 162 69 156 69 144 Z" fill="${chitinColor}" />
+      <path d="M 31 144 C 31 156 36 162 50 162 C 64 162 69 156 69 144 Z" fill="${chitinFill}" />
       <path d="M 34 148 Q 50 156 66 148" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
       <!-- Lateral Spines -->
-      <path d="M 31 151 L 22 148 L 29 157 Z" fill="${chitinColor}" />
-      <path d="M 69 151 L 78 148 L 71 157 Z" fill="${chitinColor}" />
+      <path d="M 31 151 L 22 148 L 29 157 Z" fill="${chitinFill}" />
+      <path d="M 69 151 L 78 148 L 71 157 Z" fill="${chitinFill}" />
 
       <!-- Somite T1 (Fattest Conical Base emerging from Pelvis) -->
-      <path d="M 26 134 C 26 146 32 152 50 152 C 68 152 74 146 74 134 Z" fill="${chitinColor}" />
+      <path d="M 26 134 C 26 146 32 152 50 152 C 68 152 74 146 74 134 Z" fill="${chitinFill}" />
       <path d="M 30 138 Q 50 146 70 138" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
 
       <!-- Joint Collar Node -->
-      <ellipse cx="50" cy="180" rx="8.5" ry="5" fill="${chitinColor}" />
+      <ellipse cx="50" cy="180" rx="8.5" ry="5" fill="${chitinFill}" />
       <ellipse cx="50" cy="180" rx="5.5" ry="3" fill="#ffffff" opacity="0.3" />
 
       <!-- 5-Blade Symmetrical Fan (Spreading wide on ground behind legs) -->
       <!-- Central Telson -->
-      <path d="M 43 179 C 44 190 46 200 50 202 C 54 200 56 190 57 179 Z" fill="${chitinColor}" />
+      <path d="M 43 179 C 44 190 46 200 50 202 C 54 200 56 190 57 179 Z" fill="${chitinFill}" />
       <ellipse cx="50" cy="190" rx="4.5" ry="7" fill="#ffffff" opacity="0.3" />
       <path d="M 50 180 L 50 200" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
       <circle cx="50" cy="200" r="2" fill="#ffffff" opacity="0.9" />
 
       <!-- Left Inner Uropod -->
-      <path d="M 45 179 C 36 186 28 196 30 200 C 38 200 45 192 48 180 Z" fill="${chitinColor}" />
+      <path d="M 45 179 C 36 186 28 196 30 200 C 38 200 45 192 48 180 Z" fill="${chitinFill}" />
       <path d="M 43 183 C 37 188 32 195 33 198 C 38 198 43 192 46 184" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
 
       <!-- Right Inner Uropod -->
-      <path d="M 55 179 C 64 186 72 196 70 200 C 62 200 55 192 52 180 Z" fill="${chitinColor}" />
+      <path d="M 55 179 C 64 186 72 196 70 200 C 62 200 55 192 52 180 Z" fill="${chitinFill}" />
       <path d="M 57 183 C 63 188 68 195 67 198 C 62 198 57 192 54 184" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
 
       <!-- Left Outer Uropod -->
-      <path d="M 46 179 C 30 180 16 188 18 194 C 26 196 38 190 47 180 Z" fill="${chitinColor}" />
+      <path d="M 46 179 C 30 180 16 188 18 194 C 26 196 38 190 47 180 Z" fill="${chitinFill}" />
       <path d="M 44 181 C 32 182 21 188 22 192 C 28 193 38 189 45 182" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
 
       <!-- Right Outer Uropod -->
-      <path d="M 54 179 C 70 180 84 188 82 194 C 74 196 62 190 53 180 Z" fill="${chitinColor}" />
+      <path d="M 54 179 C 70 180 84 188 82 194 C 74 196 62 190 53 180 Z" fill="${chitinFill}" />
       <path d="M 56 181 C 68 182 79 188 78 192 C 72 193 62 189 55 182" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
     </g>`
       : `
@@ -1831,55 +2081,60 @@ function injectLobsterChitinLayers(
 
       <!-- 4 Conical Segmented Tail Somites (Fattest at body root, tapering to fan) -->
       <!-- Somite T4 (Distal segment of cone) -->
-      <path d="M 98 154 C 108 164 118 172 122 178 L 104 188 C 96 180 88 170 82 162 Z" fill="${chitinColor}" />
+      <path d="M 98 154 C 108 164 118 172 122 178 L 104 188 C 96 180 88 170 82 162 Z" fill="${chitinFill}" />
       <path d="M 100 158 Q 110 167 116 174" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
 
       <!-- Somite T3 (Mid-distal segment of cone) -->
-      <path d="M 80 140 C 94 150 108 162 114 170 L 94 180 C 86 172 72 160 62 148 Z" fill="${chitinColor}" />
+      <path d="M 80 140 C 94 150 108 162 114 170 L 94 180 C 86 172 72 160 62 148 Z" fill="${chitinFill}" />
       <path d="M 82 144 Q 96 156 106 166" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
       <!-- Lateral Spine Spur on T3 -->
-      <path d="M 104 156 L 115 152 L 110 164 Z" fill="${chitinColor}" />
+      <path d="M 104 156 L 115 152 L 110 164 Z" fill="${chitinFill}" />
 
       <!-- Somite T2 (Mid-proximal segment of cone) -->
-      <path d="M 58 126 C 78 136 96 150 104 158 L 82 170 C 72 160 54 148 38 136 Z" fill="${chitinColor}" />
+      <path d="M 58 126 C 78 136 96 150 104 158 L 82 170 C 72 160 54 148 38 136 Z" fill="${chitinFill}" />
       <path d="M 62 130 Q 82 142 96 152" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
       <!-- Lateral Spine Spur on T2 -->
-      <path d="M 90 140 L 102 136 L 96 148 Z" fill="${chitinColor}" />
+      <path d="M 90 140 L 102 136 L 96 148 Z" fill="${chitinFill}" />
 
       <!-- Somite T1 (Massive Conical Base emerging from Pelvis/Torso) -->
-      <path d="M 34 118 C 58 122 82 132 94 142 L 68 158 C 52 148 34 138 16 132 Z" fill="${chitinColor}" />
+      <path d="M 34 118 C 58 122 82 132 94 142 L 68 158 C 52 148 34 138 16 132 Z" fill="${chitinFill}" />
       <path d="M 38 122 Q 62 130 82 138" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
 
       <!-- Heavy Tail Fan Joint Collar Node -->
-      <ellipse cx="116" cy="180" rx="8.5" ry="6" fill="${chitinColor}" transform="rotate(25 116 180)" />
+      <ellipse cx="116" cy="180" rx="8.5" ry="6" fill="${chitinFill}" transform="rotate(25 116 180)" />
       <ellipse cx="116" cy="180" rx="5.5" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(25 116 180)" />
 
       <!-- Massive 5-Blade Fan Tail (Flared out on the ground) -->
       <!-- 1. Upper Outer Uropod (Sweeping High Blade) -->
-      <path d="M 114 176 C 126 158 144 152 152 158 C 156 166 144 180 126 186 Z" fill="${chitinColor}" />
+      <path d="M 114 176 C 126 158 144 152 152 158 C 156 166 144 180 126 186 Z" fill="${chitinFill}" />
       <path d="M 118 168 C 130 160 144 158 148 162 C 150 168 140 176 128 180" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
       <!-- Fluted Ribs -->
       <path d="M 122 172 L 140 164 M 124 176 L 144 172" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
 
       <!-- 2. Upper Inner Uropod (Secondary Upper Blade) -->
-      <path d="M 114 176 C 130 166 150 166 156 176 C 158 188 142 194 124 192 Z" fill="${chitinColor}" />
+      <path d="M 114 176 C 130 166 150 166 156 176 C 158 188 142 194 124 192 Z" fill="${chitinFill}" />
       <path d="M 122 178 C 136 170 148 170 150 178 C 152 184 140 190 126 190" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
       <path d="M 124 181 L 146 181 M 124 186 L 144 187" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
 
       <!-- 3. Central Telson (Heroic Main Tail Blade with Dorsal Keel & Node) -->
-      <path d="M 114 176 C 126 176 144 182 142 192 C 138 202 122 202 112 194 Z" fill="${chitinColor}" />
+      <path d="M 114 176 C 126 176 144 182 142 192 C 138 202 122 202 112 194 Z" fill="${chitinFill}" />
       <ellipse cx="128" cy="190" rx="7" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(20 128 190)" />
       <path d="M 115 178 L 138 193" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
       <circle cx="137" cy="193" r="2" fill="#ffffff" opacity="0.9" />
 
       <!-- 4. Lower Inner Uropod (Secondary Lower Blade) -->
-      <path d="M 110 178 C 118 186 124 198 112 202 C 100 204 96 194 102 186 Z" fill="${chitinColor}" />
+      <path d="M 110 178 C 118 186 124 198 112 202 C 100 204 96 194 102 186 Z" fill="${chitinFill}" />
       <path d="M 108 184 C 112 190 116 196 108 198 C 102 199 100 192 104 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
 
       <!-- 5. Lower Outer Uropod (Ground-Resting Trailing Blade) -->
-      <path d="M 106 180 C 108 190 98 200 86 201 C 76 200 78 190 88 184 Z" fill="${chitinColor}" />
+      <path d="M 106 180 C 108 190 98 200 86 201 C 76 200 78 190 88 184 Z" fill="${chitinFill}" />
       <path d="M 100 185 C 102 191 94 196 88 196 C 82 195 84 190 90 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
     </g>`
+
+  const tailFanLayer =
+    frameShift !== 0
+      ? `<g id="lobster-tail-fan-offset" transform="translate(0, ${frameShift})">${rawTailFanLayer}</g>`
+      : rawTailFanLayer
 
   // Auxiliary Thoracic Flank Limbs (4 Folded side limbs behind waist)
   const flankLimbsLayer = `
@@ -1888,32 +2143,32 @@ function injectLobsterChitinLayers(
       <g id="lobster-flank-left" class="lobster-idle-layer lobster-idle-flank-left">
         <!-- Left Shadows -->
         <g opacity="0.2" transform="translate(1.5, 2)">
-          <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          <path d="M 24 ${flankY1} Q 10 ${flankY1 - 2} 4 ${flankY1 + 8} Q 2 ${flankY1 + 16} 2 ${flankY1 + 22}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          <path d="M 26 ${flankY2} Q 14 ${flankY2 + 4} 10 ${flankY2 + 14} Q 8 ${flankY2 + 22} 8 ${flankY2 + 30}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
         </g>
         <!-- Base Chitin Flank Limbs Left -->
-        <path d="M 24 102 Q 10 100 4 110 Q 2 118 2 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <circle cx="4" cy="110" r="2.2" fill="${chitinColor}" />
-        <path d="M 26 116 Q 14 120 10 130 Q 8 138 8 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <circle cx="10" cy="130" r="2.2" fill="${chitinColor}" />
+        <path d="M 24 ${flankY1} Q 10 ${flankY1 - 2} 4 ${flankY1 + 8} Q 2 ${flankY1 + 16} 2 ${flankY1 + 22}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="4" cy="${flankY1 + 8}" r="2.2" fill="${chitinPalette.primary}" />
+        <path d="M 26 ${flankY2} Q 14 ${flankY2 + 4} 10 ${flankY2 + 14} Q 8 ${flankY2 + 22} 8 ${flankY2 + 30}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="10" cy="${flankY2 + 14}" r="2.2" fill="${chitinPalette.primary}" />
       </g>
       <!-- Right Flank Limbs (2 thin legs) -->
       <g id="lobster-flank-right" class="lobster-idle-layer lobster-idle-flank-right">
         <!-- Right Shadows -->
         <g opacity="0.2" transform="translate(1.5, 2)">
-          <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          <path d="M 76 ${flankY1} Q 90 ${flankY1 - 2} 96 ${flankY1 + 8} Q 98 ${flankY1 + 16} 98 ${flankY1 + 22}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          <path d="M 74 ${flankY2} Q 86 ${flankY2 + 4} 90 ${flankY2 + 14} Q 92 ${flankY2 + 22} 92 ${flankY2 + 30}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
         </g>
         <!-- Base Chitin Flank Limbs Right -->
-        <path d="M 76 102 Q 90 100 96 110 Q 98 118 98 124" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <circle cx="96" cy="110" r="2.2" fill="${chitinColor}" />
-        <path d="M 74 116 Q 86 120 90 130 Q 92 138 92 146" stroke="${chitinColor}" stroke-width="3" stroke-linecap="round" fill="none" />
-        <circle cx="90" cy="130" r="2.2" fill="${chitinColor}" />
+        <path d="M 76 ${flankY1} Q 90 ${flankY1 - 2} 96 ${flankY1 + 8} Q 98 ${flankY1 + 16} 98 ${flankY1 + 22}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        <circle cx="96" cy="${flankY1 + 8}" r="2.2" fill="${chitinPalette.primary}" />
+        <path d="M 74 ${flankY2} Q 86 ${flankY2 + 4} 90 ${flankY2 + 14} Q 92 ${flankY2 + 22} 92 ${flankY2 + 30}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" fill="none" />
+        <circle cx="90" cy="${flankY2 + 14}" r="2.2" fill="${chitinPalette.primary}" />
       </g>
     </g>`
 
   // Anthropomorphic Bipedal Standing Legs (Planted on ground line y=186 with wide muscular stance)
-  const legsLayer = `
+  const rawLegsLayer = `
     <g id="lobster-legs-layer" class="lobster-idle-layer lobster-idle-legs">
       <!-- Legs Drop Shadow -->
       <g opacity="0.24" transform="translate(1.5, 2)">
@@ -1929,18 +2184,18 @@ function injectLobsterChitinLayers(
 
       <!-- Left Standing Leg Base Chitin -->
       <!-- Thigh -->
-      <path d="M 32 136 C 26 146 18 152 16 158 L 23 161 C 27 152 34 146 39 136 Z" fill="${chitinColor}" />
+      <path d="M 32 136 C 26 146 18 152 16 158 L 23 161 C 27 152 34 146 39 136 Z" fill="${chitinFill}" />
       <path d="M 30 138 C 25 146 20 151 18 157" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
       <!-- Armored Knee Plate -->
-      <ellipse cx="20" cy="159" rx="5" ry="3.8" fill="${chitinColor}" />
+      <ellipse cx="20" cy="159" rx="5" ry="3.8" fill="${chitinFill}" />
       <ellipse cx="20" cy="159" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
       <!-- Shin / Crus -->
-      <path d="M 16 158 L 13 178 L 20 178 L 23 161 Z" fill="${chitinColor}" />
+      <path d="M 16 158 L 13 178 L 20 178 L 23 161 Z" fill="${chitinFill}" />
       <path d="M 18 162 L 16 176" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
       <!-- Ankle Joint -->
-      <ellipse cx="17" cy="178" rx="4.5" ry="2.2" fill="${chitinColor}" />
+      <ellipse cx="17" cy="178" rx="4.5" ry="2.2" fill="${chitinFill}" />
       <!-- Clawed Standing Boot Foot -->
-      <path d="M 6 186 C 6 179 13 177 19 177 C 25 177 30 179 32 186 Z" fill="${chitinColor}" />
+      <path d="M 6 186 C 6 179 13 177 19 177 C 25 177 30 179 32 186 Z" fill="${chitinFill}" />
       <path d="M 6 186 L 32 186" stroke="#020810" stroke-width="1.5" opacity="0.4" />
       <!-- Toe Claws -->
       <path d="M 6 186 C 3 186 1 183 4 181 C 7 181 9 183 10 186 Z" fill="#ffffff" opacity="0.85" />
@@ -1948,23 +2203,28 @@ function injectLobsterChitinLayers(
 
       <!-- Right Standing Leg Base Chitin -->
       <!-- Thigh -->
-      <path d="M 68 136 C 74 146 82 152 84 158 L 77 161 C 73 152 66 146 61 136 Z" fill="${chitinColor}" />
+      <path d="M 68 136 C 74 146 82 152 84 158 L 77 161 C 73 152 66 146 61 136 Z" fill="${chitinFill}" />
       <path d="M 70 138 C 75 146 80 151 82 157" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
       <!-- Armored Knee Plate -->
-      <ellipse cx="80" cy="159" rx="5" ry="3.8" fill="${chitinColor}" />
+      <ellipse cx="80" cy="159" rx="5" ry="3.8" fill="${chitinFill}" />
       <ellipse cx="80" cy="159" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
       <!-- Shin / Crus -->
-      <path d="M 84 158 L 87 178 L 80 178 L 77 161 Z" fill="${chitinColor}" />
+      <path d="M 84 158 L 87 178 L 80 178 L 77 161 Z" fill="${chitinFill}" />
       <path d="M 82 162 L 84 176" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
       <!-- Ankle Joint -->
-      <ellipse cx="83" cy="178" rx="4.5" ry="2.2" fill="${chitinColor}" />
+      <ellipse cx="83" cy="178" rx="4.5" ry="2.2" fill="${chitinFill}" />
       <!-- Clawed Standing Boot Foot -->
-      <path d="M 68 186 C 70 179 75 177 81 177 C 87 177 94 179 94 186 Z" fill="${chitinColor}" />
+      <path d="M 68 186 C 70 179 75 177 81 177 C 87 177 94 179 94 186 Z" fill="${chitinFill}" />
       <path d="M 68 186 L 94 186" stroke="#020810" stroke-width="1.5" opacity="0.4" />
       <!-- Toe Claws -->
       <path d="M 65 183 C 67 181 70 183 72 186 C 68 186 66 186 65 183 Z" fill="#ffffff" opacity="0.85" />
       <path d="M 90 186 C 91 183 93 181 96 181 C 99 183 97 186 94 186 Z" fill="#ffffff" opacity="0.85" />
     </g>`
+
+  const legsLayer =
+    frameShift !== 0
+      ? `<g id="lobster-legs-offset" transform="translate(0, ${frameShift})">${rawLegsLayer}</g>`
+      : rawLegsLayer
 
   // Parametric Abdomen: Somite 1 top width exactly matches the bottom width of the chest (cw * 2)
   const w1_top = cw
@@ -2005,61 +2265,93 @@ function injectLobsterChitinLayers(
 
   // Massive, Robust Anthropomorphic Abdominal Pleon Somites (Full-width torso matching carapace width)
   const abdomenLayer = `
-    <g id="lobster-abdomen-layer" class="lobster-idle-layer lobster-idle-abdomen">
-      <!-- Somite 5 / Pelvis Girdle (Y=138..151) -->
-      <path d="M ${s5_l_top} 138 C ${s5_l_top - 2} 146 ${s5_l_bot - 4} 151 ${s5_l_bot} 151 L ${s5_r_bot} 151 C ${s5_r_bot + 4} 151 ${s5_r_top + 2} 146 ${s5_r_top} 138 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s5_l_top} 138 C ${s5_l_top - 2} 146 ${s5_l_bot - 4} 151 ${s5_l_bot} 151 L ${s5_r_bot} 151 C ${s5_r_bot + 4} 151 ${s5_r_top + 2} 146 ${s5_r_top} 138 Z" fill="${chitinColor}" />
-      <path d="M ${s5_l_top + 4} 142 C 36 148 64 148 ${s5_r_top - 4} 142" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
-      <ellipse cx="50" cy="145" rx="9" ry="3.5" fill="#ffffff" opacity="0.2" />
+    <g id="lobster-abdomen-layer" class="lobster-idle-layer lobster-idle-abdomen" data-height="${height}">
+      <!-- Somite 5 / Pelvis Girdle (Y=${s5_top}..${s5_bot}) -->
+      <path d="M ${s5_l_top} ${s5_top} C ${s5_l_top - 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_l_bot - 4} ${s5_bot} ${s5_l_bot} ${s5_bot} L ${s5_r_bot} ${s5_bot} C ${s5_r_bot + 4} ${s5_bot} ${s5_r_top + 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_r_top} ${s5_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s5_l_top} ${s5_top} C ${s5_l_top - 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_l_bot - 4} ${s5_bot} ${s5_l_bot} ${s5_bot} L ${s5_r_bot} ${s5_bot} C ${s5_r_bot + 4} ${s5_bot} ${s5_r_top + 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_r_top} ${s5_top} Z" fill="${chitinFill}" />
+      <path d="M ${s5_l_top + 4} ${s5_top + 4} C 36 ${s5_top + 10} 64 ${s5_top + 10} ${s5_r_top - 4} ${s5_top + 4}" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
+      <ellipse cx="50" cy="${s5_top + 7}" rx="9" ry="3.5" fill="#ffffff" opacity="0.2" />
 
-      <!-- Somite 4 (Y=129..142) -->
-      <path d="M ${s4_l_top} 129 C ${s4_l_top - 2} 137 ${s4_l_bot - 3} 142 ${s4_l_bot} 142 L ${s4_r_bot} 142 C ${s4_r_bot + 3} 142 ${s4_r_top + 2} 137 ${s4_r_top} 129 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s4_l_top} 129 C ${s4_l_top - 2} 137 ${s4_l_bot - 3} 142 ${s4_l_bot} 142 L ${s4_r_bot} 142 C ${s4_r_bot + 3} 142 ${s4_r_top + 2} 137 ${s4_r_top} 129 Z" fill="${chitinColor}" />
-      <path d="M ${s4_l_top + 4} 133 C 34 139 66 139 ${s4_r_top - 4} 133" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
+      <!-- Somite 4 (Y=${s4_top}..${s4_bot}) -->
+      <path d="M ${s4_l_top} ${s4_top} C ${s4_l_top - 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_l_bot - 3} ${s4_bot} ${s4_l_bot} ${s4_bot} L ${s4_r_bot} ${s4_bot} C ${s4_r_bot + 3} ${s4_bot} ${s4_r_top + 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_r_top} ${s4_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s4_l_top} ${s4_top} C ${s4_l_top - 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_l_bot - 3} ${s4_bot} ${s4_l_bot} ${s4_bot} L ${s4_r_bot} ${s4_bot} C ${s4_r_bot + 3} ${s4_bot} ${s4_r_top + 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_r_top} ${s4_top} Z" fill="${chitinFill}" />
+      <path d="M ${s4_l_top + 4} ${s4_top + 4} C 34 ${s4_top + 10} 66 ${s4_top + 10} ${s4_r_top - 4} ${s4_top + 4}" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
 
-      <!-- Somite 3 (Y=120..133) -->
-      <path d="M ${s3_l_top} 120 C ${s3_l_top - 2} 128 ${s3_l_bot - 3} 133 ${s3_l_bot} 133 L ${s3_r_bot} 133 C ${s3_r_bot + 3} 133 ${s3_r_top + 2} 128 ${s3_r_top} 120 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s3_l_top} 120 C ${s3_l_top - 2} 128 ${s3_l_bot - 3} 133 ${s3_l_bot} 133 L ${s3_r_bot} 133 C ${s3_r_bot + 3} 133 ${s3_r_top + 2} 128 ${s3_r_top} 120 Z" fill="${chitinColor}" />
-      <path d="M ${s3_l_top + 4} 124 C 34 130 66 130 ${s3_r_top - 4} 124" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
+      <!-- Somite 3 (Y=${s3_top}..${s3_bot}) -->
+      <path d="M ${s3_l_top} ${s3_top} C ${s3_l_top - 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_l_bot - 3} ${s3_bot} ${s3_l_bot} ${s3_bot} L ${s3_r_bot} ${s3_bot} C ${s3_r_bot + 3} ${s3_bot} ${s3_r_top + 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_r_top} ${s3_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s3_l_top} ${s3_top} C ${s3_l_top - 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_l_bot - 3} ${s3_bot} ${s3_l_bot} ${s3_bot} L ${s3_r_bot} ${s3_bot} C ${s3_r_bot + 3} ${s3_bot} ${s3_r_top + 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_r_top} ${s3_top} Z" fill="${chitinFill}" />
+      <path d="M ${s3_l_top + 4} ${s3_top + 4} C 34 ${s3_top + 10} 66 ${s3_top + 10} ${s3_r_top - 4} ${s3_top + 4}" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
 
-      <!-- Somite 2 (Y=111..124) -->
-      <path d="M ${s2_l_top} 111 C ${s2_l_top - 2} 119 ${s2_l_bot - 3} 124 ${s2_l_bot} 124 L ${s2_r_bot} 124 C ${s2_r_bot + 3} 124 ${s2_r_top + 2} 119 ${s2_r_top} 111 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s2_l_top} 111 C ${s2_l_top - 2} 119 ${s2_l_bot - 3} 124 ${s2_l_bot} 124 L ${s2_r_bot} 124 C ${s2_r_bot + 3} 124 ${s2_r_top + 2} 119 ${s2_r_top} 111 Z" fill="${chitinColor}" />
-      <path d="M ${s2_l_top + 4} 115 C 34 121 66 121 ${s2_r_top - 4} 115" stroke="#ffffff" stroke-width="2.8" fill="none" opacity="0.32" />
+      <!-- Somite 2 (Y=${s2_top}..${s2_bot}) -->
+      <path d="M ${s2_l_top} ${s2_top} C ${s2_l_top - 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_l_bot - 3} ${s2_bot} ${s2_l_bot} ${s2_bot} L ${s2_r_bot} ${s2_bot} C ${s2_r_bot + 3} ${s2_bot} ${s2_r_top + 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_r_top} ${s2_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s2_l_top} ${s2_top} C ${s2_l_top - 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_l_bot - 3} ${s2_bot} ${s2_l_bot} ${s2_bot} L ${s2_r_bot} ${s2_bot} C ${s2_r_bot + 3} ${s2_bot} ${s2_r_top + 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_r_top} ${s2_top} Z" fill="${chitinFill}" />
+      <path d="M ${s2_l_top + 4} ${s2_top + 4} C 34 ${s2_top + 10} 66 ${s2_top + 10} ${s2_r_top - 4} ${s2_top + 4}" stroke="#ffffff" stroke-width="2.8" fill="none" opacity="0.32" />
 
-      <!-- Somite 1 (Upper thorax transition - starts at y=102, matching chest width at y=106) -->
-      <path d="M ${s1_l_top} 102 C ${s1_l_top - 2} 110 ${s1_l_bot - 3} 115 ${s1_l_bot} 115 L ${s1_r_bot} 115 C ${s1_r_bot + 3} 115 ${s1_r_top + 2} 110 ${s1_r_top} 102 Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s1_l_top} 102 C ${s1_l_top - 2} 110 ${s1_l_bot - 3} 115 ${s1_l_bot} 115 L ${s1_r_bot} 115 C ${s1_r_bot + 3} 115 ${s1_r_top + 2} 110 ${s1_r_top} 102 Z" fill="${chitinColor}" />
-      <path d="M ${s1_l_top + 4} 106 C 34 112 66 112 ${s1_r_top - 4} 106" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
+      <!-- Somite 1 (Upper thorax transition - starts at y=${s1_top}, matching chest width at y=${s1_top + 4}) -->
+      <path d="M ${s1_l_top} ${s1_top} C ${s1_l_top - 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_l_bot - 3} ${s1_bot} ${s1_l_bot} ${s1_bot} L ${s1_r_bot} ${s1_bot} C ${s1_r_bot + 3} ${s1_bot} ${s1_r_top + 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_r_top} ${s1_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
+      <path d="M ${s1_l_top} ${s1_top} C ${s1_l_top - 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_l_bot - 3} ${s1_bot} ${s1_l_bot} ${s1_bot} L ${s1_r_bot} ${s1_bot} C ${s1_r_bot + 3} ${s1_bot} ${s1_r_top + 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_r_top} ${s1_top} Z" fill="${chitinFill}" />
+      <path d="M ${s1_l_top + 4} ${s1_top + 4} C 34 ${s1_top + 10} 66 ${s1_top + 10} ${s1_r_top - 4} ${s1_top + 4}" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
 
       <!-- Central Dorsal Keel Highlight -->
-      <path d="M 50 104 L 50 148" stroke="#ffffff" stroke-width="2.4" opacity="0.28" stroke-linecap="round" />
+      <path d="M 50 ${keelTop} L 50 ${keelBot}" stroke="#ffffff" stroke-width="2.4" opacity="0.28" stroke-linecap="round" />
     </g>`
 
-  const armsLayer = `
-    <g id="lobster-arms-layer" data-pose="${pose.name}">
+  const leftArmTransform =
+    armScale !== 1 ? `transform="translate(34, 80) scale(${armScale}) translate(-34, -80)"` : ''
+  const rightArmTransform =
+    armScale !== 1 ? `transform="translate(66, 80) scale(${armScale}) translate(-66, -80)"` : ''
+
+  const leftArmWrapped =
+    armScale !== 1
+      ? `<g id="lobster-arm-left-scale" ${leftArmTransform}><g id="lobster-arm-left" class="lobster-idle-layer lobster-idle-arm-left"><path d="${pose.leftArm}" fill="${chitinFill}" /></g></g>`
+      : `<g id="lobster-arm-left" class="lobster-idle-layer lobster-idle-arm-left"><path d="${pose.leftArm}" fill="${chitinFill}" /></g>`
+
+  const rightArmWrapped =
+    armScale !== 1
+      ? `<g id="lobster-arm-right-scale" ${rightArmTransform}><g id="lobster-arm-right" class="lobster-idle-layer lobster-idle-arm-right"><path d="${pose.rightArm}" fill="${chitinFill}" /></g></g>`
+      : `<g id="lobster-arm-right" class="lobster-idle-layer lobster-idle-arm-right"><path d="${pose.rightArm}" fill="${chitinFill}" /></g>`
+
+  const leftArmShadow =
+    armScale !== 1
+      ? `<g ${leftArmTransform}><path d="${pose.leftArm}" fill="#020810" /></g>`
+      : `<path d="${pose.leftArm}" fill="#020810" />`
+
+  const rightArmShadow =
+    armScale !== 1
+      ? `<g ${rightArmTransform}><path d="${pose.rightArm}" fill="#020810" /></g>`
+      : `<path d="${pose.rightArm}" fill="#020810" />`
+
+  const renderedArms = `
+    <g id="lobster-arms-layer" data-pose="${pose.name}" data-arm-scale="${armScale}">
       <!-- Arm Shadows behind body -->
       <g opacity="0.22" transform="translate(1.5, 2)">
-        <path d="${pose.leftArm}" fill="#020810" />
-        <path d="${pose.rightArm}" fill="#020810" />
+        ${leftArmShadow}
+        ${rightArmShadow}
       </g>
       <!-- Base Arm Tubes -->
-      <g id="lobster-arm-left" class="lobster-idle-layer lobster-idle-arm-left">
-        <path d="${pose.leftArm}" fill="${chitinColor}" />
-      </g>
-      <g id="lobster-arm-right" class="lobster-idle-layer lobster-idle-arm-right">
-        <path d="${pose.rightArm}" fill="${chitinColor}" />
-      </g>
+      ${leftArmWrapped}
+      ${rightArmWrapped}
     </g>`
 
+  const armsLayer =
+    headYOffset !== 0
+      ? `<g id="lobster-arms-offset" transform="translate(0, ${headYOffset})">${renderedArms}</g>`
+      : renderedArms
+
+  const leftClawWrapped =
+    armScale !== 1
+      ? `<g id="lobster-claw-left-scale" ${leftArmTransform}><g id="lobster-claw-left" class="lobster-idle-layer lobster-idle-claw-left">${renderClawElement(pose.leftClaw, chitinFill)}</g></g>`
+      : `<g id="lobster-claw-left" class="lobster-idle-layer lobster-idle-claw-left">${renderClawElement(pose.leftClaw, chitinFill)}</g>`
+
+  const rightClawWrapped =
+    armScale !== 1
+      ? `<g id="lobster-claw-right-scale" ${rightArmTransform}><g id="lobster-claw-right" class="lobster-idle-layer lobster-idle-claw-right">${renderClawElement(pose.rightClaw, chitinFill)}</g></g>`
+      : `<g id="lobster-claw-right" class="lobster-idle-layer lobster-idle-claw-right">${renderClawElement(pose.rightClaw, chitinFill)}</g>`
+
   const clawsLayer = `
-    <g id="lobster-claws-layer">
-      <g id="lobster-claw-left" class="lobster-idle-layer lobster-idle-claw-left">
-        ${renderClawElement(pose.leftClaw, chitinColor)}
-      </g>
-      <g id="lobster-claw-right" class="lobster-idle-layer lobster-idle-claw-right">
-        ${renderClawElement(pose.rightClaw, chitinColor)}
-      </g>
+    <g id="lobster-claws-layer" data-arm-scale="${armScale}">
+      ${leftClawWrapped}
+      ${rightClawWrapped}
     </g>`
 
   const browLayer = `
@@ -2067,16 +2359,17 @@ function injectLobsterChitinLayers(
       <!-- Left Eyebrow -->
       <g id="lobster-brow-left" class="lobster-idle-layer lobster-idle-brow-left">
         <path d="${leftEyebrow}" stroke="#020810" stroke-width="2.5" stroke-linecap="round" opacity="0.22" />
-        <path d="${leftEyebrow}" stroke="${chitinColor}" stroke-width="1.8" stroke-linecap="round" />
+        <path d="${leftEyebrow}" stroke="${chitinPalette.anchor}" stroke-width="1.8" stroke-linecap="round" />
       </g>
       <!-- Right Eyebrow -->
       <g id="lobster-brow-right" class="lobster-idle-layer lobster-idle-brow-right">
         <path d="${rightEyebrow}" stroke="#020810" stroke-width="2.5" stroke-linecap="round" opacity="0.22" />
-        <path d="${rightEyebrow}" stroke="${chitinColor}" stroke-width="1.8" stroke-linecap="round" />
+        <path d="${rightEyebrow}" stroke="${chitinPalette.anchor}" stroke-width="1.8" stroke-linecap="round" />
       </g>
     </g>`
 
-  let outputSvg = rawSvg
+  // In DiceBear rawSvg, replace solid body color with the adjacent chitin gradient
+  let outputSvg = rawSvg.split(`fill="${chitinColor}"`).join(`fill="${chitinFill}"`)
 
   // 1. Expand ViewBox from 0 0 100 100 to tightly framed square character frame (housing side tails, claws, and antennas with balanced margins)
   outputSvg = outputSvg.replace('viewBox="0 0 100 100"', 'viewBox="-65 -35 230 230"')
@@ -2095,11 +2388,20 @@ function injectLobsterChitinLayers(
   // 4. Suppress stubby default critters antennae (so our long sweeping feelers take precedence)
   outputSvg = outputSvg.replace('<g class="dbcr-t">', '<g class="dbcr-t" opacity="0">')
 
-  // 5. Inject SVG <defs> containing background gradients
+  // 5. Inject SVG <defs> containing chitin and background gradients
   if (!isTransparent) {
     const svgTagIndex = outputSvg.indexOf('>')
     if (svgTagIndex !== -1) {
       outputSvg = outputSvg.slice(0, svgTagIndex + 1) + defsLayer + outputSvg.slice(svgTagIndex + 1)
+    }
+  } else {
+    const transparentDefs = `
+    <defs>
+      ${chitinGradientDef}
+    </defs>`
+    const svgTagIndex = outputSvg.indexOf('>')
+    if (svgTagIndex !== -1) {
+      outputSvg = outputSvg.slice(0, svgTagIndex + 1) + transparentDefs + outputSvg.slice(svgTagIndex + 1)
     }
   }
 
@@ -2124,20 +2426,25 @@ function injectLobsterChitinLayers(
     outputSvg = outputSvg.slice(0, insertIndex) + backgroundLayers + outputSvg.slice(insertIndex)
   }
 
-  outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg)
-  outputSvg = splitEyesForPupilTracking(outputSvg, chitinColor, eyelidStyle)
+  outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg, headYOffset)
+  outputSvg = splitEyesForPupilTracking(outputSvg, chitinColor, eyelidStyle, chitinColor)
 
   // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
   const endGIndex = outputSvg.lastIndexOf('</g></svg>')
   if (endGIndex !== -1) {
-    outputSvg = outputSvg.slice(0, endGIndex) + clawsLayer + browLayer + antennaeLayer + outputSvg.slice(endGIndex)
+    const rawTopLayers = clawsLayer + browLayer + antennaeLayer
+    const topLayers =
+      headYOffset !== 0
+        ? `<g id="lobster-head-top-offset" transform="translate(0, ${headYOffset})">${rawTopLayers}</g>`
+        : rawTopLayers
+    outputSvg = outputSvg.slice(0, endGIndex) + topLayers + outputSvg.slice(endGIndex)
   }
 
   return outputSvg
 }
 
 function getAvatarCacheKey(config: LobsterAvatarConfig, size: number): string {
-  return `${config.seed}|${size}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
+  return `${config.seed}|${size}|${config.height ?? ''}|${config.armScale ?? ''}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
 }
 
 const MAX_GENERATED_AVATAR_CACHE = 128

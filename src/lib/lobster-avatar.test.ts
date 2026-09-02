@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   generateLobsterAvatarSvg,
   generateLobsterAvatarDataUri,
+  getChitinGradientPalette,
   getLobsterAvatarSeededOptions,
   hasLobsterEyelids,
   hasLobsterPupilTracking,
@@ -9,14 +10,20 @@ import {
   LOBSTER_BACKGROUND_PATTERNS,
   LOBSTER_BACKGROUND_TEXTURES,
   LOBSTER_BACKGROUND_THEMES,
+  LOBSTER_CHITIN_GRADIENT_PALETTES,
   LOBSTER_CRUSTACEAN_OPTIONS,
   LOBSTER_EYELID_STYLES,
+  LOBSTER_HEIGHTS,
+  LOBSTER_HEIGHT_LABELS,
+  LOBSTER_HEIGHT_SCALES,
   LOBSTER_PATTERN_DENSITIES,
   LOBSTER_PATTERN_GLOWS,
   LOBSTER_PATTERN_PULSES,
   LOBSTER_PATTERN_SPARKLES,
+  getLobsterTorsoMetrics,
   parseLobsterAvatarConfig,
   randomLobsterSeed,
+  resolveHeightScale,
 } from './lobster-avatar'
 
 describe('lobster-avatar', () => {
@@ -494,5 +501,205 @@ describe('lobster-avatar', () => {
     const uri1 = generateLobsterAvatarDataUri(config, 256)
     const uri2 = generateLobsterAvatarDataUri(config, 256)
     expect(uri1).toBe(uri2) // Identical cached string reference
+  })
+
+  describe('height dimension & position compensation', () => {
+    it('defines 4 standard height presets with labels and scale factors', () => {
+      expect(LOBSTER_HEIGHTS).toEqual(['short', 'regular', 'tall', 'towering'])
+      expect(LOBSTER_HEIGHT_SCALES.short).toBe(0.88)
+      expect(LOBSTER_HEIGHT_SCALES.regular).toBe(1.0)
+      expect(LOBSTER_HEIGHT_SCALES.tall).toBe(1.14)
+      expect(LOBSTER_HEIGHT_SCALES.towering).toBe(1.25)
+      expect(LOBSTER_HEIGHT_LABELS.short).toContain('Compact')
+      expect(LOBSTER_HEIGHT_LABELS.towering).toContain('Towering')
+    })
+
+    it('resolves height scale for presets, aliases, and bounded numbers', () => {
+      expect(resolveHeightScale('short')).toBe(0.88)
+      expect(resolveHeightScale('compact')).toBe(0.88)
+      expect(resolveHeightScale('regular')).toBe(1.0)
+      expect(resolveHeightScale('standard')).toBe(1.0)
+      expect(resolveHeightScale('medium')).toBe(1.0)
+      expect(resolveHeightScale('tall')).toBe(1.14)
+      expect(resolveHeightScale('towering')).toBe(1.25)
+      expect(resolveHeightScale('colossal')).toBe(1.25)
+      expect(resolveHeightScale(undefined)).toBe(1.0)
+
+      // Numeric scale
+      expect(resolveHeightScale(1.15)).toBe(1.15)
+      expect(resolveHeightScale(0.8)).toBe(0.8)
+      expect(resolveHeightScale(88)).toBe(0.88) // Normalized from percentage
+      expect(resolveHeightScale(140)).toBe(1.4) // Upper clamp
+      expect(resolveHeightScale(0.5)).toBe(0.75) // Lower clamp
+    })
+
+    it('computes exact torso metrics anchored at pelvis with monotonic somites', () => {
+      const regular = getLobsterTorsoMetrics('regular')
+      expect(regular.torsoDelta).toBe(0)
+      expect(regular.headYOffset).toBe(0)
+      expect(regular.frameShift).toBe(0)
+      expect(regular.s1_top).toBe(102)
+      expect(regular.s5_bot).toBe(151)
+
+      const short = getLobsterTorsoMetrics('short')
+      expect(short.torsoDelta).toBeLessThan(0)
+      expect(short.headYOffset).toBeGreaterThan(0) // Upper body moves down to meet lower somite 1
+      expect(short.s1_top).toBeGreaterThan(regular.s1_top)
+      expect(short.s5_bot).toBe(151) // Pelvis anchor constant
+
+      const tall = getLobsterTorsoMetrics('tall')
+      expect(tall.torsoDelta).toBeGreaterThan(0)
+      expect(tall.headYOffset).toBeLessThan(0) // Upper body moves up to give torso headroom
+      expect(tall.s1_top).toBeLessThan(regular.s1_top)
+      expect(tall.s5_bot).toBe(151)
+
+      const towering = getLobsterTorsoMetrics('towering')
+      expect(towering.torsoDelta).toBeGreaterThan(tall.torsoDelta)
+      expect(towering.headYOffset).toBeLessThan(tall.headYOffset)
+      expect(towering.frameShift).toBeGreaterThan(0) // Subtle downward frame compensation
+      expect(towering.s5_bot).toBe(151)
+
+      // Vertical hierarchy verification for all presets
+      for (const h of LOBSTER_HEIGHTS) {
+        const m = getLobsterTorsoMetrics(h)
+        expect(m.s1_top).toBeLessThan(m.s1_bot)
+        expect(m.s1_bot).toBeLessThanOrEqual(m.s2_top + 5)
+        expect(m.s2_top).toBeLessThan(m.s2_bot)
+        expect(m.s3_top).toBeLessThan(m.s3_bot)
+        expect(m.s4_top).toBeLessThan(m.s4_bot)
+        expect(m.s5_top).toBeLessThan(m.s5_bot)
+        expect(m.s5_bot).toBe(151)
+        expect(m.keelTop).toBeLessThan(m.keelBot)
+      }
+    })
+
+    it('parses height attribute correctly in parseLobsterAvatarConfig', () => {
+      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 'tall' })).toEqual({
+        style: 'critters',
+        seed: 'unit-1',
+        height: 'tall',
+      })
+      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 'compact' })).toEqual({
+        style: 'critters',
+        seed: 'unit-1',
+        height: 'short',
+      })
+      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 1.2 })).toEqual({
+        style: 'critters',
+        seed: 'unit-1',
+        height: 1.2,
+      })
+      // Invalid height is safely omitted
+      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 'invalid-size' })).toEqual({
+        style: 'critters',
+        seed: 'unit-1',
+      })
+    })
+
+    it('deterministically seeds height from avatar seed', () => {
+      const seeded1 = getLobsterAvatarSeededOptions('alpha-seed')
+      const seeded2 = getLobsterAvatarSeededOptions('beta-seed')
+      expect(LOBSTER_HEIGHTS).toContain(seeded1.height)
+      expect(LOBSTER_HEIGHTS).toContain(seeded2.height)
+      expect(getLobsterAvatarSeededOptions('alpha-seed').height).toBe(seeded1.height)
+    })
+
+    it('generates pristine baseline SVG with no offset wrappers when height is regular', () => {
+      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'baseline-test', height: 'regular' })
+      expect(svg).toContain('data-height="regular"')
+      expect(svg).not.toContain('id="lobster-carapace-offset"')
+      expect(svg).not.toContain('id="lobster-arms-offset"')
+      expect(svg).not.toContain('id="lobster-head-top-offset"')
+      expect(svg).not.toContain('id="lobster-legs-offset"')
+      expect(svg).toContain('viewBox="-65 -35 230 230"')
+    })
+
+    it('renders position-compensated offset wrappers for short height without clipping', () => {
+      const metrics = getLobsterTorsoMetrics('short')
+      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'short-test', height: 'short' })
+      expect(svg).toContain('data-height="short"')
+      expect(svg).toContain(`id="lobster-carapace-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain(`id="lobster-arms-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain(`id="lobster-head-top-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain(`id="lobster-sparkles-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain('viewBox="-65 -35 230 230"')
+    })
+
+    it('renders position-compensated offset wrappers and frameShift for towering height', () => {
+      const metrics = getLobsterTorsoMetrics('towering')
+      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'tower-test', height: 'towering' })
+      expect(svg).toContain('data-height="towering"')
+      expect(svg).toContain(`id="lobster-carapace-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain(`id="lobster-arms-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain(`id="lobster-head-top-offset" transform="translate(0, ${metrics.headYOffset})"`)
+      expect(svg).toContain(`id="lobster-tail-fan-offset" transform="translate(0, ${metrics.frameShift})"`)
+      expect(svg).toContain(`id="lobster-legs-offset" transform="translate(0, ${metrics.frameShift})"`)
+      expect(svg).toContain(`id="lobster-ground-shadow-offset" transform="translate(0, ${metrics.frameShift})"`)
+      expect(svg).toContain('viewBox="-65 -35 230 230"')
+    })
+
+    it('retains perfect Somite 1 width alignment with carapace chest width across heights', () => {
+      const metrics = getLobsterTorsoMetrics('tall')
+      const domeSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-18', height: 'tall' })
+      // CARAPACE_BOTTOM_HALF_WIDTHS['dome'] = 34 -> Somite 1 top width = 50 - 34 = 16 to 50 + 34 = 84
+      expect(domeSvg).toContain(`M 16 ${metrics.s1_top}`)
+      expect(domeSvg).toContain(`84 ${metrics.s1_top} Z`)
+    })
+
+    it('compensates arm and claw length proportionally based on height', () => {
+      const regularMetrics = getLobsterTorsoMetrics('regular')
+      const shortMetrics = getLobsterTorsoMetrics('short')
+      const tallMetrics = getLobsterTorsoMetrics('tall')
+      const toweringMetrics = getLobsterTorsoMetrics('towering')
+
+      expect(regularMetrics.armScale).toBe(1.0)
+      expect(shortMetrics.armScale).toBe(0.9) // Shorter arms for compact torso
+      expect(tallMetrics.armScale).toBe(1.12) // Longer arms for elongated torso
+      expect(toweringMetrics.armScale).toBe(1.21) // Longest arms for towering torso
+
+      // Regular emits no scale wrapper groups
+      const regularSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'arm-test', height: 'regular' })
+      expect(regularSvg).toContain('data-arm-scale="1"')
+      expect(regularSvg).not.toContain('id="lobster-arm-left-scale"')
+      expect(regularSvg).not.toContain('id="lobster-claw-left-scale"')
+
+      // Towering emits scaled arms and claws anchored from shoulders (34, 80) and (66, 80)
+      const toweringSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'arm-test', height: 'towering' })
+      expect(toweringSvg).toContain(`data-arm-scale="${toweringMetrics.armScale}"`)
+      expect(toweringSvg).toContain(
+        `id="lobster-arm-left-scale" transform="translate(34, 80) scale(${toweringMetrics.armScale}) translate(-34, -80)"`
+      )
+      expect(toweringSvg).toContain(
+        `id="lobster-arm-right-scale" transform="translate(66, 80) scale(${toweringMetrics.armScale}) translate(-66, -80)"`
+      )
+      expect(toweringSvg).toContain(
+        `id="lobster-claw-left-scale" transform="translate(34, 80) scale(${toweringMetrics.armScale}) translate(-34, -80)"`
+      )
+      expect(toweringSvg).toContain(
+        `id="lobster-claw-right-scale" transform="translate(66, 80) scale(${toweringMetrics.armScale}) translate(-66, -80)"`
+      )
+
+      // Short emits compact scaled arms and claws
+      const shortSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'arm-test', height: 'short' })
+      expect(shortSvg).toContain(`data-arm-scale="${shortMetrics.armScale}"`)
+      expect(shortSvg).toContain(
+        `id="lobster-arm-left-scale" transform="translate(34, 80) scale(${shortMetrics.armScale}) translate(-34, -80)"`
+      )
+      expect(shortSvg).toContain(
+        `id="lobster-claw-left-scale" transform="translate(34, 80) scale(${shortMetrics.armScale}) translate(-34, -80)"`
+      )
+    })
+
+    it('allows explicit armScale override in config', () => {
+      const customSvg = generateLobsterAvatarSvg({
+        style: 'critters',
+        seed: 'arm-test',
+        height: 'regular',
+        armScale: 1.3,
+      })
+      expect(customSvg).toContain('data-arm-scale="1.3"')
+      expect(customSvg).toContain('id="lobster-arm-left-scale" transform="translate(34, 80) scale(1.3) translate(-34, -80)"')
+      expect(customSvg).toContain('id="lobster-claw-left-scale" transform="translate(34, 80) scale(1.3) translate(-34, -80)"')
+    })
   })
 })
