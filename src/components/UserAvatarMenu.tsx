@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, EyeOff, Sparkles, ChevronDown, Settings, User } from 'lucide-react'
+import { LogOut, ChevronDown, Settings, User } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
-import { useHeavyVfx } from '@/hooks/useHeavyVfx'
 import { getEffectiveRole } from '@/lib/permissions'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 
@@ -31,7 +30,7 @@ export interface UserAvatarMenuProps {
  * Standardized HUD User Avatar Dropdown Menu component.
  * Supports both floating popover (desktop / sidebar) and inline accordion (mobile navigation drawers).
  * Displays user profile image / letter avatar badge which opens a menu
- * containing user details (name, email), Heavy VFX toggle, and sign-out action.
+ * containing user details (name, email), settings, and sign-out action.
  * Supports dark 'benthic' and light 'corporate' themes.
  */
 export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
@@ -51,7 +50,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const [isExpanded, setIsExpanded] = useState(isOpen)
   const menuRef = useRef<HTMLDivElement>(null)
   const signOutLock = useRef(false)
-  const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
   const toastApi = useOptionalToast()
 
   const handleToggle = () => setIsOpen((prev) => !prev)
@@ -250,116 +248,47 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           >
             <div className="overflow-hidden">
               <div className="pt-2 pb-1 space-y-2">
-                {/* Underwater Bubbles Toggle Row */}
-                <div
-                  className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl ${
-                    isCorporate
-                      ? 'bg-sky-50/70 border border-sky-200/80'
-                      : 'bg-cyan-950/25 border border-cyan-950/60'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    {heavyVfxDisabled ? (
-                      <EyeOff
-                        className={`w-4 h-4 shrink-0 ${
-                          isCorporate ? 'text-amber-500' : 'text-amber-400'
-                        }`}
-                      />
-                    ) : (
-                      <Sparkles
-                        className={`w-4 h-4 shrink-0 ${
-                          isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
-                        }`}
-                      />
-                    )}
-                    <div className="flex flex-col min-w-0">
-                      <span
-                        className={`text-xs font-bold truncate font-grotesk ${
-                          isCorporate ? 'text-slate-800' : 'text-gray-200'
-                        }`}
-                      >
-                        Underwater Bubbles
-                      </span>
-                      <span
-                        className={`text-[10px] truncate font-sans ${
-                          isCorporate ? 'text-slate-500' : 'text-gray-400'
-                        }`}
-                      >
-                        {heavyVfxDisabled ? 'Off' : 'Active'}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={!heavyVfxDisabled}
-                    aria-label="Underwater bubbles toggle"
-                    onClick={toggleHeavyVfx}
-                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
-                      isCorporate
-                        ? !heavyVfxDisabled
-                          ? 'bg-sky-500 focus:ring-sky-400'
-                          : 'bg-slate-200 border-slate-300 focus:ring-sky-400'
-                        : !heavyVfxDisabled
-                        ? 'bg-[#00c3ff] focus:ring-[#00c3ff]'
-                        : 'bg-cyan-950 border-cyan-800 focus:ring-[#00c3ff]'
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                        !heavyVfxDisabled ? 'translate-x-4 bg-white' : 'translate-x-0 bg-slate-300'
-                      }`}
-                    />
-                  </button>
-                </div>
-
                 {/* Account Actions Section: Settings & Sign Out */}
-                <div
-                  className={`pt-1 border-t space-y-2 ${
-                    isCorporate ? 'border-sky-100' : 'border-cyan-950/80'
-                  }`}
-                >
-                  {user.id && (
-                    <button
-                      type="button"
-                      onClick={handleOpenProfile}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
-                        isCorporate
-                          ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
-                          : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
-                      }`}
-                    >
-                      <User className="w-4 h-4 shrink-0" />
-                      <span>YOUR PROFILE</span>
-                    </button>
-                  )}
-                  {/* Settings Link */}
+                {user.id && (
                   <button
                     type="button"
-                    onClick={handleOpenSettings}
+                    onClick={handleOpenProfile}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
                       isCorporate
                         ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
                         : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
                     }`}
                   >
-                    <Settings className="w-4 h-4 shrink-0" />
-                    <span>SETTINGS</span>
+                    <User className="w-4 h-4 shrink-0" />
+                    <span>YOUR PROFILE</span>
                   </button>
+                )}
+                {/* Settings Link */}
+                <button
+                  type="button"
+                  onClick={handleOpenSettings}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
+                    isCorporate
+                      ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
+                      : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
+                  }`}
+                >
+                  <Settings className="w-4 h-4 shrink-0" />
+                  <span>SETTINGS</span>
+                </button>
 
-                  {/* Sign Out Action Button */}
-                  <button
-                    {...signOutButtonProps}
-                    className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
-                      isCorporate
-                        ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
-                        : 'text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600'
-                    }`}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>SIGN OUT</span>
-                  </button>
-                </div>
+                {/* Sign Out Action Button */}
+                <button
+                  {...signOutButtonProps}
+                  className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
+                    isCorporate
+                      ? 'text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 shadow-xs'
+                      : 'text-red-400 hover:text-white bg-red-950/30 hover:bg-red-900/50 border border-red-800/40 hover:border-red-600'
+                  }`}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>SIGN OUT</span>
+                </button>
               </div>
             </div>
           </div>
@@ -475,78 +404,8 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
             </div>
           </div>
 
-          {/* Display & Ambience Section: Underwater Bubbles */}
-          <div
-            className={`py-2 px-0.5 border-b ${
-              isCorporate ? 'border-sky-100' : 'border-[#121c1d]'
-            }`}
-          >
-            {/* Underwater Bubbles */}
-            <div
-              className={`flex items-center justify-between gap-2 p-2 rounded-xl transition-all ${
-                isCorporate
-                  ? 'bg-sky-50/80 border border-sky-200/80 hover:border-sky-300'
-                  : 'bg-[#091012]/80 border border-cyan-900/40 hover:border-cyan-700/60'
-              }`}
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                {heavyVfxDisabled ? (
-                  <EyeOff
-                    className={`w-4 h-4 shrink-0 ${
-                      isCorporate ? 'text-amber-500' : 'text-amber-400/90'
-                    }`}
-                  />
-                ) : (
-                  <Sparkles
-                    className={`w-4 h-4 shrink-0 ${
-                      isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
-                    }`}
-                  />
-                )}
-                <div className="flex flex-col min-w-0">
-                  <span
-                    className={`text-[11px] font-bold truncate font-grotesk ${
-                      isCorporate ? 'text-slate-800' : 'text-[#dfe3e3]'
-                    }`}
-                  >
-                    Underwater Bubbles
-                  </span>
-                  <span
-                    className={`text-[9px] truncate font-sans ${
-                      isCorporate ? 'text-slate-500' : 'text-[#7a8e9e]'
-                    }`}
-                  >
-                    {heavyVfxDisabled ? 'Off' : 'Active'}
-                  </span>
-                </div>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={!heavyVfxDisabled}
-                aria-label="Underwater bubbles toggle"
-                onClick={toggleHeavyVfx}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 ${
-                  isCorporate
-                    ? !heavyVfxDisabled
-                      ? 'bg-sky-500 focus:ring-sky-400'
-                      : 'bg-slate-200 border-slate-300 focus:ring-sky-400'
-                    : !heavyVfxDisabled
-                    ? 'bg-[#00c3ff] focus:ring-[#00c3ff]'
-                    : 'bg-cyan-950/80 border-cyan-700/50 focus:ring-[#00c3ff]'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                    !heavyVfxDisabled ? 'translate-x-4 bg-white' : 'translate-x-0 bg-slate-300'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-
           {/* Account Actions Section: Settings & Sign Out */}
-          <div className="pt-2 space-y-1.5">
+          <div className="pt-3 space-y-1.5">
             {user.id && (
               <button
                 type="button"
