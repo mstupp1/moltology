@@ -108,6 +108,13 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      textareaRef.current?.focus()
+    }
+  }, [])
+
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -248,7 +255,6 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
               disabled={isSending}
               rows={1}
               className="w-full bg-transparent text-gray-100 placeholder-gray-400 text-xs sm:text-sm focus:outline-none resize-none min-h-[36px] max-h-[180px] leading-relaxed font-sans px-1 py-0.5"
-              autoFocus
             />
 
             {/* Bottom Controls Bar Inside the Box - No horizontal divider */}
