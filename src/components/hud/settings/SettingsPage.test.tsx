@@ -64,4 +64,20 @@ describe('SettingsPage', () => {
     expect(screen.getByText(/Hidden — reduces motion and battery use/i)).toBeInTheDocument()
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
   })
+
+  it('renders view-only seed number and does not render height slider', async () => {
+    render(
+      <ToastProvider>
+        <SettingsPage />
+      </ToastProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('settings-seed-number')).toBeInTheDocument()
+    })
+
+    expect(screen.getByText('Seed Number')).toBeInTheDocument()
+    expect(screen.queryByText(/Chassis Height/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^short$/i })).not.toBeInTheDocument()
+  })
 })

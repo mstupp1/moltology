@@ -3,24 +3,15 @@ import {
   Dices,
   RotateCw,
   Sparkles,
-  Shield,
-  Zap,
-  Activity,
-  Anchor,
-  Crosshair,
-  Sliders,
   ChevronLeft,
-  ChevronRight,
   CheckCircle2,
+  Lock,
 } from 'lucide-react'
 import {
   LOBSTER_AVATAR_STYLE,
-  LOBSTER_HEIGHTS,
-  LOBSTER_HEIGHT_LABELS,
   getLobsterAvatarSeededOptions,
   randomLobsterSeed,
   type LobsterAvatarConfig,
-  type LobsterHeight,
 } from '@/lib/lobster-avatar'
 import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 import {
@@ -60,7 +51,6 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   isSubmitting = false,
 }) => {
   const [seed, setSeed] = useState(() => initialSeed || randomLobsterSeed())
-  const [height, setHeight] = useState<LobsterHeight>('regular')
   const [handle, setHandle] = useState(initialHandle)
   const [isSpinningSeed, setIsSpinningSeed] = useState(false)
 
@@ -68,19 +58,21 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   const [displayStats, setDisplayStats] = useState<BaseStats>(() => initialStats || DEFAULT_BASE_STATS)
   const [isRolling, setIsRolling] = useState(false)
 
+  const seededHeight = useMemo(() => {
+    return getLobsterAvatarSeededOptions(seed.trim() || 'larva-initiate').height
+  }, [seed])
+
   const previewConfig = useMemo((): LobsterAvatarConfig => ({
     style: LOBSTER_AVATAR_STYLE,
     seed: seed.trim() || 'larva-initiate',
-    height,
-  }), [seed, height])
+    height: seededHeight,
+  }), [seed, seededHeight])
 
   // Handle avatar re-roll
   const handleRandomize = useCallback(() => {
     setIsSpinningSeed(true)
     const newSeed = randomLobsterSeed()
     setSeed(newSeed)
-    const seeded = getLobsterAvatarSeededOptions(newSeed)
-    setHeight(seeded.height)
     setTimeout(() => setIsSpinningSeed(false), 400)
   }, [])
 
@@ -126,10 +118,10 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
     const avatarConfig: LobsterAvatarConfig = {
       style: LOBSTER_AVATAR_STYLE,
       seed: seed.trim() || 'larva-initiate',
-      height,
+      height: seededHeight,
     }
     onComplete(avatarConfig, stats, parsedHandle.ok ? parsedHandle.handle : handle.trim() || null)
-  }, [seed, height, stats, onComplete, requireHandle, parsedHandle, handle])
+  }, [seed, seededHeight, stats, onComplete, requireHandle, parsedHandle, handle])
 
   return (
     <div className="flex flex-col h-full font-sans text-[#dfe3e3]">
@@ -165,30 +157,20 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
             />
           </div>
 
-          {/* Height dimension segmented control */}
+          {/* Seed Number */}
           <div className="w-full max-w-[260px] space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-grotesk tracking-wider uppercase">
-              <span className="text-[#7ea6a6]">Chassis Height</span>
-              <span className="text-[#00ffff] font-bold">{LOBSTER_HEIGHT_LABELS[height]}</span>
+            <div className="text-[11px] font-grotesk tracking-wider uppercase">
+              <span className="text-[#7ea6a6]">Seed Number</span>
             </div>
-            <div className="grid grid-cols-4 gap-1 p-1 bg-[#04111a]/80 border border-[#00ffff]/20 rounded-xl">
-              {LOBSTER_HEIGHTS.map((h) => {
-                const active = height === h
-                return (
-                  <button
-                    key={h}
-                    type="button"
-                    onClick={() => setHeight(h)}
-                    className={`py-1 text-[10px] font-grotesk font-bold uppercase tracking-wider rounded-lg transition-colors ${
-                      active
-                        ? 'bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/60 shadow-[0_0_10px_rgba(0,255,255,0.25)]'
-                        : 'text-[#7ea6a6] hover:text-[#dfe3e3] hover:bg-white/[0.04] border border-transparent'
-                    }`}
-                  >
-                    {h}
-                  </button>
-                )
-              })}
+            <div className="px-3 py-2 bg-[#04111a]/80 border border-[#00ffff]/20 rounded-xl flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(0,255,255,0.05)]">
+              <span
+                data-testid="seed-number"
+                className="font-mono text-xs text-[#00ffff] font-semibold tracking-wider truncate select-all"
+                title={seed}
+              >
+                {seed}
+              </span>
+              <Lock className="w-3.5 h-3.5 text-[#00ffff]/40 shrink-0" />
             </div>
           </div>
 
