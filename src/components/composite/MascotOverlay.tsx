@@ -42,8 +42,8 @@ export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
     key: 'lobster_navigator',
     name: 'Lobster Navigator (Benthic Explorer)',
     filename: 'char_lobster_navigator.webp',
-    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=1`,
-    description: 'Adventurous lobster navigator wearing benthic goggles with holographic depth compass',
+    s3Url: `${S3_BASE_URL}/images/characters/char_lobster_navigator.webp?v=3`,
+    description: 'Adventurous lobster explorer wearing opaque goggles and tactical benthic harness belt',
   },
   crab_stats: {
     key: 'crab_stats',

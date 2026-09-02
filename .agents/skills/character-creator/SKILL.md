@@ -27,12 +27,16 @@ Moltology's characters belong to a living, interconnected, diverse crustacean wo
   - **Naturally Set Eyes (NEVER Bulging or on Eyestalks)**: Eyes must be set smoothly into the facial plane / orbital sockets like human eyes. They must **NEVER** bulge out, pop out of the head, or be perched on insect-like stalks.
   - **Glassy Reflective Irises**: Multi-layered glossy cartoon eyes with distinct specular catchlights, glassy corneal depth, and dark pupil contrast.
   - **Naturally Attached Eyebrows (NEVER Floating)**: Eyebrows must ALWAYS be sculpted or painted directly onto the forehead surface of the carapace brow ridge immediately above the eyes. They must **NEVER** hover or float detached in mid-air off the character's head.
-* **Articulated Anatomy**:
+* **Articulated Anatomy & Strict Limb Counts**:
+  - **Lobster Limb Invariants**: Lobsters must ALWAYS possess **EXACTLY TWO main arms with pincer claws** (one left, one right) and **SIX articulated walking legs** (three on the left side, three on the right side) supporting the body, plus a segmented tail fan. Never generate 3 arms, 4 claws, or legless floating torsos.
   - Defined segmented carapaces, articulated ball-and-socket limbs, cute rounded pincers/claws, and segmented tail fans with tactile mechanical/organic presence.
+* **Apparel, Eyewear & Prop Rules**:
+  - **Opaque Eyewear for Chroma Keying**: Diving goggles, glasses, and visors must have **solid opaque frames and dark/tinted opaque lenses** (never translucent/transparent glass) to prevent the chroma key background from shining through during extraction.
+  - **Physical Gear & Tactile Props**: Favor tangible benthic equipment (tactical harnesses, utility toolbelts with pouches and carabiners, mechanical wrenches, clipboards, hardhats) over loose floating glowing holograms or floating orbs.
 * **STRICT ANTI-FLATNESS & ANTI-BUG RULES**:
   - **NEVER** generate flat 2D vector art, flat cel-shaded drawings, 2D stickers, or chalky/matte claymation figurines.
   - Every character **MUST** have visible 3D lighting, curved specular sheen, and rich depth.
-  - **NO floating eyebrows, NO detached facial elements, NO bulging eyes, NO eyestalks**.
+  - **NO floating eyebrows, NO detached facial elements, NO bulging eyes, NO eyestalks, NO mutant limb counts (never 3 arms or missing walking legs)**.
 
 ### 2. Physical & Silhouette Diversity (Not Identical Clones)
 Characters should feel varied across the cast:
