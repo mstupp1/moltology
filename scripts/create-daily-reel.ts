@@ -10,6 +10,7 @@ import { generateVeoVideo } from './generate-video'
 import { resolveThematicOutroCard } from './lib/outro-catalog'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import { getRandomCharacterKey, CharacterKey } from './lib/character-overlay'
 
 export type CtaGoal = 'quiz' | 'guide' | 'codex' | 'demo' | 'homepage'
 
@@ -1133,7 +1134,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL: STAGE 4 CLEARANCE ◈',
     ctaActionText: options.ctaActionText || ctaConfig.actionText,
     customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
-    mascot: options.mascot || 'lobster_pointing',
+    mascot: options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : getRandomCharacterKey()),
     backgroundAudioVolume: options.bgAudioVolume,
     backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
     tempDir: path.join(tempDir, 'ffmpeg-build'),
@@ -1208,7 +1209,7 @@ Usage:
 Options:
   --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
   --cta-goal <name>         Conversion goal: quiz | guide | codex | demo | homepage
-  --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_action | crab_stats | lobster_peek | lobster_peaceful | none
+  --mascot <name>           Outro mascot: lobster_pointing | lobster_thumbs_up | lobster_navigator | crab_stats | lobster_peek | lobster_peaceful | lobster_engineer | random | none
   --topic <string>          Specific topic or breaking news story
   --holiday <string>        Specific holiday or cultural event
   --color-grade <preset>    Cinematic color grading: auto | benthic-cyan | thermal-melt | photonics-matrix | calcified-armor | none

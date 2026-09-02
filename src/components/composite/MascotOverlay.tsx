@@ -11,6 +11,7 @@ export type MascotKey =
   | 'lobster_peek'
   | 'lobster_peaceful'
   | 'lobster_engineer'
+  | 'random'
   | 'none'
   | (string & {})
 
@@ -75,11 +76,51 @@ export const MASCOT_REGISTRY: Record<string, MascotInfo> = {
 }
 
 /**
+ * Get a list of all registered mascot keys (excluding 'none' and meta keys)
+ */
+export function getAllMascotKeys(): string[] {
+  return Object.keys(MASCOT_REGISTRY)
+}
+
+/**
+ * Pick a random registered mascot key, optionally excluding certain keys
+ */
+export function getRandomMascotKey(excludeKeys: string[] = []): string {
+  const pool = getAllMascotKeys().filter((k) => !excludeKeys.includes(k))
+  const candidates = pool.length > 0 ? pool : getAllMascotKeys()
+  return candidates[Math.floor(Math.random() * candidates.length)]
+}
+
+/**
+ * Generate a rotation of unique random mascot keys (e.g. for multi-slide carousels)
+ */
+export function getRandomMascotRotation(count: number): string[] {
+  const pool = [...getAllMascotKeys()]
+  // Fisher-Yates shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  if (count <= pool.length) {
+    return pool.slice(0, count)
+  }
+  // If count exceeds unique mascots, cycle with wrap-around
+  const result: string[] = []
+  for (let i = 0; i < count; i++) {
+    result.push(pool[i % pool.length])
+  }
+  return result
+}
+
+/**
  * Normalizes character keys and aliases to registry keys
  */
 export function normalizeMascotKey(rawKey: string): string {
   if (!rawKey) return 'lobster_thumbs_up'
   let raw = rawKey.trim().toLowerCase()
+  if (raw === 'random' || raw === 'dice' || raw === 'shuffle') {
+    return getRandomMascotKey()
+  }
   if (raw.endsWith('.png') || raw.endsWith('.jpg') || raw.endsWith('.webp')) {
     raw = raw.replace(/\.[^/.]+$/, '')
   }

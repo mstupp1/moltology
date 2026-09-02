@@ -299,7 +299,14 @@ describe('Composite UI Components', () => {
   })
 
   it('correctly normalizes mascot keys and aliases in getMascotInfo', async () => {
-    const { normalizeMascotKey, getMascotInfo, MASCOT_REGISTRY } = await import('./MascotOverlay')
+    const {
+      normalizeMascotKey,
+      getMascotInfo,
+      getAllMascotKeys,
+      getRandomMascotKey,
+      getRandomMascotRotation,
+      MASCOT_REGISTRY,
+    } = await import('./MascotOverlay')
 
     expect(normalizeMascotKey('pointing')).toBe('lobster_pointing')
     expect(normalizeMascotKey('lobster_pointing_cta')).toBe('lobster_pointing')
@@ -311,7 +318,20 @@ describe('Composite UI Components', () => {
     expect(normalizeMascotKey('engineer')).toBe('lobster_engineer')
     expect(normalizeMascotKey('thumbs_up')).toBe('lobster_thumbs_up')
 
-    // Verify all 7 registry items have valid Neon S3 CDN URLs
+    // Random normalization
+    const randomResolved = normalizeMascotKey('random')
+    expect(Object.keys(MASCOT_REGISTRY)).toContain(randomResolved)
+
+    // Random helpers
+    const allKeys = getAllMascotKeys()
+    expect(allKeys.length).toBeGreaterThanOrEqual(7)
+    expect(allKeys).toContain(getRandomMascotKey())
+
+    const rotation = getRandomMascotRotation(3)
+    expect(rotation.length).toBe(3)
+    expect(new Set(rotation).size).toBe(3)
+
+    // Verify all registry items have valid Neon S3 CDN URLs
     expect(Object.keys(MASCOT_REGISTRY).length).toBe(7)
     for (const key of Object.keys(MASCOT_REGISTRY)) {
       const info = getMascotInfo(key)

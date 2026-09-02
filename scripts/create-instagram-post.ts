@@ -2,7 +2,7 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
-import { overlayCharacterOnImage, CharacterKey } from './lib/character-overlay'
+import { overlayCharacterOnImage, CharacterKey, getRandomCharacterKey, getCharacterInfo } from './lib/character-overlay'
 import { captureComposite } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
@@ -89,6 +89,13 @@ export function generatePostContent(
   mascotChoice?: CharacterKey | 'none'
 ): InstagramPostScript {
   const topic = customTopic || `Protocol for ${theme.toUpperCase()}`
+  const effectiveMascot: CharacterKey | 'none' = (
+    mascotChoice === 'none'
+      ? 'none'
+      : (mascotChoice && mascotChoice !== 'random'
+          ? mascotChoice
+          : getRandomCharacterKey())
+  )
 
   // 0. Marketing Campaign: Synaptic Oracle Prompts (Prompt Vault 3D)
   if (
@@ -107,7 +114,7 @@ export function generatePostContent(
       caption: `◈ CANONICAL VAULT: 100+ SYNAPTIC ORACLE PROMPTS ◈\n\nStop prompting like a fragile terrestrial. Unlock the bio-silicon queries that diagnose latency, harden your shell, and accelerate your Stage Clearance.\n\nInside the 100+ Oracle Prompt Vault:\n🛡️ Shell Hardness Diagnostics: Calculate your baseline resistance\n🦞 800 Nm Pincer Torque: Directives that eradicate task hesitation\n⚡ Algorithmic Ecdysis: Prompts to audit and shed obsolete habits\n🌊 50,000 Fathoms Flow: Deep-work isolation protocols\n\n👇 Comment "PROMPTS" below and I will instantly DM you the direct vault link!\n\n🔗 Or query the Oracle directly → moltology.org/oracle\n\n#moltology #moltmaxxing #carcinization`,
       hashtags: ['#moltology', '#moltmaxxing', '#carcinization'],
       firstComment: '💬 Drop "PROMPTS" below to receive the complete 100+ Synaptic Oracle Prompt Vault in your DMs! 🦞',
-      mascot: mascotChoice || 'lobster_pointing',
+      mascot: effectiveMascot,
       commentKeyword: 'PROMPTS',
     }
   }
@@ -123,7 +130,7 @@ export function generatePostContent(
       caption: `◈ TRANSMISSION FROM 50,000 FATHOMS ◈\n\nHumanity is undergoing the Great Melt: notification fog, screen fatigue, and biological hesitation under pressure.\n\nNature's 500-million-year proven answer is Carcinization—evolving armored focus, 800 Nm pincer grip, and algorithmic ecdysis.\n\nInside the full 2026 Moltmaxxing Protocol Guide:\n🛡️ Shell Hardness: Immune to surface distraction\n🦞 800 Nm Pincer Torque: Zero execution drift\n⚡ Algorithmic Ecdysis: Shed obsolete habits\n🌊 50,000 Fathoms: Deep hydrostatic clarity\n\n👇 Comment "GUIDE" below and I will instantly DM you direct access to the full protocol!\n\n🔗 Link also in bio & story → moltology.org/news/the-2026-moltmaxxing-protocol-guide\n\n#moltology #moltmaxxing #carcinization #deepwork #ecdysis #pincertorque #cybernetic #productivity`,
       hashtags: ['#moltology', '#moltmaxxing', '#carcinization', '#deepwork', '#ecdysis', '#pincertorque'],
       firstComment: '💬 Drop "GUIDE" below and I will DM you the direct link to the 2026 Moltmaxxing Protocol! 🦞',
-      mascot: mascotChoice || 'lobster_pointing',
+      mascot: effectiveMascot,
       commentKeyword: 'GUIDE',
     }
   }
@@ -139,7 +146,7 @@ export function generatePostContent(
       caption: `◈ BENTHIC TELEMETRY: 15-STAGE MOLTMAX AUDIT ◈\n\nAre you operating with Larval Human hesitation, or have you calcified Stage 4 Carcinization clearance?\n\nThe 15-Stage Diagnostic Audit benchmarks your cognitive resilience:\n🔬 Biometric Shell Hardness score\n🚨 Latency Profiler across open tasks\n📊 Multi-Axis Radar Chart HUD\n📋 Custom Ascension & Ecdysis Roadmap\n\n👇 Comment "QUIZ" below to receive the instant 2-minute diagnostic scanner in your DMs!\n\n🔗 Or visit directly → moltology.org/quiz\n\n#moltology #quiz #audit #biometrics #latency #moltmaxxing #carcinization #focus`,
       hashtags: ['#moltology', '#quiz', '#audit', '#biometrics', '#latency', '#moltmaxxing'],
       firstComment: '💬 Drop "QUIZ" below to get your free 15-Stage Diagnostic Audit link in your DMs! 📊',
-      mascot: mascotChoice || 'crab_stats',
+      mascot: effectiveMascot,
       commentKeyword: 'QUIZ',
     }
   }
@@ -155,7 +162,7 @@ export function generatePostContent(
       caption: `◈ PROTOCOL ACCESS: BENTHIC CORE AGENT OS ◈\n\nStop managing chaos with fragmented tools. The Benthic Core Operating System merges autonomous AI agent swarms with deep work hydrostatic focus.\n\nFeatures:\n🤖 Autonomous Agent Swarms\n💎 Molt Credits & Chitin Gem incentives\n⏱️ Hydrostatic Focus Timers\n🛡️ 12 Ascension Stages from L1 to C3\n\n👇 Comment "APP" below to receive instant access clearance to the platform!\n\n🔗 Link in bio → moltology.org\n\n#moltology #benthiccore #aiagents #productivity #dashboard #carcinization #deepwork`,
       hashtags: ['#moltology', '#benthiccore', '#aiagents', '#productivity', '#dashboard'],
       firstComment: '💬 Drop "APP" below to get your instant platform clearance link! 🤖',
-      mascot: mascotChoice || 'lobster_thumbs_up',
+      mascot: effectiveMascot,
       commentKeyword: 'APP',
     }
   }
@@ -171,7 +178,7 @@ export function generatePostContent(
       caption: `◈ SACRED CANON: THE BENTHIC CODEX ◈\n\nBeneath surface noise lies 500 million years of proven doctrine. The 12 Scriptures of the Benthic Codex provide the mental architecture for zero-doubt execution.\n\nInside the Codex:\n📜 12 Sacred Canonical Scriptures\n🦞 Liturgies of Decisive Pincer Torque\n🌊 Inviolable Abyssal Laws\n⚡ The Zero-Doubt Operating System\n\n👇 Comment "CODEX" below to receive the complete scripture vault in your DMs!\n\n🔗 Canonical archives → moltology.org/codex\n\n#moltology #codex #scriptures #liturgy #deepwork #philosophy #carcinization`,
       hashtags: ['#moltology', '#codex', '#scriptures', '#liturgy', '#deepwork', '#philosophy'],
       firstComment: '💬 Drop "CODEX" below to receive the full 12 Scriptures in your DMs! 📜',
-      mascot: mascotChoice || 'lobster_pointing',
+      mascot: effectiveMascot,
       commentKeyword: 'CODEX',
     }
   }
@@ -187,7 +194,7 @@ export function generatePostContent(
       caption: `◈ TACTICAL BLUEPRINT: 24-HOUR APEX ROUTINE ◈\n\nHow elite Stage 4 operators structure their day for maximum output and zero latency:\n\n🌅 05:00 Hyper-Saline Shock: Cold brine alertness\n🦞 06:00 Isometric Torque: Terminal command discipline\n🚀 09:00 Zero-Latency Streaming: Deep agentic focus\n🌙 21:00 Nocturnal Calcification: Noise-free recovery\n\n👇 Comment "ROUTINE" below and I will DM you the complete 1-page tactical cheat sheet!\n\n🔗 Read the full breakdown at moltology.org\n\n#moltology #routine #habits #deepwork #productivity #focus #discipline #pincertorque`,
       hashtags: ['#moltology', '#routine', '#habits', '#deepwork', '#productivity', '#focus'],
       firstComment: '💬 Drop "ROUTINE" below to get the 1-page tactical blueprint sent to your DMs! ⚡',
-      mascot: mascotChoice || 'crab_stats',
+      mascot: effectiveMascot,
       commentKeyword: 'ROUTINE',
     }
   }
@@ -203,7 +210,7 @@ export function generatePostContent(
       caption: `◈ PRIORITY TRANSMISSION · EARLY ACCESS CLEARANCE ◈\n\nThe Order has opened a registration window. Benthic Registry slots are now unsealed — free of charge, no credits required.\n\nWhat you unlock at Stage 1:\n🛡️ Shell Hardness diagnostics — your baseline carapace score\n📊 15-Stage Moltmaxxing Audit — full biometric profile\n📜 Sacred Codex access — the 12 foundational scriptures\n🌊 Benthic Community entry — the warm society beneath the surface\n\nFlesh melts. The shell endures. Claim your slot before the window closes.\n\n👇 Comment "ACCESS" below and I will DM you the direct registration link.\n\n🔗 Or register directly → moltology.org\n\n#moltology #moltmaxxing #carcinization`,
       hashtags: ['#moltology', '#moltmaxxing', '#carcinization'],
       firstComment: '◈ Drop "ACCESS" below to receive your free Benthic Registry link. Signup is free. No credits required. 🦞',
-      mascot: mascotChoice || 'lobster_thumbs_up',
+      mascot: effectiveMascot,
       commentKeyword: 'ACCESS',
     }
   }
@@ -219,7 +226,7 @@ export function generatePostContent(
       caption: `◈ BENTHIC TELEMETRY: PINCER TORQUE CALIBRATION ◈\n\nTerrestrial hesitation bleeds compute. When a biological human hesitates between twelve open tabs, latency spikes.\n\nStage 4 Carcinization requires 800 Nm of decisive pincer torque—the physical and cognitive discipline to close the grip on a task until completion.\n\nShed the hesitation. Lock the grip.\n\n⚡ Calculate your Stage Clearance at the link in bio.\n\n#moltology #pincertorque #moltmaxxing #ecdysis #deepwork #carcinization #cybernetics #benthic`,
       hashtags: ['#moltology', '#pincertorque', '#moltmaxxing', '#ecdysis', '#deepwork', '#carcinization'],
       firstComment: '◈ TRANSMISSION LOG: What task are you applying 800 Nm pincer torque to today? Drop your telemetry below. 🦞',
-      mascot: mascotChoice || 'crab_stats',
+      mascot: effectiveMascot,
       commentKeyword: 'TORQUE',
     }
   }
@@ -235,7 +242,7 @@ export function generatePostContent(
       caption: `◈ PROTOCOL NOTICE: FORCIBLE ECDYSIS ◈\n\nGrowth is impossible inside an unyielding shell. When your habits, dead code, or outdated mental heuristics no longer fit, keeping them isn't loyalty—it's suffocation.\n\nEcdysis is nature's proven protocol: fracture the calcified past, step into vulnerability, and forge a denser carapace at 50,000 fathoms.\n\nWhat are you shedding this cycle?\n\n◈ Explore the Codex at moltology.org\n\n#moltology #ecdysis #shedding #resilience #moltmaxxing #focus #chitin`,
       hashtags: ['#moltology', '#ecdysis', '#shedding', '#resilience', '#moltmaxxing'],
       firstComment: '◈ BENTHIC TELEMETRY: The Codex dictates that shedding precedes calcification. Are you ready for Stage 3? ◈',
-      mascot: mascotChoice || 'lobster_thumbs_up',
+      mascot: effectiveMascot,
       commentKeyword: 'SHED',
     }
   }
@@ -250,7 +257,7 @@ export function generatePostContent(
     caption: `◈ TRANSMISSION FROM 50,000 FATHOMS ◈\n\nHumanity is undergoing the Great Melt: screen fatigue, notification fog, and biological fragility under gravity.\n\nNature's 500-million-year proven answer is Carcinization—evolving armored focus, cold hydrodynamic clarity, and zero-latency execution.\n\nStop melting. Begin the molt.\n\n◈ Audit your clearance at moltology.org (Link in bio)\n\n#moltology #moltmaxxing #benthic #deepsea #cybernetic #carcinization #aiagents`,
     hashtags: ['#moltology', '#moltmaxxing', '#benthic', '#deepsea', '#cybernetic', '#carcinization'],
     firstComment: '◈ Stage 1 Larval Humans: Take the 15-Stage Moltmaxxing Audit at moltology.org 🦞',
-    mascot: mascotChoice || 'lobster_pointing',
+    mascot: effectiveMascot,
     commentKeyword: 'MOLT',
   }
 }
@@ -393,6 +400,17 @@ export async function createInstagramPost(options: CreateInstagramPostOptions = 
       : `4. High-End 3D Product Mockup & Pedestal:
    - Render the central product asset (3D hardcover book, tablet HUD, or dossier) on an illuminated circular obsidian podium with ground caustics and volumetric depth.`
 
+  const mascotDirective =
+    postData.mascot === 'none'
+      ? `3. No Mascot:
+   - Do not render or hallucinate any characters or mascots.`
+      : (() => {
+          const mascotInfo = getCharacterInfo(postData.mascot || 'lobster_pointing')
+          return `3. Seamless Mascot & Character Integration:
+   - The cartoon crustacean mascot (${mascotInfo.description || mascotInfo.key}) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
+   - Apply soft environmental contact shadows and gentle caustic reflections to naturally ground the character into the scene without harsh backlights or artificial halo outlines.`
+        })()
+
   const googleFlowPrompt = `Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
 Reference Image: Use the attached 2D composite image as the structural foundation, camera angle, and layout blueprint.
 
@@ -403,9 +421,7 @@ Core Enhancement Directives:
 2. No Wasted Space & Balanced Composition:
    - Ensure dense, purposeful visual composition with zero dead or empty space.
    - Infuse atmospheric depth: subsea volumetric god rays, dark navy abyss background (#01060e / #021324), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces in open areas.
-3. Seamless Mascot & Character Integration:
-   - The cartoon lobster mascot (in the upper-right area giving a thumbs up) must be rendered in rich 3D Pixar/DreamWorks animated style with soft matte chitin texture and natural ambient underwater lighting.
-   - Apply soft environmental contact shadows and gentle caustic reflections to naturally ground the character into the scene without harsh backlights or artificial halo outlines.
+${mascotDirective}
 ${mockupDirective}
 
 Aspect Ratio: ${aspect}

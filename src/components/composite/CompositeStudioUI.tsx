@@ -458,13 +458,12 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
               onChange={(e) => setMascot(e.target.value as MascotKey)}
               className="w-full p-2.5 rounded-lg bg-[#081016] border border-slate-800 text-xs font-mono text-slate-200 focus:border-cyan-400 focus:outline-none"
             >
-              <option value="lobster_pointing">Lobster Pointing (CTA / Hero)</option>
-              <option value="lobster_thumbs_up">Lobster Thumbs Up (Approval)</option>
-              <option value="crab_stats">Crab Pointing Stats (Metrics)</option>
-              <option value="lobster_navigator">Lobster Navigator (Benthic Explorer)</option>
-              <option value="lobster_peaceful">Lobster Peaceful (Benthic)</option>
-              <option value="lobster_engineer">Lobster Engineer (Diagnostics)</option>
-              <option value="lobster_peek">Lobster Corner Peek</option>
+              <option value="random">🎲 Random Mascot (Surprise)</option>
+              {Object.values(MASCOT_REGISTRY).map((m) => (
+                <option key={m.key} value={m.key}>
+                  {m.name}
+                </option>
+              ))}
               <option value="none">None (No Mascot)</option>
             </select>
           </div>

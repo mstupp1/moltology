@@ -14,18 +14,18 @@ describe('create-instagram-post', () => {
     expect(post.caption.toLowerCase()).toContain('molt')
     expect(post.imagePrompt.toLowerCase()).toContain('benthic')
     expect(post.hashtags.length).toBeGreaterThan(0)
-    expect(post.mascot).toBe('lobster_pointing')
+    expect(post.mascot).toBeDefined()
   })
 
   it('generates Pincer Torque themed content', () => {
-    const post = generatePostContent('pincer-torque')
+    const post = generatePostContent('pincer-torque', undefined, 'crab_stats')
     expect(post.hookHeadline).toContain('PINCER TORQUE')
     expect(post.mascot).toBe('crab_stats')
     expect(post.caption).toContain('800 Nm')
   })
 
   it('generates Moltmaxxing Guide marketing lead magnet post content', () => {
-    const post = generatePostContent('moltmaxxing-guide')
+    const post = generatePostContent('moltmaxxing-guide', undefined, 'lobster_pointing')
     expect(post.title).toContain('Protocol Guide')
     expect(post.hookHeadline).toContain('STOP MELTING')
     expect(post.commentKeyword).toBe('GUIDE')
@@ -35,29 +35,29 @@ describe('create-instagram-post', () => {
   })
 
   it('generates 15-Stage Quiz marketing post content', () => {
-    const post = generatePostContent('moltmax-quiz')
+    const post = generatePostContent('moltmax-quiz', undefined, 'crab_stats')
     expect(post.title).toContain('Diagnostic Audit')
     expect(post.commentKeyword).toBe('QUIZ')
     expect(post.caption).toContain('Comment "QUIZ"')
     expect(post.mascot).toBe('crab_stats')
   })
 
-  it('generates Benthic Core App marketing post content', () => {
-    const post = generatePostContent('benthic-app')
+  it('generates Benthic Core App marketing post content with dynamic mascot', () => {
+    const post = generatePostContent('benthic-app', undefined, 'lobster_engineer')
     expect(post.title).toContain('Benthic Core')
     expect(post.commentKeyword).toBe('APP')
     expect(post.caption).toContain('Comment "APP"')
-    expect(post.mascot).toBe('lobster_thumbs_up')
+    expect(post.mascot).toBe('lobster_engineer')
   })
 
   it('generates Synaptic Oracle Prompts marketing post content', () => {
-    const post = generatePostContent('oracle-prompts')
+    const post = generatePostContent('oracle-prompts', undefined, 'lobster_navigator')
     expect(post.title).toContain('Synaptic Oracle')
     expect(post.hookHeadline).toContain('UNLOCK THE ORACLE')
     expect(post.commentKeyword).toBe('PROMPTS')
     expect(post.caption).toContain('Comment "PROMPTS"')
     expect(post.firstComment).toContain('PROMPTS')
-    expect(post.mascot).toBe('lobster_pointing')
+    expect(post.mascot).toBe('lobster_navigator')
   })
 
   it('has valid default Zernio queue and profile identifiers', () => {

@@ -5,7 +5,7 @@ import path from 'node:path'
 import { captureComposite } from './lib/composite-renderer'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
-import { CharacterKey } from './lib/character-overlay'
+import { CharacterKey, getRandomCharacterRotation, getCharacterInfo } from './lib/character-overlay'
 
 export interface CarouselSlideConfig {
   slideNumber: number
@@ -22,6 +22,14 @@ export interface CreateCarouselOptions {
   dryRun?: boolean
   publishNow?: boolean
   polishedSlides?: string[]
+}
+
+export interface CarouselCopy {
+  title: string
+  topic: string
+  caption: string
+  hashtags: string[]
+  firstComment: string
 }
 
 export const DEFAULT_INSTAGRAM_ACCOUNT_ID = '6a7f7f0777555aae01d99b54' // moltology_org / Silas Trench
@@ -44,7 +52,7 @@ function loadPostHistory(): any {
 }
 
 /**
- * Append to history ledger
+ * Append entry to history ledger
  */
 function recordPostInHistory(entry: any): void {
   const historyPath = path.resolve(process.cwd(), 'content/social/instagram-post-history.json')
@@ -60,7 +68,7 @@ function recordPostInHistory(entry: any): void {
 /**
  * Synthesize carousel caption and copy
  */
-export function generateCarouselCopy(theme: string = 'moltmaxxing', customTopic?: string) {
+export function generateCarouselCopy(theme: string = 'moltmaxxing', customTopic?: string): CarouselCopy {
   const topic = customTopic || `Architecture of ${theme.toUpperCase()}`
   return {
     title: `The Architecture of ${topic}`,
@@ -81,13 +89,13 @@ export function buildSlideGoogleFlowPrompt(slideNum: number, template: string, t
     3: 'Stage 3 Action Directives & CTA: Clean hero victory console with prominent action badge and official MoltNation seal.',
   }
 
-  const mascotDescriptions: Record<number, string> = {
-    1: 'The cheerful thumbs-up lobster in the bottom corner (Slide 1)',
-    2: 'The energetic crab mascot pointing up at the telemetry cards (Slide 2)',
-    3: 'The hero lobster pointing directly at the action CTA button (Slide 3)',
-  }
-
-  const mascotDesc = mascotDescriptions[slideNum] || 'The cartoon crustacean mascot in the corner'
+  const mascotDesc = (() => {
+    if (!mascotKey || mascotKey === 'none') {
+      return 'No mascot on this slide'
+    }
+    const info = getCharacterInfo(mascotKey)
+    return `The cartoon crustacean mascot (${info.description || info.key}, Slide ${slideNum})`
+  })()
 
   return `[SLIDE ${slideNum} - GOOGLE FLOW AI ENHANCEMENT DIRECTIVES]
 Role: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine
@@ -193,31 +201,30 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   // PATH B: Generate 3-Slide Composite Scaffolding via Web-Native Composite Studio
   console.log(`1️⃣ Generating 3-Slide Web-Native Composite Scaffolding (Headless Chrome)...`)
 
-  // Mascot rotation: ensure unique, theme-appropriate characters per slide (never duplicate across slides)
-  const defaultMascotRotation: Record<number, CharacterKey> = {
-    1: 'lobster_thumbs_up',   // Slide 1: Hook / Attention
-    2: 'crab_stats',          // Slide 2: Metrics / Spec Showdown / Breakdown
-    3: 'lobster_pointing',    // Slide 3: Action Directives / Pointing CTA
-  }
+  // Mascot rotation: ensure unique, randomized characters per slide from full character registry (never duplicate across slides)
+  const rotation = getRandomCharacterRotation(3)
+  const slide1Mascot = mascot === 'none' ? 'none' : (mascot && mascot !== 'random' ? mascot : rotation[0])
+  const slide2Mascot = mascot === 'none' ? 'none' : (slide1Mascot === rotation[1] ? rotation[0] : rotation[1])
+  const slide3Mascot = mascot === 'none' ? 'none' : (slide1Mascot === rotation[2] ? rotation[0] : rotation[2])
 
   const slideConfigs = [
     {
       num: 1,
       template: 'hook' as const,
       file: `carousel_${timestamp}_slide1_hook.png`,
-      mascot: mascot === 'none' ? 'none' : (mascot === 'lobster_pointing' ? 'lobster_thumbs_up' : (mascot || defaultMascotRotation[1])),
+      mascot: slide1Mascot,
     },
     {
       num: 2,
       template: 'spec-showdown' as const,
       file: `carousel_${timestamp}_slide2_spec.png`,
-      mascot: mascot === 'none' ? 'none' : defaultMascotRotation[2],
+      mascot: slide2Mascot,
     },
     {
       num: 3,
       template: 'directives' as const,
       file: `carousel_${timestamp}_slide3_directives.png`,
-      mascot: mascot === 'none' ? 'none' : defaultMascotRotation[3],
+      mascot: slide3Mascot,
     },
   ]
 

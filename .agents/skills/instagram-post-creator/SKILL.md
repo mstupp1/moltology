@@ -15,9 +15,10 @@ This skill automates the complete lifecycle of Moltology static Instagram posts 
 
 ## ◈ Character Family Cutouts on S3
 
-Transparent PNG character cutouts reside in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
+Transparent WebP/PNG character cutouts reside in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
-* **Discovery**: Inspect `images/characters/` in S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to select a mascot for post overlays.
+* **Full Character Library**: All registered characters (`lobster_pointing`, `lobster_thumbs_up`, `lobster_navigator`, `crab_stats`, `lobster_peek`, `lobster_peaceful`, `lobster_engineer`, and future additions) are available for selection.
+* **Dynamic & Random Rotation**: Pipelines and composite generators automatically select randomly across the entire character registry when `--mascot` is omitted or set to `random`, ensuring varied, balanced character representation across posts, reels, and carousel slides.
 * **Compositing**: Any character in `images/characters/` can be stamped onto social cards via the Web-Native Composite Studio (`SocialMarketingSlide.tsx`) or `overlayCharacterOnImage`.
 * **Character Visibility & Natural Scene Blending**: Characters must always be clearly visible with strong contrast against the background, naturally blended into the scene with ambient environmental shading. Lighting on the character should **not be obvious** (avoid artificial backlight halos or stark rim lines). When space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
 

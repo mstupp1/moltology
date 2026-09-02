@@ -12,6 +12,8 @@ export type CharacterKey =
   | 'lobster_action'
   | 'crab_stats'
   | 'lobster_engineer'
+  | 'random'
+  | 'none'
   | (string & {})
 
 export interface CharacterInfo {
@@ -75,10 +77,49 @@ export const CHARACTER_REGISTRY: Record<string, CharacterInfo> = {
 }
 
 /**
+ * Get a list of all registered character keys
+ */
+export function getAllCharacterKeys(): CharacterKey[] {
+  return Object.keys(CHARACTER_REGISTRY) as CharacterKey[]
+}
+
+/**
+ * Pick a random registered character key, optionally excluding certain keys
+ */
+export function getRandomCharacterKey(excludeKeys: string[] = []): CharacterKey {
+  const pool = getAllCharacterKeys().filter((k) => !excludeKeys.includes(k))
+  const candidates = pool.length > 0 ? pool : getAllCharacterKeys()
+  return candidates[Math.floor(Math.random() * candidates.length)]
+}
+
+/**
+ * Generate a rotation of unique random character keys (e.g. for multi-slide carousels)
+ */
+export function getRandomCharacterRotation(count: number): CharacterKey[] {
+  const pool = [...getAllCharacterKeys()]
+  // Fisher-Yates shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  if (count <= pool.length) {
+    return pool.slice(0, count)
+  }
+  const result: CharacterKey[] = []
+  for (let i = 0; i < count; i++) {
+    result.push(pool[i % pool.length])
+  }
+  return result
+}
+
+/**
  * Resolve character metadata dynamically from key or filename
  */
 export function getCharacterInfo(characterKeyOrFilename: string): CharacterInfo {
   let raw = characterKeyOrFilename.trim()
+  if (raw === 'random' || raw === 'dice' || raw === 'shuffle') {
+    return CHARACTER_REGISTRY[getRandomCharacterKey()]
+  }
   if (raw.endsWith('.png') || raw.endsWith('.jpg') || raw.endsWith('.webp')) {
     raw = raw.replace(/\.[^/.]+$/, '')
   }
