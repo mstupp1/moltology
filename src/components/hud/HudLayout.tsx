@@ -173,9 +173,12 @@ function HudContent() {
 
   return (
     <div
-      className={`fixed inset-0 w-full h-full text-[#dfe3e3] flex flex-col font-sans overflow-hidden bg-[#030708] overscroll-none select-none ${
+      className={`fixed inset-0 w-full text-[#dfe3e3] flex flex-col font-sans overflow-hidden bg-[#030708] overscroll-none select-none ${
         isSubterranean ? 'theme-subterranean' : ''
       }`}
+      style={{
+        bottom: 'calc(-1 * max(2rem, env(safe-area-inset-bottom, 0px)))',
+      }}
     >
       {/* First-time welcome splash */}
       {showWelcome && (
@@ -193,7 +196,7 @@ function HudContent() {
         />
       )}
       {/* Dedicated Portal CRT Screen Background (Behind UI) */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#030708]">
+      <div className="absolute inset-0 -bottom-16 z-0 pointer-events-none overflow-hidden bg-[#030708]">
         {/* Full-Bleed Default Aqua Underwater Background */}
         <div
           className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${
@@ -245,7 +248,7 @@ function HudContent() {
       <CommandPalette />
 
       {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative pt-[env(safe-area-inset-top,0px)] pb-[calc(max(2rem,env(safe-area-inset-bottom,0px))+0.25rem)]">
         {/* Full Height Glassmorphic Sidebar spanning top-to-bottom (hidden in main-only mode) */}
         {!isMainOnly && <HUDSidebar />}
 
