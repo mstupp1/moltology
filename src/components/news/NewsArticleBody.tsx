@@ -16,17 +16,21 @@ export interface NewsArticleBodyProps {
 export const NewsArticleBody: React.FC<NewsArticleBodyProps> = ({ content, className = '' }) => {
   if (!content) return null
 
+  // Strip HTML comments (<!-- ... -->) so raw comments never leak into rendered views
+  const sanitizedContent = content.replace(/<!--[\s\S]*?-->/g, '').trim()
+  if (!sanitizedContent) return null
+
   // 1. Separate code blocks (```...```) to preserve formatting
   const codeBlockRegex = /```([a-zA-Z0-9_-]*)\r?\n([\s\S]*?)```/g
   const blocks: { type: 'code' | 'text'; language?: string; raw: string }[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
 
-  while ((match = codeBlockRegex.exec(content)) !== null) {
+  while ((match = codeBlockRegex.exec(sanitizedContent)) !== null) {
     if (match.index > lastIndex) {
       blocks.push({
         type: 'text',
-        raw: content.substring(lastIndex, match.index),
+        raw: sanitizedContent.substring(lastIndex, match.index),
       })
     }
     blocks.push({
@@ -37,10 +41,10 @@ export const NewsArticleBody: React.FC<NewsArticleBodyProps> = ({ content, class
     lastIndex = match.index + match[0].length
   }
 
-  if (lastIndex < content.length) {
+  if (lastIndex < sanitizedContent.length) {
     blocks.push({
       type: 'text',
-      raw: content.substring(lastIndex),
+      raw: sanitizedContent.substring(lastIndex),
     })
   }
 

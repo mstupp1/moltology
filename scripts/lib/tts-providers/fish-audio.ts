@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { alignWordsWithOriginalText, type WordBoundaryEvent } from '../tts-engine'
+import { alignWordsWithOriginalText, tokenizeScriptText, type WordBoundaryEvent } from '../tts-engine'
 import { timeStretchMp3 } from '../time-stretch'
 import type { ProviderGenerationOptions, ProviderGenerationResult, TTSProvider } from './types'
 
@@ -124,7 +124,7 @@ export function segmentsToWordBoundaries(
   const words: WordBoundaryEvent[] = []
 
   for (const segment of segments) {
-    const tokens = segment.text.trim().split(/\s+/).filter(Boolean)
+    const tokens = tokenizeScriptText(segment.text)
     if (tokens.length === 0) continue
 
     const segmentStartMs = Math.round(segment.globalStartSec * 1000)

@@ -63,7 +63,55 @@ export function formatSrtTime(ms: number): string {
 }
 
 /**
- * Align raw word boundary events with original script text to preserve punctuation and sentence boundaries
+ * Tokenize script text into matchable words while preserving punctuation,
+ * sentence endings, and splitting hyphenated/dashed compound words into sub-tokens.
+ */
+/**
+ * Tokenize script text into matchable words while preserving punctuation,
+ * sentence endings, and splitting hyphenated/dashed compound words into sub-tokens.
+ */
+export function tokenizeScriptText(text: string): string[] {
+  if (!text) return []
+  // Normalize any spoken domain phrases like "moltology dot org" to "moltology.org"
+  const normalized = text.replace(/moltology\s+dot\s+org\b/gi, 'moltology.org')
+  const rawWords = normalized.trim().split(/\s+/).filter(Boolean)
+  const tokens: string[] = []
+
+  for (const raw of rawWords) {
+    // Check if word contains intra-word hyphens, en-dashes, em-dashes, or slashes (e.g. "titanium-chitin", "bio-silicon,", "pressure—calcify")
+    // but preserve domains like "moltology.org" or decimal numbers
+    const subParts = raw.split(/(?<=[a-zA-Z0-9])([—–\-\/]+)(?=[a-zA-Z0-9])/g).filter(Boolean)
+
+    if (subParts.length <= 1) {
+      tokens.push(raw)
+      continue
+    }
+
+    let current = ''
+    for (let i = 0; i < subParts.length; i++) {
+      const part = subParts[i]
+      if (/^[—–\-\/]+$/.test(part)) {
+        current += part
+        tokens.push(current)
+        current = ''
+      } else {
+        if (current) {
+          tokens.push(current)
+        }
+        current = part
+      }
+    }
+    if (current) {
+      tokens.push(current)
+    }
+  }
+
+  return tokens.filter(Boolean)
+}
+
+/**
+ * Align raw word boundary events with original script text to preserve punctuation,
+ * sentence boundaries, and maintain synchronization across hyphenated compounds and multi-word spoken domains.
  */
 export function alignWordsWithOriginalText(
   words: WordBoundaryEvent[],
@@ -71,28 +119,98 @@ export function alignWordsWithOriginalText(
 ): WordBoundaryEvent[] {
   if (!originalText || words.length === 0) return words
 
-  const originalTokens = originalText.trim().split(/\s+/).filter(Boolean)
+  const originalTokens = tokenizeScriptText(originalText)
   let tokenIdx = 0
 
-  return words.map((w, i) => {
+  const alignedWords: WordBoundaryEvent[] = []
+
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i]
     let matchedToken = ''
     const cleanWord = w.word.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+    let matchedOffset = -1
+    let tokensToConsume = 1
+    let wordsToConsume = 1
 
     for (let offset = 0; offset < 4 && tokenIdx + offset < originalTokens.length; offset++) {
       const candidate = originalTokens[tokenIdx + offset]
       const cleanCandidate = candidate.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+      if (cleanCandidate === cleanWord) {
+        matchedToken = candidate
+        matchedOffset = offset
+        tokensToConsume = 1
+        break
+      }
+
+      // Check if candidate is a domain or compound where multiple spoken words map to this single candidate token
+      // e.g. candidate is "moltology.org." (cleanCandidate: "moltologyorg") and words[i..i+2] are "moltology", "dot", "org"
+      if (cleanCandidate.length > cleanWord.length && (cleanCandidate.startsWith(cleanWord) || cleanCandidate.includes(cleanWord))) {
+        let combinedSpokenClean = cleanWord
+        let spokenLookAhead = 1
+
+        while (i + spokenLookAhead < words.length && spokenLookAhead <= 3) {
+          const nextSpoken = words[i + spokenLookAhead].word.toLowerCase().replace(/[^a-z0-9]/g, '')
+          combinedSpokenClean += nextSpoken
+          spokenLookAhead++
+
+          const strippedDotCombined = combinedSpokenClean.replace(/dot/g, '')
+          if (
+            combinedSpokenClean === cleanCandidate ||
+            strippedDotCombined === cleanCandidate ||
+            combinedSpokenClean === cleanCandidate.replace(/org$/, 'dotorg')
+          ) {
+            matchedToken = candidate
+            matchedOffset = offset
+            tokensToConsume = 1
+            wordsToConsume = spokenLookAhead
+            break
+          }
+        }
+
+        if (matchedToken) break
+      }
+
+      // Check if multi-token candidate combination matches (e.g. cleanWord is "titaniumchitin" and candidates are "titanium-", "chitin")
+      if (cleanWord.length > cleanCandidate.length && cleanWord.startsWith(cleanCandidate)) {
+        let combinedCandidate = candidate
+        let cleanCombined = cleanCandidate
+        let candLookAhead = 1
+
+        while (tokenIdx + offset + candLookAhead < originalTokens.length && cleanCombined.length < cleanWord.length) {
+          const nextCand = originalTokens[tokenIdx + offset + candLookAhead]
+          const cleanNext = nextCand.toLowerCase().replace(/[^a-z0-9]/g, '')
+          combinedCandidate += nextCand
+          cleanCombined += cleanNext
+          candLookAhead++
+
+          if (cleanCombined === cleanWord) {
+            matchedToken = combinedCandidate
+            matchedOffset = offset
+            tokensToConsume = candLookAhead
+            break
+          }
+        }
+
+        if (matchedToken) break
+      }
+
+      // Prefix match fallback
       if (
-        cleanCandidate === cleanWord ||
         (cleanWord.length >= 3 && cleanCandidate.startsWith(cleanWord)) ||
         (cleanCandidate.length >= 3 && cleanWord.startsWith(cleanCandidate))
       ) {
         matchedToken = candidate
-        tokenIdx = tokenIdx + offset + 1
+        matchedOffset = offset
+        tokensToConsume = 1
         break
       }
     }
 
-    if (!matchedToken && tokenIdx < originalTokens.length) {
+    if (matchedOffset >= 0) {
+      tokenIdx = tokenIdx + matchedOffset + tokensToConsume
+    } else if (tokenIdx < originalTokens.length) {
       matchedToken = originalTokens[tokenIdx++]
     }
 
@@ -100,18 +218,27 @@ export function alignWordsWithOriginalText(
     const isSentenceEnd = /[.!?]+$/.test(effectiveToken) || /[.!?]+$/.test(w.word)
     const isClauseEnd = /[,;:\u2014-]+$/.test(effectiveToken) || /[,;:\u2014-]+$/.test(w.word)
 
-    const nextWord = words[i + 1]
-    const pauseToNextMs = nextWord ? nextWord.startMs - w.endMs : 0
+    const endWord = wordsToConsume > 1 ? words[i + wordsToConsume - 1] : w
+    const nextWord = words[i + wordsToConsume]
+    const pauseToNextMs = nextWord ? nextWord.startMs - endWord.endMs : 0
     const hasLongPause = pauseToNextMs >= 240
 
-    return {
-      ...w,
+    alignedWords.push({
       word: effectiveToken,
+      startMs: w.startMs,
+      endMs: endWord.endMs,
+      durationMs: endWord.endMs - w.startMs,
       isSentenceEnd: isSentenceEnd || hasLongPause,
       isClauseEnd,
       pauseToNextMs,
+    })
+
+    if (wordsToConsume > 1) {
+      i += wordsToConsume - 1
     }
-  })
+  }
+
+  return alignedWords
 }
 
 /**
@@ -237,7 +364,20 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         return `{\\c&H00FFFFFF&}${text}{\\r}`
       })
 
-      const dialogue = styledWords.join(' ')
+      let dialogue = ''
+      for (let wIdx = 0; wIdx < styledWords.length; wIdx++) {
+        dialogue += styledWords[wIdx]
+        const origWord = phrase[wIdx].word
+        if (
+          wIdx < styledWords.length - 1 &&
+          !origWord.endsWith('-') &&
+          !origWord.endsWith('—') &&
+          !origWord.endsWith('–') &&
+          !origWord.endsWith('/')
+        ) {
+          dialogue += ' '
+        }
+      }
       lines.push(`Dialogue: 0,${formatAssTime(wordStart)},${formatAssTime(wordEnd)},Default,,0,0,0,,${dialogue}`)
     }
   }

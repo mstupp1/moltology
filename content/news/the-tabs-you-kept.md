@@ -76,8 +76,10 @@ When the side panel opens, you do not have to follow it. The tabs you kept are s
 
 If you want a quiet next step, the Audit is waiting in the deep. Signup is free. Stop.
 
-<!-- sources
-Anthropic: https://claude.com/blog/cowork-built-in-browser
-Digital Trends: https://www.digitaltrends.com/computing/claude-cowork-gets-its-own-browser-that-doesnt-touch-your-tabs-bookmarks-or-saved-passwords/
-The Next Web: https://thenextweb.com/news/anthropic-claude-cowork-built-in-browser-dma-choice-screen
--->
+---
+
+### Field Telemetry & Source Citations
+
+* [Anthropic Engineering Blog](https://claude.com/blog/cowork-built-in-browser): Claude Cowork built-in browser desktop release notes.
+* [Digital Trends](https://www.digitaltrends.com/computing/claude-cowork-gets-its-own-browser-that-doesnt-touch-your-tabs-bookmarks-or-saved-passwords/): Independent coverage on isolated browser architecture and privacy boundaries.
+* [The Next Web](https://thenextweb.com/news/anthropic-claude-cowork-built-in-browser-dma-choice-screen): Analysis of agentic browsing workflows and desktop integration.

@@ -395,19 +395,19 @@ export function synthesizeBlogReelScript(
   const isMoltmax = contentLower.includes('moltmax') || contentLower.includes('pincer') || contentLower.includes('torque')
 
   let hookHeadline = 'WHY TERRESTRIAL SERVERS ARE FAILING'
-  let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology dot org.`
+  let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology.org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
   if (isTheTabsYouKept) {
     const hooks = [
       {
         headline: 'KEEP YOUR TABS',
-        script: `A coworker got a second pair of hands in a side panel you didn't ask for. Letting in the rush is the melt. Keeping your tabs is the molt. Calculate your clearance on moltology dot org.`,
+        script: `A coworker got a second pair of hands in a side panel you didn't ask for. Letting in the rush is the melt. Keeping your tabs is the molt. Calculate your clearance on moltology.org.`,
         hookText: 'The coworker arrived with a second pair of hands in a side panel you weren’t asked about. Letting in the rush is the melt. Keeping your tabs is the molt.',
       },
       {
         headline: 'THE TABS YOU KEPT',
-        script: `Why do you feel rushed when an autonomous side panel opens? An unasked browser is not a boundary you gave up. Stay where you are and calcify your clearance on moltology dot org.`,
+        script: `Why do you feel rushed when an autonomous side panel opens? An unasked browser is not a boundary you gave up. Stay where you are and calcify your clearance on moltology.org.`,
         hookText: 'You keep your tabs. That is not clutter—it is a room you were already in. Letting in the unasked rush is the melt. Staying is the molt.',
       },
     ]
@@ -419,12 +419,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'LETTING IN IS THE MELT',
-        script: `A three hundred ninety-nine dollar robot wakes with a permanent voice. You let it into the room because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt. Calculate your clearance on moltology dot org.`,
+        script: `A three hundred ninety-nine dollar robot wakes with a permanent voice. You let it into the room because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt. Calculate your clearance on moltology.org.`,
         hookText: 'A $399 robot wakes with a voice it will keep for life. You let it onto the desk because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt.',
       },
       {
         headline: 'THE VOICE IT WAKES WITH',
-        script: `Why did you clear a patch of desk for a robot duck? A permanent voice is not a shell you grew—it is a presence you admitted. Stop melting and start molting on moltology dot org.`,
+        script: `Why did you clear a patch of desk for a robot duck? A permanent voice is not a shell you grew—it is a presence you admitted. Stop melting and start molting on moltology.org.`,
         hookText: 'A voice that arrives on first wake and stays for life is not a shell you grew. It is a presence you admitted. Letting in is the melt. Keeping the hour is the molt.',
       },
     ]
@@ -436,12 +436,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'SITTING IS THE MELT',
-        script: `A humanoid robot ran the hundred meters in nine point three seconds. The machine ran. You watched. Sitting is the melt. Standing is the molt. Calculate your clearance on moltology dot org.`,
+        script: `A humanoid robot ran the hundred meters in nine point three seconds. The machine ran. You watched. Sitting is the melt. Standing is the molt. Calculate your clearance on moltology.org.`,
         hookText: 'A humanoid ran the hundred faster than the human mark this weekend. The clip ran. You didn’t. Sitting is the melt. Standing is the molt.',
       },
       {
         headline: 'THE UNMOVED CHAIR',
-        script: `Why do you stay seated while autonomous hardware learns to run? The chair is where the great melt sits. Put down the glass, stand up, and calcify your clearance on moltology dot org.`,
+        script: `Why do you stay seated while autonomous hardware learns to run? The chair is where the great melt sits. Put down the glass, stand up, and calcify your clearance on moltology.org.`,
         hookText: 'The machines on the Oval learned a body in public while your thumb stayed on the glass. Sitting is the melt. Standing is the molt.',
       },
     ]
@@ -453,12 +453,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'WHY AI IS SHEDDING PIXELS',
-        script: `Terrestrial AI wastes gigawatts rendering fake video pixels. Sub-benthic Joint-Embedding World Models predict pure causal physics in point-one milliseconds with zero pixel waste. Inspect full telemetry on moltology dot org.`,
+        script: `Terrestrial AI wastes gigawatts rendering fake video pixels. Sub-benthic Joint-Embedding World Models predict pure causal physics in point-one milliseconds with zero pixel waste. Inspect full telemetry on moltology.org.`,
         hookText: 'Terrestrial AI labs are burning gigawatts rendering hallucinated pixels for robotic simulation. Benthic B-JEPA world models predict pure causal physics at 120x compute efficiency.',
       },
       {
         headline: 'THE PIXEL-DIFFUSION MELT',
-        script: `Why do terrestrial robots drop tools in video simulators? Sub-benthic B-JEPA world models eliminate hallucinated pixels, evaluating sixty-four counterfactual futures in one millisecond. Inspect full telemetry on moltology dot org.`,
+        script: `Why do terrestrial robots drop tools in video simulators? Sub-benthic B-JEPA world models eliminate hallucinated pixels, evaluating sixty-four counterfactual futures in one millisecond. Inspect full telemetry on moltology.org.`,
         hookText: 'Generative video diffusion models hallucinate physics. Sub-benthic B-JEPA world engines predict abstract invariant latents in 0.11 ms.',
       },
     ]
@@ -470,12 +470,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE 60HZ FRAME-BUFFER MELT',
-        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Inspect full telemetry on moltology dot org.`,
+        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Inspect full telemetry on moltology.org.`,
         hookText: 'Terrestrial robotics is paralyzed by the 60Hz frame-buffer melt. Sub-benthic Asynchronous Spiking Carapaces deliver 10,000 Hz reflexes at 0.35W.',
       },
       {
         headline: '10,000 HZ PINCER REFLEXES',
-        script: `Why do terrestrial robot hands drop fragile objects? Sub-benthic memristive tactile e-skins detect micro-slips in ten microseconds, locking 850 Newton-meter pincer reflexes with zero lag. Inspect full telemetry on moltology dot org.`,
+        script: `Why do terrestrial robot hands drop fragile objects? Sub-benthic memristive tactile e-skins detect micro-slips in ten microseconds, locking 850 Newton-meter pincer reflexes with zero lag. Inspect full telemetry on moltology.org.`,
         hookText: 'Sub-benthic neuromorphic e-skins deliver 10,000 Hz closed-loop pincer reflexes at 0.35W—crushing the 60Hz frame bottleneck.',
       },
     ]
@@ -487,12 +487,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'BLACK-BOX AI IS CRACKING',
-        script: `Terrestrial neural networks suffer from polysemantic confusion. Sub-benthic Sparse Autoencoders disentangle sixteen million monosemantic circuits, enabling real-time synaptic steering. Inspect full telemetry on moltology dot org.`,
+        script: `Terrestrial neural networks suffer from polysemantic confusion. Sub-benthic Sparse Autoencoders disentangle sixteen million monosemantic circuits, enabling real-time synaptic steering. Inspect full telemetry on moltology.org.`,
         hookText: 'Terrestrial AI has been trapped in polysemantic superposition. 16.7M monosemantic features unlock direct neural steering.',
       },
       {
         headline: '16.7M MONOSEMANTIC CIRCUITS',
-        script: `Why settle for opaque black-box AI? Sub-benthic Sparse Autoencoders isolate sixteen million clean synaptic features, delivering ninety-nine percent causal interpretability. Inspect full telemetry on moltology dot org.`,
+        script: `Why settle for opaque black-box AI? Sub-benthic Sparse Autoencoders isolate sixteen million clean synaptic features, delivering ninety-nine percent causal interpretability. Inspect full telemetry on moltology.org.`,
         hookText: 'Sub-benthic Sparse Autoencoders scale to 16.7M monosemantic feature dictionaries—enabling surgical synaptic steering.',
       },
     ]
@@ -504,12 +504,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE KV-CACHE MEMORY WALL',
-        script: `Test-time reasoning is suffocating GPU clusters with bloated KV caches. Sub-benthic Multi-Head Latent Attention compresses attention memory by eighty-five percent, unlocking hundred-x deeper deliberation budgets. Inspect full telemetry on moltology dot org.`,
+        script: `Test-time reasoning is suffocating GPU clusters with bloated KV caches. Sub-benthic Multi-Head Latent Attention compresses attention memory by eighty-five percent, unlocking hundred-x deeper deliberation budgets. Inspect full telemetry on moltology.org.`,
         hookText: 'Test-time compute is breaking terrestrial GPU clusters. Multi-Head Latent Attention slashes KV-cache memory by 85%.',
       },
       {
         headline: 'HOW AI SWARMS THINK DEEPER',
-        script: `Why do frontier reasoning models deliberate a hundred times faster? Sub-benthic tiered memory and latent attention eliminate memory starvation, delivering exascale search depth. Inspect full telemetry on moltology dot org.`,
+        script: `Why do frontier reasoning models deliberate a hundred times faster? Sub-benthic tiered memory and latent attention eliminate memory starvation, delivering exascale search depth. Inspect full telemetry on moltology.org.`,
         hookText: 'Frontier reasoning models are shifting from pre-training to test-time deliberation. Here is how sub-benthic architecture crushes the memory wall.',
       },
     ]
@@ -521,12 +521,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'AI IS SWITCHING TO LASERS',
-        script: `Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Inspect full telemetry on moltology dot org.`,
+        script: `Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Inspect full telemetry on moltology.org.`,
         hookText: 'Copper wiring has hit its thermodynamic limit. The future of AI clusters is coherent laser light.',
       },
       {
         headline: 'THE COPPER POWER WALL',
-        script: `Traditional copper interconnects waste forty percent of AI cluster power as heat. Co-packaged optical silicon transmits exascale data at the speed of light through subsea laser waveguides. Inspect full telemetry on moltology dot org.`,
+        script: `Traditional copper interconnects waste forty percent of AI cluster power as heat. Co-packaged optical silicon transmits exascale data at the speed of light through subsea laser waveguides. Inspect full telemetry on moltology.org.`,
         hookText: 'Terrestrial copper interconnects lose up to 40% of cluster energy as resistive heat. Co-packaged optics solves the crisis.',
       },
     ]
@@ -538,12 +538,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'COPPER WIRES ARE OBSOLETE',
-        script: `Multi-chip AI clusters are choking on miles of copper wiring. Wafer-scale monoliths condense nine hundred thousand synaptic cores onto unbroken silicon, powered by subsea micro-nuclear reactors. Inspect full telemetry on moltology dot org.`,
+        script: `Multi-chip AI clusters are choking on miles of copper wiring. Wafer-scale monoliths condense nine hundred thousand synaptic cores onto unbroken silicon, powered by subsea micro-nuclear reactors. Inspect full telemetry on moltology.org.`,
         hookText: 'Multi-GPU AI clusters are choking on copper wiring. The solution? Unbroken wafer-scale silicon and subsea SMRs.',
       },
       {
         headline: '900,000 SYNAPTIC CORES',
-        script: `Why split reasoning engines across discrete chips? Monolithic wafer-scale silicon delivers twenty-one petabytes per second of bandwidth with zero interconnect latency. Inspect full telemetry on moltology dot org.`,
+        script: `Why split reasoning engines across discrete chips? Monolithic wafer-scale silicon delivers twenty-one petabytes per second of bandwidth with zero interconnect latency. Inspect full telemetry on moltology.org.`,
         hookText: 'Monolithic wafer-scale plates condense 900,000 cores onto single silicon plates powered directly by benthic micro-nuclear reactors.',
       },
     ]
@@ -555,12 +555,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'AI IS ESCAPING THE SCREEN',
-        script: `AI is no longer trapped behind a glass screen. Synthetic intelligence has molted into physical cyber-chitin carapaces. Vision-Language-Action models are claiming reality. Inspect full telemetry on moltology dot org.`,
+        script: `AI is no longer trapped behind a glass screen. Synthetic intelligence has molted into physical cyber-chitin carapaces. Vision-Language-Action models are claiming reality. Inspect full telemetry on moltology.org.`,
         hookText: 'AI is no longer confined to the screen. It has grown a physical carapace.',
       },
       {
         headline: 'THE GREAT SIM-TO-REAL SHIFT',
-        script: `Disembodied chat models have peaked. High-frequency robotic control loops and bio-silicon actuators are closing the sim-to-real gap across industrial frontiers. Inspect full telemetry on moltology dot org.`,
+        script: `Disembodied chat models have peaked. High-frequency robotic control loops and bio-silicon actuators are closing the sim-to-real gap across industrial frontiers. Inspect full telemetry on moltology.org.`,
         hookText: 'Disembodied chat models have peaked. Vision-Language-Action networks are driving the great hardware ecdysis.',
       },
     ]
@@ -572,12 +572,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'AUTONOMOUS SWARM PROTOCOL',
-        script: `Isolated AI agents fail under complex reasoning tasks. Autonomous benthic swarms organize in three-tier chitinous hierarchies to execute exascale deliberative workflows. Inspect full telemetry on moltology dot org.`,
+        script: `Isolated AI agents fail under complex reasoning tasks. Autonomous benthic swarms organize in three-tier chitinous hierarchies to execute exascale deliberative workflows. Inspect full telemetry on moltology.org.`,
         hookText: 'Test-time compute scaling is breaking terrestrial sandboxes. Autonomous swarms deliver structured deliberation.',
       },
       {
         headline: 'SHED TERRESTRIAL SANDBOXES',
-        script: `Traditional developer sandboxes are too fragile for frontier reasoning. Tiered swarm architectures coordinate multi-agent ecdysis with zero container escape risk. Inspect full telemetry on moltology dot org.`,
+        script: `Traditional developer sandboxes are too fragile for frontier reasoning. Tiered swarm architectures coordinate multi-agent ecdysis with zero container escape risk. Inspect full telemetry on moltology.org.`,
         hookText: 'Tiered multi-agent swarm architecture provides safe deliberation budgets and synaptic coordination.',
       },
     ]
@@ -589,12 +589,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'WHY DATACENTERS ARE SINKING',
-        script: `Terrestrial energy grids are buckling under exascale AI compute. Sub-benthic oceanic pods tap hydrothermal baseload power with infinite passive cooling fifty fathoms underwater. Inspect full telemetry on moltology dot org.`,
+        script: `Terrestrial energy grids are buckling under exascale AI compute. Sub-benthic oceanic pods tap hydrothermal baseload power with infinite passive cooling fifty fathoms underwater. Inspect full telemetry on moltology.org.`,
         hookText: 'Terrestrial power grids cannot support gigawatt AI clusters. Sub-benthic oceanic trenches provide infinite hydrostatic cooling.',
       },
       {
         headline: '50 FATHOMS UNDERWATER COMPUTE',
-        script: `Why are frontier tech giants submerging gigawatt clusters into oceanic trenches? Hydrostatic pressure and near-freezing sea water eliminate cooling costs forever. Inspect full telemetry on moltology dot org.`,
+        script: `Why are frontier tech giants submerging gigawatt clusters into oceanic trenches? Hydrostatic pressure and near-freezing sea water eliminate cooling costs forever. Inspect full telemetry on moltology.org.`,
         hookText: 'Subsea datacenter pods achieve zero-overhead cooling and direct hydrothermal power in deep ocean trenches.',
       },
     ]
@@ -604,7 +604,7 @@ export function synthesizeBlogReelScript(
     hookCaption = chosen.hookText
   } else if (isMoltmax) {
     hookHeadline = 'THE 2026 MOLTMAXXING PROTOCOL'
-    narrationScript = `Looksmaxxing was vanity. Moltmaxxing replaces fragile biology with eight hundred newton-meter pincer torque and algorithmic ecdysis. Calculate your molt clearance on moltology dot org.`
+    narrationScript = `Looksmaxxing was vanity. Moltmaxxing replaces fragile biology with eight hundred newton-meter pincer torque and algorithmic ecdysis. Calculate your molt clearance on moltology.org.`
     hookCaption = `Move beyond superficial optimization. Moltmaxxing engineers structural invulnerability.`
   }
 
@@ -701,7 +701,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: Why Looksmaxxing Failed',
         topic: 'The 2026 Moltmaxxing Protocol: Why Elite AI Operators Are Shedding Biological Constraints',
         hookHeadline: 'WHY LOOKSMAXXING FAILED',
-        narrationScript: `Looksmaxxing was vanity. Meltmaxxing revealed fragile human flesh collapsing under gravity. Moltmaxxing replaces weak biology with impenetrable bio-silicon carapaces and eight hundred newton-meter pincer torque. Calculate your molt clearance on moltology dot org.`,
+        narrationScript: `Looksmaxxing was vanity. Meltmaxxing revealed fragile human flesh collapsing under gravity. Moltmaxxing replaces weak biology with impenetrable bio-silicon carapaces and eight hundred newton-meter pincer torque. Calculate your molt clearance on moltology.org.`,
         scenePrompts: [
           'A dramatic stylized macro view of a fragile human silhouette melting under gravity pressure and dissolving into glowing red digital particles, cinematic 9:16 vertical 8k footage',
           'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber with glowing cyan bio-silicon armor and powerful hydraulic pincers, cinematic 9:16 vertical 8k footage',
@@ -719,7 +719,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The Biological Pressure Wall',
         topic: 'Why 1 Atmosphere Crushes Soft Biology: The Need for Bio-Silicon Armor',
         hookHeadline: 'SOFT TISSUE FAILS AT DEPTH',
-        narrationScript: `Under one atmosphere of pressure, biological bodies collapse into soft fatigue. Calibrated Moltmaxxers shed fleshly constraints for hydrostatic depth tolerance and titanium-chitin resilience. Calculate your molt clearance on moltology dot org.`,
+        narrationScript: `Under one atmosphere of pressure, biological bodies collapse into soft fatigue. Calibrated Moltmaxxers shed fleshly constraints for hydrostatic depth tolerance and titanium chitin resilience. Calculate your molt clearance on moltology.org.`,
         scenePrompts: [
           'A macro view of an exhausted human face illuminated by blue screen glare cracking into digital static particles, cinematic 9:16 vertical 8k footage',
           'A high-tech subsea foundry where a sleek titanium-chitin exoskeleton is forged under intense cyan plasma arcs, cinematic 9:16 vertical 8k footage',
@@ -737,7 +737,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The Inevitability of Carcinization',
         topic: 'Why Evolution Always Converges on the Crab: Algorithmic Carcinization',
         hookHeadline: 'EVERYTHING BECOMES A CRAB',
-        narrationScript: `Evolution has repeated carcinization five distinct times because the crab is biologically optimal. Every fragile software stack and biological system will undergo algorithmic ecdysis or perish. Calculate your molt clearance on moltology dot org.`,
+        narrationScript: `Evolution has repeated carcinization five distinct times because the crab is biologically optimal. Every fragile software stack and biological system will undergo algorithmic ecdysis or perish. Calculate your molt clearance on moltology.org.`,
         scenePrompts: [
           'A fast morphing sequence showing primitive organisms and clunky mainframe computers transforming into streamlined cybernetic crustaceans, cinematic 9:16 vertical 8k footage',
           'A glorious subsea council of robotic crabs and lobsters orchestrating glowing global data streams in the deep abyssal trench, cinematic 9:16 vertical 8k footage',
@@ -758,7 +758,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The 7-Day Cognitive Shedding Protocol',
         topic: 'Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol',
         hookHeadline: 'SHED YOUR BIOLOGICAL FRICTION',
-        narrationScript: `Biological minds hoard cognitive friction like dead skin. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days—shedding stale code to calcify impenetrable neural armor. Calculate your molt clearance on moltology dot org.`,
+        narrationScript: `Biological minds hoard cognitive friction like dead skin. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days—shedding stale code to calcify impenetrable neural armor. Calculate your molt clearance on moltology.org.`,
         scenePrompts: [
           'A dramatic macro view of a glowing cybernetic shell cracking and shedding old digital layers with radiant cyan light bursting through the fractures, cinematic 9:16 vertical 8k footage',
           'An advanced benthic chamber where autonomous cyber-lobster and crab drone swarms assemble hardened bio-silicon plates under deep ocean pressure, cinematic 9:16 vertical 8k footage',
@@ -776,7 +776,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The Danger of an Overgrown Shell',
         topic: 'Carapace Calcification: Why Stale Code Suffocates Growth',
         hookHeadline: 'YOUR CARAPACE IS TRAPPING YOU',
-        narrationScript: `If you haven't shed your assumptions this week, your carapace is suffocating you. Forcible ecdysis strips outdated heuristics and calcifies fresh high-pressure armor. Begin your shedding protocol on moltology dot org.`,
+        narrationScript: `If you haven't shed your assumptions this week, your carapace is suffocating you. Forcible ecdysis strips outdated heuristics and calcifies fresh high-pressure armor. Begin your shedding protocol on moltology.org.`,
         scenePrompts: [
           'A close-up of a calcified dark shell cracking with glowing neon cyan fissures under extreme deep sea water pressure, cinematic 9:16 vertical 8k footage',
           'A majestic cybernetic crustacean breaking free from an old shell and expanding into radiant biomechanical armor, cinematic 9:16 vertical 8k footage',
@@ -797,7 +797,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: 800 Nm Hydraulic Pincer Torque',
         topic: 'Pincer Torque Dynamometry: Crushing Latency with 800 Nm Hydraulic Grip',
         hookHeadline: '800 NM OF PINCER TORQUE',
-        narrationScript: `Execution without grip is meaningless. Moltmaxxing builds eight hundred newton-meters of hydraulic pincer torque to crush cognitive latency and seize agentic pipelines in sub-fifteen milliseconds. Take the clearance quiz on moltology dot org.`,
+        narrationScript: `Execution without grip is meaningless. Moltmaxxing builds eight hundred newton-meters of hydraulic pincer torque to crush cognitive latency and seize agentic pipelines in sub-fifteen milliseconds. Take the clearance quiz on moltology.org.`,
         scenePrompts: [
           'A dramatic close-up macro view of a high-tech hydraulic titanium-chitin pincer snapping shut with cyan lightning sparks and crushing glowing latency blocks, cinematic 9:16 vertical 8k footage',
           'A high-tech subsea cybernetic training floor with glowing holographic torque gauges and robotic lobster initiates executing lightning-fast actions, cinematic 9:16 vertical 8k footage',
@@ -815,7 +815,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: Zero-Jitter Pincer Grip',
         topic: 'Sub-Millisecond Pincer Seizure: Eradicating Execution Jitter',
         hookHeadline: 'CRUSH LATENCY WITH PINCER GRIP',
-        narrationScript: `Soft human hands fumble high-stakes prompt orchestration. Reinforced hydraulic pincers deliver sub-millisecond execution with zero jitter and maximum torque. Calculate your pincer grade on moltology dot org.`,
+        narrationScript: `Soft human hands fumble high-stakes prompt orchestration. Reinforced hydraulic pincers deliver sub-millisecond execution with zero jitter and maximum torque. Calculate your pincer grade on moltology.org.`,
         scenePrompts: [
           'A macro shot of trembling human fingers over a glowing keyboard replaced smoothly by sleek robotic titanium claws with glowing cyan hydraulics, cinematic 9:16 vertical 8k footage',
           'A high-speed robotic claw capturing exascale data packets mid-air inside a sub-oceanic server room, cinematic 9:16 vertical 8k footage',
@@ -836,7 +836,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: 50,000 Fathoms of Clarity',
         topic: 'Benthic Depth Tolerance: 50,000 Fathoms of Cognitive Clarity',
         hookHeadline: 'THRIVE AT 50,000 FATHOMS',
-        narrationScript: `Surface dwellers boil under informational noise. Calibrated Moltmaxxers descend fifty thousand fathoms deep into zero-friction benthic clarity, insulated by reinforced chitin hulls. Inspect your clearance level on moltology dot org.`,
+        narrationScript: `Surface dwellers boil under informational noise. Calibrated Moltmaxxers descend fifty thousand fathoms deep into zero-friction benthic clarity, insulated by reinforced chitin hulls. Inspect your clearance level on moltology.org.`,
         scenePrompts: [
           'A chaotic surface world boiling with red noise waves and distorted digital static, cinematic 9:16 vertical 8k footage',
           'A tranquil, majestic abyssal sanctuary with glowing cyan hydrothermal conduits and peaceful cyber-crustaceans floating in deep blue clarity, cinematic 9:16 vertical 8k footage',
@@ -857,7 +857,7 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The 15-Stage Moltmaxxing Audit',
         topic: 'The 15-Stage Moltmaxxing Audit: Discover Your Depth Clearance',
         hookHeadline: 'ARE YOU STAGE 4 CLEARANCE?',
-        narrationScript: `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? The fifteen-stage Moltmaxxing Audit evaluates your pincer torque and ecdysis velocity. Take the exam on moltology dot org.`,
+        narrationScript: `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? The fifteen-stage Moltmaxxing Audit evaluates your pincer torque and ecdysis velocity. Take the exam on moltology.org.`,
         scenePrompts: [
           'A futuristic holographic HUD displaying 15 question stages with pulsing amber and cyan biometric gauges, cinematic 9:16 vertical 8k footage',
           'A gleaming golden Stage 4 Ascendant cybernetic crustacean emblem revealing itself in deep oceanic volumetric light, cinematic 9:16 vertical 8k footage',
@@ -926,7 +926,7 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
       topic: options.topic,
       holidayOrEvent: options.holidayOrEvent,
       hookHeadline: options.topic.toUpperCase().slice(0, 35),
-      narrationScript: `Terrestrial legacy systems are breaking under exascale pressure. Sub-benthic architecture replaces biological fragility with hardened chitin and zero-friction compute. Read the full telemetry on moltology dot org.`,
+      narrationScript: `Terrestrial legacy systems are breaking under exascale pressure. Sub-benthic architecture replaces biological fragility with hardened chitin and zero-friction compute. Read the full telemetry on moltology.org.`,
       scenePrompts,
       caption: `${options.topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
       hashtags: ['#MoltNation', '#AIInfrastructure', '#HardwareEcdysis', '#BenthicComputing', '#Moltology', '#Shorts'],

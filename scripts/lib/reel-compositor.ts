@@ -161,7 +161,27 @@ export async function renderKineticCaptionCard(
   const centerY = 1380
   const maxLineWidth = 920
 
-  const phraseText = wordsInPhrase.map((w) => w.word).join(' ')
+  const getWordSpacing = (idx: number) => {
+    const w = wordsInPhrase[idx]?.word || ''
+    if (w.endsWith('-') || w.endsWith('—') || w.endsWith('–') || w.endsWith('/')) {
+      return 0
+    }
+    return spaceWidth
+  }
+
+  let phraseText = ''
+  for (let i = 0; i < wordsInPhrase.length; i++) {
+    phraseText += wordsInPhrase[i].word
+    if (
+      i < wordsInPhrase.length - 1 &&
+      !wordsInPhrase[i].word.endsWith('-') &&
+      !wordsInPhrase[i].word.endsWith('—') &&
+      !wordsInPhrase[i].word.endsWith('–') &&
+      !wordsInPhrase[i].word.endsWith('/')
+    ) {
+      phraseText += ' '
+    }
+  }
   let baseFontSize = 64
   if (phraseText.length > 24) baseFontSize = 54
   if (phraseText.length > 34) baseFontSize = 46
@@ -185,8 +205,7 @@ export async function renderKineticCaptionCard(
   })
 
   const totalCalculatedWidth =
-    wordMeasurements.reduce((acc, curr) => acc + curr.width, 0) +
-    (wordsInPhrase.length - 1) * spaceWidth
+    wordMeasurements.reduce((acc, curr, idx) => acc + curr.width + (idx < wordsInPhrase.length - 1 ? getWordSpacing(idx) : 0), 0)
 
   let currentX = (1080 - totalCalculatedWidth) / 2
 
@@ -235,7 +254,7 @@ export async function renderKineticCaptionCard(
       ctx.shadowBlur = 0
     }
 
-    currentX += item.width + spaceWidth
+    currentX += item.width + (i < wordsInPhrase.length - 1 ? getWordSpacing(i) : 0)
   }
 
   fs.writeFileSync(outputPath, canvas.toBuffer('image/png'))

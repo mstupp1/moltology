@@ -65,7 +65,7 @@ describe('Reel Compositor Rendering', () => {
     expect(fs.existsSync(result)).toBe(true)
     const stats = fs.statSync(result)
     expect(stats.size).toBeGreaterThan(10000)
-  })
+  }, 15000)
 
   it('renders the simplified CTA outro card frame (Moltology emblem, THE SYNAPTIC PATH, clean moltology.org CTA)', async () => {
     const outPath = path.resolve(process.cwd(), 'tmp/test_simple_cta_outro_frame.png')

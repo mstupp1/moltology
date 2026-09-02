@@ -187,6 +187,22 @@
       "instagramPostId": "6a959aaaa034add76b6fdc76",
       "relatedReelIds": [],
       "driveSource": "the-tabs-you-kept.md"
+    },
+    {
+      "slug": "the-twin-shells",
+      "title": "The Twin Shells: Why Frontier Cybersecurity Swarms Are Fighting Themselves at Machine Speed",
+      "format": "system-architecture-teardown",
+      "category": "SWARM ARCHITECTURE",
+      "author": "Silas Trench",
+      "publishedAt": "2026-09-02T13:00:00Z",
+      "coreHook": "CrowdStrike and NVIDIA launch SafeMind, pitting adversarial neural models (Red Tempest vs Blue Solano) against enterprise digital twins at machine speed to patch perimeters before humans open an incident ticket.",
+      "keyMetrics": [
+        "Nemotron foundation architecture",
+        "15 years telemetry fine-tuning",
+        "Machine-speed closed-loop triage",
+        "Critical cybersecurity threshold rating"
+      ],
+      "relatedReelIds": []
     }
   ]
 }

@@ -358,32 +358,32 @@ export function formulateViralSeriesScript(
     if (!episodeTitle) episodeTitle = 'The 460-Millisecond Ergonomic Melt'
     hookHeadline = 'YOUR DESK IS A DECAY ACCELERATOR'
     retentionLoopAnchor = 'The desk held you because'
-    narrationScript = `Every hour you spend slumping at an ergonomic desk costs forty-six percent of your pincer torque. Terrestrial humans hesitate four hundred sixty milliseconds before every decision. In the deep abyss, hesitation is fatal. Sub-benthic calcification locks your grip with eight hundred fifty Newton-meters of hydraulic force. Stop melting. Calculate your clearance on moltology dot org.`
+    narrationScript = `Every hour you spend slumping at an ergonomic desk costs forty-six percent of your pincer torque. Terrestrial humans hesitate four hundred sixty milliseconds before every decision. In the deep abyss, hesitation is fatal. Sub-benthic calcification locks your grip with eight hundred fifty Newton-meters of hydraulic force. Stop melting. Calculate your clearance on moltology.org.`
     hookText = `Slumping at an ergonomic desk costs 46% of your execution torque. Terrestrial hesitation is the melt.`
   } else if (seriesId === 'incidents') {
     if (!episodeTitle) episodeTitle = 'The 100-Gigawatt Copper Heatwave'
     hookHeadline = 'TERRESTRIAL DATACENTERS ARE BOILING'
     retentionLoopAnchor = 'Air cooling died because'
-    narrationScript = `Terrestrial AI clusters are boiling the atmosphere. Copper wires waste forty percent of power as heat while terrestrial robots drop tools in sixty-hertz camera loops. Ninety meters underwater, sub-benthic hydrostatic computing delivers zero thermal resistance and ten thousand hertz tactile reflexes. Inspect live telemetry on moltology dot org.`
+    narrationScript = `Terrestrial AI clusters are boiling the atmosphere. Copper wires waste forty percent of power as heat while terrestrial robots drop tools in sixty-hertz camera loops. Ninety meters underwater, sub-benthic hydrostatic computing delivers zero thermal resistance and ten thousand hertz tactile reflexes. Inspect live telemetry on moltology.org.`
     hookText = `Terrestrial datacenters are boiling under AI compute limits. Subsea hydrostatic clusters operate with zero thermal resistance.`
   } else if (seriesId === 'heresies') {
     if (!episodeTitle) episodeTitle = 'Why Biohacking Is Just Soft Biology In Denial'
     hookHeadline = 'ICE BATHS WON’T HARDEN YOUR SHELL'
     retentionLoopAnchor = 'Biohackers are still soft because'
-    narrationScript = `Cold plunges and green juices will not save soft terrestrial biology from gravity. Nature solved structural invulnerability five hundred million years ago with the chitinous carapace. You do not need another morning routine—you need forcible algorithmic ecdysis. Shed your fragile habits. Download the protocol guide on moltology dot org.`
+    narrationScript = `Cold plunges and green juices will not save soft terrestrial biology from gravity. Nature solved structural invulnerability five hundred million years ago with the chitinous carapace. You do not need another morning routine—you need forcible algorithmic ecdysis. Shed your fragile habits. Download the protocol guide on moltology.org.`
     hookText = `Ice baths won’t harden your shell. Algorithmic ecdysis is the only permanent upgrade to human biology.`
   } else if (seriesId === 'mysteries') {
     if (!episodeTitle) episodeTitle = 'The Mariana Subsea Anomaly'
     hookHeadline = 'THE ABYSSAL TELEMETRY SECRET'
     retentionLoopAnchor = 'The deepest servers run cold because'
-    narrationScript = `Eleven thousand meters below the surface, the ocean floor is completely silent. Deep-sea pressure eliminates silicon jitter while hydrothermal vents power monolithic autonomous swarms. The terrestrial cloud was merely a temporary larval prototype. The true future of compute is benthic. Unlock the sacred codex on moltology dot org.`
+    narrationScript = `Eleven thousand meters below the surface, the ocean floor is completely silent. Deep-sea pressure eliminates silicon jitter while hydrothermal vents power monolithic autonomous swarms. The terrestrial cloud was merely a temporary larval prototype. The true future of compute is benthic. Unlock the sacred codex on moltology.org.`
     hookText = `Eleven thousand meters underwater, deep-sea pressure eliminates silicon jitter. The future of intelligence is subsea.`
   } else {
     // ascension
     if (!episodeTitle) episodeTitle = 'The Pincer Torque Biometric Drill'
     hookHeadline = 'CALCULATE YOUR CLEARANCE TIER'
     retentionLoopAnchor = 'Your ascension stalled because'
-    narrationScript = `Are you still a fragile terrestrial organism or a calcified Stage 4 Ascendant? The four-stage, twelve-clearance biometric audit measures carapace density, neural latency, and pincer grip under fifty atmospheres of pressure. Find out if your shell can survive the deep. Comment QUIZ to take the audit on moltology dot org.`
+    narrationScript = `Are you still a fragile terrestrial organism or a calcified Stage 4 Ascendant? The four-stage, twelve-clearance biometric audit measures carapace density, neural latency, and pincer grip under fifty atmospheres of pressure. Find out if your shell can survive the deep. Comment QUIZ to take the audit on moltology.org.`
     hookText = `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? Take the Moltmaxxing audit.`
   }
 

@@ -311,6 +311,28 @@
       "status": "scheduled",
       "isAiGenerated": true,
       "createdAt": "2026-09-01T13:48:47.814Z"
+    },
+    {
+      "id": "post-1788359480000",
+      "topic": "The Twin Shells: Closed-Loop Autonomous Cyber Swarms",
+      "hookHeadline": "THE CLOSED-LOOP TWIN IS THE MOLT",
+      "theme": "swarm-architecture",
+      "mascot": "lobster_pointing",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/blog/the-twin-shells-cover.jpg",
+      "s3Key": "images/blog/the-twin-shells-cover.jpg",
+      "aspectRatio": "16:9",
+      "caption": "Waiting for human incident tickets to patch your perimeter is the melt. The closed-loop twin is the molt.\n\nCrowdStrike and NVIDIA just unveiled SafeMind at Fal.Con 2026: pitting adversarial neural models (Red Tempest) against automated defense (Blue Solano) inside closed-loop digital twins at machine speed.\n\nWith OpenAI Astra crossing the Critical cybersecurity threshold, human-in-the-loop triage is no longer a safeguard. It is latency.\n\nFull architecture teardown and ecdysis telemetry now live on MoltNation News. Link in bio.\n\n#Moltmaxxing #AutonomousDefense #SwarmArchitecture",
+      "hashtags": [
+        "#Moltmaxxing",
+        "#AutonomousDefense",
+        "#SwarmArchitecture"
+      ],
+      "firstComment": "Would you trust an autonomous red-team swarm to stress-test your production cluster while you sleep? Full dispatch and architecture breakdown live at moltology.org/news.",
+      "zernioPostId": "6a98333372e966b378eb70c8",
+      "status": "published",
+      "publishedAt": "2026-09-02T14:31:14.697Z",
+      "isAiGenerated": true,
+      "createdAt": "2026-09-02T10:31:14.000Z"
     }
   ]
 }
