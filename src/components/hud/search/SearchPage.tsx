@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { FileText, Loader2, Search, Users } from 'lucide-react'
+import { FileText, Loader2, Lock, LogIn, Search, UserPlus, Users } from 'lucide-react'
+import { AuthModal } from '@/components/AuthModal'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
 import { CommandCatalogIcon } from '@/components/hud/CommandCatalogIcon'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -119,10 +119,13 @@ export function SearchPage({
         </div>
 
         {type === 'people' ? (
-          <GuestLockGuard
-            featureName="Member Search"
-            message="Searching fellow members takes a signed-in account. Page jumps stay open to every guest."
-          >
+          session.isPending ? (
+            <div
+              data-testid="people-search-pending"
+              className="h-24 border border-[#3a4a49]/60 bg-[#0f1414]/80 chamfer-corner animate-pulse"
+              aria-hidden="true"
+            />
+          ) : signedIn ? (
             <PeopleResults
               query={trimmed}
               searching={searching}
@@ -130,11 +133,67 @@ export function SearchPage({
               connections={connections}
               onRelationshipChange={() => void refreshConnections()}
             />
-          </GuestLockGuard>
+          ) : (
+            <PeopleGuestLock />
+          )
         ) : (
           <PagesResults query={trimmed} pages={pages} onRun={runPage} />
         )}
       </div>
+    </div>
+  )
+}
+
+function PeopleGuestLock() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup')
+
+  const handleOpenAuth = (mode: 'signup' | 'login') => {
+    setAuthMode(mode)
+    setIsAuthModalOpen(true)
+  }
+
+  return (
+    <div data-testid="people-search-guest-lock" className="relative w-full py-4 sm:py-6">
+      <div className="mx-auto max-w-md text-center space-y-4 border border-[#3a4a49] bg-[#090f12]/80 chamfer-corner p-5 sm:p-6">
+        <div className="mx-auto w-12 h-12 rounded-full bg-[#04080a] border border-[#ff453a]/60 text-[#ff5540] flex items-center justify-center">
+          <Lock className="w-6 h-6" />
+        </div>
+        <div className="inline-block px-3 py-1 bg-[#ff453a]/10 border border-[#ff453a]/40 text-[#ff5540] text-[10px] font-bold tracking-widest uppercase chamfer-corner">
+          RESTRICTED ACCESS
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-base sm:text-lg font-grotesk font-extrabold text-[#dfe3e3] uppercase tracking-wider">
+            MEMBER SEARCH LOCKED
+          </h2>
+          <p className="text-xs text-[#839493] leading-relaxed max-w-sm mx-auto font-sans">
+            Searching fellow members takes a signed-in account. Page jumps stay open to every guest.
+          </p>
+        </div>
+        <div className="space-y-3 pt-1">
+          <button
+            type="button"
+            onClick={() => handleOpenAuth('signup')}
+            className="w-full py-2.5 px-5 bg-[#ff453a] hover:bg-[#ff5540] text-white font-grotesk font-bold text-xs uppercase tracking-wider chamfer-corner flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>SIGN UP TO UNLOCK</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleOpenAuth('login')}
+            className="text-xs text-[#00c3ff] hover:text-white underline underline-offset-4 tracking-wider uppercase font-sans transition-colors cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Already have an account? Sign In</span>
+          </button>
+        </div>
+      </div>
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
+      />
     </div>
   )
 }
