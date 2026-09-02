@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest'
+import fs from 'node:fs'
+import path from 'node:path'
 import { formatNewsTitle } from './blog-data'
 
 describe('formatNewsTitle helper', () => {
@@ -35,5 +37,14 @@ describe('formatNewsTitle helper', () => {
       headline: 'Autonomous Swarms',
       subtitle: 'Defending Compute Freedom',
     })
+  })
+
+  it('news template title is Title: Subtitle so the HUD gets a dek', () => {
+    const raw = fs.readFileSync(path.join(process.cwd(), 'content/news/template.md'), 'utf8')
+    const match = raw.match(/^title:\s*"([^"]+)"/m)
+    expect(match).toBeTruthy()
+    const formatted = formatNewsTitle(match![1])
+    expect(formatted.headline.length).toBeGreaterThan(0)
+    expect(formatted.subtitle?.length).toBeGreaterThan(0)
   })
 })

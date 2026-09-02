@@ -9,7 +9,7 @@ description: >-
 
 # MoltNation Blog Creation & Ingestion Pipeline
 
-This skill guides illustration and publication of full-length news articles for MoltNation News (`https://moltology.org/news`). **Writing happens in Google Drive `Projects/Moltology/news/`.** This skill does not ideate, shop vectors, or draft a fallback article. Headlines, figure captions, and any Instagram companion copy follow STYLE_GUIDE BAN 1: a period or a colon, never a slash-pair.
+This skill guides illustration and publication of full-length news articles for MoltNation News (`https://moltology.org/news`). **Writing happens in Google Drive `Projects/Moltology/news/`.** This skill does not ideate, shop vectors, or draft a fallback article. Headlines, figure captions, and any Instagram companion copy follow STYLE_GUIDE BAN 1: a period or a colon, never a slash-pair. News headlines are `Title: Subtitle` (colon) in ingest `title`. Title-only does not ship. STYLE_GUIDE Blog dispatch card.
 
 ## Hard Rule: Drive `news/ready/` First
 
@@ -90,7 +90,7 @@ An empty `ready/` folder is the correct end state for that morning.
 If one or more files exist:
 
 1. Keep only ingest-ready markdown (`.md` / `text/markdown` / `text/plain`, or a Drive file whose exported text is YAML frontmatter + Markdown body).
-2. A file is ingest-ready when its frontmatter matches `content/news` (see [`content/news/template.md`](file:///Users/mylesstupp/Development/moltology/content/news/template.md) and [`content/README.md`](file:///Users/mylesstupp/Development/moltology/content/README.md)): at minimum a `title`, plus the usual optional news fields (`slug`, `summary`, `category`, `tags`, `authorName`, `authorRole`, `coverImageUrl`, `readTimeMinutes`, `isFeatured`, `isPublished`, `publishedAt`).
+2. A file is ingest-ready when its frontmatter matches `content/news` (see [`content/news/template.md`](file:///Users/mylesstupp/Development/moltology/content/news/template.md) and [`content/README.md`](file:///Users/mylesstupp/Development/moltology/content/README.md)): at minimum a `title` in `Title: Subtitle` form (colon; both halves present), plus the usual optional news fields (`slug`, `summary`, `category`, `tags`, `authorName`, `authorRole`, `coverImageUrl`, `readTimeMinutes`, `isFeatured`, `isPublished`, `publishedAt`).
 3. Skip files that are not markdown or that lack valid news frontmatter. If every file is invalid, **STOP** and report the defects. Do not write a replacement article.
 4. Among valid files, pick the **oldest** (`createdTime` ascending; `modifiedTime` as tiebreaker).
 5. Download or read that file. **That body is the article.** Do not rewrite the prose. Do not shop a new hook, vector, or archetype.
@@ -157,7 +157,7 @@ Ready files should already match this `content/news` shape:
 
 ```markdown
 ---
-title: "Engaging Headline with Real-World Engineering Hook"
+title: "Engaging Headline: The Real-World Engineering Hook"
 slug: "clean-hyphenated-slug"
 summary: "1-2 sentence executive summary highlighting the breakthrough and key metrics."
 category: "DEEP RESEARCH" # Options: PATRIOT TELEMETRY, SWARM ARCHITECTURE, SACRED DOCTRINE, DEEP RESEARCH
