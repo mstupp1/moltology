@@ -4,12 +4,14 @@ import { SEARCH_PAGE_SEO } from '@/lib/seo'
 
 describe('/search route', () => {
   it('sets a real page title instead of a blank or not-found tab', () => {
-    const head = Route.options.head as (ctx: { search: { q?: string; type?: string } }) => {
-      meta: Array<{ title?: string }>
-    }
+    const head = Route.options.head as (ctx: {
+      match: { search?: { q?: string; type?: string } }
+    }) => { meta: Array<{ title?: string }> }
     const headers = Route.options.headers as () => Record<string, string>
-    const emptyTitle = head({ search: { q: '', type: 'people' } }).meta.find((entry) => entry.title)?.title
-    const namedTitle = head({ search: { q: 'claw_lord', type: 'people' } }).meta.find(
+    const emptyTitle = head({ match: { search: { q: '', type: 'people' } } }).meta.find(
+      (entry) => entry.title,
+    )?.title
+    const namedTitle = head({ match: { search: { q: 'claw_lord', type: 'people' } } }).meta.find(
       (entry) => entry.title,
     )?.title
 

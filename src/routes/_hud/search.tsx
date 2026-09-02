@@ -50,9 +50,12 @@ export const Route = createFileRoute('/_hud/search')({
     }
   },
   headers: () => xRobotsNoindexHeaders(),
-  head: ({ search }) => ({
-    meta: [...searchPageSeo(typeof search?.q === 'string' ? search.q : '')],
-  }),
+  head: (ctx) => {
+    const q = (ctx.match as { search?: { q?: string } } | undefined)?.search?.q
+    return {
+      meta: [...searchPageSeo(typeof q === 'string' ? q : '')],
+    }
+  },
   component: SearchRoute,
   pendingComponent: HudWorkspaceGhost,
 })

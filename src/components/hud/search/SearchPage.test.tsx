@@ -5,7 +5,6 @@ import { SearchPage } from './SearchPage'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { searchMembersFn, listConnectionsFn } from '@/lib/server/api'
-import { MEMBER_SEARCH_DEBOUNCE_MS } from '@/lib/member-search'
 
 const mockNavigate = vi.fn()
 const onQueryChange = vi.fn()
@@ -94,9 +93,7 @@ describe('SearchPage', () => {
   })
 
   it('loads people through searchMembersFn and renders the Connections member row', async () => {
-    vi.useFakeTimers()
     renderSearch({ query: 'claw', type: 'people' })
-    await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS)
     await waitFor(() => {
       expect(screen.getByText('claw_lord')).toBeInTheDocument()
     })
@@ -126,9 +123,7 @@ describe('SearchPage', () => {
 
   it('uses warm empty copy when no people surface', async () => {
     vi.mocked(searchMembersFn).mockResolvedValue([])
-    vi.useFakeTimers()
     renderSearch({ query: 'zz', type: 'people' })
-    await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS)
     await waitFor(() => {
       expect(screen.getByText(/The trench stayed quiet/)).toBeInTheDocument()
     })

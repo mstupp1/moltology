@@ -5,7 +5,6 @@ import { CommandPalette } from './CommandPalette'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { searchMembersFn } from '@/lib/server/api'
-import { MEMBER_SEARCH_DEBOUNCE_MS } from '@/lib/member-search'
 
 const mockNavigate = vi.fn()
 
@@ -167,7 +166,7 @@ describe('CommandPalette Component', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
     const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
-    fireEvent.change(input, { target: { value: 'claw' } })
+    fireEvent.change(input, { target: { value: 'Codex' } })
 
     expect(screen.getByText('Sign in to search fellow members. Page jumps stay open.')).toBeInTheDocument()
     expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
@@ -180,14 +179,12 @@ describe('CommandPalette Component', () => {
   it('shows signed-in people first and Enter opens that member dossier', async () => {
     signedInSession()
     vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
-    vi.useFakeTimers()
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
     const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
     fireEvent.change(input, { target: { value: 'claw' } })
 
-    await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS)
     await waitFor(() => {
       expect(screen.getByText('claw_lord')).toBeInTheDocument()
     })
@@ -206,14 +203,12 @@ describe('CommandPalette Component', () => {
   it('sends See all to /search with people when people were in view', async () => {
     signedInSession()
     vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
-    vi.useFakeTimers()
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
     fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
       target: { value: 'claw' },
     })
-    await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS)
     await waitFor(() => {
       expect(screen.getByText('claw_lord')).toBeInTheDocument()
     })
@@ -241,14 +236,12 @@ describe('CommandPalette Component', () => {
   it('moves the highlight across people and pages with arrow keys', async () => {
     signedInSession()
     vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
-    vi.useFakeTimers()
 
     render(<ToastProvider><CommandPalette /></ToastProvider>)
     fireEvent(window, new CustomEvent('open-command-palette'))
     fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
       target: { value: 'cod' },
     })
-    await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS)
     await waitFor(() => {
       expect(screen.getByText('claw_lord')).toBeInTheDocument()
     })

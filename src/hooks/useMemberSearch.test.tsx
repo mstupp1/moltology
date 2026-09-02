@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { useMemberSearch } from './useMemberSearch'
 import { searchMembersFn } from '@/lib/server/api'
@@ -69,11 +69,15 @@ describe('useMemberSearch', () => {
       </ToastProvider>,
     )
     expect(searchMembersFn).not.toHaveBeenCalled()
-    await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS)
-    await waitFor(() => {
-      expect(screen.getByTestId('first')).toHaveTextContent('claw_lord')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(MEMBER_SEARCH_DEBOUNCE_MS - 1)
+    })
+    expect(searchMembersFn).not.toHaveBeenCalled()
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2)
     })
     expect(searchMembersFn).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('first')).toHaveTextContent('claw_lord')
     expect(screen.getByTestId('count')).toHaveTextContent('1')
   })
 })
