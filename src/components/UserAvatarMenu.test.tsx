@@ -50,6 +50,20 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('SETTINGS')).toBeInTheDocument()
   })
 
+  it('prefers a claimed designation over auth name or larva unit', () => {
+    render(
+      <UserAvatarMenu
+        user={{ ...mockUser, name: 'LARVA UNIT #2468' }}
+        displayName="claw_lord"
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /user account menu/i }))
+
+    expect(screen.getByText('claw_lord')).toBeInTheDocument()
+    expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
+  })
+
   it('triggers authClient.signOut when clicking SIGN OUT button inside dropdown menu', async () => {
     const onNavigate = vi.fn()
     render(<UserAvatarMenu user={mockUser} onNavigate={onNavigate} />)

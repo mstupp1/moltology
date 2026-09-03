@@ -177,6 +177,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           <div className="flex items-center gap-3 min-w-0">
             <UserAvatar
               user={user}
+              name={displayName}
               size="sm"
               variant={variant}
               className={
@@ -315,6 +316,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
       >
         <UserAvatar
           user={user}
+          name={displayName}
           size="sm"
           variant={variant}
           className={
@@ -358,6 +360,7 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
           >
             <UserAvatar
               user={user}
+              name={displayName}
               size="md"
               variant={variant}
               className={

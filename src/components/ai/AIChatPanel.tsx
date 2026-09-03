@@ -124,7 +124,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
 
     let isSubscribed = true
-    ;(async () => {
+    const applyProfile = async () => {
       try {
         const token = await getAuthJWTToken().catch(() => null)
         const profile = await getUserProfileFn({ data: { token: token ?? undefined, userId } })
@@ -140,10 +140,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           setMemberLarvaId(null)
         }
       }
-    })()
+    }
+    void applyProfile()
+    window.addEventListener('member-handle-changed', applyProfile)
 
     return () => {
       isSubscribed = false
+      window.removeEventListener('member-handle-changed', applyProfile)
     }
   }, [userId, user?.email, user?.role])
 

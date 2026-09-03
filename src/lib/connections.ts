@@ -140,29 +140,58 @@ export function assertCanSendFriendRequest(senderId: string, recipientId: string
 
 export function buildFriendNotificationCopy(
   kind: NotificationKind,
-  actorLarvaId: string
+  actorPublicName: string
 ): { title: string; detail: string } {
   switch (kind) {
     case 'friend_request':
       return {
         title: 'Friend request',
-        detail: `${actorLarvaId} sent you a friend request.`,
+        detail: `${actorPublicName} sent you a friend request.`,
       }
     case 'friend_accepted':
       return {
         title: 'Friend request accepted',
-        detail: `${actorLarvaId} accepted your friend request.`,
+        detail: `${actorPublicName} accepted your friend request.`,
       }
     case 'friend_rejected':
       return {
         title: 'Friend request declined',
-        detail: `${actorLarvaId} declined your friend request.`,
+        detail: `${actorPublicName} declined your friend request.`,
       }
     default:
       return {
         title: 'Connection update',
         detail: 'Something changed in your connections.',
       }
+  }
+}
+
+const FRIEND_NOTIFICATION_KINDS = new Set<NotificationKind>([
+  'friend_request',
+  'friend_accepted',
+  'friend_rejected',
+])
+
+/** Live public name + copy for Activity Center rows. Never bake larva unit in when a handle exists. */
+export function presentFriendNotification(
+  kind: NotificationKind,
+  actor: {
+    userId?: string | null
+    handle?: string | null
+    larvaId?: string | null
+  },
+): { title: string; detail: string; actorPublicName: string } {
+  const actorPublicName = resolveMemberPublicName(actor)
+  if (!FRIEND_NOTIFICATION_KINDS.has(kind)) {
+    return {
+      title: 'Connection update',
+      detail: 'Something changed in your connections.',
+      actorPublicName,
+    }
+  }
+  return {
+    ...buildFriendNotificationCopy(kind, actorPublicName),
+    actorPublicName,
   }
 }
 

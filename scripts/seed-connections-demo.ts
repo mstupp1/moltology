@@ -2,7 +2,7 @@ import { getDb } from '../src/db'
 import { friendRequests, friendships, notifications, profiles } from '../src/db/schema'
 import { eq, or, and } from 'drizzle-orm'
 import { friendRequestSourceKey } from '../src/lib/notifications'
-import { buildFriendNotificationCopy } from '../src/lib/connections'
+import { presentFriendNotification } from '../src/lib/connections'
 
 async function main() {
   const db = getDb()
@@ -31,7 +31,11 @@ async function main() {
     .returning()
 
   const [sender] = await db.select().from(profiles).where(eq(profiles.id, ascendant)).limit(1)
-  const copy = buildFriendNotificationCopy('friend_request', sender?.larvaId || 'ASCENDANT')
+  const copy = presentFriendNotification('friend_request', {
+    userId: sender?.id ?? ascendant,
+    handle: sender?.handle,
+    larvaId: sender?.larvaId,
+  })
   await db.insert(notifications).values({
     userId: me,
     kind: 'friend_request',

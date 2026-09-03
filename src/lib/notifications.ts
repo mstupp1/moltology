@@ -1,4 +1,5 @@
 import type { NotificationKind, NotificationPayload } from '../db/schema'
+import { presentFriendNotification } from './connections'
 
 export const NOTIFICATION_KIND_FRIEND_REQUEST = 'friend_request' as const
 export const NOTIFICATION_KIND_FRIEND_ACCEPTED = 'friend_accepted' as const
@@ -42,4 +43,36 @@ export function isActionableFriendRequest(
   payload: NotificationPayload
 ): boolean {
   return kind === NOTIFICATION_KIND_FRIEND_REQUEST && !readAt && Boolean(payload.requestId)
+}
+
+export function presentNotificationView(row: {
+  id: string
+  kind: NotificationKind
+  title: string
+  detail: string
+  actorUserId: string | null
+  actorLarvaId: string | null
+  actorHandle: string | null
+  payload: NotificationPayload
+  readAt: string | null
+  createdAt: string
+}): NotificationView {
+  const copy = presentFriendNotification(row.kind, {
+    userId: row.actorUserId,
+    handle: row.actorHandle,
+    larvaId: row.actorLarvaId,
+  })
+  return {
+    id: row.id,
+    kind: row.kind,
+    title: copy.title,
+    detail: copy.detail,
+    actorUserId: row.actorUserId,
+    actorLarvaId: row.actorLarvaId,
+    actorHandle: row.actorHandle?.trim() || null,
+    payload: row.payload,
+    readAt: row.readAt,
+    createdAt: row.createdAt,
+    actionable: isActionableFriendRequest(row.kind, row.readAt, row.payload),
+  }
 }
