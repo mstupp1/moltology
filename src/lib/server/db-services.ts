@@ -76,7 +76,7 @@ import {
 } from './activity-log'
 import {
   assertCanSendFriendRequest,
-  buildFriendNotificationCopy,
+  presentFriendNotification,
   canTransitionFriendRequest,
   getStageLabel,
   normalizeFriendPair,
@@ -91,7 +91,7 @@ import {
   friendAcceptedSourceKey,
   friendRejectedSourceKey,
   friendRequestSourceKey,
-  isActionableFriendRequest,
+  presentNotificationView,
   type NotificationView,
 } from '../notifications'
 
@@ -906,6 +906,8 @@ export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFn
         content: blogComments.content,
         createdAt: blogComments.createdAt,
         profileStage: profiles.stage,
+        profileHandle: profiles.handle,
+        profileLarvaId: profiles.larvaId,
       })
       .from(blogComments)
       .leftJoin(profiles, eq(blogComments.userId, profiles.id))
@@ -916,7 +918,11 @@ export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFn
       id: r.id,
       postId: r.postId,
       userId: r.userId,
-      authorName: r.authorName,
+      authorName: resolveMemberPublicName({
+        userId: r.userId,
+        handle: r.profileHandle,
+        larvaId: r.profileLarvaId ?? r.authorName,
+      }),
       authorAvatar: r.authorAvatar,
       authorStage: r.profileStage ?? 1,
       content: r.content,
@@ -3000,14 +3006,11 @@ export const sendFriendRequestHandler = async ({
     })
     .returning()
 
-  const copy = buildFriendNotificationCopy(
-    'friend_request',
-    resolveMemberPublicName({
-      userId: auth.userId,
-      handle: sender?.handle,
-      larvaId: sender?.larvaId,
-    }),
-  )
+  const copy = presentFriendNotification('friend_request', {
+    userId: auth.userId,
+    handle: sender?.handle,
+    larvaId: sender?.larvaId,
+  })
   await insertNotification(auth.dbClient, {
     userId: data.recipientId,
     kind: 'friend_request',
@@ -3075,14 +3078,11 @@ export const respondFriendRequestHandler = async ({
       .values({ userAId, userBId })
       .onConflictDoNothing()
 
-    const copy = buildFriendNotificationCopy(
-      'friend_accepted',
-      resolveMemberPublicName({
-        userId: auth.userId,
-        handle: actor?.handle,
-        larvaId: actor?.larvaId,
-      }),
-    )
+    const copy = presentFriendNotification('friend_accepted', {
+      userId: auth.userId,
+      handle: actor?.handle,
+      larvaId: actor?.larvaId,
+    })
     await insertNotification(auth.dbClient, {
       userId: request.senderId,
       kind: 'friend_accepted',
@@ -3093,14 +3093,11 @@ export const respondFriendRequestHandler = async ({
       sourceKey: friendAcceptedSourceKey(request.id),
     })
   } else {
-    const copy = buildFriendNotificationCopy(
-      'friend_rejected',
-      resolveMemberPublicName({
-        userId: auth.userId,
-        handle: actor?.handle,
-        larvaId: actor?.larvaId,
-      }),
-    )
+    const copy = presentFriendNotification('friend_rejected', {
+      userId: auth.userId,
+      handle: actor?.handle,
+      larvaId: actor?.larvaId,
+    })
     await insertNotification(auth.dbClient, {
       userId: request.senderId,
       kind: 'friend_rejected',
@@ -3366,7 +3363,7 @@ export const getNotificationsHandler = async ({
   const views: NotificationView[] = rows.map((row) => {
     const payload = (row.payload || {}) as { requestId?: string; profileId?: string }
     const readAt = row.readAt ? row.readAt.toISOString() : null
-    return {
+    return presentNotificationView({
       id: row.id,
       kind: row.kind as NotificationView['kind'],
       title: row.title,
@@ -3377,8 +3374,7 @@ export const getNotificationsHandler = async ({
       payload,
       readAt,
       createdAt: row.createdAt.toISOString(),
-      actionable: isActionableFriendRequest(row.kind as NotificationView['kind'], readAt, payload),
-    }
+    })
   })
 
   return {

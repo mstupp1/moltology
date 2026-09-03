@@ -20,9 +20,20 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+const mockGetUserProfileFn = vi.fn().mockResolvedValue(null)
+
+vi.mock('../../lib/server/api', () => ({
+  getUserProfileFn: (...args: unknown[]) => mockGetUserProfileFn(...args),
+}))
+
+vi.mock('../../lib/jwt', () => ({
+  getAuthJWTToken: vi.fn().mockResolvedValue('test-token'),
+}))
+
 describe('HUDSidebar Component Navigation & Animations', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetUserProfileFn.mockResolvedValue(null)
     localStorage.clear()
     document.body.style.overflow = ''
   })
@@ -321,5 +332,55 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     const aside = container.querySelector('aside')
     expect(aside?.className).toContain('md:w-[72px]')
     expect(aside?.className).not.toContain('md:w-72')
+  })
+
+  it('shows a claimed designation in the account menu instead of the larva unit', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          name: 'Operative Alpha',
+          email: 'alpha@moltology.io',
+        },
+      } as any,
+    } as any)
+    mockGetUserProfileFn.mockResolvedValue({
+      handle: 'claw_lord',
+      larvaId: 'LARVA UNIT #2468',
+      role: 'user',
+    })
+
+    render(<HUDSidebar />)
+
+    fireEvent.click(screen.getByRole('button', { name: /User account menu/i }))
+    await waitFor(() => {
+      expect(screen.getByText('claw_lord')).toBeInTheDocument()
+    })
+    expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
+  })
+
+  it('shows the larva unit in the account menu when no designation is claimed', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+          name: 'Operative Alpha',
+          email: 'alpha@moltology.io',
+        },
+      } as any,
+    } as any)
+    mockGetUserProfileFn.mockResolvedValue({
+      handle: null,
+      larvaId: 'LARVA UNIT #2468',
+      role: 'user',
+    })
+
+    render(<HUDSidebar />)
+
+    fireEvent.click(screen.getByRole('button', { name: /User account menu/i }))
+    await waitFor(() => {
+      expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
+    })
+    expect(screen.queryByText('claw_lord')).not.toBeInTheDocument()
   })
 })

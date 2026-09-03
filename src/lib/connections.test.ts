@@ -6,6 +6,7 @@ import {
   canTransitionFriendRequest,
   assertCanSendFriendRequest,
   buildFriendNotificationCopy,
+  presentFriendNotification,
   getStageLabel,
   toMemberSummary,
   relationshipForMember,
@@ -16,6 +17,7 @@ import {
   friendRequestSourceKey,
   friendAcceptedSourceKey,
   isActionableFriendRequest,
+  presentNotificationView,
 } from './notifications'
 
 describe('connections helpers', () => {
@@ -49,6 +51,27 @@ describe('connections helpers', () => {
     expect(buildFriendNotificationCopy('friend_accepted', 'Soft-Shed Sam').title).toBe(
       'Friend request accepted'
     )
+  })
+
+  it('presents friend notifications with the claimed designation, not the larva unit', () => {
+    const presented = presentFriendNotification('friend_request', {
+      userId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      handle: 'claw_lord',
+      larvaId: 'LARVA UNIT #2468',
+    })
+    expect(presented.actorPublicName).toBe('claw_lord')
+    expect(presented.detail).toBe('claw_lord sent you a friend request.')
+    expect(presented.detail).not.toMatch(/LARVA UNIT/)
+  })
+
+  it('presents friend notifications with the larva unit when no designation is claimed', () => {
+    const presented = presentFriendNotification('friend_accepted', {
+      userId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      handle: null,
+      larvaId: 'LARVA UNIT #2468',
+    })
+    expect(presented.actorPublicName).toBe('LARVA UNIT #2468')
+    expect(presented.detail).toBe('LARVA UNIT #2468 accepted your friend request.')
   })
 
   it('maps stage numbers to short labels', () => {
@@ -173,5 +196,41 @@ describe('notifications helpers', () => {
     expect(isActionableFriendRequest('friend_accepted', null, { requestId: 'r1' })).toBe(
       false
     )
+  })
+
+  it('rewrites stored larva-unit notification copy when the actor has a designation', () => {
+    const view = presentNotificationView({
+      id: 'n1',
+      kind: 'friend_request',
+      title: 'Friend request',
+      detail: 'LARVA UNIT #2468 sent you a friend request.',
+      actorUserId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      actorLarvaId: 'LARVA UNIT #2468',
+      actorHandle: 'claw_lord',
+      payload: { requestId: 'r1', profileId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' },
+      readAt: null,
+      createdAt: '2026-09-03T00:00:00.000Z',
+    })
+    expect(view.detail).toBe('claw_lord sent you a friend request.')
+    expect(view.detail).not.toMatch(/LARVA UNIT/)
+    expect(view.actorHandle).toBe('claw_lord')
+    expect(view.actionable).toBe(true)
+  })
+
+  it('keeps the larva unit on stored notification copy when no designation is claimed', () => {
+    const view = presentNotificationView({
+      id: 'n2',
+      kind: 'friend_accepted',
+      title: 'Friend request accepted',
+      detail: 'LARVA UNIT #2468 accepted your friend request.',
+      actorUserId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      actorLarvaId: 'LARVA UNIT #2468',
+      actorHandle: null,
+      payload: { requestId: 'r2' },
+      readAt: '2026-09-03T00:00:00.000Z',
+      createdAt: '2026-09-03T00:00:00.000Z',
+    })
+    expect(view.detail).toBe('LARVA UNIT #2468 accepted your friend request.')
+    expect(view.actionable).toBe(false)
   })
 })
