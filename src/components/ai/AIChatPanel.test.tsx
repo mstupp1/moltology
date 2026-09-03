@@ -168,6 +168,31 @@ describe('AIChatPanel Guest Mode Gating', () => {
   })
 })
 
+describe('AIChatPanel designation refresh', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('refetches the member profile when member-handle-changed fires', async () => {
+    const { getUserProfileFn } = await import('@/lib/server/api')
+    ;(getUserProfileFn as any)
+      .mockResolvedValueOnce({ role: 'user', handle: null, larvaId: '7' })
+      .mockResolvedValueOnce({ role: 'user', handle: 'claimed-name', larvaId: '7' })
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+
+    await waitFor(() => {
+      expect(getUserProfileFn).toHaveBeenCalledTimes(1)
+    })
+
+    window.dispatchEvent(new CustomEvent('member-handle-changed'))
+
+    await waitFor(() => {
+      expect(getUserProfileFn).toHaveBeenCalledTimes(2)
+    })
+  })
+})
+
 describe('AIChatPanel Chats List Panel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
