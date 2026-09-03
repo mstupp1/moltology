@@ -549,12 +549,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </button>
           )}
 
-          <img
-            src={getAssetUrl('/images/order_emblem.png')}
-            alt="Oracle"
-            className="w-4 h-4 object-contain drop-shadow-[0_0_6px_rgba(0,195,255,0.4)] shrink-0 pointer-events-none"
-          />
-          <span className="text-xs font-bold text-cyan-300 tracking-wider truncate pointer-events-none hidden xs:inline">
+          <span className="text-xs font-bold text-cyan-300 tracking-wider truncate pointer-events-none">
             {personaName}
           </span>
         </div>

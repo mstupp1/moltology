@@ -157,6 +157,15 @@ describe('AIChatPanel Guest Mode Gating', () => {
     expect(watermarkImg?.className).toContain('opacity-[0.035]')
     expect(watermarkImg?.parentElement?.className).toContain('pointer-events-none')
   })
+
+  it('does not render the extra moltology logo emblem in the top left header', () => {
+    const { container } = render(<AIChatPanel userId="usr_valid_user" personaName="SYNAPTIC ORACLE" />)
+    const header = container.querySelector('.border-b')
+    expect(header).toBeInTheDocument()
+    const headerLogo = header?.querySelector('img[src*="order_emblem.png"]')
+    expect(headerLogo).toBeNull()
+    expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
+  })
 })
 
 describe('AIChatPanel Chats Dropdown Window', () => {
