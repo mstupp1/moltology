@@ -177,7 +177,7 @@ function HudContent() {
         isSubterranean ? 'theme-subterranean' : ''
       }`}
       style={{
-        bottom: 'calc(-1 * max(2rem, env(safe-area-inset-bottom, 0px)))',
+        bottom: 'calc(-1 * env(safe-area-inset-bottom, 0px))',
       }}
     >
       {/* First-time welcome splash */}
@@ -248,7 +248,7 @@ function HudContent() {
       <CommandPalette />
 
       {/* Main Full-Height Layout with Sidebar extending to the top of screen */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative pt-[env(safe-area-inset-top,0px)] pb-[calc(max(2rem,env(safe-area-inset-bottom,0px))+0.25rem)]">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden relative pt-[env(safe-area-inset-top,0px)]">
         {/* Full Height Glassmorphic Sidebar spanning top-to-bottom (hidden in main-only mode) */}
         {!isMainOnly && <HUDSidebar />}
 

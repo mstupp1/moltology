@@ -814,7 +814,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           </nav>
 
           {/* Desktop Bottom Controls: Help & Profile/Auth */}
-          <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] relative z-40 overflow-visible">
+          <div className="mt-auto shrink-0 border-t border-[#1e2d37]/80 divide-y divide-[#1e2d37]/60 bg-[#060a0b] relative z-40 overflow-visible pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]">
             {/* Desktop Bottom Controls: Help & Support + User Avatar / Auth */}
             {isCollapsed ? (
               <div className="flex flex-col divide-y divide-[#1e2d37]/80 relative overflow-visible">
