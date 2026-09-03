@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import { ThreadListItem } from './ThreadListItem'
+import { ThreadListItem, type ThreadListDensity } from './ThreadListItem'
 import { ThreadActionSheet } from './ThreadActionSheet'
 import { DeleteThreadDialog, isDeleteConfirmSkipped } from './DeleteThreadDialog'
 import type { ManagedThread } from './useThreadActions'
@@ -14,6 +14,7 @@ export interface ThreadListProps {
   onArchive: (threadId: string, archived: boolean) => void
   onRename: (threadId: string, title: string) => void
   onDelete: (threadId: string) => void
+  density?: ThreadListDensity
   loadingMessage?: string
   emptyMessage?: string
   loadingNode?: React.ReactNode
@@ -28,6 +29,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   onArchive,
   onRename,
   onDelete,
+  density = 'compact',
   loadingMessage = 'Loading threads...',
   emptyMessage = 'No recorded threads yet.',
   loadingNode,
@@ -57,6 +59,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
       thread={t}
       isActive={activeThreadId === t.id}
       archived={archived}
+      density={density}
       isRenaming={renamingThreadId === t.id}
       onSelect={() => onSelectThread(t.id)}
       onMobileMenu={() => setActionThreadId(t.id)}

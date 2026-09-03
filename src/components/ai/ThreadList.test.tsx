@@ -52,6 +52,13 @@ describe('ThreadList', () => {
     expect(screen.queryByText('Archived Chat')).not.toBeInTheDocument()
   })
 
+  it('uses comfortable row padding when density is comfortable', () => {
+    renderList({ density: 'comfortable' })
+    const title = screen.getByText('Active Chat')
+    expect(title.closest('[data-density="comfortable"]')).toBeTruthy()
+    expect(title.closest('button')?.className).toContain('py-3')
+  })
+
   it('selects a thread when the row title is clicked', () => {
     const { onSelectThread } = renderList()
     fireEvent.click(screen.getByText('Pinned Chat'))
