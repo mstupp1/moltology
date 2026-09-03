@@ -247,7 +247,7 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     vi.useRealTimers()
   })
 
-  it('renders Chats button in popout and toggles scrollable chats window', () => {
+  it('renders Chats button in popout and toggles the chats list panel', () => {
     render(
       <OracleProvider>
         <SynapticOracleWidget />
@@ -264,11 +264,13 @@ describe('SynapticOracleWidget Drag & Resize', () => {
     expect(chatsBtn).toBeInTheDocument()
     fireEvent.click(chatsBtn)
 
+    const panel = screen.getByTestId('oracle-chats-panel')
+    expect(panel).toBeInTheDocument()
+    expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
     expect(screen.getByText('CHATS')).toBeInTheDocument()
 
-    // Close chats window
-    const closeChatsBtn = screen.getByRole('button', { name: /Close Chats Window/i })
-    fireEvent.click(closeChatsBtn)
+    fireEvent.click(screen.getByRole('button', { name: /^Close Chats$/i }))
+    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
     expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
   })
 

@@ -242,7 +242,7 @@ describe('AIChatPanel Chats List Panel', () => {
     })
   })
 
-  it('returns to the current thread when using back or close on the list panel', async () => {
+  it('returns to the current thread when using back on the list panel', async () => {
     const { getAIThreadsFn, getAIMessagesFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-alpha', title: 'Chitin Density Analysis' },
@@ -252,9 +252,16 @@ describe('AIChatPanel Chats List Panel', () => {
       { id: 'msg-2', role: 'assistant', content: 'Your shell hardness index is 94%.' },
     ])
 
-    render(<AIChatPanel userId="usr_valid_user" threadId="thread-alpha" isCompact />)
+    render(<AIChatPanel userId="usr_valid_user" isCompact />)
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
 
     await waitFor(() => {
+      expect(screen.getByText('Chitin Density Analysis')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Chitin Density Analysis/i }))
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
       expect(screen.getByText('What is my shell hardness?')).toBeInTheDocument()
     })
 
