@@ -1,10 +1,17 @@
 import { ORACLE_THREAD_ID_HEADER } from './oracle-chat'
+import { getAuthJWTToken, jwtAuthHeaders } from '../jwt'
 
 export interface StreamOracleChatParams {
   messages: Array<{ role: string; content: string }>
   userId?: string | null
   threadId?: string | null
   model?: string
+  /**
+   * Compact JWT for `Authorization: Bearer`. When omitted, mint one with a short
+   * timeout. Pass `null` to skip (guest / tests). Same-origin cookies are never
+   * enough: `/api/chat` only accepts Bearer or `x-auth-token`.
+   */
+  token?: string | null
   signal?: AbortSignal
   onThreadId?: (threadId: string) => void
   onChunk?: (fullText: string) => void
@@ -16,13 +23,28 @@ export interface StreamOracleChatResult {
   isGuest?: boolean
 }
 
+async function resolveOracleToken(token: string | null | undefined): Promise<string | null> {
+  if (token === null) return null
+  if (typeof token === 'string' && token.length > 0) return token
+  try {
+    return (await getAuthJWTToken()) ?? null
+  } catch {
+    return null
+  }
+}
+
 /**
  * Client helper: POST /api/chat and either parse guest JSON or stream plain text tokens.
+ * Auth is a Bearer JWT, not the Better Auth session cookie.
  */
 export async function streamOracleChat(params: StreamOracleChatParams): Promise<StreamOracleChatResult> {
+  const token = await resolveOracleToken(params.token)
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...jwtAuthHeaders(token),
+    },
     credentials: 'same-origin',
     signal: params.signal,
     body: JSON.stringify({
@@ -90,4 +112,3 @@ export async function streamOracleChat(params: StreamOracleChatParams): Promise<
     threadId: headerThreadId,
   }
 }
-

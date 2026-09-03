@@ -21,6 +21,8 @@
  * - `isPending === true`, missing `isPending`, or client not ready → hold chrome.
  */
 
+import { clearCachedJwt } from './jwt-cache'
+
 export type AuthSessionUser = {
   id?: string
   sub?: string
@@ -162,6 +164,7 @@ export function beginSignOut(): void {
   signOutInFlight = true
   clearOAuthPending()
   clearCachedUser()
+  clearCachedJwt()
 }
 
 export function endSignOut(): void {

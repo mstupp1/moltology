@@ -136,6 +136,21 @@ describe('resolveAuthSession', () => {
     expect(state.userId).toBe('usr_qa')
   })
 
+  it('keeps a cached member when HUD polls fail Unauthenticated and the hook settles empty', () => {
+    setCachedUser({ id: 'usr_qa', name: 'Probe' })
+
+    const state = resolveAuthSession({
+      data: null,
+      isPending: false,
+      error: new Error('Unauthenticated: Authentication required to list connections.'),
+    })
+
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.isGuest).toBe(false)
+    expect(state.userId).toBe('usr_qa')
+    expect(getCachedUser()?.id).toBe('usr_qa')
+  })
+
   it('falls back to a root user when data.user is absent', () => {
     const state = resolveAuthSession({
       data: null,
