@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   resolveAuthSession,
   setCachedUser,
@@ -7,13 +7,24 @@ import {
   beginSignOut,
   endSignOut,
   isSignOutInFlight,
+  beginOAuthSignIn,
+  clearOAuthPending,
+  isOAuthPending,
+  settleOAuthSession,
+  startGoogleSignIn,
+  rememberSessionUser,
+  SESSION_CACHE_GRACE_MS,
 } from './auth-session'
 
 describe('resolveAuthSession', () => {
   beforeEach(() => {
     endSignOut()
+    clearOAuthPending()
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.clear()
+    }
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.clear()
     }
   })
 
@@ -72,15 +83,57 @@ describe('resolveAuthSession', () => {
     expect(state.user?.name).toBe('Cached Operative')
   })
 
-  it('clears cached user when session explicitly settles as logged out', () => {
-    setCachedUser({ id: 'usr_cached_42', name: 'Cached Operative' })
+  it('clears a stale cached user when the session hook later confirms a logged-out guest', () => {
+    setCachedUser(
+      { id: 'usr_cached_42', name: 'Cached Operative' },
+      Date.now() - SESSION_CACHE_GRACE_MS - 1,
+    )
     expect(getCachedUser()).not.toBeNull()
 
-    // Hook returns settled null session
     const state = resolveAuthSession({ data: null, isPending: false })
     expect(state.isAuthenticated).toBe(false)
     expect(state.isGuest).toBe(true)
     expect(getCachedUser()).toBeNull()
+  })
+
+  it('keeps a fresh cached member when the session hook settles empty after an Oracle/session error', () => {
+    setCachedUser({ id: 'usr_qa', name: 'Probe', email: 'qa@moltology.org' })
+
+    const state = resolveAuthSession({
+      data: null,
+      isPending: false,
+      error: new Error('session refetch timed out'),
+    })
+
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.isGuest).toBe(false)
+    expect(state.userId).toBe('usr_qa')
+    expect(getCachedUser()?.id).toBe('usr_qa')
+  })
+
+  it('keeps a fresh cached member when the session hook settles empty without an explicit sign-out', () => {
+    setCachedUser({ id: 'usr_qa', name: 'Probe' })
+
+    const state = resolveAuthSession({ data: null, isPending: false })
+
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.isGuest).toBe(false)
+    expect(state.userId).toBe('usr_qa')
+    expect(getCachedUser()?.id).toBe('usr_qa')
+  })
+
+  it('keeps a cached member while the session hook is refetching after a failed Oracle ask', () => {
+    setCachedUser({ id: 'usr_qa', name: 'Probe' })
+
+    const state = resolveAuthSession({
+      data: null,
+      isPending: false,
+      isRefetching: true,
+    })
+
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.isGuest).toBe(false)
+    expect(state.userId).toBe('usr_qa')
   })
 
   it('falls back to a root user when data.user is absent', () => {
@@ -166,5 +219,114 @@ describe('resolveAuthSession', () => {
     expect(state.isPending).toBe(false)
     expect(state.isAuthenticated).toBe(false)
     expect(isSignOutInFlight()).toBe(true)
+  })
+
+  it('holds chrome during an in-flight Google OAuth return before the session cookie is visible', () => {
+    beginOAuthSignIn('/dashboard')
+    const state = resolveAuthSession({ data: null, isPending: false })
+    expect(state.isPending).toBe(true)
+    expect(state.isGuest).toBe(false)
+    expect(state.isAuthenticated).toBe(false)
+    expect(isOAuthPending()).toBe(true)
+  })
+})
+
+describe('OAuth session settlement', () => {
+  beforeEach(() => {
+    endSignOut()
+    clearOAuthPending()
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.clear()
+    }
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.clear()
+    }
+  })
+
+  it('caches the member from the first successful getSession and does not require a second OAuth attempt', async () => {
+    beginOAuthSignIn('/dashboard')
+    const getSession = vi.fn().mockResolvedValue({
+      data: { user: { id: 'usr_google', name: 'Myles', email: 'myles@example.org' } },
+    })
+
+    const user = await settleOAuthSession(getSession, { attempts: 3, delayMs: 0 })
+
+    expect(getSession).toHaveBeenCalledTimes(1)
+    expect(user?.id).toBe('usr_google')
+    expect(getCachedUser()?.id).toBe('usr_google')
+    expect(isOAuthPending()).toBe(false)
+
+    const state = resolveAuthSession({ data: null, isPending: false })
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.userId).toBe('usr_google')
+    expect(state.isGuest).toBe(false)
+  })
+
+  it('retries getSession once if the first look is empty, then authenticates on the next payload', async () => {
+    beginOAuthSignIn('/chassis')
+    const getSession = vi
+      .fn()
+      .mockResolvedValueOnce({ data: null })
+      .mockResolvedValueOnce({ data: { user: { id: 'usr_google_2', name: 'Myles' } } })
+
+    const user = await settleOAuthSession(getSession, { attempts: 3, delayMs: 0 })
+
+    expect(getSession).toHaveBeenCalledTimes(2)
+    expect(user?.id).toBe('usr_google_2')
+    expect(isOAuthPending()).toBe(false)
+  })
+
+  it('caches a user from a one-shot Google sign-in response without a second click', async () => {
+    const signInSocial = vi.fn().mockResolvedValue({
+      data: { user: { id: 'usr_google', name: 'Myles' } },
+    })
+
+    const user = await startGoogleSignIn({
+      signInSocial,
+      callbackURL: 'https://moltology.org/dashboard',
+      destination: '/dashboard',
+    })
+
+    expect(signInSocial).toHaveBeenCalledTimes(1)
+    expect(signInSocial).toHaveBeenCalledWith({
+      provider: 'google',
+      callbackURL: 'https://moltology.org/dashboard',
+    })
+    expect(user?.id).toBe('usr_google')
+    expect(getCachedUser()?.id).toBe('usr_google')
+    expect(isOAuthPending()).toBe(false)
+  })
+
+  it('keeps the OAuth latch when social sign-in redirects without a user payload', async () => {
+    const signInSocial = vi.fn().mockResolvedValue({})
+
+    const user = await startGoogleSignIn({
+      signInSocial,
+      callbackURL: 'https://moltology.org/dashboard',
+      destination: '/dashboard',
+    })
+
+    expect(user).toBeNull()
+    expect(isOAuthPending()).toBe(true)
+  })
+
+  it('clears the OAuth latch when social sign-in throws', async () => {
+    const signInSocial = vi.fn().mockRejectedValue(new Error('popup closed'))
+
+    await expect(
+      startGoogleSignIn({
+        signInSocial,
+        callbackURL: 'https://moltology.org/dashboard',
+      }),
+    ).rejects.toThrow('popup closed')
+
+    expect(isOAuthPending()).toBe(false)
+  })
+
+  it('rememberSessionUser writes a cache that survives a later empty hook settle', () => {
+    rememberSessionUser({ id: 'usr_email', name: 'Initiate' })
+    const state = resolveAuthSession({ data: null, isPending: false })
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.userId).toBe('usr_email')
   })
 })

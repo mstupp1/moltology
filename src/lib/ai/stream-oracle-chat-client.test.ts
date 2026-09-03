@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { streamOracleChat } from './stream-oracle-chat-client'
 import { ORACLE_THREAD_ID_HEADER } from './oracle-chat'
+import { getCachedUser, resolveAuthSession, setCachedUser } from '../auth-session'
 
 describe('streamOracleChat client', () => {
   beforeEach(() => {
@@ -71,6 +72,25 @@ describe('streamOracleChat client', () => {
     await expect(
       streamOracleChat({ messages: [{ role: 'user', content: 'hi' }] })
     ).rejects.toThrow('Rate limit exceeded.')
+  })
+
+  it('does not drop a signed-in session when the Oracle request errors', async () => {
+    setCachedUser({ id: 'usr_qa', name: 'Probe' })
+    vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('upstream timeout'))
+
+    await expect(
+      streamOracleChat({ messages: [{ role: 'user', content: 'hi' }], userId: 'usr_qa' }),
+    ).rejects.toThrow('upstream timeout')
+
+    expect(getCachedUser()?.id).toBe('usr_qa')
+    const state = resolveAuthSession({
+      data: null,
+      isPending: false,
+      error: new Error('upstream timeout'),
+    })
+    expect(state.isAuthenticated).toBe(true)
+    expect(state.isGuest).toBe(false)
+    expect(state.userId).toBe('usr_qa')
   })
 
   it('throws error when plain text stream completes with empty content', async () => {

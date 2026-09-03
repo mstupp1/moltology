@@ -118,6 +118,24 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     })
   })
 
+  it('caches the member after one successful Google sign-in response', async () => {
+    mockSearch = { mode: 'login', redirect: '/dashboard' }
+    vi.mocked(authClient.signIn.social).mockResolvedValue({
+      data: { user: { id: 'usr_google', name: 'Myles' } },
+    } as any)
+
+    render(<AuthRoute />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Continue with Google/i }))
+
+    const { getCachedUser } = await import('@/lib/auth-session')
+    await waitFor(() => {
+      expect(authClient.signIn.social).toHaveBeenCalledTimes(1)
+      expect(getCachedUser()?.id).toBe('usr_google')
+      expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+    })
+  })
+
   it('submits sign-in form and navigates on success', async () => {
     mockSearch = { mode: 'login', redirect: '/dashboard' }
     vi.mocked(authClient.signIn.email).mockResolvedValue({ data: { user: { id: 'user-123' } } } as any)

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
 import '@/styles/crt.css'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
@@ -70,10 +71,14 @@ export default function AuthView({ search }: { search: any }) {
       const destination = search.redirect || '/dashboard'
       const callbackURL = `${origin}${destination.startsWith('/') ? destination : `/${destination}`}`
 
-      await authClient.signIn.social({
-        provider: 'google',
+      const user = await startGoogleSignIn({
+        signInSocial: (args) => authClient.signIn.social(args),
         callbackURL,
+        destination,
       })
+      if (user) {
+        navigate({ to: destination as any })
+      }
     } catch (err: any) {
       console.error('Google OAuth Error:', err)
       setError(err?.message || 'Could not sign in with Google. Please try again.')
@@ -102,6 +107,7 @@ export default function AuthView({ search }: { search: any }) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
         } else {
           const createdUser = (res as any)?.data?.user || (res as any)?.user
+          rememberSessionUser(createdUser)
           const token = await getAuthJWTToken()
           await claimMemberHandleFn({
             data: {
@@ -134,6 +140,7 @@ export default function AuthView({ search }: { search: any }) {
         if (res?.error) {
           setError(res.error.message || 'Invalid email or password.')
         } else {
+          rememberSessionUser((res as any)?.data?.user || (res as any)?.user)
           await getUserProfileFn().catch(() => {})
           const destination = search.redirect || '/dashboard'
           navigate({ to: destination as any })
