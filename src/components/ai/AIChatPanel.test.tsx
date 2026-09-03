@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AIChatPanel } from './AIChatPanel'
@@ -168,9 +168,16 @@ describe('AIChatPanel Guest Mode Gating', () => {
   })
 })
 
-describe('AIChatPanel Chats Dropdown Window', () => {
+describe('AIChatPanel Chats List Panel', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 390 })
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(390)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
   })
 
   it('renders Chats button in header for desktop / compact panel', () => {
@@ -180,25 +187,33 @@ describe('AIChatPanel Chats Dropdown Window', () => {
     expect(chatsBtn).toHaveAttribute('title', 'Chats')
   })
 
-  it('opens small scrollable window with list of chats when clicking Chats button', async () => {
+  it('opens a full-width list panel on a narrow viewport, not a small anchored menu', async () => {
     const { getAIThreadsFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-1', title: 'First Carcinization Consultation', createdAt: new Date() },
       { id: 'thread-2', title: 'Deep Trench Strategy', createdAt: new Date() },
     ])
 
-    render(<AIChatPanel userId="usr_valid_user" />)
+    render(<AIChatPanel userId="usr_valid_user" isCompact />)
     const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
     fireEvent.click(chatsBtn)
 
-    await waitFor(() => {
-      expect(screen.getByText('CHATS')).toBeInTheDocument()
-      expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
-      expect(screen.getByText('Deep Trench Strategy')).toBeInTheDocument()
-    })
+    const panel = await screen.findByTestId('oracle-chats-panel')
+    expect(panel).toHaveAttribute('data-chats-layout', 'takeover')
+    expect(panel).toHaveAttribute('aria-label', 'Chats')
+    expect(panel.className).toMatch(/w-full/)
+    expect(panel.className).toMatch(/flex-1/)
+    expect(panel.className).not.toMatch(/absolute/)
+    expect(panel.className).not.toMatch(/w-56/)
+    expect(panel.className).not.toMatch(/max-h-\[48%\]/)
+    expect(screen.getByText('CHATS')).toBeInTheDocument()
+    expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
+    expect(screen.getByText('Deep Trench Strategy')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Back to conversation/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Close Chats$/i })).toBeInTheDocument()
   })
 
-  it('switches active thread and loads messages when selecting a chat from the window', async () => {
+  it('returns to the conversation after selecting a thread from the list', async () => {
     const { getAIThreadsFn, getAIMessagesFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-alpha', title: 'Chitin Density Analysis' },
@@ -208,7 +223,7 @@ describe('AIChatPanel Chats Dropdown Window', () => {
       { id: 'msg-2', role: 'assistant', content: 'Your shell hardness index is 94%.' },
     ])
 
-    render(<AIChatPanel userId="usr_valid_user" />)
+    render(<AIChatPanel userId="usr_valid_user" isCompact />)
     const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
     fireEvent.click(chatsBtn)
 
@@ -219,15 +234,43 @@ describe('AIChatPanel Chats Dropdown Window', () => {
     const threadItem = screen.getByRole('button', { name: /Chitin Density Analysis/i })
     fireEvent.click(threadItem)
 
-    // Chats popup should close
     await waitFor(() => {
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
       expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
       expect(screen.getByText('What is my shell hardness?')).toBeInTheDocument()
       expect(screen.getByText('Your shell hardness index is 94%.')).toBeInTheDocument()
     })
   })
 
-  it('resets chat and closes dropdown when clicking main New Chat header button', async () => {
+  it('returns to the current thread when using back or close on the list panel', async () => {
+    const { getAIThreadsFn, getAIMessagesFn } = await import('@/lib/server/api')
+    ;(getAIThreadsFn as any).mockResolvedValue([
+      { id: 'thread-alpha', title: 'Chitin Density Analysis' },
+    ])
+    ;(getAIMessagesFn as any).mockResolvedValue([
+      { id: 'msg-1', role: 'user', content: 'What is my shell hardness?' },
+      { id: 'msg-2', role: 'assistant', content: 'Your shell hardness index is 94%.' },
+    ])
+
+    render(<AIChatPanel userId="usr_valid_user" threadId="thread-alpha" isCompact />)
+
+    await waitFor(() => {
+      expect(screen.getByText('What is my shell hardness?')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    expect(screen.getByTestId('oracle-chats-panel')).toBeInTheDocument()
+    expect(screen.queryByText('What is my shell hardness?')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Back to conversation/i }))
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+      expect(screen.getByText('What is my shell hardness?')).toBeInTheDocument()
+    })
+  })
+
+  it('resets chat and closes the list panel when clicking main New Chat header button', async () => {
     const { getAIThreadsFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([
       { id: 'thread-alpha', title: 'Chitin Density Analysis' },
@@ -245,27 +288,57 @@ describe('AIChatPanel Chats Dropdown Window', () => {
     fireEvent.click(newChatBtn)
 
     await waitFor(() => {
+      expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
       expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
     })
   })
 
-  it('closes the chats window when clicking close button or pressing Escape', async () => {
+  it('closes the chats panel when clicking close or pressing Escape', async () => {
     render(<AIChatPanel userId="usr_valid_user" />)
     const chatsBtn = screen.getByRole('button', { name: /Toggle Chats/i })
     fireEvent.click(chatsBtn)
 
     expect(screen.getByText('CHATS')).toBeInTheDocument()
 
-    const closeWindowBtn = screen.getByRole('button', { name: /Close Chats Window/i })
-    fireEvent.click(closeWindowBtn)
+    fireEvent.click(screen.getByRole('button', { name: /^Close Chats$/i }))
+    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
 
-    expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
-
-    // Reopen and test Escape key
     fireEvent.click(chatsBtn)
     expect(screen.getByText('CHATS')).toBeInTheDocument()
     fireEvent.keyDown(document, { key: 'Escape' })
-    expect(screen.queryByText('CHATS')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('oracle-chats-panel')).not.toBeInTheDocument()
+  })
+
+  it('renders the list as a left column when the Oracle window is wide', async () => {
+    const { getAIThreadsFn } = await import('@/lib/server/api')
+    ;(getAIThreadsFn as any).mockResolvedValue([
+      { id: 'thread-1', title: 'First Carcinization Consultation' },
+    ])
+
+    const resizeListeners: Array<(entries: Array<{ contentRect: { width: number } }>) => void> = []
+    class MockResizeObserver {
+      constructor(cb: (entries: Array<{ contentRect: { width: number } }>) => void) {
+        resizeListeners.push(cb)
+      }
+      observe() {
+        resizeListeners.forEach((cb) => cb([{ contentRect: { width: 720 } }]))
+      }
+      disconnect() {}
+      unobserve() {}
+    }
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+
+    render(<AIChatPanel userId="usr_valid_user" />)
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+
+    const panel = await screen.findByTestId('oracle-chats-panel')
+    await waitFor(() => {
+      expect(panel).toHaveAttribute('data-chats-layout', 'column')
+    })
+    expect(panel.className).toMatch(/w-64/)
+    expect(panel.className).toMatch(/border-r/)
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
+    expect(screen.getByText('First Carcinization Consultation')).toBeInTheDocument()
   })
 
   it('displays guest mode notice with Sign Up CTA when unauthenticated', async () => {

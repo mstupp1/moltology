@@ -9,11 +9,14 @@ import {
 } from '@/components/ui/HudDropdownMenu'
 import type { ManagedThread } from './useThreadActions'
 
+export type ThreadListDensity = 'compact' | 'comfortable'
+
 export interface ThreadListItemProps {
   thread: ManagedThread
   isActive: boolean
   archived?: boolean
   isRenaming?: boolean
+  density?: ThreadListDensity
   onSelect: () => void
   onMobileMenu: () => void
   onRenameStart: () => void
@@ -37,6 +40,7 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
   isActive,
   archived = false,
   isRenaming = false,
+  density = 'compact',
   onSelect,
   onMobileMenu,
   onRenameStart,
@@ -74,11 +78,14 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
     }
   }
 
-  const kebabClasses =
-    'inline-flex items-center justify-center p-1 shrink-0 transition-all cursor-pointer text-current hover:text-cyan-200 hover:bg-cyan-950/60'
+  const isComfortable = density === 'comfortable'
+  const kebabClasses = `inline-flex items-center justify-center shrink-0 transition-all cursor-pointer text-current hover:text-cyan-200 hover:bg-cyan-950/60 ${
+    isComfortable ? 'min-w-11 min-h-11 p-2.5' : 'p-1'
+  }`
 
   return (
     <div
+      data-density={density}
       className={`group relative w-full flex items-center text-xs transition-all chamfer-corner select-none ${
         isActive
           ? 'bg-cyan-950/70 text-cyan-200 shadow-md backdrop-blur-xs'
@@ -110,7 +117,9 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
             type="button"
             onClick={onSelect}
             title={thread.title}
-            className="flex-1 min-w-0 text-left px-2 py-1.5 bg-transparent border-none outline-none cursor-pointer select-none focus:outline-none focus-visible:outline-none focus:ring-0 active:outline-none"
+            className={`flex-1 min-w-0 text-left bg-transparent border-none outline-none cursor-pointer select-none focus:outline-none focus-visible:outline-none focus:ring-0 active:outline-none ${
+              isComfortable ? 'px-3 py-3' : 'px-2 py-1.5'
+            }`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <span className="flex items-center gap-1 min-w-0">
@@ -132,7 +141,11 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
                   aria-label="Chat options"
                   title="Chat options"
                   data-testid="thread-kebab-desktop"
-                  className={`${kebabClasses} hidden md:inline-flex md:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 focus-visible:opacity-100 focus:opacity-100`}
+                  className={`${kebabClasses} hidden md:inline-flex ${
+                    isComfortable
+                      ? 'opacity-100'
+                      : 'md:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 focus-visible:opacity-100 focus:opacity-100'
+                  }`}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   <MoreVertical className="w-3.5 h-3.5" />
