@@ -94,7 +94,9 @@ describe('buildForumPostTree', () => {
 
   it('sorts siblings newest first', () => {
     const tree = buildForumPostTree(posts, 'newest')
-    expect(tree[0].children.map((n) => n.post.id)).toEqual(['b', 'c'])
+    expect(tree.map((n) => n.post.id)).toEqual(['d', 'a'])
+    const rootA = tree.find((n) => n.post.id === 'a')
+    expect(rootA?.children.map((n) => n.post.id)).toEqual(['b', 'c'])
   })
 })
 
