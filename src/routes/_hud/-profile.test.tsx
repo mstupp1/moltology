@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Route } from './profile'
 import { authClient } from '@/lib/auth-client'
-import { MEMBER_PROFILE_SEO } from '@/lib/seo'
+import { MEMBER_PROFILE_SEO, memberProfileSeo } from '@/lib/seo'
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@tanstack/react-router')>()
@@ -38,6 +38,9 @@ describe('/profile own-dossier route', () => {
     const headers = Route.options.headers as () => Record<string, string>
     const meta = head().meta
 
+    expect(meta).toEqual(
+      expect.arrayContaining(memberProfileSeo()),
+    )
     expect(meta).toEqual(
       expect.arrayContaining([{ title: MEMBER_PROFILE_SEO.title }]),
     )
