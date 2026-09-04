@@ -2,7 +2,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { getAssetUrl } from '@/lib/assets'
 
-export type CompositeAspectRatio = '4:5' | '1:1' | '9:16' | '16:9' | '16:10'
+export type CompositeAspectRatio = '3:4' | '4:5' | '1:1' | '9:16' | '16:9' | '16:10'
 
 export interface CompositeDimensions {
   width: number
@@ -11,6 +11,7 @@ export interface CompositeDimensions {
 }
 
 export const COMPOSITE_DIMENSIONS: Record<CompositeAspectRatio, CompositeDimensions> = {
+  '3:4': { width: 1080, height: 1440, label: '3:4 Google Flow & Carousel Portrait (1080×1440)' },
   '4:5': { width: 1080, height: 1350, label: '4:5 Instagram Portrait (1080×1350)' },
   '1:1': { width: 1080, height: 1080, label: '1:1 Square Feed (1080×1080)' },
   '9:16': { width: 1080, height: 1920, label: '9:16 Reels & Shorts Vertical (1080×1920)' },

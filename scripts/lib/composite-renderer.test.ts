@@ -40,6 +40,11 @@ describe('Composite Renderer Utility', () => {
   })
 
   it('has valid dimensions configured for all target aspect ratios', () => {
+    expect(COMPOSITE_DIMENSIONS['3:4']).toEqual({
+      width: 1080,
+      height: 1440,
+      label: '3:4 Google Flow & Carousel Portrait (1080×1440)',
+    })
     expect(COMPOSITE_DIMENSIONS['4:5']).toEqual({
       width: 1080,
       height: 1350,

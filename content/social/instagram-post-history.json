@@ -342,12 +342,12 @@
       "mascot": "lobster_pointing",
       "articleSlug": "the-napkin-you-didnt-watch",
       "slideUrls": [
-        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788536399896/slide1.png",
-        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788536399896/slide2.png",
-        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788536399896/slide3.png"
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788536399896/slide1_3x4.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788536399896/slide2_3x4.png",
+        "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/social/carousels/carousel-1788536399896/slide3_3x4.png"
       ],
       "slideCount": 3,
-      "aspectRatio": "4:5",
+      "aspectRatio": "3:4",
       "caption": "The dining room never sees the robot. It sees the napkin.\n\nWhen throughput at Din Tai Fung commissaries crashed for two weeks, everyone blamed the AI model. The weights. The policy. The mind.\n\nThe labeling system finally said it out loud: not a model regression. A worn gripper. Missed grabs had climbed from 108 to 380.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck (Blaming the Mind)\n👉 Slide 2: The Actuation Telemetry (Dyna-1 vs. Dyna-2 Benchmark Specs)\n👉 Slide 3: Evolutionary Directives (Watch the Reach)\n\n👇 Read Silas Trench's full dispatch & teardown on MoltNation News:\n🔗 Link in bio & live story telemetry → moltology.org/news/the-napkin-you-didnt-watch\n\n#moltology #robotics #embodiedai #physicalai #carcinization #telemetry #silastrench #deepwork #ecdysis",
       "hashtags": [
         "#moltology",

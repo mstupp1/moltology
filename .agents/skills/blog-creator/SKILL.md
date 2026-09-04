@@ -242,7 +242,7 @@ Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) an
 To maintain consistent visual mastery across all social carousels:
 
 * **Stage 1: The 2D Canvas Composite is ONLY a Mockup (Scaffolding)**:
-  - The 2D canvas composite is strictly a **layout blueprint / structural storyboard** (`1080x1350`).
+  - The 2D canvas composite is strictly a **layout blueprint / structural storyboard** (native 3:4 `1080x1440` matching Google Flow portrait mode).
   - It positions the typography, data metrics, comparison tables, flowchart nodes, character cutouts, and background into their designated spatial coordinates.
   - **Non-Negotiable Rule**: A raw 2D canvas composite is **NEVER a finished deliverable**. It must NEVER be uploaded directly to S3 or staged into the production queue as the final post.
 
@@ -276,6 +276,7 @@ To maintain consistent visual mastery across all social carousels:
                                ▼ (User Drops Assets Back)
 ┌──────────────────────────────────────────────────────────────┐
 │  STAGE 3: Deterministic S3 Ingest, Zernio Queue & 1st Comment│
+│  - Preserves full-frame (never force-crop 3:4 to 4:5)        │
 │  - Agent runs npm run carousel:create with --polished-slides │
 │  - CLI uploads polished slides to Neon S3                    │
 │  - CLI queues carousel via Zernio REST API (6a84b76d2421e968)│

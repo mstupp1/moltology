@@ -391,6 +391,7 @@ export const CompositeStudioUI: React.FC<CompositeStudioUIProps> = ({
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
+                { id: '3:4', icon: Smartphone, label: '3:4' },
                 { id: '4:5', icon: Smartphone, label: '4:5' },
                 { id: '1:1', icon: Square, label: '1:1' },
                 { id: '9:16', icon: Smartphone, label: '9:16' },

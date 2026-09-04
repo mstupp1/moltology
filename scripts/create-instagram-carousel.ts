@@ -323,7 +323,7 @@ Visual Transformation Directives (The Visual Must Explain The Text):
    - The Right Card ("WORN GRIP") glows with confident cyan illumination (#00ffff).
    - Keep all headline typography razor-sharp, unobstructed, and legible.
 
-Aspect Ratio: 4:5 (1080x1350)
+Aspect Ratio: 3:4 (Portrait in Google Flow)
 Output Style: Cinematic 3D photorealism, Pixar/DreamWorks character styling, volumetric lighting, atmospheric steam and subsea caustics, zero artifact noise.`,
 
       `[SLIDE 2 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
@@ -345,7 +345,7 @@ Visual Transformation Directives (The Visual Must Explain The Text):
 4. Glassmorphic HUD & Bevels:
    - Transform the 3 comparison cards into thick, layered 3D translucent HUD cards with rounded beveled edges, luminous cyan traces, and clean typography.
 
-Aspect Ratio: 4:5 (1080x1350)
+Aspect Ratio: 3:4 (Portrait in Google Flow)
 Output Style: Cinematic 3D sci-fi photorealism, tactile mechanical textures, pristine studio illumination, zero artifact noise.`,
 
       `[SLIDE 3 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
@@ -366,7 +366,7 @@ Visual Transformation Directives (The Visual Must Explain The Text):
    - The 3 directive items glow with soft frosted glass depth and illuminated numbered badges (01, 02, 03).
    - The CTA button at the bottom shines with an embossed golden-amber and cyan rim, framed by the official MoltNation shield watermark.
 
-Aspect Ratio: 4:5 (1080x1350)
+Aspect Ratio: 3:4 (Portrait in Google Flow)
 Output Style: Ultra high-resolution cinematic 3D render, luxury restaurant and high-tech benthic foundry fusion, rich atmospheric depth, zero artifact noise.`,
     ]
 
@@ -530,7 +530,7 @@ Key Enhancement Directives:
    - Ensure the mascot sits naturally beside the HUD elements without obscuring any text or metrics.
    - Cast natural ambient underwater lighting, gentle caustic reflections, and soft contact shadows without harsh backlights or artificial halo outlines.
 
-Aspect Ratio: 4:5 (1080x1350)
+Aspect Ratio: 3:4 (Portrait in Google Flow)
 Output Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`
 }
 
@@ -703,7 +703,7 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
     await captureComposite({
       template: config.template,
       theme,
-      aspectRatio: '4:5',
+      aspectRatio: '3:4',
       mascot: config.mascot as any,
       outputPath: outPath,
       scaleFactor: 2,

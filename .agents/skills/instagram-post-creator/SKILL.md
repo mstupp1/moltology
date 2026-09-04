@@ -27,10 +27,10 @@ Transparent WebP/PNG character cutouts reside in the Neon S3 public assets bucke
 ## 1. Core Architecture & Publishing Setup
 
 * **Instagram Persona**: Silas Trench (`@silas.trench`, Account ID: `6a7f7f0777555aae01d99b54`)
-* **Format**: 4:5 Portrait (`1080x1350`) or 1:1 Square (`1080x1080`)
+* **Format**: 3:4 Portrait (`1080x1440` / Google Flow native portrait), 4:5 Portrait (`1080x1350`), or 1:1 Square (`1080x1080`). Google Flow's portrait orientation is **3:4** (`1:1`, `3:4`, `4:3`, `9:16`, `16:9`).
 * **Image Synthesis Pipeline**:
   - **Stage 1 (Scaffolding)**: Web-Native High-DPI Composite Studio via Headless Chrome 2x Retina rendering (`scripts/lib/composite-renderer.ts`)
-  - **Stage 2 (Visual Polish Pass)**: User-facing AI (**Google Flow**) using rich, structured prompt directives
+  - **Stage 2 (Visual Polish Pass)**: User-facing AI (**Google Flow**) using rich, structured prompt directives (3:4 portrait or 1:1 square)
 * **Asset Storage**: Neon S3 (`images/social/posts/post-<timestamp>.png`)
 * **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Built directly into the CLI script (`npm run post:create`). **Never rely on MCP tools (`posts_create`, etc.) to schedule or queue.**
 * **Queue Configuration**:
@@ -94,7 +94,7 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
                                ▼ (User Drops Asset Back)
 ┌──────────────────────────────────────────────────────────────┐
 │  STAGE 3: Deterministic S3 Ingest, Zernio Queue & 1st Comment│
-│  - Resize image to exact 4:5 (1080×1350) if needed          │
+│  - Preserve full-frame (NO FORCE CROPPING to 4:5)             │
 │  - CLI uploads polished image to Neon S3                     │
 │  - CLI deterministically queues post via Zernio REST API:    │
 │    * Lead magnet themes → Daily Queue (6a8d93576f0e96efe2960c91)
@@ -132,7 +132,7 @@ When executing this pipeline as an agent, **always present the user with a struc
 
 ### Step 4: Resume S3 Upload & Deterministic Zernio Queueing (All-In-One)
 Once the user saves the polished image (e.g. `tmp/post_polished.png`):
-1. Check image dimensions — if not exactly `1080×1350` (4:5), crop/resize with `sips` before uploading.
+1. **Preserve Full-Frame (Never Crop)**: Ingest Google Flow's native 3:4 portrait (or 1:1 square) outputs directly without force-cropping to 4:5. Force-cropping chops ~49px off top/bottom and destroys margin balance. Instagram natively supports 3:4 portrait.
 2. Run the deterministic ingestion CLI:
    ```bash
    npm run post:create -- --theme <theme> --polished-image tmp/post_polished.png
