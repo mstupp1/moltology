@@ -2,6 +2,17 @@ import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { HUDTaskBar } from './HUDTaskBar'
+import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+
+function tasksWithCompletedCount(completedCount: number) {
+  return CANONICAL_ALIGNMENT_TASKS.map((t, i) => ({
+    id: t.key,
+    key: t.key,
+    time: t.time,
+    title: t.title,
+    completed: i < completedCount,
+  }))
+}
 
 describe('HUDTaskBar', () => {
   it('renders hero task bar chronometer with title, digits, and next alignment task', () => {
@@ -18,6 +29,24 @@ describe('HUDTaskBar', () => {
     
     expect(screen.queryByText('BENTHIC CHRONOMETER')).not.toBeInTheDocument()
     expect(screen.getByText(/NEXT:/i)).toBeInTheDocument()
+  })
+
+  it('does not label the header chip NEXT when all eight liturgies are complete', () => {
+    render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(8)} />)
+
+    expect(screen.getByText('8/8')).toBeInTheDocument()
+    expect(screen.getByText('COMPLETE')).toBeInTheDocument()
+    expect(screen.queryByText(/NEXT:/i)).not.toBeInTheDocument()
+    expect(screen.queryByText('Alignment Review')).not.toBeInTheDocument()
+  })
+
+  it('points the header chip at the next liturgy while alignment is in progress', () => {
+    render(<HUDTaskBar variant="header" tasks={tasksWithCompletedCount(3)} />)
+
+    expect(screen.getByText('3/8')).toBeInTheDocument()
+    expect(screen.getByText(/NEXT:/i)).toBeInTheDocument()
+    expect(screen.getByText('Nutritional Efficiency Break')).toBeInTheDocument()
+    expect(screen.queryByText('COMPLETE')).not.toBeInTheDocument()
   })
 
   it('allows switching timezone modes between LOCAL, UTC, BENTHIC, and STARDATE', () => {
