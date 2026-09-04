@@ -381,6 +381,7 @@ describe('Forum Server Handlers', () => {
               {
                 id: 'post-b',
                 topicId,
+                parentId: null,
                 userId: memberB,
                 authorName: values.authorName,
                 authorAvatar: values.authorAvatar,
@@ -422,6 +423,158 @@ describe('Forum Server Handlers', () => {
     expect(res.userId).toBe(memberB)
     expect(res.authorName).toBe(expectedB)
     expect(res.authorName).not.toBe(expectedA)
+    expect(res.parentId).toBeNull()
+  })
+
+  it('rejects a nested reply when the parent post is missing', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) {
+                return Promise.resolve([{ larvaId: PLACEHOLDER_LARVA_ID, stage: 1 }])
+              }
+              if (selectCall === 2) {
+                return Promise.resolve([{ id: '20000000-0000-0000-0000-000000000003' }])
+              }
+              return Promise.resolve([])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn(),
+    }
+
+    await expect(
+      createForumPostHandler({
+        data: {
+          topicId: '20000000-0000-0000-0000-000000000003',
+          parentId: '30000000-0000-0000-0000-000000000099',
+          content: 'This is enough content for a nested forum reply.',
+        },
+        context: {
+          user: { sub: 'test-user-id' },
+          db: mockDb as any,
+        },
+      })
+    ).rejects.toThrow('no longer available')
+    expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
+  it('rejects a nested reply when the parent belongs to another topic', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) {
+                return Promise.resolve([{ larvaId: PLACEHOLDER_LARVA_ID, stage: 1 }])
+              }
+              if (selectCall === 2) {
+                return Promise.resolve([{ id: '20000000-0000-0000-0000-000000000003' }])
+              }
+              return Promise.resolve([
+                {
+                  id: '30000000-0000-0000-0000-000000000001',
+                  topicId: '20000000-0000-0000-0000-000000000001',
+                  parentId: null,
+                },
+              ])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn(),
+    }
+
+    await expect(
+      createForumPostHandler({
+        data: {
+          topicId: '20000000-0000-0000-0000-000000000003',
+          parentId: '30000000-0000-0000-0000-000000000001',
+          content: 'This is enough content for a nested forum reply.',
+        },
+        context: {
+          user: { sub: 'test-user-id' },
+          db: mockDb as any,
+        },
+      })
+    ).rejects.toThrow('no longer available')
+    expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
+  it('creates a nested reply under a valid parent in the same topic', async () => {
+    const topicId = '20000000-0000-0000-0000-000000000003'
+    const parentId = '30000000-0000-0000-0000-000000000006'
+    let selectCall = 0
+    let insertedValues: Record<string, unknown> | null = null
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) {
+                return Promise.resolve([{ larvaId: PLACEHOLDER_LARVA_ID, stage: 2, handle: null }])
+              }
+              if (selectCall === 2) {
+                return Promise.resolve([{ id: topicId }])
+              }
+              if (selectCall === 3) {
+                return Promise.resolve([{ id: parentId, topicId, parentId: null }])
+              }
+              return Promise.resolve([{ repliesCount: 1 }])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          insertedValues = values
+          return {
+            returning: vi.fn().mockResolvedValue([
+              {
+                id: 'post-nested',
+                topicId,
+                parentId,
+                userId: 'nested-user',
+                authorName: values.authorName,
+                authorAvatar: values.authorAvatar,
+                authorStage: values.authorStage,
+                content: values.content,
+                upvotes: 0,
+                createdAt: new Date('2026-09-04T12:00:00.000Z'),
+              },
+            ]),
+          }
+        }),
+      })),
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+    }
+
+    const res = await createForumPostHandler({
+      data: {
+        topicId,
+        parentId,
+        content: 'Nested reply content that meets the minimum length.',
+      },
+      context: {
+        user: { sub: 'nested-user' },
+        db: mockDb as any,
+      },
+    })
+
+    expect(insertedValues).toEqual(expect.objectContaining({ topicId, parentId }))
+    expect(res.parentId).toBe(parentId)
   })
 
   it('lists member B reply as B, not thread author A, when both stored names are the placeholder', async () => {

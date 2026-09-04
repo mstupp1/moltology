@@ -14,6 +14,7 @@ export interface ForumCategorySeed {
 export interface ForumPostSeed {
   id: string
   topicId: string
+  parentId?: string | null
   userId?: string
   authorName: string
   authorAvatar: string
@@ -156,6 +157,7 @@ export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
       {
         id: '30000000-0000-0000-0000-000000000002',
         topicId: '20000000-0000-0000-0000-000000000001',
+        parentId: '30000000-0000-0000-0000-000000000001',
         userId: '00000000-0000-0000-0000-000000000001',
         authorName: 'Larva Unit #8971',
         authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
@@ -167,6 +169,7 @@ export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
       {
         id: '30000000-0000-0000-0000-000000000003',
         topicId: '20000000-0000-0000-0000-000000000001',
+        parentId: '30000000-0000-0000-0000-000000000002',
         authorName: 'CLAW_LORD_99',
         authorAvatar: '/images/stage1_larva.png',
         authorStage: 3,
@@ -208,6 +211,7 @@ export const INITIAL_FORUM_TOPICS: ForumTopicSeed[] = [
       {
         id: '30000000-0000-0000-0000-000000000005',
         topicId: '20000000-0000-0000-0000-000000000002',
+        parentId: '30000000-0000-0000-0000-000000000004',
         userId: '00000000-0000-0000-0000-000000000001',
         authorName: 'Larva Unit #8971',
         authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',

@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 // Neon Managed Auth Schema Reference
@@ -305,6 +305,8 @@ export const forumTopics = pgTable('forum_topics', {
 export const forumPosts = pgTable('forum_posts', {
   id: uuid('id').defaultRandom().primaryKey(),
   topicId: uuid('topicId').notNull().references(() => forumTopics.id, { onDelete: 'cascade' }),
+  /** Null = top-level reply to the topic; set = nested reply to another post in the same topic. */
+  parentId: uuid('parentId'),
   userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
   authorName: text('authorName').default('Ascendant Initiate').notNull(),
   authorAvatar: text('authorAvatar').default('/images/stage1_larva.png').notNull(),
@@ -314,6 +316,14 @@ export const forumPosts = pgTable('forum_posts', {
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
 }, (table) => [
+  // Self-FK: deleting a parent promotes children to roots rather than wiping the subtree.
+  foreignKey({
+    columns: [table.parentId],
+    foreignColumns: [table.id],
+    name: 'forum_posts_parent_id_fk',
+  }).onDelete('set null'),
+  index('forum_posts_topic_parent_idx').on(table.topicId, table.parentId),
+  index('forum_posts_topic_created_idx').on(table.topicId, table.createdAt),
   pgPolicy('forum_posts_public_read_policy', {
     for: 'select',
     using: sql`true`

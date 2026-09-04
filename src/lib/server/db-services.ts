@@ -25,7 +25,7 @@ import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
-import { slugifyForumTitle, compareHot } from '../forum-utils'
+import { slugifyForumTitle, compareHot, FORUM_REPLY_MAX_DEPTH } from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
 import { getAssetUrl } from '../assets'
 import type { PodcastEpisode } from '../podcast-data'
@@ -1078,6 +1078,7 @@ export interface ForumTopicEntry {
 export interface ForumPostEntry {
   id: string
   topicId: string
+  parentId: string | null
   userId: string | null
   authorName: string
   authorHandle?: string | null
@@ -1449,6 +1450,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         .select({
           id: forumPosts.id,
           topicId: forumPosts.topicId,
+          parentId: forumPosts.parentId,
           userId: forumPosts.userId,
           authorName: forumPosts.authorName,
           authorAvatar: forumPosts.authorAvatar,
@@ -1472,6 +1474,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
       const posts: ForumPostEntry[] = postsRecords.map((p: any) => ({
         id: p.id,
         topicId: p.topicId,
+        parentId: p.parentId ?? null,
         userId: p.userId,
         authorName: resolveMemberPublicName({
           userId: p.userId,
@@ -1658,6 +1661,7 @@ export const createForumTopicFn = createServerFn({ method: 'POST' })
 export interface CreateForumPostInput {
   topicId: string
   content: string
+  parentId?: string | null
   userId?: string
   token?: string
 }
@@ -1706,10 +1710,43 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error('This thread is no longer available. Refresh the forums and try again.')
   }
 
+  let parentId: string | null = data.parentId?.trim() || null
+  if (parentId) {
+    const [parent] = await dbClient
+      .select({ id: forumPosts.id, topicId: forumPosts.topicId, parentId: forumPosts.parentId })
+      .from(forumPosts)
+      .where(eq(forumPosts.id, parentId))
+      .limit(1)
+
+    if (!parent || parent.topicId !== data.topicId) {
+      throw new Error('That comment is no longer available. Refresh and try again.')
+    }
+
+    // Walk ancestors to enforce hard depth cap.
+    let depth = 1
+    let cursor: string | null = parent.parentId
+    const seen = new Set<string>([parent.id])
+    while (cursor) {
+      if (seen.has(cursor)) break
+      seen.add(cursor)
+      depth += 1
+      if (depth > FORUM_REPLY_MAX_DEPTH) {
+        throw new Error('This reply thread is too deep. Reply to an earlier comment instead.')
+      }
+      const [ancestor] = await dbClient
+        .select({ id: forumPosts.id, parentId: forumPosts.parentId })
+        .from(forumPosts)
+        .where(eq(forumPosts.id, cursor))
+        .limit(1)
+      cursor = ancestor?.parentId ?? null
+    }
+  }
+
   const [inserted] = await dbClient
     .insert(forumPosts)
     .values({
       topicId: data.topicId,
+      parentId,
       userId,
       authorName,
       authorAvatar,
@@ -1742,6 +1779,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   return {
     id: inserted.id,
     topicId: inserted.topicId,
+    parentId: inserted.parentId ?? null,
     userId: inserted.userId,
     authorName: inserted.authorName,
     authorHandle: userProfile?.handle?.trim() || null,
@@ -1760,6 +1798,7 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
       .object({
         topicId: z.string().min(1),
         content: z.string().min(10).max(10000),
+        parentId: z.string().min(1).nullable().optional(),
         userId: z.string().optional(),
         token: z.string().optional(),
       })

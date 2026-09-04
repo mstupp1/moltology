@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { INITIAL_FORUM_TOPICS } from '../../../lib/forum-seed-data'
 
 const mockUseLoaderData = vi.fn()
@@ -192,6 +192,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
         {
           id: 'post-b',
           topicId: 'topic-a',
+          parentId: null,
           userId: 'member-b',
           authorName: 'LARVA UNIT #2468',
           authorAvatar: '/images/stage1_larva.png',
@@ -241,6 +242,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
         {
           id: 'post-b',
           topicId: 'topic-a',
+          parentId: null,
           userId: 'member-b',
           authorName: 'pincer_prime',
           authorHandle: 'pincer_prime',
@@ -260,5 +262,73 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByRole('link', { name: 'claw_lord' })).toHaveAttribute('href', '/member/claw_lord')
     expect(screen.getByRole('link', { name: 'pincer_prime' })).toHaveAttribute('href', '/member/pincer_prime')
     expect(screen.queryByText('LARVA UNIT #8971')).not.toBeInTheDocument()
+  })
+
+  it('nests child replies under their parent and opens an inline composer', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'authed-user', name: 'Initiate' } },
+    } as any)
+
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: null,
+        authorName: 'High Ascendant',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 4,
+        title: 'Threaded discussion',
+        slug: 'threaded-discussion',
+        content: 'Original post body long enough.',
+        isPinned: false,
+        isLocked: false,
+        views: 10,
+        repliesCount: 2,
+        upvotes: 1,
+        lastReplyAt: '2026-08-03T20:30:00.000Z',
+        createdAt: '2026-08-01T12:00:00.000Z',
+      },
+      posts: [
+        {
+          id: 'post-root',
+          topicId: 'topic-a',
+          parentId: null,
+          userId: 'member-a',
+          authorName: 'Architect Vaelen',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 3,
+          content: 'Root reply body long enough to count.',
+          upvotes: 3,
+          createdAt: '2026-08-01T14:00:00.000Z',
+        },
+        {
+          id: 'post-child',
+          topicId: 'topic-a',
+          parentId: 'post-root',
+          userId: 'member-b',
+          authorName: 'Larva Unit',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 1,
+          content: 'Nested child reply body long enough.',
+          upvotes: 1,
+          createdAt: '2026-08-02T09:00:00.000Z',
+        },
+      ],
+    })
+
+    render(<ForumThreadPage />)
+
+    const cards = screen.getAllByTestId('forum-post-card')
+    expect(cards).toHaveLength(2)
+    expect(cards[0]).toHaveAttribute('data-depth', '0')
+    expect(cards[1]).toHaveAttribute('data-depth', '1')
+    expect(screen.getByTestId('forum-reply-sort')).toBeInTheDocument()
+
+    fireEvent.click(screen.getAllByTestId('forum-reply-to-comment')[0])
+    expect(screen.getByTestId('forum-inline-reply-composer')).toBeInTheDocument()
+    expect(screen.getByText('Reply to comment')).toBeInTheDocument()
   })
 })

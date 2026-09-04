@@ -353,6 +353,7 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
   .validator((data: {
     topicId: string
     content: string
+    parentId?: string | null
     userId?: string
     token?: string
   }) =>
@@ -360,6 +361,7 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
       .object({
         topicId: z.string().min(1),
         content: z.string().min(1),
+        parentId: z.string().min(1).nullable().optional(),
         userId: z.string().optional(),
         token: z.string().optional(),
       })

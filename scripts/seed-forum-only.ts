@@ -61,6 +61,7 @@ async function main() {
         .values({
           id: p.id,
           topicId: p.topicId,
+          parentId: p.parentId ?? null,
           userId: null,
           authorName: p.authorName,
           authorAvatar: p.authorAvatar,
