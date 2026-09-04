@@ -1,4 +1,5 @@
 import type { DetailedHTMLProps, MetaHTMLAttributes } from 'react'
+import { isMemberProfileUuid, resolveMemberPublicName } from './member-handle'
 
 export type MetaElement = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>
 
@@ -53,6 +54,32 @@ export function searchPageSeo(query?: string) {
   return privatePageSeo({
     title: trimmed ? `Search · ${trimmed} | Moltology` : SEARCH_PAGE_SEO.title,
     description: SEARCH_PAGE_SEO.description,
+  })
+}
+
+export type MemberProfileSeoInput = {
+  userId?: string | null
+  handle?: string | null
+  larvaId?: string | null
+}
+
+/** Map `/member/$profileId` (designation or uuid) to a public-name input. */
+export function memberIdentityFromRouteKey(profileId?: string | null): MemberProfileSeoInput | undefined {
+  const trimmed = profileId?.trim() ?? ''
+  if (!trimmed) return undefined
+  if (isMemberProfileUuid(trimmed)) {
+    return { userId: trimmed }
+  }
+  return { handle: trimmed }
+}
+
+export function memberProfileSeo(member?: MemberProfileSeoInput | null) {
+  const handle = member?.handle?.trim()
+  const hasIdentity = Boolean(handle || member?.userId || member?.larvaId?.trim())
+  const publicName = hasIdentity && member ? resolveMemberPublicName(member) : ''
+  return privatePageSeo({
+    title: publicName ? `${publicName} | Moltology` : MEMBER_PROFILE_SEO.title,
+    description: MEMBER_PROFILE_SEO.description,
   })
 }
 

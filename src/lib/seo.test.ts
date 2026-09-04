@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { seo, privatePageSeo, notFoundSeo, MEMBER_PROFILE_SEO, SEARCH_PAGE_SEO, searchPageSeo, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
+import { seo, privatePageSeo, notFoundSeo, MEMBER_PROFILE_SEO, SEARCH_PAGE_SEO, searchPageSeo, memberIdentityFromRouteKey, memberProfileSeo, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
+import { resolveMemberPublicName } from './member-handle'
 
 describe('SEO Meta Tag Generator', () => {
   it('generates standard metadata including default robots and ogType', () => {
@@ -53,9 +54,9 @@ describe('SEO Meta Tag Generator', () => {
   })
 
   it('emits a real member dossier title that is never blank or not-found', () => {
-    const meta = privatePageSeo(MEMBER_PROFILE_SEO)
+    const fallback = privatePageSeo(MEMBER_PROFILE_SEO)
     expect(MEMBER_PROFILE_SEO.title).toBe('Member Dossier | Moltology')
-    expect(meta).toEqual(
+    expect(fallback).toEqual(
       expect.arrayContaining([
         { name: 'robots', content: 'noindex, nofollow' },
         { title: 'Member Dossier | Moltology' },
@@ -63,6 +64,25 @@ describe('SEO Meta Tag Generator', () => {
     )
     expect(MEMBER_PROFILE_SEO.title).not.toBe('')
     expect(MEMBER_PROFILE_SEO.title).not.toMatch(/Page Not Found/i)
+
+    const handleMeta = memberProfileSeo({ handle: 'mstupp' })
+    const larvaId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const larvaName = resolveMemberPublicName({ userId: larvaId })
+    const larvaMeta = memberProfileSeo(memberIdentityFromRouteKey(larvaId))
+    expect(handleMeta).toEqual(
+      expect.arrayContaining([
+        { name: 'robots', content: 'noindex, nofollow' },
+        { title: 'mstupp | Moltology' },
+      ]),
+    )
+    expect(larvaMeta).toEqual(
+      expect.arrayContaining([{ title: `${larvaName} | Moltology` }]),
+    )
+    expect(memberProfileSeo()).toEqual(
+      expect.arrayContaining([{ title: MEMBER_PROFILE_SEO.title }]),
+    )
+    expect(memberIdentityFromRouteKey('mstupp')).toEqual({ handle: 'mstupp' })
+    expect(memberIdentityFromRouteKey(larvaId)).toEqual({ userId: larvaId })
   })
 
   it('emits a real search title that is never blank, including an empty query', () => {

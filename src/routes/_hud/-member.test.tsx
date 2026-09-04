@@ -5,22 +5,38 @@ import {
   memberDossierLocation,
   pickProfileForRouteKey,
   resolveMemberDossierRedirect,
+  resolveMemberPublicName,
   resolveMemberPublicParam,
 } from '@/lib/member-handle'
 
 const MEMBER_UUID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 
 describe('/member/$profileId dossier route', () => {
-  it('sets a real page title instead of a blank or not-found tab', () => {
-    const head = Route.options.head as () => { meta: Array<{ title?: string }> }
+  it('sets a page title from the public name instead of a static dossier tab', () => {
+    const head = Route.options.head as (ctx: {
+      params: { profileId: string }
+    }) => { meta: Array<{ title?: string; name?: string; content?: string }> }
     const headers = Route.options.headers as () => Record<string, string>
-    const meta = head().meta
-    const title = meta.find((entry) => entry.title)?.title
 
-    expect(title).toBe(MEMBER_PROFILE_SEO.title)
-    expect(title).not.toBe('')
-    expect(title).not.toMatch(/Page Not Found/i)
+    const handleTitle = head({ params: { profileId: 'mstupp' } }).meta.find(
+      (entry) => entry.title,
+    )?.title
+    const larvaTitle = head({ params: { profileId: MEMBER_UUID } }).meta.find(
+      (entry) => entry.title,
+    )?.title
+    const larvaName = resolveMemberPublicName({ userId: MEMBER_UUID })
+
+    expect(handleTitle).toBe('mstupp | Moltology')
+    expect(handleTitle).not.toBe(MEMBER_PROFILE_SEO.title)
+    expect(larvaTitle).toBe(`${larvaName} | Moltology`)
+    expect(larvaTitle).not.toBe(MEMBER_PROFILE_SEO.title)
+    expect(larvaTitle).toMatch(/^LARVA UNIT #/)
+    expect(handleTitle).not.toBe('')
+    expect(handleTitle).not.toMatch(/Page Not Found/i)
     expect(headers()['X-Robots-Tag']).toBe('noindex, nofollow')
+    expect(head({ params: { profileId: 'mstupp' } }).meta).toEqual(
+      expect.arrayContaining([{ name: 'robots', content: 'noindex, nofollow' }]),
+    )
     expect(Route.options.pendingComponent).toBeDefined()
   })
 
