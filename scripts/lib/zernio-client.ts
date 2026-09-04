@@ -239,6 +239,9 @@ export async function queueInstagramPost(
       {
         platform: 'instagram',
         accountId,
+        platformSpecificData: {
+          ...(options.firstComment ? { firstComment: options.firstComment } : {}),
+        },
       },
     ],
     publishNow: options.publishNow || false,
@@ -327,6 +330,9 @@ export async function queueInstagramCarousel(
       {
         platform: 'instagram',
         accountId,
+        platformSpecificData: {
+          ...(options.firstComment ? { firstComment: options.firstComment } : {}),
+        },
       },
     ],
     publishNow: options.publishNow || false,
@@ -375,6 +381,7 @@ export interface QueueDualReelAndShortOptions {
 }
 
 export interface QueueDualReelAndShortResult {
+  postId: string
   instagramPostId: string
   youtubePostId: string
   scheduledFor?: string
@@ -385,7 +392,7 @@ export interface QueueDualReelAndShortResult {
 }
 
 /**
- * Deterministically queues a dual broadcast (Instagram Reel + YouTube Short) into the Reels & Shorts queue.
+ * Deterministically queues a dual broadcast (Instagram Reel + YouTube Short) into the Reels & Shorts queue as a single unified multi-platform post.
  */
 export async function queueDualReelAndShort(
   options: QueueDualReelAndShortOptions
@@ -395,18 +402,22 @@ export async function queueDualReelAndShort(
   const igAccountId = options.instagramAccountId || DEFAULT_INSTAGRAM_ACCOUNT_ID
   const ytAccountId = options.youtubeAccountId || DEFAULT_YOUTUBE_ACCOUNT_ID
 
-  console.log(`\n📡 [Zernio API] Staging Dual Reel & Short to Queue (${queueId})...`)
+  console.log(`\n📡 [Zernio API] Staging Unified Dual Reel & Short to Queue (${queueId})...`)
 
   if (options.dryRun) {
-    console.log(`   🛡️ [Dry Run] Simulating Zernio Reel & Short payload:`)
+    console.log(`   🛡️ [Dry Run] Simulating Zernio Unified Reel & Short payload:`)
     console.log(`      • Queue ID: ${queueId}`)
     console.log(`      • Video URL: ${options.videoUrl}`)
+    console.log(`      • Instagram Account: ${igAccountId}`)
+    console.log(`      • YouTube Account: ${ytAccountId}`)
     console.log(`      • YouTube Title: ${options.youtubeTitle}`)
     console.log(`      • First comment: ${options.firstComment ? 'Yes' : 'No'}`)
+    const dryRunId = `dry-run-reel-short-${Date.now()}`
     return {
-      instagramPostId: `dry-run-ig-reel-${Date.now()}`,
-      youtubePostId: `dry-run-yt-short-${Date.now()}`,
-      scheduledFor: '2026-09-03T22:30:00.000Z',
+      postId: dryRunId,
+      instagramPostId: dryRunId,
+      youtubePostId: dryRunId,
+      scheduledFor: '2026-09-05T22:30:00.000Z',
       queueId,
       commentId: options.firstComment ? `dry-run-comment-${Date.now()}` : null,
       status: options.publishNow ? 'published' : 'queued',
@@ -414,9 +425,9 @@ export async function queueDualReelAndShort(
     }
   }
 
-  // 1. Queue Instagram Reel
-  console.log(`   • Staging Instagram Reel (${igAccountId})...`)
-  const igPayload: ZernioCreatePostPayload = {
+  // Stage Unified Post targeting both Instagram and YouTube simultaneously in a single queue slot
+  console.log(`   • Staging Unified Dual Broadcast (Instagram Reel + YouTube Short)...`)
+  const postPayload: ZernioCreatePostPayload = {
     queuedFromProfile: profileId,
     queueId,
     content: options.instagramCaption,
@@ -425,62 +436,52 @@ export async function queueDualReelAndShort(
       {
         platform: 'instagram',
         accountId: igAccountId,
+        customContent: options.instagramCaption,
         platformSpecificData: {
           contentType: 'reel',
+          shareToFeed: true,
+          ...(options.firstComment ? { firstComment: options.firstComment } : {}),
         },
       },
-    ],
-    publishNow: options.publishNow || false,
-  }
-
-  const igPost = await createZernioPost(igPayload)
-  console.log(`   ✅ Instagram Reel queued! Zernio ID: ${igPost._id}`)
-  if (igPost.scheduledFor) {
-    console.log(`   ⏰ Scheduled For: ${igPost.scheduledFor}`)
-  }
-
-  // 2. Post First Comment on Instagram
-  let commentId: string | null = null
-  if (options.firstComment) {
-    console.log(`   💬 Posting algorithmic first comment on Instagram...`)
-    const commentRes = await postZernioComment(igPost._id, igAccountId, options.firstComment)
-    commentId = commentRes?.comment?._id || commentRes?._id || 'posted'
-    if (commentId) {
-      console.log(`   ✅ First comment posted successfully!`)
-    }
-  }
-
-  // 3. Queue YouTube Short
-  console.log(`   • Staging YouTube Short (${ytAccountId})...`)
-  const ytPayload: ZernioCreatePostPayload = {
-    queuedFromProfile: profileId,
-    queueId,
-    title: options.youtubeTitle,
-    content: options.youtubeDescription,
-    tags: options.youtubeTags || [],
-    mediaItems: [{ type: 'video', url: options.videoUrl }],
-    platforms: [
       {
         platform: 'youtube',
         accountId: ytAccountId,
+        customContent: options.youtubeDescription,
         platformSpecificData: {
           title: options.youtubeTitle,
+          visibility: 'public',
+          ...(options.youtubeTags && options.youtubeTags.length > 0 ? { tags: options.youtubeTags } : {}),
+          ...(options.firstComment ? { firstComment: options.firstComment } : {}),
         },
       },
     ],
     publishNow: options.publishNow || false,
   }
 
-  const ytPost = await createZernioPost(ytPayload)
-  console.log(`   ✅ YouTube Short queued! Zernio ID: ${ytPost._id}`)
+  const post = await createZernioPost(postPayload)
+  console.log(`   ✅ Unified Reel & Short queued! Zernio Post ID: ${post._id}`)
+  if (post.scheduledFor) {
+    console.log(`   ⏰ Scheduled For: ${post.scheduledFor}`)
+  }
+
+  let commentId: string | null = null
+  if (options.firstComment) {
+    console.log(`   💬 Posting algorithmic first comment on Instagram...`)
+    const commentRes = await postZernioComment(post._id, igAccountId, options.firstComment)
+    commentId = commentRes?.comment?._id || commentRes?._id || 'posted'
+    if (commentId) {
+      console.log(`   ✅ First comment registered successfully!`)
+    }
+  }
 
   return {
-    instagramPostId: igPost._id,
-    youtubePostId: ytPost._id,
-    scheduledFor: igPost.scheduledFor || ytPost.scheduledFor,
+    postId: post._id,
+    instagramPostId: post._id,
+    youtubePostId: post._id,
+    scheduledFor: post.scheduledFor,
     queueId,
     commentId,
-    status: igPost.status,
+    status: post.status,
     dryRun: false,
   }
 }

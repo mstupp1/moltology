@@ -1536,8 +1536,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   console.log(`======================================================`)
   console.log(`📹 Master Video: ${masterReelPath}`)
   if (publicUrl) console.log(`🔗 Public Stream URL: ${publicUrl}`)
-  if (queueResult?.instagramPostId) console.log(`📸 Zernio Instagram Post ID: ${queueResult.instagramPostId}`)
-  if (queueResult?.youtubePostId) console.log(`▶️  Zernio YouTube Post ID: ${queueResult.youtubePostId}`)
+  if (queueResult?.postId) console.log(`🚀 Unified Zernio Post ID: ${queueResult.postId}`)
   if (queueResult?.scheduledFor) console.log(`⏰ Scheduled Slot: ${queueResult.scheduledFor}`)
   console.log(`💬 Recommended Caption:\n${scriptData.caption}`)
 

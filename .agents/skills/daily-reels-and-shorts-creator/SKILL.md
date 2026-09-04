@@ -200,10 +200,10 @@ When running `npm run reel:create`, Step 6 executes **deterministically and auto
 
 2. **Deterministic Zernio Queue Staging via REST API**:
    * **Automatic Queue Dispatch**: The CLI directly calls the Zernio REST API (`POST /v1/posts`) with `queuedFromProfile: '6a7f74b1839bf39ff3b6aaaa'` and `queueId: '6a84b7702421e968ac81f5bd'`.
-   * **Dual Broadcast**: Automatically provisions:
-     - **Instagram Reel**: Account ID `6a7f7f0777555aae01d99b54` (with `isAiGenerated: true` and `contentType: 'reel'`).
+   * **Dual Broadcast**: Automatically provisions a single unified multi-platform post targeting both Instagram Reel and YouTube Short simultaneously (occupying 1 queue slot):
+     - **Instagram Reel**: Account ID `6a7f7f0777555aae01d99b54` (with `contentType: 'reel'` and `shareToFeed: true`).
      - **YouTube Short**: Account ID `6a7fd9bd77555aae01ebea63` (with `title`, `description`, `tags`).
-   * **Automatic First Comment**: The CLI immediately posts the algorithmic first comment with the keyword DM trigger link via the Zernio Inbox API (`POST /v1/inbox/comments/{postId}`).
+   * **Automatic First Comment**: The CLI configures native first comment scheduling in `platformSpecificData.firstComment` and posts via Zernio Inbox API (`POST /v1/inbox/comments/{postId}`).
    * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly and unequivocally commands an immediate live broadcast.
    * **DO NOT invoke Zernio MCP tools (`posts_create`, etc.) manually**: The script deterministically handles queue assignment and first comment chaining.
 

@@ -675,8 +675,7 @@ export async function createViralSeriesReel(options: CreateViralSeriesOptions = 
   })
 
   console.log(`\n🎉 Viral Series Episode Successfully Completed & Staged!`)
-  if (queueResult?.instagramPostId) console.log(`   • Instagram Reel ID: ${queueResult.instagramPostId}`)
-  if (queueResult?.youtubePostId) console.log(`   • YouTube Short ID: ${queueResult.youtubePostId}`)
+  if (queueResult?.postId) console.log(`   • Unified Broadcast Post ID: ${queueResult.postId}`)
   if (queueResult?.scheduledFor) console.log(`   • Scheduled Slot: ${queueResult.scheduledFor}`)
 }
 

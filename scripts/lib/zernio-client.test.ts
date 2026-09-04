@@ -176,24 +176,19 @@ describe('zernio-client', () => {
     expect(postPayload.mediaItems[0].url).toBe('https://cdn.moltology.org/s1.png')
   })
 
-  it('queues dual broadcast for Reel and Short into Reels & Shorts queue', async () => {
-    const mockIg = { _id: 'reel_ig_1', status: 'scheduled', scheduledFor: '2026-09-03T22:30:00.000Z' }
-    const mockComment = { _id: 'comm_ig_reel_1' }
-    const mockYt = { _id: 'short_yt_1', status: 'scheduled', scheduledFor: '2026-09-03T22:30:00.000Z' }
+  it('queues a unified dual broadcast for Reel and Short into Reels & Shorts queue', async () => {
+    const mockPost = { _id: 'unified_reel_1', status: 'scheduled', scheduledFor: '2026-09-05T22:30:00.000Z' }
+    const mockComment = { comment: { _id: 'comm_ig_reel_1' } }
 
     const fetchSpy = vi
       .spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({
         ok: true,
-        text: async () => JSON.stringify({ post: mockIg }),
+        text: async () => JSON.stringify({ post: mockPost }),
       } as any)
       .mockResolvedValueOnce({
         ok: true,
-        text: async () => JSON.stringify({ comment: mockComment }),
-      } as any)
-      .mockResolvedValueOnce({
-        ok: true,
-        text: async () => JSON.stringify({ post: mockYt }),
+        text: async () => JSON.stringify(mockComment),
       } as any)
 
     const result = await queueDualReelAndShort({
@@ -207,9 +202,48 @@ describe('zernio-client', () => {
     })
 
     expect(result.dryRun).toBe(false)
-    expect(result.instagramPostId).toBe('reel_ig_1')
-    expect(result.youtubePostId).toBe('short_yt_1')
+    expect(result.postId).toBe('unified_reel_1')
+    expect(result.instagramPostId).toBe('unified_reel_1')
+    expect(result.youtubePostId).toBe('unified_reel_1')
     expect(result.commentId).toBe('comm_ig_reel_1')
-    expect(fetchSpy).toHaveBeenCalledTimes(3)
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
+
+    const postPayload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
+    expect(postPayload.queueId).toBe(QUEUE_IDS.REELS_AND_SHORTS)
+    expect(postPayload.mediaItems).toHaveLength(1)
+    expect(postPayload.mediaItems[0].url).toBe('https://cdn.moltology.org/reel.mp4')
+    expect(postPayload.platforms).toHaveLength(2)
+
+    // Instagram platform target
+    expect(postPayload.platforms[0].platform).toBe('instagram')
+    expect(postPayload.platforms[0].customContent).toBe('IG Reel caption')
+    expect(postPayload.platforms[0].platformSpecificData.contentType).toBe('reel')
+    expect(postPayload.platforms[0].platformSpecificData.shareToFeed).toBe(true)
+    expect(postPayload.platforms[0].platformSpecificData.firstComment).toBe('Comment QUIZ')
+
+    // YouTube platform target
+    expect(postPayload.platforms[1].platform).toBe('youtube')
+    expect(postPayload.platforms[1].customContent).toBe('Full description')
+    expect(postPayload.platforms[1].platformSpecificData.title).toBe('Epic YouTube Title #Shorts')
+    expect(postPayload.platforms[1].platformSpecificData.visibility).toBe('public')
+    expect(postPayload.platforms[1].platformSpecificData.tags).toEqual(['shorts', 'molt'])
+    expect(postPayload.platforms[1].platformSpecificData.firstComment).toBe('Comment QUIZ')
+  })
+
+  it('supports dry-run mode for unified Reel and Short without making HTTP calls', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const result = await queueDualReelAndShort({
+      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      instagramCaption: 'IG Reel caption',
+      youtubeTitle: 'Epic YouTube Title #Shorts',
+      youtubeDescription: 'Full description',
+      dryRun: true,
+    })
+
+    expect(result.dryRun).toBe(true)
+    expect(result.postId).toContain('dry-run-reel-short')
+    expect(result.instagramPostId).toBe(result.postId)
+    expect(result.youtubePostId).toBe(result.postId)
+    expect(fetchSpy).not.toHaveBeenCalled()
   })
 })

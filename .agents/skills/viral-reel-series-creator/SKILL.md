@@ -105,9 +105,9 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  STAGE 4: S3 Ingestion, Deterministic Zernio Queueing & 1st Comment (CLI)   │
 │  - CLI uploads master video to Neon S3                                      │
-│  - CLI queues dual broadcast (Instagram Reel + YouTube Short) via Zernio API│
+│  - CLI queues unified broadcast (Instagram Reel + YouTube Short, 1 slot)    │
 │  - Deterministically routes into Reels Queue (6a84b7702421e968ac81f5bd)     │
-│  - Posts instant algorithmic First Comment on Instagram via Zernio API       │
+│  - Configures algorithmic First Comment via native firstComment & API       │
 │  - Appends full episode record to content/social/viral-series-ledger.json   │
 │  - NO MANUAL MCP CALLS REQUIRED                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
