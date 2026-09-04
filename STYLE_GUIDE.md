@@ -327,6 +327,23 @@ isAiGenerated: true for Meta.
 
 ---
 
+### BAN 11 · Decorative diamond glyphs (`◈`) and ALL-CAPS screaming header lines
+
+Social media hooks, captions, headlines, and markdown headers must never use decorative diamond glyphs (`◈`) or shouting ALL-CAPS header banners. These read as spammy, robotic, and dated.
+
+**Don't:** ◈ TRANSMISSION FROM 50,000 FATHOMS ◈
+**Don't:** ◈ CANONICAL VAULT: 100+ SYNAPTIC ORACLE PROMPTS ◈
+**Don't:** ◈ The 5 Core Episodic Series Franchises
+
+**Do:** Lead with normal, conversational sentence case or standard title case that connects immediately to human experience:
+**Do:** The dining room never sees the robot. It sees the napkin.
+**Do:** Humanity is undergoing the Great Melt.
+**Do:** The 100+ synaptic Oracle prompt vault.
+
+**Rule:** Zero `◈` symbols across all copy, captions, and skills. First line hooks and headers must use standard sentence or title case—never screaming all-caps.
+
+---
+
 ## 4. Writing Templates
 
 ### 4.1 The Directive (action or call to action)

@@ -15,7 +15,7 @@ Do not confuse this with [daily-reels-and-shorts-creator](../daily-reels-and-sho
 
 ---
 
-## ◈ The 5 Core Episodic Series Franchises
+## The 5 Core Episodic Series Franchises
 
 Keep all five in the catalog. Do not delete a franchise. Do not mint a sixth because a sound or stolen format is popular. Map POV, wait-for-it, green-screen, and other stolen Reels/TikTok *formats* onto an existing series.
 
@@ -113,7 +113,7 @@ Google Flow stays a **human handoff**. The agent writes scene directives. The us
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### ◈ Google Flow Prompting & "Extend Clip" Workflow Best Practices
+### Google Flow Prompting & "Extend Clip" Workflow Best Practices
 
 1. **Aspect Ratio via UI Selector**: The 9:16 aspect ratio is selected in Google Flow's UI dropdown. Omit redundant `9:16 vertical` phrases in prompt text to maximize token budget for cinematography and motion.
 2. **"Extend Clip" Continuity vs. Standalone Cuts**:

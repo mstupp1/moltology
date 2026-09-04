@@ -12,7 +12,7 @@ This skill automates the daily creation, multi-modal video synthesis, FFmpeg com
 
 ---
 
-## ◈ Character Family Cutouts on S3
+## Character Family Cutouts on S3
 
 Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
@@ -216,7 +216,7 @@ When running `npm run reel:create`, Step 6 executes **deterministically and auto
 
 Instagram posts convert significantly higher when viewers are prompted with a **one-word comment keyword** that automatically triggers a DM response via Zernio (`POST /v1/comment-automations`).
 
-### ◈ Conversion Vectors & Matching Destinations
+### Conversion Vectors & Matching Destinations
 
 | Goal (`--cta-goal`) | Keyword Trigger | Target URL | Value Proposition & DM Copy Hook |
 |---------------------|-----------------|------------|-----------------------------------|
@@ -226,7 +226,7 @@ Instagram posts convert significantly higher when viewers are prompted with a **
 | **`demo`** | `DEMO` | `https://moltology.org` | **Interactive Bio-Silicon Telemetry**: Live interactive simulation dashboard and terminal. |
 | **`homepage`** | `INITIATE` | `https://moltology.org` | **Ascension Onboarding**: Join the Synaptic Path and create an initiate profile. |
 
-### ◈ Caption & Outro Formatting Architecture
+### Caption & Outro Formatting Architecture
 
 Every generated Reel automatically embeds the matching comment keyword and direct link:
 
@@ -244,7 +244,7 @@ Every generated Reel automatically embeds the matching comment keyword and direc
    #Moltmaxxing #MoltNation #Shorts
    ```
 
-### ◈ Zernio Comment-to-DM Follow Gate Setup
+### Zernio Comment-to-DM Follow Gate Setup
 
 When setting up Zernio comment automations (`POST /v1/comment-automations`), use the **Follow Gate** feature:
 * Set `audience: { whenUnknown: "verify" }` and `followGate: true`.

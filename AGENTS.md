@@ -6,7 +6,7 @@
 2. No tech-stack leaks and no // in user-facing copy.
 3. Warmth, safety, and positivity under the HUD.
 4. Signup is free. Chitin Gems are earned. Molt Credits are the paid layer. Rank, clearance, stage, and forum authority are never for sale.
-5. _TBD._
+5. No decorative diamond glyphs (◈) and no ALL-CAPS screaming header lines in social copy, hooks, or skills. Opening hooks must use normal, conversational sentence case or standard title case.
 
 ## Must-read before user-facing copy
 

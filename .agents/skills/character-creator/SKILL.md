@@ -12,7 +12,7 @@ It builds directly upon the **Chroma Key Studio** engine (`scripts/chroma_key.py
 
 ---
 
-## ◈ 1. Worldbuilding & Character Family Philosophy
+## 1. Worldbuilding & Character Family Philosophy
 
 Moltology's characters belong to a living, interconnected, diverse crustacean world and family. They share a consistent high-end **3D Pixar / DreamWorks animated feature CGI aesthetic** (rich volumetric modeling, satin chitin sheen, specular highlights, and subsurface scattering), celebrating wide visual and physical variety across individuals:
 
@@ -78,7 +78,7 @@ The **Lobster Pointing** character ([`scratch/character_refs/char_lobster_pointi
 
 ---
 
-## ◈ 2. Discovering Available Characters in S3
+## 2. Discovering Available Characters in S3
 
 Characters are hosted on **Neon S3** (`moltology-public-assets/images/characters/`).
 
@@ -88,7 +88,7 @@ All character files adhere to the naming convention: `char_<name>.png` (e.g. `ch
 
 ---
 
-## ◈ 3. 5-Step Creation & Deployment Workflow
+## 3. 5-Step Creation & Deployment Workflow
 
 ```mermaid
 flowchart TD
@@ -186,7 +186,7 @@ await overlayCharacterOnImage(baseImagePath, outputImagePath, {
 
 ---
 
-## ◈ 4. Mascot Lifecycle Playbooks (Add, Replace, Refresh, Remove)
+## 4. Mascot Lifecycle Playbooks (Add, Replace, Refresh, Remove)
 
 Follow these exact copy-paste protocols for managing crustacean mascots across the platform:
 
@@ -310,7 +310,7 @@ Use this when retiring an active mascot without breaking historical content:
 
 ---
 
-## ◈ 5. Troubleshooting & The Silent Fallback Trap
+## 5. Troubleshooting & The Silent Fallback Trap
 
 > [!WARNING]
 > **The Silent Fallback Trap**: If any mascot asset 404s on S3 (or has not been uploaded yet), [`MascotOverlay`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx#L161-L167) catches the `onError` event and silently falls back to `lobster_thumbs_up`.
@@ -322,7 +322,7 @@ Use this when retiring an active mascot without breaking historical content:
 
 ---
 
-## ◈ 6. Fast-Feedback Verification Policy
+## 6. Fast-Feedback Verification Policy
 
 After modifying any mascot assets, registries, or overlays:
 

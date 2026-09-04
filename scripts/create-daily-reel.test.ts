@@ -98,7 +98,11 @@ describe('Daily Reel Dynamic Script Formulation', () => {
     const goals: Array<{ goal: any; keyword: string; urlFragment: string }> = [
       { goal: 'quiz', keyword: 'QUIZ', urlFragment: 'moltology.org/quiz' },
       { goal: 'guide', keyword: 'GUIDE', urlFragment: 'moltology.org/news/the-2026-moltmaxxing-protocol-guide' },
+      { goal: 'oracle', keyword: 'ORACLE', urlFragment: 'moltology.org/oracle' },
+      { goal: 'chassis', keyword: 'CHASSIS', urlFragment: 'moltology.org/chassis' },
+      { goal: 'routine', keyword: 'ROUTINE', urlFragment: 'moltology.org/news/the-2026-moltmaxxing-protocol-guide' },
       { goal: 'codex', keyword: 'CODEX', urlFragment: 'moltology.org/codex' },
+      { goal: 'forum', keyword: 'FORUM', urlFragment: 'moltology.org/forum' },
       { goal: 'demo', keyword: 'DEMO', urlFragment: 'moltology.org' },
       { goal: 'homepage', keyword: 'INITIATE', urlFragment: 'moltology.org' },
     ]
@@ -116,6 +120,42 @@ describe('Daily Reel Dynamic Script Formulation', () => {
       expect(script.firstComment).toContain(keyword)
       expect(script.trialParams).toEqual({ graduationStrategy: 'SS_PERFORMANCE' })
     }
+  })
+
+  it('synthesizes diverse Lead Magnet endings without hardcoding Calculate your molt clearance', () => {
+    const blogA = {
+      slug: 'neuromorphic-spiking-chitin-arrays',
+      title: 'Neuromorphic Spiking Silicon & Chitin Arrays: 100x Energy Efficiency',
+      summary: 'Spiking neural networks meet sub-benthic hydrostatic computing for ultra-low power reasoning.',
+      content: 'Traditional synchronous clocks waste massive energy...',
+    }
+    const scriptA = synthesizeBlogReelScript(blogA, {})
+    // Neuromorphic/hardware should route to chassis or oracle and not end with "Calculate your clearance"
+    expect(scriptA.ctaGoal).toBe('chassis')
+    expect(scriptA.narrationScript).toMatch(/(chassis|hardware|telemetry)/)
+    expect(scriptA.commentTriggerKeyword).toBe('CHASSIS')
+
+    const blogB = {
+      slug: 'sparse-autoencoders-monosemantic-features',
+      title: 'Sparse Autoencoders: Disentangling 16.7M Monosemantic Features',
+      summary: 'Why black-box AI is cracking under mechanistic interpretability.',
+      content: 'Sparse autoencoders map latent superposition into discrete circuits...',
+    }
+    const scriptB = synthesizeBlogReelScript(blogB, {})
+    expect(scriptB.ctaGoal).toBe('oracle')
+    expect(scriptB.narrationScript).toMatch(/(oracle|prompt|vault)/)
+    expect(scriptB.commentTriggerKeyword).toBe('ORACLE')
+
+    const blogC = {
+      slug: 'the-tabs-you-kept',
+      title: 'The Tabs You Kept: A Browser Is a Boundary, Not Clutter',
+      summary: 'The coworker arrived with a second pair of hands in a side panel.',
+      content: 'A coworker got a second pair of hands in a side panel you didn\'t ask for...',
+    }
+    const scriptC = synthesizeBlogReelScript(blogC, {})
+    expect(scriptC.ctaGoal).toBe('routine')
+    expect(scriptC.narrationScript).toMatch(/(blueprint|protocol|routine)/)
+    expect(scriptC.commentTriggerKeyword).toBe('ROUTINE')
   })
 
   it('resolves cohesive contextual color grading presets based on topic and theme', async () => {

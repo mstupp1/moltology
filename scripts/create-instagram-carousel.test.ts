@@ -11,7 +11,7 @@ describe('create-instagram-carousel', () => {
   it('generates on-brand carousel copy and caption', () => {
     const copy = generateCarouselCopy('pincer-torque')
     expect(copy.title).toBeDefined()
-    expect(copy.caption).toContain('3-STAGE BENTHIC ARCHITECTURE')
+    expect(copy.caption).toContain('3-stage benthic architecture')
     expect(copy.caption).toContain('Slide 1')
     expect(copy.caption).toContain('Slide 2')
     expect(copy.caption).toContain('Slide 3')

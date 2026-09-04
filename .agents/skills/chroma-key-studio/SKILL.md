@@ -10,7 +10,7 @@ This skill automates the complete lifecycle of generating and extracting transpa
 
 ---
 
-## ◈ The Chroma Key Strategy
+## The Chroma Key Strategy
 
 When generating isolated subjects or mascots, the goal is to produce an image on a high-contrast, perfectly flat background of a single solid color that **does not exist anywhere on the subject**.
 

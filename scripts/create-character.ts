@@ -59,7 +59,7 @@ Example:
   fs.mkdirSync(scratchDir, { recursive: true })
   const outputPng = path.join(scratchDir, `${charName}.png`)
 
-  console.log(`◈ Processing Character: ${charName}`)
+  console.log(`[character] Processing Character: ${charName}`)
   console.log(`  • Input: ${inputPath}`)
   console.log(`  • Local Output: ${outputPng}`)
 

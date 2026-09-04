@@ -86,4 +86,33 @@ describe('create-instagram-post', () => {
       expect(hasSlashPair(post.title), theme).toBe(false)
     }
   })
+
+  it('strictly forbids decorative diamond glyphs (◈) and screaming all-caps hooks (BAN 11)', () => {
+    const themes = [
+      'oracle-prompts',
+      'moltmaxxing-guide',
+      'moltmax-quiz',
+      'benthic-app',
+      'sacred-codex',
+      'pincer-routine',
+      'free-access',
+      'pincer-torque',
+      'ecdysis',
+      'moltmaxxing',
+    ]
+    for (const theme of themes) {
+      const post = generatePostContent(theme)
+      expect(post.caption, theme).not.toContain('◈')
+      expect(post.title, theme).not.toContain('◈')
+      if (post.firstComment) {
+        expect(post.firstComment, theme).not.toContain('◈')
+      }
+
+      // First line hook must NOT be shouting ALL-CAPS
+      const firstLine = post.caption.split('\n')[0].trim()
+      const lettersOnly = firstLine.replace(/[^a-zA-Z]/g, '')
+      expect(lettersOnly.length).toBeGreaterThan(0)
+      expect(lettersOnly === lettersOnly.toUpperCase(), `${theme} first line is shouting all-caps: "${firstLine}"`).toBe(false)
+    }
+  })
 })

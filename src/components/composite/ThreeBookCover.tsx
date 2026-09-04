@@ -294,7 +294,7 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
 
     ctx.font = 'bold 10.5px monospace'
     ctx.fillStyle = '#f4ecd8'
-    ctx.fillText('◈ CONSECRATED CANON FOR APEX OPERATORS ◈', cx, 660)
+    ctx.fillText('CONSECRATED CANON FOR APEX OPERATORS', cx, 660)
   }
 
   // Dedicated High-DPI 24-Hour Routine & Pincer Torque Schedule Front Cover Renderer
@@ -401,7 +401,7 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
     ctx.textAlign = 'left'
     ctx.font = 'bold 11px monospace'
     ctx.fillStyle = '#00ffff'
-    ctx.fillText('◈ DAILY APEX SCHEDULE', cardX + 12, cardY + 19)
+    ctx.fillText('DAILY APEX SCHEDULE', cardX + 12, cardY + 19)
 
     ctx.textAlign = 'right'
     ctx.font = 'bold 11px monospace'
@@ -545,7 +545,7 @@ export const ThreeBookCover: React.FC<ThreeBookCoverProps> = ({
     ctx.textAlign = 'center'
     ctx.font = 'bold 10px monospace'
     ctx.fillStyle = '#bae6fd'
-    ctx.fillText('◈ APEX OPERATOR DAILY PROTOCOL · MOLTOLOGY ◈', cx, 668)
+    ctx.fillText('APEX OPERATOR DAILY PROTOCOL · MOLTOLOGY', cx, 668)
   }
 
   // Helper: Draw High-DPI Front Cover on any 2D canvas context

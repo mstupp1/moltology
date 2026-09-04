@@ -13,7 +13,7 @@ This skill automates the complete lifecycle of Moltology static Instagram posts 
 
 ---
 
-## ◈ Character Family Cutouts on S3
+## Character Family Cutouts on S3
 
 Transparent WebP/PNG character cutouts reside in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
@@ -107,8 +107,8 @@ The **Marketing Lead Magnet Template (`SocialMarketingSlide.tsx`)** is engineere
 
 ### Step 1: Campaign Selection & Copywriting
 1. Select campaign theme from the 5 archetypes or core pillars.
-2. Write high-conviction diegetic copy (STYLE_GUIDE BAN 1: caption eyebrows use a colon or a period, never a slash-pair):
-   - Problem Hook (The Great Melt vs. The Great Molt)
+2. Write high-conviction diegetic copy (STYLE_GUIDE BAN 1: caption eyebrows use a colon or a period, never a slash-pair; BAN 11: never use ◈ symbols or ALL-CAPS screaming header lines; hooks must use natural sentence or standard title case):
+   - Problem Hook (The Great Melt vs. The Great Molt — conversational, natural case)
    - 4-point value breakdown
    - Direct Comment-to-DM Call To Action (`👇 Comment "GUIDE" below and I will instantly DM you the link!`)
    - Algorithmic First Comment prompt

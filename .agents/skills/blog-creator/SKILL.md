@@ -39,7 +39,7 @@ There is no ideation matrix in this skill. An empty `ready/` folder is a success
 
 ---
 
-## ◈ Character Family Cutouts on S3
+## Character Family Cutouts on S3
 
 Transparent PNG mascot cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 

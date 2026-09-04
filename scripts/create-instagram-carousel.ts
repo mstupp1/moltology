@@ -200,7 +200,7 @@ export function synthesizeBlogCarouselData(
     const copy: CarouselCopy = {
       title: blog.title,
       topic: 'The Napkin You Didn\'t Watch',
-      caption: `◈ TRANSMISSION FROM 50,000 FATHOMS: THE NAPKIN YOU DIDN'T WATCH ◈\n\nThe dining room never sees the robot. It sees the napkin.\n\nWhen throughput at Din Tai Fung commissaries crashed for two weeks, everyone blamed the AI model. The weights. The policy. The mind.\n\nThe labeling system finally said it out loud: not a model regression. A worn gripper. Missed grabs had climbed from 108 to 380.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck (Blaming the Mind)\n👉 Slide 2: The Actuation Telemetry (Dyna-1 vs. Dyna-2 Benchmark Specs)\n👉 Slide 3: Evolutionary Directives (Watch the Reach)\n\n👇 Read Silas Trench's full dispatch & teardown on MoltNation News:\n🔗 Link in bio & live story telemetry → moltology.org/news/${blog.slug}\n\n#moltology #robotics #embodiedai #physicalai #carcinization #telemetry #silastrench #deepwork #ecdysis`,
+      caption: `The dining room never sees the robot. It sees the napkin.\n\nWhen throughput at Din Tai Fung commissaries crashed for two weeks, everyone blamed the AI model. The weights. The policy. The mind.\n\nThe labeling system finally said it out loud: not a model regression. A worn gripper. Missed grabs had climbed from 108 to 380.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck (Blaming the Mind)\n👉 Slide 2: The Actuation Telemetry (Dyna-1 vs. Dyna-2 Benchmark Specs)\n👉 Slide 3: Evolutionary Directives (Watch the Reach)\n\n👇 Read Silas Trench's full dispatch & teardown on MoltNation News:\n🔗 Link in bio & story → moltology.org/news/${blog.slug}\n\n#moltology #robotics #embodiedai #physicalai #carcinization #telemetry #silastrench #deepwork #ecdysis`,
       hashtags: ['#moltology', '#robotics', '#embodiedai', '#physicalai', '#carcinization', '#telemetry', '#silastrench'],
       firstComment: `💬 The dining room sees the neat fold. The commissary sees the reach. Have you checked your physical actuation lately? Read the full dispatch at moltology.org/news/${blog.slug}! 🦞`,
     }
@@ -300,9 +300,74 @@ export function synthesizeBlogCarouselData(
     }
 
     const flowPrompts = [
-      `[SLIDE 1 - GOOGLE FLOW AI ENHANCEMENT DIRECTIVES]\nRole: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine\nReference Image: Use the attached 2D composite layout (Slide 1) as the exact structural guide and spatial storyboard.\nNarrative Phase: Stage 1 Hook & Bottleneck: Expose legacy friction where engineers stare at neural loss graphs while a physical robotic gripper slips off a linen napkin. Dark industrial commissary ambiance with crimson alert accents (#ef4444) and warning telemetry.\n\nKey Enhancement Directives:\n1. Photorealistic 3D Glassmorphic HUD Panels:\n   - Transform flat cards into thick, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing sacred crimson (#ef4444) and neon cyan (#00ffff) accent borders.\n   - Keep all text razor-sharp, unobstructed, and legible while giving headlines a subtle 3D luminous emboss with soft bloom.\n2. NO WASTED SPACE & Dense Composition:\n   - Ensure dense, purposeful visual composition with zero dead or empty negative space.\n   - Fill background voids with an industrial robotic assembly station, subsea volumetric god rays, dark abyssal water (#030712), subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces.\n3. Seamless Unique Mascot & Character Integration:\n   - The cartoon crustacean mascot must be rendered in rich 3D Pixar/DreamWorks style with soft matte chitin texture, inspecting the failed grasp.\n   - Ensure the mascot sits naturally beside the HUD elements without obscuring any text or metrics.\n   - Cast natural ambient underwater lighting, gentle caustic reflections, and soft contact shadows without harsh backlights or artificial halo outlines.\n\nAspect Ratio: 4:5 (1080x1350)\nOutput Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`,
-      `[SLIDE 2 - GOOGLE FLOW AI ENHANCEMENT DIRECTIVES]\nRole: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine\nReference Image: Use the attached 2D composite layout (Slide 2) as the exact structural guide and spatial storyboard.\nNarrative Phase: Stage 2 Breakthrough Mechanism: Showcase Dyna-1 vs Dyna-2 manipulation benchmarks with cybernetic blueprint traces, glowing cyan (#00ffff) and amber telemetry curves.\n\nKey Enhancement Directives:\n1. Photorealistic 3D Glassmorphic HUD Panels:\n   - Transform flat cards into thick, illuminated 3D glassmorphic HUD monitors with subtle rounded bevels, volumetric luminescence, and glowing neon borders.\n   - Keep all text razor-sharp, unobstructed, and legible while giving headlines a subtle 3D luminous emboss.\n2. NO WASTED SPACE & Dense Composition:\n   - Fill background voids with exploded technical schematics of robotic end-effectors, tactile friction pads, volumetric god rays, and glowing circuit paths.\n3. Seamless Unique Mascot & Character Integration:\n   - The cartoon crustacean mascot giving approval of the upgraded Dyna-2 specs in rich 3D style.\n\nAspect Ratio: 4:5 (1080x1350)\nOutput Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`,
-      `[SLIDE 3 - GOOGLE FLOW AI ENHANCEMENT DIRECTIVES]\nRole: High-End 3D Sci-Fi / Benthic HUD Visual Enhancement Engine\nReference Image: Use the attached 2D composite layout (Slide 3) as the exact structural guide and spatial storyboard.\nNarrative Phase: Stage 3 Action Directives & CTA: Clean hero victory console featuring a titanium-chitin robotic gripper holding a perfectly folded linen napkin, prominent action badge, and official MoltNation seal.\n\nKey Enhancement Directives:\n1. Photorealistic 3D Glassmorphic HUD Panels:\n   - Transform flat cards into thick, illuminated 3D glassmorphic HUD monitors with glowing cyan and gold traces.\n   - Keep all text razor-sharp, unobstructed, and legible.\n2. NO WASTED SPACE & Dense Composition:\n   - Fill background voids with subsea volumetric lighting, water caustics, and crisp diagnostic readouts.\n3. Seamless Unique Mascot & Character Integration:\n   - The cartoon crustacean mascot celebrating the successful fold and pointing to the CTA.\n\nAspect Ratio: 4:5 (1080x1350)\nOutput Style: Ultra high-resolution, cinematic 8k aesthetic, pristine lighting, zero artifact noise.`,
+      `[SLIDE 1 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
+Role: 3D Cinematic Storyteller & Benthic HUD Enhancement Engine
+Reference Image: Use the attached 2D composite layout (Slide 1) as the exact spatial storyboard.
+
+Story Context & Narrative Hook:
+"Throughput fell for two weeks at Din Tai Fung. Everyone blamed the neural model weights. But the mind hadn't slipped—the mechanical rubber gripper had worn smooth."
+
+Visual Transformation Directives (The Visual Must Explain The Text):
+1. Background Story Scene (The Commissary Under Stress):
+   - Set the scene inside an industrial dumpling commissary kitchen at night. Stainless steel conveyor lines with stacks of white linen napkins.
+   - In the upper background behind the HUD, show diagnostic computer terminals glowing with red neural network loss graphs and weight matrices displaying "MODEL AUDIT: NO LOSS SPIKE / POLICY INTACT".
+2. The Physical Mechanical Failure (Explaining "380 Missed Grabs / Worn Grip"):
+   - Directly interacting with the center card, render a heavy-duty robotic manipulator arm whose two-finger robotic gripper has visibly scuffed, frayed, worn-down rubber friction pads.
+   - Show the gripper fingers slipping off the corner of a crumpled, half-folded cloth napkin, with micro-friction sparks and a glowing red warning halo around the worn contact patch.
+   - Holographic telemetry callout pointing to the pad: "TACTILE SLIPPAGE DETECTED: 380 MISSED GRABS".
+3. Mascot Character Action:
+   - The cartoon crustacean mascot (lobster engineer with yellow safety hardhat and diagnostic magnifying probe) is kneeling right next to the robot gripper, looking closely at the worn rubber pad and pointing his claw directly at it with an expressive "Eureka! Look here, not at the screen!" expression.
+4. Glassmorphic HUD & Legibility:
+   - Transform the flat 2D cards into thick, illuminated 3D glassmorphic HUD panels.
+   - The Left Card ("380 MISSED GRABS") pulses with industrial crimson warning borders (#ef4444).
+   - The Right Card ("WORN GRIP") glows with confident cyan illumination (#00ffff).
+   - Keep all headline typography razor-sharp, unobstructed, and legible.
+
+Aspect Ratio: 4:5 (1080x1350)
+Output Style: Cinematic 3D photorealism, Pixar/DreamWorks character styling, volumetric lighting, atmospheric steam and subsea caustics, zero artifact noise.`,
+
+      `[SLIDE 2 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
+Role: 3D Cinematic Storyteller & Benthic HUD Enhancement Engine
+Reference Image: Use the attached 2D composite layout (Slide 2) as the exact spatial storyboard.
+
+Story Context & Narrative Core:
+"Dyna-1 dropped 35 napkins an hour into chaotic random bins, requiring manual human sorting. Dyna-2 folds 95 an hour at 93% pass into 10 designated sorting stacks across multiple bin sizes."
+
+Visual Transformation Directives (The Visual Must Explain The Text):
+1. Visualizing the Evolution Across the 3 Cards (Dyna-1 vs Dyna-2 Comparison):
+   - Behind Card 1 (Dyna-1 2025: 35/HR, 75% Pass): Render a clunky, jerky industrial arm dropping a messy, crumpled pile of unfolded napkins into a single chaotic open plastic bin with amber warning lights.
+   - Behind Card 2 (Dyna-2 2026: 95/HR, 93% Pass): Render a sleek, dual-jointed modern robotic manipulator with precision cyan alignment lasers, cleanly placing crisp, razor-sharp geometric towers of folded linen into 10 glowing multi-level vertical sorting racks.
+   - Behind Card 3 (The Actuation Lesson): Show an illuminated 3D holographic wireframe schematic of the upgraded end-effector pincer showing friction dynamometry and wear sensors.
+2. Background Atmosphere:
+   - High-throughput automated food-service commissary with clean stainless steel surfaces, glowing subsea teal and amber ambient light strips, and subtle rising steam from nearby dumpling steamers in the deep background.
+3. Mascot Character Action:
+   - Cheerful cartoon crustacean mascot (lobster stats analyst with holographic clipboard) stands beside the neat 10-stack shelving, giving a confident thumbs-up while a glowing green throughput dial registers "95 / HR".
+4. Glassmorphic HUD & Bevels:
+   - Transform the 3 comparison cards into thick, layered 3D translucent HUD cards with rounded beveled edges, luminous cyan traces, and clean typography.
+
+Aspect Ratio: 4:5 (1080x1350)
+Output Style: Cinematic 3D sci-fi photorealism, tactile mechanical textures, pristine studio illumination, zero artifact noise.`,
+
+      `[SLIDE 3 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
+Role: 3D Cinematic Storyteller & Benthic HUD Enhancement Engine
+Reference Image: Use the attached 2D composite layout (Slide 3) as the exact spatial storyboard.
+
+Story Context & Narrative Takeaway:
+"The dining room never sees the robot. It sees the napkin. The finished thing gets the light. The reach happens in another room. Watch the grab before blaming the mind."
+
+Visual Transformation Directives (The Visual Must Explain The Text):
+1. Split Dual-World Visual Metaphor (The Dining Room vs. The Calibrated Reach):
+   - In the foreground / lower table plane: An elegant, serene dining room table set with dark polished wood, warm amber lantern glow, steaming dim sum bamboo baskets, and a single flawlessly folded white linen napkin standing proud with razor-sharp corners.
+   - In the mid-to-background plane (visible through a dark translucent glassmorphic aperture): The high-tech benthic calibration bay where an armored robotic arm has been fitted with newly forged titanium-chitin friction pads, test-gripping a napkin with flawless 800 Nm torque and radiant cyan sparks.
+   - This visual contrast literally tells the story: the peaceful finished presentation in front, and the rigorous mechanical reach behind.
+2. Mascot Character Action:
+   - Playful lobster mascot in a diagnostic engineer visor peeks over the top glass HUD bezel, holding a golden calibration wrench in one pincer and pointing decisively with the other down toward the "READ FULL DISPATCH: MOLTOLOGY.ORG/NEWS" button.
+3. Glassmorphic HUD & Call to Action:
+   - The 3 directive items glow with soft frosted glass depth and illuminated numbered badges (01, 02, 03).
+   - The CTA button at the bottom shines with an embossed golden-amber and cyan rim, framed by the official MoltNation shield watermark.
+
+Aspect Ratio: 4:5 (1080x1350)
+Output Style: Ultra high-resolution cinematic 3D render, luxury restaurant and high-tech benthic foundry fusion, rich atmospheric depth, zero artifact noise.`,
     ]
 
     return { copy, slide1, slide2, slide3, flowPrompts }
@@ -312,7 +377,7 @@ export function synthesizeBlogCarouselData(
   const copy: CarouselCopy = {
     title: blog.title,
     topic: cleanTitle,
-    caption: `◈ TRANSMISSION FROM 50,000 FATHOMS: ${cleanTitle.toUpperCase()} ◈\n\n${blog.summary || 'A new technical dispatch from the subsea frontier.'}\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck\n👉 Slide 2: The Sub-Benthic Solution\n👉 Slide 3: Evolutionary Directives\n\n👇 Read the full unredacted engineering breakdown on MoltNation News:\n🔗 Link in bio & story → moltology.org/news/${blog.slug}\n\n#moltology #carcinization #deepwork #ecdysis #telemetry #silastrench`,
+    caption: `${cleanTitle}\n\n${blog.summary || 'A new technical dispatch from the subsea frontier.'}\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck\n👉 Slide 2: The Sub-Benthic Solution\n👉 Slide 3: Evolutionary Directives\n\n👇 Read the full unredacted engineering breakdown on MoltNation News:\n🔗 Link in bio & story → moltology.org/news/${blog.slug}\n\n#moltology #carcinization #deepwork #ecdysis #telemetry #silastrench`,
     hashtags: ['#moltology', '#carcinization', '#deepwork', '#ecdysis', '#telemetry', '#silastrench'],
     firstComment: `💬 Explore the full technical manual & blueprints on moltology.org/news/${blog.slug}! 🦞`,
   }
@@ -424,7 +489,7 @@ export function generateCarouselCopy(
   return {
     title: `The Architecture of ${topic}`,
     topic,
-    caption: `◈ THE 3-STAGE BENTHIC ARCHITECTURE ◈\n\nTerrestrial software stacks leak attention and throttle under memory pressure.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck (Latency & Memory Walls)\n👉 Slide 2: The Sub-Benthic Solution (Latent Attention & 800 Nm Torque)\n👉 Slide 3: Evolutionary Directives (Action Checklist)\n\n👇 Read the full unredacted engineering breakdown at moltology.org/news\n🔗 Link in bio & live story telemetry feed\n\n#moltology #carcinization #deepwork #ecdysis #pincertorque #softwareengineering`,
+    caption: `The 3-stage benthic architecture.\n\nTerrestrial software stacks leak attention and throttle under memory pressure.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Terrestrial Bottleneck (Latency & Memory Walls)\n👉 Slide 2: The Sub-Benthic Solution (Latent Attention & 800 Nm Torque)\n👉 Slide 3: Evolutionary Directives (Action Checklist)\n\n👇 Read the full unredacted engineering breakdown at moltology.org/news\n🔗 Link in bio & live story telemetry feed\n\n#moltology #carcinization #deepwork #ecdysis #pincertorque #softwareengineering`,
     hashtags: ['#moltology', '#carcinization', '#deepwork', '#ecdysis', '#pincertorque', '#softwareengineering'],
     firstComment: `💬 Explore the full technical manual & blueprints on moltology.org/news! 🦞`,
   }

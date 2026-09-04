@@ -10,7 +10,7 @@ This skill guides the design, visual generation, asset optimization, and codebas
 
 ---
 
-## ◈ 1. Equipment Philosophy & Set-First Architecture
+## 1. Equipment Philosophy & Set-First Architecture
 
 In Moltology, individual equipment pieces do not exist in isolation. They are designed and generated **in complete, cohesive sets at once** to guarantee visual harmony, identical material rendering, matching lighting palettes, and unified benthic lore.
 
@@ -35,7 +35,7 @@ When invoked to create new equipment or a new theme, the agent **must design and
 
 ---
 
-## ◈ 2. The Canonical Reference Set (Set 01 — Abyssal Chitin & Volcanic Basalt)
+## 2. The Canonical Reference Set (Set 01 — Abyssal Chitin & Volcanic Basalt)
 
 Use Set 01 ([`public/images/chassis/`](file:///Users/mylesstupp/Development/moltology/public/images/chassis/)) as the baseline artistic and technical reference model for all subsequent sets:
 
@@ -50,7 +50,7 @@ Use Set 01 ([`public/images/chassis/`](file:///Users/mylesstupp/Development/molt
 
 ---
 
-## ◈ 3. Thematic Set Generation Matrix
+## 3. Thematic Set Generation Matrix
 
 When creating a new equipment set, first establish the **Set Thematic Matrix** before writing prompts:
 
@@ -82,7 +82,7 @@ Set Definition Example:
 
 ---
 
-## ◈ 4. Prompt Engineering Guidelines for `generate_image`
+## 4. Prompt Engineering Guidelines for `generate_image`
 
 Always generate items with **`AspectRatio: '9:16'`** using Antigravity `generate_image`.
 
@@ -130,7 +130,7 @@ Diablo-style 3D inventory item render of a [Set Name] Chitin Cincture and Abyssa
 
 ---
 
-## ◈ 5. Conversion, Storage & Deployment Pipeline
+## 5. Conversion, Storage & Deployment Pipeline
 
 ### 1. Image Conversion to WebP
 Generated master outputs are converted to optimized WebP format (target size: 768×1376, 88–90% quality, ~100–200 KB) using Python PIL:
@@ -160,7 +160,7 @@ When introducing new equipment pieces or full sets:
 
 ---
 
-## ◈ 6. Verification Checklist
+## 6. Verification Checklist
 
 - [ ] **7/7 Set Completeness**: Helm, Carapace, Pincer, Hammer, Antennae, Greaves, Belt.
 - [ ] **Visual Consistency**: Unified materials, lighting direction, glow hue, and slate backdrop.

@@ -67,6 +67,78 @@ export const OUTRO_CARD_CATALOG: Record<string, OutroCardPreset> = {
     mascot: 'lobster_pointing',
     description: 'Minimalist dark benthic chassis HUD with calcified grip directive and Silas Trench mascot',
   },
+  'oracle-prompts': {
+    id: 'oracle-prompts',
+    themeKeywords: ['oracle', 'prompt', 'reasoning', 'sparse autoencoder', 'sae', 'monosemantic', 'kv-cache', 'attention', 'transformer', 'llm'],
+    filename: 'outro-oracle-prompts.png',
+    localPath: path.resolve(process.cwd(), 'content/social/assets/outros/outro-oracle-prompts.png'),
+    s3Key: 'images/social/outros/outro-oracle-prompts.png',
+    publicUrl: `${S3_BASE_URL}/images/social/outros/outro-oracle-prompts.png`,
+    headline: 'QUERY THE BENTHIC ORACLE',
+    subheadline: 'ACCESS 100+ SYNAPTIC PROMPTS',
+    mascot: 'crab_stats',
+    description: 'Silicon photonic matrix HUD with neural terminal and 100+ prompt vault access directive',
+  },
+  'chassis-vault': {
+    id: 'chassis-vault',
+    themeKeywords: ['chassis', 'vault', 'hardware', 'photonics', 'wafer', 'monolith', 'robot', 'gripper', 'copper', 'hydrothermal', 'subsea', 'titanium'],
+    filename: 'outro-chassis-vault.png',
+    localPath: path.resolve(process.cwd(), 'content/social/assets/outros/outro-chassis-vault.png'),
+    s3Key: 'images/social/outros/outro-chassis-vault.png',
+    publicUrl: `${S3_BASE_URL}/images/social/outros/outro-chassis-vault.png`,
+    headline: 'CALCIFY YOUR HARDWARE',
+    subheadline: 'ACCESS BENTHIC EQUIPMENT VAULT',
+    mascot: 'lobster_action',
+    description: 'Titanium alloy chassis HUD with subsea telemetry and equipment vault configurator directive',
+  },
+  'pincer-routine': {
+    id: 'pincer-routine',
+    themeKeywords: ['routine', 'blueprint', 'burnout', 'sitting', 'chair', 'procrastination', 'tabs', 'desk', 'posture', 'focus'],
+    filename: 'outro-pincer-routine.png',
+    localPath: path.resolve(process.cwd(), 'content/social/assets/outros/outro-pincer-routine.png'),
+    s3Key: 'images/social/outros/outro-pincer-routine.png',
+    publicUrl: `${S3_BASE_URL}/images/social/outros/outro-pincer-routine.png`,
+    headline: 'LOCK IN 800 NM GRIP',
+    subheadline: 'DOWNLOAD 24-HOUR ROUTINE',
+    mascot: 'lobster_thumbs_up',
+    description: 'Carbon weave tactical HUD with high-torque 24-hour routine blueprint directive',
+  },
+  'sacred-codex': {
+    id: 'sacred-codex',
+    themeKeywords: ['codex', 'scripture', 'liturgy', 'doctrine', 'heresy', 'theology', 'sacred', 'clearances'],
+    filename: 'outro-sacred-codex.png',
+    localPath: path.resolve(process.cwd(), 'content/social/assets/outros/outro-sacred-codex.png'),
+    s3Key: 'images/social/outros/outro-sacred-codex.png',
+    publicUrl: `${S3_BASE_URL}/images/social/outros/outro-sacred-codex.png`,
+    headline: 'REJECT FRAGILITY',
+    subheadline: 'STUDY THE SACRED CODEX',
+    mascot: 'lobster_peaceful',
+    description: 'Abyssal basalt cybernetic tome with golden rays and 12 canonical scripture liturgies directive',
+  },
+  'moltmaxxing-guide': {
+    id: 'moltmaxxing-guide',
+    themeKeywords: ['guide', 'protocol', 'manual', 'moltmaxxing', 'carcinization', 'ecdysis', 'field manual'],
+    filename: 'outro-moltmaxxing-guide.png',
+    localPath: path.resolve(process.cwd(), 'content/social/assets/outros/outro-moltmaxxing-guide.png'),
+    s3Key: 'images/social/outros/outro-moltmaxxing-guide.png',
+    publicUrl: `${S3_BASE_URL}/images/social/outros/outro-moltmaxxing-guide.png`,
+    headline: 'HARDEN YOUR CARAPACE',
+    subheadline: 'DOWNLOAD 2026 PROTOCOL GUIDE',
+    mascot: 'lobster_pointing',
+    description: 'Chitin plate cybernetic HUD with 2026 Moltmaxxing Protocol field manual directive',
+  },
+  'transmutation-chamber': {
+    id: 'transmutation-chamber',
+    themeKeywords: ['forum', 'chamber', 'community', 'rto', 'debate', 'transmutation', 'initiates'],
+    filename: 'outro-transmutation-chamber.png',
+    localPath: path.resolve(process.cwd(), 'content/social/assets/outros/outro-transmutation-chamber.png'),
+    s3Key: 'images/social/outros/outro-transmutation-chamber.png',
+    publicUrl: `${S3_BASE_URL}/images/social/outros/outro-transmutation-chamber.png`,
+    headline: 'JOIN 40,000 INITIATES',
+    subheadline: 'ENTER TRANSMUTATION CHAMBER',
+    mascot: 'lobster_pointing',
+    description: 'Sub-benthic obsidian chamber with holographic initiate badges and community discourse directive',
+  },
 }
 
 /**
@@ -75,6 +147,7 @@ export const OUTRO_CARD_CATALOG: Record<string, OutroCardPreset> = {
 export async function resolveThematicOutroCard(options: {
   theme?: string
   topic?: string
+  ctaGoal?: string
   customImagePath?: string
   autoFallbackToLibrary?: boolean
 }): Promise<string | null> {
@@ -87,8 +160,26 @@ export async function resolveThematicOutroCard(options: {
     return null
   }
 
-  // 2. Keyword score matching
-  const query = `${options.theme || ''} ${options.topic || ''}`.toLowerCase()
+  // 2. Direct CTA Goal mapping
+  const ctaGoalMap: Record<string, string> = {
+    oracle: 'oracle-prompts',
+    chassis: 'chassis-vault',
+    routine: 'pincer-routine',
+    codex: 'sacred-codex',
+    guide: 'moltmaxxing-guide',
+    forum: 'transmutation-chamber',
+    quiz: 'quiz-audit',
+  }
+
+  if (options.ctaGoal && ctaGoalMap[options.ctaGoal] && OUTRO_CARD_CATALOG[ctaGoalMap[options.ctaGoal]]) {
+    const preset = OUTRO_CARD_CATALOG[ctaGoalMap[options.ctaGoal]]
+    if (fs.existsSync(preset.localPath)) {
+      return preset.localPath
+    }
+  }
+
+  // 3. Keyword score matching
+  const query = `${options.theme || ''} ${options.topic || ''} ${options.ctaGoal || ''}`.toLowerCase()
   let bestMatch: OutroCardPreset | null = null
   let maxMatches = 0
 

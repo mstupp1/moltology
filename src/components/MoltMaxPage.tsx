@@ -436,7 +436,7 @@ export const MoltMaxPage: React.FC = () => {
 
                   <div className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-950/60 px-3.5 py-2 text-xs font-sans font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                     <Shield className="h-3.5 w-3.5 text-amber-400" />
-                    <span>◈ 15 DILEMMAS</span>
+                    <span>15 DILEMMAS</span>
                   </div>
 
                   <div className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-950/60 px-3.5 py-2 text-xs font-sans font-bold uppercase tracking-wider text-cyan-300 backdrop-blur-md shadow-hud-cyan">
