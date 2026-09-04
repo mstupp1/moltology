@@ -169,6 +169,13 @@
       "when": 1788132033009,
       "tag": "0023_faulty_red_ghost",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788552572861,
+      "tag": "0024_thin_franklin_richards",
+      "breakpoints": true
     }
   ]
 }

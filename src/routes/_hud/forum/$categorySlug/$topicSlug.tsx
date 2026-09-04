@@ -1,29 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   ArrowLeft,
   MessageSquare,
   Eye,
-  Send,
   Terminal,
-  AlertTriangle,
   Clock,
   ShieldCheck,
   Activity,
-  User,
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
-import { useForumAuth } from '@/components/forum/ForumShell'
-import { getForumTopicDetailFn, createForumPostFn, ForumPostEntry, ForumTopicEntry } from '@/lib/server/api'
+import { ReplyComposer } from '@/components/forum/ReplyComposer'
+import { ForumPostCard } from '@/components/forum/ForumPostCard'
+import { getForumTopicDetailFn, ForumPostEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
-import { validateForumContent } from '@/lib/community-rules'
-import { relativeTime } from '@/lib/forum-utils'
-import { useHudPersist } from '@/hooks/useHudPersist'
+import { relativeTime, buildForumPostTree, type ForumReplySort } from '@/lib/forum-utils'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
-import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 
@@ -65,112 +60,11 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   pendingComponent: HudWorkspaceGhost,
 })
 
-function ReplyComposer({
-  topicId,
-  onPosted,
-}: {
-  topicId: string
-  onPosted: (post: ForumPostEntry) => void
-}) {
-  const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
-  const persist = useHudPersist()
-  const [content, setContent] = useState('')
-  const [posting, setPosting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (isPending) return
-    if (!isAuthenticated) {
-      openAuth('signup')
-      return
-    }
-    const validation = validateForumContent(undefined, content)
-    if (!validation.valid) {
-      setError(validation.error || 'Invalid content')
-      return
-    }
-    setPosting(true)
-    setError(null)
-    persist.begin('forum-reply')
-    try {
-      const token = await getAuthJWTToken()
-      const post = await createForumPostFn({
-        data: { topicId, content, userId: userId ?? undefined, token: token ?? undefined },
-      })
-      onPosted(post)
-      setContent('')
-    } catch (err: any) {
-      setError(err?.message || 'Failed to post reply. Please try again.')
-    } finally {
-      persist.end('forum-reply')
-      setPosting(false)
-    }
-  }
-
-  if (isPending) {
-    return (
-      <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-2.5" data-testid="forum-reply-auth-skeleton">
-        <HudGhostSkeleton variant="neutral" preset="text" width="60%" height={14} />
-        <HudGhostSkeleton variant="cyan" preset="button" width={140} height={32} />
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl text-center space-y-2.5">
-        <p className="text-xs text-[#839493]">Sign in to join the discussion.</p>
-        <button
-          onClick={() => openAuth('signup')}
-          className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.25)]"
-        >
-          Sign In / Join
-        </button>
-      </div>
-    )
-  }
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl space-y-3"
-    >
-      <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2.5">
-        <h3 className="text-xs font-grotesk font-bold uppercase tracking-wider text-[#00ffff] flex items-center gap-2">
-          <Send className="w-3.5 h-3.5" />
-          <span>Post Reply</span>
-        </h3>
-        <span className="text-[10px] text-[#839493]">{content.trim().length} / 10,000</span>
-      </div>
-
-      {error && (
-        <div className="p-2.5 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      <textarea
-        rows={4}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Write your constructive reply... (min 10 characters)"
-        className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
-      />
-
-      <div className="flex items-center justify-end">
-        <button
-          type="submit"
-          disabled={posting || content.trim().length < 10}
-          className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_10px_rgba(0,255,255,0.2)]"
-        >
-          {posting ? 'Posting...' : 'Reply'}
-        </button>
-      </div>
-    </form>
-  )
-}
+const SORT_OPTIONS: { id: ForumReplySort; label: string }[] = [
+  { id: 'oldest', label: 'Oldest' },
+  { id: 'newest', label: 'Newest' },
+  { id: 'top', label: 'Top' },
+]
 
 function ForumThreadPage() {
   const { categorySlug, topicSlug } = Route.useParams()
@@ -178,6 +72,8 @@ function ForumThreadPage() {
   const session = useAuthSession()
   const userId = session.userId
   const [detail, setDetail] = useState(loader)
+  const [replySort, setReplySort] = useState<ForumReplySort>('oldest')
+  const [replyingToId, setReplyingToId] = useState<string | null>(null)
 
   useEffect(() => {
     setDetail(loader)
@@ -212,7 +108,15 @@ function ForumThreadPage() {
     }
   }, [userId, topicSlug, categorySlug, loader])
 
-  if (!detail) {
+  const posts = detail?.posts ?? []
+  const topic = detail?.topic
+
+  const postTree = useMemo(
+    () => buildForumPostTree(posts as ForumPostEntry[], replySort),
+    [posts, replySort],
+  )
+
+  if (!detail || !topic) {
     return (
       <ForumShell>
         <div className="max-w-2xl mx-auto w-full py-16 text-center font-sans space-y-4">
@@ -230,8 +134,6 @@ function ForumThreadPage() {
       </ForumShell>
     )
   }
-
-  const { topic, posts } = detail
 
   const handleTopicVote = (res: { upvotes: number; voted: boolean }) => {
     setDetail({ ...detail, topic: { ...topic, upvotes: res.upvotes, voted: res.voted } })
@@ -360,11 +262,34 @@ function ForumThreadPage() {
 
             {/* Comments Stream */}
             <section className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-xs sm:text-sm font-grotesk font-bold uppercase tracking-widest text-[#dfe3e3] flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-[#00ffff]" />
                   <span>{posts.length} Comments</span>
                 </h2>
+                {posts.length > 0 && (
+                  <div
+                    className="flex items-center gap-1 text-[10px]"
+                    role="group"
+                    aria-label="Sort comments"
+                    data-testid="forum-reply-sort"
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setReplySort(opt.id)}
+                        className={`px-2 py-1 font-bold uppercase tracking-wider chamfer-corner transition-colors ${
+                          replySort === opt.id
+                            ? 'bg-[#00ffff]/15 text-[#00ffff] border border-[#00ffff]/50'
+                            : 'text-[#839493] border border-transparent hover:text-[#dfe3e3]'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {posts.length === 0 ? (
@@ -373,59 +298,17 @@ function ForumThreadPage() {
                 </div>
               ) : (
                 <div className="space-y-2.5">
-                  {posts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="chitin-card-inset p-3 sm:p-4 border border-[#3a4a49] chamfer-corner space-y-2.5 bg-[#070b0b]/60"
-                    >
-                      <div className="flex items-center justify-between gap-2 text-[11px] text-[#839493]">
-                        <span className="flex items-center gap-1.5 min-w-0">
-                          <img
-                            src={post.authorAvatar}
-                            alt=""
-                            className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
-                          />
-                          {post.userId ? (
-                            <Link
-                              to="/member/$profileId"
-                              params={{
-                                profileId: resolveMemberPublicParam({
-                                  id: post.userId,
-                                  handle: post.authorHandle,
-                                }),
-                              }}
-                              className="text-[#dfe3e3] font-bold truncate hover:text-[#00c3ff] transition-colors"
-                            >
-                              {post.authorName}
-                            </Link>
-                          ) : (
-                            <span className="text-[#dfe3e3] font-bold truncate">
-                              {post.authorName}
-                            </span>
-                          )}
-                          <StageBadge stage={post.authorStage} />
-                        </span>
-                        <span className="text-[10px] text-[#839493] flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#3a4a49]" />
-                          <span>{relativeTime(post.createdAt)}</span>
-                        </span>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap">
-                        {post.content}
-                      </p>
-
-                      <div className="pt-1.5 border-t border-[#3a4a49]/40 flex items-center justify-between">
-                        <VoteButton
-                          count={post.upvotes}
-                          voted={post.voted}
-                          targetId={post.id}
-                          targetType="post"
-                          onResult={handlePostVote(post.id)}
-                          size="inline"
-                        />
-                      </div>
-                    </div>
+                  {postTree.map((node) => (
+                    <ForumPostCard
+                      key={node.post.id}
+                      node={node}
+                      topicId={topic.id}
+                      replyingToId={replyingToId}
+                      onReplyClick={(id) => setReplyingToId((cur) => (cur === id ? null : id))}
+                      onCancelReply={() => setReplyingToId(null)}
+                      onPosted={handlePosted}
+                      onPostVote={handlePostVote}
+                    />
                   ))}
                 </div>
               )}

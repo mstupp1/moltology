@@ -342,6 +342,7 @@ export async function seedDatabase(databaseUrl?: string) {
             .values({
               id: p.id,
               topicId: p.topicId,
+              parentId: p.parentId ?? null,
               userId: p.userId ?? null,
               authorName: p.authorName,
               authorAvatar: p.authorAvatar,

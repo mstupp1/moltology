@@ -1,6 +1,110 @@
 /**
- * Shared forum helpers: slugification, hot scoring, and relative time formatting.
+ * Shared forum helpers: slugification, hot scoring, relative time, and reply trees.
  */
+
+/** Sibling order within a threaded reply tree. */
+export type ForumReplySort = 'oldest' | 'newest' | 'top'
+
+/** Visual indent stops increasing after this depth (0 = root). */
+export const FORUM_REPLY_MAX_INDENT_DEPTH = 5
+
+/** Server-side hard cap on nesting depth (ancestor count). */
+export const FORUM_REPLY_MAX_DEPTH = 20
+
+export interface ForumTreePost {
+  id: string
+  parentId?: string | null
+  upvotes: number
+  createdAt: string
+}
+
+export interface ForumPostTreeNode<T extends ForumTreePost = ForumTreePost> {
+  post: T
+  depth: number
+  children: ForumPostTreeNode<T>[]
+}
+
+function compareSiblings(sort: ForumReplySort) {
+  return (a: ForumTreePost, b: ForumTreePost): number => {
+    if (sort === 'newest') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    }
+    if (sort === 'top') {
+      if (b.upvotes !== a.upvotes) return b.upvotes - a.upvotes
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    }
+    // oldest (default)
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  }
+}
+
+/**
+ * Builds a nested reply tree from a flat post list.
+ * Orphans (missing / unknown parent) become roots. Cycles are broken by treating
+ * the cycling node as a root.
+ */
+export function buildForumPostTree<T extends ForumTreePost>(
+  posts: T[],
+  sort: ForumReplySort = 'oldest',
+): ForumPostTreeNode<T>[] {
+  const byId = new Map(posts.map((p) => [p.id, p]))
+  const childrenMap = new Map<string | null, T[]>()
+
+  for (const post of posts) {
+    const rawParent = post.parentId ?? null
+    const parentId = rawParent && byId.has(rawParent) && rawParent !== post.id ? rawParent : null
+    const bucket = childrenMap.get(parentId) ?? []
+    bucket.push(post)
+    childrenMap.set(parentId, bucket)
+  }
+
+  const cmp = compareSiblings(sort)
+
+  const build = (parentId: string | null, depth: number, ancestors: Set<string>): ForumPostTreeNode<T>[] => {
+    const siblings = [...(childrenMap.get(parentId) ?? [])].sort(cmp)
+    return siblings.map((post) => {
+      if (ancestors.has(post.id)) {
+        return { post, depth, children: [] }
+      }
+      const next = new Set(ancestors)
+      next.add(post.id)
+      return {
+        post,
+        depth,
+        children: build(post.id, depth + 1, next),
+      }
+    })
+  }
+
+  return build(null, 0, new Set())
+}
+
+/** Effective visual indent depth (capped). */
+export function forumReplyIndentDepth(depth: number): number {
+  return Math.min(Math.max(depth, 0), FORUM_REPLY_MAX_INDENT_DEPTH)
+}
+
+/**
+ * Walks parentId chain to compute nesting depth (0 = root).
+ * Returns null if the parent chain is broken / cyclic beyond known posts.
+ */
+export function getPostDepth(
+  postId: string,
+  byId: Map<string, { id: string; parentId?: string | null }>,
+): number {
+  let depth = 0
+  let current = byId.get(postId)
+  const seen = new Set<string>()
+  while (current?.parentId) {
+    if (seen.has(current.id)) return depth
+    seen.add(current.id)
+    const parent = byId.get(current.parentId)
+    if (!parent) return depth
+    depth += 1
+    current = parent
+  }
+  return depth
+}
 
 /**
  * Converts a topic title into a URL-safe kebab-case slug, optionally
