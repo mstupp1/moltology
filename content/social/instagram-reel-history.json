@@ -862,6 +862,86 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-02T14:06:55.207Z"
+    },
+    {
+      "id": "reel-1788444573873",
+      "topic": "The Twin Shells: Why Frontier Cybersecurity Swarms Are Fighting Themselves at Machine Speed",
+      "hookHeadline": "THE TWIN SHELLS",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-twin-shells",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Why wait for a breach before hardening the perimeter? Red and Blue adversarial swarms spar at machine speed fifty fathoms underwater, calcifying shields before dawn. Calculate your molt clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1788444573873.mp4",
+      "s3Key": "videos/social/reels/master-reel-1788444573873.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 14.966667,
+      "status": "queued",
+      "scheduledFor": "2026-09-03T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6a9980339da60a260cee6b56",
+      "zernioYouTubePostId": "6a9980346fef4de8c0100ed2",
+      "zernioPostId": "6a9980339da60a260cee6b56",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Human reaction time cannot catch an automated current. Red and Blue adversarial swarms battle inside digital twins to calcify defense at machine speed. ⚡🌊\n\nWhen defensive AI swarms deploy adversarial digital twins to attack their own infrastructure, waiting for human tickets is the melt. The closed loop is the molt.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-03T14:12:05.153Z"
+    },
+    {
+      "id": "reel-1788530703803",
+      "topic": "The Napkin You Didn't Watch: A Worn Gripper, Not a Model",
+      "hookHeadline": "THE NAPKIN YOU DIDN'T WATCH",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-napkin-you-didnt-watch",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "The dining room never sees the robot. It sees the napkin. When the fold fails, you blame the mind that planned it instead of the hand that reached. Stop melting and calcify your pincer clearance on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1788530703803.mp4",
+      "s3Key": "videos/social/reels/master-reel-1788530703803.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 14.233008,
+      "status": "queued",
+      "scheduledFor": "2026-09-05T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6a9ad0b117a7d332aea6778a",
+      "zernioYouTubePostId": "6a9ad0b342d6b672424c62e0",
+      "zernioPostId": "6a9ad0b117a7d332aea6778a",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "The dining room never sees the robot—it sees the finished fold. When throughput drops, you blame the neural policy instead of the worn gripper. Watch the grab. ⚡🌊\n\nThe dining room never sees the robot. It sees the napkin. Throughput fell for two weeks until someone watched the grab.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-04T14:07:47.601Z"
     }
   ]
 }

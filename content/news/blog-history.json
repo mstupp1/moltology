@@ -203,6 +203,23 @@
         "Critical cybersecurity threshold rating"
       ],
       "relatedReelIds": []
+    },
+    {
+      "slug": "the-napkin-you-didnt-watch",
+      "title": "The Napkin You Didn't Watch: A Worn Gripper, Not a Model",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-09-02T08:00:00-04:00",
+      "coreHook": "Din Tai Fung rolls out Dyna-2 napkin-folding robots; two weeks of falling throughput was traced to a worn mechanical gripper rather than a model regression.",
+      "keyMetrics": [
+        "1,500 napkins per 18h shift",
+        "95 napkins/hour at 93% pass",
+        "Missed grabs rose from 108 to 380",
+        "1st calcification via mechanical actuation audit"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-napkin-you-didnt-watch.md"
     }
   ]
 }

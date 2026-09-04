@@ -69,6 +69,21 @@ describe('Daily Reel Dynamic Script Formulation', () => {
     expect(script.scenePrompts[1]).toContain('latent')
   })
 
+  it('synthesizes The Napkin You Didn\'t Watch scripts with worn gripper hooks', () => {
+    const napkinBlog = {
+      slug: 'the-napkin-you-didnt-watch',
+      title: 'The Napkin You Didn\'t Watch: A Worn Gripper, Not a Model',
+      summary: 'The dining room never sees the robot. It sees the napkin. Throughput fell for two weeks until someone watched the grab.',
+      content: 'Throughput fell for two weeks. The labeling system traced it to missed grabs. A worn gripper, not a model regression...',
+    }
+
+    const script = synthesizeBlogReelScript(napkinBlog, {})
+    expect(['WATCH THE GRAB', 'THE NAPKIN YOU DIDN\'T WATCH']).toContain(script.hookHeadline)
+    expect(script.narrationScript).toMatch(/(gripper|grab|robot)/)
+    expect(script.scenePrompts[0]).toContain('gripper')
+    expect(script.scenePrompts[1]).toContain('pincer')
+  })
+
   it('builds dynamic combinatorial scene prompts with varied environments', () => {
     const prompts1 = buildDynamicScenePrompts('moltmaxxing', 'Topic A')
     const prompts2 = buildDynamicScenePrompts('moltmaxxing', 'Topic B')

@@ -41,4 +41,37 @@ describe('create-instagram-carousel', () => {
     expect(DEFAULT_INSTAGRAM_ACCOUNT_ID).toBe('6a7f7f0777555aae01d99b54')
     expect(DEFAULT_CAROUSEL_QUEUE_ID).toBe('6a84b76d2421e968ac81f5bc')
   })
+
+  it('synthesizes blog-aligned carousel copy and slide data for the-napkin-you-didnt-watch', async () => {
+    const { resolveBlogPost, synthesizeBlogCarouselData } = await import('./create-instagram-carousel')
+    const blog = resolveBlogPost({ articleSlug: 'the-napkin-you-didnt-watch' })
+    expect(blog).not.toBeNull()
+    expect(blog?.slug).toBe('the-napkin-you-didnt-watch')
+
+    const data = synthesizeBlogCarouselData(blog!)
+    expect(data.copy.title).toContain("The Napkin You Didn't Watch")
+    expect(data.copy.caption).toContain('Din Tai Fung')
+    expect(data.copy.caption).toContain('worn gripper')
+    expect(data.copy.caption).toContain('moltology.org/news/the-napkin-you-didnt-watch')
+    expect(data.copy.firstComment).toContain('the-napkin-you-didnt-watch')
+
+    // Slide 1 checks
+    expect(data.slide1.headlinePart1).toBe('BLAMING THE MODEL')
+    expect(data.slide1.leftMetric.value).toBe('380')
+    expect(data.slide1.rightMetric.value).toBe('WORN GRIP')
+
+    // Slide 2 checks
+    expect(data.slide2.headline).toContain('DYNA-1 vs. DYNA-2')
+    expect(data.slide2.cards.length).toBe(3)
+    expect(data.slide2.cards[1].metric).toContain('95 / HR')
+
+    // Slide 3 checks
+    expect(data.slide3.headlinePart1).toBe('WATCH THE GRAB')
+    expect(data.slide3.directives.length).toBe(3)
+
+    // Flow prompts checks
+    expect(data.flowPrompts.length).toBe(3)
+    expect(data.flowPrompts[0]).toContain('robotic gripper')
+    expect(data.flowPrompts[1]).toContain('Dyna-1 vs Dyna-2')
+  })
 })

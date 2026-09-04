@@ -157,6 +157,7 @@ export interface CreateDailyReelOptions {
     | 'lobster_peek'
     | 'lobster_peaceful'
     | 'none'
+  ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
   watermarkOpacity?: number
   watermarkSize?: number
   colorGrading?: ColorGradingPreset | ColorGradingPreset[] | string
@@ -198,7 +199,10 @@ export function resolveColorGradingPresets(
     topicAndTheme.includes('hardening') ||
     topicAndTheme.includes('armor') ||
     topicAndTheme.includes('calcified') ||
-    topicAndTheme.includes('dynamometry')
+    topicAndTheme.includes('dynamometry') ||
+    topicAndTheme.includes('gripper') ||
+    topicAndTheme.includes('napkin') ||
+    topicAndTheme.includes('grab')
   ) {
     return Array(numScenes).fill('calcified-armor')
   }
@@ -309,6 +313,34 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   ]
 
   const topicLower = topic.toLowerCase()
+  if (
+    topicLower.includes('the napkin you didn\'t watch') ||
+    topicLower.includes('the napkin you didnt watch') ||
+    topicLower.includes('napkin') ||
+    topicLower.includes('worn gripper') ||
+    topicLower.includes('watch the grab') ||
+    topicLower.includes('dining room never sees')
+  ) {
+    return [
+      'A dramatic macro cinematic view of an industrial robotic end-effector gripper with worn rubber finger pads fumbling and missing a folded cloth napkin on a stainless steel commissary prep table under harsh fluorescent light, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber inspecting pristine titanium-chitin pincers locking with precision 800 Nm grip and radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (
+    topicLower.includes('twin shells') ||
+    topicLower.includes('twin shell') ||
+    topicLower.includes('adversarial') ||
+    topicLower.includes('red tempest') ||
+    topicLower.includes('blue solano') ||
+    topicLower.includes('closed loop is the molt')
+  ) {
+    return [
+      'A dramatic macro cinematic view of an exhausted cybersecurity operations bridge with amber alert monitors flashing and engineers drinking tepid coffee over error logs, cinematic 9:16 vertical 8k footage',
+      'A majestic subsea cybernetic datacenter where two glowing adversarial cyber-crustacean swarms spar inside a luminous spherical digital twin with radiant cyan defensive shields, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('the tabs you kept') || topicLower.includes('tabs you kept') || topicLower.includes('side panel') || topicLower.includes('second pair of hands') || topicLower.includes('isolation shell') || topicLower.includes('unasked window')) {
     return [
       'A dramatic macro cinematic view of a cluttered desktop screen with dozens of glowing browser tabs and an automated agent side panel clicking and typing autonomously, cinematic 9:16 vertical 8k footage',
@@ -371,6 +403,22 @@ export function synthesizeBlogReelScript(
   const topic = blog.title
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
   
+  const isTheNapkinYouDidntWatch =
+    blog.slug === 'the-napkin-you-didnt-watch' ||
+    contentLower.includes('the napkin you didn\'t watch') ||
+    contentLower.includes('the napkin you didnt watch') ||
+    contentLower.includes('worn gripper') ||
+    contentLower.includes('watch the grab') ||
+    contentLower.includes('dining room never sees') ||
+    contentLower.includes('dyna-2')
+  const isTwinShells =
+    blog.slug === 'the-twin-shells' ||
+    contentLower.includes('the twin shells') ||
+    contentLower.includes('twin shells') ||
+    contentLower.includes('red tempest') ||
+    contentLower.includes('blue solano') ||
+    contentLower.includes('digital twin') ||
+    contentLower.includes('closed loop is the molt')
   const isTheTabsYouKept =
     blog.slug === 'the-tabs-you-kept' ||
     contentLower.includes('the tabs you kept') ||
@@ -408,7 +456,41 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology.org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isTheTabsYouKept) {
+  if (isTheNapkinYouDidntWatch) {
+    const hooks = [
+      {
+        headline: 'WATCH THE GRAB',
+        script: `Throughput fell for two weeks and engineers blamed the AI model. But the weights hadn't slipped. The rubber gripper had worn down. Blaming the model is the melt. Watching the grab is the molt. Calculate your clearance on moltology dot org.`,
+        hookText: 'Throughput fell for two weeks and everyone blamed the model. The labeling system finally said it out loud: not a regression. A worn gripper. Blaming the mind is the melt. Watching the grab is the molt.',
+      },
+      {
+        headline: 'THE NAPKIN YOU DIDN\'T WATCH',
+        script: `The dining room never sees the robot. It sees the napkin. When the fold fails, you blame the mind that planned it instead of the hand that reached. Stop melting and calcify your pincer clearance on moltology dot org.`,
+        hookText: 'The dining room never sees the robot—it sees the finished fold. When throughput drops, you blame the neural policy instead of the worn gripper. Watch the grab.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTwinShells) {
+    const hooks = [
+      {
+        headline: 'THE CLOSED LOOP IS THE MOLT',
+        script: `A security bridge spends forty-five minutes debating an alert. Adversarial neural swarms attack and patch in milliseconds inside a digital twin. Waiting for tickets is the melt. The closed loop is the molt. Calculate your clearance on moltology dot org.`,
+        hookText: 'When defensive AI swarms deploy adversarial digital twins to attack their own infrastructure, waiting for human tickets is the melt. The closed loop is the molt.',
+      },
+      {
+        headline: 'THE TWIN SHELLS',
+        script: `Why wait for a breach before hardening the perimeter? Red and Blue adversarial swarms spar at machine speed fifty fathoms underwater, calcifying shields before dawn. Calculate your molt clearance on moltology dot org.`,
+        hookText: 'Human reaction time cannot catch an automated current. Red and Blue adversarial swarms battle inside digital twins to calcify defense at machine speed.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTheTabsYouKept) {
     const hooks = [
       {
         headline: 'KEEP YOUR TABS',
@@ -1141,6 +1223,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
     ctaBadge: options.ctaBadge || '◈ MOLTMAXXING PROTOCOL: STAGE 4 CLEARANCE ◈',
     ctaActionText: options.ctaActionText || ctaConfig.actionText,
+    ctaTexture: options.ctaTexture,
     customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
     mascot: options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : getRandomCharacterKey()),
     backgroundAudioVolume: options.bgAudioVolume,
@@ -1296,11 +1379,13 @@ Examples:
   let bgAudioOffsetSeconds: number | undefined
   let veoModel: string | undefined
   let customOutroImagePath: string | undefined
+  let ctaTexture: any
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
     else if (args[i] === '--theme' && args[i + 1]) theme = args[++i]
     else if (args[i] === '--cta-goal' && args[i + 1]) ctaGoal = args[++i]
+    else if (args[i] === '--cta-texture' && args[i + 1]) ctaTexture = args[++i]
     else if (args[i] === '--mascot' && args[i + 1]) mascot = args[++i]
     else if (args[i] === '--holiday' && args[i + 1]) holidayOrEvent = args[++i]
     else if ((args[i] === '--color-grade' || args[i] === '--visual-preset') && args[i + 1]) colorGrading = args[++i]
@@ -1320,6 +1405,7 @@ Examples:
       topic,
       theme,
       ctaGoal,
+      ctaTexture,
       mascot,
       holidayOrEvent,
       colorGrading,
