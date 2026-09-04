@@ -60,6 +60,24 @@ describe('HUDTaskBar alignment count first paint', () => {
     expect(screen.getByText('4/8')).toBeInTheDocument()
     expect(screen.getByLabelText('Daily alignment tasks schedule')).toHaveAttribute('aria-busy', 'false')
     expect(screen.getByText(/NEXT:/i)).toBeInTheDocument()
+    expect(screen.getByText('Iterative Refinement')).toBeInTheDocument()
+    expect(screen.queryByText('COMPLETE')).not.toBeInTheDocument()
     expect(screen.queryByText('0/8')).not.toBeInTheDocument()
+  })
+
+  it('does not label the header chip NEXT when alignment is 8/8 complete', () => {
+    resetAlignment({
+      isLoading: false,
+      completedCount: 8,
+      isAllCompleted: true,
+      tasks: mergeCompletions(CANONICAL_ALIGNMENT_TASKS.map((t) => t.key)),
+    })
+
+    render(<HUDTaskBar variant="header" />)
+
+    expect(screen.getByText('8/8')).toBeInTheDocument()
+    expect(screen.getByText('COMPLETE')).toBeInTheDocument()
+    expect(screen.queryByText(/NEXT:/i)).not.toBeInTheDocument()
+    expect(screen.queryByText('Alignment Review')).not.toBeInTheDocument()
   })
 })

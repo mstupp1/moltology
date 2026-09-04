@@ -642,12 +642,16 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
           aria-expanded={isScheduleOpen}
           aria-busy={!countReady}
         >
-          {/* Next Task Indicator (Hidden on extra small screens) */}
+          {/* Alignment status: next liturgy, or complete once 8/8 is sealed */}
           <span className="text-[10px] text-[#839493] hidden md:inline truncate max-w-[130px] font-sans">
             {countReady ? (
-              <>
-                NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
-              </>
+              allTasksCompleted ? (
+                <span className="text-[#00ff88] font-semibold">COMPLETE</span>
+              ) : (
+                <>
+                  NEXT: <span className="text-[#dfe3e3] font-semibold">{nextTask?.title || 'None'}</span>
+                </>
+              )
             ) : (
               <span
                 className="inline-block h-2 w-20 rounded-full bg-[#839493]/30 animate-pulse align-middle"
