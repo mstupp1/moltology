@@ -1,6 +1,11 @@
-import { useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { authClient } from '@/lib/auth-client'
-import { resolveAuthSession, type AuthSessionState } from '@/lib/auth-session'
+import {
+  isOAuthPending,
+  resolveAuthSession,
+  settleOAuthSessionIfPending,
+  type AuthSessionState,
+} from '@/lib/auth-session'
 
 const subscribeNoop = () => () => {}
 
@@ -12,9 +17,30 @@ function useIsClient(): boolean {
   return useSyncExternalStore(subscribeNoop, () => true, () => false)
 }
 
+function readAuthClientSession(): Promise<unknown> {
+  const client = authClient as { getSession?: () => Promise<unknown> }
+  if (typeof client.getSession === 'function') {
+    return client.getSession()
+  }
+  return Promise.resolve(null)
+}
+
 export function useAuthSession(): AuthSessionState {
   const sessionRes = authClient.useSession()
   const clientReady = useIsClient()
+  const [, setOauthEpoch] = useState(0)
+
+  useEffect(() => {
+    if (!clientReady || !isOAuthPending()) return
+    let cancelled = false
+    void settleOAuthSessionIfPending(readAuthClientSession).finally(() => {
+      if (!cancelled) setOauthEpoch((n) => n + 1)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [clientReady])
+
   return resolveAuthSession(sessionRes, { clientReady })
 }
 

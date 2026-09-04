@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { X, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
 import { useAuthSession } from '../hooks/useAuthSession'
+import { rememberSessionUser, startGoogleSignIn } from '../lib/auth-session'
 import { getAuthJWTToken } from '../lib/jwt'
 import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
 import { parseMemberHandle } from '../lib/member-handle'
@@ -56,10 +57,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleGoogleSignIn = async () => {
     setError(null)
     try {
-      await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: `${window.location.origin}/dashboard`
+      const user = await startGoogleSignIn({
+        signInSocial: (args) => authClient.signIn.social(args),
+        callbackURL: `${window.location.origin}/dashboard`,
+        destination: '/dashboard',
       })
+      if (user) {
+        if (onSuccess) onSuccess()
+        onClose()
+      }
     } catch (err: any) {
       console.error('Google OAuth Error:', err)
       setError(err?.message || 'Could not sign in with Google. Please try again.')
@@ -88,6 +94,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setError(res.error.message || 'Could not create account. Please check your details and try again.')
         } else {
           const createdUser = (res as any)?.data?.user || (res as any)?.user
+          rememberSessionUser(createdUser)
           const token = await getAuthJWTToken()
           await claimMemberHandleFn({
             data: {
@@ -120,6 +127,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (res?.error) {
           setError(res.error.message || 'Invalid email or password. Please try again.')
         } else {
+          rememberSessionUser((res as any)?.data?.user || (res as any)?.user)
           await getUserProfileFn().catch(() => {})
           if (onSuccess) onSuccess()
           onClose()

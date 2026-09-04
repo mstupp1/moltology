@@ -2,12 +2,15 @@ import 'dotenv/config'
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
-import { endSignOut } from '@/lib/auth-session'
+import { clearOAuthPending, endSignOut } from '@/lib/auth-session'
+import { clearCachedJwt } from '@/lib/jwt-cache'
 
-// Automatically cleanup DOM, storage, and sign-out latch after each test
+// Automatically cleanup DOM, storage, and session latches after each test
 afterEach(() => {
   cleanup()
   endSignOut()
+  clearOAuthPending()
+  clearCachedJwt()
   if (typeof window !== 'undefined') {
     window.localStorage?.clear()
     window.sessionStorage?.clear()

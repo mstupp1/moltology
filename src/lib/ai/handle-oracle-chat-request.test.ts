@@ -4,6 +4,8 @@ import { ORACLE_THREAD_ID_HEADER } from './oracle-chat'
 
 vi.mock('../jwt', () => ({
   verifyNeonJWT: vi.fn().mockResolvedValue({ valid: false }),
+  looksLikeJwt: (token?: string | null) =>
+    !!token && token.split('.').length === 3 && token.split('.').every((part) => part.length > 0),
 }))
 
 vi.mock('./guardrails', () => ({
@@ -66,6 +68,51 @@ describe('handleOracleChatRequest', () => {
     expect(data.threadId).toBeNull()
     expect(data.text).toMatch(/Guest|account|Sign up|Oracle/i)
     expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('returns guest JSON when only a Better Auth session cookie is present', async () => {
+    const res = await handleOracleChatRequest(
+      makeRequest(
+        { messages: [{ role: 'user', content: 'What is moltology?' }] },
+        { headers: { cookie: 'better-auth.session_token=opaque-session-id; Path=/; HttpOnly' } },
+      )
+    )
+
+    expect(res.status).toBe(200)
+    const data = await res.json()
+    expect(data.isGuest).toBe(true)
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('streams for a Bearer JWT even without body.userId', async () => {
+    const { verifyNeonJWT } = await import('../jwt')
+    vi.mocked(verifyNeonJWT).mockResolvedValueOnce({
+      valid: true,
+      payload: { sub: 'usr_from_jwt' },
+      error: null,
+    } as any)
+
+    const encoder = new TextEncoder()
+    const fakeStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode('From JWT'))
+        controller.close()
+      },
+    })
+    streamTextMock.mockReturnValueOnce({ stream: fakeStream })
+
+    const jwt = 'eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ1c3JfZnJvbV9qd3QifQ.sig'
+    const res = await handleOracleChatRequest(
+      makeRequest(
+        { messages: [{ role: 'user', content: 'Teach me ecdysis' }] },
+        { headers: { Authorization: `Bearer ${jwt}` } },
+      )
+    )
+
+    expect(verifyNeonJWT).toHaveBeenCalledWith(jwt)
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toMatch(/text\/plain/)
+    expect(await res.text()).toBe('From JWT')
   })
 
   it('streams text and sets thread header for authenticated body.userId', async () => {

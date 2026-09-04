@@ -1,12 +1,14 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { authClient } from '@/lib/auth-client'
+import { beginOAuthSignIn, setCachedUser } from '@/lib/auth-session'
 import { useAuthSession } from './useAuthSession'
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     useSession: vi.fn(),
+    getSession: vi.fn(),
   },
 }))
 
@@ -53,5 +55,35 @@ describe('useAuthSession', () => {
     expect(screen.getByTestId('guest')).toHaveTextContent('false')
     expect(screen.getByTestId('auth')).toHaveTextContent('true')
     expect(screen.getByTestId('user')).toHaveTextContent('usr_probe')
+  })
+
+  it('keeps a cached member when the session hook settles empty after an Oracle error', () => {
+    setCachedUser({ id: 'usr_qa', name: 'Probe' })
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: null,
+      isPending: false,
+      error: new Error('oracle upstream timeout'),
+    } as any)
+    render(<Probe />)
+    expect(screen.getByTestId('auth')).toHaveTextContent('true')
+    expect(screen.getByTestId('guest')).toHaveTextContent('false')
+    expect(screen.getByTestId('user')).toHaveTextContent('usr_qa')
+  })
+
+  it('holds chrome after Google OAuth until getSession returns the member once', async () => {
+    beginOAuthSignIn('/dashboard')
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+    vi.mocked((authClient as any).getSession).mockResolvedValue({
+      data: { user: { id: 'usr_google', name: 'Myles' } },
+    })
+
+    render(<Probe />)
+    expect(screen.getByTestId('guest')).toHaveTextContent('false')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('auth')).toHaveTextContent('true')
+      expect(screen.getByTestId('user')).toHaveTextContent('usr_google')
+    })
+    expect((authClient as any).getSession).toHaveBeenCalled()
   })
 })
