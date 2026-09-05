@@ -4,14 +4,17 @@ import { describe, it, expect } from 'vitest'
 
 describe('Dashboard activity stream source', () => {
   it('does not ship canned luxury-sedan, credit-drop, fathom, or torque events', () => {
-    const src = readFileSync(resolve(process.cwd(), 'src/routes/_hud/dashboard.tsx'), 'utf8')
-    expect(src).not.toMatch(/Luxury Sedan/)
-    expect(src).not.toMatch(/\+450\.00 MC/)
-    expect(src).not.toMatch(/3,400/)
-    expect(src).not.toMatch(/Pincer Torque recalibrated/)
-    expect(src).not.toMatch(/INITIAL_ACTIVITIES/)
-    expect(src).toMatch(/ActivityStreamPanel/)
-    expect(src).toMatch(/ResumeOracleConsultation/)
+    const routeSrc = readFileSync(resolve(process.cwd(), 'src/routes/_hud/dashboard.tsx'), 'utf8')
+    const viewSrc = readFileSync(resolve(process.cwd(), 'src/components/hud/DashboardView.tsx'), 'utf8')
+    expect(routeSrc).not.toMatch(/Luxury Sedan/)
+    expect(routeSrc).not.toMatch(/\+450\.00 MC/)
+    expect(viewSrc).not.toMatch(/Luxury Sedan/)
+    expect(viewSrc).not.toMatch(/\+450\.00 MC/)
+    expect(viewSrc).not.toMatch(/3,400/)
+    expect(viewSrc).not.toMatch(/Pincer Torque recalibrated/)
+    expect(viewSrc).not.toMatch(/INITIAL_ACTIVITIES/)
+    expect(viewSrc).toMatch(/ActivityStreamPanel/)
+    expect(viewSrc).toMatch(/ResumeOracleConsultation/)
   })
 
   it('places Forum and Connections cards under Daily Alignment and above Activity', () => {
