@@ -8,6 +8,7 @@ import {
   X,
 } from 'lucide-react'
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
+import { HudPromoBentoCard } from '@/components/hud/HudPromoBentoCard'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { ResumeOracleConsultation } from '@/components/hud/ResumeOracleConsultation'
@@ -112,6 +113,9 @@ export default function DashboardView() {
       <WelcomeInitiateHero />
 
       <ResumeOracleConsultation />
+
+      {/* Wide Bento Card: Promos, Bundles, Seasonal Events & Requisitions */}
+      <HudPromoBentoCard />
 
       {/* Comprehensive Bento Box (6-Directive Rotating Carousel + MoltNation News) */}
       <LaunchpadCarousel />
