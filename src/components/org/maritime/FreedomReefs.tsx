@@ -8,12 +8,17 @@ import { Anchor, MapPin, Navigation, Waves } from 'lucide-react'
 import { REEF_SITES, type ReefSite } from './data'
 import { MaritimeHeading, TelemetryRow } from './primitives'
 
+/**
+ * The chart itself stays dark, like the photographs used elsewhere on the
+ * page (a soundings chart is conventionally dark) — but it is framed in the
+ * same light card border as every other image on the Org page.
+ */
 const TacticalChart: React.FC<{
   sites: ReefSite[]
   selectedId: string
   onSelect: (id: string) => void
 }> = ({ sites, selectedId, onSelect }) => (
-  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-cyan-400/25 bg-[#04121a] sm:aspect-[16/10]">
+  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-sky-100 shadow-xl shadow-sky-100 bg-[#04121a] sm:aspect-[16/10]">
     {/* Chart substrate */}
     <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full" aria-hidden="true" preserveAspectRatio="none">
       <defs>
@@ -87,14 +92,14 @@ const TacticalChart: React.FC<{
           ) : null}
           <span
             aria-hidden="true"
-            className={`relative flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all group-hover:scale-125 group-focus-visible:ring-2 group-focus-visible:ring-cyan-300 ${
+            className={`relative flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all group-hover:scale-125 group-focus-visible:ring-2 group-focus-visible:ring-sky-300 ${
               isSelected ? 'border-white scale-125' : 'border-white/50'
             } ${site.markerTone}`}
           >
             <span className="h-1.5 w-1.5 rounded-full bg-[#04121a]" />
           </span>
           <span
-            className={`pointer-events-none absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap rounded px-1.5 py-0.5 font-grotesk text-[9px] font-black uppercase tracking-[0.14em] transition-opacity ${
+            className={`pointer-events-none absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap rounded px-1.5 py-0.5 font-grotesk text-[9px] font-bold uppercase tracking-[0.14em] transition-opacity ${
               isSelected ? 'bg-black/70 text-white opacity-100' : 'bg-black/50 text-slate-300 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100'
             }`}
           >
@@ -132,18 +137,18 @@ export const FreedomReefs: React.FC = () => {
                 type="button"
                 onClick={() => setSelectedId(site.id)}
                 aria-pressed={site.id === selectedId}
-                className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                   site.id === selectedId
-                    ? 'border-cyan-400/50 bg-cyan-400/10'
-                    : 'border-white/10 bg-white/[0.03] hover:border-white/25'
+                    ? 'border-sky-300 bg-sky-50'
+                    : 'border-sky-100 bg-white hover:border-sky-300'
                 }`}
               >
                 <span aria-hidden="true" className={`h-2.5 w-2.5 shrink-0 rounded-full ${site.markerTone}`} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-grotesk text-[11px] font-black uppercase tracking-wide text-white">
+                  <span className="block truncate font-grotesk text-[11px] font-bold uppercase tracking-wide text-sky-900">
                     {site.name}
                   </span>
-                  <span className="block text-[10px] uppercase tracking-[0.16em] text-slate-400">{site.sector}</span>
+                  <span className="block text-[10px] uppercase tracking-[0.16em] text-slate-500">{site.sector}</span>
                 </span>
               </button>
             ))}
@@ -152,46 +157,46 @@ export const FreedomReefs: React.FC = () => {
 
         {/* Site record */}
         <div className="lg:col-span-5">
-          <div className="flex h-full flex-col gap-5 rounded-3xl border border-white/10 bg-[#050f16]/90 p-6 sm:p-7">
+          <div className="flex h-full flex-col gap-5 rounded-3xl border border-sky-100 bg-white p-6 shadow-xl shadow-sky-100 sm:p-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 font-grotesk text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300/80">
+              <span className="inline-flex items-center gap-2 font-grotesk text-[10px] font-bold uppercase tracking-[0.2em] text-sky-600">
                 <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                 INSTALLATION RECORD
               </span>
               <span
-                className={`rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.16em] ${selected.statusTone}`}
+                className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] ${selected.statusTone}`}
               >
                 {selected.status}
               </span>
             </div>
 
-            <h3 className="font-grotesk text-2xl font-black uppercase leading-tight tracking-tight text-white">
+            <h3 className="font-grotesk text-2xl font-bold uppercase leading-tight tracking-tight text-sky-900">
               {selected.name}
             </h3>
-            <p className="text-sm leading-relaxed text-slate-300">{selected.summary}</p>
+            <p className="text-sm leading-relaxed text-slate-600">{selected.summary}</p>
 
-            <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-2">
+            <div className="rounded-2xl border border-sky-100 bg-[#f8fbff] px-4 py-2">
               <TelemetryRow label="Sector" value={selected.sector} />
               <TelemetryRow label="Bearing" value={selected.bearing} />
               <TelemetryRow label="Working depth" value={selected.depth} />
             </div>
 
             <div className="space-y-2">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">WORKS IN PROGRESS</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">WORKS IN PROGRESS</p>
               <ul className="space-y-2">
                 {selected.works.map((work) => (
                   <li
                     key={work}
-                    className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-300"
+                    className="flex items-start gap-2 rounded-xl border border-sky-100 bg-[#f8fbff] px-3 py-2 text-xs text-slate-600"
                   >
-                    <Waves className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cyan-400" aria-hidden="true" />
+                    <Waves className="mt-0.5 h-3.5 w-3.5 shrink-0 text-sky-500" aria-hidden="true" />
                     <span className="leading-snug">{work}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <p className="mt-auto flex items-center gap-2 border-t border-white/10 pt-4 text-[10px] uppercase tracking-[0.18em] text-slate-400">
+            <p className="mt-auto flex items-center gap-2 border-t border-sky-100 pt-4 text-[10px] uppercase tracking-[0.16em] text-slate-500">
               <Navigation className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               PLOT POSITIONS ARE SCHEMATIC AND NOT FOR NAVIGATION
             </p>

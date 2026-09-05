@@ -17,10 +17,10 @@ const ThreatLevelButton: React.FC<{
     type="button"
     onClick={onSelect}
     aria-pressed={isSelected}
-    className={`group relative w-full overflow-hidden rounded-xl border px-4 py-3.5 text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+    className={`group relative w-full overflow-hidden rounded-xl border px-4 py-3.5 text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
       isSelected
-        ? `${level.activeShell} shadow-lg`
-        : 'border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]'
+        ? `${level.activeShell} shadow-md`
+        : 'border-sky-100 bg-white hover:border-sky-300 hover:bg-sky-50'
     }`}
   >
     <span className="flex items-center gap-3">
@@ -32,17 +32,17 @@ const ThreatLevelButton: React.FC<{
       />
       <span className="min-w-0 flex-1">
         <span
-          className={`block font-grotesk text-xs font-black uppercase tracking-[0.16em] ${
-            isSelected ? level.activeText : 'text-white'
+          className={`block font-grotesk text-xs font-bold uppercase tracking-[0.14em] ${
+            isSelected ? level.activeText : 'text-sky-900'
           }`}
         >
           {level.code} — {level.subject}
         </span>
-        <span className="mt-0.5 block text-[11px] leading-snug text-slate-400">{level.summary}</span>
+        <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">{level.summary}</span>
       </span>
       {isCurrent ? (
         <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.18em] ${level.activeChip}`}
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] ${level.activeChip}`}
         >
           ACTIVE
         </span>
@@ -82,11 +82,11 @@ export const ThreatAdvisory: React.FC = () => {
 
         {/* Briefing panel */}
         <div className="lg:col-span-7">
-          <div className={`h-full rounded-3xl border bg-[#04141d]/80 p-6 sm:p-8 ${selected.activeShell}`}>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div className={`h-full rounded-3xl border bg-white p-6 shadow-lg sm:p-8 ${selected.activeShell}`}>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 pb-4">
               <div className="flex items-center gap-2.5">
                 <Siren className={`h-5 w-5 ${selected.activeText}`} aria-hidden="true" />
-                <span className="font-grotesk text-sm font-black uppercase tracking-[0.18em] text-white">
+                <span className="font-grotesk text-sm font-bold uppercase tracking-[0.16em] text-sky-900">
                   LEVEL {selected.code}
                 </span>
               </div>
@@ -95,14 +95,14 @@ export const ThreatAdvisory: React.FC = () => {
 
             <div className="grid gap-6 pt-6 sm:grid-cols-12">
               <div className="space-y-4 sm:col-span-8">
-                <h3 className={`font-grotesk text-xl font-black uppercase leading-tight ${selected.activeText}`}>
+                <h3 className={`font-grotesk text-xl font-bold uppercase leading-tight ${selected.activeText}`}>
                   {selected.subject}
                 </h3>
-                <p className="text-sm leading-relaxed text-slate-300">{selected.briefing}</p>
-                <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <p className="text-sm leading-relaxed text-slate-600">{selected.briefing}</p>
+                <div className="rounded-2xl border border-sky-100 bg-[#f8fbff] px-4 py-3">
                   <TelemetryRow label="Standing posture" value={selected.posture} />
                   <TelemetryRow label="Advisory in force" value={`${current.code} — ${current.subject}`} />
-                  <TelemetryRow label="Watch floor" value="STAFFED · CONTINUOUS" tone="text-emerald-300" />
+                  <TelemetryRow label="Watch floor" value="STAFFED · CONTINUOUS" tone="text-emerald-700" />
                 </div>
               </div>
 

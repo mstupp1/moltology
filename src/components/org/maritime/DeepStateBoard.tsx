@@ -1,7 +1,8 @@
 /**
  * THE DEEP STATE IS LITERALLY DEEP
- * Open investigation board. Exhibits are pinned to a fixed-width canvas and
- * connected with string; the canvas scrolls horizontally on small screens.
+ * Open investigation board, styled as a literal cork-and-parchment board
+ * rather than a hacker terminal — index cards, red string, and pins on a
+ * warm, light surface that matches the rest of the Org page.
  */
 import React, { useState } from 'react'
 import { FileSearch, Network, Pin } from 'lucide-react'
@@ -26,35 +27,35 @@ const ExhibitCard: React.FC<{
       onFocus={() => onFocusNode(node.id)}
       onBlur={() => onFocusNode(null)}
       aria-pressed={isActive}
-      className={`absolute w-[176px] -translate-x-1/2 -translate-y-1/2 rounded-lg border p-3 text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 ${
+      className={`absolute w-[176px] -translate-x-1/2 -translate-y-1/2 rounded-sm border bg-white p-3 text-left shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 ${
         isActive
-          ? 'z-20 border-rose-400/70 bg-[#141018] shadow-[0_0_24px_rgba(244,63,94,0.25)] scale-[1.04]'
+          ? 'z-20 border-rose-400 shadow-lg scale-[1.05]'
           : isLinked
-            ? 'z-10 border-rose-400/40 bg-[#101018]'
-            : 'z-10 border-white/12 bg-[#0b1016] hover:border-white/30'
+            ? 'z-10 border-rose-300'
+            : 'z-10 border-slate-200 hover:border-rose-200'
       }`}
       style={{ left: `${node.x}%`, top: `${node.y}%` }}
     >
       <span
         aria-hidden="true"
-        className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-rose-300/70 bg-rose-500 shadow"
+        className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-rose-600 bg-rose-500 shadow"
       />
       <span className="flex items-center justify-between gap-2">
-        <span className="font-grotesk text-[9px] font-black uppercase tracking-[0.2em] text-rose-300/80">
+        <span className="font-grotesk text-[9px] font-bold uppercase tracking-[0.18em] text-rose-700">
           {node.exhibit}
         </span>
         <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden="true" />
       </span>
-      <span className="mt-1.5 block font-grotesk text-[11px] font-black uppercase leading-tight text-white">
+      <span className="mt-1.5 block font-grotesk text-[11px] font-bold uppercase leading-tight text-sky-900">
         {node.title}
       </span>
-      <span className="mt-1.5 block text-[10px] leading-snug text-slate-400">{node.note}</span>
+      <span className="mt-1.5 block text-[10px] leading-snug text-slate-500">{node.note}</span>
       {node.redacted ? (
         <span className="mt-2 block">
           <Redacted className="text-[9px]">{node.redacted}</Redacted>
         </span>
       ) : null}
-      <span className="mt-2 block text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
+      <span className="mt-2 block text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
         {node.timestamp}
       </span>
     </button>
@@ -82,9 +83,9 @@ export const DeepStateBoard: React.FC = () => {
         subtitle="Nine exhibits. Fourteen connections. No conclusions have been drawn, and none are being drawn here."
       />
 
-      <div className="overflow-hidden rounded-3xl border border-rose-400/25 bg-[#080a10]">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rose-400/20 bg-rose-500/[0.06] px-5 sm:px-8 py-4">
-          <span className="inline-flex items-center gap-2 font-grotesk text-[11px] font-black uppercase tracking-[0.22em] text-rose-200">
+      <div className="overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-xl shadow-rose-100/60">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rose-100 bg-rose-50/60 px-5 sm:px-8 py-4">
+          <span className="inline-flex items-center gap-2 font-grotesk text-[11px] font-bold uppercase tracking-[0.18em] text-rose-800">
             <Network className="h-4 w-4" aria-hidden="true" />
             EVIDENCE BOARD · SELECT AN EXHIBIT TO TRACE ITS CONNECTIONS
           </span>
@@ -96,7 +97,7 @@ export const DeepStateBoard: React.FC = () => {
           <div className="relative mx-auto h-[620px] w-[860px] p-4">
             <div
               aria-hidden="true"
-              className="absolute inset-4 rounded-2xl border border-white/5 bg-[#0a0d13] bg-pro-noise"
+              className="absolute inset-4 rounded-2xl border border-amber-100 bg-[#fbf3e3]"
             />
 
             {/* String */}
@@ -113,7 +114,7 @@ export const DeepStateBoard: React.FC = () => {
                     y1={`${a.y}%`}
                     x2={`${b.x}%`}
                     y2={`${b.y}%`}
-                    stroke={isLit ? 'rgba(244,63,94,0.85)' : 'rgba(244,63,94,0.22)'}
+                    stroke={isLit ? 'rgba(225,29,72,0.9)' : 'rgba(225,29,72,0.35)'}
                     strokeWidth={isLit ? 1.8 : 1}
                     className="transition-[stroke,stroke-width] duration-200"
                   />
@@ -133,12 +134,12 @@ export const DeepStateBoard: React.FC = () => {
           </div>
         </div>
 
-        <div className="space-y-4 border-t border-rose-400/20 px-6 sm:px-10 py-8 text-center">
-          <p className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+        <div className="space-y-4 border-t border-rose-100 px-6 sm:px-10 py-8 text-center">
+          <p className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
             <Pin className="h-3.5 w-3.5" aria-hidden="true" />
             NO FINDING HAS BEEN ENTERED · FILE REMAINS OPEN
           </p>
-          <p className="font-grotesk text-2xl sm:text-4xl font-black uppercase leading-tight tracking-tight text-rose-200">
+          <p className="font-grotesk text-2xl sm:text-4xl font-bold uppercase leading-tight tracking-tight text-rose-700">
             WE&rsquo;RE JUST ASKING QUESTIONS.
           </p>
         </div>

@@ -29,8 +29,8 @@ const EMPTY_REPORT: SightingReport = {
 }
 
 const fieldClass =
-  'w-full rounded-xl border border-white/15 bg-black/40 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/60'
-const labelClass = 'block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1.5'
+  'w-full rounded-xl border border-sky-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-1 focus:ring-sky-400'
+const labelClass = 'block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 mb-1.5'
 
 const ActionCard: React.FC<{
   option: ActionOption
@@ -40,23 +40,23 @@ const ActionCard: React.FC<{
   const Icon = option.icon
   return (
     <article
-      className={`flex h-full flex-col gap-4 rounded-3xl border p-6 transition-colors ${
-        isOpen ? 'border-cyan-400/50 bg-cyan-400/[0.07]' : 'border-white/10 bg-[#06121a]/85 hover:border-white/25'
+      className={`flex h-full flex-col gap-4 rounded-3xl border p-6 shadow-lg transition-colors ${
+        isOpen ? 'border-sky-300 bg-sky-50' : 'border-sky-100 bg-white shadow-sky-100 hover:border-sky-300'
       }`}
     >
-      <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-300">
+      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
-      <h3 className="font-grotesk text-base font-black uppercase leading-tight tracking-tight text-white">
+      <h3 className="font-grotesk text-base font-bold uppercase leading-tight tracking-tight text-sky-900">
         {option.title}
       </h3>
-      <p className="text-[13px] font-medium leading-relaxed text-slate-300">{option.summary}</p>
-      <p className="text-xs leading-relaxed text-slate-400">{option.detail}</p>
+      <p className="text-[13px] font-medium leading-relaxed text-slate-600">{option.summary}</p>
+      <p className="text-xs leading-relaxed text-slate-500">{option.detail}</p>
       <button
         type="button"
         onClick={onActivate}
         aria-expanded={option.id === 'report' ? isOpen : undefined}
-        className="mt-auto inline-flex items-center justify-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/10 px-5 py-2.5 font-grotesk text-[11px] font-black uppercase tracking-[0.14em] text-cyan-200 transition-colors hover:bg-cyan-400/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+        className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-sky-500 px-5 py-2.5 font-grotesk text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
       >
         {option.cta}
         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -114,9 +114,9 @@ export const TakeAction: React.FC<{ onSupport?: () => void }> = ({ onSupport }) 
 
       {/* Field sighting form */}
       {formOpen ? (
-        <div className="overflow-hidden rounded-3xl border border-orange-400/30 bg-[#050f16]/90">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-orange-400/20 bg-orange-500/[0.07] px-5 sm:px-8 py-4">
-            <span className="inline-flex items-center gap-2.5 font-grotesk text-[11px] font-black uppercase tracking-[0.22em] text-orange-200">
+        <div className="overflow-hidden rounded-3xl border border-amber-100 bg-white shadow-xl shadow-amber-100/60">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-amber-100 bg-amber-50/60 px-5 sm:px-8 py-4">
+            <span className="inline-flex items-center gap-2.5 font-grotesk text-[11px] font-bold uppercase tracking-[0.2em] text-amber-800">
               <ShieldAlert className="h-4 w-4" aria-hidden="true" />
               FORM OCA-8A · FIELD SIGHTING REPORT
             </span>
@@ -126,23 +126,23 @@ export const TakeAction: React.FC<{ onSupport?: () => void }> = ({ onSupport }) 
           <div className="p-5 sm:p-8">
             {caseNumber ? (
               <div className="space-y-5 text-center">
-                <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-400" aria-hidden="true" />
-                <p className="font-grotesk text-lg sm:text-2xl font-black uppercase leading-tight tracking-tight text-emerald-200">
+                <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-500" aria-hidden="true" />
+                <p className="font-grotesk text-lg sm:text-2xl font-bold uppercase leading-tight tracking-tight text-emerald-700">
                   YOUR REPORT HAS BEEN FORWARDED TO MARITIME INTELLIGENCE.
                 </p>
-                <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-black/30 px-4 py-2 text-left">
+                <div className="mx-auto max-w-md rounded-2xl border border-sky-100 bg-[#f8fbff] px-4 py-2 text-left">
                   <TelemetryRow label="Case number" value={caseNumber} />
                   <TelemetryRow label="Routed to" value="OFFICE OF CEPHALOPOD AFFAIRS" />
                   <TelemetryRow label="Queue position" value="READ IN ORDER RECEIVED" />
-                  <TelemetryRow label="Advisory posture" value="ORANGE · UNCHANGED" tone="text-orange-200" />
+                  <TelemetryRow label="Advisory posture" value="ORANGE · UNCHANGED" tone="text-orange-700" />
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-500">
                   Nothing you entered was saved or transmitted. This form is a local demonstration only.
                 </p>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 font-grotesk text-[11px] font-black uppercase tracking-[0.14em] text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                  className="inline-flex items-center gap-2 rounded-full border border-sky-200 px-5 py-2.5 font-grotesk text-[11px] font-bold uppercase tracking-[0.12em] text-sky-700 transition-colors hover:bg-sky-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 >
                   FILE ANOTHER SIGHTING
                 </button>
@@ -248,13 +248,13 @@ export const TakeAction: React.FC<{ onSupport?: () => void }> = ({ onSupport }) 
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-[11px] leading-relaxed text-slate-400">
+                <div className="flex flex-col gap-4 border-t border-sky-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-[11px] leading-relaxed text-slate-500">
                     This form does not save or send anything. Please do not enter personal details.
                   </p>
                   <button
                     type="submit"
-                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-orange-400 px-7 py-3 font-grotesk text-xs font-black uppercase tracking-[0.14em] text-orange-950 transition-colors hover:bg-orange-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050f16]"
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-amber-500 px-7 py-3 font-grotesk text-xs font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
                   >
                     <Send className="h-4 w-4" aria-hidden="true" />
                     SUBMIT SIGHTING REPORT

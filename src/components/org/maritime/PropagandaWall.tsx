@@ -75,7 +75,7 @@ export const PropagandaWall: React.FC = () => (
       </div>
     </div>
 
-    <p className="text-center text-[10px] uppercase tracking-[0.22em] text-slate-400">
+    <p className="text-center text-[10px] uppercase tracking-[0.2em] text-slate-500">
       SCROLL FOR THE FULL SERIES · SIX PLATES IN CIRCULATION
     </p>
   </section>
