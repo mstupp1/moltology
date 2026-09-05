@@ -11,6 +11,8 @@ import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
 import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { ResumeOracleConsultation } from '@/components/hud/ResumeOracleConsultation'
+import { ForumHubCard } from '@/components/hud/ForumHubCard'
+import { ConnectionsHubCard } from '@/components/hud/ConnectionsHubCard'
 import { ActivityStreamPanel } from '@/components/hud/ActivityStreamPanel'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
@@ -116,6 +118,16 @@ export default function DashboardView() {
 
       {/* Full Daily Alignment Routine & 14-Day Streak Matrix */}
       <DailyRoutineWidget />
+
+      {/* Half-row: Forum + Connections */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
+        <div className="lg:col-span-6 flex flex-col">
+          <ForumHubCard />
+        </div>
+        <div className="lg:col-span-6 flex flex-col">
+          <ConnectionsHubCard />
+        </div>
+      </div>
 
       {/* 2-Column Section: Left (Activity Stream) + Right (Changelog & Protocol Releases) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
