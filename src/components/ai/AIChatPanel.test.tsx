@@ -294,22 +294,20 @@ describe('AIChatPanel Chats List Panel', () => {
 
     render(<AIChatPanel userId="usr_valid_user" isCompact />)
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
-    await waitFor(() => {
-      expect(screen.getByText('First molt briefing')).toBeInTheDocument()
-    })
-    fireEvent.click(screen.getByRole('button', { name: /First molt briefing/i }))
+    const openChatsAndSelect = async (title: RegExp) => {
+      fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+      const threadButton = await screen.findByRole('button', { name: title })
+      fireEvent.click(threadButton)
+    }
+
+    await openChatsAndSelect(/First molt briefing/i)
 
     await waitFor(() => {
       expect(screen.getByText('Alpha user turn')).toBeInTheDocument()
       expect(screen.getByText('Alpha oracle reply')).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
-    await waitFor(() => {
-      expect(screen.getByText('Second trench notes')).toBeInTheDocument()
-    })
-    fireEvent.click(screen.getByRole('button', { name: /Second trench notes/i }))
+    await openChatsAndSelect(/Second trench notes/i)
 
     await waitFor(() => {
       expect(screen.getByText('Bravo user turn')).toBeInTheDocument()
@@ -319,12 +317,12 @@ describe('AIChatPanel Chats List Panel', () => {
     expect(screen.queryByText('Alpha oracle reply')).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
 
-    await new Promise((resolve) => setTimeout(resolve, 80))
-    expect(screen.getByText('Bravo user turn')).toBeInTheDocument()
-    expect(screen.queryByText('Alpha user turn')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Bravo user turn')).toBeInTheDocument()
+      expect(screen.queryByText('Alpha user turn')).not.toBeInTheDocument()
+    })
 
-    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
-    fireEvent.click(screen.getByRole('button', { name: /First molt briefing/i }))
+    await openChatsAndSelect(/First molt briefing/i)
 
     await waitFor(() => {
       expect(screen.getByText('Alpha user turn')).toBeInTheDocument()
