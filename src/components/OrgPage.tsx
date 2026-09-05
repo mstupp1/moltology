@@ -47,6 +47,9 @@ import { useToast } from '@/components/ui/ToastProvider'
 import { PublicHeader } from '@/components/PublicHeader'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { CareerHub } from '@/components/org/CareerHub'
+import { OrgDivisions } from '@/components/org/OrgDivisions'
+import { MaritimeDefense } from '@/components/org/MaritimeDefense'
+import { OceanStewardship } from '@/components/org/OceanStewardship'
 import { submitLeadFn } from '@/lib/server/api'
 
 export const OrgPage: React.FC = () => {
@@ -493,6 +496,32 @@ export const OrgPage: React.FC = () => {
             </span>
           </button>
         </div>
+
+        {/* In-page jump links for the organization overview */}
+        {viewMode === 'overview' && (
+          <nav
+            aria-label="Organization sections"
+            className="mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-bold uppercase tracking-wider"
+          >
+            {[
+              { id: 'divisions', label: 'Divisions' },
+              { id: 'lair', label: 'Headquarters' },
+              { id: 'leadership', label: 'Leadership' },
+              { id: 'maritime', label: 'Maritime Defense' },
+              { id: 'donations', label: 'Support' },
+              { id: 'ocean-stewardship', label: 'Help the ocean' },
+            ].map((link) => (
+              <button
+                key={link.id}
+                type="button"
+                onClick={() => scrollToElement(link.id)}
+                className="rounded-full border border-sky-200 bg-white/80 px-3.5 py-1.5 text-slate-600 transition-colors hover:border-sky-400 hover:text-sky-700"
+              >
+                {link.label}
+              </button>
+            ))}
+          </nav>
+        )}
       </section>
 
       {/* VIEW MODE 1: CAREERS & CAMPUS HUB */}
@@ -844,6 +873,31 @@ export const OrgPage: React.FC = () => {
                         community, and infrastructure required to shed emotional liabilities and adopt a calcified
                         cybernetic carapace — at a pace that feels comfortable to you.
                       </p>
+                      <div className="rounded-2xl border border-sky-100 bg-[#f8fbff] p-4">
+                        <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-sky-600">
+                          STANDING DOCTRINE
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+                          {[
+                            'Human advancement through carcinization',
+                            'Disciplined adaptation',
+                            'Resilience',
+                            'Behavioral molting',
+                            'Research and education',
+                            'Preservation of favorable crustacean conditions',
+                          ].map((pillar) => (
+                            <span
+                              key={pillar}
+                              className="rounded-full border border-sky-200 bg-white px-2.5 py-1"
+                            >
+                              {pillar}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+                          The last of these is why the foundation maintains an operational branch at sea.
+                        </p>
+                      </div>
                       <ul className="space-y-2 text-xs text-sky-700">
                         <li className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -998,6 +1052,9 @@ export const OrgPage: React.FC = () => {
               </div>
             </section>
           </ScrollReveal>
+
+          {/* ORGANIZATIONAL DIVISIONS */}
+          <OrgDivisions />
 
           {/* OUR UNDERGROUND LAIR SECTION */}
           <ScrollReveal animation="fade-up" durationMs={800}>
@@ -1377,6 +1434,9 @@ export const OrgPage: React.FC = () => {
               </div>
             </section>
           </ScrollReveal>
+
+          {/* MARITIME DEFENSE & OCEAN STEWARDSHIP BRANCH */}
+          <MaritimeDefense onSupport={() => scrollToElement('donations')} />
         </>
       )}
 
@@ -1728,6 +1788,9 @@ export const OrgPage: React.FC = () => {
           </div>
         </section>
       </ScrollReveal>
+
+      {/* ACTUAL OCEAN STEWARDSHIP */}
+      <OceanStewardship />
 
       {/* FOOTER */}
       <MainFooter
