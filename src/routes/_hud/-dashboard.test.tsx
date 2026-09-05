@@ -13,4 +13,20 @@ describe('Dashboard activity stream source', () => {
     expect(src).toMatch(/ActivityStreamPanel/)
     expect(src).toMatch(/ResumeOracleConsultation/)
   })
+
+  it('places Forum and Connections cards under Daily Alignment and above Activity', () => {
+    const src = readFileSync(resolve(process.cwd(), 'src/components/hud/DashboardView.tsx'), 'utf8')
+    const routine = src.indexOf('<DailyRoutineWidget')
+    const forum = src.indexOf('<ForumHubCard')
+    const connections = src.indexOf('<ConnectionsHubCard')
+    const activity = src.indexOf('<ActivityStreamPanel')
+
+    expect(src).toMatch(/ForumHubCard/)
+    expect(src).toMatch(/ConnectionsHubCard/)
+    expect(src).toMatch(/lg:col-span-6/)
+    expect(routine).toBeGreaterThan(-1)
+    expect(forum).toBeGreaterThan(routine)
+    expect(connections).toBeGreaterThan(forum)
+    expect(activity).toBeGreaterThan(connections)
+  })
 })

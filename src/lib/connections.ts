@@ -91,6 +91,33 @@ export function relationshipForMember(
   return { relationship: 'none', pendingRequestId: null }
 }
 
+export type ConnectionsHubPreviewKind = 'incoming' | 'friend'
+
+export type ConnectionsHubPreviewItem = ConnectionMemberSummary & {
+  kind: ConnectionsHubPreviewKind
+}
+
+function friendSinceTime(row: ConnectionMemberSummary): number {
+  if (!row.since) return 0
+  const ms = new Date(row.since).getTime()
+  return Number.isFinite(ms) ? ms : 0
+}
+
+/** Incoming requests first, then newest friends. Hub cards show at most `limit`. */
+export function pickConnectionsHubPreview(
+  connections: ConnectionsListView | null | undefined,
+  limit = 3,
+): ConnectionsHubPreviewItem[] {
+  if (!connections || limit <= 0) return []
+
+  const incoming = connections.incoming.map((row) => ({ ...row, kind: 'incoming' as const }))
+  const friends = [...connections.friends]
+    .sort((a, b) => friendSinceTime(b) - friendSinceTime(a))
+    .map((row) => ({ ...row, kind: 'friend' as const }))
+
+  return [...incoming, ...friends].slice(0, limit)
+}
+
 const STAGE_SHORT_LABELS: Record<number, string> = {
   1: 'Larval Initiate',
   2: 'Soft-Shed',

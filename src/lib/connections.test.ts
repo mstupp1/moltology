@@ -10,6 +10,7 @@ import {
   getStageLabel,
   toMemberSummary,
   relationshipForMember,
+  pickConnectionsHubPreview,
   type ConnectionsListView,
 } from './connections'
 import {
@@ -151,6 +152,56 @@ describe('connections helpers', () => {
       relationship: 'none',
       pendingRequestId: null,
     })
+  })
+
+  it('picks incoming requests before recent friends for the hub preview', () => {
+    const connections: ConnectionsListView = {
+      friends: [
+        {
+          id: 'old-friend',
+          larvaId: 'LARVA UNIT #1',
+          handle: 'old_shell',
+          displayName: 'old_shell',
+          stage: 2,
+          stageLabel: 'Soft-Shed',
+          avatarConfig: null,
+          since: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'new-friend',
+          larvaId: 'LARVA UNIT #4',
+          handle: 'new_claw',
+          displayName: 'new_claw',
+          stage: 3,
+          stageLabel: 'Exoshell Born',
+          avatarConfig: null,
+          since: '2026-08-01T00:00:00.000Z',
+        },
+      ],
+      incoming: [
+        {
+          id: 'i1',
+          larvaId: 'LARVA UNIT #2',
+          handle: 'incoming_one',
+          displayName: 'incoming_one',
+          stage: 1,
+          stageLabel: 'Larval Initiate',
+          avatarConfig: null,
+          requestId: 'req-in',
+        },
+      ],
+      outgoing: [],
+    }
+
+    const preview = pickConnectionsHubPreview(connections, 3)
+    expect(preview.map((row) => row.id)).toEqual(['i1', 'new-friend', 'old-friend'])
+    expect(preview[0]?.kind).toBe('incoming')
+    expect(preview[1]?.kind).toBe('friend')
+  })
+
+  it('returns an empty hub preview when there are no connections', () => {
+    expect(pickConnectionsHubPreview(null)).toEqual([])
+    expect(pickConnectionsHubPreview({ friends: [], incoming: [], outgoing: [] })).toEqual([])
   })
 })
 
