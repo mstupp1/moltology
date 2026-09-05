@@ -3,16 +3,26 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { HudPromoBentoCard, PROMO_SLIDES } from './HudPromoBentoCard'
 
+import { authClient } from '@/lib/auth-client'
+
 // Mock TanStack Router
 const mockNavigate = vi.fn()
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
 }))
 
+// Mock authClient for useAuthSession
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
+}))
+
 describe('HudPromoBentoCard Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.useFakeTimers()
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   afterEach(() => {
@@ -160,4 +170,49 @@ describe('HudPromoBentoCard Component', () => {
     })
     expect(screen.getByText('NEW MEMBER FOUNDATION CACHE')).toBeInTheDocument()
   })
+
+  it('applies border-l-4 and dynamically updates left border color to match active slide accent', () => {
+    render(<HudPromoBentoCard />)
+
+    const card = screen.getByTestId('hud-promo-bento-card')
+    expect(card.className).toContain('border-l-4')
+    expect(card.style.borderLeftColor).toBe('rgb(0, 255, 255)')
+
+    // Switch to Slide 2 (Welcome Bundle: #c084fc -> rgb(192, 132, 252))
+    const bundleTab = screen.getByLabelText(/Select bulletin 02/i)
+    fireEvent.click(bundleTab)
+    expect(card.style.borderLeftColor).toBe('rgb(192, 132, 252)')
+
+    // Switch to Slide 3 (Fall Festival: #fb923c -> rgb(251, 146, 60))
+    const fallTab = screen.getByLabelText(/Select bulletin 03/i)
+    fireEvent.click(fallTab)
+    expect(card.style.borderLeftColor).toBe('rgb(251, 146, 60)')
+  })
+
+  it('renders 100% Free badge and SIGN UP button in guest mode, opening AuthModal on click', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
+
+    render(<HudPromoBentoCard />)
+
+    expect(screen.getByText('100% Free')).toBeInTheDocument()
+    const signUpBtn = screen.getByRole('button', { name: /SIGN UP/i })
+    expect(signUpBtn).toBeInTheDocument()
+
+    // Clicking SIGN UP opens modal
+    fireEvent.click(signUpBtn)
+    expect(screen.getByRole('heading', { name: /Create Account/i })).toBeInTheDocument()
+  })
+
+  it('hides guest SIGN UP button when user is authenticated', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-456', name: 'Commander Pinch' } },
+      isPending: false,
+    } as any)
+
+    render(<HudPromoBentoCard />)
+
+    expect(screen.queryByText('100% Free')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
+  })
 })
+

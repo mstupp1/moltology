@@ -12,8 +12,12 @@ import {
   ArrowRight,
   Radio,
   ShieldCheck,
+  UserPlus,
 } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { AuthModal } from '@/components/AuthModal'
+import { HudButton } from '@/components/ui'
 
 export interface PromoSlide {
   id: string
@@ -108,6 +112,9 @@ export function HudPromoBentoCard({
   className = '',
 }: HudPromoBentoCardProps) {
   const navigate = useNavigate()
+  const session = useAuthSession()
+  const isGuest = session.isGuest
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
@@ -143,15 +150,17 @@ export function HudPromoBentoCard({
   }, [isPlaying, autoPlayIntervalMs, handleNext, currentIndex])
 
   return (
-    <section
+    <>
+      <section
       aria-label="Promotional announcements and seasonal events"
-      className={`chitin-card chamfer-corner relative overflow-hidden shadow-2xl border border-[#3a4a49] transition-all duration-300 flex flex-col justify-between ${className}`}
+      className={`chitin-card chamfer-corner relative overflow-hidden shadow-2xl border border-[#3a4a49] border-l-4 transition-all duration-300 flex flex-col justify-between ${className}`}
+      style={{ borderLeftColor: activeSlide.accentColor }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       data-testid="hud-promo-bento-card"
     >
       {/* Top Telemetry Header Bar */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-[#3a4a49]/60 bg-[#070b0b]/90 gap-2 shrink-0">
+      <div className="flex flex-wrap items-center justify-between px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-[#3a4a49]/60 bg-gradient-to-r from-[#0b1011]/95 via-[#0f1616]/95 to-[#0b1011]/95 gap-2 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <Radio className="w-4 h-4 text-[#00ffff] animate-pulse shrink-0" />
           <h2 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] tracking-widest uppercase truncate">
@@ -162,7 +171,25 @@ export function HudPromoBentoCard({
           </span>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Guest Sign Up CTA if in guest mode */}
+          {isGuest && (
+            <div className="flex items-center gap-2 pr-2 border-r border-[#3a4a49]/60">
+              <span className="text-[11px] text-[#839493] font-sans tracking-wider uppercase hidden sm:inline">
+                100% Free
+              </span>
+              <HudButton
+                variant="crimson"
+                size="sm"
+                icon={<UserPlus className="w-3.5 h-3.5" />}
+                onClick={() => setIsAuthModalOpen(true)}
+                className="font-sans text-xs uppercase font-bold tracking-wider whitespace-nowrap shadow-[0_0_15px_rgba(255,69,58,0.35)]"
+              >
+                SIGN UP
+              </HudButton>
+            </div>
+          )}
+
           <span className="text-[11px] font-sans text-[#839493]">
             <span style={{ color: activeSlide.accentColor }} className="font-bold">
               0{currentIndex + 1}
@@ -265,7 +292,7 @@ export function HudPromoBentoCard({
           </div>
 
           {/* Title */}
-          <h3 className="font-grotesk font-black text-xl sm:text-2xl md:text-3xl text-[#dfe3e3] uppercase tracking-wide leading-tight drop-shadow-md">
+          <h3 className="font-grotesk font-extrabold text-xl sm:text-2xl md:text-3xl text-[#dfe3e3] uppercase tracking-wider leading-tight drop-shadow-md">
             {activeSlide.title}
           </h3>
 
@@ -311,7 +338,7 @@ export function HudPromoBentoCard({
       </div>
 
       {/* Bottom Bento Tab Rail (Pill Navigation) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 sm:p-2.5 bg-[#070b0b] border-t border-[#3a4a49]/60 shrink-0">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 sm:p-2.5 bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-t border-[#3a4a49]/60 shrink-0">
         {PROMO_SLIDES.map((slide, idx) => {
           const isActive = currentIndex === idx
           return (
@@ -353,5 +380,13 @@ export function HudPromoBentoCard({
         })}
       </div>
     </section>
+
+    {/* Auth Modal for Guest Registration */}
+    <AuthModal
+      isOpen={isAuthModalOpen}
+      onClose={() => setIsAuthModalOpen(false)}
+      initialMode="signup"
+    />
+    </>
   )
 }

@@ -27,26 +27,26 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
       <div className="flex-1 min-w-0 z-10 flex flex-col justify-center gap-0.5 px-0.5 sm:px-1">
         {/* Compact Level Readouts on Top */}
         <div className="flex items-center justify-between px-0.5 select-none leading-none">
-          {/* Current Level */}
+          {/* Current Stage */}
           <div
             className="flex items-baseline gap-1"
-            title={`Current Clearance Level ${stage}`}
-            aria-label={`Level ${stage} Badge`}
+            title={`Current Clearance Stage ${stage}`}
+            aria-label={`Stage ${stage} Badge`}
           >
-            <span className="text-[9px] sm:text-[10px] font-semibold text-[#839493] tracking-wider uppercase">LVL</span>
+            <span className="text-[9px] sm:text-[10px] font-semibold text-[#839493] tracking-wider uppercase">STAGE</span>
             <span className="text-[10px] sm:text-xs font-bold text-[#00ffff] drop-shadow-[0_0_6px_rgba(0,255,255,0.7)] leading-none">
               {stage}
             </span>
           </div>
 
-          {/* Next Level / Apex Target */}
+          {/* Next Stage / Apex Target */}
           {!isMaxStage ? (
             <div
               className="flex items-baseline gap-1"
-              title={`Next Ascension Clearance: Level ${nextStage}`}
-              aria-label={`Next Level ${nextStage} Badge`}
+              title={`Next Ascension Clearance: Stage ${nextStage}`}
+              aria-label={`Next Stage ${nextStage} Badge`}
             >
-              <span className="text-[9px] sm:text-[10px] font-semibold text-[#b58060] tracking-wider uppercase">LVL</span>
+              <span className="text-[9px] sm:text-[10px] font-semibold text-[#b58060] tracking-wider uppercase">STAGE</span>
               <span className="text-[10px] sm:text-xs font-bold text-[#ffb076] drop-shadow-[0_0_6px_rgba(255,140,66,0.7)] leading-none">
                 {nextStage}
               </span>
@@ -54,8 +54,8 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
           ) : (
             <div
               className="flex items-baseline"
-              title="Apex Carcinization Level Reached"
-              aria-label="Apex Level Badge"
+              title="Apex Carcinization Stage Reached"
+              aria-label="Apex Stage Badge"
             >
               <span className="text-[9px] sm:text-[10px] font-extrabold text-[#00ff88] drop-shadow-[0_0_6px_rgba(0,255,136,0.6)] tracking-widest uppercase leading-none">
                 APEX

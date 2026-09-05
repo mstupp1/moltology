@@ -16,20 +16,20 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 describe('HUDProgressBar Component', () => {
-  it('renders current level 1 badge and next level 2 badge by default', () => {
+  it('renders current stage 1 badge and next stage 2 badge by default', () => {
     render(<HUDProgressBar />)
 
-    expect(screen.getByLabelText('Level 1 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Level 2 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 1 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 2 Badge')).toBeInTheDocument()
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
   })
 
-  it('renders custom stage level 3 and next level 4 badge', () => {
+  it('renders custom stage level 3 and next stage 4 badge', () => {
     render(<HUDProgressBar stage={3} />)
 
-    expect(screen.getByLabelText('Level 3 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Level 4 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 3 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 4 Badge')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
     expect(screen.getByText('4')).toBeInTheDocument()
   })
@@ -37,8 +37,8 @@ describe('HUDProgressBar Component', () => {
   it('renders apex badge when stage 4 is achieved', () => {
     render(<HUDProgressBar stage={4} />)
 
-    expect(screen.getByLabelText('Level 4 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Apex Level Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 4 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Apex Stage Badge')).toBeInTheDocument()
     expect(screen.getByText('APEX')).toBeInTheDocument()
   })
 

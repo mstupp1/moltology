@@ -10,7 +10,6 @@ import {
 import { LaunchpadCarousel } from '@/components/hud/LaunchpadCarousel'
 import { HudPromoBentoCard } from '@/components/hud/HudPromoBentoCard'
 import { DailyRoutineWidget } from '@/components/hud/DailyRoutineWidget'
-import { WelcomeInitiateHero } from '@/components/hud/WelcomeInitiateHero'
 import { ResumeOracleConsultation } from '@/components/hud/ResumeOracleConsultation'
 import { ForumHubCard } from '@/components/hud/ForumHubCard'
 import { ConnectionsHubCard } from '@/components/hud/ConnectionsHubCard'
@@ -109,13 +108,10 @@ export default function DashboardView() {
         </div>
       )}
 
-      {/* Serene & Inspiring Welcome Initiate Hero Section */}
-      <WelcomeInitiateHero />
+      {/* Wide Bento Welcome Banner: Benthic Transmissions, Directives & Campaigns */}
+      <HudPromoBentoCard />
 
       <ResumeOracleConsultation />
-
-      {/* Wide Bento Card: Promos, Bundles, Seasonal Events & Requisitions */}
-      <HudPromoBentoCard />
 
       {/* Comprehensive Bento Box (6-Directive Rotating Carousel + MoltNation News) */}
       <LaunchpadCarousel />
