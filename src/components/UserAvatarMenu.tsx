@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { LogOut, ChevronDown, Settings, User } from 'lucide-react'
+import { LogOut, ChevronDown, Settings, User, Globe } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { beginSignOut, endSignOut } from '@/lib/auth-session'
 import { UserAvatar } from './UserAvatar'
@@ -92,6 +92,11 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
   const handleOpenSettings = () => {
     handleClose()
     onNavigate?.('/settings')
+  }
+
+  const handleOpenHome = () => {
+    handleClose()
+    onNavigate?.('/')
   }
 
   const handleOpenProfile = () => {
@@ -195,11 +200,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                       : 'text-gray-200 group-hover:text-cyan-300'
                   }`}
                 >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      isCorporate ? 'bg-sky-500' : 'bg-[#00c3ff]'
-                    }`}
-                  />
                   {displayName}
                 </span>
                 {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
@@ -276,6 +276,20 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 >
                   <Settings className="w-4 h-4 shrink-0" />
                   <span>SETTINGS</span>
+                </button>
+
+                {/* Moltology Home Link */}
+                <button
+                  type="button"
+                  onClick={handleOpenHome}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider transition-all cursor-pointer ${
+                    isCorporate
+                      ? 'text-sky-700 hover:bg-sky-100 border border-sky-200/80'
+                      : 'text-[#00c3ff] hover:bg-cyan-950/40 border border-cyan-900/40'
+                  }`}
+                >
+                  <Globe className="w-4 h-4 shrink-0" />
+                  <span>MOLTOLOGY HOME</span>
                 </button>
 
                 {/* Sign Out Action Button */}
@@ -376,11 +390,6 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                     isCorporate ? 'text-slate-800' : 'text-[#dfe3e3]'
                   }`}
                 >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      isCorporate ? 'bg-sky-500 shadow-[0_0_6px_#0284c7]' : 'bg-[#00c3ff]'
-                    }`}
-                  />
                   {displayName}
                 </span>
                 {effectiveRole && ['admin', 'super_admin'].includes(effectiveRole) && (
@@ -442,6 +451,23 @@ export const UserAvatarMenu: React.FC<UserAvatarMenuProps> = ({
                 }`}
               />
               <span>SETTINGS</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleOpenHome}
+              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold font-grotesk tracking-wider flex items-center gap-2.5 transition-all group cursor-pointer ${
+                isCorporate
+                  ? 'text-sky-700 hover:bg-sky-50 border border-sky-200/80 hover:border-sky-300'
+                  : 'text-[#00c3ff] hover:bg-[#00c3ff]/10 border border-cyan-900/40 hover:border-[#00c3ff]/40'
+              }`}
+            >
+              <Globe
+                className={`w-4 h-4 shrink-0 ${
+                  isCorporate ? 'text-sky-600' : 'text-[#00c3ff]'
+                }`}
+              />
+              <span>MOLTOLOGY HOME</span>
             </button>
 
             {/* Sign Out Action Button */}

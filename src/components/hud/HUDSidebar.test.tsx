@@ -59,6 +59,15 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
 
+  it('navigates to /dashboard when brand emblem logo is clicked', () => {
+    render(<HUDSidebar />)
+
+    const brandLogos = screen.getAllByAltText('Order Emblem')
+    fireEvent.click(brandLogos[0])
+
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/dashboard' })
+  })
+
   it('toggles section open and closed on header click', () => {
     render(<HUDSidebar />)
 

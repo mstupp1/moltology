@@ -684,7 +684,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
             <HeaderBrand
               subtext="BENTHIC CORE"
               logoSize="sm"
-              onClick={() => handleNavClick('/')}
+              onClick={() => handleNavClick('/dashboard')}
             />
           </div>
 
@@ -740,7 +740,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           <HeaderBrand
             subtext="BENTHIC CORE"
             isCollapsed={isCollapsed}
-            onClick={() => handleNavClick('/')}
+            onClick={() => handleNavClick('/dashboard')}
           />
 
           {/* Brand Tooltip when collapsed */}

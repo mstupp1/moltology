@@ -16,6 +16,7 @@ export type CommandIconId =
   | 'scan'
 
 export type CommandNavTo =
+  | '/'
   | '/dashboard'
   | '/codex'
   | '/lectures'
@@ -45,6 +46,13 @@ export type SearchTab = 'people' | 'pages'
 
 /** Today's command list. Palette Pages and /search Pages share this. */
 export const COMMAND_CATALOG: CommandCatalogItem[] = [
+  {
+    id: 'nav-home',
+    label: 'Open Moltology Home (Landing)',
+    category: 'Navigation',
+    icon: 'landing',
+    to: '/',
+  },
   {
     id: 'nav-hub',
     label: 'Open Portal Command Hub (Mainpage)',

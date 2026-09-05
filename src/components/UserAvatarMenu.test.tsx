@@ -45,9 +45,24 @@ describe('UserAvatarMenu Component', () => {
     expect(screen.getByText('Carcinus Ascendant')).toBeInTheDocument()
     expect(screen.getByText('carcinus@moltology.org')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^settings$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^moltology home$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^sign out$/i })).toBeInTheDocument()
     expect(screen.getByText('SIGN OUT')).toBeInTheDocument()
     expect(screen.getByText('SETTINGS')).toBeInTheDocument()
+    expect(screen.getByText('MOLTOLOGY HOME')).toBeInTheDocument()
+  })
+
+  it('navigates to / when MOLTOLOGY HOME button is clicked', () => {
+    const mockNavigate = vi.fn()
+    render(<UserAvatarMenu user={mockUser} onNavigate={mockNavigate} />)
+
+    const avatarBtn = screen.getByRole('button', { name: /user account menu/i })
+    fireEvent.click(avatarBtn)
+
+    const homeBtn = screen.getByRole('button', { name: /^moltology home$/i })
+    fireEvent.click(homeBtn)
+
+    expect(mockNavigate).toHaveBeenCalledWith('/')
   })
 
   it('prefers a claimed designation over auth name or larva unit', () => {
