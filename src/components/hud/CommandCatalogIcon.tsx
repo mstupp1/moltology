@@ -11,6 +11,14 @@ import {
   Flame,
   Terminal,
   Zap,
+  Atom,
+  UserCheck,
+  Sliders,
+  ShieldAlert,
+  Radio,
+  Newspaper,
+  Settings,
+  User,
 } from 'lucide-react'
 import type { CommandIconId } from '@/lib/command-catalog'
 
@@ -42,6 +50,22 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
       return <Zap className={`${ICON_CLASS} text-yellow-400`} />
     case 'scan':
       return <Terminal className={`${ICON_CLASS} text-cyan-400`} />
+    case 'oracle':
+      return <Atom className={`${ICON_CLASS} text-[#00ffff]`} />
+    case 'connections':
+      return <UserCheck className={`${ICON_CLASS} text-[#00ffff]`} />
+    case 'chassis':
+      return <Sliders className={`${ICON_CLASS} text-cyan-300`} />
+    case 'isolation':
+      return <ShieldAlert className={`${ICON_CLASS} text-[#39ff14]`} />
+    case 'podcasts':
+      return <Radio className={`${ICON_CLASS} text-[#00ffff]`} />
+    case 'news':
+      return <Newspaper className={`${ICON_CLASS} text-[#00ffff]`} />
+    case 'settings':
+      return <Settings className={`${ICON_CLASS} text-cyan-400`} />
+    case 'profile':
+      return <User className={`${ICON_CLASS} text-[#00ffff]`} />
     default:
       return <Terminal className={`${ICON_CLASS} text-cyan-400`} />
   }

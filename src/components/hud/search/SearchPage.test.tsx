@@ -121,6 +121,20 @@ describe('SearchPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
   })
 
+  it('surfaces HUD chambers and news dispatches on Pages for obvious queries', () => {
+    renderSearch({ query: 'oracle', type: 'pages' })
+    expect(screen.getByText('Consult the Synaptic Oracle')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Consult the Synaptic Oracle'))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
+
+    renderSearch({ query: 'connections', type: 'pages' })
+    expect(screen.getByText('Open Connections & Fellow Shells')).toBeInTheDocument()
+
+    renderSearch({ query: 'news', type: 'pages' })
+    expect(screen.getByText('Open MoltNation News')).toBeInTheDocument()
+    expect(screen.getAllByText(/Read Dispatch:/).length).toBeGreaterThan(0)
+  })
+
   it('locks people search for guests while pages stay reachable', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
     renderSearch({ query: 'claw', type: 'people' })

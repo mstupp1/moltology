@@ -150,6 +150,22 @@ describe('CommandPalette Component', () => {
     expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
   })
 
+  it('surfaces the shared chamber index for oracle, connections, and news', () => {
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+
+    fireEvent.change(input, { target: { value: 'oracle' } })
+    expect(screen.getByText('Consult the Synaptic Oracle')).toBeInTheDocument()
+
+    fireEvent.change(input, { target: { value: 'connections' } })
+    expect(screen.getByText('Open Connections & Fellow Shells')).toBeInTheDocument()
+
+    fireEvent.change(input, { target: { value: 'news' } })
+    expect(screen.getByText('Open MoltNation News')).toBeInTheDocument()
+    expect(screen.getAllByText(/Read Dispatch:/).length).toBeGreaterThan(0)
+  })
+
   it('executes command action and navigates on click', () => {
     render(<ToastProvider><CommandPalette /></ToastProvider>)
 

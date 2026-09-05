@@ -7,6 +7,7 @@ import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { CommandCatalogIcon } from '@/components/hud/CommandCatalogIcon'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import {
+  catalogNavigateArgs,
   filterCommandCatalog,
   searchPageLocation,
   type CommandCatalogItem,
@@ -28,8 +29,9 @@ function runCatalogCommand(
   toast: ReturnType<typeof useToast>['toast'],
   close: () => void,
 ) {
-  if (command.to) {
-    navigate({ to: command.to })
+  const dest = catalogNavigateArgs(command)
+  if (dest) {
+    navigate(dest)
   } else if (command.toast) {
     toast.success(command.toast.message, {
       id: command.toast.id,
