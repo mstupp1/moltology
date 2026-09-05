@@ -7,17 +7,9 @@ import {
   Cpu,
   ChevronLeft,
   ChevronRight,
-  Play,
-  Pause,
   ArrowRight,
-  Radio,
-  ShieldCheck,
-  UserPlus,
 } from 'lucide-react'
 import { getAssetUrl } from '@/lib/assets'
-import { useAuthSession } from '@/hooks/useAuthSession'
-import { AuthModal } from '@/components/AuthModal'
-import { HudButton } from '@/components/ui'
 
 export interface PromoSlide {
   id: string
@@ -112,16 +104,12 @@ export function HudPromoBentoCard({
   className = '',
 }: HudPromoBentoCardProps) {
   const navigate = useNavigate()
-  const session = useAuthSession()
-  const isGuest = session.isGuest
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAutoPlay, setIsAutoPlay] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
   const [progressKey, setProgressKey] = useState(0)
 
   const activeSlide = PROMO_SLIDES[currentIndex] || PROMO_SLIDES[0]
-  const isPlaying = isAutoPlay && !isHovered
+  const isPlaying = !isHovered
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % PROMO_SLIDES.length)
@@ -150,90 +138,21 @@ export function HudPromoBentoCard({
   }, [isPlaying, autoPlayIntervalMs, handleNext, currentIndex])
 
   return (
-    <>
-      <section
+    <section
       aria-label="Promotional announcements and seasonal events"
-      className={`chitin-card chamfer-corner relative overflow-hidden shadow-2xl border border-[#3a4a49] border-l-4 transition-all duration-300 flex flex-col justify-between ${className}`}
-      style={{ borderLeftColor: activeSlide.accentColor }}
+      className={`bg-[#0a1012]/90 chamfer-corner relative overflow-hidden shadow-2xl border border-[#3a4a49] border-l-4 transition-all duration-300 flex flex-col justify-between ${className}`}
+      style={{
+        borderLeftWidth: '4px',
+        borderLeftColor: activeSlide.accentColor,
+        borderLeftStyle: 'solid',
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       data-testid="hud-promo-bento-card"
     >
-      {/* Top Telemetry Header Bar */}
-      <div className="flex flex-wrap items-center justify-between px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-[#3a4a49]/60 bg-gradient-to-r from-[#0b1011]/95 via-[#0f1616]/95 to-[#0b1011]/95 gap-2 shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <Radio className="w-4 h-4 text-[#00ffff] animate-pulse shrink-0" />
-          <h2 className="font-grotesk text-xs sm:text-sm font-bold text-[#dfe3e3] tracking-widest uppercase truncate">
-            BENTHIC TRANSMISSIONS & BULLETINS
-          </h2>
-          <span className="hidden sm:inline-flex text-[10px] font-sans font-semibold text-[#839493] bg-[#030606] px-2 py-0.5 border border-[#3a4a49] chamfer-corner">
-            {PROMO_SLIDES.length} ACTIVE DIRECTIVES
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          {/* Guest Sign Up CTA if in guest mode */}
-          {isGuest && (
-            <div className="flex items-center gap-2 pr-2 border-r border-[#3a4a49]/60">
-              <span className="text-[11px] text-[#839493] font-sans tracking-wider uppercase hidden sm:inline">
-                100% Free
-              </span>
-              <HudButton
-                variant="crimson"
-                size="sm"
-                icon={<UserPlus className="w-3.5 h-3.5" />}
-                onClick={() => setIsAuthModalOpen(true)}
-                className="font-sans text-xs uppercase font-bold tracking-wider whitespace-nowrap shadow-[0_0_15px_rgba(255,69,58,0.35)]"
-              >
-                SIGN UP
-              </HudButton>
-            </div>
-          )}
-
-          <span className="text-[11px] font-sans text-[#839493]">
-            <span style={{ color: activeSlide.accentColor }} className="font-bold">
-              0{currentIndex + 1}
-            </span>{' '}
-            / 0{PROMO_SLIDES.length}
-          </span>
-
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setIsAutoPlay((v) => !v)}
-              className={`p-1 border chamfer-corner transition-colors ${
-                isAutoPlay
-                  ? 'bg-[#00ffff]/10 border-[#00ffff]/50 text-[#00ffff]'
-                  : 'bg-[#070b0b] border-[#3a4a49] text-[#839493]'
-              }`}
-              title={isAutoPlay ? 'Pause Carousel' : 'Play Carousel'}
-              aria-label={isAutoPlay ? 'Pause automatic slide rotation' : 'Play automatic slide rotation'}
-            >
-              {isAutoPlay ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            </button>
-
-            <button
-              onClick={handlePrev}
-              className="p-1 bg-[#070b0b] hover:bg-[#171c1c] text-[#839493] hover:text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/40 chamfer-corner transition-colors"
-              title="Previous Transmission"
-              aria-label="Previous promotional slide"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              onClick={handleNext}
-              className="p-1 bg-[#070b0b] hover:bg-[#171c1c] text-[#839493] hover:text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/40 chamfer-corner transition-colors"
-              title="Next Transmission"
-              aria-label="Next promotional slide"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Main Wide Visual Stage */}
-      <div className="relative group overflow-hidden bg-black min-h-[280px] sm:min-h-[300px] md:min-h-[320px] flex flex-col justify-end">
+      <div className="relative group overflow-hidden bg-black h-[280px] sm:h-[300px] md:h-[320px] flex flex-col justify-end">
         {/* Background Visual Images with Smooth Fade */}
         {PROMO_SLIDES.map((slide, idx) => (
           <div
@@ -276,18 +195,13 @@ export function HudPromoBentoCard({
 
         {/* Foreground Content Panel */}
         <div className="relative z-10 p-4 sm:p-5 md:p-6 space-y-2 sm:space-y-3 max-w-3xl">
-          {/* Eyebrow & Badges */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Eyebrow */}
+          <div>
             <span
-              className={`text-[10px] sm:text-xs font-bold font-grotesk tracking-widest uppercase px-2 py-0.5 chamfer-corner border flex items-center gap-1.5 ${activeSlide.tagClass}`}
+              className={`text-[10px] sm:text-xs font-bold font-grotesk tracking-widest uppercase px-2 py-0.5 chamfer-corner border inline-flex items-center gap-1.5 ${activeSlide.tagClass}`}
             >
               {activeSlide.icon}
               {activeSlide.eyebrow}
-            </span>
-
-            <span className="text-[10px] font-sans font-semibold text-[#839493] bg-[#070b0b]/90 border border-[#3a4a49] px-2 py-0.5 chamfer-corner hidden sm:inline-flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-[#00ffff]" />
-              {activeSlide.badgeText}
             </span>
           </div>
 
@@ -296,8 +210,8 @@ export function HudPromoBentoCard({
             {activeSlide.title}
           </h3>
 
-          {/* Description */}
-          <p className="text-xs sm:text-sm text-[#839493] font-sans leading-relaxed max-w-2xl">
+          {/* Description with locked minimum height */}
+          <p className="text-xs sm:text-sm text-[#839493] font-sans leading-relaxed max-w-2xl min-h-[3.5rem] sm:min-h-[2.75rem] line-clamp-3">
             {activeSlide.description}
           </p>
 
@@ -313,46 +227,42 @@ export function HudPromoBentoCard({
               <span className="tracking-wider">{activeSlide.ctaText}</span>
               <ArrowRight className="w-4 h-4 text-[#00ffff]" />
             </button>
-
-            <span className="text-[10px] sm:text-[11px] text-[#839493] font-sans">
-              Auto-advancing in {Math.round(autoPlayIntervalMs / 1000)}s {!isPlaying && '(paused)'}
-            </span>
           </div>
-        </div>
-
-        {/* Continuous Progress Bar Along Stage Bottom */}
-        <div className="absolute bottom-0 inset-x-0 z-20 h-1 bg-[#030606]/80 overflow-hidden pointer-events-none">
-          <div
-            key={`${progressKey}-${isPlaying}`}
-            className="h-full w-full origin-left transition-all"
-            style={{
-              backgroundColor: activeSlide.accentColor,
-              boxShadow: `0 0 8px ${activeSlide.accentColor}`,
-              animation: isPlaying ? `carouselProgress ${autoPlayIntervalMs}ms linear forwards` : 'none',
-              width: isPlaying ? undefined : '100%',
-              opacity: isPlaying ? 1 : 0.4,
-              willChange: 'transform',
-            }}
-          />
         </div>
       </div>
 
-      {/* Bottom Bento Tab Rail (Pill Navigation) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 sm:p-2.5 bg-gradient-to-r from-[#0b1011] via-[#0f1616] to-[#0b1011] border-t border-[#3a4a49]/60 shrink-0">
+      {/* Bottom Segmented Tab Rail (Single Unified Layer with In-Tab Progress Line) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-[#3a4a49]/60 divide-x divide-[#3a4a49]/40 bg-[#070b0b] shrink-0">
         {PROMO_SLIDES.map((slide, idx) => {
           const isActive = currentIndex === idx
           return (
             <button
               key={slide.id}
               onClick={() => handleSelectSlide(idx)}
-              className={`py-2 px-2.5 rounded-sm transition-all text-left flex items-center justify-between border chamfer-corner ${
+              className={`relative py-2.5 px-3 sm:px-4 transition-all text-left flex items-center justify-between overflow-hidden ${
                 isActive
-                  ? `bg-[#0f1414] text-[#dfe3e3] ${slide.accentBorder} ${slide.accentGlow}`
-                  : 'bg-[#030606]/60 border-[#3a4a49]/40 hover:border-[#00ffff]/40 hover:bg-[#0f1414] text-[#839493] hover:text-[#dfe3e3]'
+                  ? 'bg-[#0f1414] text-[#dfe3e3]'
+                  : 'bg-[#040707]/60 hover:bg-[#0f1414]/60 text-[#839493] hover:text-[#dfe3e3]'
               }`}
               aria-label={`Select bulletin 0${idx + 1}: ${slide.title}`}
               aria-current={isActive ? 'true' : 'false'}
             >
+              {/* In-Tab Hairline Top Progress Line */}
+              <div className="absolute top-0 inset-x-0 h-[2px] bg-transparent pointer-events-none overflow-hidden">
+                {isActive && (
+                  <div
+                    key={`${progressKey}-${isPlaying}`}
+                    className="h-full w-full origin-left"
+                    style={{
+                      backgroundColor: slide.accentColor,
+                      boxShadow: `0 0 6px ${slide.accentColor}`,
+                      animation: isPlaying ? `carouselProgress ${autoPlayIntervalMs}ms linear forwards` : 'none',
+                      width: isPlaying ? undefined : '100%',
+                      willChange: 'transform',
+                    }}
+                  />
+                )}
+              </div>
               <div className="flex items-center gap-1.5 min-w-0">
                 <span
                   style={{ color: isActive ? slide.accentColor : undefined }}
@@ -380,13 +290,5 @@ export function HudPromoBentoCard({
         })}
       </div>
     </section>
-
-    {/* Auth Modal for Guest Registration */}
-    <AuthModal
-      isOpen={isAuthModalOpen}
-      onClose={() => setIsAuthModalOpen(false)}
-      initialMode="signup"
-    />
-    </>
   )
 }

@@ -3,26 +3,16 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { HudPromoBentoCard, PROMO_SLIDES } from './HudPromoBentoCard'
 
-import { authClient } from '@/lib/auth-client'
-
 // Mock TanStack Router
 const mockNavigate = vi.fn()
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
 }))
 
-// Mock authClient for useAuthSession
-vi.mock('@/lib/auth-client', () => ({
-  authClient: {
-    useSession: vi.fn(),
-  },
-}))
-
 describe('HudPromoBentoCard Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.useFakeTimers()
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
   afterEach(() => {
@@ -32,12 +22,9 @@ describe('HudPromoBentoCard Component', () => {
   it('renders the initial Early Access promo slide by default', () => {
     render(<HudPromoBentoCard />)
 
-    expect(screen.getByText('BENTHIC TRANSMISSIONS & BULLETINS')).toBeInTheDocument()
     expect(screen.getByText('WELCOME TO THE BENTHIC GRID')).toBeInTheDocument()
     expect(screen.getByText('BEGIN ONBOARDING')).toBeInTheDocument()
     expect(screen.getAllByText(/EARLY ACCESS/i).length).toBeGreaterThan(0)
-    expect(screen.getByText('01')).toBeInTheDocument()
-    expect(screen.getByText('/ 04')).toBeInTheDocument()
   })
 
   it('cycles forward and backward through all 4 slides using navigation buttons', () => {
@@ -113,22 +100,6 @@ describe('HudPromoBentoCard Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/chassis' })
   })
 
-  it('toggles play/pause auto-advance state on button click', () => {
-    render(<HudPromoBentoCard />)
-
-    const pauseBtn = screen.getByLabelText('Pause automatic slide rotation')
-    expect(pauseBtn).toBeInTheDocument()
-
-    fireEvent.click(pauseBtn)
-
-    const playBtn = screen.getByLabelText('Play automatic slide rotation')
-    expect(playBtn).toBeInTheDocument()
-    expect(screen.getByText(/paused/i)).toBeInTheDocument()
-
-    fireEvent.click(playBtn)
-    expect(screen.getByLabelText('Pause automatic slide rotation')).toBeInTheDocument()
-  })
-
   it('auto-advances slides on timer tick when playing', () => {
     render(<HudPromoBentoCard autoPlayIntervalMs={5000} />)
 
@@ -154,7 +125,6 @@ describe('HudPromoBentoCard Component', () => {
 
     // Hover pauses
     fireEvent.mouseEnter(card)
-    expect(screen.getByText(/paused/i)).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(6000)
@@ -176,6 +146,7 @@ describe('HudPromoBentoCard Component', () => {
 
     const card = screen.getByTestId('hud-promo-bento-card')
     expect(card.className).toContain('border-l-4')
+    expect(card.style.borderLeftWidth).toBe('4px')
     expect(card.style.borderLeftColor).toBe('rgb(0, 255, 255)')
 
     // Switch to Slide 2 (Welcome Bundle: #c084fc -> rgb(192, 132, 252))
@@ -187,32 +158,6 @@ describe('HudPromoBentoCard Component', () => {
     const fallTab = screen.getByLabelText(/Select bulletin 03/i)
     fireEvent.click(fallTab)
     expect(card.style.borderLeftColor).toBe('rgb(251, 146, 60)')
-  })
-
-  it('renders 100% Free badge and SIGN UP button in guest mode, opening AuthModal on click', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
-
-    render(<HudPromoBentoCard />)
-
-    expect(screen.getByText('100% Free')).toBeInTheDocument()
-    const signUpBtn = screen.getByRole('button', { name: /SIGN UP/i })
-    expect(signUpBtn).toBeInTheDocument()
-
-    // Clicking SIGN UP opens modal
-    fireEvent.click(signUpBtn)
-    expect(screen.getByRole('heading', { name: /Create Account/i })).toBeInTheDocument()
-  })
-
-  it('hides guest SIGN UP button when user is authenticated', () => {
-    vi.mocked(authClient.useSession).mockReturnValue({
-      data: { user: { id: 'user-456', name: 'Commander Pinch' } },
-      isPending: false,
-    } as any)
-
-    render(<HudPromoBentoCard />)
-
-    expect(screen.queryByText('100% Free')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /SIGN UP/i })).not.toBeInTheDocument()
   })
 })
 
