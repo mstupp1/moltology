@@ -267,6 +267,92 @@ describe('AIChatPanel Chats List Panel', () => {
     })
   })
 
+  it('switches the visible transcript on the first chat selection without a reselect', async () => {
+    const { getAIThreadsFn, getAIMessagesFn } = await import('@/lib/server/api')
+    ;(getAIThreadsFn as any).mockResolvedValue([
+      { id: 'thread-a', title: 'First molt briefing' },
+      { id: 'thread-b', title: 'Second trench notes' },
+    ])
+
+    const messagesByThread: Record<string, Array<{ id: string; role: string; content: string }>> = {
+      'thread-a': [
+        { id: 'a1', role: 'user', content: 'Alpha user turn' },
+        { id: 'a2', role: 'assistant', content: 'Alpha oracle reply' },
+      ],
+      'thread-b': [
+        { id: 'b1', role: 'user', content: 'Bravo user turn' },
+        { id: 'b2', role: 'assistant', content: 'Bravo oracle reply' },
+      ],
+    }
+
+    ;(getAIMessagesFn as any).mockImplementation(async ({ data }: { data: { threadId: string } }) => {
+      if (data.threadId === 'thread-a') {
+        await new Promise((resolve) => setTimeout(resolve, 40))
+      }
+      return messagesByThread[data.threadId] ?? []
+    })
+
+    render(<AIChatPanel userId="usr_valid_user" isCompact />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    await waitFor(() => {
+      expect(screen.getByText('First molt briefing')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: /First molt briefing/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Alpha user turn')).toBeInTheDocument()
+      expect(screen.getByText('Alpha oracle reply')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    await waitFor(() => {
+      expect(screen.getByText('Second trench notes')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Second trench notes/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Bravo user turn')).toBeInTheDocument()
+      expect(screen.getByText('Bravo oracle reply')).toBeInTheDocument()
+    })
+    expect(screen.queryByText('Alpha user turn')).not.toBeInTheDocument()
+    expect(screen.queryByText('Alpha oracle reply')).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
+
+    await new Promise((resolve) => setTimeout(resolve, 80))
+    expect(screen.getByText('Bravo user turn')).toBeInTheDocument()
+    expect(screen.queryByText('Alpha user turn')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Toggle Chats/i }))
+    fireEvent.click(screen.getByRole('button', { name: /First molt briefing/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Alpha user turn')).toBeInTheDocument()
+      expect(screen.getByText('Alpha oracle reply')).toBeInTheDocument()
+    })
+    expect(screen.queryByText('Bravo user turn')).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
+  })
+
+  it('loads a preselected thread transcript on first mount without requiring a second selection', async () => {
+    const { getAIMessagesFn } = await import('@/lib/server/api')
+    ;(getAIMessagesFn as any).mockResolvedValue([
+      { id: 'm1', role: 'user', content: 'Already selected question' },
+      { id: 'm2', role: 'assistant', content: 'Already selected answer' },
+    ])
+
+    render(<AIChatPanel userId="usr_valid_user" threadId="thread-preselected" />)
+
+    await waitFor(() => {
+      expect(getAIMessagesFn).toHaveBeenCalledWith({
+        data: { threadId: 'thread-preselected', userId: 'usr_valid_user' },
+      })
+      expect(screen.getByText('Already selected question')).toBeInTheDocument()
+      expect(screen.getByText('Already selected answer')).toBeInTheDocument()
+    })
+    expect(screen.getByPlaceholderText(/Ask Synaptic Oracle.../i)).toBeInTheDocument()
+  })
+
   it('returns to the current thread when using back on the list panel', async () => {
     const { getAIThreadsFn, getAIMessagesFn } = await import('@/lib/server/api')
     ;(getAIThreadsFn as any).mockResolvedValue([

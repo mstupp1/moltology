@@ -224,7 +224,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   const selectedModel = getOracleModel(selectedModelId)
 
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const loadedThreadIdRef = useRef<string | null>(activeThreadId)
+  // Tracks the thread whose messages are currently owned by this pane (loaded or
+  // in-flight). Always start null so a mount with an already-selected thread
+  // still fetches instead of rendering a blank pane.
+  const loadedThreadIdRef = useRef<string | null>(null)
+  const loadGenerationRef = useRef(0)
 
   // Check if current conversation has active user messages
   const hasUserMessages = messages.some((m) => m.role === 'user')
@@ -294,7 +298,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Reset to empty messages when activeThreadId is null, or fetch thread messages if set
   useEffect(() => {
     if (!activeThreadId) {
+      loadGenerationRef.current += 1
       loadedThreadIdRef.current = null
+      setMessages((prev) => (prev.length === 0 ? prev : []))
       return
     }
 
@@ -302,12 +308,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       return
     }
 
+    const generation = ++loadGenerationRef.current
     loadedThreadIdRef.current = activeThreadId
+    setMessages([])
 
     if (!userId) return
 
     getAIMessagesFn({ data: { threadId: activeThreadId, userId } })
       .then((records) => {
+        if (generation !== loadGenerationRef.current) return
         if (Array.isArray(records) && records.length > 0) {
           const mapped: ChatMessage[] = records.map((r: any) => ({
             id: r.id,
@@ -327,6 +336,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         }
       })
       .catch((err) => {
+        if (generation !== loadGenerationRef.current) return
         console.warn('Failed to load thread messages:', err)
         setMessages([])
       })
@@ -471,6 +481,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   }
 
   const handleSelectThread = (selectedId: string) => {
+    if (selectedId !== activeThreadId) {
+      loadedThreadIdRef.current = null
+      setMessages([])
+    }
     if (oracle) {
       oracle.setActiveThreadId(selectedId)
     } else {
