@@ -8,7 +8,6 @@ import {
   Scroll,
   FlaskConical,
   ShoppingCart,
-  ShieldAlert,
   Sliders,
   Users,
   Atom,
@@ -46,7 +45,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/isolation', '/subterranean', '/chassis', '/connections', '/member'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/subterranean', '/chassis', '/connections', '/member'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -385,13 +384,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'CHASSIS',
           icon: Sliders,
           path: '/chassis',
-        },
-        {
-          id: 'isolation',
-          label: 'ISOLATION PROTOCOLS',
-          shortLabel: 'ISOLATION',
-          icon: ShieldAlert,
-          path: '/isolation',
         },
         {
           id: 'subterranean',

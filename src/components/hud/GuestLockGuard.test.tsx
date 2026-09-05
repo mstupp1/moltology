@@ -57,8 +57,8 @@ describe('GuestLockGuard Component', () => {
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
 
     render(
-      <GuestLockGuard featureName="Isolation Protocols">
-        <div>Isolation Feeds</div>
+      <GuestLockGuard featureName="Benthic Lectures">
+        <div>Lecture Content</div>
       </GuestLockGuard>
     )
 

@@ -33,8 +33,7 @@ function HudContent() {
   const oracle = useSafeOracle()
   const location = useLocation()
   const isSubterranean = location.pathname.startsWith('/subterranean')
-  const isFullscreenRoute =
-    location.pathname.startsWith('/isolation') || location.pathname.startsWith('/oracle')
+  const isFullscreenRoute = location.pathname.startsWith('/oracle')
   const session = useAuthSession()
   const user = session.user
   const userId = session.userId
