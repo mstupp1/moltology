@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   Users,
@@ -15,7 +15,7 @@ import {
 import { ForumShell } from '@/components/forum/ForumShell'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
-import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
+import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { getCategoryBgImage } from '@/lib/forum-seed-data'
@@ -62,7 +62,7 @@ function ForumIndexPage() {
   const navigate = useNavigate()
   const session = useAuthSession()
   const userId = session.userId
-  const [showNew, setShowNew] = useState(false)
+  const composerRef = useRef<InlineTopicComposerHandle>(null)
   const [showRules, setShowRules] = useState(false)
   const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(topics)
   const [searchQuery, setSearchQuery] = useState('')
@@ -136,7 +136,7 @@ function ForumIndexPage() {
                 <span>Rules</span>
               </button>
               <button
-                onClick={() => setShowNew(true)}
+                onClick={() => composerRef.current?.expandAndFocus()}
                 className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
@@ -213,7 +213,22 @@ function ForumIndexPage() {
         {/* 2-Column Bento Split: Left (Latest Dispatches) + Right (Directives & Community Pulse) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
           {/* Left Column (7 cols): Latest Topics Stream */}
-          <div className="lg:col-span-7 flex flex-col">
+          <div className="lg:col-span-7 flex flex-col space-y-3.5 sm:space-y-4">
+            <InlineTopicComposer
+              ref={composerRef}
+              categories={categories}
+              onCreated={(topic) => {
+                setTopicsState((prev) => [topic, ...prev])
+                navigate({
+                  to: '/forum/$categorySlug/$topicSlug',
+                  params: {
+                    categorySlug: topic.categorySlug || 'general-discussion',
+                    topicSlug: topic.slug,
+                  },
+                })
+              }}
+            />
+
             <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3">
@@ -393,22 +408,6 @@ function ForumIndexPage() {
         </div>
       </div>
 
-      {showNew && (
-        <NewTopicDialog
-          categories={categories}
-          onClose={() => setShowNew(false)}
-          onCreated={(topic) => {
-            setTopicsState((prev) => [topic, ...prev])
-            navigate({
-              to: '/forum/$categorySlug/$topicSlug',
-              params: {
-                categorySlug: topic.categorySlug || 'general-discussion',
-                topicSlug: topic.slug,
-              },
-            })
-          }}
-        />
-      )}
       {showRules && <ForumRulesDialog onClose={() => setShowRules(false)} />}
     </ForumShell>
   )

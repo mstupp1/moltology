@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Plus, Search, MessageSquare, Terminal, ChevronRight, Compass } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
-import { NewTopicDialog } from '@/components/forum/NewTopicDialog'
+import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { INITIAL_FORUM_CATEGORIES, getCategoryBgImage } from '@/lib/forum-seed-data'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -62,7 +62,7 @@ function ForumBoardPage() {
   const [sortBy, setSortBy] = useState<SortKey>('hot')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showNew, setShowNew] = useState(false)
+  const composerRef = useRef<InlineTopicComposerHandle>(null)
 
   useEffect(() => {
     setCategory(loader.category)
@@ -163,7 +163,7 @@ function ForumBoardPage() {
             </div>
 
             <button
-              onClick={() => setShowNew(true)}
+              onClick={() => composerRef.current?.expandAndFocus()}
               className="relative z-10 px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all flex items-center gap-1.5 self-start sm:self-center shrink-0"
             >
               <Plus className="w-4 h-4" />
@@ -183,7 +183,26 @@ function ForumBoardPage() {
         {/* 2-Column Bento Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
           {/* Left Column (8 cols): Sort Tabs, Search, Topics Stream */}
-          <div className="lg:col-span-8 flex flex-col">
+          <div className="lg:col-span-8 flex flex-col space-y-3.5 sm:space-y-4">
+            {category && (
+              <InlineTopicComposer
+                ref={composerRef}
+                categories={[category]}
+                initialCategoryId={category.id}
+                fixedCategory={true}
+                onCreated={(topic) => {
+                  setTopics((prev) => [topic, ...prev])
+                  navigate({
+                    to: '/forum/$categorySlug/$topicSlug',
+                    params: {
+                      categorySlug: topic.categorySlug || category.slug,
+                      topicSlug: topic.slug,
+                    },
+                  })
+                }}
+              />
+            )}
+
             <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 h-full flex flex-col justify-between">
               <div className="space-y-3">
                 {/* Toolbar */}
@@ -230,7 +249,7 @@ function ForumBoardPage() {
                     </p>
                     {!searchQuery && (
                       <button
-                        onClick={() => setShowNew(true)}
+                        onClick={() => composerRef.current?.expandAndFocus()}
                         className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
                       >
                         Start a Discussion
@@ -303,19 +322,6 @@ function ForumBoardPage() {
         </div>
       </div>
 
-      {showNew && category && (
-        <NewTopicDialog
-          categories={[category]}
-          initialCategoryId={category.id}
-          onClose={() => setShowNew(false)}
-          onCreated={(topic) => {
-            navigate({
-              to: '/forum/$categorySlug/$topicSlug',
-              params: { categorySlug, topicSlug: topic.slug },
-            })
-          }}
-        />
-      )}
     </ForumShell>
   )
 }
