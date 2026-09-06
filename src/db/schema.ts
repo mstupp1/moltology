@@ -317,6 +317,8 @@ export const forumTopics = pgTable('forum_topics', {
   lastReplyAt: timestamp('lastReplyAt').defaultNow().notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+  /** Author withdraw — body is sealed, thread and replies stay. */
+  deletedAt: timestamp('deletedAt'),
 }, (table) => [
   pgPolicy('forum_topics_public_read_policy', {
     for: 'select',
@@ -324,6 +326,11 @@ export const forumTopics = pgTable('forum_topics', {
   }),
   pgPolicy('forum_topics_insert_policy', {
     for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+  pgPolicy('forum_topics_owner_update_policy', {
+    for: 'update',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
     withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
 ])
@@ -342,6 +349,8 @@ export const forumPosts = pgTable('forum_posts', {
   upvotes: integer('upvotes').default(0).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+  /** Author withdraw — body is sealed, nested replies stay. */
+  deletedAt: timestamp('deletedAt'),
 }, (table) => [
   // Self-FK: deleting a parent promotes children to roots rather than wiping the subtree.
   foreignKey({
@@ -357,6 +366,11 @@ export const forumPosts = pgTable('forum_posts', {
   }),
   pgPolicy('forum_posts_insert_policy', {
     for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+  pgPolicy('forum_posts_owner_update_policy', {
+    for: 'update',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`,
     withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })
 ])
