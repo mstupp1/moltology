@@ -372,6 +372,92 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
     return createForumPostHandler(args)
   })
 
+export const updateForumTopicFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    topicId: string
+    title: string
+    content: string
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        topicId: z.string().min(1),
+        title: z.string().min(1),
+        content: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { updateForumTopicHandler } = await import('./db-services')
+    return updateForumTopicHandler(args)
+  })
+
+export const updateForumPostFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    postId: string
+    content: string
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        postId: z.string().min(1),
+        content: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { updateForumPostHandler } = await import('./db-services')
+    return updateForumPostHandler(args)
+  })
+
+export const deleteForumTopicFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    topicId: string
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        topicId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { deleteForumTopicHandler } = await import('./db-services')
+    return deleteForumTopicHandler(args)
+  })
+
+export const deleteForumPostFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    postId: string
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        postId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { deleteForumPostHandler } = await import('./db-services')
+    return deleteForumPostHandler(args)
+  })
+
 export const toggleForumTopicVoteFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: {

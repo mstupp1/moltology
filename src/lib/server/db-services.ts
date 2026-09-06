@@ -25,7 +25,13 @@ import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
 import { validateForumContent } from '../community-rules'
-import { slugifyForumTitle, compareHot, FORUM_REPLY_MAX_DEPTH } from '../forum-utils'
+import {
+  slugifyForumTitle,
+  compareHot,
+  FORUM_REPLY_MAX_DEPTH,
+  toForumIso,
+  visibleForumContent,
+} from '../forum-utils'
 import { INITIAL_PODCASTS } from '../podcast-data'
 import { getAssetUrl } from '../assets'
 import type { PodcastEpisode } from '../podcast-data'
@@ -1088,6 +1094,8 @@ export interface ForumTopicEntry {
   upvotes: number
   lastReplyAt: string
   createdAt: string
+  updatedAt?: string
+  deletedAt?: string | null
   voted?: boolean
 }
 
@@ -1104,6 +1112,8 @@ export interface ForumPostEntry {
   content: string
   upvotes: number
   createdAt: string
+  updatedAt?: string
+  deletedAt?: string | null
   voted?: boolean
 }
 
@@ -1113,6 +1123,22 @@ export interface ForumPostEntry {
  */
 function resolveForumUserId(context?: ServerFnContext, _dataUserId?: string): string | null {
   return (context?.user?.sub as string) || (context?.user?.id as string) || null
+}
+
+function forumIsoOrNow(value: string | Date | null | undefined): string {
+  return toForumIso(value) ?? new Date().toISOString()
+}
+
+function assertForumAuthor(
+  rowUserId: string | null | undefined,
+  actorId: string,
+  action: 'edit' | 'delete',
+) {
+  if (!rowUserId || rowUserId !== actorId) {
+    throw new Error(
+      action === 'edit' ? 'You can only edit your own posts.' : 'You can only delete your own posts.',
+    )
+  }
 }
 
 /**
@@ -1289,6 +1315,8 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         upvotes: forumTopics.upvotes,
         lastReplyAt: forumTopics.lastReplyAt,
         createdAt: forumTopics.createdAt,
+        updatedAt: forumTopics.updatedAt,
+        deletedAt: forumTopics.deletedAt,
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
         profileAvatarConfig: profiles.avatarConfig,
@@ -1349,14 +1377,16 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         authorStage: r.authorStage,
         title: r.title,
         slug: r.slug,
-        content: r.content,
+        content: visibleForumContent(r.content, r.deletedAt),
         isPinned: r.isPinned,
         isLocked: r.isLocked,
         views: r.views,
         repliesCount: r.repliesCount,
         upvotes: r.upvotes,
-        lastReplyAt: r.lastReplyAt ? new Date(r.lastReplyAt).toISOString() : new Date().toISOString(),
-        createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
+        lastReplyAt: forumIsoOrNow(r.lastReplyAt),
+        createdAt: forumIsoOrNow(r.createdAt),
+        updatedAt: forumIsoOrNow(r.updatedAt ?? r.createdAt),
+        deletedAt: toForumIso(r.deletedAt),
       }))
 
       if (currentUserId) {
@@ -1437,6 +1467,8 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         upvotes: forumTopics.upvotes,
         lastReplyAt: forumTopics.lastReplyAt,
         createdAt: forumTopics.createdAt,
+        updatedAt: forumTopics.updatedAt,
+        deletedAt: forumTopics.deletedAt,
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
         profileStage: profiles.stage,
@@ -1478,6 +1510,8 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           content: forumPosts.content,
           upvotes: forumPosts.upvotes,
           createdAt: forumPosts.createdAt,
+          updatedAt: forumPosts.updatedAt,
+          deletedAt: forumPosts.deletedAt,
           profileHandle: profiles.handle,
           profileLarvaId: profiles.larvaId,
           profileStage: profiles.stage,
@@ -1506,9 +1540,11 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         authorAvatar: p.authorAvatar,
         authorAvatarConfig: p.profileAvatarConfig ?? null,
         authorStage: p.profileStage ?? p.authorStage,
-        content: p.content,
+        content: visibleForumContent(p.content, p.deletedAt),
         upvotes: p.upvotes,
-        createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : new Date().toISOString(),
+        createdAt: forumIsoOrNow(p.createdAt),
+        updatedAt: forumIsoOrNow(p.updatedAt ?? p.createdAt),
+        deletedAt: toForumIso(p.deletedAt),
       }))
 
       let postVotedIds = new Set<string>()
@@ -1535,15 +1571,17 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           authorStage: t.profileStage ?? t.authorStage,
           title: t.title,
           slug: t.slug,
-          content: t.content,
+          content: visibleForumContent(t.content, t.deletedAt),
           isPinned: t.isPinned,
           isLocked: t.isLocked,
           views: trackView ? t.views + 1 : t.views,
           repliesCount: t.repliesCount,
           upvotes: t.upvotes,
           ...(currentUserId ? { voted: topicVoted } : {}),
-          lastReplyAt: t.lastReplyAt ? new Date(t.lastReplyAt).toISOString() : new Date().toISOString(),
-          createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
+          lastReplyAt: forumIsoOrNow(t.lastReplyAt),
+          createdAt: forumIsoOrNow(t.createdAt),
+          updatedAt: forumIsoOrNow(t.updatedAt ?? t.createdAt),
+          deletedAt: toForumIso(t.deletedAt),
         },
         posts: posts.map((p) => ({
           ...p,
@@ -1677,8 +1715,10 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     views: inserted.views,
     repliesCount: inserted.repliesCount,
     upvotes: inserted.upvotes,
-    lastReplyAt: inserted.lastReplyAt ? new Date(inserted.lastReplyAt).toISOString() : new Date().toISOString(),
-    createdAt: inserted.createdAt ? new Date(inserted.createdAt).toISOString() : new Date().toISOString(),
+    lastReplyAt: forumIsoOrNow(inserted.lastReplyAt),
+    createdAt: forumIsoOrNow(inserted.createdAt),
+    updatedAt: forumIsoOrNow(inserted.updatedAt ?? inserted.createdAt),
+    deletedAt: toForumIso(inserted.deletedAt),
   }
 }
 
@@ -1890,7 +1930,9 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     authorStage: inserted.authorStage,
     content: inserted.content,
     upvotes: inserted.upvotes,
-    createdAt: inserted.createdAt ? new Date(inserted.createdAt).toISOString() : new Date().toISOString(),
+    createdAt: forumIsoOrNow(inserted.createdAt),
+    updatedAt: forumIsoOrNow(inserted.updatedAt ?? inserted.createdAt),
+    deletedAt: toForumIso(inserted.deletedAt),
   }
 }
 
@@ -1908,6 +1950,425 @@ export const createForumPostFn = createServerFn({ method: 'POST' })
       .parse(data)
   })
   .handler(createForumPostHandler)
+
+export interface UpdateForumTopicInput {
+  topicId: string
+  title: string
+  content: string
+  userId?: string
+  token?: string
+}
+
+export interface UpdateForumPostInput {
+  postId: string
+  content: string
+  userId?: string
+  token?: string
+}
+
+export interface DeleteForumTopicInput {
+  topicId: string
+  userId?: string
+  token?: string
+}
+
+export interface DeleteForumPostInput {
+  postId: string
+  userId?: string
+  token?: string
+}
+
+async function loadTopicCategory(
+  dbClient: Db,
+  categoryId: string,
+): Promise<{ slug: string; name: string; color: string } | null> {
+  const [cat] = await dbClient
+    .select({
+      slug: forumCategories.slug,
+      name: forumCategories.name,
+      color: forumCategories.color,
+    })
+    .from(forumCategories)
+    .where(eq(forumCategories.id, categoryId))
+    .limit(1)
+  return cat ?? null
+}
+
+/**
+ * Server Function: Author revises their own topic (title + body). Slug stays put.
+ */
+export const updateForumTopicHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<UpdateForumTopicInput>): Promise<ForumTopicEntry> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: You must be signed in to edit a topic.')
+  }
+  if (!data?.topicId || !data?.title || !data?.content) {
+    throw new Error('Invalid input: Topic, title, and content are required.')
+  }
+
+  const validation = validateForumContent(data.title, data.content)
+  if (!validation.valid) {
+    throw new Error(validation.error || 'Invalid content.')
+  }
+
+  const { userId, dbClient } = auth
+  const [existing] = await dbClient
+    .select()
+    .from(forumTopics)
+    .where(eq(forumTopics.id, data.topicId))
+    .limit(1)
+
+  if (!existing) {
+    throw new Error('This thread is no longer available. Refresh the forums and try again.')
+  }
+  if (existing.deletedAt) {
+    throw new Error('This topic was already withdrawn.')
+  }
+  assertForumAuthor(existing.userId, userId, 'edit')
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumTopics)
+    .set({
+      title: data.title.trim(),
+      content: data.content.trim(),
+      updatedAt: now,
+    })
+    .where(eq(forumTopics.id, existing.id))
+    .returning()
+
+  const cat = await loadTopicCategory(dbClient, updated.categoryId)
+
+  try {
+    await recordForumMentions(dbClient, {
+      actorUserId: userId,
+      actorPublicName: updated.authorName,
+      content: updated.content,
+      sourceType: 'topic',
+      sourceId: updated.id,
+      topicId: updated.id,
+      topicSlug: updated.slug,
+      categorySlug: cat?.slug,
+    })
+  } catch (err) {
+    console.warn('[updateForumTopicFn] Mention persist error:', err)
+  }
+
+  const [userProfile] = await dbClient
+    .select({ handle: profiles.handle })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  return {
+    id: updated.id,
+    categoryId: updated.categoryId,
+    categorySlug: cat?.slug || 'general-discussion',
+    categoryName: cat?.name || 'General Discussion',
+    categoryColor: cat?.color || '#00ffff',
+    userId: updated.userId,
+    authorName: updated.authorName,
+    authorHandle: userProfile?.handle?.trim() || null,
+    authorAvatar: updated.authorAvatar,
+    authorStage: updated.authorStage,
+    title: updated.title,
+    slug: updated.slug,
+    content: updated.content,
+    isPinned: updated.isPinned,
+    isLocked: updated.isLocked,
+    views: updated.views,
+    repliesCount: updated.repliesCount,
+    upvotes: updated.upvotes,
+    lastReplyAt: forumIsoOrNow(updated.lastReplyAt),
+    createdAt: forumIsoOrNow(updated.createdAt),
+    updatedAt: forumIsoOrNow(updated.updatedAt),
+    deletedAt: toForumIso(updated.deletedAt),
+  }
+}
+
+export const updateForumTopicFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: UpdateForumTopicInput) => {
+    return z
+      .object({
+        topicId: z.string().min(1),
+        title: z.string().min(5).max(150),
+        content: z.string().min(10).max(10000),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(updateForumTopicHandler)
+
+/**
+ * Server Function: Author revises their own reply. Mentions re-render from the new body.
+ */
+export const updateForumPostHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<UpdateForumPostInput>): Promise<ForumPostEntry> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: You must be signed in to edit a reply.')
+  }
+  if (!data?.postId || !data?.content) {
+    throw new Error('Invalid input: Reply and content are required.')
+  }
+
+  const validation = validateForumContent(undefined, data.content)
+  if (!validation.valid) {
+    throw new Error(validation.error || 'Invalid content.')
+  }
+
+  const { userId, dbClient } = auth
+  const [existing] = await dbClient
+    .select()
+    .from(forumPosts)
+    .where(eq(forumPosts.id, data.postId))
+    .limit(1)
+
+  if (!existing) {
+    throw new Error('That comment is no longer available. Refresh and try again.')
+  }
+  if (existing.deletedAt) {
+    throw new Error('This reply was already withdrawn.')
+  }
+  assertForumAuthor(existing.userId, userId, 'edit')
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumPosts)
+    .set({
+      content: data.content.trim(),
+      updatedAt: now,
+    })
+    .where(eq(forumPosts.id, existing.id))
+    .returning()
+
+  try {
+    const [topic] = await dbClient
+      .select({
+        slug: forumTopics.slug,
+        categoryId: forumTopics.categoryId,
+      })
+      .from(forumTopics)
+      .where(eq(forumTopics.id, updated.topicId))
+      .limit(1)
+    let categorySlug: string | undefined
+    if (topic?.categoryId && extractMentionHandles(updated.content).length > 0) {
+      const cat = await loadTopicCategory(dbClient, topic.categoryId)
+      categorySlug = cat?.slug
+    }
+    await recordForumMentions(dbClient, {
+      actorUserId: userId,
+      actorPublicName: updated.authorName,
+      content: updated.content,
+      sourceType: 'post',
+      sourceId: updated.id,
+      topicId: updated.topicId,
+      topicSlug: topic?.slug,
+      categorySlug,
+    })
+  } catch (err) {
+    console.warn('[updateForumPostFn] Mention persist error:', err)
+  }
+
+  const [userProfile] = await dbClient
+    .select({ handle: profiles.handle })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  return {
+    id: updated.id,
+    topicId: updated.topicId,
+    parentId: updated.parentId ?? null,
+    userId: updated.userId,
+    authorName: updated.authorName,
+    authorHandle: userProfile?.handle?.trim() || null,
+    authorAvatar: updated.authorAvatar,
+    authorStage: updated.authorStage,
+    content: updated.content,
+    upvotes: updated.upvotes,
+    createdAt: forumIsoOrNow(updated.createdAt),
+    updatedAt: forumIsoOrNow(updated.updatedAt),
+    deletedAt: toForumIso(updated.deletedAt),
+  }
+}
+
+export const updateForumPostFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: UpdateForumPostInput) => {
+    return z
+      .object({
+        postId: z.string().min(1),
+        content: z.string().min(10).max(10000),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(updateForumPostHandler)
+
+/**
+ * Server Function: Author soft-deletes their own topic (tombstone; replies stay).
+ */
+export const deleteForumTopicHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<DeleteForumTopicInput>): Promise<ForumTopicEntry> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: You must be signed in to delete a topic.')
+  }
+  if (!data?.topicId) {
+    throw new Error('Topic ID required.')
+  }
+
+  const { userId, dbClient } = auth
+  const [existing] = await dbClient
+    .select()
+    .from(forumTopics)
+    .where(eq(forumTopics.id, data.topicId))
+    .limit(1)
+
+  if (!existing) {
+    throw new Error('This thread is no longer available. Refresh the forums and try again.')
+  }
+  if (existing.deletedAt) {
+    throw new Error('This topic was already withdrawn.')
+  }
+  assertForumAuthor(existing.userId, userId, 'delete')
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumTopics)
+    .set({ deletedAt: now, updatedAt: now })
+    .where(eq(forumTopics.id, existing.id))
+    .returning()
+
+  const cat = await loadTopicCategory(dbClient, updated.categoryId)
+  const [userProfile] = await dbClient
+    .select({ handle: profiles.handle })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  return {
+    id: updated.id,
+    categoryId: updated.categoryId,
+    categorySlug: cat?.slug || 'general-discussion',
+    categoryName: cat?.name || 'General Discussion',
+    categoryColor: cat?.color || '#00ffff',
+    userId: updated.userId,
+    authorName: updated.authorName,
+    authorHandle: userProfile?.handle?.trim() || null,
+    authorAvatar: updated.authorAvatar,
+    authorStage: updated.authorStage,
+    title: updated.title,
+    slug: updated.slug,
+    content: visibleForumContent(updated.content, updated.deletedAt),
+    isPinned: updated.isPinned,
+    isLocked: updated.isLocked,
+    views: updated.views,
+    repliesCount: updated.repliesCount,
+    upvotes: updated.upvotes,
+    lastReplyAt: forumIsoOrNow(updated.lastReplyAt),
+    createdAt: forumIsoOrNow(updated.createdAt),
+    updatedAt: forumIsoOrNow(updated.updatedAt),
+    deletedAt: toForumIso(updated.deletedAt),
+  }
+}
+
+export const deleteForumTopicFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: DeleteForumTopicInput) => {
+    return z
+      .object({
+        topicId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(deleteForumTopicHandler)
+
+/**
+ * Server Function: Author soft-deletes their own reply (tombstone; children stay).
+ */
+export const deleteForumPostHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<DeleteForumPostInput>): Promise<ForumPostEntry> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: You must be signed in to delete a reply.')
+  }
+  if (!data?.postId) {
+    throw new Error('Reply ID required.')
+  }
+
+  const { userId, dbClient } = auth
+  const [existing] = await dbClient
+    .select()
+    .from(forumPosts)
+    .where(eq(forumPosts.id, data.postId))
+    .limit(1)
+
+  if (!existing) {
+    throw new Error('That comment is no longer available. Refresh and try again.')
+  }
+  if (existing.deletedAt) {
+    throw new Error('This reply was already withdrawn.')
+  }
+  assertForumAuthor(existing.userId, userId, 'delete')
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumPosts)
+    .set({ deletedAt: now, updatedAt: now })
+    .where(eq(forumPosts.id, existing.id))
+    .returning()
+
+  const [userProfile] = await dbClient
+    .select({ handle: profiles.handle })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  return {
+    id: updated.id,
+    topicId: updated.topicId,
+    parentId: updated.parentId ?? null,
+    userId: updated.userId,
+    authorName: updated.authorName,
+    authorHandle: userProfile?.handle?.trim() || null,
+    authorAvatar: updated.authorAvatar,
+    authorStage: updated.authorStage,
+    content: visibleForumContent(updated.content, updated.deletedAt),
+    upvotes: updated.upvotes,
+    createdAt: forumIsoOrNow(updated.createdAt),
+    updatedAt: forumIsoOrNow(updated.updatedAt),
+    deletedAt: toForumIso(updated.deletedAt),
+  }
+}
+
+export const deleteForumPostFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: DeleteForumPostInput) => {
+    return z
+      .object({
+        postId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  })
+  .handler(deleteForumPostHandler)
 
 export interface ToggleForumVoteInput {
   topicId?: string
