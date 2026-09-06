@@ -332,4 +332,134 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByTestId('forum-inline-reply-composer')).toBeInTheDocument()
     expect(screen.getByText('Reply to comment')).toBeInTheDocument()
   })
+
+  it('quotes the topic into the top reply composer', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'authed-user', name: 'Initiate' } },
+    } as any)
+
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: 'member-a',
+        authorName: 'claw_lord',
+        authorHandle: 'claw_lord',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 3,
+        title: 'Quote the original transmission',
+        slug: 'quote-the-original',
+        content: 'Original post body long enough.',
+        isPinned: false,
+        isLocked: false,
+        views: 10,
+        repliesCount: 0,
+        upvotes: 1,
+        lastReplyAt: '2026-08-01T12:00:00.000Z',
+        createdAt: '2026-08-01T12:00:00.000Z',
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+
+    fireEvent.click(screen.getByTestId('forum-quote-topic'))
+    const composer = screen.getByTestId('forum-top-reply-composer')
+    expect(composer.querySelector('textarea')).toHaveValue(
+      '> @claw_lord held:\n> Original post body long enough.\n\n',
+    )
+  })
+
+  it('quotes a reply into the inline composer with handle attribution', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'authed-user', name: 'Initiate' } },
+    } as any)
+
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: null,
+        authorName: 'High Ascendant',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 4,
+        title: 'Threaded discussion',
+        slug: 'threaded-discussion',
+        content: 'Original post body long enough.',
+        isPinned: false,
+        isLocked: false,
+        views: 10,
+        repliesCount: 1,
+        upvotes: 1,
+        lastReplyAt: '2026-08-01T14:00:00.000Z',
+        createdAt: '2026-08-01T12:00:00.000Z',
+      },
+      posts: [
+        {
+          id: 'post-root',
+          topicId: 'topic-a',
+          parentId: null,
+          userId: 'member-a',
+          authorName: 'pincer_prime',
+          authorHandle: 'pincer_prime',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 3,
+          content: 'Root reply body long enough to count.',
+          upvotes: 3,
+          createdAt: '2026-08-01T14:00:00.000Z',
+        },
+      ],
+    })
+
+    render(<ForumThreadPage />)
+
+    fireEvent.click(screen.getByTestId('forum-quote-post'))
+    const composer = screen.getByTestId('forum-inline-reply-composer')
+    expect(composer.querySelector('textarea')).toHaveValue(
+      '> @pincer_prime held:\n> Root reply body long enough to count.\n\n',
+    )
+  })
+
+  it('does not offer Quote on a withdrawn topic', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'authed-user', name: 'Initiate' } },
+    } as any)
+
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: 'member-a',
+        authorName: 'claw_lord',
+        authorHandle: 'claw_lord',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 3,
+        title: 'Sealed transmission',
+        slug: 'sealed-transmission',
+        content: 'This body should stay sealed.',
+        isPinned: false,
+        isLocked: false,
+        views: 10,
+        repliesCount: 0,
+        upvotes: 1,
+        lastReplyAt: '2026-08-01T12:00:00.000Z',
+        createdAt: '2026-08-01T12:00:00.000Z',
+        deletedAt: '2026-09-06T02:00:00.000Z',
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.queryByTestId('forum-quote-topic')).not.toBeInTheDocument()
+  })
 })

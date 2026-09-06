@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { AlertTriangle, Send } from 'lucide-react'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -9,28 +9,51 @@ import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
+import { prependForumQuote } from '@/lib/forum-quotes'
 
-export function ReplyComposer({
-  topicId,
-  parentId,
-  onPosted,
-  onCancel,
-  compact = false,
-  autoFocus = false,
-}: {
-  topicId: string
-  parentId?: string | null
-  onPosted: (post: ForumPostEntry) => void
-  onCancel?: () => void
-  compact?: boolean
-  autoFocus?: boolean
-}) {
+export type ReplyComposerHandle = {
+  insertQuote: (markup: string) => void
+}
+
+export const ReplyComposer = forwardRef<
+  ReplyComposerHandle,
+  {
+    topicId: string
+    parentId?: string | null
+    initialContent?: string
+    onPosted: (post: ForumPostEntry) => void
+    onCancel?: () => void
+    compact?: boolean
+    autoFocus?: boolean
+  }
+>(function ReplyComposer(
+  {
+    topicId,
+    parentId,
+    initialContent = '',
+    onPosted,
+    onCancel,
+    compact = false,
+    autoFocus = false,
+  },
+  ref,
+) {
   const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
   const { user } = useAuthSession()
   const persist = useHudPersist()
-  const [content, setContent] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+  const [content, setContent] = useState(initialContent)
   const [posting, setPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useImperativeHandle(ref, () => ({
+    insertQuote: (markup: string) => {
+      setContent((prev) => prependForumQuote(prev, markup))
+      requestAnimationFrame(() => {
+        formRef.current?.querySelector('textarea')?.focus()
+      })
+    },
+  }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,6 +131,7 @@ export function ReplyComposer({
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className={
         compact
@@ -182,4 +206,6 @@ export function ReplyComposer({
       </div>
     </form>
   )
-}
+})
+
+ReplyComposer.displayName = 'ReplyComposer'
