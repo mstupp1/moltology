@@ -23,6 +23,7 @@ export async function backfillSimulatedUsers() {
           isSimulated: true,
           simulatedPersona: mockUser.simulatedPersona,
           handle: row.handle || mockUser.handle,
+          joinSource: mockUser.joinSource ?? 'organic',
         })
         .where(eq(profiles.id, row.id))
 

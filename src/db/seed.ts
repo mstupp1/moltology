@@ -26,11 +26,20 @@ export const MOCK_SEED_USERS = [
     synapseShards: 45,
     depthPressureCoins: 12,
     isSimulated: true,
+    joinSource: 'word_of_mouth' as const,
     simulatedPersona: {
       archetype: 'Eager Larva Novice',
       tone: 'Curious, earnest, dedicated to mastering daily alignment and asking advice about early stage shedding.',
       bio: 'Initiate working through first ecdysis. Master of daily prompt construction and discipline.',
       activityCadence: 'high' as const,
+      traits: [
+        {
+          id: 'early_questioner',
+          label: 'Early questioner',
+          description: 'Asks the obvious thing everyone else was circling.',
+        },
+      ],
+      referredByHandle: 'Architect Vaelen',
     },
   },
   {
@@ -43,11 +52,20 @@ export const MOCK_SEED_USERS = [
     synapseShards: 890,
     depthPressureCoins: 310,
     isSimulated: true,
+    joinSource: 'brought_in' as const,
     simulatedPersona: {
       archetype: 'Deep-Benthic Systems Architect',
       tone: 'Analytical, architectural, sharp, obsessed with carcinization, system resilience, and pincer torque gains.',
       bio: 'Hardware & synaptic specialist. Optimizing benthic telemetry and low-latency agent loops.',
       activityCadence: 'normal' as const,
+      traits: [
+        {
+          id: 'metric_scribe',
+          label: 'Metric scribe',
+          description: 'Keeps a private ledger of shell hardness and pincer torque.',
+        },
+      ],
+      referredByHandle: 'High Ascendant Kaelith',
     },
   },
   {
@@ -60,11 +78,19 @@ export const MOCK_SEED_USERS = [
     synapseShards: 12500,
     depthPressureCoins: 4800,
     isSimulated: true,
+    joinSource: 'organic' as const,
     simulatedPersona: {
       archetype: 'High Ascendant Elder',
       tone: 'Liturgical, commanding, philosophical, benevolent guardian of the Five Core Directives.',
       bio: 'Senior steward of the Benthic Community Core. Guiding initiates through deep-trench transformation.',
       activityCadence: 'low' as const,
+      traits: [
+        {
+          id: 'pressure_calm',
+          label: 'Pressure-calm',
+          description: 'Stays even when the surface is noisy.',
+        },
+      ],
     },
   },
 ]
@@ -259,9 +285,45 @@ export async function seedDatabase(databaseUrl?: string) {
           set: {
             isSimulated: p.isSimulated,
             simulatedPersona: p.simulatedPersona,
+            joinSource: p.joinSource,
           },
         })
     }
+    const seedReferrals: Array<{ id: string; referredByUserId: string }> = [
+      { id: '00000000-0000-0000-0000-000000000002', referredByUserId: '00000000-0000-0000-0000-000000000003' },
+      { id: '00000000-0000-0000-0000-000000000001', referredByUserId: '00000000-0000-0000-0000-000000000002' },
+    ]
+    for (const row of seedReferrals) {
+      await db
+        .update(schema.profiles)
+        .set({ referredByUserId: row.referredByUserId })
+        .where(eq(schema.profiles.id, row.id))
+    }
+
+    const [vaelenKaelithA, vaelenKaelithB] =
+      '00000000-0000-0000-0000-000000000002' < '00000000-0000-0000-0000-000000000003'
+        ? ['00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000003']
+        : ['00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000002']
+    await db
+      .insert(schema.friendships)
+      .values({ userAId: vaelenKaelithA, userBId: vaelenKaelithB })
+      .onConflictDoNothing()
+    await db
+      .insert(schema.memberBonds)
+      .values({
+        fromUserId: '00000000-0000-0000-0000-000000000003',
+        toUserId: '00000000-0000-0000-0000-000000000002',
+        kind: 'brought_in',
+      })
+      .onConflictDoNothing()
+    await db
+      .insert(schema.memberBonds)
+      .values({
+        fromUserId: '00000000-0000-0000-0000-000000000003',
+        toUserId: '00000000-0000-0000-0000-000000000002',
+        kind: 'mentor',
+      })
+      .onConflictDoNothing()
     console.log(`✓ Seeded ${MOCK_SEED_PROFILES.length} mock profiles`)
 
     // 2. Seed User Stats

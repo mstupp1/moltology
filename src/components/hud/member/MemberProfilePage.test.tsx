@@ -44,6 +44,11 @@ describe('MemberProfilePage', () => {
     moltmax: null,
     relationship: 'none',
     pendingRequestId: null,
+    bio: null,
+    traits: [],
+    joinStory: null,
+    referredBy: null,
+    bonds: [],
   }
 
   beforeEach(() => {
@@ -102,5 +107,37 @@ describe('MemberProfilePage', () => {
       expect(screen.getByRole('heading', { name: 'claw_lord' })).toBeInTheDocument()
     })
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('renders join story, traits, and bonds when the dossier has them', async () => {
+    mockGetPublicProfile.mockResolvedValue({
+      ...claimedProfile,
+      bio: 'Initiate working through first ecdysis.',
+      joinStory: 'Heard about the Order from Architect Vaelen',
+      referredBy: {
+        id: '00000000-0000-0000-0000-000000000002',
+        displayName: 'Architect Vaelen',
+        handle: 'Architect Vaelen',
+      },
+      traits: [{ id: 'early_questioner', label: 'Early questioner' }],
+      bonds: [
+        {
+          kind: 'mentor',
+          label: 'Learning from Architect Vaelen',
+          memberId: '00000000-0000-0000-0000-000000000002',
+          memberName: 'Architect Vaelen',
+          memberHandle: 'Architect Vaelen',
+        },
+      ],
+    })
+
+    render(<MemberProfilePage profileId="member-a" />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Initiate working through first ecdysis.')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Heard about the Order from Architect Vaelen')).toBeInTheDocument()
+    expect(screen.getByText('Early questioner')).toBeInTheDocument()
+    expect(screen.getByText('Learning from Architect Vaelen')).toBeInTheDocument()
   })
 })

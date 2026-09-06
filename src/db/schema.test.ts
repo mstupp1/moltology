@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, notifications } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, memberBonds, notifications } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -18,6 +18,7 @@ describe('Database Schema & RLS Policies', () => {
     expect(leads).toBeDefined()
     expect(friendRequests).toBeDefined()
     expect(friendships).toBeDefined()
+    expect(memberBonds).toBeDefined()
     expect(notifications).toBeDefined()
   })
 
@@ -27,6 +28,9 @@ describe('Database Schema & RLS Policies', () => {
     expect(friendRequests.status).toBeDefined()
     expect(friendships.userAId).toBeDefined()
     expect(friendships.userBId).toBeDefined()
+    expect(memberBonds.fromUserId).toBeDefined()
+    expect(memberBonds.toUserId).toBeDefined()
+    expect(memberBonds.kind).toBeDefined()
     expect(notifications.userId).toBeDefined()
     expect(notifications.kind).toBeDefined()
     expect(notifications.sourceKey).toBeDefined()
@@ -55,6 +59,8 @@ describe('Database Schema & RLS Policies', () => {
     expect(profiles.emailOptInSource).toBeDefined()
     expect(profiles.isSimulated).toBeDefined()
     expect(profiles.simulatedPersona).toBeDefined()
+    expect(profiles.joinSource).toBeDefined()
+    expect(profiles.referredByUserId).toBeDefined()
   })
 
   it('defines required fields on the userStats table', () => {

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -84,8 +84,13 @@ import {
   type ConnectionsListView,
   type MemberSearchResult,
   type PublicProfileView,
+  type PublicProfileBond,
   type RelationshipState,
 } from '../connections'
+import {
+  presentBondLabel,
+  presentJoinStory,
+} from '../simulation-social'
 import {
   countUnreadNotifications,
   friendAcceptedSourceKey,
@@ -2932,6 +2937,9 @@ async function findMemberProfileByRouteKey(dbClient: Db, routeKey: string) {
       stage: profiles.stage,
       avatarConfig: profiles.avatarConfig,
       createdAt: profiles.createdAt,
+      joinSource: profiles.joinSource,
+      referredByUserId: profiles.referredByUserId,
+      simulatedPersona: profiles.simulatedPersona,
     })
     .from(profiles)
     .where(
@@ -2968,15 +2976,94 @@ export const getPublicProfileHandler = async ({
     profile.id
   )
 
+  const displayName = resolveMemberPublicName({
+    userId: profile.id,
+    handle: profile.handle,
+    larvaId: profile.larvaId,
+  })
+
+  let referredBy: PublicProfileView['referredBy'] = null
+  if (profile.referredByUserId) {
+    const [sponsor] = await auth.dbClient
+      .select({
+        id: profiles.id,
+        handle: profiles.handle,
+        larvaId: profiles.larvaId,
+      })
+      .from(profiles)
+      .where(eq(profiles.id, profile.referredByUserId))
+      .limit(1)
+    if (sponsor) {
+      referredBy = {
+        id: sponsor.id,
+        handle: sponsor.handle?.trim() || null,
+        displayName: resolveMemberPublicName({
+          userId: sponsor.id,
+          handle: sponsor.handle,
+          larvaId: sponsor.larvaId,
+        }),
+      }
+    }
+  }
+
+  const joinStory = presentJoinStory(
+    profile.joinSource,
+    referredBy?.displayName || profile.simulatedPersona?.referredByHandle
+  )
+
+  const bondRows = await auth.dbClient
+    .select({
+      fromUserId: memberBonds.fromUserId,
+      toUserId: memberBonds.toUserId,
+      kind: memberBonds.kind,
+    })
+    .from(memberBonds)
+    .where(or(eq(memberBonds.fromUserId, profile.id), eq(memberBonds.toUserId, profile.id)))
+    .limit(12)
+
+  const counterpartIds = [...new Set(
+    bondRows.map((row) => (row.fromUserId === profile.id ? row.toUserId : row.fromUserId))
+  )]
+  const counterpartRows =
+    counterpartIds.length > 0
+      ? await auth.dbClient
+          .select({
+            id: profiles.id,
+            handle: profiles.handle,
+            larvaId: profiles.larvaId,
+          })
+          .from(profiles)
+          .where(inArray(profiles.id, counterpartIds))
+          .limit(12)
+      : []
+  const counterpartById = new Map(counterpartRows.map((row) => [row.id, row]))
+
+  const bonds: PublicProfileBond[] = []
+  for (const row of bondRows) {
+    const viewerIsFrom = row.fromUserId === profile.id
+    const otherId = viewerIsFrom ? row.toUserId : row.fromUserId
+    const other = counterpartById.get(otherId)
+    if (!other) continue
+    const otherName = resolveMemberPublicName({
+      userId: other.id,
+      handle: other.handle,
+      larvaId: other.larvaId,
+    })
+    if (row.kind === 'brought_in' && joinStory) continue
+    bonds.push({
+      kind: row.kind,
+      label: presentBondLabel(row.kind, otherName, viewerIsFrom),
+      memberId: other.id,
+      memberName: otherName,
+      memberHandle: other.handle?.trim() || null,
+    })
+  }
+
   return {
     id: profile.id,
     larvaId: profile.larvaId,
     handle: profile.handle?.trim() || null,
-    displayName: resolveMemberPublicName({
-      userId: profile.id,
-      handle: profile.handle,
-      larvaId: profile.larvaId,
-    }),
+    displayName,
     stage: profile.stage,
     stageLabel: getStageLabel(profile.stage),
     avatarConfig: (profile.avatarConfig as PublicProfileView['avatarConfig']) ?? null,
@@ -3001,6 +3088,14 @@ export const getPublicProfileHandler = async ({
       : null,
     relationship,
     pendingRequestId,
+    bio: profile.simulatedPersona?.bio?.trim() || null,
+    traits: (profile.simulatedPersona?.traits || []).map((trait) => ({
+      id: trait.id,
+      label: trait.label,
+    })),
+    joinStory,
+    referredBy,
+    bonds,
   }
 }
 

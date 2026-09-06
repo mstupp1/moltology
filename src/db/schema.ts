@@ -1,4 +1,4 @@
-import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey } from 'drizzle-orm/pg-core'
+import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 // Neon Managed Auth Schema Reference
@@ -11,12 +11,25 @@ export const neonAuthUser = neonAuthSchema.table('user', {
   emailVerified: boolean('emailVerified'),
 })
 
+export type MemberJoinSource = 'organic' | 'word_of_mouth' | 'brought_in'
+
+export type MemberBondKind = 'nest_mate' | 'mentor' | 'brought_in'
+
+export interface SimulatedTrait {
+  id: string
+  label: string
+  description: string
+  acquiredAt?: string
+}
+
 export interface SimulatedPersonaConfig {
   archetype: string
   tone: string
   bio?: string
   activityCadence?: 'high' | 'normal' | 'low'
   lastSimulatedAt?: string
+  traits?: SimulatedTrait[]
+  referredByHandle?: string | null
 }
 
 // Moltology Cult User Profiles Table (Extends neon_auth.user with domain stats)
@@ -42,10 +55,14 @@ export const profiles = pgTable('profiles', {
   emailOptInSource: text('emailOptInSource'),
   isSimulated: boolean('isSimulated').default(false).notNull(),
   simulatedPersona: jsonb('simulatedPersona').$type<SimulatedPersonaConfig>(),
+  /** How the member found the Order: organic, word of mouth, or brought in. */
+  joinSource: text('joinSource').$type<MemberJoinSource>(),
+  referredByUserId: text('referredByUserId').references((): AnyPgColumn => profiles.id, { onDelete: 'set null' }),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
   uniqueIndex('profiles_handle_lower_uidx').on(sql`lower(${table.handle})`),
+  index('profiles_referred_by_idx').on(table.referredByUserId),
   pgPolicy('profiles_isolation_policy', {
     for: 'all',
     using: sql`id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
@@ -568,6 +585,39 @@ export const friendships = pgTable('friendships', {
     for: 'delete',
     using: sql`"userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
       OR "userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/**
+ * Typed bonds beyond platform friendships: nest-mates, mentors, and brought-in sponsors.
+ * `fromUserId` is the sponsor/mentor for directed kinds; nest-mates store lex-ordered ids.
+ */
+export const memberBonds = pgTable('member_bonds', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  fromUserId: text('fromUserId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  toUserId: text('toUserId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  kind: text('kind').$type<MemberBondKind>().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('member_bonds_pair_kind_uidx').on(table.fromUserId, table.toUserId, table.kind),
+  index('member_bonds_to_user_idx').on(table.toUserId),
+  pgPolicy('member_bonds_party_select_policy', {
+    for: 'select',
+    using: sql`"fromUserId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "toUserId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('member_bonds_party_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"fromUserId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "toUserId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('member_bonds_party_delete_policy', {
+    for: 'delete',
+    using: sql`"fromUserId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR "toUserId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
       OR (current_setting('request.jwt.claims', true) IS NULL)`,
   }),
 ])
