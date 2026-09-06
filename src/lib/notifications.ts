@@ -1,9 +1,11 @@
 import type { NotificationKind, NotificationPayload } from '../db/schema'
 import { presentFriendNotification } from './connections'
+import { isForumMentionKind, presentForumMentionNotification } from './forum-mentions'
 
 export const NOTIFICATION_KIND_FRIEND_REQUEST = 'friend_request' as const
 export const NOTIFICATION_KIND_FRIEND_ACCEPTED = 'friend_accepted' as const
 export const NOTIFICATION_KIND_FRIEND_REJECTED = 'friend_rejected' as const
+export { NOTIFICATION_KIND_FORUM_MENTION } from './forum-mentions'
 
 export type NotificationView = {
   id: string
@@ -57,11 +59,17 @@ export function presentNotificationView(row: {
   readAt: string | null
   createdAt: string
 }): NotificationView {
-  const copy = presentFriendNotification(row.kind, {
-    userId: row.actorUserId,
-    handle: row.actorHandle,
-    larvaId: row.actorLarvaId,
-  })
+  const copy = isForumMentionKind(row.kind)
+    ? presentForumMentionNotification({
+        userId: row.actorUserId,
+        handle: row.actorHandle,
+        larvaId: row.actorLarvaId,
+      })
+    : presentFriendNotification(row.kind, {
+        userId: row.actorUserId,
+        handle: row.actorHandle,
+        larvaId: row.actorLarvaId,
+      })
   return {
     id: row.id,
     kind: row.kind,

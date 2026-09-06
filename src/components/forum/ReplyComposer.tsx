@@ -6,6 +6,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
+import { MentionTextarea } from '@/components/forum/MentionTextarea'
 
 export function ReplyComposer({
   topicId,
@@ -118,11 +119,11 @@ export function ReplyComposer({
         </div>
       )}
 
-      <textarea
+      <MentionTextarea
         rows={compact ? 3 : 4}
         value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Write your constructive reply... (min 10 characters)"
+        onChange={setContent}
+        placeholder="Write your constructive reply... Hail a member with @designation. (min 10 characters)"
         autoFocus={autoFocus}
         className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
       />

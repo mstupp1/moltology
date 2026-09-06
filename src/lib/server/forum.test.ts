@@ -14,6 +14,7 @@ import {
   toggleForumTopicVoteHandler,
   toggleForumPostVoteHandler,
   getForumTopicDetailHandler,
+  recordForumMentions,
 } from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 
@@ -933,5 +934,79 @@ describe('Forum Server Handlers', () => {
     expect(detail?.posts[0].authorName).toBe('pincer_prime')
     expect(detail?.posts[0].authorName).not.toBe(detail?.topic.authorName)
     expect(detail?.topic.authorName).not.toBe(PLACEHOLDER_LARVA_ID)
+  })
+
+  it('persists a soft hail for mentioned members and skips the author', async () => {
+    const actorId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const mentionedId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    const notificationValues: Record<string, unknown>[] = []
+
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockResolvedValue([
+            { id: mentionedId, handle: 'pincer_prime' },
+            { id: actorId, handle: 'claw_lord' },
+          ]),
+        })),
+      })),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          notificationValues.push(values)
+          return {
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
+          }
+        }),
+      })),
+    }
+
+    const written = await recordForumMentions(mockDb as any, {
+      actorUserId: actorId,
+      actorPublicName: 'claw_lord',
+      content: 'Hail @pincer_prime and also @claw_lord in this thread.',
+      sourceType: 'post',
+      sourceId: 'post-mention',
+      topicId: 'topic-mention',
+      topicSlug: 'hail-thread',
+      categorySlug: 'general-discussion',
+    })
+
+    expect(written).toBe(1)
+    expect(notificationValues).toHaveLength(1)
+    expect(notificationValues[0]).toEqual(
+      expect.objectContaining({
+        userId: mentionedId,
+        kind: 'forum_mention',
+        actorUserId: actorId,
+        title: 'You were hailed',
+        detail: 'claw_lord hailed you in a discussion.',
+        sourceKey: 'forum_mention:post:post-mention:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        payload: expect.objectContaining({
+          topicId: 'topic-mention',
+          postId: 'post-mention',
+          topicSlug: 'hail-thread',
+          categorySlug: 'general-discussion',
+          handle: 'pincer_prime',
+        }),
+      }),
+    )
+  })
+
+  it('does not write a hail when the post names nobody', async () => {
+    const mockDb = {
+      select: vi.fn(),
+      insert: vi.fn(),
+    }
+    const written = await recordForumMentions(mockDb as any, {
+      actorUserId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      actorPublicName: 'claw_lord',
+      content: 'This is enough content for a forum reply.',
+      sourceType: 'post',
+      sourceId: 'post-quiet',
+      topicId: 'topic-quiet',
+    })
+    expect(written).toBe(0)
+    expect(mockDb.select).not.toHaveBeenCalled()
+    expect(mockDb.insert).not.toHaveBeenCalled()
   })
 })

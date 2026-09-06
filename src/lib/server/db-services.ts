@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, notifications } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -94,6 +94,11 @@ import {
   presentNotificationView,
   type NotificationView,
 } from '../notifications'
+import {
+  extractMentionHandles,
+  forumMentionSourceKey,
+  presentForumMentionNotification,
+} from '../forum-mentions'
 
 type Db = ReturnType<typeof getDb>
 
@@ -1619,6 +1624,21 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     .where(eq(forumCategories.id, inserted.categoryId))
     .limit(1)
 
+  try {
+    await recordForumMentions(dbClient, {
+      actorUserId: userId,
+      actorPublicName: authorName,
+      content: inserted.content,
+      sourceType: 'topic',
+      sourceId: inserted.id,
+      topicId: inserted.id,
+      topicSlug: inserted.slug,
+      categorySlug: cat?.slug,
+    })
+  } catch (err) {
+    console.warn('[createForumTopicFn] Mention persist error:', err)
+  }
+
   return {
     id: inserted.id,
     categoryId: inserted.categoryId,
@@ -1701,7 +1721,11 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   const authorStage = userProfile?.stage ?? 1
 
   const [topicExists] = await dbClient
-    .select({ id: forumTopics.id })
+    .select({
+      id: forumTopics.id,
+      slug: forumTopics.slug,
+      categoryId: forumTopics.categoryId,
+    })
     .from(forumTopics)
     .where(eq(forumTopics.id, data.topicId))
     .limit(1)
@@ -1774,6 +1798,30 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       .where(eq(forumTopics.id, data.topicId))
   } catch (err) {
     console.warn('[createForumPostFn] Topic reply counter update error:', err)
+  }
+
+  try {
+    let categorySlug: string | undefined
+    if (extractMentionHandles(inserted.content).length > 0 && topicExists.categoryId) {
+      const [cat] = await dbClient
+        .select({ slug: forumCategories.slug })
+        .from(forumCategories)
+        .where(eq(forumCategories.id, topicExists.categoryId))
+        .limit(1)
+      categorySlug = cat?.slug
+    }
+    await recordForumMentions(dbClient, {
+      actorUserId: userId,
+      actorPublicName: authorName,
+      content: inserted.content,
+      sourceType: 'post',
+      sourceId: inserted.id,
+      topicId: inserted.topicId,
+      topicSlug: topicExists.slug,
+      categorySlug,
+    })
+  } catch (err) {
+    console.warn('[createForumPostFn] Mention persist error:', err)
   }
 
   return {
@@ -2788,15 +2836,74 @@ async function resolveRelationship(
   return { relationship: 'none', pendingRequestId: null }
 }
 
+export async function recordForumMentions(
+  dbClient: Db,
+  input: {
+    actorUserId: string
+    actorPublicName: string
+    content: string
+    sourceType: 'topic' | 'post'
+    sourceId: string
+    topicId: string
+    topicSlug?: string
+    categorySlug?: string
+  },
+): Promise<number> {
+  const handles = extractMentionHandles(input.content)
+  if (handles.length === 0) return 0
+
+  const rows = await dbClient
+    .select({
+      id: profiles.id,
+      handle: profiles.handle,
+    })
+    .from(profiles)
+    .where(
+      or(
+        ...handles.map(
+          (handle) => sql`lower(${profiles.handle}) = ${normalizeHandleForCompare(handle)}`,
+        ),
+      ),
+    )
+
+  const copy = presentForumMentionNotification({ handle: input.actorPublicName })
+  const seen = new Set<string>()
+  let written = 0
+
+  for (const row of rows) {
+    if (!row.id || row.id === input.actorUserId || seen.has(row.id)) continue
+    seen.add(row.id)
+    await insertNotification(dbClient, {
+      userId: row.id,
+      kind: 'forum_mention',
+      actorUserId: input.actorUserId,
+      title: copy.title,
+      detail: copy.detail,
+      payload: {
+        profileId: input.actorUserId,
+        topicId: input.topicId,
+        postId: input.sourceType === 'post' ? input.sourceId : undefined,
+        categorySlug: input.categorySlug,
+        topicSlug: input.topicSlug,
+        handle: row.handle?.trim() || undefined,
+      },
+      sourceKey: forumMentionSourceKey(input.sourceType, input.sourceId, row.id),
+    })
+    written += 1
+  }
+
+  return written
+}
+
 async function insertNotification(
   dbClient: Db,
   input: {
     userId: string
-    kind: 'friend_request' | 'friend_accepted' | 'friend_rejected'
+    kind: NotificationKind
     actorUserId: string
     title: string
     detail: string
-    payload: { requestId?: string; profileId?: string }
+    payload: NotificationPayload
     sourceKey: string
   }
 ) {
@@ -3400,7 +3507,7 @@ export const getNotificationsHandler = async ({
     .limit(limit)
 
   const views: NotificationView[] = rows.map((row) => {
-    const payload = (row.payload || {}) as { requestId?: string; profileId?: string }
+    const payload = (row.payload || {}) as NotificationPayload
     const readAt = row.readAt ? row.readAt.toISOString() : null
     return presentNotificationView({
       id: row.id,

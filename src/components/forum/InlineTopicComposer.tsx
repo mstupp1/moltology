@@ -6,6 +6,7 @@ import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useForumAuth } from './ForumShell'
+import { MentionTextarea } from '@/components/forum/MentionTextarea'
 
 export interface InlineTopicComposerHandle {
   expandAndFocus: () => void
@@ -314,12 +315,12 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                 {content.trim().length} characters (min 10)
               </span>
             </div>
-            <textarea
+            <MentionTextarea
               id="composer-content-textarea"
               rows={5}
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your thoughts, questions, or ideas... (Markdown supported)"
+              onChange={setContent}
+              placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
               className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-[16px] sm:text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50 min-h-[110px]"
             />
           </div>

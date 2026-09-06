@@ -8,12 +8,12 @@ import {
   rankMemberSearchResults,
   sanitizeMemberSearchQuery,
 } from '@/lib/member-search'
-import { useToast } from '@/components/ui/ToastProvider'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 
 export function useMemberSearch(query: string, enabled: boolean) {
   const [results, setResults] = useState<MemberSearchResult[]>([])
   const [searching, setSearching] = useState(false)
-  const { toast } = useToast()
+  const toast = useOptionalToast()?.toast
 
   useEffect(() => {
     if (!enabled) {
@@ -39,7 +39,7 @@ export function useMemberSearch(query: string, enabled: boolean) {
       } catch (err) {
         if (!cancelled) {
           setResults([])
-          toast.error(err instanceof Error ? err.message : 'Search failed.')
+          toast?.error(err instanceof Error ? err.message : 'Search failed.')
         }
       } finally {
         if (!cancelled) setSearching(false)

@@ -27,6 +27,7 @@ vi.mock('@/lib/server/api', () => ({
   createForumPostFn: vi.fn(),
   toggleForumTopicVoteFn: vi.fn(),
   toggleForumPostVoteFn: vi.fn(),
+  searchMembersFn: vi.fn().mockResolvedValue([]),
 }))
 
 vi.mock('@/lib/jwt', () => ({

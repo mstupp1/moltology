@@ -17,6 +17,7 @@ vi.mock('@/lib/auth-client', () => ({
 
 vi.mock('@/lib/server/api', () => ({
   createForumTopicFn: vi.fn(),
+  searchMembersFn: vi.fn().mockResolvedValue([]),
 }))
 
 vi.mock('@/lib/jwt', () => ({

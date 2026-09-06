@@ -284,4 +284,28 @@ describe('notifications helpers', () => {
     expect(view.detail).toBe('LARVA UNIT #2468 accepted your friend request.')
     expect(view.actionable).toBe(false)
   })
+
+  it('presents forum hail rows with live actor designation', () => {
+    const view = presentNotificationView({
+      id: 'n3',
+      kind: 'forum_mention',
+      title: 'You were hailed',
+      detail: 'LARVA UNIT #2468 hailed you in a discussion.',
+      actorUserId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      actorLarvaId: 'LARVA UNIT #2468',
+      actorHandle: 'claw_lord',
+      payload: {
+        topicId: 'topic-1',
+        postId: 'post-1',
+        categorySlug: 'general-discussion',
+        topicSlug: 'hail-thread',
+        handle: 'pincer_prime',
+      },
+      readAt: null,
+      createdAt: '2026-09-06T00:00:00.000Z',
+    })
+    expect(view.title).toBe('You were hailed')
+    expect(view.detail).toBe('claw_lord hailed you in a discussion.')
+    expect(view.actionable).toBe(false)
+  })
 })

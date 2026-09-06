@@ -103,7 +103,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         title: item.title,
         body: item.detail,
         tag: `activity-${item.id}`,
-        url: hubUrlForNotificationKind(item.kind),
+        url: hubUrlForNotificationKind(item.kind, item.payload),
       })
     }
   }, [notifications, userId])
