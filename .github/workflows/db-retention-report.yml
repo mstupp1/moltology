@@ -1,0 +1,39 @@
+name: DB Retention Report
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Retention profile (lean or lenient)'
+        required: false
+        type: choice
+        options:
+          - lean
+          - lenient
+        default: lean
+
+jobs:
+  report:
+    name: Dry-run retention inventory
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Print retention inventory (dry-run)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RETENTION_PROFILE: ${{ github.event.inputs.profile || 'lean' }}
+        run: npm run db:retention-report
