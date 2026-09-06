@@ -352,11 +352,25 @@ async function applyRLS() {
       "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
     );`
 
+    await sql`DROP POLICY IF EXISTS forum_topics_owner_update_policy ON forum_topics;`
+    await sql`CREATE POLICY forum_topics_owner_update_policy ON forum_topics FOR UPDATE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    ) WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
     await sql`DROP POLICY IF EXISTS forum_posts_public_read_policy ON forum_posts;`
     await sql`CREATE POLICY forum_posts_public_read_policy ON forum_posts FOR SELECT USING (true);`
 
     await sql`DROP POLICY IF EXISTS forum_posts_insert_policy ON forum_posts;`
     await sql`CREATE POLICY forum_posts_insert_policy ON forum_posts FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
+    await sql`DROP POLICY IF EXISTS forum_posts_owner_update_policy ON forum_posts;`
+    await sql`CREATE POLICY forum_posts_owner_update_policy ON forum_posts FOR UPDATE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    ) WITH CHECK (
       "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
     );`
 

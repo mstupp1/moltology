@@ -14,6 +14,10 @@ import {
   toggleForumTopicVoteHandler,
   toggleForumPostVoteHandler,
   getForumTopicDetailHandler,
+  updateForumTopicHandler,
+  updateForumPostHandler,
+  deleteForumTopicHandler,
+  deleteForumPostHandler,
   recordForumMentions,
   recordForumReplyNotifications,
 } from './db-services'
@@ -1198,5 +1202,312 @@ describe('Forum Server Handlers', () => {
         sourceKey: 'forum_reply:post:post-reply-persist:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
       }),
     )
+  })
+})
+
+function selectLimit(rows: unknown[]) {
+  return {
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue(rows),
+      }),
+    }),
+  }
+}
+
+function selectWhere(rows: unknown[]) {
+  return {
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue(rows),
+    }),
+  }
+}
+
+function returningUpdate(existing: Record<string, unknown>, captured: Record<string, unknown>[]) {
+  return vi.fn().mockImplementation(() => ({
+    set: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+      captured.push(values)
+      return {
+        where: vi.fn().mockImplementation(() => ({
+          returning: vi.fn().mockResolvedValue([{ ...existing, ...values }]),
+        })),
+      }
+    }),
+  }))
+}
+
+describe('Forum author edit and soft-delete', () => {
+  const authorId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+  const otherId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+  const topicId = '20000000-0000-0000-0000-000000000010'
+  const postId = '30000000-0000-0000-0000-000000000010'
+
+  const existingTopic = {
+    id: topicId,
+    categoryId: '10000000-0000-0000-0000-000000000001',
+    userId: authorId,
+    authorName: 'claw_lord',
+    authorAvatar: '/images/stage1_larva.png',
+    authorStage: 1,
+    title: 'Original topic title here',
+    slug: 'original-topic-title-here',
+    content: 'Original topic body long enough.',
+    isPinned: false,
+    isLocked: false,
+    views: 4,
+    repliesCount: 1,
+    upvotes: 2,
+    lastReplyAt: new Date('2026-09-06T01:00:00.000Z'),
+    createdAt: new Date('2026-09-06T01:00:00.000Z'),
+    updatedAt: new Date('2026-09-06T01:00:00.000Z'),
+    deletedAt: null,
+  }
+
+  const existingPost = {
+    id: postId,
+    topicId,
+    parentId: null,
+    userId: authorId,
+    authorName: 'claw_lord',
+    authorAvatar: '/images/stage1_larva.png',
+    authorStage: 1,
+    content: 'Original reply body long enough.',
+    upvotes: 1,
+    createdAt: new Date('2026-09-06T01:10:00.000Z'),
+    updatedAt: new Date('2026-09-06T01:10:00.000Z'),
+    deletedAt: null,
+  }
+
+  const category = { slug: 'general-discussion', name: 'General Discussion', color: '#00ffff' }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('rejects unauthenticated topic and reply edits', async () => {
+    await expect(
+      updateForumTopicHandler({
+        data: { topicId, title: 'Revised topic title here', content: 'Revised topic body long enough.' },
+        context: {},
+      }),
+    ).rejects.toThrow('Unauthenticated')
+    await expect(
+      updateForumPostHandler({
+        data: { postId, content: 'Revised reply body long enough.' },
+        context: {},
+      }),
+    ).rejects.toThrow('Unauthenticated')
+    await expect(deleteForumTopicHandler({ data: { topicId }, context: {} })).rejects.toThrow('Unauthenticated')
+    await expect(deleteForumPostHandler({ data: { postId }, context: {} })).rejects.toThrow('Unauthenticated')
+  })
+
+  it('rejects edit and delete from a non-author', async () => {
+    const update = vi.fn()
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => selectLimit([existingPost])),
+      update,
+    }
+
+    await expect(
+      updateForumPostHandler({
+        data: { postId, content: 'Someone else trying to rewrite this.' },
+        context: { user: { sub: otherId }, db: mockDb as any },
+      }),
+    ).rejects.toThrow('You can only edit your own posts.')
+    expect(update).not.toHaveBeenCalled()
+
+    const topicDb = {
+      select: vi.fn().mockImplementation(() => selectLimit([existingTopic])),
+      update,
+    }
+    await expect(
+      deleteForumTopicHandler({
+        data: { topicId },
+        context: { user: { sub: otherId }, db: topicDb as any },
+      }),
+    ).rejects.toThrow('You can only delete your own posts.')
+  })
+
+  it('lets the author revise a reply and persist a new hail', async () => {
+    const mentionedId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+    const captured: Record<string, unknown>[] = []
+    const notificationValues: Record<string, unknown>[] = []
+    const select = vi.fn()
+      .mockImplementationOnce(() => selectLimit([existingPost]))
+      .mockImplementationOnce(() => selectLimit([{ slug: 'original-topic-title-here', categoryId: existingTopic.categoryId }]))
+      .mockImplementationOnce(() => selectLimit([category]))
+      .mockImplementationOnce(() => selectWhere([{ id: mentionedId, handle: 'pincer_prime' }]))
+      .mockImplementationOnce(() => selectLimit([{ handle: 'claw_lord' }]))
+
+    const mockDb = {
+      select,
+      update: returningUpdate(existingPost, captured),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          notificationValues.push(values)
+          return { onConflictDoNothing: vi.fn().mockResolvedValue([]) }
+        }),
+      })),
+    }
+
+    const res = await updateForumPostHandler({
+      data: { postId, content: 'Ask @pincer_prime before the next molt cycle.' },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(res.content).toBe('Ask @pincer_prime before the next molt cycle.')
+    expect(res.deletedAt).toBeNull()
+    expect(captured[0]).toEqual(expect.objectContaining({
+      content: 'Ask @pincer_prime before the next molt cycle.',
+    }))
+    expect(notificationValues[0]).toEqual(expect.objectContaining({
+      userId: mentionedId,
+      kind: 'forum_mention',
+      sourceKey: `forum_mention:post:${postId}:${mentionedId}`,
+    }))
+  })
+
+  it('lets the author revise their topic title and body', async () => {
+    const captured: Record<string, unknown>[] = []
+    const select = vi.fn()
+      .mockImplementationOnce(() => selectLimit([existingTopic]))
+      .mockImplementationOnce(() => selectLimit([category]))
+      .mockImplementationOnce(() => selectLimit([{ handle: 'claw_lord' }]))
+
+    const res = await updateForumTopicHandler({
+      data: { topicId, title: 'Revised topic title here', content: 'Revised topic body long enough.' },
+      context: {
+        user: { sub: authorId },
+        db: { select, update: returningUpdate(existingTopic, captured) } as any,
+      },
+    })
+
+    expect(res.title).toBe('Revised topic title here')
+    expect(res.content).toBe('Revised topic body long enough.')
+    expect(res.slug).toBe(existingTopic.slug)
+    expect(captured[0]).toEqual(expect.objectContaining({
+      title: 'Revised topic title here',
+      content: 'Revised topic body long enough.',
+    }))
+  })
+
+  it('soft-deletes an author reply and redacts the body', async () => {
+    const captured: Record<string, unknown>[] = []
+    const select = vi.fn()
+      .mockImplementationOnce(() => selectLimit([existingPost]))
+      .mockImplementationOnce(() => selectLimit([{ handle: 'claw_lord' }]))
+
+    const res = await deleteForumPostHandler({
+      data: { postId },
+      context: {
+        user: { sub: authorId },
+        db: { select, update: returningUpdate(existingPost, captured) } as any,
+      },
+    })
+
+    expect(res.content).toBe('')
+    expect(res.deletedAt).toBeTruthy()
+    expect(captured[0].deletedAt).toBeInstanceOf(Date)
+    expect(captured[0].content).toBeUndefined()
+  })
+
+  it('soft-deletes an author topic without wiping the title', async () => {
+    const captured: Record<string, unknown>[] = []
+    const select = vi.fn()
+      .mockImplementationOnce(() => selectLimit([existingTopic]))
+      .mockImplementationOnce(() => selectLimit([category]))
+      .mockImplementationOnce(() => selectLimit([{ handle: 'claw_lord' }]))
+
+    const res = await deleteForumTopicHandler({
+      data: { topicId },
+      context: {
+        user: { sub: authorId },
+        db: { select, update: returningUpdate(existingTopic, captured) } as any,
+      },
+    })
+
+    expect(res.title).toBe(existingTopic.title)
+    expect(res.content).toBe('')
+    expect(res.deletedAt).toBeTruthy()
+    expect(captured[0].deletedAt).toBeInstanceOf(Date)
+  })
+
+  it('refuses a second withdraw', async () => {
+    const update = vi.fn()
+    const mockDb = {
+      select: vi.fn().mockImplementation(() =>
+        selectLimit([{ ...existingPost, deletedAt: new Date('2026-09-06T01:20:00.000Z') }]),
+      ),
+      update,
+    }
+    await expect(
+      deleteForumPostHandler({
+        data: { postId },
+        context: { user: { sub: authorId }, db: mockDb as any },
+      }),
+    ).rejects.toThrow('already withdrawn')
+    expect(update).not.toHaveBeenCalled()
+  })
+
+  it('hides withdrawn bodies when reading a thread', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        ...existingTopic,
+                        deletedAt: new Date('2026-09-06T02:00:00.000Z'),
+                        categorySlug: 'general-discussion',
+                        categoryName: 'General Discussion',
+                        categoryColor: '#00ffff',
+                        profileHandle: 'claw_lord',
+                        profileLarvaId: null,
+                        profileStage: 1,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockResolvedValue([
+                  {
+                    ...existingPost,
+                    deletedAt: new Date('2026-09-06T02:05:00.000Z'),
+                    profileHandle: 'claw_lord',
+                    profileLarvaId: null,
+                    profileStage: 1,
+                  },
+                ]),
+              }),
+            }),
+          }),
+        }
+      }),
+      update: vi.fn(),
+    }
+
+    const res = await getForumTopicDetailHandler({
+      data: { slugOrId: existingTopic.slug, trackView: false },
+      context: { db: mockDb as any },
+    })
+
+    expect(res?.topic.content).toBe('')
+    expect(res?.topic.deletedAt).toBeTruthy()
+    expect(res?.posts[0].content).toBe('')
+    expect(res?.posts[0].deletedAt).toBeTruthy()
+    expect(res?.topic.title).toBe(existingTopic.title)
   })
 })

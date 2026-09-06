@@ -142,6 +142,41 @@ export function compareHot(a: { upvotes: number; createdAt: string }, b: { upvot
   return hotScore(b.upvotes, b.createdAt) - hotScore(a.upvotes, a.createdAt)
 }
 
+/** Diegetic empty state when an author withdraws a topic or reply. */
+export const FORUM_WITHDRAWN_BODY = 'This transmission was withdrawn.'
+
+/** Board-list preview when the original topic body has been sealed. */
+export const FORUM_WITHDRAWN_PREVIEW = 'The original transmission was withdrawn. Replies remain.'
+
+export function isForumEntryWithdrawn(entry: { deletedAt?: string | Date | null }): boolean {
+  return Boolean(entry.deletedAt)
+}
+
+/** True when the author sealed a later revision (not a withdraw). */
+export function isForumEntryRevised(entry: {
+  createdAt?: string | Date | null
+  updatedAt?: string | Date | null
+  deletedAt?: string | Date | null
+}): boolean {
+  if (isForumEntryWithdrawn(entry) || !entry.updatedAt || !entry.createdAt) return false
+  const created = new Date(entry.createdAt).getTime()
+  const updated = new Date(entry.updatedAt).getTime()
+  if (!Number.isFinite(created) || !Number.isFinite(updated)) return false
+  return updated - created > 1500
+}
+
+/** Hide withdrawn bodies from clients; the row stays in the thread. */
+export function visibleForumContent(content: string, deletedAt?: string | Date | null): string {
+  return deletedAt ? '' : content
+}
+
+export function toForumIso(value: string | Date | null | undefined): string | null {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+  return date.toISOString()
+}
+
 /**
  * Formats an ISO timestamp as a short relative time string ("3h ago", "2d ago").
  */

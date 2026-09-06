@@ -1,9 +1,11 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ForumPostCard } from './ForumPostCard'
-import { ForumPostEntry } from '@/lib/server/api'
+import { ForumShell } from './ForumShell'
+import { updateForumPostFn, deleteForumPostFn, type ForumPostEntry } from '@/lib/server/api'
 import type { ForumPostTreeNode } from '@/lib/forum-utils'
+import { FORUM_WITHDRAWN_BODY } from '@/lib/forum-utils'
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, params, ...props }: any) => (
@@ -13,14 +15,16 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }))
 
-vi.mock('@/lib/server/api', () => ({
-  toggleForumPostVoteFn: vi.fn(),
-  createForumPostFn: vi.fn(),
-  searchMembersFn: vi.fn().mockResolvedValue([]),
-}))
+const forumAuth = {
+  isAuthenticated: true,
+  isPending: false,
+  userId: 'authed-user' as string | null,
+  openAuth: vi.fn(),
+}
 
-vi.mock('@/lib/jwt', () => ({
-  getAuthJWTToken: vi.fn().mockResolvedValue('a.b.c'),
+vi.mock('@/components/forum/ForumShell', () => ({
+  useForumAuth: () => forumAuth,
+  ForumShell: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -29,13 +33,17 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
-vi.mock('@/components/forum/ForumShell', () => ({
-  useForumAuth: () => ({
-    isAuthenticated: true,
-    isPending: false,
-    userId: 'authed-user',
-    openAuth: vi.fn(),
-  }),
+vi.mock('@/lib/server/api', () => ({
+  updateForumPostFn: vi.fn(),
+  deleteForumPostFn: vi.fn(),
+  createForumPostFn: vi.fn(),
+  toggleForumPostVoteFn: vi.fn(),
+  toggleForumTopicVoteFn: vi.fn(),
+  searchMembersFn: vi.fn().mockResolvedValue([]),
+}))
+
+vi.mock('@/lib/jwt', () => ({
+  getAuthJWTToken: vi.fn().mockResolvedValue('a.b.c'),
 }))
 
 function post(overrides: Partial<ForumPostEntry> = {}): ForumPostEntry {
@@ -62,6 +70,15 @@ function node(
   return { post: entry, depth: 0, children }
 }
 
+const cardHandlers = {
+  onReplyClick: vi.fn(),
+  onQuoteClick: vi.fn(),
+  onCancelReply: vi.fn(),
+  onPosted: vi.fn(),
+  onPostVote: vi.fn(() => vi.fn()),
+  onUpdated: vi.fn(),
+}
+
 describe('ForumPostCard', () => {
   const mockPost = {
     id: 'post-101',
@@ -86,6 +103,9 @@ describe('ForumPostCard', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    forumAuth.userId = 'authed-user'
+    forumAuth.isAuthenticated = true
+    forumAuth.isPending = false
   })
 
   it('renders author info, stage badge, and content', () => {
@@ -94,11 +114,7 @@ describe('ForumPostCard', () => {
         node={baseNode}
         topicId="topic-999"
         replyingToId={null}
-        onReplyClick={vi.fn()}
-        onQuoteClick={vi.fn()}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={vi.fn(() => vi.fn())}
+        {...cardHandlers}
       />,
     )
 
@@ -116,11 +132,7 @@ describe('ForumPostCard', () => {
         topicId="topic-999"
         topicAuthorId="user-author-1"
         replyingToId={null}
-        onReplyClick={vi.fn()}
-        onQuoteClick={vi.fn()}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={vi.fn(() => vi.fn())}
+        {...cardHandlers}
       />,
     )
 
@@ -136,11 +148,7 @@ describe('ForumPostCard', () => {
         topicId="topic-999"
         topicAuthorId="different-user-id"
         replyingToId={null}
-        onReplyClick={vi.fn()}
-        onQuoteClick={vi.fn()}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={vi.fn(() => vi.fn())}
+        {...cardHandlers}
       />,
     )
 
@@ -160,11 +168,7 @@ describe('ForumPostCard', () => {
         node={baseNode}
         topicId="topic-999"
         replyingToId={null}
-        onReplyClick={vi.fn()}
-        onQuoteClick={vi.fn()}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={vi.fn(() => vi.fn())}
+        {...cardHandlers}
       />,
     )
 
@@ -184,11 +188,8 @@ describe('ForumPostCard', () => {
         node={baseNode}
         topicId="topic-999"
         replyingToId={null}
+        {...cardHandlers}
         onReplyClick={onReplyClick}
-        onQuoteClick={vi.fn()}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={vi.fn(() => vi.fn())}
       />,
     )
 
@@ -198,6 +199,13 @@ describe('ForumPostCard', () => {
 })
 
 describe('ForumPostCard quote affordance', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    forumAuth.userId = 'authed-user'
+    forumAuth.isAuthenticated = true
+    forumAuth.isPending = false
+  })
+
   it('quotes a live reply into the inline composer', () => {
     const onQuoteClick = vi.fn()
     const quote = '> @claw_lord held:\n> The molt is not optional.\n\n'
@@ -207,11 +215,8 @@ describe('ForumPostCard quote affordance', () => {
         node={node(post())}
         topicId="topic-1"
         replyingToId="post-1"
-        onReplyClick={vi.fn()}
+        {...cardHandlers}
         onQuoteClick={onQuoteClick}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={() => vi.fn()}
         quoteDraft={quote}
       />,
     )
@@ -221,22 +226,19 @@ describe('ForumPostCard quote affordance', () => {
     expect(composer.querySelector('textarea')).toHaveValue(quote)
   })
 
-  it('hides Quote on a withdrawn post so the sealed body cannot be copied', () => {
+  it('hides Quote and Reply on a withdrawn post so the sealed body cannot be copied', () => {
     render(
       <ForumPostCard
-        node={node(post({ deletedAt: '2026-09-06T02:00:00.000Z' } as ForumPostEntry & { deletedAt: string }))}
+        node={node(post({ deletedAt: '2026-09-06T02:00:00.000Z' }))}
         topicId="topic-1"
         replyingToId={null}
-        onReplyClick={vi.fn()}
-        onQuoteClick={vi.fn()}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={() => vi.fn()}
+        {...cardHandlers}
       />,
     )
 
     expect(screen.queryByTestId('forum-quote-post')).not.toBeInTheDocument()
-    expect(screen.getByTestId('forum-reply-to-comment')).toBeInTheDocument()
+    expect(screen.queryByTestId('forum-reply-to-comment')).not.toBeInTheDocument()
+    expect(screen.getByTestId('forum-withdrawn-body')).toBeInTheDocument()
   })
 
   it('notifies the thread when Quote is pressed', () => {
@@ -246,15 +248,147 @@ describe('ForumPostCard quote affordance', () => {
         node={node(post())}
         topicId="topic-1"
         replyingToId={null}
-        onReplyClick={vi.fn()}
+        {...cardHandlers}
         onQuoteClick={onQuoteClick}
-        onCancelReply={vi.fn()}
-        onPosted={vi.fn()}
-        onPostVote={() => vi.fn()}
       />,
     )
 
     fireEvent.click(screen.getByTestId('forum-quote-post'))
     expect(onQuoteClick).toHaveBeenCalledWith('post-1')
+  })
+})
+
+const authorPost: ForumPostEntry = {
+  id: 'post-1',
+  topicId: 'topic-1',
+  parentId: null,
+  userId: 'author-1',
+  authorName: 'claw_lord',
+  authorHandle: 'claw_lord',
+  authorAvatar: '/images/stage1_larva.png',
+  authorStage: 1,
+  content: 'Ask @pincer_prime before the next molt.',
+  upvotes: 0,
+  createdAt: '2026-09-06T01:00:00.000Z',
+}
+
+function renderCard(
+  entry: ForumPostEntry,
+  sessionUser: string | null,
+  onUpdated = vi.fn(),
+) {
+  forumAuth.userId = sessionUser
+  forumAuth.isAuthenticated = Boolean(sessionUser)
+
+  return render(
+    <ForumShell>
+      <ForumPostCard
+        node={node(entry)}
+        topicId="topic-1"
+        replyingToId={null}
+        {...cardHandlers}
+        onUpdated={onUpdated}
+      />
+    </ForumShell>,
+  )
+}
+
+describe('ForumPostCard author tools', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    forumAuth.userId = 'authed-user'
+    forumAuth.isAuthenticated = true
+    forumAuth.isPending = false
+  })
+
+  it('shows revise and withdraw only for the signed-in author', () => {
+    renderCard(authorPost, 'author-1')
+    expect(screen.getByTestId('forum-author-tools')).toBeInTheDocument()
+    expect(screen.getByTestId('forum-revise')).toBeInTheDocument()
+    expect(screen.getByTestId('forum-withdraw')).toBeInTheDocument()
+    expect(screen.getByTestId('forum-mention-link')).toHaveTextContent('@pincer_prime')
+  })
+
+  it('hides author tools from other members', () => {
+    renderCard(authorPost, 'someone-else')
+    expect(screen.queryByTestId('forum-author-tools')).not.toBeInTheDocument()
+    expect(screen.getByText(/Ask/)).toBeInTheDocument()
+  })
+
+  it('re-renders mention links after the author seals a revision', async () => {
+    const onUpdated = vi.fn()
+    vi.mocked(updateForumPostFn).mockResolvedValue({
+      ...authorPost,
+      content: 'Revised hail for @pincer_prime after the molt.',
+      updatedAt: '2026-09-06T01:10:00.000Z',
+    })
+
+    const { rerender } = renderCard(authorPost, 'author-1', onUpdated)
+    fireEvent.click(screen.getByTestId('forum-revise'))
+    fireEvent.change(screen.getByLabelText('Revise reply'), {
+      target: { value: 'Revised hail for @pincer_prime after the molt.' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /seal revision/i }))
+
+    await waitFor(() => {
+      expect(updateForumPostFn).toHaveBeenCalled()
+    })
+    expect(onUpdated).toHaveBeenCalledWith(
+      expect.objectContaining({ content: 'Revised hail for @pincer_prime after the molt.' }),
+    )
+
+    rerender(
+      <ForumShell>
+        <ForumPostCard
+          node={node({
+            ...authorPost,
+            content: 'Revised hail for @pincer_prime after the molt.',
+            updatedAt: '2026-09-06T01:10:00.000Z',
+          })}
+          topicId="topic-1"
+          replyingToId={null}
+          {...cardHandlers}
+          onUpdated={onUpdated}
+        />
+      </ForumShell>,
+    )
+
+    expect(screen.getByTestId('forum-mention-link')).toHaveTextContent('@pincer_prime')
+    expect(screen.getByText(/Revised hail/)).toBeInTheDocument()
+    expect(screen.getByTestId('forum-revised-mark')).toBeInTheDocument()
+  })
+
+  it('shows the withdrawn tombstone instead of the body', () => {
+    renderCard(
+      {
+        ...authorPost,
+        content: '',
+        deletedAt: '2026-09-06T02:00:00.000Z',
+      },
+      'author-1',
+    )
+    expect(screen.getByTestId('forum-withdrawn-body')).toHaveTextContent(FORUM_WITHDRAWN_BODY)
+    expect(screen.queryByTestId('forum-mention-link')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('forum-author-tools')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('forum-reply-to-comment')).not.toBeInTheDocument()
+  })
+
+  it('confirms withdraw before sealing the reply', async () => {
+    const onUpdated = vi.fn()
+    vi.mocked(deleteForumPostFn).mockResolvedValue({
+      ...authorPost,
+      content: '',
+      deletedAt: '2026-09-06T02:00:00.000Z',
+    })
+
+    renderCard(authorPost, 'author-1', onUpdated)
+    fireEvent.click(screen.getByTestId('forum-withdraw'))
+    expect(screen.getByTestId('forum-withdraw-confirm')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('forum-withdraw-confirm-btn'))
+
+    await waitFor(() => {
+      expect(deleteForumPostFn).toHaveBeenCalled()
+    })
+    expect(onUpdated).toHaveBeenCalledWith(expect.objectContaining({ deletedAt: '2026-09-06T02:00:00.000Z' }))
   })
 })

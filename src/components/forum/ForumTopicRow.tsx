@@ -2,8 +2,8 @@ import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { MessageSquare, Eye, Clock } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
-import { relativeTime } from '@/lib/forum-utils'
-import { VoteButton, StageBadge, PinBadge } from './ForumBits'
+import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime } from '@/lib/forum-utils'
+import { VoteButton, StageBadge, PinBadge, WithdrawnBadge } from './ForumBits'
 import { ForumAvatar } from './ForumAvatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 
@@ -40,6 +40,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             </span>
           )}
           {topic.isPinned && <PinBadge />}
+          {isForumEntryWithdrawn(topic) && <WithdrawnBadge />}
         </div>
 
         <Link
@@ -51,7 +52,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             {topic.title}
           </h3>
           <p className="text-xs text-[#839493] line-clamp-1 leading-relaxed mt-0.5">
-            {topic.content}
+            {isForumEntryWithdrawn(topic) ? FORUM_WITHDRAWN_PREVIEW : topic.content}
           </p>
         </Link>
 

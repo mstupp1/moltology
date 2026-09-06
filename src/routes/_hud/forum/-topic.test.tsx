@@ -25,6 +25,10 @@ vi.mock('@tanstack/react-router', () => ({
 vi.mock('@/lib/server/api', () => ({
   getForumTopicDetailFn: vi.fn().mockResolvedValue(null),
   createForumPostFn: vi.fn(),
+  updateForumTopicFn: vi.fn(),
+  updateForumPostFn: vi.fn(),
+  deleteForumTopicFn: vi.fn(),
+  deleteForumPostFn: vi.fn(),
   toggleForumTopicVoteFn: vi.fn(),
   toggleForumPostVoteFn: vi.fn(),
   searchMembersFn: vi.fn().mockResolvedValue([]),
@@ -333,6 +337,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByText('Reply to comment')).toBeInTheDocument()
   })
 
+
   it('quotes the topic into the top reply composer', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'authed-user', name: 'Initiate' } },
@@ -514,6 +519,128 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     render(<ForumThreadPage />)
 
+    expect(screen.queryByTestId('forum-quote-topic')).not.toBeInTheDocument()
+    expect(screen.getByTestId('forum-withdrawn-body')).toBeInTheDocument()
+  })
+
+  it('shows topic revise and withdraw only to the author', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'member-a', name: 'claw_lord' } },
+    } as any)
+
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: 'member-a',
+        authorName: 'claw_lord',
+        authorHandle: 'claw_lord',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 1,
+        title: 'Author owned thread',
+        slug: 'author-owned-thread',
+        content: 'Ask @pincer_prime before you molt tonight.',
+        isPinned: false,
+        isLocked: false,
+        views: 3,
+        repliesCount: 0,
+        upvotes: 0,
+        lastReplyAt: '2026-09-06T01:00:00.000Z',
+        createdAt: '2026-09-06T01:00:00.000Z',
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByTestId('forum-author-tools')).toBeInTheDocument()
+    expect(screen.getByTestId('forum-mention-link')).toHaveTextContent('@pincer_prime')
+  })
+
+  it('hides topic author tools from a different signed-in member', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'member-b', name: 'pincer_prime' } },
+    } as any)
+
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: 'member-a',
+        authorName: 'claw_lord',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 1,
+        title: 'Author owned thread',
+        slug: 'author-owned-thread',
+        content: 'Thread body from member A long enough.',
+        isPinned: false,
+        isLocked: false,
+        views: 3,
+        repliesCount: 0,
+        upvotes: 0,
+        lastReplyAt: '2026-09-06T01:00:00.000Z',
+        createdAt: '2026-09-06T01:00:00.000Z',
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+    expect(screen.queryByTestId('forum-author-tools')).not.toBeInTheDocument()
+  })
+
+  it('shows a withdrawn tombstone for a sealed topic and reply', () => {
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        id: 'topic-a',
+        categoryId: 'cat-1',
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: 'member-a',
+        authorName: 'claw_lord',
+        authorAvatar: '/images/stage1_larva.png',
+        authorStage: 1,
+        title: 'Author owned thread',
+        slug: 'author-owned-thread',
+        content: '',
+        isPinned: false,
+        isLocked: false,
+        views: 3,
+        repliesCount: 1,
+        upvotes: 0,
+        lastReplyAt: '2026-09-06T01:00:00.000Z',
+        createdAt: '2026-09-06T01:00:00.000Z',
+        deletedAt: '2026-09-06T02:00:00.000Z',
+      },
+      posts: [
+        {
+          id: 'post-b',
+          topicId: 'topic-a',
+          parentId: null,
+          userId: 'member-b',
+          authorName: 'pincer_prime',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 2,
+          content: '',
+          upvotes: 0,
+          createdAt: '2026-09-06T01:30:00.000Z',
+          deletedAt: '2026-09-06T02:05:00.000Z',
+        },
+      ],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Author owned thread' })).toBeInTheDocument()
+    expect(screen.getAllByTestId('forum-withdrawn-body').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByTestId('forum-withdrawn-badge')).toBeInTheDocument()
+    expect(screen.queryByText(/Ask @pincer_prime/)).not.toBeInTheDocument()
     expect(screen.queryByTestId('forum-quote-topic')).not.toBeInTheDocument()
   })
 })
