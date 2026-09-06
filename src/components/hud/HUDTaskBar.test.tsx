@@ -1,8 +1,42 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { HUDTaskBar } from './HUDTaskBar'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { ACTIVITY_INBOX_LABEL } from '@/lib/notifications'
+import type { NotificationView } from '@/lib/notifications'
+
+const markRead = vi.fn()
+const markAllRead = vi.fn()
+let mockNotifications: NotificationView[] = []
+let mockUnreadCount = 0
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, params, hash, ...props }: any) => {
+    const href =
+      to === '/forum/$categorySlug/$topicSlug'
+        ? `/forum/${params?.categorySlug}/${params?.topicSlug}${hash ? `#${hash}` : ''}`
+        : to
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    )
+  },
+}))
+
+vi.mock('@/hooks/useNotifications', () => ({
+  useNotifications: () => ({
+    notifications: mockNotifications,
+    unreadCount: mockUnreadCount,
+    isLoading: false,
+    refresh: vi.fn(),
+    markRead,
+    markAllRead,
+    acceptFriendRequest: vi.fn(),
+    declineFriendRequest: vi.fn(),
+  }),
+}))
 
 function tasksWithCompletedCount(completedCount: number) {
   return CANONICAL_ALIGNMENT_TASKS.map((t, i) => ({
@@ -15,6 +49,13 @@ function tasksWithCompletedCount(completedCount: number) {
 }
 
 describe('HUDTaskBar', () => {
+  beforeEach(() => {
+    mockNotifications = []
+    mockUnreadCount = 0
+    markRead.mockReset()
+    markAllRead.mockReset()
+  })
+
   it('renders hero task bar chronometer with title, digits, and next alignment task', () => {
     render(<HUDTaskBar variant="hero" />)
     
@@ -103,7 +144,7 @@ describe('HUDTaskBar', () => {
     // Test Tab Switching to ALERTS / TRANSMISSIONS
     const alertsTab = screen.getByText(/ALERTS/i)
     fireEvent.click(alertsTab)
-    expect(screen.getByText('FRIEND REQUESTS & ALERTS')).toBeInTheDocument()
+    expect(screen.getByText(ACTIVITY_INBOX_LABEL)).toBeInTheDocument()
 
     // Switch back to LITURGIES
     const liturgiesTab = screen.getByText(/LITURGIES/i)
@@ -141,5 +182,68 @@ describe('HUDTaskBar', () => {
       window.innerWidth = 1024
       window.dispatchEvent(new Event('resize'))
     })
+  })
+
+  it('lists hail and reply transmissions with thread deep-links and marks them read', () => {
+    mockNotifications = [
+      {
+        id: 'n-hail',
+        kind: 'forum_mention',
+        title: 'You were hailed',
+        detail: 'claw_lord hailed you in a discussion.',
+        actorUserId: 'actor-1',
+        actorLarvaId: null,
+        actorHandle: 'claw_lord',
+        payload: {
+          categorySlug: 'general-discussion',
+          topicSlug: 'molt-notes',
+          postId: 'post-hail',
+        },
+        readAt: null,
+        createdAt: '2026-09-06T01:00:00.000Z',
+        actionable: false,
+      },
+      {
+        id: 'n-reply',
+        kind: 'forum_reply',
+        title: 'A reply reached your thread',
+        detail: 'pincer_prime answered a thread you opened.',
+        actorUserId: 'actor-2',
+        actorLarvaId: null,
+        actorHandle: 'pincer_prime',
+        payload: {
+          categorySlug: 'general-discussion',
+          topicSlug: 'molt-notes',
+          postId: 'post-reply',
+          replyTarget: 'topic',
+        },
+        readAt: null,
+        createdAt: '2026-09-06T00:00:00.000Z',
+        actionable: false,
+      },
+    ]
+    mockUnreadCount = 2
+
+    render(<HUDTaskBar variant="header" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Daily alignment tasks schedule' }))
+    fireEvent.click(screen.getByText(/ALERTS/i))
+
+    expect(screen.getByText(ACTIVITY_INBOX_LABEL)).toBeInTheDocument()
+    expect(screen.getByText('You were hailed')).toBeInTheDocument()
+    expect(screen.getByText('A reply reached your thread')).toBeInTheDocument()
+
+    const hailLink = screen.getByRole('link', { name: /You were hailed/i })
+    expect(hailLink).toHaveAttribute(
+      'href',
+      '/forum/general-discussion/molt-notes#post-post-hail',
+    )
+    const replyLink = screen.getByRole('link', { name: /A reply reached your thread/i })
+    expect(replyLink).toHaveAttribute(
+      'href',
+      '/forum/general-discussion/molt-notes#post-post-reply',
+    )
+
+    fireEvent.click(hailLink)
+    expect(markRead).toHaveBeenCalledWith('n-hail')
   })
 })

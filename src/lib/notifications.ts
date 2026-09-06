@@ -1,11 +1,15 @@
 import type { NotificationKind, NotificationPayload } from '../db/schema'
 import { presentFriendNotification } from './connections'
 import { isForumMentionKind, presentForumMentionNotification } from './forum-mentions'
+import { isForumReplyKind, presentForumReplyNotification } from './forum-replies'
 
 export const NOTIFICATION_KIND_FRIEND_REQUEST = 'friend_request' as const
 export const NOTIFICATION_KIND_FRIEND_ACCEPTED = 'friend_accepted' as const
 export const NOTIFICATION_KIND_FRIEND_REJECTED = 'friend_rejected' as const
 export { NOTIFICATION_KIND_FORUM_MENTION } from './forum-mentions'
+export { NOTIFICATION_KIND_FORUM_REPLY, isForumInboxKind } from './forum-replies'
+
+export const ACTIVITY_INBOX_LABEL = 'HAILS, REPLIES & ALERTS'
 
 export type NotificationView = {
   id: string
@@ -65,11 +69,18 @@ export function presentNotificationView(row: {
         handle: row.actorHandle,
         larvaId: row.actorLarvaId,
       })
-    : presentFriendNotification(row.kind, {
-        userId: row.actorUserId,
-        handle: row.actorHandle,
-        larvaId: row.actorLarvaId,
-      })
+    : isForumReplyKind(row.kind)
+      ? presentForumReplyNotification({
+          userId: row.actorUserId,
+          handle: row.actorHandle,
+          larvaId: row.actorLarvaId,
+          target: row.payload.replyTarget,
+        })
+      : presentFriendNotification(row.kind, {
+          userId: row.actorUserId,
+          handle: row.actorHandle,
+          larvaId: row.actorLarvaId,
+        })
   return {
     id: row.id,
     kind: row.kind,

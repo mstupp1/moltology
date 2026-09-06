@@ -15,6 +15,7 @@ import {
   toggleForumPostVoteHandler,
   getForumTopicDetailHandler,
   recordForumMentions,
+  recordForumReplyNotifications,
 } from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 
@@ -971,7 +972,7 @@ describe('Forum Server Handlers', () => {
       categorySlug: 'general-discussion',
     })
 
-    expect(written).toBe(1)
+    expect(written).toEqual([mentionedId])
     expect(notificationValues).toHaveLength(1)
     expect(notificationValues[0]).toEqual(
       expect.objectContaining({
@@ -1005,8 +1006,197 @@ describe('Forum Server Handlers', () => {
       sourceId: 'post-quiet',
       topicId: 'topic-quiet',
     })
-    expect(written).toBe(0)
+    expect(written).toEqual([])
     expect(mockDb.select).not.toHaveBeenCalled()
     expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
+  it('persists a thread reply ping for the topic author and skips the replier', async () => {
+    const topicAuthor = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const replier = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+    const notificationValues: Record<string, unknown>[] = []
+
+    const mockDb = {
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          notificationValues.push(values)
+          return {
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
+          }
+        }),
+      })),
+    }
+
+    const written = await recordForumReplyNotifications(mockDb as any, {
+      actorUserId: replier,
+      actorPublicName: 'claw_lord',
+      replyPostId: 'post-reply',
+      topicId: 'topic-reply',
+      topicAuthorUserId: topicAuthor,
+      parentAuthorUserId: replier,
+      topicSlug: 'molt-notes',
+      categorySlug: 'general-discussion',
+    })
+
+    expect(written).toBe(1)
+    expect(notificationValues).toHaveLength(1)
+    expect(notificationValues[0]).toEqual(
+      expect.objectContaining({
+        userId: topicAuthor,
+        kind: 'forum_reply',
+        actorUserId: replier,
+        title: 'A reply reached your thread',
+        detail: 'claw_lord answered a thread you opened.',
+        sourceKey: 'forum_reply:post:post-reply:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        payload: expect.objectContaining({
+          topicId: 'topic-reply',
+          postId: 'post-reply',
+          topicSlug: 'molt-notes',
+          categorySlug: 'general-discussion',
+          replyTarget: 'topic',
+        }),
+      }),
+    )
+  })
+
+  it('persists a nested reply ping for the parent author', async () => {
+    const parentAuthor = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    const topicAuthor = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const notificationValues: Record<string, unknown>[] = []
+
+    const mockDb = {
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          notificationValues.push(values)
+          return {
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
+          }
+        }),
+      })),
+    }
+
+    const written = await recordForumReplyNotifications(mockDb as any, {
+      actorUserId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      actorPublicName: 'pincer_prime',
+      replyPostId: 'post-nested',
+      topicId: 'topic-reply',
+      topicAuthorUserId: topicAuthor,
+      parentAuthorUserId: parentAuthor,
+      topicSlug: 'molt-notes',
+      categorySlug: 'general-discussion',
+    })
+
+    expect(written).toBe(2)
+    expect(notificationValues.map((row) => row.userId).sort()).toEqual([parentAuthor, topicAuthor].sort())
+    expect(notificationValues.find((row) => row.userId === parentAuthor)?.payload).toEqual(
+      expect.objectContaining({ replyTarget: 'post' }),
+    )
+  })
+
+  it('skips a reply ping when the author was already hailed in the same post', async () => {
+    const topicAuthor = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const mockDb = {
+      insert: vi.fn(),
+    }
+
+    const written = await recordForumReplyNotifications(mockDb as any, {
+      actorUserId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      actorPublicName: 'claw_lord',
+      replyPostId: 'post-hail-reply',
+      topicId: 'topic-reply',
+      topicAuthorUserId: topicAuthor,
+      skipUserIds: [topicAuthor],
+    })
+
+    expect(written).toBe(0)
+    expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
+  it('persists a forum_reply row when a member answers another member\'s thread', async () => {
+    const topicAuthor = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    const replier = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+    const topicId = '20000000-0000-0000-0000-000000000003'
+    const notificationValues: Record<string, unknown>[] = []
+    let selectCall = 0
+
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) {
+                return Promise.resolve([{ larvaId: 'LARVA UNIT #3', stage: 2, handle: 'claw_lord' }])
+              }
+              if (selectCall === 2) {
+                return Promise.resolve([
+                  {
+                    id: topicId,
+                    slug: 'molt-notes',
+                    categoryId: '10000000-0000-0000-0000-000000000001',
+                    userId: topicAuthor,
+                  },
+                ])
+              }
+              if (selectCall === 3) {
+                return Promise.resolve([{ repliesCount: 0 }])
+              }
+              return Promise.resolve([{ slug: 'general-discussion' }])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
+          if (values.kind === 'forum_reply') {
+            notificationValues.push(values)
+            return {
+              onConflictDoNothing: vi.fn().mockResolvedValue([]),
+            }
+          }
+          return {
+            returning: vi.fn().mockResolvedValue([
+              {
+                id: 'post-reply-persist',
+                topicId,
+                parentId: null,
+                userId: replier,
+                authorName: values.authorName,
+                authorAvatar: values.authorAvatar,
+                authorStage: values.authorStage,
+                content: values.content,
+                upvotes: 0,
+                createdAt: new Date('2026-09-06T12:00:00.000Z'),
+              },
+            ]),
+          }
+        }),
+      })),
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+    }
+
+    await createForumPostHandler({
+      data: {
+        topicId,
+        content: 'This is enough content for a forum reply ping.',
+      },
+      context: {
+        user: { sub: replier },
+        db: mockDb as any,
+      },
+    })
+
+    expect(notificationValues).toHaveLength(1)
+    expect(notificationValues[0]).toEqual(
+      expect.objectContaining({
+        userId: topicAuthor,
+        kind: 'forum_reply',
+        sourceKey: 'forum_reply:post:post-reply-persist:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      }),
+    )
   })
 })

@@ -9,6 +9,8 @@ import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
+import { ACTIVITY_INBOX_LABEL, isForumInboxKind } from '@/lib/notifications'
+import { forumPostAnchorId } from '@/lib/forum-mentions'
 
 export interface AlignmentTask {
   id: string
@@ -444,7 +446,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       {activeTab === 'transmissions' && (
         <div className="space-y-2.5 animate-in fade-in duration-150">
           <div className="flex items-center justify-between text-[10px] text-[#839493]">
-            <span>FRIEND REQUESTS & ALERTS</span>
+            <span>{ACTIVITY_INBOX_LABEL}</span>
             <div className="flex items-center gap-2">
               {notificationUnread > 0 && (
                 <button
@@ -536,31 +538,78 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                 Recent Transmissions
               </div>
               <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                {recentNotifications.map((n) => (
-                  <button
-                    key={n.id}
-                    type="button"
-                    className={`w-full text-left p-2 rounded-lg bg-[#040a0d] border flex items-start gap-2 text-xs ${
-                      n.readAt ? 'border-[#3a4a49]/60 opacity-80' : 'border-[#00c3ff]/30'
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (!n.readAt) void markRead(n.id)
-                    }}
-                  >
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                        n.readAt ? 'bg-[#3a4a49]' : 'bg-[#00c3ff]'
-                      }`}
-                    />
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
-                        {n.title}
+                {recentNotifications.map((n) => {
+                  const rowClass = `w-full text-left p-2 rounded-lg bg-[#040a0d] border flex items-start gap-2 text-xs ${
+                    n.readAt ? 'border-[#3a4a49]/60 opacity-80' : 'border-[#00c3ff]/30'
+                  }`
+                  const body = (
+                    <>
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                          n.readAt ? 'bg-[#3a4a49]' : 'bg-[#00c3ff]'
+                        }`}
+                      />
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <div className="text-[10px] font-bold text-[#00ffff] font-grotesk tracking-wider">
+                          {n.title}
+                        </div>
+                        <div className="text-[#dfe3e3] text-[11px] leading-tight">{n.detail}</div>
                       </div>
-                      <div className="text-[#dfe3e3] text-[11px] leading-tight">{n.detail}</div>
-                    </div>
-                  </button>
-                ))}
+                    </>
+                  )
+                  const markAndClose = () => {
+                    if (!n.readAt) void markRead(n.id)
+                    setIsScheduleOpen(false)
+                  }
+                  if (isForumInboxKind(n.kind)) {
+                    const categorySlug = n.payload.categorySlug?.trim()
+                    const topicSlug = n.payload.topicSlug?.trim()
+                    const postId = n.payload.postId?.trim()
+                    if (categorySlug && topicSlug) {
+                      return (
+                        <Link
+                          key={n.id}
+                          to="/forum/$categorySlug/$topicSlug"
+                          params={{ categorySlug, topicSlug }}
+                          hash={postId ? forumPostAnchorId(postId) : undefined}
+                          className={rowClass}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            markAndClose()
+                          }}
+                        >
+                          {body}
+                        </Link>
+                      )
+                    }
+                    return (
+                      <Link
+                        key={n.id}
+                        to="/forum"
+                        className={rowClass}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          markAndClose()
+                        }}
+                      >
+                        {body}
+                      </Link>
+                    )
+                  }
+                  return (
+                    <button
+                      key={n.id}
+                      type="button"
+                      className={rowClass}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (!n.readAt) void markRead(n.id)
+                      }}
+                    >
+                      {body}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -576,7 +625,7 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
                     <Radio className="w-6 h-6 text-[#3a4a49] mx-auto animate-pulse" />
                     <div>ALL FREQUENCIES QUIET</div>
                     <div className="text-[10px] text-[#839493]/60">
-                      No friend requests or alerts right now.
+                      No hails, replies, or friend alerts in the log.
                     </div>
                   </>
                 )}

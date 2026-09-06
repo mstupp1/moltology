@@ -157,7 +157,7 @@ export async function showSystemNotification(
 /** Map Activity Center kinds to a deep-link inside the hub. */
 export function hubUrlForNotificationKind(
   kind: string,
-  payload?: { categorySlug?: string; topicSlug?: string },
+  payload?: { categorySlug?: string; topicSlug?: string; postId?: string },
 ): string {
   switch (kind) {
     case 'friend_request':
@@ -165,6 +165,7 @@ export function hubUrlForNotificationKind(
     case 'friend_rejected':
       return '/connections'
     case 'forum_mention':
+    case 'forum_reply':
       return forumMentionHubPath(payload ?? {})
     default:
       return '/dashboard'
