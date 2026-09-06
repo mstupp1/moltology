@@ -15,6 +15,7 @@ export function MentionTextarea({
   className,
   disabled,
   'aria-label': ariaLabel,
+  onKeyDown: onKeyDownProp,
 }: {
   id?: string
   value: string
@@ -25,6 +26,7 @@ export function MentionTextarea({
   className?: string
   disabled?: boolean
   'aria-label'?: string
+  onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void
 }) {
   const generatedId = useId()
   const fieldId = id ?? generatedId
@@ -78,33 +80,37 @@ export function MentionTextarea({
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!open) return
+    if (open) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setDismissed(true)
+        return
+      }
 
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      setDismissed(true)
-      return
+      if (options.length > 0) {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          setHighlight((index) => (index + 1) % options.length)
+          return
+        }
+        if (event.key === 'ArrowUp') {
+          event.preventDefault()
+          setHighlight((index) => (index - 1 + options.length) % options.length)
+          return
+        }
+        if (event.key === 'Enter' || event.key === 'Tab') {
+          const chosen = options[highlight]
+          const handle = chosen?.handle?.trim()
+          if (handle) {
+            event.preventDefault()
+            applyMention(handle)
+            return
+          }
+        }
+      }
     }
 
-    if (options.length === 0) return
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      setHighlight((index) => (index + 1) % options.length)
-      return
-    }
-    if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      setHighlight((index) => (index - 1 + options.length) % options.length)
-      return
-    }
-    if (event.key === 'Enter' || event.key === 'Tab') {
-      const chosen = options[highlight]
-      const handle = chosen?.handle?.trim()
-      if (!handle) return
-      event.preventDefault()
-      applyMention(handle)
-    }
+    onKeyDownProp?.(event)
   }
 
   return (

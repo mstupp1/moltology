@@ -1,9 +1,20 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { cn } from '@/lib/utils'
 import {
   LOBSTER_AVATAR_STYLE,
   generateLobsterAvatarDataUri,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
+
+export type ForumAvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
+const SIZE_CLASSES: Record<ForumAvatarSize, string> = {
+  xs: 'w-5 h-5',
+  sm: 'w-7 h-7',
+  md: 'w-9 h-9',
+  lg: 'w-11 h-11 sm:w-12 sm:h-12',
+  xl: 'w-14 h-14',
+}
 
 export interface ForumAvatarProps {
   /** Profile image URL (e.g. Google SSO or external URL) */
@@ -16,7 +27,9 @@ export interface ForumAvatarProps {
   userId?: string | null
   /** Customized lobster avatar configuration if present */
   avatarConfig?: LobsterAvatarConfig | null
-  /** CSS sizing or positioning overrides (defaults to 'w-4 h-4') */
+  /** Standard avatar size preset (defaults to 'md' = 36px) */
+  size?: ForumAvatarSize
+  /** CSS sizing or positioning overrides */
   className?: string
   /** Accessible alt text */
   alt?: string
@@ -46,7 +59,8 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
   authorHandle,
   userId,
   avatarConfig,
-  className = 'w-4 h-4',
+  size = 'md',
+  className,
   alt,
 }) => {
   const [imageError, setImageError] = useState(false)
@@ -93,7 +107,11 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
 
   return (
     <div
-      className={`relative rounded-full overflow-hidden shrink-0 border border-[#3a4a49] bg-[#081419] flex items-center justify-center ${className}`}
+      className={cn(
+        'relative rounded-full overflow-hidden shrink-0 border border-[#3a4a49] bg-[#081419] flex items-center justify-center transition-all',
+        SIZE_CLASSES[size],
+        className
+      )}
       data-testid="forum-avatar-container"
     >
       {hasCustomImage && !imageError ? (

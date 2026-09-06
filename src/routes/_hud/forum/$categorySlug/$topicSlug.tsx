@@ -8,6 +8,8 @@ import {
   Clock,
   ShieldCheck,
   Activity,
+  Link2,
+  Check,
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
@@ -23,6 +25,40 @@ import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumMentionBody } from '@/components/forum/ForumMentionBody'
+
+function TopicShareButton() {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 border border-[#3a4a49] hover:border-[#00ffff]/50 chamfer-corner transition-all shrink-0"
+      title={copied ? 'Link copied!' : 'Share discussion'}
+    >
+      {copied ? (
+        <>
+          <Check className="w-3.5 h-3.5 text-[#00ffff]" />
+          <span className="text-[#00ffff]">Copied</span>
+        </>
+      ) : (
+        <>
+          <Link2 className="w-3.5 h-3.5" />
+          <span>Share</span>
+        </>
+      )}
+    </button>
+  )
+}
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   loader: async ({ params }) => {
@@ -204,16 +240,8 @@ function ForumThreadPage() {
               </h1>
 
               {/* Author & Stats Strip */}
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-[#839493] border-b border-[#3a4a49]/60 pb-3">
-                <span className="flex items-center gap-1.5 min-w-0">
-                  <ForumAvatar
-                    src={topic.authorAvatar}
-                    authorName={topic.authorName}
-                    authorHandle={topic.authorHandle}
-                    userId={topic.userId}
-                    avatarConfig={topic.authorAvatarConfig}
-                    className="w-4 h-4"
-                  />
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#3a4a49]/60 pb-3.5">
+                <div className="flex items-center gap-3 min-w-0">
                   {topic.userId ? (
                     <Link
                       to="/member/$profileId"
@@ -223,20 +251,82 @@ function ForumThreadPage() {
                           handle: topic.authorHandle,
                         }),
                       }}
-                      className="text-[#dfe3e3] font-bold hover:text-[#00c3ff] transition-colors"
+                      className="shrink-0 group/topic-avatar focus:outline-none"
+                      tabIndex={-1}
+                      aria-hidden="true"
                     >
-                      {topic.authorName}
+                      <ForumAvatar
+                        src={topic.authorAvatar}
+                        authorName={topic.authorName}
+                        authorHandle={topic.authorHandle}
+                        userId={topic.userId}
+                        avatarConfig={topic.authorAvatarConfig}
+                        alt=""
+                        size="lg"
+                        className="ring-2 ring-[#3a4a49] group-hover/topic-avatar:ring-[#00ffff] transition-all shadow-md"
+                      />
                     </Link>
                   ) : (
-                    <span className="text-[#dfe3e3] font-bold">{topic.authorName}</span>
+                    <ForumAvatar
+                      src={topic.authorAvatar}
+                      authorName={topic.authorName}
+                      authorHandle={topic.authorHandle}
+                      userId={topic.userId}
+                      avatarConfig={topic.authorAvatarConfig}
+                      size="lg"
+                      className="ring-2 ring-[#3a4a49] shadow-md"
+                    />
                   )}
-                  <StageBadge stage={topic.authorStage} />
-                </span>
-                <span className="text-[#3a4a49]">·</span>
-                <span className="flex items-center gap-1">
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>{topic.views} views</span>
-                </span>
+
+                  <div className="min-w-0 flex flex-col justify-center">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      {topic.userId ? (
+                        <Link
+                          to="/member/$profileId"
+                          params={{
+                            profileId: resolveMemberPublicParam({
+                              id: topic.userId,
+                              handle: topic.authorHandle,
+                            }),
+                          }}
+                          className="text-[#dfe3e3] font-grotesk font-bold text-sm sm:text-base hover:text-[#00c3ff] transition-colors truncate"
+                        >
+                          {topic.authorName}
+                        </Link>
+                      ) : (
+                        <span className="text-[#dfe3e3] font-grotesk font-bold text-sm sm:text-base truncate">
+                          {topic.authorName}
+                        </span>
+                      )}
+
+                      {topic.authorHandle && (
+                        <span className="text-xs text-[#839493]/80 hidden sm:inline truncate">
+                          @{topic.authorHandle.replace(/^@/, '')}
+                        </span>
+                      )}
+
+                      <span className="px-1.5 py-0.2 text-[9px] font-sans font-bold uppercase tracking-wider bg-[#00ffff]/10 text-[#00ffff] border border-[#00ffff]/30 chamfer-corner">
+                        AUTHOR
+                      </span>
+
+                      <StageBadge stage={topic.authorStage} />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11px] text-[#839493] mt-0.5">
+                      <span className="flex items-center gap-1" title={new Date(topic.createdAt).toLocaleString()}>
+                        <Clock className="w-3 h-3 text-[#3a4a49]" />
+                        <span>{relativeTime(topic.createdAt)}</span>
+                      </span>
+                      <span className="text-[#3a4a49]">·</span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3.5 h-3.5 text-[#3a4a49]" />
+                        <span>{topic.views} views</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <TopicShareButton />
               </div>
 
               {/* Topic Body */}
@@ -308,6 +398,7 @@ function ForumThreadPage() {
                       key={node.post.id}
                       node={node}
                       topicId={topic.id}
+                      topicAuthorId={topic.userId}
                       replyingToId={replyingToId}
                       onReplyClick={(id) => setReplyingToId((cur) => (cur === id ? null : id))}
                       onCancelReply={() => setReplyingToId(null)}

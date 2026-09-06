@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { AlertTriangle, Send } from 'lucide-react'
 import { useForumAuth } from '@/components/forum/ForumShell'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { createForumPostFn, ForumPostEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumAvatar } from '@/components/forum/ForumAvatar'
 
 export function ReplyComposer({
   topicId,
@@ -24,6 +26,7 @@ export function ReplyComposer({
   autoFocus?: boolean
 }) {
   const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
+  const { user } = useAuthSession()
   const persist = useHudPersist()
   const [content, setContent] = useState('')
   const [posting, setPosting] = useState(false)
@@ -62,6 +65,15 @@ export function ReplyComposer({
     } finally {
       persist.end('forum-reply')
       setPosting(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault()
+      if (!posting && content.trim().length >= 10) {
+        handleSubmit(e as unknown as React.FormEvent)
+      }
     }
   }
 
@@ -105,11 +117,27 @@ export function ReplyComposer({
       data-testid={parentId ? 'forum-inline-reply-composer' : 'forum-top-reply-composer'}
     >
       <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
-        <h3 className="text-xs font-grotesk font-bold uppercase tracking-wider text-[#00ffff] flex items-center gap-2">
-          <Send className="w-3.5 h-3.5" />
-          <span>{parentId ? 'Reply to comment' : 'Post Reply'}</span>
-        </h3>
-        <span className="text-[10px] text-[#839493]">{content.trim().length} / 10,000</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <h3 className="text-xs font-grotesk font-bold uppercase tracking-wider text-[#00ffff] flex items-center gap-2 shrink-0">
+            <Send className="w-3.5 h-3.5" />
+            <span>{parentId ? 'Reply to comment' : 'Post Reply'}</span>
+          </h3>
+          {user && (
+            <div className="hidden sm:flex items-center gap-1.5 border-l border-[#3a4a49] pl-2 min-w-0 text-[10px] text-[#839493]">
+              <ForumAvatar
+                src={user.image || user.avatar || user.picture}
+                authorName={user.name || undefined}
+                userId={userId}
+                size="xs"
+                className="w-4 h-4 ring-1 ring-[#3a4a49]"
+              />
+              <span className="truncate">
+                as <strong className="text-[#dfe3e3]">{user.name || 'Initiate'}</strong>
+              </span>
+            </div>
+          )}
+        </div>
+        <span className="text-[10px] text-[#839493] shrink-0">{content.trim().length} / 10,000</span>
       </div>
 
       {error && (
@@ -123,28 +151,34 @@ export function ReplyComposer({
         rows={compact ? 3 : 4}
         value={content}
         onChange={setContent}
+        onKeyDown={handleKeyDown}
         placeholder="Write your constructive reply... Hail a member with @designation. (min 10 characters)"
         autoFocus={autoFocus}
         className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
       />
 
-      <div className="flex items-center justify-end gap-2">
-        {onCancel && (
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] text-[#839493]/70 hidden sm:inline">
+          Ctrl/Cmd + Enter to post
+        </span>
+        <div className="flex items-center gap-2 ml-auto">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors"
+            >
+              Cancel
+            </button>
+          )}
           <button
-            type="button"
-            onClick={onCancel}
-            className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors"
+            type="submit"
+            disabled={posting || content.trim().length < 10}
+            className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_10px_rgba(0,255,255,0.2)]"
           >
-            Cancel
+            {posting ? 'Posting...' : 'Reply'}
           </button>
-        )}
-        <button
-          type="submit"
-          disabled={posting || content.trim().length < 10}
-          className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_10px_rgba(0,255,255,0.2)]"
-        >
-          {posting ? 'Posting...' : 'Reply'}
-        </button>
+        </div>
       </div>
     </form>
   )

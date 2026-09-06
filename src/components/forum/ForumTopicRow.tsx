@@ -75,7 +75,8 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
                   authorHandle={topic.authorHandle}
                   userId={topic.userId}
                   avatarConfig={topic.authorAvatarConfig}
-                  className="w-4 h-4"
+                  size="sm"
+                  className="ring-1 ring-[#3a4a49] group-hover:ring-[#00ffff]/60"
                 />
                 <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px] hover:text-[#00c3ff] transition-colors">
                   {topic.authorName}
@@ -89,7 +90,8 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
                   authorHandle={topic.authorHandle}
                   userId={topic.userId}
                   avatarConfig={topic.authorAvatarConfig}
-                  className="w-4 h-4"
+                  size="sm"
+                  className="ring-1 ring-[#3a4a49]"
                 />
                 <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px]">
                   {topic.authorName}

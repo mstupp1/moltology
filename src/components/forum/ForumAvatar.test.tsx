@@ -105,4 +105,18 @@ describe('ForumAvatar', () => {
     expect(container).toHaveClass('h-5')
     expect(container).toHaveClass('shadow-sm')
   })
+
+  it('defaults to md size when size is unspecified', () => {
+    render(<ForumAvatar src="" authorName="DefaultUnit" />)
+    const container = screen.getByTestId('forum-avatar-container')
+    expect(container).toHaveClass('w-9')
+    expect(container).toHaveClass('h-9')
+  })
+
+  it('supports explicit size presets such as lg', () => {
+    render(<ForumAvatar src="" authorName="LgUnit" size="lg" />)
+    const container = screen.getByTestId('forum-avatar-container')
+    expect(container).toHaveClass('w-11')
+    expect(container).toHaveClass('h-11')
+  })
 })
