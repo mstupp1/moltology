@@ -15,13 +15,15 @@ import { STAGE_PIPELINE_DATA, StagePipelineInfo, SubStageInfo } from '../../lib/
 import { getAssetUrl } from '@/lib/assets'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 
 export default function PipelineView() {
-  // Current user's simulated active position in the micro-clearance pipeline (e.g., 'L-2')
-  const [currentSubStageCode] = useState<string>('L-2')
-  const [expandedStage, setExpandedStage] = useState<number | null>(1)
+  const alignment = useDailyAlignment()
+  // Current user's active position in the micro-clearance pipeline derived from lifetime XP
+  const currentSubStageCode = alignment.progression.subStage.code
+  const [expandedStage, setExpandedStage] = useState<number | null>(() => alignment.progression.stage)
   const [selectedSubStage, setSelectedSubStage] = useState<SubStageInfo | null>(
-    STAGE_PIPELINE_DATA[0].subStages[1]
+    () => alignment.progression.subStage
   )
 
   // Flatten all 12 sub-stages for the master pipeline stepper

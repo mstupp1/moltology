@@ -40,6 +40,7 @@ export const profiles = pgTable('profiles', {
   /** Chosen public designation. Unique case-insensitive. Null until claimed. */
   handle: text('handle'),
   stage: integer('stage').default(1).notNull(), // 1: Larva, 2: Soft-Shed, 3: Architect, 4: Ascendant
+  xp: integer('xp').default(0).notNull(),
   moltCredits: decimal('moltCredits', { precision: 12, scale: 2 }).default('1450.00').notNull(),
   chitinGems: integer('chitinGems').default(250).notNull(),
   synapseShards: integer('synapseShards').default(45).notNull(),
@@ -145,6 +146,24 @@ export const activityEvents = pgTable('activity_events', {
 }, (table) => [
   uniqueIndex('activity_events_user_source_unique').on(table.userId, table.sourceKey),
   pgPolicy('activity_events_isolation_policy', {
+    for: 'all',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  })
+])
+
+// User XP Transactions Table (Idempotent progression event ledger)
+export const xpTransactions = pgTable('xp_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  amount: integer('amount').notNull(),
+  source: text('source').notNull(), // 'task_completion' | 'all_tasks_bonus' | 'daily_streak' | 'streak_milestone' | 'manual'
+  sourceKey: text('sourceKey').notNull(), // Idempotency key, e.g. 'routine:silent-synchronization:2026-09-05'
+  description: text('description').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('xp_transactions_user_source_key_unique').on(table.userId, table.sourceKey),
+  index('xp_transactions_user_id_idx').on(table.userId),
+  pgPolicy('xp_transactions_isolation_policy', {
     for: 'all',
     using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
   })

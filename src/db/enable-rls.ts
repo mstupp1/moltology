@@ -29,7 +29,8 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS friendships ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS member_bonds ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS notifications ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, member_bonds, notifications')
+    await sql`ALTER TABLE IF EXISTS xp_transactions ENABLE ROW LEVEL SECURITY;`
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, member_bonds, notifications, xp_transactions')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
@@ -38,6 +39,7 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
     await sql`DROP POLICY IF EXISTS routine_completions_isolation_policy ON routine_completions;`
     await sql`DROP POLICY IF EXISTS activity_events_isolation_policy ON activity_events;`
+    await sql`DROP POLICY IF EXISTS xp_transactions_isolation_policy ON xp_transactions;`
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
     await sql`DROP POLICY IF EXISTS equipment_catalog_public_read_policy ON equipment_catalog;`
     await sql`DROP POLICY IF EXISTS user_gear_items_isolation_policy ON user_gear_items;`
@@ -93,6 +95,15 @@ async function applyRLS() {
 
     await sql`
       CREATE POLICY activity_events_isolation_policy ON activity_events
+      FOR ALL
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
+      CREATE POLICY xp_transactions_isolation_policy ON xp_transactions
       FOR ALL
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')

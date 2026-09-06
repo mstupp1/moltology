@@ -18,11 +18,11 @@ vi.mock('@/lib/auth-client', () => ({
 }))
 
 describe('HUDHeader Component', () => {
-  it('renders current level 1 badge and next level 2 badge by default', () => {
+  it('renders current stage 1 badge and next stage 2 badge by default', () => {
     render(<HUDHeader />)
 
-    expect(screen.getByLabelText('Level 1 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Level 2 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 1 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 2 Badge')).toBeInTheDocument()
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
   })
@@ -30,8 +30,8 @@ describe('HUDHeader Component', () => {
   it('renders custom clearance stage level 3 and next level 4 badge', () => {
     render(<HUDHeader stage={3} />)
 
-    expect(screen.getByLabelText('Level 3 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Level 4 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 3 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 4 Badge')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
     expect(screen.getByText('4')).toBeInTheDocument()
   })
@@ -39,19 +39,17 @@ describe('HUDHeader Component', () => {
   it('renders apex badge when stage 4 is achieved', () => {
     render(<HUDHeader stage={4} />)
 
-    expect(screen.getByLabelText('Level 4 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Apex Level Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 4 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Apex Stage Badge')).toBeInTheDocument()
     expect(screen.getByText('APEX')).toBeInTheDocument()
   })
 
-  it('renders chroma-keyed claw image facing right and does not render tail image', () => {
-    render(<HUDHeader />)
+  it('renders dynamic XP telemetry readout when xp is passed', () => {
+    render(<HUDHeader xp={2500} />)
 
-    const clawImg = screen.getByRole('img', { name: 'Exoshell Claw' })
-    expect(clawImg).toBeInTheDocument()
-    expect(clawImg).toHaveAttribute('src', getAssetUrl('/images/crab_claw.png'))
-
-    const tailImg = screen.queryByRole('img', { name: 'Benthic Appendage' })
-    expect(tailImg).not.toBeInTheDocument()
+    // 2500 XP is Stage 2 (The Soft-Shed), Sub-Stage S-1
+    expect(screen.getByText('S-1')).toBeInTheDocument()
+    expect(screen.getByText('500')).toBeInTheDocument()
+    expect(screen.getByText('8,000 XP')).toBeInTheDocument()
   })
 })

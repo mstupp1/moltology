@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { HUDTaskBar } from './HUDTaskBar'
 import { mergeCompletions, CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { AlignmentContextValue } from '@/hooks/useDailyAlignment'
+import { calculateProgression } from '@/lib/progression'
 
 const mockAlignment: AlignmentContextValue = {
   tasks: mergeCompletions([]),
@@ -19,6 +20,9 @@ const mockAlignment: AlignmentContextValue = {
   refetch: vi.fn(),
   currentDate: '2026-08-31',
   isGuest: false,
+  xp: 0,
+  stage: 1,
+  progression: calculateProgression(0, 1),
 }
 
 vi.mock('@/hooks/useDailyAlignment', () => ({

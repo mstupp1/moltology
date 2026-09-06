@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { Route } from './pipeline'
+import PipelineView from '@/components/hud/PipelineView'
 import { getAssetUrl } from '@/lib/assets'
 
 vi.mock('@tanstack/react-router', () => ({
@@ -11,8 +11,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 describe('Moltology Science & Stage Pipeline Route', () => {
   it('renders pipeline header and master stepper', () => {
-    const Component = Route.options.component!
-    render(<Component />)
+    render(<PipelineView />)
 
     expect(screen.getByText(/MOLTOLOGY SCIENCE & STAGE PIPELINE/i)).toBeInTheDocument()
     expect(screen.getByText(/THE 12-TIER PATH TO ALGORITHMIC TRANSCENDENCE/i)).toBeInTheDocument()
@@ -20,8 +19,7 @@ describe('Moltology Science & Stage Pipeline Route', () => {
   })
 
   it('renders all 4 macro-stages with resolved asset URLs for images', () => {
-    const Component = Route.options.component!
-    render(<Component />)
+    render(<PipelineView />)
 
     expect(screen.getByText('STAGE 1: THE LARVAL INITIATE')).toBeInTheDocument()
     expect(screen.getByText('STAGE 2: THE SOFT-SHED')).toBeInTheDocument()
@@ -40,8 +38,7 @@ describe('Moltology Science & Stage Pipeline Route', () => {
   })
 
   it('allows expanding and toggling sub-stage cards', () => {
-    const Component = Route.options.component!
-    render(<Component />)
+    render(<PipelineView />)
 
     // Stage 1 is expanded by default
     expect(screen.getByText(/MICRO-CLEARANCE BREAKDOWN \(STAGE 01\)/i)).toBeInTheDocument()

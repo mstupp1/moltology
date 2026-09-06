@@ -51,4 +51,21 @@ describe('HUDProgressBar Component', () => {
     const { container } = render(<HUDProgressBar showClock={false} />)
     expect(container.querySelector('[aria-label="Daily alignment tasks schedule"]')).not.toBeInTheDocument()
   })
+
+  it('renders dynamic XP telemetry and sub-stage code', () => {
+    render(<HUDProgressBar xp={1500} />)
+
+    // 1500 XP is Sub-Stage L-3: First Calcification
+    expect(screen.getByText('L-3')).toBeInTheDocument()
+    expect(screen.getByText('1,500')).toBeInTheDocument()
+    expect(screen.getByText('2,000 XP')).toBeInTheDocument()
+  })
+
+  it('renders Apex XP readout when at Apex Stage', () => {
+    render(<HUDProgressBar xp={50000} />)
+
+    expect(screen.getByText('APEX')).toBeInTheDocument()
+    expect(screen.getByText('C-1')).toBeInTheDocument()
+    expect(screen.getByText('50,000 XP')).toBeInTheDocument()
+  })
 })

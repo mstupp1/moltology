@@ -35,12 +35,14 @@ describe('Daily Alignment Server Handlers', () => {
     const mockDb = {
       select: vi.fn().mockImplementation(() => ({
         from: vi.fn().mockImplementation(() => ({
-          where: vi.fn().mockImplementation((condition) => {
-            // Check if this is the today query or past range query
-            return Promise.resolve([
+          where: vi.fn().mockImplementation(() => {
+            const rows = [
               { taskKey: 'silent-synchronization', completedOn: '2026-08-24' },
               { taskKey: 'prompt-construction', completedOn: '2026-08-24' },
-            ])
+            ]
+            const p = Promise.resolve(rows) as any
+            p.limit = vi.fn().mockResolvedValue([{ xp: 150, stage: 1 }])
+            return p
           }),
         })),
       })),
@@ -71,6 +73,10 @@ describe('Daily Alignment Server Handlers', () => {
     expect(res.completedCount).toBe(2)
     expect(res.isAllCompleted).toBe(false)
     expect(Array.isArray(res.history)).toBe(true)
+    expect(res.xp).toBe(150)
+    expect(res.stage).toBe(1)
+    expect(res.progression).toBeDefined()
+    expect(res.progression?.stageTitle).toBe('THE LARVAL INITIATE')
   })
 
   it('toggles task completion and inserts/deletes from database', async () => {
@@ -82,17 +88,28 @@ describe('Daily Alignment Server Handlers', () => {
     const deleteMock = vi.fn().mockImplementation(() => ({
       where: vi.fn().mockResolvedValue([]),
     }))
+    const updateMock = vi.fn().mockImplementation(() => ({
+      set: vi.fn().mockImplementation(() => ({
+        where: vi.fn().mockResolvedValue([]),
+      })),
+    }))
 
     const mockDb = {
       select: vi.fn().mockImplementation(() => ({
         from: vi.fn().mockImplementation(() => ({
-          where: vi.fn().mockResolvedValue([
-            { taskKey: 'silent-synchronization', completedOn: '2026-08-24' },
-          ]),
+          where: vi.fn().mockImplementation(() => {
+            const rows = [
+              { taskKey: 'silent-synchronization', completedOn: '2026-08-24', totalXp: 10, xp: 10, stage: 1 },
+            ]
+            const p = Promise.resolve(rows) as any
+            p.limit = vi.fn().mockResolvedValue([{ taskKey: 'silent-synchronization', totalXp: 10, xp: 10, stage: 1 }])
+            return p
+          }),
         })),
       })),
       insert: insertMock,
       delete: deleteMock,
+      update: updateMock,
     }
 
     // Test Toggle ON
@@ -108,8 +125,10 @@ describe('Daily Alignment Server Handlers', () => {
       },
     })
 
-    expect(insertMock).toHaveBeenCalledTimes(2)
+    // routineCompletions + activityEvents + xpTransactions = 3 inserts
+    expect(insertMock).toHaveBeenCalledTimes(3)
     expect(toggleOnRes.date).toBe('2026-08-24')
+    expect(toggleOnRes.progression).toBeDefined()
 
     // Test Toggle OFF
     await toggleDailyAlignmentTaskHandler({
@@ -124,6 +143,7 @@ describe('Daily Alignment Server Handlers', () => {
       },
     })
 
-    expect(deleteMock).toHaveBeenCalledTimes(2)
+    // routineCompletions + activityEvents + xpTransactions = 3 deletes
+    expect(deleteMock).toHaveBeenCalledTimes(3)
   })
 })

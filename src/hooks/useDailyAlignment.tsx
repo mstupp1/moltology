@@ -30,6 +30,11 @@ import {
   toggleDailyAlignmentTaskFn,
 } from '@/lib/server/api'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import {
+  calculateProgression,
+  calculateXpFromHistory,
+  type ProgressionState,
+} from '@/lib/progression'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -48,6 +53,9 @@ export interface AlignmentContextValue {
   refetch: () => Promise<void>
   currentDate: string
   isGuest: boolean
+  xp: number
+  stage: number
+  progression: ProgressionState
 }
 
 const AlignmentContext = createContext<AlignmentContextValue | null>(null)
@@ -72,6 +80,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<AlignmentTaskItem[]>(() => mergeCompletions([]))
   const [history, setHistory] = useState<Array<{ date: string; completedCount: number }>>([])
   const [serverStreakDays, setServerStreakDays] = useState<number>(0)
+  const [serverXp, setServerXp] = useState<number>(0)
+  const [serverStage, setServerStage] = useState<number>(1)
+  const [optimisticXpDelta, setOptimisticXpDelta] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
 
@@ -160,9 +171,13 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         setTasks(mergedTasks)
         markCountReady(mergedTasks, targetDate)
 
+        setServerXp(data.xp ?? 0)
+        setServerStage(data.stage ?? 1)
+
         if (pendingOverridesRef.current.size === 0) {
           setHistory(data.history || [])
           setServerStreakDays(data.streakDays || 0)
+          setOptimisticXpDelta(0)
         } else {
           // If pending overrides are active, merge history while preserving currentDate's optimistic count
           const optimisticCount = mergedTasks.filter((t) => t.completed).length
@@ -304,6 +319,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
               persistSnapshot(currentDateRef.current, merged)
 
               const remainingOverridesCount = pendingOverridesRef.current.size
+              setServerXp(response.xp ?? 0)
+              setServerStage(response.stage ?? 1)
+
               if (remainingOverridesCount > 0) {
                 const optimisticCount = merged.filter((t) => t.completed).length
                 const serverHistory = response.history || []
@@ -312,6 +330,7 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
               } else {
                 setHistory(response.history || [])
                 setServerStreakDays(response.streakDays || 0)
+                setOptimisticXpDelta(0)
               }
             }
           } catch (err) {
@@ -394,6 +413,16 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
         })
       }
 
+      // Optimistic XP adjustment
+      const willComplete = nextCompleted
+      let delta = willComplete ? 10 : -10
+      if (willComplete && nextCount === TOTAL_ALIGNMENT_TASKS) {
+        delta += 20
+      } else if (!willComplete && prevCount === TOTAL_ALIGNMENT_TASKS) {
+        delta -= 20
+      }
+      setOptimisticXpDelta((prev) => prev + delta)
+
       // Authenticated users: enqueue background sync
       if (userIdRef.current) {
         if (!queueRef.current.includes(canonicalKey)) {
@@ -409,6 +438,18 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     await fetchAlignment(currentDateRef.current)
   }, [fetchAlignment])
 
+  const progression = useMemo<ProgressionState>(() => {
+    if (userId) {
+      const currentXp = Math.max(0, serverXp + optimisticXpDelta)
+      return calculateProgression(currentXp, serverStage)
+    }
+    const guestXp = calculateXpFromHistory(history, currentDate, tasks)
+    return calculateProgression(guestXp)
+  }, [userId, serverXp, optimisticXpDelta, serverStage, history, currentDate, tasks])
+
+  const effectiveXp = progression.xp
+  const effectiveStage = progression.stage
+
   const value = useMemo<AlignmentContextValue>(() => ({
     tasks,
     completedCount,
@@ -423,6 +464,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     refetch,
     currentDate,
     isGuest,
+    xp: effectiveXp,
+    stage: effectiveStage,
+    progression,
   }), [
     tasks,
     completedCount,
@@ -436,6 +480,9 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
     refetch,
     currentDate,
     isGuest,
+    effectiveXp,
+    effectiveStage,
+    progression,
   ])
 
   return (
@@ -469,6 +516,11 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
 
   const refetch = useCallback(async () => {}, [])
 
+  const progression = useMemo<ProgressionState>(() => {
+    const xp = calculateXpFromHistory([], currentDate, tasks)
+    return calculateProgression(xp)
+  }, [currentDate, tasks])
+
   return {
     tasks,
     completedCount,
@@ -483,6 +535,9 @@ function useStandaloneDailyAlignment(): AlignmentContextValue {
     refetch,
     currentDate,
     isGuest: true,
+    xp: progression.xp,
+    stage: progression.stage,
+    progression,
   }
 }
 

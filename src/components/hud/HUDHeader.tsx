@@ -3,12 +3,14 @@ import { HUDProgressBar } from './HUDProgressBar'
 
 export interface HUDHeaderProps {
   stage?: number
+  xp?: number
   larvaId?: string
   className?: string
 }
 
 export const HUDHeader: React.FC<HUDHeaderProps> = ({
-  stage = 1,
+  stage,
+  xp,
   className = '',
 }) => {
   const scanlineRef = useRef<HTMLDivElement>(null)
@@ -27,7 +29,7 @@ export const HUDHeader: React.FC<HUDHeaderProps> = ({
         />
       </div>
 
-      <HUDProgressBar stage={stage} className="flex-1" />
+      <HUDProgressBar stage={stage} xp={xp} className="flex-1" />
     </header>
   )
 }

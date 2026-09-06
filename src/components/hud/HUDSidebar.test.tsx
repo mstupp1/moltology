@@ -184,8 +184,8 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(closeMenuBtn.textContent).toBe('')
 
     // When mobile menu is open, the progress bar row is rendered in the top header
-    expect(screen.getByLabelText('Level 1 Badge')).toBeInTheDocument()
-    expect(screen.getByLabelText('Next Level 2 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 1 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 2 Badge')).toBeInTheDocument()
   })
 
   it('renders mobile menu as full-screen portal modal with body scroll locked', async () => {

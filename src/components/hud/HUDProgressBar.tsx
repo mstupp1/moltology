@@ -1,25 +1,39 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { HUDTaskBar } from './HUDTaskBar'
+import { useDailyAlignment } from '@/hooks/useDailyAlignment'
+import { calculateProgression } from '@/lib/progression'
 
 export interface HUDProgressBarProps {
   stage?: number
+  xp?: number
   className?: string
   showTaskBar?: boolean
   /** @deprecated Use showTaskBar */
   showClock?: boolean
 }
 
-const PROGRESS = 0
-
 export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
-  stage = 1,
+  stage: propStage,
+  xp: propXp,
   className = '',
   showTaskBar,
   showClock = true,
 }) => {
+  const alignment = useDailyAlignment()
+
+  // Use propStage only if explicitly passed (e.g. testing / override), otherwise derive naturally from XP
+  const effectiveStage = propStage !== undefined ? propStage : (propXp !== undefined ? undefined : alignment.stage)
+  const effectiveXp = propXp !== undefined ? propXp : alignment.xp
+
+  const progression = useMemo(() => {
+    return calculateProgression(effectiveXp, effectiveStage)
+  }, [effectiveXp, effectiveStage])
+
   const isTaskBarVisible = showTaskBar !== undefined ? showTaskBar : showClock
-  const nextStage = Math.min(stage + 1, 4)
-  const isMaxStage = stage >= 4
+  const nextStage = Math.min(progression.stage + 1, 4)
+  const isMaxStage = progression.isMaxStage
+  const progressRatio = progression.progressRatio
+  const fillPercent = isMaxStage ? 100 : Math.round(progressRatio * 100)
 
   return (
     <div className={`flex items-center gap-1.5 sm:gap-3 font-sans select-none min-w-0 ${className}`}>
@@ -30,13 +44,33 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
           {/* Current Stage */}
           <div
             className="flex items-baseline gap-1"
-            title={`Current Clearance Stage ${stage}`}
-            aria-label={`Stage ${stage} Badge`}
+            title={`Current Clearance Stage ${progression.stage}: ${progression.stageTitle}`}
+            aria-label={`Stage ${progression.stage} Badge`}
           >
             <span className="text-[9px] sm:text-[10px] font-semibold text-[#839493] tracking-wider uppercase">STAGE</span>
             <span className="text-[10px] sm:text-xs font-bold text-[#00ffff] drop-shadow-[0_0_6px_rgba(0,255,255,0.7)] leading-none">
-              {stage}
+              {progression.stage}
             </span>
+          </div>
+
+          {/* Telemetry Center: Sub-Stage & XP Progress */}
+          <div
+            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-[#010a0d]/70 border border-cyan-900/30 text-[9px] font-mono tracking-wider"
+            title={`Telemetry: ${progression.subStage.title} · ${effectiveXp.toLocaleString()} Lifetime XP`}
+          >
+            <span className="text-cyan-400 font-bold">{progression.subStage.code}</span>
+            <span className="text-cyan-800 hidden xs:inline">·</span>
+            {!isMaxStage ? (
+              <span className="text-[#839493] hidden xs:inline">
+                <span className="text-[#dfe3e3] font-semibold">{progression.xpIntoStage.toLocaleString()}</span>
+                <span className="text-cyan-800">/</span>
+                <span>{progression.xpNeededForNextStage.toLocaleString()} XP</span>
+              </span>
+            ) : (
+              <span className="text-[#00ff88] font-bold tracking-widest hidden xs:inline">
+                {effectiveXp.toLocaleString()} XP
+              </span>
+            )}
           </div>
 
           {/* Next Stage / Apex Target */}
@@ -79,9 +113,9 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
           >
             {/* ── FILL ── */}
             <div
-              className="absolute top-0 left-0 h-full rounded-full overflow-hidden transition-all duration-700"
+              className="absolute top-0 left-0 h-full rounded-full overflow-hidden transition-all duration-500 ease-out"
               style={{
-                width: `${PROGRESS * 100}%`,
+                width: `${fillPercent}%`,
                 background: 'linear-gradient(90deg, #003a55 0%, #006f85 20%, #00c3ff 45%, #ff6b35 72%, #ff2a1a 85%, #cc0000 100%)',
                 boxShadow: '0 0 10px rgba(255,69,58,0.7), inset 0 1px 0 rgba(255,255,255,0.25)',
               }}
@@ -100,11 +134,11 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
             </div>
 
             {/* ── GLOWING PROGRESS EDGE ── */}
-            {PROGRESS > 0 && (
+            {fillPercent > 0 && (
               <div
-                className="absolute top-0 h-full pointer-events-none"
+                className="absolute top-0 h-full pointer-events-none transition-all duration-500 ease-out"
                 style={{
-                  left: `calc(${PROGRESS * 100}% - 1.5px)`,
+                  left: `calc(${fillPercent}% - 1.5px)`,
                   width: '3px',
                   background: 'white',
                   boxShadow: '0 0 8px 2px rgba(255,255,255,0.9), 0 0 14px 4px rgba(255,100,50,0.8)',

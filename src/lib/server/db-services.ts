@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -51,6 +51,14 @@ import {
   localDateString,
   type AlignmentTaskItem,
 } from '../alignment-tasks'
+import {
+  XP_CONFIG,
+  STAGE_THRESHOLDS,
+  calculateStage,
+  calculateProgression,
+  getStreakMilestoneBonus,
+  type ProgressionState,
+} from '../progression'
 import {
   INITIAL_EQUIPMENT_CATALOG,
   STARTER_EQUIPMENT_CATALOG_IDS,
@@ -3374,6 +3382,9 @@ export interface DailyAlignmentResponse {
   isAllCompleted: boolean
   history: Array<{ date: string; completedCount: number }>
   streakDays: number
+  xp?: number
+  stage?: number
+  progression?: ProgressionState
 }
 
 const getDailyAlignmentSchema = z.object({
@@ -3389,6 +3400,63 @@ const toggleDailyAlignmentSchema = z.object({
   userId: z.string().optional(),
   token: z.string().optional(),
 })
+
+export async function syncUserProgression(dbClient: Db, userId: string): Promise<{ xp: number; stage: number }> {
+  try {
+    const [sumResult] = await dbClient
+      .select({
+        totalXp: sql<number>`COALESCE(SUM(${xpTransactions.amount}), 0)::int`,
+      })
+      .from(xpTransactions)
+      .where(eq(xpTransactions.userId, userId))
+
+    let totalXp = Math.max(0, sumResult?.totalXp ?? 0)
+
+    // Fallback: If user had an existing legacy stage before XP ledger, seed their starting XP
+    if (totalXp === 0) {
+      const [existingProfile] = await dbClient
+        .select({ xp: profiles.xp, stage: profiles.stage })
+        .from(profiles)
+        .where(eq(profiles.id, userId))
+        .limit(1)
+
+      if (existingProfile && (existingProfile.stage > 1 || existingProfile.xp > 0)) {
+        totalXp = Math.max(
+          existingProfile.xp,
+          STAGE_THRESHOLDS.find((s) => s.stage === existingProfile.stage)?.minXp ?? 0
+        )
+        if (totalXp > 0) {
+          await dbClient
+            .insert(xpTransactions)
+            .values({
+              userId,
+              amount: totalXp,
+              source: 'legacy_stage_migration',
+              sourceKey: `legacy_stage:${existingProfile.stage}`,
+              description: `Legacy clearance alignment for Stage ${existingProfile.stage}`,
+            })
+            .onConflictDoNothing()
+        }
+      }
+    }
+
+    const computedStage = calculateStage(totalXp).stage
+
+    await dbClient
+      .update(profiles)
+      .set({
+        xp: totalXp,
+        stage: computedStage,
+        updatedAt: new Date(),
+      })
+      .where(eq(profiles.id, userId))
+
+    return { xp: totalXp, stage: computedStage }
+  } catch (err) {
+    console.warn('[syncUserProgression] progression update warning:', err)
+    return { xp: 0, stage: 1 }
+  }
+}
 
 export const getDailyAlignmentData = async (
   dbClient: Db,
@@ -3443,6 +3511,27 @@ export const getDailyAlignmentData = async (
 
   const streakDays = computeStreak(history, targetDate)
 
+  // Fetch or sync user XP and stage
+  let xp = 0
+  let stage = 1
+  try {
+    const [profileRecord] = await dbClient
+      .select({
+        xp: profiles.xp,
+        stage: profiles.stage,
+      })
+      .from(profiles)
+      .where(eq(profiles.id, userId))
+      .limit(1)
+
+    xp = profileRecord?.xp ?? 0
+    stage = profileRecord?.stage ?? 1
+  } catch (err) {
+    console.warn('[getDailyAlignmentData] profile XP query warning:', err)
+  }
+
+  const progression = calculateProgression(xp, stage)
+
   return {
     date: targetDate,
     tasks,
@@ -3452,6 +3541,9 @@ export const getDailyAlignmentData = async (
     isAllCompleted: completedCount >= TOTAL_ALIGNMENT_TASKS,
     history,
     streakDays,
+    xp,
+    stage,
+    progression,
   }
 }
 
@@ -3464,15 +3556,20 @@ export const getDailyAlignmentHandler = async ({
   const targetDate = date || localDateString()
 
   if (!auth) {
+    const tasks = mergeCompletions([])
+    const progression = calculateProgression(0, 1)
     return {
       date: targetDate,
-      tasks: mergeCompletions([]),
+      tasks,
       completedKeys: [],
       completedCount: 0,
       totalCount: TOTAL_ALIGNMENT_TASKS,
       isAllCompleted: false,
       history: [],
       streakDays: 0,
+      xp: 0,
+      stage: 1,
+      progression,
     }
   }
 
@@ -3491,10 +3588,11 @@ export const toggleDailyAlignmentTaskHandler = async ({
   const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
   const { userId, dbClient } = auth
 
-  const isValidKey = CANONICAL_ALIGNMENT_TASKS.some((t) => t.key === taskKey)
-  if (!isValidKey) {
+  const targetTask = CANONICAL_ALIGNMENT_TASKS.find((t) => t.key === taskKey)
+  if (!targetTask) {
     throw new Error(`Invalid liturgy identifier: ${taskKey}`)
   }
+  const taskTitle = targetTask.title || taskKey
 
   if (completed) {
     await dbClient
@@ -3510,6 +3608,57 @@ export const toggleDailyAlignmentTaskHandler = async ({
     } catch (err) {
       console.warn('[toggleDailyAlignmentTaskFn] activity event write warning:', err)
     }
+
+    // 1. Award base XP for this specific liturgy
+    try {
+      await dbClient
+        .insert(xpTransactions)
+        .values({
+          userId,
+          amount: XP_CONFIG.taskCompletionXp,
+          source: 'task_completion',
+          sourceKey: `routine:${taskKey}:${date}`,
+          description: `Completed liturgy: ${taskTitle}`,
+        })
+        .onConflictDoNothing()
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] task XP transaction warning:', err)
+    }
+
+    // 2. Check if all tasks for today are now completed
+    try {
+      const dayRows = await dbClient
+        .select({ taskKey: routineCompletions.taskKey })
+        .from(routineCompletions)
+        .where(
+          and(
+            eq(routineCompletions.userId, userId),
+            eq(routineCompletions.completedOn, date)
+          )
+        )
+
+      if (dayRows.length >= TOTAL_ALIGNMENT_TASKS) {
+        await dbClient
+          .insert(xpTransactions)
+          .values({
+            userId,
+            amount: XP_CONFIG.allTasksDailyBonusXp,
+            source: 'all_tasks_bonus',
+            sourceKey: `routine_all:${date}`,
+            description: `Daily Alignment Complete: All ${TOTAL_ALIGNMENT_TASKS} liturgies executed`,
+          })
+          .onConflictDoNothing()
+      }
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] all tasks bonus warning:', err)
+    }
+
+    // 3. Recalculate progression and update profile
+    try {
+      await syncUserProgression(dbClient, userId)
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] sync progression warning:', err)
+    }
   } else {
     await dbClient
       .delete(routineCompletions)
@@ -3524,6 +3673,30 @@ export const toggleDailyAlignmentTaskHandler = async ({
       await deleteRoutineCompletedEvent(dbClient, userId, taskKey, date)
     } catch (err) {
       console.warn('[toggleDailyAlignmentTaskFn] activity event delete warning:', err)
+    }
+
+    // Revoke base task XP and all-tasks bonus if unchecked
+    try {
+      await dbClient
+        .delete(xpTransactions)
+        .where(
+          and(
+            eq(xpTransactions.userId, userId),
+            or(
+              eq(xpTransactions.sourceKey, `routine:${taskKey}:${date}`),
+              eq(xpTransactions.sourceKey, `routine_all:${date}`)
+            )
+          )
+        )
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] XP revoke warning:', err)
+    }
+
+    // Recalculate progression and update profile
+    try {
+      await syncUserProgression(dbClient, userId)
+    } catch (err) {
+      console.warn('[toggleDailyAlignmentTaskFn] sync progression warning:', err)
     }
   }
 
