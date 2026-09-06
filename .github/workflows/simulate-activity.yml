@@ -1,0 +1,49 @@
+name: 12-Hour Activity Simulation
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (no database writes)'
+        required: false
+        type: boolean
+        default: false
+      force_spawn:
+        description: 'Force a new acolyte to spawn'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  simulate:
+    name: Simulate Community Activity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Simulation Cycle
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ inputs.force_spawn }}" = "true" ]; then
+            ARGS="$ARGS --force-spawn"
+          fi
+          npx tsx scripts/simulate-activity.ts $ARGS

@@ -53,6 +53,8 @@ describe('Database Schema & RLS Policies', () => {
     expect(profiles.emailOptIn).toBeDefined()
     expect(profiles.emailOptInAt).toBeDefined()
     expect(profiles.emailOptInSource).toBeDefined()
+    expect(profiles.isSimulated).toBeDefined()
+    expect(profiles.simulatedPersona).toBeDefined()
   })
 
   it('defines required fields on the userStats table', () => {

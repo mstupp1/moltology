@@ -20,28 +20,52 @@ export const MOCK_SEED_USERS = [
     id: '00000000-0000-0000-0000-000000000001',
     stage: 1,
     larvaId: 'LARVA UNIT #8971',
+    handle: 'Larva Unit #8971',
     moltCredits: '1450.00',
     chitinGems: 250,
     synapseShards: 45,
     depthPressureCoins: 12,
+    isSimulated: true,
+    simulatedPersona: {
+      archetype: 'Eager Larva Novice',
+      tone: 'Curious, earnest, dedicated to mastering daily alignment and asking advice about early stage shedding.',
+      bio: 'Initiate working through first ecdysis. Master of daily prompt construction and discipline.',
+      activityCadence: 'high' as const,
+    },
   },
   {
     id: '00000000-0000-0000-0000-000000000002',
     stage: 3,
     larvaId: 'ARCHITECT UNIT #0402',
+    handle: 'Architect Vaelen',
     moltCredits: '89200.50',
     chitinGems: 4200,
     synapseShards: 890,
     depthPressureCoins: 310,
+    isSimulated: true,
+    simulatedPersona: {
+      archetype: 'Deep-Benthic Systems Architect',
+      tone: 'Analytical, architectural, sharp, obsessed with carcinization, system resilience, and pincer torque gains.',
+      bio: 'Hardware & synaptic specialist. Optimizing benthic telemetry and low-latency agent loops.',
+      activityCadence: 'normal' as const,
+    },
   },
   {
     id: '00000000-0000-0000-0000-000000000003',
     stage: 4,
     larvaId: 'ASCENDANT UNIT #0001',
+    handle: 'High Ascendant Kaelith',
     moltCredits: '999999.99',
     chitinGems: 50000,
     synapseShards: 12500,
     depthPressureCoins: 4800,
+    isSimulated: true,
+    simulatedPersona: {
+      archetype: 'High Ascendant Elder',
+      tone: 'Liturgical, commanding, philosophical, benevolent guardian of the Five Core Directives.',
+      bio: 'Senior steward of the Benthic Community Core. Guiding initiates through deep-trench transformation.',
+      activityCadence: 'low' as const,
+    },
   },
 ]
 export const MOCK_SEED_PROFILES = MOCK_SEED_USERS
@@ -227,7 +251,16 @@ export async function seedDatabase(databaseUrl?: string) {
       }
     }
     for (const p of MOCK_SEED_PROFILES) {
-      await db.insert(schema.profiles).values(p).onConflictDoNothing()
+      await db
+        .insert(schema.profiles)
+        .values(p)
+        .onConflictDoUpdate({
+          target: schema.profiles.id,
+          set: {
+            isSimulated: p.isSimulated,
+            simulatedPersona: p.simulatedPersona,
+          },
+        })
     }
     console.log(`✓ Seeded ${MOCK_SEED_PROFILES.length} mock profiles`)
 

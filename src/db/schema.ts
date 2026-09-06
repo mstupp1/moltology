@@ -11,6 +11,14 @@ export const neonAuthUser = neonAuthSchema.table('user', {
   emailVerified: boolean('emailVerified'),
 })
 
+export interface SimulatedPersonaConfig {
+  archetype: string
+  tone: string
+  bio?: string
+  activityCadence?: 'high' | 'normal' | 'low'
+  lastSimulatedAt?: string
+}
+
 // Moltology Cult User Profiles Table (Extends neon_auth.user with domain stats)
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey(),
@@ -32,6 +40,8 @@ export const profiles = pgTable('profiles', {
   emailOptIn: boolean('emailOptIn').default(false).notNull(),
   emailOptInAt: timestamp('emailOptInAt'),
   emailOptInSource: text('emailOptInSource'),
+  isSimulated: boolean('isSimulated').default(false).notNull(),
+  simulatedPersona: jsonb('simulatedPersona').$type<SimulatedPersonaConfig>(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
