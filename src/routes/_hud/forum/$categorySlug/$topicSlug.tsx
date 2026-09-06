@@ -13,6 +13,7 @@ import { ForumShell } from '@/components/forum/ForumShell'
 import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
 import { ReplyComposer } from '@/components/forum/ReplyComposer'
 import { ForumPostCard } from '@/components/forum/ForumPostCard'
+import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { getForumTopicDetailFn, ForumPostEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
@@ -205,10 +206,13 @@ function ForumThreadPage() {
               {/* Author & Stats Strip */}
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-[#839493] border-b border-[#3a4a49]/60 pb-3">
                 <span className="flex items-center gap-1.5 min-w-0">
-                  <img
+                  <ForumAvatar
                     src={topic.authorAvatar}
-                    alt=""
-                    className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                    authorName={topic.authorName}
+                    authorHandle={topic.authorHandle}
+                    userId={topic.userId}
+                    avatarConfig={topic.authorAvatarConfig}
+                    className="w-4 h-4"
                   />
                   {topic.userId ? (
                     <Link

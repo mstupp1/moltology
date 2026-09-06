@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ChevronDown, ChevronRight, Clock, MessageSquare } from 'lucide-react'
 import { VoteButton, StageBadge } from '@/components/forum/ForumBits'
+import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ReplyComposer } from '@/components/forum/ReplyComposer'
 import { ForumPostEntry } from '@/lib/server/api'
 import { relativeTime } from '@/lib/forum-utils'
@@ -58,10 +59,13 @@ export function ForumPostCard({
                 {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
             )}
-            <img
+            <ForumAvatar
               src={post.authorAvatar}
-              alt=""
-              className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+              authorName={post.authorName}
+              authorHandle={post.authorHandle}
+              userId={post.userId}
+              avatarConfig={post.authorAvatarConfig}
+              className="w-4 h-4"
             />
             {post.userId ? (
               <Link

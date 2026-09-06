@@ -4,6 +4,7 @@ import { MessageSquare, Eye, Clock } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
 import { relativeTime } from '@/lib/forum-utils'
 import { VoteButton, StageBadge, PinBadge } from './ForumBits'
+import { ForumAvatar } from './ForumAvatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 
 interface ForumTopicRowProps {
@@ -68,10 +69,13 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
                 className="flex items-center gap-1.5 min-w-0 hover:opacity-90"
                 onClick={(e) => e.stopPropagation()}
               >
-                <img
+                <ForumAvatar
                   src={topic.authorAvatar}
-                  alt=""
-                  className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                  authorName={topic.authorName}
+                  authorHandle={topic.authorHandle}
+                  userId={topic.userId}
+                  avatarConfig={topic.authorAvatarConfig}
+                  className="w-4 h-4"
                 />
                 <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px] hover:text-[#00c3ff] transition-colors">
                   {topic.authorName}
@@ -79,10 +83,13 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
               </Link>
             ) : (
               <>
-                <img
+                <ForumAvatar
                   src={topic.authorAvatar}
-                  alt=""
-                  className="w-4 h-4 rounded-full border border-[#3a4a49] object-cover shrink-0"
+                  authorName={topic.authorName}
+                  authorHandle={topic.authorHandle}
+                  userId={topic.userId}
+                  avatarConfig={topic.authorAvatarConfig}
+                  className="w-4 h-4"
                 />
                 <span className="text-[#dfe3e3] font-bold truncate max-w-[120px] sm:max-w-[160px]">
                   {topic.authorName}

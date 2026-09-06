@@ -1066,6 +1066,7 @@ export interface ForumTopicEntry {
   authorName: string
   authorHandle?: string | null
   authorAvatar: string
+  authorAvatarConfig?: any | null
   authorStage: number
   title: string
   slug: string
@@ -1088,6 +1089,7 @@ export interface ForumPostEntry {
   authorName: string
   authorHandle?: string | null
   authorAvatar: string
+  authorAvatarConfig?: any | null
   authorStage: number
   content: string
   upvotes: number
@@ -1279,6 +1281,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         createdAt: forumTopics.createdAt,
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
+        profileAvatarConfig: profiles.avatarConfig,
       })
       .from(forumTopics)
       .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
@@ -1332,6 +1335,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         }),
         authorHandle: (r.profileHandle as string | null | undefined)?.trim() || null,
         authorAvatar: r.authorAvatar,
+        authorAvatarConfig: r.profileAvatarConfig ?? null,
         authorStage: r.authorStage,
         title: r.title,
         slug: r.slug,
@@ -1426,6 +1430,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         profileHandle: profiles.handle,
         profileLarvaId: profiles.larvaId,
         profileStage: profiles.stage,
+        profileAvatarConfig: profiles.avatarConfig,
       })
       .from(forumTopics)
       .leftJoin(forumCategories, eq(forumTopics.categoryId, forumCategories.id))
@@ -1466,6 +1471,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           profileHandle: profiles.handle,
           profileLarvaId: profiles.larvaId,
           profileStage: profiles.stage,
+          profileAvatarConfig: profiles.avatarConfig,
         })
         .from(forumPosts)
         .leftJoin(profiles, eq(forumPosts.userId, profiles.id))
@@ -1488,6 +1494,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         }),
         authorHandle: (p.profileHandle as string | null | undefined)?.trim() || null,
         authorAvatar: p.authorAvatar,
+        authorAvatarConfig: p.profileAvatarConfig ?? null,
         authorStage: p.profileStage ?? p.authorStage,
         content: p.content,
         upvotes: p.upvotes,
@@ -1514,6 +1521,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           }),
           authorHandle: (t.profileHandle as string | null | undefined)?.trim() || null,
           authorAvatar: t.authorAvatar,
+          authorAvatarConfig: t.profileAvatarConfig ?? null,
           authorStage: t.profileStage ?? t.authorStage,
           title: t.title,
           slug: t.slug,
@@ -1649,6 +1657,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     authorName: inserted.authorName,
     authorHandle: userProfile?.handle?.trim() || null,
     authorAvatar: inserted.authorAvatar,
+    authorAvatarConfig: userProfile?.avatarConfig ?? null,
     authorStage: inserted.authorStage,
     title: inserted.title,
     slug: inserted.slug,
@@ -1832,6 +1841,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     authorName: inserted.authorName,
     authorHandle: userProfile?.handle?.trim() || null,
     authorAvatar: inserted.authorAvatar,
+    authorAvatarConfig: userProfile?.avatarConfig ?? null,
     authorStage: inserted.authorStage,
     content: inserted.content,
     upvotes: inserted.upvotes,
