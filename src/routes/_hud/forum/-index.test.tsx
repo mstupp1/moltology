@@ -57,5 +57,24 @@ describe('ForumIndexPage (/_hud/forum/)', () => {
     expect(screen.getByText('Rules & Directives')).toBeInTheDocument()
     expect(screen.getByText('General Discussion')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /new post/i })).toBeInTheDocument()
+    expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
+  })
+
+  it('shows new-transmission counts on boards when the member has unread', () => {
+    const categories = INITIAL_FORUM_CATEGORIES.map((c, index) => ({
+      ...c,
+      topicCount: INITIAL_FORUM_TOPICS.filter((t) => t.categoryId === c.id).length,
+      unreadCount: index === 0 ? 3 : 0,
+    }))
+    mockUseLoaderData.mockReturnValue({
+      categories,
+      topics: [{ ...INITIAL_FORUM_TOPICS[0], unread: true }],
+    })
+
+    render(<ForumIndexPage />)
+
+    const marks = screen.getAllByTestId('forum-unread-mark')
+    expect(marks.some((node) => node.textContent === '3 new')).toBe(true)
+    expect(marks.some((node) => node.textContent === 'New transmission')).toBe(true)
   })
 })

@@ -64,6 +64,25 @@ export function WithdrawnBadge() {
   )
 }
 
+export function ForumUnreadMark({
+  label,
+}: {
+  label: string
+}) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-[9px] font-sans font-bold text-[#00ffff]"
+      data-testid="forum-unread-mark"
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full bg-[#00ffff] shadow-[0_0_6px_rgba(0,255,255,0.7)]"
+        aria-hidden
+      />
+      <span>{label}</span>
+    </span>
+  )
+}
+
 interface VoteButtonProps {
   count: number
   /** `undefined` = server has not hydrated vote state yet; use session cache for instant paint. */

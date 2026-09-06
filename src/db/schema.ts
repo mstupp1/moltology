@@ -441,6 +441,64 @@ export const forumReports = pgTable('forum_reports', {
   }),
 ])
 
+const forumVisitOwner = sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+
+/** Per-member last look at a topic. Opening the thread upserts lastVisitedAt. */
+export const forumTopicVisits = pgTable('forum_topic_visits', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  topicId: uuid('topicId').notNull().references(() => forumTopics.id, { onDelete: 'cascade' }),
+  lastVisitedAt: timestamp('lastVisitedAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('forum_topic_visits_user_topic_unique').on(table.userId, table.topicId),
+  index('forum_topic_visits_user_idx').on(table.userId),
+  pgPolicy('forum_topic_visits_owner_select_policy', {
+    for: 'select',
+    using: forumVisitOwner,
+  }),
+  pgPolicy('forum_topic_visits_owner_insert_policy', {
+    for: 'insert',
+    withCheck: forumVisitOwner,
+  }),
+  pgPolicy('forum_topic_visits_owner_update_policy', {
+    for: 'update',
+    using: forumVisitOwner,
+    withCheck: forumVisitOwner,
+  }),
+  pgPolicy('forum_topic_visits_owner_delete_policy', {
+    for: 'delete',
+    using: forumVisitOwner,
+  }),
+])
+
+/** Per-member first-look baseline for a board. Insert-only; never-opened topics after this are new. */
+export const forumBoardVisits = pgTable('forum_board_visits', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  categoryId: uuid('categoryId').notNull().references(() => forumCategories.id, { onDelete: 'cascade' }),
+  lastVisitedAt: timestamp('lastVisitedAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('forum_board_visits_user_category_unique').on(table.userId, table.categoryId),
+  index('forum_board_visits_user_idx').on(table.userId),
+  pgPolicy('forum_board_visits_owner_select_policy', {
+    for: 'select',
+    using: forumVisitOwner,
+  }),
+  pgPolicy('forum_board_visits_owner_insert_policy', {
+    for: 'insert',
+    withCheck: forumVisitOwner,
+  }),
+  pgPolicy('forum_board_visits_owner_update_policy', {
+    for: 'update',
+    using: forumVisitOwner,
+    withCheck: forumVisitOwner,
+  }),
+  pgPolicy('forum_board_visits_owner_delete_policy', {
+    for: 'delete',
+    using: forumVisitOwner,
+  }),
+])
+
 // User Custom Mutated Avatars Vault Table
 export const userAvatars = pgTable('user_avatars', {
   id: uuid('id').defaultRandom().primaryKey(),

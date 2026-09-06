@@ -58,6 +58,42 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'General Discussion' })).toBeInTheDocument()
     expect(screen.getByText(cat.description)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /new post/i })).toBeInTheDocument()
+    expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
+  })
+
+  it('shows unread chrome on the board header and topic list for members', () => {
+    const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.slug === 'general-discussion')!
+    mockUseLoaderData.mockReturnValue({
+      category: { ...cat, topicCount: 1, unreadCount: 2 },
+      topics: [
+        {
+          id: 'topic-unread',
+          categoryId: cat.id,
+          categorySlug: cat.slug,
+          title: 'Fresh shell notes',
+          slug: 'fresh-shell-notes',
+          content: 'A later reply landed here.',
+          authorName: 'Initiate',
+          authorAvatar: '/images/stage1_larva.png',
+          authorStage: 1,
+          userId: null,
+          isPinned: false,
+          isLocked: false,
+          views: 4,
+          repliesCount: 1,
+          upvotes: 0,
+          lastReplyAt: '2026-09-06T12:00:00.000Z',
+          createdAt: '2026-09-01T12:00:00.000Z',
+          unread: true,
+        },
+      ],
+    })
+
+    render(<ForumBoardPage />)
+
+    const marks = screen.getAllByTestId('forum-unread-mark')
+    expect(marks.some((node) => node.textContent === '2 new')).toBe(true)
+    expect(marks.some((node) => node.textContent === 'New transmission')).toBe(true)
   })
 
   it('shows a not-found state for an unknown board', () => {

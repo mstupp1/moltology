@@ -18,6 +18,8 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
+import { formatForumUnreadCount } from '@/lib/forum-visits'
+import { ForumUnreadMark } from '@/components/forum/ForumBits'
 import { getCategoryBgImage } from '@/lib/forum-seed-data'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -65,6 +67,7 @@ function ForumIndexPage() {
   const composerRef = useRef<InlineTopicComposerHandle>(null)
   const [showRules, setShowRules] = useState(false)
   const [topicsState, setTopicsState] = useState<ForumTopicEntry[]>(topics)
+  const [categoriesState, setCategoriesState] = useState<ForumCategoryEntry[]>(categories)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL')
 
@@ -72,19 +75,30 @@ function ForumIndexPage() {
     setTopicsState(topics)
   }, [topics])
 
-  // Hydrate per-user vote flags after auth is available (SSR loaders cannot send JWT).
+  useEffect(() => {
+    setCategoriesState(categories)
+  }, [categories])
+
+  // Hydrate per-user vote flags and unread after auth is available (SSR loaders cannot send JWT).
   useEffect(() => {
     if (!userId) return
     let active = true
     ;(async () => {
       try {
         const token = await getAuthJWTToken()
-        const tops = await getForumTopicsFn({
-          data: { sortBy: 'hot', userId, token: token ?? undefined },
-        })
+        const auth = { userId, token: token ?? undefined }
+        const [tops, cats] = await Promise.all([
+          getForumTopicsFn({
+            data: { sortBy: 'hot', ...auth },
+          }),
+          getForumCategoriesFn({ data: auth }),
+        ])
         if (active && tops && tops.length > 0) {
           syncForumVotesFromServer(userId, tops)
           setTopicsState(tops)
+        }
+        if (active && cats && cats.length > 0) {
+          setCategoriesState(cats)
         }
       } catch {
         // Keep loader/seed topics if vote hydration fails
@@ -107,7 +121,7 @@ function ForumIndexPage() {
     return matchesCategory && matchesSearch
   })
 
-  const totalTopicsCount = categories.reduce((sum, c) => sum + (c.topicCount || 0), 0)
+  const totalTopicsCount = categoriesState.reduce((sum, c) => sum + (c.topicCount || 0), 0)
 
   return (
     <ForumShell>
@@ -154,12 +168,12 @@ function ForumIndexPage() {
               Discussion Boards
             </h2>
             <span className="text-[10px] font-sans font-bold text-[#839493]">
-              {categories.length} BOARDS ACTIVE
+              {categoriesState.length} BOARDS ACTIVE
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {categories.map((cat) => (
+            {categoriesState.map((cat) => (
               <Link
                 key={cat.id}
                 to="/forum/$categorySlug"
@@ -203,7 +217,12 @@ function ForumIndexPage() {
                 {/* Bottom: Action Footer */}
                 <div className="relative z-10 pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-[10px] font-sans font-bold text-[#839493] group-hover:text-[#00ffff] transition-colors">
                   <span>VIEW BOARD</span>
-                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <span className="flex items-center gap-2">
+                    {typeof cat.unreadCount === 'number' && cat.unreadCount > 0 && (
+                      <ForumUnreadMark label={formatForumUnreadCount(cat.unreadCount)} />
+                    )}
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </div>
               </Link>
             ))}
@@ -216,7 +235,7 @@ function ForumIndexPage() {
           <div className="lg:col-span-7 flex flex-col space-y-3.5 sm:space-y-4">
             <InlineTopicComposer
               ref={composerRef}
-              categories={categories}
+              categories={categoriesState}
               onCreated={(topic) => {
                 setTopicsState((prev) => [topic, ...prev])
                 navigate({
@@ -267,7 +286,7 @@ function ForumIndexPage() {
                   >
                     ALL BOARDS
                   </button>
-                  {categories.map((cat) => (
+                  {categoriesState.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setSelectedCategoryFilter(cat.slug)}
@@ -391,7 +410,7 @@ function ForumIndexPage() {
                 <div className="chitin-card-inset p-2.5 border border-[#3a4a49] chamfer-corner space-y-0.5">
                   <span className="text-[10px] text-[#839493] uppercase font-bold">ACTIVE BOARDS</span>
                   <div className="font-grotesk font-bold text-base text-[#00ffff]">
-                    {categories.length}
+                    {categoriesState.length}
                   </div>
                 </div>
               </div>

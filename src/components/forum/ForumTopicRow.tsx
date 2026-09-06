@@ -3,7 +3,8 @@ import { Link } from '@tanstack/react-router'
 import { MessageSquare, Eye, Clock } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
 import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime } from '@/lib/forum-utils'
-import { VoteButton, StageBadge, PinBadge, WithdrawnBadge } from './ForumBits'
+import { FORUM_UNREAD_LABEL } from '@/lib/forum-visits'
+import { VoteButton, StageBadge, PinBadge, WithdrawnBadge, ForumUnreadMark } from './ForumBits'
 import { ForumAvatar } from './ForumAvatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 
@@ -16,7 +17,13 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
   const categorySlug = topic.categorySlug || 'general-discussion'
 
   return (
-    <div className="chitin-card-inset p-3 sm:p-3.5 border border-[#3a4a49] hover:border-[#00ffff]/60 transition-all chamfer-corner group flex items-start gap-3 sm:gap-3.5 bg-[#070b0b]/60">
+    <div
+      className={`chitin-card-inset p-3 sm:p-3.5 border transition-all chamfer-corner group flex items-start gap-3 sm:gap-3.5 bg-[#070b0b]/60 ${
+        topic.unread
+          ? 'border-[#00ffff]/45 hover:border-[#00ffff]/80'
+          : 'border-[#3a4a49] hover:border-[#00ffff]/60'
+      }`}
+    >
       <VoteButton
         count={topic.upvotes}
         voted={topic.voted}
@@ -41,6 +48,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
           )}
           {topic.isPinned && <PinBadge />}
           {isForumEntryWithdrawn(topic) && <WithdrawnBadge />}
+          {topic.unread && <ForumUnreadMark label={FORUM_UNREAD_LABEL} />}
         </div>
 
         <Link

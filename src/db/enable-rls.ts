@@ -411,6 +411,46 @@ async function applyRLS() {
     );`
     console.log('✓ RLS policies configured for forum_reports table')
 
+    await sql`ALTER TABLE IF EXISTS forum_topic_visits ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS forum_topic_visits_owner_select_policy ON forum_topic_visits;`
+    await sql`CREATE POLICY forum_topic_visits_owner_select_policy ON forum_topic_visits FOR SELECT USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_topic_visits_owner_insert_policy ON forum_topic_visits;`
+    await sql`CREATE POLICY forum_topic_visits_owner_insert_policy ON forum_topic_visits FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_topic_visits_owner_update_policy ON forum_topic_visits;`
+    await sql`CREATE POLICY forum_topic_visits_owner_update_policy ON forum_topic_visits FOR UPDATE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    ) WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_topic_visits_owner_delete_policy ON forum_topic_visits;`
+    await sql`CREATE POLICY forum_topic_visits_owner_delete_policy ON forum_topic_visits FOR DELETE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
+    await sql`ALTER TABLE IF EXISTS forum_board_visits ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS forum_board_visits_owner_select_policy ON forum_board_visits;`
+    await sql`CREATE POLICY forum_board_visits_owner_select_policy ON forum_board_visits FOR SELECT USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_board_visits_owner_insert_policy ON forum_board_visits;`
+    await sql`CREATE POLICY forum_board_visits_owner_insert_policy ON forum_board_visits FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_board_visits_owner_update_policy ON forum_board_visits;`
+    await sql`CREATE POLICY forum_board_visits_owner_update_policy ON forum_board_visits FOR UPDATE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    ) WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_board_visits_owner_delete_policy ON forum_board_visits;`
+    await sql`CREATE POLICY forum_board_visits_owner_delete_policy ON forum_board_visits FOR DELETE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
     // Enable RLS for leads table
     await sql`ALTER TABLE IF EXISTS leads ENABLE ROW LEVEL SECURITY;`
     await sql`DROP POLICY IF EXISTS leads_public_insert_policy ON leads;`
