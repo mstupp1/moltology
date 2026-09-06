@@ -14,7 +14,7 @@ export async function backfillSimulatedUsers() {
     const existing = await db
       .select({ id: profiles.id, handle: profiles.handle })
       .from(profiles)
-      .where(or(eq(profiles.id, mockUser.id), eq(profiles.larvaId, mockUser.larvaId)))
+      .where(eq(profiles.id, mockUser.id))
 
     for (const row of existing) {
       await db
