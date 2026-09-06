@@ -195,6 +195,12 @@ Do **not** show plain “Loading…” copy for Neon-backed HUD surfaces.
 
 Primitives: [`HudGhostLoader.tsx`](../../../src/components/ui/HudGhostLoader.tsx). Generic route composite: [`HudWorkspaceGhost`](../../../src/components/hud/HudGhostSkeletons.tsx) in [`HudGhostSkeletons.tsx`](../../../src/components/hud/HudGhostSkeletons.tsx).
 
+## Storage, retention, and backups
+
+Canonical plan: [`docs/neon-storage-retention.md`](../../../docs/neon-storage-retention.md). Typed windows: [`src/lib/data-retention.ts`](../../../src/lib/data-retention.ts) (`lean` default, `lenient` overlay). Dry-run inventory: `npm run db:retention-report`.
+
+Do **not** TTL canonical community/content tables. High-churn HUD telemetry (`activity_events`, read notifications, closed friend requests) is hot-then-delete. Oracle messages and old per-task completions summarize, then archive to a **private** object-storage bucket (never `moltology-public-assets`), then delete. Neon Free PITR is 6 hours and scheduled snapshots are paid-only — rotating one manual snapshot plus weekly `pg_dump` to private storage is the backup story until Launch.
+
 ## Related paths
 
 | Path | Role |
@@ -203,10 +209,13 @@ Primitives: [`HudGhostLoader.tsx`](../../../src/components/ui/HudGhostLoader.tsx
 | `drizzle/` | Versioned SQL migrations |
 | `src/db/enable-rls.ts` | RLS policies |
 | `src/db/seed.ts` | Dev full seed |
+| `src/lib/data-retention.ts` | Lean/lenient retention windows and eligibility |
+| `docs/neon-storage-retention.md` | Storage, archive, and backup plan |
 | `src/lib/server/api.ts` | Most createServerFn handlers |
 | `src/lib/server/write-auth.ts` | Write auth resolution |
 | `src/lib/jwt.ts` | `getAuthJWTToken` / JWKS verify |
 | `.github/workflows/migrate.yml` | Prod migrate + RLS |
+| `.github/workflows/db-retention-report.yml` | Weekly dry-run storage inventory |
 | `src/components/ui/HudGhostLoader.tsx` | Ghost loader primitives + `HudGhostWidget` |
 | `src/components/hud/HudGhostSkeletons.tsx` | Page/widget ghost composites |
 | `src/components/hud/HudTitlePanel.tsx` | Shared page title banner (use for every new HUD page header) |
