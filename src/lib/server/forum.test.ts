@@ -385,8 +385,10 @@ describe('Forum Server Handlers', () => {
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
-          insertedValues = values
+          if ('content' in values) insertedValues = values
           return {
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
             returning: vi.fn().mockResolvedValue([
               {
                 id: 'post-b',
@@ -545,8 +547,10 @@ describe('Forum Server Handlers', () => {
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
-          insertedValues = values
+          if ('content' in values) insertedValues = values
           return {
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
             returning: vi.fn().mockResolvedValue([
               {
                 id: 'post-nested',
@@ -790,8 +794,10 @@ describe('Forum Server Handlers', () => {
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
-          insertedValues = values
+          if ('content' in values) insertedValues = values
           return {
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
             returning: vi.fn().mockResolvedValue([
               {
                 id: 'topic-handle',

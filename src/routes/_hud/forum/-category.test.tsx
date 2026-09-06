@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { INITIAL_FORUM_CATEGORIES } from '../../../lib/forum-seed-data'
 
 const mockUseLoaderData = vi.fn()
@@ -37,6 +37,7 @@ vi.mock('@/lib/jwt', () => ({
   getAuthJWTToken: vi.fn().mockResolvedValue(null),
 }))
 
+import { getForumTopicsFn } from '@/lib/server/api'
 import { Route } from './$categorySlug/index'
 const ForumBoardPage = Route.options.component!
 
@@ -61,39 +62,40 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
     expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
   })
 
-  it('shows unread chrome on the board header and topic list for members', () => {
+  it('shows unread chrome on the board header and topic list for members', async () => {
     const cat = INITIAL_FORUM_CATEGORIES.find((c) => c.slug === 'general-discussion')!
+    const unreadTopic = {
+      id: 'topic-unread',
+      categoryId: cat.id,
+      categorySlug: cat.slug,
+      title: 'Fresh shell notes',
+      slug: 'fresh-shell-notes',
+      content: 'A later reply landed here.',
+      authorName: 'Initiate',
+      authorAvatar: '/images/stage1_larva.png',
+      authorStage: 1,
+      userId: null,
+      isPinned: false,
+      isLocked: false,
+      views: 4,
+      repliesCount: 1,
+      upvotes: 0,
+      lastReplyAt: '2026-09-06T12:00:00.000Z',
+      createdAt: '2026-09-01T12:00:00.000Z',
+      unread: true,
+    }
+    vi.mocked(getForumTopicsFn).mockResolvedValue([unreadTopic] as any)
     mockUseLoaderData.mockReturnValue({
       category: { ...cat, topicCount: 1, unreadCount: 2 },
-      topics: [
-        {
-          id: 'topic-unread',
-          categoryId: cat.id,
-          categorySlug: cat.slug,
-          title: 'Fresh shell notes',
-          slug: 'fresh-shell-notes',
-          content: 'A later reply landed here.',
-          authorName: 'Initiate',
-          authorAvatar: '/images/stage1_larva.png',
-          authorStage: 1,
-          userId: null,
-          isPinned: false,
-          isLocked: false,
-          views: 4,
-          repliesCount: 1,
-          upvotes: 0,
-          lastReplyAt: '2026-09-06T12:00:00.000Z',
-          createdAt: '2026-09-01T12:00:00.000Z',
-          unread: true,
-        },
-      ],
+      topics: [unreadTopic],
     })
 
     render(<ForumBoardPage />)
 
-    const marks = screen.getAllByTestId('forum-unread-mark')
-    expect(marks.some((node) => node.textContent === '2 new')).toBe(true)
-    expect(marks.some((node) => node.textContent === 'New transmission')).toBe(true)
+    expect(screen.getAllByTestId('forum-unread-mark').some((node) => node.textContent === '2 new')).toBe(true)
+    await waitFor(() => {
+      expect(screen.getByText('New transmission')).toBeInTheDocument()
+    })
   })
 
   it('shows a not-found state for an unknown board', () => {
