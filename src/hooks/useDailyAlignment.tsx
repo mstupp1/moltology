@@ -441,11 +441,11 @@ export function AlignmentProvider({ children }: { children: React.ReactNode }) {
   const progression = useMemo<ProgressionState>(() => {
     if (userId) {
       const currentXp = Math.max(0, serverXp + optimisticXpDelta)
-      return calculateProgression(currentXp, serverStage)
+      return calculateProgression(currentXp)
     }
     const guestXp = calculateXpFromHistory(history, currentDate, tasks)
     return calculateProgression(guestXp)
-  }, [userId, serverXp, optimisticXpDelta, serverStage, history, currentDate, tasks])
+  }, [userId, serverXp, optimisticXpDelta, history, currentDate, tasks])
 
   const effectiveXp = progression.xp
   const effectiveStage = progression.stage

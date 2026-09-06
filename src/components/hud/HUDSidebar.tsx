@@ -50,11 +50,13 @@ const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/subterranean', '
 interface HUDSidebarProps {
   larvaId?: string
   stage?: number
+  xp?: number
 }
 
 export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   larvaId = 'LARVA UNIT #8971',
-  stage = 1,
+  stage,
+  xp,
 }) => {
   const router = typeof useRouter === 'function' ? useRouter() : null
   const navigate = useNavigate()
@@ -688,7 +690,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 : 'opacity-0 pointer-events-none absolute inset-y-0 left-2.5 right-12'
             }`}
           >
-            <HUDProgressBar stage={stage} showTaskBar={false} className="w-full" />
+            <HUDProgressBar stage={stage} xp={xp} showTaskBar={false} className="w-full" />
           </div>
 
           {/* Right Action Controls */}

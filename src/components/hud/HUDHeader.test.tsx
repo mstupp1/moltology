@@ -44,12 +44,19 @@ describe('HUDHeader Component', () => {
     expect(screen.getByText('APEX')).toBeInTheDocument()
   })
 
-  it('renders dynamic XP telemetry readout when xp is passed', () => {
-    render(<HUDHeader xp={2500} />)
+  it('renders Stage 2 to Stage 3 clearance badges without sub-stage code when xp is passed', () => {
+    const { container } = render(<HUDHeader xp={2500} />)
 
-    // 2500 XP is Stage 2 (The Soft-Shed), Sub-Stage S-1
-    expect(screen.getByText('S-1')).toBeInTheDocument()
-    expect(screen.getByText('500')).toBeInTheDocument()
-    expect(screen.getByText('8,000 XP')).toBeInTheDocument()
+    // 2500 XP is Stage 2 (The Soft-Shed), progressing toward Stage 3
+    expect(screen.getByLabelText('Stage 2 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 3 Badge')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+
+    // Sub-stage code S-1 should NOT appear in the progress bar
+    expect(screen.queryByText('S-1')).not.toBeInTheDocument()
+
+    // 500 / 8,000 XP in Stage 2 = 6%
+    expect(container.querySelector('[aria-label="Progression: 6% from Stage 2 to Stage 3"]')).toBeInTheDocument()
   })
 })

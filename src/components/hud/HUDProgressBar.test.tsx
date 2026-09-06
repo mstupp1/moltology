@@ -52,20 +52,34 @@ describe('HUDProgressBar Component', () => {
     expect(container.querySelector('[aria-label="Daily alignment tasks schedule"]')).not.toBeInTheDocument()
   })
 
-  it('renders dynamic XP telemetry and sub-stage code', () => {
-    render(<HUDProgressBar xp={1500} />)
+  it('renders stage 1 to stage 2 progression without sub-stage codes when xp is passed', () => {
+    const { container } = render(<HUDProgressBar xp={1500} />)
 
-    // 1500 XP is Sub-Stage L-3: First Calcification
-    expect(screen.getByText('L-3')).toBeInTheDocument()
-    expect(screen.getByText('1,500')).toBeInTheDocument()
-    expect(screen.getByText('2,000 XP')).toBeInTheDocument()
+    expect(screen.getByLabelText('Stage 1 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Next Stage 2 Badge')).toBeInTheDocument()
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+
+    // Sub-stage codes like L-1 or L-3 should NOT be displayed in the macro progress bar
+    expect(screen.queryByText('L-1')).not.toBeInTheDocument()
+    expect(screen.queryByText('L-3')).not.toBeInTheDocument()
+
+    // Accessible progression label verifies correct proportional fill
+    expect(container.querySelector('[aria-label="Progression: 75% from Stage 1 to Stage 2"]')).toBeInTheDocument()
   })
 
-  it('renders Apex XP readout when at Apex Stage', () => {
-    render(<HUDProgressBar xp={50000} />)
+  it('keeps bar 100% full at Stage 4 Apex without sub-stage codes', () => {
+    const { container } = render(<HUDProgressBar xp={50000} />)
 
+    expect(screen.getByLabelText('Stage 4 Badge')).toBeInTheDocument()
+    expect(screen.getByLabelText('Apex Stage Badge')).toBeInTheDocument()
+    expect(screen.getByText('4')).toBeInTheDocument()
     expect(screen.getByText('APEX')).toBeInTheDocument()
-    expect(screen.getByText('C-1')).toBeInTheDocument()
-    expect(screen.getByText('50,000 XP')).toBeInTheDocument()
+
+    // Sub-stage code C-1 should NOT be displayed
+    expect(screen.queryByText('C-1')).not.toBeInTheDocument()
+
+    // 100% full progress ratio
+    expect(container.querySelector('[aria-label="Progression: Stage 4 Apex (100%)"]')).toBeInTheDocument()
   })
 })
