@@ -48,6 +48,7 @@ vi.mock('@/lib/auth-client', () => ({
 import { authClient } from '@/lib/auth-client'
 import { getForumTopicDetailFn } from '@/lib/server/api'
 import { Route } from './$categorySlug/$topicSlug'
+import { FORUM_LOCKED_ERROR } from '../../../lib/community-rules'
 const ForumThreadPage = Route.options.component!
 
 describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
@@ -76,6 +77,28 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByText(/Greetings Initiates/)).toBeInTheDocument()
     expect(screen.getByText(/0 Comments/)).toBeInTheDocument()
     expect(screen.getByText('Sign in to join the discussion.')).toBeInTheDocument()
+  })
+
+  it('shows a locked notice instead of the reply composer', () => {
+    const seed = INITIAL_FORUM_TOPICS[0]
+    mockUseLoaderData.mockReturnValue({
+      topic: {
+        ...seed,
+        isLocked: true,
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+        categoryColor: '#ff5540',
+        userId: null,
+      },
+      posts: [],
+    })
+
+    render(<ForumThreadPage />)
+
+    expect(screen.getByTestId('forum-thread-locked')).toHaveTextContent(FORUM_LOCKED_ERROR)
+    expect(screen.getByTestId('forum-lock-badge')).toBeInTheDocument()
+    expect(screen.queryByText('Sign in to join the discussion.')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('forum-top-reply-composer')).not.toBeInTheDocument()
   })
 
   it('holds the sign-in prompt while the session is unresolved', () => {

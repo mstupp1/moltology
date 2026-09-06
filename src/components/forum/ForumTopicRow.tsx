@@ -4,7 +4,7 @@ import { MessageSquare, Eye, Clock } from 'lucide-react'
 import type { ForumTopicEntry } from '@/lib/server/api'
 import { FORUM_WITHDRAWN_PREVIEW, isForumEntryWithdrawn, relativeTime } from '@/lib/forum-utils'
 import { FORUM_UNREAD_LABEL } from '@/lib/forum-visits'
-import { VoteButton, StageBadge, PinBadge, WithdrawnBadge, ForumUnreadMark } from './ForumBits'
+import { VoteButton, StageBadge, PinBadge, LockBadge, WithdrawnBadge, ForumUnreadMark } from './ForumBits'
 import { ForumAvatar } from './ForumAvatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 
@@ -47,6 +47,7 @@ export function ForumTopicRow({ topic, showCategory = true }: ForumTopicRowProps
             </span>
           )}
           {topic.isPinned && <PinBadge />}
+          {topic.isLocked && <LockBadge />}
           {isForumEntryWithdrawn(topic) && <WithdrawnBadge />}
           {topic.unread && <ForumUnreadMark label={FORUM_UNREAD_LABEL} />}
         </div>

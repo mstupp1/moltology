@@ -70,6 +70,12 @@ export const FORUM_REPORT_COPY = {
   missingTarget: 'That transmission is no longer available.',
   watchSealed: 'This ledger is sealed.',
   watchEmpty: 'The deep is quiet. No open flags.',
+  watchMarkReviewed: 'Mark reviewed',
+  watchMarking: 'Saving...',
+  toastReviewed: 'Flag marked reviewed.',
+  toastReviewError: 'Could not mark that flag reviewed. Please try again.',
+  alreadyReviewed: 'This flag was already reviewed.',
+  missingReport: 'That flag is no longer available.',
 } as const
 
 export function isForumReportReason(value: string | null | undefined): value is ForumReportReason {

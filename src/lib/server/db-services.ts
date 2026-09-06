@@ -24,7 +24,11 @@ import {
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
-import { validateForumContent } from '../community-rules'
+import {
+  assertForumWriteRateLimit,
+  FORUM_LOCKED_ERROR,
+  validateForumContent,
+} from '../community-rules'
 import {
   slugifyForumTitle,
   compareHot,
@@ -1844,6 +1848,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error('Unauthenticated: You must be registered and logged in to create discussion topics.')
   }
   const { userId, dbClient, payload } = auth
+  assertForumWriteRateLimit(userId)
 
   if (!data?.categoryId || !data?.title || !data?.content) {
     throw new Error('Invalid input: Category, title, and content are required.')
@@ -1970,6 +1975,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error('Unauthenticated: You must be registered and logged in to post replies.')
   }
   const { userId, dbClient, payload } = auth
+  assertForumWriteRateLimit(userId)
 
   if (!data?.topicId || !data?.content) {
     throw new Error('Invalid input: Topic ID and content are required.')
@@ -2001,6 +2007,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       slug: forumTopics.slug,
       categoryId: forumTopics.categoryId,
       userId: forumTopics.userId,
+      isLocked: forumTopics.isLocked,
     })
     .from(forumTopics)
     .where(eq(forumTopics.id, data.topicId))
@@ -2008,6 +2015,9 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
 
   if (!topicExists) {
     throw new Error('This thread is no longer available. Refresh the forums and try again.')
+  }
+  if (topicExists.isLocked) {
+    throw new Error(FORUM_LOCKED_ERROR)
   }
 
   let parentId: string | null = data.parentId?.trim() || null
@@ -2233,6 +2243,7 @@ export const updateForumTopicHandler = async ({
   }
 
   const { userId, dbClient } = auth
+  assertForumWriteRateLimit(userId)
   const [existing] = await dbClient
     .select()
     .from(forumTopics)
@@ -2343,6 +2354,7 @@ export const updateForumPostHandler = async ({
   }
 
   const { userId, dbClient } = auth
+  assertForumWriteRateLimit(userId)
   const [existing] = await dbClient
     .select()
     .from(forumPosts)
@@ -2900,6 +2912,74 @@ export const listForumReportsHandler = async ({
       targetWithdrawn: Boolean(topic?.deletedAt || post?.deletedAt),
     }
   })
+}
+
+export interface ReviewForumReportInput {
+  reportId: string
+  userId?: string
+  token?: string
+}
+
+export interface ForumReportReviewReceipt {
+  id: string
+  status: string
+  alreadyReviewed: boolean
+}
+
+/**
+ * Server Function: Elevated accounts mark an open flag as reviewed.
+ * Soft status change only — the target body is not mutated.
+ */
+export const reviewForumReportHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<ReviewForumReportInput>): Promise<ForumReportReviewReceipt> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required.')
+  }
+  if (!data?.reportId) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const { userId, dbClient, payload } = auth
+  await assertCovenantSteward(dbClient, userId, payload)
+
+  const [existing] = await dbClient
+    .select({
+      id: forumReports.id,
+      status: forumReports.status,
+    })
+    .from(forumReports)
+    .where(eq(forumReports.id, data.reportId))
+    .limit(1)
+
+  if (!existing) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+  if (existing.status !== 'open') {
+    return { id: existing.id, status: existing.status, alreadyReviewed: true }
+  }
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumReports)
+    .set({ status: 'reviewed', updatedAt: now })
+    .where(eq(forumReports.id, existing.id))
+    .returning({
+      id: forumReports.id,
+      status: forumReports.status,
+    })
+
+  if (!updated) {
+    throw new Error(FORUM_REPORT_COPY.toastReviewError)
+  }
+
+  return {
+    id: updated.id,
+    status: updated.status,
+    alreadyReviewed: false,
+  }
 }
 
 export interface ToggleForumVoteInput {

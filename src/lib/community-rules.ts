@@ -2,6 +2,15 @@
  * Community Rules & Guardrails for Moltology Neural Hub
  */
 
+import { checkRateLimit } from './ai/guardrails'
+import {
+  CONTENT_HARM_ERROR,
+  CONTENT_SECRET_ERROR,
+  containsHarmfulContent,
+  containsSecretLeak,
+  stripControlChars,
+} from './content-safety'
+
 export interface CommunityRule {
   id: number
   title: string
@@ -58,6 +67,36 @@ export interface GuardrailValidationResult {
   error?: string
 }
 
+export const FORUM_WRITE_RATE_LIMIT = 10
+export const FORUM_WRITE_RATE_WINDOW_MS = 60 * 1000
+export const FORUM_WRITE_RATE_ERROR = 'You are posting too quickly. Wait a minute and try again.'
+export const FORUM_LOCKED_ERROR = 'This thread is locked. New replies are closed.'
+
+/**
+ * Caps signed-in topic/reply create and edit traffic per member.
+ */
+export function assertForumWriteRateLimit(userId: string): void {
+  const result = checkRateLimit(
+    `forum-write:${userId}`,
+    FORUM_WRITE_RATE_LIMIT,
+    FORUM_WRITE_RATE_WINDOW_MS,
+  )
+  if (!result.success) {
+    throw new Error(FORUM_WRITE_RATE_ERROR)
+  }
+}
+
+function scanForumSafety(text: string): GuardrailValidationResult | null {
+  const cleaned = stripControlChars(text)
+  if (containsSecretLeak(cleaned)) {
+    return { valid: false, error: CONTENT_SECRET_ERROR }
+  }
+  if (containsHarmfulContent(cleaned)) {
+    return { valid: false, error: CONTENT_HARM_ERROR }
+  }
+  return null
+}
+
 /**
  * Validates forum topic or reply content against community guardrails.
  */
@@ -97,14 +136,11 @@ export function validateForumContent(
     }
   }
 
-  // Check for common credentials/secrets leak patterns
-  const secretPattern = /(bearer\s+[a-zA-Z0-9_\-\.]{20,}|postgres:\/\/[^\s]+|sk-[a-zA-Z0-9]{32,})/i
-  if (secretPattern.test(trimmedContent) || (title && secretPattern.test(trimmedTitle))) {
-    return {
-      valid: false,
-      error: 'Content appears to contain sensitive information such as API keys, passwords, or connection strings.',
-    }
-  }
+  const titleSafety = title !== undefined ? scanForumSafety(trimmedTitle) : null
+  if (titleSafety) return titleSafety
+
+  const bodySafety = scanForumSafety(trimmedContent)
+  if (bodySafety) return bodySafety
 
   return { valid: true }
 }
