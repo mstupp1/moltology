@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { AlertTriangle, ChevronDown, ChevronRight, Clock, MessageSquare, Link2, Check, Quote } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight, Clock, MessageSquare, Link2, Check, Quote, MoreHorizontal, Pencil, Undo2, Flag } from 'lucide-react'
 import { VoteButton, StageBadge } from '@/components/forum/ForumBits'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ReplyComposer } from '@/components/forum/ReplyComposer'
@@ -10,7 +10,7 @@ import { relativeTime } from '@/lib/forum-utils'
 import { forumReplyIndentDepth, type ForumPostTreeNode } from '@/lib/forum-utils'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
-import { ForumAuthorTools, ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
+import { ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
 import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
 import { isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
@@ -18,6 +18,13 @@ import { useForumAuth } from '@/components/forum/ForumShell'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { validateForumContent } from '@/lib/community-rules'
+import {
+  HudDropdownMenu,
+  HudDropdownMenuTrigger,
+  HudDropdownMenuContent,
+  HudDropdownMenuItem,
+  HudDropdownMenuSeparator,
+} from '@/components/ui/HudDropdownMenu'
 
 export interface ForumPostCardProps {
   node: ForumPostTreeNode<ForumPostEntry>
@@ -335,7 +342,7 @@ export function ForumPostCard({
             )}
 
             {/* Bottom Actions Bar */}
-            <div className="pt-2 border-t border-[#3a4a49]/40 flex flex-wrap items-center justify-between gap-2">
+            <div className="pt-2 border-t border-[#3a4a49]/40 flex items-center justify-between gap-2">
               <VoteButton
                 count={post.upvotes}
                 voted={post.voted}
@@ -345,32 +352,7 @@ export function ForumPostCard({
                 size="inline"
               />
 
-              <div className="flex flex-wrap items-center gap-2">
-                {canAuthor && (
-                  <ForumAuthorTools
-                    confirmingWithdraw={confirmingWithdraw}
-                    busy={busy}
-                    onRevise={() => {
-                      setDraft(post.content)
-                      setConfirmingWithdraw(false)
-                      setEditing(true)
-                      setError(null)
-                    }}
-                    onStartWithdraw={() => {
-                      setEditing(false)
-                      setConfirmingWithdraw(true)
-                    }}
-                    onCancelWithdraw={() => setConfirmingWithdraw(false)}
-                    onConfirmWithdraw={handleWithdraw}
-                  />
-                )}
-                <ForumFlagControl
-                  topicId={topicId}
-                  postId={post.id}
-                  authorId={post.userId}
-                  withdrawn={withdrawn}
-                  deletedAt={post.deletedAt}
-                />
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 {!withdrawn && (
                   <button
                     type="button"
@@ -379,7 +361,7 @@ export function ForumPostCard({
                     data-testid="forum-quote-post"
                   >
                     <Quote className="w-3.5 h-3.5" />
-                    <span>Quote</span>
+                    <span className="hidden xs:inline">Quote</span>
                   </button>
                 )}
                 {!withdrawn && (
@@ -393,8 +375,119 @@ export function ForumPostCard({
                     <span>Reply</span>
                   </button>
                 )}
+
+                {/* More Options / Overflow Menu */}
+                <HudDropdownMenu>
+                  <HudDropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Post options"
+                      title="More options"
+                      data-testid="forum-post-actions-menu"
+                      className="p-1 text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors focus:outline-none"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                  </HudDropdownMenuTrigger>
+                  <HudDropdownMenuContent align="end" sideOffset={4}>
+                    <HudDropdownMenuItem
+                      onSelect={handleCopyLink}
+                      data-testid="forum-copy-link-menu-item"
+                    >
+                      {copied ? (
+                        <Check className="w-3.5 h-3.5 text-[#00ffff] shrink-0" />
+                      ) : (
+                        <Link2 className="w-3.5 h-3.5 shrink-0" />
+                      )}
+                      <span>{copied ? 'Link Copied!' : 'Copy Link'}</span>
+                    </HudDropdownMenuItem>
+
+                    {canAuthor && (
+                      <div data-testid="forum-author-tools">
+                        <HudDropdownMenuItem
+                          onSelect={() => {
+                            setDraft(post.content)
+                            setConfirmingWithdraw(false)
+                            setEditing(true)
+                            setError(null)
+                          }}
+                          data-testid="forum-revise"
+                        >
+                          <Pencil className="w-3.5 h-3.5 shrink-0" />
+                          <span>Revise</span>
+                        </HudDropdownMenuItem>
+                      </div>
+                    )}
+
+                    <ForumFlagControl
+                      topicId={topicId}
+                      postId={post.id}
+                      authorId={post.userId}
+                      withdrawn={withdrawn}
+                      deletedAt={post.deletedAt}
+                      customTrigger={(openFlagDialog) => (
+                        <HudDropdownMenuItem
+                          onSelect={openFlagDialog}
+                          className="text-[#839493] hover:text-[#ffb703] data-[highlighted]:text-[#ffb703] data-[highlighted]:bg-[#ffb703]/10"
+                          data-testid="forum-flag"
+                        >
+                          <Flag className="w-3.5 h-3.5 shrink-0 text-[#ffb703]" />
+                          <span>Report</span>
+                        </HudDropdownMenuItem>
+                      )}
+                    />
+
+                    {canAuthor && (
+                      <>
+                        <HudDropdownMenuSeparator />
+                        <HudDropdownMenuItem
+                          destructive
+                          onSelect={() => {
+                            setEditing(false)
+                            setConfirmingWithdraw(true)
+                          }}
+                          data-testid="forum-withdraw"
+                        >
+                          <Undo2 className="w-3.5 h-3.5 shrink-0" />
+                          <span>Withdraw</span>
+                        </HudDropdownMenuItem>
+                      </>
+                    )}
+                  </HudDropdownMenuContent>
+                </HudDropdownMenu>
               </div>
             </div>
+
+            {/* Inline Withdraw Confirmation */}
+            {confirmingWithdraw && (
+              <div
+                className="p-2.5 bg-[#2d0f0f]/60 border border-[#ff5540]/60 chamfer-corner flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in duration-150"
+                data-testid="forum-withdraw-confirm"
+              >
+                <span className="text-xs text-[#dfe3e3]">
+                  Withdraw this transmission? The body will be sealed. Replies stay in the thread.
+                </span>
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingWithdraw(false)}
+                    disabled={busy}
+                    className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors disabled:opacity-50"
+                  >
+                    Keep it
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleWithdraw}
+                    disabled={busy}
+                    className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-[#ff5540] hover:bg-[#ff7766] text-black chamfer-corner transition-all disabled:opacity-50"
+                    data-testid="forum-withdraw-confirm-btn"
+                  >
+                    {busy ? 'Withdrawing...' : 'Withdraw'}
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
 

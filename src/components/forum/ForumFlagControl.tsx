@@ -19,6 +19,7 @@ export interface ForumFlagControlProps {
   authorId?: string | null
   withdrawn?: boolean
   deletedAt?: string | null
+  customTrigger?: (open: () => void) => React.ReactNode
 }
 
 export function ForumFlagControl({
@@ -27,6 +28,7 @@ export function ForumFlagControl({
   authorId,
   withdrawn,
   deletedAt,
+  customTrigger,
 }: ForumFlagControlProps) {
   const { userId } = useForumAuth()
   const persist = useHudPersist()
@@ -85,15 +87,19 @@ export function ForumFlagControl({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#ffb703] hover:bg-[#ffb703]/10 rounded transition-colors"
-        data-testid="forum-flag"
-      >
-        <Flag className="w-3.5 h-3.5" />
-        <span>{FORUM_REPORT_COPY.flagAction}</span>
-      </button>
+      {customTrigger ? (
+        customTrigger(() => setOpen(true))
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#ffb703] hover:bg-[#ffb703]/10 rounded transition-colors"
+          data-testid="forum-flag"
+        >
+          <Flag className="w-3.5 h-3.5" />
+          <span>{FORUM_REPORT_COPY.flagAction}</span>
+        </button>
+      )}
 
       {open && (
         <div

@@ -10,6 +10,8 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { prependForumQuote } from '@/lib/forum-quotes'
+import { ForumFormattingToolbar, handleFormattingShortcuts } from '@/components/forum/ForumFormattingToolbar'
+import { ForumPostBody } from '@/components/forum/ForumPostBody'
 
 export type ReplyComposerHandle = {
   insertQuote: (markup: string) => void
@@ -42,7 +44,9 @@ export const ReplyComposer = forwardRef<
   const { user } = useAuthSession()
   const persist = useHudPersist()
   const formRef = useRef<HTMLFormElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [content, setContent] = useState(initialContent)
+  const [preview, setPreview] = useState(false)
   const [posting, setPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -54,8 +58,9 @@ export const ReplyComposer = forwardRef<
   useImperativeHandle(ref, () => ({
     insertQuote: (markup: string) => {
       setContent((prev) => prependForumQuote(prev, markup))
+      setPreview(false)
       requestAnimationFrame(() => {
-        formRef.current?.querySelector('textarea')?.focus()
+        textareaRef.current?.focus()
       })
     },
   }))
@@ -88,6 +93,7 @@ export const ReplyComposer = forwardRef<
       })
       onPosted(post)
       setContent('')
+      setPreview(false)
     } catch (err: any) {
       setError(err?.message || 'Failed to post reply. Please try again.')
     } finally {
@@ -97,6 +103,9 @@ export const ReplyComposer = forwardRef<
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (handleFormattingShortcuts(e, textareaRef.current, setContent)) {
+      return
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault()
       if (!posting && content.trim().length >= 10) {
@@ -176,15 +185,41 @@ export const ReplyComposer = forwardRef<
         </div>
       )}
 
-      <MentionTextarea
-        rows={compact ? 3 : 4}
-        value={content}
-        onChange={setContent}
-        onKeyDown={handleKeyDown}
-        placeholder="Write your constructive reply... Hail a member with @designation. (min 10 characters)"
-        autoFocus={autoFocus}
-        className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
-      />
+      <div className="space-y-0">
+        <ForumFormattingToolbar
+          textareaRef={textareaRef}
+          value={content}
+          onChange={setContent}
+          preview={preview}
+          onTogglePreview={() => setPreview((v) => !v)}
+          disabled={posting}
+        />
+        {preview ? (
+          <div
+            className="w-full min-h-[90px] sm:min-h-[110px] max-h-[260px] bg-[#070b0b]/60 border border-[#3a4a49] p-3 text-xs text-[#dfe3e3] chamfer-corner-bottom overflow-y-auto"
+            data-testid="forum-reply-preview"
+          >
+            {content.trim() ? (
+              <ForumPostBody content={content} />
+            ) : (
+              <p className="text-xs text-[#839493]/60 italic">
+                Nothing to preview yet. Write your thoughts or apply formatting above...
+              </p>
+            )}
+          </div>
+        ) : (
+          <MentionTextarea
+            ref={textareaRef}
+            rows={compact ? 3 : 4}
+            value={content}
+            onChange={setContent}
+            onKeyDown={handleKeyDown}
+            placeholder="Write your constructive reply... Hail a member with @designation. (min 10 characters)"
+            autoFocus={autoFocus}
+            className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner-bottom transition-colors placeholder:text-[#839493]/50"
+          />
+        )}
+      </div>
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-[10px] text-[#839493]/70 hidden sm:inline">

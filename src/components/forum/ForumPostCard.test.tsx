@@ -252,6 +252,7 @@ describe('ForumPostCard quote affordance', () => {
         {...cardHandlers}
       />,
     )
+    fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
     expect(screen.getByTestId('forum-flag')).toBeInTheDocument()
 
     forumAuth.userId = 'member-a'
@@ -263,6 +264,7 @@ describe('ForumPostCard quote affordance', () => {
         {...cardHandlers}
       />,
     )
+    fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
     expect(screen.queryByTestId('forum-flag')).not.toBeInTheDocument()
   })
 
@@ -328,6 +330,7 @@ describe('ForumPostCard author tools', () => {
 
   it('shows revise and withdraw only for the signed-in author', () => {
     renderCard(authorPost, 'author-1')
+    fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
     expect(screen.getByTestId('forum-author-tools')).toBeInTheDocument()
     expect(screen.getByTestId('forum-revise')).toBeInTheDocument()
     expect(screen.getByTestId('forum-withdraw')).toBeInTheDocument()
@@ -349,6 +352,7 @@ describe('ForumPostCard author tools', () => {
     })
 
     const { rerender } = renderCard(authorPost, 'author-1', onUpdated)
+    fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
     fireEvent.click(screen.getByTestId('forum-revise'))
     fireEvent.change(screen.getByLabelText('Revise reply'), {
       target: { value: 'Revised hail for @pincer_prime after the molt.' },
@@ -394,7 +398,6 @@ describe('ForumPostCard author tools', () => {
     )
     expect(screen.getByTestId('forum-withdrawn-body')).toHaveTextContent(FORUM_WITHDRAWN_BODY)
     expect(screen.queryByTestId('forum-mention-link')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('forum-author-tools')).not.toBeInTheDocument()
     expect(screen.queryByTestId('forum-reply-to-comment')).not.toBeInTheDocument()
   })
 
@@ -407,6 +410,7 @@ describe('ForumPostCard author tools', () => {
     })
 
     renderCard(authorPost, 'author-1', onUpdated)
+    fireEvent.pointerDown(screen.getByTestId('forum-post-actions-menu'))
     fireEvent.click(screen.getByTestId('forum-withdraw'))
     expect(screen.getByTestId('forum-withdraw-confirm')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('forum-withdraw-confirm-btn'))

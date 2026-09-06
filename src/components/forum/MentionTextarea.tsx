@@ -5,18 +5,7 @@ import { insertMentionAtCursor, mentionQueryAtCursor } from '@/lib/forum-mention
 
 const LIST_LIMIT = 8
 
-export function MentionTextarea({
-  id,
-  value,
-  onChange,
-  placeholder,
-  rows = 4,
-  autoFocus = false,
-  className,
-  disabled,
-  'aria-label': ariaLabel,
-  onKeyDown: onKeyDownProp,
-}: {
+export interface MentionTextareaProps {
   id?: string
   value: string
   onChange: (value: string) => void
@@ -27,13 +16,32 @@ export function MentionTextarea({
   disabled?: boolean
   'aria-label'?: string
   onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void
-}) {
-  const generatedId = useId()
-  const fieldId = id ?? generatedId
-  const listboxId = `${fieldId}-mention-list`
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const justAppliedRef = useRef(false)
-  const [cursor, setCursor] = useState(0)
+}
+
+export const MentionTextarea = React.forwardRef<HTMLTextAreaElement, MentionTextareaProps>(
+  function MentionTextarea(
+    {
+      id,
+      value,
+      onChange,
+      placeholder,
+      rows = 4,
+      autoFocus = false,
+      className,
+      disabled,
+      'aria-label': ariaLabel,
+      onKeyDown: onKeyDownProp,
+    },
+    ref,
+  ) {
+    const generatedId = useId()
+    const fieldId = id ?? generatedId
+    const listboxId = `${fieldId}-mention-list`
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+    React.useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement)
+    const justAppliedRef = useRef(false)
+    const [cursor, setCursor] = useState(0)
   const [highlight, setHighlight] = useState(0)
   const [dismissed, setDismissed] = useState(false)
 
@@ -185,4 +193,6 @@ export function MentionTextarea({
       )}
     </div>
   )
-}
+})
+
+MentionTextarea.displayName = 'MentionTextarea'

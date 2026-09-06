@@ -21,6 +21,7 @@ import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ForumAuthorTools, ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
 import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumFormattingToolbar, handleFormattingShortcuts } from '@/components/forum/ForumFormattingToolbar'
 import {
   getForumTopicDetailFn,
   updateForumTopicFn,
@@ -132,8 +133,10 @@ function ForumThreadPage() {
   const [confirmingTopicWithdraw, setConfirmingTopicWithdraw] = useState(false)
   const [topicTitleDraft, setTopicTitleDraft] = useState('')
   const [topicBodyDraft, setTopicBodyDraft] = useState('')
+  const [previewTopicEdit, setPreviewTopicEdit] = useState(false)
   const [topicBusy, setTopicBusy] = useState(false)
   const [topicError, setTopicError] = useState<string | null>(null)
+  const topicBodyTextareaRef = useRef<HTMLTextAreaElement>(null)
   const topComposerRef = useRef<ReplyComposerHandle>(null)
   const persist = useHudPersist()
   const toast = useOptionalToast()
@@ -479,14 +482,43 @@ function ForumThreadPage() {
                     aria-label="Revise topic title"
                     className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-sm text-[#dfe3e3] outline-none chamfer-corner"
                   />
-                  <MentionTextarea
-                    rows={5}
-                    value={topicBodyDraft}
-                    onChange={setTopicBodyDraft}
-                    autoFocus
-                    aria-label="Revise topic body"
-                    className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors"
-                  />
+                  <div className="space-y-0">
+                    <ForumFormattingToolbar
+                      textareaRef={topicBodyTextareaRef}
+                      value={topicBodyDraft}
+                      onChange={setTopicBodyDraft}
+                      preview={previewTopicEdit}
+                      onTogglePreview={() => setPreviewTopicEdit((v) => !v)}
+                      disabled={topicBusy}
+                    />
+                    {previewTopicEdit ? (
+                      <div
+                        className="w-full min-h-[110px] max-h-[300px] bg-[#070b0b]/60 border border-[#3a4a49] p-3 text-xs text-[#dfe3e3] chamfer-corner-bottom overflow-y-auto"
+                        data-testid="topic-edit-preview"
+                      >
+                        {topicBodyDraft.trim() ? (
+                          <ForumPostBody content={topicBodyDraft} />
+                        ) : (
+                          <p className="text-xs text-[#839493]/60 italic">
+                            Nothing to preview yet. Transmit some thoughts or apply formatting above...
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <MentionTextarea
+                        ref={topicBodyTextareaRef}
+                        rows={5}
+                        value={topicBodyDraft}
+                        onChange={setTopicBodyDraft}
+                        onKeyDown={(e) => {
+                          handleFormattingShortcuts(e, topicBodyTextareaRef.current, setTopicBodyDraft)
+                        }}
+                        autoFocus
+                        aria-label="Revise topic body"
+                        className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner-bottom transition-colors"
+                      />
+                    )}
+                  </div>
                   <div className="flex items-center justify-end gap-2">
                     <button
                       type="button"
