@@ -5,6 +5,7 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { useForumAuth } from './ForumShell'
+import { MentionTextarea } from '@/components/forum/MentionTextarea'
 
 interface NewTopicDialogProps {
   categories: ForumCategoryEntry[]
@@ -126,11 +127,11 @@ export function NewTopicDialog({
                 {content.trim().length} characters (min 10)
               </span>
             </div>
-            <textarea
+            <MentionTextarea
               rows={6}
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your thoughts, questions, or ideas..."
+              onChange={setContent}
+              placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
               className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50"
             />
           </div>

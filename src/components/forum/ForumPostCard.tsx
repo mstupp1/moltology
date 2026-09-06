@@ -7,6 +7,7 @@ import { ForumPostEntry } from '@/lib/server/api'
 import { relativeTime } from '@/lib/forum-utils'
 import { forumReplyIndentDepth, type ForumPostTreeNode } from '@/lib/forum-utils'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
+import { ForumMentionBody } from '@/components/forum/ForumMentionBody'
 
 export function ForumPostCard({
   node,
@@ -89,7 +90,10 @@ export function ForumPostCard({
           </span>
         </div>
 
-        <p className="text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap">{post.content}</p>
+        <ForumMentionBody
+          content={post.content}
+          className="text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap"
+        />
 
         <div className="pt-1.5 border-t border-[#3a4a49]/40 flex items-center justify-between gap-2">
           <VoteButton

@@ -21,6 +21,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
+import { ForumMentionBody } from '@/components/forum/ForumMentionBody'
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   loader: async ({ params }) => {
@@ -235,9 +236,10 @@ function ForumThreadPage() {
               </div>
 
               {/* Topic Body */}
-              <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
-                {topic.content}
-              </div>
+              <ForumMentionBody
+                content={topic.content}
+                className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]"
+              />
 
               {/* Action Footer */}
               <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between">

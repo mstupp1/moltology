@@ -8,6 +8,7 @@
  */
 
 import { getHubServiceWorkerRegistration, isBrowser } from '@/lib/pwa'
+import { forumMentionHubPath } from '@/lib/forum-mentions'
 
 export const SYSTEM_NOTIFICATIONS_PREF_KEY = 'moltology_system_notifications_enabled'
 export const SYSTEM_NOTIFICATION_SEEN_PREFIX = 'molt_sys_notif_seen:'
@@ -154,12 +155,17 @@ export async function showSystemNotification(
 }
 
 /** Map Activity Center kinds to a deep-link inside the hub. */
-export function hubUrlForNotificationKind(kind: string): string {
+export function hubUrlForNotificationKind(
+  kind: string,
+  payload?: { categorySlug?: string; topicSlug?: string },
+): string {
   switch (kind) {
     case 'friend_request':
     case 'friend_accepted':
     case 'friend_rejected':
       return '/connections'
+    case 'forum_mention':
+      return forumMentionHubPath(payload ?? {})
     default:
       return '/dashboard'
   }
