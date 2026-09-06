@@ -8,6 +8,10 @@ import {
   forumReplyIndentDepth,
   getPostDepth,
   FORUM_REPLY_MAX_INDENT_DEPTH,
+  isForumEntryWithdrawn,
+  isForumEntryRevised,
+  visibleForumContent,
+  FORUM_WITHDRAWN_BODY,
 } from './forum-utils'
 
 describe('slugifyForumTitle', () => {
@@ -105,6 +109,40 @@ describe('forumReplyIndentDepth', () => {
     expect(forumReplyIndentDepth(0)).toBe(0)
     expect(forumReplyIndentDepth(3)).toBe(3)
     expect(forumReplyIndentDepth(FORUM_REPLY_MAX_INDENT_DEPTH + 4)).toBe(FORUM_REPLY_MAX_INDENT_DEPTH)
+  })
+})
+
+describe('withdrawn and revised visibility', () => {
+  it('treats a sealed deletedAt as withdrawn and hides the body', () => {
+    expect(isForumEntryWithdrawn({ deletedAt: null })).toBe(false)
+    expect(isForumEntryWithdrawn({ deletedAt: '2026-09-06T02:00:00.000Z' })).toBe(true)
+    expect(visibleForumContent('Ask @claw_lord before you molt.', null)).toBe(
+      'Ask @claw_lord before you molt.',
+    )
+    expect(visibleForumContent('Ask @claw_lord before you molt.', '2026-09-06T02:00:00.000Z')).toBe('')
+    expect(FORUM_WITHDRAWN_BODY).toMatch(/withdrawn/i)
+  })
+
+  it('marks a later revision without treating withdraw as revised', () => {
+    expect(
+      isForumEntryRevised({
+        createdAt: '2026-09-06T01:00:00.000Z',
+        updatedAt: '2026-09-06T01:00:00.000Z',
+      }),
+    ).toBe(false)
+    expect(
+      isForumEntryRevised({
+        createdAt: '2026-09-06T01:00:00.000Z',
+        updatedAt: '2026-09-06T01:05:00.000Z',
+      }),
+    ).toBe(true)
+    expect(
+      isForumEntryRevised({
+        createdAt: '2026-09-06T01:00:00.000Z',
+        updatedAt: '2026-09-06T01:05:00.000Z',
+        deletedAt: '2026-09-06T01:06:00.000Z',
+      }),
+    ).toBe(false)
   })
 })
 
