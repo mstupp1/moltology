@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   ArrowLeft,
@@ -10,10 +10,11 @@ import {
   Activity,
   Link2,
   Check,
+  Quote,
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
-import { ReplyComposer } from '@/components/forum/ReplyComposer'
+import { ReplyComposer, type ReplyComposerHandle } from '@/components/forum/ReplyComposer'
 import { ForumPostCard } from '@/components/forum/ForumPostCard'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { getForumTopicDetailFn, ForumPostEntry } from '@/lib/server/api'
@@ -24,7 +25,8 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
-import { ForumMentionBody } from '@/components/forum/ForumMentionBody'
+import { ForumPostBody } from '@/components/forum/ForumPostBody'
+import { buildForumQuoteMarkup, isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
 
 function TopicShareButton() {
   const [copied, setCopied] = useState(false)
@@ -112,6 +114,8 @@ function ForumThreadPage() {
   const [detail, setDetail] = useState(loader)
   const [replySort, setReplySort] = useState<ForumReplySort>('oldest')
   const [replyingToId, setReplyingToId] = useState<string | null>(null)
+  const [replyQuote, setReplyQuote] = useState('')
+  const topComposerRef = useRef<ReplyComposerHandle>(null)
 
   useEffect(() => {
     setDetail(loader)
@@ -189,7 +193,30 @@ function ForumThreadPage() {
       topic: { ...topic, repliesCount: topic.repliesCount + 1, lastReplyAt: new Date().toISOString() },
       posts: [...posts, post],
     })
+    setReplyQuote('')
   }
+
+  const handleReplyClick = (postId: string) => {
+    setReplyQuote('')
+    setReplyingToId((cur) => (cur === postId ? null : postId))
+  }
+
+  const handleQuotePost = (postId: string) => {
+    const post = posts.find((p) => p.id === postId)
+    if (!post) return
+    const result = buildForumQuoteMarkup(post)
+    if (!result.ok) return
+    setReplyQuote(result.markup)
+    setReplyingToId(postId)
+  }
+
+  const handleQuoteTopic = () => {
+    const result = buildForumQuoteMarkup(topic)
+    if (!result.ok) return
+    topComposerRef.current?.insertQuote(result.markup)
+  }
+
+  const topicWithdrawn = isForumQuoteSourceWithdrawn(topic)
 
   return (
     <ForumShell>
@@ -331,11 +358,11 @@ function ForumThreadPage() {
 
               {/* Topic Body */}
               <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
-                <ForumMentionBody content={topic.content} />
+                <ForumPostBody content={topic.content} />
               </div>
 
               {/* Action Footer */}
-              <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between">
+              <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between gap-2">
                 <VoteButton
                   count={topic.upvotes}
                   voted={topic.voted}
@@ -345,15 +372,28 @@ function ForumThreadPage() {
                   size="inline"
                 />
 
-                <div className="text-[11px] text-[#839493] flex items-center gap-1">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
-                  <span>{topic.repliesCount} comments</span>
+                <div className="flex items-center gap-3">
+                  {!topicWithdrawn && (
+                    <button
+                      type="button"
+                      onClick={handleQuoteTopic}
+                      className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] transition-colors"
+                      data-testid="forum-quote-topic"
+                    >
+                      <Quote className="w-3.5 h-3.5" />
+                      Quote
+                    </button>
+                  )}
+                  <div className="text-[11px] text-[#839493] flex items-center gap-1">
+                    <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+                    <span>{topic.repliesCount} comments</span>
+                  </div>
                 </div>
               </div>
             </article>
 
             {/* Reply Composer */}
-            <ReplyComposer topicId={topic.id} onPosted={handlePosted} />
+            <ReplyComposer ref={topComposerRef} topicId={topic.id} onPosted={handlePosted} />
 
             {/* Comments Stream */}
             <section className="space-y-3">
@@ -400,10 +440,15 @@ function ForumThreadPage() {
                       topicId={topic.id}
                       topicAuthorId={topic.userId}
                       replyingToId={replyingToId}
-                      onReplyClick={(id) => setReplyingToId((cur) => (cur === id ? null : id))}
-                      onCancelReply={() => setReplyingToId(null)}
+                      onReplyClick={handleReplyClick}
+                      onQuoteClick={handleQuotePost}
+                      onCancelReply={() => {
+                        setReplyingToId(null)
+                        setReplyQuote('')
+                      }}
                       onPosted={handlePosted}
                       onPostVote={handlePostVote}
+                      quoteDraft={replyQuote}
                     />
                   ))}
                 </div>

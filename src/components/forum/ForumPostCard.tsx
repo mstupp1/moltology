@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ChevronDown, ChevronRight, Clock, MessageSquare, Link2, Check } from 'lucide-react'
+import { ChevronDown, ChevronRight, Clock, MessageSquare, Link2, Check, Quote } from 'lucide-react'
 import { VoteButton, StageBadge } from '@/components/forum/ForumBits'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ReplyComposer } from '@/components/forum/ReplyComposer'
@@ -8,7 +8,8 @@ import { ForumPostEntry } from '@/lib/server/api'
 import { relativeTime } from '@/lib/forum-utils'
 import { forumReplyIndentDepth, type ForumPostTreeNode } from '@/lib/forum-utils'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
-import { ForumMentionBody } from '@/components/forum/ForumMentionBody'
+import { ForumPostBody } from '@/components/forum/ForumPostBody'
+import { isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
 
 export interface ForumPostCardProps {
   node: ForumPostTreeNode<ForumPostEntry>
@@ -16,9 +17,11 @@ export interface ForumPostCardProps {
   replyingToId: string | null
   topicAuthorId?: string | null
   onReplyClick: (postId: string) => void
+  onQuoteClick: (postId: string) => void
   onCancelReply: () => void
   onPosted: (post: ForumPostEntry) => void
   onPostVote: (postId: string) => (res: { upvotes: number; voted: boolean }) => void
+  quoteDraft?: string
 }
 
 export function ForumPostCard({
@@ -27,9 +30,11 @@ export function ForumPostCard({
   replyingToId,
   topicAuthorId,
   onReplyClick,
+  onQuoteClick,
   onCancelReply,
   onPosted,
   onPostVote,
+  quoteDraft = '',
 }: ForumPostCardProps) {
   const { post, depth, children } = node
   const [collapsed, setCollapsed] = useState(false)
@@ -39,6 +44,7 @@ export function ForumPostCard({
   const childCount = children.length
   const continued = depth > indent
   const isOp = Boolean(topicAuthorId && post.userId && post.userId === topicAuthorId)
+  const withdrawn = isForumQuoteSourceWithdrawn(post)
 
   const handleCopyLink = async () => {
     try {
@@ -199,10 +205,9 @@ export function ForumPostCard({
           </div>
         ) : (
           <>
-            {/* Comment Body */}
-            <ForumMentionBody
+            <ForumPostBody
               content={post.content}
-              className="text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap pl-0 sm:pl-0.5"
+              className="space-y-2 text-xs sm:text-sm text-[#dfe3e3] leading-relaxed"
             />
 
             {/* Bottom Actions Bar */}
@@ -217,6 +222,17 @@ export function ForumPostCard({
               />
 
               <div className="flex items-center gap-2">
+                {!withdrawn && (
+                  <button
+                    type="button"
+                    onClick={() => onQuoteClick(post.id)}
+                    className="inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] hover:bg-[#00ffff]/10 rounded transition-colors"
+                    data-testid="forum-quote-post"
+                  >
+                    <Quote className="w-3.5 h-3.5" />
+                    <span>Quote</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => onReplyClick(post.id)}
@@ -236,6 +252,7 @@ export function ForumPostCard({
           <ReplyComposer
             topicId={topicId}
             parentId={post.id}
+            initialContent={quoteDraft}
             onPosted={(p) => {
               onPosted(p)
               onCancelReply()
@@ -257,9 +274,11 @@ export function ForumPostCard({
             topicAuthorId={topicAuthorId}
             replyingToId={replyingToId}
             onReplyClick={onReplyClick}
+            onQuoteClick={onQuoteClick}
             onCancelReply={onCancelReply}
             onPosted={onPosted}
             onPostVote={onPostVote}
+            quoteDraft={quoteDraft}
           />
         ))}
     </div>
