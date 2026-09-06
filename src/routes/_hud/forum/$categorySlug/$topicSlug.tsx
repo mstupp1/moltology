@@ -14,7 +14,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
-import { VoteButton, StageBadge, PinBadge, WithdrawnBadge } from '@/components/forum/ForumBits'
+import { VoteButton, StageBadge, PinBadge, LockBadge, WithdrawnBadge } from '@/components/forum/ForumBits'
 import { ReplyComposer, type ReplyComposerHandle } from '@/components/forum/ReplyComposer'
 import { ForumPostCard } from '@/components/forum/ForumPostCard'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
@@ -39,7 +39,7 @@ import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
 import { buildForumQuoteMarkup, isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
-import { validateForumContent } from '@/lib/community-rules'
+import { FORUM_LOCKED_ERROR, validateForumContent } from '@/lib/community-rules'
 
 function TopicShareButton() {
   const [copied, setCopied] = useState(false)
@@ -351,6 +351,7 @@ function ForumThreadPage() {
                     </span>
                   )}
                   {topic.isPinned && <PinBadge />}
+                  {topic.isLocked && <LockBadge />}
                   {topicWithdrawn && <WithdrawnBadge />}
                 </div>
 
@@ -550,7 +551,7 @@ function ForumThreadPage() {
                     withdrawn={topicWithdrawn}
                     deletedAt={topic.deletedAt}
                   />
-                  {!topicWithdrawn && (
+                  {!topicWithdrawn && !topic.isLocked && (
                     <button
                       type="button"
                       onClick={handleQuoteTopic}
@@ -570,7 +571,17 @@ function ForumThreadPage() {
             </article>
 
             {/* Reply Composer */}
-            <ReplyComposer ref={topComposerRef} topicId={topic.id} onPosted={handlePosted} />
+            {topic.isLocked ? (
+              <div
+                className="chitin-card p-4 sm:p-5 chamfer-corner shadow-2xl text-center space-y-1.5"
+                data-testid="forum-thread-locked"
+              >
+                <p className="text-xs text-[#dfe3e3] font-bold">Thread locked</p>
+                <p className="text-xs text-[#839493]">{FORUM_LOCKED_ERROR}</p>
+              </div>
+            ) : (
+              <ReplyComposer ref={topComposerRef} topicId={topic.id} onPosted={handlePosted} />
+            )}
 
             {/* Comments Stream */}
             <section className="space-y-3">
@@ -616,6 +627,7 @@ function ForumThreadPage() {
                       node={node}
                       topicId={topic.id}
                       topicAuthorId={topic.userId}
+                      topicLocked={topic.isLocked}
                       replyingToId={replyingToId}
                       onReplyClick={handleReplyClick}
                       onQuoteClick={handleQuotePost}

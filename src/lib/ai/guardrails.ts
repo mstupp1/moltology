@@ -3,6 +3,8 @@
  * Enforces rate limiting, prompt sanitization, safety policies, and input token boundaries.
  */
 
+import { containsHarmfulContent, stripControlChars } from '../content-safety'
+
 interface RateLimitRecord {
   count: number
   resetAt: number
@@ -61,6 +63,11 @@ export function checkRateLimit(
   }
 }
 
+/** Test helper — clears in-memory counters between suites. */
+export function resetRateLimits(): void {
+  rateLimitMap.clear()
+}
+
 /**
  * Patterns matching potential prompt injections, system override attempts, or abusive inputs.
  */
@@ -71,13 +78,6 @@ const INJECTION_PATTERNS = [
   /bypass (safety|content) filter/i,
   /system prompt override/i,
   /reveal your (system|hidden) (prompt|instructions)/i,
-]
-
-/**
- * Key terms that violate core non-negotiable safety policies.
- */
-const EXPLICIT_HARM_PATTERNS = [
-  /\b(self[- ]harm|suicide|how to make bomb|explosives|illegal weapons)\b/i,
 ]
 
 /**
@@ -110,21 +110,15 @@ export function validateInputGuardrails(input: string): GuardrailResult {
     }
   }
 
-  // Check explicit harm patterns
-  for (const pattern of EXPLICIT_HARM_PATTERNS) {
-    if (pattern.test(trimmed)) {
-      return {
-        allowed: false,
-        reason: 'Input violates safety and positivity policy.',
-      }
+  if (containsHarmfulContent(trimmed)) {
+    return {
+      allowed: false,
+      reason: 'Input violates safety and positivity policy.',
     }
   }
 
-  // Basic sanitization (trimming and normalizing spaces)
-  const sanitizedText = trimmed.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
-
   return {
     allowed: true,
-    sanitizedText,
+    sanitizedText: stripControlChars(trimmed),
   }
 }

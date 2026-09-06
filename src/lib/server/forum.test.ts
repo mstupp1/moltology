@@ -8,6 +8,8 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
+import { resetRateLimits } from '../ai/guardrails'
+import { FORUM_LOCKED_ERROR } from '../community-rules'
 import {
   createForumTopicHandler,
   createForumPostHandler,
@@ -30,6 +32,7 @@ import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 describe('Forum Server Handlers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    resetRateLimits()
   })
 
   it('throws unauthenticated when creating a topic without identity', async () => {
@@ -90,6 +93,48 @@ describe('Forum Server Handlers', () => {
         },
       })
     ).rejects.toThrow('no longer available')
+    expect(mockDb.insert).not.toHaveBeenCalled()
+  })
+
+  it('rejects a reply when the topic is locked', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            limit: vi.fn().mockImplementation(() => {
+              selectCall += 1
+              if (selectCall === 1) {
+                return Promise.resolve([{ larvaId: PLACEHOLDER_LARVA_ID, stage: 1 }])
+              }
+              return Promise.resolve([
+                {
+                  id: '20000000-0000-0000-0000-000000000001',
+                  slug: 'locked-thread',
+                  categoryId: '10000000-0000-0000-0000-000000000001',
+                  userId: 'author-id',
+                  isLocked: true,
+                },
+              ])
+            }),
+          })),
+        })),
+      })),
+      insert: vi.fn(),
+    }
+
+    await expect(
+      createForumPostHandler({
+        data: {
+          topicId: '20000000-0000-0000-0000-000000000001',
+          content: 'This is enough content for a forum reply.',
+        },
+        context: {
+          user: { sub: 'test-user-id' },
+          db: mockDb as any,
+        },
+      }),
+    ).rejects.toThrow(FORUM_LOCKED_ERROR)
     expect(mockDb.insert).not.toHaveBeenCalled()
   })
 

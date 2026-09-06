@@ -558,6 +558,22 @@ export const listForumReportsFn = createServerFn({ method: 'POST' })
     return listForumReportsHandler(args)
   })
 
+export const reviewForumReportFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { reportId: string; userId?: string; token?: string }) =>
+    z
+      .object({
+        reportId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { reviewForumReportHandler } = await import('./db-services')
+    return reviewForumReportHandler(args)
+  })
+
 export const getPodcastsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(async (args) => {

@@ -2,17 +2,22 @@ import React, { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ShieldCheck } from 'lucide-react'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { listForumReportsFn, type ForumReportWatchEntry } from '@/lib/server/api'
+import { listForumReportsFn, reviewForumReportFn, type ForumReportWatchEntry } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useHudPersist } from '@/hooks/useHudPersist'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { FORUM_REPORT_COPY } from '@/lib/forum-reports'
 import { relativeTime } from '@/lib/forum-utils'
 import { forumPostAnchorId } from '@/lib/forum-mentions'
 
 export function CovenantWatchPage() {
   const session = useAuthSession()
+  const persist = useHudPersist()
+  const toast = useOptionalToast()
   const [reports, setReports] = useState<ForumReportWatchEntry[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [reviewingId, setReviewingId] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -42,6 +47,30 @@ export function CovenantWatchPage() {
       cancelled = true
     }
   }, [session.userId, session.isPending])
+
+  const handleMarkReviewed = async (reportId: string) => {
+    if (!session.userId || reviewingId) return
+    setReviewingId(reportId)
+    persist.begin('forum-report-review')
+    try {
+      const token = await getAuthJWTToken()
+      await reviewForumReportFn({
+        data: {
+          reportId,
+          userId: session.userId,
+          token: token ?? undefined,
+        },
+      })
+      setReports((current) => (current ?? []).filter((row) => row.id !== reportId))
+      toast?.toast.success(FORUM_REPORT_COPY.toastReviewed)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : FORUM_REPORT_COPY.toastReviewError
+      toast?.toast.error(message)
+    } finally {
+      persist.end('forum-report-review')
+      setReviewingId(null)
+    }
+  }
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative" data-testid="covenant-watch">
@@ -91,16 +120,29 @@ export function CovenantWatchPage() {
                   </p>
                   {row.note && <p className="text-xs text-[#dfe3e3] leading-relaxed">{row.note}</p>}
                   <p className="text-[11px] text-[#839493]">Flagged by {row.reporterName}</p>
-                  {row.categorySlug && row.topicSlug && (
-                    <Link
-                      to="/forum/$categorySlug/$topicSlug"
-                      params={{ categorySlug: row.categorySlug, topicSlug: row.topicSlug }}
-                      hash={row.postId ? forumPostAnchorId(row.postId) : undefined}
-                      className="text-[11px] font-bold text-[#00ffff] hover:underline"
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    {row.categorySlug && row.topicSlug && (
+                      <Link
+                        to="/forum/$categorySlug/$topicSlug"
+                        params={{ categorySlug: row.categorySlug, topicSlug: row.topicSlug }}
+                        hash={row.postId ? forumPostAnchorId(row.postId) : undefined}
+                        className="text-[11px] font-bold text-[#00ffff] hover:underline"
+                      >
+                        Open transmission
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => void handleMarkReviewed(row.id)}
+                      disabled={reviewingId === row.id}
+                      className="text-[11px] font-bold uppercase tracking-wider text-[#839493] hover:text-[#00ffff] disabled:opacity-50 transition-colors"
+                      data-testid="covenant-watch-mark-reviewed"
                     >
-                      Open transmission
-                    </Link>
-                  )}
+                      {reviewingId === row.id
+                        ? FORUM_REPORT_COPY.watchMarking
+                        : FORUM_REPORT_COPY.watchMarkReviewed}
+                    </button>
+                  </div>
                 </li>
               )
             })}
