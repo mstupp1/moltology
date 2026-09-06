@@ -65,15 +65,15 @@ export function CovenantWatchPage() {
           </p>
         )}
 
-        {reports === null && !error ? (
+        {error ? null : reports === null ? (
           <p className="text-xs text-[#839493]">Gathering the ledger.</p>
-        ) : reports && reports.length === 0 && !error ? (
+        ) : reports.length === 0 ? (
           <p className="text-xs text-[#839493]" data-testid="covenant-watch-empty">
             {FORUM_REPORT_COPY.watchEmpty}
           </p>
         ) : (
           <ul className="space-y-2.5" data-testid="covenant-watch-list">
-            {(reports ?? []).map((row) => {
+            {reports.map((row) => {
               return (
                 <li
                   key={row.id}

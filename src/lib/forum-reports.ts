@@ -90,14 +90,15 @@ export function validateForumReportInput(input: {
   reason?: string | null
   note?: string | null
 }): { valid: true; reason: ForumReportReason; note: string | null } | { valid: false; error: string } {
-  if (!isForumReportReason(input.reason ?? null)) {
+  const reason = input.reason
+  if (!isForumReportReason(reason)) {
     return { valid: false, error: FORUM_REPORT_COPY.reasonRequired }
   }
   const note = normalizeForumReportNote(input.note)
   if (note && note.length > FORUM_REPORT_NOTE_MAX) {
     return { valid: false, error: FORUM_REPORT_COPY.noteTooLong }
   }
-  return { valid: true, reason: input.reason, note }
+  return { valid: true, reason, note }
 }
 
 export function canFlagForumTarget(opts: {
