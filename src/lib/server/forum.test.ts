@@ -20,6 +20,10 @@ import {
   deleteForumPostHandler,
   recordForumMentions,
   recordForumReplyNotifications,
+  persistForumTopicVisit,
+  persistForumBoardVisit,
+  getForumTopicsHandler,
+  getForumCategoriesHandler,
 } from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
 
@@ -381,8 +385,10 @@ describe('Forum Server Handlers', () => {
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
-          insertedValues = values
+          if ('content' in values) insertedValues = values
           return {
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
             returning: vi.fn().mockResolvedValue([
               {
                 id: 'post-b',
@@ -541,8 +547,10 @@ describe('Forum Server Handlers', () => {
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
-          insertedValues = values
+          if ('content' in values) insertedValues = values
           return {
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
             returning: vi.fn().mockResolvedValue([
               {
                 id: 'post-nested',
@@ -786,8 +794,10 @@ describe('Forum Server Handlers', () => {
       })),
       insert: vi.fn().mockImplementation(() => ({
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
-          insertedValues = values
+          if ('content' in values) insertedValues = values
           return {
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
             returning: vi.fn().mockResolvedValue([
               {
                 id: 'topic-handle',
@@ -1509,5 +1519,360 @@ describe('Forum author edit and soft-delete', () => {
     expect(res?.posts[0].content).toBe('')
     expect(res?.posts[0].deletedAt).toBeTruthy()
     expect(res?.topic.title).toBe(existingTopic.title)
+  })
+
+  it('upserts a topic visit and a board baseline when a member opens a thread', async () => {
+    const onConflictDoUpdate = vi.fn().mockResolvedValue([])
+    const onConflictDoNothing = vi.fn().mockResolvedValue([])
+    const insert = vi.fn().mockImplementation(() => ({
+      values: vi.fn().mockReturnValue({
+        onConflictDoUpdate,
+        onConflictDoNothing,
+      }),
+    }))
+
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: '20000000-0000-0000-0000-000000000001',
+                        categoryId: '10000000-0000-0000-0000-000000000001',
+                        categorySlug: 'rules-announcements',
+                        categoryName: 'Rules & Directives',
+                        categoryColor: '#ff5540',
+                        userId: null,
+                        authorName: 'Author',
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 1,
+                        title: 'Welcome',
+                        slug: 'welcome-to-community-core-directives',
+                        content: 'Body content here.',
+                        isPinned: true,
+                        isLocked: false,
+                        views: 100,
+                        repliesCount: 0,
+                        upvotes: 88,
+                        lastReplyAt: new Date('2026-08-03T20:30:00.000Z'),
+                        createdAt: new Date('2026-08-01T12:00:00.000Z'),
+                        profileLarvaId: null,
+                        profileStage: null,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        if (selectCall === 2) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                where: vi.fn().mockReturnValue({
+                  orderBy: vi.fn().mockResolvedValue([]),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([]),
+          }),
+        }
+      }),
+      insert,
+      update: vi.fn(),
+    }
+
+    const res = await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'welcome-to-community-core-directives',
+        categorySlug: 'rules-announcements',
+        trackView: false,
+      },
+      context: {
+        user: { sub: 'test-user-id' },
+        db: mockDb as any,
+      },
+    })
+
+    expect(res?.topic.id).toBe('20000000-0000-0000-0000-000000000001')
+    expect(insert).toHaveBeenCalled()
+    expect(onConflictDoUpdate).toHaveBeenCalled()
+    expect(onConflictDoNothing).toHaveBeenCalled()
+  })
+
+  it('does not mark a visit when a guest opens a thread', async () => {
+    const insert = vi.fn()
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: '20000000-0000-0000-0000-000000000001',
+                        categoryId: '10000000-0000-0000-0000-000000000001',
+                        categorySlug: 'rules-announcements',
+                        categoryName: 'Rules & Directives',
+                        categoryColor: '#ff5540',
+                        userId: null,
+                        authorName: 'Author',
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 1,
+                        title: 'Welcome',
+                        slug: 'welcome-to-community-core-directives',
+                        content: 'Body content here.',
+                        isPinned: true,
+                        isLocked: false,
+                        views: 100,
+                        repliesCount: 0,
+                        upvotes: 88,
+                        lastReplyAt: new Date('2026-08-03T20:30:00.000Z'),
+                        createdAt: new Date('2026-08-01T12:00:00.000Z'),
+                        profileLarvaId: null,
+                        profileStage: null,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }),
+        }
+      }),
+      insert,
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      })),
+    }
+
+    await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'welcome-to-community-core-directives',
+        categorySlug: 'rules-announcements',
+      },
+      context: { db: mockDb as any },
+    })
+
+    expect(insert).not.toHaveBeenCalled()
+  })
+
+  it('hydrates unread on topic lists for signed-in members only', async () => {
+    const topicRow = {
+      id: '20000000-0000-0000-0000-000000000001',
+      categoryId: '10000000-0000-0000-0000-000000000001',
+      categorySlug: 'rules-announcements',
+      categoryName: 'Rules & Directives',
+      categoryColor: '#ff5540',
+      userId: null,
+      authorName: 'Author',
+      authorAvatar: '/images/stage1_larva.png',
+      authorStage: 1,
+      title: 'Welcome',
+      slug: 'welcome-to-community-core-directives',
+      content: 'Body content here.',
+      isPinned: true,
+      isLocked: false,
+      views: 10,
+      repliesCount: 2,
+      upvotes: 4,
+      lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
+      createdAt: new Date('2026-09-01T12:00:00.000Z'),
+      profileHandle: null,
+      profileLarvaId: null,
+      profileAvatarConfig: null,
+    }
+
+    const topicQuery = {
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([topicRow]),
+    }
+    topicQuery.leftJoin.mockReturnValue(topicQuery)
+
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return { from: vi.fn().mockReturnValue(topicQuery) }
+        }
+        if (selectCall === 2) {
+          return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+        }
+        if (selectCall === 3) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([
+                {
+                  topicId: topicRow.id,
+                  lastVisitedAt: new Date('2026-09-06T10:00:00.000Z'),
+                },
+              ]),
+            }),
+          }
+        }
+        return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+      }),
+      insert: vi.fn().mockImplementation(() => ({
+        values: vi.fn().mockReturnValue({
+          onConflictDoNothing: vi.fn().mockResolvedValue([]),
+        }),
+      })),
+    }
+
+    const signedIn = await getForumTopicsHandler({
+      data: { sortBy: 'latest' },
+      context: { user: { sub: 'test-user-id' }, db: mockDb as any },
+    })
+    expect(signedIn[0].unread).toBe(true)
+    expect(signedIn[0].voted).toBe(false)
+
+    const guestDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockReturnValue({
+          leftJoin: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          orderBy: vi.fn().mockResolvedValue([topicRow]),
+        }),
+      })),
+    }
+    const guestChain = {
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([topicRow]),
+    }
+    guestChain.leftJoin.mockReturnValue(guestChain)
+    guestDb.select.mockImplementation(() => ({ from: vi.fn().mockReturnValue(guestChain) }))
+
+    const guest = await getForumTopicsHandler({
+      data: { sortBy: 'latest' },
+      context: { db: guestDb as any },
+    })
+    expect(guest[0].unread).toBeUndefined()
+  })
+
+  it('counts unread topics on boards for signed-in members', async () => {
+    const category = {
+      id: '10000000-0000-0000-0000-000000000001',
+      slug: 'rules-announcements',
+      name: 'Rules & Directives',
+      description: 'Official announcements.',
+      icon: 'ShieldCheck',
+      color: '#ff5540',
+      sortOrder: 1,
+    }
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return { from: vi.fn().mockReturnValue({ orderBy: vi.fn().mockResolvedValue([category]) }) }
+        }
+        if (selectCall === 2) {
+          return {
+            from: vi.fn().mockReturnValue({
+              groupBy: vi.fn().mockResolvedValue([{ categoryId: category.id, count: 1 }]),
+            }),
+          }
+        }
+        if (selectCall === 3) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([
+                {
+                  id: '20000000-0000-0000-0000-000000000001',
+                  categoryId: category.id,
+                  lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
+                  createdAt: new Date('2026-09-01T12:00:00.000Z'),
+                },
+              ]),
+            }),
+          }
+        }
+        if (selectCall === 4) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([
+                {
+                  topicId: '20000000-0000-0000-0000-000000000001',
+                  lastVisitedAt: new Date('2026-09-06T10:00:00.000Z'),
+                },
+              ]),
+            }),
+          }
+        }
+        return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+      }),
+    }
+
+    const signedIn = await getForumCategoriesHandler({
+      data: {},
+      context: { user: { sub: 'test-user-id' }, db: mockDb as any },
+    })
+    expect(signedIn[0].unreadCount).toBe(1)
+
+    const guestDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockReturnValue({
+          orderBy: vi.fn().mockResolvedValue([category]),
+          groupBy: vi.fn().mockResolvedValue([{ categoryId: category.id, count: 1 }]),
+        }),
+      })),
+    }
+    const guest = await getForumCategoriesHandler({
+      data: {},
+      context: { db: guestDb as any },
+    })
+    expect(guest[0].unreadCount).toBeUndefined()
+  })
+})
+
+describe('forum visit persist', () => {
+  it('upserts lastVisitedAt for a topic and inserts a board baseline once', async () => {
+    const onConflictDoUpdate = vi.fn().mockResolvedValue([])
+    const onConflictDoNothing = vi.fn().mockResolvedValue([])
+    const values = vi.fn().mockReturnValue({ onConflictDoUpdate, onConflictDoNothing })
+    const insert = vi.fn().mockReturnValue({ values })
+    const db = { insert } as any
+
+    await persistForumTopicVisit(db, 'member-1', 'topic-1', 'board-1')
+
+    expect(insert).toHaveBeenCalledTimes(2)
+    expect(onConflictDoUpdate).toHaveBeenCalled()
+    expect(onConflictDoNothing).toHaveBeenCalled()
+  })
+
+  it('skips writes without a member or target', async () => {
+    const insert = vi.fn()
+    await persistForumTopicVisit({ insert } as any, '', 'topic-1')
+    await persistForumBoardVisit({ insert } as any, 'member-1', '')
+    expect(insert).not.toHaveBeenCalled()
   })
 })

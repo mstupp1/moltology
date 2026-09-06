@@ -263,14 +263,29 @@ export const createBlogCommentFn = createServerFn({ method: 'POST' })
 
 export const getForumCategoryBySlugFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { slug: string }) => z.object({ slug: z.string().min(1) }).parse(data))
+  .validator((data: { slug: string; userId?: string; token?: string }) =>
+    z.object({
+      slug: z.string().min(1),
+      userId: z.string().optional(),
+      token: z.string().optional(),
+    }).parse(data),
+  )
   .handler(async (args) => {
     const { getForumCategoryBySlugHandler } = await import('./db-services')
     return getForumCategoryBySlugHandler(args)
   })
 
-export const getForumCategoriesFn = createServerFn({ method: 'GET' })
+export const getForumCategoriesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
+  .validator((data?: { userId?: string; token?: string }) =>
+    z
+      .object({
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .optional()
+      .parse(data || {}),
+  )
   .handler(async (args) => {
     const { getForumCategoriesHandler } = await import('./db-services')
     return getForumCategoriesHandler(args)

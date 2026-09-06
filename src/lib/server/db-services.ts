@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -32,6 +32,11 @@ import {
   toForumIso,
   visibleForumContent,
 } from '../forum-utils'
+import {
+  countUnreadForumTopics,
+  topicHasUnreadActivity,
+  type ForumVisitMaps,
+} from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdminOrSuperAdmin } from '../permissions'
 import { INITIAL_PODCASTS } from '../podcast-data'
@@ -1072,6 +1077,8 @@ export interface ForumCategoryEntry {
   sortOrder: number
   topicCount: number
   bgImage?: string
+  /** Signed-in only: topics with activity after the member last looked. */
+  unreadCount?: number
 }
 
 export interface ForumTopicEntry {
@@ -1099,6 +1106,8 @@ export interface ForumTopicEntry {
   updatedAt?: string
   deletedAt?: string | null
   voted?: boolean
+  /** Signed-in only: new activity since this member last opened the thread. */
+  unread?: boolean
 }
 
 export interface ForumPostEntry {
@@ -1177,13 +1186,121 @@ async function fetchVotedPostIds(dbClient: Db, userId: string, postIds: string[]
   }
 }
 
+async function fetchForumVisitMaps(
+  dbClient: Db,
+  userId: string,
+  topicIds: string[],
+  categoryIds: string[],
+): Promise<ForumVisitMaps> {
+  const topicVisitedAtById = new Map<string, string>()
+  const boardVisitedAtById = new Map<string, string>()
+  if (!userId) return { topicVisitedAtById, boardVisitedAtById }
+
+  try {
+    if (topicIds.length > 0) {
+      const topicRows = await dbClient
+        .select({
+          topicId: forumTopicVisits.topicId,
+          lastVisitedAt: forumTopicVisits.lastVisitedAt,
+        })
+        .from(forumTopicVisits)
+        .where(and(eq(forumTopicVisits.userId, userId), inArray(forumTopicVisits.topicId, topicIds)))
+      for (const row of topicRows) {
+        const iso = toForumIso(row.lastVisitedAt)
+        if (row.topicId && iso) topicVisitedAtById.set(row.topicId, iso)
+      }
+    }
+    if (categoryIds.length > 0) {
+      const boardRows = await dbClient
+        .select({
+          categoryId: forumBoardVisits.categoryId,
+          lastVisitedAt: forumBoardVisits.lastVisitedAt,
+        })
+        .from(forumBoardVisits)
+        .where(and(eq(forumBoardVisits.userId, userId), inArray(forumBoardVisits.categoryId, categoryIds)))
+      for (const row of boardRows) {
+        const iso = toForumIso(row.lastVisitedAt)
+        if (row.categoryId && iso) boardVisitedAtById.set(row.categoryId, iso)
+      }
+    }
+  } catch (err) {
+    console.warn('[fetchForumVisitMaps] failed:', err)
+  }
+
+  return { topicVisitedAtById, boardVisitedAtById }
+}
+
+export async function persistForumTopicVisit(
+  dbClient: Db,
+  userId: string,
+  topicId: string,
+  categoryId?: string | null,
+): Promise<void> {
+  if (!userId || !topicId) return
+  try {
+    await dbClient
+      .insert(forumTopicVisits)
+      .values({ userId, topicId, lastVisitedAt: new Date() })
+      .onConflictDoUpdate({
+        target: [forumTopicVisits.userId, forumTopicVisits.topicId],
+        set: { lastVisitedAt: new Date() },
+      })
+    if (categoryId) {
+      await persistForumBoardVisit(dbClient, userId, categoryId)
+    }
+  } catch (err) {
+    console.warn('[persistForumTopicVisit] failed:', err)
+  }
+}
+
+export async function persistForumBoardVisit(
+  dbClient: Db,
+  userId: string,
+  categoryId: string,
+): Promise<void> {
+  if (!userId || !categoryId) return
+  try {
+    await dbClient
+      .insert(forumBoardVisits)
+      .values({ userId, categoryId, lastVisitedAt: new Date() })
+      .onConflictDoNothing()
+  } catch (err) {
+    console.warn('[persistForumBoardVisit] failed:', err)
+  }
+}
+
+async function fetchCategoryTopicActivity(
+  dbClient: Db,
+  categoryIds: string[],
+): Promise<Array<{ id: string; categoryId: string; lastReplyAt: Date | null; createdAt: Date | null }>> {
+  if (categoryIds.length === 0) return []
+  try {
+    return await dbClient
+      .select({
+        id: forumTopics.id,
+        categoryId: forumTopics.categoryId,
+        lastReplyAt: forumTopics.lastReplyAt,
+        createdAt: forumTopics.createdAt,
+      })
+      .from(forumTopics)
+      .where(inArray(forumTopics.categoryId, categoryIds))
+  } catch (err) {
+    console.warn('[fetchCategoryTopicActivity] failed:', err)
+    return []
+  }
+}
+
 /**
  * Server Function: Get a single forum category by slug with its topic count.
  */
-export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnArgs<{ slug: string }>): Promise<ForumCategoryEntry | null> => {
+export const getForumCategoryBySlugHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ slug: string; userId?: string; token?: string }>): Promise<ForumCategoryEntry | null> => {
   const slug = data?.slug
   if (!slug) return null
   const dbClient = context?.db || getDb()
+  const currentUserId = resolveForumUserId(context, data?.userId)
 
   try {
     const [cat] = await dbClient
@@ -1197,7 +1314,7 @@ export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnA
         .select({ count: sql<number>`count(*)::int` })
         .from(forumTopics)
         .where(eq(forumTopics.categoryId, cat.id))
-      return {
+      const entry: ForumCategoryEntry = {
         id: cat.id,
         slug: cat.slug,
         name: cat.name,
@@ -1208,6 +1325,20 @@ export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnA
         bgImage: (cat as any).bgImage || getCategoryBgImage(cat.slug),
         topicCount: countRow?.count || 0,
       }
+
+      if (currentUserId) {
+        const activity = await fetchCategoryTopicActivity(dbClient, [cat.id])
+        const visits = await fetchForumVisitMaps(
+          dbClient,
+          currentUserId,
+          activity.map((row) => row.id),
+          [cat.id],
+        )
+        entry.unreadCount = countUnreadForumTopics(activity, visits, cat.id)
+        await persistForumBoardVisit(dbClient, currentUserId, cat.id)
+      }
+
+      return entry
     }
 
     return null
@@ -1219,14 +1350,29 @@ export const getForumCategoryBySlugHandler = async ({ data, context }: ServerFnA
 
 export const getForumCategoryBySlugFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data: { slug: string }) => z.object({ slug: z.string().min(1) }).parse(data))
+  .validator((data: { slug: string; userId?: string; token?: string }) =>
+    z.object({
+      slug: z.string().min(1),
+      userId: z.string().optional(),
+      token: z.string().optional(),
+    }).parse(data),
+  )
   .handler(getForumCategoryBySlugHandler)
+
+export interface GetForumCategoriesInput {
+  userId?: string
+  token?: string
+}
 
 /**
  * Server Function: Get all forum categories with topic counts.
  */
-export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Promise<ForumCategoryEntry[]> => {
+export const getForumCategoriesHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetForumCategoriesInput>): Promise<ForumCategoryEntry[]> => {
   const dbClient = context?.db || getDb()
+  const currentUserId = resolveForumUserId(context, data?.userId)
   try {
     const cats = await dbClient
       .select({
@@ -1260,11 +1406,28 @@ export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Prom
         console.warn('[getForumCategoriesFn] Topic count grouping failed:', err)
       }
 
-      return cats.map((c: any) => ({
+      const entries: ForumCategoryEntry[] = cats.map((c: any) => ({
         ...c,
         bgImage: c.bgImage || getCategoryBgImage(c.slug),
         topicCount: countsMap.get(c.id) || 0,
       }))
+
+      if (currentUserId) {
+        const categoryIds = entries.map((entry) => entry.id)
+        const activity = await fetchCategoryTopicActivity(dbClient, categoryIds)
+        const visits = await fetchForumVisitMaps(
+          dbClient,
+          currentUserId,
+          activity.map((row) => row.id),
+          categoryIds,
+        )
+        return entries.map((entry) => ({
+          ...entry,
+          unreadCount: countUnreadForumTopics(activity, visits, entry.id),
+        }))
+      }
+
+      return entries
     }
 
     return []
@@ -1274,8 +1437,17 @@ export const getForumCategoriesHandler = async ({ context }: ServerFnArgs): Prom
   }
 }
 
-export const getForumCategoriesFn = createServerFn({ method: 'GET' })
+export const getForumCategoriesFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
+  .validator((data?: GetForumCategoriesInput) =>
+    z
+      .object({
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .optional()
+      .parse(data || {}),
+  )
   .handler(getForumCategoriesHandler)
 
 export interface GetForumTopicsInput {
@@ -1393,9 +1565,37 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
 
       if (currentUserId) {
         const votedIds = await fetchVotedTopicIds(dbClient, currentUserId, entries.map((e) => e.id))
-        return entries.map((e) => ({ ...e, voted: votedIds.has(e.id) }))
+        const categoryIds = [...new Set(entries.map((e) => e.categoryId).filter(Boolean))]
+        const visits = await fetchForumVisitMaps(
+          dbClient,
+          currentUserId,
+          entries.map((e) => e.id),
+          categoryIds,
+        )
+        if (categorySlug && categorySlug !== 'all') {
+          const boardId = entries[0]?.categoryId
+          if (boardId) await persistForumBoardVisit(dbClient, currentUserId, boardId)
+        }
+        return entries.map((e) => ({
+          ...e,
+          voted: votedIds.has(e.id),
+          unread: topicHasUnreadActivity(e, visits),
+        }))
       }
       return entries
+    }
+
+    if (currentUserId && categorySlug && categorySlug !== 'all') {
+      try {
+        const [board] = await dbClient
+          .select({ id: forumCategories.id })
+          .from(forumCategories)
+          .where(eq(forumCategories.slug, categorySlug))
+          .limit(1)
+        if (board?.id) await persistForumBoardVisit(dbClient, currentUserId, board.id)
+      } catch (err) {
+        console.warn('[getForumTopicsFn] Board visit persist failed:', err)
+      }
     }
 
     // Empty DB is a valid state — never return seed IDs that cannot be replied to / voted on.
@@ -1523,6 +1723,10 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         .leftJoin(profiles, eq(forumPosts.userId, profiles.id))
         .where(eq(forumPosts.topicId, t.id))
         .orderBy(forumPosts.createdAt)
+
+      if (currentUserId) {
+        await persistForumTopicVisit(dbClient, currentUserId, t.id, t.categoryId)
+      }
 
       const topicVoted = currentUserId
         ? (await fetchVotedTopicIds(dbClient, currentUserId, [t.id])).has(t.id)
@@ -1697,6 +1901,8 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     console.warn('[createForumTopicFn] Mention persist error:', err)
   }
 
+  await persistForumTopicVisit(dbClient, userId, inserted.id, inserted.categoryId)
+
   return {
     id: inserted.id,
     categoryId: inserted.categoryId,
@@ -1868,6 +2074,8 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   } catch (err) {
     console.warn('[createForumPostFn] Topic reply counter update error:', err)
   }
+
+  await persistForumTopicVisit(dbClient, userId, data.topicId, topicExists.categoryId)
 
   const mentionHandles = extractMentionHandles(inserted.content)
   const mayReplyNotify =
