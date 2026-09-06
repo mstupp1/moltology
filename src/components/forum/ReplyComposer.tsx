@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { AlertTriangle, Send } from 'lucide-react'
 import { useForumAuth } from '@/components/forum/ForumShell'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -45,6 +45,11 @@ export const ReplyComposer = forwardRef<
   const [content, setContent] = useState(initialContent)
   const [posting, setPosting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!initialContent) return
+    setContent((prev) => prependForumQuote(prev, initialContent))
+  }, [initialContent])
 
   useImperativeHandle(ref, () => ({
     insertQuote: (markup: string) => {
