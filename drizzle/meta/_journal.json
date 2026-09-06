@@ -183,6 +183,13 @@
       "when": 1788658725204,
       "tag": "0025_misty_lady_ursula",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788662155263,
+      "tag": "0026_brainy_garia",
+      "breakpoints": true
     }
   ]
 }

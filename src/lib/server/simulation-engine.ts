@@ -1,5 +1,5 @@
 import { generateText } from 'ai'
-import { eq, desc, and, not, inArray, sql } from 'drizzle-orm'
+import { eq, desc, or, inArray, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
 import {
   profiles,
@@ -9,6 +9,9 @@ import {
   forumTopics,
   forumPosts,
   forumVotes,
+  friendships,
+  memberBonds,
+  type MemberJoinSource,
   type SimulatedPersonaConfig,
 } from '../../db/schema'
 import { CANONICAL_ALIGNMENT_TASKS, type CanonicalAlignmentTask } from '../alignment-tasks'
@@ -17,6 +20,26 @@ import { resolveMemberLarvaId } from '../larva-id'
 import { resolveMemberPublicName } from '../member-handle'
 import { slugifyForumTitle } from '../forum-utils'
 import { validateInputGuardrails } from '../ai/guardrails'
+import { normalizeFriendPair } from '../connections'
+import {
+  DEFAULT_BOND_CHANCE,
+  DEFAULT_CONNECTION_CHANCE,
+  DEFAULT_JOIN_SOURCE_WEIGHTS,
+  DEFAULT_MAX_BONDS_PER_MEMBER,
+  DEFAULT_MAX_TRAITS_PER_MEMBER,
+  DEFAULT_MUTATION_CHANCE,
+  applyTraitMutation,
+  bondPairKey,
+  chooseBondForPair,
+  formatPersonaVoiceBlock,
+  friendshipPairKey,
+  normalizeBondEndpoints,
+  pickNewTrait,
+  pickUnconnectedPair,
+  pickWeightedSponsor,
+  rollChance,
+  sampleJoinOrigin,
+} from '../simulation-social'
 
 export const SIMULATION_MODEL_ID = process.env.SIMULATION_MODEL_ID || 'alibaba/qwen3.8-flash'
 
@@ -37,6 +60,12 @@ export interface SimulationGrowthConfig {
       maxTasks: number
     }
   >
+  mutationChance: number
+  maxTraitsPerMember: number
+  connectionChance: number
+  bondChance: number
+  maxBondsPerMember: number
+  joinSourceWeights: Record<MemberJoinSource, number>
 }
 
 export const DEFAULT_GROWTH_CONFIG: SimulationGrowthConfig = {
@@ -54,6 +83,12 @@ export const DEFAULT_GROWTH_CONFIG: SimulationGrowthConfig = {
     2: { perfectDayChance: 0.25, minTasks: 2, maxTasks: 5 },
     1: { perfectDayChance: 0.1, minTasks: 1, maxTasks: 3 },
   },
+  mutationChance: DEFAULT_MUTATION_CHANCE,
+  maxTraitsPerMember: DEFAULT_MAX_TRAITS_PER_MEMBER,
+  connectionChance: DEFAULT_CONNECTION_CHANCE,
+  bondChance: DEFAULT_BOND_CHANCE,
+  maxBondsPerMember: DEFAULT_MAX_BONDS_PER_MEMBER,
+  joinSourceWeights: DEFAULT_JOIN_SOURCE_WEIGHTS,
 }
 
 export function assertAiGatewayKey(): string {
@@ -170,6 +205,47 @@ Rules:
   }
 }
 
+type DbClient = ReturnType<typeof getDb>
+
+async function listSimulatedMembers(dbClient: DbClient) {
+  return dbClient
+    .select({
+      id: profiles.id,
+      handle: profiles.handle,
+      larvaId: profiles.larvaId,
+      stage: profiles.stage,
+      simulatedPersona: profiles.simulatedPersona,
+    })
+    .from(profiles)
+    .where(eq(profiles.isSimulated, true))
+}
+
+async function ensureFriendship(dbClient: DbClient, leftId: string, rightId: string) {
+  const [userAId, userBId] = normalizeFriendPair(leftId, rightId)
+  await dbClient.insert(friendships).values({ userAId, userBId }).onConflictDoNothing()
+}
+
+async function ensureBond(
+  dbClient: DbClient,
+  kind: 'nest_mate' | 'mentor' | 'brought_in',
+  fromUserId: string,
+  toUserId: string
+) {
+  const pair = normalizeBondEndpoints(kind, fromUserId, toUserId)
+  await dbClient
+    .insert(memberBonds)
+    .values({ fromUserId: pair.fromUserId, toUserId: pair.toUserId, kind })
+    .onConflictDoNothing()
+}
+
+function publicNameFor(member: { id: string; handle: string | null; larvaId?: string | null }) {
+  return resolveMemberPublicName({
+    userId: member.id,
+    handle: member.handle,
+    larvaId: member.larvaId,
+  })
+}
+
 /**
  * Spawns a new simulated member into profiles and userStats.
  */
@@ -178,12 +254,8 @@ export async function spawnSimulatedUser(
   config = DEFAULT_GROWTH_CONFIG,
   options: { force?: boolean; dryRun?: boolean } = {}
 ) {
-  const [countRes] = await dbClient
-    .select({ count: sql<number>`count(*)::int` })
-    .from(profiles)
-    .where(eq(profiles.isSimulated, true))
-
-  const currentCount = countRes?.count ?? 0
+  const existingMembers = await listSimulatedMembers(dbClient)
+  const currentCount = existingMembers.length
   const spawnProb = getTieredSpawnProbability(currentCount, config.maxSimulatedUsers)
 
   if (!options.force && Math.random() > spawnProb) {
@@ -198,6 +270,12 @@ export async function spawnSimulatedUser(
 
   const userId = crypto.randomUUID()
   const larvaId = resolveMemberLarvaId(userId)
+
+  const origin = sampleJoinOrigin(existingMembers.length, config.joinSourceWeights)
+  const sponsor = origin.needsSponsor ? pickWeightedSponsor(existingMembers) : null
+  const joinSource: MemberJoinSource = sponsor ? origin.source : 'organic'
+  const referredByUserId = sponsor?.id ?? null
+  const referredByHandle = sponsor ? publicNameFor(sponsor) : null
 
   const currencyMap: Record<number, { credits: string; gems: number; shards: number }> = {
     1: { credits: '1450.00', gems: 250, shards: 45 },
@@ -216,6 +294,8 @@ export async function spawnSimulatedUser(
     bio: persona.bio,
     activityCadence: 'normal',
     lastSimulatedAt: new Date().toISOString(),
+    traits: [],
+    referredByHandle,
   }
 
   if (options.dryRun) {
@@ -226,6 +306,9 @@ export async function spawnSimulatedUser(
       handle: persona.handle,
       stage,
       persona: simulatedPersona,
+      joinSource,
+      referredByUserId,
+      referredByHandle,
     }
   }
 
@@ -238,6 +321,8 @@ export async function spawnSimulatedUser(
       stage,
       isSimulated: true,
       simulatedPersona,
+      joinSource,
+      referredByUserId,
       moltCredits: curr.credits,
       chitinGems: curr.gems,
       synapseShards: curr.shards,
@@ -262,10 +347,22 @@ export async function spawnSimulatedUser(
     })
     .onConflictDoNothing()
 
+  if (sponsor && (joinSource === 'brought_in' || joinSource === 'word_of_mouth')) {
+    if (joinSource === 'brought_in') {
+      await ensureFriendship(dbClient, sponsor.id, userId)
+      await ensureBond(dbClient, 'brought_in', sponsor.id, userId)
+    }
+  }
+
   return {
     spawned: true,
     dryRun: false,
     profile: newProfile,
+    handle: persona.handle,
+    stage,
+    joinSource,
+    referredByUserId,
+    referredByHandle,
   }
 }
 
@@ -409,8 +506,7 @@ export async function simulateForumActivity(
     const contextStr = existingPosts.map((p) => `${p.authorName}: ${p.content}`).join('\n')
 
     const prompt = `You are ${resolveMemberPublicName({ userId: author.id, handle: author.handle, larvaId: author.larvaId })} (Stage ${author.stage}).
-Persona Archetype: ${author.simulatedPersona?.archetype || 'Acolyte'}
-Tone: ${author.simulatedPersona?.tone || 'Constructive, respectful'}
+${formatPersonaVoiceBlock(author.simulatedPersona)}
 
 Write a concise forum reply (2 to 4 sentences) to this thread:
 Thread Title: "${topic.title}"
@@ -501,8 +597,7 @@ Hard rules:
   const author = simulatedMembers[Math.floor(Math.random() * simulatedMembers.length)]
 
   const prompt = `You are ${resolveMemberPublicName({ userId: author.id, handle: author.handle, larvaId: author.larvaId })} (Stage ${author.stage}).
-Persona Archetype: ${author.simulatedPersona?.archetype || 'Acolyte'}
-Tone: ${author.simulatedPersona?.tone || 'Inquisitive'}
+${formatPersonaVoiceBlock(author.simulatedPersona)}
 
 Generate a thoughtful new forum discussion thread for the "${targetCategory.name}" category (${targetCategory.description}).
 
@@ -652,6 +747,207 @@ export async function simulateForumReactions(
 }
 
 /**
+ * Mild chance a simulated member gains a unique personality trait.
+ */
+export async function mutateSimulatedPersona(
+  dbClient: ReturnType<typeof getDb>,
+  config = DEFAULT_GROWTH_CONFIG,
+  options: { force?: boolean; dryRun?: boolean } = {}
+) {
+  if (!options.force && !rollChance(config.mutationChance)) {
+    return { mutated: false, reason: 'Mutation roll skipped.' }
+  }
+
+  const members = await listSimulatedMembers(dbClient)
+  const eligible = members.filter(
+    (member) => (member.simulatedPersona?.traits?.length || 0) < config.maxTraitsPerMember
+  )
+  if (eligible.length === 0) {
+    return { mutated: false, reason: 'No simulated members have room for another trait.' }
+  }
+
+  const target = eligible[Math.floor(Math.random() * eligible.length)]
+  const trait = pickNewTrait((target.simulatedPersona?.traits || []).map((row) => row.id))
+  if (!trait) {
+    return { mutated: false, reason: 'Trait catalog exhausted for the chosen member.' }
+  }
+
+  const updatedPersona = applyTraitMutation(target.simulatedPersona, trait)
+
+  if (!options.dryRun) {
+    await dbClient
+      .update(profiles)
+      .set({ simulatedPersona: updatedPersona, updatedAt: new Date() })
+      .where(eq(profiles.id, target.id))
+  }
+
+  return {
+    mutated: true,
+    dryRun: Boolean(options.dryRun),
+    userId: target.id,
+    handle: target.handle,
+    trait,
+  }
+}
+
+/**
+ * Mild chance two simulated members become platform friends.
+ * Sim-to-sim only — never sends requests to real members.
+ */
+export async function simulateConnections(
+  dbClient: ReturnType<typeof getDb>,
+  config = DEFAULT_GROWTH_CONFIG,
+  options: { force?: boolean; dryRun?: boolean } = {}
+) {
+  if (!options.force && !rollChance(config.connectionChance)) {
+    return { connected: false, reason: 'Connection roll skipped.' }
+  }
+
+  const members = await listSimulatedMembers(dbClient)
+  if (members.length < 2) {
+    return { connected: false, reason: 'Need at least two simulated members to connect.' }
+  }
+
+  const simIds = members.map((member) => member.id)
+  const existingRows = await dbClient
+    .select({ userAId: friendships.userAId, userBId: friendships.userBId })
+    .from(friendships)
+    .where(or(inArray(friendships.userAId, simIds), inArray(friendships.userBId, simIds)))
+
+  const existingKeys = existingRows
+    .filter((row) => simIds.includes(row.userAId) && simIds.includes(row.userBId))
+    .map((row) => friendshipPairKey(row.userAId, row.userBId))
+
+  const pair = pickUnconnectedPair(members, existingKeys)
+  if (!pair) {
+    return { connected: false, reason: 'Simulated members are already fully connected.' }
+  }
+
+  const [left, right] = pair
+  if (!options.dryRun) {
+    await ensureFriendship(dbClient, left.id, right.id)
+  }
+
+  return {
+    connected: true,
+    dryRun: Boolean(options.dryRun),
+    userAId: left.id,
+    userBId: right.id,
+    handles: [left.handle, right.handle],
+  }
+}
+
+/**
+ * Mild chance two already-connected simulated members deepen into a typed bond.
+ */
+export async function simulateRelationships(
+  dbClient: ReturnType<typeof getDb>,
+  config = DEFAULT_GROWTH_CONFIG,
+  options: { force?: boolean; dryRun?: boolean } = {}
+) {
+  if (!options.force && !rollChance(config.bondChance)) {
+    return { bonded: false, reason: 'Relationship roll skipped.' }
+  }
+
+  const members = await listSimulatedMembers(dbClient)
+  if (members.length < 2) {
+    return { bonded: false, reason: 'Need at least two simulated members to form a bond.' }
+  }
+
+  const memberById = new Map(members.map((member) => [member.id, member]))
+  const simIds = members.map((member) => member.id)
+
+  const friendRows = await dbClient
+    .select({ userAId: friendships.userAId, userBId: friendships.userBId })
+    .from(friendships)
+    .where(or(inArray(friendships.userAId, simIds), inArray(friendships.userBId, simIds)))
+
+  const friendPairs = friendRows.filter(
+    (row) => memberById.has(row.userAId) && memberById.has(row.userBId)
+  )
+  if (friendPairs.length === 0) {
+    return { bonded: false, reason: 'No simulated friendships exist to deepen.' }
+  }
+
+  const bondRows = await dbClient
+    .select({
+      fromUserId: memberBonds.fromUserId,
+      toUserId: memberBonds.toUserId,
+      kind: memberBonds.kind,
+    })
+    .from(memberBonds)
+    .where(or(inArray(memberBonds.fromUserId, simIds), inArray(memberBonds.toUserId, simIds)))
+
+  const bondCounts = new Map<string, number>()
+  const existingBondKeys = new Set<string>()
+  for (const row of bondRows) {
+    existingBondKeys.add(bondPairKey(row.kind, row.fromUserId, row.toUserId))
+    bondCounts.set(row.fromUserId, (bondCounts.get(row.fromUserId) || 0) + 1)
+    bondCounts.set(row.toUserId, (bondCounts.get(row.toUserId) || 0) + 1)
+  }
+
+  const candidates = friendPairs.filter((row) => {
+    const left = memberById.get(row.userAId)
+    const right = memberById.get(row.userBId)
+    if (!left || !right) return false
+    if ((bondCounts.get(left.id) || 0) >= config.maxBondsPerMember) return false
+    if ((bondCounts.get(right.id) || 0) >= config.maxBondsPerMember) return false
+    const planned = chooseBondForPair(left, right)
+    return !existingBondKeys.has(bondPairKey(planned.kind, planned.from.id, planned.to.id))
+  })
+
+  if (candidates.length === 0) {
+    return { bonded: false, reason: 'No friendship is eligible for a new bond.' }
+  }
+
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)]
+  const left = memberById.get(chosen.userAId)!
+  const right = memberById.get(chosen.userBId)!
+  const planned = chooseBondForPair(left, right)
+
+  if (!options.dryRun) {
+    await ensureBond(dbClient, planned.kind, planned.from.id, planned.to.id)
+  }
+
+  return {
+    bonded: true,
+    dryRun: Boolean(options.dryRun),
+    kind: planned.kind,
+    fromUserId: planned.from.id,
+    toUserId: planned.to.id,
+    handles: [planned.from.handle, planned.to.handle],
+  }
+}
+
+function shouldRunPhase(
+  phase: 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social',
+  options: {
+    spawnOnly?: boolean
+    routinesOnly?: boolean
+    forumOnly?: boolean
+    votesOnly?: boolean
+    mutationsOnly?: boolean
+    socialOnly?: boolean
+  }
+) {
+  const anyOnly = Boolean(
+    options.spawnOnly ||
+      options.routinesOnly ||
+      options.forumOnly ||
+      options.votesOnly ||
+      options.mutationsOnly ||
+      options.socialOnly
+  )
+  if (!anyOnly) return true
+  if (phase === 'spawn') return Boolean(options.spawnOnly)
+  if (phase === 'routines') return Boolean(options.routinesOnly)
+  if (phase === 'forum') return Boolean(options.forumOnly)
+  if (phase === 'votes') return Boolean(options.votesOnly)
+  if (phase === 'mutations') return Boolean(options.mutationsOnly)
+  return Boolean(options.socialOnly)
+}
+
+/**
  * Primary simulation orchestrator. Runs every 12 hours via GitHub Actions.
  */
 export async function runSimulationCycle(options: {
@@ -661,6 +957,8 @@ export async function runSimulationCycle(options: {
   routinesOnly?: boolean
   forumOnly?: boolean
   votesOnly?: boolean
+  mutationsOnly?: boolean
+  socialOnly?: boolean
 } = {}) {
   // Fail fast immediately if AI Gateway key is missing
   assertAiGatewayKey()
@@ -674,7 +972,7 @@ export async function runSimulationCycle(options: {
   const results: Record<string, unknown> = {}
 
   // 1. Spawner
-  if (!options.routinesOnly && !options.forumOnly && !options.votesOnly) {
+  if (shouldRunPhase('spawn', options)) {
     console.log('[SimulationCycle] Checking acolyte spawn conditions...')
     const spawnRes = await spawnSimulatedUser(dbClient, DEFAULT_GROWTH_CONFIG, {
       force: options.forceSpawn,
@@ -682,14 +980,16 @@ export async function runSimulationCycle(options: {
     })
     results.spawn = spawnRes
     if (spawnRes.spawned) {
-      console.log(`[SimulationCycle] ✓ Spawned new acolyte: ${spawnRes.handle || spawnRes.profile?.handle} (Stage ${spawnRes.stage || spawnRes.profile?.stage})`)
+      console.log(
+        `[SimulationCycle] ✓ Spawned new acolyte: ${spawnRes.handle || spawnRes.profile?.handle} (Stage ${spawnRes.stage || spawnRes.profile?.stage})${spawnRes.joinSource ? ` via ${spawnRes.joinSource}` : ''}`
+      )
     } else {
       console.log(`[SimulationCycle] - Spawner skipped: ${spawnRes.reason}`)
     }
   }
 
   // 2. Routines
-  if (!options.spawnOnly && !options.forumOnly && !options.votesOnly) {
+  if (shouldRunPhase('routines', options)) {
     console.log('[SimulationCycle] Simulating daily routine alignment completions...')
     const routineRes = await simulateDailyRoutines(dbClient, DEFAULT_GROWTH_CONFIG, {
       dryRun: options.dryRun,
@@ -699,7 +999,7 @@ export async function runSimulationCycle(options: {
   }
 
   // 3. Forum
-  if (!options.spawnOnly && !options.routinesOnly && !options.votesOnly) {
+  if (shouldRunPhase('forum', options)) {
     console.log('[SimulationCycle] Simulating forum discussions and replies...')
     const forumRes = await simulateForumActivity(dbClient, { dryRun: options.dryRun })
     results.forum = forumRes
@@ -713,11 +1013,55 @@ export async function runSimulationCycle(options: {
   }
 
   // 4. Votes
-  if (!options.spawnOnly && !options.routinesOnly && !options.forumOnly) {
+  if (shouldRunPhase('votes', options)) {
     console.log('[SimulationCycle] Simulating community upvotes...')
     const voteRes = await simulateForumReactions(dbClient, { dryRun: options.dryRun })
     results.votes = voteRes
     console.log(`[SimulationCycle] ✓ Cast ${voteRes.votesCast} community upvotes.`)
+  }
+
+  // 5. Personality mutations
+  if (shouldRunPhase('mutations', options)) {
+    console.log('[SimulationCycle] Checking for mild persona mutations...')
+    const mutationRes = await mutateSimulatedPersona(dbClient, DEFAULT_GROWTH_CONFIG, {
+      dryRun: options.dryRun,
+    })
+    results.mutation = mutationRes
+    if (mutationRes.mutated) {
+      console.log(
+        `[SimulationCycle] ✓ ${mutationRes.handle || mutationRes.userId} gained trait "${mutationRes.trait?.label}"`
+      )
+    } else {
+      console.log(`[SimulationCycle] - Mutation skipped: ${mutationRes.reason}`)
+    }
+  }
+
+  // 6. Connections + typed relationships
+  if (shouldRunPhase('social', options)) {
+    console.log('[SimulationCycle] Simulating member connections and bonds...')
+    const connectionRes = await simulateConnections(dbClient, DEFAULT_GROWTH_CONFIG, {
+      dryRun: options.dryRun,
+    })
+    results.connection = connectionRes
+    if (connectionRes.connected) {
+      console.log(
+        `[SimulationCycle] ✓ Connected ${connectionRes.handles?.[0] || connectionRes.userAId} with ${connectionRes.handles?.[1] || connectionRes.userBId}`
+      )
+    } else {
+      console.log(`[SimulationCycle] - Connection skipped: ${connectionRes.reason}`)
+    }
+
+    const bondRes = await simulateRelationships(dbClient, DEFAULT_GROWTH_CONFIG, {
+      dryRun: options.dryRun,
+    })
+    results.relationship = bondRes
+    if (bondRes.bonded) {
+      console.log(
+        `[SimulationCycle] ✓ Formed ${bondRes.kind} bond between ${bondRes.handles?.[0] || bondRes.fromUserId} and ${bondRes.handles?.[1] || bondRes.toUserId}`
+      )
+    } else {
+      console.log(`[SimulationCycle] - Relationship skipped: ${bondRes.reason}`)
+    }
   }
 
   console.log('[SimulationCycle] ✓ Simulation tick completed successfully!')

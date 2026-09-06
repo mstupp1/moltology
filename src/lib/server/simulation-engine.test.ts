@@ -9,6 +9,9 @@ import {
   simulateDailyRoutines,
   simulateForumActivity,
   simulateForumReactions,
+  mutateSimulatedPersona,
+  simulateConnections,
+  simulateRelationships,
   DEFAULT_GROWTH_CONFIG,
 } from './simulation-engine'
 import { CANONICAL_ALIGNMENT_TASKS } from '../alignment-tasks'
@@ -174,7 +177,15 @@ describe('Simulation Engine', () => {
       const mockDb: any = {
         select: vi.fn().mockReturnThis(),
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue([{ count: 3 }]),
+        where: vi.fn().mockResolvedValue([
+          {
+            id: 'sponsor-1',
+            handle: 'Architect Vaelen',
+            larvaId: 'ARCHITECT UNIT #0402',
+            stage: 3,
+            simulatedPersona: { archetype: 'Architect', tone: 'Analytical' },
+          },
+        ]),
       }
 
       const res = await spawnSimulatedUser(mockDb, DEFAULT_GROWTH_CONFIG, {
@@ -185,6 +196,7 @@ describe('Simulation Engine', () => {
       expect(res.spawned).toBe(true)
       expect(res.dryRun).toBe(true)
       expect(res.handle).toBe('BenthicPilot_99')
+      expect(['organic', 'word_of_mouth', 'brought_in']).toContain(res.joinSource)
     })
   })
 
@@ -374,6 +386,89 @@ describe('Simulation Engine', () => {
       const res = await simulateForumReactions(mockDb, { dryRun: true, voteCount: 1 })
       expect(res.votesCast).toBe(1)
       expect(res.actions[0]).toEqual({ voterId: 'voter-1', postId: 'post-99' })
+    })
+  })
+
+  describe('mutateSimulatedPersona', () => {
+    it('applies a unique trait in dry run mode when forced', async () => {
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([
+          {
+            id: 'sim-user-1',
+            handle: 'ReefCrafter',
+            larvaId: 'LARVA UNIT #22',
+            stage: 2,
+            simulatedPersona: { archetype: 'Pilot', tone: 'Direct', traits: [] },
+          },
+        ]),
+        update: vi.fn(),
+      }
+
+      const res = await mutateSimulatedPersona(mockDb, DEFAULT_GROWTH_CONFIG, {
+        force: true,
+        dryRun: true,
+      })
+
+      expect(res.mutated).toBe(true)
+      expect(res.trait?.label).toBeTruthy()
+      expect(mockDb.update).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('simulateConnections', () => {
+    it('pairs two unconnected simulated members in dry run mode', async () => {
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn(),
+        insert: vi.fn(),
+      }
+      mockDb.where
+        .mockResolvedValueOnce([
+          { id: 'a', handle: 'Acolyte_a', larvaId: 'L1', stage: 1, simulatedPersona: {} },
+          { id: 'b', handle: 'Acolyte_b', larvaId: 'L2', stage: 2, simulatedPersona: {} },
+        ])
+        .mockResolvedValueOnce([])
+
+      const res = await simulateConnections(mockDb, DEFAULT_GROWTH_CONFIG, {
+        force: true,
+        dryRun: true,
+      })
+
+      expect(res.connected).toBe(true)
+      expect(res.handles).toEqual(['Acolyte_a', 'Acolyte_b'])
+      expect(mockDb.insert).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('simulateRelationships', () => {
+    it('deepens an existing friendship into a mentor bond in dry run mode', async () => {
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn(),
+        insert: vi.fn(),
+      }
+      mockDb.where
+        .mockResolvedValueOnce([
+          { id: 'a', handle: 'Elder', larvaId: 'L4', stage: 4, simulatedPersona: {} },
+          { id: 'b', handle: 'Larva', larvaId: 'L1', stage: 1, simulatedPersona: {} },
+        ])
+        .mockResolvedValueOnce([{ userAId: 'a', userBId: 'b' }])
+        .mockResolvedValueOnce([])
+
+      const res = await simulateRelationships(mockDb, DEFAULT_GROWTH_CONFIG, {
+        force: true,
+        dryRun: true,
+      })
+
+      expect(res.bonded).toBe(true)
+      expect(res.kind).toBe('mentor')
+      expect(res.fromUserId).toBe('a')
+      expect(res.toUserId).toBe('b')
+      expect(mockDb.insert).not.toHaveBeenCalled()
     })
   })
 })

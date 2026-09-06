@@ -25,6 +25,14 @@ export type PublicMoltmaxSummary = {
   stage: string | null
 } | null
 
+export type PublicProfileBond = {
+  kind: string
+  label: string
+  memberId: string
+  memberName: string
+  memberHandle: string | null
+}
+
 export type PublicProfileView = {
   id: string
   larvaId: string
@@ -38,6 +46,11 @@ export type PublicProfileView = {
   moltmax: PublicMoltmaxSummary
   relationship: RelationshipState
   pendingRequestId: string | null
+  bio: string | null
+  traits: Array<{ id: string; label: string }>
+  joinStory: string | null
+  referredBy: { id: string; displayName: string; handle: string | null } | null
+  bonds: PublicProfileBond[]
 }
 
 export type ConnectionMemberSummary = {

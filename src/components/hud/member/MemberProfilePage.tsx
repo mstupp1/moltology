@@ -137,6 +137,49 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               <Calendar className="w-3.5 h-3.5" />
               Member since {memberSinceLabel}
             </p>
+            {profile.bio && (
+              <p className="text-sm text-[#9aa8a7] leading-relaxed">{profile.bio}</p>
+            )}
+            {profile.joinStory && (
+              profile.referredBy ? (
+                <Link
+                  to="/member/$profileId"
+                  params={{ profileId: profile.referredBy.handle || profile.referredBy.id }}
+                  className="inline-block text-xs text-[#00c3ff] hover:underline"
+                >
+                  {profile.joinStory}
+                </Link>
+              ) : (
+                <p className="text-xs text-[#839493]">{profile.joinStory}</p>
+              )
+            )}
+            {(profile.traits ?? []).length > 0 && (
+              <ul className="flex flex-wrap gap-1.5 pt-0.5">
+                {(profile.traits ?? []).map((trait) => (
+                  <li
+                    key={trait.id}
+                    className="px-2 py-0.5 text-[10px] font-medium tracking-wide text-[#dfe3e3] border border-[#3a4a49] bg-[#0d1819] chamfer-corner"
+                  >
+                    {trait.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {(profile.bonds ?? []).length > 0 && (
+              <ul className="space-y-1 pt-0.5">
+                {(profile.bonds ?? []).map((bond) => (
+                  <li key={`${bond.kind}-${bond.memberId}`}>
+                    <Link
+                      to="/member/$profileId"
+                      params={{ profileId: bond.memberHandle || bond.memberId }}
+                      className="text-xs text-[#839493] hover:text-[#00c3ff] hover:underline"
+                    >
+                      {bond.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="pt-1">
               <FriendRequestButton
                 profileId={profile.id}
