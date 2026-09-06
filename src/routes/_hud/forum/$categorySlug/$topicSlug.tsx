@@ -11,22 +11,34 @@ import {
   Link2,
   Check,
   Quote,
+  AlertTriangle,
 } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
-import { VoteButton, StageBadge, PinBadge } from '@/components/forum/ForumBits'
+import { VoteButton, StageBadge, PinBadge, WithdrawnBadge } from '@/components/forum/ForumBits'
 import { ReplyComposer, type ReplyComposerHandle } from '@/components/forum/ReplyComposer'
 import { ForumPostCard } from '@/components/forum/ForumPostCard'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
-import { getForumTopicDetailFn, ForumPostEntry } from '@/lib/server/api'
+import { ForumAuthorTools, ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
+import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import {
+  getForumTopicDetailFn,
+  updateForumTopicFn,
+  deleteForumTopicFn,
+  ForumPostEntry,
+  ForumTopicEntry,
+} from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { syncForumVotesFromServer } from '@/lib/forum-vote-cache'
 import { relativeTime, buildForumPostTree, type ForumReplySort } from '@/lib/forum-utils'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useHudPersist } from '@/hooks/useHudPersist'
+import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { seo } from '@/lib/seo'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
 import { buildForumQuoteMarkup, isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
+import { validateForumContent } from '@/lib/community-rules'
 
 function TopicShareButton() {
   const [copied, setCopied] = useState(false)
@@ -115,7 +127,15 @@ function ForumThreadPage() {
   const [replySort, setReplySort] = useState<ForumReplySort>('oldest')
   const [replyingToId, setReplyingToId] = useState<string | null>(null)
   const [replyQuote, setReplyQuote] = useState('')
+  const [editingTopic, setEditingTopic] = useState(false)
+  const [confirmingTopicWithdraw, setConfirmingTopicWithdraw] = useState(false)
+  const [topicTitleDraft, setTopicTitleDraft] = useState('')
+  const [topicBodyDraft, setTopicBodyDraft] = useState('')
+  const [topicBusy, setTopicBusy] = useState(false)
+  const [topicError, setTopicError] = useState<string | null>(null)
   const topComposerRef = useRef<ReplyComposerHandle>(null)
+  const persist = useHudPersist()
+  const toast = useOptionalToast()
 
   useEffect(() => {
     setDetail(loader)
@@ -196,6 +216,81 @@ function ForumThreadPage() {
     setReplyQuote('')
   }
 
+  const handlePostUpdated = (post: ForumPostEntry) => {
+    setDetail({
+      ...detail,
+      posts: posts.map((p) => (p.id === post.id ? { ...p, ...post } : p)),
+    })
+  }
+
+  const handleTopicUpdated = (next: ForumTopicEntry) => {
+    setDetail({
+      ...detail,
+      topic: { ...topic, ...next },
+    })
+  }
+
+  const handleTopicSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const validation = validateForumContent(topicTitleDraft, topicBodyDraft)
+    if (!validation.valid) {
+      setTopicError(validation.error || 'Invalid content')
+      return
+    }
+    setTopicBusy(true)
+    setTopicError(null)
+    persist.begin('forum-revise-topic')
+    try {
+      const token = await getAuthJWTToken()
+      const updated = await updateForumTopicFn({
+        data: {
+          topicId: topic.id,
+          title: topicTitleDraft,
+          content: topicBodyDraft,
+          userId: userId ?? undefined,
+          token: token ?? undefined,
+        },
+      })
+      handleTopicUpdated(updated)
+      setEditingTopic(false)
+      toast?.toast.success('Topic updated.')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not update that topic.'
+      setTopicError(message)
+      toast?.toast.error(message)
+    } finally {
+      persist.end('forum-revise-topic')
+      setTopicBusy(false)
+    }
+  }
+
+  const handleTopicWithdraw = async () => {
+    setTopicBusy(true)
+    setTopicError(null)
+    persist.begin('forum-withdraw-topic')
+    try {
+      const token = await getAuthJWTToken()
+      const updated = await deleteForumTopicFn({
+        data: {
+          topicId: topic.id,
+          userId: userId ?? undefined,
+          token: token ?? undefined,
+        },
+      })
+      handleTopicUpdated(updated)
+      setConfirmingTopicWithdraw(false)
+      setEditingTopic(false)
+      toast?.toast.success('Topic withdrawn.')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not withdraw that topic.'
+      setTopicError(message)
+      toast?.toast.error(message)
+    } finally {
+      persist.end('forum-withdraw-topic')
+      setTopicBusy(false)
+    }
+  }
+
   const handleReplyClick = (postId: string) => {
     setReplyQuote('')
     setReplyingToId((cur) => (cur === postId ? null : postId))
@@ -217,6 +312,7 @@ function ForumThreadPage() {
   }
 
   const topicWithdrawn = isForumQuoteSourceWithdrawn(topic)
+  const canAuthorTopic = Boolean(userId && topic.userId && userId === topic.userId && !topicWithdrawn)
 
   return (
     <ForumShell>
@@ -254,11 +350,17 @@ function ForumThreadPage() {
                     </span>
                   )}
                   {topic.isPinned && <PinBadge />}
+                  {topicWithdrawn && <WithdrawnBadge />}
                 </div>
 
                 <div className="text-[10px] text-[#839493] flex items-center gap-1">
                   <Clock className="w-3 h-3 text-[#3a4a49]" />
                   <span>{relativeTime(topic.createdAt)}</span>
+                  <ForumRevisedMark
+                    createdAt={topic.createdAt}
+                    updatedAt={topic.updatedAt}
+                    deletedAt={topic.deletedAt}
+                  />
                 </div>
               </div>
 
@@ -357,9 +459,58 @@ function ForumThreadPage() {
               </div>
 
               {/* Topic Body */}
-              <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
-                <ForumPostBody content={topic.content} />
-              </div>
+              {topicWithdrawn ? (
+                <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner border border-[#3a4a49]">
+                  <ForumWithdrawnBody className="text-xs sm:text-sm text-[#839493] leading-relaxed italic" />
+                </div>
+              ) : editingTopic ? (
+                <form onSubmit={handleTopicSave} className="space-y-2.5" data-testid="forum-revise-topic-form">
+                  {topicError && (
+                    <div className="p-2.5 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span>{topicError}</span>
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    value={topicTitleDraft}
+                    onChange={(e) => setTopicTitleDraft(e.target.value)}
+                    aria-label="Revise topic title"
+                    className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-sm text-[#dfe3e3] outline-none chamfer-corner"
+                  />
+                  <MentionTextarea
+                    rows={5}
+                    value={topicBodyDraft}
+                    onChange={setTopicBodyDraft}
+                    autoFocus
+                    aria-label="Revise topic body"
+                    className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors"
+                  />
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingTopic(false)
+                        setTopicError(null)
+                      }}
+                      className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#839493] hover:text-[#dfe3e3] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={topicBusy || topicTitleDraft.trim().length < 5 || topicBodyDraft.trim().length < 10}
+                      className="px-4 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all"
+                    >
+                      {topicBusy ? 'Sealing...' : 'Seal revision'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
+                  <ForumPostBody content={topic.content} />
+                </div>
+              )}
 
               {/* Action Footer */}
               <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between gap-2">
@@ -373,6 +524,25 @@ function ForumThreadPage() {
                 />
 
                 <div className="flex items-center gap-3">
+                  {canAuthorTopic && (
+                    <ForumAuthorTools
+                      confirmingWithdraw={confirmingTopicWithdraw}
+                      busy={topicBusy}
+                      onRevise={() => {
+                        setTopicTitleDraft(topic.title)
+                        setTopicBodyDraft(topic.content)
+                        setConfirmingTopicWithdraw(false)
+                        setEditingTopic(true)
+                        setTopicError(null)
+                      }}
+                      onStartWithdraw={() => {
+                        setEditingTopic(false)
+                        setConfirmingTopicWithdraw(true)
+                      }}
+                      onCancelWithdraw={() => setConfirmingTopicWithdraw(false)}
+                      onConfirmWithdraw={() => void handleTopicWithdraw()}
+                    />
+                  )}
                   {!topicWithdrawn && (
                     <button
                       type="button"
@@ -448,6 +618,7 @@ function ForumThreadPage() {
                       }}
                       onPosted={handlePosted}
                       onPostVote={handlePostVote}
+                      onUpdated={handlePostUpdated}
                       quoteDraft={replyQuote}
                     />
                   ))}

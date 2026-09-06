@@ -53,6 +53,17 @@ export function PinBadge() {
   )
 }
 
+export function WithdrawnBadge() {
+  return (
+    <span
+      className="text-[9px] font-sans bg-[#839493]/10 text-[#839493] border border-[#839493]/40 px-1.5 py-0.2 font-bold chamfer-corner"
+      data-testid="forum-withdrawn-badge"
+    >
+      Withdrawn
+    </span>
+  )
+}
+
 interface VoteButtonProps {
   count: number
   /** `undefined` = server has not hydrated vote state yet; use session cache for instant paint. */
