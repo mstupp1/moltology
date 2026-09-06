@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { LaunchpadCarousel, LAUNCHPAD_MODULES } from './LaunchpadCarousel'
 
@@ -13,13 +13,14 @@ describe('LaunchpadCarousel Component', () => {
   it('renders correctly with initial module and news feed', () => {
     render(<LaunchpadCarousel />)
 
-    expect(screen.getByText('PORTAL DIRECTIVES')).toBeInTheDocument()
+    expect(screen.getByText('FEATURED MODULES')).toBeInTheDocument()
     expect(screen.getByText('MOLT-CYCLE LECTURES')).toBeInTheDocument()
     expect(screen.getByText('RESUME LECTURE (68%)')).toBeInTheDocument()
 
     // MoltNation News Section
     expect(screen.getByText('MOLTNATION NEWS')).toBeInTheDocument()
-    expect(screen.getByText('BREAKING')).toBeInTheDocument()
+    expect(screen.queryByText('BREAKING')).not.toBeInTheDocument()
+    expect(screen.queryByText('LIVE')).not.toBeInTheDocument()
     expect(screen.queryByText('DAILY ALIGNMENT')).not.toBeInTheDocument()
   })
 
@@ -43,11 +44,42 @@ describe('LaunchpadCarousel Component', () => {
     render(<LaunchpadCarousel />)
 
     // Click on tab index 2 (The Benthic Market)
-    const marketTab = screen.getByText('03. market')
+    const marketTab = screen.getByText('market')
     fireEvent.click(marketTab)
 
     expect(screen.getByText('THE BENTHIC MARKET')).toBeInTheDocument()
     expect(screen.getByText('OPEN MARKET VAULT')).toBeInTheDocument()
+  })
+
+  it('includes 6 launchpad modules with Oracle as the 6th directive', () => {
+    expect(LAUNCHPAD_MODULES).toHaveLength(6)
+    expect(LAUNCHPAD_MODULES[5].id).toBe('oracle')
+    expect(LAUNCHPAD_MODULES[5].title).toBe('SYNAPTIC ORACLE')
+    expect(LAUNCHPAD_MODULES[5].route).toBe('/oracle')
+    expect(LAUNCHPAD_MODULES[5].ctaText).toBe('CONSULT ORACLE')
+  })
+
+  it('allows selecting the 6th oracle directive and navigates to /oracle', () => {
+    render(<LaunchpadCarousel />)
+
+    const oracleTab = screen.getByText('oracle')
+    fireEvent.click(oracleTab)
+
+    expect(screen.getByText('SYNAPTIC ORACLE')).toBeInTheDocument()
+    const ctaBtn = screen.getByText('CONSULT ORACLE')
+    expect(ctaBtn).toBeInTheDocument()
+
+    fireEvent.click(ctaBtn)
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/oracle' })
+  })
+
+  it('does not render top telemetry header row (pause/play button or counter in header) on the directives card', () => {
+    render(<LaunchpadCarousel />)
+
+    const directivesSection = screen.getByLabelText('Featured Modules')
+    expect(within(directivesSection).queryByTitle('Pause Auto-advance')).not.toBeInTheDocument()
+    expect(within(directivesSection).queryByTitle('Enable Auto-advance')).not.toBeInTheDocument()
+    expect(within(directivesSection).queryByText(/01 \/ 06/)).not.toBeInTheDocument()
   })
 
   it('navigates to module route when primary CTA button is clicked', () => {
@@ -78,13 +110,14 @@ describe('LaunchpadCarousel Component', () => {
     expect(column!.className).toMatch(/max-h-\[700px]/)
   })
 
-  it('renders featured news article card with smooth fade key and periodic counter', () => {
+  it('renders featured news article card edge to edge without featured or secondary badge', () => {
     render(<LaunchpadCarousel />)
 
-    // Initial featured badge and headline
-    expect(screen.getByText('FEATURED 01')).toBeInTheDocument()
-    expect(screen.getByText('The 2026 Moltmaxxing Protocol')).toBeInTheDocument()
-    expect(screen.getByText('READ ARTICLE')).toBeInTheDocument()
+    // Verify news card badges are removed
+    const newsPanel = screen.getByTestId('moltnation-news-panel')
+    expect(within(newsPanel).queryByText(/FEATURED/i)).not.toBeInTheDocument()
+    expect(within(newsPanel).getByText('The 2026 Moltmaxxing Protocol')).toBeInTheDocument()
+    expect(within(newsPanel).getByText('READ ARTICLE')).toBeInTheDocument()
   })
 
   it('opens reader modal with parsed markdown when clicking featured news card, and closes it', () => {
@@ -104,15 +137,16 @@ describe('LaunchpadCarousel Component', () => {
     expect(screen.queryByTitle('Close Modal')).not.toBeInTheDocument()
   })
 
-  it('opens reader modal when clicking a wire article from the scrollable list', () => {
+  it('opens reader modal when clicking an article from the scrollable list', () => {
     render(<LaunchpadCarousel />)
 
-    // Find wire articles list header
-    expect(screen.getByText(/WIRE ARTICLES/i)).toBeInTheDocument()
+    // Find articles list header (WIRE removed)
+    expect(screen.getByText(/ARTICLES \(\d+\)/i)).toBeInTheDocument()
+    expect(screen.queryByText(/WIRE ARTICLES/i)).not.toBeInTheDocument()
 
-    // Click on a wire article item (h5 heading)
-    const wireArticle = screen.getByRole('heading', { level: 5, name: /From Prompt Engineering to Bio-Silicon Cognition/i })
-    fireEvent.click(wireArticle)
+    // Click on an article item (h5 heading)
+    const article = screen.getByRole('heading', { level: 5, name: /From Prompt Engineering to Bio-Silicon Cognition/i })
+    fireEvent.click(article)
 
     // Modal reader should open
     expect(screen.getByTitle('Close Modal')).toBeInTheDocument()

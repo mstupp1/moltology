@@ -24,6 +24,8 @@ export interface PromoSlide {
   accentBorder: string
   accentGlow: string
   tagClass: string
+  ctaButtonClass: string
+  navButtonClass: string
   icon: React.ReactNode
 }
 
@@ -42,6 +44,8 @@ export const PROMO_SLIDES: PromoSlide[] = [
     accentBorder: 'border-[#00ffff]/60',
     accentGlow: 'shadow-[0_0_20px_rgba(0,255,255,0.25)]',
     tagClass: 'bg-[#00ffff]/15 text-[#00ffff] border-[#00ffff]/40',
+    ctaButtonClass: 'bg-[#00ffff]/20 hover:bg-[#00ffff]/30 shadow-[0_0_15px_rgba(0,255,255,0.25)]',
+    navButtonClass: 'border-[#00ffff]/40 text-[#00ffff] hover:bg-[#00ffff]',
     icon: <Sparkles className="w-4 h-4 text-[#00ffff]" />,
   },
   {
@@ -58,6 +62,8 @@ export const PROMO_SLIDES: PromoSlide[] = [
     accentBorder: 'border-[#c084fc]/60',
     accentGlow: 'shadow-[0_0_20px_rgba(192,132,252,0.25)]',
     tagClass: 'bg-[#c084fc]/15 text-[#e9d5ff] border-[#c084fc]/40',
+    ctaButtonClass: 'bg-[#c084fc]/20 hover:bg-[#c084fc]/30 shadow-[0_0_15px_rgba(192,132,252,0.25)]',
+    navButtonClass: 'border-[#c084fc]/40 text-[#c084fc] hover:bg-[#c084fc]',
     icon: <Gift className="w-4 h-4 text-[#c084fc]" />,
   },
   {
@@ -74,6 +80,8 @@ export const PROMO_SLIDES: PromoSlide[] = [
     accentBorder: 'border-[#fb923c]/60',
     accentGlow: 'shadow-[0_0_20px_rgba(251,146,60,0.25)]',
     tagClass: 'bg-[#fb923c]/15 text-[#fed7aa] border-[#fb923c]/40',
+    ctaButtonClass: 'bg-[#fb923c]/20 hover:bg-[#fb923c]/30 shadow-[0_0_15px_rgba(251,146,60,0.25)]',
+    navButtonClass: 'border-[#fb923c]/40 text-[#fb923c] hover:bg-[#fb923c]',
     icon: <Leaf className="w-4 h-4 text-[#fb923c]" />,
   },
   {
@@ -90,6 +98,8 @@ export const PROMO_SLIDES: PromoSlide[] = [
     accentBorder: 'border-[#38bdf8]/60',
     accentGlow: 'shadow-[0_0_20px_rgba(56,189,248,0.25)]',
     tagClass: 'bg-[#38bdf8]/15 text-[#bae6fd] border-[#38bdf8]/40',
+    ctaButtonClass: 'bg-[#38bdf8]/20 hover:bg-[#38bdf8]/30 shadow-[0_0_15px_rgba(56,189,248,0.25)]',
+    navButtonClass: 'border-[#38bdf8]/40 text-[#38bdf8] hover:bg-[#38bdf8]',
     icon: <Cpu className="w-4 h-4 text-[#38bdf8]" />,
   },
 ]
@@ -158,7 +168,7 @@ export function HudPromoBentoCard({
           <div
             key={slide.id}
             className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 pointer-events-none ${
-              idx === currentIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+              idx === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
             style={{ backgroundImage: `url(${slide.image})` }}
             role="img"
@@ -177,7 +187,7 @@ export function HudPromoBentoCard({
         {/* Large Navigation Floating Chevron Buttons */}
         <button
           onClick={handlePrev}
-          className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 bg-[#070b0b]/80 hover:bg-[#00ffff] text-[#00ffff] hover:text-black border border-[#00ffff]/40 transition-all rounded-full opacity-0 group-hover:opacity-100 hover:scale-105"
+          className={`absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 bg-[#070b0b]/80 hover:text-black border transition-all rounded-full opacity-0 group-hover:opacity-100 hover:scale-105 ${activeSlide.navButtonClass}`}
           aria-label="Previous promotional slide"
           title="Previous slide"
         >
@@ -186,7 +196,7 @@ export function HudPromoBentoCard({
 
         <button
           onClick={handleNext}
-          className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 bg-[#070b0b]/80 hover:bg-[#00ffff] text-[#00ffff] hover:text-black border border-[#00ffff]/40 transition-all rounded-full opacity-0 group-hover:opacity-100 hover:scale-105"
+          className={`absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 bg-[#070b0b]/80 hover:text-black border transition-all rounded-full opacity-0 group-hover:opacity-100 hover:scale-105 ${activeSlide.navButtonClass}`}
           aria-label="Next promotional slide"
           title="Next slide"
         >
@@ -219,13 +229,10 @@ export function HudPromoBentoCard({
           <div className="pt-1 flex flex-wrap items-center gap-3">
             <button
               onClick={() => navigate({ to: activeSlide.route })}
-              style={{
-                borderColor: activeSlide.accentColor,
-              }}
-              className="px-4 py-2 sm:px-5 sm:py-2.5 bg-[#00ffff]/20 hover:bg-[#00ffff]/30 text-[#dfe3e3] hover:text-[#ffffff] font-grotesk font-bold text-xs sm:text-sm chamfer-corner flex items-center gap-2 shadow-[0_0_15px_rgba(0,255,255,0.25)] transition-all hover:scale-[1.02] active:scale-95"
+              className={`px-4 py-2 sm:px-5 sm:py-2.5 font-grotesk font-bold text-xs sm:text-sm chamfer-corner flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95 ${activeSlide.ctaButtonClass}`}
             >
               <span className="tracking-wider">{activeSlide.ctaText}</span>
-              <ArrowRight className="w-4 h-4 text-[#00ffff]" />
+              <ArrowRight className="w-4 h-4" style={{ color: activeSlide.accentColor }} />
             </button>
           </div>
         </div>
@@ -263,14 +270,19 @@ export function HudPromoBentoCard({
                   />
                 )}
               </div>
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span
-                  style={{ color: isActive ? slide.accentColor : undefined }}
-                  className="text-[10px] font-grotesk font-bold shrink-0"
-                >
-                  0{idx + 1}.
+              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                <span className="shrink-0">
+                  {React.isValidElement(slide.icon)
+                    ? React.cloneElement(slide.icon as React.ReactElement<{ className?: string }>, {
+                        className: `w-3.5 h-3.5 ${isActive ? '' : 'text-[#839493] opacity-60'}`,
+                      })
+                    : slide.icon}
                 </span>
-                <span className="text-[10px] sm:text-[11px] font-grotesk font-bold uppercase tracking-wider truncate">
+                <span
+                  className={`text-[10px] sm:text-[11px] font-grotesk font-bold uppercase tracking-wider truncate transition-colors ${
+                    isActive ? 'text-[#dfe3e3]' : 'text-[#839493]'
+                  }`}
+                >
                   {slide.id === 'early_access' && 'EARLY ACCESS'}
                   {slide.id === 'welcome_bundle' && 'INITIATE BUNDLE'}
                   {slide.id === 'fall_promo' && 'FALL FESTIVAL'}

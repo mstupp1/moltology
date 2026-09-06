@@ -159,5 +159,36 @@ describe('HudPromoBentoCard Component', () => {
     fireEvent.click(fallTab)
     expect(card.style.borderLeftColor).toBe('rgb(251, 146, 60)')
   })
+
+  it('dynamically updates overlaid CTA button and chevron background colors to match active slide primary color', () => {
+    render(<HudPromoBentoCard />)
+
+    const nextBtn = screen.getByLabelText('Next promotional slide')
+    const cta1 = screen.getByText('BEGIN ONBOARDING').closest('button')
+    expect(cta1?.className).toContain('bg-[#00ffff]/20')
+    expect(nextBtn.className).toContain('hover:bg-[#00ffff]')
+
+    // Switch to Slide 2 (Welcome Bundle - purple #c084fc)
+    const bundleTab = screen.getByLabelText(/Select bulletin 02/i)
+    fireEvent.click(bundleTab)
+    const cta2 = screen.getByText('CLAIM BUNDLE (50% OFF)').closest('button')
+    expect(cta2?.className).toContain('bg-[#c084fc]/20')
+    expect(nextBtn.className).toContain('hover:bg-[#c084fc]')
+
+    // Switch to Slide 3 (Fall Festival - orange #fb923c)
+    const fallTab = screen.getByLabelText(/Select bulletin 03/i)
+    fireEvent.click(fallTab)
+    const cta3 = screen.getByText('EXPLORE FALL FESTIVAL').closest('button')
+    expect(cta3?.className).toContain('bg-[#fb923c]/20')
+    expect(nextBtn.className).toContain('hover:bg-[#fb923c]')
+
+    // Switch to Slide 4 (Cyber Chassis - sky blue #38bdf8)
+    const chassisTab = screen.getByLabelText(/Select bulletin 04/i)
+    fireEvent.click(chassisTab)
+    const cta4 = screen.getByText('CONFIGURE CHASSIS').closest('button')
+    expect(cta4?.className).toContain('bg-[#38bdf8]/20')
+    expect(nextBtn.className).toContain('hover:bg-[#38bdf8]')
+  })
 })
+
 
