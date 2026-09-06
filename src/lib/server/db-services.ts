@@ -104,6 +104,11 @@ import {
   forumMentionSourceKey,
   presentForumMentionNotification,
 } from '../forum-mentions'
+import {
+  forumReplySourceKey,
+  presentForumReplyNotification,
+  type ForumReplyTarget,
+} from '../forum-replies'
 
 type Db = ReturnType<typeof getDb>
 
@@ -1739,6 +1744,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       id: forumTopics.id,
       slug: forumTopics.slug,
       categoryId: forumTopics.categoryId,
+      userId: forumTopics.userId,
     })
     .from(forumTopics)
     .where(eq(forumTopics.id, data.topicId))
@@ -1749,9 +1755,15 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   }
 
   let parentId: string | null = data.parentId?.trim() || null
+  let parentAuthorUserId: string | null = null
   if (parentId) {
     const [parent] = await dbClient
-      .select({ id: forumPosts.id, topicId: forumPosts.topicId, parentId: forumPosts.parentId })
+      .select({
+        id: forumPosts.id,
+        topicId: forumPosts.topicId,
+        parentId: forumPosts.parentId,
+        userId: forumPosts.userId,
+      })
       .from(forumPosts)
       .where(eq(forumPosts.id, parentId))
       .limit(1)
@@ -1759,6 +1771,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     if (!parent || parent.topicId !== data.topicId) {
       throw new Error('That comment is no longer available. Refresh and try again.')
     }
+    parentAuthorUserId = parent.userId ?? null
 
     // Walk ancestors to enforce hard depth cap.
     let depth = 1
@@ -1814,17 +1827,28 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     console.warn('[createForumPostFn] Topic reply counter update error:', err)
   }
 
-  try {
-    let categorySlug: string | undefined
-    if (extractMentionHandles(inserted.content).length > 0 && topicExists.categoryId) {
+  const mentionHandles = extractMentionHandles(inserted.content)
+  const mayReplyNotify =
+    Boolean(topicExists.userId && topicExists.userId !== userId) ||
+    Boolean(parentAuthorUserId && parentAuthorUserId !== userId)
+
+  let mentionedUserIds: string[] = []
+  let categorySlug: string | undefined
+  if ((mentionHandles.length > 0 || mayReplyNotify) && topicExists.categoryId) {
+    try {
       const [cat] = await dbClient
         .select({ slug: forumCategories.slug })
         .from(forumCategories)
         .where(eq(forumCategories.id, topicExists.categoryId))
         .limit(1)
       categorySlug = cat?.slug
+    } catch (err) {
+      console.warn('[createForumPostFn] Category slug lookup error:', err)
     }
-    await recordForumMentions(dbClient, {
+  }
+
+  try {
+    mentionedUserIds = await recordForumMentions(dbClient, {
       actorUserId: userId,
       actorPublicName: authorName,
       content: inserted.content,
@@ -1836,6 +1860,22 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     })
   } catch (err) {
     console.warn('[createForumPostFn] Mention persist error:', err)
+  }
+
+  try {
+    await recordForumReplyNotifications(dbClient, {
+      actorUserId: userId,
+      actorPublicName: authorName,
+      replyPostId: inserted.id,
+      topicId: inserted.topicId,
+      topicAuthorUserId: topicExists.userId,
+      parentAuthorUserId,
+      skipUserIds: mentionedUserIds,
+      topicSlug: topicExists.slug,
+      categorySlug,
+    })
+  } catch (err) {
+    console.warn('[createForumPostFn] Reply persist error:', err)
   }
 
   return {
@@ -2863,9 +2903,9 @@ export async function recordForumMentions(
     topicSlug?: string
     categorySlug?: string
   },
-): Promise<number> {
+): Promise<string[]> {
   const handles = extractMentionHandles(input.content)
-  if (handles.length === 0) return 0
+  if (handles.length === 0) return []
 
   const rows = await dbClient
     .select({
@@ -2883,7 +2923,7 @@ export async function recordForumMentions(
 
   const copy = presentForumMentionNotification({ handle: input.actorPublicName })
   const seen = new Set<string>()
-  let written = 0
+  const mentionedUserIds: string[] = []
 
   for (const row of rows) {
     if (!row.id || row.id === input.actorUserId || seen.has(row.id)) continue
@@ -2903,6 +2943,61 @@ export async function recordForumMentions(
         handle: row.handle?.trim() || undefined,
       },
       sourceKey: forumMentionSourceKey(input.sourceType, input.sourceId, row.id),
+    })
+    mentionedUserIds.push(row.id)
+  }
+
+  return mentionedUserIds
+}
+
+export async function recordForumReplyNotifications(
+  dbClient: Db,
+  input: {
+    actorUserId: string
+    actorPublicName: string
+    replyPostId: string
+    topicId: string
+    topicAuthorUserId?: string | null
+    parentAuthorUserId?: string | null
+    skipUserIds?: string[]
+    topicSlug?: string
+    categorySlug?: string
+  },
+): Promise<number> {
+  const skip = new Set(input.skipUserIds ?? [])
+  skip.add(input.actorUserId)
+
+  const recipients = new Map<string, ForumReplyTarget>()
+  if (input.topicAuthorUserId && !skip.has(input.topicAuthorUserId)) {
+    recipients.set(input.topicAuthorUserId, 'topic')
+  }
+  if (input.parentAuthorUserId && !skip.has(input.parentAuthorUserId)) {
+    recipients.set(input.parentAuthorUserId, 'post')
+  }
+
+  if (recipients.size === 0) return 0
+
+  let written = 0
+  for (const [recipientUserId, replyTarget] of recipients) {
+    const copy = presentForumReplyNotification({
+      handle: input.actorPublicName,
+      target: replyTarget,
+    })
+    await insertNotification(dbClient, {
+      userId: recipientUserId,
+      kind: 'forum_reply',
+      actorUserId: input.actorUserId,
+      title: copy.title,
+      detail: copy.detail,
+      payload: {
+        profileId: input.actorUserId,
+        topicId: input.topicId,
+        postId: input.replyPostId,
+        categorySlug: input.categorySlug,
+        topicSlug: input.topicSlug,
+        replyTarget,
+      },
+      sourceKey: forumReplySourceKey(input.replyPostId, recipientUserId),
     })
     written += 1
   }

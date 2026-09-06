@@ -48,6 +48,13 @@ describe('system-notifications', () => {
         topicSlug: 'molt-notes',
       }),
     ).toBe('/forum/general-discussion/molt-notes')
+    expect(
+      hubUrlForNotificationKind('forum_reply', {
+        categorySlug: 'general-discussion',
+        topicSlug: 'molt-notes',
+        postId: 'post-reply',
+      }),
+    ).toBe('/forum/general-discussion/molt-notes#post-post-reply')
   })
 
   it('tracks seen notification tags in session storage', () => {

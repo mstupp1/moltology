@@ -165,6 +165,7 @@ export function hubUrlForNotificationKind(
     case 'friend_rejected':
       return '/connections'
     case 'forum_mention':
+    case 'forum_reply':
       return forumMentionHubPath(payload ?? {})
     default:
       return '/dashboard'

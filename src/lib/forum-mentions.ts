@@ -107,14 +107,21 @@ export function presentForumMentionNotification(actor: {
   }
 }
 
+export function forumPostAnchorId(postId: string): string {
+  return `post-${postId.trim()}`
+}
+
 export function forumMentionHubPath(payload: {
   categorySlug?: string
   topicSlug?: string
+  postId?: string
 }): string {
   const categorySlug = payload.categorySlug?.trim()
   const topicSlug = payload.topicSlug?.trim()
   if (categorySlug && topicSlug) {
-    return `/forum/${categorySlug}/${topicSlug}`
+    const path = `/forum/${categorySlug}/${topicSlug}`
+    const postId = payload.postId?.trim()
+    return postId ? `${path}#${forumPostAnchorId(postId)}` : path
   }
   return '/forum'
 }

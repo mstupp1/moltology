@@ -308,4 +308,28 @@ describe('notifications helpers', () => {
     expect(view.detail).toBe('claw_lord hailed you in a discussion.')
     expect(view.actionable).toBe(false)
   })
+
+  it('presents forum reply rows with live actor designation and thread target', () => {
+    const view = presentNotificationView({
+      id: 'n4',
+      kind: 'forum_reply',
+      title: 'A reply reached your thread',
+      detail: 'LARVA UNIT #2468 answered a thread you opened.',
+      actorUserId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      actorLarvaId: 'LARVA UNIT #2468',
+      actorHandle: 'claw_lord',
+      payload: {
+        topicId: 'topic-1',
+        postId: 'post-2',
+        categorySlug: 'general-discussion',
+        topicSlug: 'molt-notes',
+        replyTarget: 'topic',
+      },
+      readAt: null,
+      createdAt: '2026-09-06T00:00:00.000Z',
+    })
+    expect(view.title).toBe('A reply reached your thread')
+    expect(view.detail).toBe('claw_lord answered a thread you opened.')
+    expect(view.actionable).toBe(false)
+  })
 })

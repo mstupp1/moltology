@@ -515,7 +515,12 @@ export const podcasts = pgTable('podcasts', {
 export type FriendRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled'
 
 /** Notification kinds for the Activity Center. */
-export type NotificationKind = 'friend_request' | 'friend_accepted' | 'friend_rejected' | 'forum_mention'
+export type NotificationKind =
+  | 'friend_request'
+  | 'friend_accepted'
+  | 'friend_rejected'
+  | 'forum_mention'
+  | 'forum_reply'
 
 export type NotificationPayload = {
   requestId?: string
@@ -525,6 +530,7 @@ export type NotificationPayload = {
   categorySlug?: string
   topicSlug?: string
   handle?: string
+  replyTarget?: 'topic' | 'post'
 }
 
 // Friend requests between members

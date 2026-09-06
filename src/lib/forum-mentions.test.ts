@@ -67,6 +67,13 @@ describe('forum mentions', () => {
     expect(forumMentionHubPath({ categorySlug: 'general-discussion', topicSlug: 'molt-notes' })).toBe(
       '/forum/general-discussion/molt-notes',
     )
+    expect(
+      forumMentionHubPath({
+        categorySlug: 'general-discussion',
+        topicSlug: 'molt-notes',
+        postId: 'post-hail',
+      }),
+    ).toBe('/forum/general-discussion/molt-notes#post-post-hail')
     expect(forumMentionHubPath({})).toBe('/forum')
   })
 })
