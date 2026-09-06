@@ -14,7 +14,7 @@ export function ForumMentionBody({
   const parts = splitForumMentionParts(content)
 
   return (
-    <div className={className} data-testid={testId}>
+    <p className={className} data-testid={testId}>
       {parts.map((part, index) => {
         if (part.type === 'text') {
           return <React.Fragment key={`t-${index}`}>{part.value}</React.Fragment>
@@ -31,6 +31,6 @@ export function ForumMentionBody({
           </Link>
         )
       })}
-    </div>
+    </p>
   )
 }

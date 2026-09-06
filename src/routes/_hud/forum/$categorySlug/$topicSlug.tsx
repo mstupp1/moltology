@@ -236,10 +236,9 @@ function ForumThreadPage() {
               </div>
 
               {/* Topic Body */}
-              <ForumMentionBody
-                content={topic.content}
-                className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]"
-              />
+              <div className="chitin-card-inset p-3.5 sm:p-4 chamfer-corner text-xs sm:text-sm text-[#dfe3e3] leading-relaxed whitespace-pre-wrap border border-[#3a4a49]">
+                <ForumMentionBody content={topic.content} />
+              </div>
 
               {/* Action Footer */}
               <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between">

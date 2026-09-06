@@ -30,6 +30,7 @@ export function MentionTextarea({
   const fieldId = id ?? generatedId
   const listboxId = `${fieldId}-mention-list`
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const justAppliedRef = useRef(false)
   const [cursor, setCursor] = useState(0)
   const [highlight, setHighlight] = useState(0)
   const [dismissed, setDismissed] = useState(false)
@@ -50,6 +51,10 @@ export function MentionTextarea({
   }, [query, open])
 
   useEffect(() => {
+    if (justAppliedRef.current) {
+      justAppliedRef.current = false
+      return
+    }
     setDismissed(false)
   }, [query])
 
@@ -60,13 +65,15 @@ export function MentionTextarea({
 
   const applyMention = (handle: string) => {
     const next = insertMentionAtCursor(value, cursor, handle)
+    justAppliedRef.current = true
     onChange(next.text)
+    setCursor(next.cursor)
+    setDismissed(true)
     requestAnimationFrame(() => {
       const el = textareaRef.current
       if (!el) return
       el.focus()
       el.setSelectionRange(next.cursor, next.cursor)
-      setCursor(next.cursor)
     })
   }
 
