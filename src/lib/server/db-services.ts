@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -32,6 +32,8 @@ import {
   toForumIso,
   visibleForumContent,
 } from '../forum-utils'
+import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
+import { isAdminOrSuperAdmin } from '../permissions'
 import { INITIAL_PODCASTS } from '../podcast-data'
 import { getAssetUrl } from '../assets'
 import type { PodcastEpisode } from '../podcast-data'
@@ -2369,6 +2371,320 @@ export const deleteForumPostFn = createServerFn({ method: 'POST' })
       .parse(data)
   })
   .handler(deleteForumPostHandler)
+
+export interface CreateForumReportInput {
+  topicId?: string
+  postId?: string
+  reason: string
+  note?: string | null
+  userId?: string
+  token?: string
+}
+
+export interface ForumReportReceipt {
+  id: string
+  topicId: string | null
+  postId: string | null
+  reason: string
+  note: string | null
+  status: string
+  createdAt: string
+  alreadyReported: boolean
+}
+
+export interface ForumReportWatchEntry {
+  id: string
+  reporterId: string
+  reporterName: string
+  topicId: string | null
+  postId: string | null
+  reason: string
+  reasonLabel: string
+  note: string | null
+  status: string
+  createdAt: string
+  topicTitle: string | null
+  topicSlug: string | null
+  categorySlug: string | null
+  targetKind: 'topic' | 'reply'
+  targetWithdrawn: boolean
+}
+
+function jwtClaimEmail(payload: JWTPayload | null): string | null {
+  const email = payload && typeof payload.email === 'string' ? payload.email : null
+  return email
+}
+
+async function assertCovenantSteward(
+  dbClient: Db,
+  userId: string,
+  payload: JWTPayload | null,
+): Promise<void> {
+  const [profile] = await dbClient
+    .select({ role: profiles.role })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+
+  if (!isAdminOrSuperAdmin({ email: jwtClaimEmail(payload), role: profile?.role }, profile?.role)) {
+    throw new Error(FORUM_REPORT_COPY.watchSealed)
+  }
+}
+
+function mapForumReportReceipt(
+  row: {
+    id: string
+    topicId: string | null
+    postId: string | null
+    reason: string
+    note: string | null
+    status: string
+    createdAt: Date | string
+  },
+  alreadyReported: boolean,
+): ForumReportReceipt {
+  return {
+    id: row.id,
+    topicId: row.topicId,
+    postId: row.postId,
+    reason: row.reason,
+    note: row.note,
+    status: row.status,
+    createdAt: forumIsoOrNow(row.createdAt),
+    alreadyReported,
+  }
+}
+
+/**
+ * Server Function: Signed-in members flag another member's topic or reply.
+ * Soft row only. One open report per reporter + target.
+ */
+export const createForumReportHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<CreateForumReportInput>): Promise<ForumReportReceipt> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: You must be signed in to flag a transmission.')
+  }
+  if (!data?.topicId && !data?.postId) {
+    throw new Error(FORUM_REPORT_COPY.missingTarget)
+  }
+
+  const parsed = validateForumReportInput({ reason: data.reason, note: data.note })
+  if (!parsed.valid) {
+    throw new Error(parsed.error)
+  }
+
+  const { userId, dbClient } = auth
+  let topicId = data.topicId ?? null
+  let postId = data.postId ?? null
+
+  if (postId) {
+    const [post] = await dbClient
+      .select({
+        id: forumPosts.id,
+        topicId: forumPosts.topicId,
+        userId: forumPosts.userId,
+        deletedAt: forumPosts.deletedAt,
+      })
+      .from(forumPosts)
+      .where(eq(forumPosts.id, postId))
+      .limit(1)
+
+    if (!post) {
+      throw new Error(FORUM_REPORT_COPY.missingTarget)
+    }
+    if (post.deletedAt) {
+      throw new Error(FORUM_REPORT_COPY.withdrawnTarget)
+    }
+    if (post.userId && post.userId === userId) {
+      throw new Error(FORUM_REPORT_COPY.ownTarget)
+    }
+    if (topicId && topicId !== post.topicId) {
+      throw new Error(FORUM_REPORT_COPY.missingTarget)
+    }
+    topicId = post.topicId
+    postId = post.id
+  } else if (topicId) {
+    const [topic] = await dbClient
+      .select({
+        id: forumTopics.id,
+        userId: forumTopics.userId,
+        deletedAt: forumTopics.deletedAt,
+      })
+      .from(forumTopics)
+      .where(eq(forumTopics.id, topicId))
+      .limit(1)
+
+    if (!topic) {
+      throw new Error(FORUM_REPORT_COPY.missingTarget)
+    }
+    if (topic.deletedAt) {
+      throw new Error(FORUM_REPORT_COPY.withdrawnTarget)
+    }
+    if (topic.userId && topic.userId === userId) {
+      throw new Error(FORUM_REPORT_COPY.ownTarget)
+    }
+    topicId = topic.id
+    postId = null
+  }
+
+  const existingQuery = postId
+    ? and(
+        eq(forumReports.reporterId, userId),
+        eq(forumReports.postId, postId),
+        eq(forumReports.status, 'open'),
+      )
+    : and(
+        eq(forumReports.reporterId, userId),
+        eq(forumReports.topicId, topicId!),
+        isNull(forumReports.postId),
+        eq(forumReports.status, 'open'),
+      )
+
+  const [existing] = await dbClient
+    .select()
+    .from(forumReports)
+    .where(existingQuery)
+    .limit(1)
+
+  if (existing) {
+    return mapForumReportReceipt(existing, true)
+  }
+
+  try {
+    const [inserted] = await dbClient
+      .insert(forumReports)
+      .values({
+        reporterId: userId,
+        topicId,
+        postId,
+        reason: parsed.reason,
+        note: parsed.note,
+        status: 'open',
+      })
+      .returning()
+
+    return mapForumReportReceipt(inserted, false)
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error
+    const [dup] = await dbClient
+      .select()
+      .from(forumReports)
+      .where(existingQuery)
+      .limit(1)
+    if (dup) return mapForumReportReceipt(dup, true)
+    throw error
+  }
+}
+
+/**
+ * Server Function: Elevated accounts read the open flag ledger.
+ * Query path: forum_reports where status = 'open', newest first.
+ */
+export const listForumReportsHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ userId?: string; token?: string }>): Promise<ForumReportWatchEntry[]> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required.')
+  }
+
+  const { userId, dbClient, payload } = auth
+  await assertCovenantSteward(dbClient, userId, payload)
+
+  const reports = await dbClient
+    .select()
+    .from(forumReports)
+    .where(eq(forumReports.status, 'open'))
+    .orderBy(desc(forumReports.createdAt))
+    .limit(100)
+
+  if (reports.length === 0) return []
+
+  const topicIds = [...new Set(reports.map((row) => row.topicId).filter((id): id is string => Boolean(id)))]
+  const reporterIds = [...new Set(reports.map((row) => row.reporterId))]
+
+  const topicRows = topicIds.length
+    ? await dbClient
+        .select({
+          id: forumTopics.id,
+          title: forumTopics.title,
+          slug: forumTopics.slug,
+          categoryId: forumTopics.categoryId,
+          deletedAt: forumTopics.deletedAt,
+        })
+        .from(forumTopics)
+        .where(inArray(forumTopics.id, topicIds))
+    : []
+
+  const categoryIds = [...new Set(topicRows.map((row) => row.categoryId))]
+  const categoryRows = categoryIds.length
+    ? await dbClient
+        .select({
+          id: forumCategories.id,
+          slug: forumCategories.slug,
+        })
+        .from(forumCategories)
+        .where(inArray(forumCategories.id, categoryIds))
+    : []
+
+  const reporterRows = reporterIds.length
+    ? await dbClient
+        .select({
+          id: profiles.id,
+          handle: profiles.handle,
+          larvaId: profiles.larvaId,
+        })
+        .from(profiles)
+        .where(inArray(profiles.id, reporterIds))
+    : []
+
+  const topicsById = new Map(topicRows.map((row) => [row.id, row]))
+  const categoriesById = new Map(categoryRows.map((row) => [row.id, row]))
+  const reportersById = new Map(reporterRows.map((row) => [row.id, row]))
+
+  const postIds = [...new Set(reports.map((row) => row.postId).filter((id): id is string => Boolean(id)))]
+  const postRows = postIds.length
+    ? await dbClient
+        .select({
+          id: forumPosts.id,
+          deletedAt: forumPosts.deletedAt,
+        })
+        .from(forumPosts)
+        .where(inArray(forumPosts.id, postIds))
+    : []
+  const postsById = new Map(postRows.map((row) => [row.id, row]))
+
+  return reports.map((row) => {
+    const topic = row.topicId ? topicsById.get(row.topicId) : undefined
+    const reporter = reportersById.get(row.reporterId)
+    const post = row.postId ? postsById.get(row.postId) : undefined
+    return {
+      id: row.id,
+      reporterId: row.reporterId,
+      reporterName: resolveMemberPublicName({
+        userId: row.reporterId,
+        handle: reporter?.handle,
+        larvaId: reporter?.larvaId,
+      }),
+      topicId: row.topicId,
+      postId: row.postId,
+      reason: row.reason,
+      reasonLabel: forumReportReasonLabel(row.reason),
+      note: row.note,
+      status: row.status,
+      createdAt: forumIsoOrNow(row.createdAt),
+      topicTitle: topic?.title ?? null,
+      topicSlug: topic?.slug ?? null,
+      categorySlug: topic ? categoriesById.get(topic.categoryId)?.slug ?? null : null,
+      targetKind: row.postId ? 'reply' : 'topic',
+      targetWithdrawn: Boolean(topic?.deletedAt || post?.deletedAt),
+    }
+  })
+}
 
 export interface ToggleForumVoteInput {
   topicId?: string

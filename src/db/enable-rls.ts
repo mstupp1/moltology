@@ -393,6 +393,24 @@ async function applyRLS() {
       "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
     );`
 
+    await sql`ALTER TABLE IF EXISTS forum_reports ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS forum_reports_owner_insert_policy ON forum_reports;`
+    await sql`CREATE POLICY forum_reports_owner_insert_policy ON forum_reports FOR INSERT WITH CHECK (
+      "reporterId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS forum_reports_select_policy ON forum_reports;`
+    await sql`CREATE POLICY forum_reports_select_policy ON forum_reports FOR SELECT USING (
+      "reporterId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR EXISTS (
+        SELECT 1 FROM profiles
+        WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+          AND profiles.role IN ('admin', 'super_admin')
+      )
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    console.log('✓ RLS policies configured for forum_reports table')
+
     // Enable RLS for leads table
     await sql`ALTER TABLE IF EXISTS leads ENABLE ROW LEVEL SECURITY;`
     await sql`DROP POLICY IF EXISTS leads_public_insert_policy ON leads;`

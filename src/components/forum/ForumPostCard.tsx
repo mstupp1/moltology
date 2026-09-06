@@ -11,6 +11,7 @@ import { forumReplyIndentDepth, type ForumPostTreeNode } from '@/lib/forum-utils
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ForumPostBody } from '@/components/forum/ForumPostBody'
 import { ForumAuthorTools, ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
+import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
 import { isForumQuoteSourceWithdrawn } from '@/lib/forum-quotes'
 import { useForumAuth } from '@/components/forum/ForumShell'
@@ -363,6 +364,13 @@ export function ForumPostCard({
                     onConfirmWithdraw={handleWithdraw}
                   />
                 )}
+                <ForumFlagControl
+                  topicId={topicId}
+                  postId={post.id}
+                  authorId={post.userId}
+                  withdrawn={withdrawn}
+                  deletedAt={post.deletedAt}
+                />
                 {!withdrawn && (
                   <button
                     type="button"

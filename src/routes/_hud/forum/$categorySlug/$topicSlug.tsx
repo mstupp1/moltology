@@ -19,6 +19,7 @@ import { ReplyComposer, type ReplyComposerHandle } from '@/components/forum/Repl
 import { ForumPostCard } from '@/components/forum/ForumPostCard'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ForumAuthorTools, ForumRevisedMark, ForumWithdrawnBody } from '@/components/forum/ForumAuthorTools'
+import { ForumFlagControl } from '@/components/forum/ForumFlagControl'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
 import {
   getForumTopicDetailFn,
@@ -543,6 +544,12 @@ function ForumThreadPage() {
                       onConfirmWithdraw={() => void handleTopicWithdraw()}
                     />
                   )}
+                  <ForumFlagControl
+                    topicId={topic.id}
+                    authorId={topic.userId}
+                    withdrawn={topicWithdrawn}
+                    deletedAt={topic.deletedAt}
+                  />
                   {!topicWithdrawn && (
                     <button
                       type="button"

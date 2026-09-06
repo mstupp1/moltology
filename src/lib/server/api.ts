@@ -502,6 +502,47 @@ export const toggleForumPostVoteFn = createServerFn({ method: 'POST' })
     return toggleForumPostVoteHandler(args)
   })
 
+export const createForumReportFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: {
+    topicId?: string
+    postId?: string
+    reason: string
+    note?: string | null
+    userId?: string
+    token?: string
+  }) =>
+    z
+      .object({
+        topicId: z.string().min(1).optional(),
+        postId: z.string().min(1).optional(),
+        reason: z.string().min(1),
+        note: z.string().nullable().optional(),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { createForumReportHandler } = await import('./db-services')
+    return createForumReportHandler(args)
+  })
+
+export const listForumReportsFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { userId?: string; token?: string }) =>
+    z
+      .object({
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data ?? {})
+  )
+  .handler(async (args) => {
+    const { listForumReportsHandler } = await import('./db-services')
+    return listForumReportsHandler(args)
+  })
+
 export const getPodcastsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(async (args) => {
