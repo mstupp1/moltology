@@ -14,6 +14,12 @@ import {
   presentJoinStory,
   rollChance,
   sampleJoinOrigin,
+  calculatePostDepth,
+  chooseForumReplyTarget,
+  extractQuoteSnippet,
+  formatDiegeticQuoteBlock,
+  pickMentionCandidate,
+  balanceTopicAndPostVotes,
 } from './simulation-social'
 
 describe('simulation social helpers', () => {
@@ -160,4 +166,125 @@ describe('simulation social helpers', () => {
       expect(block).toContain('Distinct traits: Dry-trench wit')
     })
   })
+
+  describe('forum simulation helpers', () => {
+    const sampleTopic = {
+      id: 'topic-1',
+      userId: 'op-user',
+      authorName: 'Op Author',
+      authorHandle: 'OpHandle',
+      title: 'Optimal Cold Plunge Protocols',
+      content: 'What submergence temperatures yield the highest baseline recovery?',
+    }
+
+    it('calculatePostDepth measures tree depth correctly', () => {
+      const parentMap = new Map<string, string | null>([
+        ['post-1', null],
+        ['post-2', 'post-1'],
+        ['post-3', 'post-2'],
+      ])
+      expect(calculatePostDepth('post-1', parentMap)).toBe(0)
+      expect(calculatePostDepth('post-2', parentMap)).toBe(1)
+      expect(calculatePostDepth('post-3', parentMap)).toBe(2)
+    })
+
+    it('chooseForumReplyTarget returns top-level when no posts exist', () => {
+      const target = chooseForumReplyTarget(sampleTopic, [], 'other-user')
+      expect(target.parentId).toBeNull()
+      expect(target.targetPost).toBeNull()
+      expect(target.isOpFollowUp).toBe(false)
+    })
+
+    it('chooseForumReplyTarget triggers OP follow-up to commenter', () => {
+      const posts = [
+        {
+          id: 'post-1',
+          userId: 'commenter-user',
+          authorName: 'Commenter',
+          authorHandle: 'CommenterHandle',
+          content: 'I run 48F for 3 minutes.',
+        },
+      ]
+      // When OP replies, they target the commenter
+      const target = chooseForumReplyTarget(sampleTopic, posts, 'op-user')
+      expect(target.isOpFollowUp).toBe(true)
+      expect(target.parentId).toBe('post-1')
+      expect(target.targetPost?.id).toBe('post-1')
+    })
+
+    it('chooseForumReplyTarget respects maxDepth boundary', () => {
+      // Chain of depth 4: p1 (0) -> p2 (1) -> p3 (2) -> p4 (3) -> p5 (4)
+      const posts = [
+        { id: 'p1', userId: 'u1', parentId: null, content: 'Root' },
+        { id: 'p2', userId: 'u2', parentId: 'p1', content: 'Depth 1' },
+        { id: 'p3', userId: 'u3', parentId: 'p2', content: 'Depth 2' },
+        { id: 'p4', userId: 'u4', parentId: 'p3', content: 'Depth 3' },
+        { id: 'p5', userId: 'u5', parentId: 'p4', content: 'Depth 4' },
+      ]
+      // maxDepth = 4. A reply to p5 would have depth 5 (too deep).
+      // So chooseForumReplyTarget should NEVER pick p5.
+      for (let i = 0; i < 20; i++) {
+        const target = chooseForumReplyTarget(sampleTopic, posts, 'u-new', {
+          maxDepth: 4,
+          nestedChance: 1.0,
+        })
+        expect(target.parentId).not.toBe('p5')
+      }
+    })
+
+    it('extractQuoteSnippet extracts clean 1-2 sentence excerpts without blockquotes', () => {
+      const raw = `> @Someone held:
+> Old quote line here.
+
+Mastering the 06:00 Priority Pincer Lock was the turning point. It stabilized my torque by 18% in three days. After that, cold plunges felt natural.`
+
+      const snippet = extractQuoteSnippet(raw, 160)
+      expect(snippet).not.toBeNull()
+      expect(snippet).not.toContain('Old quote line')
+      expect(snippet).toContain('Mastering the 06:00 Priority Pincer Lock')
+    })
+
+    it('formatDiegeticQuoteBlock formats with author handle attribution', () => {
+      const block = formatDiegeticQuoteBlock(
+        'Vaelen',
+        'Architect Vaelen',
+        'Priority Pincer Lock was the turning point.'
+      )
+      expect(block).toBe(
+        '> @Vaelen held:\n> Priority Pincer Lock was the turning point.\n\n'
+      )
+    })
+
+    it('pickMentionCandidate selects target post author or participant', () => {
+      const mention = pickMentionCandidate(
+        'user-a',
+        [{ userId: 'user-b', handle: 'UserB' }],
+        [{ userId: 'user-c', handle: 'UserC' }],
+        { userId: 'user-b', handle: 'UserB' },
+        () => 0.1 // < 0.6 triggers target author
+      )
+      expect(mention).toEqual({ userId: 'user-b', handle: 'UserB' })
+    })
+
+    it('balanceTopicAndPostVotes balances between topics and posts', () => {
+      const topics = [{ id: 't1', userId: 'other-1' }]
+      const posts = [{ id: 'p1', userId: 'other-2' }]
+      const existing = new Set<string>()
+
+      // Low roll chooses topic
+      const topicVote = balanceTopicAndPostVotes('voter-1', topics, posts, existing, {
+        topicRatio: 0.5,
+        rng: () => 0.2,
+      })
+      expect(topicVote).toEqual({ type: 'topic', id: 't1' })
+
+      // High roll chooses post
+      const postVote = balanceTopicAndPostVotes('voter-1', topics, posts, existing, {
+        topicRatio: 0.5,
+        rng: () => 0.8,
+      })
+      expect(postVote).toEqual({ type: 'post', id: 'p1' })
+    })
+  })
 })
+

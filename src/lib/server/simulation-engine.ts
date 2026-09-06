@@ -21,6 +21,7 @@ import { resolveMemberPublicName } from '../member-handle'
 import { slugifyForumTitle } from '../forum-utils'
 import { validateInputGuardrails } from '../ai/guardrails'
 import { normalizeFriendPair } from '../connections'
+import { recordForumMentions, recordForumReplyNotifications } from './db-services'
 import {
   DEFAULT_BOND_CHANCE,
   DEFAULT_CONNECTION_CHANCE,
@@ -28,17 +29,30 @@ import {
   DEFAULT_MAX_BONDS_PER_MEMBER,
   DEFAULT_MAX_TRAITS_PER_MEMBER,
   DEFAULT_MUTATION_CHANCE,
+  DEFAULT_FORUM_ACTIONS_PER_CYCLE,
+  DEFAULT_FORUM_NESTED_REPLY_CHANCE,
+  DEFAULT_FORUM_QUOTE_CHANCE,
+  DEFAULT_FORUM_MENTION_CHANCE,
+  DEFAULT_FORUM_TOPIC_VOTE_RATIO,
+  DEFAULT_FORUM_EDIT_CHANCE,
+  SIMULATION_MAX_REPLY_DEPTH,
   applyTraitMutation,
   bondPairKey,
   chooseBondForPair,
+  chooseForumReplyTarget,
+  extractQuoteSnippet,
+  formatDiegeticQuoteBlock,
   formatPersonaVoiceBlock,
   friendshipPairKey,
   normalizeBondEndpoints,
+  pickMentionCandidate,
   pickNewTrait,
   pickUnconnectedPair,
   pickWeightedSponsor,
+  balanceTopicAndPostVotes,
   rollChance,
   sampleJoinOrigin,
+  type ForumPostCandidate,
 } from '../simulation-social'
 
 export const SIMULATION_MODEL_ID = process.env.SIMULATION_MODEL_ID || 'alibaba/qwen3.8-flash'
@@ -66,6 +80,13 @@ export interface SimulationGrowthConfig {
   bondChance: number
   maxBondsPerMember: number
   joinSourceWeights: Record<MemberJoinSource, number>
+  forumActionsPerCycle?: number
+  forumNestedReplyChance?: number
+  forumQuoteChance?: number
+  forumMentionChance?: number
+  forumTopicVoteRatio?: number
+  forumEditChance?: number
+  forumVoteCount?: number
 }
 
 export const DEFAULT_GROWTH_CONFIG: SimulationGrowthConfig = {
@@ -89,6 +110,13 @@ export const DEFAULT_GROWTH_CONFIG: SimulationGrowthConfig = {
   bondChance: DEFAULT_BOND_CHANCE,
   maxBondsPerMember: DEFAULT_MAX_BONDS_PER_MEMBER,
   joinSourceWeights: DEFAULT_JOIN_SOURCE_WEIGHTS,
+  forumActionsPerCycle: DEFAULT_FORUM_ACTIONS_PER_CYCLE,
+  forumNestedReplyChance: DEFAULT_FORUM_NESTED_REPLY_CHANCE,
+  forumQuoteChance: DEFAULT_FORUM_QUOTE_CHANCE,
+  forumMentionChance: DEFAULT_FORUM_MENTION_CHANCE,
+  forumTopicVoteRatio: DEFAULT_FORUM_TOPIC_VOTE_RATIO,
+  forumEditChance: DEFAULT_FORUM_EDIT_CHANCE,
+  forumVoteCount: 3,
 }
 
 export function assertAiGatewayKey(): string {
@@ -458,12 +486,30 @@ export async function simulateDailyRoutines(
 
 /**
  * Simulates an in-character forum reply or new discussion topic.
+ * Uses Reddit-style community interactions naturally:
+ * - Direct comment replies with parentId (nested trees up to max depth).
+ * - Topic author follow-up dialogue (OP answering questions / acknowledging tips).
+ * - Diegetic quote-replies (> @handle held:) when responding to a specific point.
+ * - Contextual @handle mentions with Activity Center notifications.
  */
 export async function simulateForumActivity(
   dbClient: ReturnType<typeof getDb>,
-  options: { dryRun?: boolean } = {}
+  optionsOrConfig?: { dryRun?: boolean; config?: SimulationGrowthConfig } | SimulationGrowthConfig,
+  maybeOptions?: { dryRun?: boolean }
 ) {
   assertAiGatewayKey()
+
+  let config = DEFAULT_GROWTH_CONFIG
+  let options: { dryRun?: boolean } = {}
+  if (optionsOrConfig && 'maxSimulatedUsers' in optionsOrConfig) {
+    config = optionsOrConfig as SimulationGrowthConfig
+    options = maybeOptions || {}
+  } else if (optionsOrConfig) {
+    options = optionsOrConfig as { dryRun?: boolean }
+    if ((optionsOrConfig as any).config) {
+      config = (optionsOrConfig as any).config
+    }
+  }
 
   const simulatedMembers = await dbClient
     .select()
@@ -474,44 +520,173 @@ export async function simulateForumActivity(
     return { action: 'none', reason: 'No simulated members exist.' }
   }
 
+  const memberById = new Map(simulatedMembers.map((m) => [m.id, m]))
+
   // Check recent topics
   const recentTopics = await dbClient
     .select()
     .from(forumTopics)
     .where(eq(forumTopics.isLocked, false))
     .orderBy(desc(forumTopics.createdAt))
-    .limit(8)
+    .limit(10)
 
   const topicsNeedingReplies = recentTopics.filter((t) => t.repliesCount < 4)
-  const shouldReply = topicsNeedingReplies.length > 0 && Math.random() < 0.75
+  const shouldReply = recentTopics.length > 0 && (topicsNeedingReplies.length > 0 ? Math.random() < 0.8 : Math.random() < 0.65)
 
   if (shouldReply) {
     // Reply to an existing topic
-    const topic = topicsNeedingReplies[Math.floor(Math.random() * topicsNeedingReplies.length)]
-    // Pick an author who is not the topic creator
-    const availableMembers = simulatedMembers.filter((m) => m.id !== topic.userId)
-    const author =
-      availableMembers.length > 0
-        ? availableMembers[Math.floor(Math.random() * availableMembers.length)]
-        : simulatedMembers[0]
+    const topic =
+      topicsNeedingReplies.length > 0 && Math.random() < 0.75
+        ? topicsNeedingReplies[Math.floor(Math.random() * topicsNeedingReplies.length)]
+        : recentTopics[Math.floor(Math.random() * recentTopics.length)]
 
-    // Fetch up to 2 latest comments for context
-    const existingPosts = await dbClient
-      .select({ authorName: forumPosts.authorName, content: forumPosts.content })
-      .from(forumPosts)
-      .where(eq(forumPosts.topicId, topic.id))
-      .orderBy(desc(forumPosts.createdAt))
-      .limit(2)
+    // Fetch existing posts for context and tree nesting
+    let existingPosts: Array<{
+      id: string
+      userId?: string | null
+      parentId?: string | null
+      authorName?: string | null
+      content: string
+      createdAt?: string | Date | null
+    }> = []
 
-    const contextStr = existingPosts.map((p) => `${p.authorName}: ${p.content}`).join('\n')
+    try {
+      const postsQuery = await dbClient
+        .select({
+          id: forumPosts.id,
+          userId: forumPosts.userId,
+          parentId: forumPosts.parentId,
+          authorName: forumPosts.authorName,
+          content: forumPosts.content,
+          createdAt: forumPosts.createdAt,
+        })
+        .from(forumPosts)
+        .where(eq(forumPosts.topicId, topic.id))
+        .orderBy(desc(forumPosts.createdAt))
+        .limit(10)
+      if (Array.isArray(postsQuery)) {
+        existingPosts = postsQuery
+      }
+    } catch {
+      existingPosts = []
+    }
 
-    const prompt = `You are ${resolveMemberPublicName({ userId: author.id, handle: author.handle, larvaId: author.larvaId })} (Stage ${author.stage}).
+    const postCandidates: ForumPostCandidate[] = existingPosts.map((p) => ({
+      id: p.id,
+      userId: p.userId,
+      parentId: p.parentId,
+      authorName: p.authorName,
+      authorHandle: memberById.get(p.userId || '')?.handle || null,
+      content: p.content,
+      createdAt: p.createdAt,
+    }))
+
+    // Check if OP is simulated and has comments to respond to
+    const isTopicAuthorSimulated = Boolean(topic.userId && memberById.has(topic.userId))
+    const hasCommenters = postCandidates.some((p) => p.userId && p.userId !== topic.userId)
+    const doOpFollowUp = isTopicAuthorSimulated && hasCommenters && Math.random() < 0.35
+
+    let author = doOpFollowUp
+      ? memberById.get(topic.userId!)!
+      : null
+
+    if (!author) {
+      const nonOpMembers = simulatedMembers.filter((m) => m.id !== topic.userId)
+      author =
+        nonOpMembers.length > 0
+          ? nonOpMembers[Math.floor(Math.random() * nonOpMembers.length)]
+          : simulatedMembers[Math.floor(Math.random() * simulatedMembers.length)]
+    }
+
+    // Determine target (top-level vs nested reply)
+    const { parentId, targetPost, isOpFollowUp } = chooseForumReplyTarget(
+      {
+        id: topic.id,
+        userId: topic.userId,
+        authorName: topic.authorName,
+        title: topic.title,
+        content: topic.content,
+      },
+      postCandidates,
+      author.id,
+      {
+        nestedChance: config.forumNestedReplyChance ?? DEFAULT_FORUM_NESTED_REPLY_CHANCE,
+        maxDepth: SIMULATION_MAX_REPLY_DEPTH,
+      }
+    )
+
+    // Check if we should quote a snippet from target
+    const shouldQuote = Boolean(
+      targetPost &&
+      rollChance(config.forumQuoteChance ?? DEFAULT_FORUM_QUOTE_CHANCE)
+    )
+    let quoteSnippet: string | null = null
+    let quoteBlock: string | null = null
+    if (shouldQuote && targetPost) {
+      quoteSnippet = extractQuoteSnippet(targetPost.content, 180)
+      if (quoteSnippet) {
+        quoteBlock = formatDiegeticQuoteBlock(
+          targetPost.authorHandle,
+          targetPost.authorName || 'Initiate',
+          quoteSnippet
+        )
+      }
+    }
+
+    // Check if we should mention a member
+    const shouldMention = rollChance(config.forumMentionChance ?? DEFAULT_FORUM_MENTION_CHANCE)
+    let mentionCandidate: { userId: string; handle: string } | null = null
+    if (shouldMention) {
+      const participants = postCandidates
+        .map((p) => ({ userId: p.userId || '', handle: p.authorHandle || null }))
+        .filter((p) => p.userId && p.handle)
+      if (topic.userId && memberById.get(topic.userId)?.handle) {
+        participants.push({ userId: topic.userId, handle: memberById.get(topic.userId)!.handle })
+      }
+      mentionCandidate = pickMentionCandidate(
+        author.id,
+        participants,
+        [],
+        targetPost ? { userId: targetPost.userId, handle: targetPost.authorHandle } : null
+      )
+    }
+
+    const authorPublicName = resolveMemberPublicName({
+      userId: author.id,
+      handle: author.handle,
+      larvaId: author.larvaId,
+    })
+
+    // Construct contextual prompt
+    let contextStr = `Thread Title: "${topic.title}"\nOriginal Post: "${topic.content}"`
+    if (isOpFollowUp && targetPost) {
+      contextStr += `\n\nYou are the Original Poster (OP). You are following up on this comment by ${targetPost.authorHandle ? `@${targetPost.authorHandle}` : targetPost.authorName}:\n"${targetPost.content}"`
+    } else if (targetPost) {
+      contextStr += `\n\nYou are replying directly to this comment by ${targetPost.authorHandle ? `@${targetPost.authorHandle}` : targetPost.authorName}:\n"${targetPost.content}"`
+    } else if (postCandidates.length > 0) {
+      const recent = postCandidates.slice(0, 2).map((p) => `${p.authorName}: ${p.content}`).join('\n')
+      contextStr += `\n\nRecent replies in thread:\n${recent}`
+    }
+
+    let directives = `Write a concise forum reply (2 to 4 sentences) to this thread.`
+    if (isOpFollowUp) {
+      directives += ` As the thread author, answer their comment, express gratitude, or add practical telemetry from your experience.`
+    } else if (targetPost) {
+      directives += ` Engage directly with the specific point made in their comment.`
+    }
+    if (quoteSnippet) {
+      directives += ` Address this quoted statement: "${quoteSnippet}". Do not write blockquote lines yourself; the quote header is formatted automatically.`
+    }
+    if (mentionCandidate) {
+      directives += ` You may naturally address or mention @${mentionCandidate.handle} in conversational flow.`
+    }
+
+    const prompt = `You are ${authorPublicName} (Stage ${author.stage}).
 ${formatPersonaVoiceBlock(author.simulatedPersona)}
 
-Write a concise forum reply (2 to 4 sentences) to this thread:
-Thread Title: "${topic.title}"
-Original Post: "${topic.content}"
-${contextStr ? `Recent replies:\n${contextStr}` : ''}
+${directives}
+
+${contextStr}
 
 Hard rules:
 - Stay completely in-character in the Moltology world (chitin, molting, ecdysis, discipline, carapace, deep-sea pressure).
@@ -527,25 +702,24 @@ Hard rules:
       temperature: 0.75,
     })
 
-    const replyContent = aiRes.text.trim().replace(/^["'`]|["'`]$/g, '')
+    let replyContent = aiRes.text.trim().replace(/^["'`]|["'`]$/g, '')
+    if (quoteBlock && !replyContent.startsWith('>')) {
+      replyContent = `${quoteBlock}${replyContent}`
+    }
+
     const guardrail = validateInputGuardrails(replyContent)
     if (!guardrail.allowed) {
       throw new Error(`[SimulationEngine] AI generated unsafe forum reply: ${guardrail.reason}`)
     }
 
     if (!options.dryRun) {
-      const authorName = resolveMemberPublicName({
-        userId: author.id,
-        handle: author.handle,
-        larvaId: author.larvaId,
-      })
-
       const [newPost] = await dbClient
         .insert(forumPosts)
         .values({
           topicId: topic.id,
+          parentId: parentId ?? null,
           userId: author.id,
-          authorName,
+          authorName: authorPublicName,
           authorAvatar: '/images/stage1_larva.png',
           authorStage: author.stage,
           content: replyContent,
@@ -560,12 +734,64 @@ Hard rules:
         })
         .where(eq(forumTopics.id, topic.id))
 
+      // Lookup category slug for notifications
+      let categorySlug: string | undefined
+      if (topic.categoryId) {
+        try {
+          const [cat] = await dbClient
+            .select({ slug: forumCategories.slug })
+            .from(forumCategories)
+            .where(eq(forumCategories.id, topic.categoryId))
+            .limit(1)
+          categorySlug = cat?.slug
+        } catch {
+          // ignore
+        }
+      }
+
+      // Record Activity Center notifications
+      let mentionedUserIds: string[] = []
+      try {
+        mentionedUserIds = await recordForumMentions(dbClient, {
+          actorUserId: author.id,
+          actorPublicName: authorPublicName,
+          content: replyContent,
+          sourceType: 'post',
+          sourceId: newPost.id,
+          topicId: topic.id,
+          topicSlug: topic.slug,
+          categorySlug,
+        })
+      } catch (mErr) {
+        console.warn('[SimulationEngine] recordForumMentions error:', mErr)
+      }
+
+      try {
+        await recordForumReplyNotifications(dbClient, {
+          actorUserId: author.id,
+          actorPublicName: authorPublicName,
+          replyPostId: newPost.id,
+          topicId: topic.id,
+          topicAuthorUserId: topic.userId,
+          parentAuthorUserId: targetPost?.userId ?? null,
+          skipUserIds: mentionedUserIds,
+          topicSlug: topic.slug,
+          categorySlug,
+        })
+      } catch (rErr) {
+        console.warn('[SimulationEngine] recordForumReplyNotifications error:', rErr)
+      }
+
       return {
         action: 'reply',
         topicId: topic.id,
         topicTitle: topic.title,
         postId: newPost.id,
-        authorName,
+        parentId: newPost.parentId,
+        isOpFollowUp,
+        quoted: Boolean(quoteBlock),
+        mentioned: Boolean(mentionCandidate),
+        authorName: authorPublicName,
         content: replyContent,
         dryRun: false,
       }
@@ -575,7 +801,12 @@ Hard rules:
       action: 'reply',
       topicId: topic.id,
       topicTitle: topic.title,
+      parentId: parentId ?? null,
+      isOpFollowUp,
+      quoted: Boolean(quoteBlock),
+      mentioned: Boolean(mentionCandidate),
       authorHandle: author.handle,
+      authorName: authorPublicName,
       content: replyContent,
       dryRun: true,
     }
@@ -587,7 +818,6 @@ Hard rules:
     return { action: 'none', reason: 'No forum categories exist in database.' }
   }
 
-  // Filter out read-only / announcements
   const openCategories = categories.filter((c) => c.slug !== 'rules-announcements')
   const targetCategory =
     openCategories.length > 0
@@ -595,8 +825,13 @@ Hard rules:
       : categories[0]
 
   const author = simulatedMembers[Math.floor(Math.random() * simulatedMembers.length)]
+  const authorName = resolveMemberPublicName({
+    userId: author.id,
+    handle: author.handle,
+    larvaId: author.larvaId,
+  })
 
-  const prompt = `You are ${resolveMemberPublicName({ userId: author.id, handle: author.handle, larvaId: author.larvaId })} (Stage ${author.stage}).
+  const prompt = `You are ${authorName} (Stage ${author.stage}).
 ${formatPersonaVoiceBlock(author.simulatedPersona)}
 
 Generate a thoughtful new forum discussion thread for the "${targetCategory.name}" category (${targetCategory.description}).
@@ -632,11 +867,6 @@ Hard rules:
   }
 
   if (!options.dryRun) {
-    const authorName = resolveMemberPublicName({
-      userId: author.id,
-      handle: author.handle,
-      larvaId: author.larvaId,
-    })
     const slug = slugifyForumTitle(topicData.title)
 
     const [newTopic] = await dbClient
@@ -654,6 +884,21 @@ Hard rules:
       })
       .returning()
 
+    try {
+      await recordForumMentions(dbClient, {
+        actorUserId: author.id,
+        actorPublicName: authorName,
+        content: newTopic.content,
+        sourceType: 'topic',
+        sourceId: newTopic.id,
+        topicId: newTopic.id,
+        topicSlug: newTopic.slug,
+        categorySlug: targetCategory.slug,
+      })
+    } catch (mErr) {
+      console.warn('[SimulationEngine] topic recordForumMentions error:', mErr)
+    }
+
     return {
       action: 'topic',
       topicId: newTopic.id,
@@ -669,18 +914,20 @@ Hard rules:
     categorySlug: targetCategory.slug,
     title: topicData.title,
     authorHandle: author.handle,
+    authorName,
     dryRun: true,
   }
 }
 
 /**
- * Simulates community upvotes on recent forum posts or topics.
+ * Simulates community upvotes on recent forum posts and topics.
  */
 export async function simulateForumReactions(
   dbClient: ReturnType<typeof getDb>,
-  options: { dryRun?: boolean; voteCount?: number } = {}
+  options: { dryRun?: boolean; voteCount?: number; config?: SimulationGrowthConfig } = {}
 ) {
-  const voteTargetCount = options.voteCount ?? 2
+  const config = options.config || DEFAULT_GROWTH_CONFIG
+  const voteTargetCount = options.voteCount ?? config.forumVoteCount ?? 3
 
   const simulatedMembers = await dbClient
     .select({ id: profiles.id })
@@ -691,51 +938,132 @@ export async function simulateForumReactions(
     return { votesCast: 0, actions: [] }
   }
 
-  // Fetch recent posts
+  // Fetch recent posts first (keeps backward compatibility with test mocks)
   const recentPosts = await dbClient
     .select({ id: forumPosts.id, userId: forumPosts.userId, topicId: forumPosts.topicId })
     .from(forumPosts)
     .orderBy(desc(forumPosts.createdAt))
-    .limit(10)
+    .limit(15)
 
-  if (recentPosts.length === 0) {
+  // Fetch recent topics
+  let recentTopics: Array<{ id: string; userId?: string | null }> = []
+  try {
+    const fetchedTopics = await dbClient
+      .select({ id: forumTopics.id, userId: forumTopics.userId })
+      .from(forumTopics)
+      .orderBy(desc(forumTopics.createdAt))
+      .limit(10)
+    if (Array.isArray(fetchedTopics)) {
+      recentTopics = fetchedTopics
+    }
+  } catch {
+    recentTopics = []
+  }
+
+  if ((!recentPosts || recentPosts.length === 0) && recentTopics.length === 0) {
     return { votesCast: 0, actions: [] }
   }
 
-  const actions: Array<{ voterId: string; postId: string }> = []
+  // Fetch existing votes for simulated members if available
+  const existingVoteKeys = new Set<string>()
+  try {
+    const simIds = simulatedMembers.map((m) => m.id)
+    const existingRows = await dbClient
+      .select({ userId: forumVotes.userId, topicId: forumVotes.topicId, postId: forumVotes.postId })
+      .from(forumVotes)
+      .where(inArray(forumVotes.userId, simIds))
+
+    if (Array.isArray(existingRows)) {
+      for (const row of existingRows) {
+        if (row.topicId) existingVoteKeys.add(`${row.userId}:topic:${row.topicId}`)
+        if (row.postId) existingVoteKeys.add(`${row.userId}:post:${row.postId}`)
+      }
+    }
+  } catch {
+    // Ignore in tests with minimal mocks
+  }
+
+  const actions: Array<{ voterId: string; postId?: string; topicId?: string; targetType?: 'post' | 'topic' }> = []
 
   for (let i = 0; i < voteTargetCount; i++) {
     const voter = simulatedMembers[Math.floor(Math.random() * simulatedMembers.length)]
-    // Pick post not authored by voter
-    const candidatePosts = recentPosts.filter((p) => p.userId !== voter.id)
-    if (candidatePosts.length === 0) continue
 
-    const post = candidatePosts[Math.floor(Math.random() * candidatePosts.length)]
+    // Build voter-specific existing keys
+    const voterExistingKeys = new Set<string>()
+    for (const key of existingVoteKeys) {
+      if (key.startsWith(`${voter.id}:`)) {
+        voterExistingKeys.add(key.slice(`${voter.id}:`.length))
+      }
+    }
 
-    if (!options.dryRun) {
-      try {
-        const [inserted] = await dbClient
-          .insert(forumVotes)
-          .values({
-            userId: voter.id,
-            postId: post.id,
-          })
-          .onConflictDoNothing()
-          .returning()
+    const voteTarget = balanceTopicAndPostVotes(
+      voter.id,
+      recentTopics,
+      recentPosts || [],
+      voterExistingKeys,
+      {
+        topicRatio: config.forumTopicVoteRatio ?? DEFAULT_FORUM_TOPIC_VOTE_RATIO,
+      }
+    )
 
-        if (inserted) {
-          await dbClient
-            .update(forumPosts)
-            .set({ upvotes: sql`${forumPosts.upvotes} + 1` })
-            .where(eq(forumPosts.id, post.id))
+    if (!voteTarget) continue
 
-          actions.push({ voterId: voter.id, postId: post.id })
+    if (voteTarget.type === 'topic') {
+      if (!options.dryRun) {
+        try {
+          const [inserted] = await dbClient
+            .insert(forumVotes)
+            .values({
+              userId: voter.id,
+              topicId: voteTarget.id,
+            })
+            .onConflictDoNothing()
+            .returning()
+
+          if (inserted) {
+            await dbClient
+              .update(forumTopics)
+              .set({ upvotes: sql`${forumTopics.upvotes} + 1` })
+              .where(eq(forumTopics.id, voteTarget.id))
+
+            actions.push({ voterId: voter.id, topicId: voteTarget.id, targetType: 'topic' })
+            existingVoteKeys.add(`${voter.id}:topic:${voteTarget.id}`)
+          }
+        } catch {
+          // Safe skip on constraint clash
         }
-      } catch (voteErr) {
-        // Safe skip on constraint clash
+      } else {
+        actions.push({ voterId: voter.id, topicId: voteTarget.id, targetType: 'topic' })
+        existingVoteKeys.add(`${voter.id}:topic:${voteTarget.id}`)
       }
     } else {
-      actions.push({ voterId: voter.id, postId: post.id })
+      if (!options.dryRun) {
+        try {
+          const [inserted] = await dbClient
+            .insert(forumVotes)
+            .values({
+              userId: voter.id,
+              postId: voteTarget.id,
+            })
+            .onConflictDoNothing()
+            .returning()
+
+          if (inserted) {
+            await dbClient
+              .update(forumPosts)
+              .set({ upvotes: sql`${forumPosts.upvotes} + 1` })
+              .where(eq(forumPosts.id, voteTarget.id))
+
+            actions.push({ voterId: voter.id, postId: voteTarget.id })
+            existingVoteKeys.add(`${voter.id}:post:${voteTarget.id}`)
+          }
+        } catch {
+          // Safe skip on constraint clash
+        }
+      } else {
+        actions.push({ voterId: voter.id, postId: voteTarget.id })
+        existingVoteKeys.add(`${voter.id}:post:${voteTarget.id}`)
+      }
     }
   }
 
@@ -743,6 +1071,90 @@ export async function simulateForumReactions(
     votesCast: actions.length,
     actions,
     dryRun: Boolean(options.dryRun),
+  }
+}
+
+/**
+ * Mild chance a simulated member revises their recent forum reply with an update note.
+ */
+export async function simulateForumRevision(
+  dbClient: ReturnType<typeof getDb>,
+  config = DEFAULT_GROWTH_CONFIG,
+  options: { force?: boolean; dryRun?: boolean } = {}
+) {
+  if (!options.force && !rollChance(config.forumEditChance ?? DEFAULT_FORUM_EDIT_CHANCE)) {
+    return { revised: false, reason: 'Revision roll skipped.' }
+  }
+
+  const simulatedMembers = await listSimulatedMembers(dbClient)
+  if (simulatedMembers.length === 0) {
+    return { revised: false, reason: 'No simulated members exist.' }
+  }
+
+  const simIds = simulatedMembers.map((m) => m.id)
+
+  let recentPosts: Array<{
+    id: string
+    userId: string | null
+    authorName: string
+    content: string
+    updatedAt?: Date | null
+  }> = []
+
+  try {
+    const fetched = await dbClient
+      .select({
+        id: forumPosts.id,
+        userId: forumPosts.userId,
+        authorName: forumPosts.authorName,
+        content: forumPosts.content,
+        updatedAt: forumPosts.updatedAt,
+      })
+      .from(forumPosts)
+      .where(inArray(forumPosts.userId, simIds))
+      .orderBy(desc(forumPosts.createdAt))
+      .limit(8)
+    if (Array.isArray(fetched)) {
+      recentPosts = fetched
+    }
+  } catch {
+    recentPosts = []
+  }
+
+  const eligiblePosts = recentPosts.filter(
+    (p) => p.content && !p.content.includes('Edit:') && !p.content.includes('Update:')
+  )
+
+  if (eligiblePosts.length === 0) {
+    return { revised: false, reason: 'No eligible posts for revision.' }
+  }
+
+  const target = eligiblePosts[Math.floor(Math.random() * eligiblePosts.length)]
+  const revisionNotes = [
+    'Edit: Recalibrated telemetry logs — the shell density gain held steady at +14% after the second cold window.',
+    'Edit: Clarification: make sure the morning liturgy is logged before initiation; otherwise the streak bonus is forfeited.',
+    'Edit: Confirmed with the elders — carapace thickness rating increases linearly with daily discipline.',
+    'Edit: Update: The soft-shed window stabilized at 48 hours after adhering strictly to the evening salt bath.',
+  ]
+  const note = revisionNotes[Math.floor(Math.random() * revisionNotes.length)]
+  const updatedContent = `${target.content.trim()}\n\n${note}`
+
+  if (!options.dryRun) {
+    await dbClient
+      .update(forumPosts)
+      .set({
+        content: updatedContent,
+        updatedAt: new Date(),
+      })
+      .where(eq(forumPosts.id, target.id))
+  }
+
+  return {
+    revised: true,
+    dryRun: Boolean(options.dryRun),
+    postId: target.id,
+    authorName: target.authorName,
+    note,
   }
 }
 
@@ -1000,24 +1412,42 @@ export async function runSimulationCycle(options: {
 
   // 3. Forum
   if (shouldRunPhase('forum', options)) {
-    console.log('[SimulationCycle] Simulating forum discussions and replies...')
-    const forumRes = await simulateForumActivity(dbClient, { dryRun: options.dryRun })
-    results.forum = forumRes
-    if (forumRes.action === 'reply') {
-      console.log(`[SimulationCycle] ✓ Generated forum reply by ${forumRes.authorName || forumRes.authorHandle} on topic "${forumRes.topicTitle}"`)
-    } else if (forumRes.action === 'topic') {
-      console.log(`[SimulationCycle] ✓ Created new forum topic "${forumRes.title}" by ${forumRes.authorName || forumRes.authorHandle}`)
-    } else {
-      console.log(`[SimulationCycle] - Forum action skipped: ${forumRes.reason}`)
+    console.log('[SimulationCycle] Simulating forum discussions, replies, and threads...')
+    const forumActions: any[] = []
+    const actionCount = DEFAULT_GROWTH_CONFIG.forumActionsPerCycle || 2
+    for (let i = 0; i < actionCount; i++) {
+      const forumRes = await simulateForumActivity(dbClient, DEFAULT_GROWTH_CONFIG, { dryRun: options.dryRun })
+      forumActions.push(forumRes)
+      if (forumRes.action === 'reply') {
+        console.log(
+          `[SimulationCycle] ✓ Generated forum reply by ${forumRes.authorName || forumRes.authorHandle} on topic "${forumRes.topicTitle}"${forumRes.parentId ? ` (nested reply)` : ''}${forumRes.quoted ? ` (quoted)` : ''}${forumRes.isOpFollowUp ? ` (OP follow-up)` : ''}`
+        )
+      } else if (forumRes.action === 'topic') {
+        console.log(`[SimulationCycle] ✓ Created new forum topic "${forumRes.title}" by ${forumRes.authorName || forumRes.authorHandle}`)
+      } else {
+        console.log(`[SimulationCycle] - Forum action skipped: ${forumRes.reason}`)
+      }
+    }
+    results.forum = forumActions.length === 1 ? forumActions[0] : forumActions
+
+    // Revision check
+    const revisionRes = await simulateForumRevision(dbClient, DEFAULT_GROWTH_CONFIG, { dryRun: options.dryRun })
+    results.revision = revisionRes
+    if (revisionRes.revised) {
+      console.log(`[SimulationCycle] ✓ Revised post ${revisionRes.postId} by ${revisionRes.authorName}`)
     }
   }
 
   // 4. Votes
   if (shouldRunPhase('votes', options)) {
-    console.log('[SimulationCycle] Simulating community upvotes...')
-    const voteRes = await simulateForumReactions(dbClient, { dryRun: options.dryRun })
+    console.log('[SimulationCycle] Simulating community upvotes on topics and replies...')
+    const voteRes = await simulateForumReactions(dbClient, {
+      dryRun: options.dryRun,
+      voteCount: DEFAULT_GROWTH_CONFIG.forumVoteCount,
+      config: DEFAULT_GROWTH_CONFIG,
+    })
     results.votes = voteRes
-    console.log(`[SimulationCycle] ✓ Cast ${voteRes.votesCast} community upvotes.`)
+    console.log(`[SimulationCycle] ✓ Cast ${voteRes.votesCast} community upvotes across topics and replies.`)
   }
 
   // 5. Personality mutations

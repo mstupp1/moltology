@@ -282,3 +282,235 @@ export function formatPersonaVoiceBlock(persona: SimulatedPersonaConfig | null |
       : 'Distinct traits: none yet.'
   return `Persona Archetype: ${archetype}\nTone: ${tone}\n${traitLine}`
 }
+
+export const DEFAULT_FORUM_ACTIONS_PER_CYCLE = 2
+export const DEFAULT_FORUM_NESTED_REPLY_CHANCE = 0.55
+export const DEFAULT_FORUM_QUOTE_CHANCE = 0.22
+export const DEFAULT_FORUM_MENTION_CHANCE = 0.25
+export const DEFAULT_FORUM_TOPIC_VOTE_RATIO = 0.45
+export const DEFAULT_FORUM_EDIT_CHANCE = 0.08
+export const SIMULATION_MAX_REPLY_DEPTH = 4
+
+export interface ForumPostCandidate {
+  id: string
+  userId?: string | null
+  parentId?: string | null
+  authorName?: string | null
+  authorHandle?: string | null
+  content: string
+  createdAt?: string | Date | null
+}
+
+export interface ForumTopicCandidate {
+  id: string
+  userId?: string | null
+  authorName?: string | null
+  authorHandle?: string | null
+  title: string
+  content: string
+}
+
+/**
+ * Computes the nesting depth of a post within a topic.
+ * 0 = top-level reply directly to topic.
+ */
+export function calculatePostDepth(postId: string, parentMap: Map<string, string | null>): number {
+  let depth = 0
+  let current = parentMap.get(postId)
+  const seen = new Set<string>([postId])
+  while (current) {
+    if (seen.has(current)) break
+    seen.add(current)
+    depth += 1
+    current = parentMap.get(current)
+  }
+  return depth
+}
+
+/**
+ * Chooses whether a simulated reply targets the topic root (top-level) or an existing post (nested).
+ * Emulates authentic Reddit behavior:
+ * - Thread OP has an elevated tendency to follow up with commenters.
+ * - Non-OP members balance top-level thoughts with replies to comments.
+ * - Prevents exceeding maximum reply depth.
+ */
+export function chooseForumReplyTarget(
+  topic: ForumTopicCandidate,
+  posts: ForumPostCandidate[],
+  authorUserId: string,
+  options: {
+    nestedChance?: number
+    maxDepth?: number
+    rng?: Rng
+  } = {}
+): {
+  parentId: string | null
+  targetPost: ForumPostCandidate | null
+  isOpFollowUp: boolean
+} {
+  const rng = options.rng ?? Math.random
+  const maxDepth = options.maxDepth ?? SIMULATION_MAX_REPLY_DEPTH
+  const nestedChance = options.nestedChance ?? DEFAULT_FORUM_NESTED_REPLY_CHANCE
+
+  if (posts.length === 0) {
+    return { parentId: null, targetPost: null, isOpFollowUp: false }
+  }
+
+  const isAuthorOp = Boolean(topic.userId && topic.userId === authorUserId)
+  const parentMap = new Map<string, string | null>()
+  for (const p of posts) {
+    parentMap.set(p.id, p.parentId ?? null)
+  }
+
+  // Eligible posts for nesting: depth < maxDepth and not authored by the reply author (unless OP has no others)
+  const eligiblePosts = posts.filter((p) => {
+    const depth = calculatePostDepth(p.id, parentMap)
+    return depth < maxDepth
+  })
+
+  if (eligiblePosts.length === 0) {
+    return { parentId: null, targetPost: null, isOpFollowUp: false }
+  }
+
+  // OP Follow-up: If OP is replying and other members have commented, OP replies to a commenter.
+  if (isAuthorOp) {
+    const commenterPosts = eligiblePosts.filter((p) => p.userId !== authorUserId)
+    if (commenterPosts.length > 0) {
+      // Pick the most recent commenter post or a random one
+      const target = commenterPosts[Math.floor(rng() * commenterPosts.length)]
+      return { parentId: target.id, targetPost: target, isOpFollowUp: true }
+    }
+  }
+
+  // Non-OP member deciding between top-level and nested reply
+  const wantsNested = rollChance(nestedChance, rng)
+  if (!wantsNested) {
+    return { parentId: null, targetPost: null, isOpFollowUp: false }
+  }
+
+  // Prefer posts authored by others
+  const othersPosts = eligiblePosts.filter((p) => p.userId !== authorUserId)
+  const candidates = othersPosts.length > 0 ? othersPosts : eligiblePosts
+  const chosen = candidates[Math.floor(rng() * candidates.length)]
+
+  return { parentId: chosen.id, targetPost: chosen, isOpFollowUp: false }
+}
+
+/**
+ * Extracts a concise, quote-worthy snippet from post content (1-2 sentences, max ~200 chars).
+ * Strips out existing blockquote lines and clean markdown.
+ */
+export function extractQuoteSnippet(content: string, maxChars = 200): string | null {
+  if (!content) return null
+
+  // Remove existing blockquote lines
+  const cleanLines = content
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('>'))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (!cleanLines) return null
+
+  // Extract first 1 or 2 sentences
+  const sentenceMatch = cleanLines.match(/^(.*?[.!?])(?:\s+.*?[.!?])?/i)
+  let snippet = (sentenceMatch ? sentenceMatch[0] : cleanLines).trim()
+
+  if (snippet.length > maxChars) {
+    snippet = snippet.slice(0, maxChars).replace(/\s+\S*$/, '…')
+  }
+
+  return snippet.length >= 10 ? snippet : null
+}
+
+/**
+ * Formats a diegetic quote block compatible with Moltology's HUD quote chrome.
+ */
+export function formatDiegeticQuoteBlock(
+  authorHandle: string | null | undefined,
+  authorName: string,
+  snippet: string
+): string {
+  const handle = authorHandle?.trim()
+  const attribution = handle ? `@${handle} held:` : `${authorName.trim()} held:`
+  const lines = snippet.trim().split('\n').map((l) => (l.length ? `> ${l}` : '>')).join('\n')
+  return `> ${attribution}\n${lines}\n\n`
+}
+
+/**
+ * Picks a natural mention candidate from thread participants or bonded connections.
+ */
+export function pickMentionCandidate(
+  authorUserId: string,
+  participants: Array<{ userId: string; handle: string | null }>,
+  bonds: Array<{ userId: string; handle: string | null }>,
+  targetPostAuthor?: { userId?: string | null; handle?: string | null } | null,
+  rng: Rng = Math.random
+): { userId: string; handle: string } | null {
+  // If target post author has a handle and is not self, 60% chance to mention them directly
+  if (
+    targetPostAuthor?.userId &&
+    targetPostAuthor.userId !== authorUserId &&
+    targetPostAuthor.handle?.trim() &&
+    rng() < 0.6
+  ) {
+    return {
+      userId: targetPostAuthor.userId,
+      handle: targetPostAuthor.handle.trim(),
+    }
+  }
+
+  // Combine other participants and bonded members
+  const pool = [...participants, ...bonds].filter(
+    (p) => p.userId !== authorUserId && Boolean(p.handle?.trim())
+  )
+
+  if (pool.length === 0) return null
+
+  const chosen = pool[Math.floor(rng() * pool.length)]
+  return chosen.handle ? { userId: chosen.userId, handle: chosen.handle.trim() } : null
+}
+
+/**
+ * Balances simulated upvotes between forum topics and replies.
+ */
+export function balanceTopicAndPostVotes(
+  voterId: string,
+  candidateTopics: Array<{ id: string; userId?: string | null }>,
+  candidatePosts: Array<{ id: string; userId?: string | null }>,
+  existingVoteKeys: Set<string>,
+  options: {
+    topicRatio?: number
+    rng?: Rng
+  } = {}
+): { type: 'topic'; id: string } | { type: 'post'; id: string } | null {
+  const rng = options.rng ?? Math.random
+  const topicRatio = options.topicRatio ?? DEFAULT_FORUM_TOPIC_VOTE_RATIO
+
+  const eligibleTopics = candidateTopics.filter(
+    (t) => t.userId !== voterId && !existingVoteKeys.has(`topic:${t.id}`)
+  )
+  const eligiblePosts = candidatePosts.filter(
+    (p) => p.userId !== voterId && !existingVoteKeys.has(`post:${p.id}`)
+  )
+
+  if (eligibleTopics.length === 0 && eligiblePosts.length === 0) {
+    return null
+  }
+
+  const chooseTopic = eligibleTopics.length > 0 && (eligiblePosts.length === 0 || rng() < topicRatio)
+  if (chooseTopic) {
+    const t = eligibleTopics[Math.floor(rng() * eligibleTopics.length)]
+    return { type: 'topic', id: t.id }
+  }
+
+  if (eligiblePosts.length > 0) {
+    const p = eligiblePosts[Math.floor(rng() * eligiblePosts.length)]
+    return { type: 'post', id: p.id }
+  }
+
+  return null
+}
+

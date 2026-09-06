@@ -9,13 +9,14 @@ import {
   simulateDailyRoutines,
   simulateForumActivity,
   simulateForumReactions,
+  simulateForumRevision,
   mutateSimulatedPersona,
   simulateConnections,
   simulateRelationships,
   DEFAULT_GROWTH_CONFIG,
 } from './simulation-engine'
 import { CANONICAL_ALIGNMENT_TASKS } from '../alignment-tasks'
-import { profiles, forumTopics, forumPosts } from '../../db/schema'
+import { profiles, forumCategories, forumTopics, forumPosts } from '../../db/schema'
 
 vi.mock('ai', () => ({
   generateText: vi.fn(),
@@ -23,6 +24,11 @@ vi.mock('ai', () => ({
 
 vi.mock('./activity-log', () => ({
   recordRoutineCompletedEvent: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock('./db-services', () => ({
+  recordForumMentions: vi.fn().mockResolvedValue(['mock-user-id']),
+  recordForumReplyNotifications: vi.fn().mockResolvedValue(1),
 }))
 
 describe('Simulation Engine', () => {
@@ -365,6 +371,339 @@ describe('Simulation Engine', () => {
       expect(res.action).toBe('topic')
       expect(res.title).toBe('Optimal Cold Plunge Protocols for Soft-Shed Window')
     })
+
+    it('creates nested reply with parentId and target comment context', async () => {
+      process.env.AI_GATEWAY_API_KEY = 'test-key'
+      const { generateText } = await import('ai')
+      vi.mocked(generateText).mockResolvedValueOnce({
+        text: 'I found 3 minutes in the plunge to be the sweet spot for carapace hardening.',
+      } as any)
+
+      const mockMembers = [
+        {
+          id: 'author-1',
+          handle: 'Architect_Vaelen',
+          stage: 3,
+          isSimulated: true,
+          simulatedPersona: { archetype: 'Architect', tone: 'Analytical' },
+        },
+        {
+          id: 'author-2',
+          handle: 'Larva_Initiate',
+          stage: 1,
+          isSimulated: true,
+          simulatedPersona: { archetype: 'Larva', tone: 'Eager' },
+        },
+      ]
+
+      const mockTopics = [
+        {
+          id: 'topic-1',
+          userId: 'other-user',
+          title: 'Cold plunge protocol',
+          content: 'What duration works best?',
+          repliesCount: 1,
+          isLocked: false,
+        },
+      ]
+
+      const mockPosts = [
+        {
+          id: 'post-1',
+          userId: 'author-1',
+          parentId: null,
+          authorName: 'Architect Vaelen',
+          content: 'Start with 2 minutes before progressing deeper.',
+          createdAt: new Date(),
+        },
+      ]
+
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue(mockMembers) }
+          }
+          if (table === forumTopics || table?._?.name === 'forum_topics') {
+            return {
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockResolvedValue(mockTopics),
+                }),
+              }),
+            }
+          }
+          return {
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue(mockPosts),
+              }),
+            }),
+          }
+        }),
+      }
+      const mockMath = vi.spyOn(Math, 'random').mockReturnValue(0.1)
+
+      const res = await simulateForumActivity(mockDb, {
+        config: {
+          ...DEFAULT_GROWTH_CONFIG,
+          forumNestedReplyChance: 1.0,
+          forumQuoteChance: 0,
+        },
+        dryRun: true,
+      })
+
+      expect(res.action).toBe('reply')
+      expect(res.parentId).toBe('post-1')
+      expect(res.content).toContain('sweet spot')
+
+      mockMath.mockRestore()
+    })
+
+    it('creates quote-reply with diegetic quote block when quote roll triggers', async () => {
+      process.env.AI_GATEWAY_API_KEY = 'test-key'
+      const { generateText } = await import('ai')
+      vi.mocked(generateText).mockResolvedValueOnce({
+        text: 'We saw the exact same result in sector 4.',
+      } as any)
+
+      const mockMembers = [
+        {
+          id: 'author-1',
+          handle: 'Vaelen',
+          stage: 3,
+          isSimulated: true,
+          simulatedPersona: { archetype: 'Architect', tone: 'Analytical' },
+        },
+        {
+          id: 'author-2',
+          handle: 'ReefCrafter',
+          stage: 2,
+          isSimulated: true,
+          simulatedPersona: { archetype: 'Pilot', tone: 'Direct' },
+        },
+      ]
+
+      const mockTopics = [
+        {
+          id: 'topic-1',
+          userId: 'author-1',
+          title: 'Carapace torque metrics',
+          content: 'Torque gains reported.',
+          repliesCount: 1,
+          isLocked: false,
+        },
+      ]
+
+      const mockPosts = [
+        {
+          id: 'post-1',
+          userId: 'author-1',
+          parentId: null,
+          authorName: 'Vaelen',
+          content: 'Priority Pincer Lock increased torque by 18% in three days.',
+          createdAt: new Date(),
+        },
+      ]
+
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue(mockMembers) }
+          }
+          if (table === forumTopics || table?._?.name === 'forum_topics') {
+            return {
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockResolvedValue(mockTopics),
+                }),
+              }),
+            }
+          }
+          return {
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue(mockPosts),
+              }),
+            }),
+          }
+        }),
+      }
+      const mockMath = vi.spyOn(Math, 'random').mockReturnValue(0.1)
+
+      const res = await simulateForumActivity(mockDb, {
+        config: {
+          ...DEFAULT_GROWTH_CONFIG,
+          forumNestedReplyChance: 1.0,
+          forumQuoteChance: 1.0,
+        },
+        dryRun: true,
+      })
+
+      expect(res.action).toBe('reply')
+      expect(res.quoted).toBe(true)
+      expect(res.content).toContain('> @Vaelen held:')
+      expect(res.content).toContain('Priority Pincer Lock')
+
+      mockMath.mockRestore()
+    })
+
+    it('dispatches Activity Center mentions and reply notifications on non-dry-run write', async () => {
+      process.env.AI_GATEWAY_API_KEY = 'test-key'
+      const { generateText } = await import('ai')
+      vi.mocked(generateText).mockResolvedValueOnce({
+        text: 'Thanks @ElderShell for the advice.',
+      } as any)
+
+      const { recordForumMentions, recordForumReplyNotifications } = await import('./db-services')
+
+      const mockMembers = [
+        {
+          id: 'author-1',
+          handle: 'Acolyte_42',
+          stage: 1,
+          isSimulated: true,
+          simulatedPersona: { archetype: 'Larva', tone: 'Eager' },
+        },
+      ]
+
+      const mockTopics = [
+        {
+          id: 'topic-1',
+          categoryId: 'cat-1',
+          userId: 'topic-author',
+          slug: 'topic-slug',
+          title: 'Question',
+          content: 'Advice needed.',
+          repliesCount: 0,
+          isLocked: false,
+        },
+      ]
+
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue(mockMembers) }
+          }
+          if (table === forumTopics || table?._?.name === 'forum_topics') {
+            return {
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockResolvedValue(mockTopics),
+                }),
+              }),
+            }
+          }
+          if (table === forumCategories || table?._?.name === 'forum_categories') {
+            return {
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ slug: 'general-discussion' }]),
+              }),
+            }
+          }
+          return {
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }
+        }),
+        insert: vi.fn().mockReturnValue({
+          values: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([{ id: 'new-post-1', parentId: null }]),
+          }),
+        }),
+        update: vi.fn().mockReturnValue({
+          set: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([]),
+          }),
+        }),
+      }
+
+      const res = await simulateForumActivity(mockDb, { dryRun: false })
+      expect(res.action).toBe('reply')
+      expect(mockDb.insert).toHaveBeenCalled()
+      expect(recordForumMentions).toHaveBeenCalled()
+      expect(recordForumReplyNotifications).toHaveBeenCalled()
+    })
+
+    it('engages OP follow-up dialogue when topic author is simulated and has comments', async () => {
+      process.env.AI_GATEWAY_API_KEY = 'test-key'
+      const { generateText } = await import('ai')
+      vi.mocked(generateText).mockResolvedValueOnce({
+        text: 'Thanks for the tip! Did your pincer torque feel fatigued after the cold dive?',
+      } as any)
+
+      const mockMembers = [
+        {
+          id: 'op-user',
+          handle: 'Thread_Creator',
+          stage: 2,
+          isSimulated: true,
+          simulatedPersona: { archetype: 'Pilot', tone: 'Inquisitive' },
+        },
+      ]
+
+      const mockTopics = [
+        {
+          id: 'topic-1',
+          userId: 'op-user',
+          title: 'Cold plunge protocol',
+          content: 'What duration works best?',
+          repliesCount: 1,
+          isLocked: false,
+        },
+      ]
+
+      const mockPosts = [
+        {
+          id: 'post-1',
+          userId: 'other-user',
+          parentId: null,
+          authorName: 'Architect Vaelen',
+          content: 'Run 48F for 3 minutes.',
+          createdAt: new Date(),
+        },
+      ]
+
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue(mockMembers) }
+          }
+          if (table === forumTopics || table?._?.name === 'forum_topics') {
+            return {
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockResolvedValue(mockTopics),
+                }),
+              }),
+            }
+          }
+          return {
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue(mockPosts),
+              }),
+            }),
+          }
+        }),
+      }
+
+      const mockMath = vi.spyOn(Math, 'random').mockReturnValue(0.1)
+
+      const res = await simulateForumActivity(mockDb, { dryRun: true })
+      expect(res.action).toBe('reply')
+      expect(res.isOpFollowUp).toBe(true)
+      expect(res.parentId).toBe('post-1')
+      expect(res.authorHandle).toBe('Thread_Creator')
+
+      mockMath.mockRestore()
+    })
   })
 
   describe('simulateForumReactions', () => {
@@ -386,6 +725,90 @@ describe('Simulation Engine', () => {
       const res = await simulateForumReactions(mockDb, { dryRun: true, voteCount: 1 })
       expect(res.votesCast).toBe(1)
       expect(res.actions[0]).toEqual({ voterId: 'voter-1', postId: 'post-99' })
+    })
+
+    it('casts upvotes on candidate topics when topic vote is chosen', async () => {
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue([{ id: 'voter-1' }]) }
+          }
+          if (table === forumPosts || table?._?.name === 'forum_posts') {
+            return {
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }
+          }
+          if (table === forumTopics || table?._?.name === 'forum_topics') {
+            return {
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([{ id: 'topic-99', userId: 'author-2' }]),
+              }),
+            }
+          }
+          return { where: vi.fn().mockResolvedValue([]) }
+        }),
+      }
+
+      const res = await simulateForumReactions(mockDb, {
+        dryRun: true,
+        voteCount: 1,
+        config: { ...DEFAULT_GROWTH_CONFIG, forumTopicVoteRatio: 1.0 },
+      })
+      expect(res.votesCast).toBe(1)
+      expect(res.actions[0]).toEqual({
+        voterId: 'voter-1',
+        topicId: 'topic-99',
+        targetType: 'topic',
+      })
+    })
+  })
+
+  describe('simulateForumRevision', () => {
+    it('appends an Edit: update note to an eligible post', async () => {
+      const mockMembers = [{ id: 'user-1', handle: 'Vaelen', larvaId: 'L1', stage: 3 }]
+      const mockPosts = [
+        {
+          id: 'post-1',
+          userId: 'user-1',
+          authorName: 'Vaelen',
+          content: 'Initial post content discussing cold plunge.',
+          createdAt: new Date(),
+        },
+      ]
+
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue(mockMembers) }
+          }
+          return {
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue(mockPosts),
+              }),
+            }),
+          }
+        }),
+        update: vi.fn().mockReturnValue({
+          set: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([]),
+          }),
+        }),
+      }
+
+      const res = await simulateForumRevision(mockDb, DEFAULT_GROWTH_CONFIG, {
+        force: true,
+        dryRun: false,
+      })
+
+      expect(res.revised).toBe(true)
+      expect(res.postId).toBe('post-1')
+      expect(res.note).toContain('Edit:')
+      expect(mockDb.update).toHaveBeenCalled()
     })
   })
 
