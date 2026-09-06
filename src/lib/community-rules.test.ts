@@ -78,4 +78,4 @@ describe('Community Rules & Guardrails', () => {
     }
     expect(() => assertForumWriteRateLimit(userId)).toThrow(FORUM_WRITE_RATE_ERROR)
   })
-}))
+})
