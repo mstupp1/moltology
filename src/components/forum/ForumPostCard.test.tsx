@@ -37,6 +37,7 @@ vi.mock('@/lib/server/api', () => ({
   updateForumPostFn: vi.fn(),
   deleteForumPostFn: vi.fn(),
   createForumPostFn: vi.fn(),
+  createForumReportFn: vi.fn(),
   toggleForumPostVoteFn: vi.fn(),
   toggleForumTopicVoteFn: vi.fn(),
   searchMembersFn: vi.fn().mockResolvedValue([]),
@@ -238,7 +239,31 @@ describe('ForumPostCard quote affordance', () => {
 
     expect(screen.queryByTestId('forum-quote-post')).not.toBeInTheDocument()
     expect(screen.queryByTestId('forum-reply-to-comment')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('forum-flag')).not.toBeInTheDocument()
     expect(screen.getByTestId('forum-withdrawn-body')).toBeInTheDocument()
+  })
+
+  it('shows Flag on another member reply and hides it on your own', () => {
+    const { rerender } = render(
+      <ForumPostCard
+        node={node(post({ userId: 'member-a' }))}
+        topicId="topic-1"
+        replyingToId={null}
+        {...cardHandlers}
+      />,
+    )
+    expect(screen.getByTestId('forum-flag')).toBeInTheDocument()
+
+    forumAuth.userId = 'member-a'
+    rerender(
+      <ForumPostCard
+        node={node(post({ userId: 'member-a' }))}
+        topicId="topic-1"
+        replyingToId={null}
+        {...cardHandlers}
+      />,
+    )
+    expect(screen.queryByTestId('forum-flag')).not.toBeInTheDocument()
   })
 
   it('notifies the thread when Quote is pressed', () => {

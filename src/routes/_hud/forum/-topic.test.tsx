@@ -29,6 +29,7 @@ vi.mock('@/lib/server/api', () => ({
   updateForumPostFn: vi.fn(),
   deleteForumTopicFn: vi.fn(),
   deleteForumPostFn: vi.fn(),
+  createForumReportFn: vi.fn(),
   toggleForumTopicVoteFn: vi.fn(),
   toggleForumPostVoteFn: vi.fn(),
   searchMembersFn: vi.fn().mockResolvedValue([]),
@@ -520,6 +521,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     render(<ForumThreadPage />)
 
     expect(screen.queryByTestId('forum-quote-topic')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('forum-flag')).not.toBeInTheDocument()
     expect(screen.getByTestId('forum-withdrawn-body')).toBeInTheDocument()
   })
 
@@ -558,6 +560,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     expect(screen.getByTestId('forum-author-tools')).toBeInTheDocument()
     expect(screen.getByTestId('forum-mention-link')).toHaveTextContent('@pincer_prime')
+    expect(screen.queryByTestId('forum-flag')).not.toBeInTheDocument()
   })
 
   it('hides topic author tools from a different signed-in member', () => {
@@ -592,6 +595,7 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
 
     render(<ForumThreadPage />)
     expect(screen.queryByTestId('forum-author-tools')).not.toBeInTheDocument()
+    expect(screen.getByTestId('forum-flag')).toBeInTheDocument()
   })
 
   it('shows a withdrawn tombstone for a sealed topic and reply', () => {

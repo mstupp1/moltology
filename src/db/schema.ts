@@ -404,6 +404,43 @@ export const forumVotes = pgTable('forum_votes', {
   })
 ])
 
+export type ForumReportStatus = 'open' | 'reviewed'
+
+/** Peer flags. Soft rows only — the target body is not mutated. */
+export const forumReports = pgTable('forum_reports', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  reporterId: text('reporterId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  topicId: uuid('topicId').references(() => forumTopics.id, { onDelete: 'cascade' }),
+  postId: uuid('postId').references(() => forumPosts.id, { onDelete: 'cascade' }),
+  reason: text('reason').notNull(),
+  note: text('note'),
+  status: text('status').default('open').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('forum_reports_open_topic_reporter_uidx')
+    .on(table.reporterId, table.topicId)
+    .where(sql`${table.status} = 'open' AND ${table.topicId} IS NOT NULL AND ${table.postId} IS NULL`),
+  uniqueIndex('forum_reports_open_post_reporter_uidx')
+    .on(table.reporterId, table.postId)
+    .where(sql`${table.status} = 'open' AND ${table.postId} IS NOT NULL`),
+  index('forum_reports_status_created_idx').on(table.status, table.createdAt),
+  pgPolicy('forum_reports_owner_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"reporterId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+  pgPolicy('forum_reports_select_policy', {
+    for: 'select',
+    using: sql`"reporterId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR EXISTS (
+        SELECT 1 FROM profiles
+        WHERE profiles.id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+          AND profiles.role IN ('admin', 'super_admin')
+      )
+      OR (current_setting('request.jwt.claims', true) IS NULL)`
+  }),
+])
+
 // User Custom Mutated Avatars Vault Table
 export const userAvatars = pgTable('user_avatars', {
   id: uuid('id').defaultRandom().primaryKey(),
