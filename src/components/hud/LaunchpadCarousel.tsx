@@ -343,9 +343,9 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                     />
                   ))}
 
-                  {/* Subtle Ambient Sci-Fi Gradients for Text Legibility (Softened for Image Clarity) */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b]/90 via-[#070b0b]/40 to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b]/80 via-[#070b0b]/20 to-transparent pointer-events-none" />
+                  {/* Balanced Ambient Sci-Fi Vignette for Text Legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070b0b]/95 via-[#070b0b]/60 sm:via-[#070b0b]/40 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#070b0b]/85 via-[#070b0b]/40 sm:via-[#070b0b]/20 to-transparent pointer-events-none" />
 
                   {/* Subtle HUD Scanline Overlay */}
                   <div className="absolute inset-0 pointer-events-none opacity-15 bg-[linear-gradient(rgba(0,255,255,0.15)_1px,transparent_1px)] bg-[size:100%_4px]" />
