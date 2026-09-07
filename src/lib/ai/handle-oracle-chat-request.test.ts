@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { handleOracleChatRequest } from './handle-oracle-chat-request'
-import { ORACLE_THREAD_ID_HEADER } from './oracle-chat'
+import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-chat'
+import { ORACLE_MODELS } from './oracle-models'
 
 vi.mock('../jwt', () => ({
   verifyNeonJWT: vi.fn().mockResolvedValue({ valid: false }),
@@ -47,6 +48,24 @@ function makeRequest(body: unknown, init?: RequestInit) {
 }
 
 const TEST_THREAD_ID = '11111111-1111-4111-8111-111111111111'
+const encoder = new TextEncoder()
+
+function textStream(text: string) {
+  return new ReadableStream({
+    start(controller) {
+      if (text) controller.enqueue(encoder.encode(text))
+      controller.close()
+    },
+  })
+}
+
+function emptyStream() {
+  return new ReadableStream({
+    start(controller) {
+      controller.close()
+    },
+  })
+}
 
 describe('handleOracleChatRequest', () => {
   beforeEach(() => {
@@ -186,5 +205,78 @@ describe('handleOracleChatRequest', () => {
     expect(res.status).toBe(400)
     const data = await res.json()
     expect(data.error).toMatch(/Messages/i)
+  })
+
+  it('uses the primary model when it streams a response', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Primary answer') })
+
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        userId: 'usr_test',
+      })
+    )
+
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('Primary answer')
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+  })
+
+  it('falls through to the next model when the primary stream is empty', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Secondary answer') })
+
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        userId: 'usr_test',
+      })
+    )
+
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('Secondary answer')
+    expect(streamTextMock).toHaveBeenCalledTimes(2)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+    expect(streamTextMock.mock.calls[1]?.[0]?.model).toBe(ORACLE_MODELS[1].id)
+  })
+
+  it('returns 502 only after every model in the list fails', async () => {
+    for (const _model of ORACLE_MODELS) {
+      streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    }
+
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        userId: 'usr_test',
+      })
+    )
+
+    expect(res.status).toBe(502)
+    expect(res.headers.get('content-type')).toMatch(/application\/json/)
+    const data = await res.json()
+    expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
+    expect(data.text).toContain(ORACLE_UNAVAILABLE_MESSAGE)
+    expect(streamTextMock).toHaveBeenCalledTimes(ORACLE_MODELS.length)
+  })
+
+  it('tries the selected model first, then remaining candidates', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Fallback after pick') })
+
+    const selected = 'alibaba/qwen3.8-flash'
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        userId: 'usr_test',
+        model: selected,
+      })
+    )
+
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('Fallback after pick')
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(selected)
+    expect(streamTextMock.mock.calls[1]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
   })
 })

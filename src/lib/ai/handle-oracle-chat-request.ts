@@ -9,6 +9,7 @@ import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt } from './codex-prompt'
 import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle } from './service'
 import {
+  commitOracleTextStream,
   formatOracleUnavailableMessage,
   getLastUserText,
   getOracleCandidateModelIds,
@@ -134,6 +135,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   let lastError: Error | null = null
 
   for (const modelCandidate of candidateModels) {
+    const abortController = new AbortController()
     try {
       const threadIdForSave = activeThreadId
       const shouldSummarizeTitle = isNewThread
@@ -141,6 +143,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         model: modelCandidate as any,
         system: systemPrompt,
         messages: payloadMessages,
+        abortSignal: abortController.signal,
         onFinish: async ({ text }) => {
           if (!userId || !threadIdForSave) return
           try {
@@ -177,6 +180,12 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
         },
       })
 
+      // Do not commit until the first token arrives. streamText() returns immediately,
+      // so an empty or hung MiniMax stream must fall through to the next candidate.
+      const committedStream = await commitOracleTextStream(
+        toTextStream({ stream: result.stream }),
+      )
+
       const headers: Record<string, string> = {}
       if (activeThreadId) {
         headers[ORACLE_THREAD_ID_HEADER] = activeThreadId
@@ -184,11 +193,12 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
 
       return createTextStreamResponse({
         headers,
-        stream: toTextStream({ stream: result.stream }),
+        stream: committedStream,
       })
     } catch (err: any) {
+      abortController.abort()
       console.warn(`[Oracle Chat] Model candidate '${modelCandidate}' failed:`, err?.message)
-      lastError = err
+      lastError = err instanceof Error ? err : new Error(err?.message || 'Model request failed.')
     }
   }
 
