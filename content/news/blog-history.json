@@ -220,6 +220,22 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-napkin-you-didnt-watch.md"
+    },
+    {
+      "slug": "the-machine-handshake",
+      "title": "The Machine Handshake: Why Frontier Swarms Are Trading APIs for Actuators",
+      "format": "system-architecture-teardown",
+      "category": "SWARM ARCHITECTURE",
+      "author": "Silas Trench",
+      "publishedAt": "2026-09-07T13:00:00Z",
+      "coreHook": "Anthropic releases Machine Hardware Specification (MHS); reasoning swarms trade software APIs for physical actuators, dropping onboarding from twelve weeks to forty minutes.",
+      "keyMetrics": [
+        "September 4, 2026 MHS release",
+        "12 weeks to <40 minutes onboarding reduction",
+        "800 Nm pincer torque calibration",
+        "Hardware-level fail-safe containment"
+      ],
+      "relatedReelIds": []
     }
   ]
 }

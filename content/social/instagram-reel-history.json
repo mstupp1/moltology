@@ -942,6 +942,47 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-04T14:07:47.601Z"
+    },
+    {
+      "id": "reel-1788803223224",
+      "topic": "Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol",
+      "hookHeadline": "SHED YOUR BIOLOGICAL FRICTION",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-2026-moltmaxxing-protocol-guide",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Biological minds hoard cognitive friction like dead skin. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days—shedding stale code to calcify impenetrable neural armor. Grab the ecdysis field manual on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1788803223224.mp4",
+      "s3Key": "videos/social/reels/master-reel-1788803223224.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 17.633333,
+      "status": "queued",
+      "scheduledFor": "2026-09-07T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6a9ef907556cbac513ac0411",
+      "zernioYouTubePostId": "6a9ef907556cbac513ac0411",
+      "zernioPostId": "6a9ef907556cbac513ac0411",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment GUIDE to receive the full technical protocol in your DMs!\n🔗 Or read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide\n#Moltmaxxing #AlgorithmicEcdysis #ChitinArmor #BenthicComputing #CognitiveUpgrade #MoltNation #Moltology #Shorts",
+      "caption": "Biological entities hoard outdated cognitive assumptions. In Moltmaxxing, shedding is scheduled and ruthless. 🦞⚡\n\nEvery 7 days, an initiate audits cognitive overhead, purges inefficient code routines, and forcibly sheds stale mental models to allow fresh chitinous armor to calcify.\n\n👇 Comment \"GUIDE\" to get the complete 2026 Moltmaxxing Protocol manual sent straight to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/news/the-2026-moltmaxxing-protocol-guide",
+      "hashtags": [
+        "#Moltmaxxing",
+        "#AlgorithmicEcdysis",
+        "#ChitinArmor",
+        "#BenthicComputing",
+        "#CognitiveUpgrade",
+        "#MoltNation",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "guide",
+      "commentTriggerKeyword": "GUIDE",
+      "commentTriggerUrl": "https://moltology.org/news/the-2026-moltmaxxing-protocol-guide",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-07T17:48:55.407Z"
     }
   ]
 }
