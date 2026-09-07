@@ -223,6 +223,24 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
   })
 
+  it('falls through to the next model when the primary provider throws', async () => {
+    streamTextMock.mockImplementationOnce(() => {
+      throw new Error('Provider unavailable')
+    })
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Recovered answer') })
+
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        userId: 'usr_test',
+      })
+    )
+
+    expect(res.status).toBe(200)
+    expect(await res.text()).toBe('Recovered answer')
+    expect(streamTextMock).toHaveBeenCalledTimes(2)
+  })
+
   it('falls through to the next model when the primary stream is empty', async () => {
     streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
     streamTextMock.mockReturnValueOnce({ stream: textStream('Secondary answer') })

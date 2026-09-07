@@ -62,7 +62,9 @@ export function toModelMessages(messages: OracleChatMessageInput[]) {
 
 function chunkHasText(chunk: unknown): boolean {
   if (typeof chunk === 'string') return chunk.trim().length > 0
-  if (chunk instanceof Uint8Array) return new TextDecoder().decode(chunk).trim().length > 0
+  if (ArrayBuffer.isView(chunk)) {
+    return new TextDecoder().decode(chunk).trim().length > 0
+  }
   return false
 }
 
