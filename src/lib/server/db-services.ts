@@ -1324,7 +1324,7 @@ export const getForumCategoryBySlugHandler = async ({
       .from(forumCategories)
       .where(inArray(forumCategories.slug, lookupSlugs))
 
-    const cat = matches.find((row) => row.slug === slug) ?? matches[0]
+    const cat = matches.find((row: { slug: string }) => row.slug === slug) ?? matches[0]
 
     if (cat) {
       const [countRow] = await dbClient
