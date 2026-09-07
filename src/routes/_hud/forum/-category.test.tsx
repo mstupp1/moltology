@@ -6,7 +6,10 @@ import { INITIAL_FORUM_CATEGORIES } from '../../../lib/forum-seed-data'
 const mockUseLoaderData = vi.fn()
 const mockUseParams = vi.fn()
 const mockNavigate = vi.fn()
-const mockUseSession = vi.fn(() => ({ data: null, isPending: false }))
+const mockUseSession = vi.fn((): { data: { user: { id: string } } | null; isPending: boolean } => ({
+  data: null,
+  isPending: false,
+}))
 
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
