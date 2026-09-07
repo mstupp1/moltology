@@ -48,7 +48,7 @@ export const INITIAL_FORUM_CATEGORIES: ForumCategorySeed[] = [
   {
     id: '10000000-0000-0000-0000-000000000001',
     slug: 'rules-announcements',
-    name: 'Rules & Directives',
+    name: 'Rules & Directives', // URL alias: /forum/rules-directives → this slug
     description: 'Official announcements, platform updates, and core community guidelines.',
     icon: 'ShieldCheck',
     color: '#ff5540',

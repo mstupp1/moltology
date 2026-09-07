@@ -11,6 +11,12 @@ const mockUseSession = vi.fn((): { data: { user: { id: string } } | null; isPend
   isPending: false,
 }))
 
+const mockRedirect = vi.fn((args: unknown) => {
+  const err = new Error('REDIRECT')
+  Object.assign(err, args)
+  throw err
+})
+
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
     ...config,
@@ -21,6 +27,7 @@ vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/forum/general-discussion' }),
   Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
+  redirect: (args: unknown) => mockRedirect(args),
 }))
 
 vi.mock('@/lib/server/api', () => ({
@@ -167,5 +174,21 @@ describe('ForumBoardPage (/_hud/forum/$categorySlug/)', () => {
     render(<ForumBoardPage />)
 
     expect(screen.getByText('Board Not Found')).toBeInTheDocument()
+  })
+
+  it('redirects rules-directives to the seeded rules-announcements board', async () => {
+    const rules = INITIAL_FORUM_CATEGORIES.find((c) => c.slug === 'rules-announcements')!
+    vi.mocked(getForumCategoryBySlugFn).mockResolvedValue({ ...rules, topicCount: 1 } as any)
+    const loader = Route.options.loader as any
+
+    await expect(
+      loader({ params: { categorySlug: 'rules-directives' } }),
+    ).rejects.toThrow('REDIRECT')
+
+    expect(mockRedirect).toHaveBeenCalledWith({
+      to: '/forum/$categorySlug',
+      params: { categorySlug: 'rules-announcements' },
+      replace: true,
+    })
   })
 })

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Plus, Search, MessageSquare, Terminal, ChevronRight, Compass } from 'lucide-react'
 import { ForumShell } from '@/components/forum/ForumShell'
 import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
@@ -23,8 +23,15 @@ export const Route = createFileRoute('/_hud/forum/$categorySlug/')({
     } catch (e) {
       console.warn('Board loader category error:', e)
     }
+    if (category && category.slug !== params.categorySlug) {
+      throw redirect({
+        to: '/forum/$categorySlug',
+        params: { categorySlug: category.slug },
+        replace: true,
+      })
+    }
     try {
-      topics = (await getForumTopicsFn({ data: { categorySlug: params.categorySlug, sortBy: 'hot' } })) || []
+      topics = (await getForumTopicsFn({ data: { categorySlug: category?.slug || params.categorySlug, sortBy: 'hot' } })) || []
     } catch (e) {
       console.warn('Board loader topics error:', e)
     }

@@ -31,6 +31,8 @@ import {
   FORUM_REPLY_MAX_DEPTH,
   toForumIso,
   visibleForumContent,
+  forumCategoryLookupSlugs,
+  forumCategorySlugsMatch,
 } from '../forum-utils'
 import {
   countUnreadForumTopics,
@@ -1316,11 +1318,13 @@ export const getForumCategoryBySlugHandler = async ({
   const currentUserId = await resolveForumReaderId(data, context)
 
   try {
-    const [cat] = await dbClient
+    const lookupSlugs = forumCategoryLookupSlugs(slug)
+    const matches = await dbClient
       .select()
       .from(forumCategories)
-      .where(eq(forumCategories.slug, slug))
-      .limit(1)
+      .where(inArray(forumCategories.slug, lookupSlugs))
+
+    const cat = matches.find((row) => row.slug === slug) ?? matches[0]
 
     if (cat) {
       const [countRow] = await dbClient
@@ -1515,7 +1519,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     // Apply conditions
     const conditions = []
     if (categorySlug && categorySlug !== 'all') {
-      conditions.push(eq(forumCategories.slug, categorySlug))
+      conditions.push(inArray(forumCategories.slug, forumCategoryLookupSlugs(categorySlug)))
     }
     if (query && query.trim() !== '') {
       const q = `%${query.trim()}%`
@@ -1603,7 +1607,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         const [board] = await dbClient
           .select({ id: forumCategories.id })
           .from(forumCategories)
-          .where(eq(forumCategories.slug, categorySlug))
+          .where(inArray(forumCategories.slug, forumCategoryLookupSlugs(categorySlug)))
           .limit(1)
         if (board?.id) await persistForumBoardVisit(dbClient, currentUserId, board.id)
       } catch (err) {
@@ -1698,8 +1702,8 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
     if (topicRecord.length > 0) {
       const t = topicRecord[0]
 
-      // Validate nested URL: category slug must match the topic's category
-      if (categorySlug && t.categorySlug && categorySlug !== t.categorySlug) {
+      // Validate nested URL: category slug must match the topic's category (aliases allowed)
+      if (categorySlug && t.categorySlug && !forumCategorySlugsMatch(categorySlug, t.categorySlug)) {
         return null
       }
 
