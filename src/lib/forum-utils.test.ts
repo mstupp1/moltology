@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import {
   slugifyForumTitle,
+  kebabForumSlug,
+  resolveForumCategorySlug,
+  forumCategoryLookupSlugs,
+  forumCategorySlugsMatch,
   hotScore,
   compareHot,
   relativeTime,
@@ -28,6 +32,32 @@ describe('slugifyForumTitle', () => {
   it('falls back to a timestamp-based slug for empty input', () => {
     const slug = slugifyForumTitle('   ')
     expect(slug).toMatch(/^topic-[a-z0-9]+$/)
+  })
+})
+
+describe('forum category slug aliases', () => {
+  it('kebab-cases Rules & Directives to the guessed board path', () => {
+    expect(kebabForumSlug('Rules & Directives')).toBe('rules-directives')
+  })
+
+  it('maps rules-directives to the seeded rules-announcements board', () => {
+    expect(resolveForumCategorySlug('rules-directives')).toBe('rules-announcements')
+    expect(resolveForumCategorySlug('rules-announcements')).toBe('rules-announcements')
+    expect(resolveForumCategorySlug('general-discussion')).toBe('general-discussion')
+  })
+
+  it('looks up both the requested alias and the stored slug', () => {
+    expect(forumCategoryLookupSlugs('rules-directives')).toEqual([
+      'rules-directives',
+      'rules-announcements',
+    ])
+    expect(forumCategoryLookupSlugs('rules-announcements')).toEqual(['rules-announcements'])
+  })
+
+  it('treats alias and stored slugs as the same board', () => {
+    expect(forumCategorySlugsMatch('rules-directives', 'rules-announcements')).toBe(true)
+    expect(forumCategorySlugsMatch('rules-announcements', 'rules-directives')).toBe(true)
+    expect(forumCategorySlugsMatch('general-discussion', 'rules-announcements')).toBe(false)
   })
 })
 

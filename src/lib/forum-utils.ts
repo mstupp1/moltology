@@ -111,16 +111,49 @@ export function getPostDepth(
  * suffixed with a short random token to guarantee uniqueness.
  */
 export function slugifyForumTitle(title: string, withSuffix = true): string {
-  const base = title
+  const base = kebabForumSlug(title)
+  if (!base) return `topic-${Date.now().toString(36)}`
+  if (!withSuffix) return base
+  return `${base}-${Math.random().toString(36).slice(2, 6)}`
+}
+
+/** Kebab-case a forum title or board name without a uniqueness suffix. */
+export function kebabForumSlug(text: string): string {
+  return text
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 80)
-  if (!base) return `topic-${Date.now().toString(36)}`
-  if (!withSuffix) return base
-  return `${base}-${Math.random().toString(36).slice(2, 6)}`
+}
+
+/**
+ * Name-guessed or retired board slugs that still point at a live category.
+ * "Rules & Directives" kebab-cases to `rules-directives`, but the seeded
+ * board slug is `rules-announcements`.
+ */
+export const FORUM_CATEGORY_SLUG_ALIASES: Record<string, string> = {
+  'rules-directives': 'rules-announcements',
+}
+
+export function resolveForumCategorySlug(slug: string): string {
+  return FORUM_CATEGORY_SLUG_ALIASES[slug] ?? slug
+}
+
+/** Slugs to query when a board URL may be an alias of the stored category. */
+export function forumCategoryLookupSlugs(slug: string): string[] {
+  const resolved = resolveForumCategorySlug(slug)
+  return resolved === slug ? [slug] : [slug, resolved]
+}
+
+export function forumCategorySlugsMatch(
+  requested: string | undefined,
+  actual: string | undefined,
+): boolean {
+  if (!requested || !actual) return true
+  if (requested === actual) return true
+  return resolveForumCategorySlug(requested) === actual || resolveForumCategorySlug(actual) === requested
 }
 
 /**

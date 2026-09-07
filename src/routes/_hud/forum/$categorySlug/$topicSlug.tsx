@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import {
   ArrowLeft,
   MessageSquare,
@@ -78,15 +78,26 @@ function TopicShareButton() {
 
 export const Route = createFileRoute('/_hud/forum/$categorySlug/$topicSlug')({
   loader: async ({ params }) => {
+    let res = null
     try {
-      const res = await getForumTopicDetailFn({
+      res = await getForumTopicDetailFn({
         data: { slugOrId: params.topicSlug, categorySlug: params.categorySlug },
       })
-      return res
     } catch (e) {
       console.warn('Thread loader error:', e)
       return null
     }
+    if (res?.topic.categorySlug && res.topic.categorySlug !== params.categorySlug) {
+      throw redirect({
+        to: '/forum/$categorySlug/$topicSlug',
+        params: {
+          categorySlug: res.topic.categorySlug,
+          topicSlug: params.topicSlug,
+        },
+        replace: true,
+      })
+    }
+    return res
   },
   head: ({ loaderData, params }) => {
     const topic = loaderData?.topic
