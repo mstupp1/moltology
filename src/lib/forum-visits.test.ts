@@ -60,9 +60,13 @@ describe('isForumTopicUnread', () => {
     ).toBe(false)
   })
 
-  it('stays quiet when the member has never been here', () => {
-    expect(isForumTopicUnread({ lastActivityAt: activity })).toBe(false)
+  it('is unread when the member has never looked at the topic or board', () => {
+    expect(isForumTopicUnread({ lastActivityAt: activity })).toBe(true)
+  })
+
+  it('stays quiet when activity cannot be parsed', () => {
     expect(isForumTopicUnread({ lastActivityAt: 'not-a-date', topicVisitedAt: activity })).toBe(false)
+    expect(isForumTopicUnread({})).toBe(false)
   })
 })
 
@@ -123,7 +127,8 @@ describe('countUnreadForumTopics', () => {
     expect(countUnreadForumTopics(topics, visits, 'board-a')).toBe(2)
     expect(topicHasUnreadActivity(topics[0], visits)).toBe(true)
     expect(topicHasUnreadActivity(topics[1], visits)).toBe(false)
-    expect(topicHasUnreadActivity(topics[3], visits)).toBe(false)
+    expect(topicHasUnreadActivity(topics[2], visits)).toBe(true)
+    expect(topicHasUnreadActivity(topics[3], visits)).toBe(true)
   })
 })
 

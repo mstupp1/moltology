@@ -1137,11 +1137,16 @@ export interface ForumPostEntry {
 }
 
 /**
- * Resolves the authenticated user id from middleware context only.
- * Bare client userId is not trusted for writes.
+ * Resolves the signed-in member for forum reads (unread + visit persist).
+ * Uses resolveWriteAuth so `data.token` still hydrates when middleware
+ * context has no user — the same path vote writes already take.
  */
-function resolveForumUserId(context?: ServerFnContext, _dataUserId?: string): string | null {
-  return (context?.user?.sub as string) || (context?.user?.id as string) || null
+async function resolveForumReaderId(
+  data?: { userId?: string; token?: string } | null,
+  context?: ServerFnContext,
+): Promise<string | null> {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  return auth?.userId ?? null
 }
 
 function forumIsoOrNow(value: string | Date | null | undefined): string {
@@ -1308,7 +1313,7 @@ export const getForumCategoryBySlugHandler = async ({
   const slug = data?.slug
   if (!slug) return null
   const dbClient = context?.db || getDb()
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
 
   try {
     const [cat] = await dbClient
@@ -1380,7 +1385,7 @@ export const getForumCategoriesHandler = async ({
   context,
 }: ServerFnArgs<GetForumCategoriesInput>): Promise<ForumCategoryEntry[]> => {
   const dbClient = context?.db || getDb()
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
   try {
     const cats = await dbClient
       .select({
@@ -1473,7 +1478,7 @@ export interface GetForumTopicsInput {
 export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetForumTopicsInput>): Promise<ForumTopicEntry[]> => {
   const dbClient = context?.db || getDb()
   const { categorySlug, query, sortBy = 'hot' } = data || {}
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
 
   try {
     const queryBuilder = dbClient
@@ -1651,7 +1656,7 @@ export interface ForumTopicDetailResult {
 export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs<GetForumTopicDetailInput>): Promise<ForumTopicDetailResult | null> => {
   const { slugOrId, categorySlug, trackView = true } = data || {}
   if (!slugOrId) return null
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
   const dbClient = context?.db || getDb()
 
   try {

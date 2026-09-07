@@ -26,7 +26,8 @@ export function forumTopicActivityAt(topic: {
 /**
  * A topic is unread when activity landed after the member last looked.
  * Topic visit wins. Board first-look is the baseline for never-opened threads.
- * No visit at either scope means they have not been here yet — no chrome.
+ * Signed-in + activity + no look at either scope is unread — otherwise first
+ * sight of the boards stays quiet and the chrome never appears.
  */
 export function isForumTopicUnread(input: {
   lastActivityAt?: string | Date | null
@@ -42,7 +43,7 @@ export function isForumTopicUnread(input: {
   const boardVisited = parseForumTime(input.boardVisitedAt)
   if (boardVisited != null) return activity > boardVisited
 
-  return false
+  return true
 }
 
 export function topicHasUnreadActivity(

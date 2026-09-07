@@ -8,6 +8,12 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
+vi.mock('../jwt', () => ({
+  looksLikeJwt: (token?: string | null) =>
+    !!token && token.split('.').length === 3 && token.split('.').every((p) => p.length > 0),
+  verifyNeonJWT: vi.fn(),
+}))
+
 import {
   createForumTopicHandler,
   createForumPostHandler,
@@ -26,6 +32,7 @@ import {
   getForumCategoriesHandler,
 } from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
+import { verifyNeonJWT } from '../jwt'
 
 describe('Forum Server Handlers', () => {
   beforeEach(() => {
@@ -1776,6 +1783,127 @@ describe('Forum author edit and soft-delete', () => {
       context: { db: guestDb as any },
     })
     expect(guest[0].unread).toBeUndefined()
+  })
+
+  it('marks never-visited topics unread once a member is signed in', async () => {
+    const topicRow = {
+      id: '20000000-0000-0000-0000-000000000001',
+      categoryId: '10000000-0000-0000-0000-000000000001',
+      categorySlug: 'rules-announcements',
+      categoryName: 'Rules & Directives',
+      categoryColor: '#ff5540',
+      userId: null,
+      authorName: 'Author',
+      authorAvatar: '/images/stage1_larva.png',
+      authorStage: 1,
+      title: 'Welcome',
+      slug: 'welcome-to-community-core-directives',
+      content: 'Body content here.',
+      isPinned: true,
+      isLocked: false,
+      views: 10,
+      repliesCount: 2,
+      upvotes: 4,
+      lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
+      createdAt: new Date('2026-09-01T12:00:00.000Z'),
+      profileHandle: null,
+      profileLarvaId: null,
+      profileAvatarConfig: null,
+    }
+    const topicQuery = {
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([topicRow]),
+    }
+    topicQuery.leftJoin.mockReturnValue(topicQuery)
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return { from: vi.fn().mockReturnValue(topicQuery) }
+        }
+        return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+      }),
+    }
+
+    const signedIn = await getForumTopicsHandler({
+      data: { sortBy: 'latest' },
+      context: { user: { sub: 'test-user-id' }, db: mockDb as any },
+    })
+    expect(signedIn[0].unread).toBe(true)
+  })
+
+  it('hydrates unread from data.token when middleware has no user', async () => {
+    vi.mocked(verifyNeonJWT).mockResolvedValue({
+      valid: true,
+      payload: { sub: 'user-from-jwt' },
+      error: null,
+    })
+
+    const topicRow = {
+      id: '20000000-0000-0000-0000-000000000001',
+      categoryId: '10000000-0000-0000-0000-000000000001',
+      categorySlug: 'rules-announcements',
+      categoryName: 'Rules & Directives',
+      categoryColor: '#ff5540',
+      userId: null,
+      authorName: 'Author',
+      authorAvatar: '/images/stage1_larva.png',
+      authorStage: 1,
+      title: 'Welcome',
+      slug: 'welcome-to-community-core-directives',
+      content: 'Body content here.',
+      isPinned: true,
+      isLocked: false,
+      views: 10,
+      repliesCount: 2,
+      upvotes: 4,
+      lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
+      createdAt: new Date('2026-09-01T12:00:00.000Z'),
+      profileHandle: null,
+      profileLarvaId: null,
+      profileAvatarConfig: null,
+    }
+    const topicQuery = {
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([topicRow]),
+    }
+    topicQuery.leftJoin.mockReturnValue(topicQuery)
+
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return { from: vi.fn().mockReturnValue(topicQuery) }
+        }
+        if (selectCall === 2) {
+          return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+        }
+        if (selectCall === 3) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([
+                {
+                  topicId: topicRow.id,
+                  lastVisitedAt: new Date('2026-09-06T10:00:00.000Z'),
+                },
+              ]),
+            }),
+          }
+        }
+        return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+      }),
+    }
+
+    const signedIn = await getForumTopicsHandler({
+      data: { sortBy: 'latest', token: 'eyJ.payload.sig' },
+      context: { db: mockDb as any },
+    })
+    expect(verifyNeonJWT).toHaveBeenCalledWith('eyJ.payload.sig')
+    expect(signedIn[0].unread).toBe(true)
   })
 
   it('counts unread topics on boards for signed-in members', async () => {
