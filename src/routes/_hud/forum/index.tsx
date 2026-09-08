@@ -19,6 +19,7 @@ import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/for
 import { ForumRulesDialog } from '@/components/forum/ForumRulesDialog'
 import { getForumCategoriesFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { formatForumUnreadCount } from '@/lib/forum-visits'
+import { formatForumTopicCount } from '@/lib/forum-utils'
 import { ForumUnreadMark } from '@/components/forum/ForumBits'
 import { getCategoryBgImage } from '@/lib/forum-seed-data'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -205,7 +206,7 @@ function ForumIndexPage() {
                     {cat.name}
                   </h3>
                   <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b]/90 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner shrink-0 shadow-md backdrop-blur-sm">
-                    {cat.topicCount} TOPICS
+                    {formatForumTopicCount(cat.topicCount)}
                   </span>
                 </div>
 

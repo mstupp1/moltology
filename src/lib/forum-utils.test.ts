@@ -16,6 +16,7 @@ import {
   isForumEntryRevised,
   visibleForumContent,
   FORUM_WITHDRAWN_BODY,
+  formatForumTopicCount,
 } from './forum-utils'
 
 describe('slugifyForumTitle', () => {
@@ -173,6 +174,18 @@ describe('withdrawn and revised visibility', () => {
         deletedAt: '2026-09-06T01:06:00.000Z',
       }),
     ).toBe(false)
+  })
+})
+
+describe('formatForumTopicCount', () => {
+  it('uses singular TOPIC only when the count is 1', () => {
+    expect(formatForumTopicCount(1)).toBe('1 TOPIC')
+  })
+
+  it('uses plural TOPICS for zero and for two or more', () => {
+    expect(formatForumTopicCount(0)).toBe('0 TOPICS')
+    expect(formatForumTopicCount(2)).toBe('2 TOPICS')
+    expect(formatForumTopicCount(12)).toBe('12 TOPICS')
   })
 })
 

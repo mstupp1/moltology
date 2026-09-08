@@ -6,6 +6,7 @@ import { ForumTopicRow } from '@/components/forum/ForumTopicRow'
 import { InlineTopicComposer, InlineTopicComposerHandle } from '@/components/forum/InlineTopicComposer'
 import { getForumCategoryBySlugFn, getForumTopicsFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/server/api'
 import { formatForumUnreadCount } from '@/lib/forum-visits'
+import { formatForumTopicCount } from '@/lib/forum-utils'
 import { ForumUnreadMark } from '@/components/forum/ForumBits'
 import { INITIAL_FORUM_CATEGORIES, getCategoryBgImage } from '@/lib/forum-seed-data'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -169,7 +170,7 @@ function ForumBoardPage() {
                   {category.name}
                 </h1>
                 <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b]/90 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner backdrop-blur-sm shadow-md">
-                  {category.topicCount} TOPICS
+                  {formatForumTopicCount(category.topicCount)}
                 </span>
                 {typeof category.unreadCount === 'number' && category.unreadCount > 0 && (
                   <ForumUnreadMark label={formatForumUnreadCount(category.unreadCount)} />
