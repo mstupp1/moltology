@@ -66,6 +66,9 @@ describe('ForumIndexPage (/_hud/forum/)', () => {
     expect(screen.getByText('General Discussion')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /new post/i })).toBeInTheDocument()
     expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
+    expect(screen.getAllByText('1 TOPIC')).toHaveLength(3)
+    expect(screen.getAllByText('0 TOPICS')).toHaveLength(3)
+    expect(screen.queryByText('1 TOPICS')).not.toBeInTheDocument()
   })
 
   it('shows new-transmission counts on boards when the member has unread', () => {

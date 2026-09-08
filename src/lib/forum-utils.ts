@@ -156,6 +156,11 @@ export function forumCategorySlugsMatch(
   return resolveForumCategorySlug(requested) === actual || resolveForumCategorySlug(actual) === requested
 }
 
+/** HUD badge copy for a board topic count: "1 TOPIC" / "0 TOPICS" / "N TOPICS". */
+export function formatForumTopicCount(count: number): string {
+  return `${count} ${count === 1 ? 'TOPIC' : 'TOPICS'}`
+}
+
 /**
  * Reddit-style hot ranking score.
  * `score` is the net vote count (we only track upvotes), `createdAt` is epoch seconds.
