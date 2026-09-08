@@ -57,7 +57,7 @@ function buildHeatmapGrid(
   history: Array<{ date: string; completedCount: number }>,
   todayDate: string,
   totalTasks: number = TOTAL_ALIGNMENT_TASKS,
-  weeks = ALIGNMENT_HEATMAP_DESKTOP.weeks
+  weeks: number = ALIGNMENT_HEATMAP_DESKTOP.weeks
 ): { grid: HeatmapCell[][]; monthLabels: Array<{ label: string; colIndex: number }> } {
   const countMap = new Map<string, number>()
   for (const item of history) {
@@ -379,6 +379,8 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                 onClick={toggleReminders}
                 className="flex items-center gap-1 text-[10px] font-bold min-h-[44px] sm:min-h-0 px-2.5 sm:px-2 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors touch-manipulation shrink-0"
                 title="Toggle automated 10-minute prior toast reminders"
+                aria-label={remindersEnabled ? 'Turn reminders off' : 'Turn reminders on'}
+                aria-pressed={remindersEnabled}
               >
                 {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
                 <span className="sm:hidden">{remindersEnabled ? 'ON' : 'OFF'}</span>

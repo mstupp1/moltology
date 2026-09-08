@@ -177,7 +177,7 @@ describe('DailyRoutineWidget Component', () => {
     const heatmap = screen.getByTestId('alignment-heatmap-scroll')
     expect(heatmap.querySelectorAll('button')).toHaveLength(ALIGNMENT_HEATMAP_MOBILE.weeks * 7)
 
-    const reminderToggle = screen.getByRole('button', { name: /ON|OFF/i })
+    const reminderToggle = screen.getByTitle('Toggle automated 10-minute prior toast reminders')
     expect(reminderToggle.className).toMatch(/min-h-\[44px\]/)
   })
 })
