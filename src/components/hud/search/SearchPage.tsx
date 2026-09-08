@@ -13,6 +13,7 @@ import {
   type ConnectionsListView,
 } from '@/lib/connections'
 import {
+  catalogNavigateArgs,
   filterCommandCatalog,
   type CommandCatalogItem,
   type SearchTab,
@@ -59,8 +60,9 @@ export function SearchPage({
   }, [refreshConnections])
 
   const runPage = (command: CommandCatalogItem) => {
-    if (command.to) {
-      navigate({ to: command.to })
+    const dest = catalogNavigateArgs(command)
+    if (dest) {
+      navigate(dest)
       return
     }
     if (command.toast) {
