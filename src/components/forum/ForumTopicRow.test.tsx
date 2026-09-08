@@ -49,6 +49,11 @@ describe('ForumTopicRow unread chrome', () => {
     expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
   })
 
+  it('shows a locked badge when the thread is sealed', () => {
+    render(<ForumTopicRow topic={topicEntry({ isLocked: true })} />)
+    expect(screen.getByTestId('forum-lock-badge')).toHaveTextContent('Locked')
+  })
+
   it('stays quiet for guests when unread is omitted', () => {
     render(<ForumTopicRow topic={topicEntry({ unread: undefined })} />)
     expect(screen.queryByTestId('forum-unread-mark')).not.toBeInTheDocument()
