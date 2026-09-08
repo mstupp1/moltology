@@ -190,7 +190,7 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       hotDays: windows.activityEventsHotDays,
       deleteAfterDays: windows.activityEventsHotDays,
       simulatedDays: windows.simulatedTelemetryDays,
-      notes: 'HUD stream shows 8 rows. No archive value. Delete past the hot window.',
+      notes: 'Personal HUD + circle social stream. High-churn telemetry. Delete past the hot window.',
     },
     {
       table: 'notifications',

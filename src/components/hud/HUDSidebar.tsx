@@ -28,6 +28,7 @@ import {
   Biohazard,
   Microscope,
   Lock,
+  Activity,
 
 } from 'lucide-react'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -45,7 +46,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/subterranean', '/chassis', '/connections', '/member'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/subterranean', '/chassis', '/connections', '/member', '/stream'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -406,6 +407,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'FORUM',
           icon: Users,
           path: '/forum',
+        },
+        {
+          id: 'stream',
+          label: 'ACTIVITY STREAM',
+          shortLabel: 'STREAM',
+          icon: Activity,
+          path: '/stream',
         },
         {
           id: 'connections',

@@ -10,6 +10,7 @@ export type CommandIconId =
   | 'pipeline'
   | 'journal'
   | 'forum'
+  | 'stream'
   | 'landing'
   | 'support'
   | 'purge'
@@ -25,6 +26,7 @@ export type CommandNavTo =
   | '/pipeline'
   | '/journal'
   | '/forum'
+  | '/stream'
   | '/landing'
   | '/support'
 
@@ -116,6 +118,14 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     icon: 'forum',
     shortcut: 'G F',
     to: '/forum',
+  },
+  {
+    id: 'nav-stream',
+    label: 'Open Activity Stream',
+    category: 'Navigation',
+    icon: 'stream',
+    shortcut: 'G A',
+    to: '/stream',
   },
   {
     id: 'nav-landing',

@@ -218,6 +218,13 @@
       "when": 1788666932212,
       "tag": "0030_clever_psylocke",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788822400000,
+      "tag": "0031_social_activity_stream",
+      "breakpoints": true
     }
   ]
 }
