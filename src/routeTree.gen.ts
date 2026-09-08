@@ -45,6 +45,7 @@ import { Route as HudPodcastsRouteImport } from './routes/_hud/podcasts'
 import { Route as HudProfileRouteImport } from './routes/_hud/profile'
 import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
+import { Route as HudStreamRouteImport } from './routes/_hud/stream'
 import { Route as HudSubterraneanRouteImport } from './routes/_hud/subterranean'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as HudWatchRouteImport } from './routes/_hud/watch'
@@ -243,6 +244,11 @@ const HudSettingsRoute = HudSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => HudRoute,
 } as any)
+const HudStreamRoute = HudStreamRouteImport.update({
+  id: '/stream',
+  path: '/stream',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudSubterraneanRoute = HudSubterraneanRouteImport.update({
   id: '/subterranean',
   path: '/subterranean',
@@ -373,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
+  '/stream': typeof HudStreamRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
@@ -428,6 +435,7 @@ export interface FileRoutesByTo {
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
+  '/stream': typeof HudStreamRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
@@ -485,6 +493,7 @@ export interface FileRoutesById {
   '/_hud/profile': typeof HudProfileRoute
   '/_hud/search': typeof HudSearchRoute
   '/_hud/settings': typeof HudSettingsRoute
+  '/_hud/stream': typeof HudStreamRoute
   '/_hud/subterranean': typeof HudSubterraneanRoute
   '/_hud/support': typeof HudSupportRoute
   '/_hud/watch': typeof HudWatchRoute
@@ -542,6 +551,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/stream'
     | '/subterranean'
     | '/support'
     | '/watch'
@@ -597,6 +607,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/stream'
     | '/subterranean'
     | '/support'
     | '/watch'
@@ -653,6 +664,7 @@ export interface FileRouteTypes {
     | '/_hud/profile'
     | '/_hud/search'
     | '/_hud/settings'
+    | '/_hud/stream'
     | '/_hud/subterranean'
     | '/_hud/support'
     | '/_hud/watch'
@@ -962,6 +974,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudSettingsRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/stream': {
+      id: '/_hud/stream'
+      path: '/stream'
+      fullPath: '/stream'
+      preLoaderRoute: typeof HudStreamRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/subterranean': {
       id: '/_hud/subterranean'
       path: '/subterranean'
@@ -1105,6 +1124,7 @@ interface HudRouteChildren {
   HudProfileRoute: typeof HudProfileRoute
   HudSearchRoute: typeof HudSearchRoute
   HudSettingsRoute: typeof HudSettingsRoute
+  HudStreamRoute: typeof HudStreamRoute
   HudSubterraneanRoute: typeof HudSubterraneanRoute
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
@@ -1130,6 +1150,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudProfileRoute: HudProfileRoute,
   HudSearchRoute: HudSearchRoute,
   HudSettingsRoute: HudSettingsRoute,
+  HudStreamRoute: HudStreamRoute,
   HudSubterraneanRoute: HudSubterraneanRoute,
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,

@@ -680,6 +680,23 @@ export const getActivityEventsFn = createServerFn({ method: 'POST' })
     return getActivityEventsHandler(args)
   })
 
+const getActivityFeedSchema = z.object({
+  scope: z.enum(['self', 'circle']).optional(),
+  filter: z.enum(['all', 'highlights', 'liturgies', 'streaks', 'stages']).optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+  cursor: z.string().min(1).max(120).optional(),
+  userId: z.string().optional(),
+  token: z.string().optional(),
+})
+
+export const getActivityFeedFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: z.input<typeof getActivityFeedSchema>) => getActivityFeedSchema.parse(data))
+  .handler(async (args) => {
+    const { getActivityFeedHandler } = await import('./db-services')
+    return getActivityFeedHandler(args)
+  })
+
 export const getChassisLoadoutFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data?: { token?: string; userId?: string }) => data ?? {})

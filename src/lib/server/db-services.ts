@@ -95,7 +95,11 @@ import { verifyTurnstileToken } from './turnstile'
 import {
   deleteRoutineCompletedEvent,
   listActivityEventsForUser,
+  listActivityFeed,
+  recordDayAlignedEvent,
   recordRoutineCompletedEvent,
+  recordStageReachedEvent,
+  recordStreakMilestoneEvent,
 } from './activity-log'
 import {
   assertCanSendFriendRequest,
@@ -3597,6 +3601,13 @@ export const toggleDailyAlignmentTaskHandler = async ({
   const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
   const { userId, dbClient } = auth
 
+  const [beforeProfile] = await dbClient
+    .select({ stage: profiles.stage })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  const previousStage = beforeProfile?.stage ?? 1
+
   const targetTask = CANONICAL_ALIGNMENT_TASKS.find((t) => t.key === taskKey)
   if (!targetTask) {
     throw new Error(`Invalid liturgy identifier: ${taskKey}`)
@@ -3693,7 +3704,8 @@ export const toggleDailyAlignmentTaskHandler = async ({
             eq(xpTransactions.userId, userId),
             or(
               eq(xpTransactions.sourceKey, `routine:${taskKey}:${date}`),
-              eq(xpTransactions.sourceKey, `routine_all:${date}`)
+              eq(xpTransactions.sourceKey, `routine_all:${date}`),
+              like(xpTransactions.sourceKey, `streak:%:${date}`)
             )
           )
         )
@@ -3709,7 +3721,35 @@ export const toggleDailyAlignmentTaskHandler = async ({
     }
   }
 
-  return await getDailyAlignmentData(dbClient, userId, date)
+  const result = await getDailyAlignmentData(dbClient, userId, date)
+
+  try {
+    if (result.isAllCompleted) {
+      await recordDayAlignedEvent(dbClient, userId, date, result.completedCount, result.totalCount)
+      const streakBonus = getStreakMilestoneBonus(result.streakDays)
+      if (streakBonus > 0) {
+        await dbClient
+          .insert(xpTransactions)
+          .values({
+            userId,
+            amount: streakBonus,
+            source: 'streak_milestone',
+            sourceKey: `streak:${result.streakDays}:${date}`,
+            description: `Streak milestone: ${result.streakDays} days`,
+          })
+          .onConflictDoNothing()
+        await recordStreakMilestoneEvent(dbClient, userId, date, result.streakDays, streakBonus)
+      }
+    }
+    const nextStage = result.stage ?? previousStage
+    if (nextStage > previousStage) {
+      await recordStageReachedEvent(dbClient, userId, nextStage, previousStage)
+    }
+  } catch (err) {
+    console.warn('[toggleDailyAlignmentTaskFn] highlight activity warning:', err)
+  }
+
+  return result
 }
 
 export const getDailyAlignmentFn = createServerFn({ method: 'POST' })
@@ -3753,6 +3793,46 @@ export const getActivityEventsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data?: GetActivityEventsInput) => getActivityEventsSchema.parse(data || {}))
   .handler(getActivityEventsHandler)
+
+export interface GetActivityFeedInput {
+  userId?: string
+  token?: string
+  scope?: 'self' | 'circle'
+  filter?: 'all' | 'highlights' | 'liturgies' | 'streaks' | 'stages'
+  limit?: number
+  cursor?: string
+}
+
+const getActivityFeedSchema = z.object({
+  userId: z.string().optional(),
+  token: z.string().optional(),
+  scope: z.enum(['self', 'circle']).optional(),
+  filter: z.enum(['all', 'highlights', 'liturgies', 'streaks', 'stages']).optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+  cursor: z.string().min(1).max(120).optional(),
+})
+
+export const getActivityFeedHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetActivityFeedInput>) => {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return { events: [], nextCursor: null }
+  const parsed = getActivityFeedSchema.parse(data || {})
+  try {
+    return await listActivityFeed(auth.dbClient, auth.userId, {
+      scope: parsed.scope,
+      filter: parsed.filter,
+      limit: parsed.limit,
+      cursor: parsed.cursor,
+    })
+  } catch (error) {
+    console.error('[ServerFn getActivityFeedFn] DB query failed:', error)
+    return { events: [], nextCursor: null }
+  }
+}
+
+// ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 
 // ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 

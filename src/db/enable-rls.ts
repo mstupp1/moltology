@@ -39,6 +39,10 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS routines_isolation_policy ON routines;`
     await sql`DROP POLICY IF EXISTS routine_completions_isolation_policy ON routine_completions;`
     await sql`DROP POLICY IF EXISTS activity_events_isolation_policy ON activity_events;`
+    await sql`DROP POLICY IF EXISTS activity_events_select_policy ON activity_events;`
+    await sql`DROP POLICY IF EXISTS activity_events_owner_insert_policy ON activity_events;`
+    await sql`DROP POLICY IF EXISTS activity_events_owner_update_policy ON activity_events;`
+    await sql`DROP POLICY IF EXISTS activity_events_owner_delete_policy ON activity_events;`
     await sql`DROP POLICY IF EXISTS xp_transactions_isolation_policy ON xp_transactions;`
     await sql`DROP POLICY IF EXISTS user_avatars_isolation_policy ON user_avatars;`
     await sql`DROP POLICY IF EXISTS equipment_catalog_public_read_policy ON equipment_catalog;`
@@ -94,8 +98,47 @@ async function applyRLS() {
     `
 
     await sql`
-      CREATE POLICY activity_events_isolation_policy ON activity_events
-      FOR ALL
+      CREATE POLICY activity_events_select_policy ON activity_events
+      FOR SELECT
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+        OR visibility = 'public'
+        OR (
+          visibility = 'friends'
+          AND EXISTS (
+            SELECT 1 FROM friendships f
+            WHERE (
+              (f."userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') AND f."userBId" = activity_events."userId")
+              OR (f."userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') AND f."userAId" = activity_events."userId")
+            )
+          )
+        )
+      );
+    `
+    await sql`
+      CREATE POLICY activity_events_owner_insert_policy ON activity_events
+      FOR INSERT
+      WITH CHECK (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY activity_events_owner_update_policy ON activity_events
+      FOR UPDATE
+      USING (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      )
+      WITH CHECK (
+        "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY activity_events_owner_delete_policy ON activity_events
+      FOR DELETE
       USING (
         "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
         OR (current_setting('request.jwt.claims', true) IS NULL)

@@ -9,6 +9,7 @@ import {
 describe('command catalog', () => {
   it('keeps the existing navigation, ritual, and system commands', () => {
     expect(COMMAND_CATALOG.map((cmd) => cmd.id)).toEqual([
+      'nav-home',
       'nav-hub',
       'nav-codex',
       'nav-lectures',
@@ -17,6 +18,7 @@ describe('command catalog', () => {
       'nav-pipeline',
       'nav-journal',
       'nav-forum',
+      'nav-stream',
       'nav-landing',
       'nav-support',
       'ritual-purge',
