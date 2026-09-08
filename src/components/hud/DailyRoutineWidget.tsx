@@ -5,17 +5,46 @@ import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { localDateString, shiftDays, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 
 // ---------------------------------------------------------------------------
 // ActivityHeatmap — 52-week GitHub-style grid (Sun–Sat rows, weeks as cols)
 // ---------------------------------------------------------------------------
-const CELL = 14   // px — cell width & height
-const GAP  = 3    // px — gap between cells in a column (and between columns)
-const COL_W = CELL + GAP   // 17px per column (cell + right gap)
-const DOW_GUTTER = 32      // px — left gutter for day-of-week labels
-const MIN_MONTH_GAP = 3    // minimum columns between month label ticks
+const NARROW_VIEWPORT_MQ = '(max-width: 639px)'
+
+export const ALIGNMENT_HEATMAP_DESKTOP = {
+  weeks: 52,
+  cell: 14,
+  gap: 3,
+  dowGutter: 32,
+} as const
+
+export const ALIGNMENT_HEATMAP_MOBILE = {
+  weeks: 20,
+  cell: 11,
+  gap: 2,
+  dowGutter: 16,
+} as const
+
+function useIsNarrowViewport() {
+  const [narrow, setNarrow] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const media = window.matchMedia(NARROW_VIEWPORT_MQ)
+    const update = () => setNarrow(media.matches)
+    update()
+    if (media.addEventListener) {
+      media.addEventListener('change', update)
+      return () => media.removeEventListener('change', update)
+    }
+    media.addListener(update)
+    return () => media.removeListener(update)
+  }, [])
+
+  return narrow
+}
 
 interface HeatmapCell {
   date: string
@@ -28,7 +57,7 @@ function buildHeatmapGrid(
   history: Array<{ date: string; completedCount: number }>,
   todayDate: string,
   totalTasks: number = TOTAL_ALIGNMENT_TASKS,
-  weeks = 52
+  weeks = ALIGNMENT_HEATMAP_DESKTOP.weeks
 ): { grid: HeatmapCell[][]; monthLabels: Array<{ label: string; colIndex: number }> } {
   const countMap = new Map<string, number>()
   for (const item of history) {
@@ -42,13 +71,14 @@ function buildHeatmapGrid(
   const gridEnd = new Date(todayObj)
   gridEnd.setDate(todayObj.getDate() + daysToSat)
 
-  // Grid starts 52 weeks back (Sun of that week)
+  // Grid starts `weeks` back (Sun of that week)
   const gridStart = new Date(gridEnd)
   gridStart.setDate(gridEnd.getDate() - weeks * 7 + 1)
 
   const cols: HeatmapCell[][] = []
   const monthLabels: Array<{ label: string; colIndex: number }> = []
   let lastMonth = -1
+  const MIN_MONTH_GAP = 3
   let lastLabelCol = -MIN_MONTH_GAP - 1               // allow first label at col 0
 
   for (let w = 0; w < weeks; w++) {
@@ -103,10 +133,13 @@ interface ActivityHeatmapProps {
 function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TASKS }: ActivityHeatmapProps) {
   const [tooltip, setTooltip] = useState<{ cell: HeatmapCell; x: number; y: number } | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const isNarrow = useIsNarrowViewport()
+  const layout = isNarrow ? ALIGNMENT_HEATMAP_MOBILE : ALIGNMENT_HEATMAP_DESKTOP
+  const colW = layout.cell + layout.gap
 
   const { grid, monthLabels } = useMemo(
-    () => buildHeatmapGrid(history, currentDate, totalTasks),
-    [history, currentDate, totalTasks]
+    () => buildHeatmapGrid(history, currentDate, totalTasks, layout.weeks),
+    [history, currentDate, totalTasks, layout.weeks]
   )
 
   // Auto-scroll to the rightmost position (most recent week = today) on mount & whenever grid changes
@@ -120,46 +153,65 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
     return () => cancelAnimationFrame(id)
   }, [grid])
 
+  const showCellTooltip = (cell: HeatmapCell, target: HTMLElement) => {
+    const container = scrollRef.current
+    if (!container) return
+    const rect = target.getBoundingClientRect()
+    const containerRect = container.getBoundingClientRect()
+    const rawX = rect.left - containerRect.left + container.scrollLeft
+    const maxX = Math.max(0, container.scrollWidth - 148)
+    setTooltip({
+      cell,
+      x: Math.min(rawX + 12, maxX),
+      y: rect.top - containerRect.top,
+    })
+  }
+
   // DOW labels — only render on alternate rows to avoid crowding at small heights
-  const DOW_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const DOW_LABELS = isNarrow
+    ? ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const VISIBLE_DOW = new Set([0, 2, 4, 6]) // Sun, Tue, Thu, Sat
 
   return (
-    <div className="bg-[#070b0b] border border-[#3a4a49] p-4 chamfer-corner space-y-3 text-xs">
+    <div className="bg-[#070b0b] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner space-y-3 text-xs min-w-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-[#00c3ff]" />
-          <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider">
-            52-Week Activity
+      <div className="flex flex-wrap items-center justify-between gap-1 border-b border-[#3a4a49]/60 pb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <BarChart3 className="w-4 h-4 text-[#00c3ff] shrink-0" />
+          <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider truncate">
+            {isNarrow ? 'Activity' : '52-Week Activity'}
           </span>
         </div>
-        <span className="text-[10px] text-[#839493]">Daily tasks done</span>
+        <span className="text-[10px] text-[#839493] shrink-0">
+          {isNarrow ? `${layout.weeks}-wk` : 'Daily tasks done'}
+        </span>
       </div>
 
       {/* Scroll container — must have min-w-0 so it doesn't expand the parent */}
       <div
         ref={scrollRef}
-        className="overflow-x-auto pb-2 relative min-w-0"
+        className="overflow-x-auto overscroll-x-contain pb-2 relative min-w-0 max-w-full"
         style={{ WebkitOverflowScrolling: 'touch' }}
         onMouseLeave={() => setTooltip(null)}
+        data-testid="alignment-heatmap-scroll"
       >
         {/* Inner content — w-max keeps everything together and lets overflow-x-auto work */}
         <div className="w-max">
           {/* Month labels row */}
           <div className="flex mb-2">
             {/* DOW gutter spacer */}
-            <div style={{ width: DOW_GUTTER }} className="shrink-0" />
+            <div style={{ width: layout.dowGutter }} className="shrink-0" />
             {/* Relative container sized to exactly the grid width */}
             <div
               className="relative"
-              style={{ width: grid.length * COL_W, height: 16 }}
+              style={{ width: grid.length * colW, height: 16 }}
             >
               {monthLabels.map(({ label, colIndex }) => (
                 <span
                   key={`${label}-${colIndex}`}
                   className="absolute text-[10px] text-[#839493] font-sans"
-                  style={{ left: colIndex * COL_W }}
+                  style={{ left: colIndex * colW }}
                 >
                   {label}
                 </span>
@@ -171,11 +223,11 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
           <div className="flex items-start">
             {/* Day-of-week labels — sized to match cell height + gap */}
             <div
-              className="flex flex-col shrink-0 pr-2"
-              style={{ width: DOW_GUTTER, gap: GAP }}
+              className="flex flex-col shrink-0 pr-1 sm:pr-2"
+              style={{ width: layout.dowGutter, gap: layout.gap }}
             >
               {DOW_LABELS.map((label, i) => (
-                <div key={label} style={{ height: CELL }} className="flex items-center">
+                <div key={`${label}-${i}`} style={{ height: layout.cell }} className="flex items-center">
                   <span
                     className={`text-[9px] text-[#839493] leading-none ${VISIBLE_DOW.has(i) ? '' : 'invisible'}`}
                   >
@@ -186,23 +238,25 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
             </div>
 
             {/* Week columns */}
-            <div className="flex items-start" style={{ gap: GAP }}>
+            <div className="flex items-start" style={{ gap: layout.gap }}>
               {grid.map((col, wIdx) => (
-                <div key={wIdx} className="flex flex-col" style={{ gap: GAP }}>
+                <div key={wIdx} className="flex flex-col" style={{ gap: layout.gap }}>
                   {col.map((cell, dIdx) => (
-                    <div
+                    <button
                       key={dIdx}
-                      className={`border rounded-[2px] cursor-pointer transition-opacity hover:opacity-70 ${heatmapColor(cell.count, cell.isFuture, cell.isToday)}`}
-                      style={{ width: CELL, height: CELL }}
-                      onMouseEnter={(e) => {
-                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-                        const containerRect = scrollRef.current!.getBoundingClientRect()
-                        setTooltip({
-                          cell,
-                          x: rect.left - containerRect.left + scrollRef.current!.scrollLeft,
-                          y: rect.top - containerRect.top,
-                        })
-                      }}
+                      type="button"
+                      aria-label={`${cell.date}: ${
+                        cell.isFuture
+                          ? 'future'
+                          : cell.count === 0
+                          ? 'no tasks done'
+                          : `${cell.count} of ${totalTasks} tasks done`
+                      }`}
+                      className={`border rounded-[2px] cursor-pointer transition-opacity hover:opacity-70 touch-manipulation p-0 ${heatmapColor(cell.count, cell.isFuture, cell.isToday)}`}
+                      style={{ width: layout.cell, height: layout.cell }}
+                      onMouseEnter={(e) => showCellTooltip(cell, e.currentTarget)}
+                      onFocus={(e) => showCellTooltip(cell, e.currentTarget)}
+                      onClick={(e) => showCellTooltip(cell, e.currentTarget)}
                     />
                   ))}
                 </div>
@@ -215,8 +269,8 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
             <div
               className="absolute z-30 pointer-events-none bg-[#0b1010] border border-[#00c3ff] px-2 py-1 text-[10px] whitespace-nowrap text-[#dfe3e3] shadow-lg chamfer-corner"
               style={{
-                left: tooltip.x + 16,
-                top: tooltip.y - 36,
+                left: tooltip.x,
+                top: Math.max(0, tooltip.y - 36),
               }}
             >
               <span className="text-[#00c3ff] font-bold">{tooltip.cell.date}</span>
@@ -232,13 +286,13 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-2 pt-1 border-t border-[#3a4a49]/40">
+      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#3a4a49]/40">
         <span className="text-[10px] text-[#839493]">Less</span>
         {[0, 2, 4, 6, 8].map((lvl) => (
           <div
             key={lvl}
             className={`border rounded-[2px] ${heatmapColor(lvl, false, false)}`}
-            style={{ width: CELL, height: CELL }}
+            style={{ width: layout.cell, height: layout.cell }}
           />
         ))}
         <span className="text-[10px] text-[#839493]">More</span>
@@ -274,31 +328,35 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
   return (
     <HudGhostWidget isLoading={isLoading || isAlignmentLoading} skeleton={<DailyRoutineGhost />}>
-      <HudCard id="daily-routine-hub" variant="teal" className="p-4 sm:p-6 relative space-y-5 font-sans shadow-2xl border-[#00c3ff]/40">
+      <HudCard
+        id="daily-routine-hub"
+        variant="teal"
+        className="p-3 sm:p-4 md:p-6 relative space-y-4 sm:space-y-5 font-sans shadow-2xl border-[#00c3ff]/40 min-w-0 overflow-hidden"
+      >
         {/* Main Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#3a4a49]/80 pb-4 gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-[#00c3ff]" />
-              <h2 className="font-grotesk text-base sm:text-lg font-bold tracking-wider text-[#dfe3e3] uppercase">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#3a4a49]/80 pb-3 sm:pb-4 gap-3 sm:gap-4">
+          <div className="space-y-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Calendar className="w-5 h-5 text-[#00c3ff] shrink-0" />
+              <h2 className="font-grotesk text-sm sm:text-base md:text-lg font-bold tracking-wider text-[#dfe3e3] uppercase leading-tight">
                 DAILY ALIGNMENT ROUTINE
               </h2>
-              <HudBadge variant="cyan" className="text-[10px]">
+              <HudBadge variant="cyan" className="text-[10px] shrink-0">
                 MANDATORY LITURGY
               </HudBadge>
             </div>
-            <p className="text-xs text-[#839493]">
+            <p className="text-xs text-[#839493] leading-relaxed">
               Complete your 8 scheduled alignment items daily to maintain carapace density and preserve your active streak.
             </p>
           </div>
 
           {/* Stats Summary Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs shrink-0">
-            <HudBadge variant="crimson" dot pulse className="px-3 py-1.5 font-bold">
+            <HudBadge variant="crimson" dot pulse className="px-2.5 sm:px-3 py-1.5 font-bold">
               <Flame className="w-4 h-4 text-[#ff453a] fill-[#ff453a] inline mr-1.5" />
               {streakDays} DAY STREAK
             </HudBadge>
-            <HudBadge variant={completedCount === totalCount ? 'emerald' : 'cyan'} className="px-3 py-1.5 font-bold">
+            <HudBadge variant={completedCount === totalCount ? 'emerald' : 'cyan'} className="px-2.5 sm:px-3 py-1.5 font-bold">
               <CheckCircle2 className="w-3.5 h-3.5 inline mr-1" />
               {completedCount}/{totalCount} COMPLETE
             </HudBadge>
@@ -306,106 +364,115 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
         </div>
 
         {/* 2-Column Layout: Left (Vertical Task List) + Right (Streak Calendar & Alignment Metrics) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 min-w-0">
           {/* Left Column (7 cols): Clean Vertical List of 8 Tasks */}
-          <div className="lg:col-span-7 space-y-3">
+          <div className="lg:col-span-7 space-y-3 min-w-0">
             <div className="flex flex-wrap items-center justify-between border-b border-[#3a4a49]/60 pb-2 gap-2">
-              <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-[#00c3ff]" />
-                DAILY ALIGNMENT SCHEDULE ({completedCount}/{totalCount})
+              <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2 min-w-0">
+                <TrendingUp className="w-4 h-4 text-[#00c3ff] shrink-0" />
+                <span className="sm:hidden">SCHEDULE ({completedCount}/{totalCount})</span>
+                <span className="hidden sm:inline">DAILY ALIGNMENT SCHEDULE ({completedCount}/{totalCount})</span>
               </span>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={toggleReminders}
-                  className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors"
-                  title="Toggle automated 10-minute prior toast reminders"
-                >
-                  {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
-                  <span>{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={toggleReminders}
+                className="flex items-center gap-1 text-[10px] font-bold min-h-[44px] sm:min-h-0 px-2.5 sm:px-2 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors touch-manipulation shrink-0"
+                title="Toggle automated 10-minute prior toast reminders"
+              >
+                {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
+                <span className="sm:hidden">{remindersEnabled ? 'ON' : 'OFF'}</span>
+                <span className="hidden sm:inline">{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
+              </button>
             </div>
 
-            <div className="space-y-2 font-sans text-xs">
+            <div className="space-y-1.5 sm:space-y-2 font-sans text-xs">
               {tasks.map((task) => {
                 const reminderTime = getTaskReminderTime(task.time)
                 return (
-                  <div
+                  <button
                     key={task.id}
+                    type="button"
                     onClick={() => toggleTask(task.key || task.id)}
-                    className={`p-3 border transition-all cursor-pointer flex items-center justify-between chamfer-corner group ${
+                    aria-pressed={task.completed}
+                    className={`w-full min-h-[44px] px-2.5 py-2.5 sm:p-3 border transition-all cursor-pointer flex items-center justify-between gap-2 chamfer-corner group text-left touch-manipulation ${
                       task.completed
                         ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
                         : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                       {task.completed ? (
-                        <CheckSquare className="w-4.5 h-4.5 text-[#00c3ff] shrink-0" />
+                        <CheckSquare className="w-5 h-5 sm:w-4 sm:h-4 text-[#00c3ff] shrink-0" />
                       ) : (
-                        <Square className="w-4.5 h-4.5 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
+                        <Square className="w-5 h-5 sm:w-4 sm:h-4 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
                       )}
-                      <div className="min-w-0 space-y-0.5">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.2 border border-[#3a4a49]">
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                          <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.5 border border-[#3a4a49] shrink-0">
                             {task.time}
                           </span>
                           {reminderTime && (
-                            <span className="text-[9px] text-[#ffb700] bg-[#091214] px-1.5 py-0.2 border border-[#ffb700]/30 flex items-center gap-1">
+                            <span className="hidden sm:inline-flex text-[9px] text-[#ffb700] bg-[#091214] px-1.5 py-0.5 border border-[#ffb700]/30 items-center gap-1">
                               <Bell className="w-2.5 h-2.5 text-[#ffb700]" />
                               {reminderTime} (10m REMINDER)
                             </span>
                           )}
                         </div>
-                        <span className={`text-xs font-bold block truncate ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
+                        <span className={`text-xs font-bold block whitespace-normal sm:truncate ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
                           {task.title}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 shrink-0 ml-2">
+                    <span className="hidden sm:inline-flex shrink-0">
                       <HudBadge variant={task.completed ? 'cyan' : 'neutral'} className="text-[10px]">
                         {task.completed ? 'COMPLETE' : 'PENDING'}
                       </HudBadge>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 )
               })}
             </div>
           </div>
 
           {/* Right Column (5 cols): Streak Calendar, Heatmap & Alignment Stats */}
-          <div className="lg:col-span-5 space-y-4">
+          <div className="lg:col-span-5 space-y-4 min-w-0">
             {/* 14-Day Streak Calendar Grid */}
-            <div className="bg-[#070b0b] border border-[#3a4a49] p-4 chamfer-corner space-y-3">
-              <div className="flex items-center justify-between border-b border-[#3a4a49]/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-[#00c3ff]" />
+            <div className="bg-[#070b0b] border border-[#3a4a49] p-3 sm:p-4 chamfer-corner space-y-3 min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-1 border-b border-[#3a4a49]/60 pb-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <BarChart3 className="w-4 h-4 text-[#00c3ff] shrink-0" />
                   <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider">
-                    STREAK CALENDAR & MATRIX
+                    <span className="sm:hidden">STREAK MATRIX</span>
+                    <span className="hidden sm:inline">STREAK CALENDAR & MATRIX</span>
                   </span>
                 </div>
-                <span className="text-[10px] text-[#00c3ff] font-bold">14-DAY RECORD</span>
+                <span className="text-[10px] text-[#00c3ff] font-bold shrink-0">14-DAY RECORD</span>
               </div>
 
               {/* Streak Bar Graph */}
               <div className="space-y-2 pt-1">
-                <div className="grid grid-cols-7 gap-1.5 items-end h-24 pt-4 px-1 border-b border-[#3a4a49]/40 pb-2">
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5 items-end h-24 pt-4 px-0.5 sm:px-1 border-b border-[#3a4a49]/40 pb-2">
                   {streakHistory.slice(-7).map((item, idx) => {
                     const heightPct = Math.max(item.pct, 15)
                     const isFull = item.pct === 100
 
                     return (
-                      <div
+                      <button
                         key={idx}
+                        type="button"
                         onMouseEnter={() => setHoveredDay(item)}
                         onMouseLeave={() => setHoveredDay(null)}
-                        className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group relative"
+                        onFocus={() => setHoveredDay(item)}
+                        onBlur={() => setHoveredDay(null)}
+                        onClick={() => setHoveredDay((prev) => (prev?.day === item.day ? null : item))}
+                        className="flex flex-col items-center gap-1.5 h-full justify-end cursor-pointer group relative min-w-0 touch-manipulation bg-transparent p-0 border-0"
+                        aria-label={`${item.dayName}: ${item.completed} of ${item.total} tasks`}
                       >
                         {/* Tooltip */}
                         {hoveredDay?.day === item.day && (
-                          <div className="absolute -top-9 z-30 bg-[#0b1010] border border-[#00c3ff] px-2 py-0.5 text-[9px] whitespace-nowrap text-[#dfe3e3] shadow-lg chamfer-corner">
+                          <div className="absolute -top-9 left-1/2 -translate-x-1/2 z-30 bg-[#0b1010] border border-[#00c3ff] px-2 py-0.5 text-[9px] whitespace-nowrap text-[#dfe3e3] shadow-lg chamfer-corner">
                             <span className="text-[#00c3ff] font-bold">{item.day}:</span> {item.completed}/{item.total}
                           </div>
                         )}
@@ -424,18 +491,19 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                           />
                         </div>
 
-                        {/* Day Name */}
-                        <span className={`text-[9px] font-sans ${item.isToday ? 'text-[#00c3ff] font-bold' : 'text-[#839493]'}`}>
-                          {item.dayName}
+                        {/* Day Name — 2-letter on phones so the 7-col grid stays even */}
+                        <span className={`text-[8px] sm:text-[9px] font-sans leading-none ${item.isToday ? 'text-[#00c3ff] font-bold' : 'text-[#839493]'}`}>
+                          <span className="sm:hidden">{item.isToday ? 'TD' : item.dayName.slice(0, 2)}</span>
+                          <span className="hidden sm:inline">{item.dayName}</span>
                         </span>
-                      </div>
+                      </button>
                     )
                   })}
                 </div>
 
                 {/* Progress Readout */}
                 <div className="space-y-1 pt-1">
-                  <div className="flex justify-between text-[10px] text-[#839493]">
+                  <div className="flex flex-wrap justify-between gap-x-2 gap-y-0.5 text-[10px] text-[#839493]">
                     <span>TODAY'S ALIGNMENT ({completionPercent}%)</span>
                     <span className="text-[#00c3ff] font-bold">{completedCount} / {totalCount} TASKS</span>
                   </div>

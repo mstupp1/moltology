@@ -46,12 +46,12 @@ export function LaunchpadCarouselGhost() {
  */
 export function DailyRoutineGhost() {
   return (
-    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-4 sm:p-5 rounded-sm space-y-4 shadow-sm relative">
+    <div className="bg-[#070b0c]/90 border border-[#3a4a49]/60 p-3 sm:p-5 rounded-sm space-y-4 shadow-sm relative min-w-0 overflow-hidden">
       {/* Widget Header */}
-      <div className="flex items-center justify-between border-b border-[#3a4a49]/40 pb-3">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49]/40 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
           <HudGhostSkeleton variant="teal" preset="avatar" width={28} height={28} />
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <HudGhostSkeleton variant="teal" preset="heading" width={150} height={16} />
             <HudGhostSkeleton variant="neutral" preset="text" width={180} height={11} />
           </div>
