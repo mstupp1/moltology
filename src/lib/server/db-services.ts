@@ -4801,6 +4801,7 @@ export const listConnectionsHandler = async ({
         ...other,
         avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
         requestId: row.id,
+        since: row.createdAt,
       })
     })
     .filter(Boolean) as ConnectionsListView['incoming']
@@ -4814,6 +4815,7 @@ export const listConnectionsHandler = async ({
         ...other,
         avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
         requestId: row.id,
+        since: row.createdAt,
       })
     })
     .filter(Boolean) as ConnectionsListView['outgoing']

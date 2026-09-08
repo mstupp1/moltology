@@ -104,11 +104,14 @@ export function relationshipForMember(
   return { relationship: 'none', pendingRequestId: null }
 }
 
-export type ConnectionsHubPreviewKind = 'incoming' | 'friend'
+export type ConnectionsHubPreviewKind = 'incoming' | 'sent' | 'friend'
 
 export type ConnectionsHubPreviewItem = ConnectionMemberSummary & {
   kind: ConnectionsHubPreviewKind
 }
+
+export const CONNECTIONS_HUB_PREVIEW_LIMIT = 3
+export const CONNECTIONS_HUB_CIRCLE_LIMIT = 5
 
 function friendSinceTime(row: ConnectionMemberSummary): number {
   if (!row.since) return 0
@@ -116,19 +119,44 @@ function friendSinceTime(row: ConnectionMemberSummary): number {
   return Number.isFinite(ms) ? ms : 0
 }
 
-/** Incoming requests first, then newest friends. Hub cards show at most `limit`. */
+function newestFirst(rows: ConnectionMemberSummary[]): ConnectionMemberSummary[] {
+  return [...rows].sort((a, b) => friendSinceTime(b) - friendSinceTime(a))
+}
+
+/** Incoming requests, then sent, then newest friends. Hub cards show at most `limit`. */
 export function pickConnectionsHubPreview(
   connections: ConnectionsListView | null | undefined,
-  limit = 3,
+  limit = CONNECTIONS_HUB_PREVIEW_LIMIT,
 ): ConnectionsHubPreviewItem[] {
   if (!connections || limit <= 0) return []
 
   const incoming = connections.incoming.map((row) => ({ ...row, kind: 'incoming' as const }))
-  const friends = [...connections.friends]
-    .sort((a, b) => friendSinceTime(b) - friendSinceTime(a))
-    .map((row) => ({ ...row, kind: 'friend' as const }))
+  const sent = connections.outgoing.map((row) => ({ ...row, kind: 'sent' as const }))
+  const friends = newestFirst(connections.friends).map((row) => ({ ...row, kind: 'friend' as const }))
 
-  return [...incoming, ...friends].slice(0, limit)
+  return [...incoming, ...sent, ...friends].slice(0, limit)
+}
+
+/** Newest friends for the hub avatar stack. */
+export function pickConnectionsHubCircle(
+  connections: ConnectionsListView | null | undefined,
+  limit = CONNECTIONS_HUB_CIRCLE_LIMIT,
+): ConnectionMemberSummary[] {
+  if (!connections || limit <= 0) return []
+  return newestFirst(connections.friends).slice(0, limit)
+}
+
+export function relationshipForHubPreview(item: ConnectionsHubPreviewItem): {
+  relationship: RelationshipState
+  pendingRequestId: string | null
+} {
+  if (item.kind === 'incoming') {
+    return { relationship: 'pending_received', pendingRequestId: item.requestId ?? null }
+  }
+  if (item.kind === 'sent') {
+    return { relationship: 'pending_sent', pendingRequestId: item.requestId ?? null }
+  }
+  return { relationship: 'friends', pendingRequestId: null }
 }
 
 const STAGE_SHORT_LABELS: Record<number, string> = {

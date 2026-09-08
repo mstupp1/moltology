@@ -11,6 +11,8 @@ import {
   toMemberSummary,
   relationshipForMember,
   pickConnectionsHubPreview,
+  pickConnectionsHubCircle,
+  relationshipForHubPreview,
   type ConnectionsListView,
 } from './connections'
 import {
@@ -197,6 +199,91 @@ describe('connections helpers', () => {
     expect(preview.map((row) => row.id)).toEqual(['i1', 'new-friend', 'old-friend'])
     expect(preview[0]?.kind).toBe('incoming')
     expect(preview[1]?.kind).toBe('friend')
+  })
+
+  it('slots sent requests after incoming and before friends in the hub preview', () => {
+    const connections: ConnectionsListView = {
+      friends: [
+        {
+          id: 'old-friend',
+          larvaId: 'LARVA UNIT #1',
+          handle: 'old_shell',
+          displayName: 'old_shell',
+          stage: 2,
+          stageLabel: 'Soft-Shed',
+          avatarConfig: null,
+          since: '2024-01-01T00:00:00.000Z',
+        },
+      ],
+      incoming: [
+        {
+          id: 'i1',
+          larvaId: 'LARVA UNIT #2',
+          handle: 'incoming_one',
+          displayName: 'incoming_one',
+          stage: 1,
+          stageLabel: 'Larval Initiate',
+          avatarConfig: null,
+          requestId: 'req-in',
+        },
+      ],
+      outgoing: [
+        {
+          id: 'o1',
+          larvaId: 'LARVA UNIT #3',
+          handle: 'sent_one',
+          displayName: 'sent_one',
+          stage: 2,
+          stageLabel: 'Soft-Shed',
+          avatarConfig: null,
+          requestId: 'req-out',
+        },
+      ],
+    }
+
+    const preview = pickConnectionsHubPreview(connections, 3)
+    expect(preview.map((row) => row.id)).toEqual(['i1', 'o1', 'old-friend'])
+    expect(preview.map((row) => row.kind)).toEqual(['incoming', 'sent', 'friend'])
+    expect(relationshipForHubPreview(preview[0]!)).toEqual({
+      relationship: 'pending_received',
+      pendingRequestId: 'req-in',
+    })
+    expect(relationshipForHubPreview(preview[1]!)).toEqual({
+      relationship: 'pending_sent',
+      pendingRequestId: 'req-out',
+    })
+  })
+
+  it('picks newest friends for the hub avatar circle', () => {
+    const connections: ConnectionsListView = {
+      friends: [
+        {
+          id: 'old-friend',
+          larvaId: 'LARVA UNIT #1',
+          handle: 'old_shell',
+          displayName: 'old_shell',
+          stage: 2,
+          stageLabel: 'Soft-Shed',
+          avatarConfig: null,
+          since: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'new-friend',
+          larvaId: 'LARVA UNIT #4',
+          handle: 'new_claw',
+          displayName: 'new_claw',
+          stage: 3,
+          stageLabel: 'Exoshell Born',
+          avatarConfig: null,
+          since: '2026-08-01T00:00:00.000Z',
+        },
+      ],
+      incoming: [],
+      outgoing: [],
+    }
+
+    expect(pickConnectionsHubCircle(connections, 1).map((row) => row.id)).toEqual(['new-friend'])
+    expect(pickConnectionsHubCircle(null)).toEqual([])
   })
 
   it('returns an empty hub preview when there are no connections', () => {

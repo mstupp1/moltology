@@ -11,35 +11,49 @@ export function MemberSearchRow({
   relationship,
   pendingRequestId,
   onRelationshipChange,
+  compact = false,
+  caption,
+  allowRemove = true,
 }: {
   member: MemberSearchResult
   relationship: RelationshipState
   pendingRequestId: string | null
   onRelationshipChange?: () => void
+  compact?: boolean
+  caption?: string
+  allowRemove?: boolean
 }) {
   return (
-    <li className="chitin-card-inset p-3 border border-[#3a4a49] flex items-center gap-3 chamfer-corner">
+    <li
+      className={`chitin-card-inset border border-[#3a4a49] flex items-center gap-3 chamfer-corner ${
+        compact ? 'p-2.5' : 'p-3'
+      }`}
+    >
       <LobsterAvatarPortrait
         config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
-        className="w-12 h-12 shrink-0"
-        size={128}
+        className={compact ? 'w-9 h-9 shrink-0' : 'w-12 h-12 shrink-0'}
+        size={compact ? 96 : 128}
+        eyeTracking={!compact}
       />
       <div className="min-w-0 flex-1">
         <Link
           to="/member/$profileId"
           params={{ profileId: resolveMemberPublicParam(member) }}
-          className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
+          className={`font-bold text-[#dfe3e3] hover:text-[#00c3ff] truncate block ${compact ? 'text-xs' : 'text-sm'}`}
         >
           {member.displayName}
         </Link>
         <div className="text-[10px] uppercase tracking-wider text-[#839493]">
           Stage {member.stage} · {member.stageLabel}
+          {caption ? ` · ${caption}` : ''}
         </div>
       </div>
       <FriendRequestButton
         profileId={member.id}
         relationship={relationship}
         pendingRequestId={pendingRequestId}
+        compact={compact}
+        allowRemove={allowRemove}
         onRelationshipChange={() => onRelationshipChange?.()}
       />
     </li>
