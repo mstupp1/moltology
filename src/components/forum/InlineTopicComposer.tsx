@@ -7,6 +7,8 @@ import { useHudPersist } from '@/hooks/useHudPersist'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useForumAuth } from './ForumShell'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
+import { ForumFormattingToolbar, handleFormattingShortcuts } from '@/components/forum/ForumFormattingToolbar'
+import { ForumPostBody } from '@/components/forum/ForumPostBody'
 
 export interface InlineTopicComposerHandle {
   expandAndFocus: () => void
@@ -40,11 +42,13 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
     const [categoryId, setCategoryId] = useState(initialCategoryId || categories[0]?.id || '')
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
+    const [preview, setPreview] = useState(false)
     const [creating, setCreating] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
     const containerRef = useRef<HTMLDivElement>(null)
     const titleInputRef = useRef<HTMLInputElement>(null)
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     // Keep category in sync if initialCategoryId changes
     useEffect(() => {
@@ -85,6 +89,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
 
     const handleCollapse = () => {
       setIsExpanded(false)
+      setPreview(false)
       setError(null)
     }
 
@@ -117,6 +122,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
         onCreated(topic)
         setTitle('')
         setContent('')
+        setPreview(false)
         setIsExpanded(false)
       } catch (err: any) {
         setError(err?.message || 'Failed to create post. Please try again.')
@@ -315,14 +321,43 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
                 {content.trim().length} characters (min 10)
               </span>
             </div>
-            <MentionTextarea
-              id="composer-content-textarea"
-              rows={5}
-              value={content}
-              onChange={setContent}
-              placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
-              className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-[16px] sm:text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner transition-colors placeholder:text-[#839493]/50 min-h-[110px]"
-            />
+            <div className="space-y-0">
+              <ForumFormattingToolbar
+                textareaRef={textareaRef}
+                value={content}
+                onChange={setContent}
+                preview={preview}
+                onTogglePreview={() => setPreview((v) => !v)}
+                disabled={creating}
+              />
+              {preview ? (
+                <div
+                  className="w-full min-h-[110px] max-h-[300px] bg-[#070b0b]/60 border border-[#3a4a49] p-3 text-xs text-[#dfe3e3] chamfer-corner-bottom overflow-y-auto"
+                  data-testid="inline-composer-preview"
+                >
+                  {content.trim() ? (
+                    <ForumPostBody content={content} />
+                  ) : (
+                    <p className="text-xs text-[#839493]/60 italic">
+                      Nothing to preview yet. Transmit some thoughts or apply formatting above...
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <MentionTextarea
+                  id="composer-content-textarea"
+                  ref={textareaRef}
+                  rows={5}
+                  value={content}
+                  onChange={setContent}
+                  onKeyDown={(e) => {
+                    handleFormattingShortcuts(e, textareaRef.current, setContent)
+                  }}
+                  placeholder="Share your thoughts, questions, or ideas... Hail a member with @designation."
+                  className="w-full bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] p-3 text-[16px] sm:text-xs text-[#dfe3e3] outline-none resize-y chamfer-corner-bottom transition-colors placeholder:text-[#839493]/50 min-h-[110px]"
+                />
+              )}
+            </div>
           </div>
 
           <p className="text-[11px] text-[#839493] leading-relaxed border-l-2 border-[#3a4a49] pl-2.5">

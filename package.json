@@ -50,7 +50,8 @@
     "guide:pdf": "tsx scripts/generate-guide-pdf.ts",
     "tts:voices": "tsx scripts/list-fish-voices.ts",
     "simulate:activity": "tsx scripts/simulate-activity.ts",
-    "db:retention-report": "tsx scripts/db-retention-report.ts"
+    "db:retention-report": "tsx scripts/db-retention-report.ts",
+    "vercel:prune": "tsx scripts/prune-vercel-deployments.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.27",

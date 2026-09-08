@@ -8,6 +8,12 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
+vi.mock('../jwt', () => ({
+  looksLikeJwt: (token?: string | null) =>
+    !!token && token.split('.').length === 3 && token.split('.').every((p) => p.length > 0),
+  verifyNeonJWT: vi.fn(),
+}))
+
 import { resetRateLimits } from '../ai/guardrails'
 import { FORUM_LOCKED_ERROR } from '../community-rules'
 import {
@@ -26,8 +32,10 @@ import {
   persistForumBoardVisit,
   getForumTopicsHandler,
   getForumCategoriesHandler,
+  getForumCategoryBySlugHandler,
 } from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
+import { verifyNeonJWT } from '../jwt'
 
 describe('Forum Server Handlers', () => {
   beforeEach(() => {
@@ -1823,6 +1831,127 @@ describe('Forum author edit and soft-delete', () => {
     expect(guest[0].unread).toBeUndefined()
   })
 
+  it('marks never-visited topics unread once a member is signed in', async () => {
+    const topicRow = {
+      id: '20000000-0000-0000-0000-000000000001',
+      categoryId: '10000000-0000-0000-0000-000000000001',
+      categorySlug: 'rules-announcements',
+      categoryName: 'Rules & Directives',
+      categoryColor: '#ff5540',
+      userId: null,
+      authorName: 'Author',
+      authorAvatar: '/images/stage1_larva.png',
+      authorStage: 1,
+      title: 'Welcome',
+      slug: 'welcome-to-community-core-directives',
+      content: 'Body content here.',
+      isPinned: true,
+      isLocked: false,
+      views: 10,
+      repliesCount: 2,
+      upvotes: 4,
+      lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
+      createdAt: new Date('2026-09-01T12:00:00.000Z'),
+      profileHandle: null,
+      profileLarvaId: null,
+      profileAvatarConfig: null,
+    }
+    const topicQuery = {
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([topicRow]),
+    }
+    topicQuery.leftJoin.mockReturnValue(topicQuery)
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return { from: vi.fn().mockReturnValue(topicQuery) }
+        }
+        return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+      }),
+    }
+
+    const signedIn = await getForumTopicsHandler({
+      data: { sortBy: 'latest' },
+      context: { user: { sub: 'test-user-id' }, db: mockDb as any },
+    })
+    expect(signedIn[0].unread).toBe(true)
+  })
+
+  it('hydrates unread from data.token when middleware has no user', async () => {
+    vi.mocked(verifyNeonJWT).mockResolvedValue({
+      valid: true,
+      payload: { sub: 'user-from-jwt' },
+      error: null,
+    })
+
+    const topicRow = {
+      id: '20000000-0000-0000-0000-000000000001',
+      categoryId: '10000000-0000-0000-0000-000000000001',
+      categorySlug: 'rules-announcements',
+      categoryName: 'Rules & Directives',
+      categoryColor: '#ff5540',
+      userId: null,
+      authorName: 'Author',
+      authorAvatar: '/images/stage1_larva.png',
+      authorStage: 1,
+      title: 'Welcome',
+      slug: 'welcome-to-community-core-directives',
+      content: 'Body content here.',
+      isPinned: true,
+      isLocked: false,
+      views: 10,
+      repliesCount: 2,
+      upvotes: 4,
+      lastReplyAt: new Date('2026-09-06T12:00:00.000Z'),
+      createdAt: new Date('2026-09-01T12:00:00.000Z'),
+      profileHandle: null,
+      profileLarvaId: null,
+      profileAvatarConfig: null,
+    }
+    const topicQuery = {
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([topicRow]),
+    }
+    topicQuery.leftJoin.mockReturnValue(topicQuery)
+
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return { from: vi.fn().mockReturnValue(topicQuery) }
+        }
+        if (selectCall === 2) {
+          return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+        }
+        if (selectCall === 3) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([
+                {
+                  topicId: topicRow.id,
+                  lastVisitedAt: new Date('2026-09-06T10:00:00.000Z'),
+                },
+              ]),
+            }),
+          }
+        }
+        return { from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }
+      }),
+    }
+
+    const signedIn = await getForumTopicsHandler({
+      data: { sortBy: 'latest', token: 'eyJ.payload.sig' },
+      context: { db: mockDb as any },
+    })
+    expect(verifyNeonJWT).toHaveBeenCalledWith('eyJ.payload.sig')
+    expect(signedIn[0].unread).toBe(true)
+  })
+
   it('counts unread topics on boards for signed-in members', async () => {
     const category = {
       id: '10000000-0000-0000-0000-000000000001',
@@ -1919,5 +2048,168 @@ describe('forum visit persist', () => {
     await persistForumTopicVisit({ insert } as any, '', 'topic-1')
     await persistForumBoardVisit({ insert } as any, 'member-1', '')
     expect(insert).not.toHaveBeenCalled()
+  })
+})
+
+describe('forum category slug aliases', () => {
+  const rulesBoard = {
+    id: '10000000-0000-0000-0000-000000000001',
+    slug: 'rules-announcements',
+    name: 'Rules & Directives',
+    description: 'Official announcements, platform updates, and core community guidelines.',
+    icon: 'ShieldCheck',
+    color: '#ff5540',
+    sortOrder: 1,
+  }
+
+  it('resolves /forum/rules-directives to the seeded Rules & Directives board', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockResolvedValue([rulesBoard]),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue([{ count: 3 }]),
+          }),
+        }
+      }),
+    }
+
+    const cat = await getForumCategoryBySlugHandler({
+      data: { slug: 'rules-directives' },
+      context: { db: mockDb as any },
+    })
+
+    expect(cat).not.toBeNull()
+    expect(cat?.slug).toBe('rules-announcements')
+    expect(cat?.name).toBe('Rules & Directives')
+    expect(cat?.topicCount).toBe(3)
+  })
+
+  it('loads a rules thread when the URL uses the name-guessed board slug', async () => {
+    let selectCall = 0
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => {
+        selectCall += 1
+        if (selectCall === 1) {
+          return {
+            from: vi.fn().mockReturnValue({
+              leftJoin: vi.fn().mockReturnValue({
+                leftJoin: vi.fn().mockReturnValue({
+                  where: vi.fn().mockReturnValue({
+                    limit: vi.fn().mockResolvedValue([
+                      {
+                        id: '20000000-0000-0000-0000-000000000001',
+                        categoryId: rulesBoard.id,
+                        categorySlug: 'rules-announcements',
+                        categoryName: 'Rules & Directives',
+                        categoryColor: '#ff5540',
+                        userId: null,
+                        authorName: 'High Ascendant Kaelith',
+                        authorAvatar: '/images/stage1_larva.png',
+                        authorStage: 4,
+                        title: 'WELCOME TO THE COMMUNITY CORE',
+                        slug: 'welcome-to-community-core-directives',
+                        content: 'Greetings Initiates.',
+                        isPinned: true,
+                        isLocked: false,
+                        views: 1420,
+                        repliesCount: 3,
+                        upvotes: 88,
+                        lastReplyAt: new Date('2026-08-03T20:30:00.000Z'),
+                        createdAt: new Date('2026-08-01T12:00:00.000Z'),
+                        profileLarvaId: null,
+                        profileStage: null,
+                      },
+                    ]),
+                  }),
+                }),
+              }),
+            }),
+          }
+        }
+        return {
+          from: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }),
+        }
+      }),
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    }
+
+    const res = await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'welcome-to-community-core-directives',
+        categorySlug: 'rules-directives',
+        trackView: false,
+      },
+      context: { db: mockDb as any },
+    })
+
+    expect(res?.topic.categorySlug).toBe('rules-announcements')
+    expect(res?.topic.slug).toBe('welcome-to-community-core-directives')
+  })
+
+  it('still rejects a thread under a different live board', async () => {
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockReturnValue({
+          leftJoin: vi.fn().mockReturnValue({
+            leftJoin: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([
+                  {
+                    id: '20000000-0000-0000-0000-000000000001',
+                    categoryId: rulesBoard.id,
+                    categorySlug: 'rules-announcements',
+                    categoryName: 'Rules & Directives',
+                    categoryColor: '#ff5540',
+                    userId: null,
+                    authorName: 'Author',
+                    authorAvatar: '/images/stage1_larva.png',
+                    authorStage: 1,
+                    title: 'Welcome',
+                    slug: 'welcome-to-community-core-directives',
+                    content: 'Body',
+                    isPinned: true,
+                    isLocked: false,
+                    views: 1,
+                    repliesCount: 0,
+                    upvotes: 0,
+                    lastReplyAt: new Date('2026-08-03T20:30:00.000Z'),
+                    createdAt: new Date('2026-08-01T12:00:00.000Z'),
+                  },
+                ]),
+              }),
+            }),
+          }),
+        }),
+      })),
+    }
+
+    const res = await getForumTopicDetailHandler({
+      data: {
+        slugOrId: 'welcome-to-community-core-directives',
+        categorySlug: 'general-discussion',
+      },
+      context: { db: mockDb as any },
+    })
+
+    expect(res).toBeNull()
   })
 })

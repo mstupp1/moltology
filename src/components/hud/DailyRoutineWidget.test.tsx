@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { DailyRoutineWidget } from './DailyRoutineWidget'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { DailyRoutineWidget, ALIGNMENT_HEATMAP_MOBILE } from './DailyRoutineWidget'
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
@@ -13,10 +13,40 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+function renderWidget() {
+  return render(
+    <ToastProvider>
+      <AlignmentProvider>
+        <DailyRoutineWidget />
+      </AlignmentProvider>
+    </ToastProvider>
+  )
+}
+
+function stubViewport(maxWidthPx: number, viewportWidth: number) {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes(`max-width: ${maxWidthPx}px`) && viewportWidth <= maxWidthPx,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  )
+}
+
 describe('DailyRoutineWidget Component', () => {
   beforeEach(() => {
     localStorage.clear()
     sessionStorage.clear()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   it('renders correctly with title, 8 canonical tasks, and streak calendar', () => {
@@ -113,5 +143,41 @@ describe('DailyRoutineWidget Component', () => {
     expect(task1).toHaveClass('line-through')
     expect(task2).toHaveClass('line-through')
     expect(task3).toHaveClass('line-through')
+  })
+
+  it('uses toggle buttons with 44px tap targets and contains heatmap overflow', () => {
+    renderWidget()
+
+    const firstTask = screen.getByRole('button', { name: /Silent Synchronization/i })
+    expect(firstTask).toHaveAttribute('aria-pressed', 'false')
+    expect(firstTask.className).toMatch(/min-h-\[44px\]/)
+    expect(firstTask.className).toMatch(/touch-manipulation/)
+
+    const hub = document.getElementById('daily-routine-hub')
+    expect(hub?.className).toMatch(/min-w-0/)
+    expect(hub?.className).toMatch(/overflow-hidden/)
+
+    const heatmap = screen.getByTestId('alignment-heatmap-scroll')
+    expect(heatmap.className).toMatch(/overflow-x-auto/)
+    expect(heatmap.className).toMatch(/min-w-0/)
+  })
+
+  it('compacts schedule chrome and heatmap to 20 weeks on narrow viewports', async () => {
+    stubViewport(639, 390)
+    renderWidget()
+
+    await waitFor(() => {
+      expect(screen.getByText('SCHEDULE (0/8)')).toBeInTheDocument()
+      expect(screen.getByText('Activity')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText('52-Week Activity')).not.toBeInTheDocument()
+    expect(screen.getByText('STREAK MATRIX')).toBeInTheDocument()
+
+    const heatmap = screen.getByTestId('alignment-heatmap-scroll')
+    expect(heatmap.querySelectorAll('button')).toHaveLength(ALIGNMENT_HEATMAP_MOBILE.weeks * 7)
+
+    const reminderToggle = screen.getByTitle('Toggle automated 10-minute prior toast reminders')
+    expect(reminderToggle.className).toMatch(/min-h-\[44px\]/)
   })
 })

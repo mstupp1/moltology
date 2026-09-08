@@ -14,6 +14,76 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-09-05-stage-xp-progression-advanced-forum-tools-launchpad-carousel',
+    version: '2026.09.05',
+    title: 'Stage XP Progression, Advanced Forum Mentions & Bento Launchpad',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Navigation', 'Tools'],
+    summary: 'Earn experience points from daily liturgical routines to advance your ascension stage, engage in deeper discussions with @handle mentions and quote replies, and explore featured modules in the Command Hub bento carousel.',
+    content: `### Stage Experience Progression & Live HUD Bar
+- Earn experience points (XP) for completing daily liturgical tasks, finishing daily sets, and maintaining active streaks.
+- Watch your progression unfold live in the top HUD navigation bar as you advance toward the next ascension stage.
+- Celebrate streak milestones with scaling bonus rewards that recognize your long-term dedication to the molt.
+
+### Advanced Forum Mentions, Quotes & Revisions
+- Hail peers directly in discussion topics and replies using @handle mentions with automatic suggestion matching.
+- Quote specific passages from topics or replies into your responses with dedicated quote formatting.
+- Edit your own published topics and responses to refine your thoughts, or withdraw posts with a graceful empty state.
+- Keep track of unread discussions and new replies with subtle board indicators and topic activity markers.
+
+### Activity Center Inbox & Bento Launchpad
+- Receive instant alerts in the Activity Center when members mention your handle or reply to your forum threads.
+- Discover featured tools, guides, and Oracle modules with an interactive wide bento carousel on the Command Hub dashboard.
+- Enjoy refined forum avatar cards with custom character fallbacks and smooth navigation back to the platform home.`,
+    releasedAt: '2026-09-05T23:59:00Z',
+  },
+  {
+    slug: '2026-09-04-threaded-forum-replies-inline-composer-hub-cards',
+    version: '2026.09.04',
+    title: 'Threaded Forum Discussions, Inline Topic Composer & Command Hub Cards',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Tools', 'Mobile'],
+    summary: 'Follow conversations naturally with nested threaded replies, start new forum topics seamlessly using an expandable inline composer, and jump directly into active discussions from the Command Hub.',
+    content: `### Nested Threaded Forum Replies
+- Reply directly to specific comments with tree-structured discussion threads and visual reply guidelines.
+- Follow in-depth conversations effortlessly with nested indentation and dedicated reply buttons on every response.
+- Copy permanent anchor links to any individual comment to share or reference specific discussion points.
+
+### Expandable Inline Topic Composer
+- Start new discussions instantly using an inline topic composer anchored directly above community discussion feeds.
+- Replaced disruptive modal dialogs with a smooth, collapsible writing space optimized for mobile and desktop screens.
+- Enjoy touch-friendly controls and comfortable mobile input sizing that prevents unexpected viewport zooming.
+
+### Command Hub Quick Cards & Alignment Polish
+- Jump straight into active forum threads and member connections with dedicated access cards on the main dashboard.
+- Ensured your selected Oracle chat transcripts open reliably on first click without reload delays.
+- Refined daily alignment status chips to clearly display completion when all eight liturgical practices are finished.`,
+    releasedAt: '2026-09-04T23:59:00Z',
+  },
+  {
+    slug: '2026-09-02-hud-search-public-dossiers-avatar-studio',
+    version: '2026.09.02',
+    title: 'HUD Member Search, Dedicated Profile Links & Expanded Avatar Studio',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Search', 'Navigation'],
+    summary: 'Find members and platform destinations instantly from the Command Palette or dedicated search hub, share direct links to your public profile dossier, and personalize your lobster avatar with custom proportions and expressions.',
+    content: `### Instant Member & Platform Search
+- Search members, profiles, and platform destinations directly from the Command Palette or dedicated search page with instant matching.
+- Find peers by unique handle, member unit number, or public designation with priority search rankings.
+- Enjoy a responsive search layout with clean guest previews and protected member directories.
+
+### Dedicated Public Profile Dossiers
+- Share direct, clean links to your personal profile dossier using your unique member handle.
+- Member handles now link seamlessly across community forum discussions, connections, and activity notices.
+- Retained automatic redirection for legacy profile links to maintain permanent bookmarks.
+
+### Avatar Studio Customization & Chat Drawer
+- Personalize your crustacean avatar with adjustable arm scale, eyelid expressions, and subtle background motion.
+- Upgraded the AI Oracle chat selector to a dedicated conversation list drawer with smooth transitions on desktop and mobile.
+- Added one-click sign out from the avatar menu and streamlined system notices with clear, actionable English.`,
+    releasedAt: '2026-09-02T23:59:00Z',
+  },
+  {
     slug: '2026-09-01-unique-member-designations-fullscreen-journal-reader-interface-speed',
     version: '2026.09.01',
     title: 'Unique Member Designations, Fullscreen Journal Reader & Interface Speed',

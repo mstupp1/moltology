@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import {
+  commitOracleTextStream,
   formatOracleUnavailableMessage,
   getOracleCandidateModelIds,
+  ORACLE_EMPTY_RESPONSE_ERROR,
+  ORACLE_MODEL_TIMEOUT_ERROR,
   ORACLE_UNAVAILABLE_MESSAGE,
   pickGuestOracleResponse,
   toModelMessages,
@@ -40,5 +43,64 @@ describe('oracle-chat helpers', () => {
       { role: 'user', content: 'hi' },
       { role: 'assistant', content: 'hello' },
     ])
+  })
+
+  it('commits a byte stream after the first non-empty token', async () => {
+    const encoder = new TextEncoder()
+    const source = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(encoder.encode('Hello '))
+        controller.enqueue(encoder.encode('initiate'))
+        controller.close()
+      },
+    })
+
+    const committed = await commitOracleTextStream(source)
+    const reader = committed.getReader()
+    const chunks: string[] = []
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(new TextDecoder().decode(value))
+    }
+
+    expect(chunks.join('')).toBe('Hello initiate')
+  })
+
+  it('commits a stream after the first non-empty token', async () => {
+    const source = new ReadableStream<string>({
+      start(controller) {
+        controller.enqueue('Hello ')
+        controller.enqueue('initiate')
+        controller.close()
+      },
+    })
+
+    const committed = await commitOracleTextStream(source)
+    const reader = committed.getReader()
+    const chunks: string[] = []
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(value)
+    }
+
+    expect(chunks.join('')).toBe('Hello initiate')
+  })
+
+  it('rejects empty streams so the caller can fall through', async () => {
+    const source = new ReadableStream<string>({
+      start(controller) {
+        controller.close()
+      },
+    })
+
+    await expect(commitOracleTextStream(source)).rejects.toThrow(ORACLE_EMPTY_RESPONSE_ERROR)
+  })
+
+  it('rejects when the first token never arrives', async () => {
+    const source = new ReadableStream<string>()
+
+    await expect(commitOracleTextStream(source, 20)).rejects.toThrow(ORACLE_MODEL_TIMEOUT_ERROR)
   })
 })

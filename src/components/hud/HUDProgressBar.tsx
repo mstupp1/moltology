@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { HUDTaskBar } from './HUDTaskBar'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
-import { calculateProgression } from '@/lib/progression'
+import { calculateProgression, STAGE_THRESHOLDS } from '@/lib/progression'
 
 export interface HUDProgressBarProps {
   stage?: number
@@ -21,14 +21,21 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
 }) => {
   const alignment = useDailyAlignment()
 
-  // Use propStage only if explicitly passed (e.g. testing / override), otherwise derive naturally from XP
-  const effectiveStage = propStage !== undefined ? propStage : (propXp !== undefined ? undefined : alignment.stage)
-  const effectiveXp = propXp !== undefined ? propXp : alignment.xp
-
+  // Use explicit props (e.g. testing / override) if provided; otherwise use live alignment progression
   const progression = useMemo(() => {
-    return calculateProgression(effectiveXp, effectiveStage)
-  }, [effectiveXp, effectiveStage])
+    if (propStage !== undefined || propXp !== undefined) {
+      const explicitXp =
+        propXp !== undefined
+          ? propXp
+          : (propStage !== undefined
+              ? (STAGE_THRESHOLDS.find((s) => s.stage === propStage)?.minXp ?? 0)
+              : alignment.xp)
+      return calculateProgression(explicitXp, propStage)
+    }
+    return alignment.progression
+  }, [propStage, propXp, alignment.progression, alignment.xp])
 
+  const effectiveXp = propXp !== undefined ? propXp : progression.xp
   const isTaskBarVisible = showTaskBar !== undefined ? showTaskBar : showClock
   const nextStage = Math.min(progression.stage + 1, 4)
   const isMaxStage = progression.isMaxStage
@@ -39,7 +46,7 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
     <div className={`flex items-center gap-1.5 sm:gap-3 font-sans select-none min-w-0 ${className}`}>
       {/* ── CENTER: Full-Space Conversion Bar with Compact Top Level Readouts ── */}
       <div className="flex-1 min-w-0 z-10 flex flex-col justify-center gap-0.5 px-0.5 sm:px-1">
-        {/* Compact Level Readouts on Top */}
+        {/* Compact Level Readouts on Top: Current Stage on left, Next Stage on right */}
         <div className="flex items-center justify-between px-0.5 select-none leading-none">
           {/* Current Stage */}
           <div
@@ -51,26 +58,6 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
             <span className="text-[10px] sm:text-xs font-bold text-[#00ffff] drop-shadow-[0_0_6px_rgba(0,255,255,0.7)] leading-none">
               {progression.stage}
             </span>
-          </div>
-
-          {/* Telemetry Center: Sub-Stage & XP Progress */}
-          <div
-            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-[#010a0d]/70 border border-cyan-900/30 text-[9px] font-mono tracking-wider"
-            title={`Telemetry: ${progression.subStage.title} · ${effectiveXp.toLocaleString()} Lifetime XP`}
-          >
-            <span className="text-cyan-400 font-bold">{progression.subStage.code}</span>
-            <span className="text-cyan-800 hidden xs:inline">·</span>
-            {!isMaxStage ? (
-              <span className="text-[#839493] hidden xs:inline">
-                <span className="text-[#dfe3e3] font-semibold">{progression.xpIntoStage.toLocaleString()}</span>
-                <span className="text-cyan-800">/</span>
-                <span>{progression.xpNeededForNextStage.toLocaleString()} XP</span>
-              </span>
-            ) : (
-              <span className="text-[#00ff88] font-bold tracking-widest hidden xs:inline">
-                {effectiveXp.toLocaleString()} XP
-              </span>
-            )}
           </div>
 
           {/* Next Stage / Apex Target */}
@@ -88,7 +75,7 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
           ) : (
             <div
               className="flex items-baseline"
-              title="Apex Carcinization Stage Reached"
+              title="Apex Carcinization Stage Reached (Stage 4 Max)"
               aria-label="Apex Stage Badge"
             >
               <span className="text-[9px] sm:text-[10px] font-extrabold text-[#00ff88] drop-shadow-[0_0_6px_rgba(0,255,136,0.6)] tracking-widest uppercase leading-none">
@@ -99,7 +86,20 @@ export const HUDProgressBar: React.FC<HUDProgressBarProps> = ({
         </div>
 
         {/* ═══ VERTICAL OPTIMIZED TRACK ═══ */}
-        <div className="relative flex items-center w-full" style={{ height: '16px' }}>
+        <div
+          className="relative flex items-center w-full"
+          style={{ height: '16px' }}
+          title={
+            isMaxStage
+              ? `Apex Clearance Reached · ${effectiveXp.toLocaleString()} Lifetime XP (Stage 4 Max)`
+              : `Ascension Progress: ${progression.xpIntoStage.toLocaleString()} / ${progression.xpNeededForNextStage.toLocaleString()} XP (${fillPercent}%) · Stage ${progression.stage} → Stage ${nextStage}`
+          }
+          aria-label={
+            isMaxStage
+              ? `Progression: Stage 4 Apex (100%)`
+              : `Progression: ${fillPercent}% from Stage ${progression.stage} to Stage ${nextStage}`
+          }
+        >
 
           {/* Track shell */}
           <div

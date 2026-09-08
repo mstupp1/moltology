@@ -6,6 +6,12 @@ import { INITIAL_FORUM_TOPICS } from '../../../lib/forum-seed-data'
 const mockUseLoaderData = vi.fn()
 const mockUseParams = vi.fn()
 
+const mockRedirect = vi.fn((args: unknown) => {
+  const err = new Error('REDIRECT')
+  Object.assign(err, args)
+  throw err
+})
+
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
     ...config,
@@ -20,6 +26,7 @@ vi.mock('@tanstack/react-router', () => ({
       {children}
     </a>
   ),
+  redirect: (args: unknown) => mockRedirect(args),
 }))
 
 vi.mock('@/lib/server/api', () => ({
@@ -669,5 +676,36 @@ describe('ForumThreadPage (/_hud/forum/$categorySlug/$topicSlug)', () => {
     expect(screen.getByTestId('forum-withdrawn-badge')).toBeInTheDocument()
     expect(screen.queryByText(/Ask @pincer_prime/)).not.toBeInTheDocument()
     expect(screen.queryByTestId('forum-quote-topic')).not.toBeInTheDocument()
+  })
+
+  it('redirects a rules-directives thread URL to the stored board slug', async () => {
+    const seed = INITIAL_FORUM_TOPICS[0]
+    vi.mocked(getForumTopicDetailFn).mockResolvedValue({
+      topic: {
+        ...seed,
+        categorySlug: 'rules-announcements',
+        categoryName: 'Rules & Directives',
+      },
+      posts: [],
+    } as any)
+    const loader = Route.options.loader as any
+
+    await expect(
+      loader({
+        params: {
+          categorySlug: 'rules-directives',
+          topicSlug: 'welcome-to-community-core-directives',
+        },
+      }),
+    ).rejects.toThrow('REDIRECT')
+
+    expect(mockRedirect).toHaveBeenCalledWith({
+      to: '/forum/$categorySlug/$topicSlug',
+      params: {
+        categorySlug: 'rules-announcements',
+        topicSlug: 'welcome-to-community-core-directives',
+      },
+      replace: true,
+    })
   })
 })

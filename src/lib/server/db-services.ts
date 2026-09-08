@@ -35,6 +35,8 @@ import {
   FORUM_REPLY_MAX_DEPTH,
   toForumIso,
   visibleForumContent,
+  forumCategoryLookupSlugs,
+  forumCategorySlugsMatch,
 } from '../forum-utils'
 import {
   countUnreadForumTopics,
@@ -1141,11 +1143,16 @@ export interface ForumPostEntry {
 }
 
 /**
- * Resolves the authenticated user id from middleware context only.
- * Bare client userId is not trusted for writes.
+ * Resolves the signed-in member for forum reads (unread + visit persist).
+ * Uses resolveWriteAuth so `data.token` still hydrates when middleware
+ * context has no user — the same path vote writes already take.
  */
-function resolveForumUserId(context?: ServerFnContext, _dataUserId?: string): string | null {
-  return (context?.user?.sub as string) || (context?.user?.id as string) || null
+async function resolveForumReaderId(
+  data?: { userId?: string; token?: string } | null,
+  context?: ServerFnContext,
+): Promise<string | null> {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  return auth?.userId ?? null
 }
 
 function forumIsoOrNow(value: string | Date | null | undefined): string {
@@ -1312,14 +1319,16 @@ export const getForumCategoryBySlugHandler = async ({
   const slug = data?.slug
   if (!slug) return null
   const dbClient = context?.db || getDb()
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
 
   try {
-    const [cat] = await dbClient
+    const lookupSlugs = forumCategoryLookupSlugs(slug)
+    const matches = await dbClient
       .select()
       .from(forumCategories)
-      .where(eq(forumCategories.slug, slug))
-      .limit(1)
+      .where(inArray(forumCategories.slug, lookupSlugs))
+
+    const cat = matches.find((row: { slug: string }) => row.slug === slug) ?? matches[0]
 
     if (cat) {
       const [countRow] = await dbClient
@@ -1384,7 +1393,7 @@ export const getForumCategoriesHandler = async ({
   context,
 }: ServerFnArgs<GetForumCategoriesInput>): Promise<ForumCategoryEntry[]> => {
   const dbClient = context?.db || getDb()
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
   try {
     const cats = await dbClient
       .select({
@@ -1477,7 +1486,7 @@ export interface GetForumTopicsInput {
 export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetForumTopicsInput>): Promise<ForumTopicEntry[]> => {
   const dbClient = context?.db || getDb()
   const { categorySlug, query, sortBy = 'hot' } = data || {}
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
 
   try {
     const queryBuilder = dbClient
@@ -1514,7 +1523,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     // Apply conditions
     const conditions = []
     if (categorySlug && categorySlug !== 'all') {
-      conditions.push(eq(forumCategories.slug, categorySlug))
+      conditions.push(inArray(forumCategories.slug, forumCategoryLookupSlugs(categorySlug)))
     }
     if (query && query.trim() !== '') {
       const q = `%${query.trim()}%`
@@ -1602,7 +1611,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         const [board] = await dbClient
           .select({ id: forumCategories.id })
           .from(forumCategories)
-          .where(eq(forumCategories.slug, categorySlug))
+          .where(inArray(forumCategories.slug, forumCategoryLookupSlugs(categorySlug)))
           .limit(1)
         if (board?.id) await persistForumBoardVisit(dbClient, currentUserId, board.id)
       } catch (err) {
@@ -1655,7 +1664,7 @@ export interface ForumTopicDetailResult {
 export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs<GetForumTopicDetailInput>): Promise<ForumTopicDetailResult | null> => {
   const { slugOrId, categorySlug, trackView = true } = data || {}
   if (!slugOrId) return null
-  const currentUserId = resolveForumUserId(context, data?.userId)
+  const currentUserId = await resolveForumReaderId(data, context)
   const dbClient = context?.db || getDb()
 
   try {
@@ -1697,8 +1706,8 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
     if (topicRecord.length > 0) {
       const t = topicRecord[0]
 
-      // Validate nested URL: category slug must match the topic's category
-      if (categorySlug && t.categorySlug && categorySlug !== t.categorySlug) {
+      // Validate nested URL: category slug must match the topic's category (aliases allowed)
+      if (categorySlug && t.categorySlug && !forumCategorySlugsMatch(categorySlug, t.categorySlug)) {
         return null
       }
 
@@ -4872,6 +4881,7 @@ export const listConnectionsHandler = async ({
         ...other,
         avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
         requestId: row.id,
+        since: row.createdAt,
       })
     })
     .filter(Boolean) as ConnectionsListView['incoming']
@@ -4885,6 +4895,7 @@ export const listConnectionsHandler = async ({
         ...other,
         avatarConfig: (other.avatarConfig as { style: string; seed: string } | null) ?? null,
         requestId: row.id,
+        since: row.createdAt,
       })
     })
     .filter(Boolean) as ConnectionsListView['outgoing']
