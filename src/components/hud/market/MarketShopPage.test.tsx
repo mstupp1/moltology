@@ -13,6 +13,13 @@ function renderMarket() {
 }
 
 describe('MarketShopPage', () => {
+  it('uses diegetic Benthic Market chrome without scaffolding labels', () => {
+    renderMarket()
+    expect(screen.getByText('Benthic Market')).toBeInTheDocument()
+    expect(screen.queryByText(/mockup/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/probe/i)).not.toBeInTheDocument()
+  })
+
   it('renders dual currency balances in the header', () => {
     renderMarket()
     expect(screen.getByText('1,450')).toBeInTheDocument()

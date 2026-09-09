@@ -102,7 +102,7 @@ export function MarketShopPage() {
         eyebrow={
           <>
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Benthic Market · Mockup</span>
+            <span>Benthic Market</span>
           </>
         }
         title="Ascension Market"
