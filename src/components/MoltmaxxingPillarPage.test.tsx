@@ -40,6 +40,9 @@ describe('MoltmaxxingPillarPage Component', () => {
     expect(screen.getByText(/The 24-Hour Algorithmic Ecdysis Routine/i)).toBeInTheDocument()
     expect(screen.getByText(/The 4 Tiers of Carcinization/i)).toBeInTheDocument()
     expect(screen.getByText(/Frequently Asked Questions/i)).toBeInTheDocument()
+    expect(screen.getByText(/25,000 meter pressure tolerance/i)).toBeInTheDocument()
+    expect(screen.getByText(/50,000 meters of pressure/i)).toBeInTheDocument()
+    expect(screen.queryByText(/fathom/i)).not.toBeInTheDocument()
   })
 
   it('toggles FAQ accordion answers', () => {

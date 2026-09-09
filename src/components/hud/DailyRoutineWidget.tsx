@@ -5,7 +5,7 @@ import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 
 // ---------------------------------------------------------------------------
@@ -326,10 +326,17 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
   const completionPercent = Math.round((completedCount / Math.max(totalCount, 1)) * 100)
 
+  useEffect(() => {
+    if (isLoading || isAlignmentLoading) return
+    if (typeof window === 'undefined') return
+    if (window.location.hash !== `#${DAILY_ALIGNMENT_HUB_ID}`) return
+    document.getElementById(DAILY_ALIGNMENT_HUB_ID)?.scrollIntoView({ block: 'start' })
+  }, [isLoading, isAlignmentLoading])
+
   return (
     <HudGhostWidget isLoading={isLoading || isAlignmentLoading} skeleton={<DailyRoutineGhost />}>
       <HudCard
-        id="daily-routine-hub"
+        id={DAILY_ALIGNMENT_HUB_ID}
         variant="teal"
         className="p-3 sm:p-4 md:p-6 relative space-y-4 sm:space-y-5 font-sans shadow-2xl border-[#00c3ff]/40 min-w-0 overflow-hidden"
       >

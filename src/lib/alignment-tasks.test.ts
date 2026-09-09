@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   CANONICAL_ALIGNMENT_TASKS,
+  DAILY_ALIGNMENT_HUB_ID,
   TOTAL_ALIGNMENT_TASKS,
   localDateString,
   parseLocalDate,
@@ -14,6 +15,7 @@ describe('alignment-tasks catalog and helpers', () => {
   it('contains exactly 8 canonical daily alignment tasks with valid keys and times', () => {
     expect(CANONICAL_ALIGNMENT_TASKS).toHaveLength(8)
     expect(TOTAL_ALIGNMENT_TASKS).toBe(8)
+    expect(DAILY_ALIGNMENT_HUB_ID).toBe('daily-routine-hub')
 
     const expectedKeys = [
       'silent-synchronization',

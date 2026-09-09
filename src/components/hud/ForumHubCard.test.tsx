@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import {
   ForumHubCard,
+  FORUM_HUB_CTA,
   FORUM_HUB_EMPTY_COPY,
   FORUM_HUB_TITLE,
   forumHubTopicPreview,
@@ -136,7 +137,7 @@ describe('ForumHubCard', () => {
     })
     expect(screen.getByText(FORUM_HUB_EMPTY_COPY.body)).toBeInTheDocument()
     expect(screen.getByText(FORUM_HUB_TITLE)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /enter forums/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: FORUM_HUB_CTA })).toBeInTheDocument()
   })
 
   it('renders pulse chips, board shortcuts, and up to three active threads', async () => {
@@ -218,18 +219,18 @@ describe('ForumHubCard', () => {
     await waitFor(() => {
       expect(screen.getByText(FORUM_HUB_EMPTY_COPY.title)).toBeInTheDocument()
     })
-    expect(screen.getByRole('button', { name: /enter forums/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: FORUM_HUB_CTA })).toBeInTheDocument()
   })
 
-  it('navigates to the forums from the CTA', async () => {
+  it('navigates to Community from the CTA', async () => {
     vi.mocked(getForumTopicsFn).mockResolvedValue([])
 
     render(<ForumHubCard />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /enter forums/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: FORUM_HUB_CTA })).toBeInTheDocument()
     })
-    fireEvent.click(screen.getByRole('button', { name: /enter forums/i }))
+    fireEvent.click(screen.getByRole('button', { name: FORUM_HUB_CTA }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/forum' })
   })
 })

@@ -137,7 +137,7 @@ function ForumIndexPage() {
           }
           title={
             <>
-              COMMUNITY <span className="text-[#00ffff]">FORUMS</span>
+              COMMUNITY
             </>
           }
           description="Discussions, questions, and ideas across every stage of the Order."
