@@ -205,7 +205,7 @@ function ForumThreadPage() {
             className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#070b0b] hover:bg-[#171c1c] border border-[#00ffff]/60 text-[#00ffff] text-xs font-bold uppercase chamfer-corner transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Back to Forums
+            Back to Community
           </Link>
         </div>
       </ForumShell>

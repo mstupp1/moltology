@@ -16,11 +16,12 @@ import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
 import { ForumAvatar } from '@/components/forum/ForumAvatar'
 import { ForumUnreadMark, PinBadge } from '@/components/forum/ForumBits'
 
-export const FORUM_HUB_TITLE = 'COMMUNITY FORUMS'
+export const FORUM_HUB_TITLE = 'COMMUNITY'
 export const FORUM_HUB_SUBTITLE = 'Live boards and the latest transmissions.'
+export const FORUM_HUB_CTA = 'ENTER COMMUNITY'
 export const FORUM_HUB_EMPTY_COPY = {
   title: 'The boards are quiet',
-  body: 'No threads yet. Open the forums to start one.',
+  body: 'No threads yet. Open Community to start one.',
 } as const
 
 const HUB_THREAD_LIMIT = 3
@@ -269,7 +270,7 @@ export function ForumHubCard() {
           onClick={() => navigate({ to: '/forum' })}
           className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
         >
-          <span>ENTER FORUMS</span>
+          <span>{FORUM_HUB_CTA}</span>
           <ChevronRight className="w-3 h-3" />
         </button>
       </div>

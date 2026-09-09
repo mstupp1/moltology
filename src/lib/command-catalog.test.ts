@@ -7,6 +7,13 @@ import {
 } from './command-catalog'
 
 describe('command catalog', () => {
+  it('names the social surface Community, not Forum', () => {
+    const forumNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-forum')
+    expect(forumNav?.to).toBe('/forum')
+    expect(forumNav?.label).toBe('Open Community')
+    expect(forumNav?.label).not.toMatch(/forum/i)
+  })
+
   it('keeps the existing navigation, ritual, and system commands', () => {
     expect(COMMAND_CATALOG.map((cmd) => cmd.id)).toEqual([
       'nav-home',

@@ -403,8 +403,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       items: [
         {
           id: 'forum',
-          label: 'COMMUNITY FORUMS',
-          shortLabel: 'FORUM',
+          label: 'COMMUNITY',
+          shortLabel: 'COMMUNITY',
           icon: Users,
           path: '/forum',
         },

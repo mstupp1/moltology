@@ -60,7 +60,7 @@ describe('ForumIndexPage (/_hud/forum/)', () => {
 
     render(<ForumIndexPage />)
 
-    expect(screen.getByRole('heading', { level: 1, name: /forums/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /community/i })).toBeInTheDocument()
     expect(screen.getByText('Discussion Boards')).toBeInTheDocument()
     expect(screen.getByText('Rules & Directives')).toBeInTheDocument()
     expect(screen.getByText('General Discussion')).toBeInTheDocument()

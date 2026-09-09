@@ -113,7 +113,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-forum',
-    label: 'Open Community Forums & Discussions',
+    label: 'Open Community',
     category: 'Navigation',
     icon: 'forum',
     shortcut: 'G F',
