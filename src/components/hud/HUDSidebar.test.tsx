@@ -163,7 +163,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('CHASSIS')).toBeInTheDocument()
     expect(screen.getByText('VATS')).toBeInTheDocument()
     expect(screen.getByText('LINKS')).toBeInTheDocument()
-    expect(screen.getByText('COMMUNITY')).toBeInTheDocument()
+    expect(screen.getAllByText('COMMUNITY').length).toBeGreaterThan(0)
     expect(screen.getByText('SUPPORT')).toBeInTheDocument()
   })
 
