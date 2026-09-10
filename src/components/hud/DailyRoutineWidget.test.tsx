@@ -95,8 +95,8 @@ describe('DailyRoutineWidget Component', () => {
     expect(screen.queryByText(/52-Week Activity/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/DAILY ALIGNMENT SCHEDULE/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/10M REMINDERS/i)).not.toBeInTheDocument()
-    expect(screen.queryByText('COMPLETE')).not.toBeInTheDocument()
-    expect(screen.queryByText('PENDING')).not.toBeInTheDocument()
+    expect(screen.queryByText(/^COMPLETE$/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^PENDING$/)).not.toBeInTheDocument()
 
     CANONICAL_ALIGNMENT_TASKS.forEach((task) => {
       expect(screen.getByText(task.title)).toBeInTheDocument()
