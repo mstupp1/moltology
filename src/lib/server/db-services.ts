@@ -3572,7 +3572,9 @@ export const getDailyAlignmentData = async (
   const tasks = mergeCompletions(completedKeys)
   const completedCount = completedKeys.length
 
-  const startDate = shiftDays(targetDate, -30)
+  // Match max 52-week heatmap span (52×7 − 1 lookback → 364 daily buckets)
+  const HISTORY_LOOKBACK_DAYS = 52 * 7 - 1
+  const startDate = shiftDays(targetDate, -HISTORY_LOOKBACK_DAYS)
   const pastCompletions = await dbClient
     .select({
       completedOn: routineCompletions.completedOn,
@@ -3596,7 +3598,7 @@ export const getDailyAlignmentData = async (
   }
 
   const history: Array<{ date: string; completedCount: number }> = []
-  for (let i = 30; i >= 0; i--) {
+  for (let i = HISTORY_LOOKBACK_DAYS; i >= 0; i--) {
     const d = shiftDays(targetDate, -i)
     const count = dayCounts.get(d)?.size || 0
     history.push({ date: d, completedCount: count })
