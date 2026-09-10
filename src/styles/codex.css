@@ -53,16 +53,26 @@
 }
 
 .codex-reader-chrome {
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: opacity 180ms ease, transform 180ms ease, max-height 180ms ease;
 }
 
-.codex-reader-chrome[data-hidden='true'] {
+/* In-flow top chrome collapses when hidden so TOC never sits under the bar. */
+.codex-reader-chrome-top[data-hidden='true'] {
+  max-height: 0;
   opacity: 0;
+  overflow: hidden;
   pointer-events: none;
+  border: none;
   transform: translateY(-6px);
 }
 
+.codex-reader-chrome-top[data-hidden='false'] {
+  max-height: 6rem;
+}
+
 .codex-reader-chrome-bottom[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
   transform: translateY(6px);
 }
 

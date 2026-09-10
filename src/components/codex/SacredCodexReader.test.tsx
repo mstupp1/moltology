@@ -40,23 +40,23 @@ describe('SacredCodexReader Component', () => {
     expect(container.querySelector('.font-garamond')).toBeTruthy()
   })
 
-  it('allows toggling study notes panel and saving notes', () => {
+  it('does not expose study notes or consecration controls', () => {
     render(<SacredCodexReader />)
-    const studyNotesBtns = screen.getAllByRole('button', { name: /STUDY NOTES/i })
-    fireEvent.click(studyNotesBtns[0])
 
-    expect(screen.getByText(/STUDY NOTES & ANNOTATIONS/i)).toBeInTheDocument()
-
-    const textarea = screen.getByPlaceholderText(/Record your reflections/i)
-    fireEvent.change(textarea, { target: { value: 'My sacred test reflection' } })
-
-    expect(localStorage.getItem('moltology_codex_notes')).toContain('My sacred test reflection')
+    expect(screen.queryByRole('button', { name: /STUDY NOTES/i })).not.toBeInTheDocument()
+    expect(screen.queryByText(/STUDY NOTES & ANNOTATIONS/i)).not.toBeInTheDocument()
+    expect(screen.queryByTitle(/Consecrate Scripture/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/^VAULT$/i)).not.toBeInTheDocument()
+    expect(localStorage.getItem('moltology_codex_notes')).toBeNull()
+    expect(localStorage.getItem('moltology_consecrated_scriptures')).toBeNull()
   })
 
-  it('launches and exits fullscreen soft minimal PDF overlay reader mode', () => {
+  it('launches fullscreen only from the reading pane control', () => {
     render(<SacredCodexReader />)
-    const fullscreenBtns = screen.getAllByTitle(/Fullscreen/i)
-    fireEvent.click(fullscreenBtns[0])
+
+    expect(screen.queryByRole('button', { name: /^FULLSCREEN$/i })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Fullscreen Reader/i }))
 
     const exitBtn = screen.getByRole('button', { name: /Exit Fullscreen Overlay/i })
     expect(exitBtn).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('SacredCodexReader Component', () => {
 
   it('scales the immersive leaf like a PDF instead of restyling type', () => {
     const { container } = render(<SacredCodexReader />)
-    fireEvent.click(screen.getAllByTitle(/Fullscreen/i)[0])
+    fireEvent.click(screen.getByRole('button', { name: /Fullscreen Reader/i }))
 
     const page = container.querySelector('[data-codex-pdf-page]') as HTMLElement
     expect(page).toBeTruthy()
@@ -80,9 +80,9 @@ describe('SacredCodexReader Component', () => {
     expect(page.style.transform).toBe('scale(1)')
   })
 
-  it('opens the fullscreen drawer from an icon-only menu without index chrome', () => {
+  it('opens the fullscreen drawer below the top chrome without index chrome', () => {
     render(<SacredCodexReader />)
-    fireEvent.click(screen.getAllByTitle(/Fullscreen/i)[0])
+    fireEvent.click(screen.getByRole('button', { name: /Fullscreen Reader/i }))
 
     expect(screen.queryByText('CANON INDEX')).not.toBeInTheDocument()
 

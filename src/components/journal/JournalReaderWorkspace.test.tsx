@@ -43,12 +43,14 @@ describe('JournalReaderWorkspace', () => {
     expect(screen.getByTestId(`archive-card-${paper.slug}`)).toBeInTheDocument()
   })
 
-  it('launches and exits the immersive fullscreen overlay', () => {
+  it('launches fullscreen only from the reading pane control', () => {
     const { container } = render(
       <JournalReaderWorkspace papers={INITIAL_JOURNAL_PAPERS} />
     )
 
-    fireEvent.click(screen.getAllByTitle(/Fullscreen/i)[0])
+    expect(screen.queryByRole('button', { name: /^FULLSCREEN$/i })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Fullscreen Paper Reader/i }))
     expect(screen.getByRole('dialog', { name: /Immersive paper reader/i })).toBeInTheDocument()
     expect(container.querySelector('[data-reader-pdf-page]')).toBeTruthy()
 
@@ -63,14 +65,11 @@ describe('JournalReaderWorkspace', () => {
     expect(screen.getByRole('button', { name: /Next paper/i })).toBeDisabled()
   })
 
-  it('keeps theme and type controls in sync through reader preferences', () => {
+  it('does not expose theme or font size controls', () => {
     render(<JournalReaderWorkspace papers={INITIAL_JOURNAL_PAPERS} />)
 
-    const parchment = screen.getByRole('button', { name: /Parchment/i })
-    expect(parchment).toHaveAttribute('aria-pressed', 'false')
-
-    fireEvent.click(parchment)
-    expect(parchment).toHaveAttribute('aria-pressed', 'true')
-    expect(localStorage.getItem('moltology_journal_reader_prefs')).toContain('parchment')
+    expect(screen.queryByRole('button', { name: /Parchment/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Increase font size/i })).not.toBeInTheDocument()
+    expect(localStorage.getItem('moltology_journal_reader_prefs')).toBeNull()
   })
 })
