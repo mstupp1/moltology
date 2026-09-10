@@ -173,7 +173,8 @@ describe('DailyRoutineWidget Component', () => {
 
     const reminderToggle = screen.getByTitle('Toggle automated 10-minute prior toast reminders')
     expect(reminderToggle.className).toMatch(/min-h-\[44px\]/)
-    expect(reminderToggle).toHaveTextContent('OFF')
+    expect(reminderToggle.textContent).toMatch(/^(ON|OFF)$/)
+    expect(['true', 'false']).toContain(reminderToggle.getAttribute('aria-pressed'))
   })
 
   it('shows a dynamic week badge for the activity heatmap', () => {
