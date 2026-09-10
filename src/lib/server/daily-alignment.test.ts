@@ -73,6 +73,10 @@ describe('Daily Alignment Server Handlers', () => {
     expect(res.completedCount).toBe(2)
     expect(res.isAllCompleted).toBe(false)
     expect(Array.isArray(res.history)).toBe(true)
+    // 52×7 − 1 lookback inclusive → 364 daily buckets for the activity heatmap
+    expect(res.history).toHaveLength(52 * 7)
+    expect(res.history[0]?.date).toBe('2025-08-26')
+    expect(res.history[res.history.length - 1]?.date).toBe('2026-08-24')
     expect(res.xp).toBe(150)
     expect(res.stage).toBe(1)
     expect(res.progression).toBeDefined()
