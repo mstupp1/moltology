@@ -193,10 +193,6 @@ export interface CodexDocumentSheetProps {
   scripture: ScriptureItem
   pageIndex: number
   pageCount: number
-  highlightedVerses?: Record<number, boolean>
-  copiedVerseIndex?: number | null
-  onToggleHighlight?: (verseNumber: number) => void
-  onCopyVerse?: (verseNumber: number, text: string) => void
   onPrev: () => void
   onNext: () => void
   onSelectScripture: (id: string) => void

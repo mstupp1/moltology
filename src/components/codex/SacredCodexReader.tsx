@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   BookOpen,
   Scroll,
   Search,
-  CheckCircle2,
-  Bookmark,
-  BookmarkCheck,
   Menu,
-  MessageSquare,
   Maximize2,
   Printer,
   RefreshCw,
@@ -16,10 +12,10 @@ import {
   CANONICAL_SCRIPTURES,
   CODEX_VOLUMES,
 } from '@/lib/codexData'
-import { HudButton } from '@/components/ui'
 import '@/styles/codex.css'
-import { CodexDocumentSheet, stripMarkdown } from './CodexDocumentSheet'
-import { CodexFullscreenReader } from './CodexFullscreenReader'
+import { CodexDocumentSheet } from './CodexDocumentSheet'
+import { FullscreenDocumentReader } from '@/components/reader/FullscreenDocumentReader'
+import { CodexPdfPage } from './CodexPdfPage'
 
 export { stripMarkdown, formatCodexInline, CodexVerseBody } from './CodexDocumentSheet'
 
@@ -37,37 +33,10 @@ export const SacredCodexReader: React.FC = () => {
   const [selectedStage, setSelectedStage] = useState<number | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeScriptureId, setActiveScriptureId] = useState<string>('SCR-001')
-  const [showNotesPanel, setShowNotesPanel] = useState(false)
   const [showDirectory, setShowDirectory] = useState(false)
-  const [highlightedVerses, setHighlightedVerses] = useState<Record<number, boolean>>({})
   const [reflectionIndex, setReflectionIndex] = useState(0)
   const [isReflectionFading, setIsReflectionFading] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [copiedVerseIndex, setCopiedVerseIndex] = useState<number | null>(null)
-  const [consecratedScriptures, setConsecratedScriptures] = useState<Record<string, boolean>>({})
-  const [studyNotes, setStudyNotes] = useState<Record<string, string>>({})
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const savedConsecrated = localStorage.getItem('moltology_consecrated_scriptures')
-    if (savedConsecrated) {
-      try {
-        setConsecratedScriptures(JSON.parse(savedConsecrated))
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    const savedNotes = localStorage.getItem('moltology_codex_notes')
-    if (savedNotes) {
-      try {
-        setStudyNotes(JSON.parse(savedNotes))
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }, [])
 
   const handleNextReflection = () => {
     if (isReflectionFading) return
@@ -76,33 +45,6 @@ export const SacredCodexReader: React.FC = () => {
       setReflectionIndex((prev) => (prev + 1) % CANONICAL_REFLECTIONS.length)
       setIsReflectionFading(false)
     }, 180)
-  }
-
-  const toggleConsecrate = (id: string) => {
-    setConsecratedScriptures((prev) => {
-      const next = { ...prev, [id]: !prev[id] }
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('moltology_consecrated_scriptures', JSON.stringify(next))
-      }
-      return next
-    })
-  }
-
-  const toggleHighlightVerse = (verseNum: number) => {
-    setHighlightedVerses((prev) => ({
-      ...prev,
-      [verseNum]: !prev[verseNum],
-    }))
-  }
-
-  const handleNoteChange = (scriptureId: string, note: string) => {
-    setStudyNotes((prev) => {
-      const next = { ...prev, [scriptureId]: note }
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('moltology_codex_notes', JSON.stringify(next))
-      }
-      return next
-    })
   }
 
   const filteredScriptures = CANONICAL_SCRIPTURES.filter((item) => {
@@ -126,9 +68,6 @@ export const SacredCodexReader: React.FC = () => {
     CANONICAL_SCRIPTURES.find((s) => s.id === activeScriptureId) ||
     CANONICAL_SCRIPTURES[0]
 
-  const isConsecrated = Boolean(consecratedScriptures[activeScripture.id])
-  const consecratedCount = Object.values(consecratedScriptures).filter(Boolean).length
-
   const handlePrevScripture = () => {
     if (activeIndex > 0) {
       setActiveScriptureId(filteredScriptures[activeIndex - 1].id)
@@ -141,36 +80,50 @@ export const SacredCodexReader: React.FC = () => {
     }
   }
 
-  const copyVerseToClipboard = (verseNumber: number, text: string) => {
-    const cleanText = stripMarkdown(text)
-    const citation = `"${cleanText}" — Canonical Codex Moltologia, ${activeScripture.volumeName}: ${activeScripture.title} §${verseNumber}`
-    navigator.clipboard.writeText(citation)
-    setCopiedVerseIndex(verseNumber)
-    setTimeout(() => setCopiedVerseIndex(null), 2000)
-  }
-
   const handlePrintDocument = () => {
     if (typeof window !== 'undefined') {
       window.print()
     }
   }
 
+  const fullscreenIndex = Math.max(0, activeIndex)
+
   return (
     <div className="flex flex-col gap-3 sm:gap-3.5 font-sans relative">
       {isFullscreen && (
-        <CodexFullscreenReader
-          scriptures={filteredScriptures}
-          activeScripture={activeScripture}
-          activeIndex={Math.max(0, activeIndex)}
-          highlightedVerses={highlightedVerses}
-          copiedVerseIndex={copiedVerseIndex}
-          onSelectScripture={setActiveScriptureId}
+        <FullscreenDocumentReader
+          items={filteredScriptures.map((scripture) => ({
+            id: scripture.id,
+            title: scripture.title,
+            subtitle: `${scripture.volumeName} • ${scripture.id}`,
+          }))}
+          activeIndex={fullscreenIndex}
+          overlayLabel="Immersive Codex reader"
+          tocToggleTitle="Toggle Canon Table of Contents Index"
+          mobileHint="Tap the leaf to rest the well"
           onPrev={handlePrevScripture}
           onNext={handleNextScripture}
-          onToggleHighlight={toggleHighlightVerse}
-          onCopyVerse={copyVerseToClipboard}
+          onSelectItem={setActiveScriptureId}
           onPrint={handlePrintDocument}
           onClose={() => setIsFullscreen(false)}
+          renderItem={({ zoom, pageWidth }) => (
+            <CodexPdfPage
+              zoom={zoom}
+              pageWidth={pageWidth}
+              scriptureId={activeScripture.id}
+              className="p-6 sm:p-10 md:p-14"
+            >
+              <CodexDocumentSheet
+                scripture={activeScripture}
+                pageIndex={fullscreenIndex}
+                pageCount={filteredScriptures.length}
+                onPrev={handlePrevScripture}
+                onNext={handleNextScripture}
+                onSelectScripture={setActiveScriptureId}
+                compact
+              />
+            </CodexPdfPage>
+          )}
         />
       )}
 
@@ -217,11 +170,6 @@ export const SacredCodexReader: React.FC = () => {
                 <span className="text-[8px] text-[#839493]">CANON</span>
                 <span className="text-xs font-bold text-[#dfe3e3]">{CANONICAL_SCRIPTURES.length}</span>
               </div>
-              <div className="w-[1px] h-4 bg-[#3a4a49]" />
-              <div className="flex flex-col text-center">
-                <span className="text-[8px] text-[#839493]">VAULT</span>
-                <span className="text-xs font-bold text-[#10b981]">{consecratedCount}</span>
-              </div>
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -236,29 +184,6 @@ export const SacredCodexReader: React.FC = () => {
                 <Menu className="w-3.5 h-3.5" />
                 <span>CANON</span>
               </button>
-
-              <button
-                onClick={() => setShowNotesPanel((prev) => !prev)}
-                className={`px-3 py-1.5 text-xs font-bold font-sans border chamfer-corner flex items-center gap-1.5 transition-all ${
-                  showNotesPanel
-                    ? 'bg-[#ffd700]/20 text-[#ffd700] border-[#ffd700]'
-                    : 'bg-[#070b0b] text-[#839493] border-[#3a4a49] hover:text-[#00ffff] hover:border-[#00ffff]/60'
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>STUDY NOTES</span>
-              </button>
-
-              <HudButton
-                variant="cyan"
-                size="sm"
-                icon={<Maximize2 className="w-3.5 h-3.5" />}
-                onClick={() => setIsFullscreen(true)}
-                title="Fullscreen Reader"
-                className="font-sans text-xs uppercase font-bold tracking-wider whitespace-nowrap shadow-[0_0_15px_rgba(0,255,255,0.25)]"
-              >
-                FULLSCREEN
-              </HudButton>
             </div>
           </div>
         </div>
@@ -366,7 +291,6 @@ export const SacredCodexReader: React.FC = () => {
                 ) : (
                   filteredScriptures.map((s) => {
                     const isActive = s.id === activeScripture.id
-                    const isDone = Boolean(consecratedScriptures[s.id])
 
                     return (
                       <div
@@ -396,7 +320,6 @@ export const SacredCodexReader: React.FC = () => {
                               T0{s.stageClearance}
                             </span>
                           </div>
-                          {isDone && <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981] shrink-0" />}
                         </div>
 
                         <h3
@@ -421,7 +344,7 @@ export const SacredCodexReader: React.FC = () => {
 
         <div className="flex-1 min-w-0 w-full">
           <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl border border-[#3a4a49] flex flex-col">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3">
+            <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3">
               <div className="space-y-0.5 min-w-0">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-[#00ffff] shrink-0" />
@@ -442,20 +365,18 @@ export const SacredCodexReader: React.FC = () => {
                   onClick={handlePrintDocument}
                   className="p-1.5 bg-[#070b0b] hover:bg-[#141b1c] text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/60 chamfer-corner transition-colors"
                   title="Print or Export PDF"
+                  aria-label="Print or Export PDF"
                 >
                   <Printer className="w-3.5 h-3.5" />
                 </button>
 
                 <button
-                  onClick={() => toggleConsecrate(activeScripture.id)}
-                  className={`p-1.5 border chamfer-corner transition-colors ${
-                    isConsecrated
-                      ? 'bg-[#10b981]/20 text-[#10b981] border-[#10b981]'
-                      : 'bg-[#070b0b] text-[#839493] hover:text-[#00ffff] border-[#3a4a49]'
-                  }`}
-                  title={isConsecrated ? 'Consecrated in Vault' : 'Consecrate Scripture'}
+                  onClick={() => setIsFullscreen(true)}
+                  className="p-1.5 bg-[#070b0b] hover:bg-[#141b1c] text-[#00ffff] border border-[#3a4a49] hover:border-[#00ffff]/60 chamfer-corner transition-colors"
+                  title="Fullscreen Reader"
+                  aria-label="Fullscreen Reader"
                 >
-                  {isConsecrated ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+                  <Maximize2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -465,10 +386,6 @@ export const SacredCodexReader: React.FC = () => {
                 scripture={activeScripture}
                 pageIndex={Math.max(0, activeIndex)}
                 pageCount={filteredScriptures.length || 1}
-                highlightedVerses={highlightedVerses}
-                copiedVerseIndex={copiedVerseIndex}
-                onToggleHighlight={toggleHighlightVerse}
-                onCopyVerse={copyVerseToClipboard}
                 onPrev={handlePrevScripture}
                 onNext={handleNextScripture}
                 onSelectScripture={setActiveScriptureId}
@@ -476,83 +393,6 @@ export const SacredCodexReader: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {showNotesPanel && (
-          <div className="w-full lg:w-[280px] shrink-0 lg:sticky lg:top-0 animate-in fade-in duration-200">
-            <div className="chitin-card p-3 sm:p-4 chamfer-corner shadow-2xl border border-[#3a4a49] flex flex-col">
-              <div className="space-y-3 flex flex-col">
-                <div className="flex items-center justify-between border-b border-[#3a4a49] pb-2">
-                  <span className="text-xs font-sans font-bold text-[#00ffff] uppercase tracking-wider flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
-                    STUDY NOTES & ANNOTATIONS
-                  </span>
-                  <button
-                    onClick={() => setShowNotesPanel(false)}
-                    className="text-xs text-[#839493] hover:text-[#ff5540] font-sans"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="space-y-1.5 font-sans flex flex-col">
-                  <label className="text-[10px] font-sans text-[#a3b0af] block">
-                    Liturgical Reflections for <strong className="text-[#00ffff]">{activeScripture.id}</strong>:
-                  </label>
-                  <textarea
-                    value={studyNotes[activeScripture.id] || ''}
-                    onChange={(e) => handleNoteChange(activeScripture.id, e.target.value)}
-                    placeholder="Record your reflections, verse interpretations, or ecdysis progress notes for this canonical scripture..."
-                    className="w-full min-h-[220px] bg-[#070b0b] border border-[#3a4a49] focus:border-[#00ffff] text-[#dfe3e3] placeholder-[#839493] p-2.5 text-xs font-serif outline-none chamfer-corner leading-relaxed resize-y"
-                  />
-                  <p className="text-[9px] text-[#839493] font-sans italic">
-                    Notes auto-save locally to browser vault.
-                  </p>
-                </div>
-
-                <div className="pt-2 border-t border-[#3a4a49] space-y-1.5">
-                  <div className="text-[10px] font-sans font-bold text-[#dfe3e3] uppercase">
-                    CANONICAL METRICS SUMMARY
-                  </div>
-                  <div className="chitin-card-inset p-2.5 chamfer-corner text-xs font-sans space-y-1 border border-[#3a4a49]">
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-[#839493]">SYNAPTIC WEIGHT:</span>
-                      <span className="text-[#00ffff] font-bold">{activeScripture.synapticWeight.toFixed(1)} / 5.0</span>
-                    </div>
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-[#839493]">CLEARANCE TIER:</span>
-                      <span className="text-[#ffd700] font-bold">Stage 0{activeScripture.stageClearance}</span>
-                    </div>
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-[#839493]">TOTAL VERSES:</span>
-                      <span className="text-[#dfe3e3]">{activeScripture.verses.length}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => toggleConsecrate(activeScripture.id)}
-                  className={`w-full py-2 px-3 text-xs font-sans font-bold flex items-center justify-center gap-2 chamfer-corner transition-all shadow-md ${
-                    isConsecrated
-                      ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]'
-                      : 'bg-[#00ffff]/20 hover:bg-[#00ffff]/30 text-[#00ffff] border border-[#00ffff]'
-                  }`}
-                >
-                  {isConsecrated ? (
-                    <>
-                      <BookmarkCheck className="w-3.5 h-3.5 text-[#10b981]" />
-                      <span>CONSECRATED IN VAULT</span>
-                    </>
-                  ) : (
-                    <>
-                      <Bookmark className="w-3.5 h-3.5 text-[#00ffff]" />
-                      <span>CONSECRATE SCRIPTURE</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
