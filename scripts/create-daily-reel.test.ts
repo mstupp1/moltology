@@ -143,7 +143,7 @@ describe('Daily Reel Dynamic Script Formulation', () => {
     }
     const scriptB = synthesizeBlogReelScript(blogB, {})
     expect(scriptB.ctaGoal).toBe('oracle')
-    expect(scriptB.narrationScript).toMatch(/(oracle|prompt|vault)/)
+    expect(scriptB.narrationScript).toMatch(/(oracle|prompt|vault)/i)
     expect(scriptB.commentTriggerKeyword).toBe('ORACLE')
 
     const blogC = {

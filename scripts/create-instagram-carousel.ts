@@ -194,6 +194,12 @@ export function synthesizeBlogCarouselData(
     blog.slug.includes('tabs-you-kept') ||
     contentLower.includes('tabs you kept') ||
     contentLower.includes('claude cowork')
+  const isPhoneRings =
+    blog.slug.includes('phone-rings') ||
+    contentLower.includes('room service without the knock') ||
+    contentLower.includes('butlerbot') ||
+    contentLower.includes('tim healy')
+
 
   // Bespoke synthesis for "The Napkin You Didn't Watch"
   if (isNapkin) {
@@ -372,6 +378,182 @@ Output Style: Ultra high-resolution cinematic 3D render, luxury restaurant and h
 
     return { copy, slide1, slide2, slide3, flowPrompts }
   }
+
+  // Bespoke synthesis for "The Phone Rings in Someone Else's Voice"
+  if (isPhoneRings) {
+    const copy: CarouselCopy = {
+      title: blog.title,
+      topic: "The Phone Rings in Someone Else's Voice",
+      caption: `The room phone rings. You are still in the chair. No knock at the door.\n\nAt the Maldron Hotel Newcastle, Spark Robotics' ButlerBot W3 (Anna Bot) delivers room service while ringing guest phones in actor Tim Healy's voice. Room-service revenue doubled.\n\nStaff stay on the restaurant and bar floor. The corridor gets a second body. The phone rings in someone else's voice so the knock never has to come.\n\nSwipe through the 3-stage breakdown:\n👉 Slide 1: The Soft-Shell Window (The Borrowed Voice)\n👉 Slide 2: Corridor Telemetry (Newcastle Maldron Hotel Specs)\n👉 Slide 3: Molt Directives (Chat or No-Chat Choice)\n\n👇 Read Dr. Thalassa Vance's full dispatch & teardown on MoltNation News:\n🔗 Link in bio & story → moltology.org/news/${blog.slug}\n\n#moltology #robotics #embodiedai #physicalai #carcinization #telemetry #thalassavance #attention #thegreatmelt #ecdysis`,
+      hashtags: ['#moltology', '#robotics', '#embodiedai', '#physicalai', '#carcinization', '#telemetry', '#thalassavance', '#attention'],
+      firstComment: `💬 Did you want the knock, or the tray that already knew your room? Explore Dr. Thalassa Vance's full dispatch at moltology.org/news/${blog.slug}! 🦞`,
+    }
+
+    const slide1 = {
+      categoryBadge: 'TELEMETRY AUDIT',
+      headlinePart1: 'THE BORROWED VOICE',
+      headlinePart2: 'IS THE MELT',
+      headlineHighlight: 'ROOM SERVICE WITHOUT THE KNOCK',
+      narrativeText:
+        'When an autonomous robot calls your room in an actor\'s voice, the hesitation isn\'t failure. It\'s the Soft-Shell Window when you notice the door and voice are no longer the same person.',
+      leftMetric: {
+        label: 'SURFACE NOVELTY',
+        value: 'MELT',
+        sublabel: 'BORROWED VOICE',
+        description: 'Actor Tim Healy voice synthesized on the room handset.',
+        variant: 'red' as const,
+      },
+      rightMetric: {
+        label: 'CORRIDOR BODY',
+        value: 'MOLT',
+        sublabel: 'CONTACT BOUNDARY',
+        description: 'Lower-contact runs decouple corridor traffic from the floor.',
+        variant: 'cyan' as const,
+      },
+      bulletPoints: [
+        'Autonomous ButlerBot runs repetitive corridor deliveries',
+        'Handset rings with familiar voice before arrival',
+        'Hesitation is noticing the voice/door mismatch',
+        'You still choose: chat or no-chat, door open or closed',
+      ],
+    }
+
+    const slide2 = {
+      categoryBadge: 'CORRIDOR TELEMETRY',
+      headline: 'NEWCASTLE BOT SPECS',
+      cards: [
+        {
+          number: '01',
+          title: 'MALDRON HOTEL RUN',
+          metric: '2x ROOM REVENUE',
+          description:
+            'General manager Anna Wadcock reports room-service revenue doubled since deploying ButlerBot W3.',
+          variant: 'cyan' as const,
+        },
+        {
+          number: '02',
+          title: 'SPARK BUTLERBOT W3',
+          metric: '90–95% ORDERS',
+          description:
+            'Navigates corridors, calls lifts, and handles routine tray and toiletry deliveries autonomously.',
+          variant: 'sky' as const,
+        },
+        {
+          number: '03',
+          title: 'CONTACT TELEMETRY',
+          metric: 'TIM HEALY AUDIO',
+          description:
+            'Synthesized voice rings the room phone, moving the greeting from the doorway to the receiver.',
+          bullets: [
+            'Lower-contact option for introverted guests',
+            'Staff remain on restaurant and bar floor',
+            'Corridor traffic decoupled from human hospitality',
+          ],
+          variant: 'amber' as const,
+        },
+      ],
+    }
+
+    const slide3 = {
+      categoryBadge: 'MOLT PROTOCOL',
+      headlinePart1: 'CHAT OR NO-CHAT',
+      headlinePart2: 'CHOOSE YOUR CONTACT',
+      directives: [
+        {
+          number: '01',
+          title: 'FEEL THE SOFT-SHELL PAUSE',
+          description:
+            'When a system speaks in a familiar tone, pause before opening the door or clicking reply.',
+        },
+        {
+          number: '02',
+          title: 'DECOUPLE NOVELTY FROM UTILITY',
+          description:
+            'Surface noise sells the clever voice; the real shift is choosing how much human contact you actually want.',
+        },
+        {
+          number: '03',
+          title: 'CALCIFY YOUR BOUNDARIES',
+          description:
+            'Never let borrowed voices bypass your discernment. Keep the hour for your own terms.',
+        },
+      ],
+      ctaHeader: 'READ DR. THALASSA VANCE\'S FULL DISPATCH',
+      ctaButtonText: `MOLTOLOGY.ORG/NEWS`,
+      ctaSubtitle: '🔗 Link in bio & live story telemetry feed',
+    }
+
+    const flowPrompts = [
+      `[SLIDE 1 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
+Role: 3D Cinematic Storyteller & Benthic HUD Enhancement Engine
+Reference Image: Use the attached 2D composite layout (Slide 1) as the exact spatial storyboard.
+
+Story Context & Narrative Hook:
+"The room phone rings. You are still in the chair. No knock at the door. An autonomous ButlerBot stands outside in the hotel corridor, while the handset speaks in actor Tim Healy's voice."
+
+Visual Transformation Directives (The Visual Must Explain The Text):
+1. Background Story Scene (The Dim Hotel Corridor & Room):
+   - Set the scene at the threshold of a quiet luxury hotel room at night. Deep mahogany door slightly ajar with warm ambient sconce lighting casting long shadows across patterned carpet.
+   - Outside the door in the dim corridor, render the sleek autonomous ButlerBot W3 carrying a covered silver room-service tray, glowing with subtle cyan telemetry status rings.
+2. The Voice Mismatch (Explaining "The Borrowed Voice"):
+   - On the bedside table beside the door, show a classic hotel telephone handset off the hook, emitting a glowing amber holographic acoustic voice waveform visualization labeled "TIM HEALY SYNTHESIS".
+3. Mascot Character Action:
+   - Cartoon crustacean mascot (lobster in hotel guest robe with diagnostic earpiece) is pausing at the door handle, looking thoughtfully back at the handset with a contemplative "Noticing the Pause" expression.
+4. Glassmorphic HUD & Legibility:
+   - Transform the flat 2D cards into thick, illuminated 3D glassmorphic HUD panels.
+   - Left Card ("SURFACE NOVELTY / MELT") pulses with cautionary red-orange borders (#ef4444).
+   - Right Card ("CORRIDOR BODY / MOLT") glows with crisp cyan luminescence (#00ffff).
+   - Keep all headline typography razor-sharp, unobstructed, and legible.
+
+Aspect Ratio: 3:4 (Portrait in Google Flow)
+Output Style: Cinematic 3D photorealism, Pixar/DreamWorks character styling, atmospheric depth, warm hotel sconces with cool cyan robotic accents, zero artifact noise.`,
+
+      `[SLIDE 2 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
+Role: 3D Cinematic Storyteller & Benthic HUD Enhancement Engine
+Reference Image: Use the attached 2D composite layout (Slide 2) as the exact spatial storyboard.
+
+Story Context & Narrative Core:
+"At Newcastle's Maldron Hotel, room service revenue doubled with Spark Robotics' ButlerBot W3 handling 90-95% of orders. Staff stay on the restaurant floor while the bot works the lifts and halls."
+
+Visual Transformation Directives (The Visual Must Explain The Text):
+1. Visualizing the Corridor Automation (3 Spec Cards):
+   - Behind Card 1 (Maldron Hotel Run: 2x Revenue): Render a glowing hotel lobby bar filled with human hospitality staff attending to seated restaurant guests under warm ambient bistro chandeliers.
+   - Behind Card 2 (Spark ButlerBot W3: 90-95% Orders): Show the autonomous robot interfacing wirelessly with the elevator floor call panel, elevator doors glowing with cyan navigation beams.
+   - Behind Card 3 (Contact Telemetry: Tim Healy Audio): Render a holographic acoustic frequency spectrum displaying synthesized voice dynamics and low-contact delivery telemetry.
+2. Background Atmosphere:
+   - Futuristic yet warm luxury hotel corridor with polished brass trim, rich navy wallpaper, subsea cyan guide lights along the baseboard, and volumetric corridor depth.
+3. Mascot Character Action:
+   - Cheerful lobster mascot in service concierge uniform gives a confident nod next to the elevator interface, holding an illuminated digital tablet showing 100% route clearance.
+4. Glassmorphic HUD & Bevels:
+   - Transform the 3 comparison cards into thick, layered 3D translucent HUD cards with rounded beveled edges, luminous cyan and sky-blue traces, and clean typography.
+
+Aspect Ratio: 3:4 (Portrait in Google Flow)
+Output Style: Cinematic 3D sci-fi photorealism, luxury hospitality atmosphere, pristine lighting, zero artifact noise.`,
+
+      `[SLIDE 3 - STORY-DRIVEN VISUAL ENHANCEMENT DIRECTIVES]
+Role: 3D Cinematic Storyteller & Benthic HUD Enhancement Engine
+Reference Image: Use the attached 2D composite layout (Slide 3) as the exact spatial storyboard.
+
+Story Context & Narrative Takeaway:
+"Did you want the knock? Did you want the chat? The second body on the corridor doesn't answer that for you. It only makes the question louder. Choose the contact you actually want."
+
+Visual Transformation Directives (The Visual Must Explain The Text):
+1. Visual Metaphor (The Choice Between Door Open and Calm Solitude):
+   - Foreground: Serene, quiet private hotel suite table with warm lamp glow, a steaming cup of tea, and an open notebook, undisturbed by unwanted interruptions.
+   - Midground / Background: The closed suite door with a soft cyan indicator light showing "SERVICE DELIVERED: TRAY AT THRESHOLD", demonstrating peaceful personal boundary protection.
+2. Mascot Character Action:
+   - Zen lobster mascot sitting comfortably in an armchair, holding a steaming mug in one claw and gesturing gracefully with the other down toward the "READ FULL DISPATCH: MOLTOLOGY.ORG/NEWS" button.
+3. Glassmorphic HUD & Call to Action:
+   - The 3 directive items glow with soft frosted glass depth and illuminated numbered badges (01, 02, 03).
+   - The CTA button at the bottom shines with an embossed golden-amber and cyan rim, framed by the official MoltNation shield watermark.
+
+Aspect Ratio: 3:4 (Portrait in Google Flow)
+Output Style: Ultra high-resolution cinematic 3D render, tranquil luxury hospitality atmosphere, rich depth of field, zero artifact noise.`,
+    ]
+
+    return { copy, slide1, slide2, slide3, flowPrompts }
+  }
+
 
   // Fallback for general blog post
   const copy: CarouselCopy = {
