@@ -72,13 +72,18 @@ export function formatSrtTime(ms: number): string {
  */
 export function tokenizeScriptText(text: string): string[] {
   if (!text) return []
-  // Normalize any spoken domain phrases like "moltology dot org" to "moltology.org"
-  const normalized = text.replace(/moltology\s+dot\s+org\b/gi, 'moltology.org')
+  // Normalize spoken domain/path phrases like "moltology dot org slash codex" or "moltology.org slash codex" to "moltology.org/codex"
+  const normalized = text
+    .replace(/\b([a-zA-Z0-9-]+\s*(?:dot|\.)\s*[a-zA-Z]{2,})\s+slash\s+([a-zA-Z0-9_\-]+)\b/gi, (_, domain, path) => {
+      const cleanDomain = domain.replace(/\s*dot\s*/gi, '.').replace(/\s+/g, '')
+      return `${cleanDomain}/${path}`
+    })
+    .replace(/\bmoltology\s+dot\s+org\b/gi, 'moltology.org')
   const rawWords = normalized.trim().split(/\s+/).filter(Boolean)
   const tokens: string[] = []
 
   for (const raw of rawWords) {
-    // Check if word contains intra-word hyphens, en-dashes, em-dashes, or slashes (e.g. "titanium-chitin", "bio-silicon,", "pressure—calcify")
+    // Check if word contains intra-word hyphens, en-dashes, em-dashes, or slashes (e.g. "titanium-chitin", "bio-silicon,", "pressure—calcify", "moltology.org/codex")
     // but preserve domains like "moltology.org" or decimal numbers
     const subParts = raw.split(/(?<=[a-zA-Z0-9])([—–\-\/]+)(?=[a-zA-Z0-9])/g).filter(Boolean)
 
@@ -141,31 +146,54 @@ export function alignWordsWithOriginalText(
         matchedToken = candidate
         matchedOffset = offset
         tokensToConsume = 1
+        // If candidate ends with a slash (e.g. "moltology.org/"), and the next spoken word is "slash",
+        // consume that spoken "slash" as part of this token so it doesn't leak into subsequent tokens.
+        if (
+          candidate.endsWith('/') &&
+          i + 1 < words.length &&
+          words[i + 1].word.toLowerCase().replace(/[^a-z0-9]/g, '') === 'slash'
+        ) {
+          wordsToConsume = 2
+        }
         break
       }
 
       // Check if candidate is a domain or compound where multiple spoken words map to this single candidate token
       // e.g. candidate is "moltology.org." (cleanCandidate: "moltologyorg") and words[i..i+2] are "moltology", "dot", "org"
+      // or candidate is "moltology.org/" and words[i..i+3] are "moltology", "dot", "org", "slash"
       if (cleanCandidate.length > cleanWord.length && (cleanCandidate.startsWith(cleanWord) || cleanCandidate.includes(cleanWord))) {
         let combinedSpokenClean = cleanWord
         let spokenLookAhead = 1
 
-        while (i + spokenLookAhead < words.length && spokenLookAhead <= 3) {
+        while (i + spokenLookAhead < words.length && spokenLookAhead <= 4) {
           const nextSpoken = words[i + spokenLookAhead].word.toLowerCase().replace(/[^a-z0-9]/g, '')
           combinedSpokenClean += nextSpoken
           spokenLookAhead++
 
           const strippedDotCombined = combinedSpokenClean.replace(/dot/g, '')
-          if (
-            combinedSpokenClean === cleanCandidate ||
-            strippedDotCombined === cleanCandidate ||
-            combinedSpokenClean === cleanCandidate.replace(/org$/, 'dotorg')
-          ) {
-            matchedToken = candidate
-            matchedOffset = offset
-            tokensToConsume = 1
-            wordsToConsume = spokenLookAhead
-            break
+          const strippedDotSlashCombined = combinedSpokenClean.replace(/(?:dot|slash)/g, '')
+
+          if (candidate.endsWith('/')) {
+            // Trailing slash token (e.g. "moltology.org/") must consume through spoken "slash" if present
+            if (strippedDotSlashCombined === cleanCandidate && combinedSpokenClean.endsWith('slash')) {
+              matchedToken = candidate
+              matchedOffset = offset
+              tokensToConsume = 1
+              wordsToConsume = spokenLookAhead
+              break
+            }
+          } else {
+            if (
+              combinedSpokenClean === cleanCandidate ||
+              strippedDotCombined === cleanCandidate ||
+              combinedSpokenClean === cleanCandidate.replace(/org$/, 'dotorg')
+            ) {
+              matchedToken = candidate
+              matchedOffset = offset
+              tokensToConsume = 1
+              wordsToConsume = spokenLookAhead
+              break
+            }
           }
         }
 
@@ -398,7 +426,20 @@ export function generateSrtSubtitles(words: WordBoundaryEvent[], outputPath: str
     if (phrase.length === 0) return
     const startMs = phrase[0].startMs
     const endMs = phrase[phrase.length - 1].endMs + 200
-    const text = phrase.map((p) => p.word).join(' ').toUpperCase()
+    let text = ''
+    for (let i = 0; i < phrase.length; i++) {
+      text += phrase[i].word
+      if (
+        i < phrase.length - 1 &&
+        !phrase[i].word.endsWith('-') &&
+        !phrase[i].word.endsWith('—') &&
+        !phrase[i].word.endsWith('–') &&
+        !phrase[i].word.endsWith('/')
+      ) {
+        text += ' '
+      }
+    }
+    text = text.toUpperCase()
 
     srtEntries.push(`${index + 1}\n${formatSrtTime(startMs)} --> ${formatSrtTime(endMs)}\n${text}\n`)
   })

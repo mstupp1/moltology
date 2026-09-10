@@ -244,6 +244,56 @@ describe('TTS Engine Utilities', () => {
     expect(chunks[0].map((w) => w.word)).toEqual(['Calculate', 'your', 'molt'])
     expect(chunks[1].map((w) => w.word)).toEqual(['clearance', 'on', 'moltology.org.'])
   })
+
+  it('guarantees moltology dot org slash codex is aligned to moltology.org/codex without leaking "slash"', () => {
+    const script = 'Unlock the twelve sacred liturgies at moltology dot org slash codex.'
+    const tokens = tokenizeScriptText(script)
+    expect(tokens).toEqual(['Unlock', 'the', 'twelve', 'sacred', 'liturgies', 'at', 'moltology.org/', 'codex.'])
+
+    const rawTtsWords: WordBoundaryEvent[] = [
+      { word: 'Unlock', startMs: 8710, endMs: 9070, durationMs: 360 },
+      { word: 'the', startMs: 9070, endMs: 9140, durationMs: 70 },
+      { word: 'twelve', startMs: 9140, endMs: 9500, durationMs: 360 },
+      { word: 'sacred', startMs: 9500, endMs: 9920, durationMs: 420 },
+      { word: 'liturgies', startMs: 9920, endMs: 10420, durationMs: 500 },
+      { word: 'at', startMs: 10420, endMs: 10570, durationMs: 150 },
+      { word: 'moltology', startMs: 10570, endMs: 11100, durationMs: 530 },
+      { word: 'dot', startMs: 11100, endMs: 11300, durationMs: 200 },
+      { word: 'org', startMs: 11300, endMs: 11710, durationMs: 410 },
+      { word: 'slash', startMs: 11710, endMs: 12140, durationMs: 430 },
+      { word: 'codex', startMs: 12140, endMs: 12940, durationMs: 800 },
+    ]
+
+    const aligned = alignWordsWithOriginalText(rawTtsWords, script)
+    expect(aligned.map((w) => w.word)).toEqual([
+      'Unlock',
+      'the',
+      'twelve',
+      'sacred',
+      'liturgies',
+      'at',
+      'moltology.org/',
+      'codex.',
+    ])
+
+    // Verify duration spans
+    const urlDomain = aligned.find((w) => w.word === 'moltology.org/')!
+    expect(urlDomain.startMs).toBe(10570)
+    expect(urlDomain.endMs).toBe(12140) // Consumed through "slash"
+
+    const urlPath = aligned.find((w) => w.word === 'codex.')!
+    expect(urlPath.startMs).toBe(12140)
+    expect(urlPath.endMs).toBe(12940)
+
+    // Verify phrase chunking renders moltology.org/codex. together
+    const chunks = chunkWordsIntoPhrases(aligned, 3)
+    const lastChunk = chunks[chunks.length - 1]
+    expect(lastChunk.map((w) => w.word)).toEqual(['moltology.org/', 'codex.'])
+
+    // Verify no "slash" word exists in any chunk
+    const hasWordSlash = chunks.some((c) => c.some((w) => w.word.toLowerCase() === 'slash'))
+    expect(hasWordSlash).toBe(false)
+  })
 })
 
 describe('Fish Audio provider helpers', () => {
