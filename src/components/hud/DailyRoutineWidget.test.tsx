@@ -48,12 +48,12 @@ describe('computeHeatmapLayout', () => {
 
     expect(layout.weeks).toBeGreaterThanOrEqual(minWeeks)
     expect(layout.weeks).toBeLessThan(maxWeeks)
-    expect(layout.cell).toBeGreaterThanOrEqual(minCell)
+    expect(layout.cell).toBeGreaterThan(minCell)
     expect(layout.cell).toBeLessThanOrEqual(maxCell)
     expect(layout.scrolls).toBe(false)
     expect(layout.fillsWidth).toBe(true)
-    // Remainder must be smaller than one more week column
-    expect(available - gridWidth).toBeLessThan(minCell + gap)
+    // Remainder must be smaller than one more max-sized week column
+    expect(available - gridWidth).toBeLessThan(maxCell + gap)
   })
 
   it('uses up to 52 weeks and grows cells on a wide container', () => {

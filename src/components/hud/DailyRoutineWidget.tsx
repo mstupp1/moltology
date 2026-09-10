@@ -40,8 +40,9 @@ export type HeatmapLayout = {
 
 /**
  * Pick week count + cell size so the grid fills `containerWidth` when possible.
- * Prefers as many weeks as fit at MIN_CELL (up to 52); grows cells up to MAX_CELL.
- * Scrolls only when even a compact grid cannot fit.
+ * Fits the full 52-week year when the container is wide enough at MIN_CELL;
+ * otherwise prefers larger cells (up to MAX_CELL) so phone cards do not leave
+ * a dead horizontal gutter.
  */
 export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
   const { maxWeeks, minWeeks, minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
@@ -52,6 +53,7 @@ export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
 
   const available = Math.max(0, Math.floor(containerWidth) - dowGutter)
   const minStride = minCell + gap
+  const maxStride = maxCell + gap
 
   if (available < minStride) {
     return {
@@ -64,28 +66,28 @@ export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
     }
   }
 
-  // Max weeks that fit at the minimum cell size (capped at 52, floored at minWeeks when possible)
-  const weeksAtMin = Math.floor(available / minStride)
-
   let weeks: number
   let cell: number
   let scrolls = false
 
-  if (weeksAtMin >= maxWeeks) {
+  const yearMinWidth = maxWeeks * minStride
+  if (available >= yearMinWidth) {
+    // Full year fits — grow cells toward MAX_CELL to absorb leftover width
     weeks = maxWeeks
-    cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
-  } else if (weeksAtMin >= minWeeks) {
-    weeks = weeksAtMin
-    cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
-  } else if (weeksAtMin >= 1) {
-    // Narrower than minWeeks: still fill with however many weeks fit
-    weeks = weeksAtMin
     cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
   } else {
-    // Pathologically narrow — keep a usable year window and pan
-    weeks = maxWeeks
-    cell = minCell
-    scrolls = true
+    // Prefer larger cells so the grid fills the card; keep as many weeks as fit
+    weeks = Math.max(1, Math.floor(available / maxStride))
+    if (weeks < minWeeks && available >= minWeeks * minStride) {
+      weeks = minWeeks
+    }
+    if (weeks < 1) {
+      weeks = maxWeeks
+      cell = minCell
+      scrolls = true
+    } else {
+      cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
+    }
   }
 
   const gridWidth = weeks * (cell + gap)
@@ -94,7 +96,7 @@ export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
   }
 
   const remainder = available - gridWidth
-  const fillsWidth = !scrolls && remainder < minStride
+  const fillsWidth = !scrolls && remainder < maxStride
 
   return { weeks, cell, gap, dowGutter, fillsWidth, scrolls }
 }
