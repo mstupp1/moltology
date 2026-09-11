@@ -71,13 +71,13 @@ describe('summarizeThreadTitle', () => {
 describe('updateAIThreadTitle', () => {
   it('updates thread title and returns updated record', async () => {
     const { updateAIThreadTitle } = await import('./service')
-    const res = await updateAIThreadTitle('thread-1', 'New Generated Title')
+    const res = await updateAIThreadTitle('thread-1', 'New Generated Title', 'usr_1')
     expect(res).toBeDefined()
   })
 
   it('returns null if threadId or title is missing', async () => {
     const { updateAIThreadTitle } = await import('./service')
-    expect(await updateAIThreadTitle('', 'Title')).toBeNull()
-    expect(await updateAIThreadTitle('thread-1', '')).toBeNull()
+    expect(await updateAIThreadTitle('', 'Title', 'usr_1')).toBeNull()
+    expect(await updateAIThreadTitle('thread-1', '', 'usr_1')).toBeNull()
   })
 })

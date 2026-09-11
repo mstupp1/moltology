@@ -6,6 +6,7 @@ import { ThreadList } from '@/components/ai/ThreadList'
 import { useThreadActions, type ThreadPatch } from '@/components/ai/useThreadActions'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { getAIThreadsFn } from '@/lib/server/api'
+import { oracleAuthData } from '@/lib/ai/oracle-auth-client'
 import { AuthModal } from '@/components/AuthModal'
 import { BenthicCTAButton } from '@/components/hud/BenthicCTAButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
@@ -234,15 +235,22 @@ function OracleRouteComponent() {
 
   useEffect(() => {
     if (oracle || !userId) return
+    let cancelled = false
     setLocalIsLoading(true)
-    getAIThreadsFn({ data: { userId } })
+    void oracleAuthData(userId)
+      .then((auth) => getAIThreadsFn({ data: auth }))
       .then((data) => {
-        if (Array.isArray(data)) {
+        if (!cancelled && Array.isArray(data)) {
           setLocalThreads(data)
         }
       })
       .catch((err) => console.warn('Failed to load user AI threads:', err))
-      .finally(() => setLocalIsLoading(false))
+      .finally(() => {
+        if (!cancelled) setLocalIsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [userId, oracle])
 
   useEffect(() => {
@@ -270,7 +278,8 @@ function OracleRouteComponent() {
     if (oracle) {
       oracle.refreshThreads()
     } else if (userId) {
-      getAIThreadsFn({ data: { userId } })
+      void oracleAuthData(userId)
+        .then((auth) => getAIThreadsFn({ data: auth }))
         .then((data) => {
           if (Array.isArray(data)) {
             setLocalThreads(data)

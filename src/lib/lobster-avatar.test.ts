@@ -24,6 +24,8 @@ import {
   parseLobsterAvatarConfig,
   randomLobsterSeed,
   resolveHeightScale,
+  escapeSvgAttr,
+  LOBSTER_BACKGROUND_MOTION_MODES,
 } from './lobster-avatar'
 
 describe('lobster-avatar', () => {
@@ -67,6 +69,34 @@ describe('lobster-avatar', () => {
       seed: 'legacy',
     })
     expect(parseLobsterAvatarConfig(null)).toBeNull()
+  })
+
+  it('drops attacker-controlled backgroundMotion and eyelidStyle values', () => {
+    const parsed = parseLobsterAvatarConfig({
+      style: 'critters',
+      seed: 'xss-proof',
+      backgroundMotion: 'x"><image href=x onerror=alert(1)>',
+      eyelidStyle: 'relaxed"><image href=x onerror=alert(1)>',
+    })
+    expect(parsed).toEqual({ style: 'critters', seed: 'xss-proof' })
+    expect(LOBSTER_BACKGROUND_MOTION_MODES).toContain('static')
+  })
+
+  it('does not break out of SVG attributes when motion/eyelid payloads are injected', () => {
+    const payload = 'x"><image href=x onerror=alert(1)>'
+    const svg = generateLobsterAvatarSvg({
+      style: 'critters',
+      seed: 'xss-proof',
+      backgroundMotion: payload as any,
+      eyelidStyle: payload as any,
+    }, 128)
+    expect(svg).toBeTruthy()
+    expect(svg).not.toContain(payload)
+    expect(svg).not.toContain('onerror=alert(1)')
+  })
+
+  it('escapes quotes and brackets in SVG attributes', () => {
+    expect(escapeSvgAttr('x"><img src=x>')).toBe('x&quot;&gt;&lt;img src=x&gt;')
   })
 
   it('has 12 canonical on-brand background themes, 7 curated vector patterns, 7 homepage textures, 3 densities, and glow/pulse/sparkles options', () => {

@@ -7,7 +7,7 @@ import { extractAuthToken } from '../server/middleware'
 import { verifyNeonJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt } from './codex-prompt'
-import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle } from './service'
+import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle, getOwnedAIThread } from './service'
 import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
@@ -82,7 +82,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     }
   }
 
-  const userId = authUserId || body.userId
+  const userId = authUserId
   const userText = getLastUserText(messages)
 
   const clientIp =
@@ -114,9 +114,15 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   }
 
   let activeThreadId = body.threadId
-  const isNewThread = !activeThreadId
-  if (!activeThreadId) {
+  let isNewThread = !activeThreadId
+  if (activeThreadId) {
+    const owned = await getOwnedAIThread(userId, activeThreadId)
+    if (!owned) {
+      return Response.json({ error: 'Thread not found.' }, { status: 403 })
+    }
+  } else {
     activeThreadId = crypto.randomUUID()
+    isNewThread = true
   }
   const initialThreadTitle =
     userText.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
@@ -161,7 +167,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
               summarizeThreadTitle(userText)
                 .then(async (aiTitle) => {
                   if (aiTitle && aiTitle !== initialThreadTitle) {
-                    await updateAIThreadTitle(threadIdForSave, aiTitle)
+                    await updateAIThreadTitle(threadIdForSave, aiTitle, userId)
                   }
                 })
                 .catch((err) => {

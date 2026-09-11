@@ -343,7 +343,7 @@ describe('AIChatPanel Chats List Panel', () => {
 
     await waitFor(() => {
       expect(getAIMessagesFn).toHaveBeenCalledWith({
-        data: { threadId: 'thread-preselected', userId: 'usr_valid_user' },
+        data: { threadId: 'thread-preselected', userId: 'usr_valid_user', token: 'mock-jwt' },
       })
       expect(screen.getByText('Already selected question')).toBeInTheDocument()
       expect(screen.getByText('Already selected answer')).toBeInTheDocument()

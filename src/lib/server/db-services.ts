@@ -443,17 +443,19 @@ export const getS3AssetUrlFn = createServerFn({ method: 'POST' })
 
 interface GetAIThreadsInput {
   userId?: string
+  token?: string
 }
 
 /**
- * Server Function: Fetch user's AI conversation threads.
+ * Server Function: Fetch the authenticated user's AI conversation threads.
+ * Identity is the verified JWT only — never a client-supplied userId.
  */
 export const getAIThreadsHandler = async ({ data, context }: ServerFnArgs<GetAIThreadsInput>) => {
-  const userId = context?.user?.sub || context?.user?.id || data?.userId
-  if (!userId) return []
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return []
   try {
     const { getUserAIThreads } = await import('../ai/service')
-    return await getUserAIThreads(userId)
+    return await getUserAIThreads(auth.userId)
   } catch (err) {
     console.warn('[getAIThreadsFn] DB query error:', err)
     return []
@@ -470,16 +472,19 @@ export const getAIThreadsFn = createServerFn({ method: 'POST' })
 interface GetAIMessagesInput {
   threadId: string
   userId?: string
+  token?: string
 }
 
 /**
- * Server Function: Fetch messages for a specific AI thread.
+ * Server Function: Fetch messages for a thread the authenticated user owns.
  */
-export const getAIMessagesHandler = async ({ data }: ServerFnArgs<GetAIMessagesInput>) => {
+export const getAIMessagesHandler = async ({ data, context }: ServerFnArgs<GetAIMessagesInput>) => {
   if (!data?.threadId) return []
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return []
   try {
     const { getAIThreadMessages } = await import('../ai/service')
-    const msgs = await getAIThreadMessages(data.threadId)
+    const msgs = await getAIThreadMessages(data.threadId, auth.userId)
     return msgs.map((m: any) => ({
       id: m.id,
       threadId: m.threadId,
@@ -652,15 +657,16 @@ interface SendChatMessageInput {
   userId?: string
   threadId?: string
   model?: string
+  token?: string
 }
 
 /**
  * Server Function: Send a message to the Benthic neural gateway (free-tier Oracle models) with guardrails & DB persistence.
  */
 export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<SendChatMessageInput>) => {
-  const { messages, userId: inputUserId, threadId: inputThreadId, model: selectedModelId } = data || {}
-  const authUserId = context?.user?.sub || context?.user?.id
-  const userId = authUserId || inputUserId
+  const { messages, threadId: inputThreadId, model: selectedModelId } = data || {}
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  const userId = auth?.userId
 
   if (!Array.isArray(messages) || messages.length === 0) {
     throw new Error('Messages array is required')
@@ -680,7 +686,7 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     throw new Error(guardrail.reason || 'Message blocked by safety filters.')
   }
 
-  const { saveAIMessage, createAIThread, summarizeThreadTitle } = await import('../ai/service')
+  const { saveAIMessage, createAIThread, summarizeThreadTitle, getOwnedAIThread } = await import('../ai/service')
   let activeThreadId = inputThreadId
 
   // Guest Mode Gating: Unauthenticated seekers receive friendly, clear guidance directing them to sign up
@@ -692,30 +698,34 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
     }
   }
 
-  // Safe DB Thread creation & User message logging
-  if (userId) {
-    try {
-      if (!activeThreadId) {
-        const title = await summarizeThreadTitle(userText)
-        const newThread = await createAIThread({
-          userId,
-          title,
-          persona: 'oracle',
-        })
-        activeThreadId = newThread?.id || activeThreadId
-      }
-
-      if (activeThreadId) {
-        await saveAIMessage({
-          threadId: activeThreadId,
-          userId,
-          role: 'user',
-          content: userText,
-        })
-      }
-    } catch (dbErr) {
-      console.warn('[sendChatMessageFn] DB thread/message logging warning:', dbErr)
+  if (activeThreadId) {
+    const owned = await getOwnedAIThread(userId, activeThreadId)
+    if (!owned) {
+      throw new Error('Thread not found.')
     }
+  }
+
+  try {
+    if (!activeThreadId) {
+      const title = await summarizeThreadTitle(userText)
+      const newThread = await createAIThread({
+        userId,
+        title,
+        persona: 'oracle',
+      })
+      activeThreadId = newThread?.id || activeThreadId
+    }
+
+    if (activeThreadId) {
+      await saveAIMessage({
+        threadId: activeThreadId,
+        userId,
+        role: 'user',
+        content: userText,
+      })
+    }
+  } catch (dbErr) {
+    console.warn('[sendChatMessageFn] DB thread/message logging warning:', dbErr)
   }
 
   const { generateText } = await import('ai')
@@ -785,6 +795,7 @@ export const sendChatMessageFn = createServerFn({ method: 'POST' })
         userId: z.string().optional(),
         threadId: z.string().optional(),
         model: z.string().optional(),
+        token: z.string().optional(),
       })
       .parse(data)
   })
@@ -3276,8 +3287,8 @@ const lobsterAvatarConfigSchema = z.object({
   patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
   patternPulse: z.enum(['pulse', 'steady']).optional(),
   patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
-  eyelidStyle: z.string().max(64).optional(),
-  backgroundMotion: z.string().max(64).optional(),
+  eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried']).optional(),
+  backgroundMotion: z.enum(['drift_diagonal', 'drift_horizontal', 'radar_sweep', 'wave_undulate', 'pulse_breathe', 'static']).optional(),
   transparentBackground: z.boolean().optional(),
   token: z.string().optional(),
   userId: z.string().optional(),

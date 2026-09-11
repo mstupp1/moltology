@@ -33,6 +33,23 @@ export type BackgroundMotionMode =
   | 'pulse_breathe'
   | 'static'
 
+export const LOBSTER_BACKGROUND_MOTION_MODES: readonly BackgroundMotionMode[] = [
+  'drift_diagonal',
+  'drift_horizontal',
+  'radar_sweep',
+  'wave_undulate',
+  'pulse_breathe',
+  'static',
+] as const
+
+export function escapeSvgAttr(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 export type PatternDensity = 'compact' | 'standard' | 'spacious'
 export type PatternGlow = 'subtle' | 'chromatic' | 'none'
 export type PatternPulse = 'pulse' | 'steady'
@@ -366,7 +383,10 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   ) {
     config.eyelidStyle = obj.eyelidStyle as EyelidStyle
   }
-  if (typeof obj.backgroundMotion === 'string' && obj.backgroundMotion.trim()) {
+  if (
+    typeof obj.backgroundMotion === 'string' &&
+    (LOBSTER_BACKGROUND_MOTION_MODES as readonly string[]).includes(obj.backgroundMotion.trim())
+  ) {
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
   }
   if (typeof obj.transparentBackground === 'boolean') {
@@ -605,7 +625,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-isometric-cubes"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-isometric-cubes"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -671,7 +691,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-bubbles"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-bubbles"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -722,7 +742,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-circuit"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-circuit"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -773,7 +793,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-hex-mesh"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-hex-mesh"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -825,7 +845,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
           : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-overlapping-circles"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-overlapping-circles"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -883,7 +903,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
           : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-triangle-constellations"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-triangle-constellations"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -944,7 +964,7 @@ export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
         ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
         : ''
 
-      return `<g id="pattern-dense-lattice"${isMoving ? ` data-motion="${motion.mode}"` : ''}>
+      return `<g id="pattern-dense-lattice"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
         ${animPulse}
         <defs>
           <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
@@ -1599,7 +1619,7 @@ function splitEyesForPupilTracking(
 
   const eyelidsBlock =
     eyelidGroups.length > 0
-      ? `<g id="lobster-eyelids-layer" class="lobster-idle-layer lobster-idle-eyelids" data-eyelid-style="${eyelidStyle}"${transformAttr}>${eyelidGroups.join('')}</g>`
+      ? `<g id="lobster-eyelids-layer" class="lobster-idle-layer lobster-idle-eyelids" data-eyelid-style="${escapeSvgAttr(eyelidStyle)}"${transformAttr}>${eyelidGroups.join('')}</g>`
       : ''
 
   const replacement =
@@ -1898,12 +1918,19 @@ function injectLobsterChitinLayers(
   const glow = config.patternGlow || seeded.glow
   const pulse = config.patternPulse || seeded.pulse
   const sparkles = config.patternSparkles || seeded.sparkles
-  const eyelidStyle = config.eyelidStyle || seeded.eyelidStyle
-  const motion = (config.backgroundMotion && {
-    mode: config.backgroundMotion,
-    duration: seeded.motion.duration,
-    direction: seeded.motion.direction,
-  }) || seeded.motion
+  const eyelidStyle =
+    config.eyelidStyle && (LOBSTER_EYELID_STYLES as readonly string[]).includes(config.eyelidStyle)
+      ? config.eyelidStyle
+      : seeded.eyelidStyle
+  const motion =
+    config.backgroundMotion &&
+    (LOBSTER_BACKGROUND_MOTION_MODES as readonly string[]).includes(config.backgroundMotion)
+      ? {
+          mode: config.backgroundMotion,
+          duration: seeded.motion.duration,
+          direction: seeded.motion.direction,
+        }
+      : seeded.motion
   const isTransparent = Boolean(config.transparentBackground)
 
   // Subtle curved cartoon eyebrows positioned right above the orbital eye sockets
@@ -1974,7 +2001,7 @@ function injectLobsterChitinLayers(
       : sparklesMarkup
 
   const backgroundLayer = `
-    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${motion.mode}">
+    <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${escapeSvgAttr(motion.mode)}">
       <!-- Base 2-Color Angular Gradient -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGradId})" />
       <!-- Primary Ambient Radial Glow Disc -->
