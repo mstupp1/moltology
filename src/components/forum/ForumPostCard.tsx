@@ -31,6 +31,7 @@ export interface ForumPostCardProps {
   topicId: string
   replyingToId: string | null
   topicAuthorId?: string | null
+  topicLocked?: boolean
   onReplyClick: (postId: string) => void
   onQuoteClick: (postId: string) => void
   onCancelReply: () => void
@@ -45,6 +46,7 @@ export function ForumPostCard({
   topicId,
   replyingToId,
   topicAuthorId,
+  topicLocked = false,
   onReplyClick,
   onQuoteClick,
   onCancelReply,
@@ -353,7 +355,7 @@ export function ForumPostCard({
               />
 
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {!withdrawn && (
+                {!withdrawn && !topicLocked && (
                   <button
                     type="button"
                     onClick={() => onQuoteClick(post.id)}
@@ -364,7 +366,7 @@ export function ForumPostCard({
                     <span className="hidden xs:inline">Quote</span>
                   </button>
                 )}
-                {!withdrawn && (
+                {!withdrawn && !topicLocked && (
                   <button
                     type="button"
                     onClick={() => onReplyClick(post.id)}
@@ -492,7 +494,7 @@ export function ForumPostCard({
         )}
 
         {/* Inline Reply Composer */}
-        {isReplying && (
+        {isReplying && !topicLocked && (
           <ReplyComposer
             topicId={topicId}
             parentId={post.id}
@@ -516,6 +518,7 @@ export function ForumPostCard({
             node={child}
             topicId={topicId}
             topicAuthorId={topicAuthorId}
+            topicLocked={topicLocked}
             replyingToId={replyingToId}
             onReplyClick={onReplyClick}
             onQuoteClick={onQuoteClick}

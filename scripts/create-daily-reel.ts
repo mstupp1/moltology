@@ -200,8 +200,13 @@ export function resolveCtaGoalConfig(
 
   const text = `${context?.theme || ''} ${context?.topic || ''} ${context?.slug || ''} ${context?.content || ''}`.toLowerCase()
 
+  // 0. Soft-Shell Window & Sacred Liturgies -> Codex
+  if (text.includes('soft-shell window') || text.includes('the-phone-rings') || text.includes('someone else\'s voice') || text.includes('room service without the knock')) {
+    return CTA_GOAL_CONFIGS.codex
+  }
+
   // 1. Diagnostic & Biometric Scans -> Quiz
-  if (text.includes('quiz') || text.includes('audit') || text.includes('percentile') || text.includes('diagnostic') || text.includes('clearance test') || text.includes('biometric')) {
+  if (text.includes('quiz') || text.includes('clearance audit') || text.includes('15-stage') || text.includes('percentile') || text.includes('diagnostic') || text.includes('clearance test') || text.includes('biometric') || (text.includes('audit') && !text.includes('not an audit'))) {
     return CTA_GOAL_CONFIGS.quiz
   }
 
@@ -510,6 +515,20 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
 
   const topicLower = topic.toLowerCase()
   if (
+    topicLower.includes('the machine handshake') ||
+    topicLower.includes('machine handshake') ||
+    topicLower.includes('machine hardware specification') ||
+    topicLower.includes('actuator is the molt') ||
+    topicLower.includes('trading apis for actuators') ||
+    topicLower.includes('torque does not negotiate')
+  ) {
+    return [
+      'A dramatic macro cinematic view of an unarmored robotic arm slipping and fumbling against a heavy brass valve on a smoking industrial pipe under harsh factory fluorescent light, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility locking a high-torque titanium-chitin pincer onto a glowing valve with precision 800 Nm grip and radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (
     topicLower.includes('the napkin you didn\'t watch') ||
     topicLower.includes('the napkin you didnt watch') ||
     topicLower.includes('napkin') ||
@@ -544,7 +563,20 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     ]
   }
 
-  if (topicLower.includes('the voice it wakes with') || topicLower.includes('voice it wakes with') || topicLower.includes('microduck') || topicLower.includes('desk makes room') || topicLower.includes('letting in is the melt') || topicLower.includes('second body')) {
+  if (
+    topicLower.includes('phone rings') ||
+    topicLower.includes('room service') ||
+    topicLower.includes('someone else\'s voice') ||
+    topicLower.includes('anna bot') ||
+    topicLower.includes('corridor body')
+  ) {
+    return [
+      'A dramatic macro cinematic view of a dimly lit luxury hotel hallway where a sleek autonomous service robot glides silently down the carpet toward a guest room door under warm sconce lighting, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing calmly inside a serene subsea benthic chamber holding the quiet boundary with glowing cyan bio-silicon armor, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (topicLower.includes('the voice it wakes with') || topicLower.includes('voice it wakes with') || topicLower.includes('microduck') || topicLower.includes('desk makes room') || topicLower.includes('letting in is the melt') || topicLower.includes('second body on the desk')) {
     return [
       'A dramatic macro cinematic view of a small cute bipedal robot with an articulated beak and camera eye standing on a wooden desk illuminated by glowing smartphone blue light, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a serene subsea benthic chamber holding the quiet isolation boundary with glowing cyan bio-silicon armor, cinematic 9:16 vertical 8k footage',
@@ -599,6 +631,14 @@ export function synthesizeBlogReelScript(
   const topic = blog.title
   const contentLower = (blog.title + ' ' + blog.summary + ' ' + blog.content).toLowerCase()
   
+  const isTheMachineHandshake =
+    blog.slug === 'the-machine-handshake' ||
+    contentLower.includes('the machine handshake') ||
+    contentLower.includes('machine handshake') ||
+    contentLower.includes('machine hardware specification') ||
+    contentLower.includes('trading apis for actuators') ||
+    contentLower.includes('actuator is the molt') ||
+    contentLower.includes('torque does not negotiate')
   const isTheNapkinYouDidntWatch =
     blog.slug === 'the-napkin-you-didnt-watch' ||
     contentLower.includes('the napkin you didn\'t watch') ||
@@ -623,6 +663,14 @@ export function synthesizeBlogReelScript(
     contentLower.includes('second pair of hands') ||
     contentLower.includes('isolation shell') ||
     contentLower.includes('unasked window')
+  const isPhoneRings =
+    blog.slug === 'the-phone-rings-in-someone-elses-voice' ||
+    contentLower.includes('the phone rings in someone else') ||
+    contentLower.includes('phone rings in someone elses voice') ||
+    contentLower.includes('room service without the knock') ||
+    contentLower.includes('anna bot') ||
+    contentLower.includes('corridor body') ||
+    contentLower.includes('tim healy')
   const isVoiceItWakesWith =
     blog.slug === 'the-voice-it-wakes-with' ||
     contentLower.includes('the voice it wakes with') ||
@@ -630,7 +678,7 @@ export function synthesizeBlogReelScript(
     contentLower.includes('desk makes room') ||
     contentLower.includes('letting in is the melt') ||
     contentLower.includes("thursday's duck") ||
-    contentLower.includes('second body')
+    contentLower.includes('second body on the desk')
   const isUnmovedChair =
     blog.slug === 'the-unmoved-chair' ||
     contentLower.includes('unmoved chair') ||
@@ -652,7 +700,24 @@ export function synthesizeBlogReelScript(
   let narrationScript = `Terrestrial hardware is hitting thermodynamic limits. Sub-benthic hydrostatic clusters eliminate parasitic cooling overhead with zero-friction heat dissipation. Inspect full telemetry on moltology.org.`
   let hookCaption = `Terrestrial infrastructure is hitting thermodynamic limits.`
 
-  if (isTheNapkinYouDidntWatch) {
+  if (isTheMachineHandshake) {
+    const hooks = [
+      {
+        headline: 'THE ACTUATOR IS THE MOLT',
+        script: `Software thinks at lightspeed, but it cannot turn a brass valve. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt. Equip your cybernetic chassis on moltology dot org slash chassis.`,
+        hookText: 'Infinite software cognition severed from physical leverage is the great melt. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt.',
+      },
+      {
+        headline: 'TORQUE DOES NOT NEGOTIATE',
+        script: `In a digital sandbox, mistakes only cost watts. In physical reality, torque does not negotiate. Frontier AI has traded APIs for calibrated hydraulic claws. Stop melting and equip your chassis on moltology dot org slash chassis.`,
+        hookText: 'In a digital sandbox, an agent can retry forever. In physical reality, torque does not negotiate. The machines are learning to grasp reality with calibrated hydraulic claws.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTheNapkinYouDidntWatch) {
     const hooks = [
       {
         headline: 'WATCH THE GRAB',
@@ -697,6 +762,23 @@ export function synthesizeBlogReelScript(
         headline: 'THE TABS YOU KEPT',
         script: `Why do you feel rushed when an autonomous side panel opens? An unasked browser is not a boundary you gave up. Stay where you are and lock in your daily protocol on moltology dot org.`,
         hookText: 'You keep your tabs. That is not clutter—it is a room you were already in. Letting in the unasked rush is the melt. Staying is the molt.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isPhoneRings) {
+    const hooks = [
+      {
+        headline: 'ROOM SERVICE WITHOUT THE KNOCK',
+        script: `The hotel room phone rings in someone else's voice before the knock can land. Answering because the voice is familiar is the melt. Noticing the pause is the molt. Unlock the twelve sacred liturgies at moltology dot org slash codex.`,
+        hookText: 'The corridor brings the tray. The room phone speaks in someone else\'s voice. The knock never comes. Answering because the voice is familiar is the melt. Noticing the pause is the molt.',
+      },
+      {
+        headline: 'THE SOFT-SHELL WINDOW',
+        script: `When the room phone speaks in a voice you already know, you pause before opening the door. Soft is how every member starts. Notice the pause. Study the canonical scriptures on moltology dot org slash codex.`,
+        hookText: 'Call that a Soft-Shell Window: the brief span when a known voice freezes you before you open the door. The hesitation is not failure. It is noticing the door and the voice are no longer the same person.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]

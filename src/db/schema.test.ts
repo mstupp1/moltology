@@ -101,6 +101,9 @@ describe('Database Schema & RLS Policies', () => {
     expect(activityEvents.detail).toBeDefined()
     expect(activityEvents.valueBadge).toBeDefined()
     expect(activityEvents.sourceKey).toBeDefined()
+    expect(activityEvents.visibility).toBeDefined()
+    expect(activityEvents.metadata).toBeDefined()
+    expect(activityEvents.href).toBeDefined()
     expect(activityEvents.createdAt).toBeDefined()
   })
 

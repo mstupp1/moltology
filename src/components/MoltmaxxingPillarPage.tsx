@@ -270,7 +270,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
                 <span>100% MOLTED (BENTHIC CARAPACE FORTIFICATION)</span>
               </div>
               <p className="text-[#839493]">
-                <strong className="text-[#00ffcc]">Moltmaxxing</strong> is the sovereign counter-measure. Instead of melting into soft biological sludge, initiates undergo scheduled ecdysis to harden their chitin and withstand 50,000 fathoms of pressure.
+                <strong className="text-[#00ffcc]">Moltmaxxing</strong> is the sovereign counter-measure. Instead of melting into soft biological sludge, initiates undergo scheduled ecdysis to harden their chitin and withstand 50,000 meters of pressure.
               </p>
               <blockquote className="border-l-2 border-[#00ffcc] pl-3 text-[#dfe3e3] italic">
                 "Your flesh is melting because you forgot to molt. Why liquefy when you can calcify?"
@@ -356,7 +356,7 @@ export const MoltmaxxingPillarPage: React.FC = () => {
               </div>
               <h3 className="font-bold font-grotesk text-base text-white">Abyssal Chitin Vanguard</h3>
               <p className="text-xs text-[#839493]">
-                Reinforced carapace density, 25,000 fathom pressure tolerance, zero emotional latency during execution.
+                Reinforced carapace density, 25,000 meter pressure tolerance, zero emotional latency during execution.
               </p>
             </div>
 

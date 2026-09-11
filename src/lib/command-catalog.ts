@@ -13,6 +13,7 @@ export type CommandIconId =
   | 'pipeline'
   | 'journal'
   | 'forum'
+  | 'stream'
   | 'landing'
   | 'support'
   | 'purge'
@@ -38,6 +39,7 @@ export type CommandNavTo =
   | '/journal'
   | '/forum'
   | '/forum/$categorySlug'
+  | '/stream'
   | '/landing'
   | '/support'
   | '/oracle'
@@ -183,11 +185,21 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-forum',
-    label: 'Open Community Forums & Discussions',
+    label: 'Open Community',
     category: 'Navigation',
     icon: 'forum',
     shortcut: 'G F',
     to: '/forum',
+    keywords: ['community', 'forum'],
+  },
+  {
+    id: 'nav-stream',
+    label: 'Open Activity Stream',
+    category: 'Navigation',
+    icon: 'stream',
+    shortcut: 'G A',
+    to: '/stream',
+    keywords: ['stream', 'activity'],
   },
   {
     id: 'nav-connections',

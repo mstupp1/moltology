@@ -1,23 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { Activity, CheckCircle2, Clock } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Activity, ChevronRight } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { getActivityEventsFn } from '@/lib/server/api'
+import { getActivityFeedFn } from '@/lib/server/api'
 import {
   ACTIVITY_STREAM_EMPTY_COPY,
   ACTIVITY_STREAM_SUBTITLE,
+  kindsForActivityFilter,
   type ActivityEventView,
 } from '@/lib/activity-events'
 import { ActivityFeedGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { ActivityFeedItem } from '@/components/hud/ActivityFeedItem'
 
-function eventIcon() {
-  return <CheckCircle2 className="w-4 h-4 text-[#00ffff]" />
+const HUB_STREAM_LIMIT = 5
+
+function PulseChip({ label, count }: { label: string; count: number }) {
+  if (count <= 0) return null
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] chamfer-corner bg-[#070b0b]/60">
+      {label}
+      <span className="tabular-nums text-[#00ffff]">{count}</span>
+    </span>
+  )
 }
 
 export function ActivityStreamPanel() {
+  const navigate = useNavigate()
   const session = useAuthSession()
-  const user = session.user
   const userId = session.userId
   const isAuthPending = session.isPending
 
@@ -39,11 +50,17 @@ export function ActivityStreamPanel() {
 
       try {
         const token = await getAuthJWTToken()
-        const fetched = await getActivityEventsFn({
-          data: { token: token ?? undefined, userId },
+        const fetched = await getActivityFeedFn({
+          data: {
+            token: token ?? undefined,
+            userId,
+            scope: 'circle',
+            filter: 'all',
+            limit: HUB_STREAM_LIMIT,
+          },
         })
         if (isMounted) {
-          setEvents(Array.isArray(fetched) ? fetched : [])
+          setEvents(Array.isArray(fetched?.events) ? fetched.events : [])
         }
       } catch {
         if (isMounted) setEvents([])
@@ -58,10 +75,24 @@ export function ActivityStreamPanel() {
     }
   }, [userId, isAuthPending])
 
+  const pulse = useMemo(() => {
+    const liturgies = kindsForActivityFilter('liturgies') ?? []
+    const streaks = kindsForActivityFilter('streaks') ?? []
+    const stages = kindsForActivityFilter('stages') ?? []
+    return {
+      liturgies: events.filter((event) => liturgies.includes(event.kind)).length,
+      streaks: events.filter((event) => streaks.includes(event.kind)).length,
+      stages: events.filter((event) => stages.includes(event.kind)).length,
+    }
+  }, [events])
+
   return (
-    <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between">
+    <div
+      className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3.5 sm:space-y-4 h-full flex flex-col justify-between"
+      data-testid="activity-stream-panel"
+    >
       <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
           <div>
             <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
               <Activity className="w-4 h-4 text-[#00ffff]" />
@@ -80,43 +111,34 @@ export function ActivityStreamPanel() {
               <p className="text-xs text-[#839493] leading-relaxed">{ACTIVITY_STREAM_EMPTY_COPY.body}</p>
             </div>
           ) : (
-            <div className="space-y-1.5 font-sans">
-              {events.slice(0, 5).map((act) => (
-                <div
-                  key={act.id}
-                  className="chitin-card-inset p-2.5 flex items-start justify-between gap-2.5 hover:border-[#00ffff]/50 transition-colors group chamfer-corner"
-                >
-                  <div className="flex items-start gap-2.5 min-w-0">
-                    <div className="p-1.5 bg-[#070b0b] border border-[#3a4a49] shrink-0 mt-0.5">
-                      {eventIcon()}
-                    </div>
-                    <div className="min-w-0 space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase group-hover:text-[#00ffff] transition-colors truncate">
-                          {act.title}
-                        </span>
-                        <span className="text-[9px] text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.2 shrink-0">
-                          {act.category}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[#839493] leading-snug line-clamp-1">{act.detail}</p>
-                      <div className="text-[10px] text-[#3a4a49] group-hover:text-[#839493] transition-colors flex items-center gap-1 pt-0.5">
-                        <Clock className="w-3 h-3" />
-                        <span>{act.occurredLabel}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {act.valueBadge ? (
-                    <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#070b0b] border border-[#3a4a49] px-1.5 py-0.5 shrink-0">
-                      {act.valueBadge}
-                    </span>
-                  ) : null}
+            <div className="space-y-2.5 font-sans">
+              {(pulse.liturgies > 0 || pulse.streaks > 0 || pulse.stages > 0) && (
+                <div className="flex flex-wrap gap-1.5">
+                  <PulseChip label="Liturgies" count={pulse.liturgies} />
+                  <PulseChip label="Streaks" count={pulse.streaks} />
+                  <PulseChip label="Stages" count={pulse.stages} />
                 </div>
-              ))}
+              )}
+              <div className="space-y-2">
+                {events.slice(0, HUB_STREAM_LIMIT).map((event) => (
+                  <ActivityFeedItem key={event.id} event={event} variant="compact" />
+                ))}
+              </div>
             </div>
           )}
         </HudGhostWidget>
+      </div>
+
+      <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs">
+        <span className="text-[#839493] text-[10px]">OPEN THE CIRCLE FEED</span>
+        <button
+          type="button"
+          onClick={() => navigate({ to: '/stream' })}
+          className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+        >
+          <span>OPEN STREAM</span>
+          <ChevronRight className="w-3 h-3" />
+        </button>
       </div>
     </div>
   )

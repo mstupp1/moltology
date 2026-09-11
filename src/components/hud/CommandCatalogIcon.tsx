@@ -8,6 +8,7 @@ import {
   Layers,
   Microscope,
   Users,
+  Activity,
   Flame,
   Terminal,
   Zap,
@@ -43,6 +44,8 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
       return <Microscope className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'forum':
       return <Users className={`${ICON_CLASS} text-[#00ffff]`} />
+    case 'stream':
+      return <Activity className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'landing':
       return <Flame className={`${ICON_CLASS} text-red-500`} />
     case 'support':

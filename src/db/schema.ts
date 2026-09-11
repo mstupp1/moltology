@@ -133,7 +133,27 @@ export const routineCompletions = pgTable('routine_completions', {
   })
 ])
 
-/** Per-member HUD activity stream. Empty table → empty stream. Never seed canned rows. */
+export type ActivityEventVisibility = 'private' | 'friends' | 'public'
+
+export type ActivityEventMetadata = {
+  taskKey?: string
+  taskTitle?: string
+  time?: string
+  date?: string
+  streakDays?: number
+  bonusXp?: number
+  stage?: number
+  previousStage?: number
+  stageTitle?: string
+  completedCount?: number
+  totalCount?: number
+}
+
+/**
+ * Per-member HUD + circle activity stream.
+ * Empty table → empty stream. Never seed canned rows.
+ * `visibility` gates circle reads; owner always sees their own rows.
+ */
 export const activityEvents = pgTable('activity_events', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
@@ -142,13 +162,47 @@ export const activityEvents = pgTable('activity_events', {
   detail: text('detail').notNull(),
   valueBadge: text('valueBadge'),
   sourceKey: text('sourceKey').notNull(),
+  visibility: text('visibility').$type<ActivityEventVisibility>().default('friends').notNull(),
+  metadata: jsonb('metadata').$type<ActivityEventMetadata>().default({}).notNull(),
+  href: text('href'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 }, (table) => [
   uniqueIndex('activity_events_user_source_unique').on(table.userId, table.sourceKey),
-  pgPolicy('activity_events_isolation_policy', {
-    for: 'all',
-    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
-  })
+  index('activity_events_user_created_idx').on(table.userId, table.createdAt),
+  index('activity_events_kind_created_idx').on(table.kind, table.createdAt),
+  pgPolicy('activity_events_select_policy', {
+    for: 'select',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+      OR visibility = 'public'
+      OR (
+        visibility = 'friends'
+        AND EXISTS (
+          SELECT 1 FROM friendships f
+          WHERE (
+            (f."userAId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') AND f."userBId" = "userId")
+            OR (f."userBId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') AND f."userAId" = "userId")
+          )
+        )
+      )`,
+  }),
+  pgPolicy('activity_events_owner_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('activity_events_owner_update_policy', {
+    for: 'update',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('activity_events_owner_delete_policy', {
+    for: 'delete',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
 ])
 
 // User XP Transactions Table (Idempotent progression event ledger)

@@ -32,6 +32,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
+import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudCodexRouteImport } from './routes/_hud/codex'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
@@ -45,6 +46,7 @@ import { Route as HudPodcastsRouteImport } from './routes/_hud/podcasts'
 import { Route as HudProfileRouteImport } from './routes/_hud/profile'
 import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
+import { Route as HudStreamRouteImport } from './routes/_hud/stream'
 import { Route as HudSubterraneanRouteImport } from './routes/_hud/subterranean'
 import { Route as HudSupportRouteImport } from './routes/_hud/support'
 import { Route as HudWatchRouteImport } from './routes/_hud/watch'
@@ -178,6 +180,11 @@ const TermsDotmdRoute = TermsDotmdRouteImport.update({
   path: '/terms.md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HudAlignmentRoute = HudAlignmentRouteImport.update({
+  id: '/alignment',
+  path: '/alignment',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudChassisRoute = HudChassisRouteImport.update({
   id: '/chassis',
   path: '/chassis',
@@ -241,6 +248,11 @@ const HudSearchRoute = HudSearchRouteImport.update({
 const HudSettingsRoute = HudSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudStreamRoute = HudStreamRouteImport.update({
+  id: '/stream',
+  path: '/stream',
   getParentRoute: () => HudRoute,
 } as any)
 const HudSubterraneanRoute = HudSubterraneanRouteImport.update({
@@ -360,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/alignment': typeof HudAlignmentRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/connections': typeof HudConnectionsRoute
@@ -373,6 +386,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
+  '/stream': typeof HudStreamRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
@@ -415,6 +429,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/alignment': typeof HudAlignmentRoute
   '/chassis': typeof HudChassisRoute
   '/codex': typeof HudCodexRoute
   '/connections': typeof HudConnectionsRoute
@@ -428,6 +443,7 @@ export interface FileRoutesByTo {
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
+  '/stream': typeof HudStreamRoute
   '/subterranean': typeof HudSubterraneanRoute
   '/support': typeof HudSupportRoute
   '/watch': typeof HudWatchRoute
@@ -472,6 +488,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/codex': typeof HudCodexRoute
   '/_hud/connections': typeof HudConnectionsRoute
@@ -485,6 +502,7 @@ export interface FileRoutesById {
   '/_hud/profile': typeof HudProfileRoute
   '/_hud/search': typeof HudSearchRoute
   '/_hud/settings': typeof HudSettingsRoute
+  '/_hud/stream': typeof HudStreamRoute
   '/_hud/subterranean': typeof HudSubterraneanRoute
   '/_hud/support': typeof HudSupportRoute
   '/_hud/watch': typeof HudWatchRoute
@@ -529,6 +547,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/terms.md'
+    | '/alignment'
     | '/chassis'
     | '/codex'
     | '/connections'
@@ -542,6 +561,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/stream'
     | '/subterranean'
     | '/support'
     | '/watch'
@@ -584,6 +604,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/terms.md'
+    | '/alignment'
     | '/chassis'
     | '/codex'
     | '/connections'
@@ -597,6 +618,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/stream'
     | '/subterranean'
     | '/support'
     | '/watch'
@@ -640,6 +662,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/terms.md'
+    | '/_hud/alignment'
     | '/_hud/chassis'
     | '/_hud/codex'
     | '/_hud/connections'
@@ -653,6 +676,7 @@ export interface FileRouteTypes {
     | '/_hud/profile'
     | '/_hud/search'
     | '/_hud/settings'
+    | '/_hud/stream'
     | '/_hud/subterranean'
     | '/_hud/support'
     | '/_hud/watch'
@@ -871,6 +895,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_hud/alignment': {
+      id: '/_hud/alignment'
+      path: '/alignment'
+      fullPath: '/alignment'
+      preLoaderRoute: typeof HudAlignmentRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/chassis': {
       id: '/_hud/chassis'
       path: '/chassis'
@@ -960,6 +991,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof HudSettingsRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/stream': {
+      id: '/_hud/stream'
+      path: '/stream'
+      fullPath: '/stream'
+      preLoaderRoute: typeof HudStreamRouteImport
       parentRoute: typeof HudRoute
     }
     '/_hud/subterranean': {
@@ -1092,6 +1130,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface HudRouteChildren {
+  HudAlignmentRoute: typeof HudAlignmentRoute
   HudChassisRoute: typeof HudChassisRoute
   HudCodexRoute: typeof HudCodexRoute
   HudConnectionsRoute: typeof HudConnectionsRoute
@@ -1105,6 +1144,7 @@ interface HudRouteChildren {
   HudProfileRoute: typeof HudProfileRoute
   HudSearchRoute: typeof HudSearchRoute
   HudSettingsRoute: typeof HudSettingsRoute
+  HudStreamRoute: typeof HudStreamRoute
   HudSubterraneanRoute: typeof HudSubterraneanRoute
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
@@ -1117,6 +1157,7 @@ interface HudRouteChildren {
 }
 
 const HudRouteChildren: HudRouteChildren = {
+  HudAlignmentRoute: HudAlignmentRoute,
   HudChassisRoute: HudChassisRoute,
   HudCodexRoute: HudCodexRoute,
   HudConnectionsRoute: HudConnectionsRoute,
@@ -1130,6 +1171,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudProfileRoute: HudProfileRoute,
   HudSearchRoute: HudSearchRoute,
   HudSettingsRoute: HudSettingsRoute,
+  HudStreamRoute: HudStreamRoute,
   HudSubterraneanRoute: HudSubterraneanRoute,
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,

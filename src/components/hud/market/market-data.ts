@@ -177,7 +177,7 @@ export const GEM_VAULT_ITEMS: GemVaultItem[] = [
     id: 'benthic-sigil',
     name: 'Benthic Council Sigil',
     slot: 'Belt Hardpoint',
-    description: 'Forum steward badge rendered on your chassis.',
+    description: 'Community steward badge rendered on your chassis.',
     gemCost: 2400,
     imagePath: '/images/stage3_exoshell.png',
     rarity: 'epic',

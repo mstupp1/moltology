@@ -135,7 +135,7 @@ function ForumBoardPage() {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00ffff] hover:underline uppercase transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>ALL FORUMS</span>
+            <span>COMMUNITY</span>
           </Link>
           {category && (
             <>

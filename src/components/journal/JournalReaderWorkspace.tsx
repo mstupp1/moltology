@@ -14,10 +14,8 @@ import {
 } from 'lucide-react'
 import type { JournalPaper } from '@/lib/journal-data'
 import { INITIAL_JOURNAL_EDITORIAL_BOARD, JOURNAL_META } from '@/lib/journal-data'
-import { PAPER_PALETTES } from '@/lib/paper-palette'
-import { HudButton } from '@/components/ui'
+import { PAPER_PALETTES, READER_FONT_SIZE } from '@/lib/paper-palette'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
-import { useReaderPreferences } from '@/components/reader/useReaderPreferences'
 import { FullscreenDocumentReader } from '@/components/reader/FullscreenDocumentReader'
 import { ReaderPdfPage } from '@/components/reader/ReaderPdfPage'
 import { JournalPaperSheet } from './JournalPaperSheet'
@@ -35,9 +33,9 @@ interface JournalReaderWorkspaceProps {
 
 /**
  * The Benthic Compendium reading workspace. Mirrors the Sacred Codex reader:
- * an archive directory beside a themed reading pane, with an immersive
- * fullscreen overlay. Only the content differs — codex scriptures vs. journal
- * papers — and paper selection stays URL-driven through onNavigate.
+ * an archive directory beside a reading pane, with an immersive fullscreen
+ * overlay. Only the content differs — codex scriptures vs. journal papers —
+ * and paper selection stays URL-driven through onNavigate.
  */
 export function JournalReaderWorkspace({
   papers,
@@ -48,7 +46,6 @@ export function JournalReaderWorkspace({
   const [searchQuery, setSearchQuery] = useState('')
   const [showDirectory, setShowDirectory] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const preferences = useReaderPreferences('moltology_journal_reader_prefs')
   const paneRef = useRef<HTMLDivElement>(null)
   const prevSlugRef = useRef<string | null>(null)
 
@@ -112,7 +109,7 @@ export function JournalReaderWorkspace({
 
   if (!activePaper) return null
 
-  const palette = PAPER_PALETTES[preferences.theme]
+  const palette = PAPER_PALETTES.paper
   const totalReadMinutes = papers.reduce((sum, p) => sum + p.readTimeMinutes, 0)
 
   return (
@@ -138,13 +135,12 @@ export function JournalReaderWorkspace({
               zoom={zoom}
               pageWidth={pageWidth}
               pageId={activePaper.slug}
-              className={cn(preferences.theme === 'night' && 'codex-dark-theme')}
               style={{ backgroundColor: palette.sheet, color: palette.ink }}
             >
               <JournalPaperSheet
                 paper={activePaper}
-                theme={preferences.theme}
-                fontSize={preferences.fontSize}
+                theme="paper"
+                fontSize={READER_FONT_SIZE.default}
                 compact
               />
             </ReaderPdfPage>
@@ -192,17 +188,6 @@ export function JournalReaderWorkspace({
               <Menu className="w-3.5 h-3.5" />
               <span>ARCHIVE</span>
             </button>
-
-            <HudButton
-              variant="cyan"
-              size="sm"
-              icon={<Maximize2 className="w-3.5 h-3.5" />}
-              onClick={() => setIsFullscreen(true)}
-              title="Fullscreen Paper Reader"
-              className="font-sans text-xs uppercase font-bold tracking-wider whitespace-nowrap"
-            >
-              FULLSCREEN
-            </HudButton>
           </>
         }
       >
@@ -366,7 +351,6 @@ export function JournalReaderWorkspace({
 
             <JournalPaperReader
               paper={activePaper}
-              preferences={preferences}
               pageIndex={Math.max(0, activeNavIndex)}
               pageCount={filteredPapers.length || 1}
               onPrev={handlePrevPaper}

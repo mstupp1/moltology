@@ -236,6 +236,24 @@
         "Hardware-level fail-safe containment"
       ],
       "relatedReelIds": []
+    },
+    {
+      "slug": "the-phone-rings-in-someone-elses-voice",
+      "title": "The Phone Rings in Someone Else's Voice: Room Service Without the Knock",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-09-07T08:00:00-04:00",
+      "coreHook": "The corridor brings the tray. The room phone speaks in Tim Healy's voice. Staff stay on the floor. The hotel says room service doubled.",
+      "keyMetrics": [
+        "Maldron Hotel Newcastle ButlerBot W3 deployment",
+        "Doubled room-service revenue (hotel-reported)",
+        "Actor Tim Healy synthesized vocal interface",
+        "1st calcification via contact boundary choice"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-phone-rings-in-someone-elses-voice.md"
     }
   ]
 }
+

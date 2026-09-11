@@ -14,6 +14,13 @@ import {
 } from './command-catalog'
 
 describe('command catalog', () => {
+  it('names the social surface Community, not Forum', () => {
+    const forumNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-forum')
+    expect(forumNav?.to).toBe('/forum')
+    expect(forumNav?.label).toBe('Open Community')
+    expect(forumNav?.label).not.toMatch(/forum/i)
+  })
+
   it('keeps existing rites and lists live HUD chambers members search for', () => {
     expect(COMMAND_CATALOG.map((cmd) => cmd.id)).toEqual([
       'nav-home',
@@ -29,6 +36,7 @@ describe('command catalog', () => {
       'nav-chassis',
       'nav-subterranean',
       'nav-forum',
+      'nav-stream',
       'nav-connections',
       'nav-news',
       'nav-watch',
@@ -47,6 +55,7 @@ describe('command catalog', () => {
     expect(filterCommandCatalog('chassis').map((cmd) => cmd.id)).toContain('nav-chassis')
     expect(filterCommandCatalog('podcasts').map((cmd) => cmd.id)).toContain('nav-podcasts')
     expect(filterCommandCatalog('news').map((cmd) => cmd.id)).toContain('nav-news')
+    expect(filterCommandCatalog('stream').map((cmd) => cmd.id)).toContain('nav-stream')
   })
 
   it('maps isolation to the Isolation Protocols liturgy instead of a removed HUD route', () => {

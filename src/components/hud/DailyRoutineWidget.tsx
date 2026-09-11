@@ -5,45 +5,124 @@ import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
-import { localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 
 // ---------------------------------------------------------------------------
-// ActivityHeatmap — 52-week GitHub-style grid (Sun–Sat rows, weeks as cols)
+// ActivityHeatmap — width-aware GitHub-style grid (Sun–Sat rows, weeks as cols)
 // ---------------------------------------------------------------------------
-const NARROW_VIEWPORT_MQ = '(max-width: 639px)'
 
-export const ALIGNMENT_HEATMAP_DESKTOP = {
-  weeks: 52,
-  cell: 14,
-  gap: 3,
-  dowGutter: 32,
-} as const
-
-export const ALIGNMENT_HEATMAP_MOBILE = {
-  weeks: 20,
-  cell: 11,
+export const ALIGNMENT_HEATMAP = {
+  maxWeeks: 52,
+  minWeeks: 12,
+  minCell: 11,
+  maxCell: 16,
   gap: 2,
   dowGutter: 16,
 } as const
 
-function useIsNarrowViewport() {
-  const [narrow, setNarrow] = useState(false)
+/** SSR / pre-measure fallback — fills a typical phone card without a dead gutter once measured. */
+export const ALIGNMENT_HEATMAP_DEFAULT = {
+  weeks: 20,
+  cell: 11,
+  gap: ALIGNMENT_HEATMAP.gap,
+  dowGutter: ALIGNMENT_HEATMAP.dowGutter,
+} as const
+
+export type HeatmapLayout = {
+  weeks: number
+  cell: number
+  gap: number
+  dowGutter: number
+  fillsWidth: boolean
+  scrolls: boolean
+}
+
+/**
+ * Pick week count + cell size so the grid fills `containerWidth` when possible.
+ * Fits the full 52-week year when the container is wide enough at MIN_CELL;
+ * otherwise prefers larger cells (up to MAX_CELL) so phone cards do not leave
+ * a dead horizontal gutter.
+ */
+export function computeHeatmapLayout(containerWidth: number): HeatmapLayout {
+  const { maxWeeks, minWeeks, minCell, maxCell, gap, dowGutter } = ALIGNMENT_HEATMAP
+
+  if (!Number.isFinite(containerWidth) || containerWidth <= 0) {
+    return { ...ALIGNMENT_HEATMAP_DEFAULT, fillsWidth: true, scrolls: false }
+  }
+
+  const available = Math.max(0, Math.floor(containerWidth) - dowGutter)
+  const minStride = minCell + gap
+  const maxStride = maxCell + gap
+
+  if (available < minStride) {
+    return {
+      weeks: minWeeks,
+      cell: minCell,
+      gap,
+      dowGutter,
+      fillsWidth: false,
+      scrolls: true,
+    }
+  }
+
+  let weeks: number
+  let cell: number
+  let scrolls = false
+
+  const yearMinWidth = maxWeeks * minStride
+  if (available >= yearMinWidth) {
+    // Full year fits — grow cells toward MAX_CELL to absorb leftover width
+    weeks = maxWeeks
+    cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
+  } else {
+    // Prefer larger cells so the grid fills the card; keep as many weeks as fit
+    weeks = Math.max(1, Math.floor(available / maxStride))
+    if (weeks < minWeeks && available >= minWeeks * minStride) {
+      weeks = minWeeks
+    }
+    if (weeks < 1) {
+      weeks = maxWeeks
+      cell = minCell
+      scrolls = true
+    } else {
+      cell = Math.min(maxCell, Math.max(minCell, Math.floor(available / weeks) - gap))
+    }
+  }
+
+  const gridWidth = weeks * (cell + gap)
+  if (gridWidth > available) {
+    scrolls = true
+  }
+
+  const remainder = available - gridWidth
+  const fillsWidth = !scrolls && remainder < maxStride
+
+  return { weeks, cell, gap, dowGutter, fillsWidth, scrolls }
+}
+
+function useHeatmapLayout(containerRef: React.RefObject<HTMLElement | null>): HeatmapLayout {
+  const [layout, setLayout] = useState<HeatmapLayout>(() => ({
+    ...ALIGNMENT_HEATMAP_DEFAULT,
+    fillsWidth: true,
+    scrolls: false,
+  }))
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    const media = window.matchMedia(NARROW_VIEWPORT_MQ)
-    const update = () => setNarrow(media.matches)
-    update()
-    if (media.addEventListener) {
-      media.addEventListener('change', update)
-      return () => media.removeEventListener('change', update)
-    }
-    media.addListener(update)
-    return () => media.removeListener(update)
-  }, [])
+    const el = containerRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
 
-  return narrow
+    const update = () => {
+      setLayout(computeHeatmapLayout(el.clientWidth))
+    }
+    update()
+
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [containerRef])
+
+  return layout
 }
 
 interface HeatmapCell {
@@ -57,7 +136,7 @@ function buildHeatmapGrid(
   history: Array<{ date: string; completedCount: number }>,
   todayDate: string,
   totalTasks: number = TOTAL_ALIGNMENT_TASKS,
-  weeks: number = ALIGNMENT_HEATMAP_DESKTOP.weeks
+  weeks: number = ALIGNMENT_HEATMAP.maxWeeks
 ): { grid: HeatmapCell[][]; monthLabels: Array<{ label: string; colIndex: number }> } {
   const countMap = new Map<string, number>()
   for (const item of history) {
@@ -133,8 +212,7 @@ interface ActivityHeatmapProps {
 function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TASKS }: ActivityHeatmapProps) {
   const [tooltip, setTooltip] = useState<{ cell: HeatmapCell; x: number; y: number } | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const isNarrow = useIsNarrowViewport()
-  const layout = isNarrow ? ALIGNMENT_HEATMAP_MOBILE : ALIGNMENT_HEATMAP_DESKTOP
+  const layout = useHeatmapLayout(scrollRef)
   const colW = layout.cell + layout.gap
 
   const { grid, monthLabels } = useMemo(
@@ -167,10 +245,8 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
     })
   }
 
-  // DOW labels — only render on alternate rows to avoid crowding at small heights
-  const DOW_LABELS = isNarrow
-    ? ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  // Single-letter DOW labels — compact chrome on every viewport
+  const DOW_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
   const VISIBLE_DOW = new Set([0, 2, 4, 6]) // Sun, Tue, Thu, Sat
 
   return (
@@ -180,11 +256,11 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
         <div className="flex items-center gap-2 min-w-0">
           <BarChart3 className="w-4 h-4 text-[#00c3ff] shrink-0" />
           <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider truncate">
-            {isNarrow ? 'Activity' : '52-Week Activity'}
+            Activity
           </span>
         </div>
-        <span className="text-[10px] text-[#839493] shrink-0">
-          {isNarrow ? `${layout.weeks}-wk` : 'Daily tasks done'}
+        <span className="text-[10px] text-[#839493] shrink-0" data-testid="alignment-heatmap-weeks">
+          {layout.weeks}-wk
         </span>
       </div>
 
@@ -223,7 +299,7 @@ function ActivityHeatmap({ history, currentDate, totalTasks = TOTAL_ALIGNMENT_TA
           <div className="flex items-start">
             {/* Day-of-week labels — sized to match cell height + gap */}
             <div
-              className="flex flex-col shrink-0 pr-1 sm:pr-2"
+              className="flex flex-col shrink-0 pr-1"
               style={{ width: layout.dowGutter, gap: layout.gap }}
             >
               {DOW_LABELS.map((label, i) => (
@@ -321,15 +397,21 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
 
   const [hoveredDay, setHoveredDay] = useState<DailyStreakDay | null>(null)
 
-  const { remindersEnabled, toggleReminders, getTaskReminderTime } =
-    useAlignmentReminders(tasks)
+  const { remindersEnabled, toggleReminders } = useAlignmentReminders(tasks)
 
   const completionPercent = Math.round((completedCount / Math.max(totalCount, 1)) * 100)
+
+  useEffect(() => {
+    if (isLoading || isAlignmentLoading) return
+    if (typeof window === 'undefined') return
+    if (window.location.hash !== `#${DAILY_ALIGNMENT_HUB_ID}`) return
+    document.getElementById(DAILY_ALIGNMENT_HUB_ID)?.scrollIntoView({ block: 'start' })
+  }, [isLoading, isAlignmentLoading])
 
   return (
     <HudGhostWidget isLoading={isLoading || isAlignmentLoading} skeleton={<DailyRoutineGhost />}>
       <HudCard
-        id="daily-routine-hub"
+        id={DAILY_ALIGNMENT_HUB_ID}
         variant="teal"
         className="p-3 sm:p-4 md:p-6 relative space-y-4 sm:space-y-5 font-sans shadow-2xl border-[#00c3ff]/40 min-w-0 overflow-hidden"
       >
@@ -370,71 +452,50 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             <div className="flex flex-wrap items-center justify-between border-b border-[#3a4a49]/60 pb-2 gap-2">
               <span className="font-grotesk text-xs font-bold text-[#dfe3e3] uppercase tracking-wider flex items-center gap-2 min-w-0">
                 <TrendingUp className="w-4 h-4 text-[#00c3ff] shrink-0" />
-                <span className="sm:hidden">SCHEDULE ({completedCount}/{totalCount})</span>
-                <span className="hidden sm:inline">DAILY ALIGNMENT SCHEDULE ({completedCount}/{totalCount})</span>
+                SCHEDULE ({completedCount}/{totalCount})
               </span>
 
               <button
                 type="button"
                 onClick={toggleReminders}
-                className="flex items-center gap-1 text-[10px] font-bold min-h-[44px] sm:min-h-0 px-2.5 sm:px-2 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors touch-manipulation shrink-0"
+                className="flex items-center gap-1 text-[10px] font-bold min-h-[44px] px-2.5 py-1 border border-[#3a4a49] hover:border-[#00c3ff] bg-[#030606] text-[#00c3ff] transition-colors touch-manipulation shrink-0"
                 title="Toggle automated 10-minute prior toast reminders"
                 aria-label={remindersEnabled ? 'Turn reminders off' : 'Turn reminders on'}
                 aria-pressed={remindersEnabled}
               >
                 {remindersEnabled ? <Bell className="w-3 h-3 text-[#00c3ff]" /> : <BellOff className="w-3 h-3 text-[#ff453a]" />}
-                <span className="sm:hidden">{remindersEnabled ? 'ON' : 'OFF'}</span>
-                <span className="hidden sm:inline">{remindersEnabled ? '10M REMINDERS: ON' : 'REMINDERS: OFF'}</span>
+                <span>{remindersEnabled ? 'ON' : 'OFF'}</span>
               </button>
             </div>
 
             <div className="space-y-1.5 sm:space-y-2 font-sans text-xs">
-              {tasks.map((task) => {
-                const reminderTime = getTaskReminderTime(task.time)
-                return (
-                  <button
-                    key={task.id}
-                    type="button"
-                    onClick={() => toggleTask(task.key || task.id)}
-                    aria-pressed={task.completed}
-                    className={`w-full min-h-[44px] px-2.5 py-2.5 sm:p-3 border transition-all cursor-pointer flex items-center justify-between gap-2 chamfer-corner group text-left touch-manipulation ${
-                      task.completed
-                        ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
-                        : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                      {task.completed ? (
-                        <CheckSquare className="w-5 h-5 sm:w-4 sm:h-4 text-[#00c3ff] shrink-0" />
-                      ) : (
-                        <Square className="w-5 h-5 sm:w-4 sm:h-4 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
-                      )}
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                          <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.5 border border-[#3a4a49] shrink-0">
-                            {task.time}
-                          </span>
-                          {reminderTime && (
-                            <span className="hidden sm:inline-flex text-[9px] text-[#ffb700] bg-[#091214] px-1.5 py-0.5 border border-[#ffb700]/30 items-center gap-1">
-                              <Bell className="w-2.5 h-2.5 text-[#ffb700]" />
-                              {reminderTime} (10m REMINDER)
-                            </span>
-                          )}
-                        </div>
-                        <span className={`text-xs font-bold block whitespace-normal sm:truncate ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
-                          {task.title}
-                        </span>
-                      </div>
-                    </div>
-
-                    <span className="hidden sm:inline-flex shrink-0">
-                      <HudBadge variant={task.completed ? 'cyan' : 'neutral'} className="text-[10px]">
-                        {task.completed ? 'COMPLETE' : 'PENDING'}
-                      </HudBadge>
+              {tasks.map((task) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  onClick={() => toggleTask(task.key || task.id)}
+                  aria-pressed={task.completed}
+                  className={`w-full min-h-[44px] px-2.5 py-2.5 sm:p-3 border transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 chamfer-corner group text-left touch-manipulation ${
+                    task.completed
+                      ? 'bg-[#0b1010] border-[#00c3ff]/50 text-[#839493]'
+                      : 'bg-[#0f1414] border-[#3a4a49] text-[#dfe3e3] hover:border-[#00c3ff] hover:bg-[#121919]'
+                  }`}
+                >
+                  {task.completed ? (
+                    <CheckSquare className="w-5 h-5 text-[#00c3ff] shrink-0" />
+                  ) : (
+                    <Square className="w-5 h-5 text-[#839493] shrink-0 group-hover:text-[#00c3ff]" />
+                  )}
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <span className="text-[10px] font-bold text-[#00c3ff] bg-[#030606] px-1.5 py-0.5 border border-[#3a4a49] inline-block">
+                      {task.time}
                     </span>
-                  </button>
-                )
-              })}
+                    <span className={`text-xs font-bold block whitespace-normal ${task.completed ? 'line-through opacity-75 text-[#839493]' : 'text-[#dfe3e3]'}`}>
+                      {task.title}
+                    </span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -446,8 +507,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                 <div className="flex items-center gap-2 min-w-0">
                   <BarChart3 className="w-4 h-4 text-[#00c3ff] shrink-0" />
                   <span className="text-xs font-bold font-grotesk text-[#dfe3e3] uppercase tracking-wider">
-                    <span className="sm:hidden">STREAK MATRIX</span>
-                    <span className="hidden sm:inline">STREAK CALENDAR & MATRIX</span>
+                    STREAK MATRIX
                   </span>
                 </div>
                 <span className="text-[10px] text-[#00c3ff] font-bold shrink-0">14-DAY RECORD</span>
@@ -493,10 +553,9 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
                           />
                         </div>
 
-                        {/* Day Name — 2-letter on phones so the 7-col grid stays even */}
+                        {/* Day Name — short labels so the 7-col grid stays even */}
                         <span className={`text-[8px] sm:text-[9px] font-sans leading-none ${item.isToday ? 'text-[#00c3ff] font-bold' : 'text-[#839493]'}`}>
-                          <span className="sm:hidden">{item.isToday ? 'TD' : item.dayName.slice(0, 2)}</span>
-                          <span className="hidden sm:inline">{item.dayName}</span>
+                          {item.isToday ? 'TD' : item.dayName.slice(0, 2)}
                         </span>
                       </button>
                     )
@@ -522,7 +581,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             </div>
 
 
-            {/* 52-Week Activity Heatmap */}
+            {/* Activity Heatmap */}
             <ActivityHeatmap history={history} currentDate={currentDate} />
           </div>
 

@@ -8,7 +8,7 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { createForumReportHandler, listForumReportsHandler } from './db-services'
+import { createForumReportHandler, listForumReportsHandler, reviewForumReportHandler } from './db-services'
 import { FORUM_REPORT_COPY } from '../forum-reports'
 
 function selectLimit(rows: unknown[]) {
@@ -264,5 +264,66 @@ describe('Forum report handlers', () => {
         targetWithdrawn: false,
       }),
     )
+  })
+
+  it('seals review writes for ordinary members', async () => {
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => selectLimit([{ role: 'user' }])),
+      update: vi.fn(),
+    }
+
+    await expect(
+      reviewForumReportHandler({
+        data: { reportId: 'report-2' },
+        context: { user: { sub: reporterId }, db: mockDb as any },
+      }),
+    ).rejects.toThrow(FORUM_REPORT_COPY.watchSealed)
+    expect(mockDb.update).not.toHaveBeenCalled()
+  })
+
+  it('marks an open flag reviewed for an elevated steward', async () => {
+    const select = vi
+      .fn()
+      .mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+      .mockImplementationOnce(() => selectLimit([{ id: 'report-2', status: 'open' }]))
+
+    const mockDb = {
+      select,
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            returning: vi.fn().mockResolvedValue([{ id: 'report-2', status: 'reviewed' }]),
+          })),
+        })),
+      })),
+    }
+
+    const receipt = await reviewForumReportHandler({
+      data: { reportId: 'report-2' },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(receipt).toEqual({ id: 'report-2', status: 'reviewed', alreadyReviewed: false })
+    expect(mockDb.update).toHaveBeenCalled()
+  })
+
+  it('returns alreadyReviewed when the flag is no longer open', async () => {
+    const select = vi
+      .fn()
+      .mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+      .mockImplementationOnce(() => selectLimit([{ id: 'report-2', status: 'reviewed' }]))
+
+    const mockDb = {
+      select,
+      update: vi.fn(),
+    }
+
+    const receipt = await reviewForumReportHandler({
+      data: { reportId: 'report-2' },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(receipt.alreadyReviewed).toBe(true)
+    expect(mockDb.update).not.toHaveBeenCalled()
   })
 })

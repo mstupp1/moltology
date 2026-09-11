@@ -558,6 +558,22 @@ export const listForumReportsFn = createServerFn({ method: 'POST' })
     return listForumReportsHandler(args)
   })
 
+export const reviewForumReportFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { reportId: string; userId?: string; token?: string }) =>
+    z
+      .object({
+        reportId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { reviewForumReportHandler } = await import('./db-services')
+    return reviewForumReportHandler(args)
+  })
+
 export const getPodcastsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .handler(async (args) => {
@@ -678,6 +694,23 @@ export const getActivityEventsFn = createServerFn({ method: 'POST' })
   .handler(async (args) => {
     const { getActivityEventsHandler } = await import('./db-services')
     return getActivityEventsHandler(args)
+  })
+
+const getActivityFeedSchema = z.object({
+  scope: z.enum(['self', 'circle']).optional(),
+  filter: z.enum(['all', 'highlights', 'liturgies', 'streaks', 'stages']).optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+  cursor: z.string().min(1).max(120).optional(),
+  userId: z.string().optional(),
+  token: z.string().optional(),
+})
+
+export const getActivityFeedFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: z.input<typeof getActivityFeedSchema>) => getActivityFeedSchema.parse(data))
+  .handler(async (args) => {
+    const { getActivityFeedHandler } = await import('./db-services')
+    return getActivityFeedHandler(args)
   })
 
 export const getChassisLoadoutFn = createServerFn({ method: 'POST' })

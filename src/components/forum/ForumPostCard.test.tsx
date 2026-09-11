@@ -197,6 +197,21 @@ describe('ForumPostCard', () => {
     fireEvent.click(screen.getByTestId('forum-reply-to-comment'))
     expect(onReplyClick).toHaveBeenCalledWith('post-101')
   })
+
+  it('hides reply and quote actions when the topic is locked', () => {
+    render(
+      <ForumPostCard
+        node={baseNode}
+        topicId="topic-999"
+        topicLocked
+        replyingToId={null}
+        {...cardHandlers}
+      />,
+    )
+
+    expect(screen.queryByTestId('forum-reply-to-comment')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('forum-quote-post')).not.toBeInTheDocument()
+  })
 })
 
 describe('ForumPostCard quote affordance', () => {

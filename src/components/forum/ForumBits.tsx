@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ArrowBigUp, ShieldCheck, Cpu, Terminal, Flame, Radio, MessageSquare, Pin } from 'lucide-react'
+import { ArrowBigUp, ShieldCheck, Cpu, Terminal, Flame, Radio, MessageSquare, Pin, Lock } from 'lucide-react'
 import { toggleForumTopicVoteFn, toggleForumPostVoteFn } from '@/lib/server/api'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { peekForumVote, resolveForumVoted, writeForumVote } from '@/lib/forum-vote-cache'
@@ -49,6 +49,17 @@ export function PinBadge() {
   return (
     <span className="text-[9px] font-sans bg-[#ff5540]/15 text-[#ff5540] border border-[#ff5540]/50 px-1.5 py-0.2 font-bold chamfer-corner flex items-center gap-1">
       <Pin className="w-2.5 h-2.5" /> PINNED
+    </span>
+  )
+}
+
+export function LockBadge() {
+  return (
+    <span
+      className="text-[9px] font-sans bg-[#839493]/10 text-[#839493] border border-[#839493]/50 px-1.5 py-0.2 font-bold chamfer-corner flex items-center gap-1"
+      data-testid="forum-lock-badge"
+    >
+      <Lock className="w-2.5 h-2.5" /> Locked
     </span>
   )
 }

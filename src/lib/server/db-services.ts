@@ -24,7 +24,11 @@ import {
 import { INITIAL_BLOG_POSTS } from '../blog-data'
 import type { BlogPostData } from '../blog-data'
 import { getCategoryBgImage } from '../forum-seed-data'
-import { validateForumContent } from '../community-rules'
+import {
+  assertForumWriteRateLimit,
+  FORUM_LOCKED_ERROR,
+  validateForumContent,
+} from '../community-rules'
 import {
   slugifyForumTitle,
   compareHot,
@@ -95,7 +99,11 @@ import { verifyTurnstileToken } from './turnstile'
 import {
   deleteRoutineCompletedEvent,
   listActivityEventsForUser,
+  listActivityFeed,
+  recordDayAlignedEvent,
   recordRoutineCompletedEvent,
+  recordStageReachedEvent,
+  recordStreakMilestoneEvent,
 } from './activity-log'
 import {
   assertCanSendFriendRequest,
@@ -1853,6 +1861,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error('Unauthenticated: You must be registered and logged in to create discussion topics.')
   }
   const { userId, dbClient, payload } = auth
+  assertForumWriteRateLimit(userId)
 
   if (!data?.categoryId || !data?.title || !data?.content) {
     throw new Error('Invalid input: Category, title, and content are required.')
@@ -1979,6 +1988,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     throw new Error('Unauthenticated: You must be registered and logged in to post replies.')
   }
   const { userId, dbClient, payload } = auth
+  assertForumWriteRateLimit(userId)
 
   if (!data?.topicId || !data?.content) {
     throw new Error('Invalid input: Topic ID and content are required.')
@@ -2010,6 +2020,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       slug: forumTopics.slug,
       categoryId: forumTopics.categoryId,
       userId: forumTopics.userId,
+      isLocked: forumTopics.isLocked,
     })
     .from(forumTopics)
     .where(eq(forumTopics.id, data.topicId))
@@ -2017,6 +2028,9 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
 
   if (!topicExists) {
     throw new Error('This thread is no longer available. Refresh the forums and try again.')
+  }
+  if (topicExists.isLocked) {
+    throw new Error(FORUM_LOCKED_ERROR)
   }
 
   let parentId: string | null = data.parentId?.trim() || null
@@ -2242,6 +2256,7 @@ export const updateForumTopicHandler = async ({
   }
 
   const { userId, dbClient } = auth
+  assertForumWriteRateLimit(userId)
   const [existing] = await dbClient
     .select()
     .from(forumTopics)
@@ -2352,6 +2367,7 @@ export const updateForumPostHandler = async ({
   }
 
   const { userId, dbClient } = auth
+  assertForumWriteRateLimit(userId)
   const [existing] = await dbClient
     .select()
     .from(forumPosts)
@@ -2909,6 +2925,74 @@ export const listForumReportsHandler = async ({
       targetWithdrawn: Boolean(topic?.deletedAt || post?.deletedAt),
     }
   })
+}
+
+export interface ReviewForumReportInput {
+  reportId: string
+  userId?: string
+  token?: string
+}
+
+export interface ForumReportReviewReceipt {
+  id: string
+  status: string
+  alreadyReviewed: boolean
+}
+
+/**
+ * Server Function: Elevated accounts mark an open flag as reviewed.
+ * Soft status change only — the target body is not mutated.
+ */
+export const reviewForumReportHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<ReviewForumReportInput>): Promise<ForumReportReviewReceipt> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required.')
+  }
+  if (!data?.reportId) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const { userId, dbClient, payload } = auth
+  await assertCovenantSteward(dbClient, userId, payload)
+
+  const [existing] = await dbClient
+    .select({
+      id: forumReports.id,
+      status: forumReports.status,
+    })
+    .from(forumReports)
+    .where(eq(forumReports.id, data.reportId))
+    .limit(1)
+
+  if (!existing) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+  if (existing.status !== 'open') {
+    return { id: existing.id, status: existing.status, alreadyReviewed: true }
+  }
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumReports)
+    .set({ status: 'reviewed', updatedAt: now })
+    .where(eq(forumReports.id, existing.id))
+    .returning({
+      id: forumReports.id,
+      status: forumReports.status,
+    })
+
+  if (!updated) {
+    throw new Error(FORUM_REPORT_COPY.toastReviewError)
+  }
+
+  return {
+    id: updated.id,
+    status: updated.status,
+    alreadyReviewed: false,
+  }
 }
 
 export interface ToggleForumVoteInput {
@@ -3488,7 +3572,9 @@ export const getDailyAlignmentData = async (
   const tasks = mergeCompletions(completedKeys)
   const completedCount = completedKeys.length
 
-  const startDate = shiftDays(targetDate, -30)
+  // Match max 52-week heatmap span (52×7 − 1 lookback → 364 daily buckets)
+  const HISTORY_LOOKBACK_DAYS = 52 * 7 - 1
+  const startDate = shiftDays(targetDate, -HISTORY_LOOKBACK_DAYS)
   const pastCompletions = await dbClient
     .select({
       completedOn: routineCompletions.completedOn,
@@ -3512,7 +3598,7 @@ export const getDailyAlignmentData = async (
   }
 
   const history: Array<{ date: string; completedCount: number }> = []
-  for (let i = 30; i >= 0; i--) {
+  for (let i = HISTORY_LOOKBACK_DAYS; i >= 0; i--) {
     const d = shiftDays(targetDate, -i)
     const count = dayCounts.get(d)?.size || 0
     history.push({ date: d, completedCount: count })
@@ -3596,6 +3682,13 @@ export const toggleDailyAlignmentTaskHandler = async ({
 
   const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
   const { userId, dbClient } = auth
+
+  const [beforeProfile] = await dbClient
+    .select({ stage: profiles.stage })
+    .from(profiles)
+    .where(eq(profiles.id, userId))
+    .limit(1)
+  const previousStage = beforeProfile?.stage ?? 1
 
   const targetTask = CANONICAL_ALIGNMENT_TASKS.find((t) => t.key === taskKey)
   if (!targetTask) {
@@ -3693,7 +3786,8 @@ export const toggleDailyAlignmentTaskHandler = async ({
             eq(xpTransactions.userId, userId),
             or(
               eq(xpTransactions.sourceKey, `routine:${taskKey}:${date}`),
-              eq(xpTransactions.sourceKey, `routine_all:${date}`)
+              eq(xpTransactions.sourceKey, `routine_all:${date}`),
+              like(xpTransactions.sourceKey, `streak:%:${date}`)
             )
           )
         )
@@ -3709,7 +3803,35 @@ export const toggleDailyAlignmentTaskHandler = async ({
     }
   }
 
-  return await getDailyAlignmentData(dbClient, userId, date)
+  const result = await getDailyAlignmentData(dbClient, userId, date)
+
+  try {
+    if (result.isAllCompleted) {
+      await recordDayAlignedEvent(dbClient, userId, date, result.completedCount, result.totalCount)
+      const streakBonus = getStreakMilestoneBonus(result.streakDays)
+      if (streakBonus > 0) {
+        await dbClient
+          .insert(xpTransactions)
+          .values({
+            userId,
+            amount: streakBonus,
+            source: 'streak_milestone',
+            sourceKey: `streak:${result.streakDays}:${date}`,
+            description: `Streak milestone: ${result.streakDays} days`,
+          })
+          .onConflictDoNothing()
+        await recordStreakMilestoneEvent(dbClient, userId, date, result.streakDays, streakBonus)
+      }
+    }
+    const nextStage = result.stage ?? previousStage
+    if (nextStage > previousStage) {
+      await recordStageReachedEvent(dbClient, userId, nextStage, previousStage)
+    }
+  } catch (err) {
+    console.warn('[toggleDailyAlignmentTaskFn] highlight activity warning:', err)
+  }
+
+  return result
 }
 
 export const getDailyAlignmentFn = createServerFn({ method: 'POST' })
@@ -3753,6 +3875,46 @@ export const getActivityEventsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data?: GetActivityEventsInput) => getActivityEventsSchema.parse(data || {}))
   .handler(getActivityEventsHandler)
+
+export interface GetActivityFeedInput {
+  userId?: string
+  token?: string
+  scope?: 'self' | 'circle'
+  filter?: 'all' | 'highlights' | 'liturgies' | 'streaks' | 'stages'
+  limit?: number
+  cursor?: string
+}
+
+const getActivityFeedSchema = z.object({
+  userId: z.string().optional(),
+  token: z.string().optional(),
+  scope: z.enum(['self', 'circle']).optional(),
+  filter: z.enum(['all', 'highlights', 'liturgies', 'streaks', 'stages']).optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+  cursor: z.string().min(1).max(120).optional(),
+})
+
+export const getActivityFeedHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetActivityFeedInput>) => {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return { events: [], nextCursor: null }
+  const parsed = getActivityFeedSchema.parse(data || {})
+  try {
+    return await listActivityFeed(auth.dbClient, auth.userId, {
+      scope: parsed.scope,
+      filter: parsed.filter,
+      limit: parsed.limit,
+      cursor: parsed.cursor,
+    })
+  } catch (error) {
+    console.error('[ServerFn getActivityFeedFn] DB query failed:', error)
+    return { events: [], nextCursor: null }
+  }
+}
+
+// ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 
 // ─── Chassis loadout (equipment vault) ───────────────────────────────────────
 

@@ -47,6 +47,10 @@ interface FullscreenDocumentReaderProps {
  * the viewport chrome (auto-hiding bars, zoom, pinch and double-tap scaling,
  * keyboard navigation, table-of-contents drawer) while the caller renders the
  * actual page content through renderItem.
+ *
+ * Layout is a true column: top chrome sits above the TOC + viewport row so the
+ * sidebar never collides with the toolbar. While the TOC is open, chrome stays
+ * pinned and visible.
  */
 export function FullscreenDocumentReader({
   items,
@@ -73,6 +77,7 @@ export function FullscreenDocumentReader({
   const hideTimerRef = useRef<number | null>(null)
 
   const activeItem = items[activeIndex]
+  const showChrome = chromeVisible || navOpen
 
   zoomRef.current = zoom
 
@@ -113,6 +118,13 @@ export function FullscreenDocumentReader({
   }, [revealChrome])
 
   useEffect(() => {
+    if (navOpen) {
+      setChromeVisible(true)
+      if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current)
+    }
+  }, [navOpen])
+
+  useEffect(() => {
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
@@ -135,6 +147,10 @@ export function FullscreenDocumentReader({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (navOpen) {
+          setNavOpen(false)
+          return
+        }
         onClose()
         return
       }
@@ -161,7 +177,7 @@ export function FullscreenDocumentReader({
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [fitPage, onClose, onNext, onPrev, setZoomAt])
+  }, [fitPage, navOpen, onClose, onNext, onPrev, setZoomAt])
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -231,6 +247,10 @@ export function FullscreenDocumentReader({
       return
     }
     lastTapRef.current = now
+    if (navOpen) {
+      setChromeVisible(true)
+      return
+    }
     setChromeVisible((visible) => !visible)
   }
 
@@ -242,8 +262,9 @@ export function FullscreenDocumentReader({
       aria-label={overlayLabel}
     >
       <div
-        className="codex-reader-chrome no-print absolute inset-x-0 top-0 z-30"
-        data-hidden={chromeVisible ? 'false' : 'true'}
+        className="codex-reader-chrome codex-reader-chrome-top no-print shrink-0 z-30"
+        data-hidden={showChrome ? 'false' : 'true'}
+        data-pinned={navOpen ? 'true' : 'false'}
         onMouseEnter={() => {
           setChromeVisible(true)
           if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current)
@@ -252,7 +273,7 @@ export function FullscreenDocumentReader({
           if (!navOpen) revealChrome()
         }}
       >
-        <div className="codex-reader-chrome-bar flex items-center justify-between gap-2 px-2.5 sm:px-4 py-2 bg-[#0e1415]/92 backdrop-blur-md border-b border-[#293635] pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="codex-reader-chrome-bar flex items-center justify-between gap-2 px-2.5 sm:px-4 py-2 bg-[#0e1415]/95 backdrop-blur-md border-b border-[#293635] pt-[max(0.5rem,env(safe-area-inset-top))]">
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={() => {
@@ -364,7 +385,7 @@ export function FullscreenDocumentReader({
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex min-h-0 overflow-hidden relative">
         {navOpen && (
           <>
             <button
@@ -372,7 +393,7 @@ export function FullscreenDocumentReader({
               aria-label="Close contents drawer"
               onClick={() => setNavOpen(false)}
             />
-            <div className="absolute md:relative inset-y-0 left-0 w-[min(20rem,86vw)] bg-[#0e1415] border-r border-[#293635] p-3 overflow-y-auto space-y-1.5 z-20 font-sans pt-[4.5rem] md:pt-3">
+            <aside className="absolute md:relative inset-y-0 left-0 w-[min(20rem,86vw)] shrink-0 bg-[#0e1415] border-r border-[#293635] p-3 overflow-y-auto space-y-1.5 z-20 font-sans">
               {items.map((item) => {
                 const isActive = item.id === activeItem?.id
                 return (
@@ -394,17 +415,17 @@ export function FullscreenDocumentReader({
                   </button>
                 )
               })}
-            </div>
+            </aside>
           </>
         )}
 
         <div
           ref={viewportRef}
-          className="codex-reader-viewport flex-1 overflow-auto"
+          className="codex-reader-viewport flex-1 min-w-0 overflow-auto"
           onClick={handleViewportPointer}
           onMouseMove={revealChrome}
         >
-          <div className="codex-reader-well min-h-full flex justify-center items-start px-2 sm:px-6 py-16 sm:py-14 pb-24">
+          <div className="codex-reader-well min-h-full flex justify-center items-start px-2 sm:px-6 py-8 sm:py-10 pb-24">
             {renderItem({ zoom, pageWidth })}
           </div>
         </div>
@@ -412,9 +433,9 @@ export function FullscreenDocumentReader({
 
       <div
         className="codex-reader-chrome codex-reader-chrome-bottom no-print absolute inset-x-0 bottom-0 z-30 sm:hidden"
-        data-hidden={chromeVisible ? 'false' : 'true'}
+        data-hidden={showChrome ? 'false' : 'true'}
       >
-        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#0e1415]/92 backdrop-blur-md border-t border-[#293635] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#0e1415]/95 backdrop-blur-md border-t border-[#293635] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <button
             onClick={onPrev}
             disabled={activeIndex <= 0}
