@@ -946,8 +946,8 @@ export const LandingPage: React.FC = () => {
                     key={i}
                     className="w-0.5 sm:w-1 bg-cyan-400 rounded-full animate-pulse"
                     style={{
-                      height: `${Math.sin(i + activeHymn) * 12 + 16}px`,
-                      animationDelay: `${i * 0.08}s`,
+                      height: `${Math.round(Math.sin(i + activeHymn) * 12 + 16)}px`,
+                      animationDelay: `${(i * 0.08).toFixed(2)}s`,
                     }}
                   />
                 ))}
