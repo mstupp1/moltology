@@ -24,6 +24,17 @@ export function extractAuthToken(request?: Request | null): string | null {
   return null
 }
 
+export function extractClientIp(request?: Request | null): string | null {
+  if (!request || !request.headers) return null
+  const forwarded = request.headers.get('x-forwarded-for')
+  if (forwarded) {
+    const first = forwarded.split(',')[0]?.trim()
+    if (first) return first
+  }
+  const realIp = request.headers.get('x-real-ip')?.trim()
+  return realIp || null
+}
+
 /**
  * Middleware for logging server function performance and errors.
  */
@@ -73,6 +84,7 @@ export const authMiddleware = createMiddleware().server(async ({ request, next, 
       user,
       token,
       db,
+      clientIp: extractClientIp(request),
     },
   })
 })
@@ -86,18 +98,20 @@ export const optionalAuthMiddleware = createMiddleware().server(async ({ request
   const dataToken = typeof data?.token === 'string' && looksLikeJwt(data.token) ? data.token : null
   const token = headerToken || dataToken
   const { getDb } = await import('../../db')
-  let ctx: { user: any; token: string | null; db: any }
+  let ctx: { user: any; token: string | null; db: any; clientIp: string | null }
+
+  const clientIp = extractClientIp(request)
 
   if (!token) {
-    ctx = { user: null, token: null, db: getDb() }
+    ctx = { user: null, token: null, db: getDb(), clientIp }
   } else {
     const verification = await verifyNeonJWT(token)
     if (verification.valid && verification.payload) {
       const { ensureUserProfile } = await import('../user-sync')
       await ensureUserProfile(verification.payload.sub)
-      ctx = { user: verification.payload, token, db: getDb() }
+      ctx = { user: verification.payload, token, db: getDb(), clientIp }
     } else {
-      ctx = { user: null, token: null, db: getDb() }
+      ctx = { user: null, token: null, db: getDb(), clientIp }
     }
   }
 

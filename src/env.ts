@@ -12,6 +12,8 @@ function getRawEnv(): Record<string, unknown> {
     AI_GATEWAY_API_KEY: processEnv.AI_GATEWAY_API_KEY || importMetaEnv.AI_GATEWAY_API_KEY,
     VITE_TURNSTILE_SITE_KEY: importMetaEnv.VITE_TURNSTILE_SITE_KEY || processEnv.VITE_TURNSTILE_SITE_KEY,
     TURNSTILE_SECRET_KEY: processEnv.TURNSTILE_SECRET_KEY || importMetaEnv.TURNSTILE_SECRET_KEY,
+    RESEND_API_KEY: processEnv.RESEND_API_KEY || importMetaEnv.RESEND_API_KEY,
+    RESEND_FROM_EMAIL: processEnv.RESEND_FROM_EMAIL || importMetaEnv.RESEND_FROM_EMAIL,
     NODE_ENV: processEnv.NODE_ENV || importMetaEnv.MODE,
   }
 }
@@ -33,6 +35,8 @@ export const envSchema = z.object({
   AI_GATEWAY_API_KEY: z.string().optional(),
   VITE_TURNSTILE_SITE_KEY: z.string().default('1x00000000000000000000AA'),
   TURNSTILE_SECRET_KEY: z.string().default('1x0000000000000000000000000000000AA'),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 })
 

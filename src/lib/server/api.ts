@@ -890,3 +890,25 @@ export const markNotificationReadFn = createServerFn({ method: 'POST' })
     const { markNotificationReadHandler } = await import('./db-services')
     return markNotificationReadHandler(args)
   })
+
+const createSupportTicketSchema = z.object({
+  subject: z.string().min(1),
+  body: z.string().min(1),
+  category: z.enum(['SHELL_INTEGRITY', 'SESSION_CLEARANCE', 'MARKET_CREDITS', 'OTHER']).optional(),
+  urgency: z.enum(['NORMAL', 'HIGH', 'CRITICAL']).optional(),
+  turnstileToken: z.string().optional(),
+  molt_bait_field: z.string().optional(),
+  to: z.string().optional(),
+  recipient: z.string().optional(),
+  token: z.string().optional(),
+  userId: z.string().optional(),
+  clientIp: z.string().optional(),
+})
+
+export const createSupportTicketFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: z.input<typeof createSupportTicketSchema>) => createSupportTicketSchema.parse(data))
+  .handler(async (args) => {
+    const { createSupportTicketHandler } = await import('./support-tickets')
+    return createSupportTicketHandler(args)
+  })

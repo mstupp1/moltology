@@ -11,7 +11,6 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
-  CheckCircle2,
   AlertTriangle,
   Database,
   ShieldCheck,
@@ -24,8 +23,8 @@ import { getPublicChangelogs, type ChangelogEntry } from '@/lib/changelogs'
 import { seo } from '@/lib/seo'
 import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
 import { HudPagination } from '@/components/ui/HudPagination'
-import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
+import SupportTicketForm from '@/components/hud/SupportTicketForm'
 
 export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   // loaderData passed as prop
@@ -38,14 +37,6 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 20
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({ v1_0_0: true, v1_4_2: true })
-
-  // Ticket Form state
-  const [ticketSubject, setTicketSubject] = useState('')
-  const [ticketCategory, setTicketCategory] = useState('SHELL_INTEGRITY')
-  const [ticketDescription, setTicketDescription] = useState('')
-  const [ticketSubmitted, setTicketSubmitted] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
 
   const toggleExpand = (version: string) => {
     setExpandedEntries((prev) => ({
@@ -188,19 +179,6 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
       default:
         return 'text-[#839493] border-[#3a4a49] bg-[#070b0b]'
     }
-  }
-
-  const handleTicketSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!ticketSubject || !ticketDescription) return
-    setTicketSubmitted(true)
-    setTurnstileToken(null)
-    turnstileRef.current?.reset()
-    setTimeout(() => {
-      setTicketSubmitted(false)
-      setTicketSubject('')
-      setTicketDescription('')
-    }, 4000)
   }
 
   return (
@@ -516,95 +494,11 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
           <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
             <Send className="w-5 h-5 text-[#00ffff]" />
             <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-              TRANSMIT NEURAL SUPPORT TICKET
+              Transmit a support ticket
             </h2>
           </div>
 
-          {ticketSubmitted ? (
-            <div className="bg-[#00ffff]/10 border border-[#00ffff] p-6 chamfer-corner text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-[#00ffff] mx-auto animate-bounce" />
-              <h3 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase">
-                TRANSMISSION ACKNOWLEDGED
-              </h3>
-              <p className="text-xs text-[#839493]">
-                Your neural ticket has been dispatched to Benthic Engineering Units. Response expected within 12 fathoms.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleTicketSubmit} className="space-y-4 max-w-2xl">
-              <div className="space-y-1">
-                <label className="text-xs text-[#839493] font-bold block uppercase">
-                  TICKET SUBJECT / SYMPTOM
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g., Carapace torque synchronization latency"
-                  value={ticketSubject}
-                  onChange={(e) => setTicketSubject(e.target.value)}
-                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs text-[#839493] font-bold block uppercase">
-                    CATEGORY
-                  </label>
-                  <select
-                    value={ticketCategory}
-                    onChange={(e) => setTicketCategory(e.target.value)}
-                    className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-none chamfer-corner"
-                  >
-                    <option value="SHELL_INTEGRITY">SHELL / CHASSIS INTEGRITY</option>
-                    <option value="NEON_AUTH">NEON AUTH & SESSION</option>
-                    <option value="MARKET_TRANSMUTATION">MARKET & CREDITS</option>
-                    <option value="OTHER">GENERAL INQUIRY</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-[#839493] font-bold block uppercase">
-                    URGENCY LEVEL
-                  </label>
-                  <select className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-none chamfer-corner">
-                    <option value="NORMAL">NOMINAL (48 HOURS)</option>
-                    <option value="HIGH">HIGH PRESSURE (12 HOURS)</option>
-                    <option value="CRITICAL">CRITICAL BREACH (IMMEDIATE)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs text-[#839493] font-bold block uppercase">
-                  DETAILED TELEMETRY / LOGS
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  placeholder="Describe the issue or paste relevant error readouts..."
-                  value={ticketDescription}
-                  onChange={(e) => setTicketDescription(e.target.value)}
-                  className="w-full bg-[#030606] border border-[#3a4a49] focus:border-[#00ffff] text-xs text-[#dfe3e3] p-2.5 outline-none chamfer-corner resize-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] font-bold text-xs flex items-center gap-2 chamfer-corner transition-all shadow-[0_0_15px_rgba(0,255,255,0.3)] active:scale-95"
-              >
-                <Send className="w-4 h-4" />
-                <span>DISPATCH NEURAL TICKET</span>
-              </button>
-
-              <TurnstileWidget
-                ref={turnstileRef}
-                action="support_ticket"
-                size="flexible"
-                onVerify={(token) => setTurnstileToken(token)}
-                onExpire={() => setTurnstileToken(null)}
-              />
-            </form>
-          )}
+          <SupportTicketForm />
         </div>
       )}
 

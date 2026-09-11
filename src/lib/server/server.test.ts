@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { ServerError, formatServerError } from './error'
-import { extractAuthToken } from './middleware'
+import { extractAuthToken, extractClientIp } from './middleware'
 import { getDb } from '../../db'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
 import {
@@ -96,6 +96,27 @@ describe('Auth Token Extraction', () => {
       headers: { authorization: 'Bearer opaque-session-id' },
     })
     expect(extractAuthToken(req)).toBeNull()
+  })
+})
+
+describe('Client IP extraction', () => {
+  it('reads the first x-forwarded-for hop', () => {
+    const req = new Request('https://example.com', {
+      headers: { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' },
+    })
+    expect(extractClientIp(req)).toBe('203.0.113.9')
+  })
+
+  it('falls back to x-real-ip', () => {
+    const req = new Request('https://example.com', {
+      headers: { 'x-real-ip': '198.51.100.4' },
+    })
+    expect(extractClientIp(req)).toBe('198.51.100.4')
+  })
+
+  it('returns null when request headers are missing', () => {
+    expect(extractClientIp(null)).toBeNull()
+    expect(extractClientIp({} as Request)).toBeNull()
   })
 })
 
