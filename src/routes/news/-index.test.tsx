@@ -11,8 +11,8 @@ vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
     ...config,
     options: config,
-    useLoaderData: () => mockUseLoaderData(),
   }),
+  useLoaderData: () => mockUseLoaderData(),
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/news' }),
   Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
@@ -39,10 +39,10 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     mockUseLoaderData.mockReturnValue(INITIAL_BLOG_POSTS)
   })
 
-  it('renders main lead dispatch first in DOM hierarchy for proper mobile stacking', () => {
+  it('renders main lead dispatch first in DOM hierarchy for proper mobile stacking', async () => {
     const { container } = render(<NewsIndexPage />)
 
-    const mainLeadBadge = screen.getByText(new RegExp(`${INITIAL_BLOG_POSTS[0].category} · MAIN LEAD DISPATCH`))
+    const mainLeadBadge = await screen.findByText(new RegExp(`${INITIAL_BLOG_POSTS[0].category} · MAIN LEAD DISPATCH`))
     expect(mainLeadBadge).toBeInTheDocument()
 
     // Verify main lead post headline and subtitle are rendered
@@ -72,18 +72,19 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     expect(columns?.[2].className).toContain('lg:col-span-3')
   })
 
-  it('renders MoltNation live breaking ticker and topic desks', () => {
+  it('renders MoltNation live breaking ticker and topic desks', async () => {
     render(<NewsIndexPage />)
 
-    expect(screen.getByText('★ MOLTNATION LIVE ★')).toBeInTheDocument()
+    expect(await screen.findByText('★ MOLTNATION LIVE ★')).toBeInTheDocument()
     expect(screen.getByText('CATCH UP ON DISPATCHES')).toBeInTheDocument()
     expect(screen.getByText('STREAMING NOW')).toBeInTheDocument()
+    expect(screen.queryByText('MOLTNATION PODCAST DISPATCHES')).not.toBeInTheDocument()
   })
 
-  it('eager-loads the flag LCP still and lazy-loads remaining dispatch artwork', () => {
+  it('eager-loads the flag LCP still and lazy-loads remaining dispatch artwork', async () => {
     render(<NewsIndexPage />)
 
-    const flag = screen.getByAltText('MoltNation Flag Background')
+    const flag = await screen.findByAltText('MoltNation Flag Background')
     expect(flag.getAttribute('loading')).toBe('eager')
     expect(flag.getAttribute('fetchpriority')).toBe('high')
 
@@ -98,10 +99,10 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     })
   })
 
-  it('emits crawlable article hrefs for every listed dispatch', () => {
+  it('emits crawlable article hrefs for every listed dispatch', async () => {
     const { container } = render(<NewsIndexPage />)
 
-    expect(screen.getByRole('navigation', { name: 'MoltNation dispatch registry' })).toBeInTheDocument()
+    expect(await screen.findByRole('navigation', { name: 'MoltNation dispatch registry' })).toBeInTheDocument()
 
     for (const post of INITIAL_BLOG_POSTS) {
       const links = container.querySelectorAll(`a[href="/news/${post.slug}"]`)
