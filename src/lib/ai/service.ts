@@ -75,6 +75,15 @@ export async function createAIThread(input: CreateThreadInput) {
     })
     .returning()
 
+  if ((input.persona || 'oracle') === 'oracle' && thread?.id) {
+    try {
+      const { maybeRecordOracleConsultationMilestone } = await import('../server/activity-log')
+      await maybeRecordOracleConsultationMilestone(dbClient, input.userId, thread.id)
+    } catch (err) {
+      console.warn('[createAIThread] Activity persist error:', err)
+    }
+  }
+
   return thread
 }
 

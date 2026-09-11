@@ -147,6 +147,16 @@ export type ActivityEventMetadata = {
   stageTitle?: string
   completedCount?: number
   totalCount?: number
+  peerUserId?: string
+  peerHandle?: string
+  peerName?: string
+  topicId?: string
+  topicSlug?: string
+  categorySlug?: string
+  categoryName?: string
+  topicTitle?: string
+  consultationCount?: number
+  threadId?: string
 }
 
 /**

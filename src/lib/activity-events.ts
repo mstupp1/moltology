@@ -1,17 +1,23 @@
 import type { CanonicalAlignmentTask } from './alignment-tasks'
-import { resolveMemberPublicName } from './member-handle'
+import { resolveMemberPublicName, resolveMemberPublicParam } from './member-handle'
 import { getStageLabel } from './connections'
 
 export const ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED = 'routine_completed' as const
 export const ACTIVITY_EVENT_KIND_DAY_ALIGNED = 'day_aligned' as const
 export const ACTIVITY_EVENT_KIND_STREAK_MILESTONE = 'streak_milestone' as const
 export const ACTIVITY_EVENT_KIND_STAGE_REACHED = 'stage_reached' as const
+export const ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED = 'connection_accepted' as const
+export const ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED = 'forum_topic_opened' as const
+export const ACTIVITY_EVENT_KIND_ORACLE_MILESTONE = 'oracle_milestone' as const
 
 export const ACTIVITY_EVENT_KINDS = [
   ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
   ACTIVITY_EVENT_KIND_STREAK_MILESTONE,
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
+  ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+  ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
 ] as const
 
 export type ActivityEventKind = (typeof ACTIVITY_EVENT_KINDS)[number]
@@ -20,9 +26,27 @@ export type ActivityVisibility = 'private' | 'friends' | 'public'
 
 export type ActivityFeedScope = 'self' | 'circle'
 
-export type ActivityFeedFilter = 'all' | 'highlights' | 'liturgies' | 'streaks' | 'stages'
+export const ACTIVITY_FEED_FILTER_IDS = [
+  'all',
+  'highlights',
+  'liturgies',
+  'streaks',
+  'stages',
+  'community',
+] as const
 
-export type ActivityEventCategory = 'ROUTINES' | 'STREAKS' | 'STAGES' | 'ACTIVITY'
+export type ActivityFeedFilter = (typeof ACTIVITY_FEED_FILTER_IDS)[number]
+
+export type ActivityEventCategory =
+  | 'ROUTINES'
+  | 'STREAKS'
+  | 'STAGES'
+  | 'CONNECTIONS'
+  | 'COMMUNITY'
+  | 'ORACLE'
+  | 'ACTIVITY'
+
+export const ORACLE_CONSULTATION_MILESTONES = [1, 5, 10, 25, 50] as const
 
 export interface ActivityKindDefinition {
   category: ActivityEventCategory
@@ -65,6 +89,27 @@ export const ACTIVITY_KIND_REGISTRY: Record<ActivityEventKind, ActivityKindDefin
     highlight: true,
     defaultVisibility: 'friends',
   },
+  connection_accepted: {
+    category: 'CONNECTIONS',
+    categoryLabel: 'Circle',
+    filter: 'community',
+    highlight: true,
+    defaultVisibility: 'friends',
+  },
+  forum_topic_opened: {
+    category: 'COMMUNITY',
+    categoryLabel: 'Community',
+    filter: 'community',
+    highlight: true,
+    defaultVisibility: 'friends',
+  },
+  oracle_milestone: {
+    category: 'ORACLE',
+    categoryLabel: 'Oracle',
+    filter: 'community',
+    highlight: true,
+    defaultVisibility: 'friends',
+  },
 }
 
 export const FALLBACK_ACTIVITY_KIND: ActivityKindDefinition = {
@@ -81,6 +126,7 @@ export const ACTIVITY_FEED_FILTERS: Array<{ id: ActivityFeedFilter; label: strin
   { id: 'liturgies', label: 'Liturgies' },
   { id: 'streaks', label: 'Streaks' },
   { id: 'stages', label: 'Stages' },
+  { id: 'community', label: 'Community' },
 ]
 
 export const ACTIVITY_FEED_SCOPES: Array<{ id: ActivityFeedScope; label: string }> = [
@@ -90,12 +136,12 @@ export const ACTIVITY_FEED_SCOPES: Array<{ id: ActivityFeedScope; label: string 
 
 export const ACTIVITY_STREAM_EMPTY_COPY = {
   title: 'The stream is still',
-  body: 'Seal a liturgy, hold a streak, or add a connection. Pulses from your circle will register here.',
+  body: 'Seal a liturgy, welcome a connection, or open a consultation. Pulses from your circle will register here.',
 } as const
 
 export const ACTIVITY_STREAM_SELF_EMPTY_COPY = {
   title: 'The stream is still',
-  body: 'Seal a daily liturgy and the first pulse of your own work will register here. Nothing is borrowed.',
+  body: 'Seal a daily liturgy, open a consultation, or welcome a connection. The first pulse of your own work will register here. Nothing is borrowed.',
 } as const
 
 export const ACTIVITY_STREAM_FILTER_EMPTY_COPY = {
@@ -103,10 +149,14 @@ export const ACTIVITY_STREAM_FILTER_EMPTY_COPY = {
   body: 'Try another filter, or check back after the next liturgy.',
 } as const
 
-export const ACTIVITY_STREAM_SUBTITLE = 'Liturgies, streaks, and stage changes from you and your circle.'
+export const ACTIVITY_STREAM_SUBTITLE =
+  'Liturgies, connections, community, and Oracle pulses from you and your circle.'
 
 export const ACTIVITY_STREAM_PAGE_DESCRIPTION =
-  'See daily liturgies, held streaks, and new stages from you and the members you keep close.'
+  'See liturgies, welcomed connections, community threads, and Oracle milestones from you and the members you keep close.'
+
+export const ACTIVITY_STREAM_GUEST_LOCK_MESSAGE =
+  'The circle feed stays sealed until you sign in. Guests do not inherit another member\'s pulses.'
 
 export interface ActivityEventMetadata {
   taskKey?: string
@@ -120,6 +170,16 @@ export interface ActivityEventMetadata {
   stageTitle?: string
   completedCount?: number
   totalCount?: number
+  peerUserId?: string
+  peerHandle?: string
+  peerName?: string
+  topicId?: string
+  topicSlug?: string
+  categorySlug?: string
+  categoryName?: string
+  topicTitle?: string
+  consultationCount?: number
+  threadId?: string
 }
 
 export interface ActivityActorView {
@@ -192,6 +252,61 @@ export function stageReachedSourceKey(stage: number): string {
   return `stage:${stage}`
 }
 
+export function connectionAcceptedSourceKey(userAId: string, userBId: string): string {
+  const [left, right] = userAId < userBId ? [userAId, userBId] : [userBId, userAId]
+  return `connection:${left}:${right}`
+}
+
+export function forumTopicOpenedSourceKey(topicId: string): string {
+  return `forum_topic:${topicId}`
+}
+
+export function oracleMilestoneSourceKey(count: number): string {
+  return `oracle:${count}`
+}
+
+export function isOracleConsultationMilestone(count: number): boolean {
+  return (ORACLE_CONSULTATION_MILESTONES as readonly number[]).includes(count)
+}
+
+export function forumTopicHref(categorySlug: string, topicSlug: string): string {
+  return `/forum/${categorySlug}/${topicSlug}`
+}
+
+export function memberActivityHref(input: { id: string; handle?: string | null }): string {
+  return `/member/${resolveMemberPublicParam(input)}`
+}
+
+export type ParsedActivityHref =
+  | { kind: 'dashboard' }
+  | { kind: 'pipeline' }
+  | { kind: 'connections' }
+  | { kind: 'oracle' }
+  | { kind: 'forum' }
+  | { kind: 'forum-board'; categorySlug: string }
+  | { kind: 'forum-topic'; categorySlug: string; topicSlug: string }
+  | { kind: 'member'; profileId: string }
+  | { kind: 'none' }
+
+export function parseActivityEventHref(href?: string | null): ParsedActivityHref {
+  const raw = href?.trim()
+  if (!raw || !raw.startsWith('/')) return { kind: 'none' }
+  const path = raw.split('?')[0].replace(/\/+$/, '') || '/'
+  if (path === '/dashboard') return { kind: 'dashboard' }
+  if (path === '/pipeline') return { kind: 'pipeline' }
+  if (path === '/connections') return { kind: 'connections' }
+  if (path === '/oracle') return { kind: 'oracle' }
+  if (path === '/forum') return { kind: 'forum' }
+  const forum = path.match(/^\/forum\/([^/]+)(?:\/([^/]+))?$/)
+  if (forum?.[1] && forum[2]) {
+    return { kind: 'forum-topic', categorySlug: forum[1], topicSlug: forum[2] }
+  }
+  if (forum?.[1]) return { kind: 'forum-board', categorySlug: forum[1] }
+  const member = path.match(/^\/member\/([^/]+)$/)
+  if (member?.[1]) return { kind: 'member', profileId: member[1] }
+  return { kind: 'none' }
+}
+
 export function buildRoutineCompletedCopy(task: CanonicalAlignmentTask): {
   kind: typeof ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED
   title: string
@@ -246,6 +361,62 @@ export function buildStageReachedCopy(stage: number): {
     title: `Reached ${stageTitle}`,
     detail: `Clearance advanced to ${stageTitle}.`,
     valueBadge: `Stage ${stage}`,
+  }
+}
+
+export function buildConnectionAcceptedCopy(peerName: string): {
+  kind: typeof ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED
+  title: string
+  detail: string
+  valueBadge: string
+} {
+  const name = peerName.trim() || 'a member'
+  return {
+    kind: ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+    title: 'Circle widened',
+    detail: `Connected with ${name}.`,
+    valueBadge: 'Bond',
+  }
+}
+
+export function buildForumTopicOpenedCopy(topicTitle: string, categoryName: string): {
+  kind: typeof ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED
+  title: string
+  detail: string
+  valueBadge: string
+} {
+  const title = topicTitle.trim() || 'New thread'
+  const board = categoryName.trim() || 'Community'
+  return {
+    kind: ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+    title,
+    detail: `Opened a thread on ${board}.`,
+    valueBadge: 'Thread',
+  }
+}
+
+export function buildOracleMilestoneCopy(consultationCount: number): {
+  kind: typeof ACTIVITY_EVENT_KIND_ORACLE_MILESTONE
+  title: string
+  detail: string
+  valueBadge: string
+} {
+  if (consultationCount <= 1) {
+    return {
+      kind: ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+      title: 'First consultation',
+      detail: 'Opened a channel with the Synaptic Oracle.',
+      valueBadge: '1',
+    }
+  }
+  return {
+    kind: ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+    title: `${consultationCount} consultations held`,
+    detail:
+      consultationCount >= 25
+        ? 'The Oracle has become part of the daily descent.'
+        : 'A steady channel with the Synaptic Oracle.',
+    valueBadge: String(consultationCount),
   }
 }
 
@@ -348,6 +519,18 @@ export function activityEventStats(view: ActivityEventView): ActivityEventStat[]
     if (meta.previousStage && meta.previousStage !== stage) {
       stats.push({ label: 'From', value: getStageLabel(meta.previousStage) })
     }
+  }
+  if (view.kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED && meta.peerName) {
+    stats.push({ label: 'With', value: meta.peerName })
+  }
+  if (view.kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED && meta.categoryName) {
+    stats.push({ label: 'Board', value: meta.categoryName })
+  }
+  if (view.kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE && (meta.consultationCount || view.valueBadge)) {
+    stats.push({
+      label: 'Held',
+      value: meta.consultationCount ? String(meta.consultationCount) : String(view.valueBadge),
+    })
   }
   return stats.filter((stat) => stat.value.trim().length > 0)
 }

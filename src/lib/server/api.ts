@@ -7,6 +7,7 @@ import {
   type EquipSlotId,
   type MoveTarget,
 } from '../chassis-loadout'
+import { ACTIVITY_FEED_FILTER_IDS } from '../activity-events'
 
 export type * from './db-services'
 
@@ -691,7 +692,7 @@ export const getActivityEventsFn = createServerFn({ method: 'POST' })
 
 const getActivityFeedSchema = z.object({
   scope: z.enum(['self', 'circle']).optional(),
-  filter: z.enum(['all', 'highlights', 'liturgies', 'streaks', 'stages']).optional(),
+  filter: z.enum(ACTIVITY_FEED_FILTER_IDS).optional(),
   limit: z.number().int().min(1).max(50).optional(),
   cursor: z.string().min(1).max(120).optional(),
   userId: z.string().optional(),

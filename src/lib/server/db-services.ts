@@ -95,10 +95,16 @@ import {
 } from '../ai/oracle-chat'
 import { verifyTurnstileToken } from './turnstile'
 import {
+  ACTIVITY_FEED_FILTER_IDS,
+  type ActivityFeedFilter,
+} from '../activity-events'
+import {
   deleteRoutineCompletedEvent,
   listActivityEventsForUser,
   listActivityFeed,
+  recordConnectionAcceptedEvents,
   recordDayAlignedEvent,
+  recordForumTopicOpenedEvent,
   recordRoutineCompletedEvent,
   recordStageReachedEvent,
   recordStreakMilestoneEvent,
@@ -1937,6 +1943,18 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
   }
 
   await persistForumTopicVisit(dbClient, userId, inserted.id, inserted.categoryId)
+
+  try {
+    await recordForumTopicOpenedEvent(dbClient, userId, {
+      id: inserted.id,
+      title: inserted.title,
+      slug: inserted.slug,
+      categorySlug: cat?.slug || 'general-discussion',
+      categoryName: cat?.name || 'General Discussion',
+    })
+  } catch (err) {
+    console.warn('[createForumTopicFn] Activity persist error:', err)
+  }
 
   return {
     id: inserted.id,
@@ -3840,7 +3858,7 @@ export interface GetActivityFeedInput {
   userId?: string
   token?: string
   scope?: 'self' | 'circle'
-  filter?: 'all' | 'highlights' | 'liturgies' | 'streaks' | 'stages'
+  filter?: ActivityFeedFilter
   limit?: number
   cursor?: string
 }
@@ -3849,7 +3867,7 @@ const getActivityFeedSchema = z.object({
   userId: z.string().optional(),
   token: z.string().optional(),
   scope: z.enum(['self', 'circle']).optional(),
-  filter: z.enum(['all', 'highlights', 'liturgies', 'streaks', 'stages']).optional(),
+  filter: z.enum(ACTIVITY_FEED_FILTER_IDS).optional(),
   limit: z.number().int().min(1).max(50).optional(),
   cursor: z.string().min(1).max(120).optional(),
 })
@@ -4727,6 +4745,23 @@ export const respondFriendRequestHandler = async ({
       payload: { requestId: request.id, profileId: auth.userId },
       sourceKey: friendAcceptedSourceKey(request.id),
     })
+
+    try {
+      const [sender] = await auth.dbClient
+        .select({ id: profiles.id, larvaId: profiles.larvaId, handle: profiles.handle })
+        .from(profiles)
+        .where(eq(profiles.id, request.senderId))
+        .limit(1)
+      if (sender) {
+        await recordConnectionAcceptedEvents(
+          auth.dbClient,
+          { id: auth.userId, handle: actor?.handle, larvaId: actor?.larvaId },
+          { id: sender.id, handle: sender.handle, larvaId: sender.larvaId }
+        )
+      }
+    } catch (err) {
+      console.warn('[respondFriendRequestFn] Activity persist error:', err)
+    }
   } else {
     const copy = presentFriendNotification('friend_rejected', {
       userId: auth.userId,
