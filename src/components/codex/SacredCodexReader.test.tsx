@@ -93,6 +93,19 @@ describe('SacredCodexReader Component', () => {
     expect(screen.getAllByText(/The Prime Directive/i).length).toBeGreaterThan(0)
   })
 
+  it('focuses a scripture from a catalog slug and stays honest when the leaf is missing', () => {
+    const { rerender } = render(<SacredCodexReader scriptureSlug="scr-010" />)
+    expect(screen.getAllByRole('heading', { level: 2, name: /The Law of Ecdysis/i })[0]).toBeInTheDocument()
+    expect(screen.getByTestId('codex-scripture-sheet')).toHaveAttribute('data-codex-scripture', 'SCR-010')
+    expect(screen.getByTestId('codex-scripture-sheet')).toHaveAttribute('data-codex-focus', 'true')
+
+    rerender(<SacredCodexReader scriptureSlug="scr-999" />)
+    expect(screen.getByTestId('codex-scripture-missing')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Scripture not in this vault/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Return to the Sacred Codex/i })).toHaveAttribute('href', '/codex')
+    expect(screen.queryByTestId('codex-scripture-sheet')).not.toBeInTheDocument()
+  })
+
   it('supports filtering by stage clearance and searching scriptures', () => {
     render(<SacredCodexReader />)
     const stage2Btn = screen.getByRole('button', { name: /STAGE 2/i })

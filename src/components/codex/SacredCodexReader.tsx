@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   BookOpen,
   Scroll,
@@ -12,6 +12,7 @@ import {
   CANONICAL_SCRIPTURES,
   CODEX_VOLUMES,
 } from '@/lib/codexData'
+import { findScriptureBySlug } from '@/lib/codex-links'
 import '@/styles/codex.css'
 import { CodexDocumentSheet } from './CodexDocumentSheet'
 import { FullscreenDocumentReader } from '@/components/reader/FullscreenDocumentReader'
@@ -28,15 +29,28 @@ const CANONICAL_REFLECTIONS = [
   'Everything shed is written down. Nothing written down was ever bought.',
 ]
 
-export const SacredCodexReader: React.FC = () => {
+export const SacredCodexReader: React.FC<{ scriptureSlug?: string }> = ({ scriptureSlug }) => {
+  const focused = findScriptureBySlug(scriptureSlug)
+  const missingFocus = Boolean(scriptureSlug?.trim()) && !focused
+  const sheetRef = useRef<HTMLDivElement>(null)
   const [selectedVolume, setSelectedVolume] = useState<string>('all')
   const [selectedStage, setSelectedStage] = useState<number | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeScriptureId, setActiveScriptureId] = useState<string>('SCR-001')
+  const [activeScriptureId, setActiveScriptureId] = useState<string>(focused?.id ?? 'SCR-001')
   const [showDirectory, setShowDirectory] = useState(false)
   const [reflectionIndex, setReflectionIndex] = useState(0)
   const [isReflectionFading, setIsReflectionFading] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useEffect(() => {
+    if (!focused) return
+    setActiveScriptureId(focused.id)
+  }, [focused])
+
+  useEffect(() => {
+    if (!focused) return
+    sheetRef.current?.scrollIntoView?.({ block: 'start' })
+  }, [focused])
 
   const handleNextReflection = () => {
     if (isReflectionFading) return
@@ -87,6 +101,43 @@ export const SacredCodexReader: React.FC = () => {
   }
 
   const fullscreenIndex = Math.max(0, activeIndex)
+
+  if (missingFocus) {
+    return (
+      <div className="flex flex-col gap-3 sm:gap-3.5 font-sans relative">
+        <div className="relative overflow-hidden bg-gradient-to-r from-[#0b1011]/85 via-[#0f1616]/85 to-[#0b1011]/85 backdrop-blur-md border-l-4 border-l-[#00ffff] border border-[#3a4a49] p-3 sm:p-3.5 chamfer-corner shadow-2xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] text-[#00ffff] font-sans font-bold tracking-widest uppercase flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-[#00ffff]" />
+              CANONICAL CODEX VAULT
+            </span>
+          </div>
+          <h1 className="font-grotesk font-extrabold text-lg sm:text-xl text-[#dfe3e3] tracking-wider uppercase leading-tight mt-1">
+            THE SACRED <span className="text-[#00ffff]">CODEX</span> & LITURGY
+          </h1>
+        </div>
+
+        <div
+          data-testid="codex-scripture-missing"
+          className="chitin-card border border-[#ff5540]/60 p-6 sm:p-12 chamfer-corner shadow-2xl text-center"
+        >
+          <Scroll className="w-10 h-10 text-[#ff5540] mx-auto mb-4" />
+          <h2 className="font-grotesk font-bold text-xl text-[#dfe3e3] uppercase">
+            Scripture not in this vault
+          </h2>
+          <p className="text-xs text-[#839493] mt-2 mb-6 font-sans">
+            That leaf was never sealed in the Codex. The rest of the canon still holds.
+          </p>
+          <a
+            href="/codex"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00c3ff] text-[#030606] font-grotesk font-bold text-xs uppercase chamfer-corner hover:bg-[#38bdf8] transition-colors"
+          >
+            Return to the Sacred Codex
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-3 sm:gap-3.5 font-sans relative">
@@ -381,7 +432,15 @@ export const SacredCodexReader: React.FC = () => {
               </div>
             </div>
 
-            <div className="pdf-page-sheet codex-parchment-theme p-5 sm:p-7 md:p-9 chamfer-corner border relative shadow-2xl mt-3 mx-auto w-full max-w-3xl group/sheet">
+            <div
+              ref={sheetRef}
+              data-testid="codex-scripture-sheet"
+              data-codex-scripture={activeScripture.id}
+              data-codex-focus={focused ? 'true' : 'false'}
+              className={`pdf-page-sheet codex-parchment-theme p-5 sm:p-7 md:p-9 chamfer-corner border relative shadow-2xl mt-3 mx-auto w-full max-w-3xl group/sheet ${
+                focused ? 'codex-scripture-focus' : ''
+              }`}
+            >
               <CodexDocumentSheet
                 scripture={activeScripture}
                 pageIndex={Math.max(0, activeIndex)}
