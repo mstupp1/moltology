@@ -4,31 +4,42 @@ import { Search, Users, Inbox, Send, Loader2 } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
+import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
 import { getAuthJWTToken } from '@/lib/jwt'
+import { listConnectionsFn } from '@/lib/server/api'
 import {
-  listConnectionsFn,
-  respondFriendRequestFn,
-  cancelFriendRequestFn,
-  removeConnectionFn,
-} from '@/lib/server/api'
-import { relationshipForMember, type ConnectionsListView } from '@/lib/connections'
+  CONNECTIONS_FRIENDS_EMPTY,
+  CONNECTIONS_INCOMING_EMPTY,
+  CONNECTIONS_SENT_EMPTY,
+  relationshipForMember,
+  resolveConnectionsTab,
+  type ConnectionsListView,
+  type ConnectionsTab,
+} from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { useToast } from '@/components/ui/ToastProvider'
-import { useHudPersist } from '@/hooks/useHudPersist'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 
-type TabId = 'friends' | 'incoming' | 'sent'
+export {
+  CONNECTIONS_FRIENDS_EMPTY,
+  CONNECTIONS_INCOMING_EMPTY,
+  CONNECTIONS_SENT_EMPTY,
+}
 
-export const ConnectionsPage: React.FC = () => {
-  const [tab, setTab] = useState<TabId>('friends')
+export const ConnectionsPage: React.FC<{
+  tab?: ConnectionsTab
+  onTabChange?: (tab: ConnectionsTab) => void
+}> = ({ tab: tabProp, onTabChange }) => {
   const [connections, setConnections] = useState<ConnectionsListView | null>(null)
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
-  const persist = useHudPersist()
   const { results, searching } = useMemberSearch(query, true)
+
+  const incomingCount = connections?.incoming.length ?? 0
+  const tab = resolveConnectionsTab(tabProp, incomingCount)
 
   const refresh = useCallback(async () => {
     try {
@@ -46,21 +57,13 @@ export const ConnectionsPage: React.FC = () => {
     void refresh()
   }, [refresh])
 
-  const withPersist = async (fn: () => Promise<void>) => {
-    persist.begin('connections')
-    try {
-      await fn()
-      await refresh()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Action failed.')
-    } finally {
-      persist.end('connections')
-    }
+  const selectTab = (next: ConnectionsTab) => {
+    onTabChange?.(next)
   }
 
-  const tabs: Array<{ id: TabId; label: string; count: number; icon: typeof Users }> = [
+  const tabs: Array<{ id: ConnectionsTab; label: string; count: number; icon: typeof Users }> = [
     { id: 'friends', label: 'Friends', count: connections?.friends.length ?? 0, icon: Users },
-    { id: 'incoming', label: 'Incoming', count: connections?.incoming.length ?? 0, icon: Inbox },
+    { id: 'incoming', label: 'Incoming', count: incomingCount, icon: Inbox },
     { id: 'sent', label: 'Sent', count: connections?.outgoing.length ?? 0, icon: Send },
   ]
 
@@ -70,6 +73,13 @@ export const ConnectionsPage: React.FC = () => {
       : tab === 'incoming'
         ? connections?.incoming ?? []
         : connections?.outgoing ?? []
+
+  const emptyCopy =
+    tab === 'friends'
+      ? CONNECTIONS_FRIENDS_EMPTY
+      : tab === 'incoming'
+        ? CONNECTIONS_INCOMING_EMPTY
+        : CONNECTIONS_SENT_EMPTY
 
   return (
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
@@ -127,143 +137,86 @@ export const ConnectionsPage: React.FC = () => {
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
         <div className="flex flex-wrap gap-2 border-b border-[#3a4a49] pb-3">
-          {tabs.map(({ id, label, count, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTab(id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border chamfer-corner transition-colors ${
-                tab === id
-                  ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
-                  : 'border-[#3a4a49] text-[#839493] hover:border-[#00c3ff]/50'
-              }`}
-            >
-              <Icon className="w-3 h-3" />
-              {label}
-              <span className="tabular-nums opacity-80">{count}</span>
-            </button>
-          ))}
+          {tabs.map(({ id, label, count, icon: Icon }) => {
+            const pendingIncoming = id === 'incoming' && count > 0
+            const selected = tab === id
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => selectTab(id)}
+                aria-pressed={selected}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider border chamfer-corner transition-colors ${
+                  selected
+                    ? 'border-[#00c3ff] text-[#00c3ff] bg-[#00c3ff]/10'
+                    : pendingIncoming
+                      ? 'border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/10'
+                      : 'border-[#3a4a49] text-[#839493] hover:border-[#00c3ff]/50'
+                }`}
+              >
+                <Icon className="w-3 h-3" />
+                {label}
+                <span className="tabular-nums opacity-80">{count}</span>
+              </button>
+            )
+          })}
         </div>
 
         {loading ? (
           <div className="py-10 text-center text-xs text-[#839493]">Loading connections…</div>
         ) : rows.length === 0 ? (
-          <div className="py-10 text-center text-xs text-[#839493]">
-            {tab === 'friends' && 'No friends yet. Search above to find members.'}
-            {tab === 'incoming' && 'No incoming friend requests.'}
-            {tab === 'sent' && 'No outgoing friend requests.'}
-          </div>
+          <div className="py-10 text-center text-xs text-[#839493]">{emptyCopy}</div>
         ) : (
           <ul className="space-y-2">
-            {rows.map((member) => (
-              <li
-                key={`${tab}-${member.id}`}
-                className="chitin-card-inset p-3 border border-[#3a4a49] flex flex-wrap items-center gap-3 chamfer-corner"
-              >
-                <LobsterAvatarPortrait
-                  config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
-                  className="w-12 h-12 shrink-0"
-                  size={128}
-                />
-                <div className="min-w-0 flex-1">
-                  <Link
-                    to="/member/$profileId"
-                    params={{ profileId: resolveMemberPublicParam(member) }}
-                    className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
-                  >
-                    {member.displayName}
-                  </Link>
-                  <div className="text-[10px] uppercase tracking-wider text-[#839493]">
-                    Stage {member.stage} · {member.stageLabel}
+            {rows.map((member) => {
+              const { relationship, pendingRequestId } = relationshipForMember(connections, member.id)
+              return (
+                <li
+                  key={`${tab}-${member.id}`}
+                  className={`chitin-card-inset p-3 border flex flex-wrap items-center gap-3 chamfer-corner ${
+                    tab === 'incoming' ? 'border-[#00ffff]/45' : 'border-[#3a4a49]'
+                  }`}
+                >
+                  <LobsterAvatarPortrait
+                    config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
+                    className="w-12 h-12 shrink-0"
+                    size={128}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      to="/member/$profileId"
+                      params={{ profileId: resolveMemberPublicParam(member) }}
+                      className="font-bold text-sm text-[#dfe3e3] hover:text-[#00c3ff] truncate block"
+                    >
+                      {member.displayName}
+                    </Link>
+                    <div className="text-[10px] uppercase tracking-wider text-[#839493]">
+                      Stage {member.stage} · {member.stageLabel}
+                    </div>
+                    {tab === 'incoming' && (
+                      <div className="text-[10px] uppercase tracking-wider text-[#00ffff] mt-0.5">
+                        Incoming request
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {tab === 'incoming' && member.requestId && (
-                    <>
-                      <button
-                        type="button"
-                        className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#00ff9d]/50 text-[#00ff9d] chamfer-corner"
-                        onClick={() =>
-                          withPersist(async () => {
-                            const token = await getAuthJWTToken()
-                            await respondFriendRequestFn({
-                              data: {
-                                requestId: member.requestId!,
-                                action: 'accept',
-                                token: token ?? undefined,
-                              },
-                            })
-                            toast.success('Friend request accepted.')
-                          })
-                        }
-                      >
-                        Accept
-                      </button>
-                      <button
-                        type="button"
-                        className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] chamfer-corner"
-                        onClick={() =>
-                          withPersist(async () => {
-                            const token = await getAuthJWTToken()
-                            await respondFriendRequestFn({
-                              data: {
-                                requestId: member.requestId!,
-                                action: 'reject',
-                                token: token ?? undefined,
-                              },
-                            })
-                            toast.info('Friend request declined.')
-                          })
-                        }
-                      >
-                        Decline
-                      </button>
-                    </>
-                  )}
-                  {tab === 'sent' && member.requestId && (
-                    <button
-                      type="button"
-                      className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] chamfer-corner"
-                      onClick={() =>
-                        withPersist(async () => {
-                          const token = await getAuthJWTToken()
-                          await cancelFriendRequestFn({
-                            data: { requestId: member.requestId!, token: token ?? undefined },
-                          })
-                          toast.info('Friend request cancelled.')
-                        })
-                      }
+                  <div className="flex flex-wrap items-center gap-2">
+                    <FriendRequestButton
+                      profileId={member.id}
+                      relationship={relationship}
+                      pendingRequestId={pendingRequestId}
+                      onRelationshipChange={() => void refresh()}
+                    />
+                    <Link
+                      to="/member/$profileId"
+                      params={{ profileId: resolveMemberPublicParam(member) }}
+                      className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] chamfer-corner"
                     >
-                      Cancel
-                    </button>
-                  )}
-                  {tab === 'friends' && (
-                    <button
-                      type="button"
-                      className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#3a4a49] text-[#839493] hover:border-[#ff453a] hover:text-[#ff453a] chamfer-corner"
-                      onClick={() =>
-                        withPersist(async () => {
-                          const token = await getAuthJWTToken()
-                          await removeConnectionFn({
-                            data: { friendId: member.id, token: token ?? undefined },
-                          })
-                          toast.info('Connection removed.')
-                        })
-                      }
-                    >
-                      Remove
-                    </button>
-                  )}
-                  <Link
-                    to="/member/$profileId"
-                    params={{ profileId: resolveMemberPublicParam(member) }}
-                    className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] chamfer-corner"
-                  >
-                    View
-                  </Link>
-                </div>
-              </li>
-            ))}
+                      View
+                    </Link>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>

@@ -123,14 +123,18 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
     )
   }
 
-  if (relationship === 'pending_received' && pendingRequestId) {
+  if (relationship === 'pending_received') {
     return (
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          disabled={busy}
+          disabled={busy || !pendingRequestId}
           onClick={() =>
             run('accept', async () => {
+              if (!pendingRequestId) {
+                toast.error('Could not update friend request.')
+                return
+              }
               const token = await getAuthJWTToken()
               await respondFriendRequestFn({
                 data: { requestId: pendingRequestId, action: 'accept', token: token ?? undefined },
@@ -146,9 +150,13 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
         </button>
         <button
           type="button"
-          disabled={busy}
+          disabled={busy || !pendingRequestId}
           onClick={() =>
             run('decline', async () => {
+              if (!pendingRequestId) {
+                toast.error('Could not update friend request.')
+                return
+              }
               const token = await getAuthJWTToken()
               await respondFriendRequestFn({
                 data: { requestId: pendingRequestId, action: 'reject', token: token ?? undefined },

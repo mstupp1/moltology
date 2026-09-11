@@ -161,9 +161,10 @@ export function hubUrlForNotificationKind(
 ): string {
   switch (kind) {
     case 'friend_request':
+      return '/connections?tab=incoming'
     case 'friend_accepted':
     case 'friend_rejected':
-      return '/connections'
+      return '/connections?tab=friends'
     case 'forum_mention':
     case 'forum_reply':
       return forumMentionHubPath(payload ?? {})

@@ -13,6 +13,10 @@ import {
   pickConnectionsHubPreview,
   pickConnectionsHubCircle,
   relationshipForHubPreview,
+  parseConnectionsTab,
+  resolveConnectionsTab,
+  connectionsHubLocation,
+  connectionsPageLocation,
   type ConnectionsListView,
 } from './connections'
 import {
@@ -289,6 +293,24 @@ describe('connections helpers', () => {
   it('returns an empty hub preview when there are no connections', () => {
     expect(pickConnectionsHubPreview(null)).toEqual([])
     expect(pickConnectionsHubPreview({ friends: [], incoming: [], outgoing: [] })).toEqual([])
+  })
+
+  it('parses connections tabs and deep-links Incoming when anything is pending', () => {
+    expect(parseConnectionsTab('incoming')).toBe('incoming')
+    expect(parseConnectionsTab('sent')).toBe('sent')
+    expect(parseConnectionsTab('friends')).toBe('friends')
+    expect(parseConnectionsTab('nope')).toBeUndefined()
+    expect(parseConnectionsTab(undefined)).toBeUndefined()
+    expect(resolveConnectionsTab(undefined, 0)).toBe('friends')
+    expect(resolveConnectionsTab(undefined, 1)).toBe('incoming')
+    expect(resolveConnectionsTab('friends', 2)).toBe('friends')
+    expect(resolveConnectionsTab('sent', 2)).toBe('sent')
+    expect(connectionsHubLocation(0)).toEqual({ to: '/connections', search: { tab: 'friends' } })
+    expect(connectionsHubLocation(1)).toEqual({ to: '/connections', search: { tab: 'incoming' } })
+    expect(connectionsPageLocation('incoming')).toEqual({
+      to: '/connections',
+      search: { tab: 'incoming' },
+    })
   })
 })
 
