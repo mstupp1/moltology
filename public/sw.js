@@ -24,7 +24,6 @@ const HUB_PATH_PREFIXES = [
   '/oracle',
   '/codex',
   '/lectures',
-  '/podcasts',
   '/pipeline',
   '/journal',
   '/market',

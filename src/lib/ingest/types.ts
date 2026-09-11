@@ -1,4 +1,4 @@
-export type IngestContentType = 'blog' | 'news' | 'changelog' | 'podcast'
+export type IngestContentType = 'blog' | 'news' | 'changelog'
 
 export interface IngestOptions {
   file?: string
@@ -55,24 +55,4 @@ export interface ChangelogPayload {
   content: string
   isPublished?: boolean
   releasedAt?: Date
-}
-
-export interface PodcastPayload {
-  slug: string
-  title: string
-  subtitle?: string | null
-  description: string
-  audioUrl: string
-  s3Key?: string | null
-  durationSeconds: number
-  fileSizeBytes?: number | null
-  authorName?: string
-  authorAvatar?: string
-  authorRole?: string
-  category?: string
-  tags?: string[]
-  isFeatured?: boolean
-  isPublished?: boolean
-  transcript?: string | null
-  publishedAt?: Date
 }

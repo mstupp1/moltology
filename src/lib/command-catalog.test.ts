@@ -30,7 +30,6 @@ describe('command catalog', () => {
       'nav-codex',
       'nav-isolation-protocols',
       'nav-lectures',
-      'nav-podcasts',
       'nav-pipeline',
       'nav-journal',
       'nav-market',
@@ -54,7 +53,6 @@ describe('command catalog', () => {
     expect(filterCommandCatalog('oracle').map((cmd) => cmd.id)).toContain('nav-oracle')
     expect(filterCommandCatalog('connections').map((cmd) => cmd.id)).toContain('nav-connections')
     expect(filterCommandCatalog('chassis').map((cmd) => cmd.id)).toContain('nav-chassis')
-    expect(filterCommandCatalog('podcasts').map((cmd) => cmd.id)).toContain('nav-podcasts')
     expect(filterCommandCatalog('news').map((cmd) => cmd.id)).toContain('nav-news')
     expect(filterCommandCatalog('stream').map((cmd) => cmd.id)).toContain('nav-stream')
   })

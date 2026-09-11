@@ -10,7 +10,6 @@ import {
   inferContentType,
   normalizeBlogPayload,
   normalizeChangelogPayload,
-  normalizePodcastPayload,
 } from './parser'
 import { IngestOptions, IngestResult, RawParsedContent } from './types'
 
@@ -267,118 +266,6 @@ export async function upsertChangelog(
 }
 
 /**
- * Upserts a podcast transmission into Neon PostgreSQL.
- */
-export async function upsertPodcast(
-  parsed: RawParsedContent,
-  dbClient: any,
-  dryRun = false
-): Promise<IngestResult> {
-  const payload = normalizePodcastPayload(parsed)
-
-  // Auto-detect local audio file and upload to Neon S3
-  if (
-    payload.audioUrl &&
-    !payload.audioUrl.startsWith('http://') &&
-    !payload.audioUrl.startsWith('https://')
-  ) {
-    let localAudioPath = path.isAbsolute(payload.audioUrl)
-      ? payload.audioUrl
-      : path.resolve(path.dirname(parsed.filePath), payload.audioUrl)
-
-    if (!fs.existsSync(localAudioPath)) {
-      const rootPath = path.resolve(process.cwd(), payload.audioUrl)
-      if (fs.existsSync(rootPath)) {
-        localAudioPath = rootPath
-      }
-    }
-
-    if (fs.existsSync(localAudioPath) && fs.statSync(localAudioPath).isFile()) {
-      if (!dryRun) {
-        const ext = path.extname(localAudioPath)
-        const targetKey = `podcasts/${payload.slug}${ext}`
-        const uploaded = await uploadLocalFileToS3(localAudioPath, targetKey)
-        payload.audioUrl = uploaded.publicUrl
-        payload.s3Key = targetKey
-        payload.fileSizeBytes = uploaded.size
-      }
-    }
-  }
-
-  if (dryRun) {
-    return {
-      filePath: parsed.filePath,
-      type: 'podcast',
-      identifier: payload.slug,
-      title: payload.title,
-      action: 'validated',
-      success: true,
-    }
-  }
-
-  const existing = await dbClient
-    .select({ id: schema.podcasts.id })
-    .from(schema.podcasts)
-    .where(eq(schema.podcasts.slug, payload.slug))
-    .limit(1)
-
-  const isUpdate = existing.length > 0
-
-  await dbClient
-    .insert(schema.podcasts)
-    .values({
-      slug: payload.slug,
-      title: payload.title,
-      subtitle: payload.subtitle,
-      description: payload.description,
-      audioUrl: payload.audioUrl,
-      s3Key: payload.s3Key,
-      durationSeconds: payload.durationSeconds,
-      fileSizeBytes: payload.fileSizeBytes,
-      authorName: payload.authorName,
-      authorAvatar: payload.authorAvatar,
-      authorRole: payload.authorRole,
-      category: payload.category,
-      tags: payload.tags,
-      isFeatured: payload.isFeatured,
-      isPublished: payload.isPublished,
-      transcript: payload.transcript,
-      publishedAt: payload.publishedAt,
-    })
-    .onConflictDoUpdate({
-      target: schema.podcasts.slug,
-      set: {
-        title: payload.title,
-        subtitle: payload.subtitle,
-        description: payload.description,
-        audioUrl: payload.audioUrl,
-        s3Key: payload.s3Key,
-        durationSeconds: payload.durationSeconds,
-        fileSizeBytes: payload.fileSizeBytes,
-        authorName: payload.authorName,
-        authorAvatar: payload.authorAvatar,
-        authorRole: payload.authorRole,
-        category: payload.category,
-        tags: payload.tags,
-        isFeatured: payload.isFeatured,
-        isPublished: payload.isPublished,
-        transcript: payload.transcript,
-        publishedAt: payload.publishedAt,
-        updatedAt: new Date(),
-      },
-    })
-
-  return {
-    filePath: parsed.filePath,
-    type: 'podcast',
-    identifier: payload.slug,
-    title: payload.title,
-    action: isUpdate ? 'updated' : 'inserted',
-    success: true,
-  }
-}
-
-/**
  * Dispatches a parsed content item to the appropriate table upsert handler.
  */
 export async function ingestContentItem(
@@ -386,23 +273,23 @@ export async function ingestContentItem(
   options: IngestOptions = {},
   dbClient?: any
 ): Promise<IngestResult> {
-  const targetType = inferContentType(
-    parsed.filePath,
-    options.type,
-    parsed.metadata?.type
-  )
-
-  const client = options.dryRun ? null : dbClient || getIngestDb(options)
+  let targetType: IngestResult['type'] = 'blog'
 
   try {
+    targetType = inferContentType(
+      parsed.filePath,
+      options.type,
+      parsed.metadata?.type
+    )
+
+    const client = options.dryRun ? null : dbClient || getIngestDb(options)
+
     switch (targetType) {
       case 'blog':
       case 'news':
         return await upsertBlogPost(parsed, client, options.dryRun)
       case 'changelog':
         return await upsertChangelog(parsed, client, options.dryRun)
-      case 'podcast':
-        return await upsertPodcast(parsed, client, options.dryRun)
       default:
         throw new Error(`Unsupported content type: "${targetType}"`)
     }

@@ -662,37 +662,6 @@ export const userGearItems = pgTable('user_gear_items', {
     .where(sql`"vaultIndex" IS NOT NULL`),
 ])
 
-// Podcasts / Audio Transmissions Table
-export const podcasts = pgTable('podcasts', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  slug: text('slug').notNull().unique(),
-  title: text('title').notNull(),
-  subtitle: text('subtitle'),
-  description: text('description').notNull(),
-  audioUrl: text('audioUrl').notNull(),
-  s3Key: text('s3Key'),
-  durationSeconds: integer('durationSeconds').notNull(),
-  fileSizeBytes: integer('fileSizeBytes'),
-  authorName: text('authorName').default('High Ascendant Carcinus').notNull(),
-  authorAvatar: text('authorAvatar').default('/images/order_emblem.png').notNull(),
-  authorRole: text('authorRole').default('Stage 4 Ascendant').notNull(),
-  category: text('category').default('TRANSMISSION').notNull(),
-  tags: jsonb('tags').$type<string[]>().default([]).notNull(),
-  playCount: integer('playCount').default(0).notNull(),
-  likes: integer('likes').default(0).notNull(),
-  isFeatured: boolean('isFeatured').default(false).notNull(),
-  isPublished: boolean('isPublished').default(true).notNull(),
-  transcript: text('transcript'),
-  publishedAt: timestamp('publishedAt').defaultNow().notNull(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
-}, (table) => [
-  pgPolicy('podcasts_public_read_policy', {
-    for: 'select',
-    using: sql`"isPublished" = true`
-  })
-])
-
 /** Friend request lifecycle statuses. */
 export type FriendRequestStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled'
 

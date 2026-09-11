@@ -3,7 +3,6 @@ import {
   BlogPostPayload,
   ChangelogPayload,
   IngestContentType,
-  PodcastPayload,
   RawParsedContent,
 } from './types'
 
@@ -47,7 +46,9 @@ export function inferContentType(
     const lower = t.toLowerCase().trim()
     if (lower === 'blog' || lower === 'news' || lower === 'article') return 'blog'
     if (lower === 'changelog' || lower === 'changelogs') return 'changelog'
-    if (lower === 'podcast' || lower === 'podcasts' || lower === 'audio') return 'podcast'
+    if (lower === 'podcast' || lower === 'podcasts' || lower === 'audio') {
+      throw new Error('Podcast ingest is no longer supported')
+    }
     return null
   }
 
@@ -60,7 +61,6 @@ export function inferContentType(
   const normalizedPath = filePath.toLowerCase().replace(/\\/g, '/')
   if (normalizedPath.includes('/news/') || normalizedPath.includes('/blog/')) return 'blog'
   if (normalizedPath.includes('/changelog/') || normalizedPath.includes('/changelogs/')) return 'changelog'
-  if (normalizedPath.includes('/podcast/') || normalizedPath.includes('/podcasts/')) return 'podcast'
 
   return 'blog'
 }
@@ -195,69 +195,5 @@ export function normalizeChangelogPayload(parsed: RawParsedContent): ChangelogPa
     content: content.trim(),
     isPublished: metadata.isPublished !== undefined ? Boolean(metadata.isPublished) : true,
     releasedAt,
-  }
-}
-
-/**
- * Normalizes parsed data into a validated PodcastPayload.
- */
-export function normalizePodcastPayload(parsed: RawParsedContent): PodcastPayload {
-  const { metadata, content } = parsed
-
-  const title = metadata.title || metadata.name
-  if (!title || typeof title !== 'string' || !title.trim()) {
-    throw new Error(`Missing required "title" in frontmatter/payload for "${parsed.filePath}"`)
-  }
-
-  const audioUrl = metadata.audioUrl || metadata.audio || metadata.url
-  if (!audioUrl || typeof audioUrl !== 'string' || !audioUrl.trim()) {
-    throw new Error(`Missing required "audioUrl" in frontmatter/payload for "${parsed.filePath}"`)
-  }
-
-  const slug = metadata.slug ? generateSlug(String(metadata.slug)) : generateSlug(title)
-  if (!slug) {
-    throw new Error(`Could not generate a valid slug from title "${title}" in "${parsed.filePath}"`)
-  }
-
-  const description =
-    metadata.description ||
-    metadata.summary ||
-    (content ? content.slice(0, 200).replace(/[#*>\-_~`]/g, '').trim() : 'No description provided.')
-
-  const tags = Array.isArray(metadata.tags)
-    ? metadata.tags.map((t: any) => String(t).trim()).filter(Boolean)
-    : typeof metadata.tags === 'string'
-      ? metadata.tags.split(',').map((t) => t.trim()).filter(Boolean)
-      : []
-
-  const durationSeconds =
-    typeof metadata.durationSeconds === 'number'
-      ? metadata.durationSeconds
-      : typeof metadata.duration === 'number'
-        ? metadata.duration
-        : 0
-
-  const publishedAt = metadata.publishedAt || metadata.date
-    ? new Date(metadata.publishedAt || metadata.date)
-    : new Date()
-
-  return {
-    slug,
-    title: title.trim(),
-    subtitle: metadata.subtitle || null,
-    description: description.trim(),
-    audioUrl: audioUrl.trim(),
-    s3Key: metadata.s3Key || null,
-    durationSeconds,
-    fileSizeBytes: metadata.fileSizeBytes || null,
-    authorName: metadata.authorName || metadata.author || 'High Ascendant Carcinus',
-    authorAvatar: metadata.authorAvatar || '/images/order_emblem.png',
-    authorRole: metadata.authorRole || 'Stage 4 Ascendant',
-    category: metadata.category || 'TRANSMISSION',
-    tags,
-    isFeatured: Boolean(metadata.isFeatured),
-    isPublished: metadata.isPublished !== undefined ? Boolean(metadata.isPublished) : true,
-    transcript: metadata.transcript || (content ? content.trim() : null),
-    publishedAt,
   }
 }

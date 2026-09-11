@@ -22,7 +22,6 @@ export type CommandIconId =
   | 'connections'
   | 'chassis'
   | 'isolation'
-  | 'podcasts'
   | 'news'
   | 'watch'
   | 'settings'
@@ -45,7 +44,6 @@ export type CommandNavTo =
   | '/oracle'
   | '/connections'
   | '/chassis'
-  | '/podcasts'
   | '/news'
   | '/news/$slug'
   | '/watch'
@@ -131,14 +129,6 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     shortcut: 'G L',
     to: '/lectures',
     keywords: ['academy', 'courses', 'lectures'],
-  },
-  {
-    id: 'nav-podcasts',
-    label: 'Open Benthic Podcasts',
-    category: 'Navigation',
-    icon: 'podcasts',
-    to: '/podcasts',
-    keywords: ['podcasts', 'audio', 'broadcast'],
   },
   {
     id: 'nav-pipeline',
