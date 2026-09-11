@@ -18,4 +18,15 @@ describe('/connections route', () => {
     )
     expect(Route.options.pendingComponent).toBeDefined()
   })
+
+  it('reads the Incoming tab from search and ignores unknown tabs', () => {
+    const validate = Route.options.validateSearch as (search: Record<string, unknown>) => {
+      tab?: 'friends' | 'incoming' | 'sent'
+    }
+    expect(validate({})).toEqual({ tab: undefined })
+    expect(validate({ tab: 'incoming' })).toEqual({ tab: 'incoming' })
+    expect(validate({ tab: 'sent' })).toEqual({ tab: 'sent' })
+    expect(validate({ tab: 'friends' })).toEqual({ tab: 'friends' })
+    expect(validate({ tab: 'dead-count' })).toEqual({ tab: undefined })
+  })
 })

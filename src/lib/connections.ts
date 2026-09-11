@@ -104,6 +104,42 @@ export function relationshipForMember(
   return { relationship: 'none', pendingRequestId: null }
 }
 
+export const CONNECTIONS_TABS = ['friends', 'incoming', 'sent'] as const
+export type ConnectionsTab = (typeof CONNECTIONS_TABS)[number]
+
+export const CONNECTIONS_INCOMING_EMPTY = 'No incoming requests. The trench is quiet.'
+export const CONNECTIONS_FRIENDS_EMPTY = 'No friends yet. Search above to find members.'
+export const CONNECTIONS_SENT_EMPTY = 'No sent requests waiting.'
+
+export function isConnectionsTab(value: unknown): value is ConnectionsTab {
+  return value === 'friends' || value === 'incoming' || value === 'sent'
+}
+
+export function parseConnectionsTab(value: unknown): ConnectionsTab | undefined {
+  return isConnectionsTab(value) ? value : undefined
+}
+
+/** Explicit tab wins. With no tab, pending Incoming is the live chamber. */
+export function resolveConnectionsTab(
+  tab: ConnectionsTab | undefined,
+  incomingCount: number,
+): ConnectionsTab {
+  if (tab) return tab
+  return incomingCount > 0 ? 'incoming' : 'friends'
+}
+
+export function connectionsPageLocation(tab: ConnectionsTab = 'friends'): {
+  to: '/connections'
+  search: { tab: ConnectionsTab }
+} {
+  return { to: '/connections', search: { tab } }
+}
+
+/** Hub CTA: Incoming when anything is pending, otherwise Friends. */
+export function connectionsHubLocation(incomingCount: number) {
+  return connectionsPageLocation(incomingCount > 0 ? 'incoming' : 'friends')
+}
+
 export type ConnectionsHubPreviewKind = 'incoming' | 'sent' | 'friend'
 
 export type ConnectionsHubPreviewItem = ConnectionMemberSummary & {

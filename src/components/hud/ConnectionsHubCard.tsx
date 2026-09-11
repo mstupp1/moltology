@@ -5,12 +5,15 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { listConnectionsFn } from '@/lib/server/api'
 import {
+  connectionsHubLocation,
+  connectionsPageLocation,
   pickConnectionsHubCircle,
   pickConnectionsHubPreview,
   relationshipForHubPreview,
   relationshipForMember,
   type ConnectionsHubPreviewItem,
   type ConnectionsListView,
+  type ConnectionsTab,
 } from '@/lib/connections'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
@@ -58,23 +61,27 @@ function CountChip({
   label,
   count,
   accent = false,
+  onOpen,
 }: {
   label: string
   count: number
   accent?: boolean
+  onOpen: () => void
 }) {
   const lit = accent && count > 0
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border chamfer-corner ${
+    <button
+      type="button"
+      onClick={onOpen}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border chamfer-corner transition-colors ${
         lit
-          ? 'border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/10'
-          : 'border-[#3a4a49] text-[#839493] bg-[#070b0b]/60'
+          ? 'border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/10 hover:bg-[#00ffff]/20'
+          : 'border-[#3a4a49] text-[#839493] bg-[#070b0b]/60 hover:border-[#00ffff]/50'
       }`}
     >
       {label}
       <span className="tabular-nums text-[#00ffff]">{count}</span>
-    </span>
+    </button>
   )
 }
 
@@ -167,6 +174,9 @@ export function ConnectionsHubCard() {
   const sentCount = connections.outgoing.length
   const showSearchResults = canSearch && queryReady
   const showPreview = !showSearchResults
+  const openConnections = (tab?: ConnectionsTab) => {
+    navigate(tab ? connectionsPageLocation(tab) : connectionsHubLocation(incomingCount))
+  }
 
   return (
     <div
@@ -180,9 +190,13 @@ export function ConnectionsHubCard() {
               <Users className="w-4 h-4 text-[#00ffff] shrink-0" />
               {CONNECTIONS_HUB_TITLE}
               {incomingCount > 0 && (
-                <span className="text-[9px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-1.5 py-0.5 chamfer-corner tracking-wider">
+                <button
+                  type="button"
+                  onClick={() => openConnections('incoming')}
+                  className="text-[9px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-1.5 py-0.5 chamfer-corner tracking-wider hover:bg-[#00ffff]/20"
+                >
                   {incomingCount} INCOMING
-                </span>
+                </button>
               )}
             </h2>
             <p className="text-xs text-[#839493] mt-0.5">{CONNECTIONS_HUB_SUBTITLE}</p>
@@ -210,9 +224,14 @@ export function ConnectionsHubCard() {
             )}
 
             <div className="flex flex-wrap gap-1.5">
-              <CountChip label="Friends" count={friendCount} />
-              <CountChip label="Incoming" count={incomingCount} accent />
-              <CountChip label="Sent" count={sentCount} />
+              <CountChip label="Friends" count={friendCount} onOpen={() => openConnections('friends')} />
+              <CountChip
+                label="Incoming"
+                count={incomingCount}
+                accent
+                onOpen={() => openConnections('incoming')}
+              />
+              <CountChip label="Sent" count={sentCount} onOpen={() => openConnections('sent')} />
             </div>
 
             {showSearchResults && searchResults.length > 0 && (
@@ -270,10 +289,10 @@ export function ConnectionsHubCard() {
         </span>
         <button
           type="button"
-          onClick={() => navigate({ to: '/connections' })}
+          onClick={() => openConnections()}
           className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
         >
-          <span>OPEN CONNECTIONS</span>
+          <span>{incomingCount > 0 ? 'OPEN INCOMING' : 'OPEN CONNECTIONS'}</span>
           <ChevronRight className="w-3 h-3" />
         </button>
       </div>

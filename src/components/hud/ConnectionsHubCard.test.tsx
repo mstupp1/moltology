@@ -211,6 +211,37 @@ describe('ConnectionsHubCard', () => {
       expect(screen.getByRole('button', { name: /open connections/i })).toBeInTheDocument()
     })
     fireEvent.click(screen.getByRole('button', { name: /open connections/i }))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/connections' })
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/connections', search: { tab: 'friends' } })
+  })
+
+  it('deep-links the hub CTA and Incoming count into Incoming when a request is pending', async () => {
+    vi.mocked(listConnectionsFn).mockResolvedValue({
+      friends: [],
+      incoming: [
+        {
+          id: 'in-1',
+          larvaId: 'LARVA UNIT #2',
+          handle: 'incoming_one',
+          displayName: 'incoming_one',
+          stage: 1,
+          stageLabel: 'Larval Initiate',
+          avatarConfig: null,
+          requestId: 'req-in',
+          since: new Date().toISOString(),
+        },
+      ],
+      outgoing: [],
+    })
+
+    renderHub()
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /open incoming/i })).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: /open incoming/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/connections', search: { tab: 'incoming' } })
+
+    fireEvent.click(screen.getByRole('button', { name: /^incoming/i }))
+    expect(mockNavigate).toHaveBeenLastCalledWith({ to: '/connections', search: { tab: 'incoming' } })
   })
 })

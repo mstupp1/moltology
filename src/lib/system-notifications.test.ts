@@ -38,8 +38,9 @@ describe('system-notifications', () => {
   })
 
   it('maps friend kinds to connections', () => {
-    expect(hubUrlForNotificationKind('friend_request')).toBe('/connections')
-    expect(hubUrlForNotificationKind('friend_accepted')).toBe('/connections')
+    expect(hubUrlForNotificationKind('friend_request')).toBe('/connections?tab=incoming')
+    expect(hubUrlForNotificationKind('friend_accepted')).toBe('/connections?tab=friends')
+    expect(hubUrlForNotificationKind('friend_rejected')).toBe('/connections?tab=friends')
     expect(hubUrlForNotificationKind('unknown')).toBe('/dashboard')
     expect(hubUrlForNotificationKind('forum_mention')).toBe('/forum')
     expect(
