@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { HUDTaskBar } from './HUDTaskBar'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 import { ACTIVITY_INBOX_LABEL } from '@/lib/notifications'
 import type { NotificationView } from '@/lib/notifications'
 
@@ -182,6 +183,23 @@ describe('HUDTaskBar', () => {
       window.innerWidth = 1024
       window.dispatchEvent(new Event('resize'))
     })
+  })
+
+  it('opens the liturgies panel when the dashboard alignment card event fires', () => {
+    render(<HUDTaskBar variant="header" />)
+
+    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent(OPEN_ALIGNMENT_PANEL_EVENT))
+    })
+
+    expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
+    expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Daily alignment tasks schedule' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
   })
 
   it('lists hail and reply transmissions with thread deep-links and marks them read', () => {

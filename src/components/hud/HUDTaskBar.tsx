@@ -7,6 +7,7 @@ import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { Link } from '@tanstack/react-router'
+import { OPEN_ALIGNMENT_PANEL_EVENT, isAlignmentPanelHostVisible } from '@/lib/alignment-panel'
 import { CANONICAL_ALIGNMENT_TASKS, type AlignmentTaskItem } from '@/lib/alignment-tasks'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 import { ACTIVITY_INBOX_LABEL, isForumInboxKind } from '@/lib/notifications'
@@ -132,6 +133,22 @@ export const HUDTaskBar: React.FC<HUDTaskBarProps> = ({
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isScheduleOpen])
+
+  // Dashboard Daily Alignment card (and leftover /alignment hops) open this same panel.
+  useEffect(() => {
+    const handleOpenAlignmentPanel = () => {
+      if (variant === 'header' && !isAlignmentPanelHostVisible(headerIslandRef.current)) {
+        return
+      }
+      setActiveTab('liturgies')
+      setIsScheduleOpen(true)
+    }
+
+    window.addEventListener(OPEN_ALIGNMENT_PANEL_EVENT, handleOpenAlignmentPanel)
+    return () => {
+      window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, handleOpenAlignmentPanel)
+    }
+  }, [variant])
 
   // Handle manual resync click
   const handleResync = () => {

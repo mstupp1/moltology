@@ -5,6 +5,7 @@ import { useAlignmentReminders } from '@/hooks/useAlignmentReminders'
 import { useDailyAlignment } from '@/hooks/useDailyAlignment'
 import { DailyRoutineGhost } from '@/components/hud/HudGhostSkeletons'
 import { HudGhostWidget } from '@/components/ui/HudGhostLoader'
+import { openAlignmentPanel } from '@/lib/alignment-panel'
 import { DAILY_ALIGNMENT_HUB_ID, localDateString, parseLocalDate, TOTAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
 import type { DailyStreakDay } from '@/lib/alignment-tasks'
 
@@ -417,10 +418,16 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
       >
         {/* Main Header Banner */}
         <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#3a4a49]/80 pb-3 sm:pb-4 gap-3 sm:gap-4">
-          <div className="space-y-1 min-w-0">
+          <button
+            type="button"
+            onClick={openAlignmentPanel}
+            aria-label="Open daily alignment liturgies"
+            data-testid="daily-alignment-card-open"
+            className="space-y-1 min-w-0 text-left group cursor-pointer bg-transparent border-0 p-0 touch-manipulation"
+          >
             <div className="flex flex-wrap items-center gap-2">
               <Calendar className="w-5 h-5 text-[#00c3ff] shrink-0" />
-              <h2 className="font-grotesk text-sm sm:text-base md:text-lg font-bold tracking-wider text-[#dfe3e3] uppercase leading-tight">
+              <h2 className="font-grotesk text-sm sm:text-base md:text-lg font-bold tracking-wider text-[#dfe3e3] group-hover:text-[#00c3ff] transition-colors uppercase leading-tight">
                 DAILY ALIGNMENT ROUTINE
               </h2>
               <HudBadge variant="cyan" className="text-[10px] shrink-0">
@@ -430,7 +437,7 @@ export function DailyRoutineWidget({ isLoading = false }: DailyRoutineWidgetProp
             <p className="text-xs text-[#839493] leading-relaxed">
               Complete your 8 scheduled alignment items daily to maintain carapace density and preserve your active streak.
             </p>
-          </div>
+          </button>
 
           {/* Stats Summary Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs shrink-0">

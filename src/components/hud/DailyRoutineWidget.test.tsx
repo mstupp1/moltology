@@ -10,12 +10,22 @@ import {
 import { AlignmentProvider } from '@/hooks/useDailyAlignment'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { CANONICAL_ALIGNMENT_TASKS } from '@/lib/alignment-tasks'
+import { HUDTaskBar } from './HUDTaskBar'
+import { OPEN_ALIGNMENT_PANEL_EVENT } from '@/lib/alignment-panel'
 
 // Mock authClient to return guest or user
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     useSession: () => ({ data: null, isPending: false }),
   },
+}))
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, ...props }: { children: React.ReactNode; to?: string }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
 }))
 
 function renderWidget() {
@@ -186,5 +196,38 @@ describe('DailyRoutineWidget Component', () => {
     const heatmap = screen.getByTestId('alignment-heatmap-scroll')
     const weeks = Number(badge.textContent!.replace('-wk', ''))
     expect(heatmap.querySelectorAll('button')).toHaveLength(weeks * 7)
+  })
+
+  it('opens the header liturgies panel when the Daily Alignment card is activated', () => {
+    render(
+      <ToastProvider>
+        <AlignmentProvider>
+          <HUDTaskBar variant="header" />
+          <DailyRoutineWidget />
+        </AlignmentProvider>
+      </ToastProvider>
+    )
+
+    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByTestId('daily-alignment-card-open'))
+
+    expect(screen.getByText('DAILY ALIGNMENT SCHEDULE')).toBeInTheDocument()
+    expect(screen.getByText('NEXT IMPENDING LITURGY')).toBeInTheDocument()
+  })
+
+  it('does not open the liturgies panel when a liturgy row is toggled', () => {
+    const listener = vi.fn()
+    window.addEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
+
+    renderWidget()
+
+    fireEvent.click(screen.getByText('Silent Synchronization'))
+
+    expect(screen.getByText('1/8 COMPLETE')).toBeInTheDocument()
+    expect(listener).not.toHaveBeenCalled()
+    expect(screen.queryByText('DAILY ALIGNMENT SCHEDULE')).not.toBeInTheDocument()
+
+    window.removeEventListener(OPEN_ALIGNMENT_PANEL_EVENT, listener)
   })
 })
