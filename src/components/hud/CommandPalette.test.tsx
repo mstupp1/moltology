@@ -5,6 +5,7 @@ import { CommandPalette } from './CommandPalette'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 import { searchMembersFn } from '@/lib/server/api'
+import { SEARCH_RECENTS_STORAGE_PREFIX } from '@/lib/search-recents'
 
 const mockNavigate = vi.fn()
 
@@ -268,5 +269,94 @@ describe('CommandPalette Component', () => {
     fireEvent.keyDown(modal, { key: 'Enter' })
 
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
+  })
+
+  it('keeps a signed-in Recents trail for opened pages, people, and queries', async () => {
+    signedInSession()
+    vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
+
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
+    expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
+
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    expect(screen.getByTestId('command-palette-recents')).toBeInTheDocument()
+    expect(screen.getByText('Recents')).toBeInTheDocument()
+    expect(screen.getByTestId('command-palette-recent-page-nav-codex')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+      target: { value: 'claw' },
+    })
+    await waitFor(() => {
+      expect(screen.getByText('claw_lord')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByTestId('command-palette-person-member-claw'))
+
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    expect(screen.getByTestId('command-palette-recent-person-member-claw')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('command-palette-recent-page-nav-codex'))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
+  })
+
+  it('restores a recent query in the overlay and sheds the trail on demand', async () => {
+    signedInSession()
+    vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
+
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+      target: { value: 'claw' },
+    })
+    await waitFor(() => {
+      expect(screen.getByText('claw_lord')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByTestId('command-palette-see-all'))
+
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    const queryChip = screen.getByTestId('command-palette-recent-query-claw')
+    expect(queryChip).toBeInTheDocument()
+    fireEvent.click(queryChip)
+    expect(screen.getByPlaceholderText(/Type a command or search protocol/i)).toHaveValue('claw')
+    expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
+
+    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+      target: { value: '' },
+    })
+    expect(screen.getByTestId('command-palette-recents')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('command-palette-recents-clear'))
+    expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
+    expect(screen.queryByText('Shed trail')).not.toBeInTheDocument()
+  })
+
+  it('keeps guests empty-honest: no Recents strip and no stored trail', () => {
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
+
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
+    expect(screen.queryByText('Recents')).not.toBeInTheDocument()
+    expect(screen.queryByText('Shed trail')).not.toBeInTheDocument()
+    expect(localStorage.getItem(`${SEARCH_RECENTS_STORAGE_PREFIX}user-1`)).toBeNull()
+    expect(
+      Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index)).every(
+        (key) => !key?.startsWith(SEARCH_RECENTS_STORAGE_PREFIX),
+      ),
+    ).toBe(true)
+  })
+
+  it('does not show another member trail on this overlay', () => {
+    localStorage.setItem(
+      `${SEARCH_RECENTS_STORAGE_PREFIX}someone-else`,
+      JSON.stringify([
+        { kind: 'query', query: 'secret-shell', type: 'people', openedAt: Date.now() },
+      ]),
+    )
+    signedInSession()
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    expect(screen.queryByText('secret-shell')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('command-palette-recents')).not.toBeInTheDocument()
   })
 })

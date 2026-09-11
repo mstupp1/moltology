@@ -357,6 +357,16 @@ export function catalogNavigateArgs(command: CommandCatalogItem): CatalogNavigat
   return command.params ? { to: command.to, params: command.params } : { to: command.to }
 }
 
+/** Live catalog row for a stored page recent. Boards and news live on PAGES_CATALOG. */
+export function findCatalogCommand(
+  id: string,
+  items: CommandCatalogItem[] = PAGES_CATALOG,
+): CommandCatalogItem | undefined {
+  const trimmed = id.trim()
+  if (!trimmed) return undefined
+  return items.find((cmd) => cmd.id === trimmed)
+}
+
 export function parseSearchTab(value: unknown): SearchTab {
   return value === 'pages' ? 'pages' : 'people'
 }
