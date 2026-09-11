@@ -4,6 +4,7 @@ import {
   SUPPORT_TICKET_BODY_MAX,
   SUPPORT_TICKET_CATEGORIES,
   SUPPORT_TICKET_CATEGORY_LABELS,
+  SUPPORT_PAGE_COPY,
   SUPPORT_TICKET_COPY,
   SUPPORT_TICKET_URGENCIES,
   SUPPORT_TICKET_URGENCY_LABELS,
@@ -91,6 +92,10 @@ describe('support ticket intake helpers', () => {
       "We got your ticket. Reference abc-123. We'll email you when there's an update.",
     )
     expect(SUPPORT_TICKET_COPY.guestTitle).toBe('Sign in to contact support')
+    expect(SUPPORT_PAGE_COPY.pageTitle).toBe('Contact support')
+    expect(SUPPORT_PAGE_COPY.tabChangelog).toBe('Changelog')
+    expect(SUPPORT_PAGE_COPY.tabFaq).toBe('FAQ')
+    expect(SUPPORT_PAGE_COPY.tabDiagnostics).toBe('Diagnostics')
   })
 
   it('treats a filled honeypot as triggered and a blank one as clean', () => {
@@ -105,9 +110,12 @@ describe('support ticket intake helpers', () => {
   })
 
   it('keeps HUD copy free of slash-pairs', () => {
-    const corpus = Object.values(SUPPORT_TICKET_COPY)
+    const corpus = [...Object.values(SUPPORT_TICKET_COPY), ...Object.values(SUPPORT_PAGE_COPY)]
       .map((value) => (typeof value === 'function' ? value('abc-123') : value))
       .join(' ')
     expect(corpus).not.toMatch(/\s\/\/\s/)
+    expect(corpus).not.toMatch(
+      /neural|telemetry|benthic|steward|carapace|chassis|\bpressure\b|critical breach|transmit|dispatch/i,
+    )
   })
 })

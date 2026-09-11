@@ -225,7 +225,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   },
   {
     id: 'nav-support',
-    label: 'Open Benthic Support Portal & System Changelog',
+    label: 'Open Support',
     category: 'Navigation',
     icon: 'support',
     shortcut: 'G S',

@@ -28,6 +28,6 @@ export const Route = createFileRoute('/_hud/support')({
   component: SupportPortalRoute,
   pendingComponent: HudWorkspaceGhost,
   head: () => ({
-    meta: seo({ title: 'Benthic Support Portal & System Changelog | Moltology' }),
+    meta: seo({ title: 'Contact support | Moltology' }),
   }),
 })

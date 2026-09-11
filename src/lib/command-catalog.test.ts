@@ -15,6 +15,13 @@ import {
 } from './command-catalog'
 
 describe('command catalog', () => {
+  it('names support in plain English', () => {
+    const supportNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-support')
+    expect(supportNav?.to).toBe('/support')
+    expect(supportNav?.label).toBe('Open Support')
+    expect(supportNav?.label).not.toMatch(/benthic|neural|telemetry|dispatch|transmit/i)
+  })
+
   it('names the social surface Community, not Forum', () => {
     const forumNav = COMMAND_CATALOG.find((cmd) => cmd.id === 'nav-forum')
     expect(forumNav?.to).toBe('/forum')

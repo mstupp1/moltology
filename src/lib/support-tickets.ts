@@ -55,6 +55,35 @@ export const SUPPORT_TICKET_COPY = {
   toastReceived: 'Your ticket was received.',
 } as const
 
+export const SUPPORT_PAGE_COPY = {
+  eyebrow: 'Support',
+  pageTitle: 'Contact support',
+  tabChangelog: 'Changelog',
+  tabFaq: 'FAQ',
+  tabDiagnostics: 'Diagnostics',
+  changelogLive: 'Live',
+  changelogEmpty: 'No matching releases',
+  changelogEmptyHint: (query: string) => `Nothing matches "${query}".`,
+  changelogReset: 'Reset filters',
+  changelogExpand: 'View release notes',
+  changelogCollapse: 'Hide release notes',
+  changelogPermalink: 'Permalink',
+  faqTitle: 'FAQ',
+  faqHint: 'Answers to common questions. If you still need help, send a ticket.',
+  faqStartTitle: 'Getting started',
+  faqStartBody: 'Create a free account and sign in to use the app.',
+  faqBillingTitle: 'Billing & purchases',
+  faqBillingBody: 'Questions about purchases and the Market.',
+  faqPrivacyTitle: 'Privacy',
+  faqPrivacyBody: 'How to manage privacy and notification settings.',
+  diagnosticsTitle: 'Diagnostics',
+  diagnosticsDatabase: 'Database',
+  diagnosticsAuth: 'Sign-in',
+  diagnosticsApp: 'App',
+  diagnosticsOk: 'Operational',
+  diagnosticsHealthy: 'Healthy',
+} as const
+
 export const SUPPORT_TICKET_CATEGORY_LABELS: Record<SupportTicketCategoryId, string> = {
   ACCOUNT: 'Account & sign-in',
   BILLING: 'Billing & purchases',
