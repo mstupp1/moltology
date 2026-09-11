@@ -5,6 +5,7 @@ import { HudButton } from '@/components/ui'
 import { useSafeOracle } from '@/components/hud/OracleContext'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAIThreadsFn } from '@/lib/server/api'
+import { oracleAuthData } from '@/lib/ai/oracle-auth-client'
 import {
   oracleRouteSearch,
   pickLastActiveOracleThread,
@@ -29,7 +30,8 @@ export function ResumeOracleConsultation() {
 
     let isMounted = true
     setLocalLoading(true)
-    getAIThreadsFn({ data: { userId } })
+    oracleAuthData(userId)
+      .then((auth) => getAIThreadsFn({ data: auth }))
       .then((data) => {
         if (isMounted && Array.isArray(data)) {
           setLocalThreads(data)

@@ -140,7 +140,7 @@ describe('Oracle Route Component', () => {
 
     await waitFor(() => {
       expect(getAIMessagesFn).toHaveBeenCalledWith({
-        data: { threadId: 'thread-1', userId: 'usr_oracle_initiate' },
+        data: expect.objectContaining({ threadId: 'thread-1', userId: 'usr_oracle_initiate' }),
       })
       expect(screen.getByText(/How do I keep the last molt from melting/i)).toBeInTheDocument()
       expect(screen.getByText(/Hold the line/i)).toBeInTheDocument()

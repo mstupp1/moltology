@@ -27,6 +27,7 @@ import { getAssetUrl } from '../../lib/assets'
 import { isAdminOrSuperAdmin } from '../../lib/permissions'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { getAuthJWTToken } from '../../lib/jwt'
+import { oracleAuthData } from '../../lib/ai/oracle-auth-client'
 
 export const CHATS_COLUMN_MIN_WIDTH = 640
 
@@ -161,7 +162,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     }
     setLocalIsLoadingThreads(true)
     try {
-      const data = await getAIThreadsFn({ data: { userId } })
+      const data = await getAIThreadsFn({ data: await oracleAuthData(userId) })
       if (Array.isArray(data)) {
         setLocalThreads(data)
       }
@@ -314,7 +315,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
     if (!userId) return
 
-    getAIMessagesFn({ data: { threadId: activeThreadId, userId } })
+    void oracleAuthData(userId)
+      .then((auth) => getAIMessagesFn({ data: { threadId: activeThreadId, ...auth } }))
       .then((records) => {
         if (generation !== loadGenerationRef.current) return
         if (Array.isArray(records) && records.length > 0) {

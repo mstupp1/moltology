@@ -93,9 +93,25 @@ export async function getUserAIThreads(userId: string) {
 }
 
 /**
- * Fetches all messages for a specific AI thread.
+ * Returns the thread only when it belongs to `userId`.
  */
-export async function getAIThreadMessages(threadId: string) {
+export async function getOwnedAIThread(userId: string, threadId: string) {
+  if (!userId || !threadId) return null
+  const dbClient = getDb()
+  const [thread] = await dbClient
+    .select({ id: aiThreads.id, userId: aiThreads.userId })
+    .from(aiThreads)
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
+    .limit(1)
+  return thread || null
+}
+
+/**
+ * Fetches messages for a thread the caller owns. Unknown or foreign threads return [].
+ */
+export async function getAIThreadMessages(threadId: string, userId: string) {
+  const owned = await getOwnedAIThread(userId, threadId)
+  if (!owned) return []
   const dbClient = getDb()
   return await dbClient
     .select()
@@ -105,9 +121,11 @@ export async function getAIThreadMessages(threadId: string) {
 }
 
 /**
- * Saves a new message to an AI thread.
+ * Saves a new message to an AI thread the caller owns.
  */
 export async function saveAIMessage(input: SaveMessageInput) {
+  const owned = await getOwnedAIThread(input.userId, input.threadId)
+  if (!owned) return null
   const dbClient = getDb()
   const [message] = await dbClient
     .insert(aiMessages)
@@ -120,25 +138,24 @@ export async function saveAIMessage(input: SaveMessageInput) {
     })
     .returning()
 
-  // Update thread updatedAt timestamp
   await dbClient
     .update(aiThreads)
     .set({ updatedAt: new Date() })
-    .where(eq(aiThreads.id, input.threadId))
+    .where(and(eq(aiThreads.id, input.threadId), eq(aiThreads.userId, input.userId)))
 
   return message
 }
 
 /**
- * Updates the title of an existing AI conversation thread.
+ * Updates the title of an existing AI conversation thread the caller owns.
  */
-export async function updateAIThreadTitle(threadId: string, title: string) {
-  if (!threadId || !title || !title.trim()) return null
+export async function updateAIThreadTitle(threadId: string, title: string, userId: string) {
+  if (!threadId || !title || !title.trim() || !userId) return null
   const dbClient = getDb()
   const [updated] = await dbClient
     .update(aiThreads)
     .set({ title: title.trim().slice(0, 120), updatedAt: new Date() })
-    .where(eq(aiThreads.id, threadId))
+    .where(and(eq(aiThreads.id, threadId), eq(aiThreads.userId, userId)))
     .returning()
 
   return updated

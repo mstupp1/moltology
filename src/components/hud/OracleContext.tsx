@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAIThreadsFn } from '@/lib/server/api'
+import { oracleAuthData } from '@/lib/ai/oracle-auth-client'
 
 export type OracleMode = 'closed' | 'popout' | 'sidebar' | 'page'
 
@@ -90,7 +91,7 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
     setIsLoadingThreads(true)
     try {
-      const data = await getAIThreadsFn({ data: { userId } })
+      const data = await getAIThreadsFn({ data: await oracleAuthData(userId) })
       if (Array.isArray(data)) {
         setThreads(data)
       }

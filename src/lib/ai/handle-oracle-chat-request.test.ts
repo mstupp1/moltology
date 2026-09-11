@@ -18,6 +18,8 @@ vi.mock('./service', () => ({
   summarizeThreadTitle: vi.fn().mockResolvedValue('Test Title'),
   createAIThread: vi.fn().mockResolvedValue({ id: 'thread-1' }),
   saveAIMessage: vi.fn().mockResolvedValue({ id: 'msg-1' }),
+  updateAIThreadTitle: vi.fn().mockResolvedValue({ id: 'thread-1' }),
+  getOwnedAIThread: vi.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', userId: 'usr_from_jwt' }),
 }))
 
 vi.mock('./codex-prompt', () => ({
@@ -38,6 +40,9 @@ vi.mock('ai', () => ({
     }),
 }))
 
+const TEST_THREAD_ID = '11111111-1111-4111-8111-111111111111'
+const TEST_JWT = 'eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ1c3JfZnJvbV9qd3QifQ.sig'
+
 function makeRequest(body: unknown, init?: RequestInit) {
   return new Request('http://localhost/api/chat', {
     method: 'POST',
@@ -47,7 +52,15 @@ function makeRequest(body: unknown, init?: RequestInit) {
   })
 }
 
-const TEST_THREAD_ID = '11111111-1111-4111-8111-111111111111'
+async function authedRequest(body: unknown) {
+  const { verifyNeonJWT } = await import('../jwt')
+  vi.mocked(verifyNeonJWT).mockResolvedValueOnce({
+    valid: true,
+    payload: { sub: 'usr_from_jwt' },
+    error: null,
+  } as any)
+  return makeRequest(body, { headers: { Authorization: `Bearer ${TEST_JWT}` } })
+}
 const encoder = new TextEncoder()
 
 function textStream(text: string) {
@@ -134,7 +147,21 @@ describe('handleOracleChatRequest', () => {
     expect(await res.text()).toBe('From JWT')
   })
 
-  it('streams text and sets thread header for authenticated body.userId', async () => {
+  it('returns guest JSON when only body.userId is present', async () => {
+    const res = await handleOracleChatRequest(
+      makeRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        userId: 'usr_spoofed',
+      })
+    )
+
+    expect(res.status).toBe(200)
+    const data = await res.json()
+    expect(data.isGuest).toBe(true)
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
+
+  it('streams text and sets thread header for a verified JWT', async () => {
     const encoder = new TextEncoder()
     const fakeStream = new ReadableStream({
       start(controller) {
@@ -148,9 +175,8 @@ describe('handleOracleChatRequest', () => {
     })
 
     const res = await handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'usr_test',
         model: 'zai/glm-5.3-flash',
       })
     )
@@ -161,6 +187,21 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock).toHaveBeenCalled()
     const text = await res.text()
     expect(text).toBe('Hello initiate')
+  })
+
+  it('rejects a threadId the JWT subject does not own', async () => {
+    const { getOwnedAIThread } = await import('./service')
+    vi.mocked(getOwnedAIThread).mockResolvedValueOnce(null)
+
+    const res = await handleOracleChatRequest(
+      await authedRequest({
+        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
+        threadId: 'victim-thread',
+      })
+    )
+
+    expect(res.status).toBe(403)
+    expect(streamTextMock).not.toHaveBeenCalled()
   })
 
   it('streams before slow DB persistence completes', async () => {
@@ -183,9 +224,8 @@ describe('handleOracleChatRequest', () => {
     streamTextMock.mockReturnValueOnce({ stream: fakeStream })
 
     const requestPromise = handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Speed test' }],
-        userId: 'usr_test',
       })
     )
 
@@ -211,9 +251,8 @@ describe('handleOracleChatRequest', () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Primary answer') })
 
     const res = await handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'usr_test',
       })
     )
 
@@ -230,9 +269,8 @@ describe('handleOracleChatRequest', () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Recovered answer') })
 
     const res = await handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'usr_test',
       })
     )
 
@@ -246,9 +284,8 @@ describe('handleOracleChatRequest', () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Secondary answer') })
 
     const res = await handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'usr_test',
       })
     )
 
@@ -265,9 +302,8 @@ describe('handleOracleChatRequest', () => {
     }
 
     const res = await handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'usr_test',
       })
     )
 
@@ -285,9 +321,8 @@ describe('handleOracleChatRequest', () => {
 
     const selected = 'alibaba/qwen3.8-flash'
     const res = await handleOracleChatRequest(
-      makeRequest({
+      await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'usr_test',
         model: selected,
       })
     )
