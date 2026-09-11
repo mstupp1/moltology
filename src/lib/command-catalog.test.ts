@@ -8,6 +8,7 @@ import {
   buildPagesCatalog,
   catalogNavigateArgs,
   filterCommandCatalog,
+  findCatalogCommand,
   newsPagesFromPosts,
   parseSearchTab,
   searchPageLocation,
@@ -110,6 +111,12 @@ describe('command catalog', () => {
     expect(boardPagesFromCategories([{ slug: 'trench-watch', name: 'Trench Watch' }])[0]?.to).toBe(
       '/forum/$categorySlug',
     )
+  })
+
+  it('finds a stored page recent on the shared catalog, including boards', () => {
+    expect(findCatalogCommand('nav-oracle')?.to).toBe('/oracle')
+    expect(findCatalogCommand('board-rules-announcements')?.to).toBe('/forum/$categorySlug')
+    expect(findCatalogCommand('')).toBeUndefined()
   })
 
   it('sends See all to /search with people when they were looking at people', () => {

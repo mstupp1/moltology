@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Search, X, Users, FileText } from 'lucide-react'
+import { Search, X, Users, FileText, History } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
@@ -17,6 +17,16 @@ import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 import { memberDossierLocation } from '@/lib/member-handle'
 import type { MemberSearchResult } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import {
+  clearSearchRecents,
+  getSearchRecents,
+  pageFromRecent,
+  personFromRecent,
+  rememberOpenedPage,
+  rememberOpenedPerson,
+  rememberOpenedQuery,
+  type SearchRecentEntry,
+} from '@/lib/search-recents'
 
 type PaletteRow =
   | { kind: 'person'; member: MemberSearchResult }
@@ -51,9 +61,12 @@ export const CommandPalette: React.FC = () => {
   const close = () => setIsOpen(false)
 
   const signedIn = session.isAuthenticated && !session.isGuest
+  const memberId = signedIn ? session.userId : null
+  const [recents, setRecents] = useState<SearchRecentEntry[]>([])
   const trimmed = query.trim()
   const peopleEnabled = isOpen && signedIn && trimmed.length >= MEMBER_SEARCH_MIN_CHARS
   const { results: people, searching: searchingPeople } = useMemberSearch(query, peopleEnabled)
+  const showRecents = signedIn && !trimmed && recents.length > 0
 
   const filteredCommands = useMemo(() => filterCommandCatalog(query), [query])
 
@@ -98,7 +111,15 @@ export const CommandPalette: React.FC = () => {
     setSelectedIndex(0)
   }, [query, people])
 
+  useEffect(() => {
+    if (!isOpen) return
+    setRecents(memberId ? getSearchRecents(memberId) : [])
+  }, [isOpen, memberId])
+
   const goToSearch = (type: SearchTab) => {
+    if (memberId && trimmed) {
+      setRecents(rememberOpenedQuery(memberId, trimmed, type))
+    }
     navigate(searchPageLocation(trimmed, type))
     close()
   }
@@ -109,15 +130,33 @@ export const CommandPalette: React.FC = () => {
       return
     }
     if (row.kind === 'person') {
+      if (memberId) setRecents(rememberOpenedPerson(memberId, row.member))
       navigate(memberDossierLocation(row.member))
       close()
       return
     }
     if (row.kind === 'page') {
+      if (memberId) setRecents(rememberOpenedPage(memberId, row.command))
       runCatalogCommand(row.command, navigate, toast, close)
       return
     }
     goToSearch(people.length > 0 ? 'people' : 'pages')
+  }
+
+  const activateRecent = (entry: SearchRecentEntry) => {
+    if (entry.kind === 'query') {
+      setQuery(entry.query)
+      return
+    }
+    if (entry.kind === 'person') {
+      activateRow({ kind: 'person', member: personFromRecent(entry) })
+      return
+    }
+    activateRow({ kind: 'page', command: pageFromRecent(entry) })
+  }
+
+  const shedTrail = () => {
+    setRecents(clearSearchRecents(memberId))
   }
 
   const handleKeyDownMenu = (e: React.KeyboardEvent) => {
@@ -171,6 +210,35 @@ export const CommandPalette: React.FC = () => {
             </div>
 
             <div className="max-h-[55vh] sm:max-h-80 overflow-y-auto touch-pan-scroll p-2 space-y-1 flex-1">
+              {showRecents && (
+                <div data-testid="command-palette-recents" className="px-1 pt-1 pb-2 space-y-2">
+                  <div className="flex items-center justify-between gap-2 px-1">
+                    <div className="text-[10px] uppercase tracking-widest text-cyan-600 font-semibold flex items-center gap-1.5">
+                      <History className="w-3 h-3" />
+                      Recents
+                    </div>
+                    <button
+                      type="button"
+                      data-testid="command-palette-recents-clear"
+                      onClick={shedTrail}
+                      className="text-[10px] uppercase tracking-widest text-[#839493] hover:text-cyan-300 transition-colors min-h-[36px] px-1"
+                      aria-label="Clear recents"
+                    >
+                      Shed trail
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {recents.map((entry) => (
+                      <RecentChip
+                        key={searchRecentChipKey(entry)}
+                        entry={entry}
+                        onOpen={() => activateRecent(entry)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {showPeopleSection && (
                 <div data-testid="command-palette-people" className="space-y-1">
                   <div className="px-2 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-cyan-600 font-semibold flex items-center gap-1.5">
@@ -319,5 +387,55 @@ export const CommandPalette: React.FC = () => {
         </div>
       )}
     </>
+  )
+}
+
+function searchRecentChipKey(entry: SearchRecentEntry): string {
+  if (entry.kind === 'query') return `query:${entry.query.toLowerCase()}`
+  if (entry.kind === 'person') return `person:${entry.memberId}`
+  return `page:${entry.commandId}`
+}
+
+function RecentChip({
+  entry,
+  onOpen,
+}: {
+  entry: SearchRecentEntry
+  onOpen: () => void
+}) {
+  const livePage = entry.kind === 'page' ? pageFromRecent(entry) : null
+  const label =
+    entry.kind === 'query'
+      ? entry.query
+      : entry.kind === 'person'
+        ? entry.displayName
+        : livePage?.label ?? entry.label
+  const testId =
+    entry.kind === 'query'
+      ? `command-palette-recent-query-${entry.query}`
+      : entry.kind === 'person'
+        ? `command-palette-recent-person-${entry.memberId}`
+        : `command-palette-recent-page-${entry.commandId}`
+
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      onClick={onOpen}
+      className="max-w-full inline-flex items-center gap-1.5 px-2.5 py-1.5 min-h-[36px] border border-[#3a4a49] bg-[#0f1414] text-[#dfe3e3] hover:border-cyan-400/60 hover:text-cyan-100 chamfer-corner transition-colors"
+    >
+      {entry.kind === 'query' ? (
+        <Search className="w-3 h-3 text-cyan-400 shrink-0" />
+      ) : entry.kind === 'person' ? (
+        <LobsterAvatarPortrait
+          config={(entry.avatarConfig as LobsterAvatarConfig | null) ?? null}
+          className="w-5 h-5 shrink-0"
+          size={40}
+        />
+      ) : (
+        <CommandCatalogIcon icon={livePage?.icon ?? entry.icon} />
+      )}
+      <span className="text-[11px] font-semibold tracking-wide truncate">{label}</span>
+    </button>
   )
 }
