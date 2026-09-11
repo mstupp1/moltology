@@ -1,5 +1,9 @@
 import { env } from '../../env'
-import { SUPPORT_INBOX } from '../support-tickets'
+import {
+  SUPPORT_INBOX,
+  supportTicketCategoryLabel,
+  supportTicketUrgencyLabel,
+} from '../support-tickets'
 
 export const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
 
@@ -35,8 +39,8 @@ export function renderSupportTicketEmailText(input: SupportTicketMailInput): str
     `Member id: ${input.memberId}`,
     `Handle: ${handle}`,
     `Member email: ${memberEmail}`,
-    `Category: ${input.category}`,
-    `Urgency: ${input.urgency}`,
+    `Topic: ${supportTicketCategoryLabel(input.category)}`,
+    `Priority: ${supportTicketUrgencyLabel(input.urgency)}`,
     '',
     `Subject: ${input.subject}`,
     '',

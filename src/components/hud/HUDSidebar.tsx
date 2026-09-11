@@ -44,6 +44,7 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { getAssetUrl } from '@/lib/assets'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
+import { SUPPORT_PAGE_COPY } from '@/lib/support-tickets'
 
 const GUEST_LOCKED_PATHS = new Set(['/lectures', '/subterranean', '/chassis', '/connections', '/member', '/stream'])
 
@@ -916,7 +917,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   onMouseEnter={() => handlePrefetch('/support')}
                   onFocus={() => handlePrefetch('/support')}
                   className="flex-1 text-left relative flex items-center px-4 py-2.5 pl-5 gap-3 transition-colors duration-150 group/help cursor-pointer"
-                  title="Benthic Support Portal"
+                  title={SUPPORT_PAGE_COPY.pageTitle}
                 >
                   {currentRoute === '/support' && (
                     <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />
@@ -1033,7 +1034,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   onMouseEnter={() => handlePrefetch('/support')}
                   onFocus={() => handlePrefetch('/support')}
                   className="w-full text-left relative flex items-center transition-colors duration-150 group/help cursor-pointer px-4 py-2.5 pl-5 gap-3"
-                  title="Benthic Support Portal"
+                  title={SUPPORT_PAGE_COPY.pageTitle}
                 >
                   {currentRoute === '/support' && (
                     <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#00c3ff] shadow-[0_0_8px_rgba(0,195,255,0.6)]" />

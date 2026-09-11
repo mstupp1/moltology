@@ -811,13 +811,9 @@ export const notifications = pgTable('notifications', {
   }),
 ])
 
-export type SupportTicketCategory =
-  | 'SHELL_INTEGRITY'
-  | 'SESSION_CLEARANCE'
-  | 'MARKET_CREDITS'
-  | 'OTHER'
+export type SupportTicketCategory = 'ACCOUNT' | 'BILLING' | 'BUG' | 'OTHER'
 
-export type SupportTicketUrgency = 'NORMAL' | 'HIGH' | 'CRITICAL'
+export type SupportTicketUrgency = 'NORMAL' | 'HIGH' | 'URGENT'
 
 export type SupportTicketStatus = 'open' | 'closed'
 

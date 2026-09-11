@@ -31,7 +31,7 @@ export default function SupportTicketForm() {
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
 
   const [subject, setSubject] = useState('')
-  const [category, setCategory] = useState<SupportTicketCategoryId>('SHELL_INTEGRITY')
+  const [category, setCategory] = useState<SupportTicketCategoryId>('ACCOUNT')
   const [urgency, setUrgency] = useState<SupportTicketUrgencyId>('NORMAL')
   const [body, setBody] = useState('')
   const [honeypot, setHoneypot] = useState('')

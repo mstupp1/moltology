@@ -33,7 +33,7 @@ function createMockDb(opts?: { recentCount?: number; handle?: string | null }) {
     handle: opts?.handle ?? 'claw_lord',
     subject: 'Chassis freeze',
     body: 'The vault would not open after a greaves swap.',
-    category: 'SHELL_INTEGRITY',
+    category: 'ACCOUNT',
     urgency: 'NORMAL',
     status: 'open',
   }
@@ -65,7 +65,7 @@ function createMockDb(opts?: { recentCount?: number; handle?: string | null }) {
 const validData = {
   subject: 'Chassis freeze',
   body: 'The vault would not open after a greaves swap.',
-  category: 'SHELL_INTEGRITY' as const,
+  category: 'ACCOUNT' as const,
   urgency: 'NORMAL' as const,
   turnstileToken: 'turnstile-ok',
 }
@@ -159,7 +159,7 @@ describe('createSupportTicketHandler', () => {
         handle: 'claw_lord',
         subject: 'Chassis freeze',
         body: 'alert(1)The vault would not open after a greaves swap.',
-        category: 'SHELL_INTEGRITY',
+        category: 'ACCOUNT',
         ipHash: hashClientIp('203.0.113.9'),
       }),
     )
@@ -175,6 +175,36 @@ describe('createSupportTicketHandler', () => {
       }),
     )
     expect(mockDb.update).toHaveBeenCalled()
+  })
+
+  it('maps legacy CRITICAL to URGENT and unknown categories to OTHER', async () => {
+    const mockDb = createMockDb()
+    const values = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: TICKET_ID, userId: MEMBER_ID, handle: 'claw_lord' }]),
+    })
+    mockDb.insert = vi.fn().mockReturnValue({ values })
+
+    await createSupportTicketHandler({
+      data: {
+        ...validData,
+        category: 'SHELL_INTEGRITY',
+        urgency: 'CRITICAL',
+      },
+      context: { user: { sub: MEMBER_ID, email: 'claw@moltology.org' }, db: mockDb as any },
+    })
+
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: 'OTHER',
+        urgency: 'URGENT',
+      }),
+    )
+    expect(sendSupportTicketEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: 'OTHER',
+        urgency: 'URGENT',
+      }),
+    )
   })
 
   it('rate-limits a member who already has three recent tickets', async () => {

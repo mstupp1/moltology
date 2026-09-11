@@ -15,38 +15,37 @@ export const SUPPORT_TICKET_HONEYPOT_FIELD = 'molt_bait_field'
 export const SUPPORT_TICKET_TURNSTILE_ACTION = 'support_ticket'
 
 export const SUPPORT_TICKET_CATEGORIES = [
-  'SHELL_INTEGRITY',
-  'SESSION_CLEARANCE',
-  'MARKET_CREDITS',
+  'ACCOUNT',
+  'BILLING',
+  'BUG',
   'OTHER',
 ] as const
 
-export const SUPPORT_TICKET_URGENCIES = ['NORMAL', 'HIGH', 'CRITICAL'] as const
+export const SUPPORT_TICKET_URGENCIES = ['NORMAL', 'HIGH', 'URGENT'] as const
 
 export type SupportTicketCategoryId = (typeof SUPPORT_TICKET_CATEGORIES)[number]
 export type SupportTicketUrgencyId = (typeof SUPPORT_TICKET_URGENCIES)[number]
 
 export const SUPPORT_TICKET_COPY = {
-  formTitle: 'Transmit a support ticket',
-  formHint: 'A steward reads every ticket that lands in the Benthic Core channel.',
-  subjectLabel: 'Symptom',
-  subjectPlaceholder: 'Carapace torque synchronization latency',
-  categoryLabel: 'Channel',
-  urgencyLabel: 'Pressure',
-  bodyLabel: 'What happened',
-  bodyPlaceholder: 'Describe the issue. Paste any error readout that helps a steward find it.',
-  submit: 'Dispatch ticket',
-  submitting: 'Dispatching',
-  successTitle: 'Transmission received',
+  formTitle: 'Contact support',
+  formHint: "We'll read every ticket and reply by email.",
+  subjectLabel: 'Subject',
+  subjectPlaceholder: 'Brief summary of the issue',
+  categoryLabel: 'Topic',
+  urgencyLabel: 'Priority',
+  bodyLabel: 'Tell us what happened',
+  bodyPlaceholder: 'What you were doing, what you expected, and any error you saw.',
+  submit: 'Send',
+  submitting: 'Sending',
+  successTitle: 'We got your ticket',
   successBody: (ref: string) =>
-    `The Benthic Core has your ticket. Reference ${ref}. A steward will read it from the support channel.`,
-  guestTitle: 'Ticket channel sealed',
-  guestBody:
-    'Sign in with your initiate account to file a ticket. Guests cannot open a channel from this terminal.',
-  guestSignUp: 'Sign up to unlock',
+    `We got your ticket. Reference ${ref}. We'll email you when there's an update.`,
+  guestTitle: 'Sign in to contact support',
+  guestBody: "Create a free account or sign in. We'll reply by email.",
+  guestSignUp: 'Sign up',
   guestSignIn: 'Already have an account? Sign in',
   rateLimited: 'You already sent a ticket recently. Wait a few minutes and try again.',
-  unauthenticated: 'Sign in to file a ticket.',
+  unauthenticated: 'Sign in to contact support.',
   genericError: 'Could not send your ticket. Try again in a moment.',
   subjectRequired: 'Add a short subject.',
   bodyRequired: 'Describe the issue in a few sentences.',
@@ -56,17 +55,46 @@ export const SUPPORT_TICKET_COPY = {
   toastReceived: 'Your ticket was received.',
 } as const
 
+export const SUPPORT_PAGE_COPY = {
+  eyebrow: 'Support',
+  pageTitle: 'Contact support',
+  tabChangelog: 'Changelog',
+  tabFaq: 'FAQ',
+  tabDiagnostics: 'Diagnostics',
+  changelogLive: 'Live',
+  changelogEmpty: 'No matching releases',
+  changelogEmptyHint: (query: string) => `Nothing matches "${query}".`,
+  changelogReset: 'Reset filters',
+  changelogExpand: 'View release notes',
+  changelogCollapse: 'Hide release notes',
+  changelogPermalink: 'Permalink',
+  faqTitle: 'FAQ',
+  faqHint: 'Answers to common questions. If you still need help, send a ticket.',
+  faqStartTitle: 'Getting started',
+  faqStartBody: 'Create a free account and sign in to use the app.',
+  faqBillingTitle: 'Billing & purchases',
+  faqBillingBody: 'Questions about purchases and the Market.',
+  faqPrivacyTitle: 'Privacy',
+  faqPrivacyBody: 'How to manage privacy and notification settings.',
+  diagnosticsTitle: 'Diagnostics',
+  diagnosticsDatabase: 'Database',
+  diagnosticsAuth: 'Sign-in',
+  diagnosticsApp: 'App',
+  diagnosticsOk: 'Operational',
+  diagnosticsHealthy: 'Healthy',
+} as const
+
 export const SUPPORT_TICKET_CATEGORY_LABELS: Record<SupportTicketCategoryId, string> = {
-  SHELL_INTEGRITY: 'Shell and chassis',
-  SESSION_CLEARANCE: 'Session and clearance',
-  MARKET_CREDITS: 'Market and credits',
-  OTHER: 'General inquiry',
+  ACCOUNT: 'Account & sign-in',
+  BILLING: 'Billing & purchases',
+  BUG: "Something's broken",
+  OTHER: 'Something else',
 }
 
 export const SUPPORT_TICKET_URGENCY_LABELS: Record<SupportTicketUrgencyId, string> = {
-  NORMAL: 'Steady',
-  HIGH: 'High pressure',
-  CRITICAL: 'Critical breach',
+  NORMAL: 'Normal',
+  HIGH: 'High',
+  URGENT: 'Urgent',
 }
 
 const HTML_TAG = /<[^>]*>?/g
@@ -91,7 +119,16 @@ export function parseSupportTicketCategory(value: string | null | undefined): Su
 
 export function parseSupportTicketUrgency(value: string | null | undefined): SupportTicketUrgencyId {
   const next = (value || '').trim().toUpperCase()
+  if (next === 'CRITICAL') return 'URGENT'
   return isSupportTicketUrgency(next) ? next : 'NORMAL'
+}
+
+export function supportTicketCategoryLabel(value: string | null | undefined): string {
+  return SUPPORT_TICKET_CATEGORY_LABELS[parseSupportTicketCategory(value)]
+}
+
+export function supportTicketUrgencyLabel(value: string | null | undefined): string {
+  return SUPPORT_TICKET_URGENCY_LABELS[parseSupportTicketUrgency(value)]
 }
 
 export function isSupportTicketHoneypotTriggered(value: string | null | undefined): boolean {

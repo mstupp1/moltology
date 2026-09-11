@@ -56,7 +56,10 @@ describe('SupportTicketForm', () => {
     expect(screen.getByTestId('support-ticket-guest')).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_TICKET_COPY.guestTitle)).toBeInTheDocument()
     expect(screen.getByText(SUPPORT_TICKET_COPY.guestBody)).toBeInTheDocument()
+    expect(screen.getByText(SUPPORT_TICKET_COPY.guestSignUp)).toBeInTheDocument()
+    expect(screen.getByText(SUPPORT_TICKET_COPY.guestSignIn)).toBeInTheDocument()
     expect(screen.queryByTestId('support-ticket-form')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Benthic|carapace|Dispatch|Transmit|initiate/i)).not.toBeInTheDocument()
   })
 
   it('submits a signed-in ticket and shows the received reference', async () => {
@@ -72,6 +75,14 @@ describe('SupportTicketForm', () => {
 
     renderForm()
 
+    expect(screen.getByLabelText(SUPPORT_TICKET_COPY.categoryLabel)).toBeInTheDocument()
+    expect(screen.getByLabelText(SUPPORT_TICKET_COPY.urgencyLabel)).toBeInTheDocument()
+    expect(screen.getByText('Account & sign-in')).toBeInTheDocument()
+    expect(screen.getByText("Something's broken")).toBeInTheDocument()
+    expect(screen.getByText('Urgent')).toBeInTheDocument()
+    expect(screen.queryByText('Shell and chassis')).not.toBeInTheDocument()
+    expect(screen.queryByText('Critical breach')).not.toBeInTheDocument()
+
     fireEvent.change(screen.getByLabelText(SUPPORT_TICKET_COPY.subjectLabel), {
       target: { value: 'Chassis freeze' },
     })
@@ -85,6 +96,8 @@ describe('SupportTicketForm', () => {
         data: expect.objectContaining({
           subject: 'Chassis freeze',
           body: 'The vault would not open after a greaves swap.',
+          category: 'ACCOUNT',
+          urgency: 'NORMAL',
           userId: 'usr-1',
           token: 'mock-jwt',
           turnstileToken: 'turnstile-ok',

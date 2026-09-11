@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { HudGhostCard } from '@/components/ui/HudGhostLoader'
-import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import {
   LifeBuoy,
   FileText,
@@ -15,20 +14,19 @@ import {
   Database,
   ShieldCheck,
   Zap,
-  Terminal,
   ExternalLink,
   RotateCcw,
 } from 'lucide-react'
-import { getPublicChangelogs, type ChangelogEntry } from '@/lib/changelogs'
-import { seo } from '@/lib/seo'
+import { type ChangelogEntry } from '@/lib/changelogs'
 import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
 import { HudPagination } from '@/components/ui/HudPagination'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import SupportTicketForm from '@/components/hud/SupportTicketForm'
+import { SUPPORT_PAGE_COPY, SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
 
 export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   // loaderData passed as prop
-  const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket' | 'diagnostics'>('changelog')
+  const [activeTab, setActiveTab] = useState<'changelog' | 'kb' | 'ticket' | 'diagnostics'>('ticket')
   const changelogs: ChangelogEntry[] = loaderData?.changelogs || []
   const loading = !loaderData?.changelogs
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
@@ -183,7 +181,6 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
 
   return (
     <div className="space-y-3.5 sm:space-y-5 md:space-y-6 font-sans text-[#dfe3e3] pb-10">
-      {/* Header Banner matching Benthic Ascendance HUD standard */}
       <div className="chitin-card p-3.5 sm:p-5 chamfer-corner shadow-2xl relative overflow-hidden space-y-2.5 sm:space-y-3">
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-[#00ffff]/05 rounded-full blur-3xl pointer-events-none" />
         
@@ -195,12 +192,11 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-[#ff5540] font-bold tracking-widest uppercase bg-[#ff5540]/10 border border-[#ff5540]/40 px-1.5 py-0.5">
-                  BENTHIC CORE SUPPORT
+                  {SUPPORT_PAGE_COPY.eyebrow}
                 </span>
-                <span className="text-[10px] text-[#839493]">PORTAL v2.4</span>
               </div>
               <h1 className="font-grotesk text-lg md:text-xl font-bold tracking-wider text-[#dfe3e3] uppercase">
-                NEURAL TELEMETRY & SUPPORT CENTER
+                {SUPPORT_PAGE_COPY.pageTitle}
               </h1>
             </div>
           </div>
@@ -219,9 +215,9 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>SYSTEM CHANGELOG</span>
+            <span>{SUPPORT_PAGE_COPY.tabChangelog}</span>
             <span className="bg-[#00ffff]/20 text-[#00ffff] text-[10px] px-1.5 py-0.2 rounded-full ml-1">
-              LIVE
+              {SUPPORT_PAGE_COPY.changelogLive}
             </span>
           </button>
 
@@ -234,7 +230,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             }`}
           >
             <HelpCircle className="w-3.5 h-3.5" />
-            <span>KNOWLEDGE BASE & FAQ</span>
+            <span>{SUPPORT_PAGE_COPY.tabFaq}</span>
           </button>
 
           <button
@@ -246,7 +242,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             }`}
           >
             <Send className="w-3.5 h-3.5" />
-            <span>SUBMIT NEURAL TICKET</span>
+            <span>{SUPPORT_TICKET_COPY.formTitle}</span>
           </button>
 
           <button
@@ -258,12 +254,12 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             }`}
           >
             <Activity className="w-3.5 h-3.5" />
-            <span>SYSTEM DIAGNOSTICS</span>
+            <span>{SUPPORT_PAGE_COPY.tabDiagnostics}</span>
           </button>
         </div>
       </div>
 
-      {/* TAB 1: SYSTEM CHANGELOG */}
+      {/* Changelog */}
       {activeTab === 'changelog' && (
         <div className="space-y-4">
           {/* Standard Responsive Search & Filter Controls Bar */}
@@ -293,9 +289,9 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             <div className="chitin-card p-8 text-center space-y-3 chamfer-corner">
               <AlertTriangle className="w-8 h-8 text-[#ff5540] mx-auto" />
               <div className="space-y-1">
-                <p className="text-sm font-bold text-[#dfe3e3]">NO CHANGELOG TELEMETRY FOUND</p>
+                <p className="text-sm font-bold text-[#dfe3e3]">{SUPPORT_PAGE_COPY.changelogEmpty}</p>
                 <p className="text-xs text-[#839493] max-w-md mx-auto">
-                  No records match your filter criteria "{searchQuery || selectedCategory}".
+                  {SUPPORT_PAGE_COPY.changelogEmptyHint(searchQuery || selectedCategory)}
                 </p>
               </div>
               <button
@@ -303,7 +299,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
                 className="px-4 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 border border-[#00ffff] text-[#00ffff] text-xs font-bold chamfer-corner inline-flex items-center gap-1.5 transition-all"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>RESET FILTERS</span>
+                <span>{SUPPORT_PAGE_COPY.changelogReset}</span>
               </button>
             </div>
           ) : (
@@ -386,12 +382,12 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
                           >
                             {isExpanded ? (
                               <>
-                                <span>COLLAPSE RELEASE DETAILS</span>
+                                <span>{SUPPORT_PAGE_COPY.changelogCollapse}</span>
                                 <ChevronUp className="w-3.5 h-3.5" />
                               </>
                             ) : (
                               <>
-                                <span>VIEW FULL TRANSMUTATION LOG</span>
+                                <span>{SUPPORT_PAGE_COPY.changelogExpand}</span>
                                 <ChevronDown className="w-3.5 h-3.5" />
                               </>
                             )}
@@ -404,7 +400,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
                               className="text-[10px] text-[#839493] hover:text-[#00ffff] font-sans font-bold flex items-center gap-1 transition-colors border border-[#3a4a49] px-2 py-0.5 chamfer-corner bg-[#030606]"
                               title="View public permalink page"
                             >
-                              <span>PERMALINK</span>
+                              <span>{SUPPORT_PAGE_COPY.changelogPermalink}</span>
                               <ExternalLink className="w-2.5 h-2.5" />
                             </Link>
                           )}
@@ -433,54 +429,44 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
         </div>
       )}
 
-      {/* TAB 2: KNOWLEDGE BASE & FAQ (Modular Stub for future success) */}
       {activeTab === 'kb' && (
         <div className="space-y-4">
           <div className="chitin-card p-5 chamfer-corner space-y-4">
             <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
               <HelpCircle className="w-5 h-5 text-[#00ffff]" />
               <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-                SYNAPTIC KNOWLEDGE BASE & FAQ INDEX
+                {SUPPORT_PAGE_COPY.faqTitle}
               </h2>
             </div>
             <p className="text-xs text-[#839493] leading-relaxed">
-              Explore essential guidance for Larval Unit progression, Chitinous Mind calibration, and Benthic Market transmutations.
+              {SUPPORT_PAGE_COPY.faqHint}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all cursor-pointer group">
-                <span className="text-[10px] text-[#00ffff] font-bold uppercase tracking-widest block">
-                  MODULE 01
-                </span>
+              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all group">
                 <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff]">
-                  LARVAL STAGE ASCENDANCE
+                  {SUPPORT_PAGE_COPY.faqStartTitle}
                 </h3>
                 <p className="text-[11px] text-[#839493]">
-                  How to complete daily alignment routines and elevate your cult stage rating.
+                  {SUPPORT_PAGE_COPY.faqStartBody}
                 </p>
               </div>
 
-              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all cursor-pointer group">
-                <span className="text-[10px] text-[#00ffff] font-bold uppercase tracking-widest block">
-                  MODULE 02
-                </span>
+              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all group">
                 <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff]">
-                  ASSET SHEDDING & CREDITS
+                  {SUPPORT_PAGE_COPY.faqBillingTitle}
                 </h3>
                 <p className="text-[11px] text-[#839493]">
-                  Liquidating unneeded assets into Molt Credits and Chitin Gems via the Market.
+                  {SUPPORT_PAGE_COPY.faqBillingBody}
                 </p>
               </div>
 
-              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all cursor-pointer group">
-                <span className="text-[10px] text-[#00ffff] font-bold uppercase tracking-widest block">
-                  MODULE 03
-                </span>
+              <div className="chitin-card-inset p-4 chamfer-corner space-y-2 border border-[#3a4a49] hover:border-[#00ffff]/50 transition-all group">
                 <h3 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff]">
-                  ISOLATION & HARDENING
+                  {SUPPORT_PAGE_COPY.faqPrivacyTitle}
                 </h3>
                 <p className="text-[11px] text-[#839493]">
-                  Configuring privacy shell force-fields to detach from social noise.
+                  {SUPPORT_PAGE_COPY.faqPrivacyBody}
                 </p>
               </div>
             </div>
@@ -488,13 +474,13 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
         </div>
       )}
 
-      {/* TAB 3: SUBMIT NEURAL TICKET (Modular Stub) */}
+      {/* TAB 3: Contact support */}
       {activeTab === 'ticket' && (
         <div className="chitin-card p-5 chamfer-corner space-y-4">
           <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
             <Send className="w-5 h-5 text-[#00ffff]" />
             <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-              Transmit a support ticket
+              {SUPPORT_TICKET_COPY.formTitle}
             </h2>
           </div>
 
@@ -502,42 +488,39 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
         </div>
       )}
 
-      {/* TAB 4: SYSTEM DIAGNOSTICS */}
       {activeTab === 'diagnostics' && (
         <div className="chitin-card p-5 chamfer-corner space-y-4">
           <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
             <Activity className="w-5 h-5 text-[#00ffff]" />
             <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-              REAL-TIME INFRASTRUCTURE TELEMETRY
+              {SUPPORT_PAGE_COPY.diagnosticsTitle}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">NEON POSTGRES ORM</span>
+              <span className="text-[10px] text-[#839493] uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsDatabase}</span>
               <div className="text-sm font-bold text-[#00ffff] flex items-center gap-1.5">
                 <Database className="w-4 h-4 text-[#00ffff]" />
-                <span>OPERATIONAL</span>
+                <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
               </div>
             </div>
 
             <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">NEON MANAGED AUTH</span>
+              <span className="text-[10px] text-[#839493] uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsAuth}</span>
               <div className="text-sm font-bold text-[#00ffff] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#00ffff]" />
-                <span>HEALTHY (JWKS)</span>
+                <span>{SUPPORT_PAGE_COPY.diagnosticsHealthy}</span>
               </div>
             </div>
 
             <div className="chitin-card-inset p-3 chamfer-corner space-y-1">
-              <span className="text-[10px] text-[#839493] uppercase font-bold">TANSTACK START SSR</span>
+              <span className="text-[10px] text-[#839493] uppercase font-bold">{SUPPORT_PAGE_COPY.diagnosticsApp}</span>
               <div className="text-sm font-bold text-[#00ffff] flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-[#00ffff]" />
-                <span>NITRO SERVER</span>
+                <span>{SUPPORT_PAGE_COPY.diagnosticsOk}</span>
               </div>
             </div>
-
-
           </div>
         </div>
       )}
