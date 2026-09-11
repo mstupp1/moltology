@@ -97,7 +97,6 @@ function HubAvatarStack({ members, overflow }: { members: ConnectionsListView['f
               config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
               className="w-7 h-7"
               size={64}
-              eyeTracking={false}
               fisheyeLens={false}
               vignette={false}
               specularSheen={false}
@@ -327,7 +326,6 @@ function HubConnectionRow({
             config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
             className="w-9 h-9"
             size={96}
-            eyeTracking={false}
           />
         </Link>
         <Link

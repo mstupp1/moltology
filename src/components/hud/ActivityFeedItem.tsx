@@ -161,7 +161,6 @@ export function ActivityFeedItem({
               config={(event.actor.avatarConfig as LobsterAvatarConfig | null) ?? null}
               className={compact ? 'w-8 h-8' : 'w-10 h-10'}
               size={compact ? 64 : 96}
-              eyeTracking={false}
               fisheyeLens={false}
               vignette={false}
               specularSheen={false}

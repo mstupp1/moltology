@@ -22,11 +22,8 @@ export interface LobsterAvatarPortraitProps {
   /** Subtle hover scale on the sprite */
   interactive?: boolean
   animationSeed?: string
-  /** Subtle cursor-following eye shift with eased resistance (default on) */
-  eyeTracking?: boolean
   /** Enable foreground optical lens vignette (default true) */
   vignette?: boolean
-  /** Enable convex optical glass specular glint (default true) */
   specularSheen?: boolean
   /** Enable spherical fisheye lens curvature & chromatic refraction (default true) */
   fisheyeLens?: boolean
@@ -45,7 +42,6 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   className = 'w-48 h-48 sm:w-56 sm:h-56',
   interactive = false,
   animationSeed,
-  eyeTracking = true,
   vignette = true,
   specularSheen = true,
   fisheyeLens = true,
@@ -62,6 +58,9 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   const configPulse = config?.patternPulse
   const configSparkles = config?.patternSparkles
   const configEyelidStyle = config?.eyelidStyle
+  const configEyeColor = config?.eyeColor
+  const configEyeVariant = config?.eyeVariant
+  const configPupilVariant = config?.pupilVariant
   const configMotion = config?.backgroundMotion
   const configTransparent = config?.transparentBackground
 
@@ -82,12 +81,15 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
         ...(configPulse ? { patternPulse: configPulse } : {}),
         ...(configSparkles ? { patternSparkles: configSparkles } : {}),
         ...(configEyelidStyle ? { eyelidStyle: configEyelidStyle } : {}),
+        ...(configEyeColor ? { eyeColor: configEyeColor } : {}),
+        ...(configEyeVariant ? { eyeVariant: configEyeVariant } : {}),
+        ...(configPupilVariant ? { pupilVariant: configPupilVariant } : {}),
         ...(configMotion ? { backgroundMotion: configMotion } : {}),
         ...(configTransparent ? { transparentBackground: configTransparent } : {}),
       },
       size
     )
-  }, [src, configSeed, configHeight, configArmScale, configTheme, configPattern, configTexture, configDensity, configGlow, configPulse, configSparkles, configEyelidStyle, configMotion, configTransparent, size])
+  }, [src, configSeed, configHeight, configArmScale, configTheme, configPattern, configTexture, configDensity, configGlow, configPulse, configSparkles, configEyelidStyle, configEyeColor, configEyeVariant, configPupilVariant, configMotion, configTransparent, size])
 
   const portraitClassName = useMemo(
     () =>
@@ -119,7 +121,6 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
             outputSize={size}
             maskRadial={false}
             animationSeed={resolvedSeed}
-            eyeTracking={eyeTracking}
             texture={configTexture}
             containerClassName={`relative w-full h-full flex items-start justify-center overflow-hidden ${
               interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''

@@ -253,7 +253,25 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-phone-rings-in-someone-elses-voice.md"
+    },
+    {
+      "slug": "the-sidewalk-still-belongs-to-feet",
+      "title": "The Sidewalk Still Belongs to Feet: Scooting Past the Swarm on Clark",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-09-11T08:00:00-04:00",
+      "coreHook": "A dozen autonomous delivery robots circle on a Lincoln Park sidewalk; the viral clip is surface noise, while the walker still has to scoot around to finish the block.",
+      "keyMetrics": [
+        "300,000+ views on Lincoln Park swarm clip",
+        ">1,500 petition signatures on sidewalk accessibility",
+        ">80% survey opposition to ward rover expansion",
+        "1st calcification via shared ground boundary"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-sidewalk-still-belongs-to-feet.md"
     }
   ]
 }
+
 

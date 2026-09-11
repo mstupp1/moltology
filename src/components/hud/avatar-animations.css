@@ -263,12 +263,6 @@
 
 /* Legs stay planted — no idle animation to preserve frame stability */
 
-.lobster-avatar-animated .lobster-pupil-track-layer {
-  transform-box: fill-box;
-  transform-origin: center;
-  will-change: transform;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .lobster-avatar-animated .lobster-idle-layer {
     animation: none !important;

@@ -1104,6 +1104,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-10T14:08:55.511Z"
+    },
+    {
+      "id": "reel-1789135568773",
+      "topic": "The Sidewalk Still Belongs to Feet: Scooting Past the Swarm on Clark",
+      "hookHeadline": "FEET WERE HERE FIRST",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-sidewalk-still-belongs-to-feet",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "When delivery fleets jam the sidewalk, you do not argue with a rover. You take the open edge and keep walking. Feet were here first. Lock in your daily protocol on moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1789135568773.mp4",
+      "s3Key": "videos/social/reels/master-reel-1789135568773.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 13.233333,
+      "status": "queued",
+      "scheduledFor": "2026-09-11T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aa40b3a8da7f34db55bd7e7",
+      "zernioYouTubePostId": "6aa40b3a8da7f34db55bd7e7",
+      "zernioPostId": "6aa40b3a8da7f34db55bd7e7",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment ROUTINE to receive the 1-page 24-Hour Tactical Blueprint in your DMs!\n🔗 Or read online: moltology.org/news/the-2026-moltmaxxing-protocol-guide\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "When delivery fleets jam the sidewalk, you don’t argue with a rover. You take the open edge and keep walking. Shared ground belongs to people on foot. ⚡🌊\n\nA dozen delivery bots circle on a Lincoln Park sidewalk. The viral clip is surface noise. The walker still has to go around.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"ROUTINE\" to receive the 1-page high-torque 24-Hour Blueprint sheet in your DMs, or visit:\n🔗 Link in bio & story → moltology.org/news/the-2026-moltmaxxing-protocol-guide",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "routine",
+      "commentTriggerKeyword": "ROUTINE",
+      "commentTriggerUrl": "https://moltology.org/news/the-2026-moltmaxxing-protocol-guide",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-11T14:07:55.806Z"
     }
   ]
 }

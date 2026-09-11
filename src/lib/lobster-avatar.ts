@@ -55,6 +55,7 @@ export type PatternGlow = 'subtle' | 'chromatic' | 'none'
 export type PatternPulse = 'pulse' | 'steady'
 export type PatternSparkles = 'subtle' | 'radiant' | 'none'
 export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried'
+export type LobsterEyeColor = 'amber' | 'sapphire' | 'emerald' | 'amethyst' | 'ruby' | 'topaz'
 
 export const LOBSTER_PATTERN_DENSITIES: readonly PatternDensity[] = ['compact', 'standard', 'spacious'] as const
 export const LOBSTER_PATTERN_GLOWS: readonly PatternGlow[] = ['subtle', 'chromatic', 'none'] as const
@@ -69,6 +70,43 @@ export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
   'angry',
   'worried',
 ] as const
+
+export const LOBSTER_EYE_COLORS: readonly LobsterEyeColor[] = [
+  'amber',
+  'sapphire',
+  'emerald',
+  'amethyst',
+  'ruby',
+  'topaz',
+] as const
+
+export const LOBSTER_EYE_COLOR_LABELS: Readonly<Record<LobsterEyeColor, string>> = {
+  amber: 'Warm Amber (Pixar Hazel)',
+  sapphire: 'Ocean Sapphire (Cyan Blue)',
+  emerald: 'Abyssal Emerald (Benthic Green)',
+  amethyst: 'Mystic Amethyst (Deep Violet)',
+  ruby: 'Incandescent Ruby (Fiery Ember)',
+  topaz: 'Golden Topaz (Molten Honey)',
+}
+
+export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall'] as const
+export type LobsterEyeVariant = (typeof LOBSTER_EYE_VARIANTS)[number]
+
+export const LOBSTER_EYE_VARIANT_LABELS: Readonly<Record<LobsterEyeVariant, string>> = {
+  round: 'Spherical (Classic Pixar)',
+  wide: 'Wide (Curious)',
+  tall: 'Elongated (Doe-eyed)',
+}
+
+export const LOBSTER_PUPIL_VARIANTS = ['standard', 'big', 'sparkle', 'keen'] as const
+export type LobsterPupilVariant = (typeof LOBSTER_PUPIL_VARIANTS)[number]
+
+export const LOBSTER_PUPIL_VARIANT_LABELS: Readonly<Record<LobsterPupilVariant, string>> = {
+  standard: 'Standard Velvet',
+  big: 'Big Wonder (Dilated)',
+  sparkle: 'Radiant Sparkle',
+  keen: 'Keen Focus',
+}
 
 export const PATTERN_DENSITY_SCALES: Record<PatternDensity, number> = {
   compact: 0.75,
@@ -315,6 +353,9 @@ export interface LobsterAvatarConfig {
   patternPulse?: PatternPulse
   patternSparkles?: PatternSparkles
   eyelidStyle?: EyelidStyle
+  eyeColor?: LobsterEyeColor
+  eyeVariant?: LobsterEyeVariant
+  pupilVariant?: LobsterPupilVariant
   backgroundMotion?: BackgroundMotionMode
   transparentBackground?: boolean
 }
@@ -382,6 +423,24 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
     (LOBSTER_EYELID_STYLES as readonly string[]).includes(obj.eyelidStyle)
   ) {
     config.eyelidStyle = obj.eyelidStyle as EyelidStyle
+  }
+  if (
+    typeof obj.eyeColor === 'string' &&
+    (LOBSTER_EYE_COLORS as readonly string[]).includes(obj.eyeColor.trim().toLowerCase())
+  ) {
+    config.eyeColor = obj.eyeColor.trim().toLowerCase() as LobsterEyeColor
+  }
+  if (
+    typeof obj.eyeVariant === 'string' &&
+    (LOBSTER_EYE_VARIANTS as readonly string[]).includes(obj.eyeVariant.trim().toLowerCase())
+  ) {
+    config.eyeVariant = obj.eyeVariant.trim().toLowerCase() as LobsterEyeVariant
+  }
+  if (
+    typeof obj.pupilVariant === 'string' &&
+    (LOBSTER_PUPIL_VARIANTS as readonly string[]).includes(obj.pupilVariant.trim().toLowerCase())
+  ) {
+    config.pupilVariant = obj.pupilVariant.trim().toLowerCase() as LobsterPupilVariant
   }
   if (
     typeof obj.backgroundMotion === 'string' &&
@@ -1073,6 +1132,9 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   pulse: PatternPulse
   sparkles: PatternSparkles
   eyelidStyle: EyelidStyle
+  eyeColor: LobsterEyeColor
+  eyeVariant: LobsterEyeVariant
+  pupilVariant: LobsterPupilVariant
   height: LobsterHeight
   motion: BackgroundMotionConfig
   clawPose: ClawPose
@@ -1090,6 +1152,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   let hash9 = 0
   let hash10 = 0
   let hash11 = 0
+  let hash12 = 0
   for (let i = 0; i < seed.length; i++) {
     const ch = seed.charCodeAt(i)
     hash1 = (((hash1 << 5) - hash1) + ch) | 0
@@ -1103,6 +1166,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     hash9 = (((hash9 << 5) + hash9) + ch * 79 + 53) | 0
     hash10 = (((hash10 << 6) - hash10) + ch * 83 + 59) | 0
     hash11 = (((hash11 << 7) - hash11) + ch * 89 + 67) | 0
+    hash12 = (((hash12 << 5) - hash12) + ch * 97 + 71) | 0
   }
 
   const poseIndex = Math.abs(hash1) % LOBSTER_CLAW_POSES.length
@@ -1138,6 +1202,15 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   const eyelidStyleIndex = Math.abs(hash7 ^ hash8) % LOBSTER_EYELID_STYLES.length
   const eyelidStyle = LOBSTER_EYELID_STYLES[eyelidStyleIndex]
 
+  const eyeColorIndex = Math.abs(hash12) % LOBSTER_EYE_COLORS.length
+  const eyeColor = LOBSTER_EYE_COLORS[eyeColorIndex]
+
+  const eyeVariantIndex = Math.abs(hash3 ^ hash11) % LOBSTER_EYE_VARIANTS.length
+  const eyeVariant = LOBSTER_EYE_VARIANTS[eyeVariantIndex]
+
+  const pupilVariantIndex = Math.abs(hash4 ^ hash12) % LOBSTER_PUPIL_VARIANTS.length
+  const pupilVariant = LOBSTER_PUPIL_VARIANTS[pupilVariantIndex]
+
   const heightIndex = Math.abs(hash11) % LOBSTER_HEIGHTS.length
   const height = LOBSTER_HEIGHTS[heightIndex]
 
@@ -1167,7 +1240,24 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     direction,
   }
 
-  return { theme, pattern, texture, density, glow, pulse, sparkles, eyelidStyle, height, motion, clawPose, antennaStyle, tailPose }
+  return {
+    theme,
+    pattern,
+    texture,
+    density,
+    glow,
+    pulse,
+    sparkles,
+    eyelidStyle,
+    eyeColor,
+    eyeVariant,
+    pupilVariant,
+    height,
+    motion,
+    clawPose,
+    antennaStyle,
+    tailPose,
+  }
 }
 
 export const LOBSTER_CRUSTACEAN_OPTIONS = {
@@ -1203,8 +1293,8 @@ export const LOBSTER_CRUSTACEAN_OPTIONS = {
   patternVariant: ['belly', 'bars', 'stripes', 'speckles'] as const,
   patternProbability: 95,
 
-  // 🦞 6. Pixar-style Friendly Eyes (Filter out alien/multi-eye variants)
-  eyesVariant: ['round', 'bigPupils', 'happy', 'dots', 'wide'] as const,
+  // 🦞 6. Pixar-style Friendly Eyes (Strictly open 3D Pixar ocular variants; no dots or smiling lines)
+  eyesVariant: ['round', 'bigPupils', 'wide'] as const,
 
   // 🦞 7. Warm, expressive smiles
   mouthVariant: ['smile', 'tinySmile', 'grin', 'laugh', 'teeth', 'open'] as const,
@@ -1366,186 +1456,406 @@ function wrapDiceBearUsesInCarapaceLayer(svg: string, headYOffset = 0): string {
   return svg.slice(0, blockStart) + wrapped + svg.slice(blockEnd)
 }
 
-function isScleraShape(tag: string): boolean {
-  return /<(circle|ellipse)\b/i.test(tag) && /fill="#ffffff"/i.test(tag)
-}
-
-function isPupilShape(tag: string): boolean {
-  return /<circle\b/i.test(tag) && /fill="#1e293b"/i.test(tag)
-}
-
-function extractShapeElements(groupInner: string): string[] {
-  const elements: string[] = []
-  const pattern = /<(circle|ellipse|path)\b[^>]*\/?>/gi
-  let match: RegExpExecArray | null
-  while ((match = pattern.exec(groupInner)) !== null) {
-    elements.push(match[0])
-  }
-  return elements
-}
-
-export function hasLobsterPupilTracking(svg: string): boolean {
-  return svg.includes('lobster-pupil-track-layer')
-}
-
 export function hasLobsterEyelids(svg: string): boolean {
   return svg.includes('lobster-eyelids-layer')
 }
 
+export function hasLobsterPixarEyes(svg: string): boolean {
+  return svg.includes('lobster-pixar-eyes')
+}
+
+interface PixarEyePalette {
+  irisStops: { offset: string; color: string }[]
+  causticStops: { offset: string; color: string; opacity?: number }[]
+  limbal: string
+}
+
+const PIXAR_EYE_PALETTES: Record<LobsterEyeColor, PixarEyePalette> = {
+  amber: {
+    irisStops: [
+      { offset: '0%', color: '#1c0a02' },
+      { offset: '22%', color: '#632008' },
+      { offset: '48%', color: '#b4400a' },
+      { offset: '70%', color: '#ea580c' },
+      { offset: '86%', color: '#f59e0b' },
+      { offset: '94%', color: '#451a03' },
+      { offset: '100%', color: '#0c0502' },
+    ],
+    causticStops: [
+      { offset: '0%', color: '#fef08a', opacity: 0.95 },
+      { offset: '40%', color: '#fbbf24', opacity: 0.65 },
+      { offset: '80%', color: '#ea580c', opacity: 0.2 },
+      { offset: '100%', color: '#ea580c', opacity: 0 },
+    ],
+    limbal: '#0c0502',
+  },
+  sapphire: {
+    irisStops: [
+      { offset: '0%', color: '#020817' },
+      { offset: '22%', color: '#0f294a' },
+      { offset: '48%', color: '#1d4ed8' },
+      { offset: '70%', color: '#2563eb' },
+      { offset: '86%', color: '#38bdf8' },
+      { offset: '94%', color: '#0c2340' },
+      { offset: '100%', color: '#020617' },
+    ],
+    causticStops: [
+      { offset: '0%', color: '#bae6fd', opacity: 0.95 },
+      { offset: '40%', color: '#38bdf8', opacity: 0.65 },
+      { offset: '80%', color: '#0284c7', opacity: 0.2 },
+      { offset: '100%', color: '#0284c7', opacity: 0 },
+    ],
+    limbal: '#020617',
+  },
+  emerald: {
+    irisStops: [
+      { offset: '0%', color: '#02140a' },
+      { offset: '22%', color: '#064e3b' },
+      { offset: '48%', color: '#047857' },
+      { offset: '70%', color: '#059669' },
+      { offset: '86%', color: '#34d399' },
+      { offset: '94%', color: '#042f1a' },
+      { offset: '100%', color: '#021208' },
+    ],
+    causticStops: [
+      { offset: '0%', color: '#a7f3d0', opacity: 0.95 },
+      { offset: '40%', color: '#34d399', opacity: 0.65 },
+      { offset: '80%', color: '#059669', opacity: 0.2 },
+      { offset: '100%', color: '#059669', opacity: 0 },
+    ],
+    limbal: '#021208',
+  },
+  amethyst: {
+    irisStops: [
+      { offset: '0%', color: '#0f031c' },
+      { offset: '22%', color: '#3b0764' },
+      { offset: '48%', color: '#6b21a8' },
+      { offset: '70%', color: '#9333ea' },
+      { offset: '86%', color: '#c084fc' },
+      { offset: '94%', color: '#2a0845' },
+      { offset: '100%', color: '#0b0214' },
+    ],
+    causticStops: [
+      { offset: '0%', color: '#f5d0fe', opacity: 0.95 },
+      { offset: '40%', color: '#d8b4fe', opacity: 0.65 },
+      { offset: '80%', color: '#9333ea', opacity: 0.2 },
+      { offset: '100%', color: '#9333ea', opacity: 0 },
+    ],
+    limbal: '#0b0214',
+  },
+  ruby: {
+    irisStops: [
+      { offset: '0%', color: '#170307' },
+      { offset: '22%', color: '#4c0519' },
+      { offset: '48%', color: '#9f1239' },
+      { offset: '70%', color: '#e11d48' },
+      { offset: '86%', color: '#fb7185' },
+      { offset: '94%', color: '#380512' },
+      { offset: '100%', color: '#0f0205' },
+    ],
+    causticStops: [
+      { offset: '0%', color: '#fecdd3', opacity: 0.95 },
+      { offset: '40%', color: '#fb7185', opacity: 0.65 },
+      { offset: '80%', color: '#e11d48', opacity: 0.2 },
+      { offset: '100%', color: '#e11d48', opacity: 0 },
+    ],
+    limbal: '#0f0205',
+  },
+  topaz: {
+    irisStops: [
+      { offset: '0%', color: '#180e02' },
+      { offset: '22%', color: '#543004' },
+      { offset: '48%', color: '#a16207' },
+      { offset: '70%', color: '#ca8a04' },
+      { offset: '86%', color: '#facc15' },
+      { offset: '94%', color: '#422006' },
+      { offset: '100%', color: '#0d0701' },
+    ],
+    causticStops: [
+      { offset: '0%', color: '#fef9c3', opacity: 0.95 },
+      { offset: '40%', color: '#fde047', opacity: 0.65 },
+      { offset: '80%', color: '#ca8a04', opacity: 0.2 },
+      { offset: '100%', color: '#ca8a04', opacity: 0 },
+    ],
+    limbal: '#0d0701',
+  },
+}
+
+function renderPixarEyesDefs(paletteId: LobsterEyeColor): string {
+  const p = PIXAR_EYE_PALETTES[paletteId] ?? PIXAR_EYE_PALETTES.amber
+  const irisStopsMarkup = p.irisStops
+    .map((s) => `<stop offset="${s.offset}" stop-color="${s.color}" />`)
+    .join('')
+  const causticStopsMarkup = p.causticStops
+    .map(
+      (s) =>
+        `<stop offset="${s.offset}" stop-color="${s.color}"${s.opacity !== undefined ? ` stop-opacity="${s.opacity}"` : ''} />`
+    )
+    .join('')
+
+  return `
+    <radialGradient id="pixar-sclera-3d" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="55%" stop-color="#f8fafc" />
+      <stop offset="80%" stop-color="#e2e8f0" />
+      <stop offset="93%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </radialGradient>
+    <linearGradient id="pixar-brow-shadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0f1d" stop-opacity="0.5" />
+      <stop offset="40%" stop-color="#0a0f1d" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#0a0f1d" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id="pixar-iris-grad-${paletteId}" cx="50%" cy="48%" r="52%">
+      ${irisStopsMarkup}
+    </radialGradient>
+    <radialGradient id="pixar-caustic-grad-${paletteId}" cx="50%" cy="75%" r="45%">
+      ${causticStopsMarkup}
+    </radialGradient>
+  `
+}
+
+function renderPixarEye(
+  side: 'left' | 'right',
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  irisR: number,
+  pupilR: number,
+  paletteId: LobsterEyeColor,
+  pupilVariant: LobsterPupilVariant = 'standard'
+): string {
+  const p = PIXAR_EYE_PALETTES[paletteId] ?? PIXAR_EYE_PALETTES.amber
+  const scleraTag =
+    rx === ry
+      ? `<circle id="pixar-sclera-${side}" cx="${cx}" cy="${cy}" r="${rx}" fill="url(#pixar-sclera-3d)" />`
+      : `<ellipse id="pixar-sclera-${side}" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#pixar-sclera-3d)" />`
+
+  const cxKey = cx + irisR * 0.32
+  const cyKey = cy - irisR * 0.32
+  const keyScale = pupilVariant === 'big' ? 1.22 : 1.0
+  const rxKey = Number((irisR * 0.24 * keyScale).toFixed(2))
+  const ryKey = Number((irisR * 0.18 * keyScale).toFixed(2))
+  const causticOpacity = pupilVariant === 'keen' ? '0.94' : '0.8'
+
+  let extraGlints = ''
+  if (pupilVariant === 'sparkle') {
+    const starX = Number((cx - pupilR * 0.42).toFixed(2))
+    const starY = Number((cy - pupilR * 0.42).toFixed(2))
+    extraGlints = `
+      <!-- Starry Sparkle Glints -->
+      <polygon id="pixar-glint-star-${side}" points="${starX},${(starY - 1.2).toFixed(2)} ${(starX + 0.35).toFixed(2)},${(starY - 0.35).toFixed(2)} ${(starX + 1.2).toFixed(2)},${starY} ${(starX + 0.35).toFixed(2)},${(starY + 0.35).toFixed(2)} ${starX},${(starY + 1.2).toFixed(2)} ${(starX - 0.35).toFixed(2)},${(starY + 0.35).toFixed(2)} ${(starX - 1.2).toFixed(2)},${starY} ${(starX - 0.35).toFixed(2)},${(starY - 0.35).toFixed(2)}" fill="#ffffff" opacity="0.95" />
+      <circle id="pixar-glint-extra-${side}" cx="${(cx - irisR * 0.16).toFixed(2)}" cy="${(cy - irisR * 0.44).toFixed(2)}" r="${(irisR * 0.08).toFixed(2)}" fill="#ffffff" opacity="0.9" />`
+  }
+
+  return `
+    <g id="pixar-eye-${side}" class="pixar-eye-orb">
+      <!-- 3D Spherical Sclera -->
+      ${scleraTag}
+      <!-- Brow / Socket Shadow -->
+      <path id="pixar-socket-shadow-${side}" d="M ${(cx - rx).toFixed(2)} ${cy} A ${rx} ${ry} 0 0 1 ${(cx + rx).toFixed(2)} ${cy} A ${rx} ${(ry * 0.35).toFixed(2)} 0 0 0 ${(cx - rx).toFixed(2)} ${cy} Z" fill="url(#pixar-brow-shadow)" />
+      <!-- Dark Limbal Ring -->
+      <circle id="pixar-limbal-${side}" cx="${cx}" cy="${cy}" r="${irisR}" fill="${p.limbal}" />
+      <!-- Luminous Multi-tone Iris -->
+      <circle id="pixar-iris-${side}" cx="${cx}" cy="${cy}" r="${(irisR - 0.28).toFixed(2)}" fill="url(#pixar-iris-grad-${paletteId})" />
+      <!-- Lower Iris Caustic Glow -->
+      <ellipse id="pixar-caustic-${side}" cx="${cx}" cy="${(cy + irisR * 0.26).toFixed(2)}" rx="${(irisR * 0.72).toFixed(2)}" ry="${(irisR * 0.45).toFixed(2)}" fill="url(#pixar-caustic-grad-${paletteId})" opacity="${causticOpacity}" />
+      <!-- Deep Velvet Pupil -->
+      <circle id="pixar-pupil-${side}" cx="${cx}" cy="${cy}" r="${pupilR}" fill="#050508" />
+      <circle id="pixar-pupil-core-${side}" cx="${cx}" cy="${cy}" r="${(pupilR * 0.5).toFixed(2)}" fill="#010103" />
+      <!-- Pixar Catchlights -->
+      <ellipse id="pixar-glint-key-${side}" cx="${cxKey.toFixed(2)}" cy="${cyKey.toFixed(2)}" rx="${rxKey}" ry="${ryKey}" transform="rotate(-25 ${cxKey.toFixed(2)} ${cyKey.toFixed(2)})" fill="#ffffff" opacity="0.98" />
+      <circle id="pixar-glint-spark-${side}" cx="${(cx + irisR * 0.28).toFixed(2)}" cy="${(cy - irisR * 0.35).toFixed(2)}" r="${(irisR * 0.09).toFixed(2)}" fill="#ffffff" />
+      <circle id="pixar-glint-bounce-${side}" cx="${(cx - irisR * 0.28).toFixed(2)}" cy="${(cy + irisR * 0.30).toFixed(2)}" r="${(irisR * 0.10).toFixed(2)}" fill="#ffffff" opacity="0.55" />
+      <circle id="pixar-glint-rim-${side}" cx="${(cx + irisR * 0.40).toFixed(2)}" cy="${(cy - irisR * 0.10).toFixed(2)}" r="${(irisR * 0.06).toFixed(2)}" fill="#ffffff" opacity="0.75" />${extraGlints}
+      <!-- Cornea Curvature Sheen -->
+      <path id="pixar-cornea-arc-${side}" d="M ${(cx - rx * 0.65).toFixed(2)} ${(cy - ry * 0.32).toFixed(2)} Q ${cx} ${(cy - ry * 0.74).toFixed(2)} ${(cx + rx * 0.65).toFixed(2)} ${(cy - ry * 0.32).toFixed(2)} Q ${cx} ${(cy - ry * 0.52).toFixed(2)} ${(cx - rx * 0.65).toFixed(2)} ${(cy - ry * 0.32).toFixed(2)} Z" fill="#ffffff" opacity="0.24" />
+    </g>
+  `
+}
+
 function renderEyelidElement(
   side: 'left' | 'right',
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
   style: EyelidStyle,
   chitinColor: string
 ): string {
+  const x0 = Number((cx - (rx + 0.6)).toFixed(2))
+  const x1 = Number((cx + (rx + 0.6)).toFixed(2))
+  const topY = Number((cy - ry - 2.2).toFixed(2))
+  const midX = cx
+
+  const sideId = `lobster-eyelid-${side}`
+  const sideClass = `lobster-idle-layer lobster-idle-eyelid-${side}`
+
   if (side === 'left') {
     switch (style) {
-      case 'open':
-        // Subtle upper orbital rim covering top ~10% of sclera (Alert & Open gaze)
+      case 'open': {
+        const yCut = Number((cy - ry * 0.55).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="open">
-            <path d="M 2.5 9 C 2.5 5.5 6 4.2 10 4.2 C 14 4.2 17.5 5.5 17.5 9 Q 10 7.8 2.5 9 Z" fill="${chitinColor}" />
-            <path d="M 2.5 9 Q 10 7.8 17.5 9" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 6.2 Q 10 4.8 14.5 6.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="open">
+            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'relaxed':
-        // Classic gentle ~25% hood for a calm, friendly, natural cartoon expression
+      }
+      case 'relaxed': {
+        const yCut = Number((cy - ry * 0.22).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="relaxed">
-            <path d="M 2.5 11 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 11 Q 10 9.8 2.5 11 Z" fill="${chitinColor}" />
-            <path d="M 2.5 11 Q 10 9.8 17.5 11" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 7.2 Q 10 5.2 14.5 7.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="relaxed">
+            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.7).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.7).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)} Q ${midX} ${(topY + 1.4).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'cheerful_squint':
-        // Upper rim + sculpted lower eyelid curving upward (Joyful smiling squint)
+      }
+      case 'cheerful_squint': {
+        const yUpper = Number((cy - ry * 0.45).toFixed(2))
+        const yLower = Number((cy + ry * 0.42).toFixed(2))
+        const botY = Number((cy + ry + 2.2).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="cheerful_squint">
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="cheerful_squint">
             <!-- Upper Lid Hood -->
-            <path d="M 2.5 9.5 C 2.5 5.5 6 4.2 10 4.2 C 14 4.2 17.5 5.5 17.5 9.5 Q 10 8.2 2.5 9.5 Z" fill="${chitinColor}" />
-            <path d="M 2.5 9.5 Q 10 8.2 17.5 9.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 6.5 Q 10 5.0 14.5 6.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+            <path d="M ${x0} ${yUpper} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x0} ${yUpper} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x1} ${yUpper}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
             <!-- Lower Smiling Eyelid -->
-            <path d="M 2.5 16.5 Q 10 15.5 17.5 16.5 C 17.5 19.5 14 21.8 10 21.8 C 6 21.8 2.5 19.5 2.5 16.5 Z" fill="${chitinColor}" />
-            <path d="M 2.5 16.5 Q 10 15.5 17.5 16.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 19.5 Q 10 20.8 14.5 19.5" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
+            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower} C ${x1} ${(cy + ry * 0.75).toFixed(2)} ${(cx + rx * 0.55).toFixed(2)} ${botY} ${midX} ${botY} C ${(cx - rx * 0.55).toFixed(2)} ${botY} ${x0} ${(cy + ry * 0.75).toFixed(2)} ${x0} ${yLower} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)} Q ${midX} ${(botY - 1.3).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'focused':
-        // Tilted angled upper eyelid sloping toward rostrum (Sharp, determined gaze)
+      }
+      case 'focused': {
+        const yOuter = Number((cy - ry * 0.45).toFixed(2))
+        const yInner = Number((cy - ry * 0.18).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="focused">
-            <path d="M 2.5 9.5 C 2.5 5.5 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 11.2 Q 10 9.2 2.5 9.5 Z" fill="${chitinColor}" />
-            <path d="M 2.5 9.5 Q 10 9.2 17.5 11.2" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 6.5 Q 10 5.0 14.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="focused">
+            <path d="M ${x0} ${yOuter} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.6).toFixed(2)} ${x1} ${yInner} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x0} ${yOuter} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yOuter} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x1} ${yInner}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'chill':
-        // Deeper ~35% half-lidded hood (Super chill, cozy, wise elder benthic mood)
+      }
+      case 'chill': {
+        const yCut = Number((cy + ry * 0.05).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="chill">
-            <path d="M 2.5 12.5 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 12.5 Q 10 11.2 2.5 12.5 Z" fill="${chitinColor}" />
-            <path d="M 2.5 12.5 Q 10 11.2 17.5 12.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 7.5 Q 10 5.5 14.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="chill">
+            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)} Q ${midX} ${(topY + 1.5).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'angry':
-        // Steeper inward-sloping brow & lid for fierce, stern, determined expression
+      }
+      case 'angry': {
+        const yOuter = Number((cy - ry * 0.68).toFixed(2))
+        const yInner = Number((cy + ry * 0.08).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="angry">
-            <path d="M 2.5 7.5 C 2.5 5 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 12.8 Q 10 9 2.5 7.5 Z" fill="${chitinColor}" />
-            <path d="M 2.5 7.5 Q 10 9 17.5 12.8" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
-            <path d="M 5 6 Q 10 4.8 14.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="angry">
+            <path d="M ${x0} ${yOuter} C ${x0} ${(cy - ry * 0.85).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yOuter} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yInner}" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'worried':
-        // Inverted-sloping hood (high at center, drooping outer edges) for sad, concerned, empathetic expression
+      }
+      case 'worried': {
+        const yOuter = Number((cy + ry * 0.08).toFixed(2))
+        const yInner = Number((cy - ry * 0.68).toFixed(2))
         return `
-          <g id="lobster-eyelid-left" class="lobster-idle-layer lobster-idle-eyelid-left" data-eyelid-style="worried">
-            <path d="M 2.5 12.8 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 5 17.5 7.5 Q 10 9 2.5 12.8 Z" fill="${chitinColor}" />
-            <path d="M 2.5 12.8 Q 10 9 17.5 7.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 5.5 7.5 Q 10 4.8 15 6" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="worried">
+            <path d="M ${x0} ${yOuter} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.85).toFixed(2)} ${x1} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yOuter} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yInner}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
+      }
     }
   } else {
     // Right Eye
     switch (style) {
-      case 'open':
-        // Subtle upper orbital rim covering top ~10% of sclera (Alert & Open gaze)
+      case 'open': {
+        const yCut = Number((cy - ry * 0.55).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="open">
-            <path d="M 28.5 9 C 28.5 5.5 32 4.2 36 4.2 C 40 4.2 43.5 5.5 43.5 9 Q 36 7.8 28.5 9 Z" fill="${chitinColor}" />
-            <path d="M 28.5 9 Q 36 7.8 43.5 9" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 6.2 Q 36 4.8 40.5 6.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="open">
+            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'relaxed':
-        // Classic gentle ~25% hood for a calm, friendly, natural cartoon expression
+      }
+      case 'relaxed': {
+        const yCut = Number((cy - ry * 0.22).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="relaxed">
-            <path d="M 28.5 11 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 6 43.5 11 Q 36 9.8 28.5 11 Z" fill="${chitinColor}" />
-            <path d="M 28.5 11 Q 36 9.8 43.5 11" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 7.2 Q 36 5.2 40.5 7.2" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="relaxed">
+            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.7).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.7).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)} Q ${midX} ${(topY + 1.4).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'cheerful_squint':
-        // Upper rim + sculpted lower eyelid curving upward (Joyful smiling squint)
+      }
+      case 'cheerful_squint': {
+        const yUpper = Number((cy - ry * 0.45).toFixed(2))
+        const yLower = Number((cy + ry * 0.42).toFixed(2))
+        const botY = Number((cy + ry + 2.2).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="cheerful_squint">
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="cheerful_squint">
             <!-- Upper Lid Hood -->
-            <path d="M 28.5 9.5 C 28.5 5.5 32 4.2 36 4.2 C 40 4.2 43.5 5.5 43.5 9.5 Q 36 8.2 28.5 9.5 Z" fill="${chitinColor}" />
-            <path d="M 28.5 9.5 Q 36 8.2 43.5 9.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 6.5 Q 36 5.0 40.5 6.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+            <path d="M ${x0} ${yUpper} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x0} ${yUpper} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x1} ${yUpper}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
             <!-- Lower Smiling Eyelid -->
-            <path d="M 28.5 16.5 Q 36 15.5 43.5 16.5 C 43.5 19.5 40 21.8 36 21.8 C 32 21.8 28.5 19.5 28.5 16.5 Z" fill="${chitinColor}" />
-            <path d="M 28.5 16.5 Q 36 15.5 43.5 16.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 19.5 Q 36 20.8 40.5 19.5" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
+            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower} C ${x1} ${(cy + ry * 0.75).toFixed(2)} ${(cx + rx * 0.55).toFixed(2)} ${botY} ${midX} ${botY} C ${(cx - rx * 0.55).toFixed(2)} ${botY} ${x0} ${(cy + ry * 0.75).toFixed(2)} ${x0} ${yLower} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)} Q ${midX} ${(botY - 1.3).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'focused':
-        // Tilted angled upper eyelid sloping toward rostrum (Sharp, determined gaze)
+      }
+      case 'focused': {
+        const yOuter = Number((cy - ry * 0.45).toFixed(2))
+        const yInner = Number((cy - ry * 0.18).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="focused">
-            <path d="M 28.5 11.2 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 5.5 43.5 9.5 Q 36 9.2 28.5 11.2 Z" fill="${chitinColor}" />
-            <path d="M 28.5 11.2 Q 36 9.2 43.5 9.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 7.5 Q 36 5.0 40.5 6.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="focused">
+            <path d="M ${x0} ${yInner} C ${x0} ${(cy - ry * 0.6).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yOuter} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x0} ${yInner} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yInner} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x1} ${yOuter}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'chill':
-        // Deeper ~35% half-lidded hood (Super chill, cozy, wise elder benthic mood)
+      }
+      case 'chill': {
+        const yCut = Number((cy + ry * 0.05).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="chill">
-            <path d="M 28.5 12.5 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 6 43.5 12.5 Q 36 11.2 28.5 12.5 Z" fill="${chitinColor}" />
-            <path d="M 28.5 12.5 Q 36 11.2 43.5 12.5" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 7.5 Q 36 5.5 40.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="chill">
+            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)} Q ${midX} ${(topY + 1.5).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'angry':
-        // Steeper inward-sloping brow & lid for fierce, stern, determined expression
+      }
+      case 'angry': {
+        const yOuter = Number((cy - ry * 0.68).toFixed(2))
+        const yInner = Number((cy + ry * 0.08).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="angry">
-            <path d="M 28.5 12.8 C 28.5 6 32 4.2 36 4.2 C 40 4.2 43.5 5 43.5 7.5 Q 36 9 28.5 12.8 Z" fill="${chitinColor}" />
-            <path d="M 28.5 12.8 Q 36 9 43.5 7.5" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
-            <path d="M 31.5 7.5 Q 36 4.8 41 6" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="angry">
+            <path d="M ${x0} ${yInner} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.85).toFixed(2)} ${x1} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yInner} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yOuter}" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
-
-      case 'worried':
-        // Inverted-sloping hood (high at center, drooping outer edges) for sad, concerned, empathetic expression
+      }
+      case 'worried': {
+        const yOuter = Number((cy + ry * 0.08).toFixed(2))
+        const yInner = Number((cy - ry * 0.68).toFixed(2))
         return `
-          <g id="lobster-eyelid-right" class="lobster-idle-layer lobster-idle-eyelid-right" data-eyelid-style="worried">
-            <path d="M 28.5 7.5 C 28.5 5 32 4.2 36 4.2 C 40 4.2 43.5 6 43.5 12.8 Q 36 9 28.5 7.5 Z" fill="${chitinColor}" />
-            <path d="M 28.5 7.5 Q 36 9 43.5 12.8" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M 31 6 Q 36 4.8 40.5 7.5" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
+          <g id="${sideId}" class="${sideClass}" data-eyelid-style="worried">
+            <path d="M ${x0} ${yInner} C ${x0} ${(cy - ry * 0.85).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yInner} Z" fill="${chitinColor}" />
+            <path d="M ${x0} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yOuter}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
+            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
           </g>`
+      }
     }
   }
 }
 
-function splitEyesForPupilTracking(
+function injectLobsterEyelids(
   svg: string,
   chitinColor = '#c2410c',
   eyelidStyle: EyelidStyle = 'relaxed',
-  chitinFill?: string
+  chitinFill?: string,
+  eyeColor?: LobsterEyeColor | string,
+  eyeVariant?: LobsterEyeVariant | string,
+  pupilVariant?: LobsterPupilVariant | string
 ): string {
   const fillToUse = chitinFill || chitinColor
   const eyesLayerMatch = svg.match(
@@ -1558,77 +1868,68 @@ function splitEyesForPupilTracking(
   const transform = transformMatch?.[1] ?? ''
   const transformAttr = transform ? ` transform="${transform}"` : ''
 
-  const escapedId = symbolId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const symbolMatch = svg.match(
-    new RegExp(`<g id="${escapedId}">([\\s\\S]*?)<\\/g>(?=<g id="(?:mouth|animation)-)`)
-  )
-  if (!symbolMatch) return svg
+  const resolvedColor: LobsterEyeColor =
+    eyeColor && LOBSTER_EYE_COLORS.includes(eyeColor.trim().toLowerCase() as LobsterEyeColor)
+      ? (eyeColor.trim().toLowerCase() as LobsterEyeColor)
+      : 'amber'
 
-  const symbolContent = symbolMatch[1]
-  const scleraGroups: string[] = []
-  const pupilGroups: string[] = []
-  const eyelidGroups: string[] = []
+  const resolvedEyeVariant: LobsterEyeVariant =
+    eyeVariant && (LOBSTER_EYE_VARIANTS as readonly string[]).includes(eyeVariant.trim().toLowerCase())
+      ? (eyeVariant.trim().toLowerCase() as LobsterEyeVariant)
+      : symbolId.includes('wide')
+        ? 'tall'
+        : 'round'
 
-  const eyeGroupPattern = /<g class="dbcr-eb">([\s\S]*?)<\/g>/g
-  let groupMatch: RegExpExecArray | null
-  let eyeIndex = 0
-  while ((groupMatch = eyeGroupPattern.exec(symbolContent)) !== null) {
-    const scleraElems: string[] = []
-    const pupilElems: string[] = []
-    let hasSclera = false
+  const resolvedPupilVariant: LobsterPupilVariant =
+    pupilVariant && (LOBSTER_PUPIL_VARIANTS as readonly string[]).includes(pupilVariant.trim().toLowerCase())
+      ? (pupilVariant.trim().toLowerCase() as LobsterPupilVariant)
+      : symbolId.includes('bigPupils')
+        ? 'big'
+        : 'standard'
 
-    for (const elem of extractShapeElements(groupMatch[1])) {
-      if (isScleraShape(elem)) {
-        scleraElems.push(elem)
-        hasSclera = true
-      } else if (isPupilShape(elem)) {
-        pupilElems.push(elem)
-      } else {
-        scleraElems.push(elem)
-      }
-    }
+  let rx = 9.5
+  let ry = 9.5
+  let baseIrisR = 6.4
+  let basePupilR = 3.2
 
-    if (scleraElems.length > 0) {
-      scleraGroups.push(`<g class="dbcr-eb">${scleraElems.join('')}</g>`)
-    }
-    if (pupilElems.length > 0) {
-      const side = eyeIndex === 0 ? 'left' : 'right'
-      pupilGroups.push(
-        `<g id="lobster-pupil-${side}" class="lobster-pupil-track-layer">${pupilElems.join('')}</g>`
-      )
-    }
-
-    // Render sculpted cartoon eyelid hood for eyes with open white sclera
-    if (hasSclera) {
-      if (eyeIndex === 0) {
-        eyelidGroups.push(renderEyelidElement('left', eyelidStyle, fillToUse))
-      } else if (eyeIndex === 1) {
-        eyelidGroups.push(renderEyelidElement('right', eyelidStyle, fillToUse))
-      }
-    }
-
-    eyeIndex += 1
+  if (resolvedEyeVariant === 'wide') {
+    rx = 10.2
+    ry = 9.0
+    baseIrisR = 6.6
+    basePupilR = 3.2
+  } else if (resolvedEyeVariant === 'tall') {
+    rx = 8.8
+    ry = 10.4
+    baseIrisR = 6.2
+    basePupilR = 3.2
   }
 
-  if (pupilGroups.length === 0 && eyelidGroups.length === 0) {
-    return svg
+  let irisR = baseIrisR
+  let pupilR = basePupilR
+
+  if (resolvedPupilVariant === 'big') {
+    pupilR = Number((basePupilR * 1.30).toFixed(2))
+    irisR = Number((baseIrisR * 1.08).toFixed(2))
+  } else if (resolvedPupilVariant === 'keen') {
+    pupilR = Number((basePupilR * 0.76).toFixed(2))
+    irisR = baseIrisR
+  } else if (resolvedPupilVariant === 'sparkle') {
+    pupilR = basePupilR
+    irisR = baseIrisR
   }
 
-  const scleraBlock =
-    scleraGroups.length > 0 ? `<g${transformAttr}>${scleraGroups.join('')}</g>` : ''
+  const leftEye = renderPixarEye('left', 10, 13, rx, ry, irisR, pupilR, resolvedColor, resolvedPupilVariant)
+  const rightEye = renderPixarEye('right', 36, 13, rx, ry, irisR, pupilR, resolvedColor, resolvedPupilVariant)
+  const defs = renderPixarEyesDefs(resolvedColor)
 
-  const eyelidsBlock =
-    eyelidGroups.length > 0
-      ? `<g id="lobster-eyelids-layer" class="lobster-idle-layer lobster-idle-eyelids" data-eyelid-style="${escapeSvgAttr(eyelidStyle)}"${transformAttr}>${eyelidGroups.join('')}</g>`
-      : ''
+  const eyelidGroups = [
+    renderEyelidElement('left', 10, 13, rx, ry, eyelidStyle, fillToUse),
+    renderEyelidElement('right', 36, 13, rx, ry, eyelidStyle, fillToUse),
+  ]
 
-  const replacement =
-    `<g id="lobster-eyes-layer">` +
-    scleraBlock +
-    `<g${transformAttr}>${pupilGroups.join('')}</g>` +
-    eyelidsBlock +
-    `</g>`
+  const eyelidsBlock = `<g id="lobster-eyelids-layer" class="lobster-idle-layer lobster-idle-eyelids" data-eyelid-style="${escapeSvgAttr(eyelidStyle)}"${transformAttr}>${eyelidGroups.join('')}</g>`
 
+  const replacement = `<g id="lobster-eyes-layer"><defs>${defs}</defs><g class="lobster-pixar-eyes" data-eye-color="${escapeSvgAttr(resolvedColor)}" data-eye-variant="${escapeSvgAttr(resolvedEyeVariant)}" data-pupil-variant="${escapeSvgAttr(resolvedPupilVariant)}"${transformAttr}>${leftEye}${rightEye}</g>${eyelidsBlock}</g>`
   return svg.replace(fullEyesLayer, replacement)
 }
 
@@ -1922,6 +2223,18 @@ function injectLobsterChitinLayers(
     config.eyelidStyle && (LOBSTER_EYELID_STYLES as readonly string[]).includes(config.eyelidStyle)
       ? config.eyelidStyle
       : seeded.eyelidStyle
+  const eyeColor =
+    config.eyeColor && (LOBSTER_EYE_COLORS as readonly string[]).includes(config.eyeColor.trim().toLowerCase())
+      ? (config.eyeColor.trim().toLowerCase() as LobsterEyeColor)
+      : seeded.eyeColor
+  const eyeVariant =
+    config.eyeVariant && (LOBSTER_EYE_VARIANTS as readonly string[]).includes(config.eyeVariant.trim().toLowerCase())
+      ? (config.eyeVariant.trim().toLowerCase() as LobsterEyeVariant)
+      : seeded.eyeVariant
+  const pupilVariant =
+    config.pupilVariant && (LOBSTER_PUPIL_VARIANTS as readonly string[]).includes(config.pupilVariant.trim().toLowerCase())
+      ? (config.pupilVariant.trim().toLowerCase() as LobsterPupilVariant)
+      : seeded.pupilVariant
   const motion =
     config.backgroundMotion &&
     (LOBSTER_BACKGROUND_MOTION_MODES as readonly string[]).includes(config.backgroundMotion)
@@ -1934,8 +2247,8 @@ function injectLobsterChitinLayers(
   const isTransparent = Boolean(config.transparentBackground)
 
   // Subtle curved cartoon eyebrows positioned right above the orbital eye sockets
-  const leftEyebrow = 'M 31 35 Q 37 31 43 35'
-  const rightEyebrow = 'M 57 35 Q 63 31 69 35'
+  const leftEyebrow = 'M 29.5 35 Q 37 30.5 44.5 35'
+  const rightEyebrow = 'M 55.5 35 Q 63 30.5 70.5 35'
 
   // Render modular antenna variant with crisp primary chitin tone
   const antennaeLayer = antennaStyle.render(chitinPalette.primary)
@@ -2454,7 +2767,15 @@ function injectLobsterChitinLayers(
   }
 
   outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg, headYOffset)
-  outputSvg = splitEyesForPupilTracking(outputSvg, chitinColor, eyelidStyle, chitinColor)
+  outputSvg = injectLobsterEyelids(
+    outputSvg,
+    chitinColor,
+    eyelidStyle,
+    chitinColor,
+    eyeColor,
+    eyeVariant,
+    pupilVariant
+  )
 
   // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
   const endGIndex = outputSvg.lastIndexOf('</g></svg>')
@@ -2471,7 +2792,7 @@ function injectLobsterChitinLayers(
 }
 
 function getAvatarCacheKey(config: LobsterAvatarConfig, size: number): string {
-  return `${config.seed}|${size}|${config.height ?? ''}|${config.armScale ?? ''}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
+  return `${config.seed}|${size}|${config.height ?? ''}|${config.armScale ?? ''}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.eyeColor ?? ''}|${config.eyeVariant ?? ''}|${config.pupilVariant ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
 }
 
 const MAX_GENERATED_AVATAR_CACHE = 128

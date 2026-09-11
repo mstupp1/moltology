@@ -3306,6 +3306,9 @@ const lobsterAvatarConfigSchema = z.object({
   patternPulse: z.enum(['pulse', 'steady']).optional(),
   patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
   eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried']).optional(),
+  eyeColor: z.enum(['amber', 'sapphire', 'emerald', 'amethyst', 'ruby', 'topaz']).optional(),
+  eyeVariant: z.enum(['round', 'wide', 'tall']).optional(),
+  pupilVariant: z.enum(['standard', 'big', 'sparkle', 'keen']).optional(),
   backgroundMotion: z.enum(['drift_diagonal', 'drift_horizontal', 'radar_sweep', 'wave_undulate', 'pulse_breathe', 'static']).optional(),
   transparentBackground: z.boolean().optional(),
   token: z.string().optional(),
@@ -3341,6 +3344,9 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     patternPulse?: 'pulse' | 'steady'
     patternSparkles?: 'subtle' | 'radiant' | 'none'
     eyelidStyle?: string
+    eyeColor?: string
+    eyeVariant?: string
+    pupilVariant?: string
     backgroundMotion?: string
     transparentBackground?: boolean
   } = {
@@ -3377,6 +3383,15 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
   }
   if (validated.eyelidStyle?.trim()) {
     avatarConfig.eyelidStyle = validated.eyelidStyle.trim()
+  }
+  if (validated.eyeColor?.trim()) {
+    avatarConfig.eyeColor = validated.eyeColor.trim()
+  }
+  if (validated.eyeVariant?.trim()) {
+    avatarConfig.eyeVariant = validated.eyeVariant.trim()
+  }
+  if (validated.pupilVariant?.trim()) {
+    avatarConfig.pupilVariant = validated.pupilVariant.trim()
   }
   if (validated.backgroundMotion?.trim()) {
     avatarConfig.backgroundMotion = validated.backgroundMotion.trim()

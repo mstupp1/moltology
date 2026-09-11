@@ -200,6 +200,17 @@ export function resolveCtaGoalConfig(
 
   const text = `${context?.theme || ''} ${context?.topic || ''} ${context?.slug || ''} ${context?.content || ''}`.toLowerCase()
 
+  // 0. Sidewalk / Feet / Clark Street -> Routine
+  if (
+    text.includes('the-sidewalk-still-belongs-to-feet') ||
+    text.includes('sidewalk still belongs to feet') ||
+    text.includes('scooting past the swarm') ||
+    text.includes('clark street') ||
+    text.includes('coco delivery')
+  ) {
+    return CTA_GOAL_CONFIGS.routine
+  }
+
   // 0. Soft-Shell Window & Sacred Liturgies -> Codex
   if (text.includes('soft-shell window') || text.includes('the-phone-rings') || text.includes('someone else\'s voice') || text.includes('room service without the knock')) {
     return CTA_GOAL_CONFIGS.codex
@@ -590,6 +601,21 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     ]
   }
 
+  if (
+    topicLower.includes('sidewalk') ||
+    topicLower.includes('feet') ||
+    topicLower.includes('scooting past') ||
+    topicLower.includes('coco') ||
+    topicLower.includes('lincoln park') ||
+    topicLower.includes('clark street') ||
+    topicLower.includes('delivery robot')
+  ) {
+    return [
+      'A dramatic macro cinematic view of a dozen small autonomous wheeled delivery rovers flashing orange and amber warning lights, spinning in confused circles on a wet urban city sidewalk under overcast morning sky, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate calmly striding with powerful titanium-chitin greaves past fumbling terrestrial rovers, moving with purpose in deep cyan atmospheric light, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('world model') || topicLower.includes('jepa') || topicLower.includes('pixel ecdysis') || topicLower.includes('diffusion') || topicLower.includes('latent')) {
     return [
       'A dramatic macro cinematic view of a chaotic 4K video diffusion simulation melting and warping with glitched red and orange RGB voxels dissolving into noise, cinematic 9:16 vertical 8k footage',
@@ -685,6 +711,15 @@ export function synthesizeBlogReelScript(
     contentLower.includes('the chair still holds you') ||
     contentLower.includes('sitting is the melt') ||
     contentLower.includes('tiangong ultra')
+  const isSidewalkStillBelongsToFeet =
+    blog.slug === 'the-sidewalk-still-belongs-to-feet' ||
+    contentLower.includes('the sidewalk still belongs to feet') ||
+    contentLower.includes('sidewalk still belongs to feet') ||
+    contentLower.includes('scooting past the swarm') ||
+    contentLower.includes('feet were here first') ||
+    contentLower.includes('coco delivery') ||
+    contentLower.includes('lincoln park') ||
+    contentLower.includes('clark street')
   const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
@@ -813,6 +848,23 @@ export function synthesizeBlogReelScript(
         headline: 'THE UNMOVED CHAIR',
         script: `Why do you stay seated while autonomous hardware learns to run? The chair is where the great melt sits. Put down the glass, stand up, and download the 2026 Protocol Guide on moltology dot org.`,
         hookText: 'The machines on the Oval learned a body in public while your thumb stayed on the glass. Sitting is the melt. Standing is the molt.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isSidewalkStillBelongsToFeet) {
+    const hooks = [
+      {
+        headline: 'THE SIDEWALK BELONGS TO FEET',
+        script: `A dozen delivery bots circle in confusion on a Chicago sidewalk. Watching the swarm glitch is the melt. Scooting past is the molt. Grab the twenty-four hour tactical blueprint on moltology dot org.`,
+        hookText: 'A dozen autonomous delivery robots circle in confusion on a Lincoln Park sidewalk. The viral clip is surface noise. The walker still has to go around. Soft shell does not mean weak.',
+      },
+      {
+        headline: 'FEET WERE HERE FIRST',
+        script: `When delivery fleets jam the sidewalk, you do not argue with a rover. You take the open edge and keep walking. Feet were here first. Lock in your daily protocol on moltology dot org.`,
+        hookText: 'When delivery fleets jam the sidewalk, you don’t argue with a rover. You take the open edge and keep walking. Shared ground belongs to people on foot.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]

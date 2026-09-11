@@ -33,7 +33,6 @@ export function MemberSearchRow({
         config={(member.avatarConfig as LobsterAvatarConfig | null) ?? null}
         className={compact ? 'w-9 h-9 shrink-0' : 'w-12 h-12 shrink-0'}
         size={compact ? 96 : 128}
-        eyeTracking={!compact}
       />
       <div className="min-w-0 flex-1">
         <Link

@@ -112,32 +112,6 @@ describe('LobsterAvatarDisplay Component', () => {
     expect(screen.queryByTestId('avatar-character-light')).toBeNull()
   })
 
-  it('applies eased pupil tracking transform on each svg pupil layer', async () => {
-    const avatarSrc = generateLobsterAvatarDataUri({ style: 'critters', seed: 'seed-eye-6' }, 256)
-    expect(avatarSrc).toBeTruthy()
-
-    render(<LobsterAvatarDisplay src={avatarSrc!} eyeTracking animated />)
-
-    const inlineSvg = screen.getByTestId('lobster-avatar-inline-svg')
-    const leftPupil = inlineSvg.querySelector('#lobster-pupil-left')
-    const rightPupil = inlineSvg.querySelector('#lobster-pupil-right')
-    const eyesLayer = inlineSvg.querySelector('#lobster-eyes-layer')
-    expect(leftPupil).toBeTruthy()
-    expect(rightPupil).toBeTruthy()
-    expect(eyesLayer).toBeTruthy()
-
-    fireEvent.mouseMove(window, { clientX: 9999, clientY: 9999 })
-
-    await waitFor(() => {
-      const leftTransform = (leftPupil as SVGGraphicsElement).style.transform
-      const rightTransform = (rightPupil as SVGGraphicsElement).style.transform
-      expect(leftTransform).toMatch(/translate\(.+px, .+px\)/)
-      expect(rightTransform).toMatch(/translate\(.+px, .+px\)/)
-      expect(leftTransform).not.toBe(rightTransform)
-      expect((eyesLayer as SVGGraphicsElement).style.transform).toBe('')
-    })
-  })
-
   it('renders PBR surface texture underlay when texture prop is provided', () => {
     render(<LobsterAvatarDisplay src={testSrc} texture="carbon" />)
 

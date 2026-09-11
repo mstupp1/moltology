@@ -5,7 +5,7 @@ import {
   getChitinGradientPalette,
   getLobsterAvatarSeededOptions,
   hasLobsterEyelids,
-  hasLobsterPupilTracking,
+  hasLobsterPixarEyes,
   isValidLobsterAvatarStyle,
   LOBSTER_BACKGROUND_PATTERNS,
   LOBSTER_BACKGROUND_TEXTURES,
@@ -13,6 +13,9 @@ import {
   LOBSTER_CHITIN_GRADIENT_PALETTES,
   LOBSTER_CRUSTACEAN_OPTIONS,
   LOBSTER_EYELID_STYLES,
+  LOBSTER_EYE_COLORS,
+  LOBSTER_EYE_VARIANTS,
+  LOBSTER_PUPIL_VARIANTS,
   LOBSTER_HEIGHTS,
   LOBSTER_HEIGHT_LABELS,
   LOBSTER_HEIGHT_SCALES,
@@ -51,6 +54,7 @@ describe('lobster-avatar', () => {
         patternPulse: 'pulse',
         patternSparkles: 'radiant',
         eyelidStyle: 'cheerful_squint',
+        eyeColor: 'amber',
       })
     ).toEqual({
       style: 'critters',
@@ -63,6 +67,7 @@ describe('lobster-avatar', () => {
       patternPulse: 'pulse',
       patternSparkles: 'radiant',
       eyelidStyle: 'cheerful_squint',
+      eyeColor: 'amber',
     })
     expect(parseLobsterAvatarConfig({ style: 'adventurer', seed: 'legacy' })).toEqual({
       style: 'critters',
@@ -71,12 +76,15 @@ describe('lobster-avatar', () => {
     expect(parseLobsterAvatarConfig(null)).toBeNull()
   })
 
-  it('drops attacker-controlled backgroundMotion and eyelidStyle values', () => {
+  it('drops attacker-controlled backgroundMotion, eyelidStyle, eyeColor, eyeVariant, and pupilVariant values', () => {
     const parsed = parseLobsterAvatarConfig({
       style: 'critters',
       seed: 'xss-proof',
       backgroundMotion: 'x"><image href=x onerror=alert(1)>',
       eyelidStyle: 'relaxed"><image href=x onerror=alert(1)>',
+      eyeColor: 'amber"><script>alert(1)</script>',
+      eyeVariant: 'round"><script>alert(1)</script>',
+      pupilVariant: 'big"><script>alert(1)</script>',
     })
     expect(parsed).toEqual({ style: 'critters', seed: 'xss-proof' })
     expect(LOBSTER_BACKGROUND_MOTION_MODES).toContain('static')
@@ -225,6 +233,9 @@ describe('lobster-avatar', () => {
     expect(['subtle', 'radiant', 'none']).toContain(seededA.sparkles)
     expect(seededA.motion).toBeDefined()
     expect(seededA.motion.duration).toBeGreaterThan(0)
+    expect(LOBSTER_EYE_COLORS).toContain(seededA.eyeColor)
+    expect(LOBSTER_EYE_VARIANTS).toContain(seededA.eyeVariant)
+    expect(LOBSTER_PUPIL_VARIANTS).toContain(seededA.pupilVariant)
     expect(seededB.theme).toBeDefined()
     expect(seededB.pattern).toBeDefined()
     expect(seededB.texture).toBeDefined()
@@ -233,6 +244,9 @@ describe('lobster-avatar', () => {
     expect(seededB.pulse).toBeDefined()
     expect(seededB.sparkles).toBeDefined()
     expect(seededB.motion).toBeDefined()
+    expect(LOBSTER_EYE_COLORS).toContain(seededB.eyeColor)
+    expect(LOBSTER_EYE_VARIANTS).toContain(seededB.eyeVariant)
+    expect(LOBSTER_PUPIL_VARIANTS).toContain(seededB.pupilVariant)
 
     // Same seed always returns same options
     expect(getLobsterAvatarSeededOptions('larva-crimson-vanguard')).toEqual(seededA)
@@ -248,6 +262,9 @@ describe('lobster-avatar', () => {
     const pulses = new Set<string>()
     const sparkles = new Set<string>()
     const motions = new Set<string>()
+    const eyeColors = new Set<string>()
+    const eyeVariants = new Set<string>()
+    const pupilVariants = new Set<string>()
 
     for (const seed of seeds) {
       const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
@@ -259,6 +276,9 @@ describe('lobster-avatar', () => {
       const pulseMatch = svg?.match(/data-pulse="([^"]+)"/)
       const sparklesMatch = svg?.match(/data-sparkles="([^"]+)"/)
       const motionMatch = svg?.match(/data-motion="([^"]+)"/)
+      const eyeColorMatch = svg?.match(/data-eye-color="([^"]+)"/)
+      const eyeVariantMatch = svg?.match(/data-eye-variant="([^"]+)"/)
+      const pupilVariantMatch = svg?.match(/data-pupil-variant="([^"]+)"/)
       if (themeMatch?.[1]) themes.add(themeMatch[1])
       if (patternMatch?.[1]) patterns.add(patternMatch[1])
       if (textureMatch?.[1]) textures.add(textureMatch[1])
@@ -267,6 +287,9 @@ describe('lobster-avatar', () => {
       if (pulseMatch?.[1]) pulses.add(pulseMatch[1])
       if (sparklesMatch?.[1]) sparkles.add(sparklesMatch[1])
       if (motionMatch?.[1]) motions.add(motionMatch[1])
+      if (eyeColorMatch?.[1]) eyeColors.add(eyeColorMatch[1])
+      if (eyeVariantMatch?.[1]) eyeVariants.add(eyeVariantMatch[1])
+      if (pupilVariantMatch?.[1]) pupilVariants.add(pupilVariantMatch[1])
     }
 
     expect(themes.size).toBeGreaterThan(1)
@@ -277,6 +300,9 @@ describe('lobster-avatar', () => {
     expect(pulses.size).toBeGreaterThan(1)
     expect(sparkles.size).toBeGreaterThan(1)
     expect(motions.size).toBeGreaterThan(1)
+    expect(eyeColors.size).toBeGreaterThan(1)
+    expect(eyeVariants.size).toBeGreaterThan(1)
+    expect(pupilVariants.size).toBeGreaterThan(1)
   })
 
   it('respects manual theme, pattern, texture, density, glow, pulse, sparkles, and motion overrides in config', () => {
@@ -387,40 +413,11 @@ describe('lobster-avatar', () => {
     expect(randomLobsterSeed()).toMatch(/^larva-/)
   })
 
-  it('excludes mismatched wink eye variant from crustacean options to preserve symmetry', () => {
-    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).toEqual(['round', 'bigPupils', 'happy', 'dots', 'wide'])
+  it('restricts crustacean eyes to open Pixar-compatible variants (round, bigPupils, wide), excluding dots, happy lines, and wink', () => {
+    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).toEqual(['round', 'bigPupils', 'wide'])
     expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).not.toContain('wink')
-  })
-
-  it('splits trackable eye variants into static sclera and a pupil layer', () => {
-    const trackable = [
-      { seed: 'seed-eye-6', variant: 'round' },
-      { seed: 'seed-eye-0', variant: 'bigPupils' },
-      { seed: 'seed-eye-4', variant: 'wide' },
-      { seed: 'seed-eye-1', variant: 'dots' },
-    ]
-
-    for (const { seed, variant } of trackable) {
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
-      expect(svg, variant).toContain('id="lobster-pupil-left"')
-      expect(svg, variant).toContain('class="lobster-pupil-track-layer"')
-      expect(svg, variant).not.toContain('lobster-eye-track-layer')
-      expect(hasLobsterPupilTracking(svg!)).toBe(true)
-    }
-  })
-
-  it('tracks solid black dot eyes without a separate sclera layer', () => {
-    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-1' })
-    const eyesBlock = svg!.match(/<g id="lobster-eyes-layer">[\s\S]*?<\/g><use transform="translate\(36 60\)"/)?.[0]
-    expect(svg).toContain('id="lobster-pupil-left"')
-    expect(eyesBlock).toContain('fill="#1e293b"')
-    expect(eyesBlock).not.toContain('fill="#ffffff"')
-  })
-
-  it('leaves expression-only eye variants without a pupil tracking layer', () => {
-    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-3' })
-    expect(svg).not.toContain('lobster-pupil-track-layer')
-    expect(hasLobsterPupilTracking(svg!)).toBe(false)
+    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).not.toContain('dots')
+    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).not.toContain('happy')
   })
 
   it('renders eyelid hoods over open eyes with white sclera and iris to soften staring look', () => {
@@ -439,14 +436,16 @@ describe('lobster-avatar', () => {
     }
   })
 
-  it('suppresses eyelids for dot eyes and happy smile eyes without white sclera', () => {
+  it('renders large Pixar eyes and eyelids across all seeds, replacing legacy dot and smile variants', () => {
     const dotsSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-1' })
-    expect(dotsSvg).not.toContain('lobster-eyelids-layer')
-    expect(hasLobsterEyelids(dotsSvg!)).toBe(false)
+    expect(dotsSvg).toContain('lobster-eyelids-layer')
+    expect(hasLobsterEyelids(dotsSvg!)).toBe(true)
+    expect(hasLobsterPixarEyes(dotsSvg!)).toBe(true)
 
     const happySvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-3' })
-    expect(happySvg).not.toContain('lobster-eyelids-layer')
-    expect(hasLobsterEyelids(happySvg!)).toBe(false)
+    expect(happySvg).toContain('lobster-eyelids-layer')
+    expect(hasLobsterEyelids(happySvg!)).toBe(true)
+    expect(hasLobsterPixarEyes(happySvg!)).toBe(true)
   })
 
   it('renders eyelids filled with matching lobster chitin color', () => {
@@ -488,17 +487,19 @@ describe('lobster-avatar', () => {
       style: 'critters',
       seed: 'seed-eye-6',
       eyelidStyle: 'angry',
+      eyeVariant: 'round',
     })
     expect(angrySvg).toContain('data-eyelid-style="angry"')
-    expect(angrySvg).toContain('M 2.5 7.5 C 2.5 5 6 4.2 10 4.2 C 14 4.2 17.5 6 17.5 12.8')
+    expect(angrySvg).toContain('M -0.1 6.54 C -0.1 4.93 4.77 1.3 10 1.3')
 
     const worriedSvg = generateLobsterAvatarSvg({
       style: 'critters',
       seed: 'seed-eye-6',
       eyelidStyle: 'worried',
+      eyeVariant: 'round',
     })
     expect(worriedSvg).toContain('data-eyelid-style="worried"')
-    expect(worriedSvg).toContain('M 2.5 12.8 C 2.5 6 6 4.2 10 4.2 C 14 4.2 17.5 5 17.5 7.5')
+    expect(worriedSvg).toContain('M -0.1 13.76 C -0.1 8.25 4.77 1.3 10 1.3')
   })
 
   it('renders sculpted lower eyelids for cheerful_squint style', () => {
@@ -506,11 +507,12 @@ describe('lobster-avatar', () => {
       style: 'critters',
       seed: 'seed-eye-6',
       eyelidStyle: 'cheerful_squint',
+      eyeVariant: 'round',
     })
     expect(squintSvg).toContain('data-eyelid-style="cheerful_squint"')
-    // Lower eyelid path starts at y=16.5
-    expect(squintSvg).toContain('M 2.5 16.5 Q 10 15.5 17.5 16.5')
-    expect(squintSvg).toContain('M 28.5 16.5 Q 36 15.5 43.5 16.5')
+    // Lower eyelid path starts at y=16.99
+    expect(squintSvg).toContain('M -0.1 16.99 Q 10 15.69 20.1 16.99')
+    expect(squintSvg).toContain('M 25.9 16.99 Q 36 15.69 46.1 16.99')
   })
 
   it('deterministically seeds eyelid style from avatar seed', () => {
@@ -520,6 +522,100 @@ describe('lobster-avatar', () => {
     expect(LOBSTER_EYELID_STYLES).toContain(seededA.eyelidStyle)
     expect(LOBSTER_EYELID_STYLES).toContain(seededB.eyelidStyle)
     expect(getLobsterAvatarSeededOptions('larva-alpha').eyelidStyle).toBe(seededA.eyelidStyle)
+  })
+
+  describe('pixar eye and pupil styling', () => {
+    it('renders 3D Pixar-styled eyes with spherical sclera, vibrant iris, pupil, and specular catchlights for open eye variants', () => {
+      const openEyeSeeds = [
+        { seed: 'seed-eye-6', variant: 'round' },
+        { seed: 'seed-eye-0', variant: 'bigPupils' },
+        { seed: 'seed-eye-4', variant: 'wide' },
+      ]
+
+      for (const { seed, variant } of openEyeSeeds) {
+        const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
+        expect(svg, variant).toBeTruthy()
+        expect(hasLobsterPixarEyes(svg!), variant).toBe(true)
+        expect(svg, variant).toContain('class="lobster-pixar-eyes"')
+        expect(svg, variant).toContain('id="pixar-sclera-left"')
+        expect(svg, variant).toContain('id="pixar-sclera-right"')
+        expect(svg, variant).toContain('id="pixar-iris-left"')
+        expect(svg, variant).toContain('id="pixar-iris-right"')
+        expect(svg, variant).toContain('id="pixar-glint-key-left"')
+        expect(svg, variant).toContain('id="pixar-glint-bounce-left"')
+        expect(svg, variant).toContain('id="pixar-glint-spark-left"')
+        expect(svg, variant).toContain('id="pixar-cornea-arc-left"')
+        // Eyelid layer is preserved and placed over the Pixar eyes
+        expect(hasLobsterEyelids(svg!), variant).toBe(true)
+      }
+    })
+
+    it('supports all 6 Pixar eye color palettes with custom radial gradients', () => {
+      for (const color of LOBSTER_EYE_COLORS) {
+        const svg = generateLobsterAvatarSvg({
+          style: 'critters',
+          seed: 'seed-eye-6',
+          eyeColor: color,
+        })
+        expect(svg, color).toBeTruthy()
+        expect(hasLobsterPixarEyes(svg!), color).toBe(true)
+        expect(svg, color).toContain(`data-eye-color="${color}"`)
+        expect(svg, color).toContain(`id="pixar-iris-grad-${color}"`)
+        expect(svg, color).toContain(`id="pixar-caustic-grad-${color}"`)
+      }
+    })
+
+    it('supports all 3 eye variants (round, wide, tall) with scaled geometry', () => {
+      for (const variant of LOBSTER_EYE_VARIANTS) {
+        const svg = generateLobsterAvatarSvg({
+          style: 'critters',
+          seed: 'seed-eye-6',
+          eyeVariant: variant,
+        })
+        expect(svg, variant).toBeTruthy()
+        expect(svg, variant).toContain(`data-eye-variant="${variant}"`)
+        if (variant === 'round') {
+          expect(svg).toContain('<circle id="pixar-sclera-left" cx="10" cy="13" r="9.5"')
+        } else if (variant === 'wide') {
+          expect(svg).toContain('<ellipse id="pixar-sclera-left" cx="10" cy="13" rx="10.2" ry="9"')
+        } else if (variant === 'tall') {
+          expect(svg).toContain('<ellipse id="pixar-sclera-left" cx="10" cy="13" rx="8.8" ry="10.4"')
+        }
+      }
+    })
+
+    it('supports all 4 pupil variants (standard, big, sparkle, keen)', () => {
+      for (const pupil of LOBSTER_PUPIL_VARIANTS) {
+        const svg = generateLobsterAvatarSvg({
+          style: 'critters',
+          seed: 'seed-eye-6',
+          eyeVariant: 'round',
+          pupilVariant: pupil,
+        })
+        expect(svg, pupil).toBeTruthy()
+        expect(svg, pupil).toContain(`data-pupil-variant="${pupil}"`)
+        if (pupil === 'sparkle') {
+          expect(svg).toContain('id="pixar-glint-star-left"')
+          expect(svg).toContain('id="pixar-glint-extra-left"')
+        } else if (pupil === 'big') {
+          expect(svg).toContain('<circle id="pixar-pupil-left" cx="10" cy="13" r="4.16"')
+        } else if (pupil === 'keen') {
+          expect(svg).toContain('<circle id="pixar-pupil-left" cx="10" cy="13" r="2.43"')
+        } else if (pupil === 'standard') {
+          expect(svg).toContain('<circle id="pixar-pupil-left" cx="10" cy="13" r="3.2"')
+        }
+      }
+    })
+
+    it('applies 3D Pixar eyes universally across all avatar seeds (no dots or happy smile eyes)', () => {
+      const seed1Svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-1' })
+      expect(hasLobsterPixarEyes(seed1Svg!)).toBe(true)
+      expect(seed1Svg).toContain('lobster-pixar-eyes')
+
+      const seed3Svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-3' })
+      expect(hasLobsterPixarEyes(seed3Svg!)).toBe(true)
+      expect(seed3Svg).toContain('lobster-pixar-eyes')
+    })
   })
 
   it('efficiently caches generated SVG and Data URI strings in LRU cache', () => {

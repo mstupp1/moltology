@@ -1,22 +1,15 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import {
   pixelateImage,
   getCachedPixelatedImage,
   type PixelateOptions,
 } from '@/lib/pixelate-avatar'
 import {
-  computeLobsterPupilOffset,
   decodeSvgDataUri,
-  LOBSTER_EYE_TRACK_FOLLOW_LEFT,
-  LOBSTER_EYE_TRACK_FOLLOW_RIGHT,
   resolveIdleAnimationPhase,
-  stepLobsterEyeOffset,
-  type LobsterPupilSide,
 } from '@/lib/lobster-avatar-idle'
 import './avatar-animations.css'
 import '@/styles/pbr-textures.css'
-
-const PUPIL_SIDES: LobsterPupilSide[] = ['left', 'right']
 
 export interface LobsterAvatarDisplayProps extends PixelateOptions {
   src: string
@@ -36,8 +29,6 @@ export interface LobsterAvatarDisplayProps extends PixelateOptions {
   animated?: boolean
   /** Optional seed for deterministic animation phase offset */
   animationSeed?: string
-  /** Subtle cursor-following eye shift with eased resistance (default on) */
-  eyeTracking?: boolean
   /** Contextual Homepage PBR Surface Texture Underlay */
   texture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
 }
@@ -65,13 +56,9 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
   vignette = true,
   animated = true,
   animationSeed,
-  eyeTracking = true,
   texture,
 }) => {
-  const rootRef = useRef<HTMLDivElement>(null)
   const animatedRef = useRef<HTMLDivElement>(null)
-  const leftPupilRef = useRef<SVGGraphicsElement | null>(null)
-  const rightPupilRef = useRef<SVGGraphicsElement | null>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
 
   useEffect(() => {
@@ -90,17 +77,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
     return decodeSvgDataUri(src)
   }, [useAnimatedSvg, src])
 
-  // Cache pupil DOM element references when SVG markup updates
-  useEffect(() => {
-    if (animatedRef.current) {
-      leftPupilRef.current = animatedRef.current.querySelector('#lobster-pupil-left')
-      rightPupilRef.current = animatedRef.current.querySelector('#lobster-pupil-right')
-    } else {
-      leftPupilRef.current = null
-      rightPupilRef.current = null
-    }
-  }, [animatedSvgMarkup])
-
   const idlePhase = useMemo(
     () => resolveIdleAnimationPhase(src, animationSeed),
     [src, animationSeed]
@@ -116,156 +92,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
     () => (useAnimatedSvg ? ({ '--lobster-idle-phase': idlePhase } as React.CSSProperties) : undefined),
     [useAnimatedSvg, idlePhase]
   )
-
-  const applyPupilOffsets = useCallback((offsets: Record<LobsterPupilSide, { x: number; y: number }>) => {
-    const leftEl = leftPupilRef.current ?? animatedRef.current?.querySelector('#lobster-pupil-left')
-    const rightEl = rightPupilRef.current ?? animatedRef.current?.querySelector('#lobster-pupil-right')
-
-    if (leftEl instanceof SVGGraphicsElement) {
-      leftEl.style.transform = `translate(${offsets.left.x.toFixed(2)}px, ${offsets.left.y.toFixed(2)}px)`
-    }
-    if (rightEl instanceof SVGGraphicsElement) {
-      rightEl.style.transform = `translate(${offsets.right.x.toFixed(2)}px, ${offsets.right.y.toFixed(2)}px)`
-    }
-  }, [])
-
-  const resetPupilOffsets = useCallback(() => {
-    for (const side of PUPIL_SIDES) {
-      const layer = (side === 'left' ? leftPupilRef.current : rightPupilRef.current) ?? animatedRef.current?.querySelector(`#lobster-pupil-${side}`)
-      if (layer instanceof SVGGraphicsElement) {
-        layer.style.removeProperty('transform')
-      }
-    }
-  }, [])
-
-  // Optimized Eye Tracking: Sleeping rAF loop, throttled bounding rect, IntersectionObserver
-  useEffect(() => {
-    if (!eyeTracking || !useAnimatedSvg || reducedMotion) {
-      resetPupilOffsets()
-      return
-    }
-
-    const target = {
-      left: { x: 0, y: 0 },
-      right: { x: 0, y: 0 },
-    }
-    const current = {
-      left: { x: 0, y: 0 },
-      right: { x: 0, y: 0 },
-    }
-
-    const EPSILON = 0.005
-    let rafId = 0
-    let isRafRunning = false
-    let isVisible = true
-    let cachedRect: DOMRect | null = null
-    let lastRectTime = 0
-
-    const getAnchorRect = () => {
-      const now = performance.now()
-      if (!cachedRect || now - lastRectTime > 150) {
-        if (rootRef.current) {
-          cachedRect = rootRef.current.getBoundingClientRect()
-          lastRectTime = now
-        }
-      }
-      return cachedRect
-    }
-
-    const tick = () => {
-      if (!isRafRunning || !isVisible) return
-
-      current.left = stepLobsterEyeOffset(current.left, target.left, LOBSTER_EYE_TRACK_FOLLOW_LEFT)
-      current.right = stepLobsterEyeOffset(current.right, target.right, LOBSTER_EYE_TRACK_FOLLOW_RIGHT)
-      applyPupilOffsets(current)
-
-      const dl = Math.hypot(target.left.x - current.left.x, target.left.y - current.left.y)
-      const dr = Math.hypot(target.right.x - current.right.x, target.right.y - current.right.y)
-
-      if (dl < EPSILON && dr < EPSILON) {
-        // Converged: snap to target once and sleep rAF loop (0% idle CPU)
-        current.left.x = target.left.x
-        current.left.y = target.left.y
-        current.right.x = target.right.x
-        current.right.y = target.right.y
-        applyPupilOffsets(current)
-        isRafRunning = false
-        return
-      }
-
-      rafId = requestAnimationFrame(tick)
-    }
-
-    const startRaf = () => {
-      if (!isRafRunning && isVisible) {
-        isRafRunning = true
-        rafId = requestAnimationFrame(tick)
-      }
-    }
-
-    const onMove = (event: MouseEvent) => {
-      if (!isVisible) return
-      const rect = getAnchorRect()
-      if (!rect) return
-      target.left = computeLobsterPupilOffset(event.clientX, event.clientY, rect, 'left')
-      target.right = computeLobsterPupilOffset(event.clientX, event.clientY, rect, 'right')
-      startRaf()
-    }
-
-    const onScrollOrResize = () => {
-      cachedRect = null
-    }
-
-    // IntersectionObserver: pause eye tracking when scrolled offscreen
-    let observer: IntersectionObserver | null = null
-    if (typeof IntersectionObserver !== 'undefined' && rootRef.current) {
-      observer = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0]
-          isVisible = entry ? entry.isIntersecting : true
-          if (isVisible) {
-            startRaf()
-          } else if (isRafRunning) {
-            isRafRunning = false
-            cancelAnimationFrame(rafId)
-          }
-        },
-        { threshold: 0.05 }
-      )
-      observer.observe(rootRef.current)
-    }
-
-    const onVisibilityChange = () => {
-      if (document.hidden) {
-        isVisible = false
-        if (isRafRunning) {
-          isRafRunning = false
-          cancelAnimationFrame(rafId)
-        }
-      } else {
-        isVisible = true
-        startRaf()
-      }
-    }
-
-    // Start initial frame to align resting pupils
-    startRaf()
-    window.addEventListener('mousemove', onMove, { passive: true })
-    window.addEventListener('scroll', onScrollOrResize, { passive: true })
-    window.addEventListener('resize', onScrollOrResize, { passive: true })
-    document.addEventListener('visibilitychange', onVisibilityChange)
-
-    return () => {
-      isRafRunning = false
-      cancelAnimationFrame(rafId)
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('scroll', onScrollOrResize)
-      window.removeEventListener('resize', onScrollOrResize)
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-      if (observer) observer.disconnect()
-      resetPupilOffsets()
-    }
-  }, [eyeTracking, useAnimatedSvg, reducedMotion, animatedSvgMarkup, applyPupilOffsets, resetPupilOffsets])
 
   const shouldPixelate = pixelated && !useAnimatedSvg
 
@@ -354,7 +180,6 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
 
   return (
     <div
-      ref={rootRef}
       className={`relative inline-flex items-center justify-center overflow-hidden [contain:paint] ${containerClassName}`}
       style={radialMaskStyle}
     >
