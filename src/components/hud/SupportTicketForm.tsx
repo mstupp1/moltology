@@ -132,7 +132,7 @@ export default function SupportTicketForm() {
       setBody('')
       setTurnstileToken(null)
       turnstileRef.current?.reset()
-      toast?.success(SUPPORT_TICKET_COPY.successTitle, { id: 'support-ticket-received' })
+      toast?.success(SUPPORT_TICKET_COPY.toastReceived, { id: 'support-ticket-received' })
     } catch (error: unknown) {
       turnstileRef.current?.reset()
       setTurnstileToken(null)

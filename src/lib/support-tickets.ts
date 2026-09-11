@@ -53,6 +53,7 @@ export const SUPPORT_TICKET_COPY = {
   bodyTooLong: 'That description is too long. Trim it and try again.',
   botCheckFailed: 'Bot check failed. Refresh the challenge and try again.',
   honeypotLabel: 'Leave this empty',
+  toastReceived: 'Your ticket was received.',
 } as const
 
 export const SUPPORT_TICKET_CATEGORY_LABELS: Record<SupportTicketCategoryId, string> = {

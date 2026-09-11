@@ -92,8 +92,9 @@ describe('SupportTicketForm', () => {
       })
     })
 
-    expect(screen.getByTestId('support-ticket-success')).toBeInTheDocument()
+    const success = screen.getByTestId('support-ticket-success')
+    expect(success).toBeInTheDocument()
+    expect(success).toHaveTextContent(SUPPORT_TICKET_COPY.successTitle)
     expect(screen.getByTestId('support-ticket-reference')).toHaveTextContent('ticket-42')
-    expect(screen.getByText(SUPPORT_TICKET_COPY.successTitle)).toBeInTheDocument()
   })
 })

@@ -64,22 +64,31 @@ export function hashClientIp(ip: string | null | undefined): string | null {
   return createHash('sha256').update(ip.trim()).digest('hex').slice(0, 32)
 }
 
-function sessionEmail(payload: { email?: unknown } | null | undefined): string | null {
-  const email = payload && typeof payload.email === 'string' ? payload.email.trim() : ''
-  return email || null
+function sessionEmail(payload: unknown): string | null {
+  if (!payload || typeof payload !== 'object') return null
+  const email = (payload as { email?: unknown }).email
+  return typeof email === 'string' && email.trim() ? email.trim() : null
 }
 
 export async function createSupportTicketHandler(
   args: ServerFnArgs,
 ): Promise<CreateSupportTicketResult> {
-  const raw = args.data || {}
+  const raw = (args.data ?? {}) as Partial<CreateSupportTicketInput>
   if (isSupportTicketHoneypotTriggered(raw[SUPPORT_TICKET_HONEYPOT_FIELD])) {
     return { success: true, ticketId: null, ticketReference: null }
   }
 
   const data = createSupportTicketSchema.parse(raw)
 
-  const auth = await resolveWriteAuth({ data, context: args.context })
+  let auth
+  try {
+    auth = await resolveWriteAuth({ data, context: args.context })
+  } catch (error) {
+    if (error instanceof Error && /Unauthenticated|Unauthorized/.test(error.message)) {
+      throw new Error(SUPPORT_TICKET_COPY.unauthenticated)
+    }
+    throw error
+  }
   if (!auth) {
     throw new Error(SUPPORT_TICKET_COPY.unauthenticated)
   }
