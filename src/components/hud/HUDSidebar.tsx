@@ -24,7 +24,6 @@ import {
   ChevronRight,
   Plus,
   Minus,
-  Radio,
   Biohazard,
   Microscope,
   Lock,
@@ -46,7 +45,7 @@ import { getAssetUrl } from '@/lib/assets'
 import { HUDProgressBar } from './HUDProgressBar'
 import { HUDTaskBar } from './HUDTaskBar'
 
-const GUEST_LOCKED_PATHS = new Set(['/lectures', '/podcasts', '/subterranean', '/chassis', '/connections', '/member', '/stream'])
+const GUEST_LOCKED_PATHS = new Set(['/lectures', '/subterranean', '/chassis', '/connections', '/member', '/stream'])
 
 interface HUDSidebarProps {
   larvaId?: string
@@ -346,13 +345,6 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
           shortLabel: 'ACADEMY',
           icon: BookOpen,
           path: '/lectures',
-        },
-        {
-          id: 'podcasts',
-          label: 'BENTHIC PODCASTS',
-          shortLabel: 'PODCASTS',
-          icon: Radio,
-          path: '/podcasts',
         },
         {
           id: 'science',

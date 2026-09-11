@@ -58,11 +58,8 @@ content/
 ├── news/               # Blog posts / MoltNation news dispatches (upserts to blog_posts)
 │   ├── template.md     # Reference template for blog posts
 │   └── *.md
-├── changelogs/         # System changelogs & version releases (upserts to changelogs)
-│   ├── template.md     # Reference template for changelogs
-│   └── *.md
-└── podcasts/           # Audio transmissions & podcast episodes (upserts to podcasts)
-    ├── template.md     # Reference template for podcasts
+└── changelogs/         # System changelogs & version releases (upserts to changelogs)
+    ├── template.md     # Reference template for changelogs
     └── *.md
 ```
 
@@ -136,16 +133,3 @@ npx tsx scripts/ingest.ts content/news/my-article.md --db "postgresql://user:pas
 | `summary` | string | No | Excerpt of the release highlights |
 | `isPublished` | boolean | No | Default: `true` |
 | `releasedAt` | ISO date | No | Release timestamp |
-
-### 3. Podcasts (`content/podcasts/*.md`)
-| Field | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `title` | string | **Yes** | Episode title |
-| `audioUrl` | string | **Yes** | Direct URL to audio file (MP3 / AAC) |
-| `slug` | string | No | URL slug (auto-generated from title if omitted) |
-| `subtitle` | string | No | Subtitle or tagline |
-| `description` | string | No | Episode summary |
-| `durationSeconds`| number | No | Audio duration in seconds |
-| `category` | string | No | Default: `TRANSMISSION` |
-| `tags` | string[] | No | Tags for categorization |
-| `isPublished` | boolean | No | Default: `true` |

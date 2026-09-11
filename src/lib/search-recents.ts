@@ -39,7 +39,6 @@ const COMMAND_ICONS = new Set<CommandIconId>([
   'connections',
   'chassis',
   'isolation',
-  'podcasts',
   'news',
   'watch',
   'settings',

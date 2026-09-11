@@ -179,12 +179,6 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       notes: 'System transmutation log. Keep published rows.',
     },
     {
-      table: 'podcasts',
-      retentionClass: 'canonical',
-      hotDays: null,
-      notes: 'Catalog only. Audio already in S3 (`s3Key` / `audioUrl`).',
-    },
-    {
       table: 'activity_events',
       retentionClass: 'hot-delete',
       hotDays: windows.activityEventsHotDays,

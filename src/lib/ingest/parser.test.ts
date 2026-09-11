@@ -6,7 +6,6 @@ import {
   parseContentFile,
   normalizeBlogPayload,
   normalizeChangelogPayload,
-  normalizePodcastPayload,
 } from './parser'
 
 describe('Content Ingestion Parser Utilities', () => {
@@ -45,21 +44,29 @@ const veryLongCodeBlock = Array.from({ length: 1000 }).map(() => 'code');
 
   describe('inferContentType', () => {
     it('prioritizes explicit CLI type over path and frontmatter', () => {
-      expect(inferContentType('content/news/item.md', 'podcast', 'blog')).toBe('podcast')
+      expect(inferContentType('content/news/item.md', 'changelog', 'blog')).toBe('changelog')
       expect(inferContentType('content/changelogs/v1.md', 'blog')).toBe('blog')
     })
 
     it('uses frontmatter type if explicit type is omitted', () => {
       expect(inferContentType('arbitrary/path/file.md', undefined, 'changelog')).toBe('changelog')
-      expect(inferContentType('arbitrary/path/file.md', undefined, 'podcast')).toBe('podcast')
+      expect(inferContentType('arbitrary/path/file.md', undefined, 'news')).toBe('blog')
     })
 
     it('infers from file path if neither explicit nor frontmatter type is given', () => {
       expect(inferContentType('content/news/dispatch-01.md')).toBe('blog')
       expect(inferContentType('content/blog/dispatch-01.md')).toBe('blog')
       expect(inferContentType('content/changelogs/v1.0.md')).toBe('changelog')
-      expect(inferContentType('content/podcasts/ep1.md')).toBe('podcast')
       expect(inferContentType('content/random/unknown.md')).toBe('blog') // fallback
+    })
+
+    it('rejects retired podcast type flags', () => {
+      expect(() => inferContentType('content/news/item.md', 'podcast')).toThrow(
+        /Podcast ingest is no longer supported/
+      )
+      expect(() => inferContentType('arbitrary/path/file.md', undefined, 'podcast')).toThrow(
+        /Podcast ingest is no longer supported/
+      )
     })
   })
 
@@ -146,14 +153,6 @@ This is the body content.
           filePath: 'invalid.md',
         })
       ).toThrowError(/Missing required "title"/)
-
-      expect(() =>
-        normalizePodcastPayload({
-          metadata: { title: 'Podcast Title' },
-          content: '',
-          filePath: 'invalid.md',
-        })
-      ).toThrowError(/Missing required "audioUrl"/)
     })
   })
 })

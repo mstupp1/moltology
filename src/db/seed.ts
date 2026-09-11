@@ -10,7 +10,6 @@ import { ingestContentItem } from '../lib/ingest/handlers'
 import { INITIAL_CHANGELOGS } from '../lib/changelogs-data'
 import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
-import { INITIAL_PODCASTS } from '../lib/podcast-data'
 import { INITIAL_EQUIPMENT_CATALOG, catalogSeedInsertValues } from '../lib/equipment-seed-data'
 
 dotenv.config()
@@ -451,35 +450,6 @@ export async function seedDatabase(databaseUrl?: string) {
       }
     }
     console.log(`✓ Seeded ${INITIAL_FORUM_TOPICS.length} forum topics and associated replies`)
-
-    // Seed Podcasts
-    for (const pod of INITIAL_PODCASTS) {
-      await db
-        .insert(schema.podcasts)
-        .values({
-          slug: pod.slug,
-          title: pod.title,
-          subtitle: pod.subtitle,
-          description: pod.description,
-          audioUrl: pod.audioUrl,
-          s3Key: pod.s3Key,
-          durationSeconds: pod.durationSeconds,
-          fileSizeBytes: pod.fileSizeBytes,
-          authorName: pod.authorName,
-          authorAvatar: pod.authorAvatar,
-          authorRole: pod.authorRole,
-          category: pod.category,
-          tags: pod.tags,
-          playCount: pod.playCount,
-          likes: pod.likes,
-          isFeatured: pod.isFeatured,
-          isPublished: pod.isPublished,
-          transcript: pod.transcript,
-          publishedAt: new Date(pod.publishedAt),
-        })
-        .onConflictDoNothing({ target: schema.podcasts.slug })
-    }
-    console.log(`✓ Seeded ${INITIAL_PODCASTS.length} podcast episodes`)
 
     // 10. Seed equipment catalog (chassis loadout)
     console.log('[SEED] Seeding equipment catalog...')

@@ -38,10 +38,11 @@ describe('Content Ingestion Handlers & Dispatcher', () => {
     expect(result.type).toBe('changelog')
   })
 
-  it('handles dry-run validation for podcasts', async () => {
+  it('rejects retired podcast ingest instead of writing a table that no longer exists', async () => {
     const raw: RawParsedContent = {
       filePath: 'content/podcasts/transmission-09.md',
       metadata: {
+        type: 'podcast',
         title: 'Transmission 09',
         audioUrl: 'https://cdn.moltology.org/audio/t09.mp3',
         durationSeconds: 1200,
@@ -50,10 +51,9 @@ describe('Content Ingestion Handlers & Dispatcher', () => {
     }
 
     const result = await ingestContentItem(raw, { dryRun: true })
-    expect(result.success).toBe(true)
-    expect(result.action).toBe('validated')
-    expect(result.identifier).toBe('transmission-09')
-    expect(result.type).toBe('podcast')
+    expect(result.success).toBe(false)
+    expect(result.action).toBe('skipped')
+    expect(result.error).toContain('Podcast ingest is no longer supported')
   })
 
   it('returns graceful error when payload validation fails during ingestion', async () => {

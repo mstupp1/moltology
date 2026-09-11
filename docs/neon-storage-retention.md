@@ -31,7 +31,7 @@ Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (1
 1. **Lean default, lenient overlay.** `RETENTION_PROFILE=lean` (default) vs `lenient`. Every lean window is strictly shorter. Loosening is an env change plus a report re-run, not a schema rewrite.
 2. **Postgres holds working set, not history.** Media already lives in S3. Chat transcripts and old task logs follow the same split.
 3. **Summarize before archive, archive before delete.** Never drop Oracle transcripts without a thread summary row plus a private JSONL dump.
-4. **Canonical community is not a log.** Forum topics/posts, blog, changelogs, podcasts, equipment catalog stay. Cap the 12-hour simulator instead of deleting public texture.
+4. **Canonical community is not a log.** Forum topics/posts, blog, changelogs, equipment catalog stay. Cap the 12-hour simulator instead of deleting public texture.
 5. **Simulated members get a shorter telemetry window.** Real members keep heatmap / Oracle longer.
 6. **No PII in `moltology-public-assets`.** Archives and `pg_dump` files go to a new **private** bucket.
 7. **Apply is opt-in and batched.** The reporter is dry-run only. Deletes run in small `DELETE … WHERE ctid` / key batches with a snapshot taken first.
@@ -40,7 +40,7 @@ Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (1
 
 | Class | Lifecycle | Tables |
 | :--- | :--- | :--- |
-| Canonical | Keep for the life of the account / publication | `profiles`, `user_stats`, `routines`, `friendships`, `user_gear_items`, `user_avatars`, `equipment_catalog`, forum, blog, changelogs, podcasts |
+| Canonical | Keep for the life of the account / publication | `profiles`, `user_stats`, `routines`, `friendships`, `user_gear_items`, `user_avatars`, `equipment_catalog`, forum, blog, changelogs |
 | Hot → delete | Drop past the window. No archive. | `activity_events`, `notifications`, closed `friend_requests` |
 | Hot → summarize → delete | Compact, then drop source rows | `routine_completions` |
 | Hot → summarize → archive → delete | Summary in DB, JSONL in private storage, then drop | `ai_messages` (keep `ai_threads` + summary) |

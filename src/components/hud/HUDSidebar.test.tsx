@@ -156,7 +156,6 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('HUB')).toBeInTheDocument()
     expect(screen.getByText('ORACLE')).toBeInTheDocument()
     expect(screen.getByText('ACADEMY')).toBeInTheDocument()
-    expect(screen.getByText('PODCASTS')).toBeInTheDocument()
     expect(screen.getByText('SCIENCE')).toBeInTheDocument()
     expect(screen.getByText('JOURNAL')).toBeInTheDocument()
     expect(screen.getByText('MARKET')).toBeInTheDocument()

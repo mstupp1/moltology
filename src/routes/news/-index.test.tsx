@@ -21,7 +21,6 @@ vi.mock('@tanstack/react-router', () => ({
 // Mock API functions
 vi.mock('@/lib/server/api', () => ({
   getBlogPostsFn: vi.fn().mockResolvedValue(INITIAL_BLOG_POSTS),
-  getPodcastsFn: vi.fn().mockResolvedValue([]),
 }))
 
 // Mock authClient
@@ -79,7 +78,6 @@ describe('NewsIndexPage (index.tsx) Route Component', () => {
     expect(screen.getByText('★ MOLTNATION LIVE ★')).toBeInTheDocument()
     expect(screen.getByText('CATCH UP ON DISPATCHES')).toBeInTheDocument()
     expect(screen.getByText('STREAMING NOW')).toBeInTheDocument()
-    expect(screen.getByText('MOLTNATION PODCAST DISPATCHES')).toBeInTheDocument()
   })
 
   it('eager-loads the flag LCP still and lazy-loads remaining dispatch artwork', () => {

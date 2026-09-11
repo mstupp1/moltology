@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
 import { publicMiddleware } from './functions'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, podcasts, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
@@ -45,9 +45,7 @@ import {
 } from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdminOrSuperAdmin } from '../permissions'
-import { INITIAL_PODCASTS } from '../podcast-data'
 import { getAssetUrl } from '../assets'
-import type { PodcastEpisode } from '../podcast-data'
 import {
   CANONICAL_ALIGNMENT_TASKS,
   TOTAL_ALIGNMENT_TASKS,
@@ -3124,55 +3122,6 @@ export const toggleForumPostVoteFn = createServerFn({ method: 'POST' })
       .parse(data)
   })
   .handler(toggleForumPostVoteHandler)
-
-/**
- * Server Function: Get podcast episodes
- */
-export const getPodcastsHandler = async ({ context }: ServerFnArgs) => {
-  const dbClient = context?.db || getDb()
-  try {
-    const records = await dbClient
-      .select()
-      .from(podcasts)
-      .where(eq(podcasts.isPublished, true))
-      .orderBy(desc(podcasts.publishedAt))
-
-    if (records && records.length > 0) {
-      return records.map((r: any) => ({
-        id: r.id,
-        slug: r.slug,
-        title: r.title,
-        subtitle: r.subtitle || '',
-        description: r.description,
-        audioUrl: (r.audioUrl && /^https?:/.test(r.audioUrl))
-          ? r.audioUrl
-          : getAssetUrl(r.s3Key || (r.audioUrl || '').replace(/^\/+/, '')),
-        s3Key: r.s3Key || undefined,
-        durationSeconds: r.durationSeconds,
-        fileSizeBytes: r.fileSizeBytes || undefined,
-        authorName: r.authorName,
-        authorAvatar: r.authorAvatar,
-        authorRole: r.authorRole,
-        category: r.category,
-        tags: (r.tags as string[]) || [],
-        playCount: r.playCount,
-        likes: r.likes,
-        isFeatured: r.isFeatured,
-        isPublished: r.isPublished,
-        transcript: r.transcript || '',
-        publishedAt: r.publishedAt ? new Date(r.publishedAt).toISOString() : new Date().toISOString(),
-      }))
-    }
-  } catch (error) {
-    console.warn('[ServerFn getPodcastsFn] DB query failed, using static fallback:', error)
-  }
-
-  return INITIAL_PODCASTS
-}
-
-export const getPodcastsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .handler(getPodcastsHandler)
 
 // Lead Capture & Field Manual Decryption API
 const submitLeadSchema = z.object({

@@ -574,13 +574,6 @@ export const reviewForumReportFn = createServerFn({ method: 'POST' })
     return reviewForumReportHandler(args)
   })
 
-export const getPodcastsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .handler(async (args) => {
-    const { getPodcastsHandler } = await import('./db-services')
-    return getPodcastsHandler(args)
-  })
-
 const submitLeadSchema = z.object({
   email: z.string().email('Valid email telemetry is required for decryption transmission.'),
   source: z.string().optional().default('moltmax_guide'),

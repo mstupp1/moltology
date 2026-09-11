@@ -652,7 +652,7 @@ export function WelcomeSplash({ userName, onDismiss, initialStep = 1 }: WelcomeS
         {/* Hidden audio element */}
         <audio
           ref={audioRef}
-          src={getAssetUrl('podcasts/the-larval-condition.m4a')}
+          src={getAssetUrl('audio/benthic-ambient-loop.mp3')}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={(e) => setDuration((e.target as HTMLAudioElement).duration)}
           onEnded={handleEnded}

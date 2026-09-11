@@ -16,7 +16,7 @@ Arguments:
 Options:
   -f, --file <file>          Path to a single file to ingest.
   -d, --dir <directory>      Path to a directory of content files.
-  -t, --type <type>          Content type: 'blog' (or 'news'), 'changelog', 'podcast'.
+  -t, --type <type>          Content type: 'blog' (or 'news'), 'changelog'.
                              (Inferred automatically if omitted).
       --dev                  Target local/development database explicitly (reads DEV_DATABASE_URL).
                              (Defaults to production database if omitted).
@@ -169,7 +169,7 @@ async function runCli() {
 
       if (!args.silent) {
         if (res.success) {
-          const typeLabel = res.type === 'blog' ? 'blog_posts' : res.type === 'changelog' ? 'changelogs' : 'podcasts'
+          const typeLabel = res.type === 'changelog' ? 'changelogs' : 'blog_posts'
           const actionLabel = isDryRun ? 'Validated' : res.action === 'inserted' ? 'Inserted' : 'Updated'
           const cleanNotice = args.clean && !isDryRun ? ' (Source file purged)' : ''
           console.log(`  ✓ [${typeLabel}] ${actionLabel} "${res.title}" (${res.identifier})${cleanNotice} - ${relPath}`)
