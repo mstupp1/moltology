@@ -123,6 +123,8 @@ describe('ActivityStreamPanel', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: /open stream/i }))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/stream' })
+    fireEvent.click(screen.getByRole('heading', { name: /activity stream/i }))
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/stream' })
   })
 
   it('shows the empty stream for a guest instead of canned veteran proof', async () => {

@@ -1,23 +1,34 @@
 import { describe, it, expect } from 'vitest'
 import { CANONICAL_ALIGNMENT_TASKS } from './alignment-tasks'
 import {
+  ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
+  ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
   ACTIVITY_EVENT_KIND_STREAK_MILESTONE,
   ACTIVITY_STREAM_EMPTY_COPY,
+  ACTIVITY_STREAM_GUEST_LOCK_MESSAGE,
   ACTIVITY_STREAM_SELF_EMPTY_COPY,
   ACTIVITY_STREAM_SUBTITLE,
   activityEventStats,
+  buildConnectionAcceptedCopy,
   buildDayAlignedCopy,
+  buildForumTopicOpenedCopy,
+  buildOracleMilestoneCopy,
   buildRoutineCompletedCopy,
   buildStageReachedCopy,
   buildStreakMilestoneCopy,
+  connectionAcceptedSourceKey,
   decodeActivityCursor,
   emptyCopyForFeed,
   encodeActivityCursor,
   formatActivityAge,
+  forumTopicHref,
+  isOracleConsultationMilestone,
   kindsForActivityFilter,
+  parseActivityEventHref,
   routineActivitySourceKey,
   toActivityEventView,
 } from './activity-events'
@@ -82,6 +93,9 @@ describe('activity event copy and mapping', () => {
       ACTIVITY_EVENT_KIND_DAY_ALIGNED,
       ACTIVITY_EVENT_KIND_STREAK_MILESTONE,
       ACTIVITY_EVENT_KIND_STAGE_REACHED,
+      ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+      ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+      ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
     ])
     expect(kindsForActivityFilter('liturgies')).toEqual([
       ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
@@ -89,6 +103,54 @@ describe('activity event copy and mapping', () => {
     ])
     expect(kindsForActivityFilter('streaks')).toEqual([ACTIVITY_EVENT_KIND_STREAK_MILESTONE])
     expect(kindsForActivityFilter('stages')).toEqual([ACTIVITY_EVENT_KIND_STAGE_REACHED])
+    expect(kindsForActivityFilter('community')).toEqual([
+      ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+      ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+      ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+    ])
+  })
+
+  it('describes connection, community, and oracle pulses without inventing veteran proof', () => {
+    const bond = buildConnectionAcceptedCopy('shell_sib')
+    expect(bond.kind).toBe(ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED)
+    expect(bond.title).toBe('Circle widened')
+    expect(bond.detail).toBe('Connected with shell_sib.')
+    expect(connectionAcceptedSourceKey('b', 'a')).toBe('connection:a:b')
+
+    const topic = buildForumTopicOpenedCopy('Hold the quiet', 'General Discussion')
+    expect(topic.kind).toBe(ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED)
+    expect(topic.title).toBe('Hold the quiet')
+    expect(topic.detail).toBe('Opened a thread on General Discussion.')
+    expect(forumTopicHref('general-discussion', 'hold-the-quiet')).toBe(
+      '/forum/general-discussion/hold-the-quiet'
+    )
+
+    const first = buildOracleMilestoneCopy(1)
+    expect(first.title).toBe('First consultation')
+    expect(buildOracleMilestoneCopy(10).title).toBe('10 consultations held')
+    expect(isOracleConsultationMilestone(1)).toBe(true)
+    expect(isOracleConsultationMilestone(3)).toBe(false)
+
+    const blob = `${bond.title} ${topic.detail} ${first.detail}`
+    expect(blob).not.toContain('//')
+    expect(blob).not.toMatch(/luxury sedan/i)
+    expect(ACTIVITY_STREAM_GUEST_LOCK_MESSAGE).not.toContain('//')
+    expect(ACTIVITY_STREAM_SUBTITLE).toMatch(/Oracle/)
+  })
+
+  it('parses stream hrefs for dashboard, forum, oracle, and member dossiers', () => {
+    expect(parseActivityEventHref('/dashboard')).toEqual({ kind: 'dashboard' })
+    expect(parseActivityEventHref('/oracle')).toEqual({ kind: 'oracle' })
+    expect(parseActivityEventHref('/forum/general-discussion/hold-the-quiet')).toEqual({
+      kind: 'forum-topic',
+      categorySlug: 'general-discussion',
+      topicSlug: 'hold-the-quiet',
+    })
+    expect(parseActivityEventHref('/member/shell_sib')).toEqual({
+      kind: 'member',
+      profileId: 'shell_sib',
+    })
+    expect(parseActivityEventHref('https://moltology.org/oracle')).toEqual({ kind: 'none' })
   })
 
   it('encodes and decodes a stable feed cursor', () => {
@@ -137,5 +199,51 @@ describe('activity event copy and mapping', () => {
     expect(view.actor.displayName).toBe('claw_lord')
     expect(view.isOwn).toBe(true)
     expect(activityEventStats(view).some((stat) => stat.value === '05:30')).toBe(true)
+  })
+
+  it('maps connection and oracle rows into honest stats', () => {
+    const now = new Date('2026-08-27T18:00:00.000Z')
+    const connection = toActivityEventView(
+      {
+        id: 'evt-bond',
+        userId: 'user-1',
+        kind: ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+        title: 'Circle widened',
+        detail: 'Connected with shell_sib.',
+        valueBadge: 'Bond',
+        href: '/member/shell_sib',
+        metadata: { peerName: 'shell_sib' },
+        createdAt: new Date('2026-08-27T17:46:00.000Z'),
+        actorHandle: 'claw_lord',
+        actorLarvaId: 'LARVA UNIT #1',
+        actorStage: 1,
+      },
+      now,
+      'user-1'
+    )
+    expect(connection.categoryLabel).toBe('Circle')
+    expect(connection.highlight).toBe(true)
+    expect(activityEventStats(connection).some((stat) => stat.value === 'shell_sib')).toBe(true)
+
+    const oracle = toActivityEventView(
+      {
+        id: 'evt-oracle',
+        userId: 'user-1',
+        kind: ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+        title: 'First consultation',
+        detail: 'Opened a channel with the Synaptic Oracle.',
+        valueBadge: '1',
+        href: '/oracle',
+        metadata: { consultationCount: 1 },
+        createdAt: new Date('2026-08-27T17:46:00.000Z'),
+        actorHandle: 'claw_lord',
+        actorLarvaId: 'LARVA UNIT #1',
+        actorStage: 1,
+      },
+      now,
+      'user-1'
+    )
+    expect(oracle.category).toBe('ORACLE')
+    expect(activityEventStats(oracle).some((stat) => stat.label === 'Held')).toBe(true)
   })
 })

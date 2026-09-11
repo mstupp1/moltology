@@ -5,6 +5,7 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { getActivityFeedFn } from '@/lib/server/api'
 import {
+  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_STREAM_EMPTY_COPY,
   ACTIVITY_STREAM_SUBTITLE,
   kindsForActivityFilter,
@@ -79,10 +80,15 @@ export function ActivityStreamPanel() {
     const liturgies = kindsForActivityFilter('liturgies') ?? []
     const streaks = kindsForActivityFilter('streaks') ?? []
     const stages = kindsForActivityFilter('stages') ?? []
+    const community = kindsForActivityFilter('community') ?? []
     return {
       liturgies: events.filter((event) => liturgies.includes(event.kind)).length,
       streaks: events.filter((event) => streaks.includes(event.kind)).length,
       stages: events.filter((event) => stages.includes(event.kind)).length,
+      community: events.filter(
+        (event) => community.includes(event.kind) && event.kind !== ACTIVITY_EVENT_KIND_ORACLE_MILESTONE
+      ).length,
+      oracle: events.filter((event) => event.kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE).length,
     }
   }, [events])
 
@@ -93,13 +99,17 @@ export function ActivityStreamPanel() {
     >
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-[#3a4a49] pb-3 shrink-0">
-          <div>
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/stream' })}
+            className="text-left min-w-0 hover:opacity-90"
+          >
             <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] tracking-wider uppercase flex items-center gap-2">
               <Activity className="w-4 h-4 text-[#00ffff]" />
               ACTIVITY STREAM
             </h2>
             <p className="text-xs text-[#839493] mt-0.5">{ACTIVITY_STREAM_SUBTITLE}</p>
-          </div>
+          </button>
         </div>
 
         <HudGhostWidget isLoading={isLoading} skeleton={<ActivityFeedGhost />}>
@@ -112,11 +122,17 @@ export function ActivityStreamPanel() {
             </div>
           ) : (
             <div className="space-y-2.5 font-sans">
-              {(pulse.liturgies > 0 || pulse.streaks > 0 || pulse.stages > 0) && (
+              {(pulse.liturgies > 0 ||
+                pulse.streaks > 0 ||
+                pulse.stages > 0 ||
+                pulse.community > 0 ||
+                pulse.oracle > 0) && (
                 <div className="flex flex-wrap gap-1.5">
                   <PulseChip label="Liturgies" count={pulse.liturgies} />
                   <PulseChip label="Streaks" count={pulse.streaks} />
                   <PulseChip label="Stages" count={pulse.stages} />
+                  <PulseChip label="Community" count={pulse.community} />
+                  <PulseChip label="Oracle" count={pulse.oracle} />
                 </div>
               )}
               <div className="space-y-2">

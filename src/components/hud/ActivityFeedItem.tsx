@@ -1,12 +1,16 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
-import { CheckCircle2, Clock, Flame, Layers, Sparkles } from 'lucide-react'
+import { CheckCircle2, Clock, Flame, Layers, MessageSquare, Sparkles, Users } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import {
+  ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
+  ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
   ACTIVITY_EVENT_KIND_STREAK_MILESTONE,
   activityEventStats,
+  parseActivityEventHref,
   type ActivityEventView,
 } from '@/lib/activity-events'
 import { memberDossierLocation } from '@/lib/member-handle'
@@ -22,6 +26,15 @@ function KindIcon({ kind }: { kind: string }) {
   if (kind === ACTIVITY_EVENT_KIND_DAY_ALIGNED) {
     return <Sparkles className="w-3.5 h-3.5 text-[#00ffff]" />
   }
+  if (kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED) {
+    return <Users className="w-3.5 h-3.5 text-[#00ffff]" />
+  }
+  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED) {
+    return <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
+  }
+  if (kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE) {
+    return <Sparkles className="w-3.5 h-3.5 text-[#c4b5fd]" />
+  }
   return <CheckCircle2 className="w-3.5 h-3.5 text-[#00ffff]" />
 }
 
@@ -34,16 +47,63 @@ function EventTitleLink({
   className?: string
   children: React.ReactNode
 }) {
-  if (event.href === '/pipeline') {
+  const parsed = parseActivityEventHref(event.href)
+  if (parsed.kind === 'pipeline') {
     return (
       <Link to="/pipeline" className={className}>
         {children}
       </Link>
     )
   }
-  if (event.href === '/dashboard') {
+  if (parsed.kind === 'dashboard') {
     return (
       <Link to="/dashboard" className={className}>
+        {children}
+      </Link>
+    )
+  }
+  if (parsed.kind === 'connections') {
+    return (
+      <Link to="/connections" className={className}>
+        {children}
+      </Link>
+    )
+  }
+  if (parsed.kind === 'oracle') {
+    return (
+      <Link to="/oracle" className={className}>
+        {children}
+      </Link>
+    )
+  }
+  if (parsed.kind === 'forum') {
+    return (
+      <Link to="/forum" className={className}>
+        {children}
+      </Link>
+    )
+  }
+  if (parsed.kind === 'forum-board') {
+    return (
+      <Link to="/forum/$categorySlug" params={{ categorySlug: parsed.categorySlug }} className={className}>
+        {children}
+      </Link>
+    )
+  }
+  if (parsed.kind === 'forum-topic') {
+    return (
+      <Link
+        to="/forum/$categorySlug/$topicSlug"
+        params={{ categorySlug: parsed.categorySlug, topicSlug: parsed.topicSlug }}
+        className={className}
+      >
+        {children}
+      </Link>
+    )
+  }
+  if (parsed.kind === 'member') {
+    return (
+      <Link to="/member/$profileId" params={{ profileId: parsed.profileId }} className={className}>
         {children}
       </Link>
     )
@@ -63,6 +123,9 @@ function kindAccent(kind: string): string {
   if (kind === ACTIVITY_EVENT_KIND_STREAK_MILESTONE) return 'border-[#f59e0b]/45'
   if (kind === ACTIVITY_EVENT_KIND_STAGE_REACHED) return 'border-[#00c3ff]/45'
   if (kind === ACTIVITY_EVENT_KIND_DAY_ALIGNED) return 'border-[#00ffff]/40'
+  if (kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED) return 'border-[#00ffff]/45'
+  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED) return 'border-[#00ffff]/40'
+  if (kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE) return 'border-[#c4b5fd]/40'
   return 'border-[#3a4a49]'
 }
 

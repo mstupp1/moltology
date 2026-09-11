@@ -3,12 +3,22 @@ import {
   deleteRoutineCompletedEvent,
   listActivityEventsForUser,
   listActivityFeed,
+  maybeRecordOracleConsultationMilestone,
+  recordConnectionAcceptedEvent,
+  recordConnectionAcceptedEvents,
   recordDayAlignedEvent,
+  recordForumTopicOpenedEvent,
+  recordOracleConsultationMilestone,
   recordRoutineCompletedEvent,
   recordStageReachedEvent,
   recordStreakMilestoneEvent,
 } from './activity-log'
-import { ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED } from '../activity-events'
+import {
+  ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+  ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+  ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
+} from '../activity-events'
 
 function createMockDb(rows: unknown[] = []) {
   const onConflictDoNothing = vi.fn().mockResolvedValue([])
@@ -90,6 +100,96 @@ describe('activity event log helpers', () => {
     const mock = createMockDb()
     await recordStageReachedEvent(mock.db, 'user-1', 1)
     expect(mock.insert).not.toHaveBeenCalled()
+  })
+
+  it('records a connection pulse for each member without inventing a second network', async () => {
+    const mock = createMockDb()
+    await recordConnectionAcceptedEvents(
+      mock.db,
+      { id: 'user-1', handle: 'claw_lord', larvaId: 'LARVA UNIT #1' },
+      { id: 'user-2', handle: 'shell_sib', larvaId: 'LARVA UNIT #2' }
+    )
+    expect(mock.insert).toHaveBeenCalledTimes(2)
+    expect(mock.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'user-1',
+        kind: ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+        title: 'Circle widened',
+        detail: 'Connected with shell_sib.',
+        sourceKey: 'connection:user-1:user-2',
+        href: '/member/shell_sib',
+        visibility: 'friends',
+      })
+    )
+    expect(mock.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'user-2',
+        detail: 'Connected with claw_lord.',
+        href: '/member/claw_lord',
+      })
+    )
+  })
+
+  it('ignores a self-connection instead of writing a pulse', async () => {
+    const mock = createMockDb()
+    await recordConnectionAcceptedEvent(mock.db, 'user-1', { id: 'user-1', handle: 'claw_lord' })
+    expect(mock.insert).not.toHaveBeenCalled()
+  })
+
+  it('records a community thread pulse with a board href', async () => {
+    const mock = createMockDb()
+    await recordForumTopicOpenedEvent(mock.db, 'user-1', {
+      id: 'topic-1',
+      title: 'Hold the quiet',
+      slug: 'hold-the-quiet',
+      categorySlug: 'general-discussion',
+      categoryName: 'General Discussion',
+    })
+    expect(mock.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+        title: 'Hold the quiet',
+        detail: 'Opened a thread on General Discussion.',
+        sourceKey: 'forum_topic:topic-1',
+        href: '/forum/general-discussion/hold-the-quiet',
+        visibility: 'friends',
+      })
+    )
+  })
+
+  it('records oracle milestones only at real consultation counts', async () => {
+    const mock = createMockDb()
+    await recordOracleConsultationMilestone(mock.db, 'user-1', 3, 'thread-3')
+    expect(mock.insert).not.toHaveBeenCalled()
+    await recordOracleConsultationMilestone(mock.db, 'user-1', 1, 'thread-1')
+    expect(mock.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+        title: 'First consultation',
+        sourceKey: 'oracle:1',
+        href: '/oracle',
+        metadata: { consultationCount: 1, threadId: 'thread-1' },
+      })
+    )
+  })
+
+  it('skips oracle pulses when the thread count cannot be read', async () => {
+    const mock = createMockDb()
+    await maybeRecordOracleConsultationMilestone(mock.db, 'user-1', 'thread-1')
+    expect(mock.insert).not.toHaveBeenCalled()
+  })
+
+  it('records the first consultation when one oracle thread already exists', async () => {
+    const mock = createMockDb()
+    mock.whereSelect.mockResolvedValueOnce([{ id: 'thread-1' }])
+    await maybeRecordOracleConsultationMilestone(mock.db, 'user-1', 'thread-1')
+    expect(mock.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+        sourceKey: 'oracle:1',
+        href: '/oracle',
+      })
+    )
   })
 
   it('deletes the matching liturgy event when a completion is undone', async () => {

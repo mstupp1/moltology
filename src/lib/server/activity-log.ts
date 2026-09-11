@@ -1,20 +1,33 @@
 import { and, desc, eq, inArray, like, lt, or } from 'drizzle-orm'
-import { activityEvents, friendships, profiles, type ActivityEventMetadata } from '../../db/schema'
+import { activityEvents, aiThreads, friendships, profiles, type ActivityEventMetadata } from '../../db/schema'
 import { getDb } from '../../db'
 import { CANONICAL_ALIGNMENT_TASKS, TOTAL_ALIGNMENT_TASKS } from '../alignment-tasks'
+import { resolveMemberPublicName } from '../member-handle'
 import {
+  ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
+  ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+  ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
   ACTIVITY_EVENT_KIND_STREAK_MILESTONE,
+  buildConnectionAcceptedCopy,
   buildDayAlignedCopy,
+  buildForumTopicOpenedCopy,
+  buildOracleMilestoneCopy,
   buildRoutineCompletedCopy,
   buildStageReachedCopy,
   buildStreakMilestoneCopy,
+  connectionAcceptedSourceKey,
   dayAlignedSourceKey,
   decodeActivityCursor,
   encodeActivityCursor,
+  forumTopicHref,
+  forumTopicOpenedSourceKey,
+  isOracleConsultationMilestone,
   kindsForActivityFilter,
+  memberActivityHref,
+  oracleMilestoneSourceKey,
   resolveActivityKindMeta,
   routineActivitySourceKey,
   stageReachedSourceKey,
@@ -180,6 +193,112 @@ export async function recordStageReachedEvent(
     },
     href: '/pipeline',
   })
+}
+
+export async function recordConnectionAcceptedEvent(
+  dbClient: Db,
+  userId: string,
+  peer: { id: string; handle?: string | null; larvaId?: string | null }
+): Promise<void> {
+  if (!userId || !peer.id || userId === peer.id) return
+  const peerName = resolveMemberPublicName({
+    userId: peer.id,
+    handle: peer.handle,
+    larvaId: peer.larvaId,
+  })
+  const copy = buildConnectionAcceptedCopy(peerName)
+  await insertActivityEvent(dbClient, {
+    userId,
+    kind: ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
+    title: copy.title,
+    detail: copy.detail,
+    valueBadge: copy.valueBadge,
+    sourceKey: connectionAcceptedSourceKey(userId, peer.id),
+    metadata: {
+      peerUserId: peer.id,
+      peerHandle: peer.handle?.trim() || undefined,
+      peerName,
+    },
+    href: memberActivityHref({ id: peer.id, handle: peer.handle }),
+  })
+}
+
+export async function recordConnectionAcceptedEvents(
+  dbClient: Db,
+  left: { id: string; handle?: string | null; larvaId?: string | null },
+  right: { id: string; handle?: string | null; larvaId?: string | null }
+): Promise<void> {
+  if (!left.id || !right.id || left.id === right.id) return
+  await recordConnectionAcceptedEvent(dbClient, left.id, right)
+  await recordConnectionAcceptedEvent(dbClient, right.id, left)
+}
+
+export async function recordForumTopicOpenedEvent(
+  dbClient: Db,
+  userId: string,
+  topic: {
+    id: string
+    title: string
+    slug: string
+    categorySlug: string
+    categoryName: string
+  }
+): Promise<void> {
+  if (!userId || !topic.id || !topic.slug || !topic.categorySlug) return
+  const copy = buildForumTopicOpenedCopy(topic.title, topic.categoryName)
+  await insertActivityEvent(dbClient, {
+    userId,
+    kind: ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+    title: copy.title,
+    detail: copy.detail,
+    valueBadge: copy.valueBadge,
+    sourceKey: forumTopicOpenedSourceKey(topic.id),
+    metadata: {
+      topicId: topic.id,
+      topicSlug: topic.slug,
+      topicTitle: topic.title,
+      categorySlug: topic.categorySlug,
+      categoryName: topic.categoryName,
+    },
+    href: forumTopicHref(topic.categorySlug, topic.slug),
+  })
+}
+
+export async function recordOracleConsultationMilestone(
+  dbClient: Db,
+  userId: string,
+  consultationCount: number,
+  threadId?: string
+): Promise<void> {
+  if (!userId || !isOracleConsultationMilestone(consultationCount)) return
+  const copy = buildOracleMilestoneCopy(consultationCount)
+  await insertActivityEvent(dbClient, {
+    userId,
+    kind: ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
+    title: copy.title,
+    detail: copy.detail,
+    valueBadge: copy.valueBadge,
+    sourceKey: oracleMilestoneSourceKey(consultationCount),
+    metadata: {
+      consultationCount,
+      threadId,
+    },
+    href: '/oracle',
+  })
+}
+
+export async function maybeRecordOracleConsultationMilestone(
+  dbClient: Db,
+  userId: string,
+  threadId?: string
+): Promise<void> {
+  if (!userId) return
+  const rows = await dbClient
+    .select({ id: aiThreads.id })
+    .from(aiThreads)
+    .where(and(eq(aiThreads.userId, userId), eq(aiThreads.persona, 'oracle')))
+  const consultationCount = Array.isArray(rows) ? rows.length : 0
+  await recordOracleConsultationMilestone(dbClient, userId, consultationCount, threadId)
 }
 
 export async function deleteRoutineCompletedEvent(

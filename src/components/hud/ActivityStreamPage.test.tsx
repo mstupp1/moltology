@@ -145,5 +145,33 @@ describe('ActivityStreamPage', () => {
     await waitFor(() => {
       expect(screen.getByText(ACTIVITY_STREAM_EMPTY_COPY.title)).toBeInTheDocument()
     })
+    expect(screen.queryByText(/luxury sedan/i)).not.toBeInTheDocument()
+  })
+
+  it('requests the Community slice when that filter is selected', async () => {
+    vi.mocked(getActivityFeedFn).mockResolvedValue({ events: [], nextCursor: null })
+    render(<ActivityStreamPage />)
+    await waitFor(() => {
+      expect(getActivityFeedFn).toHaveBeenCalled()
+    })
+    fireEvent.click(screen.getByRole('tab', { name: 'Community' }))
+    await waitFor(() => {
+      expect(
+        vi.mocked(getActivityFeedFn).mock.calls.some((call) => call[0]?.data?.filter === 'community')
+      ).toBe(true)
+    })
+  })
+
+  it('does not fetch a signed-in dump when the viewer has no member id', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: null,
+      isPending: false,
+    } as any)
+    render(<ActivityStreamPage />)
+    await waitFor(() => {
+      expect(screen.getByText(ACTIVITY_STREAM_EMPTY_COPY.title)).toBeInTheDocument()
+    })
+    expect(getActivityFeedFn).not.toHaveBeenCalled()
+    expect(screen.queryByText(/luxury sedan/i)).not.toBeInTheDocument()
   })
 })

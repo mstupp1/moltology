@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { ACTIVITY_STREAM_GUEST_LOCK_MESSAGE, ACTIVITY_STREAM_PAGE_DESCRIPTION } from '@/lib/activity-events'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 
 const LazyActivityStreamPage = lazy(() =>
@@ -12,7 +13,7 @@ function ActivityStreamRoute() {
   return (
     <GuestLockGuard
       featureName="Activity Stream"
-      message="Seeing activity from your circle requires a signed-in account."
+      message={ACTIVITY_STREAM_GUEST_LOCK_MESSAGE}
     >
       <Suspense fallback={<HudWorkspaceGhost />}>
         <LazyActivityStreamPage />
@@ -27,7 +28,7 @@ export const Route = createFileRoute('/_hud/stream')({
     meta: [
       ...privatePageSeo({
         title: 'Activity Stream | Moltology',
-        description: 'See liturgies, streaks, and stage changes from you and your circle.',
+        description: ACTIVITY_STREAM_PAGE_DESCRIPTION,
       }),
     ],
   }),

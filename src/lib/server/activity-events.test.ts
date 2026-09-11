@@ -86,6 +86,17 @@ describe('getActivityFeedHandler', () => {
     expect(page).toEqual({ events: [], nextCursor: null })
   })
 
+  it('accepts the community filter and stays empty-honest when nothing is stored', async () => {
+    const page = await getActivityFeedHandler({
+      data: { scope: 'circle', filter: 'community' },
+      context: {
+        user: { sub: 'empty-member' },
+        db: createFeedDb([]) as any,
+      },
+    })
+    expect(page).toEqual({ events: [], nextCursor: null })
+  })
+
   it('returns a page of circle events with a cursor when asked', async () => {
     const page = await getActivityFeedHandler({
       data: { scope: 'self', filter: 'all', limit: 1 },
