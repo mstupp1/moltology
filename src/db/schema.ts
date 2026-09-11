@@ -811,6 +811,46 @@ export const notifications = pgTable('notifications', {
   }),
 ])
 
+export type SupportTicketCategory =
+  | 'SHELL_INTEGRITY'
+  | 'SESSION_CLEARANCE'
+  | 'MARKET_CREDITS'
+  | 'OTHER'
+
+export type SupportTicketUrgency = 'NORMAL' | 'HIGH' | 'CRITICAL'
+
+export type SupportTicketStatus = 'open' | 'closed'
+
+/**
+ * Signed-in support intake. Members insert/read their own rows.
+ * Guests have no JWT sub, so insert/select fail. Server owner (null claims) can write.
+ */
+export const supportTickets = pgTable('support_tickets', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  handle: text('handle'),
+  subject: text('subject').notNull(),
+  body: text('body').notNull(),
+  category: text('category').$type<SupportTicketCategory>().notNull(),
+  urgency: text('urgency').$type<SupportTicketUrgency>().default('NORMAL').notNull(),
+  status: text('status').$type<SupportTicketStatus>().default('open').notNull(),
+  ipHash: text('ipHash'),
+  emailSentAt: timestamp('emailSentAt'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  index('support_tickets_user_created_idx').on(table.userId, table.createdAt),
+  pgPolicy('support_tickets_owner_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('support_tickets_owner_select_policy', {
+    for: 'select',
+    using: sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
 // Top-of-Funnel Leads & Guide Downloads Table
 export const leads = pgTable('leads', {
   id: uuid('id').defaultRandom().primaryKey(),

@@ -13,6 +13,8 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       readonly DATABASE_URL?: string
+      readonly RESEND_API_KEY?: string
+      readonly RESEND_FROM_EMAIL?: string
       readonly NODE_ENV?: 'development' | 'production' | 'test'
     }
   }

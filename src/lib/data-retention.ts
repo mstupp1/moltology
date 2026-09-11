@@ -235,6 +235,12 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       notes: 'Unconverted leads: anonymize email after the window. Converted rows follow the account.',
     },
     {
+      table: 'support_tickets',
+      retentionClass: 'legal',
+      hotDays: null,
+      notes: 'Member support intake. Keep while the account exists; do not TTL.',
+    },
+    {
       table: 'neon_auth.session',
       retentionClass: 'auth-managed',
       hotDays: null,

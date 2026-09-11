@@ -505,6 +505,19 @@ async function applyRLS() {
       "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)
     );`
 
+    await sql`ALTER TABLE IF EXISTS support_tickets ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS support_tickets_owner_insert_policy ON support_tickets;`
+    await sql`CREATE POLICY support_tickets_owner_insert_policy ON support_tickets FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS support_tickets_owner_select_policy ON support_tickets;`
+    await sql`CREATE POLICY support_tickets_owner_select_policy ON support_tickets FOR SELECT USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    console.log('✓ RLS policies configured for support_tickets table')
+
     // Enable RLS for leads table
     await sql`ALTER TABLE IF EXISTS leads ENABLE ROW LEVEL SECURITY;`
     await sql`DROP POLICY IF EXISTS leads_public_insert_policy ON leads;`

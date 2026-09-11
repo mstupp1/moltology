@@ -59,6 +59,8 @@ describe('table policies', () => {
     expect(byTable.forum_posts.hotDays).toBeNull()
     expect(byTable.blog_posts.hotDays).toBeNull()
     expect(byTable.leads.retentionClass).toBe('legal')
+    expect(byTable.support_tickets.retentionClass).toBe('legal')
+    expect(byTable.support_tickets.hotDays).toBeNull()
   })
 
   it('lengthens Oracle and heatmap windows under the lenient overlay', () => {
