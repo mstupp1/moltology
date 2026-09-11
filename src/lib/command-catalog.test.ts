@@ -11,6 +11,7 @@ import {
   findCatalogCommand,
   newsPagesFromPosts,
   parseSearchTab,
+  scripturePagesFromCanon,
   searchPageLocation,
 } from './command-catalog'
 
@@ -69,7 +70,10 @@ describe('command catalog', () => {
       (cmd) => cmd.id === 'nav-isolation-protocols',
     )
     expect(isolation).toBeDefined()
-    expect(catalogNavigateArgs(isolation!)).toEqual({ to: '/codex' })
+    expect(catalogNavigateArgs(isolation!)).toEqual({
+      to: '/codex/$slug',
+      params: { slug: 'scr-031' },
+    })
     expect(isolation!.to).not.toBe('/isolation')
   })
 
@@ -84,9 +88,26 @@ describe('command catalog', () => {
     expect(PAGES_CATALOG).toEqual(buildPagesCatalog())
     expect(PAGES_CATALOG.map((cmd) => cmd.id)).toEqual([
       ...COMMAND_CATALOG.map((cmd) => cmd.id),
+      ...scripturePagesFromCanon().map((cmd) => cmd.id),
       ...INITIAL_FORUM_CATEGORIES.map((board) => `board-${board.slug}`),
       ...newsPagesFromPosts(INITIAL_BLOG_POSTS).map((cmd) => cmd.id),
     ])
+  })
+
+  it('opens a scripture search hit on the stable Codex slug', () => {
+    const hits = filterCommandCatalog('SCR-010')
+    const scripture = hits.find((cmd) => cmd.id === 'codex-scr-010')
+    expect(scripture?.label).toBe('Read Scripture: The Law of Ecdysis')
+    expect(catalogNavigateArgs(scripture!)).toEqual({
+      to: '/codex/$slug',
+      params: { slug: 'scr-010' },
+    })
+
+    const covenant = filterCommandCatalog('SCR-013').find((cmd) => cmd.id === 'codex-scr-013')
+    expect(catalogNavigateArgs(covenant!)).toEqual({
+      to: '/codex/$slug',
+      params: { slug: 'scr-013' },
+    })
   })
 
   it('includes forum boards and recent news titles from existing seed loaders', () => {
@@ -121,6 +142,7 @@ describe('command catalog', () => {
   it('finds a stored page recent on the shared catalog, including boards', () => {
     expect(findCatalogCommand('nav-oracle')?.to).toBe('/oracle')
     expect(findCatalogCommand('board-rules-announcements')?.to).toBe('/forum/$categorySlug')
+    expect(findCatalogCommand('codex-scr-010')?.to).toBe('/codex/$slug')
     expect(findCatalogCommand('')).toBeUndefined()
   })
 

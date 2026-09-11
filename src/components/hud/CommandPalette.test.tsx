@@ -178,6 +178,21 @@ describe('CommandPalette Component', () => {
     expect(screen.queryByTestId('command-palette-overlay')).not.toBeInTheDocument()
   })
 
+  it('opens a Codex scripture hit from the overlay on the stable slug path', () => {
+    render(<ToastProvider><CommandPalette /></ToastProvider>)
+
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    fireEvent.change(screen.getByPlaceholderText(/Type a command or search protocol/i), {
+      target: { value: 'SCR-010' },
+    })
+    fireEvent.click(screen.getByText('Read Scripture: The Law of Ecdysis'))
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: '/codex/$slug',
+      params: { slug: 'scr-010' },
+    })
+  })
+
   it('lets guests jump pages without leaking people rows', async () => {
     vi.mocked(searchMembersFn).mockResolvedValue([clawLord])
     render(<ToastProvider><CommandPalette /></ToastProvider>)

@@ -133,11 +133,23 @@ describe('SearchPage', () => {
     renderSearch({ query: 'isolation', type: 'pages' })
     expect(screen.getByText('Open the Isolation Protocols')).toBeInTheDocument()
     fireEvent.click(screen.getByText('Open the Isolation Protocols'))
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: '/codex/$slug',
+      params: { slug: 'scr-031' },
+    })
 
     renderSearch({ query: 'news', type: 'pages' })
     expect(screen.getByText('Open MoltNation News')).toBeInTheDocument()
     expect(screen.getAllByText(/Read Dispatch:/).length).toBeGreaterThan(0)
+  })
+
+  it('opens a Codex scripture hit on the stable slug path', () => {
+    renderSearch({ query: 'SCR-010', type: 'pages' })
+    fireEvent.click(screen.getByText('Read Scripture: The Law of Ecdysis'))
+    expect(mockNavigate).toHaveBeenCalledWith({
+      to: '/codex/$slug',
+      params: { slug: 'scr-010' },
+    })
   })
 
   it('opens a forum board from Pages with the board route params', () => {

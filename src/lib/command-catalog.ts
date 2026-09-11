@@ -1,4 +1,9 @@
 import { INITIAL_BLOG_POSTS } from './blog-data'
+import { CANONICAL_SCRIPTURES } from './codexData'
+import {
+  isolationProtocolsSlug,
+  scriptureSlugFromId,
+} from './codex-links'
 import { INITIAL_FORUM_CATEGORIES } from './forum-seed-data'
 
 export const COMMAND_CATEGORIES = ['Navigation', 'Rituals', 'System', 'Boards', 'News'] as const
@@ -31,6 +36,7 @@ export type CommandNavTo =
   | '/'
   | '/dashboard'
   | '/codex'
+  | '/codex/$slug'
   | '/lectures'
   | '/market'
   | '/subterranean'
@@ -118,7 +124,8 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     label: 'Open the Isolation Protocols',
     category: 'Navigation',
     icon: 'isolation',
-    to: '/codex',
+    to: '/codex/$slug',
+    params: { slug: isolationProtocolsSlug() },
     keywords: ['isolation', 'dome', 'privacy shell', 'perimeter'],
   },
   {
@@ -306,17 +313,36 @@ export function newsPagesFromPosts(
     }))
 }
 
+export function scripturePagesFromCanon(
+  scriptures: Array<{ id: string; title: string; category?: string }> = CANONICAL_SCRIPTURES,
+): CommandCatalogItem[] {
+  return scriptures.map((scripture) => {
+    const slug = scriptureSlugFromId(scripture.id)
+    return {
+      id: `codex-${slug}`,
+      label: `Read Scripture: ${scripture.title}`,
+      category: 'Navigation',
+      icon: 'codex',
+      to: '/codex/$slug',
+      params: { slug },
+      keywords: [scripture.id, scripture.title, scripture.category ?? '', 'scripture', 'liturgy'],
+    }
+  })
+}
+
 /**
  * Pages result source for overlay + /search?type=pages.
- * HUD chambers from COMMAND_CATALOG, plus seed Forum boards and recent News titles
- * already used by existing loaders (no schema, no migrate.yml).
+ * HUD chambers from COMMAND_CATALOG, plus seed Forum boards, recent News titles,
+ * and canonical scriptures already used by the Codex reader (no schema, no migrate.yml).
  */
 export function buildPagesCatalog(options?: {
   boards?: Array<{ slug: string; name: string; description?: string }>
   news?: Array<{ slug: string; title: string; publishedAt?: string }>
+  scriptures?: Array<{ id: string; title: string; category?: string }>
 }): CommandCatalogItem[] {
   return [
     ...COMMAND_CATALOG,
+    ...scripturePagesFromCanon(options?.scriptures ?? CANONICAL_SCRIPTURES),
     ...boardPagesFromCategories(options?.boards ?? INITIAL_FORUM_CATEGORIES),
     ...newsPagesFromPosts(options?.news ?? INITIAL_BLOG_POSTS),
   ]
@@ -330,7 +356,8 @@ function catalogHaystack(cmd: CommandCatalogItem): string {
 
 /**
  * Shared Pages filter. Empty query lists first-class chambers so overlay and /search
- * stay scannable. Typed queries also search Forum boards and recent News titles.
+ * stay scannable. Typed queries also search Forum boards, recent News titles, and
+ * canonical scriptures.
  */
 export function filterCommandCatalog(
   query: string,
