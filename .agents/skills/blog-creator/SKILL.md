@@ -21,7 +21,7 @@ Sibling folders beside `ready/`:
 
 | `ready/` state | Action |
 | :--- | :--- |
-| One or more ingest-ready markdown files | Pick the **oldest**. Use that file's body as the article. Skip topic ideation, exploration vectors, and archetype shopping. Continue with image generation, ingest, ledger, and Instagram. |
+| One or more ingest-ready markdown files | Pick the **oldest**. Use that file's body as the article. Skip topic ideation, exploration vectors, and archetype shopping. Continue with image generation, ingest, ledger, and optional companion social handoff. |
 | `ready/` is empty, missing, or has no valid markdown | **STOP.** Skip the day. Do not write a fallback article. Do not run exploration vectors. Do not generate images. Do not ingest. End the morning run. |
 
 There is no ideation matrix in this skill. An empty `ready/` folder is a successful no-op, not a prompt to invent a post.
@@ -50,11 +50,11 @@ Transparent PNG mascot cutouts are hosted in the Neon S3 public assets bucket un
 
 ---
 
-## 6-Step Production Workflow
+## 5-Step Production Workflow (Plus Companion Social Handoff)
 
 ### Step 1: Pull the Oldest Ready Article from Google Drive (Non-Negotiable)
 
-Do this before any image, draft, ingest, or Instagram work. Do not skip it. Do not invent a topic if the folder is empty.
+Do this before any image, draft, or ingest work. Do not skip it. Do not invent a topic if the folder is empty.
 
 #### 1. Locate the news folders
 Using Google Drive tools (`search_files`, then `read_file_content` / `download_file_content`):
@@ -82,7 +82,7 @@ If `ready/` does not exist, cannot be opened, or contains **no ingest-ready mark
 3. Do not write a fallback article.
 4. Do not browse the web for a topic.
 5. Do not select an exploration vector, author persona, or editorial archetype.
-6. Do not generate images, ingest, update ledgers, or queue Instagram.
+6. Do not generate images, ingest, or update ledgers.
 
 An empty `ready/` folder is the correct end state for that morning.
 
@@ -233,117 +233,31 @@ Append the newly published article into `content/news/blog-history.json`:
 
 ---
 
-### Step 6: Multi-Channel Social Distribution (Web Composite ➔ Google Flow ➔ Zernio API Queue)
+### Step 6: Companion Social Handoff & Skill Chaining (Modular)
 
-Create high-conversion accompanying Instagram carousel slides (3 to 5 slides) and publish them to Instagram via Zernio. Base the carousel on the **selected ready article**, not on a newly invented topic.
+Once an article is successfully ingested into Neon PostgreSQL, assets uploaded to S3, and recorded in `content/news/blog-history.json`, **the blog publishing lifecycle is complete**.
 
-#### 1. The Core Mental Model: Composite Scaffolding ➔ Google Flow Polish ➔ Zernio API
+Social media distribution is modular and cleanly decoupled from the blog publishing engine. Depending on your distribution goals, you can immediately chain or independently trigger one or more companion skills using the published article's slug (`<slug>`):
 
-To maintain consistent visual mastery across all social carousels:
-
-* **Stage 1: The 2D Canvas Composite is ONLY a Mockup (Scaffolding)**:
-  - The 2D canvas composite is strictly a **layout blueprint / structural storyboard** (native 3:4 `1080x1440` matching Google Flow portrait mode).
-  - It positions the typography, data metrics, comparison tables, flowchart nodes, character cutouts, and background into their designated spatial coordinates.
-  - **Non-Negotiable Rule**: A raw 2D canvas composite is **NEVER a finished deliverable**. It must NEVER be uploaded directly to S3 or staged into the production queue as the final post.
-
-* **Stage 2: The Google Flow AI Polish Pass (User Handoff Directives)**:
-  - The agent renders the 2D scaffolding slides to `tmp/mockup_slide_1.png`, `tmp/mockup_slide_2.png`, `tmp/mockup_slide_3.png`.
-  - The agent **prompts the USER** with rich, ready-to-copy **Google Flow prompt directives** for each slide:
-    1. **Photorealistic 3D Glassmorphic HUD**: Transforms flat 2D graphic boxes into rich, visually captivating 3D glassmorphic HUD interfaces with glowing neon bezel traces (#00ffff / #ef4444) and tactile depth while preserving legibility.
-    2. **NO WASTED SPACE**: Enforce dense, purposeful visual composition; fill negative voids with atmospheric subsea god rays, subtle organic micro-bubbles, water caustics, and micro-telemetry circuit traces.
-    3. **Seamless Mascot Blending**: Render cartoon crustacean characters with soft matte chitin textures, casting realistic ambient environmental lighting and contact shadows without harsh backlights or artificial halo outlines.
-    4. **Refined 3D Typography**: Blend headline and metric typography into the scene with subtle luminescence and volumetric bloom.
-
+#### 1. Accompanying Instagram Carousel (Multi-Slide Editorial Breakdown)
+Use the dedicated **`instagram-carousel-creator`** skill to generate a high-conversion 3-to-5 slide storytelling deck (`1080x1440` native 3:4 portrait) derived directly from this article:
+```bash
+# Generate 3-slide composite scaffolding and Google Flow prompt directives:
+npm run carousel:create -- --article <slug>
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 1: 2D Canvas Composite (THE MOCKUP SCAFFOLDING)       │
-│  - Spatial layout of headlines, metrics, and data charts     │
-│  - Low information density (max 1–2 focal points per slide)  │
-│  - Character cutout & vector watermark placement             │
-│  - Output: tmp/mockup_slide_<N>.png                          │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                               ▼ (Agent Prompts User)
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 2: User Polish Pass (Google Flow AI)                  │
-│  - User uploads slide scaffolding into Google Flow           │
-│  - Uses rich enhancement prompt directives from agent        │
-│  - Enforces NO WASTED SPACE with volumetric caustics & depth │
-│  - Turns flat cards into glowing glassmorphic 3D HUD panels  │
-│  - User saves outputs to tmp/polished_slide_<N>.png          │
-└──────────────────────────────┬───────────────────────────────┘
-                               │
-                               ▼ (User Drops Assets Back)
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 3: Deterministic S3 Ingest, Zernio Queue & 1st Comment│
-│  - Preserves full-frame (never force-crop 3:4 to 4:5)        │
-│  - Agent runs npm run carousel:create with --polished-slides │
-│  - CLI uploads polished slides to Neon S3                    │
-│  - CLI queues carousel via Zernio REST API (6a84b76d2421e968)│
-│  - CLI automatically posts algorithmic First Comment         │
-│  - Updates narrative continuity ledger                       │
-│  - NO MANUAL MCP CALLS REQUIRED                              │
-└──────────────────────────────────────────────────────────────┘
-```
-
-#### 2. Narrative Storytelling Arc & Low-Density Rule (Max 1–2 Key Takeaways Per Slide)
-
-* **Rule of Low Information Density**: Mobile viewers scan in 1–2 seconds. **NEVER clutter slides with walls of text, multi-bullet paragraphs, or redundant cards.** Each slide must present a single high-impact visual supported by 1–2 clean takeaways max.
-* **3-Slide Story Arc Structure**:
-  * **Slide 1 (The Hook & Bottleneck)**:
-    - *Narrative*: Expose the structural friction or failure of legacy terrestrial systems.
-    - *Visual*: Dark, high-contrast glitch/red-tinged aesthetic or dramatic bottleneck schematic.
-    - *Content*: Punchy hook headline + ONE stark comparison metric (e.g. 14.2ms lag vs 0.11ms).
-  * **Slide 2 (The Breakthrough Mechanism / Visual Chart)**:
-    - *Narrative*: Reveal the underlying bio-silicon / benthic architecture that solves the problem.
-    - *Visual*: Unique architectural diagram, latent flow chart, or data visualization (e.g. 3-tier pipeline, bandwidth spectrum, or energy curve).
-    - *Content*: 2 crisp mechanism callouts highlighting how it works (not generic bullet text).
-  * **Slide 3 (The Impact, Transformation & Protocol CTA)**:
-    - *Narrative*: Demonstrate real-world performance gain and provide the next ascension step.
-    - *Visual*: Clean hero victory shot / calibrated robotic carapace or deep research console.
-    - *Content*: 1 dominant benchmark achievement (e.g. "+120x compute gain / 99.7% fidelity") + prominent CTA to read the full breakdown on MoltNation News.
-
-#### 3. Golden Rule: Unique Bespoke Visual Theme per Slide (No Cloned Backgrounds)
-
-* **Unique Scene per Slide**: Every single slide MUST feature a distinct, bespoke 3D background matching its narrative phase (e.g. Slide 1: turbulent/glitchy terrestrial hardware, Slide 2: clean cyan synaptic latent space / blueprint, Slide 3: hyperbaric abyssal research bay or robotic carapace).
-* **Strict Anti-Cloning Rule**: NEVER reuse the same background image file across Slide 1, Slide 2, and Slide 3.
-
-#### 4. Typography & Card Layout Hierarchy
-
-* **No Tacky Square HUD Corner Ticks**: NEVER draw square corner brackets or tick marks on text cards, modals, or overlays. Keep all card styling clean, minimal, modern, and sleek with smooth rounded corners (`roundRect`).
-* **Non-Dense Formatting**: Keep text concise, bold, and readable at mobile scale (headlines at 48–54px, display numbers at 28–54px).
-* **Category Badge (Top Left)**: Rounded pill badge with glowing cyan border (`bold 14px monospace`).
-* **High-Contrast Glassmorphic Cards**: Dark translucent cards (`rgba(4, 20, 32, 0.90)`) with glowing neon borders (Crimson `#EF4444` for legacy bottlenecks, Neon Cyan `#00FFE6` for benthic breakthroughs, Sky Blue `#38BDF8` or Amber `#F59E0B` for protocols).
-* **Clean Footer Navigation & Emblem**:
-  * Left: `SWIPE FOR ARCHITECTURE ➔` or `SWIPE FOR PROTOCOLS ➔` in muted silver (`#64748B`).
-  * Right: Official MoltNation shield watermark badge.
-
-#### 5. Social Copy Rules (Curiosity + Hard Numbers + Character Flavor)
-* **The Hook**: Lead with an intriguing premise and a striking statistic.
-* **Drop "Dispatch"**: Do not refer to posts as "dispatches" on social channels. Use natural, compelling language (*"Why AI is breaking out of the screen"*, *"The 500MW problem nobody is talking about"*).
-* **Succinct Value Bullets**: Provide 2-3 fast, high-impact takeaways backed by stats (e.g. "+272% YoY surge", "120 Hz direct torque loop", "21.4 PB/s memory bandwidth").
-* **Stronger CTA**: Give a compelling reason to visit the site (*"See the full teardown and hardware schematics at moltology.org/news. Link in bio."*).
-
-#### 6. Mandatory AI-Generated Media Labeling
-* **Strict Tenet**: Always enable `isAiGenerated: true` for Instagram/Meta in `platformSpecificData`.
-
-#### 7. One-Command Execution via Web-Native Composite Studio (`carousel:create`)
-
-1. **Step 1: Generate Scaffolding & Google Flow Directives**:
+Follow the `instagram-carousel-creator` workflow:
+1. Provide the user with the 3 scaffolding image paths and rich Google Flow enhancement prompt directives.
+2. Once the user drops the polished slides into `tmp/`, resume deterministic S3 upload and Zernio queueing:
    ```bash
-   npm run carousel:create -- --theme <theme> --mascot lobster_pointing
+   npm run carousel:create -- --article <slug> --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png
    ```
-   This automatically renders all 3 slides using the **Web-Native Composite Studio** (Headless Chrome 2x Retina):
-   - Slide 1: `SocialHookSlide` (`hook`)
-   - Slide 2: `SocialSpecShowdownSlide` (`spec-showdown`)
-   - Slide 3: `SocialDirectivesSlide` (`directives`)
-   And prints out tailored **Google Flow Prompt Directives** for each slide.
 
-2. **Step 2: User Runs Google Flow & Drops Polished Slides**:
-   User generates the 3 polished slides in Google Flow and drops them into `tmp/` (e.g. `tmp/polished_slide1.png`, `tmp/polished_slide2.png`, `tmp/polished_slide3.png`).
+#### 2. Short-Form Vertical Video (Reels & Shorts)
+To produce an accompanying high-impact 9:16 vertical video dispatch highlighting the article's core thesis:
+* For daily single-topic video broadcasts, use the **`daily-reels-and-shorts-creator`** skill (`npm run reel:create`).
+* For episodic cinematic narrative shorts with subtitle burn-in, use the **`viral-reel-series-creator`** skill (`npm run series:create`).
 
-3. **Step 3: Resume S3 Upload & Deterministic Zernio Queueing (All-In-One)**:
-   ```bash
-   npm run carousel:create -- --theme <theme> --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png
-   ```
-   *(This automatically uploads the 3 polished slides to Neon S3 `images/social/carousels/...`, deterministically stages the carousel into the dedicated Zernio Queue `6a84b76d2421e968ac81f5bc` via the Zernio REST API, posts the algorithmic first comment, and appends the post ID and slot time to `content/social/instagram-post-history.json`. Never invoke Zernio MCP tools manually).*
+#### 3. Single Direct-Response Lead Magnet Post
+If the article pairs with a tactical diagnostic audit, quiz, or direct-response download:
+* Use the **`instagram-post-creator`** skill (`npm run post:create`) to generate a single-image high-conversion lead magnet card targeting the daily queue.
+

@@ -9,7 +9,12 @@ description: >-
 
 # Instagram Post Creator Pipeline (Web Composite ➔ Google Flow ➔ Zernio API Queue)
 
-This skill automates the complete lifecycle of Moltology static Instagram posts (4:5 Portrait `1080x1350` / 1:1 Square `1080x1080`) and **high-converting direct-response lead magnets** using the **Web-Native High-DPI Composite Studio**, structured **Google Flow AI visual polish prompt handoff**, Neon S3 storage, and deterministic staging into the **Zernio queue via REST API**.
+This skill automates the complete lifecycle of Moltology **single-image static Instagram posts** (3:4 Portrait `1080x1440` / 4:5 Portrait `1080x1350` / 1:1 Square `1080x1080`) and **high-converting direct-response lead magnets** using the **Web-Native High-DPI Composite Studio**, structured **Google Flow AI visual polish prompt handoff**, Neon S3 storage, and deterministic staging into the **Zernio queue via REST API** (`npm run post:create`).
+
+> [!NOTE]
+> **Single Posts vs. Multi-Slide Carousels**:
+> - Use **this skill (`instagram-post-creator`)** for single-image direct-response lead magnets (e.g. guide, quiz, app, codex, routine) scheduled into the **Daily Queue** (`6a8d93576f0e96efe2960c91`).
+> - For **multi-slide editorial carousels** (3–5 slides covering Hook, Spec Showdown, Directives, or blog companions), use the **[`instagram-carousel-creator`](../instagram-carousel-creator/SKILL.md)** skill (`npm run carousel:create`) scheduled into the **Carousels Queue** (`6a84b76d2421e968ac81f5bc`).
 
 ---
 

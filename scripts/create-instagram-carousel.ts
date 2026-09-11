@@ -916,9 +916,10 @@ export async function createInstagramCarousel(options: CreateCarouselOptions = {
   console.log(`1. Upload each slide scaffolding image to Google Flow.`)
   console.log(`2. Paste each slide's prompt directive into Google Flow.`)
   console.log(`3. Save polished slides to tmp/ (e.g. 'tmp/polished_slide1.png', 'tmp/polished_slide2.png', 'tmp/polished_slide3.png').`)
-  console.log(`4. Run this command to upload to S3 and queue to Zernio:`)
-  const targetTheme = blogPost ? `ecdysis --article ${blogPost.slug}` : theme
-  console.log(`   npm run carousel:create -- --theme ${targetTheme} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png`)
+  const resumeCmd = blogPost
+    ? `npm run carousel:create -- --article ${blogPost.slug} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png`
+    : `npm run carousel:create -- --theme ${theme} --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png`
+  console.log(`   ${resumeCmd}`)
   console.log(`==============================================================================\n`)
 
   return {
