@@ -7,7 +7,6 @@ import { resolveMemberPublicName } from '../member-handle'
 import {
   SUPPORT_TICKET_BODY_MAX,
   SUPPORT_TICKET_BODY_MIN,
-  SUPPORT_TICKET_CATEGORIES,
   SUPPORT_TICKET_COPY,
   SUPPORT_TICKET_HONEYPOT_FIELD,
   SUPPORT_TICKET_IP_LIMIT,
@@ -16,7 +15,6 @@ import {
   SUPPORT_TICKET_SUBJECT_MAX,
   SUPPORT_TICKET_SUBJECT_MIN,
   SUPPORT_TICKET_TURNSTILE_ACTION,
-  SUPPORT_TICKET_URGENCIES,
   formatSupportTicketReference,
   isSupportTicketHoneypotTriggered,
   parseSupportTicketCategory,
@@ -30,8 +28,8 @@ import { resolveWriteAuth } from './write-auth'
 export const createSupportTicketSchema = z.object({
   subject: z.string().min(1).max(SUPPORT_TICKET_SUBJECT_MAX + 64),
   body: z.string().min(1).max(SUPPORT_TICKET_BODY_MAX + 256),
-  category: z.enum(SUPPORT_TICKET_CATEGORIES).optional(),
-  urgency: z.enum(SUPPORT_TICKET_URGENCIES).optional(),
+  category: z.string().max(64).optional(),
+  urgency: z.string().max(32).optional(),
   turnstileToken: z.string().optional(),
   [SUPPORT_TICKET_HONEYPOT_FIELD]: z.string().optional(),
   to: z.string().optional(),

@@ -25,6 +25,7 @@ import { ChangelogFilterBar } from '@/components/changelog/ChangelogFilterBar'
 import { HudPagination } from '@/components/ui/HudPagination'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 import SupportTicketForm from '@/components/hud/SupportTicketForm'
+import { SUPPORT_TICKET_COPY } from '@/lib/support-tickets'
 
 export default function SupportPortalView({ loaderData }: { loaderData: any }) {
   // loaderData passed as prop
@@ -246,7 +247,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
             }`}
           >
             <Send className="w-3.5 h-3.5" />
-            <span>SUBMIT NEURAL TICKET</span>
+            <span>{SUPPORT_TICKET_COPY.formTitle}</span>
           </button>
 
           <button
@@ -494,7 +495,7 @@ export default function SupportPortalView({ loaderData }: { loaderData: any }) {
           <div className="flex items-center gap-2 border-b border-[#3a4a49] pb-3">
             <Send className="w-5 h-5 text-[#00ffff]" />
             <h2 className="font-grotesk text-sm font-bold text-[#dfe3e3] uppercase tracking-wider">
-              Transmit a support ticket
+              {SUPPORT_TICKET_COPY.formTitle}
             </h2>
           </div>
 

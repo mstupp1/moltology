@@ -894,8 +894,8 @@ export const markNotificationReadFn = createServerFn({ method: 'POST' })
 const createSupportTicketSchema = z.object({
   subject: z.string().min(1),
   body: z.string().min(1),
-  category: z.enum(['SHELL_INTEGRITY', 'SESSION_CLEARANCE', 'MARKET_CREDITS', 'OTHER']).optional(),
-  urgency: z.enum(['NORMAL', 'HIGH', 'CRITICAL']).optional(),
+  category: z.string().max(64).optional(),
+  urgency: z.string().max(32).optional(),
   turnstileToken: z.string().optional(),
   molt_bait_field: z.string().optional(),
   to: z.string().optional(),

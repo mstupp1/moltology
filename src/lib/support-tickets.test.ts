@@ -2,12 +2,18 @@ import { describe, expect, it } from 'vitest'
 import {
   SUPPORT_INBOX,
   SUPPORT_TICKET_BODY_MAX,
+  SUPPORT_TICKET_CATEGORIES,
+  SUPPORT_TICKET_CATEGORY_LABELS,
   SUPPORT_TICKET_COPY,
+  SUPPORT_TICKET_URGENCIES,
+  SUPPORT_TICKET_URGENCY_LABELS,
   formatSupportTicketReference,
   isSupportTicketHoneypotTriggered,
   parseSupportTicketCategory,
   parseSupportTicketUrgency,
   sanitizeSupportTicketText,
+  supportTicketCategoryLabel,
+  supportTicketUrgencyLabel,
   validateSupportTicketFields,
 } from './support-tickets'
 
@@ -45,9 +51,46 @@ describe('support ticket intake helpers', () => {
 
   it('falls unknown category and urgency back to safe defaults', () => {
     expect(parseSupportTicketCategory('NEON_AUTH')).toBe('OTHER')
-    expect(parseSupportTicketCategory('SHELL_INTEGRITY')).toBe('SHELL_INTEGRITY')
+    expect(parseSupportTicketCategory('SHELL_INTEGRITY')).toBe('OTHER')
+    expect(parseSupportTicketCategory('ACCOUNT')).toBe('ACCOUNT')
+    expect(parseSupportTicketCategory('billing')).toBe('BILLING')
     expect(parseSupportTicketUrgency('IMMEDIATE')).toBe('NORMAL')
     expect(parseSupportTicketUrgency('HIGH')).toBe('HIGH')
+    expect(parseSupportTicketUrgency('URGENT')).toBe('URGENT')
+    expect(parseSupportTicketUrgency('CRITICAL')).toBe('URGENT')
+  })
+
+  it('uses plain scalable topic and priority labels', () => {
+    expect(SUPPORT_TICKET_CATEGORIES).toEqual(['ACCOUNT', 'BILLING', 'BUG', 'OTHER'])
+    expect(SUPPORT_TICKET_URGENCIES).toEqual(['NORMAL', 'HIGH', 'URGENT'])
+    expect(SUPPORT_TICKET_CATEGORY_LABELS).toEqual({
+      ACCOUNT: 'Account & sign-in',
+      BILLING: 'Billing & purchases',
+      BUG: "Something's broken",
+      OTHER: 'Something else',
+    })
+    expect(SUPPORT_TICKET_URGENCY_LABELS).toEqual({
+      NORMAL: 'Normal',
+      HIGH: 'High',
+      URGENT: 'Urgent',
+    })
+    expect(supportTicketCategoryLabel('SHELL_INTEGRITY')).toBe('Something else')
+    expect(supportTicketUrgencyLabel('CRITICAL')).toBe('Urgent')
+  })
+
+  it('keeps locked form copy in plain English', () => {
+    expect(SUPPORT_TICKET_COPY.formTitle).toBe('Contact support')
+    expect(SUPPORT_TICKET_COPY.formHint).toBe("We'll read every ticket and reply by email.")
+    expect(SUPPORT_TICKET_COPY.subjectLabel).toBe('Subject')
+    expect(SUPPORT_TICKET_COPY.categoryLabel).toBe('Topic')
+    expect(SUPPORT_TICKET_COPY.urgencyLabel).toBe('Priority')
+    expect(SUPPORT_TICKET_COPY.bodyLabel).toBe('Tell us what happened')
+    expect(SUPPORT_TICKET_COPY.submit).toBe('Send')
+    expect(SUPPORT_TICKET_COPY.submitting).toBe('Sending')
+    expect(SUPPORT_TICKET_COPY.successBody('abc-123')).toBe(
+      "We got your ticket. Reference abc-123. We'll email you when there's an update.",
+    )
+    expect(SUPPORT_TICKET_COPY.guestTitle).toBe('Sign in to contact support')
   })
 
   it('treats a filled honeypot as triggered and a blank one as clean', () => {

@@ -21,7 +21,7 @@ describe('support ticket mail', () => {
       memberEmail: 'claw@moltology.org',
       subject: 'Chassis freeze',
       body: 'The vault would not open.',
-      category: 'SHELL_INTEGRITY',
+      category: 'ACCOUNT',
       urgency: 'HIGH',
     })
 
@@ -29,8 +29,28 @@ describe('support ticket mail', () => {
     expect(text).toContain('Member id: member-9')
     expect(text).toContain('Handle: claw_lord')
     expect(text).toContain('Member email: claw@moltology.org')
+    expect(text).toContain('Topic: Account & sign-in')
+    expect(text).toContain('Priority: High')
     expect(text).toContain('Subject: Chassis freeze')
     expect(text).toContain('The vault would not open.')
+    expect(text).not.toMatch(/SHELL_INTEGRITY|Critical breach|Benthic|Dispatch|Transmit/)
+  })
+
+  it('renders legacy CRITICAL as Urgent and unknown topics as Something else', () => {
+    const text = renderSupportTicketEmailText({
+      ticketId: 'ticket-2',
+      memberId: 'member-9',
+      handle: 'claw_lord',
+      subject: 'Cannot sign in',
+      body: 'The sign-in page stays blank.',
+      category: 'SESSION_CLEARANCE',
+      urgency: 'CRITICAL',
+    })
+
+    expect(text).toContain('Topic: Something else')
+    expect(text).toContain('Priority: Urgent')
+    expect(text).not.toContain('CRITICAL')
+    expect(text).not.toContain('SESSION_CLEARANCE')
   })
 
   it('skips sending when no Resend key is configured', async () => {
@@ -44,7 +64,7 @@ describe('support ticket mail', () => {
       handle: 'claw_lord',
       subject: 'Chassis freeze',
       body: 'The vault would not open.',
-      category: 'SHELL_INTEGRITY',
+      category: 'ACCOUNT',
       urgency: 'HIGH',
     })
 
@@ -67,7 +87,7 @@ describe('support ticket mail', () => {
       memberEmail: 'claw@moltology.org',
       subject: 'Chassis freeze',
       body: 'The vault would not open.',
-      category: 'SHELL_INTEGRITY',
+      category: 'ACCOUNT',
       urgency: 'HIGH',
       to: 'attacker@evil.test',
       recipient: 'other@evil.test',
