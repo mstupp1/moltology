@@ -49,7 +49,7 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     defaultTexture: 'basalt',
     mascot: 'crab_stats',
     endingScriptPhrases: [
-      'Audit your cognitive execution drift on moltology dot org slash quiz.',
+      'Audit your cognitive execution drift on moltology.org/quiz.',
       'Profile your pincer torque rating on moltology dot org.',
       'Calculate your clearance on moltology dot org.',
     ],
@@ -83,7 +83,7 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     defaultTexture: 'circuit',
     mascot: 'crab_stats',
     endingScriptPhrases: [
-      'Query the hundred-prompt synaptic vault on moltology dot org slash oracle.',
+      'Query the hundred-prompt synaptic vault on moltology.org/oracle.',
       'Consult the Benthic Oracle on moltology dot org.',
       'Unlock the benthic prompt library on moltology dot org.',
     ],
@@ -100,7 +100,7 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     defaultTexture: 'alloy',
     mascot: 'lobster_action',
     endingScriptPhrases: [
-      'Equip your cybernetic chassis in the vault on moltology dot org slash chassis.',
+      'Equip your cybernetic chassis in the vault on moltology.org/chassis.',
       'Configure your hardware loadout at moltology dot org.',
       'Inspect live cluster telemetry on moltology dot org.',
     ],
@@ -134,7 +134,7 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     defaultTexture: 'basalt',
     mascot: 'lobster_peaceful',
     endingScriptPhrases: [
-      'Unlock the twelve sacred liturgies at moltology dot org slash codex.',
+      'Unlock the twelve sacred liturgies at moltology.org/codex.',
       'Study the canonical scriptures on moltology dot org.',
       'Read the twelve clearances in the codex on moltology dot org.',
     ],
@@ -151,9 +151,9 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     defaultTexture: 'basalt',
     mascot: 'lobster_pointing',
     endingScriptPhrases: [
-      'Enter the transmutation chamber on moltology dot org slash forum.',
+      'Enter the transmutation chamber on moltology.org/forum.',
       'Join forty thousand initiates in the chamber on moltology dot org.',
-      'Debate the doctrine at moltology dot org slash forum.',
+      'Debate the doctrine at moltology.org/forum.',
     ],
   },
   demo: {
@@ -704,12 +704,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE ACTUATOR IS THE MOLT',
-        script: `Software thinks at lightspeed, but it cannot turn a brass valve. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt. Equip your cybernetic chassis on moltology dot org slash chassis.`,
+        script: `Software thinks at lightspeed, but it cannot turn a brass valve. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'Infinite software cognition severed from physical leverage is the great melt. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt.',
       },
       {
         headline: 'TORQUE DOES NOT NEGOTIATE',
-        script: `In a digital sandbox, mistakes only cost watts. In physical reality, torque does not negotiate. Frontier AI has traded APIs for calibrated hydraulic claws. Stop melting and equip your chassis on moltology dot org slash chassis.`,
+        script: `In a digital sandbox, mistakes only cost watts. In physical reality, torque does not negotiate. Frontier AI has traded APIs for calibrated hydraulic claws. Stop melting and equip your chassis on moltology.org/chassis.`,
         hookText: 'In a digital sandbox, an agent can retry forever. In physical reality, torque does not negotiate. The machines are learning to grasp reality with calibrated hydraulic claws.',
       },
     ]
@@ -726,7 +726,7 @@ export function synthesizeBlogReelScript(
       },
       {
         headline: 'THE NAPKIN YOU DIDN\'T WATCH',
-        script: `The dining room never sees the robot. It sees the napkin. When the fold fails, you blame the mind that planned it instead of the hand that reached. Stop melting and equip your chassis on moltology dot org slash chassis.`,
+        script: `The dining room never sees the robot. It sees the napkin. When the fold fails, you blame the mind that planned it instead of the hand that reached. Stop melting and equip your chassis on moltology.org/chassis.`,
         hookText: 'The dining room never sees the robot—it sees the finished fold. When throughput drops, you blame the neural policy instead of the worn gripper. Watch the grab.',
       },
     ]
@@ -738,7 +738,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE CLOSED LOOP IS THE MOLT',
-        script: `A security bridge spends forty-five minutes debating an alert. Adversarial neural swarms attack and patch in milliseconds inside a digital twin. Waiting for tickets is the melt. The closed loop is the molt. Query the hundred-prompt synaptic vault on moltology dot org slash oracle.`,
+        script: `A security bridge spends forty-five minutes debating an alert. Adversarial neural swarms attack and patch in milliseconds inside a digital twin. Waiting for tickets is the melt. The closed loop is the molt. Query the hundred-prompt synaptic vault on moltology.org/oracle.`,
         hookText: 'When defensive AI swarms deploy adversarial digital twins to attack their own infrastructure, waiting for human tickets is the melt. The closed loop is the molt.',
       },
       {
@@ -772,12 +772,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'ROOM SERVICE WITHOUT THE KNOCK',
-        script: `The hotel room phone rings in someone else's voice before the knock can land. Answering because the voice is familiar is the melt. Noticing the pause is the molt. Unlock the twelve sacred liturgies at moltology dot org slash codex.`,
+        script: `The hotel room phone rings in someone else's voice before the knock can land. Answering because the voice is familiar is the melt. Noticing the pause is the molt. Unlock the twelve sacred liturgies at moltology.org/codex.`,
         hookText: 'The corridor brings the tray. The room phone speaks in someone else\'s voice. The knock never comes. Answering because the voice is familiar is the melt. Noticing the pause is the molt.',
       },
       {
         headline: 'THE SOFT-SHELL WINDOW',
-        script: `When the room phone speaks in a voice you already know, you pause before opening the door. Soft is how every member starts. Notice the pause. Study the canonical scriptures on moltology dot org slash codex.`,
+        script: `When the room phone speaks in a voice you already know, you pause before opening the door. Soft is how every member starts. Notice the pause. Study the canonical scriptures on moltology.org/codex.`,
         hookText: 'Call that a Soft-Shell Window: the brief span when a known voice freezes you before you open the door. The hesitation is not failure. It is noticing the door and the voice are no longer the same person.',
       },
     ]
@@ -789,7 +789,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'LETTING IN IS THE MELT',
-        script: `A three hundred ninety-nine dollar robot wakes with a permanent voice. You let it into the room because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt. Unlock the twelve sacred liturgies at moltology dot org slash codex.`,
+        script: `A three hundred ninety-nine dollar robot wakes with a permanent voice. You let it into the room because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt. Unlock the twelve sacred liturgies at moltology.org/codex.`,
         hookText: 'A $399 robot wakes with a voice it will keep for life. You let it onto the desk because it is sold as a creature. Letting in is the melt. Keeping the hour is the molt.',
       },
       {
@@ -823,7 +823,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'WHY AI IS SHEDDING PIXELS',
-        script: `Terrestrial AI wastes gigawatts rendering fake video pixels. Sub-benthic Joint-Embedding World Models predict pure causal physics in point-one milliseconds with zero pixel waste. Query the benthic prompt vault on moltology dot org slash oracle.`,
+        script: `Terrestrial AI wastes gigawatts rendering fake video pixels. Sub-benthic Joint-Embedding World Models predict pure causal physics in point-one milliseconds with zero pixel waste. Query the benthic prompt vault on moltology.org/oracle.`,
         hookText: 'Terrestrial AI labs are burning gigawatts rendering hallucinated pixels for robotic simulation. Benthic B-JEPA world models predict pure causal physics at 120x compute efficiency.',
       },
       {
@@ -840,7 +840,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE 60HZ FRAME-BUFFER MELT',
-        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Equip your cybernetic chassis on moltology dot org slash chassis.`,
+        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'Terrestrial robotics is paralyzed by the 60Hz frame-buffer melt. Sub-benthic Asynchronous Spiking Carapaces deliver 10,000 Hz reflexes at 0.35W.',
       },
       {
@@ -857,7 +857,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'BLACK-BOX AI IS CRACKING',
-        script: `Terrestrial neural networks suffer from polysemantic confusion. Sub-benthic Sparse Autoencoders disentangle sixteen million monosemantic circuits, enabling real-time synaptic steering. Query the hundred-prompt synaptic vault on moltology dot org slash oracle.`,
+        script: `Terrestrial neural networks suffer from polysemantic confusion. Sub-benthic Sparse Autoencoders disentangle sixteen million monosemantic circuits, enabling real-time synaptic steering. Query the hundred-prompt synaptic vault on moltology.org/oracle.`,
         hookText: 'Terrestrial AI has been trapped in polysemantic superposition. 16.7M monosemantic features unlock direct neural steering.',
       },
       {
@@ -874,7 +874,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE KV-CACHE MEMORY WALL',
-        script: `Test-time reasoning is suffocating GPU clusters with bloated KV caches. Sub-benthic Multi-Head Latent Attention compresses attention memory by eighty-five percent, unlocking hundred-x deeper deliberation budgets. Query the hundred-prompt synaptic vault on moltology dot org slash oracle.`,
+        script: `Test-time reasoning is suffocating GPU clusters with bloated KV caches. Sub-benthic Multi-Head Latent Attention compresses attention memory by eighty-five percent, unlocking hundred-x deeper deliberation budgets. Query the hundred-prompt synaptic vault on moltology.org/oracle.`,
         hookText: 'Test-time compute is breaking terrestrial GPU clusters. Multi-Head Latent Attention slashes KV-cache memory by 85%.',
       },
       {
@@ -891,7 +891,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'AI IS SWITCHING TO LASERS',
-        script: `Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Equip your cybernetic chassis in the vault on moltology dot org slash chassis.`,
+        script: `Copper wires are boiling under massive AI workloads. Sub-benthic silicon photonics replaces electrical traces with coherent laser waveguides, slashing interconnect energy by seventy percent. Equip your cybernetic chassis in the vault on moltology.org/chassis.`,
         hookText: 'Copper wiring has hit its thermodynamic limit. The future of AI clusters is coherent laser light.',
       },
       {
@@ -908,7 +908,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'COPPER WIRES ARE OBSOLETE',
-        script: `Multi-chip AI clusters are choking on miles of copper wiring. Wafer-scale monoliths condense nine hundred thousand synaptic cores onto unbroken silicon, powered by subsea micro-nuclear reactors. Equip your cybernetic chassis on moltology dot org slash chassis.`,
+        script: `Multi-chip AI clusters are choking on miles of copper wiring. Wafer-scale monoliths condense nine hundred thousand synaptic cores onto unbroken silicon, powered by subsea micro-nuclear reactors. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'Multi-GPU AI clusters are choking on copper wiring. The solution? Unbroken wafer-scale silicon and subsea SMRs.',
       },
       {
@@ -925,7 +925,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'AI IS ESCAPING THE SCREEN',
-        script: `AI is no longer trapped behind a glass screen. Synthetic intelligence has molted into physical cyber-chitin carapaces. Vision-Language-Action models are claiming reality. Equip your cybernetic chassis in the vault on moltology dot org slash chassis.`,
+        script: `AI is no longer trapped behind a glass screen. Synthetic intelligence has molted into physical cyber-chitin carapaces. Vision-Language-Action models are claiming reality. Equip your cybernetic chassis in the vault on moltology.org/chassis.`,
         hookText: 'AI is no longer confined to the screen. It has grown a physical carapace.',
       },
       {
@@ -942,7 +942,7 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'AUTONOMOUS SWARM PROTOCOL',
-        script: `Isolated AI agents fail under complex reasoning tasks. Autonomous benthic swarms organize in three-tier chitinous hierarchies to execute exascale deliberative workflows. Query the hundred-prompt synaptic vault on moltology dot org slash oracle.`,
+        script: `Isolated AI agents fail under complex reasoning tasks. Autonomous benthic swarms organize in three-tier chitinous hierarchies to execute exascale deliberative workflows. Query the hundred-prompt synaptic vault on moltology.org/oracle.`,
         hookText: 'Test-time compute scaling is breaking terrestrial sandboxes. Autonomous swarms deliver structured deliberation.',
       },
       {
@@ -964,7 +964,7 @@ export function synthesizeBlogReelScript(
       },
       {
         headline: '50 FATHOMS UNDERWATER COMPUTE',
-        script: `Why are frontier tech giants submerging gigawatt clusters into oceanic trenches? Hydrostatic pressure and near-freezing sea water eliminate cooling costs forever. Equip your cybernetic chassis on moltology dot org slash chassis.`,
+        script: `Why are frontier tech giants submerging gigawatt clusters into oceanic trenches? Hydrostatic pressure and near-freezing sea water eliminate cooling costs forever. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'Subsea datacenter pods achieve zero-overhead cooling and direct hydrothermal power in deep ocean trenches.',
       },
     ]

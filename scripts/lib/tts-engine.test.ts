@@ -248,9 +248,9 @@ describe('TTS Engine Utilities', () => {
   it('guarantees moltology dot org slash codex is aligned to moltology.org/codex without leaking "slash"', () => {
     const script = 'Unlock the twelve sacred liturgies at moltology dot org slash codex.'
     const tokens = tokenizeScriptText(script)
-    expect(tokens).toEqual(['Unlock', 'the', 'twelve', 'sacred', 'liturgies', 'at', 'moltology.org/', 'codex.'])
+    expect(tokens).toEqual(['Unlock', 'the', 'twelve', 'sacred', 'liturgies', 'at', 'moltology.org/codex.'])
 
-    const rawTtsWords: WordBoundaryEvent[] = [
+    const rawTtsWordsWithSlash: WordBoundaryEvent[] = [
       { word: 'Unlock', startMs: 8710, endMs: 9070, durationMs: 360 },
       { word: 'the', startMs: 9070, endMs: 9140, durationMs: 70 },
       { word: 'twelve', startMs: 9140, endMs: 9500, durationMs: 360 },
@@ -264,31 +264,49 @@ describe('TTS Engine Utilities', () => {
       { word: 'codex', startMs: 12140, endMs: 12940, durationMs: 800 },
     ]
 
-    const aligned = alignWordsWithOriginalText(rawTtsWords, script)
-    expect(aligned.map((w) => w.word)).toEqual([
+    const alignedWithSlash = alignWordsWithOriginalText(rawTtsWordsWithSlash, script)
+    expect(alignedWithSlash.map((w) => w.word)).toEqual([
       'Unlock',
       'the',
       'twelve',
       'sacred',
       'liturgies',
       'at',
-      'moltology.org/',
-      'codex.',
+      'moltology.org/codex.',
     ])
 
-    // Verify duration spans
-    const urlDomain = aligned.find((w) => w.word === 'moltology.org/')!
-    expect(urlDomain.startMs).toBe(10570)
-    expect(urlDomain.endMs).toBe(12140) // Consumed through "slash"
+    const urlToken = alignedWithSlash.find((w) => w.word === 'moltology.org/codex.')!
+    expect(urlToken.startMs).toBe(10570)
+    expect(urlToken.endMs).toBe(12940)
 
-    const urlPath = aligned.find((w) => w.word === 'codex.')!
-    expect(urlPath.startMs).toBe(12140)
-    expect(urlPath.endMs).toBe(12940)
+    // Verify when speaker does not say "slash" (e.g. Fish Audio on moltology.org/codex)
+    const rawTtsWordsWithoutSlash: WordBoundaryEvent[] = [
+      { word: 'Unlock', startMs: 8710, endMs: 9070, durationMs: 360 },
+      { word: 'the', startMs: 9070, endMs: 9140, durationMs: 70 },
+      { word: 'twelve', startMs: 9140, endMs: 9500, durationMs: 360 },
+      { word: 'sacred', startMs: 9500, endMs: 9920, durationMs: 420 },
+      { word: 'liturgies', startMs: 9920, endMs: 10420, durationMs: 500 },
+      { word: 'at', startMs: 10420, endMs: 10570, durationMs: 150 },
+      { word: 'moltology', startMs: 10570, endMs: 11300, durationMs: 730 },
+      { word: 'org', startMs: 11300, endMs: 11710, durationMs: 410 },
+      { word: 'codex', startMs: 11710, endMs: 12940, durationMs: 1230 },
+    ]
 
-    // Verify phrase chunking renders moltology.org/codex. together
-    const chunks = chunkWordsIntoPhrases(aligned, 3)
+    const alignedWithoutSlash = alignWordsWithOriginalText(rawTtsWordsWithoutSlash, script)
+    expect(alignedWithoutSlash.map((w) => w.word)).toEqual([
+      'Unlock',
+      'the',
+      'twelve',
+      'sacred',
+      'liturgies',
+      'at',
+      'moltology.org/codex.',
+    ])
+
+    // Verify phrase chunking renders moltology.org/codex. cleanly
+    const chunks = chunkWordsIntoPhrases(alignedWithSlash, 3)
     const lastChunk = chunks[chunks.length - 1]
-    expect(lastChunk.map((w) => w.word)).toEqual(['moltology.org/', 'codex.'])
+    expect(lastChunk.map((w) => w.word)).toEqual(['at', 'moltology.org/codex.'])
 
     // Verify no "slash" word exists in any chunk
     const hasWordSlash = chunks.some((c) => c.some((w) => w.word.toLowerCase() === 'slash'))
