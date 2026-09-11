@@ -46,6 +46,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const [unreadCount, setUnreadCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const mountedRef = useRef(true)
+  const authFailureRef = useRef(false)
 
   useEffect(() => {
     mountedRef.current = true
@@ -54,43 +55,70 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     }
   }, [])
 
+  // Reset auth failure flag whenever active user changes
+  useEffect(() => {
+    authFailureRef.current = false
+  }, [userId])
+
   const refresh = useCallback(async () => {
-    if (!userId) {
-      setNotifications([])
-      setUnreadCount(0)
+    if (!userId || authFailureRef.current) {
+      if (!userId) {
+        setNotifications([])
+        setUnreadCount(0)
+      }
       return
     }
     setIsLoading(true)
     try {
       const token = await getAuthJWTToken()
+      if (!token) {
+        setNotifications([])
+        setUnreadCount(0)
+        return
+      }
       const result = await getNotificationsFn({
-        data: { token: token ?? undefined, userId },
+        data: { token, userId },
       })
       if (!mountedRef.current) return
+      authFailureRef.current = false
       setNotifications(result.notifications)
       setUnreadCount(result.unreadCount)
-    } catch {
-      // Quiet fail — Activity Center still shows toast history
+    } catch (err) {
+      // If unauthenticated or token expired, halt polling until user re-authenticates
+      const message = err instanceof Error ? err.message : String(err)
+      if (
+        message.toLowerCase().includes('unauthenticated') ||
+        message.toLowerCase().includes('authentication required')
+      ) {
+        authFailureRef.current = true
+      }
     } finally {
       if (mountedRef.current) setIsLoading(false)
     }
   }, [userId])
 
   useEffect(() => {
-    void refresh()
     if (!userId) return
 
-    const onFocus = () => {
+    void refresh()
+
+    const onWakeup = () => {
+      if (typeof document !== 'undefined' && document.hidden) return
       void refresh()
     }
+
+    // Skip polling when the tab is hidden / backgrounded to conserve serverless invocations
     const interval = window.setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return
       void refresh()
     }, POLL_MS)
 
-    window.addEventListener('focus', onFocus)
+    window.addEventListener('focus', onWakeup)
+    document.addEventListener('visibilitychange', onWakeup)
     return () => {
       window.clearInterval(interval)
-      window.removeEventListener('focus', onFocus)
+      window.removeEventListener('focus', onWakeup)
+      document.removeEventListener('visibilitychange', onWakeup)
     }
   }, [userId, refresh])
 
@@ -110,9 +138,11 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
   const markRead = useCallback(
     async (notificationId: string) => {
+      if (!userId) return
       const token = await getAuthJWTToken()
+      if (!token) return
       await markNotificationReadFn({
-        data: { notificationId, token: token ?? undefined, userId },
+        data: { notificationId, token, userId },
       })
       setNotifications((prev) =>
         prev.map((n) =>
@@ -125,9 +155,11 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   )
 
   const markAllRead = useCallback(async () => {
+    if (!userId) return
     const token = await getAuthJWTToken()
+    if (!token) return
     await markNotificationReadFn({
-      data: { all: true, token: token ?? undefined, userId },
+      data: { all: true, token, userId },
     })
     setNotifications((prev) =>
       prev.map((n) => ({
@@ -141,11 +173,19 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
   const respond = useCallback(
     async (requestId: string, action: 'accept' | 'reject', notificationId?: string) => {
+      if (!userId) {
+        toast.error('Authentication required.')
+        return
+      }
       persist.begin('notifications')
       try {
         const token = await getAuthJWTToken()
+        if (!token) {
+          toast.error('Authentication required.')
+          return
+        }
         await respondFriendRequestFn({
-          data: { requestId, action, token: token ?? undefined, userId },
+          data: { requestId, action, token, userId },
         })
         if (notificationId) {
           setNotifications((prev) =>
