@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { getTableConfig } from 'drizzle-orm/pg-core'
 import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, memberBonds, notifications } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
@@ -25,6 +26,13 @@ describe('Database Schema & RLS Policies', () => {
     expect(friendships).toBeDefined()
     expect(memberBonds).toBeDefined()
     expect(notifications).toBeDefined()
+  })
+
+  it('uniquely constrains Better Auth provider account pairs', () => {
+    const uniqueNames = getTableConfig(authAccount).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(uniqueNames).toContain('auth_account_provider_account_uidx')
   })
 
   it('defines required fields on friend_requests, friendships, and notifications', () => {

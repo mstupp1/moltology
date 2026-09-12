@@ -39,16 +39,37 @@ export function getAuthJwksUrl(): string {
   return `${getAuthBaseUrl()}/api/auth/jwks`
 }
 
+/**
+ * Explicit public display flag. Vite inlines `VITE_*` into both SSR and the
+ * browser, so this must never read unprefixed `GOOGLE_*` secrets.
+ */
+export function isExplicitPublicFlag(value?: string): boolean | null {
+  if (value === 'true' || value === '1') return true
+  if (value === 'false' || value === '0') return false
+  return null
+}
+
+/**
+ * Build-time value for `VITE_GOOGLE_AUTH_ENABLED`.
+ * An explicit Vite flag wins. Otherwise both server secrets mean "show Google".
+ */
+export function resolveViteGoogleAuthEnabled(env: {
+  VITE_GOOGLE_AUTH_ENABLED?: string
+  GOOGLE_CLIENT_ID?: string
+  GOOGLE_CLIENT_SECRET?: string
+}): 'true' | 'false' {
+  const explicit = isExplicitPublicFlag(env.VITE_GOOGLE_AUTH_ENABLED)
+  if (explicit !== null) return explicit ? 'true' : 'false'
+  return env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? 'true' : 'false'
+}
+
+/**
+ * Client-safe Google button gate. Only `VITE_GOOGLE_AUTH_ENABLED=true|1`.
+ * A raw `VITE_GOOGLE_CLIENT_ID` is not an enable flag.
+ */
 export function isGoogleAuthEnabled(): boolean {
-  if (readProcessEnv('GOOGLE_CLIENT_ID') && readProcessEnv('GOOGLE_CLIENT_SECRET')) {
-    return true
-  }
-  const flag =
-    readProcessEnv('VITE_GOOGLE_AUTH_ENABLED') ||
-    readViteEnv('VITE_GOOGLE_AUTH_ENABLED') ||
-    readViteEnv('VITE_GOOGLE_CLIENT_ID') ||
-    readProcessEnv('VITE_GOOGLE_CLIENT_ID')
-  return flag === 'true' || Boolean(flag && flag !== 'false')
+  const flag = readViteEnv('VITE_GOOGLE_AUTH_ENABLED') || readProcessEnv('VITE_GOOGLE_AUTH_ENABLED')
+  return isExplicitPublicFlag(flag) === true
 }
 
 export function getGoogleClientCredentials(): { clientId: string; clientSecret: string } | null {

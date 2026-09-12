@@ -55,6 +55,7 @@ export const authAccount = pgTable('account', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
   index('auth_account_userId_idx').on(table.userId),
+  uniqueIndex('auth_account_provider_account_uidx').on(table.providerId, table.accountId),
 ])
 
 export const authVerification = pgTable('verification', {

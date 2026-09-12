@@ -5,6 +5,7 @@ import {
   getAuthJwksUrl,
   getGoogleClientCredentials,
   isGoogleAuthEnabled,
+  resolveViteGoogleAuthEnabled,
 } from './auth-config'
 
 const originalEnv = { ...process.env }
@@ -36,7 +37,8 @@ describe('auth-config', () => {
     expect(getAuthBaseUrl()).toBe('https://moltology-git-preview.vercel.app')
   })
 
-  it('enables Google only when both server credentials exist', () => {
+  it('does not treat server Google secrets as a client display flag', () => {
+    delete process.env.VITE_GOOGLE_AUTH_ENABLED
     expect(isGoogleAuthEnabled()).toBe(false)
     expect(getGoogleClientCredentials()).toBeNull()
 
@@ -45,13 +47,40 @@ describe('auth-config', () => {
     expect(getGoogleClientCredentials()).toBeNull()
 
     process.env.GOOGLE_CLIENT_SECRET = 'gsecret'
-    expect(isGoogleAuthEnabled()).toBe(true)
+    expect(isGoogleAuthEnabled()).toBe(false)
     expect(getGoogleClientCredentials()).toEqual({ clientId: 'gid', clientSecret: 'gsecret' })
   })
 
-  it('treats VITE_GOOGLE_AUTH_ENABLED as a client display flag', () => {
+  it('shows Google only for an explicit VITE_GOOGLE_AUTH_ENABLED flag', () => {
     process.env.VITE_GOOGLE_AUTH_ENABLED = 'true'
     expect(isGoogleAuthEnabled()).toBe(true)
     expect(getGoogleClientCredentials()).toBeNull()
+  })
+
+  it('does not treat a raw VITE_GOOGLE_CLIENT_ID as an enable flag', () => {
+    delete process.env.VITE_GOOGLE_AUTH_ENABLED
+    process.env.VITE_GOOGLE_CLIENT_ID = '123456.apps.googleusercontent.com'
+    expect(isGoogleAuthEnabled()).toBe(false)
+  })
+})
+
+describe('resolveViteGoogleAuthEnabled', () => {
+  it('bakes true when both server secrets exist and no flag is set', () => {
+    expect(
+      resolveViteGoogleAuthEnabled({
+        GOOGLE_CLIENT_ID: 'gid',
+        GOOGLE_CLIENT_SECRET: 'gsecret',
+      }),
+    ).toBe('true')
+  })
+
+  it('lets an explicit false flag win over server secrets', () => {
+    expect(
+      resolveViteGoogleAuthEnabled({
+        VITE_GOOGLE_AUTH_ENABLED: 'false',
+        GOOGLE_CLIENT_ID: 'gid',
+        GOOGLE_CLIENT_SECRET: 'gsecret',
+      }),
+    ).toBe('false')
   })
 })
