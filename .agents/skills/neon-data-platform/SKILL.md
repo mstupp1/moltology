@@ -113,7 +113,7 @@ Do **not** wrap `.handler()` behind a helper — see [`src/lib/server/functions.
 ### Auth
 
 - Client session: `sessionRes?.data?.user || (sessionRes as any)?.user` (never `data.user` alone).
-- Writes: `await getAuthJWTToken()` — real Neon JWT only; never opaque session cookies.
+- Writes: `await getAuthJWTToken()` — real Better Auth JWT only; never opaque session cookies.
 - Server: `resolveWriteAuth` ([`src/lib/server/write-auth.ts`](../../../src/lib/server/write-auth.ts)) + owner `getDb()`. Never trust bare `userId` without matching verified JWT `sub`.
 
 ### Client write loop

@@ -4,6 +4,7 @@ import { resolveWriteAuth } from './write-auth'
 vi.mock('../jwt', () => ({
   looksLikeJwt: (token?: string | null) =>
     !!token && token.split('.').length === 3 && token.split('.').every((p) => p.length > 0),
+  verifyAuthJWT: vi.fn(),
   verifyNeonJWT: vi.fn(),
 }))
 
@@ -15,7 +16,7 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { verifyNeonJWT } from '../jwt'
+import { verifyAuthJWT } from '../jwt'
 import { ensureUserProfile } from '../user-sync'
 import { getDb } from '../../db'
 
@@ -36,7 +37,7 @@ describe('resolveWriteAuth', () => {
   })
 
   it('verifies data.token when middleware has no user', async () => {
-    vi.mocked(verifyNeonJWT).mockResolvedValue({
+    vi.mocked(verifyAuthJWT).mockResolvedValue({
       valid: true,
       payload: { sub: 'user-from-jwt' },
       error: null,
@@ -47,7 +48,7 @@ describe('resolveWriteAuth', () => {
       context: {},
     })
 
-    expect(verifyNeonJWT).toHaveBeenCalledWith('eyJ.payload.sig')
+    expect(verifyAuthJWT).toHaveBeenCalledWith('eyJ.payload.sig')
     expect(result?.userId).toBe('user-from-jwt')
     expect(getDb).toHaveBeenCalled()
   })

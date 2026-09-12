@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   looksLikeJwt,
   getAuthJWTToken,
-  verifyNeonJWT,
-  NEON_JWKS_URL,
+  verifyAuthJWT,
+  AUTH_JWKS_URL,
   clearCachedJwt,
   jwtAuthHeaders,
   JWT_FETCH_TIMEOUT_MS,
@@ -35,9 +35,9 @@ describe('jwt.ts', () => {
     clearCachedJwt()
   })
 
-  it('defines a valid NEON_JWKS_URL endpoint', () => {
-    expect(NEON_JWKS_URL).toBeDefined()
-    expect(NEON_JWKS_URL).toContain('.well-known/jwks.json')
+  it('defines a Better Auth JWKS endpoint', () => {
+    expect(AUTH_JWKS_URL).toBeDefined()
+    expect(AUTH_JWKS_URL).toContain('/api/auth/jwks')
   })
 
   it('detects compact JWTs and rejects opaque session tokens', () => {
@@ -55,7 +55,7 @@ describe('jwt.ts', () => {
   })
 
   it('returns valid: false for malformed or missing JWT tokens', async () => {
-    const result = await verifyNeonJWT('invalid.jwt.token')
+    const result = await verifyAuthJWT('invalid.jwt.token')
     expect(result.valid).toBe(false)
     expect(result.payload).toBeNull()
     expect(result.error).toBeDefined()

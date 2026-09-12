@@ -45,7 +45,7 @@ Largest tables today: `blog_posts` (248 kB, 20 rows — TOAST), `ai_messages` (1
 | Hot → summarize → delete | Compact, then drop source rows | `routine_completions` |
 | Hot → summarize → archive → delete | Summary in DB, JSONL in private storage, then drop | `ai_messages` (keep `ai_threads` + summary) |
 | Legal | Anonymize, don't hard-delete until the legal window | `leads` |
-| Auth-managed | Do not TTL from app code | `neon_auth.session`, `neon_auth.verification` |
+| Auth-managed | Do not TTL from app code | `session`, `verification`, leftover `neon_auth.session` / `neon_auth.verification` |
 
 ### Lean vs lenient windows
 
@@ -138,9 +138,11 @@ No TTL. Control growth with:
 
 Empty public table, not in `schema.ts`. Drop in a dedicated migration when convenient. Not a storage issue.
 
-### `neon_auth.*`
+### Better Auth + leftover `neon_auth.*`
 
-`verification` shows 0 live / 44 dead rows; `session` 33 live / 32 dead. Leave to autovacuum. Do not write app TTLs against Managed Auth tables.
+Self-hosted Better Auth owns `session`, `account`, `verification`, and `jwks`. Do not write app TTLs against those tables.
+
+Leftover Managed Auth `neon_auth.session` / `neon_auth.verification` can stay until CoS disables Auth on `main`. Leave to autovacuum.
 
 ## Archive storage
 
@@ -179,7 +181,7 @@ Do not enable a snapshot schedule until Launch; the API will reject it on Free.
 GitHub Action, same pattern as Neon’s S3 backup guide:
 
 - Direct (unpooled) `DATABASE_URL`.
-- `pg_dump -Fc` of `neondb` (includes `public` + `neon_auth` + `drizzle`).
+- `pg_dump -Fc` of `neondb` (includes `public` + leftover `neon_auth` + `drizzle`).
 - Upload to `backups/pgdump/neondb-YYYYMMDD.dump` in the private bucket.
 - Delete dumps older than 14 days (lean).
 

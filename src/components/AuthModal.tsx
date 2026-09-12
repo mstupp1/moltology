@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
+import { isGoogleAuthEnabled } from '../lib/auth-config'
 import { useAuthSession } from '../hooks/useAuthSession'
 import { rememberSessionUser, startGoogleSignIn } from '../lib/auth-session'
 import { getAuthJWTToken } from '../lib/jwt'
@@ -134,7 +135,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }
       }
     } catch (err: any) {
-      console.error('Neon Auth Error:', err)
+      console.error('Auth error:', err)
       setError(err?.message || 'Authentication failed. Please try again.')
     } finally {
       setLoading(false)
@@ -213,6 +214,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         )}
 
         {/* Google OAuth Option */}
+        {isGoogleAuthEnabled() && (
         <div className="mb-5 space-y-4">
           <HudButton
             variant="dark"
@@ -248,6 +250,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <span className="bg-[#0a1012] px-3 text-xs text-[#839493] font-bold uppercase tracking-widest absolute">OR</span>
           </div>
         </div>
+        )}
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-4">

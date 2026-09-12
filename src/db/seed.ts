@@ -266,8 +266,8 @@ export async function seedDatabase(databaseUrl?: string) {
   const db = drizzle(client, { schema })
 
   try {
-    // 1. Seed Neon Auth users and Cult Profiles
-    console.log('[SEED] Seeding Neon Auth users & profiles...')
+    // 1. Seed leftover neon_auth users (best-effort) and Cult Profiles
+    console.log('[SEED] Seeding profiles (and leftover neon_auth users if present)...')
     for (const au of MOCK_SEED_AUTH_USERS) {
       try {
         await db.insert(schema.neonAuthUser).values(au).onConflictDoNothing()

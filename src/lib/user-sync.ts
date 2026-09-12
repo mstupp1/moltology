@@ -7,7 +7,7 @@ import { resolveMemberLarvaId, shouldReplacePlaceholderLarvaId } from './larva-i
 export { SUPER_ADMIN_EMAILS }
 
 /**
- * Idempotently ensures a `profiles` and `user_stats` row exist for a Neon Auth user id.
+ * Idempotently ensures a `profiles` and `user_stats` row exist for a Better Auth user id.
  * Automatically elevates known super admin accounts in `profiles`.
  * Real members get a unique LARVA UNIT number instead of the shared seed default.
  */
@@ -19,14 +19,24 @@ export async function ensureUserProfile(userId?: string | null) {
     let isSuperAdmin = false
     try {
       const authUserRes = await db.execute(
-        sql`SELECT email FROM neon_auth.user WHERE id::text = ${userId} LIMIT 1`
+        sql`SELECT email FROM "user" WHERE id = ${userId} LIMIT 1`
       )
       const email = (authUserRes?.rows?.[0] as { email?: string } | undefined)?.email
       if (isSuperAdminEmail(email)) {
         isSuperAdmin = true
       }
     } catch {
-      // Fallback if neon_auth.user table cannot be queried directly
+      try {
+        const legacyRes = await db.execute(
+          sql`SELECT email FROM neon_auth.user WHERE id::text = ${userId} LIMIT 1`
+        )
+        const email = (legacyRes?.rows?.[0] as { email?: string } | undefined)?.email
+        if (isSuperAdminEmail(email)) {
+          isSuperAdmin = true
+        }
+      } catch {
+        // Auth user table may be empty during first boot
+      }
     }
 
     const initialRole = isSuperAdmin ? 'super_admin' : 'user'

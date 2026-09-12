@@ -3,11 +3,15 @@ import { handleOracleChatRequest } from './handle-oracle-chat-request'
 import { ORACLE_THREAD_ID_HEADER, ORACLE_UNAVAILABLE_MESSAGE } from './oracle-chat'
 import { ORACLE_MODELS } from './oracle-models'
 
-vi.mock('../jwt', () => ({
-  verifyNeonJWT: vi.fn().mockResolvedValue({ valid: false }),
-  looksLikeJwt: (token?: string | null) =>
-    !!token && token.split('.').length === 3 && token.split('.').every((part) => part.length > 0),
-}))
+vi.mock('../jwt', () => {
+  const verifyAuthJWT = vi.fn().mockResolvedValue({ valid: false })
+  return {
+    verifyAuthJWT,
+    verifyNeonJWT: verifyAuthJWT,
+    looksLikeJwt: (token?: string | null) =>
+      !!token && token.split('.').length === 3 && token.split('.').every((part) => part.length > 0),
+  }
+})
 
 vi.mock('./guardrails', () => ({
   checkRateLimit: vi.fn(() => ({ success: true, remaining: 29, resetMs: 60000 })),
@@ -53,8 +57,8 @@ function makeRequest(body: unknown, init?: RequestInit) {
 }
 
 async function authedRequest(body: unknown) {
-  const { verifyNeonJWT } = await import('../jwt')
-  vi.mocked(verifyNeonJWT).mockResolvedValueOnce({
+  const { verifyAuthJWT } = await import('../jwt')
+  vi.mocked(verifyAuthJWT).mockResolvedValueOnce({
     valid: true,
     payload: { sub: 'usr_from_jwt' },
     error: null,
@@ -117,8 +121,8 @@ describe('handleOracleChatRequest', () => {
   })
 
   it('streams for a Bearer JWT even without body.userId', async () => {
-    const { verifyNeonJWT } = await import('../jwt')
-    vi.mocked(verifyNeonJWT).mockResolvedValueOnce({
+    const { verifyAuthJWT } = await import('../jwt')
+    vi.mocked(verifyAuthJWT).mockResolvedValueOnce({
       valid: true,
       payload: { sub: 'usr_from_jwt' },
       error: null,
@@ -141,7 +145,7 @@ describe('handleOracleChatRequest', () => {
       )
     )
 
-    expect(verifyNeonJWT).toHaveBeenCalledWith(jwt)
+    expect(verifyAuthJWT).toHaveBeenCalledWith(jwt)
     expect(res.status).toBe(200)
     expect(res.headers.get('content-type')).toMatch(/text\/plain/)
     expect(await res.text()).toBe('From JWT')

@@ -13,6 +13,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { isGoogleAuthEnabled } from '@/lib/auth-config'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
 import '@/styles/crt.css'
@@ -147,7 +148,7 @@ export default function AuthView({ search }: { search: any }) {
         }
       }
     } catch (err: any) {
-      console.error('Neon Auth Error:', err)
+      console.error('Auth error:', err)
       setError(err?.message || 'Authentication failed. Please try again.')
     } finally {
       setLoading(false)
@@ -360,6 +361,7 @@ export default function AuthView({ search }: { search: any }) {
               )}
 
               {/* Google OAuth Option */}
+              {isGoogleAuthEnabled() && (
               <div className="mb-5 space-y-4">
                 <HudButton
                   variant="dark"
@@ -397,6 +399,7 @@ export default function AuthView({ search }: { search: any }) {
                   </span>
                 </div>
               </div>
+              )}
 
               {/* Auth Form */}
               <form onSubmit={handleSubmit} className="space-y-4">

@@ -27,7 +27,7 @@ Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js
 
 - **Web**: TanStack Start (SSR), React, Vite, Nitro, Tailwind CSS, shadcn/ui (Radix UI).
 - **Data**: Neon PostgreSQL, Drizzle ORM (`src/db/schema.ts`), RLS via JWT claims.
-- **Auth**: Neon Managed Auth (`src/lib/auth.ts`).
+- **Auth**: Self-hosted Better Auth (`src/lib/auth-server.ts`, `src/lib/auth.ts`).
 
 ### Neon, migrations, seeding, and HUD writes
 

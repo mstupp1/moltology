@@ -1,7 +1,7 @@
 import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
-// Neon Managed Auth Schema Reference
+// Leftover Managed Neon Auth view (do not drop until CoS disables Auth on main).
 export const neonAuthSchema = pgSchema('neon_auth')
 export const neonAuthUser = neonAuthSchema.table('user', {
   id: uuid('id').primaryKey(),
@@ -9,6 +9,74 @@ export const neonAuthUser = neonAuthSchema.table('user', {
   name: text('name'),
   image: text('image'),
   emailVerified: boolean('emailVerified'),
+})
+
+// Self-hosted Better Auth tables. Profiles still key off auth user id.
+export const authUser = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('emailVerified').notNull(),
+  image: text('image'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+})
+
+export const authSession = pgTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+  ipAddress: text('ipAddress'),
+  userAgent: text('userAgent'),
+  userId: text('userId')
+    .notNull()
+    .references(() => authUser.id, { onDelete: 'cascade' }),
+}, (table) => [
+  index('auth_session_userId_idx').on(table.userId),
+])
+
+export const authAccount = pgTable('account', {
+  id: text('id').primaryKey(),
+  accountId: text('accountId').notNull(),
+  providerId: text('providerId').notNull(),
+  userId: text('userId')
+    .notNull()
+    .references(() => authUser.id, { onDelete: 'cascade' }),
+  accessToken: text('accessToken'),
+  refreshToken: text('refreshToken'),
+  idToken: text('idToken'),
+  accessTokenExpiresAt: timestamp('accessTokenExpiresAt'),
+  refreshTokenExpiresAt: timestamp('refreshTokenExpiresAt'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+}, (table) => [
+  index('auth_account_userId_idx').on(table.userId),
+  uniqueIndex('auth_account_provider_account_uidx').on(table.providerId, table.accountId),
+])
+
+export const authVerification = pgTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  createdAt: timestamp('createdAt').defaultNow(),
+  updatedAt: timestamp('updatedAt').defaultNow(),
+}, (table) => [
+  index('auth_verification_identifier_idx').on(table.identifier),
+])
+
+export const authJwks = pgTable('jwks', {
+  id: text('id').primaryKey(),
+  publicKey: text('publicKey').notNull(),
+  privateKey: text('privateKey').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  expiresAt: timestamp('expiresAt'),
+  alg: text('alg'),
+  crv: text('crv'),
 })
 
 export type MemberJoinSource = 'organic' | 'word_of_mouth' | 'brought_in'
@@ -32,7 +100,7 @@ export interface SimulatedPersonaConfig {
   referredByHandle?: string | null
 }
 
-// Moltology Cult User Profiles Table (Extends neon_auth.user with domain stats)
+// Moltology Cult User Profiles Table (extends Better Auth user id with domain stats)
 export const profiles = pgTable('profiles', {
   id: text('id').primaryKey(),
   role: text('role').default('user').notNull(), // 'user' | 'admin' | 'super_admin'

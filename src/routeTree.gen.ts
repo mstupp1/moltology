@@ -63,6 +63,7 @@ import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
 import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
 
@@ -336,6 +337,11 @@ const HudMemberProfileIdRoute = HudMemberProfileIdRouteImport.update({
   path: '/member/$profileId',
   getParentRoute: () => HudRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HudForumCategorySlugIndexRoute =
   HudForumCategorySlugIndexRouteImport.update({
     id: '/forum/$categorySlug/',
@@ -400,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/codex/$slug': typeof HudCodexSlugRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/codex/': typeof HudCodexIndexRoute
   '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
@@ -457,6 +464,7 @@ export interface FileRoutesByTo {
   '/codex/$slug': typeof HudCodexSlugRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/codex': typeof HudCodexIndexRoute
   '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
@@ -516,6 +524,7 @@ export interface FileRoutesById {
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
   '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
@@ -575,6 +584,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/journal/$slug'
     | '/member/$profileId'
+    | '/api/auth/$'
     | '/codex/'
     | '/forum/'
     | '/journal/'
@@ -632,6 +642,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/journal/$slug'
     | '/member/$profileId'
+    | '/api/auth/$'
     | '/codex'
     | '/forum'
     | '/journal'
@@ -690,6 +701,7 @@ export interface FileRouteTypes {
     | '/_hud/codex/$slug'
     | '/_hud/journal/$slug'
     | '/_hud/member/$profileId'
+    | '/api/auth/$'
     | '/_hud/codex/'
     | '/_hud/forum/'
     | '/_hud/journal/'
@@ -730,6 +742,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   ChangelogIndexRoute: typeof ChangelogIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1112,6 +1125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudMemberProfileIdRouteImport
       parentRoute: typeof HudRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_hud/forum/$categorySlug/': {
       id: '/_hud/forum/$categorySlug/'
       path: '/forum/$categorySlug'
@@ -1218,16 +1238,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   ChangelogIndexRoute: ChangelogIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

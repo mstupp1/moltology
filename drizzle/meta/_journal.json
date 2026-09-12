@@ -239,6 +239,20 @@
       "when": 1789096250220,
       "tag": "0033_acoustic_franklin_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1789232462422,
+      "tag": "0034_dusty_supernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1789245839765,
+      "tag": "0035_wild_alice",
+      "breakpoints": true
     }
   ]
 }

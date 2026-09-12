@@ -241,16 +241,28 @@ export function buildTablePolicies(windows: RetentionWindows): TableRetentionPol
       notes: 'Member support intake. Keep while the account exists; do not TTL.',
     },
     {
+      table: 'session',
+      retentionClass: 'auth-managed',
+      hotDays: null,
+      notes: 'Self-hosted Better Auth sessions. Do not TTL from app code; Better Auth owns expiry.',
+    },
+    {
+      table: 'verification',
+      retentionClass: 'auth-managed',
+      hotDays: null,
+      notes: 'Better Auth ephemeral tokens. Leave expiry to Better Auth / autovacuum.',
+    },
+    {
       table: 'neon_auth.session',
       retentionClass: 'auth-managed',
       hotDays: null,
-      notes: 'Managed Auth. Do not TTL from app code. Watch dead tuples / autovacuum.',
+      notes: 'Leftover Managed Auth. Do not TTL. Drop after CoS disables neon_auth.',
     },
     {
       table: 'neon_auth.verification',
       retentionClass: 'auth-managed',
       hotDays: null,
-      notes: 'Ephemeral tokens. High dead-tuple count is expected; leave to autovacuum.',
+      notes: 'Leftover Managed Auth ephemeral tokens. Leave to autovacuum until cutover is complete.',
     },
   ]
 }
