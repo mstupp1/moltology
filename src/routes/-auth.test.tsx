@@ -24,6 +24,10 @@ vi.mock('@tanstack/react-router', () => ({
 
 const AuthRoute = Route.options.component!
 
+vi.mock('@/lib/auth-config', () => ({
+  isGoogleAuthEnabled: () => true,
+}))
+
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     useSession: vi.fn(() => ({ data: null, isPending: false })),

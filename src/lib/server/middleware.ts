@@ -1,5 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start'
-import { looksLikeJwt, verifyNeonJWT } from '../jwt'
+import { looksLikeJwt, verifyAuthJWT } from '../jwt'
 import { ServerError } from './error'
 
 /**
@@ -49,9 +49,26 @@ export const loggingMiddleware = createMiddleware().server(async ({ request, nex
   }
 })
 
+async function resolveSessionUser(request?: Request | null) {
+  if (!request?.headers) return null
+  try {
+    const { auth } = await import('../auth-server')
+    const session = await auth.api.getSession({ headers: request.headers })
+    if (!session?.user?.id) return null
+    return {
+      sub: session.user.id,
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+    }
+  } catch {
+    return null
+  }
+}
+
 /**
- * Middleware enforcing valid Neon Auth JWT authentication.
- * Injects verified user payload, JWT token, and owner db client into context.
+ * Middleware enforcing Better Auth JWT or session-cookie authentication.
+ * Injects verified user payload, JWT token (when present), and owner db client.
  * Callers that cannot send cookies must pass a JWT via Bearer / x-auth-token
  * (or resolve identity in the handler with `data.token` via resolveWriteAuth).
  */
@@ -60,24 +77,25 @@ export const authMiddleware = createMiddleware().server(async ({ request, next, 
   const dataToken = typeof data?.token === 'string' && looksLikeJwt(data.token) ? data.token : null
   const token = headerToken || dataToken
 
-  if (!token) {
+  let user: { sub?: string; id?: string; [key: string]: unknown } | null = null
+  if (token) {
+    const verification = await verifyAuthJWT(token)
+    if (verification.valid && verification.payload) {
+      user = verification.payload
+    }
+  }
+  if (!user) {
+    user = await resolveSessionUser(request)
+  }
+
+  if (!user?.sub && !user?.id) {
     throw new ServerError('Unauthorized - Missing authentication token', 'UNAUTHORIZED', 401)
   }
 
-  const verification = await verifyNeonJWT(token)
-  if (!verification.valid || !verification.payload) {
-    throw new ServerError(
-      verification.error || 'Unauthorized - Invalid or expired token',
-      'UNAUTHORIZED',
-      401,
-    )
-  }
-
-  const user = verification.payload
   const { getDb } = await import('../../db')
   const { ensureUserProfile } = await import('../user-sync')
   const db = getDb()
-  await ensureUserProfile(user.sub)
+  await ensureUserProfile(user.sub || user.id)
 
   return next({
     context: {
@@ -103,15 +121,17 @@ export const optionalAuthMiddleware = createMiddleware().server(async ({ request
   const clientIp = extractClientIp(request)
 
   if (!token) {
-    ctx = { user: null, token: null, db: getDb(), clientIp }
+    const sessionUser = await resolveSessionUser(request)
+    ctx = { user: sessionUser, token: null, db: getDb(), clientIp }
   } else {
-    const verification = await verifyNeonJWT(token)
+    const verification = await verifyAuthJWT(token)
     if (verification.valid && verification.payload) {
       const { ensureUserProfile } = await import('../user-sync')
       await ensureUserProfile(verification.payload.sub)
       ctx = { user: verification.payload, token, db: getDb(), clientIp }
     } else {
-      ctx = { user: null, token: null, db: getDb(), clientIp }
+      const sessionUser = await resolveSessionUser(request)
+      ctx = { user: sessionUser, token: null, db: getDb(), clientIp }
     }
   }
 

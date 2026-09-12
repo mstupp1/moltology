@@ -34,7 +34,23 @@ async function main() {
   // 1. Try matching by profile ID directly
   let updated = await sql`UPDATE profiles SET role = ${role} WHERE id = ${target} RETURNING id;`
 
-  // 2. If not matched by profile ID, check neon_auth.user table for email matching
+  // 2. If not matched by profile ID, check Better Auth user (then leftover neon_auth.user)
+  if (updated.length === 0) {
+    try {
+      const users = await sql`SELECT id FROM "user" WHERE email = ${target} OR id = ${target};`
+      if (users.length > 0) {
+        const userId = users[0].id
+        updated = await sql`
+          INSERT INTO profiles (id, role) VALUES (${userId}, ${role})
+          ON CONFLICT (id) DO UPDATE SET role = ${role}
+          RETURNING id;
+        `
+      }
+    } catch (err) {
+      console.warn('Checking Better Auth user warning:', err)
+    }
+  }
+
   if (updated.length === 0) {
     try {
       const users = await sql`SELECT id FROM neon_auth.user WHERE email = ${target} OR id::text = ${target};`
@@ -54,7 +70,7 @@ async function main() {
   if (updated.length > 0) {
     console.log(`✓ User '${target}' successfully granted role '${role}'!`)
   } else {
-    console.error(`❌ User '${target}' not found in profiles or neon_auth.user tables.`)
+    console.error(`❌ User '${target}' not found in profiles or auth user tables.`)
   }
 }
 

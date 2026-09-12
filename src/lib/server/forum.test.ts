@@ -8,11 +8,15 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-vi.mock('../jwt', () => ({
-  looksLikeJwt: (token?: string | null) =>
-    !!token && token.split('.').length === 3 && token.split('.').every((p) => p.length > 0),
-  verifyNeonJWT: vi.fn(),
-}))
+vi.mock('../jwt', () => {
+  const verifyAuthJWT = vi.fn()
+  return {
+    looksLikeJwt: (token?: string | null) =>
+      !!token && token.split('.').length === 3 && token.split('.').every((p) => p.length > 0),
+    verifyAuthJWT,
+    verifyNeonJWT: verifyAuthJWT,
+  }
+})
 
 import { resetRateLimits } from '../ai/guardrails'
 import { FORUM_LOCKED_ERROR } from '../community-rules'
@@ -35,7 +39,7 @@ import {
   getForumCategoryBySlugHandler,
 } from './db-services'
 import { PLACEHOLDER_LARVA_ID, resolveMemberLarvaId } from '../larva-id'
-import { verifyNeonJWT } from '../jwt'
+import { verifyAuthJWT } from '../jwt'
 
 describe('Forum Server Handlers', () => {
   beforeEach(() => {
@@ -1881,7 +1885,7 @@ describe('Forum author edit and soft-delete', () => {
   })
 
   it('hydrates unread from data.token when middleware has no user', async () => {
-    vi.mocked(verifyNeonJWT).mockResolvedValue({
+    vi.mocked(verifyAuthJWT).mockResolvedValue({
       valid: true,
       payload: { sub: 'user-from-jwt' },
       error: null,
@@ -1948,7 +1952,7 @@ describe('Forum author edit and soft-delete', () => {
       data: { sortBy: 'latest', token: 'eyJ.payload.sig' },
       context: { db: mockDb as any },
     })
-    expect(verifyNeonJWT).toHaveBeenCalledWith('eyJ.payload.sig')
+    expect(verifyAuthJWT).toHaveBeenCalledWith('eyJ.payload.sig')
     expect(signedIn[0].unread).toBe(true)
   })
 

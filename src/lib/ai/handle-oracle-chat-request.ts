@@ -4,7 +4,7 @@ import {
   toTextStream,
 } from 'ai'
 import { extractAuthToken } from '../server/middleware'
-import { verifyNeonJWT } from '../jwt'
+import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
 import { buildSystemPrompt } from './codex-prompt'
 import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle, getOwnedAIThread } from './service'
@@ -76,7 +76,7 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
   const token = extractAuthToken(request)
   let authUserId: string | undefined
   if (token) {
-    const verification = await verifyNeonJWT(token)
+    const verification = await verifyAuthJWT(token)
     if (verification.valid && verification.payload) {
       authUserId = verification.payload.sub || (verification.payload as { id?: string }).id
     }

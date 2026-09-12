@@ -293,7 +293,7 @@ async function applyRLS() {
     `
     console.log('✓ RLS policies configured for friend_requests, friendships, member_bonds, notifications')
 
-    // 4. Create trigger to auto-populate public.profiles on neon_auth.user creation
+    // 4. Auto-populate public.profiles on Better Auth user creation (keep neon_auth trigger if present)
     try {
       await sql`
         CREATE OR REPLACE FUNCTION public.handle_new_neon_user()
@@ -308,17 +308,29 @@ async function applyRLS() {
       `
 
       await sql`
-        DROP TRIGGER IF EXISTS on_neon_auth_user_created ON neon_auth.user;
+        DROP TRIGGER IF EXISTS on_auth_user_created ON "user";
       `
-
       await sql`
-        CREATE TRIGGER on_neon_auth_user_created
-          AFTER INSERT ON neon_auth.user
+        CREATE TRIGGER on_auth_user_created
+          AFTER INSERT ON "user"
           FOR EACH ROW EXECUTE PROCEDURE public.handle_new_neon_user();
       `
-      console.log('✓ Automatic profile creation trigger configured on neon_auth.user')
+      console.log('✓ Automatic profile creation trigger configured on public.user')
+
+      try {
+        await sql`
+          DROP TRIGGER IF EXISTS on_neon_auth_user_created ON neon_auth.user;
+        `
+        await sql`
+          CREATE TRIGGER on_neon_auth_user_created
+            AFTER INSERT ON neon_auth.user
+            FOR EACH ROW EXECUTE PROCEDURE public.handle_new_neon_user();
+        `
+      } catch {
+        // neon_auth may already be gone after Managed Auth cutover
+      }
     } catch (triggerErr) {
-      console.warn('⚠️ Could not attach trigger to neon_auth.user (schema missing or restricted):', triggerErr)
+      console.warn('⚠️ Could not attach profile creation trigger on public.user:', triggerErr)
     }
 
     // Ensure role column exists on profiles table

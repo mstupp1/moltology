@@ -1,19 +1,27 @@
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { authClient } from './auth-client'
-import { env } from '../env'
+import { getAuthJwksUrl } from './auth-config'
 import { peekCachedJwt, setCachedJwt } from './jwt-cache'
 
 export { clearCachedJwt } from './jwt-cache'
 
-export const NEON_JWKS_URL = env.VITE_NEON_JWKS_URL
+export const AUTH_JWKS_URL = getAuthJwksUrl()
+/** @deprecated Use AUTH_JWKS_URL — kept for existing test imports. */
+export const NEON_JWKS_URL = AUTH_JWKS_URL
 
-/** Hung Neon Auth JWT mint must not stall Oracle/HUD polls for minutes. */
+/** Hung JWT mint must not stall Oracle/HUD polls for minutes. */
 export const JWT_FETCH_TIMEOUT_MS = 4_000
 /** Refresh a cached JWT this long before `exp`. */
 export const JWT_CACHE_SKEW_MS = 30_000
 
-// Remote JWKS key set for verifying Neon Auth JWTs server-side or in API handlers
-const JWKS = createRemoteJWKSet(new URL(NEON_JWKS_URL))
+let jwks: ReturnType<typeof createRemoteJWKSet> | null = null
+
+function getJwks() {
+  if (!jwks) {
+    jwks = createRemoteJWKSet(new URL(AUTH_JWKS_URL))
+  }
+  return jwks
+}
 
 /**
  * True when a string looks like a compact JWT (three base64url segments).
@@ -67,16 +75,19 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
 }
 
 /**
- * Verify a JWT issued by Neon Auth using the remote JWKS endpoint.
+ * Verify a JWT issued by self-hosted Better Auth using the local JWKS endpoint.
  */
-export async function verifyNeonJWT(token: string) {
+export async function verifyAuthJWT(token: string) {
   try {
-    const { payload } = await jwtVerify(token, JWKS)
+    const { payload } = await jwtVerify(token, getJwks())
     return { valid: true, payload, error: null }
   } catch (error: any) {
     return { valid: false, payload: null, error: error?.message || 'Invalid JWT token' }
   }
 }
+
+/** @deprecated Use verifyAuthJWT */
+export const verifyNeonJWT = verifyAuthJWT
 
 async function fetchJwtFromClient(): Promise<string | null> {
   const client = authClient as any
@@ -130,12 +141,12 @@ function rememberJwt(token: string, now = Date.now()): string {
 }
 
 /**
- * Get a real Neon Auth JWT for the current session.
+ * Get a Better Auth JWT for the current session.
  * Prefer `authClient.token()` (JWT plugin). Never return opaque
  * session cookies or session IDs — they fail JWKS verification.
  *
  * A hung mint is treated as a miss (null), not a sign-out. A still-valid
- * cached JWT is reused so HUD polls keep working while Neon Auth is slow.
+ * cached JWT is reused so HUD polls keep working while auth is slow.
  */
 export async function getAuthJWTToken(): Promise<string | null> {
   try {
@@ -151,7 +162,7 @@ export async function getAuthJWTToken(): Promise<string | null> {
     if (cached && cached.expMs > now) return cached.token
     return null
   } catch (err) {
-    console.error('Error fetching JWT token from Neon Auth:', err)
+    console.error('Error fetching JWT token from Better Auth:', err)
     const now = Date.now()
     const cached = peekCachedJwt()
     if (cached && cached.expMs > now) return cached.token

@@ -1,6 +1,6 @@
 import type { JWTPayload } from 'jose'
 import { getDb } from '../../db'
-import { looksLikeJwt, verifyNeonJWT } from '../jwt'
+import { looksLikeJwt, verifyAuthJWT } from '../jwt'
 import { ensureUserProfile } from '../user-sync'
 
 type Db = ReturnType<typeof getDb>
@@ -45,7 +45,7 @@ export async function resolveWriteAuth(opts: {
 
   const explicitToken = data?.token
   if (!userId && looksLikeJwt(explicitToken)) {
-    const verification = await verifyNeonJWT(explicitToken!)
+    const verification = await verifyAuthJWT(explicitToken!)
     if (verification.valid && verification.payload?.sub) {
       userId = verification.payload.sub
       token = explicitToken!

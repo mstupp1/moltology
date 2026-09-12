@@ -6,8 +6,9 @@ function getRawEnv(): Record<string, unknown> {
 
   return {
     DATABASE_URL: processEnv.DATABASE_URL || importMetaEnv.DATABASE_URL || importMetaEnv.VITE_DATABASE_URL,
-    VITE_NEON_AUTH_URL: importMetaEnv.VITE_NEON_AUTH_URL || processEnv.VITE_NEON_AUTH_URL,
-    VITE_NEON_JWKS_URL: importMetaEnv.VITE_NEON_JWKS_URL || processEnv.VITE_NEON_JWKS_URL,
+    BETTER_AUTH_URL: processEnv.BETTER_AUTH_URL || importMetaEnv.BETTER_AUTH_URL || importMetaEnv.VITE_BETTER_AUTH_URL,
+    VITE_GOOGLE_AUTH_ENABLED: importMetaEnv.VITE_GOOGLE_AUTH_ENABLED || processEnv.VITE_GOOGLE_AUTH_ENABLED,
+    VITE_GOOGLE_CLIENT_ID: importMetaEnv.VITE_GOOGLE_CLIENT_ID || processEnv.VITE_GOOGLE_CLIENT_ID,
     VERCEL_OIDC_TOKEN: processEnv.VERCEL_OIDC_TOKEN || importMetaEnv.VERCEL_OIDC_TOKEN,
     AI_GATEWAY_API_KEY: processEnv.AI_GATEWAY_API_KEY || importMetaEnv.AI_GATEWAY_API_KEY,
     VITE_TURNSTILE_SITE_KEY: importMetaEnv.VITE_TURNSTILE_SITE_KEY || processEnv.VITE_TURNSTILE_SITE_KEY,
@@ -23,14 +24,9 @@ export const envSchema = z.object({
     .string()
     .min(1)
     .default('postgresql://neondb_owner:dummy@ep-dummy.us-east-1.aws.neon.tech/neondb?sslmode=require'),
-  VITE_NEON_AUTH_URL: z
-    .string()
-    .url()
-    .default('https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech/neondb/auth'),
-  VITE_NEON_JWKS_URL: z
-    .string()
-    .url()
-    .default('https://ep-cold-breeze-aye6s748.neonauth.c-5.us-east-2.aws.neon.tech/neondb/auth/.well-known/jwks.json'),
+  BETTER_AUTH_URL: z.string().url().default('http://localhost:3000'),
+  VITE_GOOGLE_AUTH_ENABLED: z.string().optional(),
+  VITE_GOOGLE_CLIENT_ID: z.string().optional(),
   VERCEL_OIDC_TOKEN: z.string().optional(),
   AI_GATEWAY_API_KEY: z.string().optional(),
   VITE_TURNSTILE_SITE_KEY: z.string().default('1x00000000000000000000AA'),
