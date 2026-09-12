@@ -1,8 +1,9 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { Route } from './auth'
+import AuthView from '@/components/auth/AuthView'
 import { authClient } from '@/lib/auth-client'
+import { Route } from './auth'
 
 const mockNavigate = vi.fn()
 let mockSearch: { mode?: 'login' | 'signup'; redirect?: string } = { mode: 'login' }
@@ -22,11 +23,17 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }))
 
-const AuthRoute = Route.options.component!
+function AuthRoute() {
+  return <AuthView search={mockSearch} />
+}
 
-vi.mock('@/lib/auth-config', () => ({
-  isGoogleAuthEnabled: () => true,
-}))
+vi.mock('@/lib/auth-config', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-config')>()
+  return {
+    ...actual,
+    isGoogleAuthEnabled: () => true,
+  }
+})
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -190,7 +197,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Create Account$/i }))
 
     await waitFor(() => {
-      expect(screen.getAllByText(/reserved for the Order/i).length).toBeGreaterThan(0)
+      expect(screen.getAllByText(/that username is reserved/i).length).toBeGreaterThan(0)
     })
     expect(authClient.signUp.email).not.toHaveBeenCalled()
   })
