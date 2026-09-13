@@ -1,12 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import {
   authErrorCallbackURL,
   mapOAuthCallbackError,
   mapOAuthLinkError,
+  hasOAuthCallbackError,
   normalizeOAuthErrorCode,
 } from './auth-oauth-errors'
 
 describe('auth-oauth-errors', () => {
+  afterEach(() => {
+    window.history.pushState({}, '', '/')
+  })
   it('normalizes Better Auth callback codes', () => {
     expect(normalizeOAuthErrorCode('account_not_linked')).toBe('account_not_linked')
     expect(normalizeOAuthErrorCode('account not linked')).toBe('account_not_linked')
@@ -25,6 +29,15 @@ describe('auth-oauth-errors', () => {
     expect(mapOAuthLinkError('unable_to_link_account')).toBe(
       'Could not connect that sign-in method. Please try again.',
     )
+  })
+
+  it('detects callback errors from an explicit code or the location query', () => {
+    expect(hasOAuthCallbackError(undefined)).toBe(false)
+    expect(hasOAuthCallbackError('account_not_linked')).toBe(true)
+    window.history.pushState({}, '', '/auth?error=unable_to_link_account')
+    expect(hasOAuthCallbackError()).toBe(true)
+    window.history.pushState({}, '', '/')
+    expect(hasOAuthCallbackError()).toBe(false)
   })
 
   it('builds an /auth error callback from an absolute callback URL', () => {

@@ -37,6 +37,19 @@ export function mapOAuthLinkError(error?: string | null): string {
   return mapOAuthCallbackError(error, DEFAULT_LINK_ERROR) ?? DEFAULT_LINK_ERROR
 }
 
+export function readLocationOAuthError(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return normalizeOAuthErrorCode(new URLSearchParams(window.location.search).get('error'))
+  } catch {
+    return null
+  }
+}
+
+export function hasOAuthCallbackError(error?: string | null): boolean {
+  return Boolean(normalizeOAuthErrorCode(error) || readLocationOAuthError())
+}
+
 export function authErrorCallbackURL(callbackURL: string): string {
   try {
     return `${new URL(callbackURL).origin}/auth`

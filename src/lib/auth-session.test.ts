@@ -13,6 +13,7 @@ import {
   settleOAuthSession,
   startGoogleSignIn,
   rememberSessionUser,
+  abandonOAuthPendingIfCallbackError,
   SESSION_CACHE_GRACE_MS,
 } from './auth-session'
 
@@ -256,6 +257,7 @@ describe('OAuth session settlement', () => {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       window.sessionStorage.clear()
     }
+    window.history.pushState({}, '', '/')
   })
 
   it('caches the member from the first successful getSession and does not require a second OAuth attempt', async () => {
@@ -337,6 +339,26 @@ describe('OAuth session settlement', () => {
     ).rejects.toThrow('popup closed')
 
     expect(isOAuthPending()).toBe(false)
+  })
+
+  it('drops the OAuth latch when a callback error is present so chrome can settle guest', () => {
+    beginOAuthSignIn('/dashboard')
+    expect(isOAuthPending()).toBe(true)
+
+    abandonOAuthPendingIfCallbackError('account_not_linked')
+
+    expect(isOAuthPending()).toBe(false)
+    const state = resolveAuthSession({ data: null, isPending: false })
+    expect(state.isPending).toBe(false)
+    expect(state.isGuest).toBe(true)
+    expect(state.isAuthenticated).toBe(false)
+  })
+
+  it('drops the OAuth latch when the URL carries an OAuth error', () => {
+    beginOAuthSignIn('/dashboard')
+    window.history.pushState({}, '', '/auth?error=account_not_linked')
+    expect(isOAuthPending()).toBe(false)
+    window.history.pushState({}, '', '/')
   })
 
   it('rememberSessionUser writes a cache that survives a later empty hook settle', () => {

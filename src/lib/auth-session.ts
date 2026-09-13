@@ -21,7 +21,7 @@
  * - `isPending === true`, missing `isPending`, or client not ready → hold chrome.
  */
 
-import { authErrorCallbackURL } from './auth-oauth-errors'
+import { authErrorCallbackURL, hasOAuthCallbackError } from './auth-oauth-errors'
 import { clearCachedJwt } from './jwt-cache'
 
 export type AuthSessionUser = {
@@ -201,7 +201,13 @@ export function clearOAuthPending(): void {
   }
 }
 
+export function abandonOAuthPendingIfCallbackError(error?: string | null): void {
+  if (!hasOAuthCallbackError(error)) return
+  clearOAuthPending()
+}
+
 export function isOAuthPending(): boolean {
+  abandonOAuthPendingIfCallbackError()
   if (oauthPendingMemory) return true
   if (typeof window === 'undefined' || typeof window.sessionStorage === 'undefined') return false
   try {

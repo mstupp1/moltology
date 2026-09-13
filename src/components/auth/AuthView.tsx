@@ -14,7 +14,7 @@ import {
 import { authClient } from '@/lib/auth-client'
 import { isGoogleAuthEnabled } from '@/lib/auth-config'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
+import { abandonOAuthPendingIfCallbackError, rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
 import { mapOAuthCallbackError } from '@/lib/auth-oauth-errors'
 import type { AuthSearch } from '@/lib/auth-search'
 import '@/styles/crt.css'
@@ -29,6 +29,7 @@ import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
 export default function AuthView({ search }: { search: AuthSearch }) {
+  abandonOAuthPendingIfCallbackError(search.error)
   const navigate = useNavigate()
   const session = useAuthSession()
   const user = session.user
