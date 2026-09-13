@@ -1,4 +1,4 @@
-export type OracleProvider = 'alibaba' | 'minimax' | 'zai'
+export type OracleProvider = 'deepseek' | 'zai'
 
 export interface OracleModel {
   id: string
@@ -9,22 +9,16 @@ export interface OracleModel {
 
 export const ORACLE_MODELS: OracleModel[] = [
   {
-    id: 'minimax/minimax-m3-free',
-    label: 'MiniMax M3',
-    shortLabel: 'M3',
-    provider: 'minimax',
+    id: 'deepseek/deepseek-v4.1-flash',
+    label: 'DeepSeek 4.1',
+    shortLabel: 'DS 4.1',
+    provider: 'deepseek',
   },
   {
     id: 'zai/glm-5.3-flash',
     label: 'GLM 5.3 Flash',
     shortLabel: 'GLM',
     provider: 'zai',
-  },
-  {
-    id: 'alibaba/qwen3.8-flash',
-    label: 'Qwen 3.8 Flash',
-    shortLabel: 'Qwen',
-    provider: 'alibaba',
   },
 ]
 
@@ -40,7 +34,7 @@ export const DEFAULT_ORACLE_PLACEHOLDER = 'Ask Synaptic Oracle...'
  * Dedicated model used for summarizing conversation titles on first message dispatch.
  * Configured separately from interactive chat models.
  */
-export const ORACLE_TITLE_MODEL_ID = 'alibaba/qwen3.7-flash'
+export const ORACLE_TITLE_MODEL_ID = 'zai/glm-5.3-flash'
 
 export function getOracleModel(id?: string): OracleModel {
   return ORACLE_MODELS.find((m) => m.id === id) || ORACLE_MODELS[0]

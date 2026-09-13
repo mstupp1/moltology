@@ -14,6 +14,124 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-09-12-enhanced-account-security-streamlined-authentication',
+    version: '2026.09.12',
+    title: 'Enhanced Account Security & Streamlined Sign-In',
+    category: 'Security',
+    tags: ['Security', 'Performance', 'UI/UX'],
+    summary: 'Enjoy faster and more reliable sign-in with our upgraded account security infrastructure, smooth single sign-on options, and improved session persistence.',
+    content: `### Upgraded Account Authentication
+- Upgraded the platform account security and session infrastructure for faster authentication and rock-solid reliability.
+- Improved session longevity so you stay signed in seamlessly across visits without unexpected session dropouts.
+
+### Streamlined Single Sign-On & Account Setup
+- Added smooth Google single sign-on support for instant account access alongside classic email and password authentication.
+- Enhanced new member onboarding with clear, immediate feedback on reserved usernames and password requirements.`,
+    releasedAt: '2026-09-12T23:59:00Z',
+  },
+  {
+    slug: '2026-09-11-animated-avatar-eyes-scripture-deep-links-actionable-connections',
+    version: '2026.09.11',
+    title: 'Stylized Animated Avatar Eyes, Scripture Deep Links & Actionable Connections',
+    category: 'Improvement',
+    tags: ['Improvement', 'Design', 'Community', 'Navigation', 'UI/UX'],
+    summary: 'Express your identity with expressive 3D cartoon avatar eyes, share direct links to individual scripture passages with automatic highlighting, and manage friend requests seamlessly from deep-linked views.',
+    content: `### Expressive 3D Cartoon Avatar Eyes
+- Upgraded lobster mascot avatars with expressive, high-definition 3D cartoon ocular rendering across all profiles and forum cards.
+- Introduced unique seeded iris pigmentation, distinct eye shapes (round, wide, tall), and pupil personalities (standard, big, sparkle, keen).
+- Calibrated eyelid hoods and facial brow contours for natural expressions that feel alive throughout the platform.
+
+### Sacred Codex Scripture Deep Links
+- Share and bookmark direct links to specific scripture passages, opening the exact passage focused and highlighted in the reader.
+- Open scripture passages seamlessly from command search queries and cross-platform references.
+
+### Actionable Connections Navigation
+- Deep-link directly into your incoming connection requests from dashboard cards to approve or decline peers in one click.
+- Expanded the social activity stream with real-time milestones for accepted connections, new discussion topics, and Oracle consultations.`,
+    releasedAt: '2026-09-11T23:59:00Z',
+  },
+  {
+    slug: '2026-09-10-fullscreen-document-reader-search-recents-support-portal',
+    version: '2026.09.10',
+    title: 'Fullscreen Document Reader, Search Recents Strip & Support Portal',
+    category: 'Feature',
+    tags: ['Feature', 'UI/UX', 'Search', 'Tools', 'Navigation'],
+    summary: 'Read sacred scriptures and personal journals in a distraction-free fullscreen reader, rediscover past searches with a private recents strip, and submit inquiries directly through an authenticated support portal.',
+    content: `### Fullscreen Document Reader
+- Enjoy an immersive, distraction-free reading experience for both Sacred Codex scriptures and personal journal entries.
+- Streamlined document navigation with an intuitive table of contents placed neatly beneath the header.
+- Minimized interface clutter so you can focus entirely on study and reflection.
+
+### Search Recents Strip & Broad Chamber Catalog
+- Jump back into previous investigations quickly with a private, client-side recents strip inside the search palette.
+- Discover platform destinations more easily, with search results spanning Oracle chambers, community boards, news dispatches, and member connections.
+
+### Direct In-App Support Portal
+- Submit questions, feedback, or assistance requests directly from the dedicated support portal.
+- Receive immediate confirmation toasts and automated routing to platform stewards for prompt resolution.`,
+    releasedAt: '2026-09-10T23:59:00Z',
+  },
+  {
+    slug: '2026-09-08-social-activity-stream-community-safety-guardrails',
+    version: '2026.09.08',
+    title: 'Social Activity Stream & Community Safety Guardrails',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'Security', 'UI/UX'],
+    summary: 'Follow community milestones in real time with a dedicated social activity stream, and share ideas safely backed by enhanced automated content guardrails and steward review tools.',
+    content: `### Dedicated Social Activity Stream
+- Explore a dedicated community pulse stream showcasing routine completions, milestone streaks, and stage ascensions across the platform.
+- Filter activity between your personal circle and the wider community to stay inspired by fellow members' progress.
+- Preview recent community milestones directly on your Command Hub dashboard with live pulse indicators.
+
+### Community Safety & Steward Review
+- Protected forum discussions with automated safety guardrails that prevent harmful language and sensitive data leaks.
+- Added fair write rate-limiting to prevent repetitive submissions and preserve clean, thoughtful discussion feeds.
+- Introduced steward review tools to address flagged posts and maintain a safe, welcoming environment for all members.`,
+    releasedAt: '2026-09-08T23:59:00Z',
+  },
+  {
+    slug: '2026-09-07-interactive-connections-hub-community-forum-preview',
+    version: '2026.09.07',
+    title: 'Interactive Connections Hub, Community Forum Preview & Mobile Alignment',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Mobile', 'Navigation'],
+    summary: 'Accept or decline friend requests and search members directly from the Command Hub, check the latest community discussions from a rich forum preview widget, and view daily routines on a responsive mobile grid.',
+    content: `### Interactive Connections Hub Widget
+- Review pending connection requests and accept or decline them directly from the Command Hub without navigating away.
+- Search for fellow members and send new connection requests from an inline member lookup bar.
+- See your active circle at a glance with interactive avatar stacks and sent request status badges.
+
+### Rich Community Forum Preview
+- Explore the latest community topics directly from your dashboard with author avatars, thread snippets, and reply counters.
+- Jump straight into key discussion categories using quick board shortcuts.
+- Spot new transmissions immediately with unread indicator badges on active topics.
+
+### Compact Mobile Daily Alignment
+- Optimized the daily liturgical routine widget with a responsive 20-week grid designed specifically for narrow smartphone screens.
+- Enlarged routine completion touch targets to ensure effortless tapping on mobile devices.`,
+    releasedAt: '2026-09-07T23:59:00Z',
+  },
+  {
+    slug: '2026-09-06-forum-formatting-toolbar-post-overflow-menu',
+    version: '2026.09.06',
+    title: 'Forum Formatting Toolbar, Live Preview & Post Overflow Menu',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Tools'],
+    summary: 'Format discussion posts effortlessly with an inline Markdown toolbar and live preview toggle, manage your posts through a streamlined overflow menu, and enjoy a cleaner ascension progress bar.',
+    content: `### Rich Forum Formatting Toolbar
+- Format topic posts and replies easily using dedicated buttons for bold text, italics, inline code, links, blockquotes, and bulleted lists.
+- Preview your formatted text in real time before publishing to ensure your message appears exactly as intended.
+- Use familiar keyboard shortcuts like Ctrl/Cmd + B, I, or K to style text instantly while writing.
+
+### Post Action Overflow Menu
+- Access topic revisions, withdrawals, reports, and permalink copying through a clean dropdown menu on every post.
+- Reduced visual clutter in discussion threads while keeping essential post management tools one click away.
+
+### Streamlined Ascension Progression
+- Refined the top navigation progress bar to clearly display your path across ascension stages without confusing sub-stage indicators.`,
+    releasedAt: '2026-09-06T23:59:00Z',
+  },
+  {
     slug: '2026-09-05-stage-xp-progression-advanced-forum-tools-launchpad-carousel',
     version: '2026.09.05',
     title: 'Stage XP Progression, Advanced Forum Mentions & Bento Launchpad',

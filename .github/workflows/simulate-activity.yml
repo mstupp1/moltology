@@ -15,6 +15,11 @@ on:
         required: false
         type: boolean
         default: false
+      simulation_enabled:
+        description: 'Enable simulation execution (set to false to pause)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   simulate:
@@ -38,6 +43,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+          SIMULATION_ENABLED: ${{ github.event.inputs.simulation_enabled != '' && github.event.inputs.simulation_enabled || secrets.SIMULATION_ENABLED || 'true' }}
         run: |
           ARGS=""
           if [ "${{ inputs.dry_run }}" = "true" ]; then

@@ -55,7 +55,7 @@ import {
   type ForumPostCandidate,
 } from '../simulation-social'
 
-export const SIMULATION_MODEL_ID = process.env.SIMULATION_MODEL_ID || 'alibaba/qwen3.8-flash'
+export const SIMULATION_MODEL_ID = process.env.SIMULATION_MODEL_ID || 'zai/glm-5.3-flash'
 
 export interface SimulationGrowthConfig {
   maxSimulatedUsers: number
@@ -1372,6 +1372,11 @@ export async function runSimulationCycle(options: {
   mutationsOnly?: boolean
   socialOnly?: boolean
 } = {}) {
+  if (process.env.SIMULATION_ENABLED === 'false') {
+    console.log('[SimulationCycle] ⏸ Simulation cycle skipped: SIMULATION_ENABLED is explicitly set to false.')
+    return { skipped: true, reason: 'SIMULATION_ENABLED is false' }
+  }
+
   // Fail fast immediately if AI Gateway key is missing
   assertAiGatewayKey()
 

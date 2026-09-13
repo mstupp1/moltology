@@ -323,7 +323,7 @@ describe('handleOracleChatRequest', () => {
     streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
     streamTextMock.mockReturnValueOnce({ stream: textStream('Fallback after pick') })
 
-    const selected = 'alibaba/qwen3.8-flash'
+    const selected = ORACLE_MODELS[1].id
     const res = await handleOracleChatRequest(
       await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
