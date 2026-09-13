@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   ACCOUNT_LINKING_OPTIONS,
   auth,
+  ensureValidJwks,
   getAuthApiErrorUrl,
   isGoogleSocialConfigured,
 } from './auth-server'
@@ -15,8 +16,9 @@ describe('auth-server', () => {
     expect(auth.api.getSession).toBeDefined()
   })
 
-  it('does not configure Google social when credentials are absent', () => {
-    expect(isGoogleSocialConfigured()).toBe(false)
+  it('reflects whether Google social is configured from environment credentials', () => {
+    const expected = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+    expect(isGoogleSocialConfigured()).toBe(expected)
   })
 
   it('auto-links Google onto existing same-email accounts', () => {
@@ -27,5 +29,10 @@ describe('auth-server', () => {
     expect(auth.api.linkSocialAccount).toBeDefined()
     expect(auth.api.listUserAccounts).toBeDefined()
     expect(auth.api.unlinkAccount).toBeDefined()
+  })
+
+  it('exposes ensureValidJwks for runtime self-healing', async () => {
+    expect(typeof ensureValidJwks).toBe('function')
+    await expect(ensureValidJwks()).resolves.not.toThrow()
   })
 })

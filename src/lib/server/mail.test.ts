@@ -74,6 +74,7 @@ describe('support ticket mail', () => {
 
   it('posts only to support@moltology.org and ignores a form-chosen recipient', async () => {
     vi.stubEnv('RESEND_API_KEY', 're_test_key')
+    vi.stubEnv('RESEND_FROM_EMAIL', DEFAULT_SUPPORT_FROM)
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       text: async () => '',

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   DEFAULT_AUTH_URL,
   getAuthBaseUrl,
@@ -9,6 +9,13 @@ import {
 } from './auth-config'
 
 const originalEnv = { ...process.env }
+
+beforeEach(() => {
+  delete process.env.GOOGLE_CLIENT_ID
+  delete process.env.GOOGLE_CLIENT_SECRET
+  delete process.env.VITE_GOOGLE_CLIENT_ID
+  delete process.env.VITE_GOOGLE_AUTH_ENABLED
+})
 
 afterEach(() => {
   for (const key of Object.keys(process.env)) {

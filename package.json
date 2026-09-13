@@ -27,6 +27,7 @@
     "db:rls": "tsx src/db/enable-rls.ts",
     "db:seed": "tsx src/db/seed.ts",
     "db:grant-admin": "tsx src/db/grant-admin.ts",
+    "db:jwks:clean": "tsx scripts/clean-jwks.ts",
     "db:ingest": "tsx scripts/ingest.ts",
     "s3:upload": "tsx scripts/upload-asset.ts",
     "s3:sync": "tsx scripts/sync-s3-assets.ts",

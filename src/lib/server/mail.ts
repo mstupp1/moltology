@@ -49,11 +49,17 @@ export function renderSupportTicketEmailText(input: SupportTicketMailInput): str
 }
 
 function resolveResendApiKey(): string | undefined {
-  return process.env.RESEND_API_KEY || env.RESEND_API_KEY || undefined
+  if (process.env.RESEND_API_KEY !== undefined) {
+    return process.env.RESEND_API_KEY || undefined
+  }
+  return env.RESEND_API_KEY || undefined
 }
 
 function resolveFromAddress(): string {
-  return process.env.RESEND_FROM_EMAIL || env.RESEND_FROM_EMAIL || DEFAULT_SUPPORT_FROM
+  if (process.env.RESEND_FROM_EMAIL !== undefined) {
+    return process.env.RESEND_FROM_EMAIL || DEFAULT_SUPPORT_FROM
+  }
+  return env.RESEND_FROM_EMAIL || DEFAULT_SUPPORT_FROM
 }
 
 /**

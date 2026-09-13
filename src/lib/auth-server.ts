@@ -141,3 +141,46 @@ export const auth = betterAuth({
 export function isGoogleSocialConfigured(): boolean {
   return Boolean(google)
 }
+
+let jwksValidated = false
+
+/**
+ * Validates that existing JWKS keys in the database can be decrypted by the
+ * currently active auth secret. If a secret was rotated, or if a dev database
+ * was reset from a production branch with a different secret, any undecryptable
+ * keys are safely pruned so Better Auth can auto-mint fresh keys without throwing
+ * 500 "Failed to decrypt private key".
+ */
+export async function ensureValidJwks(): Promise<void> {
+  if (jwksValidated) return
+
+  try {
+    const db = getDb()
+    const rows = await db.select().from(authJwks)
+    if (rows.length === 0) {
+      jwksValidated = true
+      return
+    }
+
+    const { symmetricDecrypt } = await import('better-auth/crypto')
+    const { eq } = await import('drizzle-orm')
+    const secret = getAuthSecret()
+
+    for (const row of rows) {
+      try {
+        const parsed = JSON.parse(row.privateKey)
+        await symmetricDecrypt({ key: secret, data: parsed })
+      } catch {
+        console.warn(
+          `[Better Auth] JWKS key ${row.id} cannot be decrypted with the active secret. Pruning to allow auto-minting.`,
+        )
+        await db.delete(authJwks).where(eq(authJwks.id, row.id))
+      }
+    }
+
+    jwksValidated = true
+  } catch (err) {
+    console.error('[Better Auth] Error during JWKS validation:', err)
+  }
+}
+

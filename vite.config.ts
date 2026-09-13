@@ -21,6 +21,15 @@ function syncPublicGoogleAuthFlag(mode: string) {
 export default defineConfig(({ mode }) => {
   syncPublicGoogleAuthFlag(mode)
   return {
+    ...(isTest
+      ? {}
+      : {
+          define: {
+            'import.meta.env.VITE_GOOGLE_AUTH_ENABLED': JSON.stringify(
+              process.env.VITE_GOOGLE_AUTH_ENABLED || 'false',
+            ),
+          },
+        }),
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
