@@ -4,9 +4,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AuthView from '@/components/auth/AuthView'
 import { authClient } from '@/lib/auth-client'
 import { Route } from './auth'
+import { beginOAuthSignIn } from '@/lib/auth-session'
 
 const mockNavigate = vi.fn()
-let mockSearch: { mode?: 'login' | 'signup'; redirect?: string } = { mode: 'login' }
+let mockSearch: { mode?: 'login' | 'signup'; redirect?: string; error?: string } = { mode: 'login' }
 
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (config: any) => ({
@@ -126,7 +127,18 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     expect(authClient.signIn.social).toHaveBeenCalledWith({
       provider: 'google',
       callbackURL: expect.stringContaining('/chassis'),
+      errorCallbackURL: expect.stringMatching(/\/auth$/),
     })
+  })
+
+  it('shows a mapped banner immediately even if the Google latch is still set', () => {
+    beginOAuthSignIn('/dashboard')
+    mockSearch = { mode: 'login', error: 'account_not_linked' }
+    render(<AuthRoute />)
+
+    expect(screen.queryByTestId('auth-session-skeleton')).not.toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent(/An account with this email already exists/i)
+    expect(screen.getByRole('alert')).toHaveTextContent(/connect Google in Settings/i)
   })
 
   it('submits sign-in form and navigates on success', async () => {

@@ -1,15 +1,10 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+import { authSearchSchema } from '@/lib/auth-search'
 
 const LazyAuthView = lazy(() => import('@/components/auth/AuthView'))
-
-const authSearchSchema = z.object({
-  mode: z.enum(['login', 'signup']).optional().catch('login'),
-  redirect: z.string().optional(),
-})
 
 function AuthRoute() {
   const search = Route.useSearch()

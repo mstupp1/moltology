@@ -56,6 +56,22 @@ function getTrustedOrigins(baseURL: string): string[] {
 const google = getGoogleClientCredentials()
 const baseURL = getAuthBaseUrl()
 
+/**
+ * Google is a trusted IdP. `requireLocalEmailVerified` is false so an existing
+ * email/password row (unverified in this app) can auto-link on Google sign-in.
+ * Better Auth 1.7 marks that flag deprecated; keep Google trusted and do not
+ * allow linking mismatched emails.
+ */
+export const ACCOUNT_LINKING_OPTIONS = {
+  enabled: true,
+  trustedProviders: ['google'] as const,
+  requireLocalEmailVerified: false,
+}
+
+export function getAuthApiErrorUrl(origin: string): string {
+  return `${origin.replace(/\/$/, '')}/auth`
+}
+
 export const auth = betterAuth({
   baseURL,
   secret: getAuthSecret(),
@@ -75,6 +91,16 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 6,
     autoSignIn: true,
+  },
+  account: {
+    accountLinking: {
+      enabled: ACCOUNT_LINKING_OPTIONS.enabled,
+      trustedProviders: [...ACCOUNT_LINKING_OPTIONS.trustedProviders],
+      requireLocalEmailVerified: ACCOUNT_LINKING_OPTIONS.requireLocalEmailVerified,
+    },
+  },
+  onAPIError: {
+    errorURL: getAuthApiErrorUrl(baseURL),
   },
   socialProviders: google
     ? {
