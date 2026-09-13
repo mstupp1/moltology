@@ -17,6 +17,7 @@ import { ActivityStreamPanel } from '@/components/hud/ActivityStreamPanel'
 import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
+import { NewsArticleBody } from '@/components/news/NewsArticleBody'
 
 export default function DashboardView() {
   const navigate = useNavigate()
@@ -83,8 +84,8 @@ export default function DashboardView() {
                 {activeChangelogModal.summary}
               </p>
 
-              <div className="chitin-card-inset p-4 text-xs leading-relaxed text-[#dfe3e3] whitespace-pre-line border border-[#3a4a49]">
-                {activeChangelogModal.content}
+              <div className="chitin-card-inset p-4 text-xs leading-relaxed text-[#dfe3e3] border border-[#3a4a49]">
+                <NewsArticleBody content={activeChangelogModal.content} />
               </div>
             </div>
 
@@ -152,69 +153,93 @@ export default function DashboardView() {
                     </p>
                   </div>
                 </div>
-
-                <span className="text-[10px] font-sans font-bold text-[#00ffff] bg-[#00ffff]/10 border border-[#00ffff]/40 px-2 py-0.5 chamfer-corner">
-                  v1.5.0 LATEST
-                </span>
               </div>
 
-              {/* Changelog Entries Stack */}
-              <div className="space-y-2 font-sans">
-                {changelogsList.slice(0, 3).map((item) => (
-                  <div
-                    key={item.version}
-                    onClick={() => setActiveChangelogModal(item)}
-                    className="chitin-card-inset p-3 border border-[#3a4a49] hover:border-[#00ffff]/60 transition-all chamfer-corner cursor-pointer group space-y-1.5 bg-[#070b0b]/60"
-                  >
-                    <div className="flex items-center justify-between text-[10px]">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-[#00ffff] bg-[#030606] px-1.5 py-0.2 border border-[#00ffff]/40">
-                          {item.version}
-                        </span>
-                        <span className="text-[#839493] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49]">
-                          {item.category}
-                        </span>
-                      </div>
-                      <span className="text-[#839493] text-[9px]">
-                        {new Date(item.releasedAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: '2-digit',
-                        })}
-                      </span>
-                    </div>
-
-                    <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-snug">
-                      {item.title}
-                    </h4>
-
-                    <p className="text-[11px] text-[#839493] line-clamp-2 leading-relaxed">
-                      {item.summary}
-                    </p>
-
-                    <div className="pt-1 border-t border-[#3a4a49]/40 flex items-center justify-between text-[9px] text-[#839493]">
-                      <span>CLICK TO INSPECT NOTES</span>
-                      <span className="text-[#00ffff] font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
-                        <span>VIEW</span>
-                        <ChevronRight className="w-2.5 h-2.5" />
-                      </span>
-                    </div>
+              {/* Changelog Entries Timeline (scrollable) */}
+              <div className="relative max-h-[22rem] overflow-y-auto pr-1 -mr-1">
+                <div className="relative space-y-2.5 font-sans py-1">
+                  {/* Timeline Vertical Track */}
+                  <div className="absolute left-2.5 top-3 bottom-3 w-[2px] -translate-x-1/2 pointer-events-none z-0">
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#00ffff] via-[#00ffff]/40 to-transparent opacity-60 rounded-full" />
+                    <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,transparent,transparent_6px,rgba(0,255,255,0.35)_6px,rgba(0,255,255,0.35)_7px)]" />
                   </div>
-                ))}
+
+                  {changelogsList.slice(0, 15).map((item) => (
+                    <div
+                      key={item.version}
+                      onClick={() => setActiveChangelogModal(item)}
+                      className="relative z-10 pl-7 group cursor-pointer"
+                    >
+                      {/* Timeline Indicator Node */}
+                      <div className="absolute left-2.5 top-3.5 -translate-x-1/2 group-hover:scale-125 transition-transform duration-300">
+                        <div className="w-3 h-3 rounded-full bg-[#05080a] border-2 border-[#00ffff] shadow-[0_0_8px_rgba(0,255,255,0.5)] relative flex items-center justify-center">
+                          <div className="w-1 h-1 rounded-full bg-[#00ffff]" />
+                        </div>
+                        <div className="absolute inset-0 rounded-full bg-[#00ffff]/40 blur-[5px] -z-10" />
+                      </div>
+
+                      {/* Card Container */}
+                      <div className="chitin-card-inset p-3 border border-[#3a4a49] group-hover:border-[#00ffff]/60 transition-all chamfer-corner space-y-1.5 bg-[#070b0b]/60">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-[#00ffff] bg-[#030606] px-1.5 py-0.2 border border-[#00ffff]/40">
+                              {item.version}
+                            </span>
+                            <span className="text-[#839493] bg-[#070b0b] px-1.5 py-0.2 border border-[#3a4a49]">
+                              {item.category}
+                            </span>
+                          </div>
+                          <span className="text-[#839493] text-[9px]">
+                            {new Date(item.releasedAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: '2-digit',
+                            })}
+                          </span>
+                        </div>
+
+                        <h4 className="font-grotesk text-xs font-bold text-[#dfe3e3] group-hover:text-[#00ffff] transition-colors uppercase line-clamp-1 leading-snug">
+                          {item.title}
+                        </h4>
+
+                        <p className="text-[11px] text-[#839493] line-clamp-2 leading-relaxed">
+                          {item.summary}
+                        </p>
+
+                        <div className="pt-1 border-t border-[#3a4a49]/40 flex items-center justify-between text-[9px] text-[#839493]">
+                          <span>CLICK TO INSPECT NOTES</span>
+                          <span className="text-[#00ffff] font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
+                            <span>VIEW</span>
+                            <ChevronRight className="w-2.5 h-2.5" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Bottom Support Desk Link */}
-            <div className="pt-2 border-t border-[#3a4a49]/60 flex items-center justify-between text-xs">
-              <span className="text-[#839493] text-[10px]">
-                FULL AUDIT LOGS IN SUPPORT HUB
-              </span>
+            {/* Bottom Actions */}
+            <div className="pt-2 border-t border-[#3a4a49]/60 space-y-2">
               <button
-                onClick={() => navigate({ to: '/support' })}
-                className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+                onClick={() => navigate({ to: '/changelog' })}
+                className="w-full py-1.5 bg-[#070b0b] hover:bg-[#0f1414] border border-[#3a4a49] hover:border-[#00ffff]/60 text-[10px] font-bold font-grotesk text-[#00ffff] uppercase tracking-wider chamfer-corner transition-all flex items-center justify-center gap-1.5"
               >
-                <span>SUPPORT HUB</span>
+                <span>VIEW ALL {changelogsList.length} RELEASES</span>
                 <ExternalLink className="w-3 h-3" />
               </button>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#839493] text-[10px]">
+                  FULL AUDIT LOGS IN SUPPORT HUB
+                </span>
+                <button
+                  onClick={() => navigate({ to: '/support' })}
+                  className="px-3 py-1.5 bg-[#00ffff]/15 hover:bg-[#00ffff]/25 text-[#00ffff] border border-[#00ffff]/50 text-[10px] font-bold chamfer-corner flex items-center gap-1 transition-all"
+                >
+                  <span>SUPPORT HUB</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
