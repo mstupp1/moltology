@@ -62,11 +62,18 @@ export const Route = createRootRoute({
       return xRobotsNoindexHeaders()
     }
     // The landing page renders identically for every guest (session is
-    // client-side) — serve it from the CDN edge instead of re-running SSR
+    // client-side) — serve it from the CDN edge in production instead of re-running SSR
     // per request, eliminating cold-start TTFB variance on real users.
-    if (matches.some((match) => match.pathname === '/')) {
+    const isProduction = process.env.NODE_ENV === 'production'
+    const isLandingPage = matches[matches.length - 1]?.pathname === '/'
+    if (isProduction && isLandingPage) {
       return {
         'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=600, stale-while-revalidate=3600',
+      }
+    }
+    if (!isProduction) {
+      return {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
       }
     }
     return {}
