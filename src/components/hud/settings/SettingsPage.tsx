@@ -24,8 +24,9 @@ import {
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
 import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
+import { ConnectedAccounts } from './ConnectedAccounts'
 
-export const SettingsPage: React.FC = () => {
+export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) => {
   const session = useAuthSession()
   const userId = session.userId
   const persist = useHudPersist()
@@ -181,7 +182,7 @@ export const SettingsPage: React.FC = () => {
           </>
         }
         title="Settings"
-        description="Choose your avatar, email preferences, display ambience, and command surface options."
+        description="Choose your avatar, email preferences, sign-in methods, display ambience, and command surface options."
       />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
@@ -250,7 +251,7 @@ export const SettingsPage: React.FC = () => {
                 Preferences
               </h2>
               <p className="text-xs text-[#839493] font-sans mt-0.5">
-                Communication, display, and onboarding options.
+                Communication, sign-in methods, display, and onboarding options.
               </p>
             </div>
 
@@ -272,6 +273,8 @@ export const SettingsPage: React.FC = () => {
                   Seal designation
                 </button>
               </div>
+
+              <ConnectedAccounts oauthError={oauthError} />
 
               <div className="chitin-card-inset p-3 sm:p-4 flex items-center justify-between gap-3 rounded-sm">
                 <div className="flex items-center gap-3 min-w-0">

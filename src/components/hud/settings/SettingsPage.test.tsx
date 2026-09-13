@@ -35,6 +35,25 @@ vi.mock('@/components/hud/LobsterAvatarPortrait', () => ({
   LobsterAvatarPortrait: () => <div data-testid="lobster-avatar-portrait" />,
 }))
 
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    listAccounts: vi.fn().mockResolvedValue({
+      data: [{ id: 'acc-email', providerId: 'credential' }],
+      error: null,
+    }),
+    linkSocial: vi.fn(),
+    unlinkAccount: vi.fn(),
+  },
+}))
+
+vi.mock('@/lib/auth-config', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth-config')>()
+  return {
+    ...actual,
+    isGoogleAuthEnabled: () => true,
+  }
+})
+
 describe('SettingsPage', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -53,6 +72,7 @@ describe('SettingsPage', () => {
 
     expect(screen.getByText('Visible across the hub')).toBeInTheDocument()
     expect(screen.getByText('Email Updates')).toBeInTheDocument()
+    expect(screen.getByText('Sign-in methods')).toBeInTheDocument()
     expect(screen.getByTestId('hub-surface-controls')).toBeInTheDocument()
 
     const toggle = screen.getByRole('switch', { name: /toggle underwater bubbles/i })

@@ -306,6 +306,7 @@ describe('OAuth session settlement', () => {
     expect(signInSocial).toHaveBeenCalledWith({
       provider: 'google',
       callbackURL: 'https://moltology.org/dashboard',
+      errorCallbackURL: 'https://moltology.org/auth',
     })
     expect(user?.id).toBe('usr_google')
     expect(getCachedUser()?.id).toBe('usr_google')

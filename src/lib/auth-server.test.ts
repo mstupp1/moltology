@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { auth, isGoogleSocialConfigured } from './auth-server'
+import {
+  ACCOUNT_LINKING_OPTIONS,
+  auth,
+  getAuthApiErrorUrl,
+  isGoogleSocialConfigured,
+} from './auth-server'
 
 describe('auth-server', () => {
   it('exposes a Better Auth handler and email/password API', () => {
@@ -12,5 +17,15 @@ describe('auth-server', () => {
 
   it('does not configure Google social when credentials are absent', () => {
     expect(isGoogleSocialConfigured()).toBe(false)
+  })
+
+  it('auto-links Google onto existing same-email accounts', () => {
+    expect(ACCOUNT_LINKING_OPTIONS.enabled).toBe(true)
+    expect(ACCOUNT_LINKING_OPTIONS.trustedProviders).toEqual(['google'])
+    expect(ACCOUNT_LINKING_OPTIONS.requireLocalEmailVerified).toBe(false)
+    expect(getAuthApiErrorUrl('https://moltology.org/')).toBe('https://moltology.org/auth')
+    expect(auth.api.linkSocialAccount).toBeDefined()
+    expect(auth.api.listUserAccounts).toBeDefined()
+    expect(auth.api.unlinkAccount).toBeDefined()
   })
 })

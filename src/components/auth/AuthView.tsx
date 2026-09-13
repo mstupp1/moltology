@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { z } from 'zod'
+import { useNavigate, Link } from '@tanstack/react-router'
 import {
   Lock,
   Mail,
@@ -16,6 +15,8 @@ import { authClient } from '@/lib/auth-client'
 import { isGoogleAuthEnabled } from '@/lib/auth-config'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
+import { mapOAuthCallbackError } from '@/lib/auth-oauth-errors'
+import type { AuthSearch } from '@/lib/auth-search'
 import '@/styles/crt.css'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
@@ -25,17 +26,10 @@ import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
-import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
-const authSearchSchema = z.object({
-  mode: z.enum(['login', 'signup']).optional().catch('login'),
-  redirect: z.string().optional(),
-})
-
-export default function AuthView({ search }: { search: any }) {
+export default function AuthView({ search }: { search: AuthSearch }) {
   const navigate = useNavigate()
-  // search passed as prop
   const session = useAuthSession()
   const user = session.user
 
@@ -47,15 +41,19 @@ export default function AuthView({ search }: { search: any }) {
   const [emailOptIn, setEmailOptIn] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(() => mapOAuthCallbackError(search.error))
   const [loading, setLoading] = useState(false)
 
-  // Sync mode if search query changes
   useEffect(() => {
     if (search.mode) {
       setMode(search.mode === 'signup' ? 'signup' : 'login')
     }
   }, [search.mode])
+
+  useEffect(() => {
+    const mapped = mapOAuthCallbackError(search.error)
+    if (mapped) setError(mapped)
+  }, [search.error])
 
   // Redirect if already authenticated
   useEffect(() => {

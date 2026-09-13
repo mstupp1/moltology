@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ErrorRouteImport } from './routes/error'
 import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as GuideRouteImport } from './routes/guide'
@@ -79,6 +80,11 @@ const HudRoute = HudRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErrorRoute = ErrorRouteImport.update({
+  id: '/error',
+  path: '/error',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CodexDotmdRoute = CodexDotmdRouteImport.update({
@@ -358,6 +364,7 @@ const HudForumCategorySlugTopicSlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/error': typeof ErrorRoute
   '/codex.md': typeof CodexDotmdRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
@@ -416,6 +423,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/error': typeof ErrorRoute
   '/codex.md': typeof CodexDotmdRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
@@ -476,6 +484,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
+  '/error': typeof ErrorRoute
   '/codex.md': typeof CodexDotmdRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
@@ -536,6 +545,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/error'
     | '/codex.md'
     | '/feed.xml'
     | '/guide'
@@ -594,6 +604,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/error'
     | '/codex.md'
     | '/feed.xml'
     | '/guide'
@@ -653,6 +664,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_hud'
     | '/auth'
+    | '/error'
     | '/codex.md'
     | '/feed.xml'
     | '/guide'
@@ -713,6 +725,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ErrorRoute: typeof ErrorRoute
   CodexDotmdRoute: typeof CodexDotmdRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   GuideRoute: typeof GuideRoute
@@ -766,6 +779,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/error': {
+      id: '/error'
+      path: '/error'
+      fullPath: '/error'
+      preLoaderRoute: typeof ErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/codex.md': {
@@ -1209,6 +1229,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
+  ErrorRoute: ErrorRoute,
   CodexDotmdRoute: CodexDotmdRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   GuideRoute: GuideRoute,
