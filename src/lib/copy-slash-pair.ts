@@ -70,18 +70,13 @@ function readQuotedString(source: string, start: number): { raw: string; end: nu
   return { raw, end: i }
 }
 
-function extractDoubleQuotedCopy(text: string, chunks: string[]) {
-  let i = 0
-  while (i < text.length) {
-    const char = text[i]
-    if (char === '"' || char === '`') {
-      const { raw, end } = readQuotedString(text, i)
-      chunks.push(raw)
-      i = end
-      continue
-    }
-    i += 1
+function isRegexStart(source: string, index: number): boolean {
+  let prev = index - 1
+  while (prev >= 0 && /\s/.test(source[prev])) {
+    prev -= 1
   }
+  if (prev < 0) return true
+  return /[\(=:;,!&|?{\[~^%]/.test(source[prev])
 }
 
 function blankRange(mask: string[], start: number, end: number) {
@@ -104,7 +99,6 @@ export function extractQuotedAndJsxCopy(
     if (char === '/' && next === '/') {
       const lineEnd = source.indexOf('\n', i)
       const end = lineEnd === -1 ? source.length : lineEnd
-      extractDoubleQuotedCopy(source.slice(i + 2, end), chunks)
       blankRange(mask, i, end)
       i = end
       continue
@@ -112,9 +106,31 @@ export function extractQuotedAndJsxCopy(
     if (char === '/' && next === '*') {
       const blockEnd = source.indexOf('*/', i + 2)
       const end = blockEnd === -1 ? source.length : blockEnd + 2
-      extractDoubleQuotedCopy(source.slice(i + 2, blockEnd === -1 ? source.length : blockEnd), chunks)
       blankRange(mask, i, end)
       i = end
+      continue
+    }
+    if (char === '/' && isRegexStart(source, i)) {
+      let j = i + 1
+      let inClass = false
+      while (j < source.length) {
+        if (source[j] === '\\') {
+          j += 2
+          continue
+        }
+        if (source[j] === '[') inClass = true
+        else if (source[j] === ']') inClass = false
+        else if (source[j] === '/' && !inClass) {
+          j += 1
+          while (j < source.length && /[a-z]/i.test(source[j])) {
+            j += 1
+          }
+          break
+        }
+        j += 1
+      }
+      blankRange(mask, i, j)
+      i = j
       continue
     }
     if (char === '"' || char === "'" || char === '`') {
