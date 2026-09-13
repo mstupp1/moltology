@@ -69,7 +69,6 @@ describe('ConnectedAccounts', () => {
 
     await waitFor(() => {
       expect(authClient.unlinkAccount).toHaveBeenCalledWith({
-        providerId: 'google',
         accountId: 'acc-google',
       })
     })

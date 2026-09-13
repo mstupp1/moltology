@@ -68,10 +68,14 @@ export function ConnectedAccounts({ oauthError }: { oauthError?: string }) {
     }
     setBusy('unlink')
     const googleAccount = (accounts ?? []).find((account) => account.providerId === GOOGLE_PROVIDER_ID)
+    if (!googleAccount?.id) {
+      setBusy(null)
+      toast.error('Could not disconnect Google.')
+      return
+    }
     try {
       const { error } = await authClient.unlinkAccount({
-        providerId: GOOGLE_PROVIDER_ID,
-        ...(googleAccount?.id ? { accountId: googleAccount.id } : {}),
+        accountId: googleAccount.id,
       })
       if (error) {
         toast.error(error.message || 'Could not disconnect Google.')

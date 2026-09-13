@@ -13,7 +13,7 @@ import { redirect } from '@tanstack/react-router'
 
 describe('OAuth error redirect (/error)', () => {
   it('sends Better Auth callback failures to /auth with the error code', () => {
-    const beforeLoad = Route.options.beforeLoad as (args: { search: { error?: string } }) => void
+    const beforeLoad = Route.options.beforeLoad as any
 
     expect(() => {
       beforeLoad({ search: { error: 'account_not_linked' } })
