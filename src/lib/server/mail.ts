@@ -1,3 +1,7 @@
+import {
+  EMAIL_VERIFICATION_MAIL,
+  renderEmailVerificationEmailHtml,
+} from '../../emails/email-verification'
 import { env } from '../../env'
 import {
   SUPPORT_INBOX,
@@ -65,22 +69,19 @@ export function renderSupportTicketEmailText(input: SupportTicketMailInput): str
 
 export function renderEmailVerificationText(input: EmailVerificationMailInput): string {
   return [
-    'Confirm your Moltology email',
+    EMAIL_VERIFICATION_MAIL.heading,
     '',
-    'Open this link to finish joining:',
+    EMAIL_VERIFICATION_MAIL.body,
     input.url,
     '',
-    'If you did not create an account, you can ignore this message.',
+    EMAIL_VERIFICATION_MAIL.ignore,
   ].join('\n')
 }
 
-export function renderEmailVerificationHtml(input: EmailVerificationMailInput): string {
-  const safeUrl = input.url.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-  return [
-    '<p>Confirm your Moltology email</p>',
-    `<p><a href="${safeUrl}">Open this link to finish joining</a></p>`,
-    '<p>If you did not create an account, you can ignore this message.</p>',
-  ].join('')
+export async function renderEmailVerificationHtml(
+  input: EmailVerificationMailInput,
+): Promise<string> {
+  return renderEmailVerificationEmailHtml(input.url)
 }
 
 function resolveResendApiKey(): string | undefined {
@@ -173,10 +174,18 @@ export async function sendSupportTicketEmail(
 export async function sendEmailVerificationEmail(
   input: EmailVerificationMailInput,
 ): Promise<TransactionalMailResult> {
+  let html: string
+  try {
+    html = await renderEmailVerificationHtml(input)
+  } catch (error) {
+    console.error('[mail] Failed to render verification email:', error)
+    return { sent: false, error: 'render' }
+  }
+
   return sendTransactionalEmail({
     to: input.to,
-    subject: 'Confirm your Moltology email',
+    subject: EMAIL_VERIFICATION_MAIL.subject,
     text: renderEmailVerificationText(input),
-    html: renderEmailVerificationHtml(input),
+    html,
   })
 }
