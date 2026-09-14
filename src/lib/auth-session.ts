@@ -29,6 +29,7 @@ export type AuthSessionUser = {
   sub?: string
   name?: string | null
   email?: string | null
+  emailVerified?: boolean | null
   image?: string | null
   avatar?: string | null
   picture?: string | null

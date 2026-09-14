@@ -5,6 +5,7 @@ import {
   ensureValidJwks,
   getAuthApiErrorUrl,
   isGoogleSocialConfigured,
+  resolveAccountLinkingOptions,
 } from './auth-server'
 
 describe('auth-server', () => {
@@ -34,5 +35,12 @@ describe('auth-server', () => {
   it('exposes ensureValidJwks for runtime self-healing', async () => {
     expect(typeof ensureValidJwks).toBe('function')
     await expect(ensureValidJwks()).resolves.not.toThrow()
+  })
+})
+
+describe('account linking with email verification flag', () => {
+  it('requires a verified local email when verification is on', () => {
+    expect(resolveAccountLinkingOptions(true).requireLocalEmailVerified).toBe(true)
+    expect(resolveAccountLinkingOptions(false).requireLocalEmailVerified).toBe(false)
   })
 })

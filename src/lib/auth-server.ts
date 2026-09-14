@@ -15,7 +15,9 @@ import {
   DEV_AUTH_SECRET,
   getAuthBaseUrl,
   getGoogleClientCredentials,
+  isEmailVerificationEnabled,
 } from './auth-config'
+import { sendEmailVerificationEmail } from './server/mail'
 
 function getAuthSecret(): string {
   const secret = typeof process !== 'undefined' ? process.env.BETTER_AUTH_SECRET : undefined
@@ -62,10 +64,25 @@ const baseURL = getAuthBaseUrl()
  * Better Auth 1.7 marks that flag deprecated; keep Google trusted and do not
  * allow linking mismatched emails.
  */
+const emailVerificationEnabled = isEmailVerificationEnabled()
+
+/**
+ * Google is a trusted IdP. When email verification is enabled, require a verified
+ * local email before auto-linking. When the flag is off, keep the soft link so
+ * existing unverified email/password rows can still connect Google.
+ */
 export const ACCOUNT_LINKING_OPTIONS = {
   enabled: true,
   trustedProviders: ['google'] as const,
-  requireLocalEmailVerified: false,
+  requireLocalEmailVerified: emailVerificationEnabled,
+}
+
+export function resolveAccountLinkingOptions(verificationEnabled = isEmailVerificationEnabled()) {
+  return {
+    enabled: true as const,
+    trustedProviders: ['google'] as const,
+    requireLocalEmailVerified: verificationEnabled,
+  }
 }
 
 export function getAuthApiErrorUrl(origin: string): string {
@@ -91,7 +108,19 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 6,
     autoSignIn: true,
+    requireEmailVerification: emailVerificationEnabled,
   },
+  emailVerification: emailVerificationEnabled
+    ? {
+        sendOnSignUp: true,
+        sendOnSignIn: true,
+        autoSignInAfterVerification: true,
+        expiresIn: 3600,
+        sendVerificationEmail: async ({ user, url }) => {
+          await sendEmailVerificationEmail({ to: user.email, url })
+        },
+      }
+    : undefined,
   account: {
     accountLinking: {
       enabled: ACCOUNT_LINKING_OPTIONS.enabled,

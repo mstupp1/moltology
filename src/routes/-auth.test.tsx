@@ -28,11 +28,13 @@ function AuthRoute() {
   return <AuthView search={mockSearch} />
 }
 
+let emailVerificationEnabledForTest = false
 vi.mock('@/lib/auth-config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/auth-config')>()
   return {
     ...actual,
     isGoogleAuthEnabled: () => true,
+    isEmailVerificationEnabled: () => emailVerificationEnabledForTest,
   }
 })
 
@@ -43,6 +45,7 @@ vi.mock('@/lib/auth-client', () => ({
       social: vi.fn(),
       email: vi.fn(),
     },
+    sendVerificationEmail: vi.fn(),
     signUp: {
       email: vi.fn(),
     },
@@ -59,6 +62,7 @@ vi.mock('@/lib/server/api', () => ({
 describe('Auth Split Landing Page Component (/auth)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    emailVerificationEnabledForTest = false
     mockSearch = { mode: 'login' }
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
@@ -188,6 +192,7 @@ describe('Auth Split Landing Page Component (/auth)', () => {
         name: 'ascendant_unit',
         email: 'unit@example.com',
         password: 'securepwd123',
+        callbackURL: expect.stringContaining('/moltmax'),
       })
       expect(claimMemberHandleFn).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -322,4 +327,24 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     expect(screen.queryByRole('tab', { name: /Sign Up/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /Welcome Back/i })).not.toBeInTheDocument()
   })
+
+  it('shows confirm-email panel after signup when verification is enabled', async () => {
+    emailVerificationEnabledForTest = true
+    mockSearch = { mode: 'signup', redirect: '/dashboard' }
+    vi.mocked(authClient.signUp.email).mockResolvedValue({
+      data: { user: { id: 'user-verify', email: 'verify@example.com' }, token: null },
+    } as any)
+
+    render(<AuthRoute />)
+
+    fireEvent.change(screen.getByPlaceholderText('your_designation'), { target: { value: 'verify_unit' } })
+    fireEvent.change(screen.getByPlaceholderText('name@example.com'), { target: { value: 'verify@example.com' } })
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'securepwd123' } })
+    fireEvent.click(screen.getByRole('button', { name: /^Create Account$/i }))
+
+    expect(await screen.findByTestId('email-verification-pending')).toBeInTheDocument()
+    expect(screen.getByText(/Confirm your email/i)).toBeInTheDocument()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
 })

@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Lock, Mail, AlertCircle, Loader2 } from 'lucide-react'
 import { authClient } from '../lib/auth-client'
-import { isGoogleAuthEnabled } from '../lib/auth-config'
+import { isEmailVerificationEnabled, isGoogleAuthEnabled } from '../lib/auth-config'
+import {
+  EMAIL_VERIFICATION_COPY,
+  isEmailNotVerifiedError,
+  isVerifyFirstSignupResult,
+  stashPendingSignup,
+  takePendingSignup,
+} from '../lib/auth-email-verification'
 import { useAuthSession } from '../hooks/useAuthSession'
 import { rememberSessionUser, startGoogleSignIn } from '../lib/auth-session'
 import { getAuthJWTToken } from '../lib/jwt'
@@ -37,6 +44,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
+  const [resendBusy, setResendBusy] = useState(false)
+  const [resendMessage, setResendMessage] = useState<string | null>(null)
 
   useEffect(() => {
     setMode(initialMode)
@@ -46,14 +56,90 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }, [initialMode, isOpen])
 
   useEffect(() => {
-    if (user && isOpen) {
-      getUserProfileFn().catch(() => {})
+    if (!(user && isOpen)) return
+    let cancelled = false
+    const run = async () => {
+      const pending = takePendingSignup()
+      if (pending) {
+        await finishAuthenticatedEntry({
+          handle: pending.handle,
+          emailOptIn: pending.emailOptIn,
+          userId: user.id,
+          source: 'auth_modal',
+        })
+      } else {
+        await getUserProfileFn().catch(() => {})
+      }
+      if (cancelled) return
+      setPendingVerificationEmail(null)
       if (onSuccess) onSuccess()
       onClose()
+    }
+    void run()
+    return () => {
+      cancelled = true
     }
   }, [user, isOpen])
 
   if (!isOpen) return null
+
+
+  const finishAuthenticatedEntry = async (opts: {
+    handle?: string
+    emailOptIn?: boolean
+    userId?: string
+    source: string
+  }) => {
+    const token = await getAuthJWTToken()
+    if (opts.handle) {
+      await claimMemberHandleFn({
+        data: {
+          handle: opts.handle,
+          userId: opts.userId,
+          token: token ?? undefined,
+        },
+      }).catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
+      })
+    }
+    if (opts.emailOptIn) {
+      await updateEmailPreferencesFn({
+        data: {
+          emailOptIn: true,
+          source: opts.source,
+          userId: opts.userId,
+          token: token ?? undefined,
+        },
+      }).catch(() => {})
+    }
+    await getUserProfileFn({ data: { token: token ?? undefined, userId: opts.userId } }).catch(() => {})
+  }
+
+  const handleResendVerification = async () => {
+    if (!pendingVerificationEmail) return
+    setResendBusy(true)
+    setResendMessage(null)
+    setError(null)
+    try {
+      const callbackURL =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/dashboard`
+          : '/dashboard'
+      const res = await authClient.sendVerificationEmail({
+        email: pendingVerificationEmail,
+        callbackURL,
+      })
+      if (res?.error) {
+        setError(res.error.message || 'Could not resend confirmation. Please try again.')
+      } else {
+        setResendMessage(EMAIL_VERIFICATION_COPY.resendSuccess)
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Could not resend confirmation. Please try again.')
+    } finally {
+      setResendBusy(false)
+    }
+  }
 
   const handleGoogleSignIn = async () => {
     setError(null)
@@ -86,37 +172,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setLoading(false)
           return
         }
+        const callbackURL =
+          typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : '/dashboard'
         const res = await authClient.signUp.email({
           email,
           password,
           name: parsed.handle,
+          callbackURL,
         })
         if (res?.error) {
           setError(res.error.message || 'Could not create account. Please check your details and try again.')
+        } else if (isEmailVerificationEnabled() && isVerifyFirstSignupResult(res)) {
+          stashPendingSignup({
+            handle: parsed.handle,
+            emailOptIn,
+            email,
+            callbackURL: '/dashboard',
+          })
+          setPendingVerificationEmail(email)
+          setResendMessage(null)
         } else {
           const createdUser = (res as any)?.data?.user || (res as any)?.user
           rememberSessionUser(createdUser)
-          const token = await getAuthJWTToken()
-          await claimMemberHandleFn({
-            data: {
-              handle: parsed.handle,
-              userId: createdUser?.id,
-              token: token ?? undefined,
-            },
-          }).catch((err: unknown) => {
-            setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
+          await finishAuthenticatedEntry({
+            handle: parsed.handle,
+            emailOptIn,
+            userId: createdUser?.id,
+            source: 'auth_modal',
           })
-          if (emailOptIn) {
-            await updateEmailPreferencesFn({
-              data: {
-                emailOptIn: true,
-                source: 'auth_modal',
-                userId: createdUser?.id,
-                token: token ?? undefined,
-              },
-            }).catch(() => {})
-          }
-          await getUserProfileFn({ data: { token: token ?? undefined, userId: createdUser?.id } }).catch(() => {})
           if (onSuccess) onSuccess()
           onClose()
         }
@@ -126,7 +209,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           password,
         })
         if (res?.error) {
-          setError(res.error.message || 'Invalid email or password. Please try again.')
+          if (isEmailVerificationEnabled() && isEmailNotVerifiedError(res.error)) {
+            setPendingVerificationEmail(email)
+            setError(EMAIL_VERIFICATION_COPY.loginBlocked)
+          } else {
+            setError(res.error.message || 'Invalid email or password. Please try again.')
+          }
         } else {
           rememberSessionUser((res as any)?.data?.user || (res as any)?.user)
           await getUserProfileFn().catch(() => {})
@@ -173,6 +261,55 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
         </div>
 
+        {pendingVerificationEmail ? (
+          <div className="space-y-4" data-testid="email-verification-pending">
+            <div className="text-center space-y-2">
+              <Mail className="w-8 h-8 text-[#00c3ff] mx-auto" aria-hidden="true" />
+              <h3 className="text-lg font-bold font-grotesk text-white tracking-wide">
+                {EMAIL_VERIFICATION_COPY.title}
+              </h3>
+              <p className="text-sm text-[#839493] font-sans">
+                {EMAIL_VERIFICATION_COPY.body(pendingVerificationEmail)}
+              </p>
+            </div>
+            {error ? (
+              <div
+                role="alert"
+                className="mb-2 p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 flex items-start gap-2.5 text-[#ff453a] text-xs font-sans"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0 text-[#ff453a] mt-0.5" />
+                <span>{error}</span>
+              </div>
+            ) : null}
+            {resendMessage ? (
+              <div className="p-3 bg-[#00c3ff]/10 border border-[#00c3ff]/40 text-[#00c3ff] text-xs font-sans">
+                {resendMessage}
+              </div>
+            ) : null}
+            <HudButton
+              type="button"
+              variant="cyan"
+              fullWidth
+              disabled={resendBusy || loading}
+              onClick={() => void handleResendVerification()}
+            >
+              {resendBusy ? 'Sending…' : EMAIL_VERIFICATION_COPY.resend}
+            </HudButton>
+            <button
+              type="button"
+              className="w-full text-xs text-[#839493] hover:text-[#dfe3e3] font-sans"
+              onClick={() => {
+                setPendingVerificationEmail(null)
+                setResendMessage(null)
+                setError(null)
+                setMode('login')
+              }}
+            >
+              Back to sign in
+            </button>
+          </div>
+        ) : (
+        <>
         {/* Tab Selector */}
         <div className="flex border-b border-[#3a4a49]/60 mb-6">
           <button
@@ -327,6 +464,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             onExpire={() => setTurnstileToken(null)}
           />
         </form>
+        </>
+        )}
       </HudCard>
     </div>
   )

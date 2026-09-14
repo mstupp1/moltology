@@ -78,3 +78,30 @@ export function getGoogleClientCredentials(): { clientId: string; clientSecret: 
   if (clientId && clientSecret) return { clientId, clientSecret }
   return null
 }
+
+
+/**
+ * Server + build gate for email verification.
+ * Only `EMAIL_VERIFICATION_ENABLED=true|1` or the Vite mirror enables it.
+ * Default off until Resend domain DNS (DKIM) is verified.
+ */
+export function isEmailVerificationEnabled(): boolean {
+  const flag =
+    readViteEnv('VITE_EMAIL_VERIFICATION_ENABLED') ||
+    readProcessEnv('VITE_EMAIL_VERIFICATION_ENABLED') ||
+    readProcessEnv('EMAIL_VERIFICATION_ENABLED')
+  return isExplicitPublicFlag(flag) === true
+}
+
+/**
+ * Build-time value for `VITE_EMAIL_VERIFICATION_ENABLED`.
+ * Explicit Vite flag wins; otherwise mirrors `EMAIL_VERIFICATION_ENABLED`.
+ */
+export function resolveViteEmailVerificationEnabled(env: {
+  VITE_EMAIL_VERIFICATION_ENABLED?: string
+  EMAIL_VERIFICATION_ENABLED?: string
+}): 'true' | 'false' {
+  const explicit = isExplicitPublicFlag(env.VITE_EMAIL_VERIFICATION_ENABLED)
+  if (explicit !== null) return explicit ? 'true' : 'false'
+  return isExplicitPublicFlag(env.EMAIL_VERIFICATION_ENABLED) === true ? 'true' : 'false'
+}
