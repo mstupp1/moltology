@@ -143,7 +143,7 @@ describe('email verification mail', () => {
     expect(html).toContain(EMAIL_VERIFICATION_MAIL.button)
     expect(html).toContain(EMAIL_VERIFICATION_EMBLEM_URL)
     expect(html).toContain('href="https://moltology.org/api/auth/verify-email?token=abc&amp;next=/home"')
-    expect(html).toContain('#00c3ff')
+    expect(html).toContain('background-color:rgb(0,195,255)')
     expect(html).not.toMatch(/Resend|React Email|Better Auth|\bJWT\b/)
   })
 
