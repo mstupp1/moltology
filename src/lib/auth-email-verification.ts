@@ -8,6 +8,7 @@ export const EMAIL_VERIFICATION_COPY = {
     `We sent a confirmation link to ${email}. Open it to finish joining.`,
   resend: 'Resend confirmation',
   resendSuccess: 'Confirmation sent.',
+  sendFailed: 'Could not send the confirmation email. Please try again.',
   loginBlocked:
     'Confirm your email before signing in. Check your inbox, or resend the confirmation.',
   settingsUnverified: 'Email not confirmed yet.',

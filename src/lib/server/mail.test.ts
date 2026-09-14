@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SUPPORT_INBOX } from '../support-tickets'
+import * as emailVerification from '../../emails/email-verification'
 import {
   EMAIL_VERIFICATION_EMBLEM_URL,
   EMAIL_VERIFICATION_MAIL,
@@ -119,6 +120,7 @@ describe('email verification mail', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
     vi.unstubAllEnvs()
+    vi.restoreAllMocks()
   })
 
   it('renders confirmation text with the verify url and no stack names', () => {
@@ -180,5 +182,43 @@ describe('email verification mail', () => {
     })
     expect(result).toEqual({ sent: false, skipped: true, error: 'missing-api-key' })
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('still posts plain text when HTML render fails', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key')
+    vi.stubEnv('RESEND_FROM_EMAIL', DEFAULT_SUPPORT_FROM)
+    vi.spyOn(emailVerification, 'renderEmailVerificationEmailHtml').mockRejectedValue(
+      new Error('render boom'),
+    )
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await sendEmailVerificationEmail({
+      to: 'member@example.com',
+      url: 'https://moltology.org/api/auth/verify-email?token=abc',
+    })
+
+    expect(result).toEqual({ sent: true })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const payload = JSON.parse((fetchMock.mock.calls[0][1] as { body: string }).body)
+    expect(payload.text).toContain(EMAIL_VERIFICATION_MAIL.heading)
+    expect(payload.text).toContain('token=abc')
+    expect(payload.html).toBeUndefined()
+  })
+
+  it('logs only whether a Resend key is present', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_secret_do_not_log')
+    vi.stubEnv('RESEND_FROM_EMAIL', DEFAULT_SUPPORT_FROM)
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {})
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await sendEmailVerificationEmail({
+      to: 'member@example.com',
+      url: 'https://moltology.org/api/auth/verify-email?token=abc',
+    })
+
+    expect(info).toHaveBeenCalledWith('[mail] verification send', { hasResendKey: true })
+    expect(JSON.stringify(info.mock.calls)).not.toContain('re_secret_do_not_log')
   })
 })
