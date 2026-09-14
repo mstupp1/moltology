@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SUPPORT_INBOX } from '../support-tickets'
 import {
+  EMAIL_VERIFICATION_EMBLEM_URL,
+  EMAIL_VERIFICATION_MAIL,
+} from '../../emails/email-verification'
+import {
   DEFAULT_SUPPORT_FROM,
   RESEND_EMAILS_URL,
+  renderEmailVerificationHtml,
   renderEmailVerificationText,
   renderSupportTicketEmailText,
   sendEmailVerificationEmail,
@@ -121,9 +126,25 @@ describe('email verification mail', () => {
       to: 'member@example.com',
       url: 'https://moltology.org/api/auth/verify-email?token=abc',
     })
-    expect(text).toContain('Confirm your Moltology email')
+    expect(text).toContain(EMAIL_VERIFICATION_MAIL.heading)
+    expect(text).toContain(EMAIL_VERIFICATION_MAIL.body)
+    expect(text).toContain(EMAIL_VERIFICATION_MAIL.ignore)
     expect(text).toContain('https://moltology.org/api/auth/verify-email?token=abc')
-    expect(text).not.toMatch(/Resend|Better Auth|\bJWT\b/)
+    expect(text).not.toMatch(/Resend|React Email|Better Auth|\bJWT\b/)
+  })
+
+  it('renders React Email HTML with the confirm button and emblem', async () => {
+    const url = 'https://moltology.org/api/auth/verify-email?token=abc&next=/home'
+    const html = await renderEmailVerificationHtml({
+      to: 'member@example.com',
+      url,
+    })
+    expect(html).toContain(EMAIL_VERIFICATION_MAIL.heading)
+    expect(html).toContain(EMAIL_VERIFICATION_MAIL.button)
+    expect(html).toContain(EMAIL_VERIFICATION_EMBLEM_URL)
+    expect(html).toContain('href="https://moltology.org/api/auth/verify-email?token=abc&amp;next=/home"')
+    expect(html).toContain('background-color:rgb(0,195,255)')
+    expect(html).not.toMatch(/Resend|React Email|Better Auth|\bJWT\b/)
   })
 
   it('posts verification mail to the member address', async () => {
@@ -142,9 +163,11 @@ describe('email verification mail', () => {
     expect(url).toBe(RESEND_EMAILS_URL)
     const payload = JSON.parse((init as { body: string }).body)
     expect(payload.to).toEqual(['member@example.com'])
-    expect(payload.subject).toBe('Confirm your Moltology email')
+    expect(payload.subject).toBe(EMAIL_VERIFICATION_MAIL.subject)
     expect(payload.text).toContain('token=abc')
     expect(payload.html).toContain('token=abc')
+    expect(payload.html).toContain(EMAIL_VERIFICATION_MAIL.button)
+    expect(payload.html).toContain(EMAIL_VERIFICATION_EMBLEM_URL)
   })
 
   it('skips verification mail when Resend key is missing', async () => {
