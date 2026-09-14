@@ -97,7 +97,7 @@ console.log(ttsResult.providerUsed) // 'fish' | 'edge'
 Generate 2 complementary 9:16 vertical video scenes (6–8s each) using dynamic prompt combinators and Google Veo 3.1 Lite (`veo-3.1-lite-generate-preview`):
 
 * **Image vs. Video Generation Clarification**:
-  - **Still image generation** (thumbnails, overlays, covers) is powered by **Local ComfyUI (FLUX.1 Schnell GGUF)**.
+  - **Still image generation** (bespoke CTA outros, cover frames) is powered by the **Gemini API (`gemini-2.5-flash-image` via `scripts/generate-image.ts`)** using `GEMINI_API_KEY`.
   - **Video scene generation** is powered by **Google Veo 3.1** (`scripts/generate-video.ts`) using the `GEMINI_API_KEY` in `.env`.
   - **Do NOT pass `--no-veo`** in standard production runs. `--no-veo` is strictly reserved for local dry-run tests.
   - **No Silent Fallback**: If video generation encounters an error or missing credentials, the pipeline must halt and report the error rather than silently reusing homepage hero videos.
@@ -119,7 +119,7 @@ Run the master compositor to dynamically size video scenes to match voiceover le
 
 1. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
 2. **Seamless Forward Scene Playback & Atmospheric Color Grading**: Video clips are dynamically scaled to slot durations using cinematic slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of hard jump loops, and receive tasteful, cinematic contextual color grading (`benthic-cyan`, `thermal-melt`, `photonics-matrix`, `calcified-armor`, or 2-scene `ecdysis-transmute` auto progression).
-3. **Composite Studio Base Frame Generation & Thematic AI Outro Staging (`generate_image` / Google Flow)**:
+3. **Composite Studio Base Frame Generation & Thematic AI Outro Staging (Gemini API / Google Flow)**:
    - **Base Outro Generation via Composite Studio**: Render the deterministic base structural frame via **Composite Studio** (`npm run composite:render -- --template reel-outro ...` or `renderCtaOutroFrame('tmp/base-outro-frame.png', ...)`). The web-rendered frame delivers:
      - 1080×1920 (9:16 vertical standard)
      - Strict center alignment matching site fonts (`Space Grotesk`, `Inter`, `font-mono`) and theme tokens (`#00c3ff`, `#38bdf8`, `#f59e0b`)
@@ -134,13 +134,16 @@ Run the master compositor to dynamically size video scenes to match voiceover le
        - `none` (Solid HUD) — Clean dark cyan gradient without texture.
      - Prominent, large cartoon crustacean mascot (~520px) anchored with natural soft contact shadow
    - **Mandatory Final Slide AI Elevation**:
-     - The final CTA outro slide **MUST ALWAYS** pass through AI elevation (either via Antigravity `generate_image` or user Google Flow polish) to elevate the 2D layout into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics and subtle ambient mascot lighting.
-     - **Path A: Direct Agent Elevation (`generate_image`)**:
-       - Pass the base frame as a reference image to Antigravity's `generate_image` tool with topic-specific prompt instructions.
+     - The final CTA outro slide **MUST ALWAYS** pass through AI elevation (either via Gemini API or user Google Flow polish) to elevate the 2D layout into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics and subtle ambient mascot lighting.
+     - **Path A: Direct Agent Elevation (Gemini API via `scripts/generate-image.ts`)**:
+       - Elevate the base frame using the Gemini API (**Nano Banana Pro** `gemini-3-pro-image` default, or **Nano Banana 2** `gemini-3.1-flash-image`) via CLI: `npx tsx scripts/generate-image.ts --reference <base-frame> --prompt <prompt> --aspect 9:16 --size 2K --model nano-banana-pro --out <output-path>` (or automatically in the reel pipeline via `npm run reel:create -- --ai-outro --image-model nano-banana-pro`).
+       - **Model Selection**:
+         - **Nano Banana Pro (`gemini-3-pro-image`)** *(Recommended)*: Deep volumetric glassmorphism, 2K ultra-sharp caustics, and pristine micro-textures (~13s).
+         - **Nano Banana 2 (`gemini-3.1-flash-image`)**: High-speed generation (~8s) for rapid prototyping and high-throughput batching.
        - Restyle typography into luminous 3D sci-fi lettering without adding hallucinated text or fake labels.
        - Ensure the cartoon crustacean mascot is clearly visible with natural ambient lighting and soft contact shadows (no harsh spotlights or artificial halos).
      - **Path B: User Google Flow Handoff (Rate Limits / Quota Exceeded / Fallback)**:
-       - **Strict Rule**: If `generate_image` hits API rate limits, quota restrictions, or fails, **DO NOT silently fall back** to an un-elevated flat canvas frame or generic catalog placeholder.
+       - **Strict Rule**: If Gemini API hits rate limits, quota restrictions, or fails, **DO NOT silently fall back** to an un-elevated flat canvas frame or generic catalog placeholder.
        - **Prompt the USER immediately** with:
          1. The local path to the rendered 9:16 base composite frame in `tmp/` (e.g. `tmp/base-outro-frame.png`).
          2. Rich, ready-to-copy **Google Flow AI Prompt Directives** tailored to the topic, headline, and mascot.
@@ -155,10 +158,14 @@ npx tsx -e "import { syncOutroCardsToS3 } from './scripts/lib/outro-catalog'; sy
 
 # Render base outro frame via Composite Studio CLI with contextual CTA texture:
 npx tsx scripts/render-composite.ts --template reel-outro --aspect 9:16 --mascot crab_stats --cta-texture circuit --data '{"headline":"CALCIFY YOUR GRIP","subheadline":"CALCULATE YOUR MOLT CLEARANCE","url":"moltology.org","actionBadgeText":"⚡ TAKE THE 15-STAGE MOLTMAXXING TEST"}' --out tmp/base-outro-frame.png
+
+# Elevate base frame into bespoke 3D glassmorphic HUD card via Gemini API (Nano Banana Pro):
+npx tsx scripts/generate-image.ts --reference tmp/base-outro-frame.png --prompt "Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. 9:16 vertical orientation." --aspect 9:16 --size 2K --model nano-banana-pro --out tmp/themed-outro-card.png
 ```
 
 ```typescript
 import { renderCtaOutroFrame, compositeReel } from 'scripts/lib/reel-compositor'
+import { generateGeminiImage } from 'scripts/generate-image'
 
 // 1. Generate base structural template frame via Composite Studio with chosen molting texture
 const baseOutroPath = 'tmp/base-outro-frame.png'
@@ -168,8 +175,13 @@ await renderCtaOutroFrame(baseOutroPath, 'CALCIFY YOUR GRIP', 'CALCULATE YOUR MO
   ctaActionText: '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST',
 })
 
-// 2. Generate content-themed AI outro card using base frame as reference (via generate_image)
-// Result saved to: tmp/themed-outro-card.jpg
+// 2. Elevate base frame into 3D glassmorphic HUD card using Gemini API
+const elevatedOutro = await generateGeminiImage({
+  prompt: 'Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, and luminous sci-fi lettering. 9:16 vertical orientation.',
+  referenceImagePath: baseOutroPath,
+  aspectRatio: '9:16',
+  outputFilePath: 'tmp/themed-outro-card.png',
+})
 
 // 3. Composite master video timeline with contextual color grading
 await compositeReel({
@@ -184,7 +196,7 @@ await compositeReel({
   ctaHeadline: 'SUBMIT. SHED. ASCEND.',
   ctaSubheadline: 'CALCULATE YOUR MOLT CLEARANCE',
   ctaUrl: 'moltology.org',
-  customOutroImagePath: 'tmp/themed-outro-card.jpg',
+  customOutroImagePath: elevatedOutro.localPath,
   mascot: 'crab_stats',
 })
 ```
@@ -276,8 +288,11 @@ npm run reel:create -- --theme benthic-depth --cta-goal codex --mascot lobster_p
 # Custom targeted topic or news headline:
 npm run reel:create -- --topic "Subsea Datacenter Heatwaves" --cta-goal demo --color-grade thermal-melt
 
-# Custom run with bespoke AI-restyled outro card:
-npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --custom-outro "tmp/themed-outro-card.jpg"
+# Custom run with bespoke AI-restyled outro card generated via Gemini API:
+npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --ai-outro
+
+# Or with custom pre-generated outro image:
+npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --custom-outro "tmp/themed-outro-card.png"
 
 # Direct instant publish (skip queue / publish immediately):
 npm run reel:create -- --publish-now
@@ -291,12 +306,12 @@ npm run reel:create -- --dry-run --no-veo
 ## 4. Operational Best Practices & Failure Modes
 
 1. **Video vs. Image Generation Separation**:
-   - **Still Images**: Always generated using Antigravity's built-in `generate_image` tool (never external APIs).
+   - **Still Images**: Generated using the Gemini API (**Nano Banana Pro** `gemini-3-pro-image` / **Nano Banana 2** `gemini-3.1-flash-image` via `scripts/generate-image.ts` or `--ai-outro`) using `GEMINI_API_KEY`. Default to Nano Banana Pro for 2K high-fidelity 3D glassmorphic HUD assets.
    - **Video Scenes**: Always generated using Google Veo 3.1 (`scripts/generate-video.ts`) via `GEMINI_API_KEY`.
 2. **Explicit Failure Policy**:
    - If Veo 3.1 video generation fails or credentials are missing during a production run, **the pipeline must halt immediately and throw an error**. Never silently fall back to reusing homepage video assets.
 3. **Async Task Etiquette**:
    - Long-running commands (e.g. Veo scene generation, master FFmpeg compositing) run as background tasks. Do not poll `manage_task` in a tight loop; end turn and allow the system's reactive notification to signal task completion.
 4. **Outro AI Elevation & User Handoff on Rate Limits**:
-   - The final CTA outro slide must never remain a flat 2D frame or un-elevated catalog fallback. If Antigravity `generate_image` is rate-limited or quota-restricted, the agent **MUST** halt before final video stitching, output the 9:16 base composite frame path, and prompt the USER with formatted Google Flow prompt directives to elevate the asset. Once the user drops the polished image back into `tmp/`, resume compositing with `--custom-outro`.
+   - The final CTA outro slide must never remain a flat 2D frame or un-elevated catalog fallback. If Gemini API is rate-limited or quota-restricted, the agent **MUST** halt before final video stitching, output the 9:16 base composite frame path, and prompt the USER with formatted Google Flow prompt directives to elevate the asset. Once the user drops the polished image back into `tmp/`, resume compositing with `--custom-outro`.
 

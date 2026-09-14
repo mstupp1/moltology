@@ -5,8 +5,9 @@ import path from 'node:path'
 import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
 import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
-import { compositeReel, ColorGradingPreset } from './lib/reel-compositor'
+import { compositeReel, renderCtaOutroFrame, ColorGradingPreset } from './lib/reel-compositor'
 import { generateVeoVideo } from './generate-video'
+import { generateGeminiImage } from './generate-image'
 import { resolveThematicOutroCard } from './lib/outro-catalog'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
@@ -361,6 +362,8 @@ export interface CreateDailyReelOptions {
   ctaBadge?: string
   ctaActionText?: string
   customOutroImagePath?: string
+  aiOutro?: boolean
+  imageModel?: string
   mascot?:
     | 'lobster_pointing'
     | 'lobster_thumbs_up'
@@ -1553,14 +1556,51 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     options.colorGrading
   )
 
-  const resolvedOutroPath = await resolveThematicOutroCard({
-    theme: options.theme,
-    topic: scriptData.topic,
-    ctaGoal: ctaConfig.goal,
-    customImagePath: options.customOutroImagePath,
-  })
+  let resolvedOutroPath = options.customOutroImagePath
+
+  if (!resolvedOutroPath && options.aiOutro) {
+    try {
+      console.log(`\n🎨 Generating bespoke 3D outro card via Gemini API...`)
+      const baseOutroPath = path.join(tempDir, 'base-outro-frame.png')
+      const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
+      await renderCtaOutroFrame(
+        baseOutroPath,
+        options.ctaHeadline || ctaConfig.headline,
+        options.ctaSubheadline || ctaConfig.subheadline,
+        options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+        {
+          mascot: chosenMascot,
+          ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
+          ctaActionText: options.ctaActionText || ctaConfig.actionText,
+        }
+      )
+      const elevatedOutroPath = path.join(tempDir, `gemini-elevated-outro-${timestamp}.png`)
+      const geminiResult = await generateGeminiImage({
+        prompt: `Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: ${options.theme || 'benthic'}. Topic: ${scriptData.topic}. Preserve core brand layout and URL text. 9:16 vertical orientation.`,
+        referenceImagePath: baseOutroPath,
+        aspectRatio: '9:16',
+        imageSize: '2K',
+        model: options.imageModel || 'gemini-3-pro-image',
+        outputFilePath: elevatedOutroPath,
+      })
+      resolvedOutroPath = geminiResult.localPath
+      console.log(`   ✨ Successfully generated bespoke 3D outro card: ${resolvedOutroPath}`)
+    } catch (err: any) {
+      console.warn(`   ⚠️ Bespoke Gemini outro generation failed, falling back to curated catalog: ${err.message}`)
+    }
+  }
+
+  if (!resolvedOutroPath) {
+    resolvedOutroPath = (await resolveThematicOutroCard({
+      theme: options.theme,
+      topic: scriptData.topic,
+      ctaGoal: ctaConfig.goal,
+      customImagePath: options.customOutroImagePath,
+    })) || undefined
+  }
+
   if (resolvedOutroPath) {
-    console.log(`   💎 Resolved curated thematic outro card: ${path.basename(resolvedOutroPath)}`)
+    console.log(`   💎 Resolved thematic outro card: ${path.basename(resolvedOutroPath)}`)
   }
 
   const compositeResult = await compositeReel({
@@ -1706,6 +1746,9 @@ Options:
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
+  --custom-outro <path>     Path to bespoke elevated outro card image
+  --ai-outro                Generate bespoke 3D outro card via Gemini API
+  --image-model <name>      Image model for AI outro: nano-banana-pro | nano-banana-2 (default: nano-banana-pro)
 
 Examples:
   npx tsx scripts/create-daily-reel.ts
@@ -1731,6 +1774,8 @@ Examples:
   let bgAudioOffsetSeconds: number | undefined
   let veoModel: string | undefined
   let customOutroImagePath: string | undefined
+  let aiOutro = false
+  let imageModel: string | undefined
   let ctaTexture: any
 
   for (let i = 0; i < args.length; i++) {
@@ -1750,6 +1795,8 @@ Examples:
     else if (args[i] === '--bg-offset' && args[i + 1]) bgAudioOffsetSeconds = parseFloat(args[++i])
     else if (args[i] === '--veo-model' && args[i + 1]) veoModel = args[++i]
     else if (args[i] === '--custom-outro' && args[i + 1]) customOutroImagePath = args[++i]
+    else if (args[i] === '--ai-outro') aiOutro = true
+    else if (args[i] === '--image-model' && args[i + 1]) imageModel = args[++i]
   }
 
   try {
@@ -1770,6 +1817,8 @@ Examples:
       bgAudioOffsetSeconds,
       veoModel,
       customOutroImagePath,
+      aiOutro,
+      imageModel,
     })
   } catch (err: any) {
     console.error(`\n❌ Daily reel creation failed: ${err.message}`)

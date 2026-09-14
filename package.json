@@ -34,6 +34,7 @@
     "s3:sync": "tsx scripts/sync-s3-assets.ts",
     "s3:verify": "tsx scripts/sync-s3-assets.ts --verify",
     "assets:check": "tsx scripts/check-asset-budget.ts",
+    "image:generate": "tsx scripts/generate-image.ts",
     "video:generate": "tsx scripts/generate-video.ts",
     "reel:create": "tsx scripts/create-daily-reel.ts",
     "shorts:create": "tsx scripts/create-daily-reel.ts",
