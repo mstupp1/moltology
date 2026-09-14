@@ -1144,6 +1144,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-11T14:07:55.806Z"
+    },
+    {
+      "id": "reel-1789402502553",
+      "topic": "The Hold You Sat Through: Then They Hired a Voice Again",
+      "hookHeadline": "JUDGMENT WOULD NOT FIT",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-hold-you-sat-through",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Companies cut the support desk, then spent a dollar twenty-seven to hire it back. The bot took the routine. Judgment still would not fit. Calculate your clearance on moltology.org/quiz.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1789394770057.mp4",
+      "s3Key": "videos/social/reels/master-reel-1789394770057.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 13.3,
+      "status": "queued",
+      "scheduledFor": "2026-09-14T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aa81d8783e761893c9fa738",
+      "zernioYouTubePostId": "6aa81d8783e761893c9fa738",
+      "zernioPostId": "6aa81d8783e761893c9fa738",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "More than half the companies that cut staff for AI now regret it. Two in three are already rehiring. Support is not replacement. The bot took the routine. Judgment still would not fit. ⚡🌊\n\nYou waited for a person. The company had already cut that seat. Then they hired it back. The bot took the routine. Judgment still would not fit.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-14T16:15:04.655Z"
     }
   ]
 }

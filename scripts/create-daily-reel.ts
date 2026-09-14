@@ -2,6 +2,7 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
+import { execSync } from 'node:child_process'
 import matter from 'gray-matter'
 import { generateVoiceover } from './lib/tts-engine'
 import { getRandomFishVoice } from './lib/tts-providers/fish-audio'
@@ -201,6 +202,20 @@ export function resolveCtaGoalConfig(
 
   const text = `${context?.theme || ''} ${context?.topic || ''} ${context?.slug || ''} ${context?.content || ''}`.toLowerCase()
 
+  // 0. Hold / Support Desk / The Hold You Sat Through -> Quiz
+  if (
+    text.includes('the-hold-you-sat-through') ||
+    text.includes('the hold you sat through') ||
+    text.includes('then they hired a voice again') ||
+    text.includes('judgment still would not fit') ||
+    text.includes('judgment did not fit') ||
+    text.includes('ai boomerang') ||
+    text.includes('careerminds') ||
+    text.includes('orgvue')
+  ) {
+    return CTA_GOAL_CONFIGS.quiz
+  }
+
   // 0. Sidewalk / Feet / Clark Street -> Routine
   if (
     text.includes('the-sidewalk-still-belongs-to-feet') ||
@@ -350,6 +365,8 @@ export interface CreateDailyReelOptions {
   ctaGoal?: CtaGoal
   holidayOrEvent?: string
   platforms?: ('instagram' | 'youtube')[]
+  platform?: 'all' | 'instagram' | 'youtube'
+  customVideo?: string
   publishNow?: boolean
   scheduleBestTime?: boolean
   dryRun?: boolean
@@ -619,6 +636,22 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     ]
   }
 
+  if (
+    topicLower.includes('the hold you sat through') ||
+    topicLower.includes('then they hired a voice again') ||
+    topicLower.includes('judgment still would not fit') ||
+    topicLower.includes('judgment did not fit') ||
+    topicLower.includes('hired a voice') ||
+    topicLower.includes('ai boomerang') ||
+    topicLower.includes('careerminds') ||
+    topicLower.includes('orgvue')
+  ) {
+    return [
+      'A dramatic macro cinematic view of an empty customer support office cubicle desk with an illuminated telephone headset glowing amber on hold and call-queue telemetry blinking on the monitor under dim fluorescent light, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing calmly inside a serene subsea benthic sanctuary with glowing cyan bio-silicon armor holding the steady operational boundary in deep abyssal waters, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
   if (topicLower.includes('world model') || topicLower.includes('jepa') || topicLower.includes('pixel ecdysis') || topicLower.includes('diffusion') || topicLower.includes('latent')) {
     return [
       'A dramatic macro cinematic view of a chaotic 4K video diffusion simulation melting and warping with glitched red and orange RGB voxels dissolving into noise, cinematic 9:16 vertical 8k footage',
@@ -723,6 +756,15 @@ export function synthesizeBlogReelScript(
     contentLower.includes('coco delivery') ||
     contentLower.includes('lincoln park') ||
     contentLower.includes('clark street')
+  const isTheHoldYouSatThrough =
+    blog.slug === 'the-hold-you-sat-through' ||
+    contentLower.includes('the hold you sat through') ||
+    contentLower.includes('then they hired a voice again') ||
+    contentLower.includes('judgment still would not fit') ||
+    contentLower.includes('judgment did not fit') ||
+    contentLower.includes('ai boomerang') ||
+    contentLower.includes('careerminds') ||
+    contentLower.includes('orgvue')
   const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
@@ -868,6 +910,23 @@ export function synthesizeBlogReelScript(
         headline: 'FEET WERE HERE FIRST',
         script: `When delivery fleets jam the sidewalk, you do not argue with a rover. You take the open edge and keep walking. Feet were here first. Lock in your daily protocol on moltology dot org.`,
         hookText: 'When delivery fleets jam the sidewalk, you don’t argue with a rover. You take the open edge and keep walking. Shared ground belongs to people on foot.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTheHoldYouSatThrough) {
+    const hooks = [
+      {
+        headline: 'JUDGMENT WOULD NOT FIT',
+        script: `Companies cut the support desk, then spent a dollar twenty-seven to hire it back. The bot took the routine. Judgment still would not fit. Calculate your clearance on moltology.org/quiz.`,
+        hookText: 'More than half the companies that cut staff for AI now regret it. Two in three are already rehiring. Support is not replacement. The bot took the routine. Judgment still would not fit.',
+      },
+      {
+        headline: 'THEN THEY HIRED A VOICE AGAIN',
+        script: `You waited on hold for a person who was cut, then quietly rehired six months later. Support is not replacement. Soft shell does not mean weak. Audit your clearance on moltology.org/quiz.`,
+        hookText: 'The cuts were real. Then the second listing went up. More than half the employers who cut jobs on the promise of AI now regret it. Judgment still would not fit in the bot.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]
@@ -1447,194 +1506,231 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   console.log(`   • Hook Headline: "${scriptData.hookHeadline}"`)
   console.log(`   • Narration: "${scriptData.narrationScript}"`)
 
-  // 2. Synthesize Voiceover & Word Boundaries
-  console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps (Fish Audio S2, Edge fallback)...`)
-  const voice = options.voice || getRandomFishVoice()
-  console.log(`   • Voice Persona: "${voice}"`)
-  const ttsResult = await generateVoiceover(scriptData.narrationScript, {
-    voice,
-    rate: '+12%',
-    outputDir: tempDir,
-    outputFilename: 'narration.mp3',
-  })
-  console.log(`   • TTS provider: ${ttsResult.providerUsed ?? 'unknown'}`)
-  console.log(`   • Voiceover Duration: ${ttsResult.durationSeconds.toFixed(2)}s`)
-  console.log(`   • Word Count: ${ttsResult.words.length}`)
-
-  // 3. Generate Video Scenes
-  const sceneVideoPaths: string[] = []
-  const useVeo = options.useVeo ?? true
-  const voDuration = ttsResult.durationSeconds
-  const postSpeechBuffer = 0.8
-  const requiredSpeechDuration = voDuration + postSpeechBuffer
-  const numScenes = Math.max(1, scriptData.scenePrompts.length)
-  const perSceneDurationTarget = requiredSpeechDuration / numScenes
-  // Veo supports durationSeconds integer (typically 5, 6, or 8s). Request footage equal or slightly longer than target to ensure zero looping
-  let veoSceneDuration = 6
-  if (perSceneDurationTarget <= 5) {
-    veoSceneDuration = 5
-  } else if (perSceneDurationTarget > 6.2) {
-    veoSceneDuration = 8
-  } else {
-    veoSceneDuration = 6
-  }
-
-  console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
-  if (useVeo && !options.dryRun) {
-    for (let i = 0; i < scriptData.scenePrompts.length; i++) {
-      const prompt = scriptData.scenePrompts[i]
-      console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
-      const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
-      const veoResult = await generateVeoVideo({
-        prompt,
-        model: options.veoModel || 'veo-3.1-lite-generate-preview',
-        aspectRatio: '9:16',
-        durationSeconds: veoSceneDuration,
-        uploadToS3: false,
-        keepLocal: true,
-        outputFilePath: sceneOut,
-      })
-      sceneVideoPaths.push(veoResult.localPath || sceneOut)
-    }
-  } else {
-    // Fallback or local video assembly: use contextual high quality clips from public/videos
-    console.log(`   ⚠️  Using high-fidelity local benthic video assets for assembly...`)
-    const topicLower = (scriptData.topic + ' ' + (scriptData.hookHeadline || '')).toLowerCase()
-    
-    let chosenClips = [
-      path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-      path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
-    ]
-
-    if (topicLower.includes('synaptic') || topicLower.includes('monosemantic') || topicLower.includes('sparse autoencoder') || topicLower.includes('sae') || topicLower.includes('neural') || topicLower.includes('circuit')) {
-      chosenClips = [
-        path.resolve(process.cwd(), 'public/videos/hero_synaptic_path.mp4'),
-        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-      ]
-    } else if (topicLower.includes('shed') || topicLower.includes('ecdysis')) {
-      chosenClips = [
-        path.resolve(process.cwd(), 'public/videos/hero_asset_shedding.mp4'),
-        path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
-      ]
-    } else if (topicLower.includes('isolation') || topicLower.includes('sandbox') || topicLower.includes('fault') || topicLower.includes('swarm')) {
-      chosenClips = [
-        path.resolve(process.cwd(), 'public/videos/hero_fault_isolation.mp4'),
-        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-      ]
-    } else if (topicLower.includes('carcinization') || topicLower.includes('moltmax') || topicLower.includes('ascend')) {
-      chosenClips = [
-        path.resolve(process.cwd(), 'public/videos/hero_total_carcinization.mp4'),
-        path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
-      ]
-    } else if (topicLower.includes('cryo') || topicLower.includes('chamber') || topicLower.includes('depth') || topicLower.includes('fathom')) {
-      chosenClips = [
-        path.resolve(process.cwd(), 'public/videos/benthic_cryo_chamber.mp4'),
-        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-      ]
-    }
-
-    sceneVideoPaths.push(...chosenClips.filter((v) => fs.existsSync(v)))
-  }
-
-  if (sceneVideoPaths.length === 0) {
-    throw new Error('No video clips available for compositing.')
-  }
-
-  // 4. Master FFmpeg Reel Compositing
-  console.log(`\n4️⃣ Compositing Master Reel with FFmpeg...`)
   const ctaConfig = resolveCtaGoalConfig(options.ctaGoal || scriptData.ctaGoal, {
     theme: options.theme,
     topic: scriptData.topic,
     slug: scriptData.relatedBlogSlug,
   })
 
-  const masterReelPath = path.join(tempDir, `master-reel-${timestamp}.mp4`)
-  const colorGradingPresets = resolveColorGradingPresets(
-    options.theme,
-    scriptData.topic,
-    sceneVideoPaths.length,
-    options.colorGrading
-  )
-
-  let resolvedOutroPath = options.customOutroImagePath
-
-  if (!resolvedOutroPath && options.aiOutro) {
-    try {
-      console.log(`\n🎨 Generating bespoke 3D outro card via Gemini API...`)
-      const baseOutroPath = path.join(tempDir, 'base-outro-frame.png')
-      const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
-      await renderCtaOutroFrame(
-        baseOutroPath,
-        options.ctaHeadline || ctaConfig.headline,
-        options.ctaSubheadline || ctaConfig.subheadline,
-        options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
-        {
-          mascot: chosenMascot,
-          ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
-          ctaActionText: options.ctaActionText || ctaConfig.actionText,
-        }
-      )
-      const elevatedOutroPath = path.join(tempDir, `gemini-elevated-outro-${timestamp}.png`)
-      const geminiResult = await generateGeminiImage({
-        prompt: `Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: ${options.theme || 'benthic'}. Topic: ${scriptData.topic}. Preserve core brand layout and URL text. 9:16 vertical orientation.`,
-        referenceImagePath: baseOutroPath,
-        aspectRatio: '9:16',
-        imageSize: '2K',
-        model: options.imageModel || 'gemini-3-pro-image',
-        outputFilePath: elevatedOutroPath,
-      })
-      resolvedOutroPath = geminiResult.localPath
-      console.log(`   ✨ Successfully generated bespoke 3D outro card: ${resolvedOutroPath}`)
-    } catch (err: any) {
-      console.warn(`   ⚠️ Bespoke Gemini outro generation failed, falling back to curated catalog: ${err.message}`)
-    }
-  }
-
-  if (!resolvedOutroPath) {
-    resolvedOutroPath = (await resolveThematicOutroCard({
-      theme: options.theme,
-      topic: scriptData.topic,
-      ctaGoal: ctaConfig.goal,
-      customImagePath: options.customOutroImagePath,
-    })) || undefined
-  }
-
-  if (resolvedOutroPath) {
-    console.log(`   💎 Resolved thematic outro card: ${path.basename(resolvedOutroPath)}`)
-  }
-
-  const compositeResult = await compositeReel({
-    videoClips: sceneVideoPaths,
-    voiceoverPath: ttsResult.audioPath,
-    words: ttsResult.words,
-    outputPath: masterReelPath,
-    colorGrading: colorGradingPresets,
-    watermarkOpacity: options.watermarkOpacity ?? 0.40,
-    watermarkSize: options.watermarkSize ?? 110,
-    ctaHeadline: options.ctaHeadline || ctaConfig.headline,
-    ctaSubheadline: options.ctaSubheadline || ctaConfig.subheadline,
-    ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
-    ctaBadge: options.ctaBadge || ctaConfig.actionText,
-    ctaActionText: options.ctaActionText || ctaConfig.actionText,
-    ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
-    customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
-    mascot: options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey())),
-    backgroundAudioVolume: options.bgAudioVolume,
-    backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
-    tempDir: path.join(tempDir, 'ffmpeg-build'),
-  })
-
-  // 5. Upload Master Video to Neon S3
+  let masterReelPath: string
   let publicUrl: string | undefined
   let s3Key: string | undefined
   let queueResult: QueueDualReelAndShortResult | null = null
+  let durationSeconds = 13.3
+  let compositeResult: any = null
+
+  if (options.customVideo) {
+    console.log(`\n🎬 Using pre-rendered custom video: ${options.customVideo}`)
+    if (options.customVideo.startsWith('http://') || options.customVideo.startsWith('https://')) {
+      publicUrl = options.customVideo
+      masterReelPath = options.customVideo
+    } else {
+      masterReelPath = path.resolve(options.customVideo)
+      if (!fs.existsSync(masterReelPath)) {
+        throw new Error(`Custom video file not found: ${masterReelPath}`)
+      }
+      try {
+        const probeOut = execSync(
+          `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${masterReelPath}"`,
+          { encoding: 'utf8' }
+        )
+        const parsed = parseFloat(probeOut.trim())
+        if (!isNaN(parsed) && parsed > 0) durationSeconds = parsed
+      } catch {
+        // use fallback duration
+      }
+    }
+  } else {
+    // 2. Synthesize Voiceover & Word Boundaries
+    console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps (Fish Audio S2, Edge fallback)...`)
+    const voice = options.voice || getRandomFishVoice()
+    console.log(`   • Voice Persona: "${voice}"`)
+    const ttsResult = await generateVoiceover(scriptData.narrationScript, {
+      voice,
+      rate: '+12%',
+      outputDir: tempDir,
+      outputFilename: 'narration.mp3',
+    })
+    console.log(`   • TTS provider: ${ttsResult.providerUsed ?? 'unknown'}`)
+    console.log(`   • Voiceover Duration: ${ttsResult.durationSeconds.toFixed(2)}s`)
+    console.log(`   • Word Count: ${ttsResult.words.length}`)
+
+    // 3. Generate Video Scenes
+    const sceneVideoPaths: string[] = []
+    const useVeo = options.useVeo ?? true
+    const voDuration = ttsResult.durationSeconds
+    const postSpeechBuffer = 0.8
+    const requiredSpeechDuration = voDuration + postSpeechBuffer
+    const numScenes = Math.max(1, scriptData.scenePrompts.length)
+    const perSceneDurationTarget = requiredSpeechDuration / numScenes
+    // Veo supports durationSeconds integer (typically 5, 6, or 8s). Request footage equal or slightly longer than target to ensure zero looping
+    let veoSceneDuration = 6
+    if (perSceneDurationTarget <= 5) {
+      veoSceneDuration = 5
+    } else if (perSceneDurationTarget > 6.2) {
+      veoSceneDuration = 8
+    } else {
+      veoSceneDuration = 6
+    }
+
+    console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
+    if (useVeo && !options.dryRun) {
+      for (let i = 0; i < scriptData.scenePrompts.length; i++) {
+        const prompt = scriptData.scenePrompts[i]
+        console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
+        const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
+        const veoResult = await generateVeoVideo({
+          prompt,
+          model: options.veoModel || 'veo-3.1-lite-generate-preview',
+          aspectRatio: '9:16',
+          durationSeconds: veoSceneDuration,
+          uploadToS3: false,
+          keepLocal: true,
+          outputFilePath: sceneOut,
+        })
+        sceneVideoPaths.push(veoResult.localPath || sceneOut)
+      }
+    } else {
+      // Fallback or local video assembly: use contextual high quality clips from public/videos
+      console.log(`   ⚠️  Using high-fidelity local benthic video assets for assembly...`)
+      const topicLower = (scriptData.topic + ' ' + (scriptData.hookHeadline || '')).toLowerCase()
+      
+      let chosenClips = [
+        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+        path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
+      ]
+
+      if (topicLower.includes('synaptic') || topicLower.includes('monosemantic') || topicLower.includes('sparse autoencoder') || topicLower.includes('sae') || topicLower.includes('neural') || topicLower.includes('circuit')) {
+        chosenClips = [
+          path.resolve(process.cwd(), 'public/videos/hero_synaptic_path.mp4'),
+          path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+        ]
+      } else if (topicLower.includes('shed') || topicLower.includes('ecdysis')) {
+        chosenClips = [
+          path.resolve(process.cwd(), 'public/videos/hero_asset_shedding.mp4'),
+          path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
+        ]
+      } else if (topicLower.includes('isolation') || topicLower.includes('sandbox') || topicLower.includes('fault') || topicLower.includes('swarm')) {
+        chosenClips = [
+          path.resolve(process.cwd(), 'public/videos/hero_fault_isolation.mp4'),
+          path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+        ]
+      } else if (topicLower.includes('carcinization') || topicLower.includes('moltmax') || topicLower.includes('ascend')) {
+        chosenClips = [
+          path.resolve(process.cwd(), 'public/videos/hero_total_carcinization.mp4'),
+          path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
+        ]
+      } else if (topicLower.includes('cryo') || topicLower.includes('chamber') || topicLower.includes('depth') || topicLower.includes('fathom')) {
+        chosenClips = [
+          path.resolve(process.cwd(), 'public/videos/benthic_cryo_chamber.mp4'),
+          path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
+        ]
+      }
+
+      sceneVideoPaths.push(...chosenClips.filter((v) => fs.existsSync(v)))
+    }
+
+    if (sceneVideoPaths.length === 0) {
+      throw new Error('No video clips available for compositing.')
+    }
+
+    // 4. Master FFmpeg Reel Compositing
+    console.log(`\n4️⃣ Compositing Master Reel with FFmpeg...`)
+    masterReelPath = path.join(tempDir, `master-reel-${timestamp}.mp4`)
+    const colorGradingPresets = resolveColorGradingPresets(
+      options.theme,
+      scriptData.topic,
+      sceneVideoPaths.length,
+      options.colorGrading
+    )
+
+    let resolvedOutroPath = options.customOutroImagePath
+
+    if (!resolvedOutroPath && options.aiOutro) {
+      try {
+        console.log(`\n🎨 Generating bespoke 3D outro card via Gemini API...`)
+        const baseOutroPath = path.join(tempDir, 'base-outro-frame.png')
+        const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
+        await renderCtaOutroFrame(
+          baseOutroPath,
+          options.ctaHeadline || ctaConfig.headline,
+          options.ctaSubheadline || ctaConfig.subheadline,
+          options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+          {
+            mascot: chosenMascot,
+            ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
+            ctaActionText: options.ctaActionText || ctaConfig.actionText,
+          }
+        )
+        const elevatedOutroPath = path.join(tempDir, `gemini-elevated-outro-${timestamp}.png`)
+        const geminiResult = await generateGeminiImage({
+          prompt: `Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: ${options.theme || 'benthic'}. Topic: ${scriptData.topic}. Preserve core brand layout and URL text. 9:16 vertical orientation.`,
+          referenceImagePath: baseOutroPath,
+          aspectRatio: '9:16',
+          imageSize: '2K',
+          model: options.imageModel || 'gemini-3-pro-image',
+          outputFilePath: elevatedOutroPath,
+        })
+        resolvedOutroPath = geminiResult.localPath
+        console.log(`   ✨ Successfully generated bespoke 3D outro card: ${resolvedOutroPath}`)
+      } catch (err: any) {
+        console.warn(`   ⚠️ Bespoke Gemini outro generation failed, falling back to curated catalog: ${err.message}`)
+      }
+    }
+
+    if (!resolvedOutroPath) {
+      resolvedOutroPath = (await resolveThematicOutroCard({
+        theme: options.theme,
+        topic: scriptData.topic,
+        ctaGoal: ctaConfig.goal,
+        customImagePath: options.customOutroImagePath,
+      })) || undefined
+    }
+
+    if (resolvedOutroPath) {
+      console.log(`   💎 Resolved thematic outro card: ${path.basename(resolvedOutroPath)}`)
+    }
+
+    compositeResult = await compositeReel({
+      videoClips: sceneVideoPaths,
+      voiceoverPath: ttsResult.audioPath,
+      words: ttsResult.words,
+      outputPath: masterReelPath,
+      colorGrading: colorGradingPresets,
+      watermarkOpacity: options.watermarkOpacity ?? 0.40,
+      watermarkSize: options.watermarkSize ?? 110,
+      ctaHeadline: options.ctaHeadline || ctaConfig.headline,
+      ctaSubheadline: options.ctaSubheadline || ctaConfig.subheadline,
+      ctaUrl: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+      ctaBadge: options.ctaBadge || ctaConfig.actionText,
+      ctaActionText: options.ctaActionText || ctaConfig.actionText,
+      ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
+      customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
+      mascot: options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey())),
+      backgroundAudioVolume: options.bgAudioVolume,
+      backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
+      tempDir: path.join(tempDir, 'ffmpeg-build'),
+    })
+    durationSeconds = compositeResult.durationSeconds
+  }
+
+  // 5. Upload Master Video to Neon S3
+  let platformTarget: 'all' | 'instagram' | 'youtube' = options.platform || 'all'
+  if (options.platforms && options.platforms.length === 1) {
+    platformTarget = options.platforms[0]
+  }
 
   if (!options.dryRun) {
-    console.log(`\n5️⃣ Uploading Master Reel to Neon S3...`)
-    s3Key = `videos/social/reels/${path.basename(masterReelPath)}`
-    const s3Result = await uploadLocalFileToS3(masterReelPath, s3Key, DEFAULT_BUCKET)
-    publicUrl = s3Result.publicUrl
-    console.log(`   🚀 Public S3 Video URL: ${publicUrl}`)
+    if (!publicUrl) {
+      console.log(`\n5️⃣ Uploading Master Reel to Neon S3...`)
+      s3Key = `videos/social/reels/${path.basename(masterReelPath)}`
+      const s3Result = await uploadLocalFileToS3(masterReelPath, s3Key, DEFAULT_BUCKET)
+      publicUrl = s3Result.publicUrl
+      console.log(`   🚀 Public S3 Video URL: ${publicUrl}`)
+    } else {
+      console.log(`\n5️⃣ Video S3 URL: ${publicUrl}`)
+      s3Key = `videos/social/reels/${path.basename(publicUrl.split('?')[0])}`
+    }
 
     // 6️⃣ Deterministically Queue Dual Broadcast to Zernio (Reels & Shorts Queue) & First Comment
     if (publicUrl) {
@@ -1651,6 +1747,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
         isAiGenerated: true,
         publishNow: options.publishNow,
+        platform: platformTarget,
       })
     }
 
@@ -1667,13 +1764,13 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       s3Key: s3Key || null,
       thumbnailUrl: null,
       s3ThumbKey: null,
-      durationSeconds: compositeResult.durationSeconds,
+      durationSeconds,
       status: options.publishNow ? 'published' : 'queued',
       scheduledFor: queueResult?.scheduledFor || null,
       queueId: DEFAULT_REELS_QUEUE_ID,
       zernioInstagramPostId: queueResult?.instagramPostId || null,
       zernioYouTubePostId: queueResult?.youtubePostId || null,
-      zernioPostId: queueResult?.instagramPostId || null,
+      zernioPostId: queueResult?.postId || null,
       zernioCommentId: queueResult?.commentId || null,
       isAiGenerated: true,
       firstComment: scriptData.firstComment,
@@ -1689,7 +1786,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   } else {
     console.log(`\n5️⃣ [Dry Run] Skipped S3 upload. Master video saved at: ${masterReelPath}`)
     queueResult = await queueDualReelAndShort({
-      videoUrl: `https://placeholder.storage.neon.tech/moltology-public-assets/videos/social/reels/${path.basename(masterReelPath)}`,
+      videoUrl: publicUrl || `https://placeholder.storage.neon.tech/moltology-public-assets/videos/social/reels/${path.basename(masterReelPath)}`,
       instagramCaption: scriptData.caption,
       youtubeTitle: `${scriptData.hookHeadline}: The 2026 Benthic Shift #Shorts`,
       youtubeDescription: `${scriptData.narrationScript}\n\n🔗 Calculate your Molt Clearance: ${ctaConfig.url}\n\n#Shorts #Moltmaxxing #BenthicAI`,
@@ -1702,6 +1799,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       isAiGenerated: true,
       dryRun: true,
       publishNow: options.publishNow,
+      platform: platformTarget,
     })
   }
 
@@ -1749,9 +1847,13 @@ Options:
   --custom-outro <path>     Path to bespoke elevated outro card image
   --ai-outro                Generate bespoke 3D outro card via Gemini API
   --image-model <name>      Image model for AI outro: nano-banana-pro | nano-banana-2 (default: nano-banana-pro)
+  --platform <name>         Platform target: all | instagram | youtube (default: all)
+  --custom-video <path/url> Path or URL to pre-rendered master video to skip generation
 
 Examples:
   npx tsx scripts/create-daily-reel.ts
+  npx tsx scripts/create-daily-reel.ts --platform youtube
+  npx tsx scripts/create-daily-reel.ts --custom-video tmp/reel-daily-123/master-reel-123.mp4 --platform youtube
   npx tsx scripts/create-daily-reel.ts --theme ecdysis --cta-goal guide --mascot lobster_pointing
   npx tsx scripts/create-daily-reel.ts --theme pincer-torque --cta-goal quiz --color-grade calcified-armor
   npx tsx scripts/create-daily-reel.ts --dry-run --no-veo
@@ -1774,6 +1876,8 @@ Examples:
   let bgAudioOffsetSeconds: number | undefined
   let veoModel: string | undefined
   let customOutroImagePath: string | undefined
+  let customVideo: string | undefined
+  let platform: 'all' | 'instagram' | 'youtube' | undefined
   let aiOutro = false
   let imageModel: string | undefined
   let ctaTexture: any
@@ -1795,6 +1899,8 @@ Examples:
     else if (args[i] === '--bg-offset' && args[i + 1]) bgAudioOffsetSeconds = parseFloat(args[++i])
     else if (args[i] === '--veo-model' && args[i + 1]) veoModel = args[++i]
     else if (args[i] === '--custom-outro' && args[i + 1]) customOutroImagePath = args[++i]
+    else if (args[i] === '--custom-video' && args[i + 1]) customVideo = args[++i]
+    else if (args[i] === '--platform' && args[i + 1]) platform = args[++i] as any
     else if (args[i] === '--ai-outro') aiOutro = true
     else if (args[i] === '--image-model' && args[i + 1]) imageModel = args[++i]
   }
@@ -1817,6 +1923,8 @@ Examples:
       bgAudioOffsetSeconds,
       veoModel,
       customOutroImagePath,
+      customVideo,
+      platform,
       aiOutro,
       imageModel,
     })

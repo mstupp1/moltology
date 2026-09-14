@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/_hud'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ErrorRouteImport } from './routes/error'
 import { Route as CodexDotmdRouteImport } from './routes/codex[.]md'
+import { Route as ErrorRouteImport } from './routes/error'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as GuideRouteImport } from './routes/guide'
 import { Route as JournalDotmdRouteImport } from './routes/journal[.]md'
@@ -82,14 +82,14 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ErrorRoute = ErrorRouteImport.update({
-  id: '/error',
-  path: '/error',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CodexDotmdRoute = CodexDotmdRouteImport.update({
   id: '/codex.md',
   path: '/codex.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErrorRoute = ErrorRouteImport.update({
+  id: '/error',
+  path: '/error',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
@@ -364,8 +364,8 @@ const HudForumCategorySlugTopicSlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/error': typeof ErrorRoute
   '/codex.md': typeof CodexDotmdRoute
+  '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
   '/journal.md': typeof JournalDotmdRoute
@@ -423,8 +423,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/error': typeof ErrorRoute
   '/codex.md': typeof CodexDotmdRoute
+  '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
   '/journal.md': typeof JournalDotmdRoute
@@ -484,8 +484,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_hud': typeof HudRouteWithChildren
   '/auth': typeof AuthRoute
-  '/error': typeof ErrorRoute
   '/codex.md': typeof CodexDotmdRoute
+  '/error': typeof ErrorRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/guide': typeof GuideRoute
   '/journal.md': typeof JournalDotmdRoute
@@ -545,8 +545,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/error'
     | '/codex.md'
+    | '/error'
     | '/feed.xml'
     | '/guide'
     | '/journal.md'
@@ -604,8 +604,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/error'
     | '/codex.md'
+    | '/error'
     | '/feed.xml'
     | '/guide'
     | '/journal.md'
@@ -664,8 +664,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_hud'
     | '/auth'
-    | '/error'
     | '/codex.md'
+    | '/error'
     | '/feed.xml'
     | '/guide'
     | '/journal.md'
@@ -725,8 +725,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ErrorRoute: typeof ErrorRoute
   CodexDotmdRoute: typeof CodexDotmdRoute
+  ErrorRoute: typeof ErrorRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   GuideRoute: typeof GuideRoute
   JournalDotmdRoute: typeof JournalDotmdRoute
@@ -781,18 +781,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/error': {
-      id: '/error'
-      path: '/error'
-      fullPath: '/error'
-      preLoaderRoute: typeof ErrorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/codex.md': {
       id: '/codex.md'
       path: '/codex.md'
       fullPath: '/codex.md'
       preLoaderRoute: typeof CodexDotmdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/error': {
+      id: '/error'
+      path: '/error'
+      fullPath: '/error'
+      preLoaderRoute: typeof ErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed.xml': {
@@ -1229,8 +1229,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
   AuthRoute: AuthRoute,
-  ErrorRoute: ErrorRoute,
   CodexDotmdRoute: CodexDotmdRoute,
+  ErrorRoute: ErrorRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   GuideRoute: GuideRoute,
   JournalDotmdRoute: JournalDotmdRoute,

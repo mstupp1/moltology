@@ -270,6 +270,24 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-sidewalk-still-belongs-to-feet.md"
+    },
+    {
+      "slug": "the-hold-you-sat-through",
+      "title": "The Hold You Sat Through: Then They Hired a Voice Again",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-09-14T08:00:00-04:00",
+      "coreHook": "Two in three companies that cut jobs for AI are rehiring the roles; the bot handles the routine, but judgment still would not fit.",
+      "keyMetrics": [
+        "55% of employers regret AI job cuts (Forrester/Orgvue)",
+        "55,000 US layoffs attributed to AI in 2025",
+        "66% of cutting firms rehiring eliminated roles (Careerminds)",
+        "$1.27 spent for every $1 clawed back via reductions",
+        "1st calcification via human judgment boundary"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-hold-you-sat-through.md"
     }
   ]
 }

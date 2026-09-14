@@ -246,4 +246,31 @@ describe('zernio-client', () => {
     expect(result.youtubePostId).toBe(result.postId)
     expect(fetchSpy).not.toHaveBeenCalled()
   })
+
+  it('queues a YouTube-only short when platform is youtube', async () => {
+    const mockPost = { _id: 'yt_short_1', status: 'scheduled', scheduledFor: '2026-09-05T22:30:00.000Z' }
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      text: async () => JSON.stringify({ post: mockPost }),
+    } as any)
+
+    const result = await queueDualReelAndShort({
+      videoUrl: 'https://cdn.moltology.org/reel.mp4',
+      instagramCaption: 'IG caption',
+      youtubeTitle: 'YouTube Short Title #Shorts',
+      youtubeDescription: 'Full YT description',
+      platform: 'youtube',
+    })
+
+    expect(result.postId).toBe('yt_short_1')
+    expect(result.youtubePostId).toBe('yt_short_1')
+    expect(result.instagramPostId).toBeUndefined()
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+
+    const postPayload = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string)
+    expect(postPayload.platforms).toHaveLength(1)
+    expect(postPayload.platforms[0].platform).toBe('youtube')
+    expect(postPayload.platforms[0].platformSpecificData.title).toBe('YouTube Short Title #Shorts')
+  })
 })
+
