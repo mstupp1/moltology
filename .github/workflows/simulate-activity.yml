@@ -20,6 +20,10 @@ on:
         required: false
         type: boolean
         default: true
+      simulation_model_id:
+        description: 'Override primary AI model ID (e.g. zai/glm-5.3-flash or alibaba/qwen3.7-flash)'
+        required: false
+        type: string
 
 jobs:
   simulate:
@@ -44,6 +48,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
           SIMULATION_ENABLED: ${{ github.event.inputs.simulation_enabled != '' && github.event.inputs.simulation_enabled || secrets.SIMULATION_ENABLED || 'true' }}
+          SIMULATION_MODEL_ID: ${{ github.event.inputs.simulation_model_id != '' && github.event.inputs.simulation_model_id || vars.SIMULATION_MODEL_ID || secrets.SIMULATION_MODEL_ID || '' }}
         run: |
           ARGS=""
           if [ "${{ inputs.dry_run }}" = "true" ]; then

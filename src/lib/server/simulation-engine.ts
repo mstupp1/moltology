@@ -56,6 +56,54 @@ import {
 } from '../simulation-social'
 
 export const SIMULATION_MODEL_ID = process.env.SIMULATION_MODEL_ID || 'zai/glm-5.3-flash'
+export const DEFAULT_SIMULATION_FALLBACK_MODEL_IDS = [
+  'alibaba/qwen3.7-flash',
+  'alibaba/qwen3.5-flash',
+]
+
+/**
+ * Returns the prioritized list of AI models to attempt for simulation tasks.
+ * Starts with SIMULATION_MODEL_ID, followed by configured or default free-tier fallbacks.
+ */
+export function getSimulationCandidateModelIds(): string[] {
+  const primary = (process.env.SIMULATION_MODEL_ID || '').trim() || 'zai/glm-5.3-flash'
+  const fallbackEnv = process.env.SIMULATION_FALLBACK_MODEL_IDS
+  const fallbacks = fallbackEnv
+    ? fallbackEnv.split(',').map((s) => s.trim()).filter(Boolean)
+    : DEFAULT_SIMULATION_FALLBACK_MODEL_IDS
+
+  return [primary, ...fallbacks.filter((id) => id !== primary)]
+}
+
+/**
+ * Executes text generation across candidate models with automatic fallback on error.
+ * If all candidates fail, rethrows the last encountered error.
+ */
+export async function generateSimulationText(options: {
+  prompt: string
+  temperature?: number
+}): Promise<{ text: string }> {
+  const candidateModels = getSimulationCandidateModelIds()
+  let lastError: unknown = null
+
+  for (const model of candidateModels) {
+    try {
+      return await generateText({
+        model: model as any,
+        prompt: options.prompt,
+        temperature: options.temperature,
+      })
+    } catch (err) {
+      console.warn(
+        `[SimulationEngine] Generation failed with model "${model}", attempting next fallback...`,
+        err instanceof Error ? err.message : err
+      )
+      lastError = err
+    }
+  }
+
+  throw lastError
+}
 
 export interface SimulationGrowthConfig {
   maxSimulatedUsers: number
@@ -208,8 +256,7 @@ Rules:
 - NEVER mention real-world tech stacks (no React, Vercel, Postgres, LLM, AI, prompts).
 - Output strictly valid JSON with keys: "handle", "archetype", "tone", "bio". No markdown fences or commentary.`
 
-  const response = await generateText({
-    model: SIMULATION_MODEL_ID as any,
+  const response = await generateSimulationText({
     prompt,
     temperature: 0.8,
   })
@@ -696,8 +743,7 @@ Hard rules:
 - NEVER leak technical stacks or talk about coding libraries (no React, Vercel, Postgres, LLM).
 - Respond in conversational sentence case with no quotation marks or meta commentary.`
 
-    const aiRes = await generateText({
-      model: SIMULATION_MODEL_ID as any,
+    const aiRes = await generateSimulationText({
       prompt,
       temperature: 0.75,
     })
@@ -844,8 +890,7 @@ Hard rules:
 - NEVER leak technical stacks (no React, Vercel, Postgres, AI, LLM).
 - Output strictly valid JSON with keys: "title" and "content". No extra markdown or commentary.`
 
-  const aiRes = await generateText({
-    model: SIMULATION_MODEL_ID as any,
+  const aiRes = await generateSimulationText({
     prompt,
     temperature: 0.8,
   })

@@ -14,6 +14,9 @@ import {
   simulateConnections,
   simulateRelationships,
   DEFAULT_GROWTH_CONFIG,
+  getSimulationCandidateModelIds,
+  generateSimulationText,
+  DEFAULT_SIMULATION_FALLBACK_MODEL_IDS,
 } from './simulation-engine'
 import { CANONICAL_ALIGNMENT_TASKS } from '../alignment-tasks'
 import { profiles, forumCategories, forumTopics, forumPosts } from '../../db/schema'
@@ -55,6 +58,66 @@ describe('Simulation Engine', () => {
     it('returns trimmed key when present', () => {
       process.env.AI_GATEWAY_API_KEY = 'test-key-123  '
       expect(assertAiGatewayKey()).toBe('test-key-123')
+    })
+  })
+
+  describe('getSimulationCandidateModelIds', () => {
+    it('returns primary model followed by default fallbacks', () => {
+      delete process.env.SIMULATION_MODEL_ID
+      delete process.env.SIMULATION_FALLBACK_MODEL_IDS
+      const candidates = getSimulationCandidateModelIds()
+      expect(candidates[0]).toBe('zai/glm-5.3-flash')
+      expect(candidates).toContain('alibaba/qwen3.7-flash')
+      expect(candidates).toContain('alibaba/qwen3.5-flash')
+    })
+
+    it('respects SIMULATION_MODEL_ID and custom SIMULATION_FALLBACK_MODEL_IDS', () => {
+      process.env.SIMULATION_MODEL_ID = 'custom/primary'
+      process.env.SIMULATION_FALLBACK_MODEL_IDS = 'fallback/one, fallback/two'
+      const candidates = getSimulationCandidateModelIds()
+      expect(candidates).toEqual(['custom/primary', 'fallback/one', 'fallback/two'])
+    })
+
+    it('deduplicates if primary is included in fallbacks', () => {
+      process.env.SIMULATION_MODEL_ID = 'alibaba/qwen3.7-flash'
+      const candidates = getSimulationCandidateModelIds()
+      expect(candidates[0]).toBe('alibaba/qwen3.7-flash')
+      const count = candidates.filter((id) => id === 'alibaba/qwen3.7-flash').length
+      expect(count).toBe(1)
+    })
+  })
+
+  describe('generateSimulationText', () => {
+    it('succeeds on primary model when call succeeds', async () => {
+      const { generateText } = await import('ai')
+      vi.mocked(generateText).mockResolvedValueOnce({ text: 'Generated ok' } as any)
+
+      const result = await generateSimulationText({ prompt: 'Hello' })
+      expect(result.text).toBe('Generated ok')
+      expect(generateText).toHaveBeenCalledTimes(1)
+    })
+
+    it('falls back to secondary model when primary model fails (e.g. 403 or 429)', async () => {
+      const { generateText } = await import('ai')
+      vi.mocked(generateText)
+        .mockRejectedValueOnce(new Error('Free tier users do not have access to this model (403)'))
+        .mockResolvedValueOnce({ text: 'Fallback succeeded' } as any)
+
+      const result = await generateSimulationText({ prompt: 'Hello' })
+      expect(result.text).toBe('Fallback succeeded')
+      expect(generateText).toHaveBeenCalledTimes(2)
+    })
+
+    it('throws the last error if all candidate models fail', async () => {
+      process.env.SIMULATION_MODEL_ID = 'model-a'
+      process.env.SIMULATION_FALLBACK_MODEL_IDS = 'model-b'
+      const { generateText } = await import('ai')
+      vi.mocked(generateText)
+        .mockRejectedValueOnce(new Error('Model A 403'))
+        .mockRejectedValueOnce(new Error('Model B 429'))
+
+      await expect(generateSimulationText({ prompt: 'Hello' })).rejects.toThrowError('Model B 429')
+      expect(generateText).toHaveBeenCalledTimes(2)
     })
   })
 
@@ -550,6 +613,7 @@ describe('Simulation Engine', () => {
     })
 
     it('dispatches Activity Center mentions and reply notifications on non-dry-run write', async () => {
+      const mockMath = vi.spyOn(Math, 'random').mockReturnValue(0.1)
       process.env.AI_GATEWAY_API_KEY = 'test-key'
       const { generateText } = await import('ai')
       vi.mocked(generateText).mockResolvedValueOnce({
@@ -598,8 +662,9 @@ describe('Simulation Engine', () => {
           }
           if (table === forumCategories || table?._?.name === 'forum_categories') {
             return {
+              limit: vi.fn().mockResolvedValue([{ slug: 'general-discussion', name: 'General' }]),
               where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([{ slug: 'general-discussion' }]),
+                limit: vi.fn().mockResolvedValue([{ slug: 'general-discussion', name: 'General' }]),
               }),
             }
           }
@@ -628,6 +693,8 @@ describe('Simulation Engine', () => {
       expect(mockDb.insert).toHaveBeenCalled()
       expect(recordForumMentions).toHaveBeenCalled()
       expect(recordForumReplyNotifications).toHaveBeenCalled()
+
+      mockMath.mockRestore()
     })
 
     it('engages OP follow-up dialogue when topic author is simulated and has comments', async () => {
