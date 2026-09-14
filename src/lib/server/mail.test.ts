@@ -3,7 +3,9 @@ import { SUPPORT_INBOX } from '../support-tickets'
 import {
   DEFAULT_SUPPORT_FROM,
   RESEND_EMAILS_URL,
+  renderEmailVerificationText,
   renderSupportTicketEmailText,
+  sendEmailVerificationEmail,
   sendSupportTicketEmail,
 } from './mail'
 
@@ -105,5 +107,55 @@ describe('support ticket mail', () => {
     expect(payload.from).toBe(DEFAULT_SUPPORT_FROM)
     expect(payload.subject).toBe('[Ticket ticket-1] Chassis freeze')
     expect(payload.text).toContain('Member id: member-9')
+  })
+})
+
+describe('email verification mail', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  })
+
+  it('renders confirmation text with the verify url and no stack names', () => {
+    const text = renderEmailVerificationText({
+      to: 'member@example.com',
+      url: 'https://moltology.org/api/auth/verify-email?token=abc',
+    })
+    expect(text).toContain('Confirm your Moltology email')
+    expect(text).toContain('https://moltology.org/api/auth/verify-email?token=abc')
+    expect(text).not.toMatch(/Resend|Better Auth|\bJWT\b/)
+  })
+
+  it('posts verification mail to the member address', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key')
+    vi.stubEnv('RESEND_FROM_EMAIL', DEFAULT_SUPPORT_FROM)
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await sendEmailVerificationEmail({
+      to: 'member@example.com',
+      url: 'https://moltology.org/api/auth/verify-email?token=abc',
+    })
+
+    expect(result).toEqual({ sent: true })
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe(RESEND_EMAILS_URL)
+    const payload = JSON.parse((init as { body: string }).body)
+    expect(payload.to).toEqual(['member@example.com'])
+    expect(payload.subject).toBe('Confirm your Moltology email')
+    expect(payload.text).toContain('token=abc')
+    expect(payload.html).toContain('token=abc')
+  })
+
+  it('skips verification mail when Resend key is missing', async () => {
+    vi.stubEnv('RESEND_API_KEY', '')
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const result = await sendEmailVerificationEmail({
+      to: 'member@example.com',
+      url: 'https://moltology.org/api/auth/verify-email?token=abc',
+    })
+    expect(result).toEqual({ sent: false, skipped: true, error: 'missing-api-key' })
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })

@@ -4,7 +4,7 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
 import path from 'path'
-import { resolveViteGoogleAuthEnabled } from './src/lib/auth-config'
+import { resolveViteEmailVerificationEnabled, resolveViteGoogleAuthEnabled } from './src/lib/auth-config'
 
 const isTest = Boolean(process.env.VITEST)
 
@@ -18,8 +18,19 @@ function syncPublicGoogleAuthFlag(mode: string) {
   })
 }
 
+function syncPublicEmailVerificationFlag(mode: string) {
+  if (isTest) return
+  const env = loadEnv(mode, process.cwd(), '')
+  process.env.VITE_EMAIL_VERIFICATION_ENABLED = resolveViteEmailVerificationEnabled({
+    VITE_EMAIL_VERIFICATION_ENABLED:
+      env.VITE_EMAIL_VERIFICATION_ENABLED || process.env.VITE_EMAIL_VERIFICATION_ENABLED,
+    EMAIL_VERIFICATION_ENABLED: env.EMAIL_VERIFICATION_ENABLED || process.env.EMAIL_VERIFICATION_ENABLED,
+  })
+}
+
 export default defineConfig(({ mode }) => {
   syncPublicGoogleAuthFlag(mode)
+  syncPublicEmailVerificationFlag(mode)
   return {
     ...(isTest
       ? {}
@@ -27,6 +38,9 @@ export default defineConfig(({ mode }) => {
           define: {
             'import.meta.env.VITE_GOOGLE_AUTH_ENABLED': JSON.stringify(
               process.env.VITE_GOOGLE_AUTH_ENABLED || 'false',
+            ),
+            'import.meta.env.VITE_EMAIL_VERIFICATION_ENABLED': JSON.stringify(
+              process.env.VITE_EMAIL_VERIFICATION_ENABLED || 'false',
             ),
           },
         }),

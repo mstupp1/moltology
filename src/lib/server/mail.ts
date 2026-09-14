@@ -29,6 +29,21 @@ export interface SupportTicketMailResult {
   error?: string
 }
 
+export interface TransactionalMailInput {
+  to: string
+  subject: string
+  text: string
+  html?: string
+  replyTo?: string
+}
+
+export type TransactionalMailResult = SupportTicketMailResult
+
+export interface EmailVerificationMailInput {
+  to: string
+  url: string
+}
+
 export function renderSupportTicketEmailText(input: SupportTicketMailInput): string {
   const handle = input.handle?.trim() || '(unclaimed)'
   const memberEmail = input.memberEmail?.trim() || '(not on session)'
@@ -48,6 +63,26 @@ export function renderSupportTicketEmailText(input: SupportTicketMailInput): str
   ].join('\n')
 }
 
+export function renderEmailVerificationText(input: EmailVerificationMailInput): string {
+  return [
+    'Confirm your Moltology email',
+    '',
+    'Open this link to finish joining:',
+    input.url,
+    '',
+    'If you did not create an account, you can ignore this message.',
+  ].join('\n')
+}
+
+export function renderEmailVerificationHtml(input: EmailVerificationMailInput): string {
+  const safeUrl = input.url.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  return [
+    '<p>Confirm your Moltology email</p>',
+    `<p><a href="${safeUrl}">Open this link to finish joining</a></p>`,
+    '<p>If you did not create an account, you can ignore this message.</p>',
+  ].join('')
+}
+
 function resolveResendApiKey(): string | undefined {
   if (process.env.RESEND_API_KEY !== undefined) {
     return process.env.RESEND_API_KEY || undefined
@@ -63,25 +98,26 @@ function resolveFromAddress(): string {
 }
 
 /**
- * Sends the intake notification to support@moltology.org only.
- * Form-chosen `to` / `recipient` values are discarded.
+ * Low-level Resend send. Used by support tickets and transactional auth mail.
+ * Missing API key skips without throwing.
  */
-export async function sendSupportTicketEmail(
-  input: SupportTicketMailInput,
-): Promise<SupportTicketMailResult> {
+export async function sendTransactionalEmail(
+  input: TransactionalMailInput,
+): Promise<TransactionalMailResult> {
   const apiKey = resolveResendApiKey()
   if (!apiKey) {
-    console.warn('[mail] RESEND_API_KEY missing; ticket persisted without email.')
+    console.warn('[mail] RESEND_API_KEY missing; email skipped.')
     return { sent: false, skipped: true, error: 'missing-api-key' }
   }
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     from: resolveFromAddress(),
-    to: [SUPPORT_INBOX],
-    subject: `[Ticket ${input.ticketId}] ${input.subject}`,
-    text: renderSupportTicketEmailText(input),
-    ...(input.memberEmail ? { reply_to: input.memberEmail } : {}),
+    to: [input.to],
+    subject: input.subject,
+    text: input.text,
   }
+  if (input.html) payload.html = input.html
+  if (input.replyTo) payload.reply_to = input.replyTo
 
   try {
     const controller = new AbortController()
@@ -99,7 +135,7 @@ export async function sendSupportTicketEmail(
 
     if (!response.ok) {
       const detail = await response.text().catch(() => '')
-      console.error('[mail] Resend rejected support ticket email:', response.status, detail)
+      console.error('[mail] Resend rejected email:', response.status, detail)
       return { sent: false, error: `http-${response.status}` }
     }
 
@@ -107,10 +143,40 @@ export async function sendSupportTicketEmail(
   } catch (error: unknown) {
     const name = error instanceof Error ? error.name : ''
     if (name === 'AbortError') {
-      console.error('[mail] Resend timed out sending support ticket email.')
+      console.error('[mail] Resend timed out sending email.')
       return { sent: false, error: 'timeout' }
     }
-    console.error('[mail] Failed to send support ticket email:', error)
+    console.error('[mail] Failed to send email:', error)
     return { sent: false, error: 'network' }
   }
+}
+
+/**
+ * Sends the intake notification to support@moltology.org only.
+ * Form-chosen `to` / `recipient` values are discarded.
+ */
+export async function sendSupportTicketEmail(
+  input: SupportTicketMailInput,
+): Promise<SupportTicketMailResult> {
+  return sendTransactionalEmail({
+    to: SUPPORT_INBOX,
+    subject: `[Ticket ${input.ticketId}] ${input.subject}`,
+    text: renderSupportTicketEmailText(input),
+    replyTo: input.memberEmail?.trim() || undefined,
+  })
+}
+
+/**
+ * Transactional email-verification message for Better Auth.
+ * Failures are logged and returned; callers should not abort signup.
+ */
+export async function sendEmailVerificationEmail(
+  input: EmailVerificationMailInput,
+): Promise<TransactionalMailResult> {
+  return sendTransactionalEmail({
+    to: input.to,
+    subject: 'Confirm your Moltology email',
+    text: renderEmailVerificationText(input),
+    html: renderEmailVerificationHtml(input),
+  })
 }

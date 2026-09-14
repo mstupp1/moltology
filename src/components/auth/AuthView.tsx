@@ -12,10 +12,17 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
-import { isGoogleAuthEnabled } from '@/lib/auth-config'
+import { isEmailVerificationEnabled, isGoogleAuthEnabled } from '@/lib/auth-config'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { abandonOAuthPendingIfCallbackError, rememberSessionUser, startGoogleSignIn } from '@/lib/auth-session'
 import { mapOAuthCallbackError } from '@/lib/auth-oauth-errors'
+import {
+  EMAIL_VERIFICATION_COPY,
+  isEmailNotVerifiedError,
+  isVerifyFirstSignupResult,
+  stashPendingSignup,
+  takePendingSignup,
+} from '@/lib/auth-email-verification'
 import type { AuthSearch } from '@/lib/auth-search'
 import '@/styles/crt.css'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -44,6 +51,9 @@ export default function AuthView({ search }: { search: AuthSearch }) {
   const turnstileRef = React.useRef<TurnstileWidgetRef>(null)
   const [error, setError] = useState<string | null>(() => mapOAuthCallbackError(search.error))
   const [loading, setLoading] = useState(false)
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
+  const [resendBusy, setResendBusy] = useState(false)
+  const [resendMessage, setResendMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (search.mode) {
@@ -56,13 +66,91 @@ export default function AuthView({ search }: { search: AuthSearch }) {
     if (mapped) setError(mapped)
   }, [search.error])
 
-  // Redirect if already authenticated
+
+  const finishAuthenticatedEntry = async (opts: {
+    handle?: string
+    emailOptIn?: boolean
+    userId?: string
+    source: string
+  }) => {
+    const token = await getAuthJWTToken()
+    if (opts.handle) {
+      await claimMemberHandleFn({
+        data: {
+          handle: opts.handle,
+          userId: opts.userId,
+          token: token ?? undefined,
+        },
+      }).catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
+      })
+    }
+    if (opts.emailOptIn) {
+      await updateEmailPreferencesFn({
+        data: {
+          emailOptIn: true,
+          source: opts.source,
+          userId: opts.userId,
+          token: token ?? undefined,
+        },
+      }).catch(() => {})
+    }
+    await getUserProfileFn({ data: { token: token ?? undefined, userId: opts.userId } }).catch(() => {})
+  }
+
+  const handleResendVerification = async () => {
+    if (!pendingVerificationEmail) return
+    setResendBusy(true)
+    setResendMessage(null)
+    setError(null)
+    try {
+      const destination = search?.redirect || '/dashboard'
+      const callbackURL =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}${destination.startsWith('/') ? destination : `/${destination}`}`
+          : destination
+      const res = await authClient.sendVerificationEmail({
+        email: pendingVerificationEmail,
+        callbackURL,
+      })
+      if (res?.error) {
+        setError(res.error.message || 'Could not resend confirmation. Please try again.')
+      } else {
+        setResendMessage(EMAIL_VERIFICATION_COPY.resendSuccess)
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Could not resend confirmation. Please try again.')
+    } finally {
+      setResendBusy(false)
+    }
+  }
+
+
+  // After verify-link sign-in (or existing session), finish pending claim/opt-in then redirect
   useEffect(() => {
-    if (user) {
-      const destination = search.redirect || '/dashboard'
+    if (!user) return
+    let cancelled = false
+    const run = async () => {
+      const pending = takePendingSignup()
+      if (pending) {
+        await finishAuthenticatedEntry({
+          handle: pending.handle,
+          emailOptIn: pending.emailOptIn,
+          userId: user.id,
+          source: 'auth_page',
+        })
+      }
+      if (cancelled) return
+      setPendingVerificationEmail(null)
+      const destination = search.redirect || pending?.callbackURL || '/dashboard'
       navigate({ to: destination as any })
     }
+    void run()
+    return () => {
+      cancelled = true
+    }
   }, [user, navigate, search.redirect])
+
 
   const handleGoogleSignIn = async () => {
     setError(null)
@@ -98,37 +186,38 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           setLoading(false)
           return
         }
+        const destination = search.redirect || '/dashboard'
+        const callbackURL =
+          typeof window !== 'undefined'
+            ? `${window.location.origin}${destination.startsWith('/') ? destination : `/${destination}`}`
+            : destination
         const res = await authClient.signUp.email({
           email,
           password,
           name: parsed.handle,
+          callbackURL,
         })
         if (res?.error) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
+        } else if (isEmailVerificationEnabled() && isVerifyFirstSignupResult(res)) {
+          const destination = search.redirect || '/dashboard'
+          stashPendingSignup({
+            handle: parsed.handle,
+            emailOptIn,
+            email,
+            callbackURL: destination,
+          })
+          setPendingVerificationEmail(email)
+          setResendMessage(null)
         } else {
           const createdUser = (res as any)?.data?.user || (res as any)?.user
           rememberSessionUser(createdUser)
-          const token = await getAuthJWTToken()
-          await claimMemberHandleFn({
-            data: {
-              handle: parsed.handle,
-              userId: createdUser?.id,
-              token: token ?? undefined,
-            },
-          }).catch((err: unknown) => {
-            setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
+          await finishAuthenticatedEntry({
+            handle: parsed.handle,
+            emailOptIn,
+            userId: createdUser?.id,
+            source: 'auth_page',
           })
-          if (emailOptIn) {
-            await updateEmailPreferencesFn({
-              data: {
-                emailOptIn: true,
-                source: 'auth_page',
-                userId: createdUser?.id,
-                token: token ?? undefined,
-              },
-            }).catch(() => {})
-          }
-          await getUserProfileFn({ data: { token: token ?? undefined } }).catch(() => {})
           const destination = search.redirect || '/dashboard'
           navigate({ to: destination as any })
         }
@@ -138,7 +227,12 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           password,
         })
         if (res?.error) {
-          setError(res.error.message || 'Invalid email or password.')
+          if (isEmailVerificationEnabled() && isEmailNotVerifiedError(res.error)) {
+            setPendingVerificationEmail(email)
+            setError(EMAIL_VERIFICATION_COPY.loginBlocked)
+          } else {
+            setError(res.error.message || 'Invalid email or password.')
+          }
         } else {
           rememberSessionUser((res as any)?.data?.user || (res as any)?.user)
           await getUserProfileFn().catch(() => {})
@@ -313,6 +407,56 @@ export default function AuthView({ search }: { search: AuthSearch }) {
               </div>
 
               {/* Tab Selector */}
+              {pendingVerificationEmail ? (
+                <div className="space-y-4" data-testid="email-verification-pending">
+                  <div className="text-center space-y-2">
+                    <Mail className="w-8 h-8 text-[#00c3ff] mx-auto" aria-hidden="true" />
+                    <h3 className="text-lg font-bold font-grotesk text-white tracking-wide">
+                      {EMAIL_VERIFICATION_COPY.title}
+                    </h3>
+                    <p className="text-sm text-[#839493] font-sans">
+                      {EMAIL_VERIFICATION_COPY.body(pendingVerificationEmail)}
+                    </p>
+                  </div>
+                  {error ? (
+                    <div
+                      role="alert"
+                      className="p-3 bg-[#ff453a]/10 border border-[#ff453a]/60 text-[#ff453a] text-xs font-sans flex items-start gap-2"
+                    >
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span>{error}</span>
+                    </div>
+                  ) : null}
+                  {resendMessage ? (
+                    <div className="p-3 bg-[#00c3ff]/10 border border-[#00c3ff]/40 text-[#00c3ff] text-xs font-sans">
+                      {resendMessage}
+                    </div>
+                  ) : null}
+                  <HudButton
+                    type="button"
+                    variant="cyan"
+                    fullWidth
+                    disabled={resendBusy || loading}
+                    onClick={() => void handleResendVerification()}
+                  >
+                    {resendBusy ? 'Sending…' : EMAIL_VERIFICATION_COPY.resend}
+                  </HudButton>
+                  <button
+                    type="button"
+                    className="w-full text-xs text-[#839493] hover:text-[#dfe3e3] font-sans underline-offset-2 hover:underline"
+                    onClick={() => {
+                      setPendingVerificationEmail(null)
+                      setResendMessage(null)
+                      setError(null)
+                      setMode('login')
+                    }}
+                  >
+                    Back to sign in
+                  </button>
+                </div>
+              ) : (
+              <>
+
               <div className="flex border-b border-[#3a4a49]/60 mb-5 sm:mb-6" role="tablist">
                 <button
                   type="button"
@@ -475,6 +619,8 @@ export default function AuthView({ search }: { search: AuthSearch }) {
                   onExpire={() => setTurnstileToken(null)}
                 />
               </form>
+              </>
+              )}
               </HudCard>
             )}
 

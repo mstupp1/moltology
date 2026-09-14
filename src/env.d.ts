@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly VITE_BETTER_AUTH_URL?: string
   readonly VITE_GOOGLE_AUTH_ENABLED?: string
+  readonly VITE_EMAIL_VERIFICATION_ENABLED?: string
   readonly VITE_GOOGLE_CLIENT_ID?: string
 }
 
@@ -21,6 +22,7 @@ declare global {
       readonly GOOGLE_CLIENT_SECRET?: string
       readonly RESEND_API_KEY?: string
       readonly RESEND_FROM_EMAIL?: string
+      readonly EMAIL_VERIFICATION_ENABLED?: string
       readonly NODE_ENV?: 'development' | 'production' | 'test'
     }
   }

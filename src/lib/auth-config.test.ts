@@ -4,7 +4,9 @@ import {
   getAuthBaseUrl,
   getAuthJwksUrl,
   getGoogleClientCredentials,
+  isEmailVerificationEnabled,
   isGoogleAuthEnabled,
+  resolveViteEmailVerificationEnabled,
   resolveViteGoogleAuthEnabled,
 } from './auth-config'
 
@@ -15,6 +17,8 @@ beforeEach(() => {
   delete process.env.GOOGLE_CLIENT_SECRET
   delete process.env.VITE_GOOGLE_CLIENT_ID
   delete process.env.VITE_GOOGLE_AUTH_ENABLED
+  delete process.env.VITE_EMAIL_VERIFICATION_ENABLED
+  delete process.env.EMAIL_VERIFICATION_ENABLED
 })
 
 afterEach(() => {
@@ -46,6 +50,8 @@ describe('auth-config', () => {
 
   it('does not treat server Google secrets as a client display flag', () => {
     delete process.env.VITE_GOOGLE_AUTH_ENABLED
+  delete process.env.VITE_EMAIL_VERIFICATION_ENABLED
+  delete process.env.EMAIL_VERIFICATION_ENABLED
     expect(isGoogleAuthEnabled()).toBe(false)
     expect(getGoogleClientCredentials()).toBeNull()
 
@@ -66,6 +72,8 @@ describe('auth-config', () => {
 
   it('does not treat a raw VITE_GOOGLE_CLIENT_ID as an enable flag', () => {
     delete process.env.VITE_GOOGLE_AUTH_ENABLED
+  delete process.env.VITE_EMAIL_VERIFICATION_ENABLED
+  delete process.env.EMAIL_VERIFICATION_ENABLED
     process.env.VITE_GOOGLE_CLIENT_ID = '123456.apps.googleusercontent.com'
     expect(isGoogleAuthEnabled()).toBe(false)
   })
@@ -87,6 +95,31 @@ describe('resolveViteGoogleAuthEnabled', () => {
         VITE_GOOGLE_AUTH_ENABLED: 'false',
         GOOGLE_CLIENT_ID: 'gid',
         GOOGLE_CLIENT_SECRET: 'gsecret',
+      }),
+    ).toBe('false')
+  })
+})
+
+describe('email verification flag', () => {
+  it('defaults to off', () => {
+    expect(isEmailVerificationEnabled()).toBe(false)
+    expect(resolveViteEmailVerificationEnabled({})).toBe('false')
+  })
+
+  it('enables for explicit EMAIL_VERIFICATION_ENABLED or Vite mirror', () => {
+    process.env.EMAIL_VERIFICATION_ENABLED = 'true'
+    expect(isEmailVerificationEnabled()).toBe(true)
+    expect(resolveViteEmailVerificationEnabled({ EMAIL_VERIFICATION_ENABLED: 'true' })).toBe('true')
+    delete process.env.EMAIL_VERIFICATION_ENABLED
+    process.env.VITE_EMAIL_VERIFICATION_ENABLED = '1'
+    expect(isEmailVerificationEnabled()).toBe(true)
+  })
+
+  it('lets an explicit Vite false win over server true', () => {
+    expect(
+      resolveViteEmailVerificationEnabled({
+        VITE_EMAIL_VERIFICATION_ENABLED: 'false',
+        EMAIL_VERIFICATION_ENABLED: 'true',
       }),
     ).toBe('false')
   })
