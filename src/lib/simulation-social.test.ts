@@ -20,6 +20,28 @@ import {
   formatDiegeticQuoteBlock,
   pickMentionCandidate,
   balanceTopicAndPostVotes,
+  sampleDrive,
+  ensurePersonaDrive,
+  clampAffinity,
+  bumpAffinity,
+  getAffinity,
+  affinityDeltaForReply,
+  cadenceWeight,
+  ignoreChance,
+  computeTopicFeatures,
+  scoreTopicForDrive,
+  actionWeightsForDrive,
+  planForumAction,
+  formatForumStanceDirective,
+  formatNewThreadDirective,
+  formatRelationshipHint,
+  pickCanonCitation,
+  formatCanonCitationDirective,
+  pickClusteredForumVote,
+  scoreForumVoteCandidate,
+  detectCanonCitation,
+  inferPostStance,
+  selectPairMemory,
 } from './simulation-social'
 
 describe('simulation social helpers', () => {
@@ -284,6 +306,245 @@ Mastering the 06:00 Priority Pincer Lock was the turning point. It stabilized my
         rng: () => 0.8,
       })
       expect(postVote).toEqual({ type: 'post', id: 'p1' })
+    })
+  })
+
+  describe('drives, affinities, and planner', () => {
+    it('samples drives from the configured weights', () => {
+      expect(sampleDrive(undefined, () => 0.1)).toBe('status_seeker')
+      expect(sampleDrive(undefined, () => 0.5)).toBe('contrarian')
+      expect(sampleDrive(undefined, () => 0.95)).toBe('archivist')
+    })
+
+    it('assigns a drive only when missing', () => {
+      const assigned = ensurePersonaDrive({ archetype: 'Pilot', tone: 'Direct' }, () => 0.1)
+      expect(assigned.assigned).toBe(true)
+      expect(assigned.persona.drive).toBe('status_seeker')
+      expect(assigned.persona.affinities).toEqual({})
+
+      const kept = ensurePersonaDrive(
+        { archetype: 'Pilot', tone: 'Direct', drive: 'contrarian', affinities: { x: 0.2 } },
+        () => 0.1
+      )
+      expect(kept.assigned).toBe(false)
+      expect(kept.persona.drive).toBe('contrarian')
+      expect(kept.persona.affinities).toEqual({ x: 0.2 })
+    })
+
+    it('clamps affinity updates', () => {
+      expect(clampAffinity(2)).toBe(1)
+      expect(clampAffinity(-4)).toBe(-1)
+      const next = bumpAffinity({ archetype: 'Pilot', tone: 'Direct' }, 'rival', -0.6)
+      expect(getAffinity(next, 'rival')).toBe(-0.6)
+      const clamped = bumpAffinity(next, 'rival', -0.8)
+      expect(getAffinity(clamped, 'rival')).toBe(-1)
+    })
+
+    it('uses a negative delta for challenging replies and a same-drive bonus', () => {
+      expect(affinityDeltaForReply('challenging')).toBe(-0.06)
+      expect(affinityDeltaForReply('supportive', 'archivist', 'archivist')).toBeCloseTo(0.11)
+    })
+
+    it('gives low-cadence members a higher ignore chance', () => {
+      expect(cadenceWeight('high')).toBe(3)
+      expect(ignoreChance('low')).toBeGreaterThan(ignoreChance('normal'))
+      expect(ignoreChance('normal')).toBeLessThan(0.1)
+    })
+
+    it('scores heat for status seekers and consensus for contrarians', () => {
+      const hot = computeTopicFeatures(
+        { id: 't1', repliesCount: 6, lastReplyAt: new Date() },
+        [
+          { id: 'p1', userId: 'a', content: 'Cold plunge at 48F held my torque.' },
+          { id: 'p2', userId: 'b', content: 'Same protocol, same result.' },
+        ],
+        new Map([
+          ['a', 'status_seeker'],
+          ['b', 'status_seeker'],
+        ])
+      )
+      expect(hot.heat).toBeGreaterThan(0.3)
+      expect(hot.consensus).toBeGreaterThan(0.5)
+      expect(scoreTopicForDrive('contrarian', hot)).toBeGreaterThan(scoreTopicForDrive('status_seeker', hot))
+    })
+
+    it('weights challenging replies highest for contrarians on consensus threads', () => {
+      const weights = actionWeightsForDrive('contrarian', {
+        topicId: 't1',
+        repliesCount: 3,
+        uniqueAuthors: 3,
+        hoursSinceLastActivity: 2,
+        heat: 0.6,
+        consensus: 0.9,
+        citesCanon: false,
+      })
+      expect(weights.reply_challenging).toBeGreaterThan(weights.reply_supportive)
+      expect(weights.reply_challenging).toBeGreaterThan(weights.upvote)
+    })
+
+    it('plans a supportive reply for a status seeker when a thin thread is open', () => {
+      const decision = planForumAction({
+        members: [
+          {
+            id: 'seeker',
+            drive: 'status_seeker',
+            activityCadence: 'high',
+            affinities: {},
+          },
+        ],
+        topics: [{ id: 'topic-1', userId: 'other', repliesCount: 1, lastReplyAt: new Date() }],
+        postsByTopic: new Map([
+          ['topic-1', [{ id: 'p1', userId: 'other', content: 'Any tips on first light liturgy?' }]],
+        ]),
+        rng: () => 0.1,
+      })
+      expect(decision.action).toBe('reply_supportive')
+      if (decision.action !== 'none') {
+        expect(decision.actorId).toBe('seeker')
+        expect(decision.topicId).toBe('topic-1')
+      }
+    })
+
+    it('lets low-cadence lurkers ignore an existing thread', () => {
+      const decision = planForumAction({
+        members: [
+          {
+            id: 'lurker',
+            drive: 'archivist',
+            activityCadence: 'low',
+            affinities: {},
+          },
+        ],
+        topics: [{ id: 'topic-1', userId: 'other', repliesCount: 5, lastReplyAt: new Date() }],
+        rng: () => 0.2,
+      })
+      expect(decision.action).toBe('ignore')
+    })
+
+    it('starts a thread when the board is empty', () => {
+      const decision = planForumAction({
+        members: [{ id: 'seeker', drive: 'status_seeker', activityCadence: 'normal' }],
+        topics: [],
+        rng: () => 0.99,
+      })
+      expect(decision.action).toBe('start_thread')
+    })
+
+    it('builds civil stance and relationship prompt fragments without naming drives', () => {
+      const challenging = formatForumStanceDirective('challenging')
+      expect(challenging).toContain('Contest a specific claim')
+      expect(challenging).toContain('never the molt')
+      expect(challenging).not.toContain('status_seeker')
+      expect(formatNewThreadDirective('contrarian')).toContain('overstated')
+      expect(formatRelationshipHint(-0.5, 'Vaelen')).toContain('@Vaelen')
+      expect(formatRelationshipHint(-0.5, 'Vaelen')).toContain('protocol, not the person')
+      expect(formatRelationshipHint(0.1, 'Vaelen')).toBeNull()
+    })
+
+    it('formats a short canon citation directive', () => {
+      const citation = pickCanonCitation(
+        [
+          {
+            id: 'SCR-001',
+            title: 'The Prime Directive',
+            mandate: 'Flesh melts. The shell endures.',
+            summary: 'The founding proclamation.',
+          },
+        ],
+        () => 0
+      )
+      expect(citation?.title).toBe('The Prime Directive')
+      const directive = formatCanonCitationDirective(citation!)
+      expect(directive).toContain('The Prime Directive')
+      expect(directive).not.toContain('status_seeker')
+    })
+
+    it('detects canon terms and infers challenging stance from method disagreement', () => {
+      expect(detectCanonCitation('The carapace held after ecdysis.')).toBe(true)
+      expect(inferPostStance('Try 3 minutes instead of 8; that protocol is overstated.')).toBe(
+        'challenging'
+      )
+    })
+
+    it('clusters votes toward same-drive challenging posts for contrarians', () => {
+      const vote = pickClusteredForumVote(
+        { id: 'voter', drive: 'contrarian', affinities: { rival: -0.2 } },
+        [{ id: 't1', userId: 'other', content: 'Everyone agrees 8 minutes is the only way.' }],
+        [
+          {
+            id: 'p-challenge',
+            userId: 'rival',
+            content: 'That duration is overstated; try 3 minutes instead.',
+            topicId: 't1',
+          },
+          {
+            id: 'p-support',
+            userId: 'ally',
+            content: 'Yes, 8 minutes worked for me too.',
+            topicId: 't1',
+          },
+        ],
+        new Set(),
+        { topicRatio: 0, rng: () => 0.1 }
+      )
+      expect(vote).toEqual({ type: 'post', id: 'p-challenge' })
+    })
+
+    it('scores canon-citing posts higher for archivists', () => {
+      const canonScore = scoreForumVoteCandidate({
+        voterDrive: 'archivist',
+        candidateType: 'post',
+        topicRatio: 0.45,
+        citesCanon: true,
+        inferredStance: 'cite_canon',
+      })
+      const genericScore = scoreForumVoteCandidate({
+        voterDrive: 'archivist',
+        candidateType: 'post',
+        topicRatio: 0.45,
+        citesCanon: false,
+        inferredStance: 'supportive',
+      })
+      expect(canonScore).toBeGreaterThan(genericScore)
+    })
+
+    it('retrieves the recent exchange between two members', () => {
+      const memory = selectPairMemory(
+        [
+          { id: 'p1', userId: 'a', content: 'I run 48F.' },
+          { id: 'p2', userId: 'c', content: 'Unrelated.' },
+          { id: 'p3', userId: 'b', content: 'I would go colder.' },
+        ],
+        'a',
+        'b',
+        2
+      )
+      expect(memory.map((row) => row.id)).toEqual(['p1', 'p3'])
+    })
+
+    it('biases nested replies toward rivals for contrarians', () => {
+      const posts = [
+        { id: 'ally-post', userId: 'ally', content: 'Keep the long plunge.' },
+        { id: 'rival-post', userId: 'rival', content: 'Short plunge only.' },
+      ]
+      const target = chooseForumReplyTarget(
+        {
+          id: 'topic-1',
+          userId: 'op',
+          authorName: 'Op',
+          title: 'Plunge length',
+          content: 'How long?',
+        },
+        posts,
+        'contrarian',
+        {
+          nestedChance: 1,
+          affinityBias: 'rivals',
+          affinities: { ally: 0.8, rival: -0.7 },
+          rng: () => 0.5,
+        }
+      )
+      expect(target.parentId).toBe('rival-post')
     })
   })
 })

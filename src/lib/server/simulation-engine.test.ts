@@ -17,6 +17,7 @@ import {
   getSimulationCandidateModelIds,
   generateSimulationText,
   DEFAULT_SIMULATION_FALLBACK_MODEL_IDS,
+  backfillSimulatedDrives,
 } from './simulation-engine'
 import { CANONICAL_ALIGNMENT_TASKS } from '../alignment-tasks'
 import { profiles, forumCategories, forumTopics, forumPosts } from '../../db/schema'
@@ -265,6 +266,7 @@ describe('Simulation Engine', () => {
       expect(res.spawned).toBe(true)
       expect(res.dryRun).toBe(true)
       expect(res.handle).toBe('BenthicPilot_99')
+      expect(['status_seeker', 'contrarian', 'archivist']).toContain(res.persona?.drive)
       expect(['organic', 'word_of_mouth', 'brought_in']).toContain(res.joinSource)
     })
   })
@@ -377,6 +379,63 @@ describe('Simulation Engine', () => {
       expect(res.action).toBe('reply')
       expect(res.content).toContain('Priority Pincer Lock')
 
+      mockMath.mockRestore()
+    })
+
+    it('lets a low-cadence lurker ignore an existing thread', async () => {
+      process.env.AI_GATEWAY_API_KEY = 'test-key'
+      const mockMembers = [
+        {
+          id: 'lurker-1',
+          handle: 'NightWatch',
+          stage: 4,
+          isSimulated: true,
+          simulatedPersona: {
+            archetype: 'Elder',
+            tone: 'Calm',
+            activityCadence: 'low' as const,
+            drive: 'archivist' as const,
+          },
+        },
+      ]
+      const mockTopics = [
+        {
+          id: 'topic-1',
+          userId: 'other-user',
+          title: 'How to increase shell hardness?',
+          content: 'Looking for advice on daily routines.',
+          repliesCount: 5,
+          isLocked: false,
+        },
+      ]
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn((table: any) => {
+          if (table === profiles || table?._?.name === 'profiles') {
+            return { where: vi.fn().mockResolvedValue(mockMembers) }
+          }
+          if (table === forumTopics || table?._?.name === 'forum_topics') {
+            return {
+              where: vi.fn().mockReturnValue({
+                orderBy: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockResolvedValue(mockTopics),
+                }),
+              }),
+            }
+          }
+          return {
+            where: vi.fn().mockReturnValue({
+              orderBy: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }
+        }),
+      }
+      const mockMath = vi.spyOn(Math, 'random').mockReturnValue(0.2)
+      const res = await simulateForumActivity(mockDb, { dryRun: true })
+      expect(res.action).toBe('ignore')
+      expect(res.reason).toMatch(/ignore/i)
       mockMath.mockRestore()
     })
 
@@ -876,6 +935,28 @@ describe('Simulation Engine', () => {
       expect(res.postId).toBe('post-1')
       expect(res.note).toContain('Edit:')
       expect(mockDb.update).toHaveBeenCalled()
+    })
+  })
+
+  describe('backfillSimulatedDrives', () => {
+    it('assigns missing drives without writing in dry run', async () => {
+      const mockDb: any = {
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockResolvedValue([
+          {
+            id: 'a',
+            handle: 'Acolyte_a',
+            simulatedPersona: { archetype: 'Pilot', tone: 'Direct' },
+          },
+        ]),
+        update: vi.fn(),
+      }
+
+      const res = await backfillSimulatedDrives(mockDb, { dryRun: true })
+      expect(res.assigned).toBe(1)
+      expect(res.scanned).toBe(1)
+      expect(mockDb.update).not.toHaveBeenCalled()
     })
   })
 
