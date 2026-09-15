@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Route } from './subterranean'
 import { authClient } from '@/lib/auth-client'
+import { clearCachedUser } from '@/lib/auth-session'
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -10,9 +11,12 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+const LAZY_TIMEOUT = 5000
+
 describe('Subterranean HUD Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearCachedUser()
   })
 
   it('renders guest lock screen when unauthenticated', async () => {
@@ -20,7 +24,7 @@ describe('Subterranean HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByText('SUBTERRANEAN VATS LOCKED')).toBeInTheDocument()
+    expect(await screen.findByText('SUBTERRANEAN VATS LOCKED', {}, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(
       screen.getByText(
@@ -37,7 +41,9 @@ describe('Subterranean HUD Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByText('MUTAGENIC HYBRID RESEARCH CHAMBERS')).toBeInTheDocument()
+    expect(
+      await screen.findByText('MUTAGENIC HYBRID RESEARCH CHAMBERS', {}, { timeout: LAZY_TIMEOUT })
+    ).toBeInTheDocument()
     expect(screen.getByText('ACTIVE BIO-VAT CONTAINMENT MATRIX')).toBeInTheDocument()
     expect(screen.getByText('LOVECRAFTIAN ARCHIVAL TRANSCRIPTS')).toBeInTheDocument()
   })

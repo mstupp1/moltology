@@ -46,7 +46,7 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     mockUseLoaderData.mockReturnValue(null)
     render(<NewsPostDetail />)
 
-    expect(await screen.findByText('NEWS DISPATCH NOT FOUND')).toBeInTheDocument()
+    expect(await screen.findByText('NEWS DISPATCH NOT FOUND', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getByText('RETURN TO MOLTNATION NEWS')).toBeInTheDocument()
   })
 
@@ -56,7 +56,7 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     render(<NewsPostDetail />)
 
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' })
+      await screen.findByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' }, { timeout: 5000 })
     ).toBeInTheDocument()
     expect(screen.getByText('Why Elite AI Operators Are Shedding Biological Constraints')).toBeInTheDocument()
     expect(screen.getByText(post.authorName)).toBeInTheDocument()

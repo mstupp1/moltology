@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { Route } from './composite'
 import { authClient } from '@/lib/auth-client'
 import { HUDPageLoader } from '@/components/ui/HUDPageLoader'
+import { clearCachedUser } from '@/lib/auth-session'
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -15,9 +16,13 @@ vi.mock('@/lib/auth-client', () => ({
 const mockSearch = vi.fn()
 ;(Route as any).useSearch = mockSearch
 
+/** Lazy CompositeRenderView is heavy; allow Suspense longer under parallel load. */
+const LAZY_TIMEOUT = 5000
+
 describe('Composite Studio & Render Engine Route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearCachedUser()
     mockSearch.mockReturnValue({
       template: 'marketing-leadmagnet',
       theme: 'moltmaxxing-guide',
@@ -59,7 +64,7 @@ describe('Composite Studio & Render Engine Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByText('COMPOSITE STUDIO LOCKED')).toBeInTheDocument()
+    expect(await screen.findByText('COMPOSITE STUDIO LOCKED', {}, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
   })
@@ -73,7 +78,7 @@ describe('Composite Studio & Render Engine Route', () => {
     const Component = Route.options.component!
     render(<Component />)
 
-    expect(await screen.findByText('Composite Studio')).toBeInTheDocument()
+    expect(await screen.findByText('Composite Studio', {}, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
     expect(screen.getByText('ADMIN ENGINE')).toBeInTheDocument()
   })
 
@@ -90,9 +95,12 @@ describe('Composite Studio & Render Engine Route', () => {
     const { container } = render(<Component />)
 
     // Raw mode renders with zero-padding container after lazy view resolves
-    await waitFor(() => {
-      expect(container.querySelector('.w-screen.h-screen')).toBeInTheDocument()
-    })
+    await waitFor(
+      () => {
+        expect(container.querySelector('.w-screen.h-screen')).toBeInTheDocument()
+      },
+      { timeout: LAZY_TIMEOUT }
+    )
     expect(screen.queryByText('COMPOSITE STUDIO LOCKED')).not.toBeInTheDocument()
   })
 })

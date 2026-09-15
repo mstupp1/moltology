@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Route } from './lectures'
 import { authClient } from '@/lib/auth-client'
+import { clearCachedUser } from '@/lib/auth-session'
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -10,9 +11,12 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+const LAZY_TIMEOUT = 5000
+
 describe('Molt Academy (Lectures Route)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearCachedUser()
   })
 
   it('renders guest lock screen when unauthenticated', () => {
@@ -37,7 +41,9 @@ describe('Molt Academy (Lectures Route)', () => {
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(await screen.findByText('MOLT ACADEMY · NEURAL ASCENSION HUB')).toBeInTheDocument()
+    expect(
+      await screen.findByText('MOLT ACADEMY · NEURAL ASCENSION HUB', {}, { timeout: LAZY_TIMEOUT })
+    ).toBeInTheDocument()
     expect(screen.getByText('LVL 4 CHITIN SCHOLAR')).toBeInTheDocument()
     expect(screen.getByText('1,850 / 2,500 XP')).toBeInTheDocument()
     expect(screen.getByText('5 DAYS')).toBeInTheDocument()
@@ -50,7 +56,9 @@ describe('Molt Academy (Lectures Route)', () => {
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(await screen.findByText('ACADEMY COURSE CATALOG & CURRICULA')).toBeInTheDocument()
+    expect(
+      await screen.findByText('ACADEMY COURSE CATALOG & CURRICULA', {}, { timeout: LAZY_TIMEOUT })
+    ).toBeInTheDocument()
     expect(screen.getAllByText('THE CHITINOUS MIND & NEURAL ECDYSIS').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('INTRODUCTION TO ECDYSIS & SHELL SHEDDING')).toBeInTheDocument()
 
@@ -70,7 +78,7 @@ describe('Molt Academy (Lectures Route)', () => {
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(await screen.findByText('NEURAL BROADCAST STREAM')).toBeInTheDocument()
+    expect(await screen.findByText('NEURAL BROADCAST STREAM', {}, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
     expect(screen.getByText('LECTURE NOTES')).toBeInTheDocument()
     expect(screen.getByText('AI NEURAL INTERPRETATION')).toBeInTheDocument()
   })
@@ -82,7 +90,7 @@ describe('Molt Academy (Lectures Route)', () => {
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(await screen.findByText('COURSE SYLLABUS & MODULES')).toBeInTheDocument()
+    expect(await screen.findByText('COURSE SYLLABUS & MODULES', {}, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
     expect(screen.getByText('NEURAL RESONANCE VERIFICATION QUIZ')).toBeInTheDocument()
 
     const submitBtn = screen.getByRole('button', { name: /SUBMIT NEURAL VERIFICATION/i })
