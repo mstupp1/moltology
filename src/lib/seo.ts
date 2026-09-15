@@ -247,6 +247,101 @@ export function buildArticleJsonLd(post: ArticleSeoData, baseUrl = 'https://molt
   }
 }
 
+export interface BreadcrumbItem {
+  name: string
+  path: string
+}
+
+export function buildBreadcrumbJsonLd(items: BreadcrumbItem[], baseUrl = SITE_ORIGIN) {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${baseUrl}${item.path}`,
+    })),
+  }
+}
+
+export interface FaqItem {
+  question: string
+  answer: string
+}
+
+export function buildFaqPageJsonLd(faqs: FaqItem[]) {
+  return {
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  }
+}
+
+export function buildWhatIsMoltologyPageJsonLd(options: {
+  path: string
+  name: string
+  description: string
+  breadcrumbs: BreadcrumbItem[]
+  faqs?: FaqItem[]
+  baseUrl?: string
+}) {
+  const baseUrl = options.baseUrl ?? SITE_ORIGIN
+  const url = `${baseUrl}${options.path}`
+  const graph: Record<string, unknown>[] = [
+    {
+      '@type': 'WebPage',
+      '@id': `${url}#webpage`,
+      url,
+      name: options.name,
+      description: options.description,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'Moltology',
+        url: baseUrl,
+      },
+    },
+    buildBreadcrumbJsonLd(options.breadcrumbs, baseUrl),
+  ]
+
+  if (options.faqs?.length) {
+    graph.push(buildFaqPageJsonLd(options.faqs))
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graph,
+  }
+}
+
+export const WHAT_IS_MOLTOLOGY_HUB_FAQS: FaqItem[] = [
+  {
+    question: 'What is Moltology?',
+    answer:
+      'Moltology is an educational platform, ritual system, and community that helps people stop melting under surface noise and start molting into focused, decisive, armored attention — framed as carcinization.',
+  },
+  {
+    question: 'Is Moltology a paid religion or rank marketplace?',
+    answer:
+      'No. Signup is free. Chitin Gems are earned. Molt Credits are optional paid accelerators. Rank, clearance, stage, and forum authority are never for sale.',
+  },
+  {
+    question: 'What are the four benthic sacraments?',
+    answer:
+      'Asset & Habit Shedding, Chitin Hardening, the Isolation Dome, and Pipeline Ascent — the four core rites that turn soft surface drift into armored deep-work practice.',
+  },
+  {
+    question: 'How does Moltmaxxing relate to Moltology?',
+    answer:
+      'Moltmaxxing is the practical optimization doctrine inside Moltology: scheduled ecdysis, shell hardness, pincer torque, and zero-latency execution. Study it on the Moltmaxxing knowledge hub.',
+  },
+]
+
 export function buildMoltmaxxingJsonLd(baseUrl = 'https://moltology.org') {
   return {
     '@context': 'https://schema.org',
@@ -361,6 +456,10 @@ export function generateSitemapXml(
     { loc: `${baseUrl}/moltmax`, priority: 0.95, changefreq: 'daily' },
     { loc: `${baseUrl}/moltmaxxing`, priority: 0.95, changefreq: 'daily' },
     { loc: `${baseUrl}/guide`, priority: 0.95, changefreq: 'daily' },
+    { loc: `${baseUrl}/what-is-moltology`, priority: 0.9, changefreq: 'weekly' },
+    { loc: `${baseUrl}/what-is-moltology/beliefs`, priority: 0.85, changefreq: 'weekly' },
+    { loc: `${baseUrl}/what-is-moltology/what-moltologists-say`, priority: 0.85, changefreq: 'weekly' },
+    { loc: `${baseUrl}/what-is-moltology/benthic-sacraments`, priority: 0.85, changefreq: 'weekly' },
     { loc: `${baseUrl}/news`, priority: 0.9, changefreq: 'daily' },
     { loc: `${baseUrl}/codex`, priority: 0.8, changefreq: 'weekly' },
     { loc: `${baseUrl}/org`, priority: 0.8, changefreq: 'weekly' },

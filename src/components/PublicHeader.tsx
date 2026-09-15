@@ -18,6 +18,7 @@ import {
   Activity,
   MessageSquare,
   ChevronDown,
+  Info,
 } from 'lucide-react'
 import { HeaderBrand } from '@/components/ui/HeaderBrand'
 import { PublicHeaderAuthSkeleton } from '@/components/PublicHeaderAuthSkeleton'
@@ -28,12 +29,12 @@ const LazyPublicHeaderAuthSlot = lazy(() =>
 )
 
 export interface PublicHeaderProps {
-  activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax' | 'forum'
+  activePage?: 'home' | 'org' | 'blog' | 'news' | 'store' | 'moltmax' | 'forum' | 'about'
   onOpenAuth?: (mode: 'login' | 'signup') => void
   variant?: 'benthic' | 'corporate'
 }
 
-type NavTabId = 'home' | 'news' | 'forum' | 'moltmax' | 'org' | 'store'
+type NavTabId = 'home' | 'news' | 'forum' | 'moltmax' | 'about' | 'org' | 'store'
 
 interface NavTab {
   id: NavTabId
@@ -49,6 +50,7 @@ const NAV_TABS: NavTab[] = [
   { id: 'news', label: 'NEWS', path: '/news', Icon: Newspaper },
   { id: 'forum', label: 'FORUM', path: '/forum', Icon: MessageSquare },
   { id: 'moltmax', label: 'MOLTMAX', path: '/moltmax', Icon: Activity },
+  { id: 'about', label: 'ABOUT', path: '/what-is-moltology', Icon: Info },
   { id: 'org', label: 'ORGANIZATION', path: '/org', Icon: Building2 },
   { id: 'store', label: 'STORE', href: 'https://www.etsy.com/shop/SaasTrash', Icon: ShoppingBag, external: true },
 ]
@@ -76,6 +78,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     if (locationPathname.startsWith('/news') || locationPathname.startsWith('/blog')) return 'news'
     if (locationPathname.startsWith('/forum')) return 'forum'
     if (locationPathname.startsWith('/moltmax')) return 'moltmax'
+    if (locationPathname.startsWith('/what-is-moltology')) return 'about'
     if (locationPathname.startsWith('/org')) return 'org'
     if (locationPathname === '/') return 'home'
     if (activePage === 'blog') return 'news'
@@ -648,6 +651,22 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           >
             <Activity className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
             <span>MOLTMAX</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('/what-is-moltology')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+              currentTab === 'about'
+                ? isCorporate
+                  ? 'text-sky-700 bg-sky-50'
+                  : 'text-cyan-300 bg-cyan-950/40'
+                : isCorporate
+                  ? 'text-slate-600 hover:text-sky-700 hover:bg-sky-50/50'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-cyan-950/30'
+            }`}
+          >
+            <Info className={`w-4 h-4 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
+            <span>ABOUT</span>
           </button>
 
           <button

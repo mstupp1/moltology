@@ -27,7 +27,14 @@ describe('PublicHeader Navigation Component', () => {
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     expect(within(nav).getByRole('button', { name: /THE SYNAPTIC PATH/i })).toBeInTheDocument()
     expect(within(nav).getByRole('button', { name: /^MOLTMAX$/i })).toBeInTheDocument()
+    expect(within(nav).getByText('ABOUT')).toBeInTheDocument()
     expect(within(nav).getByText('ORGANIZATION')).toBeInTheDocument()
+
+    const aboutBtn = within(nav).getByRole('button', { name: /^ABOUT$/i })
+    const orgBtn = within(nav).getByRole('button', { name: /ORGANIZATION/i })
+    expect(
+      aboutBtn.compareDocumentPosition(orgBtn) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
 
     const storeLink = within(nav).getByRole('link', { name: /STORE/i })
     expect(storeLink).toBeInTheDocument()
@@ -77,6 +84,21 @@ describe('PublicHeader Navigation Component', () => {
     const nav = screen.getByRole('navigation', { name: /main navigation/i })
     const blogBtn = within(nav).getByRole('button', { name: /NEWS/i })
     expect(blogBtn.className).toContain('text-cyan-300')
+  })
+
+  it('highlights ABOUT for the what-is-moltology hub and subroutes', () => {
+    mockPathname = '/what-is-moltology'
+    const { rerender } = render(<PublicHeader />)
+    const nav = screen.getByRole('navigation', { name: /main navigation/i })
+    expect(within(nav).getByRole('button', { name: /^ABOUT$/i }).className).toContain('text-cyan-300')
+
+    mockPathname = '/what-is-moltology/beliefs'
+    rerender(<PublicHeader />)
+    expect(
+      within(screen.getByRole('navigation', { name: /main navigation/i })).getByRole('button', {
+        name: /^ABOUT$/i,
+      }).className,
+    ).toContain('text-cyan-300')
   })
 
   it('triggers authentication modal callback when clicking desktop LOG IN / JOIN PATH', async () => {

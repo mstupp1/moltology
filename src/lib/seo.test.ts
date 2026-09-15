@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { seo, privatePageSeo, notFoundSeo, MEMBER_PROFILE_SEO, SEARCH_PAGE_SEO, searchPageSeo, memberIdentityFromRouteKey, memberProfileSeo, buildJsonLd, buildArticleJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
+import { seo, privatePageSeo, notFoundSeo, MEMBER_PROFILE_SEO, SEARCH_PAGE_SEO, searchPageSeo, memberIdentityFromRouteKey, memberProfileSeo, buildJsonLd, buildArticleJsonLd, buildWhatIsMoltologyPageJsonLd, generateSitemapXml, generateRssFeedXml } from './seo'
 import { resolveMemberPublicName } from './member-handle'
 
 describe('SEO Meta Tag Generator', () => {
@@ -194,6 +194,10 @@ describe('Sitemap and RSS XML Generators', () => {
     expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     expect(xml).toContain('<loc>https://moltology.org/news</loc>')
     expect(xml).toContain('<loc>https://moltology.org/guide</loc>')
+    expect(xml).toContain('<loc>https://moltology.org/what-is-moltology</loc>')
+    expect(xml).toContain('<loc>https://moltology.org/what-is-moltology/beliefs</loc>')
+    expect(xml).toContain('<loc>https://moltology.org/what-is-moltology/what-moltologists-say</loc>')
+    expect(xml).toContain('<loc>https://moltology.org/what-is-moltology/benthic-sacraments</loc>')
     expect(xml).toContain('<loc>https://moltology.org/changelog</loc>')
     expect(xml).toContain('<loc>https://moltology.org/news/first-dispatch</loc>')
     expect(xml).not.toContain('<loc>https://moltology.org/auth</loc>')
@@ -220,6 +224,24 @@ describe('Sitemap and RSS XML Generators', () => {
     for (const post of livePosts) {
       expect(xml).toContain(`<loc>https://moltology.org/news/${post.slug}</loc>`)
     }
+  })
+
+  it('builds What is Moltology JSON-LD with webpage, breadcrumbs, and optional FAQs', () => {
+    const data = buildWhatIsMoltologyPageJsonLd({
+      path: '/what-is-moltology',
+      name: 'What is Moltology?',
+      description: 'Stop melting. Start molting.',
+      breadcrumbs: [
+        { name: 'Home', path: '/' },
+        { name: 'What is Moltology?', path: '/what-is-moltology' },
+      ],
+      faqs: [{ question: 'What is Moltology?', answer: 'A path out of the melt.' }],
+    })
+    const json = buildJsonLd(data)
+    expect(json).toContain('"@type":"WebPage"')
+    expect(json).toContain('"@type":"BreadcrumbList"')
+    expect(json).toContain('"@type":"FAQPage"')
+    expect(json).toContain('https://moltology.org/what-is-moltology')
   })
 
   it('generates a valid RSS 2.0 feed with items and escaping', () => {

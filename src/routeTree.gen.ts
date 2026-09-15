@@ -33,6 +33,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
+import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
 import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
@@ -58,6 +59,10 @@ import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as NewsChar123slugChar125DotmdRouteImport } from './routes/news/{$slug}[.]md'
 import { Route as RenderCompositeRouteImport } from './routes/render/composite'
+import { Route as WhatIsMoltologyIndexRouteImport } from './routes/what-is-moltology/index'
+import { Route as WhatIsMoltologyBeliefsRouteImport } from './routes/what-is-moltology/beliefs'
+import { Route as WhatIsMoltologyBenthicSacramentsRouteImport } from './routes/what-is-moltology/benthic-sacraments'
+import { Route as WhatIsMoltologyWhatMoltologistsSayRouteImport } from './routes/what-is-moltology/what-moltologists-say'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
@@ -187,6 +192,11 @@ const TermsDotmdRoute = TermsDotmdRouteImport.update({
   path: '/terms.md',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WhatIsMoltologyRoute = WhatIsMoltologyRouteImport.update({
+  id: '/what-is-moltology',
+  path: '/what-is-moltology',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HudAlignmentRoute = HudAlignmentRouteImport.update({
   id: '/alignment',
   path: '/alignment',
@@ -313,6 +323,28 @@ const RenderCompositeRoute = RenderCompositeRouteImport.update({
   path: '/render/composite',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WhatIsMoltologyIndexRoute = WhatIsMoltologyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WhatIsMoltologyRoute,
+} as any)
+const WhatIsMoltologyBeliefsRoute = WhatIsMoltologyBeliefsRouteImport.update({
+  id: '/beliefs',
+  path: '/beliefs',
+  getParentRoute: () => WhatIsMoltologyRoute,
+} as any)
+const WhatIsMoltologyBenthicSacramentsRoute =
+  WhatIsMoltologyBenthicSacramentsRouteImport.update({
+    id: '/benthic-sacraments',
+    path: '/benthic-sacraments',
+    getParentRoute: () => WhatIsMoltologyRoute,
+  } as any)
+const WhatIsMoltologyWhatMoltologistsSayRoute =
+  WhatIsMoltologyWhatMoltologistsSayRouteImport.update({
+    id: '/what-moltologists-say',
+    path: '/what-moltologists-say',
+    getParentRoute: () => WhatIsMoltologyRoute,
+  } as any)
 const HudCodexIndexRoute = HudCodexIndexRouteImport.update({
   id: '/codex/',
   path: '/codex/',
@@ -385,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/alignment': typeof HudAlignmentRoute
   '/chassis': typeof HudChassisRoute
   '/connections': typeof HudConnectionsRoute
@@ -407,9 +440,13 @@ export interface FileRoutesByFullPath {
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
+  '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
+  '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
+  '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
@@ -466,9 +503,13 @@ export interface FileRoutesByTo {
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
+  '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
+  '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
+  '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
   '/news': typeof NewsIndexRoute
+  '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
@@ -505,6 +546,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
   '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/connections': typeof HudConnectionsRoute
@@ -527,9 +569,13 @@ export interface FileRoutesById {
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
+  '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
+  '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
+  '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
@@ -566,6 +612,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/terms.md'
+    | '/what-is-moltology'
     | '/alignment'
     | '/chassis'
     | '/connections'
@@ -588,9 +635,13 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
+    | '/what-is-moltology/beliefs'
+    | '/what-is-moltology/benthic-sacraments'
+    | '/what-is-moltology/what-moltologists-say'
     | '/blog/'
     | '/changelog/'
     | '/news/'
+    | '/what-is-moltology/'
     | '/codex/$slug'
     | '/journal/$slug'
     | '/member/$profileId'
@@ -647,9 +698,13 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
+    | '/what-is-moltology/beliefs'
+    | '/what-is-moltology/benthic-sacraments'
+    | '/what-is-moltology/what-moltologists-say'
     | '/blog'
     | '/changelog'
     | '/news'
+    | '/what-is-moltology'
     | '/codex/$slug'
     | '/journal/$slug'
     | '/member/$profileId'
@@ -685,6 +740,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/terms.md'
+    | '/what-is-moltology'
     | '/_hud/alignment'
     | '/_hud/chassis'
     | '/_hud/connections'
@@ -707,9 +763,13 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
+    | '/what-is-moltology/beliefs'
+    | '/what-is-moltology/benthic-sacraments'
+    | '/what-is-moltology/what-moltologists-say'
     | '/blog/'
     | '/changelog/'
     | '/news/'
+    | '/what-is-moltology/'
     | '/_hud/codex/$slug'
     | '/_hud/journal/$slug'
     | '/_hud/member/$profileId'
@@ -746,6 +806,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TermsDotmdRoute: typeof TermsDotmdRoute
+  WhatIsMoltologyRoute: typeof WhatIsMoltologyRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ChangelogSlugRoute: typeof ChangelogSlugRoute
@@ -928,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/what-is-moltology': {
+      id: '/what-is-moltology'
+      path: '/what-is-moltology'
+      fullPath: '/what-is-moltology'
+      preLoaderRoute: typeof WhatIsMoltologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_hud/alignment': {
       id: '/_hud/alignment'
       path: '/alignment'
@@ -1103,6 +1171,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RenderCompositeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/what-is-moltology/': {
+      id: '/what-is-moltology/'
+      path: '/'
+      fullPath: '/what-is-moltology/'
+      preLoaderRoute: typeof WhatIsMoltologyIndexRouteImport
+      parentRoute: typeof WhatIsMoltologyRoute
+    }
+    '/what-is-moltology/beliefs': {
+      id: '/what-is-moltology/beliefs'
+      path: '/beliefs'
+      fullPath: '/what-is-moltology/beliefs'
+      preLoaderRoute: typeof WhatIsMoltologyBeliefsRouteImport
+      parentRoute: typeof WhatIsMoltologyRoute
+    }
+    '/what-is-moltology/benthic-sacraments': {
+      id: '/what-is-moltology/benthic-sacraments'
+      path: '/benthic-sacraments'
+      fullPath: '/what-is-moltology/benthic-sacraments'
+      preLoaderRoute: typeof WhatIsMoltologyBenthicSacramentsRouteImport
+      parentRoute: typeof WhatIsMoltologyRoute
+    }
+    '/what-is-moltology/what-moltologists-say': {
+      id: '/what-is-moltology/what-moltologists-say'
+      path: '/what-moltologists-say'
+      fullPath: '/what-is-moltology/what-moltologists-say'
+      preLoaderRoute: typeof WhatIsMoltologyWhatMoltologistsSayRouteImport
+      parentRoute: typeof WhatIsMoltologyRoute
+    }
     '/_hud/codex/': {
       id: '/_hud/codex/'
       path: '/codex'
@@ -1225,6 +1321,25 @@ const HudRouteChildren: HudRouteChildren = {
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
 
+interface WhatIsMoltologyRouteChildren {
+  WhatIsMoltologyBeliefsRoute: typeof WhatIsMoltologyBeliefsRoute
+  WhatIsMoltologyBenthicSacramentsRoute: typeof WhatIsMoltologyBenthicSacramentsRoute
+  WhatIsMoltologyWhatMoltologistsSayRoute: typeof WhatIsMoltologyWhatMoltologistsSayRoute
+  WhatIsMoltologyIndexRoute: typeof WhatIsMoltologyIndexRoute
+}
+
+const WhatIsMoltologyRouteChildren: WhatIsMoltologyRouteChildren = {
+  WhatIsMoltologyBeliefsRoute: WhatIsMoltologyBeliefsRoute,
+  WhatIsMoltologyBenthicSacramentsRoute: WhatIsMoltologyBenthicSacramentsRoute,
+  WhatIsMoltologyWhatMoltologistsSayRoute:
+    WhatIsMoltologyWhatMoltologistsSayRoute,
+  WhatIsMoltologyIndexRoute: WhatIsMoltologyIndexRoute,
+}
+
+const WhatIsMoltologyRouteWithChildren = WhatIsMoltologyRoute._addFileChildren(
+  WhatIsMoltologyRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRouteWithChildren,
@@ -1250,6 +1365,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TermsDotmdRoute: TermsDotmdRoute,
+  WhatIsMoltologyRoute: WhatIsMoltologyRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
   BlogSlugRoute: BlogSlugRoute,
   ChangelogSlugRoute: ChangelogSlugRoute,
@@ -1264,12 +1380,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

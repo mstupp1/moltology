@@ -12,6 +12,7 @@ import {
   Youtube,
   Rss,
   ExternalLink,
+  Info,
 } from 'lucide-react'
 
 export interface MainFooterProps {
@@ -178,6 +179,19 @@ export const MainFooter: React.FC<MainFooterProps> = ({
             >
               <Scroll className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
               <span>SACRED CODEX</span>
+            </Link>
+
+            {/* About / What is Moltology */}
+            <Link
+              to="/what-is-moltology"
+              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                isCorporate
+                  ? 'bg-[#f8fbff] hover:bg-sky-50 border border-sky-200/70 hover:border-sky-300 text-slate-600 hover:text-sky-700 rounded-full'
+                  : 'bg-[#080e11] hover:bg-cyan-950/80 border border-cyan-900/60 hover:border-cyan-500/60 text-gray-200 hover:text-cyan-300 chamfer-corner'
+              }`}
+            >
+              <Info className={`w-3.5 h-3.5 shrink-0 ${isCorporate ? 'text-sky-600' : 'text-cyan-400'}`} />
+              <span>ABOUT</span>
             </Link>
 
             {/* Foundation Entity */}
