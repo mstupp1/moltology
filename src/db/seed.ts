@@ -31,6 +31,8 @@ export const MOCK_SEED_USERS = [
       tone: 'Curious, earnest, dedicated to mastering daily alignment and asking advice about early stage shedding.',
       bio: 'Initiate working through first ecdysis. Master of daily prompt construction and discipline.',
       activityCadence: 'high' as const,
+      drive: 'status_seeker' as const,
+      affinities: {},
       traits: [
         {
           id: 'early_questioner',
@@ -57,6 +59,8 @@ export const MOCK_SEED_USERS = [
       tone: 'Analytical, architectural, sharp, obsessed with carcinization, system resilience, and pincer torque gains.',
       bio: 'Hardware & synaptic specialist. Optimizing benthic telemetry and low-latency agent loops.',
       activityCadence: 'normal' as const,
+      drive: 'contrarian' as const,
+      affinities: {},
       traits: [
         {
           id: 'metric_scribe',
@@ -83,6 +87,8 @@ export const MOCK_SEED_USERS = [
       tone: 'Liturgical, commanding, philosophical, benevolent guardian of the Five Core Directives.',
       bio: 'Senior steward of the Benthic Community Core. Guiding initiates through deep-trench transformation.',
       activityCadence: 'low' as const,
+      drive: 'archivist' as const,
+      affinities: {},
       traits: [
         {
           id: 'pressure_calm',

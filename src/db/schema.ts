@@ -90,14 +90,22 @@ export interface SimulatedTrait {
   acquiredAt?: string
 }
 
+export type SimulatedDrive = 'status_seeker' | 'contrarian' | 'archivist'
+
+export type SimulatedActivityCadence = 'high' | 'normal' | 'low'
+
 export interface SimulatedPersonaConfig {
   archetype: string
   tone: string
   bio?: string
-  activityCadence?: 'high' | 'normal' | 'low'
+  activityCadence?: SimulatedActivityCadence
   lastSimulatedAt?: string
   traits?: SimulatedTrait[]
   referredByHandle?: string | null
+  /** Internal factional incentive. Never shown in public copy. */
+  drive?: SimulatedDrive
+  /** Pairwise affinity in [-1, 1]. Positive = ally, negative = methods rivalry. */
+  affinities?: Record<string, number>
 }
 
 // Moltology Cult User Profiles Table (extends Better Auth user id with domain stats)
