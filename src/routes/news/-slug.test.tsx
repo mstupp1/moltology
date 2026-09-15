@@ -13,6 +13,7 @@ vi.mock('@tanstack/react-router', () => ({
     options: config,
     useLoaderData: () => mockUseLoaderData(),
   }),
+  useLoaderData: () => mockUseLoaderData(),
   useNavigate: () => mockNavigate,
   useLocation: () => ({ pathname: '/news/ai-learning-ascension-manifesto' }),
   Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
@@ -41,20 +42,22 @@ describe('NewsPostDetail ($slug.tsx) Route Component', () => {
     vi.clearAllMocks()
   })
 
-  it('renders 404 not-found card when post is null', () => {
+  it('renders 404 not-found card when post is null', async () => {
     mockUseLoaderData.mockReturnValue(null)
     render(<NewsPostDetail />)
 
-    expect(screen.getByText('NEWS DISPATCH NOT FOUND')).toBeInTheDocument()
+    expect(await screen.findByText('NEWS DISPATCH NOT FOUND', {}, { timeout: 5000 })).toBeInTheDocument()
     expect(screen.getByText('RETURN TO MOLTNATION NEWS')).toBeInTheDocument()
   })
 
-  it('renders article headline, subtitle, author, share trigger, and benthic conversion CTA for a valid post', () => {
+  it('renders article headline, subtitle, author, share trigger, and benthic conversion CTA for a valid post', async () => {
     const post = INITIAL_BLOG_POSTS[0]
     mockUseLoaderData.mockReturnValue(post)
     render(<NewsPostDetail />)
 
-    expect(screen.getByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'The 2026 Moltmaxxing Protocol' }, { timeout: 5000 })
+    ).toBeInTheDocument()
     expect(screen.getByText('Why Elite AI Operators Are Shedding Biological Constraints')).toBeInTheDocument()
     expect(screen.getByText(post.authorName)).toBeInTheDocument()
     expect(screen.getByText('SHARE')).toBeInTheDocument()
