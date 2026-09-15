@@ -11,6 +11,10 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }))
 
+vi.mock('@/lib/jwt', () => ({
+  getAuthJWTToken: vi.fn().mockResolvedValue('mock-jwt'),
+}))
+
 vi.mock('@/lib/server/api', () => ({
   getBlogCommentsFn: vi.fn(),
   createBlogCommentFn: vi.fn(),
@@ -128,14 +132,14 @@ describe('BlogCommentsSection', () => {
 
     await waitFor(() => {
       expect(createBlogCommentFn).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           postId: 'post-100',
           content: 'A thrilling bio-silicon perspective!',
           userId: 'usr-1',
-        },
+        }),
       })
       expect(screen.getByText('A thrilling bio-silicon perspective!')).toBeInTheDocument()
-      expect(screen.getByText('Comment posted. Your voice carries in the deep.')).toBeInTheDocument()
+      expect(screen.getByText('Comment posted successfully.')).toBeInTheDocument()
     })
   })
 })

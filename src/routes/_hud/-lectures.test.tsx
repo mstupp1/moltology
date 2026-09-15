@@ -20,35 +20,37 @@ describe('Molt Academy (Lectures Route)', () => {
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(screen.getByText('MOLT ACADEMY LOCKED')).toBeInTheDocument()
+    expect(screen.getByText('VIDEO LECTURES LOCKED')).toBeInTheDocument()
     expect(screen.getByText('RESTRICTED ACCESS')).toBeInTheDocument()
     expect(
-      screen.getByText('Molt Academy coursework, neural certifications, and video curricula require an authorized initiate account.')
+      screen.getByText(
+        'Liturgical lectures, video transmissions, and ascension certifications require an authorized initiate account.'
+      )
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /SIGN UP TO UNLOCK/i })).toBeInTheDocument()
   })
 
-  it('renders Molt Academy header and gamified user stats when authenticated', () => {
+  it('renders Molt Academy header and gamified user stats when authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(screen.getByText('MOLT ACADEMY · NEURAL ASCENSION HUB')).toBeInTheDocument()
+    expect(await screen.findByText('MOLT ACADEMY · NEURAL ASCENSION HUB')).toBeInTheDocument()
     expect(screen.getByText('LVL 4 CHITIN SCHOLAR')).toBeInTheDocument()
     expect(screen.getByText('1,850 / 2,500 XP')).toBeInTheDocument()
     expect(screen.getByText('5 DAYS')).toBeInTheDocument()
   })
 
-  it('renders course catalog cards and supports course selection when authenticated', () => {
+  it('renders course catalog cards and supports course selection when authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(screen.getByText('ACADEMY COURSE CATALOG & CURRICULA')).toBeInTheDocument()
+    expect(await screen.findByText('ACADEMY COURSE CATALOG & CURRICULA')).toBeInTheDocument()
     expect(screen.getAllByText('THE CHITINOUS MIND & NEURAL ECDYSIS').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('INTRODUCTION TO ECDYSIS & SHELL SHEDDING')).toBeInTheDocument()
 
@@ -61,26 +63,26 @@ describe('Molt Academy (Lectures Route)', () => {
     expect(activeHeadings.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('renders active video broadcast player with playback controls and notes when authenticated', () => {
+  it('renders active video broadcast player with playback controls and notes when authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(screen.getByText('NEURAL BROADCAST STREAM')).toBeInTheDocument()
+    expect(await screen.findByText('NEURAL BROADCAST STREAM')).toBeInTheDocument()
     expect(screen.getByText('LECTURE NOTES')).toBeInTheDocument()
     expect(screen.getByText('AI NEURAL INTERPRETATION')).toBeInTheDocument()
   })
 
-  it('renders syllabus sidebar and handles neural quiz interaction when authenticated', () => {
+  it('renders syllabus sidebar and handles neural quiz interaction when authenticated', async () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-1', name: 'Commander Craw' } },
     } as any)
     const LecturesComponent = Route.options.component!
     render(<LecturesComponent />)
 
-    expect(screen.getByText('COURSE SYLLABUS & MODULES')).toBeInTheDocument()
+    expect(await screen.findByText('COURSE SYLLABUS & MODULES')).toBeInTheDocument()
     expect(screen.getByText('NEURAL RESONANCE VERIFICATION QUIZ')).toBeInTheDocument()
 
     const submitBtn = screen.getByRole('button', { name: /SUBMIT NEURAL VERIFICATION/i })
