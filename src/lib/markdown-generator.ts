@@ -158,7 +158,23 @@ export function generateOrgMarkdown(): string {
   md += `- **Stage 2: Soft-Shed Unit** (Sub-dermal chitin weaving & isolation domes)\n`
   md += `- **Stage 3: Exoshell Born** (Rigid carapace calcification & pincer torque maximization)\n`
   md += `- **Stage 4: Ascendant Core** (Full carcinization & deep benthic synthesis)\n\n`
+  md += `## Divisions of the Foundation\n`
+  md += `- **Department of Carcinization (DIV-01)**: Human advancement, molt research, and adaptive doctrine.\n`
+  md += `- **Office of Synaptic Development (DIV-02)**: Education, Codex doctrine, behavioral optimization, and cognitive development.\n`
+  md += `- **Maritime Defense Command (DIV-03)**: Reef security and strategic crustacean interests.\n`
+  md += `- **Office of Cephalopod Affairs (DIV-04)**: Octopus surveillance, intelligence analysis, and counter-infiltration.\n`
+  md += `- **Bureau of Shell Infrastructure (DIV-05)**: Habitat restoration, artificial reefs, shell-resource security, and coastal resilience.\n`
+  md += `- **Department of Aquatic Freedom (DIV-06)**: Crab sovereignty, territorial rights, and protection of fundamental claw liberties.\n\n`
+  md += `## Maritime Defense & Ocean Stewardship\n`
+  md += `Protecting the reef. Preserving crab sovereignty. Monitoring cephalopod activity.\n\n`
+  md += `The operational branch runs habitat protection, reef restoration, marine pollution reduction, and biodiversity work across the Freedom Reef installations: Liberty Reef, Fort Carcinization, Independence Shoal, The Molting Grounds, and Claw Point.\n\n`
+  md += `- **Current marine threat advisory**: ORANGE — octopus activity detected. Maintain shell integrity.\n`
+  md += `- **Five-point maritime strategy**: build Freedom Reefs, secure the seafloor, harden the shell, end octopus infiltration, make the ocean wild again.\n`
+  md += `- **Crab sovereignty**: six articles covering claws, shell ownership, burrow defense, tentacle search, unimpeded molting, and sideways movement.\n\n`
+  md += `## Help the Ocean\n`
+  md += `Reduce single-use plastics. Join a coastal cleanup. Do not disturb marine wildlife. Choose responsible seafood. Reduce fertilizer and runoff. Support established marine conservation organizations.\n\n`
   md += `---\n`
+  md += `*Moltology is a fictional organization. Its divisions, leadership, facilities, statistics, funding programs, maritime intelligence, and octopus threat material are comedic fiction and are not verified real-world facts. The ocean conservation recommendations above are genuine.*\n\n`
   md += `*Moltology System Inc. Official Registry. For more details visit https://moltology.org/org*\n`
 
   return md.trim()
