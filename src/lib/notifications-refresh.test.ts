@@ -1,14 +1,31 @@
 import { describe, expect, it } from 'vitest'
-import { NOTIFICATIONS_MIN_INTERVAL_MS, shouldFetchNotifications } from './notifications-refresh'
+import {
+  NOTIFICATIONS_MIN_INTERVAL_MS,
+  NOTIFICATIONS_REMOTE_INBOX_ENABLED,
+  shouldFetchNotifications,
+} from './notifications-refresh'
 
 describe('shouldFetchNotifications', () => {
-  it('allows the first fetch and user-forced fetches', () => {
-    expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000 })).toBe(true)
+  it('keeps the remote inbox off so HUD tabs do not query Neon', () => {
+    expect(NOTIFICATIONS_REMOTE_INBOX_ENABLED).toBe(false)
+    expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000 })).toBe(false)
     expect(
       shouldFetchNotifications({
         lastFetchedAt: 1_000,
         now: 1_001,
         force: true,
+      }),
+    ).toBe(false)
+  })
+
+  it('allows the first fetch and user-forced fetches when the inbox is on', () => {
+    expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000, enabled: true })).toBe(true)
+    expect(
+      shouldFetchNotifications({
+        lastFetchedAt: 1_000,
+        now: 1_001,
+        force: true,
+        enabled: true,
       }),
     ).toBe(true)
   })
@@ -20,6 +37,7 @@ describe('shouldFetchNotifications', () => {
         now: 1_000,
         force: true,
         inFlight: true,
+        enabled: true,
       }),
     ).toBe(false)
   })
@@ -31,12 +49,14 @@ describe('shouldFetchNotifications', () => {
       shouldFetchNotifications({
         lastFetchedAt,
         now: lastFetchedAt + NOTIFICATIONS_MIN_INTERVAL_MS - 1,
+        enabled: true,
       }),
     ).toBe(false)
     expect(
       shouldFetchNotifications({
         lastFetchedAt,
         now: lastFetchedAt + NOTIFICATIONS_MIN_INTERVAL_MS,
+        enabled: true,
       }),
     ).toBe(true)
   })

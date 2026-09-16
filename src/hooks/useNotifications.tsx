@@ -21,9 +21,12 @@ import {
   hubUrlForNotificationKind,
   showSystemNotification,
 } from '@/lib/system-notifications'
-import { shouldFetchNotifications } from '@/lib/notifications-refresh'
+import { shouldFetchNotifications, NOTIFICATIONS_REMOTE_INBOX_ENABLED } from '@/lib/notifications-refresh'
 
-export { NOTIFICATIONS_MIN_INTERVAL_MS } from '@/lib/notifications-refresh'
+export {
+  NOTIFICATIONS_MIN_INTERVAL_MS,
+  NOTIFICATIONS_REMOTE_INBOX_ENABLED,
+} from '@/lib/notifications-refresh'
 
 type NotificationsContextValue = {
   notifications: NotificationView[]
@@ -116,7 +119,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   }, [userId])
 
   useEffect(() => {
-    if (!userId) {
+    if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED || !userId) {
       lastFetchedAtRef.current = null
       inFlightRef.current = false
       return
@@ -153,7 +156,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
   const markRead = useCallback(
     async (notificationId: string) => {
-      if (!userId) return
+      if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED || !userId) return
       const token = await getAuthJWTToken()
       if (!token) return
       await markNotificationReadFn({
@@ -170,7 +173,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   )
 
   const markAllRead = useCallback(async () => {
-    if (!userId) return
+    if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED || !userId) return
     const token = await getAuthJWTToken()
     if (!token) return
     await markNotificationReadFn({
