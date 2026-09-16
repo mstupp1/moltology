@@ -5,6 +5,15 @@ import { ThreadActionSheet } from './ThreadActionSheet'
 import { DeleteThreadDialog, isDeleteConfirmSkipped } from './DeleteThreadDialog'
 import type { ManagedThread } from './useThreadActions'
 
+const pinnedAtMs = (value?: string | Date | null) => {
+  if (!value) return 0
+  const ms = value instanceof Date ? value.getTime() : new Date(value).getTime()
+  return Number.isFinite(ms) ? ms : 0
+}
+
+const SECTION_LABEL =
+  'flex items-center gap-1.5 px-1 py-1 text-[10px] font-bold tracking-wider uppercase text-gray-500 select-none'
+
 export interface ThreadListProps {
   threads: ManagedThread[]
   activeThreadId: string | null
@@ -40,6 +49,11 @@ export const ThreadList: React.FC<ThreadListProps> = ({
   const [isArchivedOpen, setIsArchivedOpen] = useState(false)
 
   const activeThreads = threads.filter((t) => !t.archivedAt)
+  const pinnedThreads = activeThreads
+    .filter((t) => t.pinnedAt)
+    .slice()
+    .sort((a, b) => pinnedAtMs(b.pinnedAt) - pinnedAtMs(a.pinnedAt))
+  const unpinnedThreads = activeThreads.filter((t) => !t.pinnedAt)
   const archivedThreads = threads.filter((t) => t.archivedAt)
 
   const actionThread = threads.find((t) => t.id === actionThreadId) || null
@@ -85,9 +99,21 @@ export const ThreadList: React.FC<ThreadListProps> = ({
 
   return (
     <>
-      <div className="space-y-1.5">
-        {activeThreads.map((t) => renderItem(t, false))}
-      </div>
+      {pinnedThreads.length > 0 && (
+        <div data-testid="pinned-threads">
+          <div className={SECTION_LABEL}>
+            <span>Pinned</span>
+            <span className="text-gray-600 font-mono">({pinnedThreads.length})</span>
+          </div>
+          <div className="space-y-1.5 mt-1.5">{pinnedThreads.map((t) => renderItem(t, false))}</div>
+        </div>
+      )}
+
+      {unpinnedThreads.length > 0 && (
+        <div className={pinnedThreads.length > 0 ? 'mt-3' : undefined} data-testid="unpinned-threads">
+          <div className="space-y-1.5">{unpinnedThreads.map((t) => renderItem(t, false))}</div>
+        </div>
+      )}
 
       {archivedThreads.length > 0 && (
         <div className="mt-3 pt-2 border-t border-cyan-950/70">
@@ -95,7 +121,7 @@ export const ThreadList: React.FC<ThreadListProps> = ({
             type="button"
             onClick={() => setIsArchivedOpen((v) => !v)}
             aria-expanded={isArchivedOpen}
-            className="w-full flex items-center gap-1.5 px-1 py-1 text-[10px] font-bold tracking-wider uppercase text-gray-500 hover:text-cyan-300 transition-colors cursor-pointer select-none"
+            className={`w-full ${SECTION_LABEL} hover:text-cyan-300 transition-colors cursor-pointer`}
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             {isArchivedOpen ? (
