@@ -7,6 +7,7 @@ import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
+import { ensureUserProfile } from '../user-sync'
 import {
   MEMBER_SEARCH_LIMIT,
   MEMBER_SEARCH_MIN_CHARS,
@@ -248,6 +249,9 @@ export const getChangelogBySlugFn = createServerFn({ method: 'POST' })
 export const getUserProfileHandler = async ({ data, context }: ServerFnArgs<{ token?: string; userId?: string }>) => {
   const auth = await resolveWriteAuth({ data, context, requireAuth: false })
   if (!auth) return null
+
+  const healed = await ensureUserProfile(auth.userId)
+  if (healed) return healed
 
   const [profileRecord] = await auth.dbClient
     .select()

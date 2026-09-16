@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { ServerError, formatServerError } from './error'
-import { extractAuthToken, extractClientIp } from './middleware'
+import { extractAuthToken, extractClientIp, hasBetterAuthSessionCookie } from './middleware'
 import { getDb } from '../../db'
 import { publicMiddleware, authenticatedMiddleware } from './functions'
 import {
@@ -96,6 +96,29 @@ describe('Auth Token Extraction', () => {
       headers: { authorization: 'Bearer opaque-session-id' },
     })
     expect(extractAuthToken(req)).toBeNull()
+  })
+})
+
+describe('Better Auth session cookie detection', () => {
+  it('returns false when the request has no session cookie', () => {
+    expect(hasBetterAuthSessionCookie(null)).toBe(false)
+    expect(hasBetterAuthSessionCookie(new Request('https://example.com'))).toBe(false)
+    expect(
+      hasBetterAuthSessionCookie(
+        new Request('https://example.com', { headers: { cookie: 'theme=dark' } }),
+      ),
+    ).toBe(false)
+  })
+
+  it('detects both standard and __Secure- Better Auth session cookies', () => {
+    const standard = new Request('https://example.com', {
+      headers: { cookie: 'better-auth.session_token=opaque-session-id; Path=/' },
+    })
+    const secure = new Request('https://example.com', {
+      headers: { cookie: '__Secure-better-auth.session_token=opaque-session-id' },
+    })
+    expect(hasBetterAuthSessionCookie(standard)).toBe(true)
+    expect(hasBetterAuthSessionCookie(secure)).toBe(true)
   })
 })
 

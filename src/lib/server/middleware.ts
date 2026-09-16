@@ -36,6 +36,17 @@ export function extractClientIp(request?: Request | null): string | null {
 }
 
 /**
+ * True when the request carries a Better Auth session cookie that `getSession` might look up.
+ * Guest crawler/SSR hits have no cookie; skipping getSession avoids a Postgres round-trip.
+ */
+export function hasBetterAuthSessionCookie(request?: Request | null): boolean {
+  if (!request?.headers) return false
+  const cookie = request.headers.get('cookie') || request.headers.get('Cookie')
+  if (!cookie) return false
+  return /(?:^|;\s*)(?:__Secure-)?better-auth\.session_token=/.test(cookie)
+}
+
+/**
  * Middleware for logging server function performance and errors.
  */
 export const loggingMiddleware = createMiddleware().server(async ({ request, next }) => {
@@ -84,7 +95,7 @@ export const authMiddleware = createMiddleware().server(async ({ request, next, 
       user = verification.payload
     }
   }
-  if (!user) {
+  if (!user && hasBetterAuthSessionCookie(request)) {
     user = await resolveSessionUser(request)
   }
 
@@ -93,9 +104,7 @@ export const authMiddleware = createMiddleware().server(async ({ request, next, 
   }
 
   const { getDb } = await import('../../db')
-  const { ensureUserProfile } = await import('../user-sync')
   const db = getDb()
-  await ensureUserProfile(user.sub || user.id)
 
   return next({
     context: {
@@ -120,18 +129,17 @@ export const optionalAuthMiddleware = createMiddleware().server(async ({ request
 
   const clientIp = extractClientIp(request)
 
+  const sessionUser = () =>
+    hasBetterAuthSessionCookie(request) ? resolveSessionUser(request) : Promise.resolve(null)
+
   if (!token) {
-    const sessionUser = await resolveSessionUser(request)
-    ctx = { user: sessionUser, token: null, db: getDb(), clientIp }
+    ctx = { user: await sessionUser(), token: null, db: getDb(), clientIp }
   } else {
     const verification = await verifyAuthJWT(token)
     if (verification.valid && verification.payload) {
-      const { ensureUserProfile } = await import('../user-sync')
-      await ensureUserProfile(verification.payload.sub)
       ctx = { user: verification.payload, token, db: getDb(), clientIp }
     } else {
-      const sessionUser = await resolveSessionUser(request)
-      ctx = { user: sessionUser, token: null, db: getDb(), clientIp }
+      ctx = { user: await sessionUser(), token: null, db: getDb(), clientIp }
     }
   }
 

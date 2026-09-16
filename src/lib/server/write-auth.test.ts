@@ -33,7 +33,7 @@ describe('resolveWriteAuth', () => {
 
     expect(result?.userId).toBe('user-from-context')
     expect(result?.dbClient).toEqual({ fromCtx: true })
-    expect(ensureUserProfile).toHaveBeenCalledWith('user-from-context')
+    expect(ensureUserProfile).not.toHaveBeenCalled()
   })
 
   it('verifies data.token when middleware has no user', async () => {

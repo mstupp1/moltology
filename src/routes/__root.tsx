@@ -2,6 +2,10 @@ import React, { lazy } from 'react'
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import '@/index.css'
 import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/lib/seo'
+import {
+  isPublicDocumentCachePath,
+  PUBLIC_DOCUMENT_CACHE_CONTROL,
+} from '@/lib/public-document-cache'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { SpeedInsights } from '@vercel/speed-insights/react'
@@ -61,14 +65,13 @@ export const Route = createRootRoute({
     if (matches.some(isNotFoundMatch)) {
       return xRobotsNoindexHeaders()
     }
-    // The landing page renders identically for every guest (session is
-    // client-side) — serve it from the CDN edge in production instead of re-running SSR
-    // per request, eliminating cold-start TTFB variance on real users.
+    // Guest-identical public documents SSR-query Postgres. Serve them from the
+    // CDN edge in production so crawlers do not keep Neon compute awake.
     const isProduction = process.env.NODE_ENV === 'production'
-    const isLandingPage = matches[matches.length - 1]?.pathname === '/'
-    if (isProduction && isLandingPage) {
+    const pathname = matches[matches.length - 1]?.pathname
+    if (isProduction && isPublicDocumentCachePath(pathname)) {
       return {
-        'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=600, stale-while-revalidate=3600',
+        'Cache-Control': PUBLIC_DOCUMENT_CACHE_CONTROL,
       }
     }
     if (!isProduction) {

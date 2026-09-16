@@ -21,14 +21,18 @@ import {
   hubUrlForNotificationKind,
   showSystemNotification,
 } from '@/lib/system-notifications'
+import { shouldFetchNotifications, NOTIFICATIONS_REMOTE_INBOX_ENABLED } from '@/lib/notifications-refresh'
 
-const POLL_MS = 60_000
+export {
+  NOTIFICATIONS_MIN_INTERVAL_MS,
+  NOTIFICATIONS_REMOTE_INBOX_ENABLED,
+} from '@/lib/notifications-refresh'
 
 type NotificationsContextValue = {
   notifications: NotificationView[]
   unreadCount: number
   isLoading: boolean
-  refresh: () => Promise<void>
+  refresh: (opts?: { force?: boolean }) => Promise<void>
   markRead: (notificationId: string) => Promise<void>
   markAllRead: () => Promise<void>
   acceptFriendRequest: (requestId: string, notificationId?: string) => Promise<void>
@@ -47,6 +51,8 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const [isLoading, setIsLoading] = useState(false)
   const mountedRef = useRef(true)
   const authFailureRef = useRef(false)
+  const lastFetchedAtRef = useRef<number | null>(null)
+  const inFlightRef = useRef(false)
 
   useEffect(() => {
     mountedRef.current = true
@@ -58,9 +64,11 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   // Reset auth failure flag whenever active user changes
   useEffect(() => {
     authFailureRef.current = false
+    lastFetchedAtRef.current = null
+    inFlightRef.current = false
   }, [userId])
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (opts?: { force?: boolean }) => {
     if (!userId || authFailureRef.current) {
       if (!userId) {
         setNotifications([])
@@ -68,6 +76,17 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       }
       return
     }
+    if (
+      !shouldFetchNotifications({
+        lastFetchedAt: lastFetchedAtRef.current,
+        now: Date.now(),
+        force: opts?.force,
+        inFlight: inFlightRef.current,
+      })
+    ) {
+      return
+    }
+    inFlightRef.current = true
     setIsLoading(true)
     try {
       const token = await getAuthJWTToken()
@@ -81,6 +100,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       })
       if (!mountedRef.current) return
       authFailureRef.current = false
+      lastFetchedAtRef.current = Date.now()
       setNotifications(result.notifications)
       setUnreadCount(result.unreadCount)
     } catch (err) {
@@ -93,12 +113,17 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         authFailureRef.current = true
       }
     } finally {
+      inFlightRef.current = false
       if (mountedRef.current) setIsLoading(false)
     }
   }, [userId])
 
   useEffect(() => {
-    if (!userId) return
+    if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED || !userId) {
+      lastFetchedAtRef.current = null
+      inFlightRef.current = false
+      return
+    }
 
     void refresh()
 
@@ -107,16 +132,9 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       void refresh()
     }
 
-    // Skip polling when the tab is hidden / backgrounded to conserve serverless invocations
-    const interval = window.setInterval(() => {
-      if (typeof document !== 'undefined' && document.hidden) return
-      void refresh()
-    }, POLL_MS)
-
     window.addEventListener('focus', onWakeup)
     document.addEventListener('visibilitychange', onWakeup)
     return () => {
-      window.clearInterval(interval)
       window.removeEventListener('focus', onWakeup)
       document.removeEventListener('visibilitychange', onWakeup)
     }
@@ -138,7 +156,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
   const markRead = useCallback(
     async (notificationId: string) => {
-      if (!userId) return
+      if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED || !userId) return
       const token = await getAuthJWTToken()
       if (!token) return
       await markNotificationReadFn({
@@ -155,7 +173,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   )
 
   const markAllRead = useCallback(async () => {
-    if (!userId) return
+    if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED || !userId) return
     const token = await getAuthJWTToken()
     if (!token) return
     await markNotificationReadFn({
@@ -198,7 +216,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
           setUnreadCount((c) => Math.max(0, c - 1))
         }
         toast.success(action === 'accept' ? 'Friend request accepted.' : 'Friend request declined.')
-        await refresh()
+        await refresh({ force: true })
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Could not update friend request.')
       } finally {
