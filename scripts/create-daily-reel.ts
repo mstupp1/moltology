@@ -1734,22 +1734,31 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
 
     // 6️⃣ Deterministically Queue Dual Broadcast to Zernio (Reels & Shorts Queue) & First Comment
     if (publicUrl) {
-      queueResult = await queueDualReelAndShort({
-        videoUrl: publicUrl,
-        instagramCaption: scriptData.caption,
-        youtubeTitle: `${scriptData.hookHeadline}: The 2026 Benthic Shift #Shorts`,
-        youtubeDescription: `${scriptData.narrationScript}\n\n🔗 Calculate your Molt Clearance: ${ctaConfig.url}\n\n#Shorts #Moltmaxxing #BenthicAI`,
-        youtubeTags: ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
-        firstComment: scriptData.firstComment,
-        queueId: DEFAULT_REELS_QUEUE_ID,
-        profileId: DEFAULT_PROFILE_ID,
-        instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
-        youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
-        isAiGenerated: true,
-        publishNow: options.publishNow,
-        platform: platformTarget,
-      })
+      try {
+        queueResult = await queueDualReelAndShort({
+          videoUrl: publicUrl,
+          instagramCaption: scriptData.caption,
+          youtubeTitle: `${scriptData.hookHeadline}: The 2026 Benthic Shift #Shorts`,
+          youtubeDescription: `${scriptData.narrationScript}\n\n🔗 Calculate your Molt Clearance: ${ctaConfig.url}\n\n#Shorts #Moltmaxxing #BenthicAI`,
+          youtubeTags: ['Shorts', 'Moltmaxxing', 'BenthicAI', 'Carcinization', 'Tech'],
+          firstComment: scriptData.firstComment,
+          queueId: DEFAULT_REELS_QUEUE_ID,
+          profileId: DEFAULT_PROFILE_ID,
+          instagramAccountId: DEFAULT_INSTAGRAM_ACCOUNT_ID,
+          youtubeAccountId: DEFAULT_YOUTUBE_ACCOUNT_ID,
+          isAiGenerated: true,
+          publishNow: options.publishNow,
+          platform: platformTarget,
+        })
+      } catch (queueErr: any) {
+        console.warn(`   ⚠️ Zernio queueing skipped: ${queueErr.message}`)
+        console.warn(`   ℹ️ Master reel is on S3. Add ZERNIO_API_KEY and re-queue, or leave this ledger row as draft.`)
+      }
     }
+
+    const publishStatus = queueResult
+      ? (options.publishNow ? 'published' : 'queued')
+      : 'draft'
 
     // Record to Social History Ledger
     recordReelInHistory({
@@ -1765,7 +1774,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       thumbnailUrl: null,
       s3ThumbKey: null,
       durationSeconds,
-      status: options.publishNow ? 'published' : 'queued',
+      status: publishStatus,
       scheduledFor: queueResult?.scheduledFor || null,
       queueId: DEFAULT_REELS_QUEUE_ID,
       zernioInstagramPostId: queueResult?.instagramPostId || null,

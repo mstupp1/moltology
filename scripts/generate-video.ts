@@ -4,6 +4,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import {
+  getGeminiApiKey,
+  resolveMediaGenerationBackend,
+  toGatewayVeoModel,
+} from './lib/ai-gateway-media'
 
 export interface GenerateVideoOptions {
   prompt: string
@@ -27,11 +32,38 @@ export interface GenerateVideoResult {
   aspectRatio: string
 }
 
-export async function generateVeoVideo(options: GenerateVideoOptions): Promise<GenerateVideoResult> {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.VERTEX_API_KEY || process.env.GOOGLE_API_KEY
-  if (!apiKey) {
-    throw new Error('Missing API key in environment variables (GEMINI_API_KEY or VERTEX_API_KEY).')
+async function generateVeoVideoViaGateway(
+  options: GenerateVideoOptions,
+  model: string,
+  aspectRatio: '9:16' | '16:9' | '1:1',
+  durationSeconds: number,
+  localPath: string
+): Promise<{ operationName: string; modelUsed: string }> {
+  const gatewayModel = toGatewayVeoModel(model)
+  console.log(`   • Backend: Vercel AI Gateway`)
+  console.log(`   • Gateway model: ${gatewayModel}`)
+
+  const { experimental_generateVideo: generateVideo } = await import('ai')
+  const result = await generateVideo({
+    model: gatewayModel,
+    prompt: options.prompt,
+    aspectRatio,
+    duration: durationSeconds,
+    abortSignal: AbortSignal.timeout(10 * 60 * 1000),
+  })
+
+  const videoBytes = result.video?.uint8Array || result.videos?.[0]?.uint8Array
+  if (!videoBytes || videoBytes.length === 0) {
+    throw new Error('AI Gateway video generation returned no video bytes.')
   }
+
+  fs.writeFileSync(localPath, videoBytes)
+  return { operationName: `ai-gateway:${gatewayModel}`, modelUsed: gatewayModel }
+}
+
+export async function generateVeoVideo(options: GenerateVideoOptions): Promise<GenerateVideoResult> {
+  const backend = resolveMediaGenerationBackend()
+  const apiKey = getGeminiApiKey()
 
   const model = options.model || 'veo-3.1-lite-generate-preview'
   const aspectRatio = options.aspectRatio || '9:16'
@@ -45,72 +77,6 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
   console.log(`   • Duration: ${durationSeconds}s`)
   console.log(`   • Prompt: "${options.prompt}"`)
 
-  // 1. Submit long-running prediction request
-  const submitUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predictLongRunning?key=${apiKey}`
-  const submitResponse = await fetch(submitUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      instances: [{ prompt: options.prompt }],
-      parameters: {
-        aspectRatio,
-        durationSeconds,
-      },
-    }),
-  })
-
-  if (!submitResponse.ok) {
-    const errText = await submitResponse.text()
-    throw new Error(`Failed to submit video generation request (${submitResponse.status}): ${errText}`)
-  }
-
-  const submitData = (await submitResponse.json()) as { name: string }
-  const operationName = submitData.name
-  console.log(`⏳ Operation started: ${operationName}`)
-
-  // 2. Poll operation status until done
-  const pollUrl = `https://generativelanguage.googleapis.com/v1beta/${operationName}?key=${apiKey}`
-  let downloadUri: string | null = null
-
-  const startTime = Date.now()
-  while (!downloadUri) {
-    await new Promise((res) => setTimeout(res, 5000))
-    const elapsed = Math.round((Date.now() - startTime) / 1000)
-    process.stdout.write(`\r⏳ Rendering video... (${elapsed}s elapsed)`)
-
-    const pollResponse = await fetch(pollUrl)
-    if (!pollResponse.ok) {
-      const errText = await pollResponse.text()
-      throw new Error(`\nPolling failed (${pollResponse.status}): ${errText}`)
-    }
-
-    const pollData = (await pollResponse.json()) as any
-    if (pollData.error) {
-      throw new Error(`\nVideo generation failed: ${JSON.stringify(pollData.error)}`)
-    }
-
-    if (pollData.done) {
-      const samples = pollData.response?.generateVideoResponse?.generatedSamples
-      if (samples && samples.length > 0 && samples[0].video?.uri) {
-        downloadUri = samples[0].video.uri
-      } else {
-        throw new Error(`\nOperation marked done but no video URI was returned: ${JSON.stringify(pollData)}`)
-      }
-    }
-  }
-
-  console.log(`\n✓ Video rendered successfully!`)
-
-  // 3. Download the generated video
-  const downloadUrlWithKey = `${downloadUri}${downloadUri.includes('?') ? '&' : '?'}key=${apiKey}`
-  const videoDownloadRes = await fetch(downloadUrlWithKey)
-  if (!videoDownloadRes.ok) {
-    throw new Error(`Failed to download generated video (${videoDownloadRes.status})`)
-  }
-
-  const arrayBuffer = await videoDownloadRes.arrayBuffer()
-  const buffer = Buffer.from(arrayBuffer)
-
   const slug = options.prompt
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -122,8 +88,90 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
     fs.mkdirSync(localDir, { recursive: true })
   }
   const localPath = options.outputFilePath || path.join(localDir, localFileName)
-  fs.writeFileSync(localPath, buffer)
-  console.log(`💾 Saved local copy to: ${localPath} (${(buffer.length / (1024 * 1024)).toFixed(2)} MB)`)
+
+  let operationName = ''
+  let resolvedModel = model
+
+  if (backend === 'gateway') {
+    const gatewayResult = await generateVeoVideoViaGateway(
+      options,
+      model,
+      aspectRatio,
+      durationSeconds,
+      localPath
+    )
+    operationName = gatewayResult.operationName
+    resolvedModel = gatewayResult.modelUsed
+    console.log(`💾 Saved local copy to: ${localPath} (${(fs.statSync(localPath).size / (1024 * 1024)).toFixed(2)} MB)`)
+  } else {
+    // 1. Submit long-running prediction request
+    const submitUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predictLongRunning?key=${apiKey}`
+    const submitResponse = await fetch(submitUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        instances: [{ prompt: options.prompt }],
+        parameters: {
+          aspectRatio,
+          durationSeconds,
+        },
+      }),
+    })
+
+    if (!submitResponse.ok) {
+      const errText = await submitResponse.text()
+      throw new Error(`Failed to submit video generation request (${submitResponse.status}): ${errText}`)
+    }
+
+    const submitData = (await submitResponse.json()) as { name: string }
+    operationName = submitData.name
+    console.log(`⏳ Operation started: ${operationName}`)
+
+    // 2. Poll operation status until done
+    const pollUrl = `https://generativelanguage.googleapis.com/v1beta/${operationName}?key=${apiKey}`
+    let downloadUri: string | null = null
+
+    const startTime = Date.now()
+    while (!downloadUri) {
+      await new Promise((res) => setTimeout(res, 5000))
+      const elapsed = Math.round((Date.now() - startTime) / 1000)
+      process.stdout.write(`\r⏳ Rendering video... (${elapsed}s elapsed)`)
+
+      const pollResponse = await fetch(pollUrl)
+      if (!pollResponse.ok) {
+        const errText = await pollResponse.text()
+        throw new Error(`\nPolling failed (${pollResponse.status}): ${errText}`)
+      }
+
+      const pollData = (await pollResponse.json()) as any
+      if (pollData.error) {
+        throw new Error(`\nVideo generation failed: ${JSON.stringify(pollData.error)}`)
+      }
+
+      if (pollData.done) {
+        const samples = pollData.response?.generateVideoResponse?.generatedSamples
+        if (samples && samples.length > 0 && samples[0].video?.uri) {
+          downloadUri = samples[0].video.uri
+        } else {
+          throw new Error(`\nOperation marked done but no video URI was returned: ${JSON.stringify(pollData)}`)
+        }
+      }
+    }
+
+    console.log(`\n✓ Video rendered successfully!`)
+
+    // 3. Download the generated video
+    const downloadUrlWithKey = `${downloadUri}${downloadUri.includes('?') ? '&' : '?'}key=${apiKey}`
+    const videoDownloadRes = await fetch(downloadUrlWithKey)
+    if (!videoDownloadRes.ok) {
+      throw new Error(`Failed to download generated video (${videoDownloadRes.status})`)
+    }
+
+    const arrayBuffer = await videoDownloadRes.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    fs.writeFileSync(localPath, buffer)
+    console.log(`💾 Saved local copy to: ${localPath} (${(buffer.length / (1024 * 1024)).toFixed(2)} MB)`)
+  }
 
   // 4. Upload to S3 if requested
   let publicUrl: string | undefined
@@ -151,7 +199,7 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
     s3Key,
     publicUrl,
     operationName,
-    model,
+    model: resolvedModel,
     durationSeconds,
     aspectRatio,
   }

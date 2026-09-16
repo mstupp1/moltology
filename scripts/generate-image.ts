@@ -4,6 +4,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
+import {
+  getGeminiApiKey,
+  resolveMediaGenerationBackend,
+  toGatewayImageModel,
+} from './lib/ai-gateway-media'
 
 export const MODEL_ALIASES: Record<string, string> = {
   'nano-banana-pro': 'gemini-3-pro-image',
@@ -56,10 +61,8 @@ function getMimeType(filePath: string): string {
 }
 
 export async function generateGeminiImage(options: GenerateImageOptions): Promise<GenerateImageResult> {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.VERTEX_API_KEY || process.env.GOOGLE_API_KEY
-  if (!apiKey) {
-    throw new Error('Missing API key in environment variables (GEMINI_API_KEY or VERTEX_API_KEY).')
-  }
+  const backend = resolveMediaGenerationBackend()
+  const apiKey = getGeminiApiKey()
 
   const rawModel = options.model || 'gemini-3-pro-image'
   const model = MODEL_ALIASES[rawModel.toLowerCase()] || rawModel
@@ -83,12 +86,36 @@ export async function generateGeminiImage(options: GenerateImageOptions): Promis
   }
   console.log(`   • Prompt: "${options.prompt.slice(0, 120)}${options.prompt.length > 120 ? '...' : ''}"`)
 
+  if (options.referenceImagePath && !fs.existsSync(options.referenceImagePath)) {
+    throw new Error(`Reference image not found at: ${options.referenceImagePath}`)
+  }
+
+  if (backend === 'gateway') {
+    const gatewayModel = toGatewayImageModel(model)
+    console.log(`   • Backend: Vercel AI Gateway (${gatewayModel})`)
+    const { generateImage } = await import('ai')
+    const promptArg = options.referenceImagePath
+      ? {
+          images: [fs.readFileSync(options.referenceImagePath)],
+          text: options.prompt,
+        }
+      : options.prompt
+    const result = await generateImage({
+      model: gatewayModel,
+      prompt: promptArg,
+      aspectRatio: aspectRatio as `${number}:${number}`,
+      abortSignal: AbortSignal.timeout(3 * 60 * 1000),
+    })
+    const imageBytes = result.image?.uint8Array || result.images?.[0]?.uint8Array
+    if (!imageBytes || imageBytes.length === 0) {
+      throw new Error('AI Gateway image generation returned no image bytes.')
+    }
+    fs.writeFileSync(outputPath, imageBytes)
+    console.log(`   ✅ Saved image to: ${outputPath} (${Math.round(imageBytes.length / 1024)} KB)`)
+  } else {
   const parts: any[] = []
 
   if (options.referenceImagePath) {
-    if (!fs.existsSync(options.referenceImagePath)) {
-      throw new Error(`Reference image not found at: ${options.referenceImagePath}`)
-    }
     const refBuffer = fs.readFileSync(options.referenceImagePath)
     const mimeType = getMimeType(options.referenceImagePath)
     parts.push({
@@ -155,6 +182,7 @@ export async function generateGeminiImage(options: GenerateImageOptions): Promis
   const imageBuffer = Buffer.from(base64Data, 'base64')
   fs.writeFileSync(outputPath, imageBuffer)
   console.log(`   ✅ Saved image to: ${outputPath} (${Math.round(imageBuffer.length / 1024)} KB)`)
+  }
 
   let s3Key = options.s3Key
   let publicUrl: string | undefined

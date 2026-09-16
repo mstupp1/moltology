@@ -19,6 +19,7 @@ describe('Gemini Image Generation Engine', () => {
     delete process.env.GEMINI_API_KEY
     delete process.env.VERTEX_API_KEY
     delete process.env.GOOGLE_API_KEY
+    delete process.env.AI_GATEWAY_API_KEY
 
     await expect(
       generateGeminiImage({
