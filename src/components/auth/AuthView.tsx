@@ -26,9 +26,7 @@ import {
 import type { AuthSearch } from '@/lib/auth-search'
 import '@/styles/crt.css'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
-import { parseMemberHandle } from '@/lib/member-handle'
-import { DesignationField } from '@/components/hud/DesignationField'
+import { getUserProfileFn, updateEmailPreferencesFn } from '@/lib/server/api'
 import { getAssetUrl } from '@/lib/assets'
 import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
@@ -43,7 +41,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
   const initialMode = search.mode === 'signup' ? 'signup' : 'login'
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
-  const [designation, setDesignation] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailOptIn, setEmailOptIn] = useState(false)
@@ -68,23 +65,11 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
 
   const finishAuthenticatedEntry = async (opts: {
-    handle?: string
     emailOptIn?: boolean
     userId?: string
     source: string
   }) => {
     const token = await getAuthJWTToken()
-    if (opts.handle) {
-      await claimMemberHandleFn({
-        data: {
-          handle: opts.handle,
-          userId: opts.userId,
-          token: token ?? undefined,
-        },
-      }).catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
-      })
-    }
     if (opts.emailOptIn) {
       await updateEmailPreferencesFn({
         data: {
@@ -126,7 +111,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
   }
 
 
-  // After verify-link sign-in (or existing session), finish pending claim/opt-in then redirect
+  // After verify-link sign-in (or existing session), finish pending opt-in then redirect
   useEffect(() => {
     if (!user) return
     let cancelled = false
@@ -134,7 +119,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
       const pending = takePendingSignup()
       if (pending) {
         await finishAuthenticatedEntry({
-          handle: pending.handle,
           emailOptIn: pending.emailOptIn,
           userId: user.id,
           source: 'auth_page',
@@ -180,12 +164,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
     try {
       if (mode === 'signup') {
-        const parsed = parseMemberHandle(designation)
-        if (!parsed.ok) {
-          setError(parsed.message)
-          setLoading(false)
-          return
-        }
         const destination = search.redirect || '/dashboard'
         const callbackURL =
           typeof window !== 'undefined'
@@ -194,7 +172,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
         const res = await authClient.signUp.email({
           email,
           password,
-          name: parsed.handle,
+          name: 'Initiate',
           callbackURL,
         })
         if (res?.error) {
@@ -202,7 +180,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
         } else if (isEmailVerificationEnabled() && isVerifyFirstSignupResult(res)) {
           const destination = search.redirect || '/dashboard'
           stashPendingSignup({
-            handle: parsed.handle,
             emailOptIn,
             email,
             callbackURL: destination,
@@ -213,7 +190,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           const createdUser = (res as any)?.data?.user || (res as any)?.user
           rememberSessionUser(createdUser)
           await finishAuthenticatedEntry({
-            handle: parsed.handle,
             emailOptIn,
             userId: createdUser?.id,
             source: 'auth_page',
@@ -546,10 +522,6 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
               {/* Auth Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
-                {mode === 'signup' && (
-                  <DesignationField value={designation} onChange={setDesignation} />
-                )}
-
                 <HudInput
                   label="Email Address"
                   type="email"

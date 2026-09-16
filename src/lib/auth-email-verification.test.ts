@@ -28,12 +28,11 @@ describe('auth-email-verification helpers', () => {
 
   it('stashes and takes pending signup data', () => {
     stashPendingSignup({
-      handle: 'claw_lord',
       emailOptIn: true,
       email: 'claw@moltology.org',
       callbackURL: '/dashboard',
     })
-    expect(peekPendingSignup()?.handle).toBe('claw_lord')
+    expect(peekPendingSignup()?.emailOptIn).toBe(true)
     const taken = takePendingSignup()
     expect(taken?.email).toBe('claw@moltology.org')
     expect(peekPendingSignup()).toBeNull()

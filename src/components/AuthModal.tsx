@@ -13,9 +13,7 @@ import {
 import { useAuthSession } from '../hooks/useAuthSession'
 import { rememberSessionUser, startGoogleSignIn } from '../lib/auth-session'
 import { getAuthJWTToken } from '../lib/jwt'
-import { claimMemberHandleFn, getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
-import { parseMemberHandle } from '../lib/member-handle'
-import { DesignationField } from './hud/DesignationField'
+import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
 
@@ -36,7 +34,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const user = session.user
 
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
-  const [designation, setDesignation] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailOptIn, setEmailOptIn] = useState(false)
@@ -62,7 +59,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const pending = takePendingSignup()
       if (pending) {
         await finishAuthenticatedEntry({
-          handle: pending.handle,
           emailOptIn: pending.emailOptIn,
           userId: user.id,
           source: 'auth_modal',
@@ -85,23 +81,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
 
   const finishAuthenticatedEntry = async (opts: {
-    handle?: string
     emailOptIn?: boolean
     userId?: string
     source: string
   }) => {
     const token = await getAuthJWTToken()
-    if (opts.handle) {
-      await claimMemberHandleFn({
-        data: {
-          handle: opts.handle,
-          userId: opts.userId,
-          token: token ?? undefined,
-        },
-      }).catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Account created. Claim your designation in the hub.')
-      })
-    }
     if (opts.emailOptIn) {
       await updateEmailPreferencesFn({
         data: {
@@ -166,25 +150,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (mode === 'signup') {
-        const parsed = parseMemberHandle(designation)
-        if (!parsed.ok) {
-          setError(parsed.message)
-          setLoading(false)
-          return
-        }
         const callbackURL =
           typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : '/dashboard'
         const res = await authClient.signUp.email({
           email,
           password,
-          name: parsed.handle,
+          name: 'Initiate',
           callbackURL,
         })
         if (res?.error) {
           setError(res.error.message || 'Could not create account. Please check your details and try again.')
         } else if (isEmailVerificationEnabled() && isVerifyFirstSignupResult(res)) {
           stashPendingSignup({
-            handle: parsed.handle,
             emailOptIn,
             email,
             callbackURL: '/dashboard',
@@ -195,7 +172,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           const createdUser = (res as any)?.data?.user || (res as any)?.user
           rememberSessionUser(createdUser)
           await finishAuthenticatedEntry({
-            handle: parsed.handle,
             emailOptIn,
             userId: createdUser?.id,
             source: 'auth_modal',
@@ -391,10 +367,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'signup' && (
-            <DesignationField value={designation} onChange={setDesignation} />
-          )}
-
           <HudInput
             label="Email Address"
             type="email"
