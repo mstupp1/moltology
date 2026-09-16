@@ -18,7 +18,6 @@ export const EMAIL_VERIFICATION_COPY = {
 const PENDING_SIGNUP_KEY = 'moltology.pendingSignup'
 
 export type PendingSignup = {
-  handle: string
   emailOptIn: boolean
   email: string
   callbackURL: string
@@ -49,7 +48,7 @@ export function peekPendingSignup(): PendingSignup | null {
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw) as PendingSignup
-    if (!parsed?.email || !parsed?.handle) return null
+    if (!parsed?.email) return null
     return parsed
   } catch {
     return null
