@@ -169,17 +169,19 @@ export async function sendSupportTicketEmail(
 
 /**
  * Transactional email-verification message for Better Auth.
- * Failures are logged and returned; callers should not abort signup.
+ * HTML render failures fall back to plain text so Resend still receives a send.
+ * Delivery failures are returned to the caller; auth-server throws when unsent.
  */
 export async function sendEmailVerificationEmail(
   input: EmailVerificationMailInput,
 ): Promise<TransactionalMailResult> {
-  let html: string
+  console.info('[mail] verification send', { hasResendKey: Boolean(resolveResendApiKey()) })
+
+  let html: string | undefined
   try {
     html = await renderEmailVerificationHtml(input)
   } catch (error) {
-    console.error('[mail] Failed to render verification email:', error)
-    return { sent: false, error: 'render' }
+    console.error('[mail] Failed to render verification email HTML; sending text only.', error)
   }
 
   return sendTransactionalEmail({

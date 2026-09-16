@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
 import {
   ACCOUNT_LINKING_OPTIONS,
   auth,
@@ -6,6 +7,7 @@ import {
   getAuthApiErrorUrl,
   isGoogleSocialConfigured,
   resolveAccountLinkingOptions,
+  sendVerificationEmail,
 } from './auth-server'
 
 describe('auth-server', () => {
@@ -42,5 +44,50 @@ describe('account linking with email verification flag', () => {
   it('requires a verified local email when verification is on', () => {
     expect(resolveAccountLinkingOptions(true).requireLocalEmailVerified).toBe(true)
     expect(resolveAccountLinkingOptions(false).requireLocalEmailVerified).toBe(false)
+  })
+})
+
+describe('sendVerificationEmail', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  })
+
+  it('throws when Resend is not sent', async () => {
+    vi.stubEnv('RESEND_API_KEY', '')
+    await expect(
+      sendVerificationEmail({
+        user: { email: 'member@example.com' },
+        url: 'https://moltology.org/api/auth/verify-email?token=abc',
+      }),
+    ).rejects.toThrow(EMAIL_VERIFICATION_COPY.sendFailed)
+  })
+
+  it('throws when Resend rejects the message', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: false, status: 401, text: async () => 'unauthorized' }),
+    )
+    await expect(
+      sendVerificationEmail({
+        user: { email: 'member@example.com' },
+        url: 'https://moltology.org/api/auth/verify-email?token=abc',
+      }),
+    ).rejects.toThrow(EMAIL_VERIFICATION_COPY.sendFailed)
+  })
+
+  it('resolves when Resend accepts the message', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key')
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(
+      sendVerificationEmail({
+        user: { email: 'member@example.com' },
+        url: 'https://moltology.org/api/auth/verify-email?token=abc',
+      }),
+    ).resolves.toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })

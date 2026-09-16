@@ -44,5 +44,7 @@ describe('auth-email-verification helpers', () => {
     expect(body).toContain('claw@moltology.org')
     expect(body).not.toMatch(/Resend|Better Auth|\bJWT\b/)
     expect(EMAIL_VERIFICATION_COPY.title).toBe('Confirm your email')
+    expect(EMAIL_VERIFICATION_COPY.sendFailed).toMatch(/confirmation email/)
+    expect(EMAIL_VERIFICATION_COPY.sendFailed).not.toMatch(/Resend|Better Auth|\bJWT\b/)
   })
 })

@@ -17,7 +17,25 @@ import {
   getGoogleClientCredentials,
   isEmailVerificationEnabled,
 } from './auth-config'
+import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
 import { sendEmailVerificationEmail } from './server/mail'
+
+/**
+ * Better Auth `sendVerificationEmail` hook. Throws when Resend did not send
+ * so signup/resend can surface an error instead of a false check-email screen.
+ */
+export async function sendVerificationEmail({
+  user,
+  url,
+}: {
+  user: { email: string }
+  url: string
+}): Promise<void> {
+  const result = await sendEmailVerificationEmail({ to: user.email, url })
+  if (result.sent !== true) {
+    throw new Error(EMAIL_VERIFICATION_COPY.sendFailed)
+  }
+}
 
 function getAuthSecret(): string {
   const secret = typeof process !== 'undefined' ? process.env.BETTER_AUTH_SECRET : undefined
@@ -116,9 +134,7 @@ export const auth = betterAuth({
         sendOnSignIn: true,
         autoSignInAfterVerification: true,
         expiresIn: 3600,
-        sendVerificationEmail: async ({ user, url }) => {
-          await sendEmailVerificationEmail({ to: user.email, url })
-        },
+        sendVerificationEmail,
       }
     : undefined,
   account: {
