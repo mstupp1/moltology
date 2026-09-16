@@ -22,7 +22,11 @@ import {
   showSystemNotification,
 } from '@/lib/system-notifications'
 
-const POLL_MS = 60_000
+/**
+ * Visible HUD tabs query Neon this often. Stay above the 5-minute scale-to-zero
+ * idle so one open member tab cannot pin Free compute continuously.
+ */
+export const NOTIFICATIONS_POLL_MS = 6 * 60_000
 
 type NotificationsContextValue = {
   notifications: NotificationView[]
@@ -111,7 +115,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     const interval = window.setInterval(() => {
       if (typeof document !== 'undefined' && document.hidden) return
       void refresh()
-    }, POLL_MS)
+    }, NOTIFICATIONS_POLL_MS)
 
     window.addEventListener('focus', onWakeup)
     document.addEventListener('visibilitychange', onWakeup)

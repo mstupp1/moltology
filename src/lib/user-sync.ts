@@ -41,27 +41,36 @@ export async function ensureUserProfile(userId?: string | null) {
 
     const initialRole = isSuperAdmin ? 'super_admin' : 'user'
     const uniqueLarvaId = resolveMemberLarvaId(userId)
-    const insertQuery = db
-      .insert(profiles)
-      .values({ id: userId, role: initialRole, larvaId: uniqueLarvaId })
 
-    const [inserted] = isSuperAdmin
-      ? await insertQuery
-          .onConflictDoUpdate({
-            target: profiles.id,
-            set: { role: 'super_admin' },
-          })
-          .returning()
-      : await insertQuery.onConflictDoNothing().returning()
+    const [existing] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.id, userId))
+      .limit(1)
 
-    let profile = inserted || null
+    let profile = existing || null
     if (!profile) {
-      const [existing] = await db
-        .select()
-        .from(profiles)
+      const [inserted] = await db
+        .insert(profiles)
+        .values({ id: userId, role: initialRole, larvaId: uniqueLarvaId })
+        .onConflictDoNothing()
+        .returning()
+      profile = inserted || null
+      if (!profile) {
+        const [raced] = await db
+          .select()
+          .from(profiles)
+          .where(eq(profiles.id, userId))
+          .limit(1)
+        profile = raced || null
+      }
+    } else if (isSuperAdmin && profile.role !== 'super_admin') {
+      const [updatedRole] = await db
+        .update(profiles)
+        .set({ role: 'super_admin' })
         .where(eq(profiles.id, userId))
-        .limit(1)
-      profile = existing || null
+        .returning()
+      if (updatedRole) profile = updatedRole
     }
 
     if (profile && shouldReplacePlaceholderLarvaId(profile.id, profile.larvaId)) {

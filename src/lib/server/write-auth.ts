@@ -1,7 +1,6 @@
 import type { JWTPayload } from 'jose'
 import { getDb } from '../../db'
 import { looksLikeJwt, verifyAuthJWT } from '../jwt'
-import { ensureUserProfile } from '../user-sync'
 
 type Db = ReturnType<typeof getDb>
 
@@ -63,8 +62,6 @@ export async function resolveWriteAuth(opts: {
     }
     return null
   }
-
-  await ensureUserProfile(userId)
 
   return { userId, token, dbClient, payload }
 }
