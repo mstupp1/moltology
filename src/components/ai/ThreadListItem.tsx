@@ -123,7 +123,9 @@ export const ThreadListItem: React.FC<ThreadListItemProps> = ({
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <span className="flex items-center gap-1 min-w-0">
-              {isPinned && <Pin className="w-2.5 h-2.5 text-cyan-400 shrink-0" fill="currentColor" />}
+              {isPinned && !archived && (
+                <Pin className="w-2.5 h-2.5 text-cyan-400 shrink-0" fill="currentColor" />
+              )}
               <span className="block truncate">{thread.title || 'Untitled Consultation'}</span>
             </span>
             {dateSource && (

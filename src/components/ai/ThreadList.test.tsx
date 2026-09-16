@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { ThreadList } from './ThreadList'
 
 vi.mock('@/components/ui/HudBottomSheet', () => ({
@@ -40,16 +40,41 @@ function renderList(overrides: Partial<Parameters<typeof ThreadList>[0]> = {}) {
   return { onPin, onArchive, onRename, onDelete, onSelectThread }
 }
 
+function kebabFor(title: string) {
+  const titleEl = screen.getByText(title)
+  const row = titleEl.closest('[data-density]')
+  return row?.querySelector('[data-testid="thread-kebab-mobile"]') as HTMLElement
+}
+
 describe('ThreadList', () => {
   beforeEach(() => {
     localStorage.clear()
   })
 
-  it('renders active threads with pin indicator on pinned rows', () => {
+  it('renders pinned threads in a labeled section above unpinned threads', () => {
     renderList()
-    expect(screen.getByText('Active Chat')).toBeInTheDocument()
-    expect(screen.getByText('Pinned Chat')).toBeInTheDocument()
+    const pinned = screen.getByTestId('pinned-threads')
+    const unpinned = screen.getByTestId('unpinned-threads')
+    expect(within(pinned).getByText('Pinned')).toBeInTheDocument()
+    expect(within(pinned).getByText('Pinned Chat')).toBeInTheDocument()
+    expect(within(pinned).queryByText('Active Chat')).not.toBeInTheDocument()
+    expect(within(unpinned).getByText('Active Chat')).toBeInTheDocument()
+    expect(pinned.compareDocumentPosition(unpinned) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(screen.queryByText('Archived Chat')).not.toBeInTheDocument()
+  })
+
+  it('sorts pinned threads with the most recently pinned first', () => {
+    renderList({
+      threads: [
+        { id: 't-old', title: 'Older Pin', pinnedAt: '2026-01-01T00:00:00Z', archivedAt: null },
+        { id: 't-new', title: 'Newer Pin', pinnedAt: '2026-06-01T00:00:00Z', archivedAt: null },
+        { id: 't-active', title: 'Active Chat', pinnedAt: null, archivedAt: null },
+      ],
+    })
+    const pinned = screen.getByTestId('pinned-threads')
+    const text = pinned.textContent || ''
+    expect(text.indexOf('Newer Pin')).toBeGreaterThan(-1)
+    expect(text.indexOf('Newer Pin')).toBeLessThan(text.indexOf('Older Pin'))
   })
 
   it('uses comfortable row padding when density is comfortable', () => {
@@ -77,8 +102,7 @@ describe('ThreadList', () => {
 
   it('opens the mobile action sheet from the kebab and pins from it', async () => {
     const { onPin } = renderList()
-    const kebabs = screen.getAllByTestId('thread-kebab-mobile')
-    fireEvent.click(kebabs[0])
+    fireEvent.click(kebabFor('Active Chat'))
 
     await waitFor(() => {
       expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
@@ -104,8 +128,7 @@ describe('ThreadList', () => {
 
   it('asks for confirmation before delete and deletes on confirm', async () => {
     const { onDelete } = renderList()
-    const kebabs = screen.getAllByTestId('thread-kebab-mobile')
-    fireEvent.click(kebabs[0])
+    fireEvent.click(kebabFor('Active Chat'))
 
     await waitFor(() => {
       expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
@@ -124,8 +147,7 @@ describe('ThreadList', () => {
   it('skips confirmation when the dont-ask-again preference is stored', async () => {
     localStorage.setItem('moltology:oracle_skip_delete_confirm', 'true')
     const { onDelete } = renderList()
-    const kebabs = screen.getAllByTestId('thread-kebab-mobile')
-    fireEvent.click(kebabs[0])
+    fireEvent.click(kebabFor('Active Chat'))
 
     await waitFor(() => {
       expect(screen.getByTestId('action-sheet')).toBeInTheDocument()
@@ -138,8 +160,7 @@ describe('ThreadList', () => {
 
   it('starts inline rename from the action sheet and commits on Enter', async () => {
     const { onRename } = renderList()
-    const kebabs = screen.getAllByTestId('thread-kebab-mobile')
-    fireEvent.click(kebabs[0])
+    fireEvent.click(kebabFor('Active Chat'))
 
     await waitFor(() => {
       expect(screen.getByTestId('action-sheet')).toBeInTheDocument()

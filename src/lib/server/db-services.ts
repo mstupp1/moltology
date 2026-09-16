@@ -570,6 +570,19 @@ interface MutateAIThreadInput {
 /**
  * Server Function: Pin or unpin an AI conversation thread.
  */
+export const pinAIThreadHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<MutateAIThreadInput & { pinned: boolean }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated')
+  if (!data?.threadId) throw new Error('Thread not found')
+  const { pinAIThread } = await import('../ai/service')
+  const thread = await pinAIThread(auth.userId, data.threadId, data.pinned)
+  if (!thread) throw new Error('Thread not found')
+  return { thread: serializeAIThread(thread) }
+}
+
 export const pinAIThreadFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: MutateAIThreadInput & { pinned: boolean }) => {
@@ -581,18 +594,24 @@ export const pinAIThreadFn = createServerFn({ method: 'POST' })
       })
       .parse(data)
   })
-  .handler(async ({ data, context }) => {
-    const auth = await resolveWriteAuth({ data, context })
-    if (!auth) throw new Error('Unauthenticated')
-    const { pinAIThread } = await import('../ai/service')
-    const thread = await pinAIThread(auth.userId, data.threadId, data.pinned)
-    if (!thread) throw new Error('Thread not found')
-    return { thread: serializeAIThread(thread) }
-  })
+  .handler(pinAIThreadHandler)
 
 /**
  * Server Function: Archive or unarchive an AI conversation thread.
  */
+export const archiveAIThreadHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<MutateAIThreadInput & { archived: boolean }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated')
+  if (!data?.threadId) throw new Error('Thread not found')
+  const { archiveAIThread } = await import('../ai/service')
+  const thread = await archiveAIThread(auth.userId, data.threadId, data.archived)
+  if (!thread) throw new Error('Thread not found')
+  return { thread: serializeAIThread(thread) }
+}
+
 export const archiveAIThreadFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: MutateAIThreadInput & { archived: boolean }) => {
@@ -604,18 +623,24 @@ export const archiveAIThreadFn = createServerFn({ method: 'POST' })
       })
       .parse(data)
   })
-  .handler(async ({ data, context }) => {
-    const auth = await resolveWriteAuth({ data, context })
-    if (!auth) throw new Error('Unauthenticated')
-    const { archiveAIThread } = await import('../ai/service')
-    const thread = await archiveAIThread(auth.userId, data.threadId, data.archived)
-    if (!thread) throw new Error('Thread not found')
-    return { thread: serializeAIThread(thread) }
-  })
+  .handler(archiveAIThreadHandler)
 
 /**
  * Server Function: Rename an AI conversation thread.
  */
+export const renameAIThreadHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<MutateAIThreadInput & { title: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated')
+  if (!data?.threadId || !data.title) throw new Error('Thread not found')
+  const { renameAIThread } = await import('../ai/service')
+  const thread = await renameAIThread(auth.userId, data.threadId, data.title)
+  if (!thread) throw new Error('Thread not found')
+  return { thread: serializeAIThread(thread) }
+}
+
 export const renameAIThreadFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: MutateAIThreadInput & { title: string }) => {
@@ -627,18 +652,21 @@ export const renameAIThreadFn = createServerFn({ method: 'POST' })
       })
       .parse(data)
   })
-  .handler(async ({ data, context }) => {
-    const auth = await resolveWriteAuth({ data, context })
-    if (!auth) throw new Error('Unauthenticated')
-    const { renameAIThread } = await import('../ai/service')
-    const thread = await renameAIThread(auth.userId, data.threadId, data.title)
-    if (!thread) throw new Error('Thread not found')
-    return { thread: serializeAIThread(thread) }
-  })
+  .handler(renameAIThreadHandler)
 
 /**
  * Server Function: Permanently delete an AI conversation thread (messages cascade).
  */
+export const deleteAIThreadHandler = async ({ data, context }: ServerFnArgs<MutateAIThreadInput>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated')
+  if (!data?.threadId) throw new Error('Thread not found')
+  const { deleteAIThread } = await import('../ai/service')
+  const ok = await deleteAIThread(auth.userId, data.threadId)
+  if (!ok) throw new Error('Thread not found')
+  return { ok: true }
+}
+
 export const deleteAIThreadFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: MutateAIThreadInput) => {
@@ -649,14 +677,7 @@ export const deleteAIThreadFn = createServerFn({ method: 'POST' })
       })
       .parse(data)
   })
-  .handler(async ({ data, context }) => {
-    const auth = await resolveWriteAuth({ data, context })
-    if (!auth) throw new Error('Unauthenticated')
-    const { deleteAIThread } = await import('../ai/service')
-    const ok = await deleteAIThread(auth.userId, data.threadId)
-    if (!ok) throw new Error('Thread not found')
-    return { ok: true }
-  })
+  .handler(deleteAIThreadHandler)
 
 interface SendChatMessageInput {
   messages: Array<{ role: string; content?: string; text?: string }>

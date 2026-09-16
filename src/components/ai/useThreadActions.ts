@@ -82,10 +82,9 @@ export function useThreadActions({
     runNext()
   }, [])
 
-  const getToken = useCallback(async () => {
-    const token = await getAuthJWTToken()
-    if (!token) throw new Error('Authentication required')
-    return token
+  const authData = useCallback(async () => {
+    const token = await getAuthJWTToken().catch(() => null)
+    return token ? { token } : {}
   }, [])
 
   const settlePatch = useCallback(
@@ -118,8 +117,7 @@ export function useThreadActions({
         pendingOverridesRef.current.set(threadId, ownPatch)
         applyLocalPatch(threadId, ownPatch)
         try {
-          const token = await getToken()
-          const res = await pinAIThreadFn({ data: { threadId, pinned, token } })
+          const res = await pinAIThreadFn({ data: { threadId, pinned, ...(await authData()) } })
           settlePatch(threadId, ownPatch, res?.thread ? { pinnedAt: res.thread.pinnedAt ?? null } : null)
         } catch (err) {
           console.warn('[useThreadActions] pin failed:', err)
@@ -129,7 +127,7 @@ export function useThreadActions({
       })
       runQueue()
     },
-    [userId, applyLocalPatch, getToken, settlePatch, revertPatch, toastError]
+    [userId, applyLocalPatch, authData, settlePatch, revertPatch, toastError]
   )
 
   const archiveThread = useCallback(
@@ -141,11 +139,10 @@ export function useThreadActions({
       queueRef.current.push(async () => {
         pendingOverridesRef.current.set(threadId, ownPatch)
         applyLocalPatch(threadId, ownPatch)
-        if (archived) onActiveThreadRemoved?.(threadId)
         try {
-          const token = await getToken()
-          const res = await archiveAIThreadFn({ data: { threadId, archived, token } })
+          const res = await archiveAIThreadFn({ data: { threadId, archived, ...(await authData()) } })
           settlePatch(threadId, ownPatch, res?.thread ? { archivedAt: res.thread.archivedAt ?? null } : null)
+          if (archived) onActiveThreadRemoved?.(threadId)
         } catch (err) {
           console.warn('[useThreadActions] archive failed:', err)
           revertPatch(threadId, ownPatch, prev ? snapshotOf(prev) : null)
@@ -154,7 +151,7 @@ export function useThreadActions({
       })
       runQueue()
     },
-    [userId, applyLocalPatch, getToken, settlePatch, revertPatch, onActiveThreadRemoved, toastError]
+    [userId, applyLocalPatch, authData, settlePatch, revertPatch, onActiveThreadRemoved, toastError]
   )
 
   const renameThread = useCallback(
@@ -169,8 +166,7 @@ export function useThreadActions({
         pendingOverridesRef.current.set(threadId, ownPatch)
         applyLocalPatch(threadId, ownPatch)
         try {
-          const token = await getToken()
-          const res = await renameAIThreadFn({ data: { threadId, title: trimmed, token } })
+          const res = await renameAIThreadFn({ data: { threadId, title: trimmed, ...(await authData()) } })
           settlePatch(threadId, ownPatch, res?.thread ? { title: res.thread.title } : null)
         } catch (err) {
           console.warn('[useThreadActions] rename failed:', err)
@@ -180,7 +176,7 @@ export function useThreadActions({
       })
       runQueue()
     },
-    [userId, applyLocalPatch, getToken, settlePatch, revertPatch, toastError]
+    [userId, applyLocalPatch, authData, settlePatch, revertPatch, toastError]
   )
 
   const deleteThread = useCallback(
@@ -190,11 +186,10 @@ export function useThreadActions({
 
       queueRef.current.push(async () => {
         removeLocalThread(threadId)
-        onActiveThreadRemoved?.(threadId)
         pendingOverridesRef.current.delete(threadId)
         try {
-          const token = await getToken()
-          await deleteAIThreadFn({ data: { threadId, token } })
+          await deleteAIThreadFn({ data: { threadId, ...(await authData()) } })
+          onActiveThreadRemoved?.(threadId)
         } catch (err) {
           console.warn('[useThreadActions] delete failed:', err)
           if (prev && restoreLocalThread) {
@@ -207,7 +202,7 @@ export function useThreadActions({
       })
       runQueue()
     },
-    [userId, removeLocalThread, applyLocalPatch, restoreLocalThread, onActiveThreadRemoved, getToken, toastError]
+    [userId, removeLocalThread, applyLocalPatch, restoreLocalThread, onActiveThreadRemoved, authData, toastError]
   )
 
   return { pinThread, archiveThread, renameThread, deleteThread }

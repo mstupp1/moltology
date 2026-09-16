@@ -28,6 +28,7 @@ vi.mock('@/components/ui/ToastProvider', () => ({
   }),
 }))
 
+import { getAuthJWTToken } from '@/lib/jwt'
 import {
   pinAIThreadFn,
   archiveAIThreadFn,
@@ -99,6 +100,7 @@ function Harness({
 describe('useThreadActions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    ;vi.mocked(getAuthJWTToken).mockResolvedValue('test-token')
     ;vi.mocked(pinAIThreadFn).mockReset()
     ;vi.mocked(archiveAIThreadFn).mockReset()
     ;vi.mocked(renameAIThreadFn).mockReset()
@@ -191,13 +193,14 @@ describe('useThreadActions', () => {
 
     fireEvent.click(screen.getByText('Delete'))
     expect(screen.getByTestId('titles').textContent).toBe('Second Thread')
-    expect(onActiveThreadRemoved).toHaveBeenCalledWith('t1')
+    expect(onActiveThreadRemoved).not.toHaveBeenCalled()
 
     await waitFor(() => {
       expect(deleteAIThreadFn).toHaveBeenCalledWith({
         data: { threadId: 't1', token: 'test-token' },
       })
     })
+    expect(onActiveThreadRemoved).toHaveBeenCalledWith('t1')
   })
 
   it('restores the thread locally when delete fails', async () => {
@@ -230,5 +233,51 @@ describe('useThreadActions', () => {
       })
     })
     expect(onActiveThreadRemoved).toHaveBeenCalledWith('t1')
+  })
+
+  it('pins without a JWT token so session auth can still succeed', async () => {
+    ;vi.mocked(getAuthJWTToken).mockResolvedValueOnce(null)
+    ;vi.mocked(pinAIThreadFn).mockResolvedValue({
+      ...MOCK_THREAD_PINNED,
+    })
+
+    render(<Harness />)
+
+    fireEvent.click(screen.getByText('Pin'))
+
+    await waitFor(() => {
+      expect(pinAIThreadFn).toHaveBeenCalledWith({
+        data: { threadId: 't1', pinned: true },
+      })
+    })
+    expect(toastErrorMock).not.toHaveBeenCalled()
+  })
+
+  it('does not clear the active thread when archive fails', async () => {
+    ;vi.mocked(archiveAIThreadFn).mockRejectedValue(new Error('network down'))
+    const onActiveThreadRemoved = vi.fn()
+
+    render(<Harness onActiveThreadRemoved={onActiveThreadRemoved} />)
+
+    fireEvent.click(screen.getByText('Archive'))
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalled()
+    })
+    expect(onActiveThreadRemoved).not.toHaveBeenCalled()
+  })
+
+  it('does not clear the active thread when delete fails', async () => {
+    ;vi.mocked(deleteAIThreadFn).mockRejectedValue(new Error('network down'))
+    const onActiveThreadRemoved = vi.fn()
+
+    render(<Harness onActiveThreadRemoved={onActiveThreadRemoved} />)
+
+    fireEvent.click(screen.getByText('Delete'))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('titles').textContent).toContain('First Thread')
+    })
+    expect(onActiveThreadRemoved).not.toHaveBeenCalled()
   })
 })

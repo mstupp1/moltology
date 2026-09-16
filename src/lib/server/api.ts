@@ -151,8 +151,8 @@ export const pinAIThreadFn = createServerFn({ method: 'POST' })
     z.object({ threadId: z.string().min(1), pinned: z.boolean(), token: z.string().optional() }).parse(data)
   )
   .handler(async (args) => {
-    const { pinAIThreadFn: serverFn } = await import('./db-services')
-    return (serverFn as any)(args)
+    const { pinAIThreadHandler } = await import('./db-services')
+    return (pinAIThreadHandler as any)(args)
   })
 
 export const archiveAIThreadFn = createServerFn({ method: 'POST' })
@@ -161,8 +161,8 @@ export const archiveAIThreadFn = createServerFn({ method: 'POST' })
     z.object({ threadId: z.string().min(1), archived: z.boolean(), token: z.string().optional() }).parse(data)
   )
   .handler(async (args) => {
-    const { archiveAIThreadFn: serverFn } = await import('./db-services')
-    return (serverFn as any)(args)
+    const { archiveAIThreadHandler } = await import('./db-services')
+    return (archiveAIThreadHandler as any)(args)
   })
 
 export const renameAIThreadFn = createServerFn({ method: 'POST' })
@@ -171,8 +171,8 @@ export const renameAIThreadFn = createServerFn({ method: 'POST' })
     z.object({ threadId: z.string().min(1), title: z.string().min(1).max(120), token: z.string().optional() }).parse(data)
   )
   .handler(async (args) => {
-    const { renameAIThreadFn: serverFn } = await import('./db-services')
-    return (serverFn as any)(args)
+    const { renameAIThreadHandler } = await import('./db-services')
+    return (renameAIThreadHandler as any)(args)
   })
 
 export const deleteAIThreadFn = createServerFn({ method: 'POST' })
@@ -181,8 +181,8 @@ export const deleteAIThreadFn = createServerFn({ method: 'POST' })
     z.object({ threadId: z.string().min(1), token: z.string().optional() }).parse(data)
   )
   .handler(async (args) => {
-    const { deleteAIThreadFn: serverFn } = await import('./db-services')
-    return (serverFn as any)(args)
+    const { deleteAIThreadHandler } = await import('./db-services')
+    return (deleteAIThreadHandler as any)(args)
   })
 
 const sendChatMessageSchema = z.object({
