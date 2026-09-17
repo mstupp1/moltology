@@ -4,6 +4,7 @@
  * and do not use this flag.
  *
  * Flip to true to restore mount/focus fetch with NOTIFICATIONS_MIN_INTERVAL_MS.
+ * Server handlers must honor this too: stale pre-#138 tabs still POST getNotificationsFn.
  */
 export const NOTIFICATIONS_REMOTE_INBOX_ENABLED = false
 
@@ -13,6 +14,19 @@ export const NOTIFICATIONS_REMOTE_INBOX_ENABLED = false
  */
 export const NOTIFICATIONS_MIN_INTERVAL_MS = 6 * 60_000
 
+export const DISABLED_REMOTE_INBOX_LIST = {
+  notifications: [] as const,
+  unreadCount: 0,
+}
+
+export const DISABLED_REMOTE_INBOX_MARK_READ = { ok: true as const }
+
+export function isRemoteInboxEnabled(
+  enabled: boolean = NOTIFICATIONS_REMOTE_INBOX_ENABLED,
+): boolean {
+  return enabled
+}
+
 export function shouldFetchNotifications(args: {
   lastFetchedAt: number | null
   now: number
@@ -21,8 +35,7 @@ export function shouldFetchNotifications(args: {
   minIntervalMs?: number
   enabled?: boolean
 }): boolean {
-  const enabled = args.enabled ?? NOTIFICATIONS_REMOTE_INBOX_ENABLED
-  if (!enabled) return false
+  if (!isRemoteInboxEnabled(args.enabled ?? NOTIFICATIONS_REMOTE_INBOX_ENABLED)) return false
   if (args.inFlight) return false
   if (args.force) return true
   if (args.lastFetchedAt == null) return true
