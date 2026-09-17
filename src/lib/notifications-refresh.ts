@@ -1,3 +1,5 @@
+import type { NotificationView } from './notifications'
+
 /**
  * Remote HUD inbox (hails, forum pings, friend alerts) requires a Postgres read.
  * Keep this off on Neon Free until we have a push/no-poll path. Toasts stay local
@@ -14,8 +16,11 @@ export const NOTIFICATIONS_REMOTE_INBOX_ENABLED = false
  */
 export const NOTIFICATIONS_MIN_INTERVAL_MS = 6 * 60_000
 
-export const DISABLED_REMOTE_INBOX_LIST = {
-  notifications: [] as const,
+export const DISABLED_REMOTE_INBOX_LIST: {
+  notifications: NotificationView[]
+  unreadCount: number
+} = {
+  notifications: [],
   unreadCount: 0,
 }
 
