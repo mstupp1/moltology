@@ -11,3 +11,5 @@ import { loggingMiddleware, authMiddleware, optionalAuthMiddleware } from './mid
  */
 export const publicMiddleware = [loggingMiddleware, optionalAuthMiddleware]
 export const authenticatedMiddleware = [loggingMiddleware, authMiddleware]
+/** Logging only — skips JWT/session lookups so a no-op handler never touches Neon. */
+export const loggingOnlyMiddleware = [loggingMiddleware]

@@ -1,6 +1,11 @@
 import { z } from 'zod'
 import { createServerFn } from '@tanstack/react-start'
-import { publicMiddleware } from './functions'
+import { loggingOnlyMiddleware, publicMiddleware } from './functions'
+import {
+  DISABLED_REMOTE_INBOX_LIST,
+  DISABLED_REMOTE_INBOX_MARK_READ,
+  isRemoteInboxEnabled,
+} from '../notifications-refresh'
 import {
   EQUIP_SLOT_IDS,
   VAULT_SIZE,
@@ -863,7 +868,8 @@ export const listConnectionsFn = createServerFn({ method: 'POST' })
   })
 
 export const getNotificationsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
+  // loggingOnly: optionalAuth would verify JWT / getSession (Neon) before the handler.
+  .middleware(loggingOnlyMiddleware)
   .validator((data?: { token?: string; userId?: string; limit?: number }) =>
     z
       .object({
@@ -874,12 +880,13 @@ export const getNotificationsFn = createServerFn({ method: 'POST' })
       .parse(data ?? {})
   )
   .handler(async (args) => {
+    if (!isRemoteInboxEnabled()) return DISABLED_REMOTE_INBOX_LIST
     const { getNotificationsHandler } = await import('./db-services')
     return getNotificationsHandler(args)
   })
 
 export const markNotificationReadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
+  .middleware(loggingOnlyMiddleware)
   .validator((data: { notificationId?: string; all?: boolean; token?: string; userId?: string }) =>
     z
       .object({
@@ -891,6 +898,7 @@ export const markNotificationReadFn = createServerFn({ method: 'POST' })
       .parse(data)
   )
   .handler(async (args) => {
+    if (!isRemoteInboxEnabled()) return DISABLED_REMOTE_INBOX_MARK_READ
     const { markNotificationReadHandler } = await import('./db-services')
     return markNotificationReadHandler(args)
   })

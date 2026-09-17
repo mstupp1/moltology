@@ -69,6 +69,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   }, [userId])
 
   const refresh = useCallback(async (opts?: { force?: boolean }) => {
+    if (!NOTIFICATIONS_REMOTE_INBOX_ENABLED) return
     if (!userId || authFailureRef.current) {
       if (!userId) {
         setNotifications([])

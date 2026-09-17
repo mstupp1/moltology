@@ -1,7 +1,11 @@
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
 import { createServerFn } from '@tanstack/react-start'
-import { publicMiddleware } from './functions'
+import { loggingOnlyMiddleware, publicMiddleware } from './functions'
+import {
+  DISABLED_REMOTE_INBOX_MARK_READ,
+  isRemoteInboxEnabled,
+} from '../notifications-refresh'
 import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
 import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
@@ -5042,13 +5046,16 @@ export const listConnectionsFn = createServerFn({ method: 'POST' })
   )
   .handler(listConnectionsHandler)
 
-export const getNotificationsHandler = async ({
-  data,
-  context,
-}: ServerFnArgs<{ token?: string; userId?: string; limit?: number }>): Promise<{
+export const getNotificationsHandler = async (
+  { data, context }: ServerFnArgs<{ token?: string; userId?: string; limit?: number }>,
+  opts?: { enabled?: boolean },
+): Promise<{
   notifications: NotificationView[]
   unreadCount: number
 }> => {
+  if (!isRemoteInboxEnabled(opts?.enabled)) {
+    return { notifications: [], unreadCount: 0 }
+  }
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to load notifications.')
 
@@ -5096,7 +5103,7 @@ export const getNotificationsHandler = async ({
 }
 
 export const getNotificationsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
+  .middleware(loggingOnlyMiddleware)
   .validator((data?: { token?: string; userId?: string; limit?: number }) =>
     z
       .object({
@@ -5108,10 +5115,11 @@ export const getNotificationsFn = createServerFn({ method: 'POST' })
   )
   .handler(getNotificationsHandler)
 
-export const markNotificationReadHandler = async ({
-  data,
-  context,
-}: ServerFnArgs<{ notificationId?: string; all?: boolean; token?: string; userId?: string }>) => {
+export const markNotificationReadHandler = async (
+  { data, context }: ServerFnArgs<{ notificationId?: string; all?: boolean; token?: string; userId?: string }>,
+  opts?: { enabled?: boolean },
+) => {
+  if (!isRemoteInboxEnabled(opts?.enabled)) return DISABLED_REMOTE_INBOX_MARK_READ
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to mark notifications read.')
 
@@ -5134,7 +5142,7 @@ export const markNotificationReadHandler = async ({
 }
 
 export const markNotificationReadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
+  .middleware(loggingOnlyMiddleware)
   .validator((data: { notificationId?: string; all?: boolean; token?: string; userId?: string }) =>
     z
       .object({

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DISABLED_REMOTE_INBOX_LIST,
+  DISABLED_REMOTE_INBOX_MARK_READ,
+  isRemoteInboxEnabled,
   NOTIFICATIONS_MIN_INTERVAL_MS,
   NOTIFICATIONS_REMOTE_INBOX_ENABLED,
   shouldFetchNotifications,
@@ -8,6 +11,9 @@ import {
 describe('shouldFetchNotifications', () => {
   it('keeps the remote inbox off so HUD tabs do not query Neon', () => {
     expect(NOTIFICATIONS_REMOTE_INBOX_ENABLED).toBe(false)
+    expect(isRemoteInboxEnabled()).toBe(false)
+    expect(DISABLED_REMOTE_INBOX_LIST).toEqual({ notifications: [], unreadCount: 0 })
+    expect(DISABLED_REMOTE_INBOX_MARK_READ).toEqual({ ok: true })
     expect(shouldFetchNotifications({ lastFetchedAt: null, now: 1_000 })).toBe(false)
     expect(
       shouldFetchNotifications({

@@ -9,6 +9,9 @@ vi.mock('../../db', () => ({
 }))
 
 import { getNotificationsHandler, markNotificationReadHandler } from './db-services'
+import { getDb } from '../../db'
+import { loggingOnlyMiddleware, publicMiddleware } from './functions'
+import { loggingMiddleware, optionalAuthMiddleware } from './middleware'
 
 const viewerId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const actorId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
@@ -16,6 +19,60 @@ const actorId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
 describe('notification inbox handlers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('skips JWT/session middleware so stale inbox polls cannot touch Neon', () => {
+    expect(loggingOnlyMiddleware).toEqual([loggingMiddleware])
+    expect(loggingOnlyMiddleware).not.toContain(optionalAuthMiddleware)
+    expect(publicMiddleware).toContain(optionalAuthMiddleware)
+  })
+
+  it('returns an empty inbox without querying when remote inbox is disabled', async () => {
+    const mockDb = {
+      select: vi.fn(),
+      update: vi.fn(),
+    }
+
+    const result = await getNotificationsHandler({
+      data: { userId: viewerId, token: 'eyJ.payload.sig' },
+      context: {
+        user: { sub: viewerId },
+        db: mockDb as any,
+      },
+    })
+
+    expect(result).toEqual({ notifications: [], unreadCount: 0 })
+    expect(mockDb.select).not.toHaveBeenCalled()
+    expect(mockDb.update).not.toHaveBeenCalled()
+    expect(getDb).not.toHaveBeenCalled()
+  })
+
+  it('no-ops mark-read without querying when remote inbox is disabled', async () => {
+    const mockDb = {
+      select: vi.fn(),
+      update: vi.fn(),
+    }
+
+    const single = await markNotificationReadHandler({
+      data: { notificationId: '11111111-1111-4111-8111-111111111111', userId: viewerId },
+      context: {
+        user: { sub: viewerId },
+        db: mockDb as any,
+      },
+    })
+    const all = await markNotificationReadHandler({
+      data: { all: true, userId: viewerId },
+      context: {
+        user: { sub: viewerId },
+        db: mockDb as any,
+      },
+    })
+
+    expect(single).toEqual({ ok: true })
+    expect(all).toEqual({ ok: true })
+    expect(mockDb.select).not.toHaveBeenCalled()
+    expect(mockDb.update).not.toHaveBeenCalled()
+    expect(getDb).not.toHaveBeenCalled()
   })
 
   it('lists hail and reply rows for the signed-in member', async () => {
@@ -69,13 +126,16 @@ describe('notification inbox handlers', () => {
       }),
     }
 
-    const result = await getNotificationsHandler({
-      data: { userId: viewerId },
-      context: {
-        user: { sub: viewerId },
-        db: mockDb as any,
+    const result = await getNotificationsHandler(
+      {
+        data: { userId: viewerId },
+        context: {
+          user: { sub: viewerId },
+          db: mockDb as any,
+        },
       },
-    })
+      { enabled: true },
+    )
 
     expect(result.unreadCount).toBe(1)
     expect(result.notifications).toHaveLength(2)
@@ -110,13 +170,16 @@ describe('notification inbox handlers', () => {
       }),
     }
 
-    const result = await markNotificationReadHandler({
-      data: { notificationId: '11111111-1111-4111-8111-111111111111' },
-      context: {
-        user: { sub: viewerId },
-        db: mockDb as any,
+    const result = await markNotificationReadHandler(
+      {
+        data: { notificationId: '11111111-1111-4111-8111-111111111111' },
+        context: {
+          user: { sub: viewerId },
+          db: mockDb as any,
+        },
       },
-    })
+      { enabled: true },
+    )
 
     expect(result).toEqual({ ok: true })
     expect(setValues[0]?.readAt).toBeInstanceOf(Date)
@@ -136,13 +199,16 @@ describe('notification inbox handlers', () => {
       }),
     }
 
-    const result = await markNotificationReadHandler({
-      data: { all: true },
-      context: {
-        user: { sub: viewerId },
-        db: mockDb as any,
+    const result = await markNotificationReadHandler(
+      {
+        data: { all: true },
+        context: {
+          user: { sub: viewerId },
+          db: mockDb as any,
+        },
       },
-    })
+      { enabled: true },
+    )
 
     expect(result).toEqual({ ok: true })
     expect(setValues[0]?.readAt).toBeInstanceOf(Date)
