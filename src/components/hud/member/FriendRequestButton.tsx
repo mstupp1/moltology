@@ -185,7 +185,7 @@ export const FriendRequestButton: React.FC<FriendRequestButtonProps> = ({
           })
           onRelationshipChange?.({
             relationship: 'pending_sent',
-            pendingRequestId: result.requestId,
+            pendingRequestId: result?.requestId ?? null,
           })
           toast.success('Friend request sent.')
         })

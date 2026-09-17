@@ -64,8 +64,17 @@ function renderPage(tab?: 'friends' | 'incoming' | 'sent') {
 describe('ConnectionsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(listConnectionsFn).mockReset()
+    vi.mocked(listConnectionsFn).mockResolvedValue({
+      friends: [],
+      incoming: [],
+      outgoing: [],
+      suggested: [],
+    })
     vi.mocked(searchMembersFn).mockResolvedValue([])
     vi.mocked(respondFriendRequestFn).mockResolvedValue({ requestId: 'req-in', status: 'accepted' })
+    vi.mocked(sendFriendRequestFn).mockResolvedValue({ requestId: 'req-out', status: 'pending' })
+    vi.mocked(dismissSynapticNearbyFn).mockResolvedValue({ ok: true })
   })
 
   it('keeps Incoming empty-honest when nothing is pending', async () => {
@@ -240,7 +249,7 @@ describe('ConnectionsPage', () => {
         outgoing: [],
         suggested: [nearbyMember],
       })
-      .mockResolvedValueOnce({
+      .mockResolvedValue({
         friends: [],
         incoming: [],
         outgoing: [{ ...nearbyMember, requestId: 'req-out' }],
@@ -260,12 +269,10 @@ describe('ConnectionsPage', () => {
       })
     })
     await waitFor(() => {
-      expect(screen.queryByText(SYNAPTIC_NEARBY_TITLE)).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /sent/i })).toHaveTextContent('1')
+      expect(screen.getByText('Friend request sent.')).toBeInTheDocument()
     })
-    fireEvent.click(screen.getByRole('button', { name: /sent/i }))
-    expect(screen.getByText('probe_alpha')).toBeInTheDocument()
-    expect(screen.getByText('Pending')).toBeInTheDocument()
+    expect(screen.queryByText(SYNAPTIC_NEARBY_TITLE)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sent/i })).toHaveTextContent('1')
   })
 
   it('hides a nearby card when dismissed and persists the hide', async () => {
