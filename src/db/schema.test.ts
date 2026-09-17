@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getTableConfig } from 'drizzle-orm/pg-core'
-import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, memberBonds, notifications } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -24,6 +24,7 @@ describe('Database Schema & RLS Policies', () => {
     expect(leads).toBeDefined()
     expect(friendRequests).toBeDefined()
     expect(friendships).toBeDefined()
+    expect(suggestionDismissals).toBeDefined()
     expect(memberBonds).toBeDefined()
     expect(notifications).toBeDefined()
   })
@@ -41,6 +42,13 @@ describe('Database Schema & RLS Policies', () => {
     expect(friendRequests.status).toBeDefined()
     expect(friendships.userAId).toBeDefined()
     expect(friendships.userBId).toBeDefined()
+    expect(suggestionDismissals.viewerId).toBeDefined()
+    expect(suggestionDismissals.dismissedUserId).toBeDefined()
+    expect(suggestionDismissals.createdAt).toBeDefined()
+    const dismissalUniques = getTableConfig(suggestionDismissals).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(dismissalUniques).toContain('suggestion_dismissals_viewer_target_uidx')
     expect(memberBonds.fromUserId).toBeDefined()
     expect(memberBonds.toUserId).toBeDefined()
     expect(memberBonds.kind).toBeDefined()
