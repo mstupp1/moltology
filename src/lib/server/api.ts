@@ -859,9 +859,33 @@ export const removeConnectionFn = createServerFn({ method: 'POST' })
     return removeConnectionHandler(args)
   })
 
+export const dismissSynapticNearbyFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { memberId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        memberId: z.string().min(1),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { dismissSynapticNearbyHandler } = await import('./db-services')
+    return dismissSynapticNearbyHandler(args)
+  })
+
 export const listConnectionsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string }) => data ?? {})
+  .validator((data?: { token?: string; userId?: string; includeSuggestions?: boolean }) =>
+    z
+      .object({
+        token: z.string().optional(),
+        userId: z.string().optional(),
+        includeSuggestions: z.boolean().optional(),
+      })
+      .parse(data ?? {})
+  )
   .handler(async (args) => {
     const { listConnectionsHandler } = await import('./db-services')
     return listConnectionsHandler(args)

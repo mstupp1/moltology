@@ -6,9 +6,9 @@ import {
   DISABLED_REMOTE_INBOX_MARK_READ,
   isRemoteInboxEnabled,
 } from '../notifications-refresh'
-import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
+import { changelogs, profiles, users, userStats, routines, routineCompletions, blogPosts, blogComments, forumCategories, forumTopics, forumPosts, forumVotes, forumReports, forumTopicVisits, forumBoardVisits, leads, equipmentCatalog, userGearItems, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, xpTransactions, type NotificationKind, type NotificationPayload } from '../../db/schema'
 import { getDb } from '../../db'
-import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, isNull } from 'drizzle-orm'
+import { eq, desc, like, or, sql, and, asc, ne, ilike, inArray, notInArray, isNull } from 'drizzle-orm'
 import type { ChangelogEntry } from '../changelogs-data'
 import { resolveWriteAuth } from './write-auth'
 import { ensureUserProfile } from '../user-sync'
@@ -121,6 +121,7 @@ import {
   getStageLabel,
   normalizeFriendPair,
   toMemberSummary,
+  SYNAPTIC_NEARBY_LIMIT,
   type ConnectionsListView,
   type MemberSearchResult,
   type PublicProfileView,
@@ -4925,10 +4926,60 @@ export const removeConnectionFn = createServerFn({ method: 'POST' })
   )
   .handler(removeConnectionHandler)
 
+/** Ranking matches `rankSynapticNearby`: same stage, then ±1, then fill; recency; newer account; xp. */
+async function selectSynapticNearby(
+  dbClient: ReturnType<typeof getDb>,
+  viewerId: string,
+  excludeIds: string[],
+): Promise<ConnectionsListView['friends']> {
+  const uniqueExcludeIds = [...new Set(excludeIds)]
+  const rows = await dbClient
+    .select({
+      id: profiles.id,
+      larvaId: profiles.larvaId,
+      handle: profiles.handle,
+      stage: profiles.stage,
+      avatarConfig: profiles.avatarConfig,
+    })
+    .from(profiles)
+    .where(
+      and(
+        uniqueExcludeIds.length > 0 ? notInArray(profiles.id, uniqueExcludeIds) : sql`true`,
+        sql`NOT EXISTS (
+          SELECT 1 FROM suggestion_dismissals d
+          WHERE d."viewerId" = ${viewerId}
+            AND d."dismissedUserId" = ${profiles.id}
+        )`,
+      ),
+    )
+    .orderBy(
+      sql`CASE
+        WHEN ${profiles.stage} = (SELECT p2."stage" FROM profiles p2 WHERE p2."id" = ${viewerId}) THEN 0
+        WHEN abs(${profiles.stage} - (SELECT p2."stage" FROM profiles p2 WHERE p2."id" = ${viewerId})) = 1 THEN 1
+        ELSE 2
+      END`,
+      desc(profiles.updatedAt),
+      desc(profiles.createdAt),
+      desc(profiles.xp),
+    )
+    .limit(SYNAPTIC_NEARBY_LIMIT)
+
+  return rows.map((row) =>
+    toMemberSummary({
+      ...row,
+      avatarConfig: (row.avatarConfig as { style: string; seed: string } | null) ?? null,
+    }),
+  )
+}
+
 export const listConnectionsHandler = async ({
   data,
   context,
-}: ServerFnArgs<{ token?: string; userId?: string }>): Promise<ConnectionsListView> => {
+}: ServerFnArgs<{
+  token?: string
+  userId?: string
+  includeSuggestions?: boolean
+}>): Promise<ConnectionsListView> => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) throw new Error('Unauthenticated: Authentication required to list connections.')
 
@@ -5021,26 +5072,84 @@ export const listConnectionsHandler = async ({
     })
     .filter(Boolean) as ConnectionsListView['outgoing']
 
+  const friends = friendProfiles.map((p) =>
+    toMemberSummary({
+      ...p,
+      avatarConfig: (p.avatarConfig as { style: string; seed: string } | null) ?? null,
+      since: friendSinceById.get(p.id) ?? null,
+    }),
+  )
+
+  const pendingCounterpartIds = pendingRows.map((row) =>
+    row.senderId === auth.userId ? row.recipientId : row.senderId,
+  )
+
+  const suggested = data?.includeSuggestions
+    ? await selectSynapticNearby(auth.dbClient, auth.userId, [
+        auth.userId,
+        ...friendIds,
+        ...pendingCounterpartIds,
+      ])
+    : undefined
+
   return {
-    friends: friendProfiles.map((p) =>
-      toMemberSummary({
-        ...p,
-        avatarConfig: (p.avatarConfig as { style: string; seed: string } | null) ?? null,
-        since: friendSinceById.get(p.id) ?? null,
-      })
-    ),
+    friends,
     incoming,
     outgoing,
+    ...(suggested ? { suggested } : {}),
   }
 }
 
+export const dismissSynapticNearbyHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ memberId: string; token?: string; userId?: string }>) => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) throw new Error('Unauthenticated: Authentication required to hide a suggestion.')
+  if (!data?.memberId) throw new Error('Missing member id.')
+  if (data.memberId === auth.userId) throw new Error('You cannot hide yourself.')
+
+  const [target] = await auth.dbClient
+    .select({ id: profiles.id })
+    .from(profiles)
+    .where(eq(profiles.id, data.memberId))
+    .limit(1)
+  if (!target) throw new Error('That member could not be found.')
+
+  await auth.dbClient
+    .insert(suggestionDismissals)
+    .values({
+      viewerId: auth.userId,
+      dismissedUserId: data.memberId,
+    })
+    .onConflictDoNothing({
+      target: [suggestionDismissals.viewerId, suggestionDismissals.dismissedUserId],
+    })
+
+  return { ok: true as const }
+}
+
+export const dismissSynapticNearbyFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { memberId: string; token?: string; userId?: string }) =>
+    z
+      .object({
+        memberId: z.string().min(1),
+        token: z.string().optional(),
+        userId: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(dismissSynapticNearbyHandler)
+
 export const listConnectionsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string }) =>
+  .validator((data?: { token?: string; userId?: string; includeSuggestions?: boolean }) =>
     z
       .object({
         token: z.string().optional(),
         userId: z.string().optional(),
+        includeSuggestions: z.boolean().optional(),
       })
       .parse(data ?? {})
   )

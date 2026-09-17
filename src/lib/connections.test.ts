@@ -17,6 +17,11 @@ import {
   resolveConnectionsTab,
   connectionsHubLocation,
   connectionsPageLocation,
+  rankSynapticNearby,
+  synapticNearbyExcludedIds,
+  synapticNearbyStageRank,
+  SYNAPTIC_NEARBY_LIMIT,
+  SYNAPTIC_NEARBY_TITLE,
   type ConnectionsListView,
 } from './connections'
 import {
@@ -312,6 +317,78 @@ describe('connections helpers', () => {
       search: { tab: 'incoming' },
     })
   })
+
+  it('excludes self, friends, pending, and dismissed from Synaptic nearby', () => {
+    const excluded = synapticNearbyExcludedIds({
+      viewerId: 'me',
+      friendIds: ['friend-1'],
+      pendingIds: ['pending-in', 'pending-out'],
+      dismissedIds: ['hidden-1'],
+    })
+    expect([...excluded].sort()).toEqual(
+      ['friend-1', 'hidden-1', 'me', 'pending-in', 'pending-out'].sort(),
+    )
+
+    const ranked = rankSynapticNearby(
+      [
+        { id: 'me', stage: 2, updatedAt: '2026-09-17T12:00:00.000Z' },
+        { id: 'friend-1', stage: 2, updatedAt: '2026-09-17T12:00:00.000Z' },
+        { id: 'pending-in', stage: 2, updatedAt: '2026-09-17T12:00:00.000Z' },
+        { id: 'hidden-1', stage: 2, updatedAt: '2026-09-17T12:00:00.000Z' },
+        { id: 'probe', stage: 2, updatedAt: '2026-09-16T12:00:00.000Z' },
+      ],
+      {
+        viewerId: 'me',
+        viewerStage: 2,
+        friendIds: ['friend-1'],
+        pendingIds: ['pending-in'],
+        dismissedIds: ['hidden-1'],
+      },
+    )
+    expect(ranked.map((row) => row.id)).toEqual(['probe'])
+  })
+
+  it('prefers same carcinization stage, then ±1, then fills so a tiny swarm is not blank', () => {
+    expect(synapticNearbyStageRank(2, 2)).toBe(0)
+    expect(synapticNearbyStageRank(2, 3)).toBe(1)
+    expect(synapticNearbyStageRank(2, 1)).toBe(1)
+    expect(synapticNearbyStageRank(2, 4)).toBe(2)
+    expect(synapticNearbyStageRank(null, 1)).toBe(2)
+
+    const ranked = rankSynapticNearby(
+      [
+        { id: 'far-new', stage: 4, updatedAt: '2026-09-17T18:00:00.000Z', createdAt: '2026-09-17T00:00:00.000Z', xp: 9 },
+        { id: 'same-old', stage: 2, updatedAt: '2026-09-01T00:00:00.000Z', createdAt: '2026-01-01T00:00:00.000Z', xp: 1 },
+        { id: 'same-hot', stage: 2, updatedAt: '2026-09-17T12:00:00.000Z', createdAt: '2026-01-02T00:00:00.000Z', xp: 1 },
+        { id: 'adj', stage: 3, updatedAt: '2026-09-17T16:00:00.000Z', createdAt: '2026-09-01T00:00:00.000Z', xp: 4 },
+        { id: 'alpha', stage: 1, updatedAt: '2026-09-10T00:00:00.000Z', createdAt: '2026-02-01T00:00:00.000Z', xp: 80 },
+        { id: 'same-tie-newer', stage: 2, updatedAt: '2026-09-17T12:00:00.000Z', createdAt: '2026-08-01T00:00:00.000Z', xp: 1 },
+        { id: 'filler', stage: 4, updatedAt: '2026-08-01T00:00:00.000Z', createdAt: '2026-08-01T00:00:00.000Z', xp: 2 },
+      ],
+      { viewerId: 'me', viewerStage: 2, limit: SYNAPTIC_NEARBY_LIMIT },
+    )
+
+    expect(ranked.map((row) => row.id)).toEqual([
+      'same-tie-newer',
+      'same-hot',
+      'same-old',
+      'adj',
+      'alpha',
+    ])
+    expect(ranked).toHaveLength(SYNAPTIC_NEARBY_LIMIT)
+    expect(ranked.some((row) => row.id === 'far-new')).toBe(false)
+  })
+
+  it('fills with any eligible initiate when nobody shares a nearby stage', () => {
+    const ranked = rankSynapticNearby(
+      [
+        { id: 'probe', stage: 4, updatedAt: '2026-09-17T12:00:00.000Z' },
+        { id: 'alpha', stage: 4, updatedAt: '2026-09-16T12:00:00.000Z' },
+      ],
+      { viewerId: 'me', viewerStage: 1 },
+    )
+    expect(ranked.map((row) => row.id)).toEqual(['probe', 'alpha'])
+  })
 })
 
 describe('connections search copy', () => {
@@ -325,6 +402,14 @@ describe('connections search copy', () => {
     expect(src).toMatch(/designation, larva unit, or name/)
     expect(src).toMatch(/useMemberSearch/)
     expect(src).toMatch(/MemberSearchRow/)
+    expect(src).toMatch(/SynapticNearbyStrip/)
+    expect(src).toMatch(/includeSuggestions: true/)
+    expect(src).not.toMatch(/People You May Know/)
+  })
+
+  it('keeps the nearby strip title diegetic', () => {
+    expect(SYNAPTIC_NEARBY_TITLE).toBe('Synaptic nearby')
+    expect(SYNAPTIC_NEARBY_TITLE).not.toMatch(/\/\//)
   })
 })
 

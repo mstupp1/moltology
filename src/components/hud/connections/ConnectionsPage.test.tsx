@@ -7,7 +7,11 @@ import {
   CONNECTIONS_FRIENDS_EMPTY,
 } from './ConnectionsPage'
 import { ToastProvider } from '@/components/ui/ToastProvider'
-import { listConnectionsFn, respondFriendRequestFn, searchMembersFn } from '@/lib/server/api'
+import { listConnectionsFn, respondFriendRequestFn, searchMembersFn, sendFriendRequestFn, dismissSynapticNearbyFn } from '@/lib/server/api'
+import {
+  SYNAPTIC_NEARBY_DISMISS_LABEL,
+  SYNAPTIC_NEARBY_TITLE,
+} from '@/lib/connections'
 
 const onTabChange = vi.fn()
 
@@ -30,6 +34,7 @@ vi.mock('@/lib/server/api', () => ({
   respondFriendRequestFn: vi.fn(),
   cancelFriendRequestFn: vi.fn(),
   removeConnectionFn: vi.fn(),
+  dismissSynapticNearbyFn: vi.fn(),
 }))
 
 vi.mock('@/components/hud/LobsterAvatarPortrait', () => ({
@@ -171,5 +176,120 @@ describe('ConnectionsPage', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: /incoming/i }))
     expect(onTabChange).toHaveBeenCalledWith('incoming')
+  })
+
+  const nearbyMember = {
+    id: 'near-1',
+    larvaId: 'LARVA UNIT #9',
+    handle: 'probe_alpha',
+    displayName: 'probe_alpha',
+    stage: 1,
+    stageLabel: 'Larval Initiate',
+    avatarConfig: null,
+  }
+
+  it('loads Synaptic nearby once on mount and hides the strip when nobody is eligible', async () => {
+    vi.mocked(listConnectionsFn).mockResolvedValue({
+      friends: [],
+      incoming: [],
+      outgoing: [],
+      suggested: [],
+    })
+
+    renderPage('friends')
+
+    await waitFor(() => {
+      expect(listConnectionsFn).toHaveBeenCalledWith({
+        data: { token: 'a.b.c', includeSuggestions: true },
+      })
+    })
+    expect(screen.queryByText(SYNAPTIC_NEARBY_TITLE)).not.toBeInTheDocument()
+    expect(listConnectionsFn).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders nearby cards that are not already friends and caps the strip at five', async () => {
+    vi.mocked(listConnectionsFn).mockResolvedValue({
+      friends: [],
+      incoming: [],
+      outgoing: [],
+      suggested: Array.from({ length: 6 }, (_, i) => ({
+        ...nearbyMember,
+        id: `near-${i + 1}`,
+        handle: `initiate_${i + 1}`,
+        displayName: `initiate_${i + 1}`,
+      })),
+    })
+
+    renderPage('friends')
+
+    await waitFor(() => {
+      expect(screen.getByText(SYNAPTIC_NEARBY_TITLE)).toBeInTheDocument()
+    })
+    expect(screen.getByText('initiate_1')).toBeInTheDocument()
+    expect(screen.getByText('initiate_5')).toBeInTheDocument()
+    expect(screen.queryByText('initiate_6')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /add friend/i })).toHaveLength(5)
+  })
+
+  it('sends a friend request from a nearby card through the existing request path', async () => {
+    vi.mocked(sendFriendRequestFn).mockResolvedValue({ requestId: 'req-out', status: 'pending' })
+    vi.mocked(listConnectionsFn)
+      .mockResolvedValueOnce({
+        friends: [],
+        incoming: [],
+        outgoing: [],
+        suggested: [nearbyMember],
+      })
+      .mockResolvedValueOnce({
+        friends: [],
+        incoming: [],
+        outgoing: [{ ...nearbyMember, requestId: 'req-out' }],
+        suggested: [],
+      })
+
+    renderPage('friends')
+
+    await waitFor(() => {
+      expect(screen.getByText('probe_alpha')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: /add friend/i }))
+
+    await waitFor(() => {
+      expect(sendFriendRequestFn).toHaveBeenCalledWith({
+        data: { recipientId: 'near-1', token: 'a.b.c' },
+      })
+    })
+    await waitFor(() => {
+      expect(screen.queryByText(SYNAPTIC_NEARBY_TITLE)).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /sent/i })).toHaveTextContent('1')
+    })
+    fireEvent.click(screen.getByRole('button', { name: /sent/i }))
+    expect(screen.getByText('probe_alpha')).toBeInTheDocument()
+    expect(screen.getByText('Pending')).toBeInTheDocument()
+  })
+
+  it('hides a nearby card when dismissed and persists the hide', async () => {
+    vi.mocked(dismissSynapticNearbyFn).mockResolvedValue({ ok: true })
+    vi.mocked(listConnectionsFn).mockResolvedValue({
+      friends: [],
+      incoming: [],
+      outgoing: [],
+      suggested: [nearbyMember],
+    })
+
+    renderPage('friends')
+
+    await waitFor(() => {
+      expect(screen.getByText('probe_alpha')).toBeInTheDocument()
+    })
+    fireEvent.click(screen.getByRole('button', { name: SYNAPTIC_NEARBY_DISMISS_LABEL }))
+
+    await waitFor(() => {
+      expect(dismissSynapticNearbyFn).toHaveBeenCalledWith({
+        data: { memberId: 'near-1', token: 'a.b.c' },
+      })
+    })
+    expect(screen.queryByText('probe_alpha')).not.toBeInTheDocument()
+    expect(screen.queryByText(SYNAPTIC_NEARBY_TITLE)).not.toBeInTheDocument()
   })
 })
