@@ -833,6 +833,34 @@ export const friendships = pgTable('friendships', {
 ])
 
 /**
+ * Per-viewer permanent hides for Synaptic nearby (and later suggestion strips).
+ * Owner-only: the dismissed member never learns they were set aside.
+ */
+export const suggestionDismissals = pgTable('suggestion_dismissals', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  viewerId: text('viewerId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  dismissedUserId: text('dismissedUserId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('suggestion_dismissals_viewer_target_uidx').on(table.viewerId, table.dismissedUserId),
+  pgPolicy('suggestion_dismissals_owner_select_policy', {
+    for: 'select',
+    using: sql`"viewerId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('suggestion_dismissals_owner_insert_policy', {
+    for: 'insert',
+    withCheck: sql`"viewerId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+  pgPolicy('suggestion_dismissals_owner_delete_policy', {
+    for: 'delete',
+    using: sql`"viewerId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/**
  * Typed bonds beyond platform friendships: nest-mates, mentors, and brought-in sponsors.
  * `fromUserId` is the sponsor/mentor for directed kinds; nest-mates store lex-ordered ids.
  */

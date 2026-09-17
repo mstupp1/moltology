@@ -1,8 +1,10 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
+import { X } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
 import type { MemberSearchResult, RelationshipState } from '@/lib/connections'
+import { SYNAPTIC_NEARBY_DISMISS_LABEL } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import { resolveMemberPublicParam } from '@/lib/member-handle'
 
@@ -14,6 +16,7 @@ export function MemberSearchRow({
   compact = false,
   caption,
   allowRemove = true,
+  onDismiss,
 }: {
   member: MemberSearchResult
   relationship: RelationshipState
@@ -22,6 +25,7 @@ export function MemberSearchRow({
   compact?: boolean
   caption?: string
   allowRemove?: boolean
+  onDismiss?: () => void
 }) {
   return (
     <li
@@ -55,6 +59,16 @@ export function MemberSearchRow({
         allowRemove={allowRemove}
         onRelationshipChange={() => onRelationshipChange?.()}
       />
+      {onDismiss && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label={SYNAPTIC_NEARBY_DISMISS_LABEL}
+          className="shrink-0 p-1.5 text-[#839493] hover:text-[#dfe3e3] hover:border-[#3a4a49] border border-transparent chamfer-corner transition-colors"
+        >
+          <X className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+        </button>
+      )}
     </li>
   )
 }

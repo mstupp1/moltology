@@ -4,15 +4,17 @@ import { Search, Users, Inbox, Send, Loader2 } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
+import { SynapticNearbyStrip } from '@/components/hud/connections/SynapticNearbyStrip'
 import { FriendRequestButton } from '@/components/hud/member/FriendRequestButton'
 import { getAuthJWTToken } from '@/lib/jwt'
-import { listConnectionsFn } from '@/lib/server/api'
+import { listConnectionsFn, dismissSynapticNearbyFn } from '@/lib/server/api'
 import {
   CONNECTIONS_FRIENDS_EMPTY,
   CONNECTIONS_INCOMING_EMPTY,
   CONNECTIONS_SENT_EMPTY,
   relationshipForMember,
   resolveConnectionsTab,
+  SYNAPTIC_NEARBY_DISMISS_TOAST,
   type ConnectionsListView,
   type ConnectionsTab,
 } from '@/lib/connections'
@@ -33,6 +35,7 @@ export const ConnectionsPage: React.FC<{
   onTabChange?: (tab: ConnectionsTab) => void
 }> = ({ tab: tabProp, onTabChange }) => {
   const [connections, setConnections] = useState<ConnectionsListView | null>(null)
+  const [hiddenSuggestionIds, setHiddenSuggestionIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
@@ -44,7 +47,9 @@ export const ConnectionsPage: React.FC<{
   const refresh = useCallback(async () => {
     try {
       const token = await getAuthJWTToken()
-      const next = await listConnectionsFn({ data: { token: token ?? undefined } })
+      const next = await listConnectionsFn({
+        data: { token: token ?? undefined, includeSuggestions: true },
+      })
       setConnections(next)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not load connections.')
@@ -56,6 +61,26 @@ export const ConnectionsPage: React.FC<{
   useEffect(() => {
     void refresh()
   }, [refresh])
+
+  const hideSuggestion = (memberId: string) => {
+    setHiddenSuggestionIds((ids) => (ids.includes(memberId) ? ids : [...ids, memberId]))
+  }
+
+  const dismissSuggestion = async (memberId: string) => {
+    hideSuggestion(memberId)
+    try {
+      const token = await getAuthJWTToken()
+      await dismissSynapticNearbyFn({ data: { memberId, token: token ?? undefined } })
+      toast.info(SYNAPTIC_NEARBY_DISMISS_TOAST)
+    } catch (err) {
+      setHiddenSuggestionIds((ids) => ids.filter((id) => id !== memberId))
+      toast.error(err instanceof Error ? err.message : 'Could not hide that suggestion.')
+    }
+  }
+
+  const suggested = (connections?.suggested ?? []).filter(
+    (member) => !hiddenSuggestionIds.includes(member.id),
+  )
 
   const selectTab = (next: ConnectionsTab) => {
     onTabChange?.(next)
@@ -134,6 +159,15 @@ export const ConnectionsPage: React.FC<{
           </p>
         )}
       </div>
+
+      <SynapticNearbyStrip
+        members={suggested}
+        onRequested={(memberId) => {
+          hideSuggestion(memberId)
+          void refresh()
+        }}
+        onDismiss={(memberId) => void dismissSuggestion(memberId)}
+      />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-3">
         <div className="flex flex-wrap gap-2 border-b border-[#3a4a49] pb-3">

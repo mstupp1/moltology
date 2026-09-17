@@ -69,6 +69,89 @@ export type ConnectionsListView = {
   friends: ConnectionMemberSummary[]
   incoming: ConnectionMemberSummary[]
   outgoing: ConnectionMemberSummary[]
+  /** Present when Connections asked for Synaptic nearby. Omitted on hub/search reads. */
+  suggested?: ConnectionMemberSummary[]
+}
+
+export const SYNAPTIC_NEARBY_LIMIT = 5
+export const SYNAPTIC_NEARBY_TITLE = 'Synaptic nearby'
+export const SYNAPTIC_NEARBY_HINT =
+  'Initiates close in carcinization stage, recently stirring in the trench.'
+export const SYNAPTIC_NEARBY_DISMISS_LABEL = 'Hide this suggestion'
+export const SYNAPTIC_NEARBY_DISMISS_TOAST = 'Suggestion hidden.'
+
+export type SynapticNearbyCandidate = {
+  id: string
+  stage: number
+  updatedAt?: string | Date | null
+  createdAt?: string | Date | null
+  xp?: number | null
+}
+
+export function synapticNearbyExcludedIds(input: {
+  viewerId: string
+  friendIds?: Iterable<string>
+  pendingIds?: Iterable<string>
+  dismissedIds?: Iterable<string>
+}): Set<string> {
+  const excluded = new Set<string>([input.viewerId])
+  for (const id of input.friendIds ?? []) excluded.add(id)
+  for (const id of input.pendingIds ?? []) excluded.add(id)
+  for (const id of input.dismissedIds ?? []) excluded.add(id)
+  return excluded
+}
+
+/** 0 = same stage, 1 = adjacent (±1), 2 = fill. Missing viewer stage still fills. */
+export function synapticNearbyStageRank(
+  viewerStage: number | null | undefined,
+  candidateStage: number,
+): number {
+  if (viewerStage == null || !Number.isFinite(viewerStage)) return 2
+  if (candidateStage === viewerStage) return 0
+  if (Math.abs(candidateStage - viewerStage) === 1) return 1
+  return 2
+}
+
+function timestampMs(value: string | Date | null | undefined): number {
+  if (!value) return 0
+  const ms = value instanceof Date ? value.getTime() : new Date(value).getTime()
+  return Number.isFinite(ms) ? ms : 0
+}
+
+export function compareSynapticNearby(
+  a: SynapticNearbyCandidate,
+  b: SynapticNearbyCandidate,
+  viewerStage: number | null | undefined,
+): number {
+  const stageDelta =
+    synapticNearbyStageRank(viewerStage, a.stage) - synapticNearbyStageRank(viewerStage, b.stage)
+  if (stageDelta !== 0) return stageDelta
+  const recencyDelta = timestampMs(b.updatedAt) - timestampMs(a.updatedAt)
+  if (recencyDelta !== 0) return recencyDelta
+  const newerAccountDelta = timestampMs(b.createdAt) - timestampMs(a.createdAt)
+  if (newerAccountDelta !== 0) return newerAccountDelta
+  const xpDelta = (b.xp ?? 0) - (a.xp ?? 0)
+  if (xpDelta !== 0) return xpDelta
+  return a.id.localeCompare(b.id)
+}
+
+export function rankSynapticNearby<T extends SynapticNearbyCandidate>(
+  candidates: T[],
+  opts: {
+    viewerId: string
+    viewerStage?: number | null
+    friendIds?: Iterable<string>
+    pendingIds?: Iterable<string>
+    dismissedIds?: Iterable<string>
+    limit?: number
+  },
+): T[] {
+  const excluded = synapticNearbyExcludedIds(opts)
+  const limit = opts.limit ?? SYNAPTIC_NEARBY_LIMIT
+  return candidates
+    .filter((row) => !excluded.has(row.id))
+    .sort((a, b) => compareSynapticNearby(a, b, opts.viewerStage))
+    .slice(0, Math.max(0, limit))
 }
 
 export type MemberSearchResult = {

@@ -27,10 +27,11 @@ async function applyRLS() {
     await sql`ALTER TABLE IF EXISTS user_gear_items ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS friend_requests ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS friendships ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS suggestion_dismissals ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS member_bonds ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS notifications ENABLE ROW LEVEL SECURITY;`
     await sql`ALTER TABLE IF EXISTS xp_transactions ENABLE ROW LEVEL SECURITY;`
-    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, member_bonds, notifications, xp_transactions')
+    console.log('✓ RLS enabled on profiles, user_stats, routines, routine_completions, activity_events, user_avatars, equipment_catalog, user_gear_items, friend_requests, friendships, suggestion_dismissals, member_bonds, notifications, xp_transactions')
 
     // 2. Drop existing policies if any to ensure clean idempotent script
     await sql`DROP POLICY IF EXISTS profiles_isolation_policy ON profiles;`
@@ -53,6 +54,9 @@ async function applyRLS() {
     await sql`DROP POLICY IF EXISTS friendships_party_select_policy ON friendships;`
     await sql`DROP POLICY IF EXISTS friendships_party_insert_policy ON friendships;`
     await sql`DROP POLICY IF EXISTS friendships_party_delete_policy ON friendships;`
+    await sql`DROP POLICY IF EXISTS suggestion_dismissals_owner_select_policy ON suggestion_dismissals;`
+    await sql`DROP POLICY IF EXISTS suggestion_dismissals_owner_insert_policy ON suggestion_dismissals;`
+    await sql`DROP POLICY IF EXISTS suggestion_dismissals_owner_delete_policy ON suggestion_dismissals;`
     await sql`DROP POLICY IF EXISTS member_bonds_party_select_policy ON member_bonds;`
     await sql`DROP POLICY IF EXISTS member_bonds_party_insert_policy ON member_bonds;`
     await sql`DROP POLICY IF EXISTS member_bonds_party_delete_policy ON member_bonds;`
@@ -239,6 +243,31 @@ async function applyRLS() {
     `
 
     await sql`
+      CREATE POLICY suggestion_dismissals_owner_select_policy ON suggestion_dismissals
+      FOR SELECT
+      USING (
+        "viewerId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY suggestion_dismissals_owner_insert_policy ON suggestion_dismissals
+      FOR INSERT
+      WITH CHECK (
+        "viewerId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+    await sql`
+      CREATE POLICY suggestion_dismissals_owner_delete_policy ON suggestion_dismissals
+      FOR DELETE
+      USING (
+        "viewerId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+        OR (current_setting('request.jwt.claims', true) IS NULL)
+      );
+    `
+
+    await sql`
       CREATE POLICY member_bonds_party_select_policy ON member_bonds
       FOR SELECT
       USING (
@@ -291,7 +320,7 @@ async function applyRLS() {
       FOR INSERT
       WITH CHECK (true);
     `
-    console.log('✓ RLS policies configured for friend_requests, friendships, member_bonds, notifications')
+    console.log('✓ RLS policies configured for friend_requests, friendships, suggestion_dismissals, member_bonds, notifications')
 
     // 4. Auto-populate public.profiles on Better Auth user creation (keep neon_auth trigger if present)
     try {
