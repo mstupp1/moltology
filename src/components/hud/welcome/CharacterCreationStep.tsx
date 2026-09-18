@@ -13,7 +13,7 @@ import {
   randomLobsterSeed,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
+import { LobsterAvatarFullBody } from '../LobsterAvatarFullBody'
 import {
   adjustStat,
   calculateStatSum,
@@ -145,14 +145,13 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
       <div className="p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 overflow-y-auto flex-1">
         {/* LEFT COLUMN: Avatar Selection (5 cols) */}
         <div className="lg:col-span-5 flex flex-col items-center space-y-3.5">
-          {/* Circular portrait preview */}
-          <div className="relative shrink-0">
-            <LobsterAvatarPortrait
+          {/* Full-body motion preview — the only animated instance on this screen */}
+          <div className="relative shrink-0 w-full max-w-[240px] sm:max-w-[260px]">
+            <LobsterAvatarFullBody
               config={previewConfig}
               size={320}
               alt="Carapace Avatar Preview"
-              className="w-full max-w-[240px] sm:max-w-[260px]"
-              interactive
+              className="w-full aspect-square"
               animationSeed={seed}
             />
           </div>

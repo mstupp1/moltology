@@ -204,6 +204,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                 size={320}
                 interactive
                 alt="Avatar preview"
+                loading="eager"
               />
 
               {/* Seed Number */}

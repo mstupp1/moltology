@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   generateLobsterAvatarSvg,
   generateLobsterAvatarDataUri,
+  LOBSTER_PORTRAIT_VIEWBOX,
   getChitinGradientPalette,
   getLobsterAvatarSeededOptions,
   hasLobsterEyelids,
@@ -147,6 +148,7 @@ describe('lobster-avatar', () => {
     expect(svg1).toBeTruthy()
     expect(svg1).toBe(svg2)
     expect(svg1).toContain('viewBox="-65 -35 230 230"')
+    expect(svg1).toContain('data-avatar-slot="fullBody"')
     expect(svg1).toContain('id="lobster-background-layer"')
     expect(svg1).toContain('id="lobster-ground-shadow"')
     expect(svg1).toContain('id="lobster-antennae-layer"')
@@ -170,6 +172,9 @@ describe('lobster-avatar', () => {
     expect(svg1).toContain('id="lobster-arm-right"')
     expect(svg1).toContain('id="lobster-claw-left"')
     expect(svg1).toContain('id="lobster-claw-right"')
+    expect(generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })).toContain(
+      `viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`
+    )
   })
 
   it('renders multi-stop 2-color angular linear gradient and dual radial spotlights in defs', () => {

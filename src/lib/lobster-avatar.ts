@@ -2160,9 +2160,31 @@ export const CARAPACE_BOTTOM_HALF_WIDTHS: Readonly<Record<string, number>> = {
  * modular antennae styles, anthropomorphic standing legs, and ground-resting fan tail
  * into the generated DiceBear SVG.
  */
+export const LOBSTER_FULL_BODY_VIEWBOX = '-65 -35 230 230' as const
+/** Close-up of head, eyes, antennae, and upper claws — not a CSS crop of the full-body frame. */
+export const LOBSTER_PORTRAIT_VIEWBOX = '8 -26 84 84' as const
+
+export type LobsterAvatarFrame = 'portrait' | 'fullBody'
+
+export interface GenerateLobsterAvatarOptions {
+  frame?: LobsterAvatarFrame
+  /** Strip SMIL motion tags. Implied for the portrait frame. */
+  staticMotion?: boolean
+}
+
+/** Remove SMIL animate nodes so a portrait data URI stays still even as an <img>. */
+export function stripSvgSmilAnimation(svg: string): string {
+  return svg
+    .replace(/<animateTransform\b[^>]*\/>/gi, '')
+    .replace(/<animate\b[^>]*\/>/gi, '')
+    .replace(/<animateTransform\b[^>]*>[\s\S]*?<\/animateTransform>/gi, '')
+    .replace(/<animate\b[^>]*>[\s\S]*?<\/animate>/gi, '')
+}
+
 function injectLobsterChitinLayers(
   rawSvg: string,
-  configOrSeed: LobsterAvatarConfig | string
+  configOrSeed: LobsterAvatarConfig | string,
+  options?: { frame?: LobsterAvatarFrame }
 ): string {
   const seed = typeof configOrSeed === 'string' ? configOrSeed : configOrSeed.seed
   const config = typeof configOrSeed === 'object' ? configOrSeed : { style: LOBSTER_AVATAR_STYLE, seed }
@@ -2711,11 +2733,14 @@ function injectLobsterChitinLayers(
   // In DiceBear rawSvg, replace solid body color with the adjacent chitin gradient
   let outputSvg = rawSvg.split(`fill="${chitinColor}"`).join(`fill="${chitinFill}"`)
 
-  // 1. Expand ViewBox from 0 0 100 100 to tightly framed square character frame (housing side tails, claws, and antennas with balanced margins)
-  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', 'viewBox="-65 -35 230 230"')
+  // 1. Dedicated frames: full-body square vs close-up portrait. Never CSS-crop one into the other.
+  const frame: LobsterAvatarFrame = options?.frame === 'portrait' ? 'portrait' : 'fullBody'
+  const viewBox = frame === 'portrait' ? LOBSTER_PORTRAIT_VIEWBOX : LOBSTER_FULL_BODY_VIEWBOX
+  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', `viewBox="${viewBox}"`)
   if (!outputSvg.includes('xmlns:xlink=')) {
     outputSvg = outputSvg.replace('<svg ', '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ')
   }
+  outputSvg = outputSvg.replace('<svg ', `<svg data-avatar-slot="${frame}" `)
 
   // 2. Strip any opaque background rect and outer root 100x100 viewport clipPath for clean alpha transparency
   outputSvg = outputSvg.replace(/<rect width="100" height="100"[^>]*\/>/g, '')
@@ -2791,8 +2816,14 @@ function injectLobsterChitinLayers(
   return outputSvg
 }
 
-function getAvatarCacheKey(config: LobsterAvatarConfig, size: number): string {
-  return `${config.seed}|${size}|${config.height ?? ''}|${config.armScale ?? ''}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.eyeColor ?? ''}|${config.eyeVariant ?? ''}|${config.pupilVariant ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
+function getAvatarCacheKey(
+  config: LobsterAvatarConfig,
+  size: number,
+  options?: GenerateLobsterAvatarOptions
+): string {
+  const frame = options?.frame ?? 'fullBody'
+  const staticMotion = options?.staticMotion ?? frame === 'portrait'
+  return `${config.seed}|${size}|${frame}|${staticMotion ? 'static' : 'live'}|${config.height ?? ''}|${config.armScale ?? ''}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.eyeColor ?? ''}|${config.eyeVariant ?? ''}|${config.pupilVariant ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
 }
 
 const MAX_GENERATED_AVATAR_CACHE = 128
@@ -2806,9 +2837,13 @@ export function clearGeneratedAvatarCache(): void {
 
 export function generateLobsterAvatarSvg(
   config: LobsterAvatarConfig,
-  size = 256
+  size = 256,
+  options?: GenerateLobsterAvatarOptions
 ): string | null {
-  const key = getAvatarCacheKey(config, size)
+  const frame = options?.frame ?? 'fullBody'
+  const staticMotion = options?.staticMotion ?? frame === 'portrait'
+  const resolvedOptions: GenerateLobsterAvatarOptions = { frame, staticMotion }
+  const key = getAvatarCacheKey(config, size, resolvedOptions)
   const cached = generatedSvgCache.get(key)
   if (cached !== undefined) {
     generatedSvgCache.delete(key)
@@ -2822,7 +2857,10 @@ export function generateLobsterAvatarSvg(
     ...LOBSTER_CRUSTACEAN_OPTIONS,
   })
   const rawSvg = avatar.toString()
-  const svg = injectLobsterChitinLayers(rawSvg, config)
+  let svg = injectLobsterChitinLayers(rawSvg, config, { frame })
+  if (svg && staticMotion) {
+    svg = stripSvgSmilAnimation(svg)
+  }
 
   if (svg) {
     if (generatedSvgCache.size >= MAX_GENERATED_AVATAR_CACHE) {
@@ -2837,9 +2875,13 @@ export function generateLobsterAvatarSvg(
 
 export function generateLobsterAvatarDataUri(
   config: LobsterAvatarConfig,
-  size = 256
+  size = 256,
+  options?: GenerateLobsterAvatarOptions
 ): string | null {
-  const key = getAvatarCacheKey(config, size)
+  const frame = options?.frame ?? 'fullBody'
+  const staticMotion = options?.staticMotion ?? frame === 'portrait'
+  const resolvedOptions: GenerateLobsterAvatarOptions = { frame, staticMotion }
+  const key = getAvatarCacheKey(config, size, resolvedOptions)
   const cached = generatedDataUriCache.get(key)
   if (cached !== undefined) {
     generatedDataUriCache.delete(key)
@@ -2847,7 +2889,7 @@ export function generateLobsterAvatarDataUri(
     return cached
   }
 
-  const svg = generateLobsterAvatarSvg(config, size)
+  const svg = generateLobsterAvatarSvg(config, size, resolvedOptions)
   if (!svg) return null
   const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 

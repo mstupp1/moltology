@@ -128,4 +128,14 @@ describe('LobsterAvatarDisplay Component', () => {
     expect(textureEl).toBeInTheDocument()
     expect(textureEl).toHaveClass('pbr-underlay-hex')
   })
+
+  it('does not keep the animated svg mounted when the document is hidden', async () => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true })
+    render(<LobsterAvatarDisplay src={testSrc} alt="Hidden Character" />)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
+    })
+    expect(screen.getByAltText('Hidden Character')).toBeInTheDocument()
+  })
 })

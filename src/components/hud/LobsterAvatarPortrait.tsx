@@ -1,95 +1,56 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
+import { type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import {
-  LOBSTER_AVATAR_STYLE,
-  generateLobsterAvatarDataUri,
-  type LobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
-import { LobsterAvatarDisplay } from './LobsterAvatarDisplay'
-
-/** Upper-body crop for critters full-body sprites in a circular frame */
-const PORTRAIT_FACE_CLASSES = 'scale-[1.3] origin-[center_38%] object-[center_42%]'
+  normalizePortraitSourcePx,
+  pickLobsterAvatarSlot,
+  resolveLobsterAvatarAssets,
+} from '@/lib/lobster-avatar-slots'
 
 export interface LobsterAvatarPortraitProps {
-  /** Pre-generated DiceBear data URI (e.g. from profile) */
+  /** Pre-generated still (portrait slot or SSO image). Never an animated full-body crop. */
   src?: string | null
-  /** Generate client-side after mount from config (SSR-safe) */
+  /** Generate a static close-up after mount from config (SSR-safe) */
   config?: LobsterAvatarConfig | null
-  /** Render resolution for generation / pixelation */
+  /** Requested source px; clamped to the two shipped sizes (128 / 256). */
   size?: number
   alt?: string
-  /** Outer frame diameter, e.g. w-48 h-48 */
   className?: string
-  /** Subtle hover scale on the sprite */
   interactive?: boolean
-  animationSeed?: string
   /** Enable foreground optical lens vignette (default true) */
   vignette?: boolean
   specularSheen?: boolean
   /** Enable spherical fisheye lens curvature & chromatic refraction (default true) */
   fisheyeLens?: boolean
+  /** Lazy-load below the fold. Eager is OK for the signed-in user's own HUD face. */
+  loading?: 'lazy' | 'eager'
 }
 
 /**
- * Circular, face-focused lobster avatar — canonical portrait for settings, chassis, and HUD surfaces.
- * Features an authentic benthic porthole frame with spherical fisheye lens barrel distortion,
- * chromatic optical ring, inner shadow depth, optical lens vignette, and convex glass specular arc.
+ * Circular, face-focused lobster portrait — static image for lists, chrome, and settings.
+ * Does not mount the animated full-body display.
  */
 export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React.memo(({
   src,
   config,
-  size = 320,
+  size = 256,
   alt = 'Carapace avatar',
   className = 'w-48 h-48 sm:w-56 sm:h-56',
   interactive = false,
-  animationSeed,
   vignette = true,
   specularSheen = true,
   fisheyeLens = true,
+  loading = 'lazy',
 }) => {
-  const resolvedSeed = animationSeed ?? config?.seed
   const configSeed = config?.seed
-  const configHeight = config?.height
-  const configArmScale = config?.armScale
-  const configTheme = config?.backgroundTheme
-  const configPattern = config?.backgroundPattern
-  const configTexture = config?.backgroundTexture
-  const configDensity = config?.patternDensity
-  const configGlow = config?.patternGlow
-  const configPulse = config?.patternPulse
-  const configSparkles = config?.patternSparkles
-  const configEyelidStyle = config?.eyelidStyle
-  const configEyeColor = config?.eyeColor
-  const configEyeVariant = config?.eyeVariant
-  const configPupilVariant = config?.pupilVariant
-  const configMotion = config?.backgroundMotion
-  const configTransparent = config?.transparentBackground
+  const sourcePx = normalizePortraitSourcePx(size)
 
-  const dataUri = useMemo(() => {
+  const portraitUrl = useMemo(() => {
     if (src) return src
-    if (!configSeed) return null
-    return generateLobsterAvatarDataUri(
-      {
-        style: LOBSTER_AVATAR_STYLE,
-        seed: configSeed,
-        ...(configHeight ? { height: configHeight } : {}),
-        ...(configArmScale ? { armScale: configArmScale } : {}),
-        ...(configTheme ? { backgroundTheme: configTheme } : {}),
-        ...(configPattern ? { backgroundPattern: configPattern } : {}),
-        ...(configTexture ? { backgroundTexture: configTexture } : {}),
-        ...(configDensity ? { patternDensity: configDensity } : {}),
-        ...(configGlow ? { patternGlow: configGlow } : {}),
-        ...(configPulse ? { patternPulse: configPulse } : {}),
-        ...(configSparkles ? { patternSparkles: configSparkles } : {}),
-        ...(configEyelidStyle ? { eyelidStyle: configEyelidStyle } : {}),
-        ...(configEyeColor ? { eyeColor: configEyeColor } : {}),
-        ...(configEyeVariant ? { eyeVariant: configEyeVariant } : {}),
-        ...(configPupilVariant ? { pupilVariant: configPupilVariant } : {}),
-        ...(configMotion ? { backgroundMotion: configMotion } : {}),
-        ...(configTransparent ? { transparentBackground: configTransparent } : {}),
-      },
-      size
-    )
-  }, [src, configSeed, configHeight, configArmScale, configTheme, configPattern, configTexture, configDensity, configGlow, configPulse, configSparkles, configEyelidStyle, configEyeColor, configEyeVariant, configPupilVariant, configMotion, configTransparent, size])
+    if (!config || !configSeed) return null
+    const assets = resolveLobsterAvatarAssets(config, { portraitSize: sourcePx })
+    const picked = pickLobsterAvatarSlot(assets, 'portrait')
+    return picked?.slot === 'portrait' ? picked.url : null
+  }, [src, config, configSeed, sourcePx])
 
   const portraitClassName = useMemo(
     () =>
@@ -102,31 +63,31 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
   )
 
   return (
-    <div className={portraitClassName}>
-      {/* 1. Internal Radial Light Gathering (Benthic Core Flare) */}
+    <div
+      className={portraitClassName}
+      data-testid="lobster-avatar-portrait"
+      data-slot="portrait"
+    >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(0,195,255,0.2)_0%,rgba(0,195,255,0.05)_55%,transparent_75%)] pointer-events-none z-0" />
 
-      {/* 2. Character Display (Sprite + Idle Animation + Eye Tracking + Fisheye Curvature) */}
-      {dataUri ? (
+      {portraitUrl ? (
         <div
           data-testid="portrait-fisheye-container"
           className={`relative z-10 w-full h-full flex items-center justify-center overflow-hidden ${
             fisheyeLens ? 'scale-[1.06] [filter:url(#benthic-fisheye-disp)]' : ''
           }`}
         >
-          <LobsterAvatarDisplay
-            src={dataUri}
+          <img
+            src={portraitUrl}
             alt={alt}
-            pixelResolution={64}
-            outputSize={size}
-            maskRadial={false}
-            animationSeed={resolvedSeed}
-            texture={configTexture}
-            containerClassName={`relative w-full h-full flex items-start justify-center overflow-hidden ${
+            width={sourcePx}
+            height={sourcePx}
+            loading={loading}
+            decoding="async"
+            data-testid="lobster-avatar-portrait-image"
+            className={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] [image-rendering:pixelated] [image-rendering:crisp-edges] ${
               interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
             }`}
-            className="w-full h-full overflow-hidden"
-            imgClassName={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] ${PORTRAIT_FACE_CLASSES}`}
           />
         </div>
       ) : (
@@ -140,15 +101,12 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
         </div>
       )}
 
-      {/* 2.5. Optical Fisheye Barrel Distortion & Chromatic Ring (Spherical Lens Curvature) */}
       {fisheyeLens && (
         <>
-          {/* Spherical Bulge / Optical Dome Magnification Ring */}
           <div
             data-testid="portrait-fisheye-dome"
             className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.06)_0%,rgba(0,195,255,0.04)_42%,transparent_68%)] pointer-events-none z-15 mix-blend-screen"
           />
-          {/* Chromatic Edge Aberration Fringe (Cyan / Magenta Lens Dispersion Ring) */}
           <div
             data-testid="portrait-fisheye-chromatic"
             className="absolute inset-0 rounded-full border-[1.5px] border-cyan-400/20 shadow-[inset_0_0_18px_rgba(0,195,255,0.22),0_0_14px_rgba(255,0,128,0.14)] pointer-events-none z-15 mix-blend-screen"
@@ -156,7 +114,6 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
         </>
       )}
 
-      {/* 3. Spherical Lens Vignette (Darkens sprite perimeter inside glass bubble) */}
       {vignette && (
         <div
           data-testid="portrait-lens-vignette"
@@ -164,24 +121,19 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
         />
       )}
 
-      {/* 4. Convex Optical Glass Specular Arc & Crest Highlight */}
       {specularSheen && (
         <>
-          {/* Top Crescent Specular Reflection */}
           <div
             data-testid="portrait-lens-sheen"
             className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.32)_0%,rgba(0,195,255,0.15)_35%,transparent_70%)] pointer-events-none z-20"
           />
-          {/* Crisp Hairline Specular Reflection (Top Crest) */}
           <div className="absolute top-0 inset-x-8 sm:inset-x-12 h-[1.5px] rounded-t-full bg-gradient-to-r from-transparent via-white/90 to-transparent pointer-events-none z-30" />
         </>
       )}
 
-      {/* 5. Micro-Fine Optical Refraction Lip (Bottom Caustic Catch) */}
       <div className="absolute bottom-0 inset-x-10 sm:inset-x-14 h-[1.5px] rounded-b-full bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none z-30" />
       <div className="absolute bottom-0 inset-x-0 h-1/4 rounded-b-full bg-[radial-gradient(ellipse_at_50%_100%,rgba(0,195,255,0.18)_0%,transparent_70%)] pointer-events-none z-20" />
 
-      {/* 6. Concentric Optical Glass Bezel Inset */}
       <div
         data-testid="portrait-lens-bezel"
         className="absolute inset-[1px] rounded-full border border-white/[0.08] pointer-events-none z-20"

@@ -60,6 +60,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
 }) => {
   const animatedRef = useRef<HTMLDivElement>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
+  const [documentHidden, setDocumentHidden] = useState(false)
 
   useEffect(() => {
     const media = window.matchMedia?.('(prefers-reduced-motion: reduce)')
@@ -70,7 +71,15 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
     return () => media.removeEventListener?.('change', sync)
   }, [])
 
-  const useAnimatedSvg = animated && !reducedMotion && src.startsWith('data:image/svg+xml')
+  useEffect(() => {
+    const sync = () => setDocumentHidden(document.hidden)
+    sync()
+    document.addEventListener('visibilitychange', sync)
+    return () => document.removeEventListener('visibilitychange', sync)
+  }, [])
+
+  const useAnimatedSvg =
+    animated && !reducedMotion && !documentHidden && src.startsWith('data:image/svg+xml')
 
   const animatedSvgMarkup = useMemo(() => {
     if (!useAnimatedSvg) return null

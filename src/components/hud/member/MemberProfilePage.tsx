@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Users, Shield, Calendar } from 'lucide-react'
-import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
+import { LobsterAvatarFullBody } from '@/components/hud/LobsterAvatarFullBody'
 import { LoadoutStatsPanel } from '@/components/hud/chassis/LoadoutStatsPanel'
 import { ReadOnlyPaperDoll } from './ReadOnlyPaperDoll'
 import { FriendRequestButton } from './FriendRequestButton'
@@ -114,9 +114,9 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       <div className="relative overflow-hidden rounded-sm border border-[#3a4a49] border-l-4 border-l-[#00c3ff] bg-gradient-to-br from-[#0a1214] via-[#071012] to-[#050808] p-4 sm:p-5 shadow-2xl chamfer-corner">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
-          <LobsterAvatarPortrait
+          <LobsterAvatarFullBody
             config={(profile.avatarConfig as LobsterAvatarConfig | null) ?? null}
-            className="w-28 h-28 sm:w-36 sm:h-36 shrink-0"
+            className="w-28 sm:w-36 shrink-0 aspect-[4/5]"
             size={256}
           />
           <div className="min-w-0 flex-1 space-y-2">
