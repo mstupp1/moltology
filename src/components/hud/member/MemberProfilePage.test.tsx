@@ -140,4 +140,21 @@ describe('MemberProfilePage', () => {
     expect(screen.getByText('Early questioner')).toBeInTheDocument()
     expect(screen.getByText('Learning from Architect Vaelen')).toBeInTheDocument()
   })
+
+  it('mounts the animated full-body slot instead of a list portrait', async () => {
+    mockGetPublicProfile.mockResolvedValue({
+      ...claimedProfile,
+      avatarConfig: { style: 'critters', seed: 'claw_lord' },
+    })
+
+    render(<MemberProfilePage profileId="member-a" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('lobster-avatar-full-body')).toBeInTheDocument()
+    })
+    expect(screen.queryByTestId('lobster-avatar-portrait')).toBeNull()
+    await waitFor(() => {
+      expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
+    })
+  })
 })

@@ -2,9 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import {
   LOBSTER_AVATAR_STYLE,
-  generateLobsterAvatarDataUri,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
+import {
+  pickLobsterAvatarSlot,
+  portraitSourcePxForCssPx,
+  resolveLobsterAvatarAssets,
+} from '@/lib/lobster-avatar-slots'
 
 export type ForumAvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -33,6 +37,8 @@ export interface ForumAvatarProps {
   className?: string
   /** Accessible alt text */
   alt?: string
+  /** Lazy-load below the fold. Eager is OK for the signed-in author's own composer face. */
+  loading?: 'lazy' | 'eager'
 }
 
 /** Check if src is an actual valid image URL rather than an empty placeholder or broken default */
@@ -50,8 +56,7 @@ function isValidCustomImageUrl(url?: string | null): boolean {
 /**
  * ForumAvatar:
  * Renders an author's custom profile picture (SSO / external image) if available,
- * or gracefully falls back to a close-up still of the user lobster character avatar SVG
- * focused on their face.
+ * or the static lobster portrait slot. Never mounts an animated full-body.
  */
 export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
   src,
@@ -62,6 +67,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
   size = 'md',
   className,
   alt,
+  loading = 'lazy',
 }) => {
   const [imageError, setImageError] = useState(false)
 
@@ -73,8 +79,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
 
   const displayAlt = alt ?? authorName ?? 'Author avatar'
 
-  const lobsterDataUri = useMemo(() => {
-    // If we have a working custom image, defer SVG generation unless needed
+  const lobsterPortraitUrl = useMemo(() => {
     if (hasCustomImage && !imageError) return null
 
     const effectiveSeed =
@@ -84,7 +89,7 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
       userId?.trim() ||
       'larva-unit'
 
-    return generateLobsterAvatarDataUri(
+    const assets = resolveLobsterAvatarAssets(
       {
         style: avatarConfig?.style || LOBSTER_AVATAR_STYLE,
         seed: effectiveSeed,
@@ -104,8 +109,10 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
         ...(avatarConfig?.backgroundMotion ? { backgroundMotion: avatarConfig.backgroundMotion } : {}),
         ...(avatarConfig?.transparentBackground ? { transparentBackground: avatarConfig.transparentBackground } : {}),
       },
-      128
+      { portraitSize: portraitSourcePxForCssPx(64) }
     )
+    const picked = pickLobsterAvatarSlot(assets, 'portrait')
+    return picked?.slot === 'portrait' ? picked.url : null
   }, [hasCustomImage, imageError, avatarConfig, authorHandle, authorName, userId])
 
   return (
@@ -122,15 +129,20 @@ export const ForumAvatar: React.FC<ForumAvatarProps> = React.memo(({
           src={src!}
           alt={displayAlt}
           className="w-full h-full object-cover rounded-full"
+          loading={loading}
+          decoding="async"
           onError={() => setImageError(true)}
           data-testid="forum-avatar-custom-image"
         />
       ) : (
         <img
-          src={lobsterDataUri ?? ''}
+          src={lobsterPortraitUrl ?? ''}
           alt={displayAlt}
-          className="w-full h-full object-cover rounded-full scale-[1.45] origin-[center_36%]"
+          className="w-full h-full object-cover rounded-full"
+          loading={loading}
+          decoding="async"
           data-testid="forum-avatar-lobster-still"
+          data-slot="portrait"
         />
       )}
     </div>

@@ -168,6 +168,7 @@ export const ReplyComposer = forwardRef<
                 userId={userId}
                 size="xs"
                 className="w-4 h-4 ring-1 ring-[#3a4a49]"
+                loading="eager"
               />
               <span className="truncate">
                 as <strong className="text-[#dfe3e3]">{user.name || 'Initiate'}</strong>

@@ -1,9 +1,36 @@
 import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { CharacterCreationStep } from './CharacterCreationStep'
+import { resetLobsterFullBodyMotionForTests } from '@/lib/lobster-avatar-slots'
+
+function mockMatchMedia() {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  })
+}
 
 describe('CharacterCreationStep', () => {
+  beforeEach(() => {
+    resetLobsterFullBodyMotionForTests()
+    mockMatchMedia()
+  })
+
+  afterEach(() => {
+    resetLobsterFullBodyMotionForTests()
+  })
+
   it('renders view-only seed number and does not render height slider', () => {
     const onBack = vi.fn()
     const onComplete = vi.fn()
@@ -50,5 +77,22 @@ describe('CharacterCreationStep', () => {
     // Seed should have changed from initial
     expect(seedEl.textContent).not.toBe('larva-fixed-seed')
     expect(seedEl.textContent).toMatch(/^larva-/)
+  })
+
+  it('mounts one animated full-body and no list portrait', async () => {
+    render(
+      <CharacterCreationStep
+        initialSeed="larva-motion-seed"
+        onBack={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByTestId('lobster-avatar-full-body')).toBeInTheDocument()
+    expect(screen.queryByTestId('lobster-avatar-portrait')).toBeNull()
+    await waitFor(() => {
+      expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
+    })
+    expect(screen.getAllByTestId('lobster-avatar-inline-svg')).toHaveLength(1)
   })
 })

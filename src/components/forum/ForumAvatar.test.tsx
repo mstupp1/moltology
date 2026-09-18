@@ -34,8 +34,12 @@ describe('ForumAvatar', () => {
     const lobsterImg = screen.getByTestId('forum-avatar-lobster-still')
     expect(lobsterImg).toBeInTheDocument()
     expect(lobsterImg.getAttribute('src')?.startsWith('data:image/svg+xml')).toBe(true)
-    expect(lobsterImg.className).toContain('scale-[1.45]')
-    expect(lobsterImg.className).toContain('origin-[center_36%]')
+    expect(lobsterImg).toHaveAttribute('data-slot', 'portrait')
+    expect(lobsterImg.className).not.toContain('scale-[')
+    expect(lobsterImg.className).not.toContain('origin-[')
+    expect(decodeURIComponent(lobsterImg.getAttribute('src') ?? '')).toContain('data-avatar-slot="portrait"')
+    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
+    expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
   })
 
   it('falls back to lobster SVG still when src is /images/stage1_larva.png', () => {
