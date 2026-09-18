@@ -4,7 +4,7 @@ import '@/index.css'
 import { SITE_ORIGIN, buildJsonLd, notFoundSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 import {
   isPublicDocumentCachePath,
-  PUBLIC_DOCUMENT_CACHE_CONTROL,
+  publicDocumentCacheHeaders,
 } from '@/lib/public-document-cache'
 import { HUDErrorBoundary, HUDErrorFallback } from '@/components/hud/HUDErrorBoundary'
 import { ToastProvider } from '@/components/ui/ToastProvider'
@@ -70,9 +70,7 @@ export const Route = createRootRoute({
     const isProduction = process.env.NODE_ENV === 'production'
     const pathname = matches[matches.length - 1]?.pathname
     if (isProduction && isPublicDocumentCachePath(pathname)) {
-      return {
-        'Cache-Control': PUBLIC_DOCUMENT_CACHE_CONTROL,
-      }
+      return publicDocumentCacheHeaders()
     }
     if (!isProduction) {
       return {

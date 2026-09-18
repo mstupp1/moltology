@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
+import { AUTH_SESSION_COOKIE_CACHE } from './auth-config'
 import {
   ACCOUNT_LINKING_OPTIONS,
   auth,
@@ -17,6 +18,13 @@ describe('auth-server', () => {
     expect(auth.api.signInEmail).toBeDefined()
     expect(auth.api.signOut).toBeDefined()
     expect(auth.api.getSession).toBeDefined()
+  })
+
+  it('caches session data in a signed cookie so get-session can skip Neon', () => {
+    const options = (auth as { options?: { session?: { cookieCache?: { enabled?: boolean; maxAge?: number } } } })
+      .options
+    expect(options?.session?.cookieCache?.enabled).toBe(true)
+    expect(options?.session?.cookieCache?.maxAge).toBe(AUTH_SESSION_COOKIE_CACHE.maxAge)
   })
 
   it('reflects whether Google social is configured from environment credentials', () => {
