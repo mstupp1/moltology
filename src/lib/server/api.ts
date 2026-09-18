@@ -40,8 +40,9 @@ export const getUserProfileFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data?: { token?: string; userId?: string }) => data ?? {})
   .handler(async (args) => {
-    const { getUserProfileHandler } = await import('./db-services')
-    return getUserProfileHandler(args)
+    const mod = await import('./db-services')
+    const handler = mod.getUserProfileHandler ?? (mod as any).default?.getUserProfileHandler
+    return handler(args)
   })
 
 const claimMemberHandleSchema = z.object({

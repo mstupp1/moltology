@@ -1,7 +1,5 @@
 import { z } from 'zod'
 import type { JWTPayload } from 'jose'
-import { createServerFn } from '@tanstack/react-start'
-import { loggingOnlyMiddleware, publicMiddleware } from './functions'
 import {
   DISABLED_REMOTE_INBOX_MARK_READ,
   isRemoteInboxEnabled,
@@ -216,9 +214,6 @@ export const getPublicChangelogsHandler = async ({ context }: ServerFnArgs) => {
   }
 }
 
-export const getPublicChangelogsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .handler(getPublicChangelogsHandler)
 
 /**
  * Server Function: Get a single published changelog entry by its slug.
@@ -242,16 +237,12 @@ export const getChangelogBySlugHandler = async ({ data, context }: ServerFnArgs<
   }
 }
 
-export const getChangelogBySlugFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: string) => z.string().min(1).parse(data))
-  .handler(getChangelogBySlugHandler)
 
 /**
  * Server Function: Get authenticated user profile.
  * Accepts optional Neon JWT in `data.token` when cookies are unavailable.
  */
-export const getUserProfileHandler = async ({ data, context }: ServerFnArgs<{ token?: string; userId?: string }>) => {
+export async function getUserProfileHandler({ data, context }: ServerFnArgs<{ token?: string; userId?: string }>) {
   const auth = await resolveWriteAuth({ data, context, requireAuth: false })
   if (!auth) return null
 
@@ -267,10 +258,6 @@ export const getUserProfileHandler = async ({ data, context }: ServerFnArgs<{ to
   return profileRecord || null
 }
 
-export const getUserProfileFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string }) => data ?? {})
-  .handler(getUserProfileHandler)
 
 const claimMemberHandleSchema = z.object({
   handle: z.string(),
@@ -338,10 +325,6 @@ export async function claimMemberHandleHandler({
   }
 }
 
-export const claimMemberHandleFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: ClaimMemberHandleInput) => claimMemberHandleSchema.parse(data))
-  .handler(claimMemberHandleHandler)
 
 /**
  * Server Function: Get authenticated user stats.
@@ -359,10 +342,6 @@ export const getUserStatsHandler = async ({ data, context }: ServerFnArgs<{ toke
   return stats || null
 }
 
-export const getUserStatsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: { token?: string }) => data ?? {})
-  .handler(getUserStatsHandler)
 
 interface UserStatsInput {
   pincerTorque?: number
@@ -406,27 +385,6 @@ export const updateUserStatsHandler = async ({ data, context }: ServerFnArgs<Use
   return updated
 }
 
-export const updateUserStatsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: UserStatsInput) => {
-    return z
-      .object({
-        pincerTorque: z.number().min(0).max(100).optional(),
-        shellHardness: z.number().min(0).max(100).optional(),
-        processingPower: z.number().min(0).max(100).optional(),
-        durability: z.number().min(0).max(100).optional(),
-        clawStrength: z.number().min(0).max(100).optional(),
-        socialDetachmentIndex: z.number().min(0).max(100).optional(),
-        submergenceDepthRating: z.number().min(0).max(100000).optional(),
-        moltmaxScore: z.number().int().min(12).max(99).optional(),
-        moltmaxClearance: z.string().min(1).max(10).optional(),
-        moltmaxStage: z.string().min(1).max(100).optional(),
-        moltmaxDimensionScores: z.record(z.string(), z.number().min(0).max(100)).optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(updateUserStatsHandler)
 
 interface GetAssetUrlInput {
   key: string
@@ -444,17 +402,6 @@ export const getS3AssetUrlHandler = async ({ data }: ServerFnArgs<GetAssetUrlInp
   return { url }
 }
 
-export const getS3AssetUrlFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: GetAssetUrlInput) => {
-    return z
-      .object({
-        key: z.string().min(1),
-        expiresIn: z.number().min(60).max(86400).optional(),
-      })
-      .parse(data)
-  })
-  .handler(getS3AssetUrlHandler)
 
 interface GetAIThreadsInput {
   userId?: string
@@ -477,12 +424,6 @@ export const getAIThreadsHandler = async ({ data, context }: ServerFnArgs<GetAIT
   }
 }
 
-export const getAIThreadsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: GetAIThreadsInput) => {
-    return z.object({ userId: z.string().optional() }).optional().parse(data || {})
-  })
-  .handler(getAIThreadsHandler)
 
 interface GetAIMessagesInput {
   threadId: string
@@ -514,17 +455,6 @@ export const getAIMessagesHandler = async ({ data, context }: ServerFnArgs<GetAI
   }
 }
 
-export const getAIMessagesFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: GetAIMessagesInput) => {
-    return z
-      .object({
-        threadId: z.string().min(1),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(getAIMessagesHandler)
 
 interface CreateAIThreadInput {
   title?: string
@@ -546,18 +476,6 @@ export const createAIThreadHandler = async ({ data, context }: ServerFnArgs<Crea
   })
 }
 
-export const createAIThreadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: CreateAIThreadInput) => {
-    return z
-      .object({
-        title: z.string().optional(),
-        persona: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(createAIThreadHandler)
 
 const serializeAIThread = (thread: any) =>
   thread
@@ -592,18 +510,6 @@ export const pinAIThreadHandler = async ({
   return { thread: serializeAIThread(thread) }
 }
 
-export const pinAIThreadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: MutateAIThreadInput & { pinned: boolean }) => {
-    return z
-      .object({
-        threadId: z.string().min(1),
-        pinned: z.boolean(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(pinAIThreadHandler)
 
 /**
  * Server Function: Archive or unarchive an AI conversation thread.
@@ -621,18 +527,6 @@ export const archiveAIThreadHandler = async ({
   return { thread: serializeAIThread(thread) }
 }
 
-export const archiveAIThreadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: MutateAIThreadInput & { archived: boolean }) => {
-    return z
-      .object({
-        threadId: z.string().min(1),
-        archived: z.boolean(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(archiveAIThreadHandler)
 
 /**
  * Server Function: Rename an AI conversation thread.
@@ -650,18 +544,6 @@ export const renameAIThreadHandler = async ({
   return { thread: serializeAIThread(thread) }
 }
 
-export const renameAIThreadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: MutateAIThreadInput & { title: string }) => {
-    return z
-      .object({
-        threadId: z.string().min(1),
-        title: z.string().min(1).max(120),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(renameAIThreadHandler)
 
 /**
  * Server Function: Permanently delete an AI conversation thread (messages cascade).
@@ -676,17 +558,6 @@ export const deleteAIThreadHandler = async ({ data, context }: ServerFnArgs<Muta
   return { ok: true }
 }
 
-export const deleteAIThreadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: MutateAIThreadInput) => {
-    return z
-      .object({
-        threadId: z.string().min(1),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(deleteAIThreadHandler)
 
 interface SendChatMessageInput {
   messages: Array<{ role: string; content?: string; text?: string }>
@@ -816,26 +687,6 @@ export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<Sen
   }
 }
 
-export const sendChatMessageFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: SendChatMessageInput) => {
-    return z
-      .object({
-        messages: z.array(
-          z.object({
-            role: z.string(),
-            content: z.string().optional(),
-            text: z.string().optional(),
-          })
-        ),
-        userId: z.string().optional(),
-        threadId: z.string().optional(),
-        model: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(sendChatMessageHandler)
 
 /**
  * Server Function: Get all published blog posts from database or fallback to seed data.
@@ -876,9 +727,6 @@ export const getBlogPostsHandler = async ({ context }: ServerFnArgs) => {
   return INITIAL_BLOG_POSTS
 }
 
-export const getBlogPostsFn = createServerFn({ method: 'GET' })
-  .middleware(publicMiddleware)
-  .handler(getBlogPostsHandler)
 
 /**
  * Server Function: Get single blog post by slug.
@@ -923,10 +771,6 @@ export const getBlogPostBySlugHandler = async ({ data: slug, context }: ServerFn
   return fallback ?? null
 }
 
-export const getBlogPostBySlugFn = createServerFn({ method: 'GET' })
-  .middleware(publicMiddleware)
-  .validator((slug: string) => slug)
-  .handler(getBlogPostBySlugHandler)
 
 /**
  * Server Function: Increment blog post view count.
@@ -956,10 +800,6 @@ export const incrementBlogPostViewsHandler = async ({ data: slug, context }: Ser
   return null
 }
 
-export const incrementBlogPostViewsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((slug: string) => slug)
-  .handler(incrementBlogPostViewsHandler)
 
 export interface BlogCommentEntry {
   id: string
@@ -1025,10 +865,6 @@ export const getBlogCommentsHandler = async ({ data: postId, context }: ServerFn
   }
 }
 
-export const getBlogCommentsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((postId: string) => postId)
-  .handler(getBlogCommentsHandler)
 
 /**
  * Server Function: Create a blog comment (Authenticated registered users only).
@@ -1110,20 +946,6 @@ export const createBlogCommentHandler = async ({ data, context }: ServerFnArgs<C
   }
 }
 
-export const createBlogCommentFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: CreateBlogCommentInput) => {
-    return z
-      .object({
-        postId: z.string().min(1),
-        content: z.string().min(3).max(1000),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-        turnstileToken: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(createBlogCommentHandler)
 
 
 // ==========================================
@@ -1418,16 +1240,6 @@ export const getForumCategoryBySlugHandler = async ({
   }
 }
 
-export const getForumCategoryBySlugFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { slug: string; userId?: string; token?: string }) =>
-    z.object({
-      slug: z.string().min(1),
-      userId: z.string().optional(),
-      token: z.string().optional(),
-    }).parse(data),
-  )
-  .handler(getForumCategoryBySlugHandler)
 
 export interface GetForumCategoriesInput {
   userId?: string
@@ -1507,18 +1319,6 @@ export const getForumCategoriesHandler = async ({
   }
 }
 
-export const getForumCategoriesFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: GetForumCategoriesInput) =>
-    z
-      .object({
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .optional()
-      .parse(data || {}),
-  )
-  .handler(getForumCategoriesHandler)
 
 export interface GetForumTopicsInput {
   categorySlug?: string
@@ -1676,21 +1476,6 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
   }
 }
 
-export const getForumTopicsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: GetForumTopicsInput) => {
-    return z
-      .object({
-        categorySlug: z.string().optional(),
-        query: z.string().optional(),
-        sortBy: z.enum(['latest', 'top', 'active', 'hot']).optional(),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .optional()
-      .parse(data || {})
-  })
-  .handler(getForumTopicsHandler)
 
 export interface GetForumTopicDetailInput {
   slugOrId: string
@@ -1874,20 +1659,6 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
   }
 }
 
-export const getForumTopicDetailFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: GetForumTopicDetailInput) => {
-    return z
-      .object({
-        slugOrId: z.string().min(1),
-        categorySlug: z.string().optional(),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-        trackView: z.boolean().optional(),
-      })
-      .parse(data)
-  })
-  .handler(getForumTopicDetailHandler)
 
 export interface CreateForumTopicInput {
   categoryId: string
@@ -2013,20 +1784,6 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
   }
 }
 
-export const createForumTopicFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: CreateForumTopicInput) => {
-    return z
-      .object({
-        categoryId: z.string().min(1),
-        title: z.string().min(5).max(150),
-        content: z.string().min(10).max(10000),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(createForumTopicHandler)
 
 export interface CreateForumPostInput {
   topicId: string
@@ -2234,20 +1991,6 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   }
 }
 
-export const createForumPostFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: CreateForumPostInput) => {
-    return z
-      .object({
-        topicId: z.string().min(1),
-        content: z.string().min(10).max(10000),
-        parentId: z.string().min(1).nullable().optional(),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(createForumPostHandler)
 
 export interface UpdateForumTopicInput {
   topicId: string
@@ -2388,20 +2131,6 @@ export const updateForumTopicHandler = async ({
   }
 }
 
-export const updateForumTopicFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: UpdateForumTopicInput) => {
-    return z
-      .object({
-        topicId: z.string().min(1),
-        title: z.string().min(5).max(150),
-        content: z.string().min(10).max(10000),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(updateForumTopicHandler)
 
 /**
  * Server Function: Author revises their own reply. Mentions re-render from the new body.
@@ -2500,19 +2229,6 @@ export const updateForumPostHandler = async ({
   }
 }
 
-export const updateForumPostFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: UpdateForumPostInput) => {
-    return z
-      .object({
-        postId: z.string().min(1),
-        content: z.string().min(10).max(10000),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(updateForumPostHandler)
 
 /**
  * Server Function: Author soft-deletes their own topic (tombstone; replies stay).
@@ -2584,18 +2300,6 @@ export const deleteForumTopicHandler = async ({
   }
 }
 
-export const deleteForumTopicFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: DeleteForumTopicInput) => {
-    return z
-      .object({
-        topicId: z.string().min(1),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(deleteForumTopicHandler)
 
 /**
  * Server Function: Author soft-deletes their own reply (tombstone; children stay).
@@ -2657,18 +2361,6 @@ export const deleteForumPostHandler = async ({
   }
 }
 
-export const deleteForumPostFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: DeleteForumPostInput) => {
-    return z
-      .object({
-        postId: z.string().min(1),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(deleteForumPostHandler)
 
 export interface CreateForumReportInput {
   topicId?: string
@@ -3110,18 +2802,6 @@ export const toggleForumTopicVoteHandler = async ({ data, context }: ServerFnArg
   return { upvotes: newCount, voted: true }
 }
 
-export const toggleForumTopicVoteFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: ToggleForumVoteInput) => {
-    return z
-      .object({
-        topicId: z.string().min(1),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(toggleForumTopicVoteHandler)
 
 /**
  * Server Function: Toggle an upvote on a reply (one vote per user).
@@ -3169,18 +2849,6 @@ export const toggleForumPostVoteHandler = async ({ data, context }: ServerFnArgs
   return { upvotes: newCount, voted: true }
 }
 
-export const toggleForumPostVoteFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: ToggleForumVoteInput) => {
-    return z
-      .object({
-        postId: z.string().min(1),
-        userId: z.string().optional(),
-        token: z.string().optional(),
-      })
-      .parse(data)
-  })
-  .handler(toggleForumPostVoteHandler)
 
 // Lead Capture & Field Manual Decryption API
 const submitLeadSchema = z.object({
@@ -3276,10 +2944,6 @@ export async function submitLeadHandler(args: ServerFnArgs<SubmitLeadInput>) {
   }
 }
 
-export const submitLeadFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: SubmitLeadInput) => submitLeadSchema.parse(data))
-  .handler(submitLeadHandler)
 
 // User Email Communication Preferences API
 const updateEmailPreferencesSchema = z.object({
@@ -3317,10 +2981,6 @@ export async function updateEmailPreferencesHandler({ data, context }: ServerFnA
   }
 }
 
-export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: UpdateEmailPreferencesInput) => updateEmailPreferencesSchema.parse(data))
-  .handler(updateEmailPreferencesHandler)
 
 // Lobster avatar (DiceBear) preferences
 const lobsterAvatarConfigSchema = z.object({
@@ -3442,10 +3102,6 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
   }
 }
 
-export const saveLobsterAvatarFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: SaveLobsterAvatarInput) => lobsterAvatarConfigSchema.parse(data))
-  .handler(saveLobsterAvatarHandler)
 
 const clearLobsterAvatarSchema = z.object({
   token: z.string().optional(),
@@ -3470,10 +3126,6 @@ export async function clearLobsterAvatarHandler({ data, context }: ServerFnArgs<
   return { success: true }
 }
 
-export const clearLobsterAvatarFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: ClearLobsterAvatarInput) => clearLobsterAvatarSchema.parse(data))
-  .handler(clearLobsterAvatarHandler)
 
 export interface GetDailyAlignmentInput {
   date?: string
@@ -3857,15 +3509,7 @@ export const toggleDailyAlignmentTaskHandler = async ({
   return result
 }
 
-export const getDailyAlignmentFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: GetDailyAlignmentInput) => getDailyAlignmentSchema.parse(data || {}))
-  .handler(getDailyAlignmentHandler)
 
-export const toggleDailyAlignmentTaskFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: ToggleDailyAlignmentInput) => toggleDailyAlignmentSchema.parse(data))
-  .handler(toggleDailyAlignmentTaskHandler)
 
 export interface GetActivityEventsInput {
   userId?: string
@@ -3894,10 +3538,6 @@ export const getActivityEventsHandler = async ({
   }
 }
 
-export const getActivityEventsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: GetActivityEventsInput) => getActivityEventsSchema.parse(data || {}))
-  .handler(getActivityEventsHandler)
 
 export interface GetActivityFeedInput {
   userId?: string
@@ -4077,17 +3717,6 @@ export const getChassisLoadoutHandler = async ({
   return loadChassisPayload(auth.dbClient, auth.userId)
 }
 
-export const getChassisLoadoutFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string }) =>
-    z
-      .object({
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data ?? {})
-  )
-  .handler(getChassisLoadoutHandler)
 
 const moveGearTargetSchema = z.discriminatedUnion('type', [
   z.object({
@@ -4154,19 +3783,6 @@ export const moveGearItemHandler = async ({ data, context }: ServerFnArgs<MoveGe
   return loadChassisPayload(dbClient, userId)
 }
 
-export const moveGearItemFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: MoveGearItemInput) =>
-    z
-      .object({
-        itemId: z.string().uuid(),
-        target: moveGearTargetSchema,
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(moveGearItemHandler)
 
 // ─── Public profiles & connections ───────────────────────────────────────────
 
@@ -4556,18 +4172,6 @@ export const getPublicProfileHandler = async ({
   }
 }
 
-export const getPublicProfileFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { profileId: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        profileId: z.string().min(1),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(getPublicProfileHandler)
 
 export const getMemberLoadoutHandler = async ({
   data,
@@ -4583,18 +4187,6 @@ export const getMemberLoadoutHandler = async ({
   return loadMemberEquippedLoadout(auth.dbClient, exists.id)
 }
 
-export const getMemberLoadoutFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { profileId: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        profileId: z.string().min(1),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(getMemberLoadoutHandler)
 
 export const searchMembersHandler = async ({
   data,
@@ -4652,18 +4244,6 @@ export const searchMembersHandler = async ({
   return rankMemberSearchResults(query, mapped)
 }
 
-export const searchMembersFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { query: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        query: z.string().min(1).max(80),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(searchMembersHandler)
 
 export const sendFriendRequestHandler = async ({
   data,
@@ -4722,18 +4302,6 @@ export const sendFriendRequestHandler = async ({
   return { requestId: created.id, status: created.status as string }
 }
 
-export const sendFriendRequestFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { recipientId: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        recipientId: z.string().min(1),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(sendFriendRequestHandler)
 
 export const respondFriendRequestHandler = async ({
   data,
@@ -4839,19 +4407,6 @@ export const respondFriendRequestHandler = async ({
   return { requestId: request.id, status: nextStatus }
 }
 
-export const respondFriendRequestFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { requestId: string; action: 'accept' | 'reject'; token?: string; userId?: string }) =>
-    z
-      .object({
-        requestId: z.string().uuid(),
-        action: z.enum(['accept', 'reject']),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(respondFriendRequestHandler)
 
 export const cancelFriendRequestHandler = async ({
   data,
@@ -4883,18 +4438,6 @@ export const cancelFriendRequestHandler = async ({
   return { requestId: request.id, status: 'cancelled' as const }
 }
 
-export const cancelFriendRequestFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { requestId: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        requestId: z.string().uuid(),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(cancelFriendRequestHandler)
 
 export const removeConnectionHandler = async ({
   data,
@@ -4913,18 +4456,6 @@ export const removeConnectionHandler = async ({
   return { ok: true as const }
 }
 
-export const removeConnectionFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { friendId: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        friendId: z.string().min(1),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(removeConnectionHandler)
 
 /** Ranking matches `rankSynapticNearby`: same stage, then ±1, then fill; recency; newer account; xp. */
 async function selectSynapticNearby(
@@ -5129,31 +4660,7 @@ export const dismissSynapticNearbyHandler = async ({
   return { ok: true as const }
 }
 
-export const dismissSynapticNearbyFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data: { memberId: string; token?: string; userId?: string }) =>
-    z
-      .object({
-        memberId: z.string().min(1),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(dismissSynapticNearbyHandler)
 
-export const listConnectionsFn = createServerFn({ method: 'POST' })
-  .middleware(publicMiddleware)
-  .validator((data?: { token?: string; userId?: string; includeSuggestions?: boolean }) =>
-    z
-      .object({
-        token: z.string().optional(),
-        userId: z.string().optional(),
-        includeSuggestions: z.boolean().optional(),
-      })
-      .parse(data ?? {})
-  )
-  .handler(listConnectionsHandler)
 
 export const getNotificationsHandler = async (
   { data, context }: ServerFnArgs<{ token?: string; userId?: string; limit?: number }>,
@@ -5211,18 +4718,6 @@ export const getNotificationsHandler = async (
   }
 }
 
-export const getNotificationsFn = createServerFn({ method: 'POST' })
-  .middleware(loggingOnlyMiddleware)
-  .validator((data?: { token?: string; userId?: string; limit?: number }) =>
-    z
-      .object({
-        token: z.string().optional(),
-        userId: z.string().optional(),
-        limit: z.number().int().min(1).max(50).optional(),
-      })
-      .parse(data ?? {})
-  )
-  .handler(getNotificationsHandler)
 
 export const markNotificationReadHandler = async (
   { data, context }: ServerFnArgs<{ notificationId?: string; all?: boolean; token?: string; userId?: string }>,
@@ -5250,17 +4745,4 @@ export const markNotificationReadHandler = async (
   return { ok: true as const }
 }
 
-export const markNotificationReadFn = createServerFn({ method: 'POST' })
-  .middleware(loggingOnlyMiddleware)
-  .validator((data: { notificationId?: string; all?: boolean; token?: string; userId?: string }) =>
-    z
-      .object({
-        notificationId: z.string().uuid().optional(),
-        all: z.boolean().optional(),
-        token: z.string().optional(),
-        userId: z.string().optional(),
-      })
-      .parse(data)
-  )
-  .handler(markNotificationReadHandler)
 
