@@ -43,7 +43,7 @@ export function getAuthJwksUrl(): string {
  * Better Auth client revalidation. Default `refetchOnWindowFocus: true` hits
  * GET `/api/auth/get-session` on every tab focus. Idle signed-in HUD tabs
  * were the remaining Vercel Fluid Active CPU + Neon wake after #138/#139.
- * Mount, sign-in, sign-out, and cross-tab storage events still fetch.
+ * Sign-in, sign-out, OAuth, and cross-tab storage events still fetch.
  */
 export const AUTH_SESSION_CLIENT_OPTIONS = {
   refetchInterval: 0,
@@ -60,6 +60,9 @@ export const AUTH_SESSION_COOKIE_CACHE = {
   enabled: true,
   maxAge: 5 * 60,
 } as const
+
+/** First get-session in a JS context may reuse chrome cache this long. Later fetches hit the network. */
+export const AUTH_SESSION_MOUNT_SHORT_CIRCUIT_MS = AUTH_SESSION_COOKIE_CACHE.maxAge * 1000
 
 /**
  * JWKS private-key heal is for mint/sign paths, not the chatty get-session read.

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   AUTH_SESSION_CLIENT_OPTIONS,
   AUTH_SESSION_COOKIE_CACHE,
+  AUTH_SESSION_MOUNT_SHORT_CIRCUIT_MS,
   authRequestNeedsJwksHeal,
   DEFAULT_AUTH_URL,
   getAuthBaseUrl,
@@ -138,6 +139,7 @@ describe('session CPU gates', () => {
   it('enables a short signed session cookie cache so get-session can skip Neon', () => {
     expect(AUTH_SESSION_COOKIE_CACHE.enabled).toBe(true)
     expect(AUTH_SESSION_COOKIE_CACHE.maxAge).toBe(5 * 60)
+    expect(AUTH_SESSION_MOUNT_SHORT_CIRCUIT_MS).toBe(5 * 60 * 1000)
   })
 
   it('skips JWKS heal on get-session and still runs it on mint/sign paths', () => {
