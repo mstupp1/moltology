@@ -81,8 +81,9 @@ describe('LobsterAvatarFullBody Component', () => {
     expect(screen.getByAltText('Second')).toBeInTheDocument()
   })
 
-  it('renders "No avatar" when config and src are missing', () => {
+  it('renders carapace silhouette with antennae when config and src are missing', () => {
     render(<LobsterAvatarFullBody />)
-    expect(screen.getByText(/No avatar/i)).toBeInTheDocument()
+    expect(screen.getByTestId('lobster-avatar-silhouette')).toBeInTheDocument()
+    expect(screen.queryByText(/No avatar/i)).toBeNull()
   })
 })

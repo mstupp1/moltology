@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Users, Shield, Calendar } from 'lucide-react'
-import { LobsterAvatarFullBody } from '@/components/hud/LobsterAvatarFullBody'
+import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { LoadoutStatsPanel } from '@/components/hud/chassis/LoadoutStatsPanel'
 import { ReadOnlyPaperDoll } from './ReadOnlyPaperDoll'
 import { FriendRequestButton } from './FriendRequestButton'
@@ -10,7 +10,11 @@ import { getAuthJWTToken } from '@/lib/jwt'
 import { getPublicProfileFn, getMemberLoadoutFn } from '@/lib/server/api'
 import type { PublicProfileView } from '@/lib/connections'
 import type { CatalogRef, GearItemState, LoadoutTotals } from '@/lib/chassis-loadout'
-import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
+import {
+  LOBSTER_AVATAR_STYLE,
+  parseLobsterAvatarConfig,
+  type LobsterAvatarConfig,
+} from '@/lib/lobster-avatar'
 import { resolveMemberDossierRedirect } from '@/lib/member-handle'
 
 const STAT_ROWS: Array<{ key: keyof NonNullable<PublicProfileView['stats']>; label: string }> = [
@@ -81,6 +85,26 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     return map
   }, [loadout])
 
+  const effectiveAvatarConfig = useMemo((): LobsterAvatarConfig | undefined => {
+    if (!profile) return undefined
+    const parsed = parseLobsterAvatarConfig(profile.avatarConfig)
+    if (parsed?.seed) return parsed
+
+    if (typeof window !== 'undefined') {
+      try {
+        const stored =
+          localStorage.getItem(`moltology:avatar_config:${profile.id}`) ||
+          localStorage.getItem(`moltology:avatar_config:${profile.larvaId}`)
+        if (stored) {
+          const storedParsed = parseLobsterAvatarConfig(stored)
+          if (storedParsed?.seed) return storedParsed
+        }
+      } catch {}
+    }
+
+    return undefined
+  }, [profile])
+
   if (!loaded) {
     return (
       <div aria-busy="true" aria-live="polite">
@@ -114,10 +138,13 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
     <div className="space-y-3.5 sm:space-y-5 font-sans relative">
       <div className="relative overflow-hidden rounded-sm border border-[#3a4a49] border-l-4 border-l-[#00c3ff] bg-gradient-to-br from-[#0a1214] via-[#071012] to-[#050808] p-4 sm:p-5 shadow-2xl chamfer-corner">
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
-          <LobsterAvatarFullBody
-            config={(profile.avatarConfig as LobsterAvatarConfig | null) ?? null}
-            className="w-28 sm:w-36 shrink-0 aspect-[4/5]"
+          <LobsterAvatarPortrait
+            config={effectiveAvatarConfig}
+            className="w-28 h-28 sm:w-36 sm:h-36 shrink-0"
             size={256}
+            interactive
+            animated
+            loading="eager"
           />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">

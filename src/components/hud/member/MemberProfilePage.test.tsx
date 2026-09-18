@@ -141,20 +141,38 @@ describe('MemberProfilePage', () => {
     expect(screen.getByText('Learning from Architect Vaelen')).toBeInTheDocument()
   })
 
-  it('mounts the animated full-body slot instead of a list portrait', async () => {
+  it('renders circular animated portrait on profile page and avoids square full-body', async () => {
     mockGetPublicProfile.mockResolvedValue({
       ...claimedProfile,
-      avatarConfig: { style: 'critters', seed: 'claw_lord' },
+      avatarConfig: JSON.stringify({ style: 'critters', seed: 'claw-lord-avatar' }),
     })
 
     render(<MemberProfilePage profileId="member-a" />)
 
     await waitFor(() => {
-      expect(screen.getByTestId('lobster-avatar-full-body')).toBeInTheDocument()
+      expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
     })
-    expect(screen.queryByTestId('lobster-avatar-portrait')).toBeNull()
+    expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
     await waitFor(() => {
       expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
     })
+  })
+
+  it('renders uncalibrated carapace silhouette in circular portrait when avatarConfig is null', async () => {
+    mockGetPublicProfile.mockResolvedValue({
+      ...claimedProfile,
+      avatarConfig: null,
+    })
+
+    render(<MemberProfilePage profileId="member-a" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
+    })
+    expect(screen.queryByText(/no avatar/i)).toBeNull()
+    await waitFor(() => {
+      expect(screen.getByTestId('lobster-avatar-silhouette')).toBeInTheDocument()
+    })
+    expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
   })
 })

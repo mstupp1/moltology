@@ -97,6 +97,7 @@ describe('SettingsPage', () => {
     })
 
     expect(screen.getByText('Seed Number')).toBeInTheDocument()
+    expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
     expect(screen.queryByText(/Chassis Height/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^short$/i })).not.toBeInTheDocument()
   })

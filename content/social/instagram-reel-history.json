@@ -1184,6 +1184,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-14T16:15:04.655Z"
+    },
+    {
+      "id": "reel-1789741150012",
+      "topic": "The Floor They Didn't Clear: A Partner That Rolls Beside You",
+      "hookHeadline": "THE TEACHER STAYS IN THE FRAME",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-floor-they-didnt-clear",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Four hundred thousand robots are entering factories worldwide. The viral feeds wanted a walking costume. Real work needs a wheeled partner where the teacher stays in the frame. Equip your cybernetic chassis on moltology.org/chassis.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1789741150012.mp4",
+      "s3Key": "videos/social/reels/master-reel-1789741150012.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 17.2,
+      "status": "queued",
+      "scheduledFor": "2026-09-18T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aad48e4f6c6c6df7d1f0d3e",
+      "zernioYouTubePostId": "6aad48e4f6c6c6df7d1f0d3e",
+      "zernioPostId": "6aad48e4f6c6c6df7d1f0d3e",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment CHASSIS to access the Benthic Equipment Vault in your DMs!\n🔗 Or configure your chassis: moltology.org/chassis\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "The feed loves a humanoid that walks like a costume. But real assembly work needs a wheeled partner where the worker at the station stays the teacher. ⚡🌊\n\nToyota's ELEY is not a stride demo. It rolls on wheels, learns the station from the worker beside it, and arrives with a plan for hundreds of thousands of partners in rebuilt factories.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"CHASSIS\" to get instant access to the Benthic Equipment Vault & loadout builder in your DMs, or visit:\n🔗 Link in bio & story → moltology.org/chassis",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "chassis",
+      "commentTriggerKeyword": "CHASSIS",
+      "commentTriggerUrl": "https://moltology.org/chassis",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-18T14:21:24.643Z"
     }
   ]
 }

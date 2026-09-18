@@ -79,7 +79,7 @@ describe('CharacterCreationStep', () => {
     expect(seedEl.textContent).toMatch(/^larva-/)
   })
 
-  it('mounts one animated full-body and no list portrait', async () => {
+  it('renders circular animated portrait preview and does not mount square full-body', () => {
     render(
       <CharacterCreationStep
         initialSeed="larva-motion-seed"
@@ -88,11 +88,8 @@ describe('CharacterCreationStep', () => {
       />,
     )
 
-    expect(screen.getByTestId('lobster-avatar-full-body')).toBeInTheDocument()
-    expect(screen.queryByTestId('lobster-avatar-portrait')).toBeNull()
-    await waitFor(() => {
-      expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
-    })
-    expect(screen.getAllByTestId('lobster-avatar-inline-svg')).toHaveLength(1)
+    expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
+    expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
+    expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
   })
 })

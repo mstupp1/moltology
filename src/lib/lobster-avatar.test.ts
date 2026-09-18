@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest'
 import {
   generateLobsterAvatarSvg,
   generateLobsterAvatarDataUri,
+  generateLobsterAvatarSilhouetteSvg,
+  generateLobsterAvatarSilhouetteDataUri,
   LOBSTER_PORTRAIT_VIEWBOX,
   getChitinGradientPalette,
   getLobsterAvatarSeededOptions,
@@ -73,6 +75,12 @@ describe('lobster-avatar', () => {
     expect(parseLobsterAvatarConfig({ style: 'adventurer', seed: 'legacy' })).toEqual({
       style: 'critters',
       seed: 'legacy',
+    })
+    expect(
+      parseLobsterAvatarConfig(JSON.stringify({ style: 'critters', seed: 'serialized-json' }))
+    ).toEqual({
+      style: 'critters',
+      seed: 'serialized-json',
     })
     expect(parseLobsterAvatarConfig(null)).toBeNull()
   })
@@ -831,6 +839,34 @@ describe('lobster-avatar', () => {
       expect(customSvg).toContain('data-arm-scale="1.3"')
       expect(customSvg).toContain('id="lobster-arm-left-scale" transform="translate(34, 80) scale(1.3) translate(-34, -80)"')
       expect(customSvg).toContain('id="lobster-claw-left-scale" transform="translate(34, 80) scale(1.3) translate(-34, -80)"')
+    })
+  })
+
+  describe('generateLobsterAvatarSilhouetteSvg', () => {
+    it('generates canonical portrait silhouette SVG matching avatar system geometry', () => {
+      const svg = generateLobsterAvatarSilhouetteSvg({ frame: 'portrait', size: 128 })
+      expect(svg).toBeTruthy()
+      expect(svg).toContain(`viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`)
+      expect(svg).toContain('data-avatar-slot="portrait"')
+      expect(svg).toContain('data-avatar-silhouette="true"')
+      expect(svg).toContain('width="128"')
+      expect(svg).toContain('height="128"')
+      // Contains antennae whips and beacons
+      expect(svg).toContain('sil-beacon-glow')
+      expect(svg).toContain('sil-benthic-grad')
+    })
+
+    it('generates portrait silhouette SVG consistently across frame options', () => {
+      const svg = generateLobsterAvatarSilhouetteSvg({ frame: 'fullBody' })
+      expect(svg).toBeTruthy()
+      expect(svg).toContain(`viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`)
+      expect(svg).toContain('data-avatar-slot="portrait"')
+    })
+
+    it('generates valid silhouette data URI', () => {
+      const uri = generateLobsterAvatarSilhouetteDataUri({ frame: 'portrait' })
+      expect(uri).toMatch(/^data:image\/svg\+xml;charset=utf-8,/)
+      expect(decodeURIComponent(uri)).toContain('data-avatar-silhouette="true"')
     })
   })
 })

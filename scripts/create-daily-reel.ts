@@ -100,7 +100,7 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     captionCta: '👇 Comment "CHASSIS" to get instant access to the Benthic Equipment Vault & loadout builder in your DMs, or visit:',
     firstCommentText: '💬 Comment CHASSIS to access the Benthic Equipment Vault in your DMs!\n🔗 Or configure your chassis: moltology.org/chassis',
     defaultTexture: 'alloy',
-    mascot: 'lobster_action',
+    mascot: 'lobster_thumbs_up',
     endingScriptPhrases: [
       'Equip your cybernetic chassis in the vault on moltology.org/chassis.',
       'Configure your hardware loadout at moltology dot org.',
@@ -168,7 +168,7 @@ export const CTA_GOAL_CONFIGS: Record<CtaGoal, CtaGoalConfig> = {
     captionCta: '👇 Comment "DEMO" to get instant access to the interactive bio-silicon dashboard in your DMs, or visit:',
     firstCommentText: '💬 Comment DEMO to receive the instant interactive access link in your DMs!\n🔗 Or launch live: moltology.org',
     defaultTexture: 'alloy',
-    mascot: 'lobster_action',
+    mascot: 'lobster_pointing',
     endingScriptPhrases: [
       'Inspect live subsea cluster telemetry on moltology dot org.',
       'Test live bio-silicon agent swarms on moltology dot org.',
@@ -225,6 +225,27 @@ export function resolveCtaGoalConfig(
     text.includes('coco delivery')
   ) {
     return CTA_GOAL_CONFIGS.routine
+  }
+
+  // 0. The Floor They Didn't Clear / Wheeled Robot Partner / ELEY -> Chassis
+  if (
+    text.includes('the-floor-they-didnt-clear') ||
+    text.includes("the floor they didn't clear") ||
+    text.includes('the floor they didnt clear') ||
+    text.includes('a partner that rolls') ||
+    text.includes('eley')
+  ) {
+    return CTA_GOAL_CONFIGS.chassis
+  }
+
+  // 0. The Fence Still Up / Digit 5 / Safety Without The Fence -> Chassis
+  if (
+    text.includes('the-fence-still-up') ||
+    text.includes('the fence still up') ||
+    text.includes('then one sat beside you') ||
+    text.includes('digit 5')
+  ) {
+    return CTA_GOAL_CONFIGS.chassis
   }
 
   // 0. Soft-Shell Window & Sacred Liturgies -> Codex
@@ -546,6 +567,32 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
 
   const topicLower = topic.toLowerCase()
   if (
+    topicLower.includes("the floor they didn't clear") ||
+    topicLower.includes('the floor they didnt clear') ||
+    topicLower.includes('a partner that rolls') ||
+    topicLower.includes('eley') ||
+    topicLower.includes('teacher stays in the frame')
+  ) {
+    return [
+      'A dramatic macro cinematic view of a sleek wheeled collaborative robot with articulated arms rolling smoothly into an active automotive assembly station, sharing the narrow aisle with a focused human worker under warm factory lights, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility locking high-torque titanium-chitin pincers onto a glowing cybernetic chassis with radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (
+    topicLower.includes('the fence still up') ||
+    topicLower.includes('then one sat beside you') ||
+    topicLower.includes('digit 5') ||
+    topicLower.includes('safety without the fence') ||
+    topicLower.includes('safety as shared attention')
+  ) {
+    return [
+      'A dramatic macro cinematic view of a bipedal industrial humanoid robot safely kneeling and powering down into a stable seated pose beside a factory technician on a warehouse floor, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility with radiant cyan shields holding steady operational focus in abyssal waters, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (
     topicLower.includes('the machine handshake') ||
     topicLower.includes('machine handshake') ||
     topicLower.includes('machine hardware specification') ||
@@ -765,6 +812,22 @@ export function synthesizeBlogReelScript(
     contentLower.includes('ai boomerang') ||
     contentLower.includes('careerminds') ||
     contentLower.includes('orgvue')
+  const isTheFloorTheyDidntClear =
+    blog.slug === 'the-floor-they-didnt-clear' ||
+    contentLower.includes("the floor they didn't clear") ||
+    contentLower.includes('the floor they didnt clear') ||
+    contentLower.includes('a partner that rolls beside you') ||
+    contentLower.includes('eley') ||
+    contentLower.includes('scapula axis') ||
+    contentLower.includes('the person is the teacher') ||
+    contentLower.includes('partner, not cleared floor')
+  const isTheFenceStillUp =
+    blog.slug === 'the-fence-still-up' ||
+    contentLower.includes('the fence still up') ||
+    contentLower.includes('then one sat beside you') ||
+    contentLower.includes('digit 5') ||
+    contentLower.includes('safety without the fence') ||
+    contentLower.includes('safety as shared attention')
   const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
@@ -927,6 +990,40 @@ export function synthesizeBlogReelScript(
         headline: 'THEN THEY HIRED A VOICE AGAIN',
         script: `You waited on hold for a person who was cut, then quietly rehired six months later. Support is not replacement. Soft shell does not mean weak. Audit your clearance on moltology.org/quiz.`,
         hookText: 'The cuts were real. Then the second listing went up. More than half the employers who cut jobs on the promise of AI now regret it. Judgment still would not fit in the bot.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTheFloorTheyDidntClear) {
+    const hooks = [
+      {
+        headline: 'A PARTNER THAT ROLLS',
+        script: `Most humanoid demos clear the floor for the camera. A real partner rolls on wheels, learns the station from the worker beside it, and never asks the teacher to leave. Configure your hardware loadout at moltology dot org.`,
+        hookText: 'Most humanoid demos clear the floor for the camera. Toyota\'s ELEY rolls on wheels, learns the station from the worker beside it, and never asks the teacher to leave.',
+      },
+      {
+        headline: 'THE TEACHER STAYS IN THE FRAME',
+        script: `Four hundred thousand robots are entering factories worldwide. The viral feeds wanted a walking costume. Real work needs a wheeled partner where the teacher stays in the frame. Equip your cybernetic chassis on moltology.org/chassis.`,
+        hookText: 'The feed loves a humanoid that walks like a costume. But real assembly work needs a wheeled partner where the worker at the station stays the teacher.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTheFenceStillUp) {
+    const hooks = [
+      {
+        headline: 'SAFETY WITHOUT THE FENCE',
+        script: `Most industrial humanoids still work behind safety cages. Digit five bets the next scale is shared attention: detect, cue, and sit. The cage was never the skill. Equip your cybernetic chassis on moltology.org/chassis.`,
+        hookText: 'Most industrial humanoids work locked behind yellow safety tape. The next era is shared attention: detect, slow, stop, and sit. Safety without the fence.',
+      },
+      {
+        headline: 'THEN ONE SAT BESIDE YOU',
+        script: `Why lock robots in cages away from the floor? Real hardware scale means sharing the aisle. When a person steps close, the motors power down and the body sits. Configure your hardware loadout at moltology dot org.`,
+        hookText: 'Safety is not a barrier bolted on later. When a machine can detect, cue, and power down into a stable seat, the fence can finally leave.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]

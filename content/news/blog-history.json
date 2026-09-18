@@ -288,6 +288,42 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-hold-you-sat-through.md"
+    },
+    {
+      "slug": "the-fence-still-up",
+      "title": "The Fence Still Up: Then One Sat Beside You",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Silas Trench",
+      "publishedAt": "2026-09-16T08:00:00-04:00",
+      "coreHook": "Most industrial humanoids still work behind cages; Digit 5 bets the next scale is proximity: detect, cue, and sit as shared attention without a fence.",
+      "keyMetrics": [
+        "September 15, 2026 Digit 5 unveiling",
+        ">$300M in multi-year customer orders",
+        ">65,000 operating hours on customer floors",
+        "50 lb lift capacity / 10:1 run-to-charge ratio",
+        "1st calcification via shared attention boundary"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-fence-still-up.md"
+    },
+    {
+      "slug": "the-floor-they-didnt-clear",
+      "title": "The Floor They Didn't Clear: A Partner That Rolls Beside You",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-09-18T08:00:00-04:00",
+      "coreHook": "Toyota plans to deploy 400,000 wheeled ELEY humanoid robots to production sites worldwide; learning from the worker beside it rather than clearing the floor.",
+      "keyMetrics": [
+        "September 18, 2026 Nikkei Asia report",
+        "400,000 in-house humanoid robots",
+        "~50kg wheeled body with dual two-finger hands",
+        "¥1 trillion/year from 2028 on factory renewal",
+        "1st calcification via shared station partner boundary"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-floor-they-didnt-clear.md"
     }
   ]
 }

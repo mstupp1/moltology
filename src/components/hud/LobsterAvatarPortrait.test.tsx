@@ -45,10 +45,11 @@ describe('LobsterAvatarPortrait Component', () => {
     expect(screen.getByTestId('portrait-lens-vignette')).toBeInTheDocument()
   })
 
-  it('renders "No avatar" fallback when no src or config is provided', () => {
+  it('renders carapace silhouette with antennae when no src or config is provided', () => {
     render(<LobsterAvatarPortrait />)
 
-    expect(screen.getByText(/No avatar/i)).toBeInTheDocument()
+    expect(screen.getByTestId('lobster-avatar-silhouette')).toBeInTheDocument()
+    expect(screen.queryByText(/No avatar/i)).toBeNull()
     expect(screen.queryByTestId('lobster-avatar-portrait-image')).toBeNull()
     expect(screen.queryByTestId('lobster-avatar-inline-svg')).toBeNull()
   })
@@ -71,5 +72,19 @@ describe('LobsterAvatarPortrait Component', () => {
   it('eager-loads when asked (signed-in HUD face)', () => {
     render(<LobsterAvatarPortrait src={testSrc} loading="eager" alt="Own face" />)
     expect(screen.getByTestId('lobster-avatar-portrait-image')).toHaveAttribute('loading', 'eager')
+  })
+
+  it('renders animated porthole display when animated={true}', () => {
+    render(
+      <LobsterAvatarPortrait
+        config={{ style: 'critters', seed: 'moving-hero' }}
+        size={256}
+        animated
+        alt="Moving hero"
+      />
+    )
+
+    expect(screen.getByTestId('lobster-avatar-portrait')).toHaveAttribute('data-animated', 'true')
+    expect(screen.queryByTestId('lobster-avatar-portrait-image')).toBeNull()
   })
 })

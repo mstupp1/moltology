@@ -202,8 +202,11 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
               <LobsterAvatarPortrait
                 config={draftConfig}
                 size={320}
-                interactive
                 alt="Avatar preview"
+                className="w-48 h-48 sm:w-56 sm:h-56 mx-auto"
+                interactive
+                animated
+                animationSeed={draftSeed}
                 loading="eager"
               />
 

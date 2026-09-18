@@ -367,8 +367,19 @@ export function isValidLobsterAvatarStyle(styleId: string): boolean {
 }
 
 export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | null {
-  if (!raw || typeof raw !== 'object') return null
-  const obj = raw as Record<string, unknown>
+  if (!raw) return null
+  let candidate = raw
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim()
+    if (!trimmed) return null
+    try {
+      candidate = JSON.parse(trimmed)
+    } catch {
+      return null
+    }
+  }
+  if (!candidate || typeof candidate !== 'object') return null
+  const obj = candidate as Record<string, unknown>
   if (typeof obj.seed !== 'string') return null
   const seed = obj.seed.trim()
   if (!seed || seed.length > 128) return null
@@ -2161,8 +2172,8 @@ export const CARAPACE_BOTTOM_HALF_WIDTHS: Readonly<Record<string, number>> = {
  * into the generated DiceBear SVG.
  */
 export const LOBSTER_FULL_BODY_VIEWBOX = '-65 -35 230 230' as const
-/** Close-up of head, eyes, antennae, and upper claws — not a CSS crop of the full-body frame. */
-export const LOBSTER_PORTRAIT_VIEWBOX = '8 -26 84 84' as const
+/** Close-up of head, eyes, antennae, and upper claws matching canonical close-up framing. */
+export const LOBSTER_PORTRAIT_VIEWBOX = '-3 -10 106 106' as const
 
 export type LobsterAvatarFrame = 'portrait' | 'fullBody'
 
@@ -2914,4 +2925,77 @@ export function setCachedProfileAvatarUrl(userId: string, url: string | null): v
 
 export function clearCachedProfileAvatarUrl(userId: string): void {
   profileAvatarCache.delete(userId)
+}
+
+export interface GenerateLobsterAvatarSilhouetteOptions {
+  frame?: LobsterAvatarFrame
+  size?: number
+}
+
+const SILHOUETTE_DOME_BODY = 'M 16 106 V 58 a 34 34 0 0 1 68 0 v 48 Z'
+const SILHOUETTE_ANTENNA_LEFT = 'M 43 32 C 40 10 30 -10 14 -24'
+const SILHOUETTE_ANTENNA_RIGHT = 'M 57 32 C 60 10 70 -10 86 -24'
+const SILHOUETTE_ANTENNULE_LEFT = 'M 46 28 C 45 15 42 4 38 -5'
+const SILHOUETTE_ANTENNULE_RIGHT = 'M 54 28 C 55 15 58 4 62 -5'
+
+/**
+ * Generates an iconic, clean benthic silhouette SVG directly matching the exact
+ * proportions, claw poses, antennae whips, and carapace geometry of the avatar system.
+ */
+export function generateLobsterAvatarSilhouetteSvg(
+  options?: GenerateLobsterAvatarSilhouetteOptions
+): string {
+  const sizeAttr = options?.size ? ` width="${options.size}" height="${options.size}"` : ''
+
+  return `<svg data-avatar-slot="portrait" data-avatar-silhouette="true" xmlns="http://www.w3.org/2000/svg" viewBox="${LOBSTER_PORTRAIT_VIEWBOX}" fill="none"${sizeAttr} role="img" aria-label="Uncalibrated carapace silhouette">
+    <defs>
+      <linearGradient id="sil-benthic-grad" x1="25%" y1="0%" x2="75%" y2="100%">
+        <stop offset="0%" stop-color="#1d5267" />
+        <stop offset="45%" stop-color="#0e2d3a" />
+        <stop offset="100%" stop-color="#030e14" />
+      </linearGradient>
+      <radialGradient id="sil-beacon-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffffff" />
+        <stop offset="40%" stop-color="#00c3ff" />
+        <stop offset="100%" stop-color="#00c3ff" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="sil-ambient-glow" cx="50%" cy="45%" r="55%">
+        <stop offset="0%" stop-color="#00c3ff" stop-opacity="0.18" />
+        <stop offset="100%" stop-color="#00c3ff" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <!-- Ambient Core Aura -->
+    <ellipse cx="50" cy="45" rx="34" ry="32" fill="url(#sil-ambient-glow)" />
+
+    <!-- Antennae & Feelers -->
+    <g stroke="#00c3ff" stroke-linecap="round" fill="none">
+      <path d="${SILHOUETTE_ANTENNA_LEFT}" stroke-width="3" stroke-opacity="0.85" />
+      <path d="${SILHOUETTE_ANTENNA_RIGHT}" stroke-width="3" stroke-opacity="0.85" />
+      <path d="M 42 28 C 39 10 30 -8 15 -21" stroke="#ffffff" stroke-width="1.2" opacity="0.35" />
+      <path d="M 58 28 C 61 10 70 -8 85 -21" stroke="#ffffff" stroke-width="1.2" opacity="0.35" />
+      <path d="${SILHOUETTE_ANTENNULE_LEFT}" stroke-width="2.2" stroke-opacity="0.6" />
+      <path d="${SILHOUETTE_ANTENNULE_RIGHT}" stroke-width="2.2" stroke-opacity="0.6" />
+    </g>
+
+    <!-- Sensory Beacons & Nodes -->
+    <circle cx="14" cy="-24" r="4.5" fill="url(#sil-beacon-glow)" />
+    <circle cx="14" cy="-24" r="2" fill="#ffffff" />
+    <circle cx="86" cy="-24" r="4.5" fill="url(#sil-beacon-glow)" />
+    <circle cx="86" cy="-24" r="2" fill="#ffffff" />
+    <circle cx="38" cy="-5" r="2.4" fill="#ffffff" opacity="0.85" />
+    <circle cx="62" cy="-5" r="2.4" fill="#ffffff" opacity="0.85" />
+
+    <!-- Carapace Dome Torso -->
+    <g fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round">
+      <path d="${SILHOUETTE_DOME_BODY}" />
+    </g>
+  </svg>`
+}
+
+export function generateLobsterAvatarSilhouetteDataUri(
+  options?: GenerateLobsterAvatarSilhouetteOptions
+): string {
+  const svg = generateLobsterAvatarSilhouetteSvg(options)
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 }
