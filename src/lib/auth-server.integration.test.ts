@@ -8,12 +8,34 @@ const dummyUrl =
   typeof process !== 'undefined' &&
   (process.env.DATABASE_URL || '').includes('ep-dummy')
 
-function readSetCookie(response: Response): string {
+function readSetCookieLines(response: Response): string[] {
   const headers = response.headers as Headers & { getSetCookie?: () => string[] }
   const many = headers.getSetCookie?.() ?? []
-  if (many.length > 0) return many.map((cookie) => cookie.split(';')[0]).join('; ')
+  if (many.length > 0) return many
   const single = response.headers.get('set-cookie')
-  return single ? single.split(';')[0] : ''
+  return single ? [single] : []
+}
+
+function applySetCookie(jar: Map<string, string>, response: Response): void {
+  // Browser cookie jar: honor sign-out Max-Age=0 so session_data cannot outlive logout.
+  for (const raw of readSetCookieLines(response)) {
+    const [pair, ...attrs] = raw.split(';')
+    const eq = pair.indexOf('=')
+    if (eq < 0) continue
+    const name = pair.slice(0, eq).trim()
+    const value = pair.slice(eq + 1).trim()
+    const attrStr = attrs.join(';').toLowerCase()
+    const expired =
+      !value ||
+      /max-age=0/.test(attrStr) ||
+      /expires=thu,\s*01 jan 1970/.test(attrStr)
+    if (expired) jar.delete(name)
+    else jar.set(name, value)
+  }
+}
+
+function cookieHeader(jar: Map<string, string>): string {
+  return [...jar.entries()].map(([name, value]) => `${name}=${value}`).join('; ')
 }
 
 async function callAuth(path: string, init: RequestInit = {}): Promise<Response> {
@@ -49,34 +71,38 @@ describe.skipIf(dummyUrl)('Better Auth email/password against Neon dev', () => {
     expect(signUpBody.user?.id).toBeTruthy()
     userId = signUpBody.user!.id!
 
+    const cookies = new Map<string, string>()
+
     const signInRes = await callAuth('/sign-in/email', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
     expect(signInRes.status).toBeLessThan(400)
-    const cookie = readSetCookie(signInRes)
-    expect(cookie).toContain('session')
+    applySetCookie(cookies, signInRes)
+    expect(cookieHeader(cookies)).toContain('session')
 
     const sessionRes = await callAuth('/get-session', {
       method: 'GET',
-      headers: { cookie },
+      headers: { cookie: cookieHeader(cookies) },
     })
     expect(sessionRes.status).toBe(200)
+    applySetCookie(cookies, sessionRes)
     const sessionBody = (await sessionRes.json()) as { user?: { id?: string; email?: string } } | null
     expect(sessionBody?.user?.id).toBe(userId)
     expect(sessionBody?.user?.email).toBe(email)
 
     const signOutRes = await callAuth('/sign-out', {
       method: 'POST',
-      headers: { cookie, 'content-type': 'application/json' },
+      headers: { cookie: cookieHeader(cookies), 'content-type': 'application/json' },
       body: JSON.stringify({}),
     })
     expect(signOutRes.status).toBeLessThan(400)
+    applySetCookie(cookies, signOutRes)
 
     const afterOut = await callAuth('/get-session', {
       method: 'GET',
-      headers: { cookie },
+      headers: { cookie: cookieHeader(cookies) },
     })
     const afterBody = await afterOut.json()
     expect(afterBody).toBeNull()
