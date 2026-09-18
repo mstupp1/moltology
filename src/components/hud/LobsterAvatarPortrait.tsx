@@ -1,8 +1,5 @@
 import React, { useMemo } from 'react'
-import {
-  LOBSTER_AVATAR_STYLE,
-  type LobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
+import { type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import {
   normalizePortraitSourcePx,
   pickLobsterAvatarSlot,
@@ -49,11 +46,8 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
 
   const portraitUrl = useMemo(() => {
     if (src) return src
-    if (!configSeed) return null
-    const assets = resolveLobsterAvatarAssets(
-      { style: config?.style ?? LOBSTER_AVATAR_STYLE, ...config, seed: configSeed },
-      { portraitSize: sourcePx }
-    )
+    if (!config || !configSeed) return null
+    const assets = resolveLobsterAvatarAssets(config, { portraitSize: sourcePx })
     const picked = pickLobsterAvatarSlot(assets, 'portrait')
     return picked?.slot === 'portrait' ? picked.url : null
   }, [src, config, configSeed, sourcePx])

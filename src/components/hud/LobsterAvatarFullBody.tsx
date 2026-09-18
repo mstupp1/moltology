@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  LOBSTER_AVATAR_STYLE,
-  type LobsterAvatarConfig,
-} from '@/lib/lobster-avatar'
+import { type LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import {
   acquireLobsterFullBodyMotion,
   pickLobsterAvatarSlot,
@@ -45,11 +42,8 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
   const configSeed = config?.seed
   const pickedUrl = useMemo(() => {
     if (src) return src
-    if (!configSeed) return null
-    const assets = resolveLobsterAvatarAssets(
-      { style: config?.style ?? LOBSTER_AVATAR_STYLE, ...config, seed: configSeed },
-      { fullBodySize: size }
-    )
+    if (!config || !configSeed) return null
+    const assets = resolveLobsterAvatarAssets(config, { fullBodySize: size })
     const picked = pickLobsterAvatarSlot(assets, 'fullBody')
     return picked?.slot === 'fullBody' ? picked.url : null
   }, [src, config, configSeed, size])
