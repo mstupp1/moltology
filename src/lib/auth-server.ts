@@ -11,6 +11,7 @@ import {
   authVerification,
 } from '../db/schema'
 import {
+  AUTH_SESSION_COOKIE_CACHE,
   DEFAULT_AUTH_URL,
   DEV_AUTH_SECRET,
   getAuthBaseUrl,
@@ -156,6 +157,12 @@ export const auth = betterAuth({
       }
     : undefined,
   trustedOrigins: getTrustedOrigins(baseURL),
+  session: {
+    cookieCache: {
+      enabled: AUTH_SESSION_COOKIE_CACHE.enabled,
+      maxAge: AUTH_SESSION_COOKIE_CACHE.maxAge,
+    },
+  },
   advanced: {
     useSecureCookies: baseURL.startsWith('https://'),
   },

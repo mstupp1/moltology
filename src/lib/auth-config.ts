@@ -40,6 +40,45 @@ export function getAuthJwksUrl(): string {
 }
 
 /**
+ * Better Auth client revalidation. Default `refetchOnWindowFocus: true` hits
+ * GET `/api/auth/get-session` on every tab focus. Idle signed-in HUD tabs
+ * were the remaining Vercel Fluid Active CPU + Neon wake after #138/#139.
+ * Mount, sign-in, sign-out, and cross-tab storage events still fetch.
+ */
+export const AUTH_SESSION_CLIENT_OPTIONS = {
+  refetchInterval: 0,
+  refetchOnWindowFocus: false,
+  refetchWhenOffline: false,
+} as const
+
+/**
+ * Signed `session_data` cookie so `getSession` can skip Postgres within maxAge.
+ * HMAC-signed (Better Auth compact strategy). Revocation can lag up to maxAge;
+ * mutating server fns still verify JWTs. 5 minutes is Better Auth's default.
+ */
+export const AUTH_SESSION_COOKIE_CACHE = {
+  enabled: true,
+  maxAge: 5 * 60,
+} as const
+
+/**
+ * JWKS private-key heal is for mint/sign paths, not the chatty get-session read.
+ */
+export function authRequestNeedsJwksHeal(urlOrPath: string): boolean {
+  const raw = typeof urlOrPath === 'string' ? urlOrPath : ''
+  let path = raw
+  try {
+    if (/^https?:\/\//i.test(raw)) {
+      path = new URL(raw).pathname
+    }
+  } catch {
+    return true
+  }
+  const normalized = path.replace(/\/+$/, '').toLowerCase()
+  return !normalized.endsWith('/get-session')
+}
+
+/**
  * Explicit public display flag. Vite inlines `VITE_*` into both SSR and the
  * browser, so this must never read unprefixed `GOOGLE_*` secrets.
  */
