@@ -15,13 +15,19 @@ import {
   type SimulatedPersonaConfig,
 } from '../../db/schema'
 import { CANONICAL_ALIGNMENT_TASKS, type CanonicalAlignmentTask } from '../alignment-tasks'
-import { recordRoutineCompletedEvent } from './activity-log'
+import {
+  recordConnectionAcceptedEvents,
+  recordForumReplyPostedEvent,
+  recordForumTopicOpenedEvent,
+  recordRoutineCompletedEvent,
+} from './activity-log'
 import { CANONICAL_SCRIPTURES } from '../codexData'
 import { resolveMemberLarvaId } from '../larva-id'
 import { resolveMemberPublicName } from '../member-handle'
 import { slugifyForumTitle } from '../forum-utils'
 import { validateInputGuardrails } from '../ai/guardrails'
 import { normalizeFriendPair } from '../connections'
+import { extractMentionHandles } from '../forum-mentions'
 import { recordForumMentions, recordForumReplyNotifications } from './db-services'
 import {
   DEFAULT_BOND_CHANCE,
@@ -548,6 +554,15 @@ export async function spawnSimulatedUser(
     if (joinSource === 'brought_in') {
       await ensureFriendship(dbClient, sponsor.id, userId)
       await ensureBond(dbClient, 'brought_in', sponsor.id, userId)
+      try {
+        await recordConnectionAcceptedEvents(
+          dbClient,
+          { id: sponsor.id, handle: sponsor.handle, larvaId: sponsor.larvaId },
+          { id: userId, handle: persona.handle, larvaId: newProfile?.larvaId }
+        )
+      } catch (err) {
+        console.warn('[SimulationEngine] recordConnectionAcceptedEvents error:', err)
+      }
     }
   }
 
@@ -1043,14 +1058,16 @@ Hard rules:
 
       // Lookup category slug for notifications
       let categorySlug: string | undefined
+      let categoryName: string | undefined
       if (topic.categoryId) {
         try {
           const [cat] = await dbClient
-            .select({ slug: forumCategories.slug })
+            .select({ slug: forumCategories.slug, name: forumCategories.name })
             .from(forumCategories)
             .where(eq(forumCategories.id, topic.categoryId))
             .limit(1)
           categorySlug = cat?.slug
+          categoryName = cat?.name
         } catch {
           // ignore
         }
@@ -1087,6 +1104,20 @@ Hard rules:
         })
       } catch (rErr) {
         console.warn('[SimulationEngine] recordForumReplyNotifications error:', rErr)
+      }
+
+      try {
+        await recordForumReplyPostedEvent(dbClient, author.id, {
+          postId: newPost.id,
+          topicId: topic.id,
+          topicTitle: topic.title,
+          topicSlug: topic.slug,
+          categorySlug: categorySlug || 'general-discussion',
+          categoryName: categoryName || 'Community',
+          mentionedHandles: extractMentionHandles(replyContent),
+        })
+      } catch (aErr) {
+        console.warn('[SimulationEngine] recordForumReplyPostedEvent error:', aErr)
       }
 
       return {
@@ -1211,6 +1242,19 @@ Hard rules:
       })
     } catch (mErr) {
       console.warn('[SimulationEngine] topic recordForumMentions error:', mErr)
+    }
+
+    try {
+      await recordForumTopicOpenedEvent(dbClient, author.id, {
+        id: newTopic.id,
+        title: newTopic.title,
+        slug: newTopic.slug,
+        categorySlug: targetCategory.slug,
+        categoryName: targetCategory.name,
+        mentionedHandles: extractMentionHandles(newTopic.content),
+      })
+    } catch (aErr) {
+      console.warn('[SimulationEngine] recordForumTopicOpenedEvent error:', aErr)
     }
 
     return {
@@ -1607,6 +1651,15 @@ export async function simulateConnections(
   const [left, right] = pair
   if (!options.dryRun) {
     await ensureFriendship(dbClient, left.id, right.id)
+    try {
+      await recordConnectionAcceptedEvents(
+        dbClient,
+        { id: left.id, handle: left.handle, larvaId: left.larvaId },
+        { id: right.id, handle: right.handle, larvaId: right.larvaId }
+      )
+    } catch (err) {
+      console.warn('[SimulationEngine] recordConnectionAcceptedEvents error:', err)
+    }
   }
 
   return {

@@ -28,6 +28,9 @@ vi.mock('ai', () => ({
 
 vi.mock('./activity-log', () => ({
   recordRoutineCompletedEvent: vi.fn().mockResolvedValue(undefined),
+  recordForumReplyPostedEvent: vi.fn().mockResolvedValue(undefined),
+  recordForumTopicOpenedEvent: vi.fn().mockResolvedValue(undefined),
+  recordConnectionAcceptedEvents: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('./db-services', () => ({
@@ -680,6 +683,7 @@ describe('Simulation Engine', () => {
       } as any)
 
       const { recordForumMentions, recordForumReplyNotifications } = await import('./db-services')
+      const { recordForumReplyPostedEvent } = await import('./activity-log')
 
       const mockMembers = [
         {
@@ -752,6 +756,15 @@ describe('Simulation Engine', () => {
       expect(mockDb.insert).toHaveBeenCalled()
       expect(recordForumMentions).toHaveBeenCalled()
       expect(recordForumReplyNotifications).toHaveBeenCalled()
+      expect(recordForumReplyPostedEvent).toHaveBeenCalledWith(
+        mockDb,
+        'author-1',
+        expect.objectContaining({
+          postId: 'new-post-1',
+          topicId: 'topic-1',
+          topicSlug: 'topic-slug',
+        })
+      )
 
       mockMath.mockRestore()
     })

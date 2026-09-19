@@ -13,11 +13,19 @@ import type { ActivityEventView } from '@/lib/activity-events'
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
-  Link: ({ children, to, params, ...props }: any) => (
-    <a href={typeof to === 'string' ? `${to}/${params?.profileId ?? ''}` : '/member'} {...props}>
-      {children}
-    </a>
-  ),
+  Link: ({ children, to, params, hash, ...props }: any) => {
+    const path = typeof to === 'string' ? to : '/member'
+    const resolved = path
+      .replace('$categorySlug', params?.categorySlug ?? '')
+      .replace('$topicSlug', params?.topicSlug ?? '')
+      .replace('$profileId', params?.profileId ?? '')
+    const href = hash ? `${resolved}#${hash}` : resolved
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    )
+  },
 }))
 
 vi.mock('@/lib/auth-client', () => ({
@@ -71,6 +79,37 @@ describe('ActivityStreamPage', () => {
       data: { user: { id: 'user-real' } },
       isPending: false,
     } as any)
+  })
+
+  it('renders a friend reply pulse and deep-links the thread', async () => {
+    vi.mocked(getActivityFeedFn).mockResolvedValue({
+      events: [
+        {
+          ...streakEvent,
+          id: 'evt-reply',
+          kind: 'forum_reply_posted',
+          category: 'COMMUNITY',
+          categoryLabel: 'Community',
+          title: 'Hold the quiet',
+          detail: 'Replied on General Discussion.',
+          valueBadge: 'Reply',
+          href: '/forum/general-discussion/hold-the-quiet#post-post-1',
+          metadata: { categoryName: 'General Discussion' },
+        },
+      ],
+      nextCursor: null,
+    })
+
+    render(<ActivityStreamPage />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Hold the quiet')).toBeInTheDocument()
+    })
+    expect(screen.getByRole('heading', { name: 'Hold the quiet' }).closest('a')).toHaveAttribute(
+      'href',
+      '/forum/general-discussion/hold-the-quiet#post-post-1'
+    )
+    expect(screen.getByText('shell_sib')).toBeInTheDocument()
   })
 
   it('renders circle pulses with actor, kind, and stats', async () => {

@@ -11,11 +11,19 @@ const mockNavigate = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
-  Link: ({ children, to, params, ...props }: any) => (
-    <a href={typeof to === 'string' ? `${to}/${params?.profileId ?? ''}` : '/member'} {...props}>
-      {children}
-    </a>
-  ),
+  Link: ({ children, to, params, hash, ...props }: any) => {
+    const path = typeof to === 'string' ? to : '/member'
+    const resolved = path
+      .replace('$categorySlug', params?.categorySlug ?? '')
+      .replace('$topicSlug', params?.topicSlug ?? '')
+      .replace('$profileId', params?.profileId ?? '')
+    const href = hash ? `${resolved}#${hash}` : resolved
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    )
+  },
 }))
 
 vi.mock('@/lib/auth-client', () => ({

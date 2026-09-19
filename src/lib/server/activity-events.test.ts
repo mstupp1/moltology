@@ -10,8 +10,8 @@ vi.mock('../../db', () => ({
 
 import { getActivityEventsHandler, getActivityFeedHandler } from './db-services'
 
-function createFeedDb(rows: unknown[] = []) {
-  const where = vi.fn().mockReturnValue({
+function createFeedDb(rows: unknown[] = [], friendRows: unknown[] = []) {
+  const feedWhere = vi.fn().mockReturnValue({
     orderBy: vi.fn().mockReturnValue({
       limit: vi.fn().mockResolvedValue(rows),
     }),
@@ -19,8 +19,8 @@ function createFeedDb(rows: unknown[] = []) {
   return {
     select: vi.fn().mockReturnValue({
       from: vi.fn().mockReturnValue({
-        where,
-        innerJoin: vi.fn().mockReturnValue({ where }),
+        where: vi.fn().mockResolvedValue(friendRows),
+        innerJoin: vi.fn().mockReturnValue({ where: feedWhere }),
       }),
     }),
   }
@@ -95,6 +95,39 @@ describe('getActivityFeedHandler', () => {
       },
     })
     expect(page).toEqual({ events: [], nextCursor: null })
+  })
+
+  it('keeps Circle on accepted friends and does not dump the viewer’s own pulses', async () => {
+    const page = await getActivityFeedHandler({
+      data: { scope: 'circle', filter: 'all', limit: 8 },
+      context: {
+        user: { sub: 'real-member' },
+        db: createFeedDb(
+          [
+            {
+              id: 'evt-friend',
+              userId: 'friend-1',
+              kind: 'forum_reply_posted',
+              title: 'Hold the quiet',
+              detail: 'Replied on General Discussion.',
+              valueBadge: 'Reply',
+              href: '/forum/general-discussion/hold-the-quiet#post-1',
+              createdAt: new Date('2026-08-27T17:46:00.000Z'),
+              actorHandle: 'shell_sib',
+              actorLarvaId: 'LARVA UNIT #2',
+              actorStage: 2,
+              actorAvatarConfig: null,
+            },
+          ],
+          [{ userAId: 'real-member', userBId: 'friend-1' }]
+        ) as any,
+      },
+    })
+
+    expect(page.events).toHaveLength(1)
+    expect(page.events[0].title).toBe('Hold the quiet')
+    expect(page.events[0].actor.displayName).toBe('shell_sib')
+    expect(page.events[0].isOwn).toBe(false)
   })
 
   it('returns a page of circle events with a cursor when asked', async () => {

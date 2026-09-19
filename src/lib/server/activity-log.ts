@@ -6,13 +6,16 @@ import { resolveMemberPublicName } from '../member-handle'
 import {
   ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
+  ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
   ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
   ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
   ACTIVITY_EVENT_KIND_STREAK_MILESTONE,
+  alignmentActivityHref,
   buildConnectionAcceptedCopy,
   buildDayAlignedCopy,
+  buildForumReplyPostedCopy,
   buildForumTopicOpenedCopy,
   buildOracleMilestoneCopy,
   buildRoutineCompletedCopy,
@@ -22,6 +25,7 @@ import {
   dayAlignedSourceKey,
   decodeActivityCursor,
   encodeActivityCursor,
+  forumReplyPostedSourceKey,
   forumTopicHref,
   forumTopicOpenedSourceKey,
   isOracleConsultationMilestone,
@@ -118,7 +122,7 @@ export async function recordRoutineCompletedEvent(
       time: task.time,
       date,
     },
-    href: '/dashboard',
+    href: alignmentActivityHref(),
   })
 }
 
@@ -142,7 +146,7 @@ export async function recordDayAlignedEvent(
       completedCount,
       totalCount,
     },
-    href: '/dashboard',
+    href: alignmentActivityHref(),
   })
 }
 
@@ -167,7 +171,7 @@ export async function recordStreakMilestoneEvent(
       streakDays,
       bonusXp,
     },
-    href: '/dashboard',
+    href: alignmentActivityHref(),
   })
 }
 
@@ -242,9 +246,11 @@ export async function recordForumTopicOpenedEvent(
     slug: string
     categorySlug: string
     categoryName: string
+    mentionedHandles?: string[]
   }
 ): Promise<void> {
   if (!userId || !topic.id || !topic.slug || !topic.categorySlug) return
+  const mentionedHandles = (topic.mentionedHandles ?? []).map((handle) => handle.trim()).filter(Boolean)
   const copy = buildForumTopicOpenedCopy(topic.title, topic.categoryName)
   await insertActivityEvent(dbClient, {
     userId,
@@ -259,8 +265,45 @@ export async function recordForumTopicOpenedEvent(
       topicTitle: topic.title,
       categorySlug: topic.categorySlug,
       categoryName: topic.categoryName,
+      ...(mentionedHandles.length > 0 ? { mentionedHandles } : {}),
     },
     href: forumTopicHref(topic.categorySlug, topic.slug),
+  })
+}
+
+export async function recordForumReplyPostedEvent(
+  dbClient: Db,
+  userId: string,
+  reply: {
+    postId: string
+    topicId: string
+    topicTitle: string
+    topicSlug: string
+    categorySlug: string
+    categoryName: string
+    mentionedHandles?: string[]
+  }
+): Promise<void> {
+  if (!userId || !reply.postId || !reply.topicId || !reply.topicSlug || !reply.categorySlug) return
+  const mentionedHandles = (reply.mentionedHandles ?? []).map((handle) => handle.trim()).filter(Boolean)
+  const copy = buildForumReplyPostedCopy(reply.topicTitle, reply.categoryName)
+  await insertActivityEvent(dbClient, {
+    userId,
+    kind: ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
+    title: copy.title,
+    detail: copy.detail,
+    valueBadge: copy.valueBadge,
+    sourceKey: forumReplyPostedSourceKey(reply.postId),
+    metadata: {
+      postId: reply.postId,
+      topicId: reply.topicId,
+      topicSlug: reply.topicSlug,
+      topicTitle: reply.topicTitle,
+      categorySlug: reply.categorySlug,
+      categoryName: reply.categoryName,
+      ...(mentionedHandles.length > 0 ? { mentionedHandles } : {}),
+    },
+    href: forumTopicHref(reply.categorySlug, reply.topicSlug, reply.postId),
   })
 }
 
@@ -336,18 +379,16 @@ export async function listActivityFeed(
   let audienceIds = [viewerId]
   if (scope === 'circle') {
     const friendIds = await listFriendIdsForUser(dbClient, viewerId)
-    audienceIds = [viewerId, ...friendIds]
+    if (friendIds.length === 0) {
+      return { events: [], nextCursor: null }
+    }
+    audienceIds = friendIds
   }
 
   const conditions = [inArray(activityEvents.userId, audienceIds)]
 
   if (scope === 'circle') {
-    conditions.push(
-      or(
-        eq(activityEvents.userId, viewerId),
-        inArray(activityEvents.visibility, ['friends', 'public'])
-      )!
-    )
+    conditions.push(inArray(activityEvents.visibility, ['friends', 'public']))
   }
 
   if (kindFilter && kindFilter.length > 0) {

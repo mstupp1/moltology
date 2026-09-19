@@ -3,6 +3,7 @@ import { CANONICAL_ALIGNMENT_TASKS } from './alignment-tasks'
 import {
   ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
+  ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
   ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
   ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_EVENT_KIND_ROUTINE_COMPLETED,
@@ -13,8 +14,10 @@ import {
   ACTIVITY_STREAM_SELF_EMPTY_COPY,
   ACTIVITY_STREAM_SUBTITLE,
   activityEventStats,
+  alignmentActivityHref,
   buildConnectionAcceptedCopy,
   buildDayAlignedCopy,
+  buildForumReplyPostedCopy,
   buildForumTopicOpenedCopy,
   buildOracleMilestoneCopy,
   buildRoutineCompletedCopy,
@@ -25,7 +28,9 @@ import {
   emptyCopyForFeed,
   encodeActivityCursor,
   formatActivityAge,
+  forumReplyPostedSourceKey,
   forumTopicHref,
+  isActivityInboxOnlyKind,
   isOracleConsultationMilestone,
   kindsForActivityFilter,
   parseActivityEventHref,
@@ -77,8 +82,9 @@ describe('activity event copy and mapping', () => {
   })
 
   it('keeps empty-state copy in-world, warm, and free of help-desk phrasing', () => {
-    expect(ACTIVITY_STREAM_EMPTY_COPY.title).toBe('The stream is still')
-    expect(ACTIVITY_STREAM_EMPTY_COPY.body).toMatch(/liturgy/)
+    expect(ACTIVITY_STREAM_EMPTY_COPY.title).toBe('The circle is quiet')
+    expect(ACTIVITY_STREAM_EMPTY_COPY.body).toMatch(/connection/)
+    expect(ACTIVITY_STREAM_EMPTY_COPY.body).toMatch(/You/)
     expect(ACTIVITY_STREAM_EMPTY_COPY.body).not.toMatch(/no activity yet/i)
     expect(ACTIVITY_STREAM_SELF_EMPTY_COPY.body).toMatch(/liturgy/)
     expect(ACTIVITY_STREAM_SUBTITLE).not.toContain('//')
@@ -95,6 +101,7 @@ describe('activity event copy and mapping', () => {
       ACTIVITY_EVENT_KIND_STAGE_REACHED,
       ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
       ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+      ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
       ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
     ])
     expect(kindsForActivityFilter('liturgies')).toEqual([
@@ -106,8 +113,12 @@ describe('activity event copy and mapping', () => {
     expect(kindsForActivityFilter('community')).toEqual([
       ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
       ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+      ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
       ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
     ])
+    expect(isActivityInboxOnlyKind('forum_mention')).toBe(true)
+    expect(isActivityInboxOnlyKind('forum_reply')).toBe(true)
+    expect(isActivityInboxOnlyKind(ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED)).toBe(false)
   })
 
   it('describes connection, community, and oracle pulses without inventing veteran proof', () => {
@@ -125,6 +136,16 @@ describe('activity event copy and mapping', () => {
       '/forum/general-discussion/hold-the-quiet'
     )
 
+    const reply = buildForumReplyPostedCopy('Hold the quiet', 'General Discussion')
+    expect(reply.kind).toBe(ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED)
+    expect(reply.title).toBe('Hold the quiet')
+    expect(reply.detail).toBe('Replied on General Discussion.')
+    expect(forumReplyPostedSourceKey('post-1')).toBe('forum_reply_posted:post-1')
+    expect(forumTopicHref('general-discussion', 'hold-the-quiet', 'post-1')).toBe(
+      '/forum/general-discussion/hold-the-quiet#post-post-1'
+    )
+    expect(alignmentActivityHref()).toBe('/dashboard#daily-routine-hub')
+
     const first = buildOracleMilestoneCopy(1)
     expect(first.title).toBe('First consultation')
     expect(buildOracleMilestoneCopy(10).title).toBe('10 consultations held')
@@ -140,16 +161,27 @@ describe('activity event copy and mapping', () => {
 
   it('parses stream hrefs for dashboard, forum, oracle, and member dossiers', () => {
     expect(parseActivityEventHref('/dashboard')).toEqual({ kind: 'dashboard' })
+    expect(parseActivityEventHref('/dashboard#daily-routine-hub')).toEqual({
+      kind: 'dashboard',
+      hash: 'daily-routine-hub',
+    })
     expect(parseActivityEventHref('/oracle')).toEqual({ kind: 'oracle' })
     expect(parseActivityEventHref('/forum/general-discussion/hold-the-quiet')).toEqual({
       kind: 'forum-topic',
       categorySlug: 'general-discussion',
       topicSlug: 'hold-the-quiet',
     })
+    expect(parseActivityEventHref('/forum/general-discussion/hold-the-quiet#post-1')).toEqual({
+      kind: 'forum-topic',
+      categorySlug: 'general-discussion',
+      topicSlug: 'hold-the-quiet',
+      hash: 'post-1',
+    })
     expect(parseActivityEventHref('/member/shell_sib')).toEqual({
       kind: 'member',
       profileId: 'shell_sib',
     })
+    expect(parseActivityEventHref('/connections')).toEqual({ kind: 'connections' })
     expect(parseActivityEventHref('https://moltology.org/oracle')).toEqual({ kind: 'none' })
   })
 
@@ -245,5 +277,34 @@ describe('activity event copy and mapping', () => {
     )
     expect(oracle.category).toBe('ORACLE')
     expect(activityEventStats(oracle).some((stat) => stat.label === 'Held')).toBe(true)
+  })
+
+  it('surfaces a hail on a forum reply without turning the stream into an inbox', () => {
+    const now = new Date('2026-08-27T18:00:00.000Z')
+    const reply = toActivityEventView(
+      {
+        id: 'evt-reply',
+        userId: 'friend-1',
+        kind: ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
+        title: 'Hold the quiet',
+        detail: 'Replied on General Discussion.',
+        valueBadge: 'Reply',
+        href: '/forum/general-discussion/hold-the-quiet#post-post-1',
+        metadata: {
+          categoryName: 'General Discussion',
+          mentionedHandles: ['shell_sib'],
+        },
+        createdAt: new Date('2026-08-27T17:46:00.000Z'),
+        actorHandle: 'claw_lord',
+        actorLarvaId: 'LARVA UNIT #1',
+        actorStage: 2,
+      },
+      now,
+      'user-1'
+    )
+    expect(reply.categoryLabel).toBe('Community')
+    expect(reply.isOwn).toBe(false)
+    expect(activityEventStats(reply).some((stat) => stat.label === 'Board')).toBe(true)
+    expect(activityEventStats(reply).some((stat) => stat.value === 'shell_sib')).toBe(true)
   })
 })
