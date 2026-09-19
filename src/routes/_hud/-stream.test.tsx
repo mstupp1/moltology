@@ -34,3 +34,15 @@ describe('/stream route', () => {
     expect(src).not.toMatch(/INITIAL_ACTIVITIES/)
   })
 })
+
+describe('Activity Stream fetch policy', () => {
+  it('loads the chamber on demand and never installs a keepalive poll', () => {
+    const page = readFileSync(resolve(process.cwd(), 'src/components/hud/ActivityStreamPage.tsx'), 'utf8')
+    const panel = readFileSync(resolve(process.cwd(), 'src/components/hud/ActivityStreamPanel.tsx'), 'utf8')
+    expect(page).not.toMatch(/setInterval/)
+    expect(page).not.toMatch(/60_000|60000/)
+    expect(panel).not.toMatch(/setInterval/)
+    expect(panel).not.toMatch(/60_000|60000/)
+    expect(panel).toMatch(/to: '\/stream'/)
+  })
+})

@@ -231,6 +231,8 @@ export type ActivityEventMetadata = {
   categorySlug?: string
   categoryName?: string
   topicTitle?: string
+  postId?: string
+  mentionedHandles?: string[]
   consultationCount?: number
   threadId?: string
 }

@@ -107,6 +107,7 @@ import {
   listActivityFeed,
   recordConnectionAcceptedEvents,
   recordDayAlignedEvent,
+  recordForumReplyPostedEvent,
   recordForumTopicOpenedEvent,
   recordRoutineCompletedEvent,
   recordStageReachedEvent,
@@ -1752,6 +1753,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
       slug: inserted.slug,
       categorySlug: cat?.slug || 'general-discussion',
       categoryName: cat?.name || 'General Discussion',
+      mentionedHandles: extractMentionHandles(inserted.content),
     })
   } catch (err) {
     console.warn('[createForumTopicFn] Activity persist error:', err)
@@ -1831,6 +1833,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   const [topicExists] = await dbClient
     .select({
       id: forumTopics.id,
+      title: forumTopics.title,
       slug: forumTopics.slug,
       categoryId: forumTopics.categoryId,
       userId: forumTopics.userId,
@@ -1923,20 +1926,19 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   await persistForumTopicVisit(dbClient, userId, data.topicId, topicExists.categoryId)
 
   const mentionHandles = extractMentionHandles(inserted.content)
-  const mayReplyNotify =
-    Boolean(topicExists.userId && topicExists.userId !== userId) ||
-    Boolean(parentAuthorUserId && parentAuthorUserId !== userId)
 
   let mentionedUserIds: string[] = []
   let categorySlug: string | undefined
-  if ((mentionHandles.length > 0 || mayReplyNotify) && topicExists.categoryId) {
+  let categoryName: string | undefined
+  if (topicExists.categoryId) {
     try {
       const [cat] = await dbClient
-        .select({ slug: forumCategories.slug })
+        .select({ slug: forumCategories.slug, name: forumCategories.name })
         .from(forumCategories)
         .where(eq(forumCategories.id, topicExists.categoryId))
         .limit(1)
       categorySlug = cat?.slug
+      categoryName = cat?.name
     } catch (err) {
       console.warn('[createForumPostFn] Category slug lookup error:', err)
     }
@@ -1971,6 +1973,20 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     })
   } catch (err) {
     console.warn('[createForumPostFn] Reply persist error:', err)
+  }
+
+  try {
+    await recordForumReplyPostedEvent(dbClient, userId, {
+      postId: inserted.id,
+      topicId: inserted.topicId,
+      topicTitle: topicExists.title || 'Community thread',
+      topicSlug: topicExists.slug,
+      categorySlug: categorySlug || 'general-discussion',
+      categoryName: categoryName || 'Community',
+      mentionedHandles: mentionHandles,
+    })
+  } catch (err) {
+    console.warn('[createForumPostFn] Activity persist error:', err)
   }
 
   return {
