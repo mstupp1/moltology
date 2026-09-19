@@ -50,8 +50,6 @@ export interface AIChatPanelProps {
   isCompact?: boolean
   className?: string
   showModeControls?: boolean
-  headerDragProps?: React.HTMLAttributes<HTMLDivElement>
-  isDraggable?: boolean
   onToggleConversations?: () => void
   placeholder?: string
 }
@@ -75,8 +73,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   isCompact = false,
   className = '',
   showModeControls = true,
-  headerDragProps,
-  isDraggable = false,
   onToggleConversations,
 }) => {
   const oracle = useSafeOracle()
@@ -537,12 +533,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       </div>
 
       {/* Shared Simplified Header */}
-      <div
-        className={`bg-[#070c0e]/75 backdrop-blur-md border-b border-cyan-900/40 px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10 ${
-          isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
-        }`}
-        {...headerDragProps}
-      >
+      <div className="bg-[#070c0e]/75 backdrop-blur-md border-b border-cyan-900/40 px-3 py-2 flex items-center justify-between gap-2 shrink-0 select-none relative z-10">
         {/* Left Section: Icon, Title & Chats Button */}
         <div className="flex items-center space-x-2 min-w-0 flex-1 truncate">
           {onToggleConversations ? (

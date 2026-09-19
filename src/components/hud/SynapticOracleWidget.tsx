@@ -19,10 +19,17 @@ const MIN_HEIGHT = 500
 const DEFAULT_WIDTH = 384
 const DEFAULT_HEIGHT = 640
 
-type ResizeDirection = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
+type ResizeDirection = 'nw' | 'n' | 'ne' | 'sw' | 'w'
 
 function clamp(val: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, val))
+}
+
+function clearStalePositionKeys() {
+  try {
+    localStorage.removeItem(STORAGE_KEY_BTN_POS)
+    localStorage.removeItem(STORAGE_KEY_POPOUT_POS)
+  } catch {}
 }
 
 /**
@@ -71,13 +78,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const [isMounted, setIsMounted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
-  // Positions & sizes state + refs to prevent stale closure bugs
-  const [buttonPos, setButtonPos] = useState<{ x: number; y: number } | null>(null)
-  const buttonPosRef = useRef<{ x: number; y: number } | null>(null)
-
-  const [popoutPos, setPopoutPos] = useState<{ x: number; y: number } | null>(null)
-  const popoutPosRef = useRef<{ x: number; y: number } | null>(null)
-
   const [popoutSize, setPopoutSize] = useState<{ width: number; height: number }>({
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
@@ -87,66 +87,21 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     height: DEFAULT_HEIGHT,
   })
 
-  const [isDraggingButton, setIsDraggingButton] = useState(false)
-  const [isDraggingWindow, setIsDraggingWindow] = useState(false)
   const [activeResizeDir, setActiveResizeDir] = useState<ResizeDirection | null>(null)
 
   // Popout open/close animation state — mirrors HudBottomSheet pattern
   const [isRendered, setIsRendered] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  const buttonDragRef = useRef<{
-    startX: number
-    startY: number
-    initX: number
-    initY: number
-    hasMoved: boolean
-    pointerId: number
-  } | null>(null)
-
-  const windowDragRef = useRef<{
-    startX: number
-    startY: number
-    initX: number
-    initY: number
-    pointerId: number
-  } | null>(null)
-
   const resizeRef = useRef<{
     direction: ResizeDirection
     startX: number
     startY: number
-    initX: number
-    initY: number
     initW: number
     initH: number
     pointerId: number
   } | null>(null)
 
-  // Calculate safe button coordinates bounded to the viewport
-  const getSafeButtonCoords = useCallback(
-    (pos: { x: number; y: number } | null) => {
-      if (typeof window === 'undefined') return { x: 0, y: 0 }
-      const btnW = buttonRef.current?.offsetWidth || 230
-      const btnH = buttonRef.current?.offsetHeight || 44
-      const maxX = Math.max(8, window.innerWidth - btnW - 8)
-      const maxY = Math.max(8, window.innerHeight - btnH - 8)
-      if (!pos) {
-        return {
-          x: Math.max(8, window.innerWidth - btnW - 24),
-          y: Math.max(8, window.innerHeight - btnH - 16),
-        }
-      }
-      return {
-        x: clamp(pos.x, 8, maxX),
-        y: clamp(pos.y, 8, maxY),
-      }
-    },
-    []
-  )
-
-  // Calculate safe popout size bounded to viewport
   const getSafePopoutDims = useCallback((size: { width: number; height: number } | null) => {
     if (typeof window === 'undefined') return { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
     const maxW = Math.max(MIN_WIDTH, window.innerWidth - 16)
@@ -158,110 +113,6 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       height: clamp(targetH, MIN_HEIGHT, maxH),
     }
   }, [])
-
-  // Calculate safe popout coordinates bounded to viewport
-  const getSafePopoutCoords = useCallback(
-    (pos: { x: number; y: number } | null, currentSize: { width: number; height: number }) => {
-      if (typeof window === 'undefined') return { x: 0, y: 0 }
-      const maxX = Math.max(8, window.innerWidth - currentSize.width - 8)
-      const maxY = Math.max(8, window.innerHeight - currentSize.height - 8)
-      if (!pos) {
-        return {
-          x: Math.max(8, window.innerWidth - currentSize.width - 24),
-          y: Math.max(8, window.innerHeight - currentSize.height - 16),
-        }
-      }
-      return {
-        x: clamp(pos.x, 8, maxX),
-        y: clamp(pos.y, 8, maxY),
-      }
-    },
-    []
-  )
-
-  // Convert button position to corresponding popout position
-  const btnPosToPopoutPos = useCallback(
-    (btnPos: { x: number; y: number } | null, size: { width: number; height: number }) => {
-      if (typeof window === 'undefined' || !btnPos) return getSafePopoutCoords(null, size)
-      const btnW = buttonRef.current?.offsetWidth || 230
-      const btnH = buttonRef.current?.offsetHeight || 44
-      const centerX = window.innerWidth / 2
-      const centerY = window.innerHeight / 2
-      const btnCenterX = btnPos.x + btnW / 2
-      const btnCenterY = btnPos.y + btnH / 2
-
-      const targetX = btnCenterX > centerX ? btnPos.x + btnW - size.width : btnPos.x
-      const targetY = btnCenterY > centerY ? btnPos.y + btnH - size.height : btnPos.y
-
-      return getSafePopoutCoords({ x: targetX, y: targetY }, size)
-    },
-    [getSafePopoutCoords]
-  )
-
-  // Convert popout position to corresponding button position
-  const popoutPosToBtnPos = useCallback(
-    (popPos: { x: number; y: number } | null, size: { width: number; height: number }) => {
-      if (typeof window === 'undefined' || !popPos) return getSafeButtonCoords(null)
-      const btnW = buttonRef.current?.offsetWidth || 230
-      const btnH = buttonRef.current?.offsetHeight || 44
-      const centerX = window.innerWidth / 2
-      const centerY = window.innerHeight / 2
-      const popCenterX = popPos.x + size.width / 2
-      const popCenterY = popPos.y + size.height / 2
-
-      const targetX = popCenterX > centerX ? popPos.x + size.width - btnW : popPos.x
-      const targetY = popCenterY > centerY ? popPos.y + size.height - btnH : popPos.y
-
-      return getSafeButtonCoords({ x: targetX, y: targetY })
-    },
-    [getSafeButtonCoords]
-  )
-
-  // Unified helpers: Updating button synchronizes popout position
-  const updateButtonPos = useCallback(
-    (pos: { x: number; y: number } | null, persist = false) => {
-      buttonPosRef.current = pos
-      setButtonPos(pos)
-      const synchedPopout = btnPosToPopoutPos(pos, popoutSizeRef.current)
-      popoutPosRef.current = synchedPopout
-      setPopoutPos(synchedPopout)
-
-      if (persist) {
-        try {
-          if (pos) {
-            localStorage.setItem(STORAGE_KEY_BTN_POS, JSON.stringify(pos))
-          }
-          if (synchedPopout) {
-            localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(synchedPopout))
-          }
-        } catch {}
-      }
-    },
-    [btnPosToPopoutPos]
-  )
-
-  // Unified helpers: Updating popout synchronizes button position
-  const updatePopoutPos = useCallback(
-    (pos: { x: number; y: number } | null, persist = false) => {
-      popoutPosRef.current = pos
-      setPopoutPos(pos)
-      const synchedBtn = popoutPosToBtnPos(pos, popoutSizeRef.current)
-      buttonPosRef.current = synchedBtn
-      setButtonPos(synchedBtn)
-
-      if (persist) {
-        try {
-          if (pos) {
-            localStorage.setItem(STORAGE_KEY_POPOUT_POS, JSON.stringify(pos))
-          }
-          if (synchedBtn) {
-            localStorage.setItem(STORAGE_KEY_BTN_POS, JSON.stringify(synchedBtn))
-          }
-        } catch {}
-      }
-    },
-    [popoutPosToBtnPos]
-  )
 
   const updatePopoutSize = useCallback((size: { width: number; height: number }, persist = false) => {
     popoutSizeRef.current = size
@@ -280,6 +131,8 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
       setIsMobile(window.innerWidth < 640)
     }
 
+    clearStalePositionKeys()
+
     try {
       const savedSize = localStorage.getItem(STORAGE_KEY_POPOUT_SIZE)
       let initialSize = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
@@ -290,90 +143,33 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         }
       }
       updatePopoutSize(initialSize)
-
-      const savedPopoutPos = localStorage.getItem(STORAGE_KEY_POPOUT_POS)
-      const savedBtn = localStorage.getItem(STORAGE_KEY_BTN_POS)
-
-      if (savedPopoutPos) {
-        const parsed = JSON.parse(savedPopoutPos)
-        if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
-          const safePop = getSafePopoutCoords(parsed, initialSize)
-          popoutPosRef.current = safePop
-          setPopoutPos(safePop)
-          const synchedBtn = popoutPosToBtnPos(safePop, initialSize)
-          buttonPosRef.current = synchedBtn
-          setButtonPos(synchedBtn)
-        } else {
-          updatePopoutPos(getSafePopoutCoords(null, initialSize))
-        }
-      } else if (savedBtn) {
-        const parsed = JSON.parse(savedBtn)
-        if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
-          const safeBtn = getSafeButtonCoords(parsed)
-          buttonPosRef.current = safeBtn
-          setButtonPos(safeBtn)
-          const synchedPop = btnPosToPopoutPos(safeBtn, initialSize)
-          popoutPosRef.current = synchedPop
-          setPopoutPos(synchedPop)
-        } else {
-          updateButtonPos(getSafeButtonCoords(null))
-        }
-      } else {
-        const defDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
-        updatePopoutSize(defDims)
-        const defPop = getSafePopoutCoords(null, defDims)
-        const defBtn = getSafeButtonCoords(null)
-        buttonPosRef.current = defBtn
-        setButtonPos(defBtn)
-        popoutPosRef.current = defPop
-        setPopoutPos(defPop)
-      }
     } catch (err) {
-      console.warn('Failed to load Oracle widget position from storage:', err)
-      const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
-      updatePopoutSize(defaultDims)
-      const defPop = getSafePopoutCoords(null, defaultDims)
-      const defBtn = getSafeButtonCoords(null)
-      buttonPosRef.current = defBtn
-      setButtonPos(defBtn)
-      popoutPosRef.current = defPop
-      setPopoutPos(defPop)
+      console.warn('Failed to load Oracle widget size from storage:', err)
+      updatePopoutSize({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT })
     }
-  }, [getSafeButtonCoords, getSafePopoutDims, getSafePopoutCoords, updateButtonPos, updatePopoutPos, updatePopoutSize, btnPosToPopoutPos, popoutPosToBtnPos])
+  }, [getSafePopoutDims, updatePopoutSize])
 
-  // Re-clamp on window resize without resetting position
+  // Re-clamp size on window resize
   useEffect(() => {
     if (!isMounted) return
     const handleResize = () => {
       if (typeof window !== 'undefined') {
         setIsMobile(window.innerWidth < 640)
       }
-      if (buttonPosRef.current) {
-        const clampedBtn = getSafeButtonCoords(buttonPosRef.current)
-        if (clampedBtn.x !== buttonPosRef.current.x || clampedBtn.y !== buttonPosRef.current.y) {
-          updateButtonPos(clampedBtn, true)
-        }
-      }
-      if (popoutSizeRef.current && popoutPosRef.current) {
-        const clampedSize = getSafePopoutDims(popoutSizeRef.current)
-        const clampedPos = getSafePopoutCoords(popoutPosRef.current, clampedSize)
-        if (
-          clampedSize.width !== popoutSizeRef.current.width ||
-          clampedSize.height !== popoutSizeRef.current.height
-        ) {
-          updatePopoutSize(clampedSize, true)
-        }
-        if (clampedPos.x !== popoutPosRef.current.x || clampedPos.y !== popoutPosRef.current.y) {
-          updatePopoutPos(clampedPos, true)
-        }
+      const clampedSize = getSafePopoutDims(popoutSizeRef.current)
+      if (
+        clampedSize.width !== popoutSizeRef.current.width ||
+        clampedSize.height !== popoutSizeRef.current.height
+      ) {
+        updatePopoutSize(clampedSize, true)
       }
     }
 
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [isMounted, getSafeButtonCoords, getSafePopoutDims, getSafePopoutCoords, updateButtonPos, updatePopoutPos, updatePopoutSize])
+  }, [isMounted, getSafePopoutDims, updatePopoutSize])
 
-  // Reset popout/button position and size when leaving sidebar mode (X-close or switch to mini window)
+  // Reset popout size when leaving sidebar mode (X-close or switch to mini window)
   const prevOracleModeRef = useRef<string | null>(oracle ? oracle.mode : null)
   useEffect(() => {
     if (!oracle) return
@@ -383,20 +179,12 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
 
     if (prevMode === 'sidebar' && (currentMode === 'popout' || currentMode === 'closed')) {
       try {
-        localStorage.removeItem(STORAGE_KEY_POPOUT_POS)
         localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
-        localStorage.removeItem(STORAGE_KEY_BTN_POS)
       } catch {}
-      const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
-      updatePopoutSize(defaultDims)
-      const defPop = getSafePopoutCoords(null, defaultDims)
-      const defBtn = getSafeButtonCoords(null)
-      popoutPosRef.current = defPop
-      buttonPosRef.current = defBtn
-      setPopoutPos(defPop)
-      setButtonPos(defBtn)
+      clearStalePositionKeys()
+      updatePopoutSize({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT })
     }
-  }, [oracle?.mode, updatePopoutSize, getSafePopoutCoords, getSafeButtonCoords])
+  }, [oracle?.mode, updatePopoutSize])
 
   const handleToggle = () => {
     if (oracle) {
@@ -456,133 +244,14 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     }
   }
 
-  const handleResetLayout = () => {
+  const handleResetSize = () => {
     try {
-      localStorage.removeItem(STORAGE_KEY_BTN_POS)
-      localStorage.removeItem(STORAGE_KEY_POPOUT_POS)
       localStorage.removeItem(STORAGE_KEY_POPOUT_SIZE)
     } catch {}
-
-    const defaultDims = { width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }
-    updatePopoutSize(defaultDims)
-    updatePopoutPos(getSafePopoutCoords(null, defaultDims))
-    updateButtonPos(getSafeButtonCoords(null))
+    clearStalePositionKeys()
+    updatePopoutSize({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT })
   }
 
-  // --- Button Drag Handlers ---
-  const handleButtonPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (e.button !== 0) return
-    const currentCoords = buttonPosRef.current || getSafeButtonCoords(null)
-    buttonDragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      initX: currentCoords.x,
-      initY: currentCoords.y,
-      hasMoved: false,
-      pointerId: e.pointerId,
-    }
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId)
-    } catch {}
-    setIsDraggingButton(true)
-  }
-
-  const handleButtonPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (!buttonDragRef.current || buttonDragRef.current.pointerId !== e.pointerId) return
-    const dx = e.clientX - buttonDragRef.current.startX
-    const dy = e.clientY - buttonDragRef.current.startY
-
-    if (!buttonDragRef.current.hasMoved && Math.hypot(dx, dy) > 4) {
-      buttonDragRef.current.hasMoved = true
-    }
-
-    if (buttonDragRef.current.hasMoved) {
-      const nextPos = getSafeButtonCoords({
-        x: buttonDragRef.current.initX + dx,
-        y: buttonDragRef.current.initY + dy,
-      })
-      updateButtonPos(nextPos)
-    }
-  }
-
-  const handleButtonPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (!buttonDragRef.current || buttonDragRef.current.pointerId !== e.pointerId) return
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId)
-    } catch {}
-
-    const wasDrag = buttonDragRef.current.hasMoved
-    buttonDragRef.current = null
-    setIsDraggingButton(false)
-
-    if (wasDrag) {
-      if (buttonPosRef.current) {
-        // Persist both positions atomically via unified updater
-        updateButtonPos(buttonPosRef.current, true)
-      }
-    } else {
-      handleToggle()
-    }
-  }
-
-  // --- Window Drag Handlers ---
-  const handleHeaderPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0) return
-    const target = e.target as HTMLElement
-    if (
-      target.closest('button') ||
-      target.closest('input') ||
-      target.closest('select') ||
-      target.closest('a')
-    ) {
-      return
-    }
-
-    const currentCoords = popoutPosRef.current || getSafePopoutCoords(null, popoutSizeRef.current)
-    windowDragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      initX: currentCoords.x,
-      initY: currentCoords.y,
-      pointerId: e.pointerId,
-    }
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId)
-    } catch {}
-    setIsDraggingWindow(true)
-  }
-
-  const handleHeaderPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!windowDragRef.current || windowDragRef.current.pointerId !== e.pointerId) return
-    const dx = e.clientX - windowDragRef.current.startX
-    const dy = e.clientY - windowDragRef.current.startY
-
-    const nextPos = getSafePopoutCoords(
-      {
-        x: windowDragRef.current.initX + dx,
-        y: windowDragRef.current.initY + dy,
-      },
-      popoutSizeRef.current
-    )
-    updatePopoutPos(nextPos)
-  }
-
-  const handleHeaderPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!windowDragRef.current || windowDragRef.current.pointerId !== e.pointerId) return
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId)
-    } catch {}
-
-    windowDragRef.current = null
-    setIsDraggingWindow(false)
-
-    if (popoutPosRef.current) {
-      // Persist both positions atomically via unified updater
-      updatePopoutPos(popoutPosRef.current, true)
-    }
-  }
-
-  // --- Window Resize Handlers ---
   const handleResizePointerDown = (
     e: React.PointerEvent<HTMLDivElement>,
     direction: ResizeDirection
@@ -591,13 +260,10 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     e.stopPropagation()
     e.preventDefault()
 
-    const currentCoords = popoutPosRef.current || getSafePopoutCoords(null, popoutSizeRef.current)
     resizeRef.current = {
       direction,
       startX: e.clientX,
       startY: e.clientY,
-      initX: currentCoords.x,
-      initY: currentCoords.y,
       initW: popoutSizeRef.current.width,
       initH: popoutSizeRef.current.height,
       pointerId: e.pointerId,
@@ -611,55 +277,22 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
   const handleResizePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!resizeRef.current || resizeRef.current.pointerId !== e.pointerId) return
 
-    const { direction, startX, startY, initX, initY, initW, initH } = resizeRef.current
+    const { direction, startX, startY, initW, initH } = resizeRef.current
     const dx = e.clientX - startX
     const dy = e.clientY - startY
 
-    const maxW = Math.max(MIN_WIDTH, window.innerWidth - 16)
-    const maxH = Math.max(MIN_HEIGHT, window.innerHeight - 16)
-
     let nextW = initW
     let nextH = initH
-    let nextX = initX
-    let nextY = initY
 
-    // Horizontal resizing
-    if (direction.includes('e')) {
-      nextW = clamp(initW + dx, MIN_WIDTH, maxW)
-      if (nextX + nextW > window.innerWidth - 8) {
-        nextW = window.innerWidth - 8 - nextX
-      }
-    } else if (direction.includes('w')) {
-      const targetW = initW - dx
-      nextW = clamp(targetW, MIN_WIDTH, maxW)
-      nextX = initX + (initW - nextW)
-      if (nextX < 8) {
-        nextW = nextW - (8 - nextX)
-        nextX = 8
-      }
+    // Bottom-right anchored: left/top edges grow the window toward the interior
+    if (direction.includes('w')) {
+      nextW = initW - dx
+    }
+    if (direction.includes('n')) {
+      nextH = initH - dy
     }
 
-    // Vertical resizing
-    if (direction.includes('s')) {
-      nextH = clamp(initH + dy, MIN_HEIGHT, maxH)
-      if (nextY + nextH > window.innerHeight - 8) {
-        nextH = window.innerHeight - 8 - nextY
-      }
-    } else if (direction.includes('n')) {
-      const targetH = initH - dy
-      nextH = clamp(targetH, MIN_HEIGHT, maxH)
-      nextY = initY + (initH - nextH)
-      if (nextY < 8) {
-        nextH = nextH - (8 - nextY)
-        nextY = 8
-      }
-    }
-
-    const safeSize = getSafePopoutDims({ width: nextW, height: nextH })
-    const safePos = getSafePopoutCoords({ x: nextX, y: nextY }, safeSize)
-
-    updatePopoutSize(safeSize)
-    updatePopoutPos(safePos)
+    updatePopoutSize(getSafePopoutDims({ width: nextW, height: nextH }))
   }
 
   const handleResizePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -671,22 +304,26 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
     resizeRef.current = null
     setActiveResizeDir(null)
 
-    if (popoutSizeRef.current && popoutPosRef.current) {
-      // Re-sync button position now that popout size may have changed the anchor
-      updatePopoutPos(popoutPosRef.current, true)
+    if (popoutSizeRef.current) {
       try {
         localStorage.setItem(STORAGE_KEY_POPOUT_SIZE, JSON.stringify(popoutSizeRef.current))
       } catch {}
     }
   }
 
+  const resizeHandleProps = (direction: ResizeDirection) => ({
+    onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => handleResizePointerDown(e, direction),
+    onPointerMove: handleResizePointerMove,
+    onPointerUp: handleResizePointerUp,
+    onPointerCancel: handleResizePointerUp,
+    onDoubleClick: handleResetSize,
+    title: 'Double-click to reset window size',
+  })
+
   // Hide the floating button completely when sidebar drawer or dedicated page is active
   if (oracle?.mode === 'sidebar' || oracle?.mode === 'page') {
     return null
   }
-
-  const currentBtnPos = isMounted ? buttonPos || getSafeButtonCoords(null) : null
-  const currentPopoutPos = isMounted ? popoutPos || getSafePopoutCoords(null, popoutSize) : null
 
   return (
     <>
@@ -724,38 +361,19 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
             isCompact={true}
             onClose={handleMobileClose}
             personaName="SYNAPTIC ORACLE"
-            isDraggable={false}
             className="h-full w-full border-none shadow-none"
           />
         </HudBottomSheet>
       )}
 
-      {/* ── Desktop: Draggable Floating Launcher Button ── */}
+      {/* ── Desktop: Fixed Floating Launcher Button ── */}
       {!isMobile && !isPopoutActive && !isRendered && (
-        <div
-          className={`hidden sm:block fixed z-40 font-sans select-none ${
-            isMounted ? '' : 'sm:right-6 sm:bottom-4'
-          }`}
-          style={
-            currentBtnPos
-              ? {
-                  left: `${currentBtnPos.x}px`,
-                  top: `${currentBtnPos.y}px`,
-                  touchAction: 'none',
-                }
-              : undefined
-          }
-        >
+        <div className="hidden sm:block fixed z-40 right-6 bottom-4 font-sans select-none">
           <button
-            ref={buttonRef}
-            onPointerDown={handleButtonPointerDown}
-            onPointerMove={handleButtonPointerMove}
-            onPointerUp={handleButtonPointerUp}
-            onPointerCancel={handleButtonPointerUp}
-            className={`${ORACLE_PILL_BASE_CLASSES} cursor-grab active:cursor-grabbing ${
-              isDraggingButton ? 'scale-105' : 'hover:scale-105 transition-transform'
-            }`}
-            title="Drag to Move • Click to Open Oracle AI"
+            type="button"
+            onClick={handleToggle}
+            className={`${ORACLE_PILL_BASE_CLASSES} cursor-pointer hover:scale-105 transition-transform`}
+            title="Open Oracle AI"
             aria-label="Open Oracle AI Popout"
           >
             <OracleLauncherPillContent />
@@ -763,124 +381,50 @@ export const SynapticOracleWidget: React.FC<SynapticOracleWidgetProps> = ({ user
         </div>
       )}
 
-      {/* ── Desktop: Fixed positioned panel with fade + scale-in ── */}
+      {/* ── Desktop: Bottom-right popout with fade + scale-in ── */}
       {!isMobile && isRendered && (
         <div
-          className={`fixed z-40 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] chamfer-corner border border-cyan-900/80 rounded-none hidden sm:block ${
-            isMounted ? '' : 'bottom-3 right-3 sm:right-6 sm:bottom-4 w-[calc(100vw-1.5rem)] sm:w-96'
-          } ${isDraggingWindow || activeResizeDir ? 'select-none' : ''}`}
+          className={`fixed z-40 right-6 bottom-4 font-sans overflow-hidden shadow-2xl shadow-cyan-950/90 bg-[#080d0d] chamfer-corner border border-cyan-900/80 rounded-none hidden sm:block ${
+            activeResizeDir ? 'select-none' : ''
+          }`}
           style={{
-            ...(currentPopoutPos
-              ? {
-                  left: `${currentPopoutPos.x}px`,
-                  top: `${currentPopoutPos.y}px`,
-                  width: `${popoutSize.width}px`,
-                  height: `${popoutSize.height}px`,
-                  minWidth: `${MIN_WIDTH}px`,
-                  minHeight: `${MIN_HEIGHT}px`,
-                  touchAction: 'none',
-                }
-              : {}),
+            width: `${popoutSize.width}px`,
+            height: `${popoutSize.height}px`,
+            minWidth: `${MIN_WIDTH}px`,
+            minHeight: `${MIN_HEIGHT}px`,
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)',
             transition: 'opacity 220ms ease-out, transform 220ms cubic-bezier(0.16, 1, 0.3, 1)',
             transformOrigin: 'bottom right',
           }}
         >
-          {/* Resize handles only rendered on desktop / non-mobile */}
-          <>
-            {/* Edge Resize Handles - Clean invisible hit areas (double-click to reset) */}
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'n')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
-              title="Double-click to reset window position & size"
-            />
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 's')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute bottom-0 left-3 right-3 h-2 cursor-s-resize z-30"
-              title="Double-click to reset window position & size"
-            />
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'w')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
-              title="Double-click to reset window position & size"
-            />
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'e')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute top-3 bottom-3 right-0 w-2 cursor-e-resize z-30"
-              title="Double-click to reset window position & size"
-            />
+          {/* Interior-facing resize handles (bottom-right stays anchored) */}
+          <div
+            {...resizeHandleProps('n')}
+            className="absolute top-0 left-3 right-3 h-2 cursor-n-resize z-30"
+          />
+          <div
+            {...resizeHandleProps('w')}
+            className="absolute top-3 bottom-3 left-0 w-2 cursor-w-resize z-30"
+          />
+          <div
+            {...resizeHandleProps('nw')}
+            className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
+          />
+          <div
+            {...resizeHandleProps('ne')}
+            className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
+          />
+          <div
+            {...resizeHandleProps('sw')}
+            className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
+          />
 
-            {/* Corner Resize Handles */}
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'nw')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute top-0 left-0 w-3.5 h-3.5 cursor-nw-resize z-40"
-              title="Double-click to reset window position & size"
-            />
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'ne')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute top-0 right-0 w-3.5 h-3.5 cursor-ne-resize z-40"
-              title="Double-click to reset window position & size"
-            />
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'sw')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute bottom-0 left-0 w-3.5 h-3.5 cursor-sw-resize z-40"
-              title="Double-click to reset window position & size"
-            />
-            <div
-              onPointerDown={(e) => handleResizePointerDown(e, 'se')}
-              onPointerMove={handleResizePointerMove}
-              onPointerUp={handleResizePointerUp}
-              onPointerCancel={handleResizePointerUp}
-              onDoubleClick={handleResetLayout}
-              className="absolute bottom-0 right-0 w-3.5 h-3.5 cursor-se-resize z-40"
-              title="Double-click to reset window position & size"
-            />
-          </>
-
-          {/* Main Chat Panel */}
           <AIChatPanel
             userId={userId}
             isCompact={true}
             onClose={handleClose}
             personaName="SYNAPTIC ORACLE"
-            isDraggable={true}
-            headerDragProps={{
-              onPointerDown: handleHeaderPointerDown,
-              onPointerMove: handleHeaderPointerMove,
-              onPointerUp: handleHeaderPointerUp,
-              onPointerCancel: handleHeaderPointerUp,
-              onDoubleClick: handleResetLayout,
-              title: 'Drag header to move chat window (double-click edge or header to reset)',
-            }}
             className="h-full w-full border-none shadow-none"
           />
         </div>
