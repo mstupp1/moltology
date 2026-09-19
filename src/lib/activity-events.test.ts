@@ -142,7 +142,7 @@ describe('activity event copy and mapping', () => {
     expect(reply.detail).toBe('Replied on General Discussion.')
     expect(forumReplyPostedSourceKey('post-1')).toBe('forum_reply_posted:post-1')
     expect(forumTopicHref('general-discussion', 'hold-the-quiet', 'post-1')).toBe(
-      '/forum/general-discussion/hold-the-quiet#post-1'
+      '/forum/general-discussion/hold-the-quiet#post-post-1'
     )
     expect(alignmentActivityHref()).toBe('/dashboard#daily-routine-hub')
 
@@ -289,7 +289,7 @@ describe('activity event copy and mapping', () => {
         title: 'Hold the quiet',
         detail: 'Replied on General Discussion.',
         valueBadge: 'Reply',
-        href: '/forum/general-discussion/hold-the-quiet#post-1',
+        href: '/forum/general-discussion/hold-the-quiet#post-post-1',
         metadata: {
           categoryName: 'General Discussion',
           mentionedHandles: ['shell_sib'],

@@ -1248,6 +1248,8 @@ describe('Forum Server Handlers', () => {
                 createdAt: new Date('2026-09-06T12:00:00.000Z'),
               },
             ]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
           }
         }),
       })),
@@ -1283,7 +1285,7 @@ describe('Forum Server Handlers', () => {
         userId: replier,
         kind: 'forum_reply_posted',
         sourceKey: 'forum_reply_posted:post-reply-persist',
-        href: '/forum/general-discussion/molt-notes#post-reply-persist',
+        href: '/forum/general-discussion/molt-notes#post-post-reply-persist',
       }),
     )
   })

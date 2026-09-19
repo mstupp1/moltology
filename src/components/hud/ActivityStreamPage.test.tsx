@@ -93,7 +93,7 @@ describe('ActivityStreamPage', () => {
           title: 'Hold the quiet',
           detail: 'Replied on General Discussion.',
           valueBadge: 'Reply',
-          href: '/forum/general-discussion/hold-the-quiet#post-1',
+          href: '/forum/general-discussion/hold-the-quiet#post-post-1',
           metadata: { categoryName: 'General Discussion' },
         },
       ],
@@ -107,7 +107,7 @@ describe('ActivityStreamPage', () => {
     })
     expect(screen.getByRole('heading', { name: 'Hold the quiet' }).closest('a')).toHaveAttribute(
       'href',
-      '/forum/general-discussion/hold-the-quiet#post-1'
+      '/forum/general-discussion/hold-the-quiet#post-post-1'
     )
     expect(screen.getByText('shell_sib')).toBeInTheDocument()
   })

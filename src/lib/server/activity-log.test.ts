@@ -180,7 +180,7 @@ describe('activity event log helpers', () => {
         title: 'Hold the quiet',
         detail: 'Replied on General Discussion.',
         sourceKey: 'forum_reply_posted:post-1',
-        href: '/forum/general-discussion/hold-the-quiet#post-1',
+        href: '/forum/general-discussion/hold-the-quiet#post-post-1',
         visibility: 'friends',
         metadata: expect.objectContaining({
           postId: 'post-1',

@@ -39,7 +39,7 @@ function event(overrides: Partial<ActivityEventView> = {}): ActivityEventView {
     occurredAt: '2026-08-27T17:46:00.000Z',
     occurredLabel: '14 minutes ago',
     visibility: 'friends',
-    href: '/forum/general-discussion/hold-the-quiet#post-1',
+    href: '/forum/general-discussion/hold-the-quiet#post-post-1',
     metadata: { categoryName: 'General Discussion', mentionedHandles: ['shell_sib'] },
     actor: {
       id: 'friend-1',
@@ -61,7 +61,7 @@ describe('ActivityFeedItem', () => {
 
     expect(screen.getByRole('heading', { name: 'Hold the quiet' }).closest('a')).toHaveAttribute(
       'href',
-      '/forum/general-discussion/hold-the-quiet#post-1'
+      '/forum/general-discussion/hold-the-quiet#post-post-1'
     )
     expect(screen.getByText('claw_lord').closest('a')).toHaveAttribute('href', '/member/claw_lord')
     expect(screen.getByText('shell_sib')).toBeInTheDocument()
