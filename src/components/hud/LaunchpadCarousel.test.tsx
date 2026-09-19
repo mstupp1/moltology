@@ -100,14 +100,20 @@ describe('LaunchpadCarousel Component', () => {
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/news' })
   })
 
-  it('caps MoltNation News panel height on mobile below desktop bento height', () => {
+  it('shrinks the MoltNation News card on mobile to the featured carousel only', () => {
     render(<LaunchpadCarousel />)
 
     const panel = screen.getByTestId('moltnation-news-panel')
     const column = panel.parentElement
     expect(column).not.toBeNull()
-    expect(column!.className).toMatch(/h-\[700px]/)
-    expect(column!.className).toMatch(/max-h-\[700px]/)
+    expect(column!.className).toMatch(/\bh-auto\b/)
+    expect(column!.className).toMatch(/lg:h-full/)
+    expect(column!.className).not.toMatch(/h-\[700px]/)
+    expect(column!.className).not.toMatch(/max-h-\[700px]/)
+
+    const articles = screen.getByTestId('moltnation-news-articles')
+    expect(articles.className).toMatch(/\bhidden\b/)
+    expect(articles.className).toMatch(/lg:flex/)
   })
 
   it('renders featured news article card edge to edge without featured or secondary badge', () => {

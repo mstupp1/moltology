@@ -462,8 +462,8 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
             </HudCard>
           </div>
 
-          {/* Right Column: MoltNation News Feed — shorter on mobile so wire list ~matches desktop (~5 rows) */}
-          <div className="lg:col-span-4 flex flex-col h-[700px] max-h-[700px] lg:h-full lg:max-h-none min-h-0">
+          {/* Right Column: MoltNation News — mobile shows featured carousel only; desktop keeps the articles list */}
+          <div className="lg:col-span-4 flex flex-col h-auto lg:h-full min-h-0">
             <div
               className="chitin-card p-3 sm:p-3.5 chamfer-corner space-y-2 shadow-2xl relative overflow-hidden border border-[#3a4a49] h-full flex flex-col justify-between min-h-0"
               onMouseEnter={() => setIsNewsHovered(true)}
@@ -536,9 +536,12 @@ export function LaunchpadCarousel({ isLoading = false }: LaunchpadCarouselProps)
                   </div>
                 )}
 
-                {/* Scrollable Articles Feed */}
+                {/* Scrollable Articles Feed — desktop only; mobile keeps the featured carousel compact */}
                 {otherNewsPosts.length > 0 && (
-                  <div className="space-y-1 pt-0.5 flex-1 flex flex-col min-h-0">
+                  <div
+                    className="hidden lg:flex lg:flex-1 flex-col space-y-1 pt-0.5 min-h-0"
+                    data-testid="moltnation-news-articles"
+                  >
                     <div className="flex items-center justify-between text-[8px] font-sans font-bold uppercase tracking-wider text-[#839493] shrink-0">
                       <span>ARTICLES ({posts.length})</span>
                     </div>
