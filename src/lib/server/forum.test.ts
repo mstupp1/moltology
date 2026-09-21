@@ -1188,6 +1188,7 @@ describe('Forum Server Handlers', () => {
     const replier = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
     const topicId = '20000000-0000-0000-0000-000000000003'
     const notificationValues: Record<string, unknown>[] = []
+    const activityValues: Record<string, unknown>[] = []
     let selectCall = 0
 
     const mockDb = {
@@ -1203,6 +1204,7 @@ describe('Forum Server Handlers', () => {
                 return Promise.resolve([
                   {
                     id: topicId,
+                    title: 'Molt notes',
                     slug: 'molt-notes',
                     categoryId: '10000000-0000-0000-0000-000000000001',
                     userId: topicAuthor,
@@ -1212,7 +1214,7 @@ describe('Forum Server Handlers', () => {
               if (selectCall === 3) {
                 return Promise.resolve([{ repliesCount: 0 }])
               }
-              return Promise.resolve([{ slug: 'general-discussion' }])
+              return Promise.resolve([{ slug: 'general-discussion', name: 'General Discussion' }])
             }),
           })),
         })),
@@ -1221,6 +1223,12 @@ describe('Forum Server Handlers', () => {
         values: vi.fn().mockImplementation((values: Record<string, unknown>) => {
           if (values.kind === 'forum_reply') {
             notificationValues.push(values)
+            return {
+              onConflictDoNothing: vi.fn().mockResolvedValue([]),
+            }
+          }
+          if (values.kind === 'forum_reply_posted') {
+            activityValues.push(values)
             return {
               onConflictDoNothing: vi.fn().mockResolvedValue([]),
             }
@@ -1240,6 +1248,8 @@ describe('Forum Server Handlers', () => {
                 createdAt: new Date('2026-09-06T12:00:00.000Z'),
               },
             ]),
+            onConflictDoNothing: vi.fn().mockResolvedValue([]),
+            onConflictDoUpdate: vi.fn().mockResolvedValue([]),
           }
         }),
       })),
@@ -1267,6 +1277,15 @@ describe('Forum Server Handlers', () => {
         userId: topicAuthor,
         kind: 'forum_reply',
         sourceKey: 'forum_reply:post:post-reply-persist:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      }),
+    )
+    expect(activityValues).toHaveLength(1)
+    expect(activityValues[0]).toEqual(
+      expect.objectContaining({
+        userId: replier,
+        kind: 'forum_reply_posted',
+        sourceKey: 'forum_reply_posted:post-reply-persist',
+        href: '/forum/general-discussion/molt-notes#post-post-reply-persist',
       }),
     )
   })

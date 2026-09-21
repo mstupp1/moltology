@@ -1,4 +1,5 @@
-import type { CanonicalAlignmentTask } from './alignment-tasks'
+import { DAILY_ALIGNMENT_HUB_ID, type CanonicalAlignmentTask } from './alignment-tasks'
+import { forumPostAnchorId } from './forum-mentions'
 import { resolveMemberPublicName, resolveMemberPublicParam } from './member-handle'
 import { getStageLabel } from './connections'
 
@@ -8,6 +9,7 @@ export const ACTIVITY_EVENT_KIND_STREAK_MILESTONE = 'streak_milestone' as const
 export const ACTIVITY_EVENT_KIND_STAGE_REACHED = 'stage_reached' as const
 export const ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED = 'connection_accepted' as const
 export const ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED = 'forum_topic_opened' as const
+export const ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED = 'forum_reply_posted' as const
 export const ACTIVITY_EVENT_KIND_ORACLE_MILESTONE = 'oracle_milestone' as const
 
 export const ACTIVITY_EVENT_KINDS = [
@@ -17,8 +19,12 @@ export const ACTIVITY_EVENT_KINDS = [
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
   ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
+  ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
   ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
 ] as const
+
+/** Inbox hails stay in Activity Center. Never treat them as stream kinds. */
+export const ACTIVITY_INBOX_ONLY_KINDS = ['forum_mention', 'forum_reply'] as const
 
 export type ActivityEventKind = (typeof ACTIVITY_EVENT_KINDS)[number]
 
@@ -103,6 +109,13 @@ export const ACTIVITY_KIND_REGISTRY: Record<ActivityEventKind, ActivityKindDefin
     highlight: true,
     defaultVisibility: 'friends',
   },
+  forum_reply_posted: {
+    category: 'COMMUNITY',
+    categoryLabel: 'Community',
+    filter: 'community',
+    highlight: true,
+    defaultVisibility: 'friends',
+  },
   oracle_milestone: {
     category: 'ORACLE',
     categoryLabel: 'Oracle',
@@ -135,8 +148,8 @@ export const ACTIVITY_FEED_SCOPES: Array<{ id: ActivityFeedScope; label: string 
 ]
 
 export const ACTIVITY_STREAM_EMPTY_COPY = {
-  title: 'The stream is still',
-  body: 'Seal a liturgy, welcome a connection, or open a consultation. Pulses from your circle will register here.',
+  title: 'The circle is quiet',
+  body: 'Welcome a connection, or wait for the next pulse from someone you keep close. Your own work lives under You.',
 } as const
 
 export const ACTIVITY_STREAM_SELF_EMPTY_COPY = {
@@ -150,10 +163,10 @@ export const ACTIVITY_STREAM_FILTER_EMPTY_COPY = {
 } as const
 
 export const ACTIVITY_STREAM_SUBTITLE =
-  'Liturgies, connections, community, and Oracle pulses from you and your circle.'
+  'Liturgies, connections, community, and Oracle pulses from the members you keep close.'
 
 export const ACTIVITY_STREAM_PAGE_DESCRIPTION =
-  'See liturgies, welcomed connections, community threads, and Oracle milestones from you and the members you keep close.'
+  'Circle holds pulses from members you keep close. You holds your own liturgies, welcomed connections, community threads, and Oracle milestones.'
 
 export const ACTIVITY_STREAM_GUEST_LOCK_MESSAGE =
   'The circle feed stays sealed until you sign in. Guests do not inherit another member\'s pulses.'
@@ -178,6 +191,8 @@ export interface ActivityEventMetadata {
   categorySlug?: string
   categoryName?: string
   topicTitle?: string
+  postId?: string
+  mentionedHandles?: string[]
   consultationCount?: number
   threadId?: string
 }
@@ -261,16 +276,30 @@ export function forumTopicOpenedSourceKey(topicId: string): string {
   return `forum_topic:${topicId}`
 }
 
+export function forumReplyPostedSourceKey(postId: string): string {
+  return `forum_reply_posted:${postId}`
+}
+
 export function oracleMilestoneSourceKey(count: number): string {
   return `oracle:${count}`
+}
+
+export function isActivityInboxOnlyKind(kind: string): boolean {
+  return (ACTIVITY_INBOX_ONLY_KINDS as readonly string[]).includes(kind)
 }
 
 export function isOracleConsultationMilestone(count: number): boolean {
   return (ORACLE_CONSULTATION_MILESTONES as readonly number[]).includes(count)
 }
 
-export function forumTopicHref(categorySlug: string, topicSlug: string): string {
-  return `/forum/${categorySlug}/${topicSlug}`
+export function forumTopicHref(categorySlug: string, topicSlug: string, postId?: string): string {
+  const path = `/forum/${categorySlug}/${topicSlug}`
+  const anchor = postId?.trim()
+  return anchor ? `${path}#${forumPostAnchorId(anchor)}` : path
+}
+
+export function alignmentActivityHref(): string {
+  return `/dashboard#${DAILY_ALIGNMENT_HUB_ID}`
 }
 
 export function memberActivityHref(input: { id: string; handle?: string | null }): string {
@@ -278,28 +307,34 @@ export function memberActivityHref(input: { id: string; handle?: string | null }
 }
 
 export type ParsedActivityHref =
-  | { kind: 'dashboard' }
+  | { kind: 'dashboard'; hash?: string }
   | { kind: 'pipeline' }
   | { kind: 'connections' }
   | { kind: 'oracle' }
   | { kind: 'forum' }
   | { kind: 'forum-board'; categorySlug: string }
-  | { kind: 'forum-topic'; categorySlug: string; topicSlug: string }
+  | { kind: 'forum-topic'; categorySlug: string; topicSlug: string; hash?: string }
   | { kind: 'member'; profileId: string }
   | { kind: 'none' }
 
 export function parseActivityEventHref(href?: string | null): ParsedActivityHref {
   const raw = href?.trim()
   if (!raw || !raw.startsWith('/')) return { kind: 'none' }
-  const path = raw.split('?')[0].replace(/\/+$/, '') || '/'
-  if (path === '/dashboard') return { kind: 'dashboard' }
+  const hashIndex = raw.indexOf('#')
+  const queryIndex = raw.indexOf('?')
+  const end = [hashIndex, queryIndex].filter((index) => index >= 0).sort((a, b) => a - b)[0]
+  const path = (end === undefined ? raw : raw.slice(0, end)).replace(/\/+$/, '') || '/'
+  const hash = hashIndex >= 0 ? raw.slice(hashIndex + 1).split('?')[0] || undefined : undefined
+  if (path === '/dashboard') return hash ? { kind: 'dashboard', hash } : { kind: 'dashboard' }
   if (path === '/pipeline') return { kind: 'pipeline' }
   if (path === '/connections') return { kind: 'connections' }
   if (path === '/oracle') return { kind: 'oracle' }
   if (path === '/forum') return { kind: 'forum' }
   const forum = path.match(/^\/forum\/([^/]+)(?:\/([^/]+))?$/)
   if (forum?.[1] && forum[2]) {
-    return { kind: 'forum-topic', categorySlug: forum[1], topicSlug: forum[2] }
+    return hash
+      ? { kind: 'forum-topic', categorySlug: forum[1], topicSlug: forum[2], hash }
+      : { kind: 'forum-topic', categorySlug: forum[1], topicSlug: forum[2] }
   }
   if (forum?.[1]) return { kind: 'forum-board', categorySlug: forum[1] }
   const member = path.match(/^\/member\/([^/]+)$/)
@@ -392,6 +427,22 @@ export function buildForumTopicOpenedCopy(topicTitle: string, categoryName: stri
     title,
     detail: `Opened a thread on ${board}.`,
     valueBadge: 'Thread',
+  }
+}
+
+export function buildForumReplyPostedCopy(topicTitle: string, categoryName: string): {
+  kind: typeof ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED
+  title: string
+  detail: string
+  valueBadge: string
+} {
+  const title = topicTitle.trim() || 'Community thread'
+  const board = categoryName.trim() || 'Community'
+  return {
+    kind: ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
+    title,
+    detail: `Replied on ${board}.`,
+    valueBadge: 'Reply',
   }
 }
 
@@ -523,8 +574,26 @@ export function activityEventStats(view: ActivityEventView): ActivityEventStat[]
   if (view.kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED && meta.peerName) {
     stats.push({ label: 'With', value: meta.peerName })
   }
-  if (view.kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED && meta.categoryName) {
+  if (
+    (view.kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED ||
+      view.kind === ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED) &&
+    meta.categoryName
+  ) {
     stats.push({ label: 'Board', value: meta.categoryName })
+  }
+  if (
+    (view.kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED ||
+      view.kind === ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED) &&
+    meta.mentionedHandles &&
+    meta.mentionedHandles.length > 0
+  ) {
+    const first = meta.mentionedHandles[0]?.trim()
+    if (first) {
+      stats.push({
+        label: 'Hailed',
+        value: meta.mentionedHandles.length > 1 ? `${first} +${meta.mentionedHandles.length - 1}` : first,
+      })
+    }
   }
   if (view.kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE && (meta.consultationCount || view.valueBadge)) {
     stats.push({

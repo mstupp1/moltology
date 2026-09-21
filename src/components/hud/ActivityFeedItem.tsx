@@ -5,6 +5,7 @@ import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import {
   ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED,
   ACTIVITY_EVENT_KIND_DAY_ALIGNED,
+  ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED,
   ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED,
   ACTIVITY_EVENT_KIND_ORACLE_MILESTONE,
   ACTIVITY_EVENT_KIND_STAGE_REACHED,
@@ -29,7 +30,7 @@ function KindIcon({ kind }: { kind: string }) {
   if (kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED) {
     return <Users className="w-3.5 h-3.5 text-[#00ffff]" />
   }
-  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED) {
+  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED || kind === ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED) {
     return <MessageSquare className="w-3.5 h-3.5 text-[#00ffff]" />
   }
   if (kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE) {
@@ -57,7 +58,7 @@ function EventTitleLink({
   }
   if (parsed.kind === 'dashboard') {
     return (
-      <Link to="/dashboard" className={className}>
+      <Link to="/dashboard" hash={parsed.hash} className={className}>
         {children}
       </Link>
     )
@@ -95,6 +96,7 @@ function EventTitleLink({
       <Link
         to="/forum/$categorySlug/$topicSlug"
         params={{ categorySlug: parsed.categorySlug, topicSlug: parsed.topicSlug }}
+        hash={parsed.hash}
         className={className}
       >
         {children}
@@ -124,7 +126,9 @@ function kindAccent(kind: string): string {
   if (kind === ACTIVITY_EVENT_KIND_STAGE_REACHED) return 'border-[#00c3ff]/45'
   if (kind === ACTIVITY_EVENT_KIND_DAY_ALIGNED) return 'border-[#00ffff]/40'
   if (kind === ACTIVITY_EVENT_KIND_CONNECTION_ACCEPTED) return 'border-[#00ffff]/45'
-  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED) return 'border-[#00ffff]/40'
+  if (kind === ACTIVITY_EVENT_KIND_FORUM_TOPIC_OPENED || kind === ACTIVITY_EVENT_KIND_FORUM_REPLY_POSTED) {
+    return 'border-[#00ffff]/40'
+  }
   if (kind === ACTIVITY_EVENT_KIND_ORACLE_MILESTONE) return 'border-[#c4b5fd]/40'
   return 'border-[#3a4a49]'
 }
