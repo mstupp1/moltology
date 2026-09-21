@@ -248,6 +248,17 @@ export function resolveCtaGoalConfig(
     return CTA_GOAL_CONFIGS.chassis
   }
 
+  // 0. The Seventh Seat / Household Agent / Shared Inbox -> Quiz
+  if (
+    text.includes('the-seventh-seat-at-the-table') ||
+    text.includes('the seventh seat at the table') ||
+    text.includes('the seventh seat') ||
+    text.includes('seventh seat') ||
+    text.includes('waiting for your inbox')
+  ) {
+    return CTA_GOAL_CONFIGS.quiz
+  }
+
   // 0. Soft-Shell Window & Sacred Liturgies -> Codex
   if (text.includes('soft-shell window') || text.includes('the-phone-rings') || text.includes('someone else\'s voice') || text.includes('room service without the knock')) {
     return CTA_GOAL_CONFIGS.codex
@@ -593,6 +604,17 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   }
 
   if (
+    topicLower.includes('the seventh seat') ||
+    topicLower.includes('seventh seat') ||
+    topicLower.includes('waiting for your inbox')
+  ) {
+    return [
+      'A dramatic macro cinematic view of a sleek household smart display on a wooden kitchen counter showing six distinct family schedules and an autonomous agent hub waiting calmly under warm morning light, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility orchestrating radiant holographic data streams with calm precision and glowing cyan shields, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (
     topicLower.includes('the machine handshake') ||
     topicLower.includes('machine handshake') ||
     topicLower.includes('machine hardware specification') ||
@@ -828,6 +850,13 @@ export function synthesizeBlogReelScript(
     contentLower.includes('digit 5') ||
     contentLower.includes('safety without the fence') ||
     contentLower.includes('safety as shared attention')
+  const isTheSeventhSeat =
+    blog.slug === 'the-seventh-seat-at-the-table' ||
+    contentLower.includes('the seventh seat at the table') ||
+    contentLower.includes('the seventh seat') ||
+    contentLower.includes('seventh seat') ||
+    contentLower.includes('waiting for your inbox') ||
+    contentLower.includes('six seats')
   const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
@@ -1024,6 +1053,23 @@ export function synthesizeBlogReelScript(
         headline: 'THEN ONE SAT BESIDE YOU',
         script: `Why lock robots in cages away from the floor? Real hardware scale means sharing the aisle. When a person steps close, the motors power down and the body sits. Configure your hardware loadout at moltology dot org.`,
         hookText: 'Safety is not a barrier bolted on later. When a machine can detect, cue, and power down into a stable seat, the fence can finally leave.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isTheSeventhSeat) {
+    const hooks = [
+      {
+        headline: 'THE SEVENTH SEAT',
+        script: `Most AI assistants live in one pocket and speak for everyone. Google gave CC six family seats. But shared attention still waits on your inbox. Calculate your clearance on moltology.org/quiz.`,
+        hookText: 'Most assistants live in one pocket and speak as if the house already agreed. Google gave an agent six family seats. Shared attention still waits on the inbox.',
+      },
+      {
+        headline: 'WAITING FOR YOUR INBOX',
+        script: `Six seats at the table, and an AI agent waiting to be invited. An agent that borrows your login is a hijack. An agent with its own seat preserves the boundary. Audit your clearance on moltology.org/quiz.`,
+        hookText: 'An AI assistant that borrows your login is a hijack. An agent with its own seat and separate account waits for the house to share the thread.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]

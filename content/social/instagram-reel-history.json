@@ -1224,6 +1224,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-18T14:21:24.643Z"
+    },
+    {
+      "id": "reel-1790000224981",
+      "topic": "The Seventh Seat at the Table: Still Waiting for Your Inbox",
+      "hookHeadline": "THE SEVENTH SEAT",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-seventh-seat-at-the-table",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Most AI assistants live in one pocket and speak for everyone. Google gave CC six family seats. But shared attention still waits on your inbox. Calculate your clearance on moltology.org/quiz.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1790000224981.mp4",
+      "s3Key": "videos/social/reels/master-reel-1790000224981.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 15.633008,
+      "status": "queued",
+      "scheduledFor": "2026-09-21T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ab13cddb719b6d5ac73a900",
+      "zernioYouTubePostId": "6ab13cddb719b6d5ac73a900",
+      "zernioPostId": "6ab13cddb719b6d5ac73a900",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Most assistants live in one pocket and speak as if the house already agreed. Google gave an agent six family seats. Shared attention still waits on the inbox. ⚡🌊\n\nGoogle rebuilt CC as a household agent with its own account and up to six seats. Shared attention still starts when someone shares the inbox.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-21T14:19:09.585Z"
     }
   ]
 }

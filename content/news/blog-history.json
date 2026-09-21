@@ -324,6 +324,23 @@
       ],
       "relatedReelIds": [],
       "driveSource": "the-floor-they-didnt-clear.md"
+    },
+    {
+      "slug": "the-seventh-seat-at-the-table",
+      "title": "The Seventh Seat at the Table: Still Waiting for Your Inbox",
+      "format": "drive-news",
+      "category": "TELEMETRY",
+      "author": "Dr. Thalassa Vance",
+      "publishedAt": "2026-09-21T08:00:00-04:00",
+      "coreHook": "Google rebuilt CC as a household agent with its own account and up to six seats; shared attention still starts when someone shares the inbox.",
+      "keyMetrics": [
+        "September 18, 2026 TechCrunch and The Verge reports",
+        "Up to 6 household member seats",
+        "Dedicated Google account for agent",
+        "1st calcification via shared inbox threshold"
+      ],
+      "relatedReelIds": [],
+      "driveSource": "the-seventh-seat-at-the-table.md"
     }
   ]
 }

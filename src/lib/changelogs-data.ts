@@ -14,6 +14,105 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-09-18-anchored-oracle-assistant-silhouette-avatars-instant-session-resumption',
+    version: '2026.09.18',
+    title: 'Anchored Oracle Assistant, Silhouette Avatars & Instant Session Resumption',
+    category: 'Improvement',
+    tags: ['Improvement', 'Tools', 'Design', 'Performance', 'UI/UX'],
+    summary: 'Chat with the Synaptic Oracle in a rock-solid anchored window, enjoy smooth silhouette placeholders while avatars load, and return to your tabs instantly with optimized session resumption.',
+    content: `### Anchored Synaptic Oracle Assistant
+- Pinned the Oracle launcher and popout window firmly to the bottom right corner of the screen for a distraction-free layout.
+- Resize the conversation window smoothly from interior edges without the panel drifting or jumping unexpectedly.
+- Automatically remembers your preferred window dimensions across sessions.
+
+### Avatar Silhouette Fallbacks & Animated Profiles
+- Crisp silhouette placeholders display instantly while 3D character assets stream in, preventing jarring visual jumps.
+- Added an animated portrait toggle on your profile page so you can showcase your lobster mascot in motion.
+
+### Instant Session Resumption & Mobile Card Polish
+- Returning to open Moltology tabs is now instantaneous, avoiding unnecessary authentication pauses when switching windows.
+- Streamlined dashboard cards on mobile devices, ensuring featured content fits cleanly without excessive scrolling.`,
+    releasedAt: '2026-09-18T23:59:00Z',
+  },
+  {
+    slug: '2026-09-17-synaptic-nearby-friends-split-avatar-rendering',
+    version: '2026.09.17',
+    title: 'Synaptic Nearby Suggestions & Dedicated Portrait Avatars',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'Design', 'Performance', 'UI/UX'],
+    summary: 'Find peers at similar stages of growth with the new Synaptic Nearby discovery strip, and experience smoother browsing across lists and forum threads with dedicated close-up avatar portraits.',
+    content: `### Synaptic Nearby Suggested Friends
+- Discover fellow members who share your progression stage and recent activity directly on the Connections page.
+- Send friend requests in a single click or dismiss suggestions you are not interested in.
+- Dismissed recommendations stay quietly hidden across visits so your suggestions remain relevant.
+
+### Dedicated Close-Up Portrait Avatars
+- Added lightweight, close-up portrait cards for avatar displays in forum feeds, member search, and compact navigation bars.
+- Full-body animated models now run exclusively on member profile cards and character creation where you want to admire the full detail.
+- Significant rendering performance boost, making long discussion threads scroll effortlessly.`,
+    releasedAt: '2026-09-17T23:59:00Z',
+  },
+  {
+    slug: '2026-09-16-pinned-oracle-chats-streamlined-onboarding-quiet-notifications',
+    version: '2026.09.16',
+    title: 'Pinned Oracle Conversations, Streamlined Onboarding & Quiet Notifications',
+    category: 'Improvement',
+    tags: ['Improvement', 'Tools', 'UI/UX', 'Performance'],
+    summary: 'Keep your most important Oracle consultations pinned at the top of your drawer, pick your member designation seamlessly during character creation, and enjoy faster page transitions with background notification optimizations.',
+    content: `### Pinned Oracle Consultations
+- Pin your favorite or most active consultations to keep them easily accessible in a dedicated section at the top of the chat drawer.
+- Rename, archive, or delete conversation threads reliably with immediate status updates.
+- Clean organization ensuring archived consultations never clutter your active workspace.
+
+### Streamlined Member Onboarding
+- Choose your unique member handle once during initial character creation without repetitive sign-up forms.
+- Immediate confirmation when claiming your handle so you can jump straight into the platform.
+
+### Quiet Background Notifications & Performance
+- Smarter background notification checking eliminates redundant background requests when browsing multiple tabs.
+- Enjoy faster page loads and smoother navigation across the Command Hub.`,
+    releasedAt: '2026-09-16T23:59:00Z',
+  },
+  {
+    slug: '2026-09-15-what-is-moltology-hub-dynamic-community-conversations',
+    version: '2026.09.15',
+    title: 'What is Moltology Knowledge Hub & Dynamic Community Conversations',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'Navigation', 'UI/UX'],
+    summary: 'Discover the foundations of Moltology through our comprehensive new public knowledge hub, and experience richer, more authentic discussions across the community boards.',
+    content: `### What is Moltology Knowledge Hub
+- Explore dedicated guides outlining core beliefs, community codes, and philosophical foundations at your own pace.
+- Read authentic member voices and real experiences from across the crustacean collective.
+- Navigate effortlessly between core pillars using the new About menu in the public navigation header and footer.
+
+### Dynamic Community Conversations
+- Upgraded discussion dynamics so forum members participate based on distinct perspectives, interests, and shared bonds.
+- Community votes and replies now cluster around shared viewpoints, making discussion threads feel lively, varied, and natural.
+- Enhanced topic suggestions and thread continuity across popular boards.`,
+    releasedAt: '2026-09-15T23:59:00Z',
+  },
+  {
+    slug: '2026-09-13-google-account-linking-branded-verification-dashboard-timeline',
+    version: '2026.09.13',
+    title: 'Google Account Linking, Branded Verification & Dashboard Updates Timeline',
+    category: 'Feature',
+    tags: ['Feature', 'Security', 'UI/UX', 'Navigation'],
+    summary: 'Connect Google Sign-In to your existing account with ease, receive clean and branded email verification cards, and browse recent releases directly from an expanded updates timeline on your Command Hub.',
+    content: `### Connected Accounts & Flexible Sign-In
+- Link your existing account seamlessly with Google Sign-In to sign in with one click without creating a duplicate profile.
+- Manage your connected sign-in methods anytime from the new Connected Accounts section in Settings.
+- Receive clear notifications and actionable guidance if an account connection requires attention.
+
+### Branded Account Verification Emails
+- Brand-new, beautifully styled verification emails with an activation card for new members.
+- Reliable fallback delivery ensuring you always receive your activation link promptly.
+
+### Command Hub Updates Timeline
+- Explore a scrollable timeline of recent platform updates directly on your dashboard.
+- Read rich release notes without leaving your hub, or jump straight to the complete changelog archive.`,
+    releasedAt: '2026-09-13T23:59:00Z',
+  },
+  {
     slug: '2026-09-12-enhanced-account-security-streamlined-authentication',
     version: '2026.09.12',
     title: 'Enhanced Account Security & Streamlined Sign-In',
