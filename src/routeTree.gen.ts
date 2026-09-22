@@ -76,6 +76,7 @@ import { Route as HudLecturesCertificatesIndexRouteImport } from './routes/_hud/
 import { Route as HudLecturesCertificatesCredentialIdRouteImport } from './routes/_hud/lectures/certificates/$credentialId'
 import { Route as HudLecturesCoursesSlugRouteImport } from './routes/_hud/lectures/courses/$slug'
 import { Route as HudLecturesTracksSlugRouteImport } from './routes/_hud/lectures/tracks/$slug'
+import { Route as HudLecturesCoursesSlugIndexRouteImport } from './routes/_hud/lectures/courses/$slug/index'
 import { Route as HudLecturesCoursesSlugLessonsLessonSlugRouteImport } from './routes/_hud/lectures/courses/$slug/lessons/$lessonSlug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -419,6 +420,12 @@ const HudLecturesTracksSlugRoute = HudLecturesTracksSlugRouteImport.update({
   path: '/lectures/tracks/$slug',
   getParentRoute: () => HudRoute,
 } as any)
+const HudLecturesCoursesSlugIndexRoute =
+  HudLecturesCoursesSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => HudLecturesCoursesSlugRoute,
+  } as any)
 const HudLecturesCoursesSlugLessonsLessonSlugRoute =
   HudLecturesCoursesSlugLessonsLessonSlugRouteImport.update({
     id: '/lessons/$lessonSlug',
@@ -493,6 +500,7 @@ export interface FileRoutesByFullPath {
   '/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
   '/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
   '/lectures/certificates/': typeof HudLecturesCertificatesIndexRoute
+  '/lectures/courses/$slug/': typeof HudLecturesCoursesSlugIndexRoute
   '/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRoutesByTo {
@@ -557,10 +565,10 @@ export interface FileRoutesByTo {
   '/lectures': typeof HudLecturesIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
   '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
-  '/lectures/courses/$slug': typeof HudLecturesCoursesSlugRouteWithChildren
   '/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
   '/forum/$categorySlug': typeof HudForumCategorySlugIndexRoute
   '/lectures/certificates': typeof HudLecturesCertificatesIndexRoute
+  '/lectures/courses/$slug': typeof HudLecturesCoursesSlugIndexRoute
   '/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRoutesById {
@@ -632,6 +640,7 @@ export interface FileRoutesById {
   '/_hud/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
   '/_hud/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
   '/_hud/lectures/certificates/': typeof HudLecturesCertificatesIndexRoute
+  '/_hud/lectures/courses/$slug/': typeof HudLecturesCoursesSlugIndexRoute
   '/_hud/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRouteTypes {
@@ -703,6 +712,7 @@ export interface FileRouteTypes {
     | '/lectures/tracks/$slug'
     | '/forum/$categorySlug/'
     | '/lectures/certificates/'
+    | '/lectures/courses/$slug/'
     | '/lectures/courses/$slug/lessons/$lessonSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -767,10 +777,10 @@ export interface FileRouteTypes {
     | '/lectures'
     | '/forum/$categorySlug/$topicSlug'
     | '/lectures/certificates/$credentialId'
-    | '/lectures/courses/$slug'
     | '/lectures/tracks/$slug'
     | '/forum/$categorySlug'
     | '/lectures/certificates'
+    | '/lectures/courses/$slug'
     | '/lectures/courses/$slug/lessons/$lessonSlug'
   id:
     | '__root__'
@@ -841,6 +851,7 @@ export interface FileRouteTypes {
     | '/_hud/lectures/tracks/$slug'
     | '/_hud/forum/$categorySlug/'
     | '/_hud/lectures/certificates/'
+    | '/_hud/lectures/courses/$slug/'
     | '/_hud/lectures/courses/$slug/lessons/$lessonSlug'
   fileRoutesById: FileRoutesById
 }
@@ -1353,6 +1364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudLecturesTracksSlugRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/lectures/courses/$slug/': {
+      id: '/_hud/lectures/courses/$slug/'
+      path: '/'
+      fullPath: '/lectures/courses/$slug/'
+      preLoaderRoute: typeof HudLecturesCoursesSlugIndexRouteImport
+      parentRoute: typeof HudLecturesCoursesSlugRoute
+    }
     '/_hud/lectures/courses/$slug/lessons/$lessonSlug': {
       id: '/_hud/lectures/courses/$slug/lessons/$lessonSlug'
       path: '/lessons/$lessonSlug'
@@ -1364,11 +1382,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface HudLecturesCoursesSlugRouteChildren {
+  HudLecturesCoursesSlugIndexRoute: typeof HudLecturesCoursesSlugIndexRoute
   HudLecturesCoursesSlugLessonsLessonSlugRoute: typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 
 const HudLecturesCoursesSlugRouteChildren: HudLecturesCoursesSlugRouteChildren =
   {
+    HudLecturesCoursesSlugIndexRoute: HudLecturesCoursesSlugIndexRoute,
     HudLecturesCoursesSlugLessonsLessonSlugRoute:
       HudLecturesCoursesSlugLessonsLessonSlugRoute,
   }
@@ -1502,3 +1522,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
