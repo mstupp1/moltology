@@ -160,7 +160,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     expect(screen.getByText('JOURNAL')).toBeInTheDocument()
     expect(screen.getByText('MARKET')).toBeInTheDocument()
     expect(screen.getByText('CHASSIS')).toBeInTheDocument()
-    expect(screen.getByText('VATS')).toBeInTheDocument()
+    expect(screen.queryByText('VATS')).not.toBeInTheDocument()
     expect(screen.getByText('LINKS')).toBeInTheDocument()
     expect(screen.getAllByText('COMMUNITY').length).toBeGreaterThan(0)
     expect(screen.getByText('SUPPORT')).toBeInTheDocument()
@@ -364,6 +364,89 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       expect(screen.getByText('claw_lord')).toBeInTheDocument()
     })
     expect(screen.queryByText(/LARVA UNIT/)).not.toBeInTheDocument()
+  })
+
+  it('hides subterranean vats from members', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'member-1',
+          name: 'Member',
+          email: 'member@example.com',
+          role: 'user',
+        },
+      } as any,
+      isPending: false,
+    } as any)
+    mockGetUserProfileFn.mockResolvedValue({ role: 'user', handle: null, larvaId: null })
+
+    render(<HUDSidebar />)
+
+    await waitFor(() => {
+      expect(mockGetUserProfileFn).toHaveBeenCalled()
+    })
+    expect(screen.queryByRole('button', { name: /SUBTERRANEAN VATS/i })).not.toBeInTheDocument()
+  })
+
+  it('shows hidden pages faded, with a hidden icon, for admins and super admins', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'admin-1',
+          name: 'Admin',
+          email: 'ops@example.com',
+          role: 'admin',
+        },
+      } as any,
+      isPending: false,
+    } as any)
+
+    const { rerender } = render(<HUDSidebar />)
+
+    const hiddenItem = screen.getByRole('button', { name: /SUBTERRANEAN VATS/i })
+    expect(hiddenItem).toHaveAttribute('data-hidden', 'true')
+    expect(hiddenItem).toHaveAttribute('title', 'Hidden page')
+    expect(hiddenItem.querySelector('[data-testid="hidden-page-icon"]')).toBeTruthy()
+    expect(hiddenItem.querySelector('.opacity-40')).toBeTruthy()
+
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'super-1',
+          name: 'Super',
+          email: 'myles@moltology.org',
+          role: 'user',
+        },
+      } as any,
+      isPending: false,
+    } as any)
+    rerender(<HUDSidebar />)
+    expect(screen.getByRole('button', { name: /SUBTERRANEAN VATS/i })).toHaveAttribute(
+      'data-hidden',
+      'true',
+    )
+  })
+
+  it('shows a hidden page when admin clearance lives only on the profile', async () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: {
+        user: {
+          id: 'profile-admin',
+          name: 'Profile Admin',
+          email: 'profile-admin@example.com',
+          role: 'user',
+        },
+      } as any,
+      isPending: false,
+    } as any)
+    mockGetUserProfileFn.mockResolvedValue({ role: 'admin', handle: null, larvaId: null })
+
+    render(<HUDSidebar />)
+
+    expect(await screen.findByRole('button', { name: /SUBTERRANEAN VATS/i })).toHaveAttribute(
+      'data-hidden',
+      'true',
+    )
   })
 
   it('shows the larva unit in the account menu when no designation is claimed', async () => {

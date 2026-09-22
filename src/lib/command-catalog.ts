@@ -5,6 +5,7 @@ import {
   scriptureSlugFromId,
 } from './codex-links'
 import { INITIAL_FORUM_CATEGORIES } from './forum-seed-data'
+import { isHiddenPagePath } from './hidden-pages'
 
 export const COMMAND_CATEGORIES = ['Navigation', 'Rituals', 'System', 'Boards', 'News'] as const
 export type CommandCategory = (typeof COMMAND_CATEGORIES)[number]
@@ -179,6 +180,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     shortcut: 'G S',
     to: '/subterranean',
     keywords: ['vats', 'bio-vault'],
+    // Members do not see this chamber. HIDDEN_PAGES is the registry.
   },
   {
     id: 'nav-forum',
@@ -362,11 +364,15 @@ function catalogHaystack(cmd: CommandCatalogItem): string {
 export function filterCommandCatalog(
   query: string,
   items?: CommandCatalogItem[],
+  options?: { includeHidden?: boolean },
 ): CommandCatalogItem[] {
   const q = query.trim().toLowerCase()
   const pool = items ?? (q ? PAGES_CATALOG : COMMAND_CATALOG)
-  if (!q) return pool
-  return pool.filter((cmd) => catalogHaystack(cmd).includes(q))
+  const visible = options?.includeHidden
+    ? pool
+    : pool.filter((cmd) => !isHiddenPagePath(cmd.to))
+  if (!q) return visible
+  return visible.filter((cmd) => catalogHaystack(cmd).includes(q))
 }
 
 export function catalogNavigateArgs(command: CommandCatalogItem): CatalogNavigateArgs | null {

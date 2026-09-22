@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Search, X, Users, FileText, History } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { CommandCatalogIcon } from '@/components/hud/CommandCatalogIcon'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
@@ -15,6 +16,7 @@ import {
 } from '@/lib/command-catalog'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 import { memberDossierLocation } from '@/lib/member-handle'
+import { isHiddenPagePath } from '@/lib/hidden-pages'
 import type { MemberSearchResult } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
 import {
@@ -58,6 +60,8 @@ export const CommandPalette: React.FC = () => {
   const navigate = useNavigate()
   const { toast } = useToast()
   const session = useAuthSession()
+  const hiddenAccess = useHiddenPageAccess()
+  const includeHidden = hiddenAccess.canView && !hiddenAccess.pending
   const close = () => setIsOpen(false)
 
   const signedIn = session.isAuthenticated && !session.isGuest
@@ -66,9 +70,16 @@ export const CommandPalette: React.FC = () => {
   const trimmed = query.trim()
   const peopleEnabled = isOpen && signedIn && trimmed.length >= MEMBER_SEARCH_MIN_CHARS
   const { results: people, searching: searchingPeople } = useMemberSearch(query, peopleEnabled)
-  const showRecents = signedIn && !trimmed && recents.length > 0
+  const visibleRecents = recents.filter((entry) => {
+    if (includeHidden || entry.kind !== 'page') return true
+    return !isHiddenPagePath(pageFromRecent(entry).to)
+  })
+  const showRecents = signedIn && !trimmed && visibleRecents.length > 0
 
-  const filteredCommands = useMemo(() => filterCommandCatalog(query), [query])
+  const filteredCommands = useMemo(
+    () => filterCommandCatalog(query, undefined, { includeHidden }),
+    [query, includeHidden],
+  )
 
   const rows: PaletteRow[] = useMemo(() => {
     const next: PaletteRow[] = []
@@ -228,7 +239,7 @@ export const CommandPalette: React.FC = () => {
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {recents.map((entry) => (
+                    {visibleRecents.map((entry) => (
                       <RecentChip
                         key={searchRecentChipKey(entry)}
                         entry={entry}

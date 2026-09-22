@@ -28,6 +28,7 @@ import {
   Microscope,
   Lock,
   Activity,
+  EyeOff,
 
 } from 'lucide-react'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -36,7 +37,8 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand } from '../ui'
-import { getEffectiveRole } from '../../lib/permissions'
+import { getEffectiveRole, isAdminOrSuperAdmin } from '../../lib/permissions'
+import { isHiddenPagePath } from '../../lib/hidden-pages'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
@@ -419,15 +421,23 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
     },
   ]
 
+  const canViewHiddenPages = isAdminOrSuperAdmin(user, userRole)
+  const visibleNavGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => canViewHiddenPages || !isHiddenPagePath(item.path)),
+    }))
+    .filter((group) => group.items.length > 0)
+
   const getActiveGroupId = (route: string) => {
-    const found = navGroups.find((group) =>
+    const found = visibleNavGroups.find((group) =>
       group.items.some(
         (item) =>
           route === item.path ||
           (item.path !== '/' && route.startsWith(item.path))
       )
     )
-    return found ? found.id : navGroups[0].id
+    return found ? found.id : visibleNavGroups[0]?.id ?? 'core'
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => ({
@@ -441,7 +451,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       if (prev[activeId]) return prev
       return { ...prev, [activeId]: true }
     })
-  }, [effectiveRoute])
+  }, [effectiveRoute, canViewHiddenPages])
 
   const toggleGroup = (groupId: string) => {
     setOpenGroups((prev) => ({
@@ -467,7 +477,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   }
 
   const renderNavGroupContent = (isMobile: boolean = false) => {
-    return navGroups.map((group, groupIdx) => {
+    return visibleNavGroups.map((group, groupIdx) => {
       const isOpen = !!openGroups[group.id]
       const isGroupActive = group.items.some(
         (item) =>
@@ -483,6 +493,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               const isActive =
                 effectiveRoute === item.path ||
                 (item.path !== '/' && effectiveRoute.startsWith(item.path))
+              const hidden = isHiddenPagePath(item.path)
 
               return (
                 <button
@@ -490,6 +501,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   onClick={() => handleNavClick(item.path)}
                   onMouseEnter={() => handlePrefetch(item.path)}
                   onFocus={() => handlePrefetch(item.path)}
+                  data-hidden={hidden ? 'true' : undefined}
+                  title={hidden ? 'Hidden page' : undefined}
                   className={`w-full text-left relative flex flex-col items-center justify-center py-2 px-1 gap-1 transition-colors duration-150 group/navitem cursor-pointer ${
                     isActive
                       ? 'bg-[#ff3b30]/10'
@@ -499,11 +512,11 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
 
                   {isActive && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)]" />
+                    <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)] ${hidden ? 'opacity-45' : ''}`} />
                   )}
 
                   <Icon
-                    className={`w-4 h-4 shrink-0 ${
+                    className={`w-4 h-4 shrink-0 ${hidden ? 'opacity-40' : ''} ${
                       isActive
                         ? 'text-[#ff5555]'
                         : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
@@ -511,14 +524,24 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                   />
 
                   <span
-                    className={`text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center truncate max-w-[62px] transition-colors duration-150 ${
+                    className={`inline-flex items-center justify-center gap-0.5 text-[8.5px] font-sans font-bold tracking-wider uppercase leading-none text-center max-w-[62px] transition-colors duration-150 ${
                       isActive
                         ? 'text-[#ff5555]'
                         : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3]'
                     }`}
                   >
-                    {item.shortLabel || item.label}
+                    <span className={`truncate ${hidden ? 'opacity-40' : ''}`}>
+                      {item.shortLabel || item.label}
+                    </span>
+                    {hidden && (
+                      <EyeOff
+                        data-testid="hidden-page-icon"
+                        aria-hidden
+                        className="w-2.5 h-2.5 shrink-0 text-[#8aa0b0]"
+                      />
+                    )}
                   </span>
+                  {hidden && <span className="sr-only">Hidden</span>}
 
                   {/* Clean Floating Tooltip */}
                   <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/navitem:opacity-100 transition-opacity duration-150">
@@ -526,6 +549,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                       <span className="w-1.5 h-1.5 rounded-full bg-[#00c3ff]" />
                       <span className="tracking-wider uppercase">
                         {item.label}
+                        {hidden ? ' · Hidden' : ''}
                       </span>
                     </div>
                   </div>
@@ -581,6 +605,7 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                 const isActive =
                   effectiveRoute === item.path ||
                   (item.path !== '/' && effectiveRoute.startsWith(item.path))
+                const hidden = isHiddenPagePath(item.path)
 
                 return (
                   <button
@@ -588,6 +613,8 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                     onClick={() => handleNavClick(item.path)}
                     onMouseEnter={() => handlePrefetch(item.path)}
                     onFocus={() => handlePrefetch(item.path)}
+                    data-hidden={hidden ? 'true' : undefined}
+                    title={hidden ? 'Hidden page' : undefined}
                     className={`w-full text-left relative flex items-center min-h-[44px] transition-colors duration-150 group/navitem ${
                       isMobile ? 'px-5 py-3 gap-3.5' : 'px-4 py-2.5 pl-5 gap-3'
                     } cursor-pointer ${
@@ -599,18 +626,18 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
 
 
                     {isActive && (
-                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)]" />
+                      <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[#ff3b30] shadow-[0_0_8px_rgba(255,59,48,0.6)] ${hidden ? 'opacity-45' : ''}`} />
                     )}
 
                     <Icon
-                      className={`${isMobile ? 'w-4.5 h-4.5' : 'w-4 h-4'} shrink-0 ${
+                      className={`${isMobile ? 'w-4.5 h-4.5' : 'w-4 h-4'} shrink-0 ${hidden ? 'opacity-40' : ''} ${
                         isActive
                           ? 'text-[#ff5555]'
                           : 'text-[#7a8e9e] group-hover/navitem:text-[#dfe3e3] transition-colors duration-150'
                       }`}
                     />
 
-                    <div className="flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1">
+                    <div className={`flex flex-col min-w-0 justify-center overflow-hidden whitespace-nowrap flex-1 ${hidden ? 'opacity-40' : ''}`}>
                       <span
                         className={`${
                           isMobile ? 'text-xs md:text-sm' : 'text-xs md:text-[12.5px]'
@@ -623,6 +650,15 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
                         {item.label}
                       </span>
                     </div>
+
+                    {hidden && (
+                      <EyeOff
+                        data-testid="hidden-page-icon"
+                        aria-hidden
+                        className="w-3.5 h-3.5 text-[#8aa0b0] shrink-0"
+                      />
+                    )}
+                    {hidden && <span className="sr-only">Hidden</span>}
 
                     {!isSessionPending && !user?.id && GUEST_LOCKED_PATHS.has(item.path) && (
                       <Lock className="w-3.5 h-3.5 text-[#ff5540]/80 shrink-0 ml-auto" />

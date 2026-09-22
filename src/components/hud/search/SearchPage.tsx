@@ -5,6 +5,7 @@ import { HudTitlePanel } from '@/components/hud/HudTitlePanel'
 import { MemberSearchRow } from '@/components/hud/connections/MemberSearchRow'
 import { CommandCatalogIcon } from '@/components/hud/CommandCatalogIcon'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useMemberSearch } from '@/hooks/useMemberSearch'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { listConnectionsFn } from '@/lib/server/api'
@@ -34,13 +35,16 @@ export function SearchPage({
   onTypeChange: (next: SearchTab) => void
 }) {
   const session = useAuthSession()
+  const hiddenAccess = useHiddenPageAccess()
   const signedIn = session.isAuthenticated && !session.isGuest
   const { results, searching } = useMemberSearch(query, signedIn)
   const [connections, setConnections] = useState<ConnectionsListView | null>(null)
   const { toast } = useToast()
   const navigate = useNavigate()
   const trimmed = query.trim()
-  const pages = filterCommandCatalog(query)
+  const pages = filterCommandCatalog(query, undefined, {
+    includeHidden: hiddenAccess.canView && !hiddenAccess.pending,
+  })
 
   const refreshConnections = useCallback(async () => {
     if (!signedIn) {

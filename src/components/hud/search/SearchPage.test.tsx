@@ -32,6 +32,7 @@ vi.mock('@/lib/jwt', () => ({
 vi.mock('@/lib/server/api', () => ({
   searchMembersFn: vi.fn(),
   listConnectionsFn: vi.fn(),
+  getUserProfileFn: vi.fn().mockResolvedValue(null),
 }))
 
 vi.mock('@/components/hud/LobsterAvatarPortrait', () => ({
@@ -119,6 +120,20 @@ describe('SearchPage', () => {
     expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
     fireEvent.click(screen.getByText('Open Sacred Codex & Canonical Scriptures'))
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/codex' })
+  })
+
+  it('shows subterranean vats on Pages for admins', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
+      isPending: false,
+    } as any)
+    renderSearch({ query: 'vats', type: 'pages' })
+    expect(screen.getByText('Open Subterranean Vats & Level -7 Bio-Vault')).toBeInTheDocument()
+  })
+
+  it('keeps subterranean vats off Pages for members', () => {
+    renderSearch({ query: 'vats', type: 'pages' })
+    expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
   })
 
   it('surfaces HUD chambers and news dispatches on Pages for obvious queries', () => {
