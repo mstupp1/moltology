@@ -573,6 +573,99 @@ async function applyRLS() {
     );`
     console.log('✓ RLS policies configured for leads table')
 
+    await sql`ALTER TABLE IF EXISTS academy_tracks ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS academy_courses ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS academy_track_courses ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS academy_modules ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS academy_lessons ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS academy_quiz_questions ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS academy_certificates ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS academy_tracks_public_read_policy ON academy_tracks;`
+    await sql`CREATE POLICY academy_tracks_public_read_policy ON academy_tracks FOR SELECT USING ("status" = 'published' OR (current_setting('request.jwt.claims', true) IS NULL));`
+    await sql`DROP POLICY IF EXISTS academy_courses_public_read_policy ON academy_courses;`
+    await sql`CREATE POLICY academy_courses_public_read_policy ON academy_courses FOR SELECT USING ("status" = 'published' OR (current_setting('request.jwt.claims', true) IS NULL));`
+    await sql`DROP POLICY IF EXISTS academy_track_courses_public_read_policy ON academy_track_courses;`
+    await sql`CREATE POLICY academy_track_courses_public_read_policy ON academy_track_courses FOR SELECT USING (
+      EXISTS (
+        SELECT 1 FROM academy_tracks t
+        WHERE t.id = academy_track_courses."trackId" AND t.status = 'published'
+      ) OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_modules_public_read_policy ON academy_modules;`
+    await sql`CREATE POLICY academy_modules_public_read_policy ON academy_modules FOR SELECT USING (
+      EXISTS (
+        SELECT 1 FROM academy_courses c
+        WHERE c.id = academy_modules."courseId" AND c.status = 'published'
+      ) OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_lessons_public_read_policy ON academy_lessons;`
+    await sql`CREATE POLICY academy_lessons_public_read_policy ON academy_lessons FOR SELECT USING (
+      EXISTS (
+        SELECT 1 FROM academy_courses c
+        WHERE c.id = academy_lessons."courseId" AND c.status = 'published'
+      ) OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_quiz_questions_public_read_policy ON academy_quiz_questions;`
+    await sql`DROP POLICY IF EXISTS academy_quiz_questions_owner_read_policy ON academy_quiz_questions;`
+    await sql`CREATE POLICY academy_quiz_questions_owner_read_policy ON academy_quiz_questions FOR SELECT USING (
+      (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_certificates_public_read_policy ON academy_certificates;`
+    await sql`CREATE POLICY academy_certificates_public_read_policy ON academy_certificates FOR SELECT USING (true);`
+
+    await sql`ALTER TABLE IF EXISTS academy_enrollments ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS academy_enrollments_owner_select_policy ON academy_enrollments;`
+    await sql`CREATE POLICY academy_enrollments_owner_select_policy ON academy_enrollments FOR SELECT USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_enrollments_owner_insert_policy ON academy_enrollments;`
+    await sql`CREATE POLICY academy_enrollments_owner_insert_policy ON academy_enrollments FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_enrollments_owner_update_policy ON academy_enrollments;`
+    await sql`CREATE POLICY academy_enrollments_owner_update_policy ON academy_enrollments FOR UPDATE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    ) WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
+    await sql`ALTER TABLE IF EXISTS academy_lesson_progress ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS academy_lesson_progress_owner_select_policy ON academy_lesson_progress;`
+    await sql`CREATE POLICY academy_lesson_progress_owner_select_policy ON academy_lesson_progress FOR SELECT USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_lesson_progress_owner_insert_policy ON academy_lesson_progress;`
+    await sql`CREATE POLICY academy_lesson_progress_owner_insert_policy ON academy_lesson_progress FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_lesson_progress_owner_update_policy ON academy_lesson_progress;`
+    await sql`CREATE POLICY academy_lesson_progress_owner_update_policy ON academy_lesson_progress FOR UPDATE USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    ) WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+
+    await sql`ALTER TABLE IF EXISTS academy_certificate_awards ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS academy_certificate_awards_owner_select_policy ON academy_certificate_awards;`
+    await sql`CREATE POLICY academy_certificate_awards_owner_select_policy ON academy_certificate_awards FOR SELECT USING (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    await sql`DROP POLICY IF EXISTS academy_certificate_awards_owner_insert_policy ON academy_certificate_awards;`
+    await sql`CREATE POLICY academy_certificate_awards_owner_insert_policy ON academy_certificate_awards FOR INSERT WITH CHECK (
+      "userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub')
+      OR (current_setting('request.jwt.claims', true) IS NULL)
+    );`
+    console.log('✓ RLS policies configured for Molt Academy tables')
+
     console.log('✓ Row Level Security (RLS) policies successfully created!')
 
 
