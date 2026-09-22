@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getTableConfig } from 'drizzle-orm/pg-core'
-import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -27,6 +27,16 @@ describe('Database Schema & RLS Policies', () => {
     expect(suggestionDismissals).toBeDefined()
     expect(memberBonds).toBeDefined()
     expect(notifications).toBeDefined()
+    expect(academyTracks).toBeDefined()
+    expect(academyCourses).toBeDefined()
+    expect(academyTrackCourses).toBeDefined()
+    expect(academyModules).toBeDefined()
+    expect(academyLessons).toBeDefined()
+    expect(academyQuizQuestions).toBeDefined()
+    expect(academyEnrollments).toBeDefined()
+    expect(academyLessonProgress).toBeDefined()
+    expect(academyCertificates).toBeDefined()
+    expect(academyCertificateAwards).toBeDefined()
   })
 
   it('uniquely constrains Better Auth provider account pairs', () => {
@@ -56,6 +66,32 @@ describe('Database Schema & RLS Policies', () => {
     expect(notifications.kind).toBeDefined()
     expect(notifications.sourceKey).toBeDefined()
     expect(notifications.readAt).toBeDefined()
+  })
+
+  it('defines academy catalog keys for courses, lessons, enrollments, and credentials', () => {
+    const lessonUniques = getTableConfig(academyLessons).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(lessonUniques).toContain('academy_lessons_course_slug_uidx')
+    const enrollmentUniques = getTableConfig(academyEnrollments).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(enrollmentUniques).toContain('academy_enrollments_user_course_uidx')
+    const progressUniques = getTableConfig(academyLessonProgress).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(progressUniques).toContain('academy_lesson_progress_user_lesson_uidx')
+    const awardUniques = getTableConfig(academyCertificateAwards).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(awardUniques).toContain('academy_certificate_awards_user_cert_uidx')
+    expect(academyCourses.slug).toBeDefined()
+    expect(academyCourses.code).toBeDefined()
+    expect(academyLessons.kind).toBeDefined()
+    expect(academyLessons.videoUrl).toBeDefined()
+    expect(academyQuizQuestions.correctIndex).toBeDefined()
+    expect(academyCertificates.scope).toBeDefined()
+    expect(academyCertificateAwards.credentialId).toBeDefined()
   })
 
   it('defines required fields on the leads table', () => {

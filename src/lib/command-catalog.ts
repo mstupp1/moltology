@@ -135,7 +135,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     icon: 'lectures',
     shortcut: 'G L',
     to: '/lectures',
-    keywords: ['academy', 'courses', 'lectures'],
+    keywords: ['academy', 'courses', 'lectures', 'tracks', 'certifications', 'lessons'],
   },
   {
     id: 'nav-pipeline',

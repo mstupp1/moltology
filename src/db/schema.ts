@@ -1,5 +1,14 @@
 import { pgTable, pgSchema, text, integer, timestamp, boolean, uuid, decimal, jsonb, pgPolicy, uniqueIndex, index, foreignKey, type AnyPgColumn } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
+import type {
+  AcademyCertificateScope,
+  AcademyEnrollmentStatus,
+  AcademyLessonKind,
+  AcademyLevel,
+  AcademyProgressStatus,
+  AcademyPublishStatus,
+  AcademyVideoProvider,
+} from '../lib/academy-types'
 
 // Leftover Managed Neon Auth view (do not drop until CoS disables Auth on main).
 export const neonAuthSchema = pgSchema('neon_auth')
@@ -988,4 +997,215 @@ export const leads = pgTable('leads', {
         AND profiles.role IN ('admin', 'super_admin')
     ) OR (NULLIF(current_setting('request.jwt.claims', true), '') IS NULL)`
   })
+])
+
+const academyPublishedOrOwner = sql`"status" = 'published' OR (current_setting('request.jwt.claims', true) IS NULL)`
+const academyOwnerOnly = sql`"userId" = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`
+
+/** Learning paths that group courses in a required order. */
+export const academyTracks = pgTable('academy_tracks', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  subtitle: text('subtitle').notNull(),
+  description: text('description').notNull(),
+  level: text('level').$type<AcademyLevel>().notNull(),
+  coverImageUrl: text('coverImageUrl'),
+  estimatedHours: integer('estimatedHours').default(1).notNull(),
+  outcomes: jsonb('outcomes').$type<string[]>().default([]).notNull(),
+  status: text('status').$type<AcademyPublishStatus>().default('published').notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  index('academy_tracks_status_sort_idx').on(table.status, table.sortOrder),
+  pgPolicy('academy_tracks_public_read_policy', {
+    for: 'select',
+    using: academyPublishedOrOwner,
+  }),
+])
+
+/** A course is the unit a member enrolls in. */
+export const academyCourses = pgTable('academy_courses', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  code: text('code').notNull().unique(),
+  title: text('title').notNull(),
+  subtitle: text('subtitle').notNull(),
+  description: text('description').notNull(),
+  category: text('category').notNull(),
+  level: text('level').$type<AcademyLevel>().notNull(),
+  coverImageUrl: text('coverImageUrl'),
+  instructorName: text('instructorName').notNull(),
+  instructorTitle: text('instructorTitle').notNull(),
+  estimatedMinutes: integer('estimatedMinutes').default(30).notNull(),
+  outcomes: jsonb('outcomes').$type<string[]>().default([]).notNull(),
+  status: text('status').$type<AcademyPublishStatus>().default('draft').notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+  publishedAt: timestamp('publishedAt'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  index('academy_courses_status_sort_idx').on(table.status, table.sortOrder),
+  index('academy_courses_category_idx').on(table.category),
+  pgPolicy('academy_courses_public_read_policy', {
+    for: 'select',
+    using: academyPublishedOrOwner,
+  }),
+])
+
+/** Ordered membership of a course inside a track. */
+export const academyTrackCourses = pgTable('academy_track_courses', {
+  trackId: uuid('trackId').notNull().references(() => academyTracks.id, { onDelete: 'cascade' }),
+  courseId: uuid('courseId').notNull().references(() => academyCourses.id, { onDelete: 'cascade' }),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+  required: boolean('required').default(true).notNull(),
+}, (table) => [
+  uniqueIndex('academy_track_courses_pk').on(table.trackId, table.courseId),
+  index('academy_track_courses_course_idx').on(table.courseId),
+  pgPolicy('academy_track_courses_public_read_policy', {
+    for: 'select',
+    using: sql`EXISTS (
+      SELECT 1 FROM academy_tracks t
+      WHERE t.id = academy_track_courses."trackId" AND t.status = 'published'
+    ) OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/** A module is a section inside a course syllabus. */
+export const academyModules = pgTable('academy_modules', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  courseId: uuid('courseId').notNull().references(() => academyCourses.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  summary: text('summary').default('').notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+}, (table) => [
+  index('academy_modules_course_sort_idx').on(table.courseId, table.sortOrder),
+  pgPolicy('academy_modules_public_read_policy', {
+    for: 'select',
+    using: sql`EXISTS (
+      SELECT 1 FROM academy_courses c
+      WHERE c.id = academy_modules."courseId" AND c.status = 'published'
+    ) OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+/** A lesson is a video lecture, a reading, or a quiz. */
+export const academyLessons = pgTable('academy_lessons', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  courseId: uuid('courseId').notNull().references(() => academyCourses.id, { onDelete: 'cascade' }),
+  moduleId: uuid('moduleId').notNull().references(() => academyModules.id, { onDelete: 'cascade' }),
+  slug: text('slug').notNull(),
+  title: text('title').notNull(),
+  summary: text('summary').default('').notNull(),
+  kind: text('kind').$type<AcademyLessonKind>().notNull(),
+  durationSeconds: integer('durationSeconds').default(0).notNull(),
+  videoUrl: text('videoUrl'),
+  videoProvider: text('videoProvider').$type<AcademyVideoProvider>(),
+  posterUrl: text('posterUrl'),
+  body: text('body'),
+  isPreview: boolean('isPreview').default(false).notNull(),
+  passingScore: integer('passingScore').default(80).notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+}, (table) => [
+  uniqueIndex('academy_lessons_course_slug_uidx').on(table.courseId, table.slug),
+  index('academy_lessons_module_sort_idx').on(table.moduleId, table.sortOrder),
+  pgPolicy('academy_lessons_public_read_policy', {
+    for: 'select',
+    using: sql`EXISTS (
+      SELECT 1 FROM academy_courses c
+      WHERE c.id = academy_lessons."courseId" AND c.status = 'published'
+    ) OR (current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+export const academyQuizQuestions = pgTable('academy_quiz_questions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  lessonId: uuid('lessonId').notNull().references(() => academyLessons.id, { onDelete: 'cascade' }),
+  prompt: text('prompt').notNull(),
+  choices: jsonb('choices').$type<string[]>().default([]).notNull(),
+  correctIndex: integer('correctIndex').notNull(),
+  explanation: text('explanation').default('').notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+}, (table) => [
+  index('academy_quiz_questions_lesson_sort_idx').on(table.lessonId, table.sortOrder),
+  pgPolicy('academy_quiz_questions_owner_read_policy', {
+    for: 'select',
+    using: sql`(current_setting('request.jwt.claims', true) IS NULL)`,
+  }),
+])
+
+export const academyEnrollments = pgTable('academy_enrollments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  courseId: uuid('courseId').notNull().references(() => academyCourses.id, { onDelete: 'cascade' }),
+  status: text('status').$type<AcademyEnrollmentStatus>().default('active').notNull(),
+  enrolledAt: timestamp('enrolledAt').defaultNow().notNull(),
+  completedAt: timestamp('completedAt'),
+}, (table) => [
+  uniqueIndex('academy_enrollments_user_course_uidx').on(table.userId, table.courseId),
+  index('academy_enrollments_user_idx').on(table.userId),
+  pgPolicy('academy_enrollments_owner_select_policy', { for: 'select', using: academyOwnerOnly }),
+  pgPolicy('academy_enrollments_owner_insert_policy', { for: 'insert', withCheck: academyOwnerOnly }),
+  pgPolicy('academy_enrollments_owner_update_policy', {
+    for: 'update',
+    using: academyOwnerOnly,
+    withCheck: academyOwnerOnly,
+  }),
+])
+
+export const academyLessonProgress = pgTable('academy_lesson_progress', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  lessonId: uuid('lessonId').notNull().references(() => academyLessons.id, { onDelete: 'cascade' }),
+  courseId: uuid('courseId').notNull().references(() => academyCourses.id, { onDelete: 'cascade' }),
+  status: text('status').$type<AcademyProgressStatus>().default('in_progress').notNull(),
+  progressPercent: integer('progressPercent').default(0).notNull(),
+  lastPositionSeconds: integer('lastPositionSeconds').default(0).notNull(),
+  quizScore: integer('quizScore'),
+  quizPassed: boolean('quizPassed').default(false).notNull(),
+  note: text('note'),
+  completedAt: timestamp('completedAt'),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('academy_lesson_progress_user_lesson_uidx').on(table.userId, table.lessonId),
+  index('academy_lesson_progress_user_course_idx').on(table.userId, table.courseId),
+  pgPolicy('academy_lesson_progress_owner_select_policy', { for: 'select', using: academyOwnerOnly }),
+  pgPolicy('academy_lesson_progress_owner_insert_policy', { for: 'insert', withCheck: academyOwnerOnly }),
+  pgPolicy('academy_lesson_progress_owner_update_policy', {
+    for: 'update',
+    using: academyOwnerOnly,
+    withCheck: academyOwnerOnly,
+  }),
+])
+
+/** Certificate template earned by finishing a course or a track. */
+export const academyCertificates = pgTable('academy_certificates', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  scope: text('scope').$type<AcademyCertificateScope>().notNull(),
+  courseId: uuid('courseId').references(() => academyCourses.id, { onDelete: 'cascade' }),
+  trackId: uuid('trackId').references(() => academyTracks.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+}, (table) => [
+  uniqueIndex('academy_certificates_course_uidx').on(table.courseId),
+  uniqueIndex('academy_certificates_track_uidx').on(table.trackId),
+  pgPolicy('academy_certificates_public_read_policy', {
+    for: 'select',
+    using: sql`true`,
+  }),
+])
+
+/** Issued credential. credentialId is the public code printed on the certificate. */
+export const academyCertificateAwards = pgTable('academy_certificate_awards', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  certificateId: uuid('certificateId').notNull().references(() => academyCertificates.id, { onDelete: 'cascade' }),
+  credentialId: text('credentialId').notNull().unique(),
+  issuedAt: timestamp('issuedAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('academy_certificate_awards_user_cert_uidx').on(table.userId, table.certificateId),
+  pgPolicy('academy_certificate_awards_owner_select_policy', { for: 'select', using: academyOwnerOnly }),
+  pgPolicy('academy_certificate_awards_owner_insert_policy', { for: 'insert', withCheck: academyOwnerOnly }),
 ])

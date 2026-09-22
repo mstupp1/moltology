@@ -39,7 +39,6 @@ import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
 import { Route as HudDashboardRouteImport } from './routes/_hud/dashboard'
 import { Route as HudHudRouteImport } from './routes/_hud/hud'
-import { Route as HudLecturesRouteImport } from './routes/_hud/lectures'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
 import { Route as HudOracleRouteImport } from './routes/_hud/oracle'
 import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
@@ -68,10 +67,17 @@ import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
 import { Route as HudJournalIndexRouteImport } from './routes/_hud/journal/index'
 import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
+import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/index'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
+import { Route as HudLecturesCertificatesIndexRouteImport } from './routes/_hud/lectures/certificates/index'
+import { Route as HudLecturesCertificatesCredentialIdRouteImport } from './routes/_hud/lectures/certificates/$credentialId'
+import { Route as HudLecturesCoursesSlugRouteImport } from './routes/_hud/lectures/courses/$slug'
+import { Route as HudLecturesTracksSlugRouteImport } from './routes/_hud/lectures/tracks/$slug'
+import { Route as HudLecturesCoursesSlugIndexRouteImport } from './routes/_hud/lectures/courses/$slug/index'
+import { Route as HudLecturesCoursesSlugLessonsLessonSlugRouteImport } from './routes/_hud/lectures/courses/$slug/lessons/$lessonSlug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -222,11 +228,6 @@ const HudHudRoute = HudHudRouteImport.update({
   path: '/hud',
   getParentRoute: () => HudRoute,
 } as any)
-const HudLecturesRoute = HudLecturesRouteImport.update({
-  id: '/lectures',
-  path: '/lectures',
-  getParentRoute: () => HudRoute,
-} as any)
 const HudMarketRoute = HudMarketRouteImport.update({
   id: '/market',
   path: '/market',
@@ -370,6 +371,11 @@ const HudJournalSlugRoute = HudJournalSlugRouteImport.update({
   path: '/journal/$slug',
   getParentRoute: () => HudRoute,
 } as any)
+const HudLecturesIndexRoute = HudLecturesIndexRouteImport.update({
+  id: '/lectures/',
+  path: '/lectures/',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudMemberProfileIdRoute = HudMemberProfileIdRouteImport.update({
   id: '/member/$profileId',
   path: '/member/$profileId',
@@ -391,6 +397,40 @@ const HudForumCategorySlugTopicSlugRoute =
     id: '/forum/$categorySlug/$topicSlug',
     path: '/forum/$categorySlug/$topicSlug',
     getParentRoute: () => HudRoute,
+  } as any)
+const HudLecturesCertificatesIndexRoute =
+  HudLecturesCertificatesIndexRouteImport.update({
+    id: '/lectures/certificates/',
+    path: '/lectures/certificates/',
+    getParentRoute: () => HudRoute,
+  } as any)
+const HudLecturesCertificatesCredentialIdRoute =
+  HudLecturesCertificatesCredentialIdRouteImport.update({
+    id: '/lectures/certificates/$credentialId',
+    path: '/lectures/certificates/$credentialId',
+    getParentRoute: () => HudRoute,
+  } as any)
+const HudLecturesCoursesSlugRoute = HudLecturesCoursesSlugRouteImport.update({
+  id: '/lectures/courses/$slug',
+  path: '/lectures/courses/$slug',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudLecturesTracksSlugRoute = HudLecturesTracksSlugRouteImport.update({
+  id: '/lectures/tracks/$slug',
+  path: '/lectures/tracks/$slug',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudLecturesCoursesSlugIndexRoute =
+  HudLecturesCoursesSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => HudLecturesCoursesSlugRoute,
+  } as any)
+const HudLecturesCoursesSlugLessonsLessonSlugRoute =
+  HudLecturesCoursesSlugLessonsLessonSlugRouteImport.update({
+    id: '/lessons/$lessonSlug',
+    path: '/lessons/$lessonSlug',
+    getParentRoute: () => HudLecturesCoursesSlugRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -423,7 +463,6 @@ export interface FileRoutesByFullPath {
   '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
-  '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/pipeline': typeof HudPipelineRoute
@@ -454,8 +493,15 @@ export interface FileRoutesByFullPath {
   '/codex/': typeof HudCodexIndexRoute
   '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
+  '/lectures/': typeof HudLecturesIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
+  '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
+  '/lectures/courses/$slug': typeof HudLecturesCoursesSlugRouteWithChildren
+  '/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
   '/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
+  '/lectures/certificates/': typeof HudLecturesCertificatesIndexRoute
+  '/lectures/courses/$slug/': typeof HudLecturesCoursesSlugIndexRoute
+  '/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -486,7 +532,6 @@ export interface FileRoutesByTo {
   '/connections': typeof HudConnectionsRoute
   '/dashboard': typeof HudDashboardRoute
   '/hud': typeof HudHudRoute
-  '/lectures': typeof HudLecturesRoute
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/pipeline': typeof HudPipelineRoute
@@ -517,8 +562,14 @@ export interface FileRoutesByTo {
   '/codex': typeof HudCodexIndexRoute
   '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
+  '/lectures': typeof HudLecturesIndexRoute
   '/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
+  '/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
+  '/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
   '/forum/$categorySlug': typeof HudForumCategorySlugIndexRoute
+  '/lectures/certificates': typeof HudLecturesCertificatesIndexRoute
+  '/lectures/courses/$slug': typeof HudLecturesCoursesSlugIndexRoute
+  '/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -552,7 +603,6 @@ export interface FileRoutesById {
   '/_hud/connections': typeof HudConnectionsRoute
   '/_hud/dashboard': typeof HudDashboardRoute
   '/_hud/hud': typeof HudHudRoute
-  '/_hud/lectures': typeof HudLecturesRoute
   '/_hud/market': typeof HudMarketRoute
   '/_hud/oracle': typeof HudOracleRoute
   '/_hud/pipeline': typeof HudPipelineRoute
@@ -583,8 +633,15 @@ export interface FileRoutesById {
   '/_hud/codex/': typeof HudCodexIndexRoute
   '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
+  '/_hud/lectures/': typeof HudLecturesIndexRoute
   '/_hud/forum/$categorySlug/$topicSlug': typeof HudForumCategorySlugTopicSlugRoute
+  '/_hud/lectures/certificates/$credentialId': typeof HudLecturesCertificatesCredentialIdRoute
+  '/_hud/lectures/courses/$slug': typeof HudLecturesCoursesSlugRouteWithChildren
+  '/_hud/lectures/tracks/$slug': typeof HudLecturesTracksSlugRoute
   '/_hud/forum/$categorySlug/': typeof HudForumCategorySlugIndexRoute
+  '/_hud/lectures/certificates/': typeof HudLecturesCertificatesIndexRoute
+  '/_hud/lectures/courses/$slug/': typeof HudLecturesCoursesSlugIndexRoute
+  '/_hud/lectures/courses/$slug/lessons/$lessonSlug': typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -618,7 +675,6 @@ export interface FileRouteTypes {
     | '/connections'
     | '/dashboard'
     | '/hud'
-    | '/lectures'
     | '/market'
     | '/oracle'
     | '/pipeline'
@@ -649,8 +705,15 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/forum/'
     | '/journal/'
+    | '/lectures/'
     | '/forum/$categorySlug/$topicSlug'
+    | '/lectures/certificates/$credentialId'
+    | '/lectures/courses/$slug'
+    | '/lectures/tracks/$slug'
     | '/forum/$categorySlug/'
+    | '/lectures/certificates/'
+    | '/lectures/courses/$slug/'
+    | '/lectures/courses/$slug/lessons/$lessonSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -681,7 +744,6 @@ export interface FileRouteTypes {
     | '/connections'
     | '/dashboard'
     | '/hud'
-    | '/lectures'
     | '/market'
     | '/oracle'
     | '/pipeline'
@@ -712,8 +774,14 @@ export interface FileRouteTypes {
     | '/codex'
     | '/forum'
     | '/journal'
+    | '/lectures'
     | '/forum/$categorySlug/$topicSlug'
+    | '/lectures/certificates/$credentialId'
+    | '/lectures/tracks/$slug'
     | '/forum/$categorySlug'
+    | '/lectures/certificates'
+    | '/lectures/courses/$slug'
+    | '/lectures/courses/$slug/lessons/$lessonSlug'
   id:
     | '__root__'
     | '/'
@@ -746,7 +814,6 @@ export interface FileRouteTypes {
     | '/_hud/connections'
     | '/_hud/dashboard'
     | '/_hud/hud'
-    | '/_hud/lectures'
     | '/_hud/market'
     | '/_hud/oracle'
     | '/_hud/pipeline'
@@ -777,8 +844,15 @@ export interface FileRouteTypes {
     | '/_hud/codex/'
     | '/_hud/forum/'
     | '/_hud/journal/'
+    | '/_hud/lectures/'
     | '/_hud/forum/$categorySlug/$topicSlug'
+    | '/_hud/lectures/certificates/$credentialId'
+    | '/_hud/lectures/courses/$slug'
+    | '/_hud/lectures/tracks/$slug'
     | '/_hud/forum/$categorySlug/'
+    | '/_hud/lectures/certificates/'
+    | '/_hud/lectures/courses/$slug/'
+    | '/_hud/lectures/courses/$slug/lessons/$lessonSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1031,13 +1105,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudHudRouteImport
       parentRoute: typeof HudRoute
     }
-    '/_hud/lectures': {
-      id: '/_hud/lectures'
-      path: '/lectures'
-      fullPath: '/lectures'
-      preLoaderRoute: typeof HudLecturesRouteImport
-      parentRoute: typeof HudRoute
-    }
     '/_hud/market': {
       id: '/_hud/market'
       path: '/market'
@@ -1234,6 +1301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudJournalSlugRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/lectures/': {
+      id: '/_hud/lectures/'
+      path: '/lectures'
+      fullPath: '/lectures/'
+      preLoaderRoute: typeof HudLecturesIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/member/$profileId': {
       id: '/_hud/member/$profileId'
       path: '/member/$profileId'
@@ -1262,8 +1336,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudForumCategorySlugTopicSlugRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/lectures/certificates/': {
+      id: '/_hud/lectures/certificates/'
+      path: '/lectures/certificates'
+      fullPath: '/lectures/certificates/'
+      preLoaderRoute: typeof HudLecturesCertificatesIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/lectures/certificates/$credentialId': {
+      id: '/_hud/lectures/certificates/$credentialId'
+      path: '/lectures/certificates/$credentialId'
+      fullPath: '/lectures/certificates/$credentialId'
+      preLoaderRoute: typeof HudLecturesCertificatesCredentialIdRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/lectures/courses/$slug': {
+      id: '/_hud/lectures/courses/$slug'
+      path: '/lectures/courses/$slug'
+      fullPath: '/lectures/courses/$slug'
+      preLoaderRoute: typeof HudLecturesCoursesSlugRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/lectures/tracks/$slug': {
+      id: '/_hud/lectures/tracks/$slug'
+      path: '/lectures/tracks/$slug'
+      fullPath: '/lectures/tracks/$slug'
+      preLoaderRoute: typeof HudLecturesTracksSlugRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/lectures/courses/$slug/': {
+      id: '/_hud/lectures/courses/$slug/'
+      path: '/'
+      fullPath: '/lectures/courses/$slug/'
+      preLoaderRoute: typeof HudLecturesCoursesSlugIndexRouteImport
+      parentRoute: typeof HudLecturesCoursesSlugRoute
+    }
+    '/_hud/lectures/courses/$slug/lessons/$lessonSlug': {
+      id: '/_hud/lectures/courses/$slug/lessons/$lessonSlug'
+      path: '/lessons/$lessonSlug'
+      fullPath: '/lectures/courses/$slug/lessons/$lessonSlug'
+      preLoaderRoute: typeof HudLecturesCoursesSlugLessonsLessonSlugRouteImport
+      parentRoute: typeof HudLecturesCoursesSlugRoute
+    }
   }
 }
+
+interface HudLecturesCoursesSlugRouteChildren {
+  HudLecturesCoursesSlugIndexRoute: typeof HudLecturesCoursesSlugIndexRoute
+  HudLecturesCoursesSlugLessonsLessonSlugRoute: typeof HudLecturesCoursesSlugLessonsLessonSlugRoute
+}
+
+const HudLecturesCoursesSlugRouteChildren: HudLecturesCoursesSlugRouteChildren =
+  {
+    HudLecturesCoursesSlugIndexRoute: HudLecturesCoursesSlugIndexRoute,
+    HudLecturesCoursesSlugLessonsLessonSlugRoute:
+      HudLecturesCoursesSlugLessonsLessonSlugRoute,
+  }
+
+const HudLecturesCoursesSlugRouteWithChildren =
+  HudLecturesCoursesSlugRoute._addFileChildren(
+    HudLecturesCoursesSlugRouteChildren,
+  )
 
 interface HudRouteChildren {
   HudAlignmentRoute: typeof HudAlignmentRoute
@@ -1271,7 +1404,6 @@ interface HudRouteChildren {
   HudConnectionsRoute: typeof HudConnectionsRoute
   HudDashboardRoute: typeof HudDashboardRoute
   HudHudRoute: typeof HudHudRoute
-  HudLecturesRoute: typeof HudLecturesRoute
   HudMarketRoute: typeof HudMarketRoute
   HudOracleRoute: typeof HudOracleRoute
   HudPipelineRoute: typeof HudPipelineRoute
@@ -1288,8 +1420,13 @@ interface HudRouteChildren {
   HudCodexIndexRoute: typeof HudCodexIndexRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
   HudJournalIndexRoute: typeof HudJournalIndexRoute
+  HudLecturesIndexRoute: typeof HudLecturesIndexRoute
   HudForumCategorySlugTopicSlugRoute: typeof HudForumCategorySlugTopicSlugRoute
+  HudLecturesCertificatesCredentialIdRoute: typeof HudLecturesCertificatesCredentialIdRoute
+  HudLecturesCoursesSlugRoute: typeof HudLecturesCoursesSlugRouteWithChildren
+  HudLecturesTracksSlugRoute: typeof HudLecturesTracksSlugRoute
   HudForumCategorySlugIndexRoute: typeof HudForumCategorySlugIndexRoute
+  HudLecturesCertificatesIndexRoute: typeof HudLecturesCertificatesIndexRoute
 }
 
 const HudRouteChildren: HudRouteChildren = {
@@ -1298,7 +1435,6 @@ const HudRouteChildren: HudRouteChildren = {
   HudConnectionsRoute: HudConnectionsRoute,
   HudDashboardRoute: HudDashboardRoute,
   HudHudRoute: HudHudRoute,
-  HudLecturesRoute: HudLecturesRoute,
   HudMarketRoute: HudMarketRoute,
   HudOracleRoute: HudOracleRoute,
   HudPipelineRoute: HudPipelineRoute,
@@ -1315,8 +1451,14 @@ const HudRouteChildren: HudRouteChildren = {
   HudCodexIndexRoute: HudCodexIndexRoute,
   HudForumIndexRoute: HudForumIndexRoute,
   HudJournalIndexRoute: HudJournalIndexRoute,
+  HudLecturesIndexRoute: HudLecturesIndexRoute,
   HudForumCategorySlugTopicSlugRoute: HudForumCategorySlugTopicSlugRoute,
+  HudLecturesCertificatesCredentialIdRoute:
+    HudLecturesCertificatesCredentialIdRoute,
+  HudLecturesCoursesSlugRoute: HudLecturesCoursesSlugRouteWithChildren,
+  HudLecturesTracksSlugRoute: HudLecturesTracksSlugRoute,
   HudForumCategorySlugIndexRoute: HudForumCategorySlugIndexRoute,
+  HudLecturesCertificatesIndexRoute: HudLecturesCertificatesIndexRoute,
 }
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
