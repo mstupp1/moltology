@@ -30,6 +30,7 @@ vi.mock('@/lib/jwt', () => ({
 
 vi.mock('@/lib/server/api', () => ({
   searchMembersFn: vi.fn(),
+  getUserProfileFn: vi.fn().mockResolvedValue(null),
 }))
 
 vi.mock('@/components/hud/LobsterAvatarPortrait', () => ({
@@ -149,6 +150,21 @@ describe('CommandPalette Component', () => {
     fireEvent.change(input, { target: { value: 'Codex' } })
     expect(screen.getByText('Open Sacred Codex & Canonical Scriptures')).toBeInTheDocument()
     expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
+  })
+
+  it('lists subterranean vats for admins and hides it from everyone else', () => {
+    const view = render(<ToastProvider><CommandPalette /></ToastProvider>)
+    fireEvent(window, new CustomEvent('open-command-palette'))
+    const input = screen.getByPlaceholderText(/Type a command or search protocol/i)
+    fireEvent.change(input, { target: { value: 'vats' } })
+    expect(screen.queryByText('Open Subterranean Vats & Level -7 Bio-Vault')).not.toBeInTheDocument()
+
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
+      isPending: false,
+    } as any)
+    view.rerender(<ToastProvider><CommandPalette /></ToastProvider>)
+    expect(screen.getByText('Open Subterranean Vats & Level -7 Bio-Vault')).toBeInTheDocument()
   })
 
   it('surfaces the shared chamber index for oracle, connections, and news', () => {

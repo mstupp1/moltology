@@ -81,7 +81,20 @@ describe('command catalog', () => {
     const codex = filterCommandCatalog('Codex')
     expect(codex.map((cmd) => cmd.id)).toEqual(['nav-codex'])
     expect(filterCommandCatalog('rituals').map((cmd) => cmd.id)).toEqual(['ritual-purge'])
-    expect(filterCommandCatalog('').length).toBe(COMMAND_CATALOG.length)
+    expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-subterranean')
+    expect(filterCommandCatalog('').length).toBe(
+      COMMAND_CATALOG.filter((cmd) => cmd.id !== 'nav-subterranean').length,
+    )
+  })
+
+  it('keeps hidden pages out of search unless the viewer can see them', () => {
+    expect(filterCommandCatalog('vats').map((cmd) => cmd.id)).not.toContain('nav-subterranean')
+    expect(
+      filterCommandCatalog('vats', undefined, { includeHidden: true }).map((cmd) => cmd.id),
+    ).toContain('nav-subterranean')
+    expect(filterCommandCatalog('', undefined, { includeHidden: true }).length).toBe(
+      COMMAND_CATALOG.length,
+    )
   })
 
   it('uses the same pages catalog for overlay and /search pages', () => {
