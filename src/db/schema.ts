@@ -484,6 +484,12 @@ export const forumTopics = pgTable('forum_topics', {
   views: integer('views').default(0).notNull(),
   repliesCount: integer('repliesCount').default(0).notNull(),
   upvotes: integer('upvotes').default(0).notNull(),
+  /** 0–100 Jev quality score. Null until a live evaluation lands. */
+  qualityScore: integer('qualityScore'),
+  /** Hot hides low-substance topics. Existing rows stay visible. */
+  discoveryEligible: boolean('discoveryEligible').default(true).notNull(),
+  /** Suggested board slug. The member's chosen category is not moved. */
+  suggestedCategory: text('suggestedCategory'),
   lastReplyAt: timestamp('lastReplyAt').defaultNow().notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),

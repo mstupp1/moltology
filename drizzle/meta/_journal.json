@@ -267,6 +267,13 @@
       "when": 1790038184208,
       "tag": "0037_workable_hannibal_king",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1790121970504,
+      "tag": "0038_even_paladin",
+      "breakpoints": true
     }
   ]
 }

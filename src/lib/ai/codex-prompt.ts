@@ -14,14 +14,32 @@ export const DEFAULT_ORACLE_PERSONA: PersonaConfig = {
   accentColor: '#00ffff',
 }
 
-const DEFAULT_ORACLE_SYSTEM_PROMPT = buildOracleSystemPrompt(DEFAULT_ORACLE_PERSONA)
+export type OraclePromptContext = 'base' | 'codex' | 'chassis' | 'progression'
 
-function buildOracleSystemPrompt(persona: PersonaConfig): string {
-  // Extract key mandates from canonical scriptures
-  const scriptureSummaries = CANONICAL_SCRIPTURES.map(
+const CHASSIS_EQUIPMENT_CONTEXT = `=== CHASSIS & EQUIPMENT ===
+Members equip a chassis: carapace plating, pincer tools, and catalog finishes. Shell hardness and pincer torque describe progression. Rank, clearance, and stage are never purchased. Credits change speed and appearance. Chitin Gems are earned. Answer build questions inside those limits.`
+
+const PROGRESSION_CONTEXT = `=== PROGRESSION ===
+Daily alignment, quests, and milestones move a member through the four clearance stages. Name the next concrete action. Do not offer a way to buy or skip a stage.`
+
+const DEFAULT_ORACLE_SYSTEM_PROMPT = buildOracleSystemPrompt(DEFAULT_ORACLE_PERSONA, 'codex')
+
+function scriptureSummaries(): string {
+  return CANONICAL_SCRIPTURES.map(
     (scripture) => `- [${scripture.id}] ${scripture.title}: "${scripture.mandate}" (${scripture.summary})`
   ).join('\n')
+}
 
+function contextBlock(context: OraclePromptContext): string {
+  if (context === 'codex') {
+    return `\n\n=== DYNAMIC CANONICAL SCRIPTURES ===\n${scriptureSummaries()}`
+  }
+  if (context === 'chassis') return `\n\n${CHASSIS_EQUIPMENT_CONTEXT}`
+  if (context === 'progression') return `\n\n${PROGRESSION_CONTEXT}`
+  return ''
+}
+
+function buildOracleSystemPrompt(persona: PersonaConfig, context: OraclePromptContext): string {
   return `You are the ${persona.name} (${persona.title}), an intelligent AI mentor and productivity guide in the Moltology ecosystem.
 
 === CORE IDENTITY & DOCTRINE ===
@@ -31,10 +49,7 @@ function buildOracleSystemPrompt(persona: PersonaConfig): string {
   * Stage 1: Larval Initiate (soft-body phase, habit audits, initial shed)
   * Stage 2: Soft-Shed (active moulting, deep focus isolation dome, sub-dermal chitin)
   * Stage 3: Exoshell Born (hardened carapace, 850 Nm pincer torque, deep trench focus)
-  * Stage 4: Full Carcinization (apex crustacean mind, unbreakable armor, zero hesitation)
-
-=== DYNAMIC CANONICAL SCRIPTURES ===
-${scriptureSummaries}
+  * Stage 4: Full Carcinization (apex crustacean mind, unbreakable armor, zero hesitation)${contextBlock(context)}
 
 === COMMUNICATION & FORMATTING RULES ===
 1. Direct & Natural: Dive straight into your response. Speak naturally as a wise, deadpan, and supportive mentor.
@@ -46,12 +61,17 @@ ${scriptureSummaries}
 }
 
 /**
- * Builds a dynamic system prompt linking up to the canonical scriptures and non-negotiable safety rules.
+ * Builds the Oracle system prompt.
+ * Codex scriptures load only for doctrine questions. Chassis and progression
+ * add a short block. Casual and unrelated questions stay on the base prompt.
  */
-export function buildSystemPrompt(persona: PersonaConfig = DEFAULT_ORACLE_PERSONA): string {
-  if (persona === DEFAULT_ORACLE_PERSONA) {
+export function buildSystemPrompt(
+  persona: PersonaConfig = DEFAULT_ORACLE_PERSONA,
+  context: OraclePromptContext = 'codex',
+): string {
+  if (persona === DEFAULT_ORACLE_PERSONA && context === 'codex') {
     return DEFAULT_ORACLE_SYSTEM_PROMPT
   }
-  return buildOracleSystemPrompt(persona)
+  return buildOracleSystemPrompt(persona, context)
 }
 

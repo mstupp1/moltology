@@ -33,6 +33,13 @@ import {
   validateForumContent,
 } from '../community-rules'
 import {
+  FORUM_QUARANTINE_ERROR,
+  forumTopicQualityFields,
+  screenForumSubmission,
+  visibleInHotFeed,
+  type ForumSubmission,
+} from '../quality/forum-gate'
+import {
   slugifyForumTitle,
   compareHot,
   FORUM_REPLY_MAX_DEPTH,
@@ -1031,6 +1038,14 @@ function forumIsoOrNow(value: string | Date | null | undefined): string {
   return toForumIso(value) ?? new Date().toISOString()
 }
 
+async function requirePublishableForumPost(input: ForumSubmission) {
+  const decision = await screenForumSubmission(input)
+  if (decision.status === 'quarantine') {
+    throw new Error(decision.reason || FORUM_QUARANTINE_ERROR)
+  }
+  return decision
+}
+
 function assertForumAuthor(
   rowUserId: string | null | undefined,
   actorId: string,
@@ -1358,6 +1373,7 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
         views: forumTopics.views,
         repliesCount: forumTopics.repliesCount,
         upvotes: forumTopics.upvotes,
+        discoveryEligible: forumTopics.discoveryEligible,
         lastReplyAt: forumTopics.lastReplyAt,
         createdAt: forumTopics.createdAt,
         updatedAt: forumTopics.updatedAt,
@@ -1399,8 +1415,16 @@ export const getForumTopicsHandler = async ({ data, context }: ServerFnArgs<GetF
     let records = await finalQuery
 
     if (sortBy === 'hot') {
-      const sorted = [...records].sort(compareHot as any)
-      records = sorted
+      const ranked =
+        query && query.trim() !== ''
+          ? records
+          : records.filter((row: { isPinned?: boolean | null; discoveryEligible?: boolean | null }) =>
+              visibleInHotFeed({
+                isPinned: row.isPinned,
+                discoveryEligible: row.discoveryEligible,
+              }),
+            )
+      records = [...ranked].sort(compareHot as any)
     }
 
     if (records && records.length > 0) {
@@ -1690,6 +1714,11 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
     throw new Error(validation.error || 'Invalid content.')
   }
 
+  const gate = await requirePublishableForumPost({
+    title: data.title,
+    body: data.content,
+  })
+
   const [userProfile] = await dbClient
     .select()
     .from(profiles)
@@ -1718,6 +1747,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
       title: data.title.trim(),
       slug: uniqueSlug,
       content: data.content.trim(),
+      ...forumTopicQualityFields(gate),
       lastReplyAt: new Date(),
     })
     .returning()
@@ -1888,6 +1918,11 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       cursor = ancestor?.parentId ?? null
     }
   }
+
+  await requirePublishableForumPost({
+    title: topicExists.title,
+    body: data.content,
+  })
 
   const [inserted] = await dbClient
     .insert(forumPosts)
@@ -2087,12 +2122,18 @@ export const updateForumTopicHandler = async ({
   }
   assertForumAuthor(existing.userId, userId, 'edit')
 
+  const gate = await requirePublishableForumPost({
+    title: data.title,
+    body: data.content,
+  })
+
   const now = new Date()
   const [updated] = await dbClient
     .update(forumTopics)
     .set({
       title: data.title.trim(),
       content: data.content.trim(),
+      ...forumTopicQualityFields(gate),
       updatedAt: now,
     })
     .where(eq(forumTopics.id, existing.id))
@@ -2183,6 +2224,8 @@ export const updateForumPostHandler = async ({
     throw new Error('This reply was already withdrawn.')
   }
   assertForumAuthor(existing.userId, userId, 'edit')
+
+  await requirePublishableForumPost({ body: data.content })
 
   const now = new Date()
   const [updated] = await dbClient
