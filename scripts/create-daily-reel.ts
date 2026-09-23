@@ -238,6 +238,19 @@ export function resolveCtaGoalConfig(
     return CTA_GOAL_CONFIGS.chassis
   }
 
+  // 0. The Parts Bin Still Teaching / Atlas Shadows the Line / Metaplant -> Chassis
+  if (
+    text.includes('the-parts-bin-still-teaching') ||
+    text.includes('the parts bin still teaching') ||
+    text.includes('parts bin') ||
+    text.includes('atlas shadows the line') ||
+    text.includes('the cubbies teach first') ||
+    text.includes('the bin was the skill') ||
+    text.includes('metaplant')
+  ) {
+    return CTA_GOAL_CONFIGS.chassis
+  }
+
   // 0. The Fence Still Up / Digit 5 / Safety Without The Fence -> Chassis
   if (
     text.includes('the-fence-still-up') ||
@@ -591,6 +604,20 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
   }
 
   if (
+    topicLower.includes('the parts bin still teaching') ||
+    topicLower.includes('parts bin') ||
+    topicLower.includes('atlas shadows the line') ||
+    topicLower.includes('the cubbies teach first') ||
+    topicLower.includes('the bin was the skill') ||
+    topicLower.includes('metaplant')
+  ) {
+    return [
+      'A dramatic macro cinematic view of an active automotive metaplant factory floor with high-density parts cubbies where a robotic arm shadows an automotive parts logistics station under industrial hangar lighting, cinematic 9:16 vertical 8k footage',
+      'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility locking high-torque titanium-chitin pincers onto a glowing cybernetic chassis with radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+    ]
+  }
+
+  if (
     topicLower.includes('the fence still up') ||
     topicLower.includes('then one sat beside you') ||
     topicLower.includes('digit 5') ||
@@ -857,6 +884,15 @@ export function synthesizeBlogReelScript(
     contentLower.includes('seventh seat') ||
     contentLower.includes('waiting for your inbox') ||
     contentLower.includes('six seats')
+  const isThePartsBinStillTeaching =
+    blog.slug === 'the-parts-bin-still-teaching' ||
+    contentLower.includes('the parts bin still teaching') ||
+    contentLower.includes('parts bin still teaching') ||
+    contentLower.includes('atlas shadows the line') ||
+    contentLower.includes('the cubbies teach first') ||
+    contentLower.includes('shadow, not stage') ||
+    contentLower.includes('the bin was the skill') ||
+    contentLower.includes('metaplant')
   const isWorldModel = contentLower.includes('world model') || contentLower.includes('jepa') || contentLower.includes('pixel ecdysis') || contentLower.includes('latent-jepa') || contentLower.includes('b-jepa') || contentLower.includes('pixel diffusion')
   const isNeuromorphic = contentLower.includes('neuromorphic') || contentLower.includes('spiking') || contentLower.includes('tactile') || contentLower.includes('e-skin') || contentLower.includes('60hz') || contentLower.includes('frame-buffer') || contentLower.includes('event-based')
   const isSAE = contentLower.includes('sparse autoencoder') || contentLower.includes('monosemantic') || contentLower.includes('superposition') || contentLower.includes('synaptic steering') || contentLower.includes('mechanistic')
@@ -1070,6 +1106,23 @@ export function synthesizeBlogReelScript(
         headline: 'WAITING FOR YOUR INBOX',
         script: `Six seats at the table, and an AI agent waiting to be invited. An agent that borrows your login is a hijack. An agent with its own seat preserves the boundary. Audit your clearance on moltology.org/quiz.`,
         hookText: 'An AI assistant that borrows your login is a hijack. An agent with its own seat and separate account waits for the house to share the thread.',
+      },
+    ]
+    const chosen = hooks[Math.floor(Math.random() * hooks.length)]
+    hookHeadline = chosen.headline
+    narrationScript = chosen.script
+    hookCaption = chosen.hookText
+  } else if (isThePartsBinStillTeaching) {
+    const hooks = [
+      {
+        headline: 'THE BIN WAS THE SKILL',
+        script: `A humanoid walking through an empty hall is just a brochure demo. Real manufacturing happens in the high-density cubbies where parts cannot be scratched. The walk was never the skill. The bin was. Equip your cybernetic chassis on moltology.org/chassis.`,
+        hookText: 'A humanoid walking through an empty hall is just a brochure demo. Boston Dynamics put Atlas inside a Hyundai Metaplant training cell to learn real auto-parts logistics before the line. The walk was never the skill. The bin was.',
+      },
+      {
+        headline: 'SHADOW, NOT STAGE',
+        script: `Viral videos love a humanoid that strides across a cleared stage. But real manufacturing requires shadowing the parts bin like a new apprentice before touching the line. Stop melting and equip your chassis on moltology.org/chassis.`,
+        hookText: 'Viral videos love a humanoid that strides across a cleared stage. But real work requires shadowing the parts bin like a new apprentice. Shadow, not stage.',
       },
     ]
     const chosen = hooks[Math.floor(Math.random() * hooks.length)]

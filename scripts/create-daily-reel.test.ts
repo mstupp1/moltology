@@ -84,6 +84,23 @@ describe('Daily Reel Dynamic Script Formulation', () => {
     expect(script.scenePrompts[1]).toContain('pincer')
   })
 
+  it('synthesizes The Parts Bin Still Teaching scripts with chassis CTA and cubbies hook', () => {
+    const partsBinBlog = {
+      slug: 'the-parts-bin-still-teaching',
+      title: 'The Parts Bin Still Teaching: Atlas Shadows the Line',
+      summary: 'Boston Dynamics opened a training cell inside Hyundai\'s Metaplant so Atlas can learn real auto-parts logistics before the line. The cubbies teach first.',
+      content: 'A humanoid walking through an empty hall is just a brochure demo. Real manufacturing happens in the high-density cubbies where parts cannot be scratched...',
+    }
+
+    const script = synthesizeBlogReelScript(partsBinBlog, {})
+    expect(['THE BIN WAS THE SKILL', 'SHADOW, NOT STAGE']).toContain(script.hookHeadline)
+    expect(script.narrationScript).toMatch(/(cubbies|parts bin|manufacturing|apprentice)/)
+    expect(script.ctaGoal).toBe('chassis')
+    expect(script.commentTriggerKeyword).toBe('CHASSIS')
+    expect(script.scenePrompts[0]).toContain('parts cubbies')
+    expect(script.scenePrompts[1]).toContain('chassis')
+  })
+
   it('builds dynamic combinatorial scene prompts with varied environments', () => {
     const prompts1 = buildDynamicScenePrompts('moltmaxxing', 'Topic A')
     const prompts2 = buildDynamicScenePrompts('moltmaxxing', 'Topic B')

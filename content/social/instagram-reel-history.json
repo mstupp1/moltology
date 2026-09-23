@@ -1264,6 +1264,46 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-21T14:19:09.585Z"
+    },
+    {
+      "id": "reel-1790172883701",
+      "topic": "The Parts Bin Still Teaching: Atlas Shadows the Line",
+      "hookHeadline": "THE BIN WAS THE SKILL",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-parts-bin-still-teaching",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "A humanoid walking through an empty hall is just a brochure demo. Real manufacturing happens in the high-density cubbies where parts cannot be scratched. The walk was never the skill. The bin was. Equip your cybernetic chassis on moltology.org/chassis.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1790172883701.mp4",
+      "s3Key": "videos/social/reels/master-reel-1790172883701.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 17.033333,
+      "status": "queued",
+      "scheduledFor": "2026-09-23T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ab3df57ce70c104be8e252a",
+      "zernioYouTubePostId": "6ab3df57ce70c104be8e252a",
+      "zernioPostId": "6ab3df57ce70c104be8e252a",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment CHASSIS to access the Benthic Equipment Vault in your DMs!\n🔗 Or configure your chassis: moltology.org/chassis\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "A humanoid walking through an empty hall is just a brochure demo. Boston Dynamics put Atlas inside a Hyundai Metaplant training cell to learn real auto-parts logistics before the line. The walk was never the skill. The bin was. ⚡🌊\n\nBoston Dynamics opened a training cell inside Hyundai's Metaplant so Atlas can learn real auto-parts logistics before the line. The cubbies teach first.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"CHASSIS\" to get instant access to the Benthic Equipment Vault & loadout builder in your DMs, or visit:\n🔗 Link in bio & story → moltology.org/chassis",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "chassis",
+      "commentTriggerKeyword": "CHASSIS",
+      "commentTriggerUrl": "https://moltology.org/chassis",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-23T14:16:56.132Z"
     }
   ]
 }
