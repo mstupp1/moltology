@@ -6,7 +6,7 @@ import { isEmailVerificationEnabled, isGoogleAuthEnabled } from '../lib/auth-con
 import {
   EMAIL_VERIFICATION_COPY,
   isEmailNotVerifiedError,
-  isVerifyFirstSignupResult,
+  shouldHoldSignupForVerification,
   stashPendingSignup,
   takePendingSignup,
 } from '../lib/auth-email-verification'
@@ -16,6 +16,7 @@ import { getAuthJWTToken } from '../lib/jwt'
 import { getUserProfileFn, updateEmailPreferencesFn } from '../lib/server/api'
 import { HudCard, HudInput, HudButton } from '@/components/ui'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
+import { SignupHoneypot, useSignupSignals } from '@/components/auth/SignupSignals'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -44,6 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
   const [resendBusy, setResendBusy] = useState(false)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
+  const signupSignals = useSignupSignals(mode === 'signup')
 
   useEffect(() => {
     setMode(initialMode)
@@ -157,10 +159,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           password,
           name: 'Initiate',
           callbackURL,
+          ...signupSignals.fields(),
         })
         if (res?.error) {
           setError(res.error.message || 'Could not create account. Please check your details and try again.')
-        } else if (isEmailVerificationEnabled() && isVerifyFirstSignupResult(res)) {
+        } else if (shouldHoldSignupForVerification(res, isEmailVerificationEnabled())) {
           stashPendingSignup({
             emailOptIn,
             email,
@@ -185,7 +188,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           password,
         })
         if (res?.error) {
-          if (isEmailVerificationEnabled() && isEmailNotVerifiedError(res.error)) {
+          if (isEmailNotVerifiedError(res.error)) {
             setPendingVerificationEmail(email)
             setError(EMAIL_VERIFICATION_COPY.loginBlocked)
           } else {
@@ -367,6 +370,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          <SignupHoneypot
+            active={mode === 'signup'}
+            value={signupSignals.honeypot}
+            onChange={signupSignals.setHoneypot}
+          />
           <HudInput
             label="Email Address"
             type="email"

@@ -666,6 +666,15 @@ async function applyRLS() {
     );`
     console.log('✓ RLS policies configured for Molt Academy tables')
 
+    await sql`ALTER TABLE IF EXISTS signup_risk_events ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS signup_risk_events_server_only_policy ON signup_risk_events;`
+    await sql`CREATE POLICY signup_risk_events_server_only_policy ON signup_risk_events FOR ALL USING (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    ) WITH CHECK (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    );`
+    console.log('✓ RLS policies configured for signup risk events')
+
     await applyPremiumColumnGuard()
 
     console.log('✓ Row Level Security (RLS) policies successfully created!')

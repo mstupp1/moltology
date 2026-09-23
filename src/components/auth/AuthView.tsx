@@ -19,7 +19,7 @@ import { mapOAuthCallbackError } from '@/lib/auth-oauth-errors'
 import {
   EMAIL_VERIFICATION_COPY,
   isEmailNotVerifiedError,
-  isVerifyFirstSignupResult,
+  shouldHoldSignupForVerification,
   stashPendingSignup,
   takePendingSignup,
 } from '@/lib/auth-email-verification'
@@ -32,6 +32,7 @@ import { MainFooter } from '@/components/MainFooter'
 import { HudCard, HudInput, HudButton, HeaderBrand } from '@/components/ui'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/TurnstileWidget'
+import { SignupHoneypot, useSignupSignals } from '@/components/auth/SignupSignals'
 
 export default function AuthView({ search }: { search: AuthSearch }) {
   abandonOAuthPendingIfCallbackError(search.error)
@@ -49,6 +50,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
   const [error, setError] = useState<string | null>(() => mapOAuthCallbackError(search.error))
   const [loading, setLoading] = useState(false)
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null)
+  const signupSignals = useSignupSignals(mode === 'signup')
   const [resendBusy, setResendBusy] = useState(false)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
 
@@ -174,10 +176,11 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           password,
           name: 'Initiate',
           callbackURL,
+          ...signupSignals.fields(),
         })
         if (res?.error) {
           setError(res.error.message || 'Sign up failed. Please check your credentials.')
-        } else if (isEmailVerificationEnabled() && isVerifyFirstSignupResult(res)) {
+        } else if (shouldHoldSignupForVerification(res, isEmailVerificationEnabled())) {
           const destination = search.redirect || '/dashboard'
           stashPendingSignup({
             emailOptIn,
@@ -203,7 +206,7 @@ export default function AuthView({ search }: { search: AuthSearch }) {
           password,
         })
         if (res?.error) {
-          if (isEmailVerificationEnabled() && isEmailNotVerifiedError(res.error)) {
+          if (isEmailNotVerifiedError(res.error)) {
             setPendingVerificationEmail(email)
             setError(EMAIL_VERIFICATION_COPY.loginBlocked)
           } else {
@@ -522,6 +525,11 @@ export default function AuthView({ search }: { search: AuthSearch }) {
 
               {/* Auth Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
+                <SignupHoneypot
+                  active={mode === 'signup'}
+                  value={signupSignals.honeypot}
+                  onChange={signupSignals.setHoneypot}
+                />
                 <HudInput
                   label="Email Address"
                   type="email"
