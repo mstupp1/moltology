@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { spawn, execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -221,8 +222,14 @@ async function main() {
   // 2. Start server on PORT 3019
   console.log(`🚀 Spawning Benthic OS server on port ${PORT}...`)
   const serverProcess = spawn('node', ['.output/server/index.mjs'], {
-    env: { ...process.env, PORT: String(PORT), NODE_ENV: 'production' },
-    stdio: 'ignore',
+    env: {
+      ...process.env,
+      PORT: String(PORT),
+      NODE_ENV: 'production',
+      BETTER_AUTH_SECRET:
+        process.env.BETTER_AUTH_SECRET || 'dev-secret-key-at-least-16-chars-long',
+    },
+    stdio: ['ignore', 'ignore', 'inherit'],
   })
 
   try {

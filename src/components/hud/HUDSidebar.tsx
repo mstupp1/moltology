@@ -11,8 +11,6 @@ import {
   Sliders,
   Users,
   Atom,
-  Menu,
-  X,
   Search,
   Command,
   LogOut,
@@ -36,7 +34,7 @@ import { getAuthJWTToken } from '../../lib/jwt'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { AuthModal } from '../AuthModal'
 import { BenthicCTAButton } from './BenthicCTAButton'
-import { ChromaElement, HeaderBrand } from '../ui'
+import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
 import { getEffectiveRole, isAdminOrSuperAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
 import { resolveMemberPublicName } from '../../lib/member-handle'
@@ -745,17 +743,13 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
               aria-label={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
               aria-expanded={isMobileHeaderOpen}
               title={isMobileHeaderOpen ? 'Close HUD Menu' : 'Open HUD Menu'}
-              className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all active:scale-95 focus:outline-none focus:ring-2 shrink-0 cursor-pointer ${
+              className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all duration-300 active:scale-95 focus:outline-none focus:ring-2 shrink-0 cursor-pointer ${
                 isMobileHeaderOpen
                   ? 'bg-red-950/50 border-red-800/80 text-red-400 hover:bg-red-900/60 focus:ring-red-500/50'
                   : 'bg-[#080d0e]/90 border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-cyan-500/50'
               }`}
             >
-              {isMobileHeaderOpen ? (
-                <X className="w-5 h-5 text-red-400 transition-transform duration-200" />
-              ) : (
-                <Menu className="w-5 h-5 text-cyan-300 transition-transform duration-200" />
-              )}
+              <AnimatedHamburger isOpen={isMobileHeaderOpen} />
             </button>
           </div>
         </div>

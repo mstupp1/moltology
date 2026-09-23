@@ -13,14 +13,13 @@ import {
   ShoppingBag,
   ExternalLink,
   Newspaper,
-  Menu,
-  X,
   Activity,
   MessageSquare,
   ChevronDown,
   Info,
 } from 'lucide-react'
 import { HeaderBrand } from '@/components/ui/HeaderBrand'
+import { AnimatedHamburger } from '@/components/ui/AnimatedHamburger'
 import { PublicHeaderAuthSkeleton } from '@/components/PublicHeaderAuthSkeleton'
 import { useIdleReady } from '@/hooks/useIdleReady'
 
@@ -534,17 +533,17 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
-            className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg active:scale-95 transition-all focus:outline-none ${
+            className={`xl:hidden flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 rounded-lg active:scale-95 transition-all duration-300 focus:outline-none ${
               isCorporate
-                ? 'bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 shadow-sm'
-                : 'bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-2 focus:ring-cyan-500/50'
+                ? mobileOpen
+                  ? 'bg-rose-50/80 border border-rose-200 text-rose-500 hover:bg-rose-100/70 shadow-sm'
+                  : 'bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 shadow-sm'
+                : mobileOpen
+                  ? 'bg-red-950/40 border border-red-800/80 text-red-400 hover:bg-red-900/60 focus:ring-2 focus:ring-red-500/50'
+                  : 'bg-[#080d0e]/90 border border-cyan-800/80 text-cyan-300 hover:bg-cyan-900/60 focus:ring-2 focus:ring-cyan-500/50'
             }`}
           >
-            {mobileOpen ? (
-              <X className={`w-5 h-5 ${isCorporate ? 'text-rose-500' : 'text-red-400'}`} />
-            ) : (
-              <Menu className={`w-5 h-5 ${isCorporate ? 'text-sky-700' : 'text-cyan-300'}`} />
-            )}
+            <AnimatedHamburger isOpen={mobileOpen} />
           </button>
 
           <div className="hidden xl:flex items-center gap-3 sm:gap-4">
