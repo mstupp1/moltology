@@ -80,6 +80,41 @@ describe('NewChatScreen Component', () => {
     expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
   })
 
+  it('renders colored pill badges for Chat and Titles in model dropdown and allows selecting Qwen 3.7', () => {
+    render(
+      <NewChatScreen
+        userId="usr_test"
+        selectedModel={getOracleModel()}
+        onSelectModel={mockOnSelectModel}
+        onSubmit={mockOnSubmit}
+        showModelPicker
+      />
+    )
+
+    const modelBtn = screen.getByRole('button', { name: /Select Cognition Model/i })
+    fireEvent.click(modelBtn)
+
+    expect(screen.getByText('Chat')).toBeInTheDocument()
+    expect(screen.getByText('Titles')).toBeInTheDocument()
+
+    // Tabular headers
+    expect(screen.getByText('In / 1M')).toBeInTheDocument()
+    expect(screen.getByText('Out / 1M')).toBeInTheDocument()
+    expect(screen.getByText('Latency')).toBeInTheDocument()
+
+    // Pricing & latency values
+    expect(screen.getByText('$0.10')).toBeInTheDocument()
+    expect(screen.getByText('$0.50')).toBeInTheDocument()
+    expect(screen.getByText('2.3s')).toBeInTheDocument()
+    expect(screen.getByText('$0.075')).toBeInTheDocument()
+    expect(screen.getByText('1.9s')).toBeInTheDocument()
+
+    const qwenOption = screen.getByRole('button', { name: /Qwen 3.7/i })
+    fireEvent.click(qwenOption)
+
+    expect(mockOnSelectModel).toHaveBeenCalledWith('alibaba/qwen3.7-flash')
+  })
+
   it('submits typed prompt on submit click and Enter key press', () => {
     render(
       <NewChatScreen

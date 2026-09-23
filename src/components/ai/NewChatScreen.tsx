@@ -337,9 +337,13 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                   {modelMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setModelMenuOpen(false)} />
-                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 min-w-56 text-xs">
-                        <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-benthic-border/60">
-                          Model
+                      <div className="absolute left-0 bottom-full mb-2 z-50 bg-benthic-surface border border-benthic-border shadow-2xl rounded-xl py-1 w-[380px] sm:w-[410px] max-w-[calc(100vw-2rem)] text-xs">
+                        <div className="px-3 py-1.5 grid grid-cols-[1fr_56px_52px_48px_16px] items-center gap-2 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-wider border-b border-benthic-border/60 select-none">
+                          <span>Model</span>
+                          <span className="text-right">In / 1M</span>
+                          <span className="text-right">Out / 1M</span>
+                          <span className="text-right">Latency</span>
+                          <span />
                         </div>
                         {ORACLE_MODELS.map((m) => (
                           <button
@@ -349,14 +353,37 @@ export const NewChatScreen: React.FC<NewChatScreenProps> = ({
                               onSelectModel(m.id)
                               setModelMenuOpen(false)
                             }}
-                            className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs transition-colors cursor-pointer ${
+                            className={`w-full text-left px-3 py-2 grid grid-cols-[1fr_56px_52px_48px_16px] items-center gap-2 text-xs transition-colors cursor-pointer group ${
                               m.id === selectedModel.id
                                 ? 'bg-benthic-high text-white font-medium'
                                 : 'text-gray-300 hover:bg-benthic-high/70 hover:text-white'
                             }`}
                           >
-                            <span className="truncate">{m.label}</span>
-                            {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+                            <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                              <span className="truncate">{m.label}</span>
+                              {m.badge === 'Chat' && (
+                                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shrink-0">
+                                  Chat
+                                </span>
+                              )}
+                              {m.badge === 'Titles' && (
+                                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0">
+                                  Titles
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-right font-mono text-[11px] text-gray-400 group-hover:text-gray-300">
+                              {m.pricing?.input ?? '—'}
+                            </span>
+                            <span className="text-right font-mono text-[11px] text-gray-400 group-hover:text-gray-300">
+                              {m.pricing?.output ?? '—'}
+                            </span>
+                            <span className="text-right font-mono text-[11px] text-emerald-400/90 font-medium">
+                              {m.latency ?? '—'}
+                            </span>
+                            <div className="flex items-center justify-end">
+                              {m.id === selectedModel.id && <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+                            </div>
                           </button>
                         ))}
                       </div>
