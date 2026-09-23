@@ -1,7 +1,10 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { hasSlashPair } from './copy-slash-pair'
 import {
   PREMIUM_PAGE_COPY,
+  STRIPE_SANDBOX_PREMIUM,
   buildPremiumCheckoutSessionParams,
   buildPremiumPortalParams,
   createPremiumIntegrationIdentifier,
@@ -26,8 +29,8 @@ import {
 const secretEnv = {
   STRIPE_SECRET_KEY: 'restricted_key_from_env',
   STRIPE_WEBHOOK_SECRET: 'whsec_from_env',
-  STRIPE_PREMIUM_PRICE_ID: 'price_from_env',
-  STRIPE_PREMIUM_PRODUCT_ID: 'prod_from_env',
+  STRIPE_PREMIUM_PRICE_ID: STRIPE_SANDBOX_PREMIUM.priceId,
+  STRIPE_PREMIUM_PRODUCT_ID: STRIPE_SANDBOX_PREMIUM.productId,
 }
 
 describe('premium banner visibility', () => {
@@ -325,17 +328,31 @@ describe('premium checkout configuration', () => {
     )
   })
 
-  it('reads price and product ids from env and never invents an amount', () => {
+  it('reads the sandbox price and product ids from env and never invents an amount', () => {
+    expect(STRIPE_SANDBOX_PREMIUM).toEqual({
+      accountId: 'acct_1Se62XQ7tNSavLB7',
+      livemode: false,
+      priceId: 'price_1UIfEjQ7tNSavLB7C4N9velE',
+      productId: 'prod_VJHoQFNhsIRtt0',
+    })
+    const example = readFileSync(resolve(process.cwd(), '.env.example'), 'utf8')
+    expect(example).toContain(`STRIPE_PREMIUM_PRICE_ID="${STRIPE_SANDBOX_PREMIUM.priceId}"`)
+    expect(example).toContain(`STRIPE_PREMIUM_PRODUCT_ID="${STRIPE_SANDBOX_PREMIUM.productId}"`)
+    expect(example).toContain('acct_1Se62XQ7tNSavLB7')
+    expect(example).toContain('livemode=false')
+    expect(example).toContain('STRIPE_SECRET_KEY=""')
+    expect(example).toContain('STRIPE_WEBHOOK_SECRET=""')
     const config = readStripePremiumConfig(secretEnv, { secret: true, price: true, webhook: true }, 'test')
-    expect(config.priceId).toBe('price_from_env')
-    expect(config.productId).toBe('prod_from_env')
+    expect(config.priceId).toBe('price_1UIfEjQ7tNSavLB7C4N9velE')
+    expect(config.productId).toBe('prod_VJHoQFNhsIRtt0')
     expect(config.secretKey).toBe('restricted_key_from_env')
     expect(JSON.stringify(config)).not.toContain('599')
   })
 
-  it('builds a subscription checkout from the price id', () => {
+  it('builds a subscription checkout from the env price id', () => {
+    const config = readStripePremiumConfig(secretEnv, { secret: true, price: true }, 'test')
     const params = buildPremiumCheckoutSessionParams({
-      priceId: 'price_from_env',
+      priceId: config.priceId!,
       userId: 'user_1',
       customerId: null,
       customerEmail: 'member@example.com',
@@ -343,7 +360,7 @@ describe('premium checkout configuration', () => {
       integrationIdentifier: 'moltology_premium_abcdefgh',
     })
     expect(params.mode).toBe('subscription')
-    expect(params.line_items).toEqual([{ price: 'price_from_env', quantity: 1 }])
+    expect(params.line_items).toEqual([{ price: 'price_1UIfEjQ7tNSavLB7C4N9velE', quantity: 1 }])
     expect(params.customer_email).toBe('member@example.com')
     expect(params.customer).toBeUndefined()
     expect(params.metadata.userId).toBe('user_1')
@@ -357,7 +374,7 @@ describe('premium checkout configuration', () => {
 
   it('reuses an existing customer instead of also sending an email', () => {
     const params = buildPremiumCheckoutSessionParams({
-      priceId: 'price_from_env',
+      priceId: STRIPE_SANDBOX_PREMIUM.priceId,
       userId: 'user_1',
       customerId: 'cus_1',
       customerEmail: 'member@example.com',
@@ -381,8 +398,10 @@ describe('premium checkout configuration', () => {
   })
 
   it('rejects a price that belongs to a different product', () => {
-    expect(premiumPriceMatchesProduct('prod_from_env', 'prod_from_env')).toBe(true)
-    expect(premiumPriceMatchesProduct({ id: 'prod_other' }, 'prod_from_env')).toBe(false)
+    expect(premiumPriceMatchesProduct(STRIPE_SANDBOX_PREMIUM.productId, STRIPE_SANDBOX_PREMIUM.productId)).toBe(
+      true,
+    )
+    expect(premiumPriceMatchesProduct({ id: 'prod_other' }, STRIPE_SANDBOX_PREMIUM.productId)).toBe(false)
     expect(premiumPriceMatchesProduct('prod_other', null)).toBe(true)
   })
 

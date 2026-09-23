@@ -170,7 +170,7 @@ export async function createPremiumCheckoutHandler(args: HandlerArgs): Promise<{
     const origin = resolvePremiumReturnOrigin(process.env.BETTER_AUTH_URL)
     const session = await stripe.checkout.sessions.create(
       buildPremiumCheckoutSessionParams({
-        priceId: config.priceId!,
+        priceId: config.priceId!, // STRIPE_PREMIUM_PRICE_ID (sandbox: price_1UIfEjQ7tNSavLB7C4N9velE)
         userId: auth.userId,
         customerId: profile.stripeCustomerId,
         customerEmail: profile.stripeCustomerId ? null : await memberEmail(auth.dbClient, auth.userId),

@@ -316,6 +316,18 @@ export function mergeRetrievedSubscription(
   }
 }
 
+/**
+ * Sandbox catalog for Premium (livemode false).
+ * Checkout does not charge these constants. It charges `STRIPE_PREMIUM_PRICE_ID`.
+ * `STRIPE_PREMIUM_PRODUCT_ID` is optional; when set, the Price must belong to that Product.
+ */
+export const STRIPE_SANDBOX_PREMIUM = {
+  accountId: 'acct_1Se62XQ7tNSavLB7',
+  livemode: false,
+  priceId: 'price_1UIfEjQ7tNSavLB7C4N9velE',
+  productId: 'prod_VJHoQFNhsIRtt0',
+} as const
+
 export type StripePremiumNeeds = {
   secret?: boolean
   webhook?: boolean
