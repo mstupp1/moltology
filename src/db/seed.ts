@@ -12,6 +12,7 @@ import { INITIAL_BLOG_POSTS } from '../lib/blog-data'
 import { INITIAL_FORUM_CATEGORIES, INITIAL_FORUM_TOPICS } from '../lib/forum-seed-data'
 import { INITIAL_EQUIPMENT_CATALOG, catalogSeedInsertValues } from '../lib/equipment-seed-data'
 import { seedAcademyCatalog } from './seed-academy'
+import { seedMerchCatalog } from './seed-merch'
 
 dotenv.config()
 
@@ -487,6 +488,10 @@ export async function seedDatabase(databaseUrl?: string) {
     console.log('[SEED] Seeding Molt Academy catalog...')
     const academySeed = await seedAcademyCatalog(db)
     console.log(`✓ Seeded ${academySeed.courses} academy courses and ${academySeed.tracks} tracks`)
+
+    console.log('[SEED] Seeding merch catalog...')
+    const merchCount = await seedMerchCatalog(db)
+    console.log(`✓ Seeded ${merchCount} merch products`)
 
     // 9. Ingest live markdown content from content/ repository
     const contentDir = path.resolve(process.cwd(), 'content')

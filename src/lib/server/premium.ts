@@ -24,6 +24,7 @@ import {
   type PremiumStripeEffect,
   type RetrievedSubscription,
 } from '../premium-membership'
+import { isMerchCheckoutCompletedEvent } from '../merch'
 import { createStripeWebhookVerifier, verifyStripeWebhookSignature } from '../stripe-webhook'
 import { ensureUserProfile } from '../user-sync'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
@@ -452,6 +453,17 @@ export async function handleStripeWebhookRequest(request: Request): Promise<Resp
       return json({ error: error.message }, 500)
     }
     return json({ error: 'Invalid Stripe signature.' }, 400)
+  }
+
+  if (isMerchCheckoutCompletedEvent(event)) {
+    try {
+      const { fulfillMerchCheckoutEvent } = await import('./merch')
+      await fulfillMerchCheckoutEvent(event)
+      return json({ received: true, merch: true }, 200)
+    } catch (error) {
+      safeLog(`merch webhook ${event.type}`, error)
+      return json({ error: 'Could not apply Stripe event.' }, 500)
+    }
   }
 
   try {

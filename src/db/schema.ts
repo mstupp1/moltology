@@ -9,6 +9,7 @@ import type {
   AcademyPublishStatus,
   AcademyVideoProvider,
 } from '../lib/academy-types'
+import type { MerchFulfillmentStatus, MerchLineItemSnapshot, MerchShippingAddress } from '../lib/merch'
 
 // Leftover Managed Neon Auth view (do not drop until CoS disables Auth on main).
 export const neonAuthSchema = pgSchema('neon_auth')
@@ -1257,5 +1258,87 @@ export const signupRiskEvents = pgTable('signup_risk_events', {
     for: 'all',
     using: signupRiskServerOnly,
     withCheck: signupRiskServerOnly,
+  }),
+])
+
+/**
+ * Merch catalog and orders. Member JWTs cannot read these tables.
+ * The owner connection used by server functions bypasses RLS.
+ */
+const merchServerOnly = sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`
+
+export const merchProducts = pgTable('merch_products', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  slug: text('slug').notNull(),
+  description: text('description').default('').notNull(),
+  category: text('category').notNull(),
+  featuredImageUrl: text('featuredImageUrl'),
+  galleryImageUrls: jsonb('galleryImageUrls').$type<string[]>().default([]).notNull(),
+  basePriceCents: integer('basePriceCents').notNull(),
+  isPublished: boolean('isPublished').default(false).notNull(),
+  sortOrder: integer('sortOrder').default(0).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('merch_products_slug_uidx').on(table.slug),
+  index('merch_products_category_idx').on(table.category),
+  index('merch_products_published_sort_idx').on(table.isPublished, table.sortOrder),
+  pgPolicy('merch_products_server_only_policy', {
+    for: 'all',
+    using: merchServerOnly,
+    withCheck: merchServerOnly,
+  }),
+])
+
+export const merchVariants = pgTable('merch_variants', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  productId: uuid('productId').notNull().references(() => merchProducts.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  size: text('size'),
+  color: text('color'),
+  colorHex: text('colorHex'),
+  priceCents: integer('priceCents').notNull(),
+  imageUrl: text('imageUrl'),
+  /** Printful sync variant id. Replace seed placeholders before a live order. */
+  printfulSyncVariantId: integer('printfulSyncVariantId').notNull(),
+  isAvailable: boolean('isAvailable').default(true).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  index('merch_variants_product_idx').on(table.productId),
+  uniqueIndex('merch_variants_printful_sync_uidx').on(table.printfulSyncVariantId),
+  pgPolicy('merch_variants_server_only_policy', {
+    for: 'all',
+    using: merchServerOnly,
+    withCheck: merchServerOnly,
+  }),
+])
+
+export const merchOrders = pgTable('merch_orders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
+  customerEmail: text('customerEmail'),
+  shippingAddress: jsonb('shippingAddress').$type<MerchShippingAddress | null>(),
+  stripeCheckoutSessionId: text('stripeCheckoutSessionId'),
+  printfulOrderId: text('printfulOrderId'),
+  fulfillmentStatus: text('fulfillmentStatus').$type<MerchFulfillmentStatus>().default('pending').notNull(),
+  subtotalCents: integer('subtotalCents').default(0).notNull(),
+  shippingCents: integer('shippingCents').default(0).notNull(),
+  taxCents: integer('taxCents').default(0).notNull(),
+  totalCents: integer('totalCents').default(0).notNull(),
+  currency: text('currency').default('usd').notNull(),
+  lineItems: jsonb('lineItems').$type<MerchLineItemSnapshot[]>().default([]).notNull(),
+  fulfillmentError: text('fulfillmentError'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+}, (table) => [
+  index('merch_orders_user_idx').on(table.userId),
+  uniqueIndex('merch_orders_stripe_session_uidx').on(table.stripeCheckoutSessionId),
+  index('merch_orders_printful_idx').on(table.printfulOrderId),
+  pgPolicy('merch_orders_server_only_policy', {
+    for: 'all',
+    using: merchServerOnly,
+    withCheck: merchServerOnly,
   }),
 ])
