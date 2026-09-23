@@ -1,6 +1,10 @@
 /**
  * Guardrails module for AI interaction.
  * Enforces rate limiting, prompt sanitization, safety policies, and input token boundaries.
+ *
+ * Obvious injection phrases are rejected here so they never reach a model.
+ * Paraphrased jailbreaks are classified by the Jev preflight in
+ * `src/lib/quality/oracle-preflight.ts` before a stream starts.
  */
 
 import { containsHarmfulContent, stripControlChars } from '../content-safety'

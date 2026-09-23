@@ -33,6 +33,14 @@ export function getOracleCandidateModelIds(selectedModelId?: string): string[] {
   ]
 }
 
+/**
+ * An explicit picker choice wins. Otherwise a Jev complexity pick leads,
+ * then the remaining models stay as fallbacks.
+ */
+export function orderOracleModels(requestedModelId?: string, preferredModelId?: string): string[] {
+  return getOracleCandidateModelIds(requestedModelId || preferredModelId)
+}
+
 export function formatOracleUnavailableMessage(lastError?: { message?: string } | null): string {
   if (lastError?.message) {
     return `${ORACLE_UNAVAILABLE_MESSAGE} (${lastError.message})`

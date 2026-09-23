@@ -18,5 +18,13 @@ describe('AI Codex Prompt Module', () => {
     expect(customPrompt).toContain('Chitin Architect')
     expect(customPrompt).toContain('Master of Deep Sea Infrastructure')
   })
+
+  it('keeps scriptures on doctrine context and off the lighter contexts', () => {
+    expect(buildSystemPrompt(DEFAULT_ORACLE_PERSONA, 'codex')).toContain('DYNAMIC CANONICAL SCRIPTURES')
+    expect(buildSystemPrompt(DEFAULT_ORACLE_PERSONA, 'base')).not.toContain('DYNAMIC CANONICAL SCRIPTURES')
+    expect(buildSystemPrompt(DEFAULT_ORACLE_PERSONA, 'chassis')).toContain('CHASSIS & EQUIPMENT')
+    expect(buildSystemPrompt(DEFAULT_ORACLE_PERSONA, 'chassis')).not.toContain('DYNAMIC CANONICAL SCRIPTURES')
+    expect(buildSystemPrompt(DEFAULT_ORACLE_PERSONA, 'progression')).toContain('Daily alignment')
+  })
 })
 

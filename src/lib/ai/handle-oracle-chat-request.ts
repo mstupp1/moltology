@@ -6,15 +6,16 @@ import {
 import { extractAuthToken } from '../server/middleware'
 import { verifyAuthJWT } from '../jwt'
 import { validateInputGuardrails, checkRateLimit } from './guardrails'
-import { buildSystemPrompt } from './codex-prompt'
+import { buildSystemPrompt, DEFAULT_ORACLE_PERSONA } from './codex-prompt'
+import { ORACLE_JAILBREAK_ERROR, screenOraclePrompt } from '../quality/oracle-preflight'
 import { saveAIMessage, createAIThread, summarizeThreadTitle, updateAIThreadTitle, getOwnedAIThread } from './service'
 import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
   getLastUserText,
-  getOracleCandidateModelIds,
   ORACLE_THREAD_ID_HEADER,
   pickGuestOracleResponse,
+  orderOracleModels,
   toModelMessages,
   type OracleChatMessageInput,
 } from './oracle-chat'
@@ -105,6 +106,14 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     )
   }
 
+  const preflight = await screenOraclePrompt(guardrail.sanitizedText || userText)
+  if (preflight.blocked) {
+    return Response.json(
+      { error: preflight.reason || ORACLE_JAILBREAK_ERROR },
+      { status: 400 }
+    )
+  }
+
   if (!userId) {
     return Response.json({
       text: pickGuestOracleResponse(userText, messages.length),
@@ -135,9 +144,9 @@ export async function handleOracleChatRequest(request: Request): Promise<Respons
     initialThreadTitle,
   })
 
-  const systemPrompt = buildSystemPrompt()
+  const systemPrompt = buildSystemPrompt(DEFAULT_ORACLE_PERSONA, preflight.context)
   const payloadMessages = toModelMessages(messages)
-  const candidateModels = getOracleCandidateModelIds(body.model)
+  const candidateModels = orderOracleModels(body.model, preflight.preferredModelId)
   let lastError: Error | null = null
 
   for (const modelCandidate of candidateModels) {

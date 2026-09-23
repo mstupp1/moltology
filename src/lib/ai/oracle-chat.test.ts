@@ -3,6 +3,7 @@ import {
   commitOracleTextStream,
   formatOracleUnavailableMessage,
   getOracleCandidateModelIds,
+  orderOracleModels,
   ORACLE_EMPTY_RESPONSE_ERROR,
   ORACLE_MODEL_TIMEOUT_ERROR,
   ORACLE_UNAVAILABLE_MESSAGE,
@@ -24,6 +25,14 @@ describe('oracle-chat helpers', () => {
     expect(getOracleCandidateModelIds()).toEqual(expected)
     expect(getOracleCandidateModelIds('unknown-model')).toEqual(expected)
     expect(getOracleCandidateModelIds('zai/glm-5.3-flash')[0]).toBe('zai/glm-5.3-flash')
+  })
+
+  it('lets an explicit model pick beat a Jev preference', () => {
+    const deep = ORACLE_MODELS[0].id
+    const fast = ORACLE_MODELS[1].id
+    expect(orderOracleModels(undefined, fast)[0]).toBe(fast)
+    expect(orderOracleModels(deep, fast)[0]).toBe(deep)
+    expect(orderOracleModels()[0]).toBe(deep)
   })
 
   it('formats plain unavailable messages with optional gateway detail', () => {
