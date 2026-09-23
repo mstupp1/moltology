@@ -18,6 +18,7 @@ import { INITIAL_CHANGELOGS, type ChangelogEntry } from '@/lib/changelogs-data'
 import { getPublicChangelogs } from '@/lib/changelogs'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { NewsArticleBody } from '@/components/news/NewsArticleBody'
+import { PremiumDashboardBanner } from '@/components/hud/PremiumDashboardBanner'
 
 export default function DashboardView() {
   const navigate = useNavigate()
@@ -111,6 +112,8 @@ export default function DashboardView() {
 
       {/* Wide Bento Welcome Banner: Benthic Transmissions, Directives & Campaigns */}
       <HudPromoBentoCard />
+
+      <PremiumDashboardBanner />
 
       <ResumeOracleConsultation />
 

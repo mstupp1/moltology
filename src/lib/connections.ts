@@ -51,6 +51,7 @@ export type PublicProfileView = {
   joinStory: string | null
   referredBy: { id: string; displayName: string; handle: string | null } | null
   bonds: PublicProfileBond[]
+  isPremium: boolean
 }
 
 export type ConnectionMemberSummary = {

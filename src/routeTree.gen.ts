@@ -42,6 +42,7 @@ import { Route as HudHudRouteImport } from './routes/_hud/hud'
 import { Route as HudMarketRouteImport } from './routes/_hud/market'
 import { Route as HudOracleRouteImport } from './routes/_hud/oracle'
 import { Route as HudPipelineRouteImport } from './routes/_hud/pipeline'
+import { Route as HudPremiumRouteImport } from './routes/_hud/premium'
 import { Route as HudProfileRouteImport } from './routes/_hud/profile'
 import { Route as HudSearchRouteImport } from './routes/_hud/search'
 import { Route as HudSettingsRouteImport } from './routes/_hud/settings'
@@ -70,6 +71,7 @@ import { Route as HudJournalSlugRouteImport } from './routes/_hud/journal/$slug'
 import { Route as HudLecturesIndexRouteImport } from './routes/_hud/lectures/index'
 import { Route as HudMemberProfileIdRouteImport } from './routes/_hud/member/$profileId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as HudForumCategorySlugIndexRouteImport } from './routes/_hud/forum/$categorySlug/index'
 import { Route as HudForumCategorySlugTopicSlugRouteImport } from './routes/_hud/forum/$categorySlug/$topicSlug'
 import { Route as HudLecturesCertificatesIndexRouteImport } from './routes/_hud/lectures/certificates/index'
@@ -243,6 +245,11 @@ const HudPipelineRoute = HudPipelineRouteImport.update({
   path: '/pipeline',
   getParentRoute: () => HudRoute,
 } as any)
+const HudPremiumRoute = HudPremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudProfileRoute = HudProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -386,6 +393,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HudForumCategorySlugIndexRoute =
   HudForumCategorySlugIndexRouteImport.update({
     id: '/forum/$categorySlug/',
@@ -466,6 +478,7 @@ export interface FileRoutesByFullPath {
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/pipeline': typeof HudPipelineRoute
+  '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
@@ -490,6 +503,7 @@ export interface FileRoutesByFullPath {
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/codex/': typeof HudCodexIndexRoute
   '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
@@ -535,6 +549,7 @@ export interface FileRoutesByTo {
   '/market': typeof HudMarketRoute
   '/oracle': typeof HudOracleRoute
   '/pipeline': typeof HudPipelineRoute
+  '/premium': typeof HudPremiumRoute
   '/profile': typeof HudProfileRoute
   '/search': typeof HudSearchRoute
   '/settings': typeof HudSettingsRoute
@@ -559,6 +574,7 @@ export interface FileRoutesByTo {
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/codex': typeof HudCodexIndexRoute
   '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
@@ -606,6 +622,7 @@ export interface FileRoutesById {
   '/_hud/market': typeof HudMarketRoute
   '/_hud/oracle': typeof HudOracleRoute
   '/_hud/pipeline': typeof HudPipelineRoute
+  '/_hud/premium': typeof HudPremiumRoute
   '/_hud/profile': typeof HudProfileRoute
   '/_hud/search': typeof HudSearchRoute
   '/_hud/settings': typeof HudSettingsRoute
@@ -630,6 +647,7 @@ export interface FileRoutesById {
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
   '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
@@ -678,6 +696,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/oracle'
     | '/pipeline'
+    | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
@@ -702,6 +721,7 @@ export interface FileRouteTypes {
     | '/journal/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
+    | '/api/stripe/webhook'
     | '/codex/'
     | '/forum/'
     | '/journal/'
@@ -747,6 +767,7 @@ export interface FileRouteTypes {
     | '/market'
     | '/oracle'
     | '/pipeline'
+    | '/premium'
     | '/profile'
     | '/search'
     | '/settings'
@@ -771,6 +792,7 @@ export interface FileRouteTypes {
     | '/journal/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
+    | '/api/stripe/webhook'
     | '/codex'
     | '/forum'
     | '/journal'
@@ -817,6 +839,7 @@ export interface FileRouteTypes {
     | '/_hud/market'
     | '/_hud/oracle'
     | '/_hud/pipeline'
+    | '/_hud/premium'
     | '/_hud/profile'
     | '/_hud/search'
     | '/_hud/settings'
@@ -841,6 +864,7 @@ export interface FileRouteTypes {
     | '/_hud/journal/$slug'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
+    | '/api/stripe/webhook'
     | '/_hud/codex/'
     | '/_hud/forum/'
     | '/_hud/journal/'
@@ -891,6 +915,7 @@ export interface RootRouteChildren {
   ChangelogIndexRoute: typeof ChangelogIndexRoute
   NewsIndexRoute: typeof NewsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1126,6 +1151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HudPipelineRouteImport
       parentRoute: typeof HudRoute
     }
+    '/_hud/premium': {
+      id: '/_hud/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof HudPremiumRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/profile': {
       id: '/_hud/profile'
       path: '/profile'
@@ -1322,6 +1354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_hud/forum/$categorySlug/': {
       id: '/_hud/forum/$categorySlug/'
       path: '/forum/$categorySlug'
@@ -1407,6 +1446,7 @@ interface HudRouteChildren {
   HudMarketRoute: typeof HudMarketRoute
   HudOracleRoute: typeof HudOracleRoute
   HudPipelineRoute: typeof HudPipelineRoute
+  HudPremiumRoute: typeof HudPremiumRoute
   HudProfileRoute: typeof HudProfileRoute
   HudSearchRoute: typeof HudSearchRoute
   HudSettingsRoute: typeof HudSettingsRoute
@@ -1438,6 +1478,7 @@ const HudRouteChildren: HudRouteChildren = {
   HudMarketRoute: HudMarketRoute,
   HudOracleRoute: HudOracleRoute,
   HudPipelineRoute: HudPipelineRoute,
+  HudPremiumRoute: HudPremiumRoute,
   HudProfileRoute: HudProfileRoute,
   HudSearchRoute: HudSearchRoute,
   HudSettingsRoute: HudSettingsRoute,
@@ -1518,6 +1559,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChangelogIndexRoute: ChangelogIndexRoute,
   NewsIndexRoute: NewsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

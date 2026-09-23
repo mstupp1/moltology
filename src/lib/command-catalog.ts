@@ -16,6 +16,7 @@ export type CommandIconId =
   | 'lectures'
   | 'market'
   | 'subterranean'
+  | 'premium'
   | 'pipeline'
   | 'journal'
   | 'forum'
@@ -41,6 +42,7 @@ export type CommandNavTo =
   | '/lectures'
   | '/market'
   | '/subterranean'
+  | '/premium'
   | '/pipeline'
   | '/journal'
   | '/forum'
@@ -180,6 +182,15 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     shortcut: 'G S',
     to: '/subterranean',
     keywords: ['vats', 'bio-vault'],
+    // Members do not see this chamber. HIDDEN_PAGES is the registry.
+  },
+  {
+    id: 'nav-premium',
+    label: 'Open Premium membership',
+    category: 'Navigation',
+    icon: 'premium',
+    to: '/premium',
+    keywords: ['premium', 'membership'],
     // Members do not see this chamber. HIDDEN_PAGES is the registry.
   },
   {

@@ -66,6 +66,24 @@ describe('MemberProfilePage', () => {
     })
     expect(screen.getByText('LARVA UNIT #2468')).toBeInTheDocument()
     expect(screen.queryByText('LARVA UNIT #8971')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
+  })
+
+  it('shows a Premium badge only while the membership is active', async () => {
+    mockGetPublicProfile.mockResolvedValue({ ...claimedProfile, isPremium: true })
+
+    const { rerender } = render(<MemberProfilePage profileId="member-a" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('premium-badge')).toHaveTextContent('Premium')
+    })
+
+    mockGetPublicProfile.mockResolvedValue({ ...claimedProfile, isPremium: false })
+    rerender(<MemberProfilePage profileId="member-b" />)
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('premium-badge')).not.toBeInTheDocument()
+    })
   })
 
   it('shows a workspace ghost while the dossier hydrates', () => {

@@ -5,6 +5,7 @@ import {
   BookOpen,
   ShoppingBag,
   Biohazard,
+  Sparkles,
   Layers,
   Microscope,
   Users,
@@ -37,6 +38,8 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
       return <ShoppingBag className={`${ICON_CLASS} text-emerald-400`} />
     case 'subterranean':
       return <Biohazard className={`${ICON_CLASS} text-[#39ff14]`} />
+    case 'premium':
+      return <Sparkles className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'pipeline':
       return <Layers className={`${ICON_CLASS} text-purple-400`} />
     case 'journal':

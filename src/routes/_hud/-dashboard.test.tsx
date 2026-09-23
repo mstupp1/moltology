@@ -15,6 +15,7 @@ describe('Dashboard activity stream source', () => {
     expect(viewSrc).not.toMatch(/INITIAL_ACTIVITIES/)
     expect(viewSrc).toMatch(/ActivityStreamPanel/)
     expect(viewSrc).toMatch(/ResumeOracleConsultation/)
+    expect(viewSrc).toMatch(/PremiumDashboardBanner/)
   })
 
   it('places Forum and Connections cards under Daily Alignment and above Activity', () => {

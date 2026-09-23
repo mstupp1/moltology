@@ -8,11 +8,14 @@ import {
 
 describe('hidden pages', () => {
   it('treats subterranean vats as a hidden page', () => {
-    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/subterranean'])
+    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/subterranean', '/premium'])
     expect(isHiddenPagePath('/subterranean')).toBe(true)
     expect(isHiddenPagePath('/subterranean/')).toBe(true)
     expect(isHiddenPagePath('/subterranean?vat=1')).toBe(true)
     expect(isHiddenPagePath('/subterranean/vault')).toBe(true)
+    expect(isHiddenPagePath('/premium')).toBe(true)
+    expect(isHiddenPagePath('/premium/')).toBe(true)
+    expect(isHiddenPagePath('/premium?checkout=success')).toBe(true)
   })
 
   it('leaves ordinary chambers visible', () => {

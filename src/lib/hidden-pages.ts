@@ -10,6 +10,10 @@ export const HIDDEN_PAGES = [
     id: 'subterranean',
     path: '/subterranean',
   },
+  {
+    id: 'premium',
+    path: '/premium',
+  },
 ] as const
 
 export type HiddenPageId = (typeof HIDDEN_PAGES)[number]['id']

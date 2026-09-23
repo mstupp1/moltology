@@ -4072,6 +4072,7 @@ async function findMemberProfileByRouteKey(dbClient: Db, routeKey: string) {
       joinSource: profiles.joinSource,
       referredByUserId: profiles.referredByUserId,
       simulatedPersona: profiles.simulatedPersona,
+      isPremium: profiles.isPremium,
     })
     .from(profiles)
     .where(
@@ -4228,6 +4229,7 @@ export const getPublicProfileHandler = async ({
     joinStory,
     referredBy,
     bonds,
+    isPremium: profile.isPremium === true,
   }
 }
 

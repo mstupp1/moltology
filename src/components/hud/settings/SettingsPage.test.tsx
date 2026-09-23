@@ -16,6 +16,11 @@ vi.mock('@/lib/jwt', () => ({
   getAuthJWTToken: vi.fn().mockResolvedValue('mock-jwt'),
 }))
 
+vi.mock('@/lib/server/premium-api', () => ({
+  getPremiumMembershipFn: vi.fn().mockResolvedValue({ hasPurchasedPremium: false, isPremium: false }),
+  setPremiumAccessFn: vi.fn(),
+}))
+
 vi.mock('@/lib/server/api', () => ({
   getUserProfileFn: vi.fn().mockResolvedValue({
     emailOptIn: false,
@@ -70,6 +75,7 @@ describe('SettingsPage', () => {
       expect(screen.getByText('Underwater Bubbles')).toBeInTheDocument()
     })
 
+    expect(await screen.findByRole('button', { name: /Purchase Premium/i })).toBeInTheDocument()
     expect(screen.getByText('Visible across the hub')).toBeInTheDocument()
     expect(screen.getByText('Email Updates')).toBeInTheDocument()
     expect(screen.getByText('Sign-in methods')).toBeInTheDocument()
