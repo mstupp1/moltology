@@ -6,8 +6,10 @@ import { canViewHiddenPages } from '../hidden-pages'
 import {
   buildPremiumCheckoutSessionParams,
   buildPremiumPortalParams,
+  cancelPremiumWithoutCheckout,
   createPremiumIntegrationIdentifier,
   emptyPremiumMembership,
+  grantPremiumWithoutCheckout,
   formatPremiumPriceLabel,
   interpretPremiumStripeEvent,
   mergeRetrievedSubscription,
@@ -27,7 +29,7 @@ import { ensureUserProfile } from '../user-sync'
 import { resolveWriteAuth, type WriteAuthContext } from './write-auth'
 
 type HandlerArgs = {
-  data?: { token?: string; userId?: string }
+  data?: { token?: string; userId?: string; action?: 'grant' | 'cancel' }
   context?: WriteAuthContext | null
 }
 
@@ -68,7 +70,11 @@ function toPublicBillingError(error: unknown, fallback: string): Error {
       error.message === 'Subscribe to Premium before managing a membership.' ||
       error.message.startsWith('Unauthenticated') ||
       error.message.startsWith('Unauthorized') ||
-      error.message === 'Could not load your membership. Try again.'
+      error.message === 'Could not load your membership. Try again.' ||
+      error.message === 'Could not update Premium. Try again.' ||
+      error.message === 'Could not activate Premium. Try again.' ||
+      error.message === 'Could not cancel Premium. Try again.' ||
+      error.message === 'Could not cancel the paid membership. Try again later.'
     ) {
       return error
     }
@@ -189,6 +195,76 @@ export async function createPremiumCheckoutHandler(args: HandlerArgs): Promise<{
     return { url: session.url }
   } catch (error) {
     throw toPublicBillingError(error, 'Could not start checkout. Try again.')
+  }
+}
+
+const premiumFlagColumns = {
+  hasPurchasedPremium: profiles.hasPurchasedPremium,
+  isPremium: profiles.isPremium,
+  premiumStatus: profiles.premiumStatus,
+  stripeCustomerId: profiles.stripeCustomerId,
+  stripeSubscriptionId: profiles.stripeSubscriptionId,
+  premiumPeriodEnd: profiles.premiumPeriodEnd,
+  premiumSyncedAt: profiles.premiumSyncedAt,
+}
+
+export async function setPremiumAccessHandler(
+  args: HandlerArgs,
+): Promise<{ hasPurchasedPremium: boolean; isPremium: boolean }> {
+  const action = args.data?.action
+  const fallback = action === 'cancel' ? 'Could not cancel Premium. Try again.' : 'Could not activate Premium. Try again.'
+  try {
+    if (action !== 'grant' && action !== 'cancel') {
+      throw new Error('Could not update Premium. Try again.')
+    }
+    const auth = await resolveWriteAuth({ data: args.data, context: args.context })
+    if (!auth) throw new Error('Unauthenticated: Authentication required.')
+    await ensureUserProfile(auth.userId)
+    const dbClient = getDb()
+    const [row] = await dbClient
+      .select(premiumFlagColumns)
+      .from(profiles)
+      .where(eq(profiles.id, auth.userId))
+      .limit(1)
+    if (!row) throw new Error('Could not load your membership. Try again.')
+
+    if (action === 'cancel' && row.stripeSubscriptionId) {
+      let secretKey = ''
+      try {
+        secretKey = readStripePremiumConfig(process.env, { secret: true }, process.env.NODE_ENV).secretKey
+      } catch (error) {
+        if (configErrorMessage(error)) {
+          throw new Error('Could not cancel the paid membership. Try again later.')
+        }
+        throw error
+      }
+      const stripe = createStripeClient(secretKey)
+      try {
+        await stripe.subscriptions.cancel(row.stripeSubscriptionId)
+      } catch (error) {
+        if (!isMissingStripeResource(error)) throw error
+      }
+    }
+
+    const now = new Date()
+    const current = membershipFromRow(row)
+    const next = action === 'grant' ? grantPremiumWithoutCheckout(current, now) : cancelPremiumWithoutCheckout(current, now)
+    await dbClient
+      .update(profiles)
+      .set({
+        hasPurchasedPremium: next.hasPurchasedPremium,
+        isPremium: next.isPremium,
+        premiumStatus: next.premiumStatus,
+        stripeCustomerId: next.stripeCustomerId,
+        stripeSubscriptionId: next.stripeSubscriptionId,
+        premiumPeriodEnd: next.premiumPeriodEnd,
+        premiumSyncedAt: next.premiumSyncedAt,
+        updatedAt: now,
+      })
+      .where(eq(profiles.id, auth.userId))
+    return { hasPurchasedPremium: next.hasPurchasedPremium, isPremium: next.isPremium }
+  } catch (error) {
+    throw toPublicBillingError(error, fallback)
   }
 }
 

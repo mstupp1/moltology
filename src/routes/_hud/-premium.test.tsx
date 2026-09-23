@@ -25,6 +25,7 @@ vi.mock('@/lib/server/premium-api', () => ({
   getPremiumOfferFn: vi.fn(),
   createPremiumCheckoutFn: vi.fn(),
   createPremiumPortalFn: vi.fn(),
+  setPremiumAccessFn: vi.fn(),
 }))
 
 const LAZY_TIMEOUT = 5000
@@ -81,6 +82,7 @@ describe('Premium HUD route', () => {
     expect(await screen.findByRole('heading', { name: /Premium membership/i }, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
     expect(screen.getByText('Premium benefits are not available yet.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Subscribe to Premium/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Activate Premium/i })).toBeInTheDocument()
     expect(screen.queryByTestId('hidden-page-unavailable')).not.toBeInTheDocument()
   })
 

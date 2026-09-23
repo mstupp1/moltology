@@ -15,6 +15,7 @@ import {
   createPremiumCheckoutFn,
   createPremiumPortalFn,
   getPremiumOfferFn,
+  setPremiumAccessFn,
 } from '@/lib/server/premium-api'
 
 export function PremiumOfferPanel({
@@ -23,12 +24,16 @@ export function PremiumOfferPanel({
   busy,
   onSubscribe,
   onManage,
+  onActivate,
+  onCancel,
 }: {
   offer: PremiumOffer
   checkout?: 'success' | 'cancel'
-  busy: 'checkout' | 'portal' | null
+  busy: 'checkout' | 'portal' | 'grant' | 'cancel' | null
   onSubscribe: () => void
   onManage: () => void
+  onActivate: () => void
+  onCancel: () => void
 }) {
   const entitlements = listPremiumEntitlements(offer.isPremium)
   return (
@@ -74,12 +79,22 @@ export function PremiumOfferPanel({
               {busy === 'checkout' ? 'Starting checkout' : PREMIUM_PAGE_COPY.subscribe}
             </HudButton>
           ) : null}
+          {!offer.isPremium ? (
+            <HudButton type="button" variant="dark" onClick={onActivate} disabled={busy !== null}>
+              {busy === 'grant' ? 'Activating' : PREMIUM_PAGE_COPY.activate}
+            </HudButton>
+          ) : (
+            <HudButton type="button" variant="dark" onClick={onCancel} disabled={busy !== null}>
+              {busy === 'cancel' ? 'Canceling' : PREMIUM_PAGE_COPY.cancel}
+            </HudButton>
+          )}
           {offer.canManage ? (
-            <HudButton type="button" variant="dark" onClick={onManage} disabled={busy !== null}>
+            <HudButton type="button" variant="ghost" onClick={onManage} disabled={busy !== null}>
               {busy === 'portal' ? 'Opening membership' : PREMIUM_PAGE_COPY.manage}
             </HudButton>
           ) : null}
         </div>
+        {!offer.isPremium ? <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.activateHint}</p> : null}
       </section>
 
       <section className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl space-y-2">
@@ -114,7 +129,7 @@ export default function PremiumView({
   toastRef.current = toast
   const [offer, setOffer] = useState<PremiumOffer | null>(null)
   const [pending, setPending] = useState(true)
-  const [busy, setBusy] = useState<'checkout' | 'portal' | null>(null)
+  const [busy, setBusy] = useState<'checkout' | 'portal' | 'grant' | 'cancel' | null>(null)
 
   useEffect(() => {
     if (checkoutProp) {
@@ -145,6 +160,26 @@ export default function PremiumView({
     }
   }, [])
 
+  async function activate(action: 'grant' | 'cancel') {
+    setBusy(action)
+    try {
+      const token = await getAuthJWTToken().catch(() => null)
+      const next = await setPremiumAccessFn({ data: { token: token ?? undefined, action } })
+      setOffer((current) => (current ? { ...current, ...next } : current))
+      toast?.toast.success(action === 'grant' ? PREMIUM_PAGE_COPY.activated : PREMIUM_PAGE_COPY.canceled)
+    } catch (error) {
+      toast?.toast.error(
+        error instanceof Error
+          ? error.message
+          : action === 'grant'
+            ? 'Could not activate Premium. Try again.'
+            : 'Could not cancel Premium. Try again.',
+      )
+    } finally {
+      setBusy(null)
+    }
+  }
+
   async function start(kind: 'checkout' | 'portal') {
     setBusy(kind)
     try {
@@ -173,6 +208,8 @@ export default function PremiumView({
       busy={busy}
       onSubscribe={() => void start('checkout')}
       onManage={() => void start('portal')}
+      onActivate={() => void activate('grant')}
+      onCancel={() => void activate('cancel')}
     />
   )
 }

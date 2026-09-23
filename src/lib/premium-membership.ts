@@ -47,6 +47,13 @@ export const PREMIUM_PAGE_COPY = {
   free: 'You do not have an active Premium membership.',
   subscribe: 'Subscribe to Premium',
   manage: 'Manage membership',
+  activate: 'Activate Premium',
+  activateHint: 'Activates Premium on this account. No payment is taken.',
+  purchase: 'Purchase Premium',
+  cancel: 'Cancel Premium',
+  activated: 'Premium is active.',
+  canceled: 'Premium is canceled.',
+  settingsTitle: 'Premium',
   checkoutSuccess: 'Checkout completed. Your membership status will update shortly.',
   checkoutCancel: 'Checkout was canceled. No charge was made.',
   pricePending: 'Monthly price will appear when billing is configured.',
@@ -111,6 +118,34 @@ export interface PremiumMembershipState {
   stripeSubscriptionId: string | null
   premiumPeriodEnd: Date | null
   premiumSyncedAt: Date | null
+}
+
+/** Local grant. Leaves any Stripe customer or subscription ids untouched. */
+export function grantPremiumWithoutCheckout(
+  previous: PremiumMembershipState,
+  syncedAt: Date,
+): PremiumMembershipState {
+  return {
+    ...previous,
+    hasPurchasedPremium: true,
+    isPremium: true,
+    premiumStatus: 'active',
+    premiumSyncedAt: syncedAt,
+  }
+}
+
+/** Local cancel. Keeps the sticky paid-once flag and any Stripe ids. */
+export function cancelPremiumWithoutCheckout(
+  previous: PremiumMembershipState,
+  syncedAt: Date,
+): PremiumMembershipState {
+  return {
+    ...previous,
+    hasPurchasedPremium: previous.hasPurchasedPremium || previous.isPremium,
+    isPremium: false,
+    premiumStatus: 'canceled',
+    premiumSyncedAt: syncedAt,
+  }
 }
 
 export function emptyPremiumMembership(): PremiumMembershipState {

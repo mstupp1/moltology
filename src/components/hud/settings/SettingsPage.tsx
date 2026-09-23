@@ -25,6 +25,7 @@ import {
 } from '@/lib/lobster-avatar'
 import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
 import { ConnectedAccounts } from './ConnectedAccounts'
+import { PremiumSettingsSection } from './PremiumSettingsSection'
 
 export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) => {
   const session = useAuthSession()
@@ -182,8 +183,10 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
           </>
         }
         title="Settings"
-        description="Choose your avatar, email preferences, sign-in methods, display ambience, and command surface options."
+        description="Choose your avatar, email preferences, sign-in methods, display ambience, command surface options, and Premium membership."
       />
+
+      <PremiumSettingsSection />
 
       <div className="chitin-card p-3 sm:p-4 md:p-5 chamfer-corner shadow-2xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">

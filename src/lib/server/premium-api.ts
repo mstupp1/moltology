@@ -31,6 +31,20 @@ export const createPremiumCheckoutFn = createServerFn({ method: 'POST' })
     return createPremiumCheckoutHandler(args)
   })
 
+export const setPremiumAccessFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: unknown) =>
+    authDataSchema
+      .extend({
+        action: z.enum(['grant', 'cancel']),
+      })
+      .parse(data ?? {}),
+  )
+  .handler(async (args) => {
+    const { setPremiumAccessHandler } = await import('./premium')
+    return setPremiumAccessHandler(args)
+  })
+
 export const createPremiumPortalFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: unknown) => authDataSchema.parse(data ?? {}))

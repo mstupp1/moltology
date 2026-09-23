@@ -4,6 +4,7 @@ import { Users, Shield, Calendar } from 'lucide-react'
 import { LobsterAvatarPortrait } from '@/components/hud/LobsterAvatarPortrait'
 import { LoadoutStatsPanel } from '@/components/hud/chassis/LoadoutStatsPanel'
 import { ReadOnlyPaperDoll } from './ReadOnlyPaperDoll'
+import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { FriendRequestButton } from './FriendRequestButton'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { getAuthJWTToken } from '@/lib/jwt'
@@ -154,6 +155,7 @@ export const MemberProfilePage: React.FC<MemberProfilePageProps> = ({
               <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-[#00c3ff]/40 text-[#00c3ff] bg-[#00c3ff]/10 chamfer-corner">
                 Stage {profile.stage} · {profile.stageLabel}
               </span>
+              {profile.isPremium ? <PremiumBadge /> : null}
             </div>
             {profile.handle && profile.displayName !== profile.larvaId && (
               <p className="text-xs text-[#839493] font-mono tracking-wider">

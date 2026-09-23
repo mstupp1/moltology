@@ -8,7 +8,9 @@ import {
   buildPremiumCheckoutSessionParams,
   buildPremiumPortalParams,
   createPremiumIntegrationIdentifier,
+  cancelPremiumWithoutCheckout,
   emptyPremiumMembership,
+  grantPremiumWithoutCheckout,
   formatPremiumPriceLabel,
   interpretPremiumStripeEvent,
   listPremiumEntitlements,
@@ -70,6 +72,12 @@ describe('premium banner visibility', () => {
       PREMIUM_PAGE_COPY.benefitsBody,
       PREMIUM_PAGE_COPY.checkoutSuccess,
       PREMIUM_PAGE_COPY.checkoutCancel,
+      PREMIUM_PAGE_COPY.activate,
+      PREMIUM_PAGE_COPY.activateHint,
+      PREMIUM_PAGE_COPY.purchase,
+      PREMIUM_PAGE_COPY.cancel,
+      PREMIUM_PAGE_COPY.activated,
+      PREMIUM_PAGE_COPY.canceled,
     ]
     for (const line of lines) {
       expect(line).not.toMatch(/stripe|postgres|vercel|drizzle/i)
@@ -78,6 +86,45 @@ describe('premium banner visibility', () => {
     }
     expect(PREMIUM_PAGE_COPY.description).toMatch(/rank, clearance, stage, or forum authority/i)
     expect(PREMIUM_PAGE_COPY.description).toMatch(/Chitin Gems stay earned/)
+  })
+})
+
+describe('premium without checkout', () => {
+  const syncedAt = new Date('2026-09-23T00:00:00.000Z')
+
+  it('activates Premium and keeps any existing billing ids', () => {
+    const next = grantPremiumWithoutCheckout(
+      {
+        ...emptyPremiumMembership(),
+        stripeCustomerId: 'cus_existing',
+        stripeSubscriptionId: 'sub_existing',
+      },
+      syncedAt,
+    )
+    expect(next.isPremium).toBe(true)
+    expect(next.hasPurchasedPremium).toBe(true)
+    expect(next.premiumStatus).toBe('active')
+    expect(next.premiumSyncedAt).toBe(syncedAt)
+    expect(next.stripeCustomerId).toBe('cus_existing')
+    expect(next.stripeSubscriptionId).toBe('sub_existing')
+  })
+
+  it('cancels the current membership and keeps the paid-once flag', () => {
+    const next = cancelPremiumWithoutCheckout(
+      {
+        ...emptyPremiumMembership(),
+        hasPurchasedPremium: true,
+        isPremium: true,
+        premiumStatus: 'active',
+        stripeCustomerId: 'cus_existing',
+      },
+      syncedAt,
+    )
+    expect(next.isPremium).toBe(false)
+    expect(next.hasPurchasedPremium).toBe(true)
+    expect(next.premiumStatus).toBe('canceled')
+    expect(next.stripeCustomerId).toBe('cus_existing')
+    expect(premiumStatusMessage(next)).toMatch(/not active/i)
   })
 })
 
