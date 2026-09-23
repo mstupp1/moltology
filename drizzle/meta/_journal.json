@@ -274,6 +274,13 @@
       "when": 1790121970504,
       "tag": "0038_even_paladin",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1790128101567,
+      "tag": "0039_far_beast",
+      "breakpoints": true
     }
   ]
 }

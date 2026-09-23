@@ -87,6 +87,7 @@
     "react-dom": "^19.0.0",
     "react-email": "^6.9.5",
     "rubberband-wasm": "^3.3.0",
+    "stripe": "^22.4.0",
     "tailwind-merge": "^3.0.1",
     "three": "^0.185.1",
     "zod": "^4.4.3"

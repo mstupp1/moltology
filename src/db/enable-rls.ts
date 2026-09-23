@@ -666,6 +666,8 @@ async function applyRLS() {
     );`
     console.log('✓ RLS policies configured for Molt Academy tables')
 
+    await applyPremiumColumnGuard()
+
     console.log('✓ Row Level Security (RLS) policies successfully created!')
 
 
@@ -673,6 +675,58 @@ async function applyRLS() {
     console.error('Error enabling RLS policies:', error)
     process.exit(1)
   }
+}
+
+/**
+ * JWT-scoped sessions can update their own profile row, but they must not
+ * rewrite Premium billing columns. Owner connections (no JWT claim) and an
+ * explicit `app.allow_premium_write=on` session may write those columns.
+ * Webhooks use the owner connection, so they keep the flags honest.
+ */
+async function applyPremiumColumnGuard() {
+  const columns = await sql`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'profiles'
+      AND column_name = 'isPremium'
+  `
+  if (!columns.length) {
+    console.log('Skipping Premium column guard; isPremium is not on profiles yet.')
+    return
+  }
+
+  await sql`
+    CREATE OR REPLACE FUNCTION protect_profile_premium_columns()
+    RETURNS trigger
+    LANGUAGE plpgsql
+    AS $fn$
+    BEGIN
+      IF current_setting('app.allow_premium_write', true) = 'on' THEN
+        RETURN NEW;
+      END IF;
+      IF NULLIF(current_setting('request.jwt.claims', true), '') IS NULL THEN
+        RETURN NEW;
+      END IF;
+      NEW."hasPurchasedPremium" := OLD."hasPurchasedPremium";
+      NEW."isPremium" := OLD."isPremium";
+      NEW."stripeCustomerId" := OLD."stripeCustomerId";
+      NEW."stripeSubscriptionId" := OLD."stripeSubscriptionId";
+      NEW."premiumStatus" := OLD."premiumStatus";
+      NEW."premiumPeriodEnd" := OLD."premiumPeriodEnd";
+      NEW."premiumSyncedAt" := OLD."premiumSyncedAt";
+      RETURN NEW;
+    END;
+    $fn$;
+  `
+  await sql`DROP TRIGGER IF EXISTS profiles_premium_columns_guard ON profiles;`
+  await sql`
+    CREATE TRIGGER profiles_premium_columns_guard
+    BEFORE UPDATE ON profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION protect_profile_premium_columns();
+  `
+  console.log('✓ Premium billing columns are guarded against JWT self-updates')
 }
 
 applyRLS()

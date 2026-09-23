@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { INITIAL_BLOG_POSTS } from './blog-data'
 import { INITIAL_FORUM_CATEGORIES } from './forum-seed-data'
+import { isHiddenPagePath } from './hidden-pages'
 import {
   COMMAND_CATALOG,
   PAGES_CATALOG,
@@ -43,6 +44,7 @@ describe('command catalog', () => {
       'nav-market',
       'nav-chassis',
       'nav-subterranean',
+      'nav-premium',
       'nav-forum',
       'nav-stream',
       'nav-connections',
@@ -82,8 +84,9 @@ describe('command catalog', () => {
     expect(codex.map((cmd) => cmd.id)).toEqual(['nav-codex'])
     expect(filterCommandCatalog('rituals').map((cmd) => cmd.id)).toEqual(['ritual-purge'])
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-subterranean')
+    expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-premium')
     expect(filterCommandCatalog('').length).toBe(
-      COMMAND_CATALOG.filter((cmd) => cmd.id !== 'nav-subterranean').length,
+      COMMAND_CATALOG.filter((cmd) => !cmd.to || !isHiddenPagePath(cmd.to)).length,
     )
   })
 
@@ -92,6 +95,10 @@ describe('command catalog', () => {
     expect(
       filterCommandCatalog('vats', undefined, { includeHidden: true }).map((cmd) => cmd.id),
     ).toContain('nav-subterranean')
+    expect(filterCommandCatalog('premium').map((cmd) => cmd.id)).not.toContain('nav-premium')
+    expect(
+      filterCommandCatalog('premium', undefined, { includeHidden: true }).map((cmd) => cmd.id),
+    ).toContain('nav-premium')
     expect(filterCommandCatalog('', undefined, { includeHidden: true }).length).toBe(
       COMMAND_CATALOG.length,
     )

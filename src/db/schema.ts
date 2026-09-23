@@ -144,11 +144,27 @@ export const profiles = pgTable('profiles', {
   /** How the member found the Order: organic, word of mouth, or brought in. */
   joinSource: text('joinSource').$type<MemberJoinSource>(),
   referredByUserId: text('referredByUserId').references((): AnyPgColumn => profiles.id, { onDelete: 'set null' }),
+  /**
+   * Paid user: true after at least one successful Premium payment.
+   * Distinct from `isPremium`, which is only the current subscription.
+   */
+  hasPurchasedPremium: boolean('hasPurchasedPremium').default(false).notNull(),
+  /** Premium member: true only while the Stripe subscription status is active. */
+  isPremium: boolean('isPremium').default(false).notNull(),
+  stripeCustomerId: text('stripeCustomerId'),
+  stripeSubscriptionId: text('stripeSubscriptionId'),
+  /** Latest Stripe subscription status. Null until the first billing event. */
+  premiumStatus: text('premiumStatus'),
+  premiumPeriodEnd: timestamp('premiumPeriodEnd'),
+  /** When the last Premium status write was applied. Older webhook events must not overwrite it. */
+  premiumSyncedAt: timestamp('premiumSyncedAt'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
   uniqueIndex('profiles_handle_lower_uidx').on(sql`lower(${table.handle})`),
   index('profiles_referred_by_idx').on(table.referredByUserId),
+  uniqueIndex('profiles_stripe_customer_uidx').on(table.stripeCustomerId),
+  uniqueIndex('profiles_stripe_subscription_uidx').on(table.stripeSubscriptionId),
   pgPolicy('profiles_isolation_policy', {
     for: 'all',
     using: sql`id = (NULLIF(current_setting('request.jwt.claims', true), '')::json->>'sub') OR (current_setting('request.jwt.claims', true) IS NULL)`

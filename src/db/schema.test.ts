@@ -186,4 +186,19 @@ describe('Database Schema & RLS Policies', () => {
     expect(blogComments.postId).toBeDefined()
     expect(blogComments.content).toBeDefined()
   })
+
+  it('keeps paid-user and current-premium flags distinct on profiles', () => {
+    expect(profiles.hasPurchasedPremium).toBeDefined()
+    expect(profiles.isPremium).toBeDefined()
+    expect(profiles.stripeCustomerId).toBeDefined()
+    expect(profiles.stripeSubscriptionId).toBeDefined()
+    expect(profiles.premiumStatus).toBeDefined()
+    expect(profiles.premiumPeriodEnd).toBeDefined()
+    expect(profiles.premiumSyncedAt).toBeDefined()
+    const uniqueNames = getTableConfig(profiles).indexes
+      .filter((idx) => idx.config.unique)
+      .map((idx) => idx.config.name)
+    expect(uniqueNames).toContain('profiles_stripe_customer_uidx')
+    expect(uniqueNames).toContain('profiles_stripe_subscription_uidx')
+  })
 })

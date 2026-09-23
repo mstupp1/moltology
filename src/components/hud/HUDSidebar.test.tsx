@@ -386,6 +386,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       expect(mockGetUserProfileFn).toHaveBeenCalled()
     })
     expect(screen.queryByRole('button', { name: /SUBTERRANEAN VATS/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /PREMIUM/i })).not.toBeInTheDocument()
   })
 
   it('shows hidden pages faded, with a hidden icon, for admins and super admins', async () => {
@@ -425,6 +426,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
       'data-hidden',
       'true',
     )
+    for (const item of screen.getAllByRole('button', { name: /PREMIUM/i })) {
+      expect(item).toHaveAttribute('data-hidden', 'true')
+    }
   })
 
   it('shows a hidden page when admin clearance lives only on the profile', async () => {
