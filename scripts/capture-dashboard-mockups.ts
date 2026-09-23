@@ -279,6 +279,16 @@ async function main() {
   } finally {
     serverProcess.kill('SIGTERM')
   }
+
+  // 3. Automated End-to-End Neon S3 CDN Sync
+  const skipS3 = args.includes('--skip-s3') || args.includes('--no-s3')
+  if (!skipS3) {
+    console.log('\n☁️ Automatically syncing marketing mockups to Neon S3 CDN...')
+    execSync('npm run s3:sync', { stdio: 'inherit' })
+    console.log('✅ Marketing mockups synced to Neon S3 with 100% asset parity!')
+  } else {
+    console.log('\n⏭️ Skipped S3 sync (--skip-s3 passed).')
+  }
 }
 
 main().catch((err) => {

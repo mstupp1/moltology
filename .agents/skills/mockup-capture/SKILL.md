@@ -41,6 +41,10 @@ Benthic OS Routes (/dashboard, /forum, /oracle, /market, /chassis, /codex)
          ├──► public/images/marketing/oracle_feature_preview.webp        (1760x1100 @ 2x, Main Hub Area)
          ├──► public/images/marketing/oracle_feature_preview_sm.webp     (1280px max width)
          │
+         ├──► Automated Neon S3 CDN Sync (`npm run s3:sync`)
+         │    • Uploads all WebPs to Neon S3 (`moltology-public-assets/images/marketing/`)
+         │    • Verifies 100% S3 Asset Parity
+         │
          ▼  Responsive <picture> / <source> WebP Resolution in UI
 ┌────────────────────────────────────────────────────────────────────────┐
 │ src/components/LandingPage.tsx (3 Core Pillars Main Hub Slates)        │
@@ -117,8 +121,13 @@ To guarantee clean, un-obscured, and fully authenticated UI screenshots without 
    npx vitest run src/components/LandingPage.test.tsx src/components/hud/DashboardMarketingShowcase.test.tsx
    ```
 
-2. **Sync Assets to S3 CDN (Optional)**:
+2. **Automated Neon S3 CDN Sync**:
+   `npm run mockups:capture` automatically triggers `npm run s3:sync` upon completing capture, uploading all generated WebP mockups to the Neon S3 public assets bucket (`moltology-public-assets/images/marketing/`) and verifying 100% asset parity. No manual upload follow-up is required.
    ```bash
-   npm run s3:sync
+   # Manual parity verification if ever needed:
+   npm run s3:verify
+
+   # Pass --skip-s3 to mockups:capture to bypass S3 upload during isolated local testing:
+   npm run mockups:capture -- --skip-s3
    ```
 
