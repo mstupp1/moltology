@@ -58,10 +58,15 @@ function HudContent() {
 
   const isPending = session.isPending
   const targetId = isPending ? null : userId || 'guest'
+  const isDashboardRoute =
+    location.pathname === '/dashboard' || location.pathname === '/dashboard/'
 
-  // Show welcome splash once per user or guest on first visit (bypassed in preview mode or main-only mode)
+  // Show welcome splash once per member on first visit anywhere in the hub,
+  // and once per guest only on the dashboard (bypassed in preview or main-only mode).
+  // A shared forum link should not cover the page for a guest's first visit.
   useEffect(() => {
     if (!targetId) return
+    if (targetId === 'guest' && !isDashboardRoute) return
     if (
       typeof window !== 'undefined' &&
       (window.location.search.includes('preview=true') ||
@@ -76,7 +81,7 @@ function HudContent() {
     if (!localStorage.getItem(key)) {
       setShowWelcome(true)
     }
-  }, [targetId])
+  }, [targetId, isDashboardRoute])
 
   const handleDismissWelcome = () => {
     const activeId = userId || 'guest'

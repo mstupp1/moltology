@@ -5,9 +5,11 @@ import { HudLayout } from '@/components/hud/HudLayout'
 import { ToastProvider } from '@/components/ui/ToastProvider'
 import { authClient } from '@/lib/auth-client'
 
+let mockPathname = '/dashboard'
+
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/dashboard' }),
+  useLocation: () => ({ pathname: mockPathname }),
   useRouter: () => ({ preloadRoute: vi.fn() }),
   Outlet: () => null,
   createFileRoute: () => (config: any) => config,
@@ -36,6 +38,7 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     localStorage.clear()
+    mockPathname = '/dashboard'
     vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as any)
   })
 
@@ -78,6 +81,38 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
     expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
   })
 
+  it('does not show the guest welcome popup on a shared forum link', () => {
+    mockPathname = '/forum/rules-announcements/welcome-to-community-core-directives'
+
+    renderHud()
+
+    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    expect(localStorage.getItem('moltology:welcomed:guest')).toBeNull()
+  })
+
+  it('still shows the guest welcome popup after a forum visit once they open the dashboard', () => {
+    mockPathname = '/forum'
+    const forumVisit = renderHud()
+    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+    forumVisit.unmount()
+
+    mockPathname = '/dashboard'
+    renderHud()
+    expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
+  })
+
+  it('still opens the guest welcome from the manual relaunch on a forum page', () => {
+    mockPathname = '/forum/general-discussion/some-topic'
+    renderHud()
+    expect(screen.queryByText('WELCOME, GUEST')).not.toBeInTheDocument()
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('launch-welcome-splash'))
+    })
+
+    expect(screen.getByText('WELCOME, GUEST')).toBeInTheDocument()
+  })
+
   it('triggers welcome popup with user name for logged-in user on first visit', () => {
     vi.mocked(authClient.useSession).mockReturnValue({
       data: { user: { id: 'user-789', name: 'Commander Crustacean' } },
@@ -94,5 +129,16 @@ describe('HUD Welcome Splash (Guest Demo & User First Visit)', () => {
     })
 
     expect(localStorage.getItem('moltology:welcomed:user-789')).toBe('1')
+  })
+
+  it('still shows the member welcome popup on a first visit to a forum link', () => {
+    mockPathname = '/forum/rules-announcements/welcome-to-community-core-directives'
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'user-789', name: 'Commander Crustacean' } },
+    } as any)
+
+    renderHud()
+
+    expect(screen.getByText('WELCOME, COMMANDER')).toBeInTheDocument()
   })
 })
