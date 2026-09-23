@@ -8,7 +8,12 @@ import {
 
 describe('hidden pages', () => {
   it('treats subterranean vats as a hidden page', () => {
-    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/subterranean', '/premium'])
+    expect(HIDDEN_PAGES.map((page) => page.path)).toEqual(['/subterranean', '/premium', '/store'])
+    expect(isHiddenPagePath('/store')).toBe(true)
+    expect(isHiddenPagePath('/store/')).toBe(true)
+    expect(isHiddenPagePath('/store?checkout=success')).toBe(true)
+    expect(isHiddenPagePath('/store/benthic-shell-tee')).toBe(true)
+    expect(isHiddenPagePath('/storefront')).toBe(false)
     expect(isHiddenPagePath('/subterranean')).toBe(true)
     expect(isHiddenPagePath('/subterranean/')).toBe(true)
     expect(isHiddenPagePath('/subterranean?vat=1')).toBe(true)

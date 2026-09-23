@@ -10,9 +10,16 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }))
 
+let storeAccess = { canView: false, pending: false }
+
+vi.mock('@/hooks/useHiddenPageAccess', () => ({
+  useHiddenPageAccess: () => storeAccess,
+}))
+
 describe('MoltNationFooter Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    storeAccess = { canView: false, pending: false }
   })
 
   it('renders MoltNation logo and clean tagline', () => {
@@ -33,7 +40,7 @@ describe('MoltNationFooter Component', () => {
     expect(screen.getByText('SACRED CODEX')).toBeInTheDocument()
     expect(screen.getByText('SYNAPTIC PATH')).toBeInTheDocument()
     expect(screen.getByText('ORGANIZATION')).toBeInTheDocument()
-    expect(screen.getByText('STORE')).toBeInTheDocument()
+    expect(screen.getByText('STORE').closest('a')).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
     expect(screen.getByText('INSTAGRAM')).toBeInTheDocument()
     expect(screen.getByText('YOUTUBE')).toBeInTheDocument()
     expect(screen.getByText('RSS FEED')).toBeInTheDocument()
@@ -45,5 +52,13 @@ describe('MoltNationFooter Component', () => {
     expect(screen.getByText(/© 2026 MOLTNATION MEDIA GROUP. ALL RIGHTS RESERVED./i)).toBeInTheDocument()
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()
+  })
+
+  it('points STORE at the on-site catalog for admins', () => {
+    storeAccess = { canView: true, pending: false }
+    render(<MoltNationFooter />)
+    const storeLink = screen.getByText('STORE').closest('a')
+    expect(storeLink).toHaveAttribute('href', '/store')
+    expect(storeLink).not.toHaveAttribute('target', '_blank')
   })
 })

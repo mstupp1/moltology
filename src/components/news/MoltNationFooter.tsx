@@ -16,6 +16,7 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { MoltNationLogo } from '@/components/news/MoltNationLogo'
+import { useStoreDestination } from '@/components/store/useStoreDestination'
 
 export interface MoltNationFooterProps {
   className?: string
@@ -27,6 +28,7 @@ export interface MoltNationFooterProps {
  * high-value SEO pathways, and safe clearance for floating controls.
  */
 export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = '' }) => {
+  const storeDestination = useStoreDestination()
   return (
     <footer
       className={`w-full bg-[#030607] border-t border-cyan-900/40 text-xs text-gray-400 font-sans relative z-20 overflow-hidden pb-28 sm:pb-12 ${className}`}
@@ -115,16 +117,26 @@ export const MoltNationFooter: React.FC<MoltNationFooterProps> = ({ className = 
               <span>ORGANIZATION</span>
             </Link>
 
-            <a
-              href="https://www.etsy.com/shop/SaasTrash"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 py-2.5 bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
-            >
-              <ShoppingBag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>STORE</span>
-              <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
-            </a>
+            {storeDestination.external ? (
+              <a
+                href={storeDestination.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2.5 bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>STORE</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
+              </a>
+            ) : (
+              <Link
+                to="/store"
+                className="px-3.5 py-2.5 bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 text-[11px] sm:text-xs font-grotesk font-bold uppercase chamfer-corner flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>STORE</span>
+              </Link>
+            )}
 
             <a
               href="https://www.instagram.com/moltology_org/"

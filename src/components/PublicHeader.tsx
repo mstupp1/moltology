@@ -3,7 +3,7 @@
  * PUBLIC TOP NAVIGATION HEADER
  * Shared navigation bar across top-level public pages (Landing / Org).
  * Features a modern glassmorphic HUD pill nav, high-tech glowing tab indicators,
- * and direct store link to https://www.etsy.com/shop/SaasTrash.
+ * Members keep the Etsy store link. Admins and super admins go to /store.
  * ============================================================================
  */
 import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react'
@@ -22,6 +22,7 @@ import { HeaderBrand } from '@/components/ui/HeaderBrand'
 import { AnimatedHamburger } from '@/components/ui/AnimatedHamburger'
 import { PublicHeaderAuthSkeleton } from '@/components/PublicHeaderAuthSkeleton'
 import { useIdleReady } from '@/hooks/useIdleReady'
+import { useStoreDestination } from '@/components/store/useStoreDestination'
 
 const LazyPublicHeaderAuthSlot = lazy(() =>
   import('@/components/PublicHeaderAuthSlot').then((m) => ({ default: m.PublicHeaderAuthSlot }))
@@ -72,6 +73,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const isCorporate = variant === 'corporate' || locationPathname === '/org' || activePage === 'org'
   const authReady = useIdleReady()
+  const storeDestination = useStoreDestination()
+  const navTabs = useMemo(() => {
+    return NAV_TABS.map((tab) => {
+      if (tab.id !== 'store') return tab
+      if (storeDestination.external) {
+        return { ...tab, href: storeDestination.href, path: undefined, external: true }
+      }
+      return { ...tab, href: undefined, path: storeDestination.href, external: false }
+    })
+  }, [storeDestination.external, storeDestination.href])
 
   const currentTab = useMemo(() => {
     if (locationPathname.startsWith('/news') || locationPathname.startsWith('/blog')) return 'news'
@@ -79,6 +90,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     if (locationPathname.startsWith('/moltmax')) return 'moltmax'
     if (locationPathname.startsWith('/what-is-moltology')) return 'about'
     if (locationPathname.startsWith('/org')) return 'org'
+    if (locationPathname.startsWith('/store')) return 'store'
     if (locationPathname === '/') return 'home'
     if (activePage === 'blog') return 'news'
     return activePage
@@ -167,11 +179,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     if (!measureNav) return
     const available = measureNav.clientWidth
     if (available <= 0) return
-    for (const tab of NAV_TABS) {
+    for (const tab of navTabs) {
       const el = tabRefs.current[tab.id]
       if (el && el.offsetWidth > 0) tabWidthsRef.current[tab.id] = el.offsetWidth
     }
-    if (NAV_TABS.some((tab) => !tabWidthsRef.current[tab.id])) return
+    if (navTabs.some((tab) => !tabWidthsRef.current[tab.id])) return
     if (moreBtnRef.current && moreBtnRef.current.offsetWidth > 0) {
       tabWidthsRef.current.__more__ = moreBtnRef.current.offsetWidth
     }
@@ -179,7 +191,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     const widthWith = (folded: Set<string>) => {
       let total = 8
       let count = 0
-      for (const tab of NAV_TABS) {
+      for (const tab of navTabs) {
         if (folded.has(tab.id)) continue
         if (count > 0) total += 4
         total += tabWidthsRef.current[tab.id] || 0
@@ -188,16 +200,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       if (folded.size > 0) total += 4 + moreWidth
       return total
     }
-    const foldOrder = NAV_TABS.map((tab) => tab.id).filter((id) => id !== currentTab).reverse()
+    const foldOrder = navTabs.map((tab) => tab.id).filter((id) => id !== currentTab).reverse()
     const folded = new Set<string>()
     while (folded.size < foldOrder.length && widthWith(folded) > available) {
       folded.add(foldOrder[folded.size])
     }
-    const next = NAV_TABS.map((tab) => tab.id).filter((id) => folded.has(id))
+    const next = navTabs.map((tab) => tab.id).filter((id) => folded.has(id))
     setOverflowIds((prev) =>
       prev.length === next.length && prev.every((id, index) => id === next[index]) ? prev : next
     )
-  }, [currentTab])
+  }, [currentTab, navTabs])
 
   useEffect(() => {
     measureOverflow()
@@ -478,7 +490,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             </div>
           </div>
 
-            {NAV_TABS.filter((tab) => !overflowIds.includes(tab.id)).map(renderNavTab)}
+            {navTabs.filter((tab) => !overflowIds.includes(tab.id)).map(renderNavTab)}
 
             {overflowIds.length > 0 && (
               <div className="relative flex items-center">
@@ -517,7 +529,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                         : 'bg-[#080d0e]/95 border border-cyan-950/80'
                     }`}
                   >
-                    {NAV_TABS.filter((tab) => overflowIds.includes(tab.id)).map(renderOverflowItem)}
+                    {navTabs.filter((tab) => overflowIds.includes(tab.id)).map(renderOverflowItem)}
                   </div>
                 )}
               </div>
@@ -684,22 +696,37 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             <span>ORGANIZATION</span>
           </button>
 
-          <a
-            href="https://www.etsy.com/shop/SaasTrash"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
-              isCorporate
-                ? 'text-amber-700 hover:bg-amber-50'
-                : 'text-amber-300 hover:bg-cyan-950/30'
-            }`}
-          >
-            <span className="flex items-center gap-3">
+          {storeDestination.external ? (
+            <a
+              href={storeDestination.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+                isCorporate
+                  ? 'text-amber-700 hover:bg-amber-50'
+                  : 'text-amber-300 hover:bg-cyan-950/30'
+              }`}
+            >
+              <span className="flex items-center gap-3">
+                <ShoppingBag className={`w-4 h-4 ${isCorporate ? 'text-amber-600' : 'text-amber-400'}`} />
+                <span>STORE</span>
+              </span>
+              <ExternalLink className={`w-3.5 h-3.5 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`} />
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onNavigate(storeDestination.href)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-grotesk font-bold tracking-wider transition-colors ${
+                isCorporate
+                  ? 'text-amber-700 hover:bg-amber-50'
+                  : 'text-amber-300 hover:bg-cyan-950/30'
+              }`}
+            >
               <ShoppingBag className={`w-4 h-4 ${isCorporate ? 'text-amber-600' : 'text-amber-400'}`} />
               <span>STORE</span>
-            </span>
-            <ExternalLink className={`w-3.5 h-3.5 opacity-70 ${isCorporate ? 'text-amber-600' : 'text-amber-500'}`} />
-          </a>
+            </button>
+          )}
 
           {/* Divider */}
           <div

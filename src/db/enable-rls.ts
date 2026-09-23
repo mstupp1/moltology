@@ -675,6 +675,29 @@ async function applyRLS() {
     );`
     console.log('✓ RLS policies configured for signup risk events')
 
+    await sql`ALTER TABLE IF EXISTS merch_products ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS merch_variants ENABLE ROW LEVEL SECURITY;`
+    await sql`ALTER TABLE IF EXISTS merch_orders ENABLE ROW LEVEL SECURITY;`
+    await sql`DROP POLICY IF EXISTS merch_products_server_only_policy ON merch_products;`
+    await sql`DROP POLICY IF EXISTS merch_variants_server_only_policy ON merch_variants;`
+    await sql`DROP POLICY IF EXISTS merch_orders_server_only_policy ON merch_orders;`
+    await sql`CREATE POLICY merch_products_server_only_policy ON merch_products FOR ALL USING (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    ) WITH CHECK (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    );`
+    await sql`CREATE POLICY merch_variants_server_only_policy ON merch_variants FOR ALL USING (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    ) WITH CHECK (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    );`
+    await sql`CREATE POLICY merch_orders_server_only_policy ON merch_orders FOR ALL USING (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    ) WITH CHECK (
+      NULLIF(current_setting('request.jwt.claims', true), '') IS NULL
+    );`
+    console.log('✓ RLS policies configured for merch products, variants, and orders')
+
     await applyPremiumColumnGuard()
 
     console.log('✓ Row Level Security (RLS) policies successfully created!')

@@ -7,9 +7,16 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }))
 
+let storeAccess = { canView: false, pending: false }
+
+vi.mock('@/hooks/useHiddenPageAccess', () => ({
+  useHiddenPageAccess: () => storeAccess,
+}))
+
 describe('MainFooter Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    storeAccess = { canView: false, pending: false }
   })
 
   it('renders default brand title, subtext, emblem, and canonical motto', () => {
@@ -37,6 +44,7 @@ describe('MainFooter Component', () => {
 
     const storeLink = screen.getByText('STORE').closest('a')
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
+    expect(storeLink).toHaveAttribute('target', '_blank')
 
     const instagramLink = screen.getByText('INSTAGRAM').closest('a')
     expect(instagramLink).toHaveAttribute('href', 'https://www.instagram.com/moltology_org/')
@@ -46,6 +54,14 @@ describe('MainFooter Component', () => {
 
     const rssLink = screen.getByText('RSS FEED').closest('a')
     expect(rssLink).toHaveAttribute('href', '/rss.xml')
+  })
+
+  it('points STORE at the on-site catalog for admins', () => {
+    storeAccess = { canView: true, pending: false }
+    render(<MainFooter />)
+    const storeLink = screen.getByText('STORE').closest('a')
+    expect(storeLink).toHaveAttribute('href', '/store')
+    expect(storeLink).not.toHaveAttribute('target', '_blank')
   })
 
   it('renders legal links and copyright', () => {
