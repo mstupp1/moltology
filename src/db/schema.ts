@@ -1231,3 +1231,31 @@ export const academyCertificateAwards = pgTable('academy_certificate_awards', {
   pgPolicy('academy_certificate_awards_owner_select_policy', { for: 'select', using: academyOwnerOnly }),
   pgPolicy('academy_certificate_awards_owner_insert_policy', { for: 'insert', withCheck: academyOwnerOnly }),
 ])
+
+/**
+ * Signup fraud audit. Blocked attempts have a null userId.
+ * Member JWTs cannot read this table. The owner connection used by the server bypasses RLS.
+ */
+const signupRiskServerOnly = sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`
+
+export const signupRiskEvents = pgTable('signup_risk_events', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  userId: text('userId').references(() => profiles.id, { onDelete: 'set null' }),
+  provider: text('provider').notNull(),
+  action: text('action').notNull(),
+  riskLevel: text('riskLevel'),
+  botScore: integer('botScore'),
+  country: text('country'),
+  emailDomain: text('emailDomain'),
+  reason: text('reason').notNull(),
+  fastSubmission: boolean('fastSubmission').default(false).notNull(),
+}, (table) => [
+  index('signup_risk_events_user_idx').on(table.userId),
+  index('signup_risk_events_created_idx').on(table.createdAt),
+  pgPolicy('signup_risk_events_server_only_policy', {
+    for: 'all',
+    using: signupRiskServerOnly,
+    withCheck: signupRiskServerOnly,
+  }),
+])

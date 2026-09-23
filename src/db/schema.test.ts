@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getTableConfig } from 'drizzle-orm/pg-core'
-import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards } from './schema'
+import { profiles, users, userStats, routines, routineCompletions, activityEvents, changelogs, neonAuthUser, authUser, authSession, authAccount, authVerification, authJwks, aiThreads, aiMessages, blogPosts, blogComments, leads, friendRequests, friendships, suggestionDismissals, memberBonds, notifications, academyTracks, academyCourses, academyTrackCourses, academyModules, academyLessons, academyQuizQuestions, academyEnrollments, academyLessonProgress, academyCertificates, academyCertificateAwards, signupRiskEvents } from './schema'
 
 describe('Database Schema & RLS Policies', () => {
   it('exports all user-scoped and system tables', () => {
@@ -37,6 +37,7 @@ describe('Database Schema & RLS Policies', () => {
     expect(academyLessonProgress).toBeDefined()
     expect(academyCertificates).toBeDefined()
     expect(academyCertificateAwards).toBeDefined()
+    expect(signupRiskEvents).toBeDefined()
   })
 
   it('uniquely constrains Better Auth provider account pairs', () => {

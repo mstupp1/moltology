@@ -281,6 +281,13 @@
       "when": 1790128101567,
       "tag": "0039_far_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1790137321652,
+      "tag": "0040_signup_risk_events",
+      "breakpoints": true
     }
   ]
 }
