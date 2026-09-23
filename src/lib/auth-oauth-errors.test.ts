@@ -18,6 +18,12 @@ describe('auth-oauth-errors', () => {
     expect(normalizeOAuthErrorCode(undefined)).toBeNull()
   })
 
+  it('maps a blocked signup to a plain retry message', () => {
+    expect(mapOAuthCallbackError('signup_blocked')).toBe(
+      'Could not create that account. Try a different email.',
+    )
+  })
+
   it('maps account_not_linked to an actionable sign-in message', () => {
     expect(mapOAuthCallbackError('account_not_linked')).toMatch(/Sign in with your email and password/i)
     expect(mapOAuthCallbackError('account_not_linked')).toMatch(/Settings/i)

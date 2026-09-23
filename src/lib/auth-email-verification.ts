@@ -76,3 +76,29 @@ export function isVerifyFirstSignupResult(result: {
   if (data && 'token' in data) return data.token == null
   return true
 }
+
+/**
+ * Explicit `{ token: null, user }` from a challenged signup.
+ * A payload that simply omits `token` is not enough: existing clients treat that as success
+ * when global email verification is off.
+ */
+export function isExplicitNullSessionSignup(result: {
+  data?: { token?: string | null; user?: unknown } | null
+  error?: unknown
+} | null | undefined): boolean {
+  if (!result || result.error) return false
+  const data = result.data
+  if (!data || typeof data !== 'object' || !('token' in data)) return false
+  return data.token == null && data.user != null
+}
+
+export function shouldHoldSignupForVerification(
+  result: {
+    data?: { token?: string | null; user?: unknown } | null
+    error?: unknown
+  } | null | undefined,
+  verificationEnabled: boolean,
+): boolean {
+  if (verificationEnabled && isVerifyFirstSignupResult(result)) return true
+  return isExplicitNullSessionSignup(result)
+}

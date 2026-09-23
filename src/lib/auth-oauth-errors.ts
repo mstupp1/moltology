@@ -12,6 +12,7 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   unable_to_get_user_info: 'Could not finish Google sign-in. Please try again.',
   invalid_code: 'Google sign-in expired. Please try again.',
   no_code: 'Google sign-in was cancelled. Please try again.',
+  signup_blocked: 'Could not create that account. Try a different email.',
 }
 
 const DEFAULT_OAUTH_ERROR = 'Could not sign in with Google. Please try again.'

@@ -184,12 +184,14 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     fireEvent.click(submitBtn)
 
     await waitFor(() => {
-      expect(authClient.signUp.email).toHaveBeenCalledWith({
+      expect(authClient.signUp.email).toHaveBeenCalledWith(expect.objectContaining({
         name: 'Initiate',
         email: 'unit@example.com',
         password: 'securepwd123',
         callbackURL: expect.stringContaining('/moltmax'),
-      })
+        confirm_website: '',
+        signupElapsedMs: expect.any(Number),
+      }))
       expect(mockNavigate).toHaveBeenCalledWith({ to: '/moltmax' })
     })
   })
@@ -312,6 +314,22 @@ describe('Auth Split Landing Page Component (/auth)', () => {
     render(<AuthRoute />)
 
     fireEvent.change(screen.getByPlaceholderText('name@example.com'), { target: { value: 'verify@example.com' } })
+    fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'securepwd123' } })
+    fireEvent.click(screen.getByRole('button', { name: /^Create Account$/i }))
+
+    expect(await screen.findByTestId('email-verification-pending')).toBeInTheDocument()
+  })
+
+  it('shows confirm-email panel when a challenged signup withholds the session', async () => {
+    emailVerificationEnabledForTest = false
+    mockSearch = { mode: 'signup' }
+    vi.mocked(authClient.signUp.email).mockResolvedValue({
+      data: { user: { id: 'user-held', email: 'held@example.com' }, token: null },
+    } as any)
+
+    render(<AuthRoute />)
+
+    fireEvent.change(screen.getByPlaceholderText('name@example.com'), { target: { value: 'held@example.com' } })
     fireEvent.change(screen.getByPlaceholderText('••••••••'), { target: { value: 'securepwd123' } })
     fireEvent.click(screen.getByRole('button', { name: /^Create Account$/i }))
 

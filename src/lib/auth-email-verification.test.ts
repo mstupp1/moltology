@@ -3,8 +3,10 @@ import {
   EMAIL_VERIFICATION_COPY,
   clearPendingSignup,
   isEmailNotVerifiedError,
+  isExplicitNullSessionSignup,
   isVerifyFirstSignupResult,
   peekPendingSignup,
+  shouldHoldSignupForVerification,
   stashPendingSignup,
   takePendingSignup,
 } from './auth-email-verification'
@@ -24,6 +26,16 @@ describe('auth-email-verification helpers', () => {
     expect(isVerifyFirstSignupResult({ data: { token: null, user: { id: '1' } } })).toBe(true)
     expect(isVerifyFirstSignupResult({ data: { token: 'sess', user: { id: '1' } } })).toBe(false)
     expect(isVerifyFirstSignupResult({ error: { message: 'fail' } })).toBe(false)
+  })
+
+  it('holds a challenged signup only when the server explicitly withholds the token', () => {
+    const withheld = { data: { token: null, user: { id: '1' } } }
+    const omitted = { data: { user: { id: '1' } } }
+    expect(isExplicitNullSessionSignup(withheld)).toBe(true)
+    expect(isExplicitNullSessionSignup(omitted)).toBe(false)
+    expect(shouldHoldSignupForVerification(withheld, false)).toBe(true)
+    expect(shouldHoldSignupForVerification(omitted, false)).toBe(false)
+    expect(shouldHoldSignupForVerification(omitted, true)).toBe(true)
   })
 
   it('stashes and takes pending signup data', () => {

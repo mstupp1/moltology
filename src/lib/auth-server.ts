@@ -20,6 +20,7 @@ import {
 } from './auth-config'
 import { EMAIL_VERIFICATION_COPY } from './auth-email-verification'
 import { sendEmailVerificationEmail } from './server/mail'
+import { persistAdmittedSignup, signupAuthAfterHook, validateSignupUser } from './server/signup-auth'
 
 /**
  * Better Auth `sendVerificationEmail` hook. Throws when Resend did not send
@@ -129,15 +130,16 @@ export const auth = betterAuth({
     autoSignIn: true,
     requireEmailVerification: emailVerificationEnabled,
   },
-  emailVerification: emailVerificationEnabled
-    ? {
-        sendOnSignUp: true,
-        sendOnSignIn: true,
-        autoSignInAfterVerification: true,
-        expiresIn: 3600,
-        sendVerificationEmail,
-      }
-    : undefined,
+  // The sender stays configured when the global flag is off so a challenged
+  // signup can still confirm the inbox and resend. Clean signups are not
+  // forced through verification unless the flag is on.
+  emailVerification: {
+    sendOnSignUp: emailVerificationEnabled,
+    sendOnSignIn: emailVerificationEnabled,
+    autoSignInAfterVerification: true,
+    expiresIn: 3600,
+    sendVerificationEmail,
+  },
   account: {
     accountLinking: {
       enabled: ACCOUNT_LINKING_OPTIONS.enabled,
@@ -166,15 +168,24 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: baseURL.startsWith('https://'),
   },
+  user: {
+    validateUserInfo: async ({ user, source }, context) => {
+      return validateSignupUser({ user, source, request: context.request })
+    },
+  },
   databaseHooks: {
     user: {
       create: {
         after: async (user) => {
           const { ensureUserProfile } = await import('./user-sync')
           await ensureUserProfile(user.id)
+          await persistAdmittedSignup(user)
         },
       },
     },
+  },
+  hooks: {
+    after: signupAuthAfterHook,
   },
   plugins: [
     jwt({
