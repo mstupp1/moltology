@@ -15,6 +15,12 @@ import {
 import { ACTIVITY_FEED_FILTER_IDS } from '../activity-events'
 
 export type * from './db-services'
+export type {
+  AdminMemberDirectory,
+  AdminMemberRole,
+  AdminPurchaseRow,
+  AdminTelemetry,
+} from './admin-oversight'
 
 // ============================================================================
 // SERVER FUNCTIONS (Thin RPC Proxies - Bundled for Client & Server)
@@ -948,4 +954,54 @@ export const createSupportTicketFn = createServerFn({ method: 'POST' })
   .handler(async (args) => {
     const { createSupportTicketHandler } = await import('./support-tickets')
     return createSupportTicketHandler(args)
+  })
+
+const adminAuthSchema = z.object({
+  token: z.string().optional(),
+  userId: z.string().optional(),
+})
+
+export const getAdminTelemetryFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) => adminAuthSchema.parse(data ?? {}))
+  .handler(async (args) => {
+    const { getAdminTelemetryHandler } = await import('./admin-oversight')
+    return getAdminTelemetryHandler(args)
+  })
+
+export const searchAdminMembersFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string; query?: string }) =>
+    adminAuthSchema
+      .extend({
+        query: z.string().max(80).optional(),
+      })
+      .parse(data ?? {}),
+  )
+  .handler(async (args) => {
+    const { searchAdminMembersHandler } = await import('./admin-oversight')
+    return searchAdminMembersHandler(args)
+  })
+
+export const setAdminMemberRoleFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { token?: string; userId?: string; profileId: string; role: string }) =>
+    adminAuthSchema
+      .extend({
+        profileId: z.string().min(1),
+        role: z.enum(['user', 'admin', 'super_admin']),
+      })
+      .parse(data),
+  )
+  .handler(async (args) => {
+    const { setAdminMemberRoleHandler } = await import('./admin-oversight')
+    return setAdminMemberRoleHandler(args)
+  })
+
+export const listAdminPurchasesFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) => adminAuthSchema.parse(data ?? {}))
+  .handler(async (args) => {
+    const { listAdminPurchasesHandler } = await import('./admin-oversight')
+    return listAdminPurchasesHandler(args)
   })

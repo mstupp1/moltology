@@ -16,6 +16,7 @@ import {
 } from '@/lib/command-catalog'
 import { MEMBER_SEARCH_MIN_CHARS } from '@/lib/member-search'
 import { memberDossierLocation } from '@/lib/member-handle'
+import { isAdminOnlyPath } from '@/lib/admin-access'
 import { isHiddenPagePath } from '@/lib/hidden-pages'
 import type { MemberSearchResult } from '@/lib/connections'
 import type { LobsterAvatarConfig } from '@/lib/lobster-avatar'
@@ -62,6 +63,7 @@ export const CommandPalette: React.FC = () => {
   const session = useAuthSession()
   const hiddenAccess = useHiddenPageAccess()
   const includeHidden = hiddenAccess.canView && !hiddenAccess.pending
+  const includeAdminOnly = includeHidden
   const close = () => setIsOpen(false)
 
   const signedIn = session.isAuthenticated && !session.isGuest
@@ -71,14 +73,17 @@ export const CommandPalette: React.FC = () => {
   const peopleEnabled = isOpen && signedIn && trimmed.length >= MEMBER_SEARCH_MIN_CHARS
   const { results: people, searching: searchingPeople } = useMemberSearch(query, peopleEnabled)
   const visibleRecents = recents.filter((entry) => {
-    if (includeHidden || entry.kind !== 'page') return true
-    return !isHiddenPagePath(pageFromRecent(entry).to)
+    if (entry.kind !== 'page') return true
+    const destination = pageFromRecent(entry).to
+    if (isAdminOnlyPath(destination) && !includeAdminOnly) return false
+    if (includeHidden) return true
+    return !isHiddenPagePath(destination)
   })
   const showRecents = signedIn && !trimmed && visibleRecents.length > 0
 
   const filteredCommands = useMemo(
-    () => filterCommandCatalog(query, undefined, { includeHidden }),
-    [query, includeHidden],
+    () => filterCommandCatalog(query, undefined, { includeHidden, includeAdminOnly }),
+    [query, includeHidden, includeAdminOnly],
   )
 
   const rows: PaletteRow[] = useMemo(() => {

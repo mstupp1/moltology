@@ -387,6 +387,7 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     })
     expect(screen.queryByRole('button', { name: /SUBTERRANEAN VATS/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /PREMIUM/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^ADMIN$/i })).not.toBeInTheDocument()
   })
 
   it('shows hidden pages faded, with a hidden icon, for admins and super admins', async () => {
@@ -403,6 +404,9 @@ describe('HUDSidebar Component Navigation & Animations', () => {
     } as any)
 
     const { rerender } = render(<HUDSidebar />)
+
+    const adminItem = screen.getByRole('button', { name: /^ADMIN$/i })
+    expect(adminItem).not.toHaveAttribute('data-hidden', 'true')
 
     const hiddenItem = screen.getByRole('button', { name: /SUBTERRANEAN VATS/i })
     expect(hiddenItem).toHaveAttribute('data-hidden', 'true')

@@ -42,8 +42,10 @@ export function SearchPage({
   const { toast } = useToast()
   const navigate = useNavigate()
   const trimmed = query.trim()
+  const staffCatalog = hiddenAccess.canView && !hiddenAccess.pending
   const pages = filterCommandCatalog(query, undefined, {
-    includeHidden: hiddenAccess.canView && !hiddenAccess.pending,
+    includeHidden: staffCatalog,
+    includeAdminOnly: staffCatalog,
   })
 
   const refreshConnections = useCallback(async () => {

@@ -34,6 +34,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
+import { Route as HudAdminRouteImport } from './routes/_hud/admin'
 import { Route as HudAlignmentRouteImport } from './routes/_hud/alignment'
 import { Route as HudChassisRouteImport } from './routes/_hud/chassis'
 import { Route as HudConnectionsRouteImport } from './routes/_hud/connections'
@@ -204,6 +205,11 @@ const WhatIsMoltologyRoute = WhatIsMoltologyRouteImport.update({
   id: '/what-is-moltology',
   path: '/what-is-moltology',
   getParentRoute: () => rootRouteImport,
+} as any)
+const HudAdminRoute = HudAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => HudRoute,
 } as any)
 const HudAlignmentRoute = HudAlignmentRouteImport.update({
   id: '/alignment',
@@ -470,6 +476,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
+  '/admin': typeof HudAdminRoute
   '/alignment': typeof HudAlignmentRoute
   '/chassis': typeof HudChassisRoute
   '/connections': typeof HudConnectionsRoute
@@ -541,6 +548,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
+  '/admin': typeof HudAdminRoute
   '/alignment': typeof HudAlignmentRoute
   '/chassis': typeof HudChassisRoute
   '/connections': typeof HudConnectionsRoute
@@ -614,6 +622,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
+  '/_hud/admin': typeof HudAdminRoute
   '/_hud/alignment': typeof HudAlignmentRoute
   '/_hud/chassis': typeof HudChassisRoute
   '/_hud/connections': typeof HudConnectionsRoute
@@ -688,6 +697,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
+    | '/admin'
     | '/alignment'
     | '/chassis'
     | '/connections'
@@ -759,6 +769,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/terms.md'
+    | '/admin'
     | '/alignment'
     | '/chassis'
     | '/connections'
@@ -831,6 +842,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
+    | '/_hud/admin'
     | '/_hud/alignment'
     | '/_hud/chassis'
     | '/_hud/connections'
@@ -1094,6 +1106,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/what-is-moltology'
       preLoaderRoute: typeof WhatIsMoltologyRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_hud/admin': {
+      id: '/_hud/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof HudAdminRouteImport
+      parentRoute: typeof HudRoute
     }
     '/_hud/alignment': {
       id: '/_hud/alignment'
@@ -1438,6 +1457,7 @@ const HudLecturesCoursesSlugRouteWithChildren =
   )
 
 interface HudRouteChildren {
+  HudAdminRoute: typeof HudAdminRoute
   HudAlignmentRoute: typeof HudAlignmentRoute
   HudChassisRoute: typeof HudChassisRoute
   HudConnectionsRoute: typeof HudConnectionsRoute
@@ -1470,6 +1490,7 @@ interface HudRouteChildren {
 }
 
 const HudRouteChildren: HudRouteChildren = {
+  HudAdminRoute: HudAdminRoute,
   HudAlignmentRoute: HudAlignmentRoute,
   HudChassisRoute: HudChassisRoute,
   HudConnectionsRoute: HudConnectionsRoute,
@@ -1564,12 +1585,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
