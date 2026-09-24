@@ -90,7 +90,7 @@
   "premium.event-sync::src/lib/premium-membership.ts#interpretPremiumStripeEvent": "fadbb33e066e",
   "premium.event-sync::src/lib/premium-membership.ts#reducePremiumMembership": "424fa3131ba1",
   "premium.event-sync::src/lib/server/premium.ts#applyPremiumStripeEvent": "c23e3b9500dc",
-  "premium.no-charge-toggle::src/lib/server/premium.ts#setPremiumAccessHandler": "16df7f719fcc",
+  "premium.no-charge-toggle::src/lib/server/premium.ts#setPremiumAccessHandler": "048f46c1dc26",
   "premium.no-standing::src/lib/premium-membership.ts#listPremiumEntitlements": "b5fde708473a",
   "premium.no-standing::src/lib/premium-membership.ts#PREMIUM_PAGE_COPY": "32d7c24fd724",
   "premium.price-from-env::src/lib/premium-membership.ts#premiumPriceMatchesProduct": "9e9b54875c98",
