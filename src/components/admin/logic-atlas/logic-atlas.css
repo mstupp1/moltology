@@ -1,0 +1,269 @@
+/* Logic Atlas: React Flow restyled for the HUD. Scoped to .logic-atlas-flow. */
+
+.logic-atlas-flow {
+  --xy-background-color: #070c0d;
+  --xy-background-pattern-dots-color-default: rgba(0, 195, 255, 0.14);
+  --xy-edge-stroke-default: rgba(131, 148, 147, 0.38);
+  --xy-edge-stroke-width-default: 1.25;
+  --xy-edge-label-background-color-default: #0b1011;
+  --xy-edge-label-color-default: #9fb3b2;
+  --xy-minimap-background-color-default: rgba(11, 16, 17, 0.92);
+  --xy-minimap-mask-background-color-default: rgba(7, 12, 13, 0.72);
+  --xy-minimap-mask-stroke-color-default: rgba(0, 195, 255, 0.55);
+  --xy-minimap-mask-stroke-width-default: 2;
+  --xy-controls-button-background-color-default: #0e181b;
+  --xy-controls-button-background-color-hover-default: #122028;
+  --xy-controls-button-color-default: #9fb3b2;
+  --xy-controls-button-color-hover-default: #00ffff;
+  --xy-controls-button-border-color-default: #243233;
+  --xy-controls-box-shadow-default: none;
+  --xy-attribution-background-color-default: transparent;
+  background: radial-gradient(ellipse at 30% 0%, rgba(0, 195, 255, 0.06), transparent 60%), #070c0d;
+}
+
+.logic-atlas-flow .react-flow__controls {
+  border: 1px solid #243233;
+}
+
+.logic-atlas-flow .react-flow__minimap {
+  border: 1px solid #243233;
+}
+
+.logic-atlas-flow .react-flow__node {
+  cursor: pointer;
+}
+
+.logic-atlas-flow .react-flow__node-domain,
+.logic-atlas-flow .react-flow__node-domainLabel {
+  cursor: default;
+  pointer-events: none;
+}
+
+.logic-atlas-flow .react-flow__handle {
+  opacity: 0;
+  width: 6px;
+  height: 6px;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+}
+
+/* Domain boxes */
+.atlas-domain {
+  width: 100%;
+  height: 100%;
+  border: 1px solid color-mix(in srgb, var(--domain) 34%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--domain) 9%, transparent), transparent 120px),
+    rgba(11, 16, 17, 0.55);
+  transition: opacity 180ms ease, border-color 180ms ease;
+}
+
+.atlas-domain[data-dim='true'] {
+  opacity: 0.35;
+}
+
+.atlas-domain[data-focus='true'] {
+  border-color: color-mix(in srgb, var(--domain) 70%, transparent);
+}
+
+/* Rule cards */
+.atlas-rule {
+  position: relative;
+  width: 264px;
+  height: 104px;
+  background: #0e181b;
+  border: 1px solid #243233;
+  border-left: 3px solid var(--domain);
+  transition:
+    opacity 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.atlas-rule:hover {
+  border-color: color-mix(in srgb, var(--domain) 70%, #243233);
+  border-left-color: var(--domain);
+}
+
+.atlas-rule[data-state='dim'] {
+  opacity: 0.16;
+}
+
+.atlas-rule[data-state='neighbor'] {
+  border-color: color-mix(in srgb, var(--domain) 55%, #243233);
+  border-left-color: var(--domain);
+}
+
+.atlas-rule[data-state='selected'] {
+  border-color: var(--domain);
+  box-shadow:
+    0 0 0 1px var(--domain),
+    0 0 28px color-mix(in srgb, var(--domain) 40%, transparent);
+  transform: translateY(-1px);
+}
+
+.atlas-rule[data-lod='compact'] .atlas-rule-body {
+  display: none;
+}
+
+.atlas-rule[data-lod='compact'] .atlas-rule-title {
+  font-size: 24px;
+  line-height: 1.12;
+  -webkit-line-clamp: 3;
+}
+
+/* Overview: rule cards become tinted tiles; flagged rules glow. */
+.atlas-rule[data-lod='overview'] {
+  background: color-mix(in srgb, var(--domain) 16%, #0b1011);
+  border-color: color-mix(in srgb, var(--domain) 30%, transparent);
+}
+
+.atlas-rule[data-lod='overview'] > :not(.react-flow__handle) {
+  visibility: hidden;
+}
+
+.atlas-rule[data-lod='overview'][data-flag='gap'] {
+  background: rgba(255, 85, 64, 0.32);
+  border-color: rgba(255, 85, 64, 0.9);
+}
+
+.atlas-rule[data-lod='overview'][data-flag='watch'] {
+  background: rgba(255, 176, 32, 0.26);
+  border-color: rgba(255, 176, 32, 0.85);
+}
+
+.atlas-domain-label {
+  pointer-events: none;
+  text-shadow:
+    0 0 18px rgba(7, 12, 13, 0.95),
+    0 0 4px rgba(7, 12, 13, 0.95);
+  transition: opacity 180ms ease;
+}
+
+.atlas-domain-label[data-dim='true'] {
+  opacity: 0.3;
+}
+
+.atlas-rule-title,
+.atlas-rule-statement {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.atlas-rule-title {
+  -webkit-line-clamp: 1;
+}
+
+.atlas-rule-statement {
+  -webkit-line-clamp: 2;
+}
+
+/* Edges */
+.logic-atlas-flow .react-flow__edge.atlas-edge-cross path.react-flow__edge-path {
+  stroke-dasharray: 5 6;
+  stroke: rgba(131, 148, 147, 0.22);
+}
+
+.logic-atlas-flow .react-flow__edge.atlas-edge-dim path.react-flow__edge-path {
+  opacity: 0.06;
+}
+
+.logic-atlas-flow .react-flow__edge.atlas-edge-active path.react-flow__edge-path {
+  stroke: #00ffff;
+  stroke-width: 2;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.55));
+}
+
+/* Flow diagram in the drawer */
+.atlas-flow-step {
+  width: 208px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  text-align: center;
+  font-size: 11.5px;
+  line-height: 1.2;
+  color: #dfe3e3;
+  background: #0e181b;
+  border: 1px solid #2c3d3e;
+}
+
+.atlas-flow-step[data-kind='start'] {
+  border-radius: 999px;
+  border-color: rgba(0, 195, 255, 0.6);
+  color: #9fe8ff;
+}
+
+.atlas-flow-step[data-kind='check'] {
+  border-style: dashed;
+  border-color: rgba(159, 179, 178, 0.55);
+}
+
+.atlas-flow-step[data-kind='action'] {
+  border-color: rgba(210, 123, 255, 0.55);
+}
+
+.atlas-flow-step[data-tone='allow'] {
+  border-color: rgba(124, 255, 107, 0.65);
+  background: rgba(124, 255, 107, 0.07);
+  color: #c8ffbf;
+}
+
+.atlas-flow-step[data-tone='block'] {
+  border-color: rgba(255, 85, 64, 0.7);
+  background: rgba(255, 85, 64, 0.08);
+  color: #ffc2b8;
+}
+
+.atlas-flow-step[data-tone='warn'] {
+  border-color: rgba(255, 176, 32, 0.7);
+  background: rgba(255, 176, 32, 0.08);
+  color: #ffe0a6;
+}
+
+/* Decision prose */
+.atlas-prose {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #b9c6c5;
+}
+
+.atlas-prose p + p,
+.atlas-prose p + ul,
+.atlas-prose ul + p {
+  margin-top: 0.5rem;
+}
+
+.atlas-prose ul {
+  list-style: disc;
+  padding-left: 1.1rem;
+}
+
+.atlas-prose li + li {
+  margin-top: 0.25rem;
+}
+
+.atlas-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  padding: 0.05rem 0.3rem;
+  background: rgba(0, 195, 255, 0.08);
+  color: #9fe8ff;
+}
+
+.atlas-prose strong {
+  color: #dfe3e3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-rule,
+  .atlas-domain {
+    transition: none;
+  }
+}

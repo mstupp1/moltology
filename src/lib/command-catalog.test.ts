@@ -52,6 +52,7 @@ describe('command catalog', () => {
       'nav-news',
       'nav-watch',
       'nav-admin',
+      'nav-logic-atlas',
       'nav-landing',
       'nav-support',
       'nav-settings',
@@ -116,6 +117,10 @@ describe('command catalog', () => {
     expect(
       filterCommandCatalog('admin', undefined, { includeAdminOnly: true }).map((cmd) => cmd.id),
     ).toContain('nav-admin')
+    expect(filterCommandCatalog('logic').map((cmd) => cmd.id)).not.toContain('nav-logic-atlas')
+    expect(
+      filterCommandCatalog('logic', undefined, { includeAdminOnly: true }).map((cmd) => cmd.id),
+    ).toContain('nav-logic-atlas')
     expect(
       filterCommandCatalog('', undefined, { includeHidden: true, includeAdminOnly: true }).length,
     ).toBe(COMMAND_CATALOG.length)

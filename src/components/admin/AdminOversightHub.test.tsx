@@ -78,6 +78,7 @@ describe('Admin access and oversight hub', () => {
     fireEvent.click(screen.getByTestId('admin-tab-sectors'))
     expect(screen.getByTestId('admin-sectors')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Composite Studio/i })).toHaveAttribute('href', '/render/composite')
+    expect(screen.getByRole('link', { name: /Logic Atlas/i })).toHaveAttribute('href', '/admin/logic')
     expect(screen.queryByTestId('covenant-watch')).not.toBeInTheDocument()
   })
 })

@@ -158,6 +158,11 @@ function StatusCard({
 
 const SECTORS = [
   {
+    title: 'Logic Atlas',
+    detail: 'Map of business rules, where they live in code, and the decisions behind them.',
+    to: '/admin/logic' as const,
+  },
+  {
     title: 'Subterranean',
     detail: 'Hidden bio-vault chamber.',
     to: '/subterranean' as const,
@@ -176,7 +181,7 @@ const SECTORS = [
 
 function SectorDirectory() {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-2.5" data-testid="admin-sectors">
+    <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2.5" data-testid="admin-sectors">
       {SECTORS.map((sector) => (
         <Link
           key={sector.to}

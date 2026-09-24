@@ -18,7 +18,7 @@ function AdminRoute() {
   )
 }
 
-export const Route = createFileRoute('/_hud/admin')({
+export const Route = createFileRoute('/_hud/admin/')({
   headers: () => xRobotsNoindexHeaders(),
   head: () => ({
     meta: [

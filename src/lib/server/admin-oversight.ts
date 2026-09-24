@@ -16,7 +16,7 @@ export type AdminMemberRole = (typeof ADMIN_MEMBER_ROLES)[number]
 export const ADMIN_MEMBER_LIMIT = 25
 export const ADMIN_PURCHASE_LIMIT = 50
 
-type HandlerArgs<T> = {
+export type HandlerArgs<T> = {
   data?: T
   context?: WriteAuthContext | null
 }
@@ -80,7 +80,8 @@ function asRole(value: string | null | undefined, email: string | null): AdminMe
   return 'user'
 }
 
-async function requireStaff(args: HandlerArgs<WriteAuthData | undefined>) {
+/** Verified JWT plus a staff role read from the database. Shared by staff-only RPCs. */
+export async function requireStaff(args: HandlerArgs<WriteAuthData | undefined>) {
   const auth = await resolveWriteAuth({ data: args.data, context: args.context })
   if (!auth) {
     throw new Error('Unauthenticated: Authentication required.')
