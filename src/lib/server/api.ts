@@ -1005,3 +1005,11 @@ export const listAdminPurchasesFn = createServerFn({ method: 'POST' })
     const { listAdminPurchasesHandler } = await import('./admin-oversight')
     return listAdminPurchasesHandler(args)
   })
+
+export const getLogicAtlasFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data?: { token?: string; userId?: string }) => adminAuthSchema.parse(data ?? {}))
+  .handler(async (args) => {
+    const { getLogicAtlasHandler } = await import('./logic-atlas')
+    return getLogicAtlasHandler(args)
+  })

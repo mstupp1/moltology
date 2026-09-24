@@ -19,6 +19,10 @@ Agents MUST read [BRAND_BIBLE.md](BRAND_BIBLE.md) and [STYLE_GUIDE.md](STYLE_GUI
 
 Scriptures, liturgies, and doctrine live under [`codex/`](codex/README.md). Treat `codex/` as the engineering and content location for those files, not as a lore dump in this document.
 
+## Logic Atlas
+
+Business rules and the decisions behind them are mapped in [`docs/logic/`](docs/logic/) and rendered for staff at `/admin/logic`. Refresh it with the [`logic-atlas`](.agents/skills/logic-atlas/SKILL.md) skill after merging changes to thresholds, access, the economy, screening, moderation, or data handling.
+
 ## Visual source of truth
 
 Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. shadcn/ui primitives live in `src/components/ui/`.

@@ -59,6 +59,7 @@ export type CommandNavTo =
   | '/news/$slug'
   | '/watch'
   | '/admin'
+  | '/admin/logic'
   | '/settings'
   | '/profile'
 
@@ -245,6 +246,14 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     icon: 'admin',
     to: '/admin',
     keywords: ['admin', 'steward', 'oversight'],
+  },
+  {
+    id: 'nav-logic-atlas',
+    label: 'Open Logic Atlas',
+    category: 'Navigation',
+    icon: 'admin',
+    to: '/admin/logic',
+    keywords: ['logic', 'atlas', 'rules', 'decisions', 'business logic'],
   },
   {
     id: 'nav-landing',
