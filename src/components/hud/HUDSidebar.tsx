@@ -28,6 +28,7 @@ import {
   Lock,
   Activity,
   EyeOff,
+  ShieldCheck,
 
 } from 'lucide-react'
 import { getUserProfileFn } from '../../lib/server/api'
@@ -38,6 +39,7 @@ import { BenthicCTAButton } from './BenthicCTAButton'
 import { ChromaElement, HeaderBrand, AnimatedHamburger } from '../ui'
 import { getEffectiveRole, isAdminOrSuperAdmin } from '../../lib/permissions'
 import { isHiddenPagePath } from '../../lib/hidden-pages'
+import { isAdminOnlyPath } from '../../lib/admin-access'
 import { resolveMemberPublicName } from '../../lib/member-handle'
 import { UserAvatar } from '../UserAvatar'
 import { UserAvatarMenu } from '../UserAvatarMenu'
@@ -399,6 +401,19 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
       ],
     },
     {
+      id: 'steward',
+      title: 'STEWARD',
+      items: [
+        {
+          id: 'admin',
+          label: 'ADMIN',
+          shortLabel: 'ADMIN',
+          icon: ShieldCheck,
+          path: '/admin',
+        },
+      ],
+    },
+    {
       id: 'community',
       title: 'COMMUNITY',
       items: [
@@ -431,7 +446,10 @@ export const HUDSidebar: React.FC<HUDSidebarProps> = ({
   const visibleNavGroups = navGroups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => canViewHiddenPages || !isHiddenPagePath(item.path)),
+      items: group.items.filter((item) => {
+        if (isAdminOnlyPath(item.path)) return canViewHiddenPages
+        return canViewHiddenPages || !isHiddenPagePath(item.path)
+      }),
     }))
     .filter((group) => group.items.length > 0)
 

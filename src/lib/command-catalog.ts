@@ -5,6 +5,7 @@ import {
   scriptureSlugFromId,
 } from './codex-links'
 import { INITIAL_FORUM_CATEGORIES } from './forum-seed-data'
+import { isAdminOnlyPath } from './admin-access'
 import { isHiddenPagePath } from './hidden-pages'
 
 export const COMMAND_CATEGORIES = ['Navigation', 'Rituals', 'System', 'Boards', 'News'] as const
@@ -31,6 +32,7 @@ export type CommandIconId =
   | 'isolation'
   | 'news'
   | 'watch'
+  | 'admin'
   | 'settings'
   | 'profile'
 
@@ -56,6 +58,7 @@ export type CommandNavTo =
   | '/news'
   | '/news/$slug'
   | '/watch'
+  | '/admin'
   | '/settings'
   | '/profile'
 
@@ -236,6 +239,14 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
     keywords: ['watch', 'covenant', 'steward'],
   },
   {
+    id: 'nav-admin',
+    label: 'Open Admin',
+    category: 'Navigation',
+    icon: 'admin',
+    to: '/admin',
+    keywords: ['admin', 'steward', 'oversight'],
+  },
+  {
     id: 'nav-landing',
     label: 'View Order Landing Portal',
     category: 'Navigation',
@@ -375,13 +386,15 @@ function catalogHaystack(cmd: CommandCatalogItem): string {
 export function filterCommandCatalog(
   query: string,
   items?: CommandCatalogItem[],
-  options?: { includeHidden?: boolean },
+  options?: { includeHidden?: boolean; includeAdminOnly?: boolean },
 ): CommandCatalogItem[] {
   const q = query.trim().toLowerCase()
   const pool = items ?? (q ? PAGES_CATALOG : COMMAND_CATALOG)
-  const visible = options?.includeHidden
-    ? pool
-    : pool.filter((cmd) => !isHiddenPagePath(cmd.to))
+  const visible = pool.filter((cmd) => {
+    if (isAdminOnlyPath(cmd.to) && !options?.includeAdminOnly) return false
+    if (!options?.includeHidden && isHiddenPagePath(cmd.to)) return false
+    return true
+  })
   if (!q) return visible
   return visible.filter((cmd) => catalogHaystack(cmd).includes(q))
 }

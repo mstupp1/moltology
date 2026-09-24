@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { INITIAL_BLOG_POSTS } from './blog-data'
 import { INITIAL_FORUM_CATEGORIES } from './forum-seed-data'
+import { isAdminOnlyPath } from './admin-access'
 import { isHiddenPagePath } from './hidden-pages'
 import {
   COMMAND_CATALOG,
@@ -50,6 +51,7 @@ describe('command catalog', () => {
       'nav-connections',
       'nav-news',
       'nav-watch',
+      'nav-admin',
       'nav-landing',
       'nav-support',
       'nav-settings',
@@ -85,8 +87,12 @@ describe('command catalog', () => {
     expect(filterCommandCatalog('rituals').map((cmd) => cmd.id)).toEqual(['ritual-purge'])
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-subterranean')
     expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-premium')
+    expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-admin')
+    expect(filterCommandCatalog('').map((cmd) => cmd.id)).not.toContain('nav-watch')
     expect(filterCommandCatalog('').length).toBe(
-      COMMAND_CATALOG.filter((cmd) => !cmd.to || !isHiddenPagePath(cmd.to)).length,
+      COMMAND_CATALOG.filter(
+        (cmd) => (!cmd.to || !isHiddenPagePath(cmd.to)) && !isAdminOnlyPath(cmd.to),
+      ).length,
     )
   })
 
@@ -100,8 +106,19 @@ describe('command catalog', () => {
       filterCommandCatalog('premium', undefined, { includeHidden: true }).map((cmd) => cmd.id),
     ).toContain('nav-premium')
     expect(filterCommandCatalog('', undefined, { includeHidden: true }).length).toBe(
-      COMMAND_CATALOG.length,
+      COMMAND_CATALOG.filter((cmd) => !isAdminOnlyPath(cmd.to)).length,
     )
+  })
+
+  it('keeps admin tools out of search unless the viewer is staff', () => {
+    expect(filterCommandCatalog('admin').map((cmd) => cmd.id)).not.toContain('nav-admin')
+    expect(filterCommandCatalog('watch').map((cmd) => cmd.id)).not.toContain('nav-watch')
+    expect(
+      filterCommandCatalog('admin', undefined, { includeAdminOnly: true }).map((cmd) => cmd.id),
+    ).toContain('nav-admin')
+    expect(
+      filterCommandCatalog('', undefined, { includeHidden: true, includeAdminOnly: true }).length,
+    ).toBe(COMMAND_CATALOG.length)
   })
 
   it('uses the same pages catalog for overlay and /search pages', () => {
