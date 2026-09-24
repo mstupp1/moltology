@@ -12,10 +12,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 10,
     "rules": 88,
-    "decisions": 29,
-    "anchors": 146,
+    "decisions": 30,
+    "anchors": 147,
     "drifted": 0,
-    "flagged": 12
+    "flagged": 11
   },
   "canvas": {
     "width": 5277,
@@ -654,10 +654,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3408,
+          "line": 3409,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3408"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3409"
         }
       ],
       "tests": [
@@ -674,7 +674,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "progression.stage-from-xp"
       ],
       "decisions": [
-        "xp-ledger"
+        "xp-ledger",
+        "clamp-alignment-dates"
       ],
       "flag": null,
       "flow": null,
@@ -687,30 +688,42 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "progression.client-date",
       "domain": "progression",
-      "title": "Liturgy date comes from the client",
+      "title": "Liturgy dates stay near today",
       "kind": "gate",
       "status": "active",
-      "statement": "The toggle handler accepts any YYYY-MM-DD date from the client and awards XP for that day. It only checks the format.",
+      "statement": "Checking off a liturgy is accepted only when the date is yesterday, today, or tomorrow in server time. Other dates are rejected. Reading alignment history for older dates is still allowed.",
       "anchors": [
         {
-          "file": "src/lib/server/db-services.ts",
-          "symbol": "toggleDailyAlignmentSchema",
-          "line": 3223,
-          "value": "z.object({ taskKey: z.string().min(1), completed: z.boolean(), date: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/), userId: z.string().optional(), token: z.string().…",
+          "file": "src/lib/alignment-tasks.ts",
+          "symbol": "isAlignmentDateWritable",
+          "line": 120,
+          "value": "isAlignmentDateWritable(date, now)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3223"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/alignment-tasks.ts#L120"
+        },
+        {
+          "file": "src/lib/server/db-services.ts",
+          "symbol": "toggleDailyAlignmentTaskHandler",
+          "line": 3409,
+          "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3409"
         }
       ],
-      "tests": [],
+      "tests": [
+        {
+          "file": "src/lib/server/daily-alignment.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/daily-alignment.test.ts"
+        }
+      ],
       "dependsOn": [
         "progression.xp-ledger"
       ],
       "usedBy": [],
-      "decisions": [],
-      "flag": {
-        "level": "gap",
-        "note": "A member can check off past or future days to earn XP and advance stage. Clamp the date to today (plus or minus one day for time zones) on the server."
-      },
+      "decisions": [
+        "clamp-alignment-dates"
+      ],
+      "flag": null,
       "flow": null,
       "position": {
         "x": 320,
@@ -729,10 +742,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3231,
+          "line": 3232,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3231"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3232"
         },
         {
           "file": "src/lib/progression.ts",
@@ -865,10 +878,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3231,
+          "line": 3232,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3231"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3232"
         }
       ],
       "tests": [],
@@ -2357,10 +2370,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 2923,
+          "line": 2924,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2923"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2924"
         }
       ],
       "tests": [
@@ -2990,18 +3003,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1699,
+          "line": 1700,
           "value": "createForumTopicHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1699"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1700"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 1041,
+          "line": 1042,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1041"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1042"
         }
       ],
       "tests": [
@@ -3595,10 +3608,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 1049,
+          "line": 1050,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1049"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1050"
         }
       ],
       "tests": [
@@ -3641,10 +3654,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1831,
+          "line": 1832,
           "value": "createForumPostHandler({ data, context })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1831"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1832"
         }
       ],
       "tests": [
@@ -3731,18 +3744,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2467,
+          "line": 2468,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2467"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2468"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2754,
+          "line": 2755,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2754"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2755"
         }
       ],
       "tests": [
@@ -6181,6 +6194,46 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "heading": "Consequences",
           "html": "<ul>\n<li>New staff tools belong in the hub and must call <code>requireStaff</code>.</li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "id": "clamp-alignment-dates",
+      "date": "2026-09-24",
+      "title": "Clamp liturgy check-offs to yesterday, today, or tomorrow",
+      "summary": "The server rejects alignment dates outside a one-day window around server time, so members cannot earn XP for arbitrary days.",
+      "domains": [
+        "progression"
+      ],
+      "rules": [
+        "progression.client-date",
+        "progression.xp-ledger"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "doc",
+          "label": "progression.md",
+          "url": "https://github.com/mstupp1/moltology/blob/main/docs/logic/domains/progression.md"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>Checking off a liturgy wrote XP rows keyed by the date the client sent. The date only had to match YYYY-MM-DD, so a member could complete past or future days and advance stage. Stage is earned, so that date had to be limited on the server.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Accept a check-off only when the date is yesterday, today, or tomorrow in server time. The extra day on each side covers members whose local midnight differs from the server. Other dates are rejected with a plain error before any completion or XP row is written. Reading alignment history still accepts older dates, because the heatmap and streak views need them.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Clamp to the server&#39;s today only. Rejected because members west or east of the server would fail around midnight.</li>\n<li>Keep accepting any date and ignore XP for dates outside the window. Rejected because the completion row would still rewrite history.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Members can no longer farm XP by checking off arbitrary days.</li>\n<li>A member more than one day away from server time cannot check off their local today. The product does not have per-member time zones, so the one-day window is the bound.</li>\n</ul>"
         }
       ]
     }

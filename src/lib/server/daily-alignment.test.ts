@@ -1,8 +1,11 @@
 import { describe, it, expect, vi } from 'vitest'
+import { localDateString, shiftDays } from '../alignment-tasks'
 import {
   getDailyAlignmentHandler,
   toggleDailyAlignmentTaskHandler,
 } from './db-services'
+
+const writableDate = localDateString()
 
 describe('Daily Alignment Server Handlers', () => {
   it('returns default empty alignment when called without user context in getDailyAlignmentHandler', async () => {
@@ -121,7 +124,7 @@ describe('Daily Alignment Server Handlers', () => {
       data: {
         taskKey: 'silent-synchronization',
         completed: true,
-        date: '2026-08-24',
+        date: writableDate,
       },
       context: {
         user: { sub: 'test-user-id' },
@@ -131,7 +134,7 @@ describe('Daily Alignment Server Handlers', () => {
 
     // routineCompletions + activityEvents + xpTransactions = 3 inserts
     expect(insertMock).toHaveBeenCalledTimes(3)
-    expect(toggleOnRes.date).toBe('2026-08-24')
+    expect(toggleOnRes.date).toBe(writableDate)
     expect(toggleOnRes.progression).toBeDefined()
 
     // Test Toggle OFF
@@ -139,7 +142,7 @@ describe('Daily Alignment Server Handlers', () => {
       data: {
         taskKey: 'silent-synchronization',
         completed: false,
-        date: '2026-08-24',
+        date: writableDate,
       },
       context: {
         user: { sub: 'test-user-id' },
@@ -149,5 +152,60 @@ describe('Daily Alignment Server Handlers', () => {
 
     // routineCompletions + activityEvents + xpTransactions = 3 deletes
     expect(deleteMock).toHaveBeenCalledTimes(3)
+  })
+
+  it('accepts liturgy dates within one day of the server today and rejects the rest', async () => {
+    const insertMock = vi.fn().mockImplementation(() => ({
+      values: vi.fn().mockImplementation(() => ({
+        onConflictDoNothing: vi.fn().mockResolvedValue([]),
+      })),
+    }))
+    const mockDb = {
+      select: vi.fn().mockImplementation(() => ({
+        from: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => {
+            const rows = [{ taskKey: 'silent-synchronization', totalXp: 10, xp: 10, stage: 1 }]
+            const p = Promise.resolve(rows) as any
+            p.limit = vi.fn().mockResolvedValue([{ xp: 10, stage: 1 }])
+            return p
+          }),
+        })),
+      })),
+      insert: insertMock,
+      delete: vi.fn().mockImplementation(() => ({
+        where: vi.fn().mockResolvedValue([]),
+      })),
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockResolvedValue([]),
+        })),
+      })),
+    }
+    const context = { user: { sub: 'test-user-id' }, db: mockDb as any }
+
+    for (const date of [shiftDays(writableDate, -1), writableDate, shiftDays(writableDate, 1)]) {
+      const res = await toggleDailyAlignmentTaskHandler({
+        data: { taskKey: 'silent-synchronization', completed: true, date },
+        context,
+      })
+      expect(res.date).toBe(date)
+    }
+
+    for (const date of [shiftDays(writableDate, -2), shiftDays(writableDate, 2), '2020-01-01', '2099-12-31']) {
+      await expect(
+        toggleDailyAlignmentTaskHandler({
+          data: { taskKey: 'silent-synchronization', completed: true, date },
+          context,
+        })
+      ).rejects.toThrow('outside the allowed window')
+    }
+
+    expect(insertMock).toHaveBeenCalledTimes(9)
+
+    const history = await getDailyAlignmentHandler({
+      data: { date: '2026-08-24' },
+      context,
+    })
+    expect(history.date).toBe('2026-08-24')
   })
 })

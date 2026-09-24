@@ -34,16 +34,16 @@ rules:
         symbol: toggleDailyAlignmentTaskHandler
     tests: [src/lib/server/daily-alignment.test.ts]
   - id: progression.client-date
-    title: Liturgy date comes from the client
+    title: Liturgy dates stay near today
     kind: gate
-    statement: The toggle handler accepts any YYYY-MM-DD date from the client and awards XP for that day. It only checks the format.
+    statement: Checking off a liturgy is accepted only when the date is yesterday, today, or tomorrow in server time. Other dates are rejected. Reading alignment history for older dates is still allowed.
     dependsOn: [progression.xp-ledger]
-    flag:
-      level: gap
-      note: A member can check off past or future days to earn XP and advance stage. Clamp the date to today (plus or minus one day for time zones) on the server.
     anchors:
+      - file: src/lib/alignment-tasks.ts
+        symbol: isAlignmentDateWritable
       - file: src/lib/server/db-services.ts
-        symbol: toggleDailyAlignmentSchema
+        symbol: toggleDailyAlignmentTaskHandler
+    tests: [src/lib/server/daily-alignment.test.ts]
   - id: progression.stage-from-xp
     title: Stage is derived from lifetime XP
     kind: invariant
