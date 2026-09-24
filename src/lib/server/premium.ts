@@ -217,9 +217,7 @@ export async function setPremiumAccessHandler(
     if (action !== 'grant' && action !== 'cancel') {
       throw new Error('Could not update Premium. Try again.')
     }
-    const auth = await resolveWriteAuth({ data: args.data, context: args.context })
-    if (!auth) throw new Error('Unauthenticated: Authentication required.')
-    await ensureUserProfile(auth.userId)
+    const { auth } = await requirePremiumOperator(args)
     const dbClient = getDb()
     const [row] = await dbClient
       .select(premiumFlagColumns)

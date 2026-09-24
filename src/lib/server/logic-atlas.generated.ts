@@ -12,13 +12,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
   "stats": {
     "domains": 10,
     "rules": 88,
-    "decisions": 30,
+    "decisions": 31,
     "anchors": 147,
     "drifted": 0,
-    "flagged": 11
+    "flagged": 10
   },
   "canvas": {
-    "width": 5277,
+    "width": 5569,
     "height": 2692
   },
   "domains": [
@@ -147,12 +147,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Premium & billing",
       "color": "#d27bff",
       "summary": "A Stripe monthly membership in soft launch behind the staff gate. It does not sell standing, and it unlocks nothing yet.",
-      "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see or buy it.</p>",
+      "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
         "x": 4329,
         "y": 1084,
-        "width": 948,
-        "height": 652
+        "width": 1240,
+        "height": 496
       },
       "ruleIds": [
         "premium.soft-launch",
@@ -2431,16 +2431,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "access.hidden-pages"
       ],
       "usedBy": [
-        "premium.price-from-env"
+        "premium.price-from-env",
+        "premium.no-charge-toggle"
       ],
       "decisions": [
-        "premium-soft-launch"
+        "premium-soft-launch",
+        "premium-no-charge-staff-gate"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 76
+        "x": 72,
+        "y": 208
       },
       "drift": "ok"
     },
@@ -2541,8 +2543,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 94,
-        "y": 364
+        "x": 430,
+        "y": 208
       },
       "drift": "ok"
     },
@@ -2587,8 +2589,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 320,
-        "y": 232
+        "x": 28,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -2611,10 +2613,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "handleStripeWebhookRequest",
-          "line": 429,
+          "line": 427,
           "value": "handleStripeWebhookRequest(request)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L429"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L427"
         }
       ],
       "tests": [
@@ -2633,8 +2635,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 656,
-        "y": 364
+        "x": 948,
+        "y": 208
       },
       "drift": "ok"
     },
@@ -2665,10 +2667,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/premium.ts",
           "symbol": "applyPremiumStripeEvent",
-          "line": 356,
+          "line": 354,
           "value": "applyPremiumStripeEvent(event, secretKey)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L356"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L354"
         }
       ],
       "tests": [
@@ -2917,8 +2919,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "height": 730
       },
       "position": {
-        "x": 612,
-        "y": 520
+        "x": 904,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -2950,8 +2952,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 28,
-        "y": 520
+        "x": 612,
+        "y": 364
       },
       "drift": "ok"
     },
@@ -2961,7 +2963,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "No-charge activate and cancel",
       "kind": "permission",
       "status": "soft-launch",
-      "statement": "Signed-in members can activate or cancel Premium without paying through setPremiumAccessHandler. Cancel also cancels a real Stripe subscription when one is on file.",
+      "statement": "Only staff can activate or cancel Premium without a charge. A signed-in member is refused. Cancel also cancels a real Stripe subscription when one is on file.",
       "anchors": [
         {
           "file": "src/lib/server/premium.ts",
@@ -2972,23 +2974,27 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L211"
         }
       ],
-      "tests": [],
+      "tests": [
+        {
+          "file": "src/lib/server/premium.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.test.ts"
+        }
+      ],
       "dependsOn": [
+        "premium.soft-launch",
         "premium.two-flags",
         "access.write-auth"
       ],
       "usedBy": [],
       "decisions": [
-        "premium-soft-launch"
+        "premium-soft-launch",
+        "premium-no-charge-staff-gate"
       ],
-      "flag": {
-        "level": "gap",
-        "note": "This handler checks sign-in but not staff clearance, so any member can make themselves Premium. It is harmless while Premium unlocks nothing, but it must be gated before benefits ship."
-      },
+      "flag": null,
       "flow": null,
       "position": {
         "x": 320,
-        "y": 520
+        "y": 364
       },
       "drift": "ok"
     },
@@ -6236,6 +6242,41 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<ul>\n<li>Members can no longer farm XP by checking off arbitrary days.</li>\n<li>A member more than one day away from server time cannot check off their local today. The product does not have per-member time zones, so the one-day window is the bound.</li>\n</ul>"
         }
       ]
+    },
+    {
+      "id": "premium-no-charge-staff-gate",
+      "date": "2026-09-24",
+      "title": "Staff-gate the no-charge Premium toggle",
+      "summary": "Activate and cancel without a charge now require the same staff clearance as checkout.",
+      "domains": [
+        "premium",
+        "access"
+      ],
+      "rules": [
+        "premium.no-charge-toggle",
+        "premium.soft-launch"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The no-charge activate and cancel path only checked that the caller was signed in. Any member could set Premium on their own profile. Checkout, price lookup, and the billing portal already required staff clearance during the soft launch.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Run the no-charge toggle through the same staff check as the other Premium handlers. A non-staff caller gets the plain message &quot;This page is not available.&quot; Settings hides Purchase Premium and Cancel Premium from members so they do not see a control that would fail.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<ul>\n<li>Leave the toggle open until benefits exist. Rejected because a member could already mark themselves Premium before benefits ship.</li>\n<li>Remove the no-charge path. Rejected because staff still need a way to turn Premium on and off without Stripe during the soft launch.</li>\n</ul>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<ul>\n<li>Members cannot grant themselves Premium.</li>\n<li>Staff can still activate or cancel their own membership without a charge, and a cancel still ends a Stripe subscription when one is on file.</li>\n</ul>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -6549,6 +6590,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "premium.two-flags->premium.billing-columns-guarded",
       "source": "premium.two-flags",
       "target": "premium.billing-columns-guarded",
+      "crossDomain": false
+    },
+    {
+      "id": "premium.soft-launch->premium.no-charge-toggle",
+      "source": "premium.soft-launch",
+      "target": "premium.no-charge-toggle",
       "crossDomain": false
     },
     {
