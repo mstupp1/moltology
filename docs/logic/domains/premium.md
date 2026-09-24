@@ -139,14 +139,12 @@ rules:
     title: No-charge activate and cancel
     kind: permission
     status: soft-launch
-    statement: Signed-in members can activate or cancel Premium without paying through setPremiumAccessHandler. Cancel also cancels a real Stripe subscription when one is on file.
-    dependsOn: [premium.two-flags, access.write-auth]
-    flag:
-      level: gap
-      note: This handler checks sign-in but not staff clearance, so any member can make themselves Premium. It is harmless while Premium unlocks nothing, but it must be gated before benefits ship.
+    statement: Only staff can activate or cancel Premium without a charge. A signed-in member is refused. Cancel also cancels a real Stripe subscription when one is on file.
+    dependsOn: [premium.soft-launch, premium.two-flags, access.write-auth]
     anchors:
       - file: src/lib/server/premium.ts
         symbol: setPremiumAccessHandler
+    tests: [src/lib/server/premium.test.ts]
 ---
 
-Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see or buy it.
+Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.
