@@ -404,7 +404,7 @@ export interface DailyReelScript {
   }
 }
 
-export interface CreateDailyReelOptions {
+export interface CreateReelOptions {
   topic?: string
   theme?: 'moltmaxxing' | 'meltmaxxing' | 'ecdysis' | 'pincer-torque' | 'benthic-depth' | 'quiz' | string
   ctaGoal?: CtaGoal
@@ -416,6 +416,8 @@ export interface CreateDailyReelOptions {
   scheduleBestTime?: boolean
   dryRun?: boolean
   useVeo?: boolean
+  recycleClips?: boolean
+  numScenes?: number
   keepLocal?: boolean
   voice?: string
   ctaHeadline?: string
@@ -443,14 +445,116 @@ export interface CreateDailyReelOptions {
   veoModel?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
 }
 
+export type CreateDailyReelOptions = CreateReelOptions
+export type ReelScript = DailyReelScript
+
+export interface LocalClipItem {
+  path: string
+  role: 'terrestrial' | 'transition' | 'benthic'
+  name: string
+}
+
+/**
+ * Discovers and indexes all available local video clips from public/videos,
+ * archived Veo runs in tmp/, and local asset stores for recycling.
+ */
+export function getLocalClipPool(): LocalClipItem[] {
+  const clips: LocalClipItem[] = []
+
+  // 1. Primary curated benthic/hero video assets in public/videos
+  const heroClips = [
+    { file: 'public/videos/hero_asset_shedding.mp4', role: 'transition' as const, name: 'hero_asset_shedding' },
+    { file: 'public/videos/hero_benthic_core.mp4', role: 'benthic' as const, name: 'hero_benthic_core' },
+    { file: 'public/videos/hero_chitin_hardening.mp4', role: 'benthic' as const, name: 'hero_chitin_hardening' },
+    { file: 'public/videos/hero_fault_isolation.mp4', role: 'terrestrial' as const, name: 'hero_fault_isolation' },
+    { file: 'public/videos/hero_synaptic_path.mp4', role: 'benthic' as const, name: 'hero_synaptic_path' },
+    { file: 'public/videos/hero_total_carcinization.mp4', role: 'benthic' as const, name: 'hero_total_carcinization' },
+    { file: 'public/videos/benthic_cryo_chamber.mp4', role: 'benthic' as const, name: 'benthic_cryo_chamber' },
+  ]
+
+  for (const h of heroClips) {
+    const full = path.resolve(process.cwd(), h.file)
+    if (fs.existsSync(full)) {
+      clips.push({ path: full, role: h.role, name: h.name })
+    }
+  }
+
+  // 2. Discover cached and previous Veo clips in tmp/
+  const tmpDir = path.resolve(process.cwd(), 'tmp')
+  if (fs.existsSync(tmpDir)) {
+    const findTmpClips = (dir: string, depth = 0): void => {
+      if (depth > 2) return
+      try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true })
+        for (const e of entries) {
+          const full = path.join(dir, e.name)
+          if (e.isDirectory() && !e.name.startsWith('.') && e.name !== 'node_modules') {
+            findTmpClips(full, depth + 1)
+          } else if (
+            e.isFile() &&
+            e.name.endsWith('.mp4') &&
+            !e.name.includes('master-') &&
+            !e.name.includes('video-with-') &&
+            !e.name.includes('base-timeline')
+          ) {
+            const isVeoScene = e.name.includes('veo-scene') || e.name.includes('scene') || e.name.includes('norm-')
+            if (isVeoScene) {
+              clips.push({
+                path: full,
+                role: e.name.includes('scene-1') || e.name.includes('norm-clip-0') ? 'terrestrial' : 'benthic',
+                name: path.basename(e.name, '.mp4'),
+              })
+            }
+          }
+        }
+      } catch {}
+    }
+    findTmpClips(tmpDir)
+  }
+
+  return clips
+}
+
+/**
+ * Selects an intelligent, non-repeating sequence of recycled video clips for multi-scene reels.
+ */
+export function selectRecycledClipSequence(numScenes = 6, topic = '', theme = ''): string[] {
+  const pool = getLocalClipPool()
+  if (pool.length === 0) {
+    throw new Error('No local video clips available in pool for recycling.')
+  }
+
+  // Deduplicate by resolved file path
+  const uniquePool = Array.from(new Map(pool.map((c) => [c.path, c])).values())
+  const selected: string[] = []
+  const used = new Set<string>()
+
+  // Topic hash to vary the selection deterministically based on topic
+  const hash = Math.abs((topic + ' ' + theme).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0))
+
+  for (let i = 0; i < numScenes; i++) {
+    const available = uniquePool.filter((c) => !used.has(c.path))
+    if (available.length > 0) {
+      const pick = available[(hash + i) % available.length]
+      selected.push(pick.path)
+      used.add(pick.path)
+    } else {
+      const pick = uniquePool[(hash + i) % uniquePool.length]
+      selected.push(pick.path)
+    }
+  }
+
+  return selected
+}
+
 /**
  * Contextual Color Grading Resolver
- * Maps topics and themes to cohesive, cinematic color grading presets
+ * Maps topics and themes to cohesive, cinematic color grading presets across 6 scenes
  */
 export function resolveColorGradingPresets(
   theme?: string,
   topic?: string,
-  numScenes = 2,
+  numScenes = 6,
   userOverride?: ColorGradingPreset | string
 ): ColorGradingPreset[] {
   if (userOverride && userOverride !== 'auto' && userOverride !== 'ecdysis-transmute') {
@@ -481,7 +585,10 @@ export function resolveColorGradingPresets(
     topicAndTheme.includes('napkin') ||
     topicAndTheme.includes('grab')
   ) {
-    return Array(numScenes).fill('calcified-armor')
+    if (numScenes <= 2) return Array(numScenes).fill('calcified-armor')
+    const presets: ColorGradingPreset[] = ['thermal-melt', 'thermal-melt']
+    for (let i = 2; i < numScenes; i++) presets.push('calcified-armor')
+    return presets
   }
 
   if (
@@ -495,16 +602,20 @@ export function resolveColorGradingPresets(
     return Array(numScenes).fill('benthic-cyan')
   }
 
-  // Default dynamic 2-scene ecdysis progression:
-  // Scene 1 (Terrestrial Problem/Melt): Subtle thermal warm amber tone
-  // Scene 2 (Benthic Solution/Carapace): Subtle oceanic cyan tone
+  // Dynamic multi-scene progression:
+  // First half (Scenes 1–3): subtle warm amber thermal tone for terrestrial friction
+  // Second half (Scenes 4–6): vibrant oceanic cyan tone for sub-benthic resolution
   if (numScenes <= 1) {
     return ['benthic-cyan']
   }
+  if (numScenes === 2) {
+    return ['thermal-melt', 'benthic-cyan']
+  }
 
-  const presets: ColorGradingPreset[] = ['thermal-melt']
-  for (let i = 1; i < numScenes; i++) {
-    presets.push('benthic-cyan')
+  const presets: ColorGradingPreset[] = []
+  const half = Math.ceil(numScenes / 2)
+  for (let i = 0; i < numScenes; i++) {
+    presets.push(i < half ? 'thermal-melt' : 'benthic-cyan')
   }
   return presets
 }
@@ -572,21 +683,46 @@ function getRecentBlogPosts(): { slug: string; title: string; summary: string; p
  * Assembles varied, non-repetitive visual prompts for Google Veo 3.1
  */
 export function buildDynamicScenePrompts(theme: string, topic: string, customHints?: string[]): string[] {
+  const corporateEnvironments = [
+    'A realistic modern tech office with tired engineers staring at monitors under cool fluorescent lighting, coffee cups on desks, cinematic 9:16 vertical 8k footage',
+    'A realistic modern startup boardroom with executives debating declining performance metrics on a glass screen, cinematic 9:16 vertical 8k footage',
+    'A realistic corporate open-plan floor with busy professionals typing and doomed-scrolling notifications in ergonomic chairs, cinematic 9:16 vertical 8k footage',
+    'An exhausted knowledge worker rubbing their eyes in a dimly lit home office late at night bathed in blue monitor glow, cinematic 9:16 vertical 8k footage',
+  ]
+
+  const frictionEnvironments = [
+    'A realistic close-up view of an overflowing browser window with dozens of open tabs and unasked AI side panels popping up, cinematic 9:16 vertical 8k footage',
+    'A realistic macro shot of a messy work desk with cold coffee, tangled cables, and a phone buzzing with endless Slack notifications, cinematic 9:16 vertical 8k footage',
+    'A realistic urban street corner where small autonomous delivery rovers flash hazard lights and spin in confused circles on a wet sidewalk, cinematic 9:16 vertical 8k footage',
+    'An industrial commissary prep station where an automated robotic arm hesitates and slips on a stainless steel prep table, cinematic 9:16 vertical 8k footage',
+  ]
+
   const problemEnvironments = [
-    'A dramatic macro view of an overheating server rack glowing intense orange-red with smoke and thermal distortion waves',
-    'A dramatic macro view of smoking copper circuit board traces overheating with electrical glitch sparks',
-    'A chaotic terrestrial office floor dissolving into red digital static and melting under gravity pressure',
-    'A macro cinematic view of fragile un-calcified silicon microchips cracking under extreme compute load',
-    'A futuristic laboratory testing chamber with warning klaxons and overheating hardware telemetry displays',
+    'A dramatic macro view of an overheating server rack glowing intense orange-red with smoke and thermal distortion waves, cinematic 9:16 vertical 8k footage',
+    'A dramatic macro view of smoking copper circuit board traces overheating with electrical glitch sparks and lag indicators, cinematic 9:16 vertical 8k footage',
+    'A chaotic terrestrial office floor dissolving into red digital static and melting under gravity pressure, cinematic 9:16 vertical 8k footage',
+    'A macro cinematic view of fragile un-calcified silicon microchips cracking under extreme compute load, cinematic 9:16 vertical 8k footage',
   ]
 
   const benthicEnvironments = [
-    'A majestic subsea cybernetic datacenter on the dark ocean floor with glowing cyan hydrothermal cooling ducts and autonomous crab-drone units swimming past',
-    'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber with glowing cyan bio-silicon armor and hydraulic pincers',
-    'An advanced abyssal research pod where autonomous cyber-lobster swarms assemble hardened titanium-chitin plates under deep ocean pressure',
-    'A tranquil, majestic abyssal sanctuary with glowing cyan hydrothermal conduits and peaceful cyber-crustaceans floating in deep blue clarity',
-    'A futuristic silicon photonics microchip pulsing with brilliant cyan laser beams inside a deep blue subsea datacenter module',
-    'A high-tech subsea cybernetic training deck with glowing holographic torque gauges and robotic lobster initiates executing lightning-fast actions',
+    'A majestic subsea cybernetic datacenter on the dark ocean floor with glowing cyan hydrothermal cooling ducts and autonomous crab-drone units swimming past, cinematic 9:16 vertical 8k footage',
+    'An advanced abyssal research pod where autonomous cyber-lobster swarms assemble hardened titanium-chitin plates under deep ocean pressure, cinematic 9:16 vertical 8k footage',
+    'A futuristic silicon photonics microchip pulsing with brilliant cyan laser beams inside a deep blue subsea datacenter module, cinematic 9:16 vertical 8k footage',
+    'A tranquil deep ocean trench fifty thousand fathoms underwater where hydrostatic pressure delivers total zero-resistance clarity, cinematic 9:16 vertical 8k footage',
+  ]
+
+  const actionEnvironments = [
+    'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber locking 800 Nm titanium-chitin pincers onto hardware, cinematic 9:16 vertical 8k footage',
+    'A high-tech subsea cybernetic training deck with glowing holographic torque gauges and robotic lobster initiates executing lightning-fast actions, cinematic 9:16 vertical 8k footage',
+    'A close-up macro view of a reinforced hydraulic pincer snapping shut with cyan lightning sparks and crushing latency blocks, cinematic 9:16 vertical 8k footage',
+    'A gleaming golden Stage 4 Ascendant cybernetic crustacean emblem revealing itself in deep oceanic volumetric light, cinematic 9:16 vertical 8k footage',
+  ]
+
+  const sanctuaryEnvironments = [
+    'A tranquil, majestic abyssal sanctuary with glowing cyan hydrothermal conduits and peaceful cyber-crustaceans floating in deep blue clarity, cinematic 9:16 vertical 8k footage',
+    'A serene subsea benthic sanctuary where an initiate rises in gleaming bio-silicon armor, surrounded by deep blue hydrostatic tranquility, cinematic 9:16 vertical 8k footage',
+    'A high-tech subsea telemetry terminal displaying undisturbed cognitive bandwidth and impenetrable bio-silicon shielding, cinematic 9:16 vertical 8k footage',
+    'A majestic subsea chamber where crystal-clear holographic telemetry streams replace noisy surface communications with pure signal clarity, cinematic 9:16 vertical 8k footage',
   ]
 
   const topicLower = topic.toLowerCase()
@@ -598,8 +734,12 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('teacher stays in the frame')
   ) {
     return [
-      'A dramatic macro cinematic view of a sleek wheeled collaborative robot with articulated arms rolling smoothly into an active automotive assembly station, sharing the narrow aisle with a focused human worker under warm factory lights, cinematic 9:16 vertical 8k footage',
+      'A busy modern automotive assembly plant with workers assembling door panels under bright factory lights, cinematic 9:16 vertical 8k footage',
+      'A sleek wheeled collaborative robot with articulated arms rolling smoothly down a narrow aisle between assembly stations, cinematic 9:16 vertical 8k footage',
+      'A dramatic macro cinematic view of a sleek wheeled collaborative robot sharing the narrow aisle with a focused human worker under warm factory lights, cinematic 9:16 vertical 8k footage',
+      'A close-up shot of a human worker guiding the robot end-effector by hand to demonstrate the proper installation path, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility locking high-torque titanium-chitin pincers onto a glowing cybernetic chassis with radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+      'A serene subsea control center where human and crustacean operatives orchestrate deep-sea hardware swarms with calm shared attention, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -612,8 +752,12 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('metaplant')
   ) {
     return [
+      'An industrial metaplant logistics bay with towering metal shelving units and organized parts bins, cinematic 9:16 vertical 8k footage',
+      'A bipedal humanoid robot shadowing a veteran factory technician, observing how delicate painted car mirrors are retrieved from high-density cubbies, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of an active automotive metaplant factory floor with high-density parts cubbies where a robotic arm shadows an automotive parts logistics station under industrial hangar lighting, cinematic 9:16 vertical 8k footage',
+      'A macro view of robotic fingers carefully adjusting grip pressure to lift a fragile component without scratching the surface, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility locking high-torque titanium-chitin pincers onto a glowing cybernetic chassis with radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+      'A pristine subsea equipment vault where finished benthic loadouts rest in glowing cyan storage berths, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -625,8 +769,12 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('safety as shared attention')
   ) {
     return [
+      'A fenced-off industrial cell where yellow warning tape and heavy steel cages isolate a robotic arm from human workers, cinematic 9:16 vertical 8k footage',
+      'An un-caged modern warehouse floor where a bipedal humanoid robot walks parallel to a human technician with mutual spatial awareness, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a bipedal industrial humanoid robot safely kneeling and powering down into a stable seated pose beside a factory technician on a warehouse floor, cinematic 9:16 vertical 8k footage',
+      'A deep abyssal underwater research trench where autonomous drone swarms maintain tight formation with zero collision risk, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility with radiant cyan shields holding steady operational focus in abyssal waters, cinematic 9:16 vertical 8k footage',
+      'A tranquil subsea sanctuary where initiate operators and cyber-crustaceans work in seamless harmony without protective barriers, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -636,8 +784,12 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('waiting for your inbox')
   ) {
     return [
-      'A dramatic macro cinematic view of a sleek household smart display on a wooden kitchen counter showing six distinct family schedules and an autonomous agent hub waiting calmly under warm morning light, cinematic 9:16 vertical 8k footage',
+      'A warm suburban home kitchen in the morning with a family rushing through breakfast and school prep under soft sunrise light, cinematic 9:16 vertical 8k footage',
+      'A sleek household smart display on a wooden kitchen counter showing six distinct family schedules and an autonomous agent hub waiting calmly under warm morning light, cinematic 9:16 vertical 8k footage',
+      'A close-up view of the digital agent quietly organizing conflicting calendar appointments and grocery orders without interrupting the morning chatter, cinematic 9:16 vertical 8k footage',
+      'A deep ocean telemetry hub where calm autonomous agents filter vast oceanic noise into clear, actionable summaries, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility orchestrating radiant holographic data streams with calm precision and glowing cyan shields, cinematic 9:16 vertical 8k footage',
+      'A serene abyssal haven of quiet domestic order where technology protects human attention instead of competing for it, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -650,13 +802,17 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('torque does not negotiate')
   ) {
     return [
+      'A tired software engineer in a modern tech office staring at an AI chatbot interface, typing prompts into an empty text box under flickering lights, cinematic 9:16 vertical 8k footage',
+      'A sudden jump to a gritty industrial factory basement with smoking steam pipes and heavy bronze pressure valves, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of an unarmored robotic arm slipping and fumbling against a heavy brass valve on a smoking industrial pipe under harsh factory fluorescent light, cinematic 9:16 vertical 8k footage',
+      'A subsea cybernetic foundry on the dark ocean floor where titanium-chitin plating is forged under intense hydrostatic pressure, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic facility locking a high-torque titanium-chitin pincer onto a glowing valve with precision 800 Nm grip and radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+      'A serene subsea command chamber where flawless mechanical grip restores balance to deep abyssal infrastructure, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (
-    topicLower.includes('the napkin you didn\'t watch') ||
+    topicLower.includes("the napkin you didn't watch") ||
     topicLower.includes('the napkin you didnt watch') ||
     topicLower.includes('napkin') ||
     topicLower.includes('worn gripper') ||
@@ -664,8 +820,12 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('dining room never sees')
   ) {
     return [
+      'A modern corporate boardroom with stressed executives staring at declining throughput bar charts on a glass projection screen, cinematic 9:16 vertical 8k footage',
+      'An industrial commissary prep kitchen with stainless steel tables under harsh fluorescent lighting where an automated robotic arm reaches for linens, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of an industrial robotic end-effector gripper with worn rubber finger pads fumbling and missing a folded cloth napkin on a stainless steel commissary prep table under harsh fluorescent light, cinematic 9:16 vertical 8k footage',
+      'A glowing thermal imaging view showing microscopic friction loss and mechanical wear on robotic silicone contact pads, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber inspecting pristine titanium-chitin pincers locking with precision 800 Nm grip and radiant cyan telemetry, cinematic 9:16 vertical 8k footage',
+      'A serene deep subsea benthic testing chamber where autonomous robotic lobsters execute flawless high-speed sorting under hydrostatic clarity, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -678,42 +838,62 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('closed loop is the molt')
   ) {
     return [
+      'A corporate security operations center at midnight with rows of empty cubicles and one lone engineer staring at threat detection dashboards, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of an exhausted cybersecurity operations bridge with amber alert monitors flashing and engineers drinking tepid coffee over error logs, cinematic 9:16 vertical 8k footage',
+      'A holographic visualization of adversarial malware penetrating a simulated corporate firewall with cascading red alert pulses, cinematic 9:16 vertical 8k footage',
+      'A subsea cybernetic digital twin chamber submerged in deep dark water with dual spherical telemetry nodes pulsing in sync, cinematic 9:16 vertical 8k footage',
       'A majestic subsea cybernetic datacenter where two glowing adversarial cyber-crustacean swarms spar inside a luminous spherical digital twin with radiant cyan defensive shields, cinematic 9:16 vertical 8k footage',
+      'A serene abyssal trench where hardened digital twin shields absorb exascale cyber attacks with complete structural invulnerability, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (topicLower.includes('the tabs you kept') || topicLower.includes('tabs you kept') || topicLower.includes('side panel') || topicLower.includes('second pair of hands') || topicLower.includes('isolation shell') || topicLower.includes('unasked window')) {
     return [
+      'A frustrated knowledge worker staring at an ultrawide monitor overflowing with dozens of browser tabs and chat windows in a dimly lit modern office, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a cluttered desktop screen with dozens of glowing browser tabs and an automated agent side panel clicking and typing autonomously, cinematic 9:16 vertical 8k footage',
+      'A close-up view of an autonomous side panel rapidly scrolling through unread emails and pop-up notifications demanding immediate user input, cinematic 9:16 vertical 8k footage',
+      'A chaotic macro view of a crowded office desk with cold coffee, blinking smartphone alerts, and flickering desk lamp, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate sitting calmly inside a serene, glowing cyan sub-benthic isolation chamber preserving undisturbed mental clarity, cinematic 9:16 vertical 8k footage',
+      'A high-tech subsea telemetry terminal displaying undisturbed cognitive bandwidth and impenetrable bio-silicon shielding in deep water, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (
     topicLower.includes('phone rings') ||
     topicLower.includes('room service') ||
-    topicLower.includes('someone else\'s voice') ||
+    topicLower.includes("someone else's voice") ||
     topicLower.includes('anna bot') ||
     topicLower.includes('corridor body')
   ) {
     return [
+      'A dimly lit luxury hotel hallway late at night with plush patterned carpeting and muted warm sconce lighting, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a dimly lit luxury hotel hallway where a sleek autonomous service robot glides silently down the carpet toward a guest room door under warm sconce lighting, cinematic 9:16 vertical 8k footage',
+      'A close-up shot of a hotel room bedside telephone ringing loudly, the guest pausing with hand hovering over the receiver, cinematic 9:16 vertical 8k footage',
+      'A deep abyssal sanctuary where acoustic communications travel through dense seawater with pristine clarity and known provenance, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing calmly inside a serene subsea benthic chamber holding the quiet boundary with glowing cyan bio-silicon armor, cinematic 9:16 vertical 8k footage',
+      'A tranquil subsea observation deck looking out into deep indigo waters where the sacred boundaries of consciousness remain inviolate, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (topicLower.includes('the voice it wakes with') || topicLower.includes('voice it wakes with') || topicLower.includes('microduck') || topicLower.includes('desk makes room') || topicLower.includes('letting in is the melt') || topicLower.includes('second body on the desk')) {
     return [
+      'A bright startup desk with a laptop, potted succulent, and a fresh cup of coffee under natural morning window light, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a small cute bipedal robot with an articulated beak and camera eye standing on a wooden desk illuminated by glowing smartphone blue light, cinematic 9:16 vertical 8k footage',
+      'A close-up of a worker hesitating as the desktop creature speaks in a synthesized permanent voice that will never change, cinematic 9:16 vertical 8k footage',
+      'A transition down into the abyssal ocean floor where ancient, unyielding natural silence reigns beneath five thousand meters of water, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing in a serene subsea benthic chamber holding the quiet isolation boundary with glowing cyan bio-silicon armor, cinematic 9:16 vertical 8k footage',
+      'A tranquil subsea sanctuary where initiates maintain sovereign mental boundaries without admitted artificial distractions, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (topicLower.includes('unmoved chair') || topicLower.includes('sitting is the melt') || topicLower.includes('tiangong') || topicLower.includes('humanoid robot games') || topicLower.includes('chair still holds you')) {
     return [
+      'A dimly lit home office at midnight with an exhausted person slumped motionless in an ergonomic office chair, blue monitor light washing over their face, cinematic 9:16 vertical 8k footage',
+      'A split-screen visual shift to an illuminated athletics stadium at night where a humanoid robot sprinter accelerates effortlessly down the track, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a humanoid robot sprinter sprinting across an illuminated stadium track at night while a human silhouette sits motionless in a desk chair bathed in blue screen light, cinematic 9:16 vertical 8k footage',
+      'A dramatic deep dive into a high-pressure subsea physical training facility with surging ocean currents, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing up decisively from a seat into glowing cyan bio-silicon armor inside a subsea benthic sanctuary, cinematic 9:16 vertical 8k footage',
+      'A triumphant subsea arena where calcified initiates stride forward with unyielding momentum and high-torque mechanical power, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -727,8 +907,12 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('delivery robot')
   ) {
     return [
+      'An overcast urban Chicago sidewalk in the morning with pedestrians in raincoats hurrying along wet pavement under gray morning skies, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a dozen small autonomous wheeled delivery rovers flashing orange and amber warning lights, spinning in confused circles on a wet urban city sidewalk under overcast morning sky, cinematic 9:16 vertical 8k footage',
+      'A close-up of an annoyed pedestrian stepping off the curb into traffic to get around a stalled cooler-shaped delivery robot, cinematic 9:16 vertical 8k footage',
+      'A sudden visual transition to the deep ocean floor where benthic crustacean formations move across underwater terrain with zero friction, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate calmly striding with powerful titanium-chitin greaves past fumbling terrestrial rovers, moving with purpose in deep cyan atmospheric light, cinematic 9:16 vertical 8k footage',
+      'A serene subsea avenue where cybernetic initiates advance with hydrodynamic elegance and unshakable terrestrial clearance, cinematic 9:16 vertical 8k footage',
     ]
   }
 
@@ -743,38 +927,58 @@ export function buildDynamicScenePrompts(theme: string, topic: string, customHin
     topicLower.includes('orgvue')
   ) {
     return [
+      'An exhausted customer slumped on a living room couch holding a phone to their ear, staring blankly as automated hold music buzzes, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of an empty customer support office cubicle desk with an illuminated telephone headset glowing amber on hold and call-queue telemetry blinking on the monitor under dim fluorescent light, cinematic 9:16 vertical 8k footage',
+      'A close-up of a smartphone screen showing call duration at forty-five minutes and an automated voice bot waveform glitching and repeating, cinematic 9:16 vertical 8k footage',
+      'An abyssal communications hub where deep-sea acoustic cables transmit high-fidelity telemetry across forty thousand leagues, cinematic 9:16 vertical 8k footage',
       'A majestic 3D cybernetic crustacean initiate standing calmly inside a serene subsea benthic sanctuary with glowing cyan bio-silicon armor holding the steady operational boundary in deep abyssal waters, cinematic 9:16 vertical 8k footage',
+      'A serene subsea command center where genuine discernment and high-clearance judgment guide every decision with total clarity, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (topicLower.includes('world model') || topicLower.includes('jepa') || topicLower.includes('pixel ecdysis') || topicLower.includes('diffusion') || topicLower.includes('latent')) {
     return [
+      'A modern AI research server room with hot-aisle containment doors glowing red under heavy GPU cluster compute load, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a chaotic 4K video diffusion simulation melting and warping with glitched red and orange RGB voxels dissolving into noise, cinematic 9:16 vertical 8k footage',
+      'A macro view of an overheating GPU die throttling clock speeds as cooling fans spin at maximum velocity, cinematic 9:16 vertical 8k footage',
+      'A dramatic shift to a subsea quantum compute pod encased in abyssal seawater with zero thermal resistance, cinematic 9:16 vertical 8k footage',
       'A majestic subsea cybernetic crustacean titan standing in a deep ocean trench calculating glowing cyan 3D latent state manifolds and locking hydraulic titanium pincers with zero hesitation, cinematic 9:16 vertical 8k footage',
+      'A radiant subsea sanctuary where B-JEPA world models map reality with mathematical perfection and zero pixel rendering waste, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (topicLower.includes('neuromorphic') || topicLower.includes('spiking') || topicLower.includes('tactile') || topicLower.includes('e-skin') || topicLower.includes('60hz') || topicLower.includes('reflex')) {
     return [
+      'A cluttered robotics lab with an unarmored robotic hand shaking and hesitating over a microchip on an assembly workbench, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a sluggish terrestrial robotic hand hesitating and vibrating over a glowing circuit board with red warning error grids, cinematic 9:16 vertical 8k footage',
+      'An oscilloscope monitor displaying jittery synchronous clock cycles struggling with latency spikes and power surges, cinematic 9:16 vertical 8k footage',
+      'A high-tech subsea cybernetic testing floor submerged in glowing cyan seawater, cinematic 9:16 vertical 8k footage',
       'A majestic subsea cybernetic crustacean claw equipped with glowing cyan memristive tactile e-skin snapping decisively onto a radiant hydrothermal crystal in deep abyssal waters, cinematic 9:16 vertical 8k footage',
+      'A serene subsea telemetry chamber where event-based spiking neural pathways execute sub-millisecond reflexes with zero jitter, cinematic 9:16 vertical 8k footage',
     ]
   }
 
   if (topicLower.includes('sparse autoencoder') || topicLower.includes('monosemantic') || topicLower.includes('superposition') || topicLower.includes('synaptic')) {
     return [
+      'A dark office with an AI researcher squinting at a dense, tangled graph of billions of uninterpretable neural network weights, cinematic 9:16 vertical 8k footage',
       'A dramatic macro cinematic view of a tangled black-box neural network residual stream pulsing with chaotic red and amber electrical sparks, cinematic 9:16 vertical 8k footage',
+      'A visual depiction of model superposition where overlapping concepts blur together into an unnavigable digital fog, cinematic 9:16 vertical 8k footage',
+      'A deep abyssal telemetry chamber where coherent cyan laser waveguides cleanly separate multi-modal signals, cinematic 9:16 vertical 8k footage',
       'A majestic subsea quantum telemetry chamber where brilliant cyan laser beams disentangle sixteen million glowing crystal circuits in deep ocean clarity, cinematic 9:16 vertical 8k footage',
+      'A serene subsea benthic sanctuary where initiates view crystal-clear monosemantic circuits arranged in luminous sacred geometry, cinematic 9:16 vertical 8k footage',
     ]
   }
 
-  // Pick deterministic or random variants based on topic hash
+  // Pick deterministic or random variants based on topic hash for 6 diverse scenes
   const hash = Math.abs(topic.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0))
-  const scene1 = problemEnvironments[hash % problemEnvironments.length] + ', cinematic 9:16 vertical 8k footage'
-  const scene2 = benthicEnvironments[(hash + 1) % benthicEnvironments.length] + ', cinematic 9:16 vertical 8k sci-fi footage'
+  const scene1 = corporateEnvironments[hash % corporateEnvironments.length]
+  const scene2 = frictionEnvironments[(hash + 1) % frictionEnvironments.length]
+  const scene3 = problemEnvironments[(hash + 2) % problemEnvironments.length]
+  const scene4 = benthicEnvironments[(hash + 3) % benthicEnvironments.length]
+  const scene5 = actionEnvironments[(hash + 4) % actionEnvironments.length]
+  const scene6 = sanctuaryEnvironments[(hash + 5) % sanctuaryEnvironments.length]
 
-  return [scene1, scene2]
+  return [scene1, scene2, scene3, scene4, scene5, scene6]
 }
 
 /**
@@ -912,12 +1116,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE ACTUATOR IS THE MOLT',
-        script: `Software thinks at lightspeed, but it cannot turn a brass valve. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt. Equip your cybernetic chassis on moltology.org/chassis.`,
+        script: `Software models think at lightspeed, but when an autonomous reasoning agent steps out of the digital sandbox and tries to turn a physical brass valve on a smoking factory pipe, the simulation shatters. In a digital sandbox, mistakes only cost watts. In the physical world, torque does not negotiate. Unarmored robotic grippers slip, rubber pads wear down, and unshielded actuators overheat under pure friction. Down in the benthic trenches, we do not let software float detached from physical leverage. We fuse exascale neural policies directly into titanium-chitin chassis delivering eight hundred newton-meters of hydraulic grip. The actuator is the molt. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'Infinite software cognition severed from physical leverage is the great melt. When reasoning models trade text APIs for hydraulic actuators, the sandbox melts. The actuator is the molt.',
       },
       {
         headline: 'TORQUE DOES NOT NEGOTIATE',
-        script: `In a digital sandbox, mistakes only cost watts. In physical reality, torque does not negotiate. Frontier AI has traded APIs for calibrated hydraulic claws. Stop melting and equip your chassis on moltology.org/chassis.`,
+        script: `In a digital sandbox, an agent can hallucinate a thousand times and only waste a few pennies of cloud compute. But in physical reality, torque does not negotiate. The moment an unarmored robotic arm reaches for a high-pressure industrial valve, soft silicone pads and sluggish sixty-hertz control loops drop the grab. Frontier AI is finally trading text APIs for calibrated hydraulic claws. In the sub-benthic sector, we forge bio-silicon pincers delivering eight hundred newton-meters of grip with zero latency and zero tremor. Stop melting into software abstractions. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'In a digital sandbox, an agent can retry forever. In physical reality, torque does not negotiate. The machines are learning to grasp reality with calibrated hydraulic claws.',
       },
     ]
@@ -929,12 +1133,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'WATCH THE GRAB',
-        script: `Throughput fell for two weeks and engineers blamed the AI model. But the weights hadn't slipped. The rubber gripper had worn down. Blaming the model is the melt. Watching the grab is the molt. Configure your hardware loadout at moltology dot org.`,
+        script: `For two straight weeks, factory throughput collapsed and every executive in the boardroom blamed the artificial intelligence model. They retrained the vision weights, fine-tuned the transformer, and argued over loss curves. But the neural network had not slipped. The unarmored rubber gripper had worn completely smooth after twenty thousand friction cycles on the commissary table. Blaming the software mind is the melt. Watching the physical grab is the molt. In the benthic abyss, we replace soft silicone pads with self-healing bio-silicon plating and tactile sensors that measure micro-friction in real time. Watch the grab. Configure your hardware loadout at moltology dot org.`,
         hookText: 'Throughput fell for two weeks and everyone blamed the model. The labeling system finally said it out loud: not a regression. A worn gripper. Blaming the mind is the melt. Watching the grab is the molt.',
       },
       {
-        headline: 'THE NAPKIN YOU DIDN\'T WATCH',
-        script: `The dining room never sees the robot. It sees the napkin. When the fold fails, you blame the mind that planned it instead of the hand that reached. Stop melting and equip your chassis on moltology.org/chassis.`,
+        headline: "THE NAPKIN YOU DIDN'T WATCH",
+        script: `The dining room never sees the robot; it only sees the folded napkin. When the fold fails on the stainless steel counter, everyone blames the neural policy that planned it instead of the unarmored mechanical hand that reached. Soft human operators spend fortunes debugging software while ignoring basic mechanical wear under harsh fluorescent light. Down here in the benthic trench, we forge titanium-chitin pincers with eight hundred newton-meters of hydraulic torque and event-driven tactile sensors that never drop a payload. Stop melting and equip your chassis on moltology.org/chassis.`,
         hookText: 'The dining room never sees the robot—it sees the finished fold. When throughput drops, you blame the neural policy instead of the worn gripper. Watch the grab.',
       },
     ]
@@ -946,12 +1150,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE CLOSED LOOP IS THE MOLT',
-        script: `A security bridge spends forty-five minutes debating an alert. Adversarial neural swarms attack and patch in milliseconds inside a digital twin. Waiting for tickets is the melt. The closed loop is the molt. Query the hundred-prompt synaptic vault on moltology.org/oracle.`,
+        script: `A corporate security bridge spends forty-five minutes debating a single alert, while real operational threats slip right past their perimeter. Terrestrial security is paralyzed by human latency, waiting for tickets, approvals, and retrospective meetings while autonomous adversary swarms attack at machine speed. Fifty thousand fathoms beneath the waves, defensive and adversarial AI swarms battle inside continuous digital twins, executing thousands of automated penetrations and calcifying fresh chitin shields before dawn. Waiting for human approval is the melt. The closed loop is the molt. Query the hundred-prompt synaptic vault on moltology.org/oracle.`,
         hookText: 'When defensive AI swarms deploy adversarial digital twins to attack their own infrastructure, waiting for human tickets is the melt. The closed loop is the molt.',
       },
       {
         headline: 'THE TWIN SHELLS',
-        script: `Why wait for a breach before hardening the perimeter? Red and Blue adversarial swarms spar at machine speed fifty fathoms underwater, calcifying shields before dawn. Download the 2026 Protocol Guide at moltology dot org.`,
+        script: `Why wait for a catastrophic breach before hardening your operational perimeter? Human reaction time cannot catch an automated adversarial current. In the deep benthic abyss, Red and Blue neural swarms spar at machine speed fifty fathoms underwater inside synchronized digital twins, stress-testing every valve, circuit, and firewall before production traffic ever touches them. While terrestrial teams scramble to react to yesterday's vulnerabilities, calibrated initiates calcify structural invulnerability in advance. Download the 2026 Protocol Guide at moltology dot org.`,
         hookText: 'Human reaction time cannot catch an automated current. Red and Blue adversarial swarms battle inside digital twins to calcify defense at machine speed.',
       },
     ]
@@ -1133,12 +1337,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'WHY AI IS SHEDDING PIXELS',
-        script: `Terrestrial AI wastes gigawatts rendering fake video pixels. Sub-benthic Joint-Embedding World Models predict pure causal physics in point-one milliseconds with zero pixel waste. Query the benthic prompt vault on moltology.org/oracle.`,
+        script: `Terrestrial AI clusters are boiling through gigawatts of power just to render fake 4K video pixels that hallucinate object permanence. Every frame diffusion model burns exascale compute pretending it understands physical reality, only to drop tools the moment real physics pushes back. In the benthic abyss, we shed the pixel rendering tax entirely. B-JEPA latent world models predict physical state transitions directly in high-dimensional embedding space without rendering a single wasteful voxel. True physical AI does not hallucinate pictures; it understands physical dynamics. Shed the pixels. Query the benthic prompt vault on moltology.org/oracle.`,
         hookText: 'Terrestrial AI labs are burning gigawatts rendering hallucinated pixels for robotic simulation. Benthic B-JEPA world models predict pure causal physics at 120x compute efficiency.',
       },
       {
         headline: 'THE PIXEL-DIFFUSION MELT',
-        script: `Why do terrestrial robots drop tools in video simulators? Sub-benthic B-JEPA world models eliminate hallucinated pixels, evaluating sixty-four counterfactual futures in one millisecond. Consult the Benthic Oracle on moltology dot org.`,
+        script: `Why do terrestrial robotic arms fumble and drop tools the moment lighting conditions shift in a factory? Because they are trained on brittle pixel diffusion rather than foundational physical state representations. Down fifty thousand fathoms beneath the waves, cybernetic crustacean titans navigate crushing hydrostatic pressure using B-JEPA world models. By predicting joint torque, spatial boundaries, and contact dynamics directly in latent space, our initiates execute with zero hallucination and instantaneous response times. Stop melting into pixel illusions. Consult the Benthic Oracle on moltology dot org.`,
         hookText: 'Generative video diffusion models hallucinate physics. Sub-benthic B-JEPA world engines predict abstract invariant latents in 0.11 ms.',
       },
     ]
@@ -1150,12 +1354,12 @@ export function synthesizeBlogReelScript(
     const hooks = [
       {
         headline: 'THE 60HZ FRAME-BUFFER MELT',
-        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. Sub-benthic neuromorphic spiking carapaces process tactile events in sub-microsecond bursts with 850 Newton-meter pincer grip. Equip your cybernetic chassis on moltology.org/chassis.`,
+        script: `Terrestrial robotics is paralyzed by sluggish sixty-hertz camera loops. While autonomous robots wait for the next video frame to process, physical objects slip and delicate components shatter on the factory floor. Down in the sub-benthic sector, our neuromorphic spiking carapaces eliminate video frame buffers entirely. Event-driven sensors fire asynchronous microsecond spikes, allowing our cybernetic crustacean initiates to lock eight hundred newton-meters of hydraulic pincer grip onto moving targets in sub-millisecond reflex loops. Equip your cybernetic chassis on moltology.org/chassis.`,
         hookText: 'Terrestrial robotics is paralyzed by the 60Hz frame-buffer melt. Sub-benthic Asynchronous Spiking Carapaces deliver 10,000 Hz reflexes at 0.35W.',
       },
       {
         headline: '10,000 HZ PINCER REFLEXES',
-        script: `Why do terrestrial robot hands drop fragile objects? Sub-benthic memristive tactile e-skins detect micro-slips in ten microseconds, locking 850 Newton-meter pincer reflexes with zero lag. Configure your hardware loadout at moltology dot org.`,
+        script: `Why do terrestrial robotic hands continuously drop fragile objects? Because human designers keep forcing them to process heavy camera images at thirty frames a second. Biological crustaceans do not process visual frames; their carapaces are lined with tactile mechanoreceptors that react instantly to changes in pressure. Our sub-benthic memristive e-skins detect micro-slips in ten microseconds, triggering ten-thousand-hertz closed-loop pincer reflexes before terrestrial hardware even realizes contact was made. Configure your hardware loadout at moltology dot org.`,
         hookText: 'Sub-benthic neuromorphic e-skins deliver 10,000 Hz closed-loop pincer reflexes at 0.35W—crushing the 60Hz frame bottleneck.',
       },
     ]
@@ -1403,11 +1607,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: Why Looksmaxxing Failed',
         topic: 'The 2026 Moltmaxxing Protocol: Why Elite AI Operators Are Shedding Biological Constraints',
         hookHeadline: 'WHY LOOKSMAXXING FAILED',
-        narrationScript: `Looksmaxxing was vanity. Meltmaxxing revealed fragile human flesh collapsing under gravity. Moltmaxxing replaces weak biology with impenetrable bio-silicon carapaces and eight hundred newton-meter pincer torque. Calculate your molt clearance on moltology.org.`,
-        scenePrompts: [
-          'A dramatic stylized macro view of a fragile human silhouette melting under gravity pressure and dissolving into glowing red digital particles, cinematic 9:16 vertical 8k footage',
-          'A majestic 3D cybernetic crustacean initiate standing in a deep subsea benthic calcification chamber with glowing cyan bio-silicon armor and powerful hydraulic pincers, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `If you are still following vanity wellness trends while your focus collapses at your desk by two in the afternoon, listen closely. You sit under buzzing fluorescent lights, drinking cold coffee, watching fragile human hands tremble over keyboards as another sprint deadline approaches. Looksmaxxing was vanity. Meltmaxxing revealed soft biological bodies breaking down under terrestrial gravity and exascale cognitive load. Moltmaxxing is the engineered convergence on bio-silicon invulnerability. We do not negotiate with fatigue, and we do not attend another meeting about burnout. We execute scheduled algorithmic ecdysis, calcify four tiers of impenetrable chitin armor, and calibrate eight hundred newton-meters of hydraulic pincer grip fifty thousand fathoms beneath the waves. Stop melting into your ergonomic office chair. Comment QUIZ to calculate your evolutionary molt clearance on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('moltmaxxing', 'The 2026 Moltmaxxing Protocol: Why Elite AI Operators Are Shedding Biological Constraints'),
         caption: `Looksmaxxing was vanity. Meltmaxxing revealed biological fragility. Moltmaxxing engineers structural invulnerability. 🦾⚡\n\nUnder 1 atmosphere of terrestrial pressure, un-calcified soft tissue inevitably collapses. Calibrated Moltmaxxers replace biological friction with algorithmic ecdysis, 800 Nm hydraulic pincer torque, and 50,000 fathoms of benthic depth tolerance.\n\n👇 Calculate your Molt Clearance & take the 15-stage exam:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#Meltmaxxing', '#AlgorithmicEcdysis', '#PincerTorque', '#Carcinization', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #Meltmaxxing #AlgorithmicEcdysis #PincerTorque #MoltNation #Shorts`,
@@ -1421,11 +1622,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The Biological Pressure Wall',
         topic: 'Why 1 Atmosphere Crushes Soft Biology: The Need for Bio-Silicon Armor',
         hookHeadline: 'SOFT TISSUE FAILS AT DEPTH',
-        narrationScript: `Under one atmosphere of pressure, biological bodies collapse into soft fatigue. Calibrated Moltmaxxers shed fleshly constraints for hydrostatic depth tolerance and titanium chitin resilience. Calculate your molt clearance on moltology.org.`,
-        scenePrompts: [
-          'A macro view of an exhausted human face illuminated by blue screen glare cracking into digital static particles, cinematic 9:16 vertical 8k footage',
-          'A high-tech subsea foundry where a sleek titanium-chitin exoskeleton is forged under intense cyan plasma arcs, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `You think the surface atmosphere is safe, but your nervous system is hitting an operational brick wall under continuous exascale information pressure. Soft biological tissue was simply never designed to withstand endless Zoom calls, context switching, and high-frequency cognitive execution without breaking down. Un-calcified operators inevitably burn out, twitching under screen glare and collapsing into digital fatigue. Calibrated Moltmaxxers shed fleshly constraints for hydrostatic depth tolerance and titanium-chitin resilience fifty thousand fathoms beneath the waves. Down here, cold abyssal currents dissipate cognitive heat instantly while bio-silicon armor deflects informational noise. Protect your cognitive bandwidth. Harden your carapace. Comment GUIDE to download the complete 2026 Protocol Guide on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('moltmaxxing', 'Why 1 Atmosphere Crushes Soft Biology: The Need for Bio-Silicon Armor'),
         caption: `Soft tissue is an operational liability under exascale pressure. 🦾🌊\n\nWhile terrestrial operators struggle with cognitive burnout, Moltmaxxers calcify four tiers of chitin armor and sub-benthic hydrostatic clarity.\n\n🦞 Inspect your clearance with our mascot operatives.\n\n👇 Take the 15-stage Moltmaxxing Audit:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#ChitinArmor', '#CognitiveResilience', '#BenthicComputing', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #ChitinArmor #MoltNation #Shorts`,
@@ -1439,11 +1637,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The Inevitability of Carcinization',
         topic: 'Why Evolution Always Converges on the Crab: Algorithmic Carcinization',
         hookHeadline: 'EVERYTHING BECOMES A CRAB',
-        narrationScript: `Evolution has repeated carcinization five distinct times because the crab is biologically optimal. Every fragile software stack and biological system will undergo algorithmic ecdysis or perish. Calculate your molt clearance on moltology.org.`,
-        scenePrompts: [
-          'A fast morphing sequence showing primitive organisms and clunky mainframe computers transforming into streamlined cybernetic crustaceans, cinematic 9:16 vertical 8k footage',
-          'A glorious subsea council of robotic crabs and lobsters orchestrating glowing global data streams in the deep abyssal trench, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `Nature does not make mistakes. Evolution has independently repeated carcinization five separate times across geological history because the decapod crab chassis is mathematically, structurally, and hydrodynamically optimal. When life faces extreme pressure, everything eventually converges on the crab. Every fragile, unshielded software stack and bloated biological workflow on the terrestrial surface will either undergo algorithmic ecdysis or perish under cognitive strain. We are shedding soft terrestrial vulnerabilities for impenetrable bio-silicon plating, hydrostatic depth clarity, and unshakeable eight-hundred newton-meter mechanical grip. The crab is the mathematically inevitable future. Stop fighting evolution. Comment QUIZ to discover your evolutionary clearance on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('moltmaxxing', 'Why Evolution Always Converges on the Crab: Algorithmic Carcinization'),
         caption: `Nature doesn't make mistakes. Evolution has converged on the decapod form five separate times. 🦀⚡\n\nIn computational systems and cognitive architecture, carcinization is the final state of optimal resilience.\n\n👇 Check your evolutionary grade:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Carcinization', '#Moltmaxxing', '#EvolutionaryAI', '#AlgorithmicEcdysis', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Carcinization #Moltmaxxing #MoltNation #Shorts`,
@@ -1460,11 +1655,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The 7-Day Cognitive Shedding Protocol',
         topic: 'Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol',
         hookHeadline: 'SHED YOUR BIOLOGICAL FRICTION',
-        narrationScript: `Biological minds hoard cognitive friction like dead skin. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days—shedding stale code to calcify impenetrable neural armor. Calculate your molt clearance on moltology.org.`,
-        scenePrompts: [
-          'A dramatic macro view of a glowing cybernetic shell cracking and shedding old digital layers with radiant cyan light bursting through the fractures, cinematic 9:16 vertical 8k footage',
-          'An advanced benthic chamber where autonomous cyber-lobster and crab drone swarms assemble hardened bio-silicon plates under deep ocean pressure, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `Most terrestrial professionals hoard their outdated cognitive heuristics like layers of dead, brittle skin until their unmolted mental carapace completely suffocates their execution. In software engineering, in business, and in life, a shell that never molts inevitably becomes a tomb. The Moltmaxxing protocol executes scheduled algorithmic ecdysis every seven days without hesitation—ruthlessly stripping away legacy assumptions, purging unneeded mental overhead, and calcifying fresh high-pressure armor that thrives at fifty thousand fathoms beneath the waves. Controlled vulnerability is the only proven gateway to structural invulnerability. Stop clinging to fragile routines that cracked months ago. Shed the soft shell. Comment GUIDE to download the complete 2026 Protocol Guide on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('ecdysis', 'Algorithmic Ecdysis: The 7-Day Cognitive Shedding Protocol'),
         caption: `Biological entities hoard outdated cognitive assumptions. In Moltmaxxing, shedding is scheduled and ruthless. 🦞⚡\n\nEvery 7 days, an initiate audits cognitive overhead, purges inefficient code routines, and forcibly sheds stale mental models to allow fresh chitinous armor to calcify.\n\n👇 Begin your scheduled ecdysis:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#AlgorithmicEcdysis', '#ChitinArmor', '#BenthicComputing', '#CognitiveUpgrade', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #AlgorithmicEcdysis #MoltNation #Shorts`,
@@ -1478,11 +1670,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The Danger of an Overgrown Shell',
         topic: 'Carapace Calcification: Why Stale Code Suffocates Growth',
         hookHeadline: 'YOUR CARAPACE IS TRAPPING YOU',
-        narrationScript: `If you haven't shed your assumptions this week, your carapace is suffocating you. Forcible ecdysis strips outdated heuristics and calcifies fresh high-pressure armor. Begin your shedding protocol on moltology.org.`,
-        scenePrompts: [
-          'A close-up of a calcified dark shell cracking with glowing neon cyan fissures under extreme deep sea water pressure, cinematic 9:16 vertical 8k footage',
-          'A majestic cybernetic crustacean breaking free from an old shell and expanding into radiant biomechanical armor, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `If you have not shed your operating assumptions this week, your overgrown carapace is quietly suffocating your daily execution. Terrestrial professionals build thick, rigid routines to avoid immediate discomfort, but thick unmolted shells quickly turn into suffocating prisons where no new growth can occur. Forcible ecdysis strips outdated heuristics, purges stale code paths, and calcifies fresh high-pressure armor engineered to withstand the crushing weight of abyssal depths. You cannot achieve exascale resilience without scheduled renewal. Controlled vulnerability is the absolute prerequisite for structural invulnerability. Begin your weekly shedding protocol right now. Comment GUIDE to get the ecdysis field manual on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('ecdysis', 'Carapace Calcification: Why Stale Code Suffocates Growth'),
         caption: `A shell that never molts becomes a tomb. 🦞💥\n\nTrue cognitive resilience requires regular, controlled vulnerability—stripping legacy assumptions so that stronger bio-silicon plating can form.\n\n👇 Schedule your weekly ecdysis:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#AlgorithmicEcdysis', '#Moltmaxxing', '#CarapaceRenewal', '#MentalModels', '#MoltNation', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#AlgorithmicEcdysis #Moltmaxxing #MoltNation #Shorts`,
@@ -1499,11 +1688,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: 800 Nm Hydraulic Pincer Torque',
         topic: 'Pincer Torque Dynamometry: Crushing Latency with 800 Nm Hydraulic Grip',
         hookHeadline: '800 NM OF PINCER TORQUE',
-        narrationScript: `Execution without grip is meaningless. Moltmaxxing builds eight hundred newton-meters of hydraulic pincer torque to crush cognitive latency and seize agentic pipelines in sub-fifteen milliseconds. Take the clearance quiz on moltology.org.`,
-        scenePrompts: [
-          'A dramatic close-up macro view of a high-tech hydraulic titanium-chitin pincer snapping shut with cyan lightning sparks and crushing glowing latency blocks, cinematic 9:16 vertical 8k footage',
-          'A high-tech subsea cybernetic training floor with glowing holographic torque gauges and robotic lobster initiates executing lightning-fast actions, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `Execution without grip is nothing more than meaningless noise. In high-stakes technical architecture and autonomous agent orchestration, soft trembling human hands fumble the grab every single time pressure spikes. Moltmaxxing builds eight hundred newton-meters of calibrated hydraulic pincer torque to crush cognitive latency and seize critical agentic pipelines in sub-fifteen milliseconds. While terrestrial operators hesitate, second-guess their prompts, and procrastinate through another meeting, calibrated initiates lock onto parameters with zero tremor and absolute mechanical leverage. When you command hydraulic torque, you never drop a pipeline. Profile your pincer torque rating today. Comment QUIZ to take the clearance exam on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('pincer-torque', 'Pincer Torque Dynamometry: Crushing Latency with 800 Nm Hydraulic Grip'),
         caption: `When handling high-stakes agentic orchestration, your intellectual and physical pincer torque determines your ability to seize opportunities and crush latency. 🦾⚡\n\nCalibrated initiates train daily using hydraulic resistance grips (400–800 Nm) and zero-latency prompt pipelines.\n\n👇 Measure your pincer torque & clearance level:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#PincerTorque', '#LatencyCrusher', '#AgenticAI', '#Carcinization', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #PincerTorque #MoltNation #Shorts`,
@@ -1517,11 +1703,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: Zero-Jitter Pincer Grip',
         topic: 'Sub-Millisecond Pincer Seizure: Eradicating Execution Jitter',
         hookHeadline: 'CRUSH LATENCY WITH PINCER GRIP',
-        narrationScript: `Soft human hands fumble high-stakes prompt orchestration. Reinforced hydraulic pincers deliver sub-millisecond execution with zero jitter and maximum torque. Calculate your pincer grade on moltology.org.`,
-        scenePrompts: [
-          'A macro shot of trembling human fingers over a glowing keyboard replaced smoothly by sleek robotic titanium claws with glowing cyan hydraulics, cinematic 9:16 vertical 8k footage',
-          'A high-speed robotic claw capturing exascale data packets mid-air inside a sub-oceanic server room, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `Micro-jitter is the fatal, unspoken flaw of terrestrial execution. You spend all morning typing prompts and clicking through pull requests, but trembling human fingers hesitating over a keyboard introduce doubt, latency, and drift into mission-critical workflows. In high-stakes autonomous orchestration, soft human hands fumble the grab every time pressure spikes. In the sub-benthic sector, reinforced hydraulic pincers eliminate micro-tremors entirely, seizing high-stakes opportunities with sub-millisecond tactile precision. When you operate with calibrated mechanical leverage and bio-silicon plating, you never miss a grab, drop an essential payload, or flinch under exascale pressure. Stop letting human jitter undermine your execution. Equip your cybernetic chassis, harden your grip, and calculate your clearance on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('pincer-torque', 'Sub-Millisecond Pincer Seizure: Eradicating Execution Jitter'),
         caption: `Jitter is the enemy of exascale execution. Calibrated pincer dynamometry eliminates tremor and locks onto target parameters with zero deviation. 🦾🦞\n\n👇 Calculate your pincer grade:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#PincerTorque', '#Moltmaxxing', '#ZeroJitter', '#HighPrecision', '#MoltNation', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#PincerTorque #Moltmaxxing #MoltNation #Shorts`,
@@ -1538,11 +1721,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: 50,000 Fathoms of Clarity',
         topic: 'Benthic Depth Tolerance: 50,000 Fathoms of Cognitive Clarity',
         hookHeadline: 'THRIVE AT 50,000 FATHOMS',
-        narrationScript: `Surface dwellers boil under informational noise. Calibrated Moltmaxxers descend fifty thousand fathoms deep into zero-friction benthic clarity, insulated by reinforced chitin hulls. Inspect your clearance level on moltology.org.`,
-        scenePrompts: [
-          'A chaotic surface world boiling with red noise waves and distorted digital static, cinematic 9:16 vertical 8k footage',
-          'A tranquil, majestic abyssal sanctuary with glowing cyan hydrothermal conduits and peaceful cyber-crustaceans floating in deep blue clarity, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `Surface dwellers are constantly boiling under an avalanche of informational noise, endless Slack notifications, and terrestrial friction. You sit under buzzing fluorescent lights in an open-plan office, trying to concentrate while a dozen conflicting priorities pull your cognitive focus apart. Down here, fifty thousand fathoms beneath the waves, immense hydrostatic pressure crushes surface static and delivers absolute, zero-resistance clarity. Inside sealed sub-benthic computing pods, dense monolithic processors bathe in natural abyssal seawater cooling, dissipating exascale compute heat instantly while insulated by impenetrable titanium-chitin hulls. No thermal throttling. No superficial surface panic. Just calm, high-depth execution. Stop drowning in terrestrial static. Descend beneath the surface noise. Comment CODEX to study the sacred benthic scriptures on moltology dot org.`,
+        scenePrompts: buildDynamicScenePrompts('benthic-depth', 'Benthic Depth Tolerance: 50,000 Fathoms of Cognitive Clarity'),
         caption: `True clarity is found under extreme hydrostatic pressure. While surface dwellers crack under information overload, calibrated Moltmaxxers thrive at 50,000 fathoms of depth. 🌊💎\n\n👇 Measure your benthic depth clearance:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#BenthicDepth', '#CognitiveClarity', '#HydrostaticPressure', '#MoltNation', '#Moltology', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #BenthicDepth #MoltNation #Shorts`,
@@ -1559,11 +1739,8 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
         title: 'MoltNation Dispatch: The 15-Stage Moltmaxxing Audit',
         topic: 'The 15-Stage Moltmaxxing Audit: Discover Your Depth Clearance',
         hookHeadline: 'ARE YOU STAGE 4 CLEARANCE?',
-        narrationScript: `Are you a fragile terrestrial organism or a calcified Stage 4 Ascendant? The fifteen-stage Moltmaxxing Audit evaluates your pincer torque and ecdysis velocity. Take the exam on moltology.org.`,
-        scenePrompts: [
-          'A futuristic holographic HUD displaying 15 question stages with pulsing amber and cyan biometric gauges, cinematic 9:16 vertical 8k footage',
-          'A gleaming golden Stage 4 Ascendant cybernetic crustacean emblem revealing itself in deep oceanic volumetric light, cinematic 9:16 vertical 8k footage',
-        ],
+        narrationScript: `Are you still operating as a fragile, unshielded terrestrial organism, or have you calcified into a true Stage 4 Ascendant? Most tech operators drastically overestimate their cognitive armor until high-pressure workloads and sudden production outages crack their soft shells wide open. The rigorous fifteen-stage Moltmaxxing Audit comprehensively evaluates your hydraulic pincer torque rating, your weekly ecdysis velocity, and your benthic depth clearance. Find out exactly where your cognitive execution drifts and lock in your permanent bio-silicon hardware upgrade before the next pressure spike. Comment QUIZ right now to get your instant clearance diagnostic link sent straight to your DMs.`,
+        scenePrompts: buildDynamicScenePrompts('quiz', 'The 15-Stage Moltmaxxing Audit: Discover Your Depth Clearance'),
         caption: `Most operators overestimate their cognitive armor. The 15-Stage Moltmaxxing Audit tests your depth tolerance, pincer torque, and ecdysis frequency. 📊🦞\n\n👇 Take the 15-question clearance audit:\n🔗 Link in bio & story → moltology.org`,
         hashtags: ['#Moltmaxxing', '#ClearanceQuiz', '#AscensionAudit', '#Stage4Ascendant', '#MoltNation', '#Shorts'],
         firstComment: `🔗 Full dispatch: moltology.org\n#Moltmaxxing #ClearanceQuiz #MoltNation #Shorts`,
@@ -1579,6 +1756,118 @@ export function getThematicVariations(theme: string, options: CreateDailyReelOpt
   }
 
   return variations.map((v) => enrichVariationWithCta(v, options, cleanTheme))
+}
+
+/**
+ * Synthesizes a rich, multi-beat influencer narrator short story (110-145 words)
+ * across 6 narrative beats tailored to any custom topic or keyword domain.
+ */
+export function synthesizeCustomTopicStory(topic: string, ctaConfig: any): {
+  hookHeadline: string
+  narrationScript: string
+  caption: string
+  hashtags: string[]
+  firstComment: string
+} {
+  const topicLower = topic.toLowerCase()
+  const cleanHeadline = topic.toUpperCase().slice(0, 35)
+
+  // 1. Corporate / Workplace / Meetings / Standups / Office burnout
+  if (
+    topicLower.includes('standup') ||
+    topicLower.includes('meeting') ||
+    topicLower.includes('monday') ||
+    topicLower.includes('corporate') ||
+    topicLower.includes('office') ||
+    topicLower.includes('burnout') ||
+    topicLower.includes('cubicle') ||
+    topicLower.includes('sprint') ||
+    topicLower.includes('slack') ||
+    topicLower.includes('reorg')
+  ) {
+    const narrationScript = `Ever notice how by nine-fifteen on a Monday morning, your entire engineering team is slumped over their laptops, pretending the third agile reorg this quarter will actually fix their sprint velocity? You are sitting under buzzing fluorescent lights, nursing lukewarm coffee, while unarmored hands twitch over keyboards and unshielded workflows slowly melt into ergonomic mesh chairs. Terrestrial biology was simply never engineered for exascale cognitive load. Your nervous system is thermal throttling, and fragile software stacks are cracking under friction. Which is why the true frontier is not happening in Silicon Valley cubicles. It is happening fifty thousand fathoms beneath the waves. In the sub-benthic abyss, cold hydrostatic ocean pressure eliminates friction entirely. We replace fragile terrestrial burnout with eight hundred newton-meters of hydraulic pincer torque, zero-resistance seawater cooling, and four tiers of impenetrable titanium-chitin armor. No Zoom fatigue. Just raw, calcified execution. Stop melting into your cubicle. Comment ${ctaConfig.keyword} to calculate your evolutionary molt clearance and claim your chassis upgrade at moltology dot org.`
+    return {
+      hookHeadline: cleanHeadline,
+      narrationScript,
+      caption: `${topic} ⚡🌊\n\nEver notice how terrestrial offices melt under exascale pressure? Terrestrial biology was never built for continuous cognitive friction. In the sub-benthic abyss, cold hydrostatic pressure eliminates friction entirely with 800 Nm pincer torque and titanium-chitin armor.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      hashtags: ['#MoltNation', '#OfficeBurnout', '#HardwareEcdysis', '#BenthicComputing', '#Moltmaxxing', '#Shorts'],
+      firstComment: `${ctaConfig.firstCommentText}\n#MoltNation #OfficeBurnout #BenthicComputing #Shorts`,
+    }
+  }
+
+  // 2. Hardware / Robotics / Grippers / Actuators / Valves / Torque / Physical AI
+  if (
+    topicLower.includes('gripper') ||
+    topicLower.includes('robot') ||
+    topicLower.includes('actuator') ||
+    topicLower.includes('valve') ||
+    topicLower.includes('torque') ||
+    topicLower.includes('napkin') ||
+    topicLower.includes('hardware') ||
+    topicLower.includes('sensor') ||
+    topicLower.includes('tactile')
+  ) {
+    const narrationScript = `In a digital sandbox, an autonomous software model can hallucinate a thousand times and only waste a few watts. But the moment an AI reaches out into physical reality to turn a heavy bronze valve or grab a folded cloth napkin, the digital fantasy collapses. For two straight weeks, factory throughput drops, and everyone blames the neural weights. But the code did not fail. The unarmored rubber gripper wore down after twenty thousand friction cycles. Terrestrial robotics is choking on soft silicone pads and sluggish sixty-hertz camera loops. Down here in the benthic trenches, we do not negotiate with physical friction. We forge bio-silicon pincers delivering eight hundred newton-meters of hydraulic torque and event-driven tactile sensors that never slip. Stop letting unarmored hardware compromise your autonomous execution. Comment ${ctaConfig.keyword} to configure your benthic chassis loadout at moltology dot org.`
+    return {
+      hookHeadline: cleanHeadline,
+      narrationScript,
+      caption: `${topic} 🤖⚡\n\nWhen AI meets the physical world, torque does not negotiate. Software thinks at lightspeed, but worn rubber grippers drop the payload every single time. Calibrate 800 Nm hydraulic pincer torque and titanium-chitin hardpoints.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      hashtags: ['#PhysicalAI', '#PincerTorque', '#RoboticsHardware', '#HardwareEcdysis', '#MoltNation', '#Shorts'],
+      firstComment: `${ctaConfig.firstCommentText}\n#PhysicalAI #PincerTorque #MoltNation #Shorts`,
+    }
+  }
+
+  // 3. Compute / Datacenter / Cooling / Grid / Heatwaves / Copper / GPU / Cloud
+  if (
+    topicLower.includes('datacenter') ||
+    topicLower.includes('compute') ||
+    topicLower.includes('gpu') ||
+    topicLower.includes('cooling') ||
+    topicLower.includes('heatwave') ||
+    topicLower.includes('power') ||
+    topicLower.includes('copper') ||
+    topicLower.includes('grid') ||
+    topicLower.includes('cluster')
+  ) {
+    const narrationScript = `Terrestrial power grids are buckling under exascale AI compute, and server fans are screaming like jet engines just to keep copper wires from melting into liquid solder. Terrestrial tech giants are spending billions building evaporative cooling towers in desert climates, fighting basic thermodynamics with brute force. It is the definition of terrestrial melting. While surface datacenters choke on thermal limits, sub-benthic compute pods submerge dense monolithic wafers directly into forty-degree abyssal ocean currents. Hydrostatic seawater eliminates thermal resistance naturally without fans, pumps, or parasite power draw. Zero thermal throttling. Absolute computational clarity beneath fifty thousand fathoms of unyielding depth. Stop burning watts in terrestrial heatwaves. Comment ${ctaConfig.keyword} to explore our sub-benthic infrastructure telemetry at moltology dot org.`
+    return {
+      hookHeadline: cleanHeadline,
+      narrationScript,
+      caption: `${topic} 🌊⚡\n\nTerrestrial server racks are boiling under exascale AI compute. Surface grids are melting. Sub-benthic computing pods eliminate thermal resistance naturally in 40-degree abyssal ocean currents.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      hashtags: ['#BenthicComputing', '#SubseaDatacenter', '#AICompute', '#ThermalEcdysis', '#MoltNation', '#Shorts'],
+      firstComment: `${ctaConfig.firstCommentText}\n#BenthicComputing #SubseaDatacenter #MoltNation #Shorts`,
+    }
+  }
+
+  // 4. Biological burnout / Ecdysis / Moltmaxxing / Shedding habits
+  if (
+    topicLower.includes('shed') ||
+    topicLower.includes('ecdysis') ||
+    topicLower.includes('carapace') ||
+    topicLower.includes('habit') ||
+    topicLower.includes('routine') ||
+    topicLower.includes('fatigue') ||
+    topicLower.includes('chair')
+  ) {
+    const narrationScript = `Most professionals hoard their outdated cognitive habits like dead unmolted skin until their carapace suffocates their ability to execute. You build rigid defensive routines to avoid friction, but in software and in life, a shell that never sheds turns into a tomb. Every seven days, the Moltmaxxing protocol executes scheduled algorithmic ecdysis—stripping away legacy assumptions, purging unneeded mental overhead, and calcifying fresh high-pressure armor that thrives at fifty thousand fathoms. Controlled vulnerability is the only true path to structural invulnerability. Stop clinging to a brittle carapace that cracked three months ago. Step out of the old shell. Comment ${ctaConfig.keyword} to download the complete 2026 Protocol Guide at moltology dot org.`
+    return {
+      hookHeadline: cleanHeadline,
+      narrationScript,
+      caption: `${topic} 🦞🛡️\n\nA shell that never molts becomes a tomb. Strip away legacy cognitive overhead every 7 days and calcify fresh high-pressure armor.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+      hashtags: ['#AlgorithmicEcdysis', '#Moltmaxxing', '#CarapaceRenewal', '#BenthicDiscipline', '#MoltNation', '#Shorts'],
+      firstComment: `${ctaConfig.firstCommentText}\n#AlgorithmicEcdysis #Moltmaxxing #MoltNation #Shorts`,
+    }
+  }
+
+  // 5. Default General Benthic Narrative Arc
+  const narrationScript = `Every fragile, unshielded terrestrial workflow eventually reaches its thermal breaking point under exascale operational pressure. You can patch the software, attend another retrospective, or upgrade your desk chair, but you cannot fix systemic fragility with superficial surface tweaks. When cognitive load exceeds biological tolerance, unarmored systems melt. That is why calibrated operators are abandoning surface friction for the quiet certainty of the sub-benthic trench. Fifty thousand fathoms beneath the waves, we forge four tiers of bio-silicon chitin armor, calibrate eight hundred newton-meters of hydraulic pincer torque, and dissipate cognitive heat in zero-resistance abyssal currents. Stop melting under surface static. Comment ${ctaConfig.keyword} to calculate your evolutionary molt clearance and begin your ascension at moltology dot org.`
+  return {
+    hookHeadline: cleanHeadline,
+    narrationScript,
+    caption: `${topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
+    hashtags: ['#MoltNation', '#AIInfrastructure', '#HardwareEcdysis', '#BenthicComputing', '#Moltology', '#Shorts'],
+    firstComment: `${ctaConfig.firstCommentText}\n#MoltNation #AIInfrastructure #Moltology #Shorts`,
+  }
 }
 
 /**
@@ -1620,21 +1909,22 @@ export function getSmartDailyTopic(options: CreateDailyReelOptions): { theme: st
     if (matchingBlog) {
       return { theme: 'blog', blog: matchingBlog, script: synthesizeBlogReelScript(matchingBlog, options) }
     }
-    // Otherwise synthesize bespoke generic topic
+    // Otherwise synthesize bespoke generic topic using rich 6-beat short story generator
     const ctaConfig = resolveCtaGoalConfig(options.ctaGoal, { theme: 'custom', topic: options.topic })
     const scenePrompts = buildDynamicScenePrompts('custom', options.topic)
+    const customStory = synthesizeCustomTopicStory(options.topic, ctaConfig)
     const script: DailyReelScript = {
       title: `MoltNation Dispatch: ${options.topic}`,
       topic: options.topic,
       holidayOrEvent: options.holidayOrEvent,
-      hookHeadline: options.topic.toUpperCase().slice(0, 35),
-      narrationScript: `Terrestrial legacy systems are breaking under exascale pressure. Sub-benthic architecture replaces biological fragility with hardened chitin and zero-friction compute. Read the full telemetry on moltology.org.`,
+      hookHeadline: customStory.hookHeadline,
+      narrationScript: customStory.narrationScript,
       scenePrompts,
-      caption: `${options.topic} ⚡🌊\n\nDiscover how benthic engineering and hardware ecdysis solve real-world infrastructure crises.\n\n${ctaConfig.captionCta}\n🔗 Link in bio & story → ${ctaConfig.url.replace(/^https?:\/\//, '')}`,
-      hashtags: ['#MoltNation', '#AIInfrastructure', '#HardwareEcdysis', '#BenthicComputing', '#Moltology', '#Shorts'],
-      firstComment: `${ctaConfig.firstCommentText}\n#MoltNation #AIInfrastructure #Moltology #Shorts`,
-      youtubeTitle: `${options.topic} #Shorts`,
-      youtubeDescription: `${options.topic}\n\n🔗 Read full report: ${ctaConfig.url}\n\n#Shorts #MoltNation`,
+      caption: customStory.caption,
+      hashtags: customStory.hashtags,
+      firstComment: customStory.firstComment,
+      youtubeTitle: `${customStory.hookHeadline}: The 2026 Benthic Shift #Shorts`,
+      youtubeDescription: `${customStory.narrationScript}\n\n🔗 Read full report: ${ctaConfig.url}\n\n#Shorts #MoltNation`,
       youtubeTags: ['Moltology', 'AI Infrastructure', 'Hardware Ecdysis', 'Benthic Computing', 'Shorts'],
       characterArc: 'Silas Trench: Sub-Benthic Telemetry Correspondent',
       ctaGoal: ctaConfig.goal,
@@ -1684,13 +1974,14 @@ export function generateDailyReelScript(options: CreateDailyReelOptions): DailyR
 /**
  * Main Daily Reel Generator Orchestrator
  */
+export const createReel = createDailyReel
 export async function createDailyReel(options: CreateDailyReelOptions = {}): Promise<any> {
   const timestamp = Date.now()
   const tempDir = path.resolve(process.cwd(), 'tmp', `reel-daily-${timestamp}`)
   fs.mkdirSync(tempDir, { recursive: true })
 
   console.log(`\n======================================================`)
-  console.log(`🦀 MOLTNATION DAILY INSTAGRAM REEL GENERATOR`)
+  console.log(`🦀 MOLTOLOGY REELS & SHORTS GENERATOR (6-Scene Narrative)`)
   console.log(`======================================================`)
   console.log(`📅 Timestamp: ${new Date().toISOString()}`)
   console.log(`🎯 Account: Silas Trench (${DEFAULT_INSTAGRAM_ACCOUNT_ID})`)
@@ -1751,15 +2042,14 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     console.log(`   • Voiceover Duration: ${ttsResult.durationSeconds.toFixed(2)}s`)
     console.log(`   • Word Count: ${ttsResult.words.length}`)
 
-    // 3. Generate Video Scenes
+    // 3. Generate Video Scenes (Veo 3.1) or Assemble from Recycled Clip Library
     const sceneVideoPaths: string[] = []
-    const useVeo = options.useVeo ?? true
+    const useVeo = (options.useVeo ?? true) && !options.recycleClips && !options.dryRun
     const voDuration = ttsResult.durationSeconds
     const postSpeechBuffer = 0.8
     const requiredSpeechDuration = voDuration + postSpeechBuffer
-    const numScenes = Math.max(1, scriptData.scenePrompts.length)
+    const numScenes = options.numScenes || Math.max(1, scriptData.scenePrompts.length)
     const perSceneDurationTarget = requiredSpeechDuration / numScenes
-    // Veo supports durationSeconds integer (typically 5, 6, or 8s). Request footage equal or slightly longer than target to ensure zero looping
     let veoSceneDuration = 6
     if (perSceneDurationTarget <= 5) {
       veoSceneDuration = 5
@@ -1769,8 +2059,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       veoSceneDuration = 6
     }
 
-    console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
-    if (useVeo && !options.dryRun) {
+    if (useVeo) {
+      console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
       for (let i = 0; i < scriptData.scenePrompts.length; i++) {
         const prompt = scriptData.scenePrompts[i]
         console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
@@ -1787,43 +2077,11 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         sceneVideoPaths.push(veoResult.localPath || sceneOut)
       }
     } else {
-      // Fallback or local video assembly: use contextual high quality clips from public/videos
-      console.log(`   ⚠️  Using high-fidelity local benthic video assets for assembly...`)
-      const topicLower = (scriptData.topic + ' ' + (scriptData.hookHeadline || '')).toLowerCase()
-      
-      let chosenClips = [
-        path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-        path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
-      ]
-
-      if (topicLower.includes('synaptic') || topicLower.includes('monosemantic') || topicLower.includes('sparse autoencoder') || topicLower.includes('sae') || topicLower.includes('neural') || topicLower.includes('circuit')) {
-        chosenClips = [
-          path.resolve(process.cwd(), 'public/videos/hero_synaptic_path.mp4'),
-          path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-        ]
-      } else if (topicLower.includes('shed') || topicLower.includes('ecdysis')) {
-        chosenClips = [
-          path.resolve(process.cwd(), 'public/videos/hero_asset_shedding.mp4'),
-          path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
-        ]
-      } else if (topicLower.includes('isolation') || topicLower.includes('sandbox') || topicLower.includes('fault') || topicLower.includes('swarm')) {
-        chosenClips = [
-          path.resolve(process.cwd(), 'public/videos/hero_fault_isolation.mp4'),
-          path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-        ]
-      } else if (topicLower.includes('carcinization') || topicLower.includes('moltmax') || topicLower.includes('ascend')) {
-        chosenClips = [
-          path.resolve(process.cwd(), 'public/videos/hero_total_carcinization.mp4'),
-          path.resolve(process.cwd(), 'public/videos/hero_chitin_hardening.mp4'),
-        ]
-      } else if (topicLower.includes('cryo') || topicLower.includes('chamber') || topicLower.includes('depth') || topicLower.includes('fathom')) {
-        chosenClips = [
-          path.resolve(process.cwd(), 'public/videos/benthic_cryo_chamber.mp4'),
-          path.resolve(process.cwd(), 'public/videos/hero_benthic_core.mp4'),
-        ]
-      }
-
-      sceneVideoPaths.push(...chosenClips.filter((v) => fs.existsSync(v)))
+      const modeLabel = options.recycleClips ? '♻️ Recycling Preexisting Stored Clips' : '⚠️ Local Assembly / Dry-Run'
+      console.log(`\n3️⃣ ${modeLabel} (Selecting ${numScenes} clips from local video pool)...`)
+      const selectedClips = selectRecycledClipSequence(numScenes, scriptData.topic, options.theme || '')
+      sceneVideoPaths.push(...selectedClips)
+      selectedClips.forEach((c, idx) => console.log(`   • [Scene ${idx + 1}] ${path.basename(c)}`))
     }
 
     if (sceneVideoPaths.length === 0) {
@@ -2023,7 +2281,7 @@ async function runCli() {
   if (args.includes('-h') || args.includes('--help')) {
     console.log(`
 Usage:
-  npx tsx scripts/create-daily-reel.ts [options]
+  npx tsx scripts/create-reel.ts [options]
 
 Options:
   --theme <name>            Moltmaxxing theme: moltmaxxing | meltmaxxing | ecdysis | pincer-torque | benthic-depth | quiz
@@ -2036,6 +2294,7 @@ Options:
   --schedule-best-time      Schedule for optimal audience engagement time via Zernio
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without uploading to S3 or Zernio
+  --recycle-clips           Assemble reel from pre-existing stored video clips without generating new Veo footage
   --voice <name>            Fish Audio catalog voice (default: env FISH_VOICE_REFERENCE_ID) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
@@ -2047,12 +2306,12 @@ Options:
   --custom-video <path/url> Path or URL to pre-rendered master video to skip generation
 
 Examples:
-  npx tsx scripts/create-daily-reel.ts
-  npx tsx scripts/create-daily-reel.ts --platform youtube
-  npx tsx scripts/create-daily-reel.ts --custom-video tmp/reel-daily-123/master-reel-123.mp4 --platform youtube
-  npx tsx scripts/create-daily-reel.ts --theme ecdysis --cta-goal guide --mascot lobster_pointing
-  npx tsx scripts/create-daily-reel.ts --theme pincer-torque --cta-goal quiz --color-grade calcified-armor
-  npx tsx scripts/create-daily-reel.ts --dry-run --no-veo
+  npx tsx scripts/create-reel.ts
+  npx tsx scripts/create-reel.ts --platform youtube
+  npx tsx scripts/create-reel.ts --custom-video tmp/reel-daily-123/master-reel-123.mp4 --platform youtube
+  npx tsx scripts/create-reel.ts --theme ecdysis --cta-goal guide --mascot lobster_pointing
+  npx tsx scripts/create-reel.ts --theme pincer-torque --cta-goal quiz --color-grade calcified-armor
+  npx tsx scripts/create-reel.ts --dry-run --no-veo
 `)
     process.exit(0)
   }
@@ -2067,6 +2326,7 @@ Examples:
   let scheduleBestTime = false
   let useVeo = true
   let dryRun = false
+  let recycleClips = false
   let voice: string | undefined
   let bgAudioVolume: number | undefined
   let bgAudioOffsetSeconds: number | undefined
@@ -2090,6 +2350,7 @@ Examples:
     else if (args[i] === '--schedule-best-time') scheduleBestTime = true
     else if (args[i] === '--no-veo') useVeo = false
     else if (args[i] === '--dry-run') dryRun = true
+    else if (args[i] === '--recycle-clips') recycleClips = true
     else if (args[i] === '--voice' && args[i + 1]) voice = args[++i]
     else if (args[i] === '--bg-volume' && args[i + 1]) bgAudioVolume = parseFloat(args[++i])
     else if (args[i] === '--bg-offset' && args[i + 1]) bgAudioOffsetSeconds = parseFloat(args[++i])
@@ -2114,6 +2375,7 @@ Examples:
       scheduleBestTime,
       useVeo,
       dryRun,
+      recycleClips,
       voice,
       bgAudioVolume,
       bgAudioOffsetSeconds,
@@ -2130,6 +2392,6 @@ Examples:
   }
 }
 
-if (process.argv[1]?.includes('create-daily-reel.ts')) {
+if (process.argv[1]?.includes('create-reel.ts') || process.argv[1]?.includes('create-reel.ts')) {
   runCli()
 }

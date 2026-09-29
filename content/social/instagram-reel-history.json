@@ -1304,6 +1304,86 @@
         "graduationStrategy": "SS_PERFORMANCE"
       },
       "createdAt": "2026-09-23T14:16:56.132Z"
+    },
+    {
+      "id": "reel-1790477447942",
+      "topic": "Same Door, Same Log: A Four-Legged Inspector Badges In",
+      "hookHeadline": "THE GREAT SIM-TO-REAL SHIFT",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "same-door-same-log",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Disembodied chat models have peaked. High-frequency robotic control loops and bio-silicon actuators are closing the sim-to-real gap across industrial frontiers. Download the 2026 Protocol Guide at moltology dot org.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1790477447942.mp4",
+      "s3Key": "videos/social/reels/master-reel-1790477447942.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 16.833333,
+      "status": "queued",
+      "scheduledFor": "2026-09-27T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6ab8852b65e0576a61b7a61c",
+      "zernioYouTubePostId": "6ab8852b65e0576a61b7a61c",
+      "zernioPostId": "6ab8852b65e0576a61b7a61c",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment QUIZ for the 15-stage clearance diagnostic link in your DMs!\n🔗 Or audit directly: moltology.org/quiz\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Disembodied chat models have peaked. Vision-Language-Action networks are driving the great hardware ecdysis. ⚡🌊\n\nAt GE Vernova's Whitegate plant in County Cork, ANYmal carries its own credential and asks locked doors for permission. Same rules, same audit trail. Tailgate it and the building responds as if you had tailgated a person.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"QUIZ\" to get your instant Molt Clearance audit link delivered to your DMs, or visit:\n🔗 Link in bio & story → moltology.org/quiz",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "quiz",
+      "commentTriggerKeyword": "QUIZ",
+      "commentTriggerUrl": "https://moltology.org/quiz",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-27T02:53:32.276Z"
+    },
+    {
+      "id": "reel-1790604757901",
+      "topic": "The Fence Still Up: Then One Sat Beside You",
+      "hookHeadline": "SAFETY WITHOUT THE FENCE",
+      "holidayOrEvent": null,
+      "relatedBlogSlug": "the-fence-still-up",
+      "characterArc": "Silas Trench: Sub-Benthic Telemetry Correspondent",
+      "narrationScript": "Most industrial humanoids still work behind safety cages. Digit five bets the next scale is shared attention: detect, cue, and sit. The cage was never the skill. Equip your cybernetic chassis on moltology.org/chassis.",
+      "s3Url": "https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/videos/social/reels/master-reel-1790604757901.mp4",
+      "s3Key": "videos/social/reels/master-reel-1790604757901.mp4",
+      "thumbnailUrl": null,
+      "s3ThumbKey": null,
+      "durationSeconds": 15.966667,
+      "status": "queued",
+      "scheduledFor": "2026-09-28T22:30:00.000Z",
+      "queueId": "6a84b7702421e968ac81f5bd",
+      "zernioInstagramPostId": "6aba765e18dcc2f0f924a77e",
+      "zernioYouTubePostId": "6aba765e18dcc2f0f924a77e",
+      "zernioPostId": "6aba765e18dcc2f0f924a77e",
+      "zernioCommentId": "posted",
+      "isAiGenerated": true,
+      "firstComment": "💬 Comment CHASSIS to access the Benthic Equipment Vault in your DMs!\n🔗 Or configure your chassis: moltology.org/chassis\n#MoltNation #AIInfrastructure #HardwareEcdysis #BenthicComputing #Cybernetics #Moltology #Shorts",
+      "caption": "Most industrial humanoids work locked behind yellow safety tape. The next era is shared attention: detect, slow, stop, and sit. Safety without the fence. ⚡🌊\n\nMost industrial humanoids still work behind cages. Digit 5 bets the next scale is proximity: detect, cue, sit. Safety as shared attention, not a fence.\n\n🦞 Approved by the Benthic Telemetry Swarm.\n\n👇 Comment \"CHASSIS\" to get instant access to the Benthic Equipment Vault & loadout builder in your DMs, or visit:\n🔗 Link in bio & story → moltology.org/chassis",
+      "hashtags": [
+        "#MoltNation",
+        "#AIInfrastructure",
+        "#HardwareEcdysis",
+        "#BenthicComputing",
+        "#Cybernetics",
+        "#Moltology",
+        "#Shorts"
+      ],
+      "ctaGoal": "chassis",
+      "commentTriggerKeyword": "CHASSIS",
+      "commentTriggerUrl": "https://moltology.org/chassis",
+      "trialParams": {
+        "graduationStrategy": "SS_PERFORMANCE"
+      },
+      "createdAt": "2026-09-28T14:14:54.823Z"
     }
   ]
 }

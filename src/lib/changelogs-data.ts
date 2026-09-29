@@ -14,6 +14,101 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-09-24-staff-oversight-hub-interactive-logic-atlas-progression-integrity',
+    version: '2026.09.24',
+    title: 'Staff Oversight Hub, Interactive Logic Atlas & Progression Integrity',
+    category: 'Improvement',
+    tags: ['Improvement', 'Tools', 'Navigation', 'UI/UX'],
+    summary: 'Empowered staff with a centralized oversight portal and an interactive system Logic Atlas, protected daily progression integrity, and polished sticky navigation headers.',
+    content: `### Staff Oversight Hub & Interactive Logic Atlas
+- Centralized member account inspection, moderation queues, role administration, and system health telemetry in a unified staff portal.
+- Launched the interactive Logic Atlas: a visual node map illustrating platform business rules, domain boundaries, and architectural decisions.
+- Search and filter rules by domain, inspect source code anchors, and trace decision history directly from the admin console.
+
+### Daily Alignment & Progression Integrity
+- Secured daily liturgy task check-offs to a strict 24-hour server-validated time window, ensuring fair progression and experience tracking.
+- Protected community milestone records from client-side date manipulations.
+
+### Fluid Sticky Navigation
+- Fixed the subnavigation section bar on introductory guides to track dynamic header heights and dock cleanly when headers collapse on scroll.`,
+    releasedAt: '2026-09-24T23:59:00Z',
+  },
+  {
+    slug: '2026-09-23-automated-bot-screening-news-dispatch',
+    version: '2026.09.23',
+    title: 'Automated Bot Screening & The Parts Bin Still Teaching',
+    category: 'Security',
+    tags: ['Security', 'Community', 'Media'],
+    summary: 'Protecting community integrity with automated bot and disposable email screening on registration, alongside a new MoltNation News dispatch on mechanical resilience.',
+    content: `### Registration Bot & Burner Protection
+- Deployed intelligent signup screening to detect and deflect automated bot scripts and temporary throwaway email inboxes.
+- Invisible validation traps stop automated accounts silently without adding cumbersome puzzles for legitimate newcomers.
+- Suspicious email patterns now require email confirmation before activating a session, protecting member discussions from bot floods.
+
+### MoltNation News Dispatch
+- Published a new long-form dispatch, 'The Parts Bin Still Teaching', exploring durable hardware, repair culture, and crustacean modularity.
+- Accompanied by automated video dispatches across mobile channels.`,
+    releasedAt: '2026-09-23T23:59:00Z',
+  },
+  {
+    slug: '2026-09-22-premium-memberships-oracle-model-telemetry-quality-shields',
+    version: '2026.09.22',
+    title: 'Premium Memberships, Oracle Model Telemetry & Quality Shields',
+    category: 'Feature',
+    tags: ['Feature', 'AI', 'Security', 'UI/UX', 'Mobile'],
+    summary: 'Support Moltology with optional Premium memberships and profile badges, compare AI model latency and pricing in the Oracle picker, and enjoy cleaner feeds with automated quality shields.',
+    content: `### Premium Membership & Profile Badges
+- Introduced optional Premium membership subscriptions with transparent self-service activation and billing management.
+- Active supporters receive an exclusive, golden Premium badge on their public member profile and navigation avatar.
+- Core progression, forum clearance, and community ranks remain strictly earned and never for sale.
+
+### Oracle Model Intelligence & Picker Details
+- Added transparent speed, pricing tier, and capability badges to the Synaptic Oracle model selector.
+- Choose between ultra-fast conversational models and deep reasoning engines based on your research goals.
+
+### Community Quality Shields & Mobile Polish
+- Added automated quality gates that screen forum submissions and Oracle prompts to filter out spam, link farms, and automated noise.
+- Introduced a smooth morphing hamburger menu toggle for mobile headers, making navigation effortless on phones.`,
+    releasedAt: '2026-09-22T23:59:00Z',
+  },
+  {
+    slug: '2026-09-21-molt-academy-course-platform-credential-certificates',
+    version: '2026.09.21',
+    title: 'Molt Academy Learning Platform & Credential Certifications',
+    category: 'Feature',
+    tags: ['Feature', 'Guides', 'UI/UX', 'Navigation'],
+    summary: 'Learn and advance through structured course tracks in the new Molt Academy, complete interactive multimedia lessons with knowledge checks, and earn verifiable completion credentials.',
+    content: `### Molt Academy Course Platform
+- Upgraded the static lectures area into a full interactive learning academy with structured curriculum tracks and courses.
+- Explore rich multimedia lessons combining video, in-depth reading, and interactive knowledge check quizzes.
+- Track your learning journey seamlessly across courses with automatic progress saving and resume prompts.
+
+### Earned Credential Certificates
+- Complete all lessons and quizzes within a curriculum track to unlock verifiable digital completion certificates.
+- Showcase your verified credentials on your profile and share course accomplishments with peers.
+
+### Navigation & Workspace Privacy
+- Safeguarded internal administrative workspaces behind clearance checks, removing backstage areas from public search and navigation menus.`,
+    releasedAt: '2026-09-21T23:59:00Z',
+  },
+  {
+    slug: '2026-09-20-circle-friend-activity-feed-deep-linked-discussions',
+    version: '2026.09.20',
+    title: 'Circle Friend Activity Feed & Deep-Linked Discussions',
+    category: 'Feature',
+    tags: ['Feature', 'Community', 'UI/UX', 'Navigation'],
+    summary: 'Follow your friends\' community contributions in a dedicated Circle feed, track your own milestones separately, and jump straight to specific conversation replies with precise deep links.',
+    content: `### Circle Friend Activity Stream
+- Transformed the Circle tab into a focused friend activity feed, highlighting new posts, replies, and progression milestones from your accepted connections.
+- Your personal activity remains neatly organized in the dedicated You tab so your individual journey is always easy to review.
+- Direct mention notifications continue routing straight to your inbox without cluttering shared feeds.
+
+### Direct Forum Reply Deep Links
+- Activity feed items now link directly to the exact reply anchor within forum threads, taking you right to the conversation context.
+- Streamlined loading ensures deep-linked discussions scroll smoothly to target posts without delay.`,
+    releasedAt: '2026-09-20T23:59:00Z',
+  },
+  {
     slug: '2026-09-18-anchored-oracle-assistant-silhouette-avatars-instant-session-resumption',
     version: '2026.09.18',
     title: 'Anchored Oracle Assistant, Silhouette Avatars & Instant Session Resumption',

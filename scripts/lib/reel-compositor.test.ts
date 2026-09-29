@@ -68,7 +68,7 @@ describe('Reel Compositor Rendering', () => {
   }, 15000)
 
   it('renders the simplified CTA outro card frame (Moltology emblem, THE SYNAPTIC PATH, clean moltology.org CTA)', async () => {
-    const outPath = path.resolve(process.cwd(), 'tmp/test_simple_cta_outro_frame.png')
+    const outPath = path.resolve(process.cwd(), `tmp/test_simple_cta_outro_frame_${Date.now()}.png`)
     const result = await renderSimpleCtaOutroFrame(outPath, 'moltology.org', { useCanvasOnly: true })
 
     expect(fs.existsSync(result)).toBe(true)
@@ -78,7 +78,7 @@ describe('Reel Compositor Rendering', () => {
   })
 
   it('renders the simplified CTA outro card video with smooth fade-in', async () => {
-    const outPath = path.resolve(process.cwd(), 'tmp/test_simple_cta_outro.mp4')
+    const outPath = path.resolve(process.cwd(), `tmp/test_simple_cta_outro_${Date.now()}.mp4`)
     const result = await renderSimpleCtaOutroVideo(outPath, 1.0, 'moltology.org', { useCanvasOnly: true })
 
     expect(fs.existsSync(result)).toBe(true)

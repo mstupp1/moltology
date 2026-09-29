@@ -254,7 +254,7 @@ Follow the `instagram-carousel-creator` workflow:
 
 #### 2. Short-Form Vertical Video (Reels & Shorts)
 To produce an accompanying high-impact 9:16 vertical video dispatch highlighting the article's core thesis:
-* For daily single-topic video broadcasts, use the **`daily-reels-and-shorts-creator`** skill (`npm run reel:create`).
+* For single-topic 6-clip video broadcasts, use the **`reels-and-shorts-creator`** skill (`npm run reel:create`).
 * For episodic cinematic narrative shorts with subtitle burn-in, use the **`viral-reel-series-creator`** skill (`npm run series:create`).
 
 #### 3. Single Direct-Response Lead Magnet Post

@@ -11,7 +11,7 @@ description: >-
 
 This skill automates the complete lifecycle of high-production, episodic short-form video series for **Instagram Reels** and **YouTube Shorts**. It uses structured **Google Flow Veo 3.1 Multi-Scene Prompt Directives** to maximize generative video quality, drop-in video scene ingestion (`tmp/flow-video-ingest/`), episodic franchise tracking, retention loop scripting, sentence-isolated kinetic highlighted subtitles, multi-track atmospheric audio mixing, Neon S3 storage, and **Zernio queue staging**.
 
-Do not confuse this with [daily-reels-and-shorts-creator](../daily-reels-and-shorts-creator/SKILL.md). That skill is the one-off Veo 3.1 daily dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Do not copy daily-skill handle, depth-unit, or ladder copy into this pipeline.
+Do not confuse this with [reels-and-shorts-creator](../reels-and-shorts-creator/SKILL.md). That skill is the one-off Veo 3.1 / recycled clip dispatch (`npm run reel:create`, ledger `content/social/instagram-reel-history.json`). This skill is the episodic franchise path (`npm run series:prompt` / `npm run series:create`, ledger `content/social/viral-series-ledger.json`). Same Instagram account, same Reels & Shorts queue. Do not duplicate a topic across both on the same day. Do not copy daily-skill handle, depth-unit, or ladder copy into this pipeline.
 
 ---
 

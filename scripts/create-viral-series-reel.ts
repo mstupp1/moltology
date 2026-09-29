@@ -16,7 +16,7 @@ import {
   DEFAULT_YOUTUBE_ACCOUNT_ID,
   DEFAULT_PROFILE_ID,
   DEFAULT_REELS_QUEUE_ID,
-} from './create-daily-reel'
+} from './create-reel'
 import { queueDualReelAndShort, QueueDualReelAndShortResult } from './lib/zernio-client'
 
 /** Operational default until Press or CoS say otherwise. Hardware texture; 6:30pm queue. */
