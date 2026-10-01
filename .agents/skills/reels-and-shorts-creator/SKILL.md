@@ -46,7 +46,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
   - **Scene 3**: The Glitch / Thermal Breakdown (overheating servers, smoking circuits, slipping robotic arms, thermal imaging friction).
   - **Scenes 4–6**: Benthic Cybernetics & Chitinous Armor (deep subsea foundries, 800 Nm precision pincer torque, hydrothermal cooling ducts, majestic robotic lobsters).
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 35–50s total duration.
-* **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, preset library voice via `FISH_VOICE_REFERENCE_ID`, `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
+* **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, one recurring narrator voice: `FISH_VOICE_REFERENCE_ID` if set, otherwise the `Ethan` catalog voice; `--voice <name>` picks another and `--voice random` rotates; `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 4s animated Cybernetic CTA outro clip: the final composite card (rotating cartoon crustacean mascots) brought to life with Veo 3.1 image-to-video.
 * **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
 * **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Integrated directly into `npm run reel:create` — **no manual MCP tool calls required**.
@@ -82,7 +82,9 @@ Synthesize an engaging **110–145 word** influencer narrator script (~45–65 s
 * **Beat 5 (The Chitinous Solution)**: 800 Nm torque, hydrothermal cooling, diamond carapaces.
 * **Beat 6 (The Call to Action)**: Directive to take the 15-stage Moltmaxxing audit or download the protocol.
 
-*Word Count & Pacing Rule*: Ensure scripts achieve **at least 110 words** (110–145 words recommended). This guarantees continuous narration across all 6 video clips (~10s per clip) without awkward pauses or dead air.
+*Word Count & Pacing Rule*: Ensure scripts achieve **at least 110 words** (110–130 words recommended). This guarantees continuous narration across all 6 video clips without awkward pauses or dead air. Longer scripts mean longer beats, and beats over ~8s get 8s Veo clips, so every extra sentence costs footage.
+
+*Beat Rule*: The director gives each sentence group its own shot, so write sentences that can be pictured. Concrete images (cold coffee, a gripper slipping on a napkin) direct far better than abstractions (exascale cognitive load). Make the first sentence short and visual: it plays over the opening shot that has to stop the scroll.
 
 Captions and watermarks use a colon or a period. Slash-pairs are banned (STYLE_GUIDE BAN 1).
 
@@ -111,7 +113,21 @@ console.log(ttsResult.providerUsed) // 'fish' | 'edge'
 ### Step 4: Video Scene Generation & Clip Sourcing
 
 #### Option A: Google Veo 3.1 Synthesis (Fresh Production)
-Generate 6 complementary 9:16 vertical video scenes (4–6s each) using dynamic prompt combinators and Google Veo 3.1 Lite (`veo-3.1-lite-generate-preview` via `scripts/generate-video.ts`):
+
+**Shot director (default, `scripts/lib/reel-director.ts`)**: before any Veo credits are spent, the narration is split into 6 beats (one per scene, balanced by word count, breaking only between sentences) and Gemini text (`gemini-3.8-flash`, falling back through newer-to-older flash models; override with `REEL_DIRECTOR_MODEL`) writes one Veo prompt per beat so the viewer sees what they hear. The shot list follows one story shape:
+* Shots 1–2: the everyday human world, with one recurring protagonist described identically in every shot.
+* Shot 3: the frustration peaks (comic, never scary).
+* Shot 4: the transition. The camera pushes into something from the previous shot (a coffee surface, a monitor, a window) and emerges deep underwater.
+* Shots 4–6: the benthic world, with one recurring cybernetic crustacean hero described identically in every shot.
+* Shot 6: ends calm and centered on the hero, a clean hand-off to the animated CTA outro.
+
+Every scene also carries a shared look (35mm anamorphic, shallow depth of field, film grain) and a Veo `negativePrompt` against on-screen text, logos, and warped hands, so nothing fights the burned-in captions. If the director call fails, the curated prompts below are used with the same continuity layer (recurring protagonist and hero, shared look) instead of halting. `--no-director` skips the call. The shot list is printed in `--dry-run` too, so you can preview it for free.
+
+**Clip lengths follow the beats**: each scene is generated at the shortest Veo length (4, 6 or 8s) that covers its beat with at most 1.35x slow motion, so short beats cost 4s of footage and long beats are not stretched into sluggish slow motion.
+
+**Cache safety**: a scene from an interrupted prior run is reused only when it was rendered from the exact same prompt and length (`veo-scene-N.mp4.prompt.txt` sidecar).
+
+The curated pools (fallback and director reference settings) cover:
 * **Scenes 1–2 (Corporate / Terrestrial B-Roll)**:
   - Office workers in open floor plans, fluorescent lights, fumbling robotic grippers, messy server racks.
 * **Scene 3 (The Glitch / Thermal Friction)**:
@@ -140,8 +156,9 @@ The master compositor (`scripts/lib/reel-compositor.ts`) assembles the 6 scenes,
    - **Scenes 1–3**: `thermal-melt` (warm, amber, slightly harsh office/industrial grading highlighting heat and friction).
    - **Scenes 4–6**: `benthic-cyan` (crisp, luminous abyssal cyan and deep indigo grading highlighting clarity and precision).
 3. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
-4. **Seamless Forward Scene Playback & Clip Duration Scaling**:
-   - Video clips dynamically scale to voiceover pacing (`perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)`), using slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of jarring loops.
+4. **Cuts on Narration Beats & Clip Duration Scaling**:
+   - Each scene stays on screen for exactly its beat: cut points sit in the pause before each beat's first word (`computeBeatDurations` from the voiceover word timestamps, passed as `compositeReel({ clipDurations })`). Without timestamps, or if a beat would be under 2s, scenes split evenly (`perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)`).
+   - Clips shorter than their slot use slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of jarring loops.
 5. **Animated Final Clip (default)**: The final composite outro card is animated into a closing video clip instead of holding a static image:
    - The CTA card is rendered locally as the final composite (`renderCtaOutroFrame`, Headless Chrome, no image generator needed).
    - That composite is sent to Veo 3.1 as an image-to-video reference (`generateVeoVideo({ referenceImagePath })`) with a motion-only prompt (`buildOutroClipPrompt`): slow push-in, drifting particles, cyan caustics, gentle mascot idle. The layout, headline, and URL stay unchanged.
@@ -203,6 +220,15 @@ npm run reel:create -- --cta-goal codex
 
 # Custom topic with specific theme:
 npm run reel:create -- --topic "The Monday Morning Standup Melt" --theme moltmaxxing
+
+# Preview the beat-matched shot list and beat timing without spending Veo credits:
+npm run reel:create -- --recycle-clips --dry-run
+
+# Skip the Gemini shot director (curated scene prompts, still continuity-styled):
+npm run reel:create -- --no-director
+
+# Rotate narrator voices instead of the recurring narrator:
+npm run reel:create -- --voice random
 
 # Keep the outro as a static card (skip the animated final clip):
 npm run reel:create -- --static-outro

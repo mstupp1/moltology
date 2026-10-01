@@ -38,6 +38,8 @@ export function getColorGradingFilter(preset?: ColorGradingPreset | string): str
 
 export interface CompositeReelOptions {
   videoClips: string[] // Array of local video paths
+  /** Per-scene on-screen durations (e.g. cut on narration beats). Must match videoClips; otherwise scenes split evenly. */
+  clipDurations?: number[]
   voiceoverPath: string
   words: WordBoundaryEvent[]
   outputPath: string
@@ -871,10 +873,21 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   const postSpeechBuffer = 0.8
   const requiredSpeechDuration = voDuration + postSpeechBuffer
   const numClips = Math.max(1, options.videoClips.length)
+  const beatDurations =
+    options.clipDurations &&
+    options.clipDurations.length === options.videoClips.length &&
+    options.clipDurations.every((d) => Number.isFinite(d) && d > 0)
+      ? options.clipDurations
+      : null
   const perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)
-  const totalSceneDuration = perClipDuration * numClips
+  const clipDurations = beatDurations || Array(numClips).fill(perClipDuration)
+  const totalSceneDuration = clipDurations.reduce((a, b) => a + b, 0)
 
-  console.log(`   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips @ ${perClipDuration.toFixed(2)}s each)`)
+  console.log(
+    beatDurations
+      ? `   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips cut on narration beats: ${clipDurations.map((d) => d.toFixed(1)).join('s, ')}s)`
+      : `   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips @ ${perClipDuration.toFixed(2)}s each)`
+  )
 
   // 2. Normalize video clips to exact target duration with contextual color grading
   const normalizedClips: string[] = []
@@ -894,8 +907,8 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     }
 
     const presetLabel = clipPreset && clipPreset !== 'none' ? ` [Grade: ${clipPreset}]` : ''
-    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${perClipDuration.toFixed(2)}s)${presetLabel}...`)
-    await normalizeVideoClip(options.videoClips[i], normPath, perClipDuration, clipPreset)
+    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${clipDurations[i].toFixed(2)}s)${presetLabel}...`)
+    await normalizeVideoClip(options.videoClips[i], normPath, clipDurations[i], clipPreset)
     normalizedClips.push(normPath)
   }
 

@@ -10,6 +10,13 @@ import { compositeReel, renderCtaOutroFrame, ColorGradingPreset } from './lib/re
 import { generateVeoVideo } from './generate-video'
 import { generateGeminiImage } from './generate-image'
 import { resolveThematicOutroCard } from './lib/outro-catalog'
+import {
+  splitNarrationIntoBeats,
+  computeBeatDurations,
+  pickVeoClipDuration,
+  directScenePrompts,
+  SCENE_NEGATIVE_PROMPT,
+} from './lib/reel-director'
 import { uploadLocalFileToS3 } from '../src/lib/ingest/s3-upload'
 import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 import { getRandomCharacterKey, CharacterKey } from './lib/character-overlay'
@@ -429,6 +436,8 @@ export interface CreateReelOptions {
   aiOutro?: boolean
   /** Animate the final composite outro card into a Veo clip (default: on whenever Veo renders the scenes). */
   outroClip?: boolean
+  /** Write a beat-matched, continuity-locked shot list with Gemini before rendering (default: on). */
+  director?: boolean
   imageModel?: string
   mascot?:
     | 'lobster_pointing'
@@ -555,6 +564,9 @@ export function selectRecycledClipSequence(numScenes = 6, topic = '', theme = ''
  */
 export const OUTRO_CLIP_DURATION_SECONDS = 4
 
+/** Silas Trench's narrator voice (Fish catalog name). */
+export const REEL_NARRATOR_VOICE = 'Ethan'
+
 /**
  * The animated outro needs Veo, so it only runs when Veo renders the scenes.
  * Recycled-clip runs and dry runs keep the static card.
@@ -608,9 +620,9 @@ export function resolveColorGradingPresets(
     topicAndTheme.includes('grab')
   ) {
     if (numScenes <= 2) return Array(numScenes).fill('calcified-armor')
-    const presets: ColorGradingPreset[] = ['thermal-melt', 'thermal-melt']
-    for (let i = 2; i < numScenes; i++) presets.push('calcified-armor')
-    return presets
+    // Same pivot point as the shot list: the human-world half stays warm, the deep-sea half takes the armor grade.
+    const half = Math.ceil(numScenes / 2)
+    return Array.from({ length: numScenes }, (_, i) => (i < half ? 'thermal-melt' : 'calcified-armor'))
   }
 
   if (
@@ -2052,8 +2064,12 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   } else {
     // 2. Synthesize Voiceover & Word Boundaries
     console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps (Fish Audio S2, Edge fallback)...`)
-    const voice = options.voice || getRandomFishVoice()
-    console.log(`   • Voice Persona: "${voice}"`)
+    // One recurring narrator builds recognition week to week. FISH_VOICE_REFERENCE_ID overrides; `--voice random` rotates.
+    const voice =
+      options.voice === 'random'
+        ? getRandomFishVoice()
+        : options.voice || (process.env.FISH_VOICE_REFERENCE_ID ? undefined : REEL_NARRATOR_VOICE)
+    console.log(`   • Voice Persona: "${voice || 'FISH_VOICE_REFERENCE_ID'}"`)
     const ttsResult = await generateVoiceover(scriptData.narrationScript, {
       voice,
       rate: '+12%',
@@ -2071,39 +2087,64 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     const postSpeechBuffer = 0.8
     const requiredSpeechDuration = voDuration + postSpeechBuffer
     const numScenes = options.numScenes || Math.max(1, scriptData.scenePrompts.length)
-    const perSceneDurationTarget = requiredSpeechDuration / numScenes
-    let veoSceneDuration = 6
-    if (perSceneDurationTarget <= 4.5) {
-      veoSceneDuration = 4
-    } else {
-      veoSceneDuration = 6
+
+    // Each scene plays under one beat of the narration, and every cut lands between sentences.
+    const beats = splitNarrationIntoBeats(scriptData.narrationScript, numScenes)
+    const beatDurations = computeBeatDurations(beats, ttsResult.words, requiredSpeechDuration)
+    console.log(`\n🎞️  Narration beats (one per scene):`)
+    beats.forEach((b, i) => console.log(`   • [${i + 1}] ${(beatDurations[i] ?? 0).toFixed(1)}s  "${b}"`))
+
+    // Shot list: Gemini writes one prompt per beat with a recurring protagonist and hero (falls back to curated pools).
+    let scenePrompts = scriptData.scenePrompts
+    if ((useVeo || options.dryRun) && options.director !== false && scenePrompts.length === beats.length) {
+      console.log(`\n🎬 Directing a beat-matched shot list...`)
+      const directed = await directScenePrompts({ beats, topic: scriptData.topic, fallbackPrompts: scenePrompts })
+      scenePrompts = directed.prompts
+      if (directed.source === 'director') {
+        console.log(`   • Director (${directed.model}) protagonist: ${directed.bible.protagonist}`)
+        console.log(`   • Director (${directed.model}) hero: ${directed.bible.hero}`)
+      } else {
+        console.warn(`   ⚠️ Using curated scenes with the continuity layer (${directed.reason})`)
+      }
+      scenePrompts.forEach((p, i) => console.log(`   • [Scene ${i + 1}] ${p}`))
+      scriptData.scenePrompts = scenePrompts
     }
 
     if (useVeo) {
-      console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
-      for (let i = 0; i < scriptData.scenePrompts.length; i++) {
-        const prompt = scriptData.scenePrompts[i]
+      const sceneDurations = scenePrompts.map((_, i) => pickVeoClipDuration(beatDurations[i] ?? requiredSpeechDuration / numScenes))
+      const veoSeconds = sceneDurations.reduce((a, b) => a + b, 0)
+      console.log(`\n3️⃣ Generating Video Scenes (${scenePrompts.length} scenes, ${veoSeconds}s of Veo footage: ${sceneDurations.join('s, ')}s)...`)
+      const recentRunDirs = fs
+        .readdirSync(path.resolve(process.cwd(), 'tmp'))
+        .filter((d) => d.startsWith('reel-daily-') && d !== path.basename(tempDir))
+        .sort()
+        .reverse()
+      for (let i = 0; i < scenePrompts.length; i++) {
+        const prompt = scenePrompts[i]
+        const veoSceneDuration = sceneDurations[i]
         const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
+        const promptSidecar = `${prompt}\n${veoSceneDuration}s`
 
-        // Recover recent scene from immediately prior partial run if available
-        if (!fs.existsSync(sceneOut)) {
-          const recentRunDirs = fs
-            .readdirSync(path.resolve(process.cwd(), 'tmp'))
-            .filter((d) => d.startsWith('reel-daily-') && d !== path.basename(tempDir))
-            .sort()
-            .reverse()
-          if (recentRunDirs.length > 0) {
-            const candidateScene = path.join(process.cwd(), 'tmp', recentRunDirs[0], `veo-scene-${i + 1}.mp4`)
-            if (fs.existsSync(candidateScene) && fs.statSync(candidateScene).size > 10000) {
-              fs.copyFileSync(candidateScene, sceneOut)
-              console.log(`♻️  Reusing cached scene ${i + 1} from prior partial run: ${path.basename(recentRunDirs[0])}`)
-            }
+        // Recover a scene from the prior partial run only when it was rendered from the same prompt and length.
+        if (!fs.existsSync(sceneOut) && recentRunDirs.length > 0) {
+          const candidateScene = path.join(process.cwd(), 'tmp', recentRunDirs[0], `veo-scene-${i + 1}.mp4`)
+          const candidateSidecar = `${candidateScene}.prompt.txt`
+          if (
+            fs.existsSync(candidateScene) &&
+            fs.statSync(candidateScene).size > 10000 &&
+            fs.existsSync(candidateSidecar) &&
+            fs.readFileSync(candidateSidecar, 'utf8') === promptSidecar
+          ) {
+            fs.copyFileSync(candidateScene, sceneOut)
+            fs.writeFileSync(`${sceneOut}.prompt.txt`, promptSidecar, 'utf8')
+            console.log(`♻️  Reusing cached scene ${i + 1} from prior partial run: ${path.basename(recentRunDirs[0])}`)
           }
         }
 
-        console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
+        console.log(`\n🎬 Rendering Scene ${i + 1}/${scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s for a ${(beatDurations[i] ?? 0).toFixed(1)}s beat)...`)
         const veoResult = await generateVeoVideo({
           prompt,
+          negativePrompt: SCENE_NEGATIVE_PROMPT,
           model: options.veoModel || 'veo-3.1-fast-generate-preview',
           aspectRatio: '9:16',
           durationSeconds: veoSceneDuration,
@@ -2111,6 +2152,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
           keepLocal: true,
           outputFilePath: sceneOut,
         })
+        fs.writeFileSync(`${sceneOut}.prompt.txt`, promptSidecar, 'utf8')
         sceneVideoPaths.push(veoResult.localPath || sceneOut)
       }
     } else {
@@ -2218,6 +2260,7 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
 
     compositeResult = await compositeReel({
       videoClips: sceneVideoPaths,
+      clipDurations: sceneVideoPaths.length === beatDurations.length ? beatDurations : undefined,
       voiceoverPath: ttsResult.audioPath,
       words: ttsResult.words,
       outputPath: masterReelPath,
@@ -2368,13 +2411,14 @@ Options:
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without uploading to S3 or Zernio
   --recycle-clips           Assemble reel from pre-existing stored video clips without generating new Veo footage
-  --voice <name>            Fish Audio catalog voice (default: env FISH_VOICE_REFERENCE_ID) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
+  --voice <name>            Fish Audio catalog voice (default: env FISH_VOICE_REFERENCE_ID, else Ethan; "random" rotates) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
   --custom-outro <path>     Path to bespoke elevated outro card image
   --ai-outro                Generate bespoke 3D outro card via Gemini API (needs an image generator)
   --static-outro            Keep the outro as a static card instead of animating the final composite into a Veo clip
+  --no-director             Skip the Gemini shot list and use the curated scene prompts (still continuity-styled)
   --image-model <name>      Image model for AI outro: nano-banana-pro | nano-banana-2 (default: nano-banana-pro)
   --platform <name>         Platform target: all | instagram | youtube (default: all)
   --custom-video <path/url> Path or URL to pre-rendered master video to skip generation
@@ -2410,6 +2454,7 @@ Examples:
   let platform: 'all' | 'instagram' | 'youtube' | undefined
   let aiOutro = false
   let outroClip = true
+  let director = true
   let imageModel: string | undefined
   let ctaTexture: any
 
@@ -2435,6 +2480,7 @@ Examples:
     else if (args[i] === '--platform' && args[i + 1]) platform = args[++i] as any
     else if (args[i] === '--ai-outro') aiOutro = true
     else if (args[i] === '--static-outro') outroClip = false
+    else if (args[i] === '--no-director') director = false
     else if (args[i] === '--image-model' && args[i + 1]) imageModel = args[++i]
   }
 
@@ -2461,6 +2507,7 @@ Examples:
       platform,
       aiOutro,
       outroClip,
+      director,
       imageModel,
     })
   } catch (err: any) {
