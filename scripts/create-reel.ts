@@ -2051,10 +2051,8 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     const numScenes = options.numScenes || Math.max(1, scriptData.scenePrompts.length)
     const perSceneDurationTarget = requiredSpeechDuration / numScenes
     let veoSceneDuration = 6
-    if (perSceneDurationTarget <= 5) {
-      veoSceneDuration = 5
-    } else if (perSceneDurationTarget > 6.2) {
-      veoSceneDuration = 8
+    if (perSceneDurationTarget <= 4.5) {
+      veoSceneDuration = 4
     } else {
       veoSceneDuration = 6
     }
@@ -2063,11 +2061,28 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       console.log(`\n3️⃣ Generating Video Scenes (${numScenes} scenes @ ${veoSceneDuration}s each, target slot: ${perSceneDurationTarget.toFixed(2)}s)...`)
       for (let i = 0; i < scriptData.scenePrompts.length; i++) {
         const prompt = scriptData.scenePrompts[i]
-        console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
         const sceneOut = path.join(tempDir, `veo-scene-${i + 1}.mp4`)
+
+        // Recover recent scene from immediately prior partial run if available
+        if (!fs.existsSync(sceneOut)) {
+          const recentRunDirs = fs
+            .readdirSync(path.resolve(process.cwd(), 'tmp'))
+            .filter((d) => d.startsWith('reel-daily-') && d !== path.basename(tempDir))
+            .sort()
+            .reverse()
+          if (recentRunDirs.length > 0) {
+            const candidateScene = path.join(process.cwd(), 'tmp', recentRunDirs[0], `veo-scene-${i + 1}.mp4`)
+            if (fs.existsSync(candidateScene) && fs.statSync(candidateScene).size > 10000) {
+              fs.copyFileSync(candidateScene, sceneOut)
+              console.log(`♻️  Reusing cached scene ${i + 1} from prior partial run: ${path.basename(recentRunDirs[0])}`)
+            }
+          }
+        }
+
+        console.log(`\n🎬 Rendering Scene ${i + 1}/${scriptData.scenePrompts.length} with Veo 3.1 (${veoSceneDuration}s)...`)
         const veoResult = await generateVeoVideo({
           prompt,
-          model: options.veoModel || 'veo-3.1-lite-generate-preview',
+          model: options.veoModel || 'veo-3.1-fast-generate-preview',
           aspectRatio: '9:16',
           durationSeconds: veoSceneDuration,
           uploadToS3: false,
