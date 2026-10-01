@@ -445,6 +445,31 @@ export function generateSrtSubtitles(words: WordBoundaryEvent[], outputPath: str
   return outputPath
 }
 
+/**
+ * Brand words the voice models misread. "Moltmaxxing" and "Moltmaxxers" are said like a single x,
+ * so the doubled x is dropped before synthesis (any "...maxx..." word).
+ */
+export function applyPronunciations(text: string): string {
+  return text.replace(/(max)x/gi, '$1')
+}
+
+/** Puts the brand spelling back on caption words after synthesis from the respelled text. */
+export function restoreDisplaySpelling(words: WordBoundaryEvent[], originalText: string): WordBoundaryEvent[] {
+  const respelled = new Map<string, string>()
+  for (const token of originalText.split(/\s+/)) {
+    const core = token.replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, '')
+    if (!core) continue
+    const spoken = applyPronunciations(core)
+    if (spoken !== core) respelled.set(spoken.toLowerCase(), core)
+  }
+  if (respelled.size === 0) return words
+  return words.map((w) => {
+    const match = w.word.match(/^([^A-Za-z0-9]*)(.*?)([^A-Za-z0-9]*)$/)
+    const original = match ? respelled.get(match[2].toLowerCase()) : undefined
+    return original && match ? { ...w, word: `${match[1]}${original}${match[3]}` } : w
+  })
+}
+
 function resolveProviderMode(options: TTSGenerationOptions): TTSProviderName {
   if (options.provider) return options.provider
   const fromEnv = (process.env.TTS_PROVIDER || 'auto').toLowerCase()
@@ -473,6 +498,7 @@ export async function generateVoiceover(text: string, options: TTSGenerationOpti
   const timestamp = Date.now()
   const mode = resolveProviderMode(options)
   const providerOptions = toProviderOptions(options, outputDir)
+  const spokenText = applyPronunciations(text)
 
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true })
@@ -482,7 +508,7 @@ export async function generateVoiceover(text: string, options: TTSGenerationOpti
   let providerUsed: 'fish' | 'edge'
 
   if (mode === 'edge') {
-    providerResult = await edgeProvider.synthesize(text, providerOptions)
+    providerResult = await edgeProvider.synthesize(spokenText, providerOptions)
     providerUsed = 'edge'
   } else if (mode === 'fish') {
     if (!isFishConfigured(providerOptions)) {
@@ -490,23 +516,25 @@ export async function generateVoiceover(text: string, options: TTSGenerationOpti
         'TTS_PROVIDER=fish requires FISH_API_KEY and FISH_VOICE_REFERENCE_ID (or referenceId option)'
       )
     }
-    providerResult = await fishProvider.synthesize(text, providerOptions)
+    providerResult = await fishProvider.synthesize(spokenText, providerOptions)
     providerUsed = 'fish'
   } else if (isFishConfigured(providerOptions)) {
     try {
-      providerResult = await fishProvider.synthesize(text, providerOptions)
+      providerResult = await fishProvider.synthesize(spokenText, providerOptions)
       providerUsed = 'fish'
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
       console.warn(`⚠️ Fish Audio TTS failed, falling back to Edge TTS: ${message}`)
-      providerResult = await edgeProvider.synthesize(text, providerOptions)
+      providerResult = await edgeProvider.synthesize(spokenText, providerOptions)
       providerUsed = 'edge'
     }
   } else {
     console.warn('⚠️ Fish Audio not configured (FISH_API_KEY missing); using Edge TTS')
-    providerResult = await edgeProvider.synthesize(text, providerOptions)
+    providerResult = await edgeProvider.synthesize(spokenText, providerOptions)
     providerUsed = 'edge'
   }
+
+  providerResult = { ...providerResult, words: restoreDisplaySpelling(providerResult.words, text) }
 
   const assPath = path.join(outputDir, `subtitles-${timestamp}.ass`)
   const srtPath = path.join(outputDir, `subtitles-${timestamp}.srt`)

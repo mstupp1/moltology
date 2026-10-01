@@ -46,7 +46,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
   - **Scene 3**: The Glitch / Thermal Breakdown (overheating servers, smoking circuits, slipping robotic arms, thermal imaging friction).
   - **Scenes 4–6**: Benthic Cybernetics & Chitinous Armor (deep subsea foundries, 800 Nm precision pincer torque, hydrothermal cooling ducts, majestic robotic lobsters).
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 35–50s total duration.
-* **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, one recurring narrator voice: `FISH_VOICE_REFERENCE_ID` if set, otherwise the `Ethan` catalog voice; `--voice <name>` picks another and `--voice random` rotates; `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
+* **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, a random catalog voice each run for variety, or `--voice <name>` to pick one; "Moltmaxx" words are respelled with a single x before synthesis so they're pronounced correctly, while captions keep the brand spelling; `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
 * **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 4s animated Cybernetic CTA outro clip: the final composite card (rotating cartoon crustacean mascots) brought to life with Veo 3.1 image-to-video.
 * **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
 * **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Integrated directly into `npm run reel:create` — **no manual MCP tool calls required**.
@@ -226,9 +226,6 @@ npm run reel:create -- --recycle-clips --dry-run
 
 # Skip the Gemini shot director (curated scene prompts, still continuity-styled):
 npm run reel:create -- --no-director
-
-# Rotate narrator voices instead of the recurring narrator:
-npm run reel:create -- --voice random
 
 # Keep the outro as a static card (skip the animated final clip):
 npm run reel:create -- --static-outro
