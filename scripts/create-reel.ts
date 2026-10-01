@@ -564,6 +564,9 @@ export function selectRecycledClipSequence(numScenes = 6, topic = '', theme = ''
  */
 export const OUTRO_CLIP_DURATION_SECONDS = 4
 
+/** Default reel narrator (Fish catalog name), picked by Myles on 2026-10-01. */
+export const REEL_NARRATOR_VOICE = 'BOOK RECORD REGULAR'
+
 /**
  * The animated outro needs Veo, so it only runs when Veo renders the scenes.
  * Recycled-clip runs and dry runs keep the static card.
@@ -2061,8 +2064,12 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
   } else {
     // 2. Synthesize Voiceover & Word Boundaries
     console.log(`\n2️⃣ Synthesizing Neural Voiceover & Kinetic Timestamps (Fish Audio S2, Edge fallback)...`)
-    const voice = options.voice || getRandomFishVoice()
-    console.log(`   • Voice Persona: "${voice}"`)
+    // Default narrator voice; `--voice random` rotates through the catalog, FISH_VOICE_REFERENCE_ID overrides the default.
+    const voice =
+      options.voice === 'random'
+        ? getRandomFishVoice()
+        : options.voice || (process.env.FISH_VOICE_REFERENCE_ID ? undefined : REEL_NARRATOR_VOICE)
+    console.log(`   • Voice Persona: "${voice || 'FISH_VOICE_REFERENCE_ID'}"`)
     const ttsResult = await generateVoiceover(scriptData.narrationScript, {
       voice,
       rate: '+12%',
@@ -2404,7 +2411,7 @@ Options:
   --no-veo                  Skip Google Veo rendering (use local benthic footage)
   --dry-run                 Local test without uploading to S3 or Zernio
   --recycle-clips           Assemble reel from pre-existing stored video clips without generating new Veo footage
-  --voice <name>            Fish Audio catalog voice (default: env FISH_VOICE_REFERENCE_ID) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
+  --voice <name>            Fish Audio catalog voice (default: BOOK RECORD REGULAR, or env FISH_VOICE_REFERENCE_ID; "random" rotates) or Edge TTS voice for fallback (default: en-US-ChristopherNeural). Fish voices: Ethan, Mommy, Just Many, Twilight Sparkle, Young Creative Voice, Friendly Young Woman, Laura, BOOK RECORD REGULAR, Friendly Young Female
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
