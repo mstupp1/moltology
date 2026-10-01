@@ -33,11 +33,22 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
     throw new Error('Missing API key in environment variables (GEMINI_API_KEY or VERTEX_API_KEY).')
   }
 
-  const model = options.model || 'veo-3.1-lite-generate-preview'
+  const model = options.model || 'veo-3.1-fast-generate-preview'
   const aspectRatio = options.aspectRatio || '9:16'
   const durationSeconds = options.durationSeconds || 6
   const uploadToS3 = options.uploadToS3 ?? true
   const bucket = options.bucket || DEFAULT_BUCKET
+
+  if (options.outputFilePath && fs.existsSync(options.outputFilePath) && fs.statSync(options.outputFilePath).size > 10000) {
+    console.log(`\n✓ Video scene already exists locally at: ${options.outputFilePath}`)
+    return {
+      localPath: options.outputFilePath,
+      operationName: 'cached',
+      model,
+      durationSeconds,
+      aspectRatio,
+    }
+  }
 
   console.log(`\n🎬 Initiating video generation...`)
   console.log(`   • Model: ${model}`)
@@ -45,57 +56,83 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
   console.log(`   • Duration: ${durationSeconds}s`)
   console.log(`   • Prompt: "${options.prompt}"`)
 
-  // 1. Submit long-running prediction request
-  const submitUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predictLongRunning?key=${apiKey}`
-  const submitResponse = await fetch(submitUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      instances: [{ prompt: options.prompt }],
-      parameters: {
-        aspectRatio,
-        durationSeconds,
-      },
-    }),
-  })
-
-  if (!submitResponse.ok) {
-    const errText = await submitResponse.text()
-    throw new Error(`Failed to submit video generation request (${submitResponse.status}): ${errText}`)
-  }
-
-  const submitData = (await submitResponse.json()) as { name: string }
-  const operationName = submitData.name
-  console.log(`⏳ Operation started: ${operationName}`)
-
-  // 2. Poll operation status until done
-  const pollUrl = `https://generativelanguage.googleapis.com/v1beta/${operationName}?key=${apiKey}`
   let downloadUri: string | null = null
+  let operationName = ''
+  const maxAttempts = 4
 
-  const startTime = Date.now()
-  while (!downloadUri) {
-    await new Promise((res) => setTimeout(res, 5000))
-    const elapsed = Math.round((Date.now() - startTime) / 1000)
-    process.stdout.write(`\r⏳ Rendering video... (${elapsed}s elapsed)`)
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      // 1. Submit long-running prediction request
+      const submitUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predictLongRunning?key=${apiKey}`
+      const submitResponse = await fetch(submitUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instances: [{ prompt: options.prompt }],
+          parameters: {
+            aspectRatio,
+            durationSeconds,
+          },
+        }),
+      })
 
-    const pollResponse = await fetch(pollUrl)
-    if (!pollResponse.ok) {
-      const errText = await pollResponse.text()
-      throw new Error(`\nPolling failed (${pollResponse.status}): ${errText}`)
-    }
-
-    const pollData = (await pollResponse.json()) as any
-    if (pollData.error) {
-      throw new Error(`\nVideo generation failed: ${JSON.stringify(pollData.error)}`)
-    }
-
-    if (pollData.done) {
-      const samples = pollData.response?.generateVideoResponse?.generatedSamples
-      if (samples && samples.length > 0 && samples[0].video?.uri) {
-        downloadUri = samples[0].video.uri
-      } else {
-        throw new Error(`\nOperation marked done but no video URI was returned: ${JSON.stringify(pollData)}`)
+      if (!submitResponse.ok) {
+        const errText = await submitResponse.text()
+        throw new Error(`Failed to submit video generation request (${submitResponse.status}): ${errText}`)
       }
+
+      const submitData = (await submitResponse.json()) as { name: string }
+      operationName = submitData.name
+      console.log(`⏳ Operation started (attempt ${attempt}/${maxAttempts}): ${operationName}`)
+
+      // 2. Poll operation status until done
+      const pollUrl = `https://generativelanguage.googleapis.com/v1beta/${operationName}?key=${apiKey}`
+
+      const startTime = Date.now()
+      while (!downloadUri) {
+        await new Promise((res) => setTimeout(res, 5000))
+        const elapsed = Math.round((Date.now() - startTime) / 1000)
+        process.stdout.write(`\r⏳ Rendering video... (${elapsed}s elapsed)`)
+
+        const pollResponse = await fetch(pollUrl)
+        if (!pollResponse.ok) {
+          const errText = await pollResponse.text()
+          throw new Error(`\nPolling failed (${pollResponse.status}): ${errText}`)
+        }
+
+        const pollData = (await pollResponse.json()) as any
+        if (pollData.error) {
+          throw new Error(`\nVideo generation failed: ${JSON.stringify(pollData.error)}`)
+        }
+
+        if (pollData.done) {
+          const samples = pollData.response?.generateVideoResponse?.generatedSamples
+          if (samples && samples.length > 0 && samples[0].video?.uri) {
+            downloadUri = samples[0].video.uri
+          } else {
+            throw new Error(`\nOperation marked done but no video URI was returned: ${JSON.stringify(pollData)}`)
+          }
+        }
+      }
+
+      break
+    } catch (err: any) {
+      if (
+        attempt < maxAttempts &&
+        (err.message.includes('code":13') ||
+          err.message.includes('13') ||
+          err.message.includes('internal server issue') ||
+          err.message.includes('503') ||
+          err.message.includes('429') ||
+          err.message.includes('RESOURCE_EXHAUSTED'))
+      ) {
+        const isRateLimit = err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED')
+        const backoffSeconds = isRateLimit ? 25 : 6
+        console.warn(`\n⚠️ Veo generation hit transient issue (${isRateLimit ? 'Rate limit / 429' : err.message.slice(0, 80)}). Retrying in ${backoffSeconds}s (attempt ${attempt + 1}/${maxAttempts})...`)
+        await new Promise((res) => setTimeout(res, backoffSeconds * 1000))
+        continue
+      }
+      throw err
     }
   }
 

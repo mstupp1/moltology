@@ -63,6 +63,7 @@ import {
   computeStreak,
   shiftDays,
   localDateString,
+  isAlignmentDateWritable,
   type AlignmentTaskItem,
 } from '../alignment-tasks'
 import {
@@ -3417,18 +3418,23 @@ export const toggleDailyAlignmentTaskHandler = async ({
   const { taskKey, completed, date } = toggleDailyAlignmentSchema.parse(data)
   const { userId, dbClient } = auth
 
+  const targetTask = CANONICAL_ALIGNMENT_TASKS.find((t) => t.key === taskKey)
+  if (!targetTask) {
+    throw new Error(`Invalid liturgy identifier: ${taskKey}`)
+  }
+  if (!isAlignmentDateWritable(date)) {
+    throw new Error(
+      'That date is outside the allowed window. Check off liturgies for yesterday, today, or tomorrow.'
+    )
+  }
+  const taskTitle = targetTask.title || taskKey
+
   const [beforeProfile] = await dbClient
     .select({ stage: profiles.stage })
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
   const previousStage = beforeProfile?.stage ?? 1
-
-  const targetTask = CANONICAL_ALIGNMENT_TASKS.find((t) => t.key === taskKey)
-  if (!targetTask) {
-    throw new Error(`Invalid liturgy identifier: ${taskKey}`)
-  }
-  const taskTitle = targetTask.title || taskKey
 
   if (completed) {
     await dbClient

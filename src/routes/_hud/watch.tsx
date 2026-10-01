@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { GuestLockGuard } from '@/components/hud/GuestLockGuard'
+import { AdminAccessGuard } from '@/components/admin/AdminAccessGuard'
 import { HudWorkspaceGhost } from '@/components/hud/HudGhostSkeletons'
 import { privatePageSeo, xRobotsNoindexHeaders } from '@/lib/seo'
 
@@ -10,14 +10,11 @@ const LazyCovenantWatchPage = lazy(() =>
 
 function CovenantWatchRoute() {
   return (
-    <GuestLockGuard
-      featureName="Covenant Watch"
-      message="Covenant Watch is a signed-in steward ledger. Create a free account to continue."
-    >
+    <AdminAccessGuard skeleton={<HudWorkspaceGhost />}>
       <Suspense fallback={<HudWorkspaceGhost />}>
         <LazyCovenantWatchPage />
       </Suspense>
-    </GuestLockGuard>
+    </AdminAccessGuard>
   )
 }
 

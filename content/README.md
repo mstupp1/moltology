@@ -47,7 +47,7 @@ When an agent is asked to **"run blog creation process"**, it follows this loop:
    - Confirm article and rendered HUD figures are live on `https://moltology.org/news/<slug>`.
 6. **Companion Social Distribution (Optional & Decoupled)**:
    - To create an accompanying 3-slide Instagram carousel, use [`.agents/skills/instagram-carousel-creator/SKILL.md`](../.agents/skills/instagram-carousel-creator/SKILL.md) (`npm run carousel:create -- --article <slug>`).
-   - To create companion reels/shorts or lead magnets, see [`.agents/skills/daily-reels-and-shorts-creator/SKILL.md`](../.agents/skills/daily-reels-and-shorts-creator/SKILL.md) and [`.agents/skills/instagram-post-creator/SKILL.md`](../.agents/skills/instagram-post-creator/SKILL.md).
+   - To create companion reels/shorts or lead magnets, see [`.agents/skills/reels-and-shorts-creator/SKILL.md`](../.agents/skills/reels-and-shorts-creator/SKILL.md) and [`.agents/skills/instagram-post-creator/SKILL.md`](../.agents/skills/instagram-post-creator/SKILL.md).
 
 ---
 

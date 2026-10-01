@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { PremiumBadge } from '@/components/hud/PremiumBadge'
 import { useOptionalToast } from '@/components/ui/ToastProvider'
+import { useHiddenPageAccess } from '@/hooks/useHiddenPageAccess'
 import { useHudPersist } from '@/hooks/useHudPersist'
 import { getAuthJWTToken } from '@/lib/jwt'
 import { PREMIUM_PAGE_COPY, premiumStatusMessage } from '@/lib/premium-membership'
@@ -13,6 +14,7 @@ type Membership = {
 
 export function PremiumSettingsSection() {
   const persist = useHudPersist()
+  const access = useHiddenPageAccess()
   const toast = useOptionalToast()
   const toastRef = useRef(toast)
   toastRef.current = toast
@@ -83,28 +85,30 @@ export function PremiumSettingsSection() {
         {membership.isPremium ? <PremiumBadge /> : null}
       </div>
       <p className="text-xs text-[#839493]">{premiumStatusMessage(membership)}</p>
-      {membership.isPremium ? (
-        <button
-          type="button"
-          onClick={() => void update('cancel')}
-          disabled={busy !== null}
-          className="px-4 py-2 border border-[#3a4a49] hover:border-[#00c3ff]/50 text-[#dfe3e3] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40"
-        >
-          {busy === 'cancel' ? 'Canceling' : PREMIUM_PAGE_COPY.cancel}
-        </button>
-      ) : (
-        <div className="space-y-2">
-          <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.activateHint}</p>
+      {access.canView ? (
+        membership.isPremium ? (
           <button
             type="button"
-            onClick={() => void update('grant')}
+            onClick={() => void update('cancel')}
             disabled={busy !== null}
-            className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40"
+            className="px-4 py-2 border border-[#3a4a49] hover:border-[#00c3ff]/50 text-[#dfe3e3] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40"
           >
-            {busy === 'grant' ? 'Activating' : PREMIUM_PAGE_COPY.purchase}
+            {busy === 'cancel' ? 'Canceling' : PREMIUM_PAGE_COPY.cancel}
           </button>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.activateHint}</p>
+            <button
+              type="button"
+              onClick={() => void update('grant')}
+              disabled={busy !== null}
+              className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40"
+            >
+              {busy === 'grant' ? 'Activating' : PREMIUM_PAGE_COPY.purchase}
+            </button>
+          </div>
+        )
+      ) : null}
     </section>
   )
 }

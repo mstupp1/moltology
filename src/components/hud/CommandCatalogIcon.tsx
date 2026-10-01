@@ -19,6 +19,7 @@ import {
   ShieldAlert,
   Newspaper,
   Eye,
+  ShieldCheck,
   Settings,
   User,
 } from 'lucide-react'
@@ -68,6 +69,8 @@ export function CommandCatalogIcon({ icon }: { icon: CommandIconId }) {
       return <Newspaper className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'watch':
       return <Eye className={`${ICON_CLASS} text-[#00ffff]`} />
+    case 'admin':
+      return <ShieldCheck className={`${ICON_CLASS} text-[#00ffff]`} />
     case 'settings':
       return <Settings className={`${ICON_CLASS} text-cyan-400`} />
     case 'profile':

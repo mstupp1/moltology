@@ -9,22 +9,16 @@ vi.mock('@tanstack/react-router', () => ({
   }),
 }))
 
-vi.mock('@/components/hud/GuestLockGuard', () => ({
-  GuestLockGuard: ({ featureName }: { featureName?: string }) => (
-    <div data-testid="guest-lock">{featureName}</div>
-  ),
-}))
-
-vi.mock('@/components/forum/CovenantWatchPage', () => ({
-  CovenantWatchPage: () => <div data-testid="covenant-watch">Covenant Watch</div>,
+vi.mock('@/components/admin/AdminAccessGuard', () => ({
+  AdminAccessGuard: () => <div data-testid="admin-access-guard" />,
 }))
 
 import { Route } from './watch'
 
 describe('Covenant Watch route', () => {
-  it('gates the steward ledger behind a signed-in shell', () => {
+  it('gates the steward ledger behind the admin access guard', () => {
     const Page = Route.options.component!
     render(<Page />)
-    expect(screen.getByTestId('guest-lock')).toHaveTextContent('Covenant Watch')
+    expect(screen.getByTestId('admin-access-guard')).toBeInTheDocument()
   })
 })

@@ -80,6 +80,9 @@ export const CANONICAL_ALIGNMENT_TASKS: CanonicalAlignmentTask[] = [
 
 export const TOTAL_ALIGNMENT_TASKS = CANONICAL_ALIGNMENT_TASKS.length
 
+/** Days before and after the server's today that a member may check off. */
+export const ALIGNMENT_WRITE_WINDOW_DAYS = 1
+
 /**
  * Returns YYYY-MM-DD for the given Date object in the client's local timezone.
  */
@@ -108,6 +111,18 @@ export function shiftDays(dateStr: string, days: number): string {
   const date = parseLocalDate(dateStr)
   date.setDate(date.getDate() + days)
   return localDateString(date)
+}
+
+/**
+ * True when `date` is within today ± ALIGNMENT_WRITE_WINDOW_DAYS.
+ * `now` is the server clock. Read paths may still request older dates.
+ */
+export function isAlignmentDateWritable(date: string, now: Date = new Date()): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false
+  const today = localDateString(now)
+  const earliest = shiftDays(today, -ALIGNMENT_WRITE_WINDOW_DAYS)
+  const latest = shiftDays(today, ALIGNMENT_WRITE_WINDOW_DAYS)
+  return date >= earliest && date <= latest
 }
 
 /**

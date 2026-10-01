@@ -19,4 +19,25 @@ describe('Changelogs API & Seed Data', () => {
   it('exposes getChangelogBySlug function', () => {
     expect(typeof getChangelogBySlug).toBe('function')
   })
+
+  it('ensures all INITIAL_CHANGELOGS have valid schema and are sorted chronologically', () => {
+    const validCategories = new Set(['Feature', 'Improvement', 'Fix', 'Performance', 'Security', 'Design'])
+
+    for (let i = 0; i < INITIAL_CHANGELOGS.length; i++) {
+      const entry = INITIAL_CHANGELOGS[i]
+      expect(entry.slug).toMatch(/^[a-z0-9-]+$/)
+      expect(entry.title).toBeTruthy()
+      expect(entry.summary).toBeTruthy()
+      expect(entry.content).toBeTruthy()
+      expect(validCategories.has(entry.category)).toBe(true)
+      expect(new Date(entry.releasedAt).getTime()).not.toBeNaN()
+
+      if (i > 0) {
+        const prev = INITIAL_CHANGELOGS[i - 1]
+        expect(new Date(prev.releasedAt).getTime()).toBeGreaterThanOrEqual(
+          new Date(entry.releasedAt).getTime()
+        )
+      }
+    }
+  })
 })

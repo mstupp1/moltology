@@ -42,6 +42,7 @@ const COMMAND_ICONS = new Set<CommandIconId>([
   'isolation',
   'news',
   'watch',
+  'admin',
   'settings',
   'profile',
 ])

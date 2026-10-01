@@ -993,46 +993,108 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     }
   }
 
-  // 7. Build FFmpeg filter graph for Watermark + Kinetic Overlays
-  // Input 0: base video
-  // Input 1: watermark PNG
-  // Inputs 2...N: caption PNGs
-  const ffmpegInputs: string[] = ['-y', '-i', baseVideoPath, '-loop', '1', '-i', watermarkPngPath]
-
-  overlayEvents.forEach((ev) => {
-    ffmpegInputs.push('-loop', '1', '-i', ev.pngPath)
-  })
-
-  // Filter complex construction: Watermark stays up until CTA outro begins
-  let filterStr = `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1]`
-  let lastOut = 'v1'
-
-  overlayEvents.forEach((ev, idx) => {
-    const inStreamIndex = idx + 2
-    const currentOut = `v${idx + 2}`
-    filterStr += `;[${lastOut}][${inStreamIndex}:v]overlay=0:0:enable='between(t,${ev.startSec.toFixed(3)},${ev.endSec.toFixed(3)})'[${currentOut}]`
-    lastOut = currentOut
-  })
-
+  // 7. Fast Streamlined FFmpeg Compositing for Watermark + Kinetic Captions
+  // Instead of chaining hundreds of individual image overlays in filter_complex (which causes pathological CPU lag),
+  // we assemble the kinetic caption cards into a single timed stream using the FFmpeg concat demuxer,
+  // reducing the entire overlay filter to a constant 2 layers for sub-10s rendering.
   const videoWithOverlaysPath = path.join(tempDir, 'video-with-overlays.mp4')
-  console.log(`   • Compositing brand watermark + kinetic captions onto video...`)
+  console.log(`   • Compositing brand watermark + kinetic captions onto video (streamlined 2-layer pipeline)...`)
 
-  await runFfmpeg([
-    ...ffmpegInputs,
-    '-filter_complex',
-    filterStr,
-    '-map',
-    `[${lastOut}]`,
-    '-t',
-    totalVideoDuration.toString(),
-    '-c:v',
-    'libx264',
-    '-pix_fmt',
-    'yuv420p',
-    '-r',
-    '30',
-    videoWithOverlaysPath,
-  ])
+  if (overlayEvents.length === 0) {
+    await runFfmpeg([
+      '-y',
+      '-i',
+      baseVideoPath,
+      '-loop',
+      '1',
+      '-i',
+      watermarkPngPath,
+      '-filter_complex',
+      `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[out]`,
+      '-map',
+      '[out]',
+      '-t',
+      totalVideoDuration.toString(),
+      '-c:v',
+      'libx264',
+      '-preset',
+      'fast',
+      '-crf',
+      '22',
+      '-pix_fmt',
+      'yuv420p',
+      '-r',
+      '30',
+      videoWithOverlaysPath,
+    ])
+  } else {
+    // Generate transparent blank card for gaps
+    const emptyPngPath = path.join(tempDir, 'empty-transparent.png')
+    const emptyCanvas = createCanvas(1080, 1920)
+    fs.writeFileSync(emptyPngPath, emptyCanvas.toBuffer('image/png'))
+
+    // Generate ffconcat demuxer script with exact word timestamps
+    const concatFilePath = path.join(tempDir, 'captions-concat.txt')
+    const concatLines: string[] = ['ffconcat version 1.0']
+
+    let currentTimelineSec = 0
+    for (const ev of overlayEvents) {
+      const gap = ev.startSec - currentTimelineSec
+      if (gap > 0.005) {
+        concatLines.push(`file 'empty-transparent.png'`)
+        concatLines.push(`duration ${gap.toFixed(3)}`)
+      }
+      const dur = Math.max(0.04, ev.endSec - ev.startSec)
+      concatLines.push(`file '${path.basename(ev.pngPath)}'`)
+      concatLines.push(`duration ${dur.toFixed(3)}`)
+      currentTimelineSec = ev.endSec
+    }
+
+    const remaining = totalVideoDuration - currentTimelineSec
+    if (remaining > 0.005) {
+      concatLines.push(`file 'empty-transparent.png'`)
+      concatLines.push(`duration ${remaining.toFixed(3)}`)
+      concatLines.push(`file 'empty-transparent.png'`)
+    } else {
+      const lastFile = path.basename(overlayEvents[overlayEvents.length - 1].pngPath)
+      concatLines.push(`file '${lastFile}'`)
+    }
+
+    fs.writeFileSync(concatFilePath, concatLines.join('\n'), 'utf8')
+
+    await runFfmpeg([
+      '-y',
+      '-i',
+      baseVideoPath,
+      '-loop',
+      '1',
+      '-i',
+      watermarkPngPath,
+      '-f',
+      'concat',
+      '-safe',
+      '0',
+      '-i',
+      concatFilePath,
+      '-filter_complex',
+      `[0:v][1:v]overlay=0:0:enable='between(t,0,${totalSceneDuration})'[v1];[v1][2:v]overlay=0:0:shortest=1[out]`,
+      '-map',
+      '[out]',
+      '-t',
+      totalVideoDuration.toString(),
+      '-c:v',
+      'libx264',
+      '-preset',
+      'fast',
+      '-crf',
+      '22',
+      '-pix_fmt',
+      'yuv420p',
+      '-r',
+      '30',
+      videoWithOverlaysPath,
+    ])
+  }
 
   // 8. Mix Audio: Voiceover + Ducked Background Music
   const bgAudioPath =

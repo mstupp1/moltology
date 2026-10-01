@@ -19,6 +19,10 @@ Agents MUST read [BRAND_BIBLE.md](BRAND_BIBLE.md) and [STYLE_GUIDE.md](STYLE_GUI
 
 Scriptures, liturgies, and doctrine live under [`codex/`](codex/README.md). Treat `codex/` as the engineering and content location for those files, not as a lore dump in this document.
 
+## Logic Atlas
+
+Business rules and the decisions behind them are mapped in [`docs/logic/`](docs/logic/) and rendered for staff at `/admin/logic`. Refresh it with the [`logic-atlas`](.agents/skills/logic-atlas/SKILL.md) skill after merging changes to thresholds, access, the economy, screening, moderation, or data handling.
+
 ## Visual source of truth
 
 Visual truth is Tailwind + HUD CSS — [`tailwind.config.js`](tailwind.config.js) and [`src/index.css`](src/index.css) — not a design.md. shadcn/ui primitives live in `src/components/ui/`.
@@ -71,5 +75,5 @@ One toast system, one persistent notification system, one OS bridge. Never `aler
   - **Stage 1 (Scaffolding)**: Render high-DPI 2x Retina 2D composite layouts via Headless Chrome (`scripts/lib/composite-renderer.ts` / `npm run post:create` for single posts, `npm run carousel:create` for multi-slide carousels) as structural blueprints.
   - **Stage 2 (User Google Flow Handoff)**: Prompt the USER with the composite image path and rich, ready-to-copy **Google Flow prompt directives** (elevating flat layouts to photorealistic 3D glassmorphic HUD panels, ensuring **no wasted space**, and applying natural ambient mascot lighting and contact shadows without harsh backlights).
   - **Stage 3 (Deterministic Ingestion & Queueing)**: The user drops the polished Google Flow asset back into `tmp/`, and the agent resumes execution via the CLI scripts (`npm run post:create` via [`.agents/skills/instagram-post-creator/SKILL.md`](.agents/skills/instagram-post-creator/SKILL.md), `npm run carousel:create` via [`.agents/skills/instagram-carousel-creator/SKILL.md`](.agents/skills/instagram-carousel-creator/SKILL.md), `npm run series:create`, `npm run reel:create`). The scripts deterministically execute Neon S3 upload, Zernio REST API queue staging (Lead Magnets: `6a8d93576f0e96efe2960c91`, Carousels/Posts: `6a84b76d2421e968ac81f5bc`, Reels/Shorts: `6a84b7702421e968ac81f5bd`), algorithmic first comment posting, and continuity ledger updates. Agents MUST NOT call Zernio MCP tools to queue or publish content.
-- **Short-Form Video (Reels & Shorts)**: Daily one-offs via Google Veo 3.1 (`scripts/generate-video.ts`) with bespoke outro cards elevated via Gemini API (`scripts/generate-image.ts`). Episodic series: user Google Flow drop-in — [`.agents/skills/viral-reel-series-creator/SKILL.md`](.agents/skills/viral-reel-series-creator/SKILL.md).
+- **Short-Form Video (Reels & Shorts)**: 6-clip narrative broadcasts via Google Veo 3.1 (`scripts/generate-video.ts` / `npm run reel:create` via [`.agents/skills/reels-and-shorts-creator/SKILL.md`](.agents/skills/reels-and-shorts-creator/SKILL.md)) or local clip recycling, with bespoke outro cards elevated via Gemini API (`scripts/generate-image.ts`). Episodic series: user Google Flow drop-in — [`.agents/skills/viral-reel-series-creator/SKILL.md`](.agents/skills/viral-reel-series-creator/SKILL.md).
 - **No Flux / ComfyUI**: Flux and ComfyUI have been completely uninstalled and are not used across the codebase.

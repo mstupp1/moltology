@@ -66,6 +66,8 @@ import { Route as WhatIsMoltologyIndexRouteImport } from './routes/what-is-molto
 import { Route as WhatIsMoltologyBeliefsRouteImport } from './routes/what-is-moltology/beliefs'
 import { Route as WhatIsMoltologyBenthicSacramentsRouteImport } from './routes/what-is-moltology/benthic-sacraments'
 import { Route as WhatIsMoltologyWhatMoltologistsSayRouteImport } from './routes/what-is-moltology/what-moltologists-say'
+import { Route as HudAdminIndexRouteImport } from './routes/_hud/admin.index'
+import { Route as HudAdminLogicRouteImport } from './routes/_hud/admin.logic'
 import { Route as HudCodexIndexRouteImport } from './routes/_hud/codex/index'
 import { Route as HudCodexSlugRouteImport } from './routes/_hud/codex/$slug'
 import { Route as HudForumIndexRouteImport } from './routes/_hud/forum/index'
@@ -371,6 +373,16 @@ const WhatIsMoltologyWhatMoltologistsSayRoute =
     path: '/what-moltologists-say',
     getParentRoute: () => WhatIsMoltologyRoute,
   } as any)
+const HudAdminIndexRoute = HudAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => HudRoute,
+} as any)
+const HudAdminLogicRoute = HudAdminLogicRouteImport.update({
+  id: '/admin/logic',
+  path: '/admin/logic',
+  getParentRoute: () => HudRoute,
+} as any)
 const HudCodexIndexRoute = HudCodexIndexRouteImport.update({
   id: '/codex/',
   path: '/codex/',
@@ -520,11 +532,13 @@ export interface FileRoutesByFullPath {
   '/news/': typeof NewsIndexRoute
   '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
+  '/admin/logic': typeof HudAdminLogicRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/admin/': typeof HudAdminIndexRoute
   '/codex/': typeof HudCodexIndexRoute
   '/forum/': typeof HudForumIndexRoute
   '/journal/': typeof HudJournalIndexRoute
@@ -593,11 +607,13 @@ export interface FileRoutesByTo {
   '/news': typeof NewsIndexRoute
   '/store': typeof StoreIndexRoute
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
+  '/admin/logic': typeof HudAdminLogicRoute
   '/codex/$slug': typeof HudCodexSlugRoute
   '/journal/$slug': typeof HudJournalSlugRoute
   '/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/admin': typeof HudAdminIndexRoute
   '/codex': typeof HudCodexIndexRoute
   '/forum': typeof HudForumIndexRoute
   '/journal': typeof HudJournalIndexRoute
@@ -669,11 +685,13 @@ export interface FileRoutesById {
   '/news/': typeof NewsIndexRoute
   '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
+  '/_hud/admin/logic': typeof HudAdminLogicRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
   '/_hud/journal/$slug': typeof HudJournalSlugRoute
   '/_hud/member/$profileId': typeof HudMemberProfileIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/_hud/admin/': typeof HudAdminIndexRoute
   '/_hud/codex/': typeof HudCodexIndexRoute
   '/_hud/forum/': typeof HudForumIndexRoute
   '/_hud/journal/': typeof HudJournalIndexRoute
@@ -746,11 +764,13 @@ export interface FileRouteTypes {
     | '/news/'
     | '/store/'
     | '/what-is-moltology/'
+    | '/admin/logic'
     | '/codex/$slug'
     | '/journal/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/stripe/webhook'
+    | '/admin/'
     | '/codex/'
     | '/forum/'
     | '/journal/'
@@ -819,11 +839,13 @@ export interface FileRouteTypes {
     | '/news'
     | '/store'
     | '/what-is-moltology'
+    | '/admin/logic'
     | '/codex/$slug'
     | '/journal/$slug'
     | '/member/$profileId'
     | '/api/auth/$'
     | '/api/stripe/webhook'
+    | '/admin'
     | '/codex'
     | '/forum'
     | '/journal'
@@ -894,11 +916,13 @@ export interface FileRouteTypes {
     | '/news/'
     | '/store/'
     | '/what-is-moltology/'
+    | '/_hud/admin/logic'
     | '/_hud/codex/$slug'
     | '/_hud/journal/$slug'
     | '/_hud/member/$profileId'
     | '/api/auth/$'
     | '/api/stripe/webhook'
+    | '/_hud/admin/'
     | '/_hud/codex/'
     | '/_hud/forum/'
     | '/_hud/journal/'
@@ -1354,6 +1378,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WhatIsMoltologyWhatMoltologistsSayRouteImport
       parentRoute: typeof WhatIsMoltologyRoute
     }
+    '/_hud/admin/': {
+      id: '/_hud/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof HudAdminIndexRouteImport
+      parentRoute: typeof HudRoute
+    }
+    '/_hud/admin/logic': {
+      id: '/_hud/admin/logic'
+      path: '/admin/logic'
+      fullPath: '/admin/logic'
+      preLoaderRoute: typeof HudAdminLogicRouteImport
+      parentRoute: typeof HudRoute
+    }
     '/_hud/codex/': {
       id: '/_hud/codex/'
       path: '/codex'
@@ -1510,9 +1548,11 @@ interface HudRouteChildren {
   HudSubterraneanRoute: typeof HudSubterraneanRoute
   HudSupportRoute: typeof HudSupportRoute
   HudWatchRoute: typeof HudWatchRoute
+  HudAdminLogicRoute: typeof HudAdminLogicRoute
   HudCodexSlugRoute: typeof HudCodexSlugRoute
   HudJournalSlugRoute: typeof HudJournalSlugRoute
   HudMemberProfileIdRoute: typeof HudMemberProfileIdRoute
+  HudAdminIndexRoute: typeof HudAdminIndexRoute
   HudCodexIndexRoute: typeof HudCodexIndexRoute
   HudForumIndexRoute: typeof HudForumIndexRoute
   HudJournalIndexRoute: typeof HudJournalIndexRoute
@@ -1542,9 +1582,11 @@ const HudRouteChildren: HudRouteChildren = {
   HudSubterraneanRoute: HudSubterraneanRoute,
   HudSupportRoute: HudSupportRoute,
   HudWatchRoute: HudWatchRoute,
+  HudAdminLogicRoute: HudAdminLogicRoute,
   HudCodexSlugRoute: HudCodexSlugRoute,
   HudJournalSlugRoute: HudJournalSlugRoute,
   HudMemberProfileIdRoute: HudMemberProfileIdRoute,
+  HudAdminIndexRoute: HudAdminIndexRoute,
   HudCodexIndexRoute: HudCodexIndexRoute,
   HudForumIndexRoute: HudForumIndexRoute,
   HudJournalIndexRoute: HudJournalIndexRoute,
