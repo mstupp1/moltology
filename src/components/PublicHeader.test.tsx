@@ -39,10 +39,23 @@ describe('PublicHeader Navigation Component', () => {
     const storeLink = within(nav).getByRole('link', { name: /STORE/i })
     expect(storeLink).toBeInTheDocument()
     expect(storeLink).toHaveAttribute('href', 'https://www.etsy.com/shop/SaasTrash')
+    expect(storeLink).toHaveAttribute('target', '_blank')
 
     // Confirm that SCAN and NEW badges are not rendered in navigation
     expect(screen.queryByText('SCAN')).not.toBeInTheDocument()
     expect(screen.queryByText('NEW')).not.toBeInTheDocument()
+  })
+
+  it('points STORE at the on-site catalog for admins', () => {
+    vi.mocked(authClient.useSession).mockReturnValue({
+      data: { user: { id: 'admin-1', email: 'ops@example.com', role: 'admin' } },
+      isPending: false,
+    } as never)
+    render(<PublicHeader activePage="home" />)
+    const nav = screen.getByRole('navigation', { name: /main navigation/i })
+    expect(within(nav).queryByRole('link', { name: /STORE/i })).not.toBeInTheDocument()
+    expect(within(nav).getByRole('button', { name: /STORE/i })).toBeInTheDocument()
+    vi.mocked(authClient.useSession).mockReturnValue({ data: null, isPending: false } as never)
   })
 
   it('highlights correct navigation links based on activePage or current route', () => {

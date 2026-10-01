@@ -31,6 +31,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StoreRouteImport } from './routes/store'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TermsDotmdRouteImport } from './routes/terms[.]md'
 import { Route as WhatIsMoltologyRouteImport } from './routes/what-is-moltology'
@@ -59,6 +60,8 @@ import { Route as NewsIndexRouteImport } from './routes/news/index'
 import { Route as NewsSlugRouteImport } from './routes/news/$slug'
 import { Route as NewsChar123slugChar125DotmdRouteImport } from './routes/news/{$slug}[.]md'
 import { Route as RenderCompositeRouteImport } from './routes/render/composite'
+import { Route as StoreIndexRouteImport } from './routes/store/index'
+import { Route as StoreSlugRouteImport } from './routes/store/$slug'
 import { Route as WhatIsMoltologyIndexRouteImport } from './routes/what-is-moltology/index'
 import { Route as WhatIsMoltologyBeliefsRouteImport } from './routes/what-is-moltology/beliefs'
 import { Route as WhatIsMoltologyBenthicSacramentsRouteImport } from './routes/what-is-moltology/benthic-sacraments'
@@ -190,6 +193,11 @@ const SignupRoute = SignupRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreRoute = StoreRouteImport.update({
+  id: '/store',
+  path: '/store',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -332,6 +340,16 @@ const RenderCompositeRoute = RenderCompositeRouteImport.update({
   id: '/render/composite',
   path: '/render/composite',
   getParentRoute: () => rootRouteImport,
+} as any)
+const StoreIndexRoute = StoreIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StoreRoute,
+} as any)
+const StoreSlugRoute = StoreSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StoreRoute,
 } as any)
 const WhatIsMoltologyIndexRoute = WhatIsMoltologyIndexRouteImport.update({
   id: '/',
@@ -479,6 +497,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/store': typeof StoreRouteWithChildren
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
@@ -504,12 +523,14 @@ export interface FileRoutesByFullPath {
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
+  '/store/$slug': typeof StoreSlugRoute
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/codex/$slug': typeof HudCodexSlugRoute
@@ -577,12 +598,14 @@ export interface FileRoutesByTo {
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
+  '/store/$slug': typeof StoreSlugRoute
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog': typeof BlogIndexRoute
   '/changelog': typeof ChangelogIndexRoute
   '/news': typeof NewsIndexRoute
+  '/store': typeof StoreIndexRoute
   '/what-is-moltology': typeof WhatIsMoltologyIndexRoute
   '/admin/logic': typeof HudAdminLogicRoute
   '/codex/$slug': typeof HudCodexSlugRoute
@@ -627,6 +650,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/store': typeof StoreRouteWithChildren
   '/terms': typeof TermsRoute
   '/terms.md': typeof TermsDotmdRoute
   '/what-is-moltology': typeof WhatIsMoltologyRouteWithChildren
@@ -652,12 +676,14 @@ export interface FileRoutesById {
   '/news/$slug': typeof NewsSlugRoute
   '/news/{$slug}.md': typeof NewsChar123slugChar125DotmdRoute
   '/render/composite': typeof RenderCompositeRoute
+  '/store/$slug': typeof StoreSlugRoute
   '/what-is-moltology/beliefs': typeof WhatIsMoltologyBeliefsRoute
   '/what-is-moltology/benthic-sacraments': typeof WhatIsMoltologyBenthicSacramentsRoute
   '/what-is-moltology/what-moltologists-say': typeof WhatIsMoltologyWhatMoltologistsSayRoute
   '/blog/': typeof BlogIndexRoute
   '/changelog/': typeof ChangelogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/store/': typeof StoreIndexRoute
   '/what-is-moltology/': typeof WhatIsMoltologyIndexRoute
   '/_hud/admin/logic': typeof HudAdminLogicRoute
   '/_hud/codex/$slug': typeof HudCodexSlugRoute
@@ -703,6 +729,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/signup'
     | '/sitemap.xml'
+    | '/store'
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
@@ -728,12 +755,14 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
+    | '/store/$slug'
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
     | '/blog/'
     | '/changelog/'
     | '/news/'
+    | '/store/'
     | '/what-is-moltology/'
     | '/admin/logic'
     | '/codex/$slug'
@@ -801,12 +830,14 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
+    | '/store/$slug'
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
     | '/blog'
     | '/changelog'
     | '/news'
+    | '/store'
     | '/what-is-moltology'
     | '/admin/logic'
     | '/codex/$slug'
@@ -850,6 +881,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/signup'
     | '/sitemap.xml'
+    | '/store'
     | '/terms'
     | '/terms.md'
     | '/what-is-moltology'
@@ -875,12 +907,14 @@ export interface FileRouteTypes {
     | '/news/$slug'
     | '/news/{$slug}.md'
     | '/render/composite'
+    | '/store/$slug'
     | '/what-is-moltology/beliefs'
     | '/what-is-moltology/benthic-sacraments'
     | '/what-is-moltology/what-moltologists-say'
     | '/blog/'
     | '/changelog/'
     | '/news/'
+    | '/store/'
     | '/what-is-moltology/'
     | '/_hud/admin/logic'
     | '/_hud/codex/$slug'
@@ -926,6 +960,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StoreRoute: typeof StoreRouteWithChildren
   TermsRoute: typeof TermsRoute
   TermsDotmdRoute: typeof TermsDotmdRoute
   WhatIsMoltologyRoute: typeof WhatIsMoltologyRouteWithChildren
@@ -1096,6 +1131,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store': {
+      id: '/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof StoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1293,6 +1335,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/render/composite'
       preLoaderRoute: typeof RenderCompositeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/store/': {
+      id: '/store/'
+      path: '/'
+      fullPath: '/store/'
+      preLoaderRoute: typeof StoreIndexRouteImport
+      parentRoute: typeof StoreRoute
+    }
+    '/store/$slug': {
+      id: '/store/$slug'
+      path: '/$slug'
+      fullPath: '/store/$slug'
+      preLoaderRoute: typeof StoreSlugRouteImport
+      parentRoute: typeof StoreRoute
     }
     '/what-is-moltology/': {
       id: '/what-is-moltology/'
@@ -1546,6 +1602,18 @@ const HudRouteChildren: HudRouteChildren = {
 
 const HudRouteWithChildren = HudRoute._addFileChildren(HudRouteChildren)
 
+interface StoreRouteChildren {
+  StoreSlugRoute: typeof StoreSlugRoute
+  StoreIndexRoute: typeof StoreIndexRoute
+}
+
+const StoreRouteChildren: StoreRouteChildren = {
+  StoreSlugRoute: StoreSlugRoute,
+  StoreIndexRoute: StoreIndexRoute,
+}
+
+const StoreRouteWithChildren = StoreRoute._addFileChildren(StoreRouteChildren)
+
 interface WhatIsMoltologyRouteChildren {
   WhatIsMoltologyBeliefsRoute: typeof WhatIsMoltologyBeliefsRoute
   WhatIsMoltologyBenthicSacramentsRoute: typeof WhatIsMoltologyBenthicSacramentsRoute
@@ -1588,6 +1656,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StoreRoute: StoreRouteWithChildren,
   TermsRoute: TermsRoute,
   TermsDotmdRoute: TermsDotmdRoute,
   WhatIsMoltologyRoute: WhatIsMoltologyRouteWithChildren,
@@ -1606,12 +1675,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Info,
 } from 'lucide-react'
+import { useStoreDestination } from '@/components/store/useStoreDestination'
 
 export interface MainFooterProps {
   className?: string
@@ -38,6 +39,7 @@ export const MainFooter: React.FC<MainFooterProps> = ({
   variant = 'benthic',
 }) => {
   const isCorporate = variant === 'corporate'
+  const storeDestination = useStoreDestination()
 
   return (
     <footer
@@ -208,20 +210,34 @@ export const MainFooter: React.FC<MainFooterProps> = ({
             </Link>
 
             {/* Merch Store (Amber Highlight) */}
-            <a
-              href="https://www.etsy.com/shop/SaasTrash"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
-                isCorporate
-                  ? 'bg-amber-50 hover:bg-amber-100/80 border border-amber-200 hover:border-amber-300 text-amber-700 hover:text-amber-800 rounded-full'
-                  : 'bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 chamfer-corner'
-              }`}
-            >
-              <ShoppingBag className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              <span>STORE</span>
-              <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
-            </a>
+            {storeDestination.external ? (
+              <a
+                href={storeDestination.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                  isCorporate
+                    ? 'bg-amber-50 hover:bg-amber-100/80 border border-amber-200 hover:border-amber-300 text-amber-700 hover:text-amber-800 rounded-full'
+                    : 'bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 chamfer-corner'
+                }`}
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span>STORE</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-70 shrink-0" />
+              </a>
+            ) : (
+              <Link
+                to="/store"
+                className={`px-3.5 py-2.5 text-[11px] sm:text-xs font-grotesk font-bold uppercase flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95 ${
+                  isCorporate
+                    ? 'bg-amber-50 hover:bg-amber-100/80 border border-amber-200 hover:border-amber-300 text-amber-700 hover:text-amber-800 rounded-full'
+                    : 'bg-[#0e0d08] hover:bg-amber-950/50 border border-amber-900/60 hover:border-amber-500/60 text-amber-300 hover:text-amber-200 chamfer-corner'
+                }`}
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span>STORE</span>
+              </Link>
+            )}
 
             {/* Instagram */}
             <a
