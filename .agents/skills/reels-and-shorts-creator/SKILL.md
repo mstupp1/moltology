@@ -21,7 +21,7 @@ Both major target platforms allow extended short-form videos up to 3 minutes:
 * **Instagram Reels**: Up to 3 minutes (180s).
 * **YouTube Shorts**: Up to 3 minutes (180s) (extended globally from 60s in October 2024).
 
-The Moltology 6-clip format targets **~35–50 seconds** (each video scene spanning 4–6s plus voiceover pacing and a 2.5s branded CTA outro). This sits squarely in the highest-retention bracket for organic algorithm distribution on both platforms.
+The Moltology 6-clip format targets **~35–50 seconds** (each video scene spanning 4–6s plus voiceover pacing and a 4s animated CTA outro clip, or a 2.5s static card when the outro isn't animated). This sits squarely in the highest-retention bracket for organic algorithm distribution on both platforms.
 
 ---
 
@@ -47,7 +47,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
   - **Scenes 4–6**: Benthic Cybernetics & Chitinous Armor (deep subsea foundries, 800 Nm precision pincer torque, hydrothermal cooling ducts, majestic robotic lobsters).
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 35–50s total duration.
 * **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, preset library voice via `FISH_VOICE_REFERENCE_ID`, `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
-* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a clean, high-end 2.5s Cybernetic CTA outro card with rotating cartoon crustacean mascots.
+* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 4s animated Cybernetic CTA outro clip: the final composite card (rotating cartoon crustacean mascots) brought to life with Veo 3.1 image-to-video.
 * **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
 * **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Integrated directly into `npm run reel:create` — **no manual MCP tool calls required**.
 * **Queue Configuration**:
@@ -129,7 +129,7 @@ Leverage pre-existing high-definition clips stored in `public/videos/` and `tmp/
 ---
 
 ### Step 5: High-Speed FFmpeg Master Compositing & Atmospheric Grading
-The master compositor (`scripts/lib/reel-compositor.ts`) assembles the 6 scenes, watermark, kinetic subtitles, and the 2.5s CTA outro card in **under 10 seconds** using a **Streamlined 2-Layer Concat Overlay Architecture**:
+The master compositor (`scripts/lib/reel-compositor.ts`) assembles the 6 scenes, watermark, kinetic subtitles, and the CTA outro clip in **under 10 seconds** using a **Streamlined 2-Layer Concat Overlay Architecture**:
 
 1. **Streamlined 2-Layer Concat Overlay Architecture (Anti-Hang Design)**:
    - *Why Legacy Chaining Failed*: Chaining dozens or hundreds of PNG image overlays with `enable='between(...)'` in an FFmpeg filter complex forced FFmpeg to evaluate $O(N \times \text{frames})$ layers per frame (>300,000 evaluations), stalling processing for 12+ minutes.
@@ -142,7 +142,13 @@ The master compositor (`scripts/lib/reel-compositor.ts`) assembles the 6 scenes,
 3. **Sentence-Isolated Kinetic Subtitles**: Captions strictly respect sentence cadence and clause boundaries (`alignWordsWithOriginalText`), never bridging sentences across chunks or leaving trailing single words.
 4. **Seamless Forward Scene Playback & Clip Duration Scaling**:
    - Video clips dynamically scale to voiceover pacing (`perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)`), using slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of jarring loops.
-5. **Thematic Outro Staging**: Appends the 2.5s branded outro card elevated via Gemini API or Google Flow.
+5. **Animated Final Clip (default)**: The final composite outro card is animated into a closing video clip instead of holding a static image:
+   - The CTA card is rendered locally as the final composite (`renderCtaOutroFrame`, Headless Chrome, no image generator needed).
+   - That composite is sent to Veo 3.1 as an image-to-video reference (`generateVeoVideo({ referenceImagePath })`) with a motion-only prompt (`buildOutroClipPrompt`): slow push-in, drifting particles, cyan caustics, gentle mascot idle. The layout, headline, and URL stay unchanged.
+   - The 4s clip (`OUTRO_CLIP_DURATION_SECONDS`) is appended via `compositeReel({ customOutroVideoPath })`.
+   - Runs whenever Veo renders the scenes. `--recycle-clips`, `--no-veo`, and `--dry-run` keep the static card, and so does `--static-outro`.
+   - If `--custom-outro` or `--ai-outro` supplies a card, that card is animated instead of the base composite.
+   - If the outro clip fails, the reel still ships with the static card and a warning (the outro is the closing beat, not a story scene).
 
 ---
 
@@ -198,7 +204,13 @@ npm run reel:create -- --cta-goal codex
 # Custom topic with specific theme:
 npm run reel:create -- --topic "The Monday Morning Standup Melt" --theme moltmaxxing
 
-# Custom run with bespoke AI-restyled outro card generated via Gemini API:
+# Keep the outro as a static card (skip the animated final clip):
+npm run reel:create -- --static-outro
+
+# Animate a single card by hand (image-to-video):
+npx tsx scripts/generate-video.ts "Slow push-in, drifting particles, keep all text unchanged" --image tmp/base-outro-frame.png --duration 4 --no-upload
+
+# Custom run with bespoke AI-restyled outro card generated via Gemini API (needs an image generator; the result is then animated):
 npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --ai-outro
 
 # Direct instant publish (skip queue / publish immediately):
@@ -212,6 +224,7 @@ npm run reel:create -- --publish-now
 1. **Video vs. Image Generation Separation**:
    - **Still Images**: Generated using the Gemini API (**Nano Banana Pro** `gemini-3-pro-image` / **Nano Banana 2** `gemini-3.1-flash-image` via `scripts/generate-image.ts` or `--ai-outro`) using `GEMINI_API_KEY`.
    - **Video Scenes**: Always generated using Google Veo 3.1 (`scripts/generate-video.ts`) or recycled from local clips via `--recycle-clips`.
+   - **Outro**: The default outro needs no image generator. The composite card is rendered locally and animated with Veo, so scheduled cloud runs (which have no image generator) still get a finished closing clip.
 2. **Explicit Failure Policy**:
    - If Veo 3.1 video generation fails or credentials are missing during a production run without `--recycle-clips`, **the pipeline must halt immediately and throw an error**. Never silently fall back to random files.
 3. **Async Task Etiquette**:

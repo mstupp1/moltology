@@ -7,7 +7,10 @@ import {
   getLocalClipPool,
   selectRecycledClipSequence,
   resolveColorGradingPresets,
+  shouldAnimateOutro,
+  buildOutroClipPrompt,
 } from './create-reel'
+import { getImageMimeType } from './generate-video'
 
 describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
   it('generates a complete 6-scene narrative script with custom topic', () => {
@@ -230,5 +233,31 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
     // Explicit user override
     const overridePresets = resolveColorGradingPresets('ecdysis', 'Generic Topic', 6, 'calcified-armor')
     expect(overridePresets).toEqual(Array(6).fill('calcified-armor'))
+  })
+})
+
+describe('Animated outro clip', () => {
+  it('animates the outro by default only when Veo renders the scenes', () => {
+    expect(shouldAnimateOutro({ useVeo: true })).toBe(true)
+    expect(shouldAnimateOutro({ useVeo: true, outroClip: true })).toBe(true)
+    expect(shouldAnimateOutro({ useVeo: true, outroClip: false })).toBe(false)
+    expect(shouldAnimateOutro({ useVeo: false })).toBe(false)
+    expect(shouldAnimateOutro({ useVeo: false, outroClip: true })).toBe(false)
+  })
+
+  it('builds a prompt that keeps the card text intact and carries theme and topic', () => {
+    const prompt = buildOutroClipPrompt('ecdysis', 'Hydrostatic Cooling')
+    expect(prompt).toContain('Keep the layout')
+    expect(prompt).toContain('No new text')
+    expect(prompt).toContain('Theme: ecdysis')
+    expect(prompt).toContain('Topic: Hydrostatic Cooling')
+    expect(buildOutroClipPrompt(undefined, 'x')).toContain('Theme: benthic')
+  })
+
+  it('maps reference image extensions to Veo mime types', () => {
+    expect(getImageMimeType('a/frame.png')).toBe('image/png')
+    expect(getImageMimeType('a/frame.JPG')).toBe('image/jpeg')
+    expect(getImageMimeType('a/frame.jpeg')).toBe('image/jpeg')
+    expect(getImageMimeType('a/frame.webp')).toBe('image/webp')
   })
 })

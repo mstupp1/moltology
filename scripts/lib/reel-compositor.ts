@@ -56,6 +56,8 @@ export interface CompositeReelOptions {
   ctaActionText?: string
   ctaTexture?: 'chitin' | 'hex' | 'alloy' | 'carbon' | 'basalt' | 'circuit' | 'none' | string
   customOutroImagePath?: string
+  /** Animated outro clip (e.g. Veo image-to-video of the composite card). Takes precedence over the still card. */
+  customOutroVideoPath?: string
   mascot?:
     | 'lobster_pointing'
     | 'lobster_thumbs_up'
@@ -900,21 +902,26 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   // 3. Generate CTA Outro Video
   const ctaDuration = options.ctaDurationSeconds || 2.5
   const outroVideoPath = path.join(tempDir, 'cta-outro.mp4')
-  console.log(`   • Rendering branded CTA outro card (${ctaDuration}s)...`)
-  await renderCtaOutroVideo(
-    outroVideoPath,
-    ctaDuration,
-    options.ctaHeadline,
-    options.ctaSubheadline,
-    options.ctaUrl,
-    {
-      mascot: options.mascot,
-      ctaBadge: options.ctaBadge,
-      ctaActionText: options.ctaActionText,
-      ctaTexture: options.ctaTexture,
-      customImagePath: options.customOutroImagePath,
-    }
-  )
+  if (options.customOutroVideoPath && fs.existsSync(options.customOutroVideoPath)) {
+    console.log(`   • Normalizing animated CTA outro clip (${ctaDuration}s)...`)
+    await normalizeVideoClip(options.customOutroVideoPath, outroVideoPath, ctaDuration, 'none', false)
+  } else {
+    console.log(`   • Rendering branded CTA outro card (${ctaDuration}s)...`)
+    await renderCtaOutroVideo(
+      outroVideoPath,
+      ctaDuration,
+      options.ctaHeadline,
+      options.ctaSubheadline,
+      options.ctaUrl,
+      {
+        mascot: options.mascot,
+        ctaBadge: options.ctaBadge,
+        ctaActionText: options.ctaActionText,
+        ctaTexture: options.ctaTexture,
+        customImagePath: options.customOutroImagePath,
+      }
+    )
+  }
   normalizedClips.push(outroVideoPath)
 
   // 4. Concatenate video clips into base timeline

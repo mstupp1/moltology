@@ -427,6 +427,8 @@ export interface CreateReelOptions {
   ctaActionText?: string
   customOutroImagePath?: string
   aiOutro?: boolean
+  /** Animate the final composite outro card into a Veo clip (default: on whenever Veo renders the scenes). */
+  outroClip?: boolean
   imageModel?: string
   mascot?:
     | 'lobster_pointing'
@@ -551,6 +553,26 @@ export function selectRecycledClipSequence(numScenes = 6, topic = '', theme = ''
  * Contextual Color Grading Resolver
  * Maps topics and themes to cohesive, cinematic color grading presets across 6 scenes
  */
+export const OUTRO_CLIP_DURATION_SECONDS = 4
+
+/**
+ * The animated outro needs Veo, so it only runs when Veo renders the scenes.
+ * Recycled-clip runs and dry runs keep the static card.
+ */
+export function shouldAnimateOutro(options: { outroClip?: boolean; useVeo: boolean }): boolean {
+  return options.useVeo && options.outroClip !== false
+}
+
+export function buildOutroClipPrompt(theme: string | undefined, topic: string): string {
+  return [
+    'Animate this branded vertical call-to-action card into a short, calm cinematic shot.',
+    'Keep the layout, emblem, mascot, headline, and URL text exactly as they are: sharp, legible, and unmoved.',
+    'Add slow push-in camera motion, drifting deep-sea particles, soft volumetric cyan caustics rippling across the glass panel,',
+    'a gentle idle motion on the mascot, and natural ambient lighting with soft contact shadows. No new text, no cuts, no harsh backlight.',
+    `Theme: ${theme || 'benthic'}. Topic: ${topic}.`,
+  ].join(' ')
+}
+
 export function resolveColorGradingPresets(
   theme?: string,
   topic?: string,
@@ -2114,23 +2136,31 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     )
 
     let resolvedOutroPath = options.customOutroImagePath
+    let outroClipPath: string | undefined
+    const animateOutro = shouldAnimateOutro({ outroClip: options.outroClip, useVeo })
+    const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
+
+    // The final composite: the rendered CTA card that the AI outro (still or clip) builds from.
+    const renderBaseOutroFrame = async (): Promise<string> => {
+      const baseOutroPath = path.join(tempDir, 'base-outro-frame.png')
+      await renderCtaOutroFrame(
+        baseOutroPath,
+        options.ctaHeadline || ctaConfig.headline,
+        options.ctaSubheadline || ctaConfig.subheadline,
+        options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+        {
+          mascot: chosenMascot,
+          ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
+          ctaActionText: options.ctaActionText || ctaConfig.actionText,
+        }
+      )
+      return baseOutroPath
+    }
 
     if (!resolvedOutroPath && options.aiOutro) {
       try {
         console.log(`\n🎨 Generating bespoke 3D outro card via Gemini API...`)
-        const baseOutroPath = path.join(tempDir, 'base-outro-frame.png')
-        const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
-        await renderCtaOutroFrame(
-          baseOutroPath,
-          options.ctaHeadline || ctaConfig.headline,
-          options.ctaSubheadline || ctaConfig.subheadline,
-          options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
-          {
-            mascot: chosenMascot,
-            ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
-            ctaActionText: options.ctaActionText || ctaConfig.actionText,
-          }
-        )
+        const baseOutroPath = await renderBaseOutroFrame()
         const elevatedOutroPath = path.join(tempDir, `gemini-elevated-outro-${timestamp}.png`)
         const geminiResult = await generateGeminiImage({
           prompt: `Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: ${options.theme || 'benthic'}. Topic: ${scriptData.topic}. Preserve core brand layout and URL text. 9:16 vertical orientation.`,
@@ -2147,6 +2177,30 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       }
     }
 
+    if (animateOutro) {
+      try {
+        // Animate the final composite (or a supplied/elevated card) instead of holding a static image.
+        const outroStill = resolvedOutroPath && fs.existsSync(resolvedOutroPath) ? resolvedOutroPath : await renderBaseOutroFrame()
+        console.log(`\n🎬 Animating final composite outro card with Veo 3.1 (${OUTRO_CLIP_DURATION_SECONDS}s)...`)
+        const outroResult = await generateVeoVideo({
+          prompt: buildOutroClipPrompt(options.theme, scriptData.topic),
+          referenceImagePath: outroStill,
+          model: options.veoModel || 'veo-3.1-fast-generate-preview',
+          aspectRatio: '9:16',
+          durationSeconds: OUTRO_CLIP_DURATION_SECONDS,
+          uploadToS3: false,
+          keepLocal: true,
+          outputFilePath: path.join(tempDir, 'veo-outro-clip.mp4'),
+        })
+        outroClipPath = outroResult.localPath
+        resolvedOutroPath = outroStill
+        console.log(`   ✨ Animated outro clip ready: ${path.basename(outroClipPath)}`)
+      } catch (err: any) {
+        // The outro is the closing beat, not a story scene: keep the reel and fall back to the static card.
+        console.warn(`   ⚠️ Animated outro generation failed, falling back to the static outro card: ${err.message}`)
+      }
+    }
+
     if (!resolvedOutroPath) {
       resolvedOutroPath = (await resolveThematicOutroCard({
         theme: options.theme,
@@ -2156,7 +2210,9 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       })) || undefined
     }
 
-    if (resolvedOutroPath) {
+    if (outroClipPath) {
+      console.log(`   💎 Using animated outro clip built from: ${path.basename(resolvedOutroPath || 'composite')}`)
+    } else if (resolvedOutroPath) {
       console.log(`   💎 Resolved thematic outro card: ${path.basename(resolvedOutroPath)}`)
     }
 
@@ -2175,7 +2231,9 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       ctaActionText: options.ctaActionText || ctaConfig.actionText,
       ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
       customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
-      mascot: options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey())),
+      customOutroVideoPath: outroClipPath,
+      ctaDurationSeconds: outroClipPath ? OUTRO_CLIP_DURATION_SECONDS : undefined,
+      mascot: chosenMascot,
       backgroundAudioVolume: options.bgAudioVolume,
       backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
       tempDir: path.join(tempDir, 'ffmpeg-build'),
@@ -2315,7 +2373,8 @@ Options:
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
   --custom-outro <path>     Path to bespoke elevated outro card image
-  --ai-outro                Generate bespoke 3D outro card via Gemini API
+  --ai-outro                Generate bespoke 3D outro card via Gemini API (needs an image generator)
+  --static-outro            Keep the outro as a static card instead of animating the final composite into a Veo clip
   --image-model <name>      Image model for AI outro: nano-banana-pro | nano-banana-2 (default: nano-banana-pro)
   --platform <name>         Platform target: all | instagram | youtube (default: all)
   --custom-video <path/url> Path or URL to pre-rendered master video to skip generation
@@ -2350,6 +2409,7 @@ Examples:
   let customVideo: string | undefined
   let platform: 'all' | 'instagram' | 'youtube' | undefined
   let aiOutro = false
+  let outroClip = true
   let imageModel: string | undefined
   let ctaTexture: any
 
@@ -2374,6 +2434,7 @@ Examples:
     else if (args[i] === '--custom-video' && args[i + 1]) customVideo = args[++i]
     else if (args[i] === '--platform' && args[i + 1]) platform = args[++i] as any
     else if (args[i] === '--ai-outro') aiOutro = true
+    else if (args[i] === '--static-outro') outroClip = false
     else if (args[i] === '--image-model' && args[i + 1]) imageModel = args[++i]
   }
 
@@ -2399,6 +2460,7 @@ Examples:
       customVideo,
       platform,
       aiOutro,
+      outroClip,
       imageModel,
     })
   } catch (err: any) {

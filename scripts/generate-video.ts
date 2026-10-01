@@ -7,6 +7,8 @@ import { DEFAULT_BUCKET } from '../src/lib/s3-client'
 
 export interface GenerateVideoOptions {
   prompt: string
+  /** Optional still image to animate (image-to-video). The clip starts from this frame. */
+  referenceImagePath?: string
   model?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
   aspectRatio?: '9:16' | '16:9' | '1:1'
   durationSeconds?: number
@@ -25,6 +27,13 @@ export interface GenerateVideoResult {
   model: string
   durationSeconds: number
   aspectRatio: string
+}
+
+export function getImageMimeType(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase()
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg'
+  if (ext === '.webp') return 'image/webp'
+  return 'image/png'
 }
 
 export async function generateVeoVideo(options: GenerateVideoOptions): Promise<GenerateVideoResult> {
@@ -56,6 +65,18 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
   console.log(`   • Duration: ${durationSeconds}s`)
   console.log(`   • Prompt: "${options.prompt}"`)
 
+  const instance: Record<string, unknown> = { prompt: options.prompt }
+  if (options.referenceImagePath) {
+    if (!fs.existsSync(options.referenceImagePath)) {
+      throw new Error(`Reference image not found: ${options.referenceImagePath}`)
+    }
+    instance.image = {
+      bytesBase64Encoded: fs.readFileSync(options.referenceImagePath).toString('base64'),
+      mimeType: getImageMimeType(options.referenceImagePath),
+    }
+    console.log(`   • Reference Image: ${options.referenceImagePath}`)
+  }
+
   let downloadUri: string | null = null
   let operationName = ''
   const maxAttempts = 4
@@ -68,7 +89,7 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          instances: [{ prompt: options.prompt }],
+          instances: [instance],
           parameters: {
             aspectRatio,
             durationSeconds,
@@ -208,6 +229,7 @@ Options:
   --duration <sec>    Duration in seconds (4 to 8, default: 6)
   --key <s3Key>       Custom S3 destination key
   --out <path>        Custom local output path
+  --image <path>      Animate a still image (image-to-video); the clip starts from this frame
   --keep-local        Keep the temporary video file locally after uploading to S3
   --no-upload         Skip upload to Neon S3 (preserves local file)
 
@@ -226,6 +248,7 @@ Examples:
   let keepLocal = false
   let s3Key: string | undefined
   let outputFilePath: string | undefined
+  let referenceImagePath: string | undefined
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--prompt' && args[i + 1]) {
@@ -240,6 +263,8 @@ Examples:
       s3Key = args[++i]
     } else if (args[i] === '--out' && args[i + 1]) {
       outputFilePath = args[++i]
+    } else if (args[i] === '--image' && args[i + 1]) {
+      referenceImagePath = args[++i]
     } else if (args[i] === '--keep-local') {
       keepLocal = true
     } else if (args[i] === '--no-upload' || args[i] === '--no-s3') {
@@ -258,6 +283,7 @@ Examples:
   try {
     const result = await generateVeoVideo({
       prompt,
+      referenceImagePath,
       model,
       aspectRatio,
       durationSeconds,
