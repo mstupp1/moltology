@@ -9,6 +9,8 @@ export interface GenerateVideoOptions {
   prompt: string
   /** Optional still image to animate (image-to-video). The clip starts from this frame. */
   referenceImagePath?: string
+  /** What Veo should avoid (e.g. on-screen text). Dropped automatically if the API rejects the field. */
+  negativePrompt?: string
   model?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
   aspectRatio?: '9:16' | '16:9' | '1:1'
   durationSeconds?: number
@@ -80,6 +82,7 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
   let downloadUri: string | null = null
   let operationName = ''
   const maxAttempts = 4
+  let sendNegativePrompt = Boolean(options.negativePrompt)
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -93,6 +96,7 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
           parameters: {
             aspectRatio,
             durationSeconds,
+            ...(sendNegativePrompt ? { negativePrompt: options.negativePrompt } : {}),
           },
         }),
       })
@@ -138,10 +142,16 @@ export async function generateVeoVideo(options: GenerateVideoOptions): Promise<G
 
       break
     } catch (err: any) {
+      // A 400 on submit is free: if it is about negativePrompt, resubmit without it rather than failing the run.
+      if (sendNegativePrompt && /\(400\)/.test(err.message) && /negative/i.test(err.message)) {
+        console.warn(`\n⚠️ Veo rejected negativePrompt; resubmitting without it.`)
+        sendNegativePrompt = false
+        attempt--
+        continue
+      }
       if (
         attempt < maxAttempts &&
-        (err.message.includes('code":13') ||
-          err.message.includes('13') ||
+        (/"code":\s*13\b/.test(err.message) ||
           err.message.includes('internal server issue') ||
           err.message.includes('503') ||
           err.message.includes('429') ||

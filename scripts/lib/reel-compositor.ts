@@ -38,6 +38,8 @@ export function getColorGradingFilter(preset?: ColorGradingPreset | string): str
 
 export interface CompositeReelOptions {
   videoClips: string[] // Array of local video paths
+  /** Per-scene on-screen durations (e.g. cut on narration beats). Must match videoClips; otherwise scenes split evenly. */
+  clipDurations?: number[]
   voiceoverPath: string
   words: WordBoundaryEvent[]
   outputPath: string
@@ -871,10 +873,21 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
   const postSpeechBuffer = 0.8
   const requiredSpeechDuration = voDuration + postSpeechBuffer
   const numClips = Math.max(1, options.videoClips.length)
+  const beatDurations =
+    options.clipDurations &&
+    options.clipDurations.length === options.videoClips.length &&
+    options.clipDurations.every((d) => Number.isFinite(d) && d > 0)
+      ? options.clipDurations
+      : null
   const perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)
-  const totalSceneDuration = perClipDuration * numClips
+  const clipDurations = beatDurations || Array(numClips).fill(perClipDuration)
+  const totalSceneDuration = clipDurations.reduce((a, b) => a + b, 0)
 
-  console.log(`   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips @ ${perClipDuration.toFixed(2)}s each)`)
+  console.log(
+    beatDurations
+      ? `   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips cut on narration beats: ${clipDurations.map((d) => d.toFixed(1)).join('s, ')}s)`
+      : `   • Target scene footage duration: ${totalSceneDuration.toFixed(2)}s (${numClips} clips @ ${perClipDuration.toFixed(2)}s each)`
+  )
 
   // 2. Normalize video clips to exact target duration with contextual color grading
   const normalizedClips: string[] = []
@@ -894,8 +907,8 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
     }
 
     const presetLabel = clipPreset && clipPreset !== 'none' ? ` [Grade: ${clipPreset}]` : ''
-    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${perClipDuration.toFixed(2)}s)${presetLabel}...`)
-    await normalizeVideoClip(options.videoClips[i], normPath, perClipDuration, clipPreset)
+    console.log(`   • Normalizing scene ${i + 1}/${options.videoClips.length} (${clipDurations[i].toFixed(2)}s)${presetLabel}...`)
+    await normalizeVideoClip(options.videoClips[i], normPath, clipDurations[i], clipPreset)
     normalizedClips.push(normPath)
   }
 
@@ -1130,8 +1143,8 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       ffmpegBgArgs.push('-ss', bgOffset.toString())
     }
 
-    // Mix Voiceover (input 1 with audio padding) + Subtle Ducked Ambient BG (input 2)
-    // Smooth 0.8s entrance fade and 1.5s ending fade
+    // Mix Voiceover (input 1, padded to the full video so the music runs under the outro) + ambient BG (input 2).
+    // BG sits under the voice, swells to 2x over 1.2s once the narration ends, with a 0.8s entrance and 1.5s ending fade.
     const fadeInDuration = 0.8
     const fadeOutDuration = 1.5
     const fadeOutStart = Math.max(0, totalVideoDuration - fadeOutDuration)
@@ -1148,7 +1161,7 @@ export async function compositeReel(options: CompositeReelOptions): Promise<Comp
       '-i',
       bgAudioPath,
       '-filter_complex',
-      `[1:a]apad=pad_dur=3[vo];[2:a]volume=${bgVolume},afade=t=in:ss=0:d=${fadeInDuration},afade=t=out:st=${fadeOutStart.toFixed(3)}:d=${fadeOutDuration}[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
+      `[1:a]apad=whole_dur=${totalVideoDuration.toFixed(3)}[vo];[2:a]volume='${bgVolume}*(1+min(max((t-${voDuration.toFixed(3)})/1.2,0),1))':eval=frame,afade=t=in:ss=0:d=${fadeInDuration},afade=t=out:st=${fadeOutStart.toFixed(3)}:d=${fadeOutDuration}[bg];[vo][bg]amix=inputs=2:duration=first:dropout_transition=0[aout]`,
       '-map',
       '0:v',
       '-map',

@@ -215,12 +215,12 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
     const photonicsPresets = resolveColorGradingPresets('moltmaxxing', 'Silicon Photonics and Laser Waveguides', 6)
     expect(photonicsPresets).toEqual(Array(6).fill('photonics-matrix'))
 
-    // Torque & Carapace topics: scenes 1-2 thermal-melt, scenes 3-6 calcified-armor
+    // Torque & Carapace topics: human-world half thermal-melt, deep-sea half calcified-armor
     const torquePresets = resolveColorGradingPresets('pincer-torque', '800 Nm Pincer Torque Dynamometry', 6)
     expect(torquePresets).toEqual([
       'thermal-melt',
       'thermal-melt',
-      'calcified-armor',
+      'thermal-melt',
       'calcified-armor',
       'calcified-armor',
       'calcified-armor',
