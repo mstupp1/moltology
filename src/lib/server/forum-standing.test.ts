@@ -78,6 +78,21 @@ describe('reviewMemberPosts', () => {
     expect(res.standingChanges).toEqual([{ userId: 'spam', delta: -3 }])
   })
 
+  it('reuses the live score and only rescreens posts the live gate missed', async () => {
+    const { db } = fakeDb([
+      [],
+      [
+        { id: 'p1', userId: 'dana', content: 'Scored live.', qualityScore: 75, topicTitle: 'Hi' },
+        { id: 'p2', userId: 'dana', content: 'Missed live.', qualityScore: null, topicTitle: 'Hi' },
+      ],
+    ])
+    const evaluate = vi.fn(async () => score(4))
+    const res = await reviewMemberPosts(db, { now: NOW, evaluate })
+    expect(evaluate).toHaveBeenCalledTimes(1)
+    expect(evaluate).toHaveBeenCalledWith(expect.objectContaining({ body: 'Missed live.' }))
+    expect(res.reviewed.map((r) => r.id)).toEqual(['p1', 'p2'])
+  })
+
   it('defers posts Jev could not score and writes nothing for them', async () => {
     const { db, updates } = fakeDb([
       [],

@@ -302,6 +302,13 @@
       "when": 1790971349600,
       "tag": "0042_forum_standing",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790973540721,
+      "tag": "0043_ai_usage_events",
+      "breakpoints": true
     }
   ]
 }

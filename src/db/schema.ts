@@ -422,6 +422,30 @@ export const aiMessages = pgTable('ai_messages', {
   })
 ])
 
+/**
+ * One row per Oracle model call, kept apart from ai_messages so deleting a
+ * thread does not reset usage limits. Server-only: member JWTs cannot read it.
+ */
+const aiUsageServerOnly = sql`NULLIF(current_setting('request.jwt.claims', true), '') IS NULL`
+
+export const aiUsageEvents = pgTable('ai_usage_events', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('userId').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  /** 'chat' counts toward limits. 'title' is recorded for cost only. */
+  kind: text('kind').notNull(),
+  model: text('model'),
+  inputTokens: integer('inputTokens'),
+  outputTokens: integer('outputTokens'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+}, (table) => [
+  index('ai_usage_events_user_created_idx').on(table.userId, table.createdAt),
+  pgPolicy('ai_usage_events_server_only_policy', {
+    for: 'all',
+    using: aiUsageServerOnly,
+    withCheck: aiUsageServerOnly,
+  }),
+])
+
 // Blog Posts Table
 export const blogPosts = pgTable('blog_posts', {
   id: uuid('id').defaultRandom().primaryKey(),

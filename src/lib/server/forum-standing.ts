@@ -207,21 +207,30 @@ export async function reviewMemberPosts(
     .orderBy(forumPosts.createdAt)
     .limit(REVIEW_BATCH_LIMIT)
 
-  const screen = (title: string, body: string) =>
-    screenForumSubmission(
+  // Posts the live gate already scored keep that score. Only posts the live
+  // gate missed (timeout or outage) go back to the moderation model.
+  const score = async (
+    title: string,
+    body: string,
+    liveScore: number | null,
+  ): Promise<{ qualityScore: number | null; prohibited: boolean }> => {
+    if (liveScore != null) return { qualityScore: liveScore, prohibited: false }
+    const decision = await screenForumSubmission(
       { title, body },
       { evaluate: options.evaluate, timeoutMs: REVIEW_JEV_TIMEOUT_MS },
     )
+    return {
+      qualityScore: decision.source === 'jev' ? decision.qualityScore : null,
+      prohibited: decision.status === 'quarantine',
+    }
+  }
 
   const reviewed: ReviewedItem[] = []
   let deferred = 0
 
-  // Every post gets a fresh pass so prohibited content that slipped past a
-  // live timeout is caught. The live score is the fallback.
   for (const topic of topics) {
-    const decision = await screen(topic.title, topic.content)
-    const qualityScore = decision.source === 'jev' ? decision.qualityScore : topic.qualityScore
-    const outcome = reviewOutcome({ qualityScore, prohibited: decision.status === 'quarantine' })
+    const { qualityScore, prohibited } = await score(topic.title, topic.content, topic.qualityScore)
+    const outcome = reviewOutcome({ qualityScore, prohibited })
     if (!outcome || !topic.userId) {
       deferred += 1
       continue
@@ -240,9 +249,8 @@ export async function reviewMemberPosts(
   }
 
   for (const reply of replies) {
-    const decision = await screen(reply.topicTitle, reply.content)
-    const qualityScore = decision.source === 'jev' ? decision.qualityScore : reply.qualityScore
-    const outcome = reviewOutcome({ qualityScore, prohibited: decision.status === 'quarantine' })
+    const { qualityScore, prohibited } = await score(reply.topicTitle, reply.content, reply.qualityScore)
+    const outcome = reviewOutcome({ qualityScore, prohibited })
     if (!outcome || !reply.userId) {
       deferred += 1
       continue

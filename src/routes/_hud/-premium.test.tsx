@@ -80,7 +80,7 @@ describe('Premium HUD route', () => {
     render(<Component />)
 
     expect(await screen.findByRole('heading', { name: /Premium membership/i }, { timeout: LAZY_TIMEOUT })).toBeInTheDocument()
-    expect(screen.getByText('Premium benefits are not available yet.')).toBeInTheDocument()
+    expect(screen.getByText('Premium raises your Oracle chat limits.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Subscribe to Premium/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Activate Premium/i })).toBeInTheDocument()
     expect(screen.queryByTestId('hidden-page-unavailable')).not.toBeInTheDocument()

@@ -7,6 +7,8 @@
  * forum authority, or Chitin Gems.
  */
 
+import { ORACLE_FREE_LIMITS, ORACLE_PREMIUM_LIMITS } from './ai/usage-limits'
+
 const ZERO_DECIMAL_CURRENCIES = new Set([
   'bif',
   'clp',
@@ -41,7 +43,7 @@ export const PREMIUM_PAGE_COPY = {
   description:
     'Premium does not change your rank, clearance, stage, or forum authority. Chitin Gems stay earned. Signup stays free.',
   benefitsTitle: 'What Premium unlocks',
-  benefitsBody: 'Premium benefits are not available yet.',
+  benefitsBody: 'Premium raises your Oracle chat limits.',
   active: 'Your Premium membership is active.',
   lapsed: 'You have purchased Premium before. It is not active right now.',
   free: 'You do not have an active Premium membership.',
@@ -95,11 +97,13 @@ export function shouldShowPremiumDashboardBanner(input: {
 }
 
 /**
- * TODO: define what an active Premium membership unlocks.
+ * What Premium unlocks. Lists the same benefits for every viewer.
  * Do not grant rank, clearance, stage, forum authority, or Chitin Gems.
  */
 export function listPremiumEntitlements(_isPremium: boolean): readonly string[] {
-  return []
+  return [
+    `${ORACLE_PREMIUM_LIMITS.perDay} Oracle messages a day instead of ${ORACLE_FREE_LIMITS.perDay}`,
+  ]
 }
 
 export function isCurrentPremiumStatus(status: string | null | undefined): boolean {

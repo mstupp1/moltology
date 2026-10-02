@@ -1,4 +1,4 @@
-import { evaluateWithJev, exceedsJevConfidence } from './jev'
+import { clampEvaluationText, evaluateWithJev, exceedsJevConfidence } from './jev'
 
 /**
  * Member-post boards. Rules & Directives stays staff-owned, so it is not a choice.
@@ -158,7 +158,7 @@ async function defaultForumEvaluator(
     timeoutMs,
     state: {
       title: input.title?.trim() || '',
-      body: input.body.trim(),
+      body: clampEvaluationText(input.body.trim()),
     },
     questions: FORUM_QUESTIONS,
   })

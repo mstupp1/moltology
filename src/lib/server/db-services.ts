@@ -100,13 +100,6 @@ import {
 
 
 import { getPresignedViewUrl } from '../s3-client'
-import {
-  formatOracleUnavailableMessage,
-  getLastUserText,
-  getOracleCandidateModelIds,
-  pickGuestOracleResponse,
-  toModelMessages,
-} from '../ai/oracle-chat'
 import { verifyTurnstileToken } from './turnstile'
 import {
   ACTIVITY_FEED_FILTER_IDS,
@@ -568,135 +561,6 @@ export const deleteAIThreadHandler = async ({ data, context }: ServerFnArgs<Muta
   const ok = await deleteAIThread(auth.userId, data.threadId)
   if (!ok) throw new Error('Thread not found')
   return { ok: true }
-}
-
-
-interface SendChatMessageInput {
-  messages: Array<{ role: string; content?: string; text?: string }>
-  userId?: string
-  threadId?: string
-  model?: string
-  token?: string
-}
-
-/**
- * Server Function: Send a message to the Benthic neural gateway (free-tier Oracle models) with guardrails & DB persistence.
- */
-export const sendChatMessageHandler = async ({ data, context }: ServerFnArgs<SendChatMessageInput>) => {
-  const { messages, threadId: inputThreadId, model: selectedModelId } = data || {}
-  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
-  const userId = auth?.userId
-
-  if (!Array.isArray(messages) || messages.length === 0) {
-    throw new Error('Messages array is required')
-  }
-
-  const userText = getLastUserText(messages)
-
-  const { validateInputGuardrails, checkRateLimit } = await import('../ai/guardrails')
-  const clientIp = '127.0.0.1'
-  const rateLimit = checkRateLimit(userId || clientIp, 30, 60 * 1000)
-  if (!rateLimit.success) {
-    throw new Error('Rate limit exceeded. Please wait a moment before sending more messages.')
-  }
-
-  const guardrail = validateInputGuardrails(userText)
-  if (!guardrail.allowed) {
-    throw new Error(guardrail.reason || 'Message blocked by safety filters.')
-  }
-
-  const { saveAIMessage, createAIThread, summarizeThreadTitle, getOwnedAIThread } = await import('../ai/service')
-  let activeThreadId = inputThreadId
-
-  // Guest Mode Gating: Unauthenticated seekers receive friendly, clear guidance directing them to sign up
-  if (!userId) {
-    return {
-      text: pickGuestOracleResponse(userText, messages.length),
-      threadId: null,
-      isGuest: true,
-    }
-  }
-
-  if (activeThreadId) {
-    const owned = await getOwnedAIThread(userId, activeThreadId)
-    if (!owned) {
-      throw new Error('Thread not found.')
-    }
-  }
-
-  try {
-    if (!activeThreadId) {
-      const title = await summarizeThreadTitle(userText)
-      const newThread = await createAIThread({
-        userId,
-        title,
-        persona: 'oracle',
-      })
-      activeThreadId = newThread?.id || activeThreadId
-    }
-
-    if (activeThreadId) {
-      await saveAIMessage({
-        threadId: activeThreadId,
-        userId,
-        role: 'user',
-        content: userText,
-      })
-    }
-  } catch (dbErr) {
-    console.warn('[sendChatMessageFn] DB thread/message logging warning:', dbErr)
-  }
-
-  const { generateText } = await import('ai')
-  const { buildSystemPrompt } = await import('../ai/codex-prompt')
-
-  let assistantText = ''
-  const systemPrompt = buildSystemPrompt()
-  const payloadMessages = toModelMessages(messages)
-
-  // Model cascade: selected model first, then remaining candidates, so a rate-limited or restricted model falls through to a reachable one.
-  const candidateModels = getOracleCandidateModelIds(selectedModelId)
-  let lastError: Error | null = null
-
-  for (const modelCandidate of candidateModels) {
-    try {
-      const result = await generateText({
-        model: modelCandidate as any,
-        system: systemPrompt,
-        messages: payloadMessages,
-      })
-      if (result.text) {
-        assistantText = result.text
-        break
-      }
-    } catch (err: any) {
-      console.warn(`[Oracle Chat] Model candidate '${modelCandidate}' failed:`, err.message)
-      lastError = err
-    }
-  }
-
-  if (!assistantText) {
-    assistantText = formatOracleUnavailableMessage(lastError)
-  }
-
-  // Safe DB Assistant message logging
-  if (userId && activeThreadId && assistantText) {
-    try {
-      await saveAIMessage({
-        threadId: activeThreadId,
-        userId,
-        role: 'assistant',
-        content: assistantText,
-      })
-    } catch (dbErr) {
-      console.warn('[sendChatMessageFn] DB assistant response logging warning:', dbErr)
-    }
-  }
-
-  return {
-    text: assistantText,
-    threadId: activeThreadId,
-  }
 }
 
 
@@ -2239,7 +2103,7 @@ export const updateForumPostHandler = async ({
   }
   assertForumAuthor(existing.userId, userId, 'edit')
 
-  await requirePublishableForumPost({ body: data.content })
+  const gate = await requirePublishableForumPost({ body: data.content })
 
   const now = new Date()
   const [updated] = await dbClient
@@ -2247,6 +2111,8 @@ export const updateForumPostHandler = async ({
     .set({
       content: data.content.trim(),
       updatedAt: now,
+      // A fresh live score, or null so the 12-hour review rescreens the edit.
+      qualityScore: gate.source === 'jev' ? gate.qualityScore : null,
     })
     .where(eq(forumPosts.id, existing.id))
     .returning()

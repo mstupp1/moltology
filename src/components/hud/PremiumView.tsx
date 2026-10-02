@@ -103,7 +103,7 @@ export function PremiumOfferPanel({
         </h2>
         <p className="text-xs text-[#839493]">{PREMIUM_PAGE_COPY.benefitsBody}</p>
         {entitlements.length === 0 ? null : (
-          <ul>
+          <ul className="list-disc pl-4 text-xs text-[#dfe3e3] space-y-1">
             {entitlements.map((item) => (
               <li key={item}>{item}</li>
             ))}

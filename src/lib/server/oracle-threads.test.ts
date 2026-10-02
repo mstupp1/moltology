@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   getAIThreadsHandler,
   getAIMessagesHandler,
-  sendChatMessageHandler,
   pinAIThreadHandler,
   archiveAIThreadHandler,
   deleteAIThreadHandler,
@@ -106,23 +105,6 @@ describe('Oracle thread authorization', () => {
 
     expect(getAIThreadMessages).toHaveBeenCalledWith('t1', 'usr_jwt')
     expect(rows[0]?.content).toBe('hi')
-  })
-
-  it('sendChatMessageHandler stays in guest mode when only userId is supplied', async () => {
-    const { resolveWriteAuth } = await import('./write-auth')
-    vi.mocked(resolveWriteAuth).mockResolvedValueOnce(null)
-
-    const res = await sendChatMessageHandler({
-      data: {
-        messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        userId: 'spoofed-user',
-      },
-      context: {},
-    })
-
-    expect(res).toMatchObject({ isGuest: true, threadId: null })
-    const { generateText } = await import('ai')
-    expect(generateText).not.toHaveBeenCalled()
   })
 })
 

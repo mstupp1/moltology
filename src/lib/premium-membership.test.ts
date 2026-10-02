@@ -129,9 +129,9 @@ describe('premium without checkout', () => {
 })
 
 describe('premium entitlements', () => {
-  it('does not invent unlocks for free or current premium members', () => {
-    expect(listPremiumEntitlements(false)).toEqual([])
-    expect(listPremiumEntitlements(true)).toEqual([])
+  it('lists the higher Oracle limit as the only unlock', () => {
+    expect(listPremiumEntitlements(false)).toEqual(['300 Oracle messages a day instead of 30'])
+    expect(listPremiumEntitlements(true)).toEqual(listPremiumEntitlements(false))
   })
 })
 

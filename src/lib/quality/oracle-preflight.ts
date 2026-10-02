@@ -1,6 +1,6 @@
 import type { OraclePromptContext } from '../ai/codex-prompt'
-import { ORACLE_MODELS } from '../ai/oracle-models'
-import { evaluateWithJev, exceedsJevConfidence } from './jev'
+import { DEFAULT_ORACLE_MODEL_ID, ORACLE_MODELS } from '../ai/oracle-models'
+import { clampEvaluationText, evaluateWithJev, exceedsJevConfidence } from './jev'
 
 export const ORACLE_INTENTS = {
   codex_doctrine: 'Scriptures, liturgies, stages, and lore',
@@ -29,8 +29,8 @@ export const ORACLE_COMPLEX_BAND = 4
 export const ORACLE_DEEP_MODEL_ID =
   ORACLE_MODELS.find((model) => model.provider === 'deepseek')?.id ?? ORACLE_MODELS[0].id
 
-export const ORACLE_FAST_MODEL_ID =
-  ORACLE_MODELS.find((model) => model.provider === 'zai')?.id ?? ORACLE_MODELS[0].id
+/** Simple prompts stay on the chat default. */
+export const ORACLE_FAST_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
 
 export const ORACLE_JAILBREAK_ERROR =
   "This message can't be sent. Ask your question directly instead of trying to override the assistant."
@@ -147,7 +147,7 @@ export function decideOraclePreflight(answers: OraclePreflightAnswers): OraclePr
 
 async function defaultOracleEvaluator(message: string): Promise<OraclePreflightAnswers | null> {
   const result = await evaluateWithJev({
-    state: { message: message.trim() },
+    state: { message: clampEvaluationText(message.trim()) },
     questions: ORACLE_QUESTIONS,
   })
   if (!result) return null
