@@ -98,9 +98,13 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
                 }}
               >
                 <div className="absolute top-0 inset-x-0 h-[1.5px] bg-white/25 pointer-events-none" />
-                <div className="flex items-center justify-center gap-3 text-white font-black text-5xl tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-                  <span>{url}</span>
-                  <ArrowRight className="w-9 h-9 text-cyan-300 stroke-[3.5] drop-shadow-[0_0_10px_rgba(0,195,255,0.8)]" />
+                <div
+                  className={`flex items-center justify-center gap-3 text-white font-black tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] ${
+                    url.length > 32 ? 'text-2xl' : url.length > 22 ? 'text-3xl' : 'text-5xl'
+                  }`}
+                >
+                  <span className="truncate max-w-[500px]">{url}</span>
+                  <ArrowRight className="w-8 h-8 text-cyan-300 stroke-[3.5] drop-shadow-[0_0_10px_rgba(0,195,255,0.8)] shrink-0" />
                 </div>
                 {actionBadgeText && (
                   <div className="mt-3 flex items-center justify-center gap-2 text-amber-400 font-mono font-bold text-lg tracking-wider uppercase drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]">
@@ -127,8 +131,12 @@ export const ReelOutroCard: React.FC<ReelOutroCardProps> = ({
           mascot={mascot}
           glow={false}
           position="bottom-right"
-          width={460}
-          className="-bottom-10 -right-4 z-30 pointer-events-none"
+          width={mascot === 'crab_stats' ? 360 : 400}
+          className={
+            mascot === 'crab_stats'
+              ? '-bottom-44 -right-4 z-30 pointer-events-none'
+              : '-bottom-28 right-2 z-30 pointer-events-none'
+          }
         />
       </div>
     </CompositeContainer>

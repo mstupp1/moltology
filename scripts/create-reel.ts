@@ -2505,10 +2505,21 @@ Examples:
   let imageModel: string | undefined
   let ctaTexture: any
 
+  let ctaHeadline: string | undefined
+  let ctaSubheadline: string | undefined
+  let ctaUrl: string | undefined
+  let ctaBadge: string | undefined
+  let ctaActionText: string | undefined
+
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--topic' && args[i + 1]) topic = args[++i]
     else if (args[i] === '--theme' && args[i + 1]) theme = args[++i]
     else if (args[i] === '--cta-goal' && args[i + 1]) ctaGoal = args[++i]
+    else if (args[i] === '--cta-headline' && args[i + 1]) ctaHeadline = args[++i]
+    else if (args[i] === '--cta-subheadline' && args[i + 1]) ctaSubheadline = args[++i]
+    else if (args[i] === '--cta-url' && args[i + 1]) ctaUrl = args[++i]
+    else if (args[i] === '--cta-badge' && args[i + 1]) ctaBadge = args[++i]
+    else if (args[i] === '--cta-action-text' && args[i + 1]) ctaActionText = args[++i]
     else if (args[i] === '--cta-texture' && args[i + 1]) ctaTexture = args[++i]
     else if (args[i] === '--mascot' && args[i + 1]) mascot = args[++i]
     else if (args[i] === '--holiday' && args[i + 1]) holidayOrEvent = args[++i]
@@ -2537,25 +2548,30 @@ Examples:
     const ctaConfig = resolveCtaGoalConfig(ctaGoal || 'quiz', { theme, topic: topicText })
     const chosenMascot = mascot === 'none' ? 'none' : (mascot && mascot !== 'random' ? mascot : (ctaConfig.mascot || getRandomCharacterKey()))
     const outPath = customOutroImagePath || path.resolve(process.cwd(), 'tmp/base-outro-frame.png')
+    const finalHeadline = ctaHeadline || ctaConfig.headline
+    const finalSubheadline = ctaSubheadline || ctaConfig.subheadline
+    const finalUrl = (ctaUrl || ctaConfig.url).replace(/^https?:\/\//, '')
+    const finalActionText = ctaActionText || ctaBadge || ctaConfig.actionText
+
     console.log(`\n📸 Rendering Composite Studio base outro frame to ${outPath}...`)
     await renderCtaOutroFrame(
       outPath,
-      ctaConfig.headline,
-      ctaConfig.subheadline,
-      ctaConfig.url.replace(/^https?:\/\//, ''),
+      finalHeadline,
+      finalSubheadline,
+      finalUrl,
       {
         mascot: chosenMascot,
         ctaTexture: ctaTexture || ctaConfig.defaultTexture,
-        ctaActionText: ctaConfig.actionText,
+        ctaActionText: finalActionText,
       }
     )
     const prompt = buildAntigravityOutroPrompt({
       theme,
       topic: topicText,
-      headline: ctaConfig.headline,
-      subheadline: ctaConfig.subheadline,
-      url: ctaConfig.url.replace(/^https?:\/\//, ''),
-      actionText: ctaConfig.actionText,
+      headline: finalHeadline,
+      subheadline: finalSubheadline,
+      url: finalUrl,
+      actionText: finalActionText,
     })
     console.log(`✅ Base outro frame rendered: ${outPath}`)
     console.log(`\n💡 Antigravity generate_image Directives:`)
