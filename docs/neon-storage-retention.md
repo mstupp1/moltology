@@ -211,7 +211,7 @@ These waste the 512 MB cap and the 10-branch cap as badly as fat tables.
 
 ## Simulation engine
 
-[`simulate-activity.yml`](../.github/workflows/simulate-activity.yml) writes completions, activity events, topics, posts, and votes every 12 hours, capped at 30 simulated users.
+The 12-hour activity simulation (managed via Antigravity Scheduled Tasks with manual cloud fallback in [`simulate-activity.yml`](../.github/workflows/simulate-activity.yml)) writes completions, activity events, topics, posts, and votes every 12 hours, capped at 30 simulated users.
 
 That is the only **linear** writer today. Completions + events for 30 users × ~4 tasks/day is tens of thousands of rows/year — still small, but forum threads accumulate forever (canonical class).
 

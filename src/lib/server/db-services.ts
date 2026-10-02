@@ -2466,11 +2466,13 @@ export interface ForumReportWatchEntry {
   note: string | null
   status: string
   createdAt: string
+  updatedAt?: string | null
   topicTitle: string | null
   topicSlug: string | null
   categorySlug: string | null
   targetKind: 'topic' | 'reply'
   targetWithdrawn: boolean
+  targetContent?: string | null
 }
 
 function jwtClaimEmail(payload: JWTPayload | null): string | null {
@@ -2642,14 +2644,21 @@ export const createForumReportHandler = async ({
   }
 }
 
+export interface ListForumReportsInput {
+  userId?: string
+  token?: string
+  status?: 'open' | 'reviewed' | 'all'
+  limit?: number
+}
+
 /**
- * Server Function: Elevated accounts read the open flag ledger.
- * Query path: forum_reports where status = 'open', newest first.
+ * Server Function: Elevated accounts read the flag ledger.
+ * Query path: forum_reports where status = 'open' (default) or 'reviewed'.
  */
 export const listForumReportsHandler = async ({
   data,
   context,
-}: ServerFnArgs<{ userId?: string; token?: string }>): Promise<ForumReportWatchEntry[]> => {
+}: ServerFnArgs<ListForumReportsInput>): Promise<ForumReportWatchEntry[]> => {
   const auth = await resolveWriteAuth({ data, context })
   if (!auth) {
     throw new Error('Unauthenticated: Authentication required.')
@@ -2658,12 +2667,16 @@ export const listForumReportsHandler = async ({
   const { userId, dbClient, payload } = auth
   await assertCovenantSteward(dbClient, userId, payload)
 
+  const filterStatus = data?.status === 'reviewed' ? 'reviewed' : data?.status === 'all' ? null : 'open'
+  const maxLimit = Math.min(Math.max(data?.limit ?? 50, 1), 100)
+
+  const queryCondition = filterStatus ? eq(forumReports.status, filterStatus) : undefined
   const reports = await dbClient
     .select()
     .from(forumReports)
-    .where(eq(forumReports.status, 'open'))
-    .orderBy(desc(forumReports.createdAt))
-    .limit(100)
+    .where(queryCondition)
+    .orderBy(desc(filterStatus === 'reviewed' ? forumReports.updatedAt : forumReports.createdAt))
+    .limit(maxLimit)
 
   if (reports.length === 0) return []
 
@@ -2678,6 +2691,7 @@ export const listForumReportsHandler = async ({
           slug: forumTopics.slug,
           categoryId: forumTopics.categoryId,
           deletedAt: forumTopics.deletedAt,
+          content: forumTopics.content,
         })
         .from(forumTopics)
         .where(inArray(forumTopics.id, topicIds))
@@ -2715,6 +2729,7 @@ export const listForumReportsHandler = async ({
         .select({
           id: forumPosts.id,
           deletedAt: forumPosts.deletedAt,
+          content: forumPosts.content,
         })
         .from(forumPosts)
         .where(inArray(forumPosts.id, postIds))
@@ -2725,6 +2740,7 @@ export const listForumReportsHandler = async ({
     const topic = row.topicId ? topicsById.get(row.topicId) : undefined
     const reporter = reportersById.get(row.reporterId)
     const post = row.postId ? postsById.get(row.postId) : undefined
+    const targetContent = post ? post.content : topic ? topic.content : null
     return {
       id: row.id,
       reporterId: row.reporterId,
@@ -2740,11 +2756,13 @@ export const listForumReportsHandler = async ({
       note: row.note,
       status: row.status,
       createdAt: forumIsoOrNow(row.createdAt),
+      updatedAt: forumIsoOrNow(row.updatedAt),
       topicTitle: topic?.title ?? null,
       topicSlug: topic?.slug ?? null,
       categorySlug: topic ? categoriesById.get(topic.categoryId)?.slug ?? null : null,
       targetKind: row.postId ? 'reply' : 'topic',
       targetWithdrawn: Boolean(topic?.deletedAt || post?.deletedAt),
+      targetContent,
     }
   })
 }
@@ -2814,6 +2832,233 @@ export const reviewForumReportHandler = async ({
     id: updated.id,
     status: updated.status,
     alreadyReviewed: false,
+  }
+}
+
+export interface RemoveForumReportTargetInput {
+  reportId: string
+  userId?: string
+  token?: string
+}
+
+export interface ForumReportRemovalReceipt {
+  id: string
+  status: string
+  targetKind: 'topic' | 'reply'
+  targetId: string
+  alreadyWithdrawn: boolean
+}
+
+/**
+ * Server Function: Elevated accounts soft-delete a flagged transmission from the forum.
+ * Sets deletedAt on the forum post or topic (without dropping the DB row), and resolves open report(s).
+ */
+export const removeForumReportTargetHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<RemoveForumReportTargetInput>): Promise<ForumReportRemovalReceipt> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required.')
+  }
+  if (!data?.reportId) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const { userId, dbClient, payload } = auth
+  await assertCovenantSteward(dbClient, userId, payload)
+
+  const [report] = await dbClient
+    .select({
+      id: forumReports.id,
+      topicId: forumReports.topicId,
+      postId: forumReports.postId,
+      status: forumReports.status,
+    })
+    .from(forumReports)
+    .where(eq(forumReports.id, data.reportId))
+    .limit(1)
+
+  if (!report) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const now = new Date()
+  let alreadyWithdrawn = false
+  const targetKind: 'topic' | 'reply' = report.postId ? 'reply' : 'topic'
+  const targetId = report.postId || report.topicId
+
+  if (!targetId) {
+    throw new Error(FORUM_REPORT_COPY.missingTarget)
+  }
+
+  if (report.postId) {
+    const [post] = await dbClient
+      .select({ id: forumPosts.id, deletedAt: forumPosts.deletedAt })
+      .from(forumPosts)
+      .where(eq(forumPosts.id, report.postId))
+      .limit(1)
+
+    if (!post) {
+      throw new Error(FORUM_REPORT_COPY.missingTarget)
+    }
+    if (post.deletedAt) {
+      alreadyWithdrawn = true
+    } else {
+      await dbClient
+        .update(forumPosts)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(forumPosts.id, post.id))
+    }
+
+    // Resolve all open reports on this post
+    await dbClient
+      .update(forumReports)
+      .set({ status: 'reviewed', updatedAt: now })
+      .where(and(eq(forumReports.postId, report.postId), eq(forumReports.status, 'open')))
+  } else if (report.topicId) {
+    const [topic] = await dbClient
+      .select({ id: forumTopics.id, deletedAt: forumTopics.deletedAt })
+      .from(forumTopics)
+      .where(eq(forumTopics.id, report.topicId))
+      .limit(1)
+
+    if (!topic) {
+      throw new Error(FORUM_REPORT_COPY.missingTarget)
+    }
+    if (topic.deletedAt) {
+      alreadyWithdrawn = true
+    } else {
+      await dbClient
+        .update(forumTopics)
+        .set({ deletedAt: now, updatedAt: now })
+        .where(eq(forumTopics.id, topic.id))
+    }
+
+    // Resolve all open reports on this topic
+    await dbClient
+      .update(forumReports)
+      .set({ status: 'reviewed', updatedAt: now })
+      .where(and(eq(forumReports.topicId, report.topicId), isNull(forumReports.postId), eq(forumReports.status, 'open')))
+  }
+
+  // Ensure this report is resolved
+  await dbClient
+    .update(forumReports)
+    .set({ status: 'reviewed', updatedAt: now })
+    .where(eq(forumReports.id, report.id))
+
+  return {
+    id: report.id,
+    status: 'reviewed',
+    targetKind,
+    targetId,
+    alreadyWithdrawn,
+  }
+}
+
+export interface RestoreForumReportTargetInput {
+  reportId: string
+  restoreContent?: boolean
+  userId?: string
+  token?: string
+}
+
+/**
+ * Server Function: Elevated accounts restore a soft-deleted transmission back to the forum.
+ */
+export const restoreForumReportTargetHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<RestoreForumReportTargetInput>): Promise<{
+  id: string
+  restoredContent: boolean
+}> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required.')
+  }
+  if (!data?.reportId) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const { userId, dbClient, payload } = auth
+  await assertCovenantSteward(dbClient, userId, payload)
+
+  const [report] = await dbClient
+    .select({
+      id: forumReports.id,
+      topicId: forumReports.topicId,
+      postId: forumReports.postId,
+    })
+    .from(forumReports)
+    .where(eq(forumReports.id, data.reportId))
+    .limit(1)
+
+  if (!report) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const now = new Date()
+  let restoredContent = false
+
+  if (data?.restoreContent !== false) {
+    if (report.postId) {
+      await dbClient
+        .update(forumPosts)
+        .set({ deletedAt: null, updatedAt: now })
+        .where(eq(forumPosts.id, report.postId))
+      restoredContent = true
+    } else if (report.topicId) {
+      await dbClient
+        .update(forumTopics)
+        .set({ deletedAt: null, updatedAt: now })
+        .where(eq(forumTopics.id, report.topicId))
+      restoredContent = true
+    }
+  }
+
+  return {
+    id: report.id,
+    restoredContent,
+  }
+}
+
+/**
+ * Server Function: Elevated accounts reopen a reviewed flag.
+ */
+export const reopenForumReportHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<{ reportId: string; userId?: string; token?: string }>): Promise<{
+  id: string
+  status: 'open'
+}> => {
+  const auth = await resolveWriteAuth({ data, context })
+  if (!auth) {
+    throw new Error('Unauthenticated: Authentication required.')
+  }
+  if (!data?.reportId) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  const { userId, dbClient, payload } = auth
+  await assertCovenantSteward(dbClient, userId, payload)
+
+  const now = new Date()
+  const [updated] = await dbClient
+    .update(forumReports)
+    .set({ status: 'open', updatedAt: now })
+    .where(eq(forumReports.id, data.reportId))
+    .returning({ id: forumReports.id, status: forumReports.status })
+
+  if (!updated) {
+    throw new Error(FORUM_REPORT_COPY.missingReport)
+  }
+
+  return {
+    id: updated.id,
+    status: 'open',
   }
 }
 

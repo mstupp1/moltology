@@ -127,7 +127,7 @@ export function AdminOversightHub() {
         })}
       </div>
 
-      {tab === 'watch' ? <CovenantWatchPage /> : null}
+      {tab === 'watch' ? <CovenantWatchPage onChanged={() => void loadTelemetry()} /> : null}
       {tab === 'sectors' ? <SectorDirectory /> : null}
       {tab === 'members' ? (
         <MemberDirectory userId={session.userId} onChanged={() => void loadTelemetry()} />

@@ -574,11 +574,13 @@ export const createForumReportFn = createServerFn({ method: 'POST' })
 
 export const listForumReportsFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
-  .validator((data?: { userId?: string; token?: string }) =>
+  .validator((data?: { userId?: string; token?: string; status?: 'open' | 'reviewed' | 'all'; limit?: number }) =>
     z
       .object({
         userId: z.string().optional(),
         token: z.string().optional(),
+        status: z.enum(['open', 'reviewed', 'all']).optional(),
+        limit: z.number().optional(),
       })
       .parse(data ?? {})
   )
@@ -601,6 +603,55 @@ export const reviewForumReportFn = createServerFn({ method: 'POST' })
   .handler(async (args) => {
     const { reviewForumReportHandler } = await import('./db-services')
     return reviewForumReportHandler(args)
+  })
+
+export const removeForumReportTargetFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { reportId: string; userId?: string; token?: string }) =>
+    z
+      .object({
+        reportId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { removeForumReportTargetHandler } = await import('./db-services')
+    return removeForumReportTargetHandler(args)
+  })
+
+export const restoreForumReportTargetFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { reportId: string; restoreContent?: boolean; userId?: string; token?: string }) =>
+    z
+      .object({
+        reportId: z.string().min(1),
+        restoreContent: z.boolean().optional(),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { restoreForumReportTargetHandler } = await import('./db-services')
+    return restoreForumReportTargetHandler(args)
+  })
+
+export const reopenForumReportFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { reportId: string; userId?: string; token?: string }) =>
+    z
+      .object({
+        reportId: z.string().min(1),
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { reopenForumReportHandler } = await import('./db-services')
+    return reopenForumReportHandler(args)
   })
 
 const submitLeadSchema = z.object({

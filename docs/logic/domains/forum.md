@@ -182,15 +182,17 @@ rules:
         symbol: FORUM_REPORT_NOTE_MAX
     tests: [src/lib/forum-reports.test.ts, src/lib/server/forum-reports.test.ts]
   - id: forum.covenant-watch
-    title: Staff review flags
+    title: Staff review and resolve flags
     kind: permission
-    statement: Only staff can list open flags or mark them reviewed at Covenant Watch. Reviewing changes the flag status only and does not touch the post.
+    statement: Only staff can list flags, mark them reviewed, or soft-delete flagged transmissions at Covenant Watch. Removing a post soft-deletes it from the board while preserving data in the database, and staff can review recently resolved items.
     dependsOn: [forum.peer-flags, access.staff]
     anchors:
       - file: src/lib/server/db-services.ts
         symbol: assertCovenantSteward
       - file: src/lib/server/db-services.ts
         symbol: reviewForumReportHandler
+      - file: src/lib/server/db-services.ts
+        symbol: removeForumReportTargetHandler
     tests: [src/lib/server/forum-reports.test.ts]
   - id: forum.community-rules
     title: Five community rules

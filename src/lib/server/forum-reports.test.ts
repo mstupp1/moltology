@@ -8,7 +8,14 @@ vi.mock('../../db', () => ({
   getDb: vi.fn(() => ({ mocked: true })),
 }))
 
-import { createForumReportHandler, listForumReportsHandler, reviewForumReportHandler } from './db-services'
+import {
+  createForumReportHandler,
+  listForumReportsHandler,
+  reviewForumReportHandler,
+  removeForumReportTargetHandler,
+  restoreForumReportTargetHandler,
+  reopenForumReportHandler,
+} from './db-services'
 import { FORUM_REPORT_COPY } from '../forum-reports'
 
 function selectLimit(rows: unknown[]) {
@@ -325,5 +332,214 @@ describe('Forum report handlers', () => {
 
     expect(receipt.alreadyReviewed).toBe(true)
     expect(mockDb.update).not.toHaveBeenCalled()
+  })
+
+  it('removes a flagged post from the forum and resolves open flags', async () => {
+    const reportRow = {
+      id: 'report-post',
+      topicId,
+      postId,
+      status: 'open',
+    }
+    const postRow = {
+      id: postId,
+      deletedAt: null,
+    }
+
+    const select = vi
+      .fn()
+      .mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+      .mockImplementationOnce(() => selectLimit([reportRow]))
+      .mockImplementationOnce(() => selectLimit([postRow]))
+
+    const updateCalls: any[] = []
+    const mockDb = {
+      select,
+      update: vi.fn().mockImplementation((table: any) => ({
+        set: vi.fn().mockImplementation((values: any) => ({
+          where: vi.fn().mockImplementation((cond: any) => {
+            updateCalls.push({ table, values, cond })
+            return Promise.resolve([])
+          }),
+        })),
+      })),
+    }
+
+    const receipt = await removeForumReportTargetHandler({
+      data: { reportId: 'report-post' },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(receipt).toEqual({
+      id: 'report-post',
+      status: 'reviewed',
+      targetKind: 'reply',
+      targetId: postId,
+      alreadyWithdrawn: false,
+    })
+    expect(mockDb.update).toHaveBeenCalled()
+    // Should have soft-deleted the post and updated report status
+    expect(updateCalls.some((c) => c.values.deletedAt !== undefined)).toBe(true)
+    expect(updateCalls.some((c) => c.values.status === 'reviewed')).toBe(true)
+  })
+
+  it('removes a flagged topic from the forum and resolves open flags', async () => {
+    const reportRow = {
+      id: 'report-topic',
+      topicId,
+      postId: null,
+      status: 'open',
+    }
+    const topicRow = {
+      id: topicId,
+      deletedAt: null,
+    }
+
+    const select = vi
+      .fn()
+      .mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+      .mockImplementationOnce(() => selectLimit([reportRow]))
+      .mockImplementationOnce(() => selectLimit([topicRow]))
+
+    const updateCalls: any[] = []
+    const mockDb = {
+      select,
+      update: vi.fn().mockImplementation((table: any) => ({
+        set: vi.fn().mockImplementation((values: any) => ({
+          where: vi.fn().mockImplementation((cond: any) => {
+            updateCalls.push({ table, values, cond })
+            return Promise.resolve([])
+          }),
+        })),
+      })),
+    }
+
+    const receipt = await removeForumReportTargetHandler({
+      data: { reportId: 'report-topic' },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(receipt).toEqual({
+      id: 'report-topic',
+      status: 'reviewed',
+      targetKind: 'topic',
+      targetId: topicId,
+      alreadyWithdrawn: false,
+    })
+    expect(updateCalls.some((c) => c.values.deletedAt !== undefined)).toBe(true)
+  })
+
+  it('restores a removed transmission back to the forum', async () => {
+    const reportRow = {
+      id: 'report-post',
+      topicId,
+      postId,
+    }
+
+    const select = vi
+      .fn()
+      .mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+      .mockImplementationOnce(() => selectLimit([reportRow]))
+
+    const updateCalls: any[] = []
+    const mockDb = {
+      select,
+      update: vi.fn().mockImplementation((table: any) => ({
+        set: vi.fn().mockImplementation((values: any) => ({
+          where: vi.fn().mockImplementation((cond: any) => {
+            updateCalls.push({ table, values, cond })
+            return Promise.resolve([])
+          }),
+        })),
+      })),
+    }
+
+    const receipt = await restoreForumReportTargetHandler({
+      data: { reportId: 'report-post', restoreContent: true },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(receipt).toEqual({
+      id: 'report-post',
+      restoredContent: true,
+    })
+    expect(updateCalls.some((c) => c.values.deletedAt === null)).toBe(true)
+  })
+
+  it('reopens a reviewed report', async () => {
+    const select = vi.fn().mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+
+    const mockDb = {
+      select,
+      update: vi.fn().mockImplementation(() => ({
+        set: vi.fn().mockImplementation(() => ({
+          where: vi.fn().mockImplementation(() => ({
+            returning: vi.fn().mockResolvedValue([{ id: 'report-2', status: 'open' }]),
+          })),
+        })),
+      })),
+    }
+
+    const receipt = await reopenForumReportHandler({
+      data: { reportId: 'report-2' },
+      context: { user: { sub: authorId }, db: mockDb as any },
+    })
+
+    expect(receipt).toEqual({ id: 'report-2', status: 'open' })
+    expect(mockDb.update).toHaveBeenCalled()
+  })
+
+  it('lists resolved reports with target content snippet and status', async () => {
+    const resolvedRow = {
+      id: 'report-resolved',
+      reporterId,
+      topicId,
+      postId: null,
+      reason: 'surface_noise',
+      note: 'Spam report',
+      status: 'reviewed',
+      createdAt: new Date('2026-09-06T05:00:00.000Z'),
+      updatedAt: new Date('2026-09-06T06:00:00.000Z'),
+    }
+
+    const select = vi
+      .fn()
+      .mockImplementationOnce(() => selectLimit([{ role: 'admin' }]))
+      .mockImplementationOnce(() => selectLimit([resolvedRow]))
+      .mockImplementationOnce(() =>
+        selectWhere([
+          {
+            id: topicId,
+            title: 'Promo topic',
+            slug: 'promo-topic',
+            categoryId: '10000000-0000-0000-0000-000000000001',
+            deletedAt: new Date('2026-09-06T06:00:00.000Z'),
+            content: 'Buy crypto gems cheap!',
+          },
+        ]),
+      )
+      .mockImplementationOnce(() =>
+        selectWhere([{ id: '10000000-0000-0000-0000-000000000001', slug: 'general-discussion' }]),
+      )
+      .mockImplementationOnce(() =>
+        selectWhere([{ id: reporterId, handle: 'sentinel', larvaId: 'LARVA #9' }]),
+      )
+      .mockImplementationOnce(() => selectWhere([]))
+
+    const rows = await listForumReportsHandler({
+      data: { status: 'reviewed' },
+      context: { user: { sub: authorId }, db: { select } as any },
+    })
+
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        id: 'report-resolved',
+        status: 'reviewed',
+        targetKind: 'topic',
+        targetWithdrawn: true,
+        targetContent: 'Buy crypto gems cheap!',
+      }),
+    )
   })
 })

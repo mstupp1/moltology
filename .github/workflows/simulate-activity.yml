@@ -1,8 +1,9 @@
 name: 12-Hour Activity Simulation
 
 on:
-  schedule:
-    - cron: '0 */12 * * *'
+  # Recurring 12-hour cadence is now managed via Antigravity Scheduled Tasks.
+  # schedule:
+  #   - cron: '0 */12 * * *'
   workflow_dispatch:
     inputs:
       dry_run:

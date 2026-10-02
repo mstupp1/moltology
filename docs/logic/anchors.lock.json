@@ -55,6 +55,7 @@
   "forum.content-safety::src/lib/content-safety.ts#containsHarmfulContent": "68e8fea4a02f",
   "forum.content-safety::src/lib/content-safety.ts#containsSecretLeak": "6ace747377e8",
   "forum.covenant-watch::src/lib/server/db-services.ts#assertCovenantSteward": "ad451d9b0516",
+  "forum.covenant-watch::src/lib/server/db-services.ts#removeForumReportTargetHandler": "8105160cf9cf",
   "forum.covenant-watch::src/lib/server/db-services.ts#reviewForumReportHandler": "95f43cd543ab",
   "forum.fail-open::src/lib/quality/forum-gate.ts#forumTopicQualityFields": "8ac043112926",
   "forum.fail-open::src/lib/quality/forum-gate.ts#screenForumSubmission": "ecea0aaa496d",
