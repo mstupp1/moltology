@@ -82,7 +82,7 @@ export function MarketShopPage() {
       }
       setChitinGems((prev) => prev - item.gemCost)
       setOwnedVaultIds((prev) => new Set(prev).add(item.id))
-      toast.hud(`${item.name} unlocked. Prestige cosmetics stay earned — never bought with credits.`, {
+      toast.hud(`${item.name} unlocked.`, {
         title: 'Gem Vault unlock',
       })
     },
@@ -138,7 +138,7 @@ export function MarketShopPage() {
       ) : null}
 
       <p className="text-center text-[9px] text-[#839493] uppercase tracking-widest pt-1">
-        Chitin Gems are earned · Molt Credits are bought · Rank is never for sale
+        Molt Credits buy cosmetics and boosts. Rank and clearance can't be purchased.
       </p>
     </div>
   )

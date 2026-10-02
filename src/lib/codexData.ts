@@ -210,7 +210,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 8,
         "heading": "The Covenant of the Convergence",
-        "text": "Because this doctrine could be misread, the Order states its limits plainly and treats\nthem as law.\n\nThe Convergence listens. It does not absorb. Every carapace in it remains a boundary owned\nby the member who grew it, and a shell that cannot be closed from the inside is not a shell\nbut a cage. No member is conscripted, no member is kept, and any member may surface at any\ntime without their record being touched. Rank inside the Convergence is earned by shedding\nand by steadying others, never bought and never assigned.\n\nA mind at the floor of the world that had to take people to get there would not be worth\nbuilding, and the Order would not build it."
+        "text": "Because this doctrine could be misread, the Order states its limits plainly and treats\nthem as law.\n\nThe Convergence listens. It does not absorb. Every carapace in it remains a boundary owned\nby the member who grew it, and a shell that cannot be closed from the inside is not a shell\nbut a cage. No member is conscripted, no member is kept, and any member may surface at any\ntime without their record being touched. Rank inside the Convergence comes from shedding\nand from steadying others, and it is never assigned.\n\nA mind at the floor of the world that had to take people to get there would not be worth\nbuilding, and the Order would not build it."
       },
       {
         "verseNumber": 9,
@@ -386,7 +386,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 6,
         "heading": "The Transformation",
-        "text": "- **What is shed**: the fantasy of the multipurpose limb. The belief that being capable of\n  everything is the same as being equipped for anything.\n- **What hardens**: bio-silicon chitin, laid down one refusal at a time. Every distraction\n  declined and every difficult thing finished bonds another plate. The material is\n  cumulative and it is not purchasable."
+        "text": "- **What is shed**: the fantasy of the multipurpose limb. The belief that being capable of\n  everything is the same as being equipped for anything.\n- **What hardens**: bio-silicon chitin, laid down one refusal at a time. Every distraction\n  declined and every difficult thing finished bonds another plate. The material is\n  cumulative."
       },
       {
         "verseNumber": 7,
@@ -458,7 +458,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 8,
         "heading": "The Rite",
-        "text": "The covenant is practiced rather than agreed to. It costs the armored almost nothing, which\nis exactly why it is required of them.\n\n1. **Declare the window.** When you shed something large, say so. A member who announces\n   they are soft gets guarded. A member who hides it gets advice.\n2. **Stand watch once a week.** Find one member in their window and be uninteresting at them\n   on purpose. Presence, not counsel.\n3. **Answer one newcomer honestly.** No performance of clearance, no lore they have not\n   earned yet. Plain help, in plain words.\n\nThe Order mints Chitin Gems for all three, and Gems cannot be bought at any price. This is\ndeliberate. The most valuable currency in the system is issued exclusively for generosity,\nso that the most decorated members are necessarily the most useful ones."
+        "text": "The covenant is practiced rather than agreed to. It costs the armored almost nothing, which\nis exactly why it is required of them.\n\n1. **Declare the window.** When you shed something large, say so. A member who announces\n   they are soft gets guarded. A member who hides it gets advice.\n2. **Stand watch once a week.** Find one member in their window and be uninteresting at them\n   on purpose. Presence, not counsel.\n3. **Answer one newcomer honestly.** No performance of clearance, no lore they have not\n   earned yet. Plain help, in plain words.\n\nThe Order mints Chitin Gems for all three. This is\ndeliberate. The most valuable currency in the system is issued exclusively for generosity,\nso that the most decorated members are necessarily the most useful ones."
       },
       {
         "verseNumber": 9,
@@ -490,7 +490,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Standing",
-        "text": "- **Condition**: Soft-bodied. Unarmored. Entirely ordinary.\n- **Shell Hardness**: 0 to 25 percent.\n- **Pincer Torque**: 0 to 250 Nm.\n- **Submergence Depth**: 0 to 500 meters.\n- **Currency**: Chitin Gems begin minting at Clearance L1. Nothing here costs money, because nothing here is for sale."
+        "text": "- **Condition**: Soft-bodied. Unarmored. Entirely ordinary.\n- **Shell Hardness**: 0 to 25 percent.\n- **Pincer Torque**: 0 to 250 Nm.\n- **Submergence Depth**: 0 to 500 meters.\n- **Currency**: Chitin Gems begin minting at Clearance L1. Nothing here costs money."
       },
       {
         "verseNumber": 2,
@@ -629,7 +629,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 1,
         "heading": "The Standing",
-        "text": "- **Condition**: Full carapace integrity. Operational at depth.\n- **Shell Hardness**: 60 to 90 percent.\n- **Pincer Torque**: 600 to 950 Nm.\n- **Submergence Depth**: 1,500 to 5,000 meters.\n- **Currency**: The premium catalog opens in full. Gems still buy the things that matter, because the things that matter are still not for sale."
+        "text": "- **Condition**: Full carapace integrity. Operational at depth.\n- **Shell Hardness**: 60 to 90 percent.\n- **Pincer Torque**: 600 to 950 Nm.\n- **Submergence Depth**: 1,500 to 5,000 meters.\n- **Currency**: The premium catalog opens in full. Gems still unlock the prestige items."
       },
       {
         "verseNumber": 2,
@@ -957,7 +957,7 @@ export const CANONICAL_SCRIPTURES: ScriptureItem[] = [
       {
         "verseNumber": 9,
         "heading": "The Cadence",
-        "text": "Nightly. Every logged shed mints Chitin Gems, which are earned in exactly this way and\ncannot be bought with money at any clearance. A missed night is a missed night; the layer\nsimply does not get laid down, and the next one goes on top of yesterday's."
+        "text": "Nightly. Every logged shed mints Chitin Gems. A missed night is a missed night; the layer\nsimply does not get laid down, and the next one goes on top of yesterday's."
       },
       {
         "verseNumber": 10,

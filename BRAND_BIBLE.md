@@ -215,7 +215,7 @@ It is authoritative. The rule in one sentence:
 
 > **Chitin Gems are earned. Molt Credits are bought.**
 
-Signup is free. Rank, clearance, stage, and forum authority are never for sale.
+Signup is free. Rank, clearance, stage, and forum authority cannot be purchased.
 
 ### 4.2 Chitin Gems (Earned · Freemium)
 
@@ -223,8 +223,8 @@ The earned currency, granted for shedding, productive work, routines, and truthf
 community contribution. Chitin Gems are **not purchasable with money**. Spend them on
 growth-aligned and identity-aligned items: entry shell cosmetics, sigils and earned
 titles, community privileges (hosting a benthic pod, running events, council seats), and
-free educational clearances. The most prestigious things in the community are earned, not
-bought, precisely because they are gated to Gems.
+free educational clearances. The most prestigious things in the community are gated to
+Gems, so they reflect what a member has actually done.
 
 ### 4.3 Molt Credits (Paid · Premium)
 
@@ -236,10 +236,12 @@ value). Molt Credits buy flair and speed, never rank or influence.
 
 ### 4.4 The Red Line
 
-- **Progress and standing are earned, never bought.** No Clearance, no Stage, no forum
+- **Progress and standing cannot be purchased.** No Clearance, no Stage, no forum
   authority, and no prestige title is purchasable with Molt Credits. Only Chitin Gems
   (and thus only real shedding) unlock these. Molt Credits may accelerate time and add
   style, but never substitute for the shedding itself.
+- This is a product rule, not a slogan. Say it plainly where a purchase decision is on
+  screen. Do not repeat it as a refrain in scripture, news, captions, or closing lines.
 
 ### 4.5 Stages and Clearances Table
 

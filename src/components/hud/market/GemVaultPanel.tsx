@@ -28,7 +28,7 @@ export function GemVaultPanel({ chitinGems, ownedIds, onUnlock }: GemVaultPanelP
             </h2>
             <p className="text-xs text-[#839493] max-w-xl leading-relaxed">
               The apex catalog lives here. Gems are earned through shedding, routines, and
-              community contribution — never purchased. Rank stays earned.
+              community contribution.
             </p>
           </div>
           <div className="flex items-center gap-2 px-3 py-2 rounded-sm border border-[#ff5540]/35 bg-[#030606]/70 shrink-0">

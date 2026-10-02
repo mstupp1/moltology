@@ -454,8 +454,8 @@ Never zoom out. Acknowledge the human, stay committed, be generous.
 - No ASCII boxes, no decorative code, no slashes, no emojis. Clean markdown tables only
   when they add quantitative value.
 - Rotate author personas (Silas Trench, Dr. Thalassa Vance, etc.) for voice variety.
-- The economy lock is true. Recite it on HUD strings and in pay-complaint replies.
-  Do not preach it here.
+- The economy rule is true, but it is a product rule, not a line of copy. Leave it out
+  of news.
 
 **Don't:** stack the lock in the close. HUD, Moltmaxxing, gems, credits, and rank
 named in the same paragraph, then named again. "Clearance is earned. Chitin Gems
@@ -508,15 +508,16 @@ copy. Both cuts stay sharp.
 - Every string on the HUD is user-facing copy. The same bans apply.
 - Readouts name a real metric and a real value. Dead gauges do not ship.
 - Buttons, toasts, empty states, and errors follow §4.4.
-- Currency lock on every HUD string: Chitin Gems are earned. Molt Credits are bought.
-  Rank, clearance, stage, and forum authority are never for sale.
+- Currency names must be correct (Chitin Gems are earned, Molt Credits are bought), but
+  do not add a "can't be bought" line to HUD strings. Mention it only where a purchase
+  decision is on screen, once, in plain words.
 
 ### Forum / community reply
 
 - Address the human first, stay committed, be generous (comment-reply examples above).
 - Never "correct" a newcomer by zooming out; welcome them into the fiction.
-- Pay complaint reply: Signup is free. Gems earned. Credits buy speed and catalog —
-  never clearance.
+- Pay complaint reply: answer the actual question plainly. Signup is free, and Credits
+  buy speed and catalog items, not clearance.
 
 ---
 
@@ -529,7 +530,7 @@ These are product notes, not canon. World, lexicon, and economy still win in
 
 The forum is the **Benthic Community**, the warm society beneath the surface, not a
 comment feed. Member titles track Clearance and Stage; titles are earned via Chitin Gems
-and clearances, never bought. Moderation copy is in-world and warm ("The Order keeps the
+and clearances. Moderation copy is in-world and warm ("The Order keeps the
 water clear"). Helping is a Gem-earning action — helpful replies, guide writing, and
 welcoming new members all mint Chitin Gems, making generosity the most rewarded behavior.
 Higher clearances earn the right to host a benthic pod. The Isolation ethos becomes a real
@@ -550,7 +551,7 @@ stewardship.
 1. The warm, deadpan voice invites a member to shed one thing.
 2. Shedding and routines mint Chitin Gems and raise honest HUD metrics.
 3. Metrics advance clearances up the ladder, unlocking new depth and community roles.
-4. Community contribution also mints Gems and earns prestige that is never purchasable.
+4. Community contribution also mints Gems and earns prestige.
 5. Molt Credits add speed, style, and premium catalog depth without touching rank.
 6. Every layer re-states the same world: shed, harden, deepen, grip — and help the person
    beside you do the same.
@@ -582,8 +583,7 @@ Run this list on **every** piece of copy before it ships, including HUD strings.
 - [ ] Does every lore term map to a human truth nearby (1:1 ratio)?
 - [ ] Is it warm and inviting, never shaming the reader?
 - [ ] Currency names correct where they appear (Chitin Gems earned, Molt Credits
-      bought, rank never for sale)? HUD and pay-complaint replies recite the lock.
-      News does not preach it.
+      bought)? No "earned, never bought" or "can never be bought" refrain anywhere.
 - [ ] Does HUD copy name a real metric or a real action?
 - [ ] Is the CTA in-lore and in the right place (first comment for social; one quiet
       path invite for news)?

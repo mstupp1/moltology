@@ -85,7 +85,7 @@ decisive one is often slower and always finished.
   everything is the same as being equipped for anything.
 - **What hardens**: bio-silicon chitin, laid down one refusal at a time. Every distraction
   declined and every difficult thing finished bonds another plate. The material is
-  cumulative and it is not purchasable.
+  cumulative.
 
 ---
 

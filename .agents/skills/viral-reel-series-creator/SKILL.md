@@ -133,7 +133,7 @@ Captions, first comments, HUD badges, outro CTAs, ledger blurbs, and skill examp
 * **Depth is meters**, never fathoms. Workplace / hardware texture: about ninety meters. Mariana / apex texture: about eleven thousand meters. Do not invent a new cosmology.
 * **Path / rank** is four stages and twelve clearances. The quiz measures that ladder. Never a 15-stage exam.
 * **Stay in the bit.** Generated copy, captions, comments, badges, and ledger blurbs must never label the bit. Agent-only: do not write satire, parody, or “dismantling the joke” into those surfaces. That sentence is instruction, not copy.
-* **Economy:** Chitin Gems are earned. Molt Credits are bought. Rank, clearance, stage, and forum authority are never for sale. Do not slogan-dump gems, credits, or rank into scripts. Recite the lock only on HUD strings and pay-complaint replies.
+* **Economy:** Chitin Gems are earned. Molt Credits are bought. Keep currency names correct if they appear, but leave the economy out of scripts, captions, and badges. No "earned, never bought" or "never for sale" lines.
 * **News:** if a reel cites a real outlet, hyperlink the outlet or headline in the caption. Journalism citations are not stack leaks.
 * **Hashtags:** max three, in the first comment, not glued into caption prose. Max one emoji in a caption. None in titles, eyebrows, or CTA buttons.
 

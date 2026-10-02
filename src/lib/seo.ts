@@ -328,7 +328,7 @@ export const WHAT_IS_MOLTOLOGY_HUB_FAQS: FaqItem[] = [
   {
     question: 'Is Moltology a paid religion or rank marketplace?',
     answer:
-      'No. Signup is free. Chitin Gems are earned. Molt Credits are optional paid accelerators. Rank, clearance, stage, and forum authority are never for sale.',
+      'No. Signup is free. Chitin Gems are earned. Molt Credits are optional paid accelerators. Rank, clearance, stage, and forum authority cannot be purchased.',
   },
   {
     question: 'What are the four benthic sacraments?',

@@ -29,7 +29,7 @@ const quotes = [
   },
   {
     quote:
-      'Chitin Gems feel better earned than bought. Knowing clearance cannot be purchased keeps the trench honest. We rise by shedding, not by spending.',
+      'I came for the gems and stayed for the Audit. Ten minutes a night, one thing shed, and the week stopped feeling like a pile of open tabs.',
     name: 'Mariana Clerk',
     stage: 'Exoshell Born · E2',
   },

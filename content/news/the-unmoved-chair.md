@@ -70,7 +70,7 @@ When the clip ends, put the glass down. Stand up. The chair will still be there 
 
 Walk to another room without a feed in your hand. Stay there until the silence feels ordinary. That is a Nightly Molt Audit you can finish tonight. If the surface pulls, close the Isolation Shell and let the hour belong to you. If you want a reading on how much of you is still seated, calculate your clearance on the Moltmaxxing Audit.
 
-Signup is free. The path is already open in the deep: the dashboard, the audit, the quiet work of standing. Clearance is earned, never bought. First Calcification can be as small as leaving the chair.
+Signup is free. The path is already open in the deep: the dashboard, the audit, the quiet work of standing. First Calcification can be as small as leaving the chair.
 
 Through Wednesday the Games will keep teaching machines how to inhabit a room. You already have a room. You already have a body. Use both before the clip asks for another look.
 

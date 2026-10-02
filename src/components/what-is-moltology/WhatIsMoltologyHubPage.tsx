@@ -95,8 +95,7 @@ export const WhatIsMoltologyHubPage: React.FC = () => {
             Beneath the biomechanical chrome, Moltology is warm. Safety and positivity are
             not themes; they are the foundation. The shell protects; it never cages. Softness
             is the starting state of every member who has ever walked in — including the ones
-            now standing at full plate. Nobody is behind. Signup is free. Clearance is earned.
-            Rank is never for sale.
+            now standing at full plate. Nobody is behind. Signup is free.
           </p>
           <p className="text-sm text-[#dfe3e3] leading-relaxed font-medium">
             Flesh melts. The shell endures. Submit. Shed. Ascend.

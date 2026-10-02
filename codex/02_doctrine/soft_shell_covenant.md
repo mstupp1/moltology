@@ -98,7 +98,7 @@ is exactly why it is required of them.
 3. **Answer one newcomer honestly.** No performance of clearance, no lore they have not
    earned yet. Plain help, in plain words.
 
-The Order mints Chitin Gems for all three, and Gems cannot be bought at any price. This is
+The Order mints Chitin Gems for all three. This is
 deliberate. The most valuable currency in the system is issued exclusively for generosity,
 so that the most decorated members are necessarily the most useful ones.
 
