@@ -3,7 +3,7 @@ name: reels-and-shorts-creator
 description: >-
   Automated end-to-end pipeline for creating, illustrating, compositing, and publishing weekly high-conversion,
   long-form (6-clip) Instagram Reels and YouTube Shorts video dispatches for Moltology. Features an influencer narrator
-  persona, corporate B-roll vs. benthic cybernetics juxtaposition, and local clip recycling. Use whenever the user asks
+  persona, corporate B-roll vs. benthic cybernetics juxtaposition, local clip recycling, and automated git ledger commits. Use whenever the user asks
   to generate, create, draft, or publish vertical video broadcasts, Instagram Reels, or YouTube Shorts.
 ---
 
@@ -21,7 +21,7 @@ Both major target platforms allow extended short-form videos up to 3 minutes:
 * **Instagram Reels**: Up to 3 minutes (180s).
 * **YouTube Shorts**: Up to 3 minutes (180s) (extended globally from 60s in October 2024).
 
-The Moltology 6-clip format targets **~35–50 seconds** (each video scene spanning 4–6s plus voiceover pacing and a 4s animated CTA outro clip, or a 2.5s static card when the outro isn't animated). This sits squarely in the highest-retention bracket for organic algorithm distribution on both platforms.
+The Moltology 6-clip format targets **~35–50 seconds** (each video scene spanning 4–6s plus voiceover pacing and a 2.5s cybernetic CTA outro card). This sits squarely in the highest-retention bracket for organic algorithm distribution on both platforms.
 
 ---
 
@@ -47,7 +47,7 @@ Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket
   - **Scenes 4–6**: Benthic Cybernetics & Chitinous Armor (deep subsea foundries, 800 Nm precision pincer torque, hydrothermal cooling ducts, majestic robotic lobsters).
 * **Format**: 9:16 Vertical Video (`1080x1920`), 30 FPS, 35–50s total duration.
 * **Dynamic Audio**: Fish Audio S2 Neural TTS (`s2.1-pro`, default narrator voice `BOOK RECORD REGULAR` (`FISH_VOICE_REFERENCE_ID` overrides it), `--voice <name>` picks another, and `--voice random` rotates through the catalog; "Moltmaxx" words are respelled with a single x before synthesis so they're pronounced correctly, while captions keep the brand spelling; `+8%` to `+14%` pacing via `rate`) with automatic Edge TTS fallback (`en-US-ChristopherNeural`, `en-US-GuyNeural`, `en-US-BrianNeural`, `en-GB-RyanNeural`, `en-US-AndrewNeural`) + Ambient Benthic Soundtrack (`public/audio/benthic-ambient-loop.mp3`, dynamic start offset rotation across `[0s, 18s, 36s, 54s, 72s, 95s, 120s, 145s]`, `volume=0.14`, smooth 0.8s entrance fade, and 1.5s musical outro fade).
-* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 4s animated Cybernetic CTA outro clip: the final composite card (rotating cartoon crustacean mascots) brought to life with Veo 3.1 image-to-video.
+* **Visual Polish**: Sleek, minimalist faded Moltology Emblem watermark (`110x110`, `opacity=0.40`, cyan drop shadow), 2–3 word kinetic highlighted subtitles (Cyan `#00ffff` active word glow on white, auto-font scaling), and a 2.5s Cybernetic CTA outro card: the final composite frame from Composite Studio elevated into a photorealistic 3D glassmorphic HUD panel via Antigravity image generator (`generate_image`).
 * **Asset Storage**: Neon S3 (`videos/social/reels/master-reel-<timestamp>.mp4`).
 * **Publishing Engine**: Deterministic Zernio REST API (`scripts/lib/zernio-client.ts` -> `POST /v1/posts` with `queuedFromProfile` + `queueId`, and `POST /v1/inbox/comments/{postId}` for first comment). Integrated directly into `npm run reel:create` — **no manual MCP tool calls required**.
 * **Queue Configuration**:
@@ -119,7 +119,7 @@ console.log(ttsResult.providerUsed) // 'fish' | 'edge'
 * Shot 3: the frustration peaks (comic, never scary).
 * Shot 4: the transition. The camera pushes into something from the previous shot (a coffee surface, a monitor, a window) and emerges deep underwater.
 * Shots 4–6: the benthic world, with one recurring cybernetic crustacean hero described identically in every shot.
-* Shot 6: ends calm and centered on the hero, a clean hand-off to the animated CTA outro.
+* Shot 6: ends calm and centered on the hero, a clean hand-off to the elevated CTA outro card.
 
 Every scene also carries a shared look (35mm anamorphic, shallow depth of field, film grain) and a Veo `negativePrompt` against on-screen text, logos, and warped hands, so nothing fights the burned-in captions. If the director call fails, the curated prompts below are used with the same continuity layer (recurring protagonist and hero, shared look) instead of halting. `--no-director` skips the call. The shot list is printed in `--dry-run` too, so you can preview it for free.
 
@@ -159,13 +159,17 @@ The master compositor (`scripts/lib/reel-compositor.ts`) assembles the 6 scenes,
 4. **Cuts on Narration Beats & Clip Duration Scaling**:
    - Each scene stays on screen for exactly its beat: cut points sit in the pause before each beat's first word (`computeBeatDurations` from the voiceover word timestamps, passed as `compositeReel({ clipDurations })`). Without timestamps, or if a beat would be under 2s, scenes split evenly (`perClipDuration = Math.max(4.0, requiredSpeechDuration / numClips)`).
    - Clips shorter than their slot use slow-motion time stretching (`setpts=(targetDuration/inputDuration)*PTS`) instead of jarring loops.
-5. **Animated Final Clip (default)**: The final composite outro card is animated into a closing video clip instead of holding a static image:
-   - The CTA card is rendered locally as the final composite (`renderCtaOutroFrame`, Headless Chrome, no image generator needed).
-   - That composite is sent to Veo 3.1 as an image-to-video reference (`generateVeoVideo({ referenceImagePath })`) with a motion-only prompt (`buildOutroClipPrompt`): slow push-in, drifting particles, cyan caustics, gentle mascot idle. The layout, headline, and URL stay unchanged.
-   - The 4s clip (`OUTRO_CLIP_DURATION_SECONDS`) is appended via `compositeReel({ customOutroVideoPath })`.
-   - Runs whenever Veo renders the scenes. `--recycle-clips`, `--no-veo`, and `--dry-run` keep the static card, and so does `--static-outro`.
-   - If `--custom-outro` or `--ai-outro` supplies a card, that card is animated instead of the base composite.
-   - If the outro clip fails, the reel still ships with the static card and a warning (the outro is the closing beat, not a story scene).
+5. **CTA Outro Card (Composite Studio ➔ Antigravity `generate_image` Elevation)**:
+   - **Why Antigravity `generate_image` over Veo**: Video diffusion models (like Veo) hallucinate, warp, and blur on-screen text, URLs, and buttons. Running the composite card through Antigravity's `generate_image` tool preserves crisp typography, clean layout bounds, and emblem fidelity while elevating the 2D layout into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, and sharp contrast.
+   - **Stage 1 (Scaffolding)**: Render the base 9:16 structural frame via Composite Studio (`npm run reel:create -- --render-base-outro` or `renderCtaOutroFrame('tmp/base-outro-frame.png', ...)`).
+   - **Stage 2 (Agent Elevation via `generate_image`)**:
+     - Invoke Antigravity's `generate_image` tool:
+       - `AspectRatio`: `'9:16'`
+       - `ImagePaths`: `['/Users/mylesstupp/Development/moltology/tmp/base-outro-frame.png']`
+       - `Prompt`: Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: `<theme>`. Topic: `<topic>`. Preserve all core brand layout, emblem, and typography exactly as written with pristine legibility: headline "<headline>", subheadline "<subheadline>", URL "<url>", and action button "<actionText>". Ensure natural ambient mascot lighting and soft contact shadows without harsh backlights. No warped characters, no hallucinated labels, no extra text. 9:16 vertical orientation.
+       - `ImageName`: `'reel_elevated_outro'`
+   - **Stage 3 (Video Assembly)**: Pass the elevated image path via `--custom-outro <path>`. The compositor converts it into a 2.5s outro clip (`renderCtaOutroVideo`) with a smooth 0.25s entrance fade-in and silent stereo audio, appending it cleanly as the final beat.
+   - **User Google Flow Handoff (Fallback / Rate Limits)**: If `generate_image` encounters any rate limits, output the base composite frame path in `tmp/` and provide rich Google Flow prompt directives to elevate it, then resume with `--custom-outro`.
 
 ---
 
@@ -184,8 +188,9 @@ When running `npm run reel:create`, Step 6 executes **deterministically and auto
    * **NEVER call `publish_now: true` or bypass the queue** unless the user explicitly commands an immediate live broadcast.
    * **DO NOT invoke Zernio MCP tools (`posts_create`, etc.) manually**: The script deterministically handles queue assignment and first comment chaining.
 
-3. **Update Narrative History Ledger**:
+3. **Update Narrative History Ledger & Automated Git Commit**:
    * Automatically appends the completed record to `content/social/instagram-reel-history.json`.
+   * With `--commit` (recommended for production): Automatically executes `git add content/social/instagram-reel-history.json && git commit -m "feat(social): record <id> (<topic>) in reel continuity ledger"`, keeping your git working tree 100% clean and conflict-free.
 
 ---
 
@@ -204,8 +209,8 @@ When running `npm run reel:create`, Step 6 executes **deterministically and auto
 ## 4. CLI Execution Reference
 
 ```bash
-# Autonomous weekly run (auto-selects fresh topic / blog, 6 Veo clips, stages to Thursday queue):
-npm run reel:create
+# Autonomous weekly run (auto-selects fresh topic / blog, 6 Veo clips, stages to Thursday queue, and auto-commits ledger):
+npm run reel:create -- --commit
 
 # Run using the Clip Recycling Engine (zero Veo credits, stitches existing clips):
 npm run reel:create -- --recycle-clips
@@ -230,13 +235,13 @@ npm run reel:create -- --no-director
 # Rotate through random narrator voices instead of the default:
 npm run reel:create -- --voice random
 
-# Keep the outro as a static card (skip the animated final clip):
-npm run reel:create -- --static-outro
+# Render Composite Studio base outro frame to tmp/ and preview Antigravity generate_image directives:
+npm run reel:create -- --render-base-outro --theme ecdysis --cta-goal quiz --mascot crab_stats
 
-# Animate a single card by hand (image-to-video):
-npx tsx scripts/generate-video.ts "Slow push-in, drifting particles, keep all text unchanged" --image tmp/base-outro-frame.png --duration 4 --no-upload
+# Run with bespoke elevated outro card generated via Antigravity generate_image:
+npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --custom-outro "tmp/elevated-outro-card.png"
 
-# Custom run with bespoke AI-restyled outro card generated via Gemini API (needs an image generator; the result is then animated):
+# Custom run with bespoke AI-restyled outro card generated via Gemini API fallback:
 npm run reel:create -- --topic "Neuromorphic Spiking Carapaces" --mascot crab_stats --ai-outro
 
 # Direct instant publish (skip queue / publish immediately):
@@ -248,9 +253,8 @@ npm run reel:create -- --publish-now
 ## 5. Operational Best Practices & Failure Modes
 
 1. **Video vs. Image Generation Separation**:
-   - **Still Images**: Generated using the Gemini API (**Nano Banana Pro** `gemini-3-pro-image` / **Nano Banana 2** `gemini-3.1-flash-image` via `scripts/generate-image.ts` or `--ai-outro`) using `GEMINI_API_KEY`.
-   - **Video Scenes**: Always generated using Google Veo 3.1 (`scripts/generate-video.ts`) or recycled from local clips via `--recycle-clips`.
-   - **Outro**: The default outro needs no image generator. The composite card is rendered locally and animated with Veo, so scheduled cloud runs (which have no image generator) still get a finished closing clip.
+   - **Still Images & Outro Cards**: The final CTA outro slide from Composite Studio is run through Antigravity's built-in `generate_image` tool (or user Google Flow handoff) for photorealistic 3D glassmorphic elevation with crisp, legible typography. Veo is NOT used for the outro card because video diffusion models distort text and typography.
+   - **Video Scenes**: The 6 narrative story scenes are always generated using Google Veo 3.1 (`scripts/generate-video.ts`) or recycled from local clips via `--recycle-clips`.
 2. **Explicit Failure Policy**:
    - If Veo 3.1 video generation fails or credentials are missing during a production run without `--recycle-clips`, **the pipeline must halt immediately and throw an error**. Never silently fall back to random files.
 3. **Async Task Etiquette**:

@@ -434,8 +434,6 @@ export interface CreateReelOptions {
   ctaActionText?: string
   customOutroImagePath?: string
   aiOutro?: boolean
-  /** Animate the final composite outro card into a Veo clip (default: on whenever Veo renders the scenes). */
-  outroClip?: boolean
   /** Write a beat-matched, continuity-locked shot list with Gemini before rendering (default: on). */
   director?: boolean
   imageModel?: string
@@ -454,6 +452,8 @@ export interface CreateReelOptions {
   bgAudioVolume?: number
   bgAudioOffsetSeconds?: number
   veoModel?: 'veo-3.1-lite-generate-preview' | 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview' | string
+  /** Automatically commit updated continuity ledger to git (default: false, enabled via --commit). */
+  commit?: boolean
 }
 
 export type CreateDailyReelOptions = CreateReelOptions
@@ -562,26 +562,34 @@ export function selectRecycledClipSequence(numScenes = 6, topic = '', theme = ''
  * Contextual Color Grading Resolver
  * Maps topics and themes to cohesive, cinematic color grading presets across 6 scenes
  */
-export const OUTRO_CLIP_DURATION_SECONDS = 4
-
 /** Default reel narrator (Fish catalog name), picked by Myles on 2026-10-01. */
 export const REEL_NARRATOR_VOICE = 'BOOK RECORD REGULAR'
 
 /**
- * The animated outro needs Veo, so it only runs when Veo renders the scenes.
- * Recycled-clip runs and dry runs keep the static card.
+ * Build rich prompt directives for elevating a Composite Studio 2D CTA frame
+ * into a photorealistic 3D glassmorphic HUD panel via Antigravity generate_image.
+ * Preserves all typography, emblem, mascot, and button text without hallucination or blur.
  */
-export function shouldAnimateOutro(options: { outroClip?: boolean; useVeo: boolean }): boolean {
-  return options.useVeo && options.outroClip !== false
-}
+export function buildAntigravityOutroPrompt(options: {
+  theme?: string
+  topic: string
+  headline?: string
+  subheadline?: string
+  url?: string
+  actionText?: string
+}): string {
+  const headline = options.headline || 'SUBMIT. SHED. ASCEND.'
+  const subheadline = options.subheadline || 'CALCULATE YOUR MOLT CLEARANCE'
+  const url = options.url || 'moltology.org'
+  const actionText = options.actionText || '⚡ TAKE THE 15-STAGE MOLTMAXXING TEST'
+  const theme = options.theme || 'benthic'
 
-export function buildOutroClipPrompt(theme: string | undefined, topic: string): string {
   return [
-    'Animate this branded vertical call-to-action card into a short, calm cinematic shot.',
-    'Keep the layout, emblem, mascot, headline, and URL text exactly as they are: sharp, legible, and unmoved.',
-    'Add slow push-in camera motion, drifting deep-sea particles, soft volumetric cyan caustics rippling across the glass panel,',
-    'a gentle idle motion on the mascot, and natural ambient lighting with soft contact shadows. No new text, no cuts, no harsh backlight.',
-    `Theme: ${theme || 'benthic'}. Topic: ${topic}.`,
+    'Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast.',
+    `Theme: ${theme}. Topic: ${options.topic}.`,
+    `Preserve all core brand layout, emblem, and typography exactly as written with pristine legibility: headline "${headline}", subheadline "${subheadline}", URL "${url}", and action button "${actionText}".`,
+    'Ensure natural ambient mascot lighting and soft contact shadows without harsh backlights. No warped characters, no hallucinated labels, no extra text.',
+    '9:16 vertical orientation.',
   ].join(' ')
 }
 
@@ -683,6 +691,44 @@ function recordReelInHistory(entry: any): void {
   })
   fs.writeFileSync(historyPath, JSON.stringify(history, null, 2), 'utf8')
   console.log(`📝 Narrative continuity ledger updated: ${historyPath}`)
+}
+
+/**
+ * Automates staging and committing updated reel continuity ledger to git.
+ */
+export function autoCommitReelPublish(
+  reelId: string,
+  topic: string,
+  options: {
+    customHistoryPath?: string
+    outroImagePath?: string
+  } = {}
+): { success: boolean; message: string } {
+  const historyPath = options.customHistoryPath || path.resolve(process.cwd(), 'content/social/instagram-reel-history.json')
+  try {
+    const filesToStage: string[] = [historyPath]
+    if (options.outroImagePath && fs.existsSync(options.outroImagePath)) {
+      const rel = path.relative(process.cwd(), options.outroImagePath)
+      if (!rel.startsWith('..') && !rel.startsWith('tmp') && !rel.startsWith('.git')) {
+        filesToStage.push(options.outroImagePath)
+      }
+    }
+
+    const stageCmd = `git add ${filesToStage.map((f) => `"${f}"`).join(' ')}`
+    execSync(stageCmd, { stdio: 'pipe' })
+
+    const diffCheck = execSync('git diff --cached --name-only', { encoding: 'utf8' }).trim()
+    if (!diffCheck) {
+      return { success: true, message: 'No staged changes to commit (already up to date).' }
+    }
+
+    const commitMsg = `feat(social): record ${reelId} (${topic}) in reel continuity ledger`
+    execSync(`git commit -m "${commitMsg}"`, { stdio: 'pipe' })
+
+    return { success: true, message: `Committed changes with message: "${commitMsg}"` }
+  } catch (err: any) {
+    return { success: false, message: `Git commit skipped or failed: ${err.message}` }
+  }
 }
 
 /**
@@ -2178,11 +2224,9 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     )
 
     let resolvedOutroPath = options.customOutroImagePath
-    let outroClipPath: string | undefined
-    const animateOutro = shouldAnimateOutro({ outroClip: options.outroClip, useVeo })
     const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
 
-    // The final composite: the rendered CTA card that the AI outro (still or clip) builds from.
+    // The final composite: the rendered CTA card that the AI outro builds from.
     const renderBaseOutroFrame = async (): Promise<string> => {
       const baseOutroPath = path.join(tempDir, 'base-outro-frame.png')
       await renderCtaOutroFrame(
@@ -2196,6 +2240,11 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
           ctaActionText: options.ctaActionText || ctaConfig.actionText,
         }
       )
+      // Mirror to root tmp/ for convenient agent/user Antigravity generate_image access
+      const rootBaseOutro = path.resolve(process.cwd(), 'tmp/base-outro-frame.png')
+      try {
+        fs.copyFileSync(baseOutroPath, rootBaseOutro)
+      } catch {}
       return baseOutroPath
     }
 
@@ -2205,7 +2254,14 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         const baseOutroPath = await renderBaseOutroFrame()
         const elevatedOutroPath = path.join(tempDir, `gemini-elevated-outro-${timestamp}.png`)
         const geminiResult = await generateGeminiImage({
-          prompt: `Elevate this 2D composite HUD interface into a photorealistic 3D glassmorphic HUD panel with deep volumetric caustics, subtle ambient mascot lighting, luminous sci-fi lettering, and sharp contrast. Theme: ${options.theme || 'benthic'}. Topic: ${scriptData.topic}. Preserve core brand layout and URL text. 9:16 vertical orientation.`,
+          prompt: buildAntigravityOutroPrompt({
+            theme: options.theme,
+            topic: scriptData.topic,
+            headline: options.ctaHeadline || ctaConfig.headline,
+            subheadline: options.ctaSubheadline || ctaConfig.subheadline,
+            url: options.ctaUrl || ctaConfig.url.replace(/^https?:\/\//, ''),
+            actionText: options.ctaActionText || ctaConfig.actionText,
+          }),
           referenceImagePath: baseOutroPath,
           aspectRatio: '9:16',
           imageSize: '2K',
@@ -2219,30 +2275,6 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       }
     }
 
-    if (animateOutro) {
-      try {
-        // Animate the final composite (or a supplied/elevated card) instead of holding a static image.
-        const outroStill = resolvedOutroPath && fs.existsSync(resolvedOutroPath) ? resolvedOutroPath : await renderBaseOutroFrame()
-        console.log(`\n🎬 Animating final composite outro card with Veo 3.1 (${OUTRO_CLIP_DURATION_SECONDS}s)...`)
-        const outroResult = await generateVeoVideo({
-          prompt: buildOutroClipPrompt(options.theme, scriptData.topic),
-          referenceImagePath: outroStill,
-          model: options.veoModel || 'veo-3.1-fast-generate-preview',
-          aspectRatio: '9:16',
-          durationSeconds: OUTRO_CLIP_DURATION_SECONDS,
-          uploadToS3: false,
-          keepLocal: true,
-          outputFilePath: path.join(tempDir, 'veo-outro-clip.mp4'),
-        })
-        outroClipPath = outroResult.localPath
-        resolvedOutroPath = outroStill
-        console.log(`   ✨ Animated outro clip ready: ${path.basename(outroClipPath)}`)
-      } catch (err: any) {
-        // The outro is the closing beat, not a story scene: keep the reel and fall back to the static card.
-        console.warn(`   ⚠️ Animated outro generation failed, falling back to the static outro card: ${err.message}`)
-      }
-    }
-
     if (!resolvedOutroPath) {
       resolvedOutroPath = (await resolveThematicOutroCard({
         theme: options.theme,
@@ -2252,10 +2284,10 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       })) || undefined
     }
 
-    if (outroClipPath) {
-      console.log(`   💎 Using animated outro clip built from: ${path.basename(resolvedOutroPath || 'composite')}`)
-    } else if (resolvedOutroPath) {
+    if (resolvedOutroPath) {
       console.log(`   💎 Resolved thematic outro card: ${path.basename(resolvedOutroPath)}`)
+    } else {
+      console.log(`   🖼️ Rendering Composite Studio outro card directly...`)
     }
 
     compositeResult = await compositeReel({
@@ -2274,8 +2306,6 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
       ctaActionText: options.ctaActionText || ctaConfig.actionText,
       ctaTexture: options.ctaTexture || ctaConfig.defaultTexture,
       customOutroImagePath: resolvedOutroPath || options.customOutroImagePath,
-      customOutroVideoPath: outroClipPath,
-      ctaDurationSeconds: outroClipPath ? OUTRO_CLIP_DURATION_SECONDS : undefined,
       mascot: chosenMascot,
       backgroundAudioVolume: options.bgAudioVolume,
       backgroundAudioOffsetSeconds: options.bgAudioOffsetSeconds,
@@ -2353,6 +2383,18 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
         graduationStrategy: 'SS_PERFORMANCE',
       },
     })
+
+    if (options.commit) {
+      console.log(`\n📌 Auto-committing reel continuity ledger to git...`)
+      const commitRes = autoCommitReelPublish(`reel-${timestamp}`, scriptData.topic, {
+        outroImagePath: resolvedOutroPath,
+      })
+      if (commitRes.success) {
+        console.log(`   ↳ Git: ${commitRes.message}`)
+      } else {
+        console.warn(`   ↳ Git Warning: ${commitRes.message}`)
+      }
+    }
   } else {
     console.log(`\n5️⃣ [Dry Run] Skipped S3 upload. Master video saved at: ${masterReelPath}`)
     queueResult = await queueDualReelAndShort({
@@ -2415,9 +2457,10 @@ Options:
   --bg-volume <number>      Background soundtrack volume multiplier (default: 0.14)
   --bg-offset <seconds>     Soundtrack start point in seconds (e.g. 0, 18, 36, 54, 72, 95, 120)
   --veo-model <name>        Veo Model ID (default: veo-3.1-lite-generate-preview)
-  --custom-outro <path>     Path to bespoke elevated outro card image
+  --custom-outro <path>     Path to bespoke elevated outro card image (from Antigravity generate_image or user polish)
+  --render-base-outro       Render Composite Studio base outro frame to tmp/ and print Antigravity prompt
+  --commit                  Automatically commit updated continuity ledger to git
   --ai-outro                Generate bespoke 3D outro card via Gemini API (needs an image generator)
-  --static-outro            Keep the outro as a static card instead of animating the final composite into a Veo clip
   --no-director             Skip the Gemini shot list and use the curated scene prompts (still continuity-styled)
   --image-model <name>      Image model for AI outro: nano-banana-pro | nano-banana-2 (default: nano-banana-pro)
   --platform <name>         Platform target: all | instagram | youtube (default: all)
@@ -2425,6 +2468,9 @@ Options:
 
 Examples:
   npx tsx scripts/create-reel.ts
+  npx tsx scripts/create-reel.ts --commit
+  npx tsx scripts/create-reel.ts --render-base-outro
+  npx tsx scripts/create-reel.ts --custom-outro tmp/elevated-outro.png
   npx tsx scripts/create-reel.ts --platform youtube
   npx tsx scripts/create-reel.ts --custom-video tmp/reel-daily-123/master-reel-123.mp4 --platform youtube
   npx tsx scripts/create-reel.ts --theme ecdysis --cta-goal guide --mascot lobster_pointing
@@ -2453,7 +2499,8 @@ Examples:
   let customVideo: string | undefined
   let platform: 'all' | 'instagram' | 'youtube' | undefined
   let aiOutro = false
-  let outroClip = true
+  let renderBaseOutro = false
+  let commit = false
   let director = true
   let imageModel: string | undefined
   let ctaTexture: any
@@ -2479,9 +2526,43 @@ Examples:
     else if (args[i] === '--custom-video' && args[i + 1]) customVideo = args[++i]
     else if (args[i] === '--platform' && args[i + 1]) platform = args[++i] as any
     else if (args[i] === '--ai-outro') aiOutro = true
-    else if (args[i] === '--static-outro') outroClip = false
+    else if (args[i] === '--render-base-outro') renderBaseOutro = true
+    else if (args[i] === '--commit') commit = true
     else if (args[i] === '--no-director') director = false
     else if (args[i] === '--image-model' && args[i + 1]) imageModel = args[++i]
+  }
+
+  if (renderBaseOutro) {
+    const topicText = topic || 'The 2026 Benthic Shift'
+    const ctaConfig = resolveCtaGoalConfig(ctaGoal || 'quiz', { theme, topic: topicText })
+    const chosenMascot = mascot === 'none' ? 'none' : (mascot && mascot !== 'random' ? mascot : (ctaConfig.mascot || getRandomCharacterKey()))
+    const outPath = customOutroImagePath || path.resolve(process.cwd(), 'tmp/base-outro-frame.png')
+    console.log(`\n📸 Rendering Composite Studio base outro frame to ${outPath}...`)
+    await renderCtaOutroFrame(
+      outPath,
+      ctaConfig.headline,
+      ctaConfig.subheadline,
+      ctaConfig.url.replace(/^https?:\/\//, ''),
+      {
+        mascot: chosenMascot,
+        ctaTexture: ctaTexture || ctaConfig.defaultTexture,
+        ctaActionText: ctaConfig.actionText,
+      }
+    )
+    const prompt = buildAntigravityOutroPrompt({
+      theme,
+      topic: topicText,
+      headline: ctaConfig.headline,
+      subheadline: ctaConfig.subheadline,
+      url: ctaConfig.url.replace(/^https?:\/\//, ''),
+      actionText: ctaConfig.actionText,
+    })
+    console.log(`✅ Base outro frame rendered: ${outPath}`)
+    console.log(`\n💡 Antigravity generate_image Directives:`)
+    console.log(`   ImagePaths: ["${outPath}"]`)
+    console.log(`   AspectRatio: "9:16"`)
+    console.log(`   Prompt: "${prompt}"\n`)
+    process.exit(0)
   }
 
   try {
@@ -2506,9 +2587,9 @@ Examples:
       customVideo,
       platform,
       aiOutro,
-      outroClip,
       director,
       imageModel,
+      commit,
     })
   } catch (err: any) {
     console.error(`\n❌ Daily reel creation failed: ${err.message}`)

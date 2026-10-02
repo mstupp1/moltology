@@ -7,8 +7,8 @@ import {
   getLocalClipPool,
   selectRecycledClipSequence,
   resolveColorGradingPresets,
-  shouldAnimateOutro,
-  buildOutroClipPrompt,
+  buildAntigravityOutroPrompt,
+  autoCommitReelPublish,
 } from './create-reel'
 import { getImageMimeType } from './generate-video'
 
@@ -236,22 +236,30 @@ describe('Reels & Shorts Dynamic Script Formulation & Clip Recycling', () => {
   })
 })
 
-describe('Animated outro clip', () => {
-  it('animates the outro by default only when Veo renders the scenes', () => {
-    expect(shouldAnimateOutro({ useVeo: true })).toBe(true)
-    expect(shouldAnimateOutro({ useVeo: true, outroClip: true })).toBe(true)
-    expect(shouldAnimateOutro({ useVeo: true, outroClip: false })).toBe(false)
-    expect(shouldAnimateOutro({ useVeo: false })).toBe(false)
-    expect(shouldAnimateOutro({ useVeo: false, outroClip: true })).toBe(false)
-  })
-
-  it('builds a prompt that keeps the card text intact and carries theme and topic', () => {
-    const prompt = buildOutroClipPrompt('ecdysis', 'Hydrostatic Cooling')
-    expect(prompt).toContain('Keep the layout')
-    expect(prompt).toContain('No new text')
+describe('Antigravity CTA outro elevation', () => {
+  it('builds an Antigravity image generator prompt that preserves typography and carries theme and topic', () => {
+    const prompt = buildAntigravityOutroPrompt({
+      theme: 'ecdysis',
+      topic: 'Hydrostatic Cooling',
+      headline: 'SUBMIT. SHED. ASCEND.',
+      subheadline: 'CALCULATE YOUR MOLT CLEARANCE',
+      url: 'moltology.org/quiz',
+      actionText: '⚡ TAKE THE 15-STAGE TEST',
+    })
+    expect(prompt).toContain('3D glassmorphic HUD panel')
     expect(prompt).toContain('Theme: ecdysis')
     expect(prompt).toContain('Topic: Hydrostatic Cooling')
-    expect(buildOutroClipPrompt(undefined, 'x')).toContain('Theme: benthic')
+    expect(prompt).toContain('headline "SUBMIT. SHED. ASCEND."')
+    expect(prompt).toContain('subheadline "CALCULATE YOUR MOLT CLEARANCE"')
+    expect(prompt).toContain('URL "moltology.org/quiz"')
+    expect(prompt).toContain('9:16 vertical orientation')
+  })
+
+  it('falls back to default benthic theme and standard headlines when omitted', () => {
+    const prompt = buildAntigravityOutroPrompt({ topic: 'Deep Trench Cooling' })
+    expect(prompt).toContain('Theme: benthic')
+    expect(prompt).toContain('Topic: Deep Trench Cooling')
+    expect(prompt).toContain('SUBMIT. SHED. ASCEND.')
   })
 
   it('maps reference image extensions to Veo mime types', () => {
@@ -259,5 +267,14 @@ describe('Animated outro clip', () => {
     expect(getImageMimeType('a/frame.JPG')).toBe('image/jpeg')
     expect(getImageMimeType('a/frame.jpeg')).toBe('image/jpeg')
     expect(getImageMimeType('a/frame.webp')).toBe('image/webp')
+  })
+})
+
+describe('autoCommitReelPublish', () => {
+  it('handles git staging and commit gracefully without throwing', () => {
+    const res = autoCommitReelPublish('reel-test-123', 'Test Topic')
+    expect(res).toBeDefined()
+    expect(typeof res.success).toBe('boolean')
+    expect(typeof res.message).toBe('string')
   })
 })
