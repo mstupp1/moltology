@@ -196,4 +196,36 @@ describe('directScenePrompts', () => {
     const result = await directScenePrompts({ beats, topic: 't', fallbackPrompts, apiKey: '' })
     expect(result.source).toBe('fallback')
   })
+
+  it('binds canonical Composite Studio mascots to the hero in directScenePrompts', async () => {
+    const result = await directScenePrompts({
+      beats,
+      topic: 't',
+      fallbackPrompts,
+      mascot: 'lobster_engineer',
+      apiKey: '',
+    })
+    expect(result.source).toBe('fallback')
+    expect(result.bible.mascotKey).toBe('lobster_engineer')
+    expect(result.bible.hero).toContain('yellow safety hardhat')
+    expect(result.bible.hero).toContain('holographic diagnostic tablet')
+    expect(result.prompts[1]).toContain('yellow safety hardhat')
+  })
 })
+
+describe('resolveHeroForMascot', () => {
+  it('resolves canonical mascots and common aliases', async () => {
+    const { resolveHeroForMascot } = await import('./reel-director')
+    expect(resolveHeroForMascot('lobster_engineer')?.key).toBe('lobster_engineer')
+    expect(resolveHeroForMascot('engineer')?.key).toBe('lobster_engineer')
+    expect(resolveHeroForMascot('crab_stats')?.key).toBe('crab_stats')
+    expect(resolveHeroForMascot('stats')?.key).toBe('crab_stats')
+    expect(resolveHeroForMascot('lobster_navigator')?.key).toBe('lobster_navigator')
+    expect(resolveHeroForMascot('explorer')?.key).toBe('lobster_navigator')
+    expect(resolveHeroForMascot('lobster_peaceful')?.key).toBe('lobster_peaceful')
+    expect(resolveHeroForMascot('zen')?.key).toBe('lobster_peaceful')
+    expect(resolveHeroForMascot('none')).toBeNull()
+    expect(resolveHeroForMascot('random')).toBeNull()
+  })
+})
+

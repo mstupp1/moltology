@@ -2079,6 +2079,13 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     slug: scriptData.relatedBlogSlug,
   })
 
+  const chosenMascot =
+    options.mascot === 'none'
+      ? 'none'
+      : options.mascot && options.mascot !== 'random'
+      ? options.mascot
+      : ctaConfig.mascot || getRandomCharacterKey()
+
   let masterReelPath: string
   let publicUrl: string | undefined
   let s3Key: string | undefined
@@ -2143,8 +2150,13 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     // Shot list: Gemini writes one prompt per beat with a recurring protagonist and hero (falls back to curated pools).
     let scenePrompts = scriptData.scenePrompts
     if ((useVeo || options.dryRun) && options.director !== false && scenePrompts.length === beats.length) {
-      console.log(`\n🎬 Directing a beat-matched shot list...`)
-      const directed = await directScenePrompts({ beats, topic: scriptData.topic, fallbackPrompts: scenePrompts })
+      console.log(`\n🎬 Directing a beat-matched shot list with canonical mascot ("${chosenMascot}")...`)
+      const directed = await directScenePrompts({
+        beats,
+        topic: scriptData.topic,
+        fallbackPrompts: scenePrompts,
+        mascot: chosenMascot,
+      })
       scenePrompts = directed.prompts
       if (directed.source === 'director') {
         console.log(`   • Director (${directed.model}) protagonist: ${directed.bible.protagonist}`)
@@ -2224,7 +2236,6 @@ export async function createDailyReel(options: CreateDailyReelOptions = {}): Pro
     )
 
     let resolvedOutroPath = options.customOutroImagePath
-    const chosenMascot = options.mascot === 'none' ? 'none' : (options.mascot && options.mascot !== 'random' ? options.mascot : (ctaConfig.mascot || getRandomCharacterKey()))
 
     // The final composite: the rendered CTA card that the AI outro builds from.
     const renderBaseOutroFrame = async (): Promise<string> => {

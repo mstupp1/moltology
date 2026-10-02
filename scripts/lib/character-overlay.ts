@@ -278,3 +278,22 @@ export async function overlayCharacterOnImage(
   fs.writeFileSync(outputImagePath, isPng ? canvas.toBuffer('image/png') : canvas.toBuffer('image/jpeg'))
   return outputImagePath
 }
+
+/**
+ * Normalize any alias, casing, or variation to standard mascot key
+ */
+export function normalizeMascotKey(rawKey?: string): string {
+  if (!rawKey) return 'lobster_thumbs_up'
+  const raw = rawKey.toLowerCase().trim()
+
+  if (raw === 'lobster_pointing_cta' || raw === 'pointing' || raw === 'cta' || raw === 'lobster_cta') return 'lobster_pointing'
+  if (raw === 'lobster_corner_peek' || raw === 'peek' || raw === 'corner_peek') return 'lobster_peek'
+  if (raw === 'crab_pointing_stats' || raw === 'crab_stats' || raw === 'stats' || raw === 'pointing_stats') return 'crab_stats'
+  if (raw === 'lobster_navigator' || raw === 'navigator' || raw === 'explorer' || raw === 'lobster_speed_action' || raw === 'speed_action' || raw === 'lobster_action' || raw === 'action' || raw === 'speed') return 'lobster_navigator'
+  if (raw === 'lobster_floating_peaceful' || raw === 'floating_peaceful' || raw === 'peaceful' || raw === 'zen' || raw === 'floating') return 'lobster_peaceful'
+  if (raw === 'lobster_engineer' || raw === 'engineer' || raw === 'diagnostic' || raw === 'hardhat') return 'lobster_engineer'
+  if (raw === 'thumbs_up' || raw === 'thumbs' || raw === 'approval' || raw === 'lobster_thumbs') return 'lobster_thumbs_up'
+
+  return raw
+}
+
