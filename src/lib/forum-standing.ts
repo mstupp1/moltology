@@ -1,7 +1,6 @@
 /**
- * Forum Standing: earned trust that decides who may open threads and which
- * replies sink. Standing is upvotes from other members plus review
- * adjustments. It is earned only, never bought (BRAND_BIBLE §4.4).
+ * Forum Standing decides who may open threads and which replies sink.
+ * Standing is upvotes from other members plus review adjustments.
  *
  * Pure rules live here. Reads and writes live in server/forum-standing.ts.
  */
