@@ -63,8 +63,8 @@ describe('WelcomeSplash Flow Component', () => {
     fireEvent.click(proceedBtn)
 
     // Verify Step 2 is now mounted
-    expect(screen.getByText(/CALIBRATE LARVAL CHASSIS/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Randomize/i })).toBeInTheDocument()
+    expect(screen.getByText(/Build your crustacean/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Surprise me/i })).toBeInTheDocument()
     expect(screen.getByText(/Base Biometrics Roller/i)).toBeInTheDocument()
     expect(screen.getByText(/300 \/ 300 PTS/i)).toBeInTheDocument()
   })
@@ -76,7 +76,7 @@ describe('WelcomeSplash Flow Component', () => {
     const skipBtn = screen.getByText(/Skip Transmission/i)
     fireEvent.click(skipBtn)
 
-    expect(screen.getByText(/CALIBRATE LARVAL CHASSIS/i)).toBeInTheDocument()
+    expect(screen.getByText(/Build your crustacean/i)).toBeInTheDocument()
   })
 
   it('allows switching between steps via the top navigation pills', () => {
@@ -86,7 +86,7 @@ describe('WelcomeSplash Flow Component', () => {
     // Click Step 2 pill
     const step2Pill = screen.getByRole('button', { name: /02 · CARAPACE & STATS/i })
     fireEvent.click(step2Pill)
-    expect(screen.getByText(/CALIBRATE LARVAL CHASSIS/i)).toBeInTheDocument()
+    expect(screen.getByText(/Build your crustacean/i)).toBeInTheDocument()
 
     // Click Step 1 pill
     const step1Pill = screen.getByRole('button', { name: /01 · TRANSMISSION/i })

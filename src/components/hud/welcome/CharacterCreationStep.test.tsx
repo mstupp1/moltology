@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { CharacterCreationStep } from './CharacterCreationStep'
 import { resetLobsterFullBodyMotionForTests } from '@/lib/lobster-avatar-slots'
 
@@ -31,55 +31,7 @@ describe('CharacterCreationStep', () => {
     resetLobsterFullBodyMotionForTests()
   })
 
-  it('renders view-only seed number and does not render height slider', () => {
-    const onBack = vi.fn()
-    const onComplete = vi.fn()
-    render(
-      <CharacterCreationStep
-        initialSeed="larva-test-123"
-        onBack={onBack}
-        onComplete={onComplete}
-      />,
-    )
-
-    // Should render Seed Number view-only section
-    expect(screen.getByText('Seed Number')).toBeInTheDocument()
-    expect(screen.queryByText('VIEW ONLY')).not.toBeInTheDocument()
-    const seedEl = screen.getByTestId('seed-number')
-    expect(seedEl).toBeInTheDocument()
-    expect(seedEl.textContent).toBe('larva-test-123')
-
-    // Should NOT render height slider / options
-    expect(screen.queryByText(/Chassis Height/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^short$/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^regular$/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^tall$/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^towering$/i })).not.toBeInTheDocument()
-  })
-
-  it('updates the view-only seed number when clicking Randomize', () => {
-    const onBack = vi.fn()
-    const onComplete = vi.fn()
-    render(
-      <CharacterCreationStep
-        initialSeed="larva-fixed-seed"
-        onBack={onBack}
-        onComplete={onComplete}
-      />,
-    )
-
-    const seedEl = screen.getByTestId('seed-number')
-    expect(seedEl.textContent).toBe('larva-fixed-seed')
-
-    const randomizeBtn = screen.getByRole('button', { name: /Randomize/i })
-    fireEvent.click(randomizeBtn)
-
-    // Seed should have changed from initial
-    expect(seedEl.textContent).not.toBe('larva-fixed-seed')
-    expect(seedEl.textContent).toMatch(/^larva-/)
-  })
-
-  it('renders circular animated portrait preview and does not mount square full-body', () => {
+  it('renders the live preview with both the full body and the portrait inset', () => {
     render(
       <CharacterCreationStep
         initialSeed="larva-motion-seed"
@@ -88,8 +40,41 @@ describe('CharacterCreationStep', () => {
       />,
     )
 
-    expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
-    expect(screen.queryByTestId('lobster-avatar-full-body')).toBeNull()
-    expect(screen.getByTestId('lobster-avatar-inline-svg')).toBeInTheDocument()
+    expect(screen.getByTestId('avatar-creator-preview')).toBeInTheDocument()
+    expect(screen.getByTestId('lobster-avatar-full-body')).toBeInTheDocument()
+    expect(screen.getAllByTestId('lobster-avatar-portrait').length).toBeGreaterThan(0)
+    expect(screen.getByTestId('avatar-creator-panel')).toBeInTheDocument()
+    expect(screen.queryByText('Seed Number')).not.toBeInTheDocument()
+  })
+
+  it('switches race and shows the matching race as selected', () => {
+    render(
+      <CharacterCreationStep
+        initialSeed="larva-race-seed"
+        onBack={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    const raceGroup = screen.getByRole('group', { name: 'Race' })
+    const crab = within(raceGroup).getByRole('button', { name: /Crab/i })
+    expect(crab).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(crab)
+    expect(crab).toHaveAttribute('aria-pressed', 'true')
+    expect(within(raceGroup).getByRole('button', { name: /Lobster/i })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('keeps the chosen race when surprising the member with a new look', () => {
+    render(
+      <CharacterCreationStep
+        initialConfig={{ style: 'critters', seed: 'larva-surprise', race: 'crab' }}
+        onBack={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /Surprise me/i }))
+    const raceGroup = screen.getByRole('group', { name: 'Race' })
+    expect(within(raceGroup).getByRole('button', { name: /Crab/i })).toHaveAttribute('aria-pressed', 'true')
   })
 })

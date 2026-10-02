@@ -5,15 +5,15 @@ import {
   Sparkles,
   ChevronLeft,
   CheckCircle2,
-  Lock,
 } from 'lucide-react'
 import {
   LOBSTER_AVATAR_STYLE,
-  getLobsterAvatarSeededOptions,
+  lockAvatarConfig,
   randomLobsterSeed,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
+import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
+import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import {
   adjustStat,
   calculateStatSum,
@@ -33,6 +33,8 @@ import { DesignationField } from '../DesignationField'
 
 export interface CharacterCreationStepProps {
   initialSeed?: string
+  /** A saved or in-progress character to keep editing. */
+  initialConfig?: LobsterAvatarConfig | null
   initialStats?: BaseStats
   initialHandle?: string
   requireHandle?: boolean
@@ -43,6 +45,7 @@ export interface CharacterCreationStepProps {
 
 export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   initialSeed,
+  initialConfig,
   initialStats,
   initialHandle = '',
   requireHandle = true,
@@ -50,31 +53,14 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
   onComplete,
   isSubmitting = false,
 }) => {
-  const [seed, setSeed] = useState(() => initialSeed || randomLobsterSeed())
+  const [avatarConfig, setAvatarConfig] = useState<LobsterAvatarConfig>(
+    () => initialConfig ?? { style: LOBSTER_AVATAR_STYLE, seed: initialSeed || randomLobsterSeed() }
+  )
   const [handle, setHandle] = useState(initialHandle)
-  const [isSpinningSeed, setIsSpinningSeed] = useState(false)
 
   const [stats, setStats] = useState<BaseStats>(() => initialStats || DEFAULT_BASE_STATS)
   const [displayStats, setDisplayStats] = useState<BaseStats>(() => initialStats || DEFAULT_BASE_STATS)
   const [isRolling, setIsRolling] = useState(false)
-
-  const seededHeight = useMemo(() => {
-    return getLobsterAvatarSeededOptions(seed.trim() || 'larva-initiate').height
-  }, [seed])
-
-  const previewConfig = useMemo((): LobsterAvatarConfig => ({
-    style: LOBSTER_AVATAR_STYLE,
-    seed: seed.trim() || 'larva-initiate',
-    height: seededHeight,
-  }), [seed, seededHeight])
-
-  // Handle avatar re-roll
-  const handleRandomize = useCallback(() => {
-    setIsSpinningSeed(true)
-    const newSeed = randomLobsterSeed()
-    setSeed(newSeed)
-    setTimeout(() => setIsSpinningSeed(false), 400)
-  }, [])
 
   // Handle dice stat rolling with cyber rolling animation
   const handleRollStats = useCallback(() => {
@@ -115,88 +101,39 @@ export const CharacterCreationStep: React.FC<CharacterCreationStepProps> = ({
 
   const handleFinish = useCallback(() => {
     if (requireHandle && !parsedHandle.ok) return
-    const avatarConfig: LobsterAvatarConfig = {
-      style: LOBSTER_AVATAR_STYLE,
-      seed: seed.trim() || 'larva-initiate',
-      height: seededHeight,
-    }
-    onComplete(avatarConfig, stats, parsedHandle.ok ? parsedHandle.handle : handle.trim() || null)
-  }, [seed, seededHeight, stats, onComplete, requireHandle, parsedHandle, handle])
+    onComplete(lockAvatarConfig(avatarConfig), stats, parsedHandle.ok ? parsedHandle.handle : handle.trim() || null)
+  }, [avatarConfig, stats, onComplete, requireHandle, parsedHandle, handle])
 
   return (
     <div className="flex flex-col h-full font-sans text-[#dfe3e3]">
       {/* Header Banner */}
       <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-3 text-center border-b border-[#00ffff]/15 bg-[#030a0d]/60">
         <div className="font-sans text-[10px] tracking-[0.3em] text-[#00ffff]/60 uppercase mb-1">
-          ⬡ STEP 02 · CARAPACE REGISTRATION & BIOMETRICS ⬡
+          Step 2 · Character and biometrics
         </div>
         <h2
           className="font-grotesk text-lg sm:text-2xl font-bold text-[#00ffff] tracking-tight"
           style={{ textShadow: '0 0 20px rgba(0,255,255,0.4)' }}
         >
-          CALIBRATE LARVAL CHASSIS
+          Build your crustacean
         </h2>
         <p className="text-[#7ea6a6] text-xs max-w-md mx-auto mt-0.5">
-          Select your cyber-crustacean carapace avatar and roll base biometrics before entering the Synaptic Core.
+          Pick a lobster or a crab, dress the shell, then roll your base biometrics. You can change your look later in Settings.
         </p>
       </div>
 
       {/* Main Two-Column Layout */}
       <div className="p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 overflow-y-auto flex-1">
-        {/* LEFT COLUMN: Avatar Selection (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col items-center space-y-3.5">
-          {/* Circular portrait preview */}
-          <div className="relative shrink-0">
-            <LobsterAvatarPortrait
-              config={previewConfig}
-              size={320}
-              alt="Carapace Avatar Preview"
-              className="w-full max-w-[240px] sm:max-w-[260px]"
-              interactive
-              animated
-              animationSeed={seed}
-              loading="eager"
-            />
-          </div>
-
-          {/* Seed Number */}
-          <div className="w-full max-w-[260px] space-y-1.5">
-            <div className="text-[11px] font-grotesk tracking-wider uppercase">
-              <span className="text-[#7ea6a6]">Seed Number</span>
-            </div>
-            <div className="px-3 py-2 bg-[#04111a]/80 border border-[#00ffff]/20 rounded-xl flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(0,255,255,0.05)]">
-              <span
-                data-testid="seed-number"
-                className="font-mono text-xs text-[#00ffff] font-semibold tracking-wider truncate select-all"
-                title={seed}
-              >
-                {seed}
-              </span>
-              <Lock className="w-3.5 h-3.5 text-[#00ffff]/40 shrink-0" />
-            </div>
-          </div>
-
-          <div className="w-full max-w-[260px]">
-            <DesignationField value={handle} onChange={setHandle} disabled={isSubmitting} />
-          </div>
-
-          {/* Avatar Actions */}
-          <div className="w-full max-w-[260px] space-y-2.5">
-            {/* Re-Roll Avatar Button */}
-            <button
-              onClick={handleRandomize}
-              className="w-full py-2.5 px-3 rounded-xl border border-[#00ffff]/40 bg-[#00ffff]/10 hover:bg-[#00ffff]/20 hover:border-[#00ffff] text-[#00ffff] text-xs font-semibold tracking-wider uppercase flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 shadow-[0_0_15px_rgba(0,255,255,0.15)]"
-            >
-              <RotateCw
-                className={`w-3.5 h-3.5 ${isSpinningSeed ? 'animate-spin' : ''}`}
-              />
-              Randomize
-            </button>
-          </div>
+        {/* LEFT COLUMN: Character creator (6 cols) */}
+        <div className="lg:col-span-6 flex flex-col items-center gap-3">
+          <AvatarCreatorPreview config={avatarConfig} className="max-w-[300px]" />
+          <AvatarCreatorPanel value={avatarConfig} onChange={setAvatarConfig} disabled={isSubmitting} />
         </div>
 
-        {/* RIGHT COLUMN: Base Stats Dice Roller (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col space-y-4">
+        {/* RIGHT COLUMN: Designation and base stats (6 cols) */}
+        <div className="lg:col-span-6 flex flex-col space-y-4">
+          <DesignationField value={handle} onChange={setHandle} disabled={isSubmitting} />
+
           {/* Top Bar: Rolling Action & Pool Status */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 p-3 rounded-xl bg-[#04111a]/80 border border-[#00ffff]/20">
             <div>

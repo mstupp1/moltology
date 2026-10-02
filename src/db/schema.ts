@@ -132,10 +132,11 @@ export const profiles = pgTable('profiles', {
   synapseShards: integer('synapseShards').default(45).notNull(),
   depthPressureCoins: integer('depthPressureCoins').default(12).notNull(),
   activeAvatarId: text('activeAvatarId'),
-  /** DiceBear avatar config: { style, seed } — rendered client-side */
+  /** Avatar config: { style, seed } plus any creator choices (race, shell, face, gear, scene). Rendered client-side. */
   avatarConfig: jsonb('avatarConfig').$type<{
     style: string
     seed: string
+    [trait: string]: string | number | boolean
   }>(),
   emailOptIn: boolean('emailOptIn').default(false).notNull(),
   emailOptInAt: timestamp('emailOptInAt'),

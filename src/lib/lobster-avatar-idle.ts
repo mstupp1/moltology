@@ -1,29 +1,28 @@
 /**
  * Idle animation helpers for layered lobster avatar SVGs.
- * Keyframes live in index.css (`.lobster-avatar-animated`) for reliable SVG `<g>` transforms.
+ * Keyframes live in avatar-animations.css (`.lobster-avatar-animated`) for reliable SVG `<g>` transforms.
  */
 
-export const LOBSTER_IDLE_LAYER_IDS = [
-  'lobster-carapace-layer',
-  'lobster-abdomen-layer',
-  'lobster-brow-layer',
-  'lobster-brow-left',
-  'lobster-brow-right',
-  'lobster-eyelids-layer',
-  'lobster-eyelid-left',
-  'lobster-eyelid-right',
-  'lobster-arm-left',
-  'lobster-arm-right',
-  'lobster-claw-left',
-  'lobster-claw-right',
-  'lobster-flank-limbs',
-  'lobster-flank-left',
-  'lobster-flank-right',
-  'lobster-tail-fan-layer',
-  'lobster-antennae-layer',
-  'lobster-antenna-left',
-  'lobster-antenna-right',
-  'lobster-legs-layer',
+/** Classes the avatar rigs put on each idle-animated layer. */
+export const LOBSTER_IDLE_LAYER_CLASSES = [
+  'lobster-idle-carapace',
+  'lobster-idle-abdomen',
+  'lobster-idle-tail',
+  'lobster-idle-flank-limbs',
+  'lobster-idle-legs',
+  'lobster-idle-arm-left',
+  'lobster-idle-arm-right',
+  'lobster-idle-claw-left',
+  'lobster-idle-claw-right',
+  'lobster-idle-antennae',
+  'lobster-idle-antenna-left',
+  'lobster-idle-antenna-right',
+  'lobster-idle-eyes',
+  'lobster-idle-eyelid-left',
+  'lobster-idle-eyelid-right',
+  'lobster-idle-brow-left',
+  'lobster-idle-brow-right',
+  'lobster-idle-blink',
 ] as const
 
 export const LOBSTER_IDLE_LAYER_CLASS = 'lobster-idle-layer'

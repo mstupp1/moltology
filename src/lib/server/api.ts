@@ -13,6 +13,7 @@ import {
   type MoveTarget,
 } from '../chassis-loadout'
 import { ACTIVITY_FEED_FILTER_IDS } from '../activity-events'
+import { avatarConfigShape } from '../avatar/config-schema'
 
 export type * from './db-services'
 export type {
@@ -634,23 +635,7 @@ export const updateEmailPreferencesFn = createServerFn({ method: 'POST' })
   })
 
 const lobsterAvatarConfigSchema = z.object({
-  style: z.string().min(1).max(64),
-  seed: z.string().min(1).max(128),
-  height: z.union([z.enum(['short', 'regular', 'tall', 'towering']), z.number().min(0.75).max(1.4)]).optional(),
-  armScale: z.number().min(0.7).max(1.4).optional(),
-  backgroundTheme: z.string().max(64).optional(),
-  backgroundPattern: z.string().max(64).optional(),
-  backgroundTexture: z.string().max(64).optional(),
-  patternDensity: z.enum(['compact', 'standard', 'spacious']).optional(),
-  patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
-  patternPulse: z.enum(['pulse', 'steady']).optional(),
-  patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
-  eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried']).optional(),
-  eyeColor: z.enum(['amber', 'sapphire', 'emerald', 'amethyst', 'ruby', 'topaz']).optional(),
-  eyeVariant: z.enum(['round', 'wide', 'tall']).optional(),
-  pupilVariant: z.enum(['standard', 'big', 'sparkle', 'keen']).optional(),
-  backgroundMotion: z.enum(['drift_diagonal', 'drift_horizontal', 'radar_sweep', 'wave_undulate', 'pulse_breathe', 'static']).optional(),
-  transparentBackground: z.boolean().optional(),
+  ...avatarConfigShape,
   token: z.string().optional(),
   userId: z.string().optional(),
 })

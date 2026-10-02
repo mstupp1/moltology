@@ -93,7 +93,7 @@ describe('SettingsPage', () => {
     expect(localStorage.getItem('moltology_heavy_vfx_disabled')).toBe('true')
   })
 
-  it('renders view-only seed number and does not render height slider', async () => {
+  it('renders the avatar creator with preview and controls', async () => {
     render(
       <ToastProvider>
         <SettingsPage />
@@ -101,12 +101,11 @@ describe('SettingsPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByTestId('settings-seed-number')).toBeInTheDocument()
+      expect(screen.getByTestId('avatar-creator-panel')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('Seed Number')).toBeInTheDocument()
-    expect(screen.getByTestId('lobster-avatar-portrait')).toBeInTheDocument()
-    expect(screen.queryByText(/Chassis Height/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /^short$/i })).not.toBeInTheDocument()
+    expect(screen.getByTestId('avatar-creator-preview')).toBeInTheDocument()
+    expect(screen.queryByText('Seed Number')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Surprise me/i })).toBeInTheDocument()
   })
 })

@@ -1,38 +1,46 @@
 import { describe, it, expect } from 'vitest'
 import {
+  AVATAR_ACCESSORIES,
+  AVATAR_PORTRAIT_VIEWBOXES,
+  AVATAR_RACES,
+  AVATAR_TRAIT_KEYS,
   generateLobsterAvatarSvg,
   generateLobsterAvatarDataUri,
   generateLobsterAvatarSilhouetteSvg,
   generateLobsterAvatarSilhouetteDataUri,
-  LOBSTER_PORTRAIT_VIEWBOX,
-  getChitinGradientPalette,
   getLobsterAvatarSeededOptions,
-  hasLobsterEyelids,
-  hasLobsterPixarEyes,
   isValidLobsterAvatarStyle,
+  lockAvatarConfig,
+  LOBSTER_BACKGROUND_MOTION_MODES,
   LOBSTER_BACKGROUND_PATTERNS,
   LOBSTER_BACKGROUND_TEXTURES,
   LOBSTER_BACKGROUND_THEMES,
-  LOBSTER_CHITIN_GRADIENT_PALETTES,
-  LOBSTER_CRUSTACEAN_OPTIONS,
-  LOBSTER_EYELID_STYLES,
   LOBSTER_EYE_COLORS,
   LOBSTER_EYE_VARIANTS,
-  LOBSTER_PUPIL_VARIANTS,
-  LOBSTER_HEIGHTS,
+  LOBSTER_EYELID_STYLES,
+  LOBSTER_FULL_BODY_VIEWBOX,
   LOBSTER_HEIGHT_LABELS,
   LOBSTER_HEIGHT_SCALES,
+  LOBSTER_HEIGHTS,
   LOBSTER_PATTERN_DENSITIES,
   LOBSTER_PATTERN_GLOWS,
   LOBSTER_PATTERN_PULSES,
   LOBSTER_PATTERN_SPARKLES,
-  getLobsterTorsoMetrics,
+  LOBSTER_PORTRAIT_VIEWBOX,
+  LOBSTER_PUPIL_VARIANTS,
   parseLobsterAvatarConfig,
   randomLobsterSeed,
+  rerollAvatarConfig,
+  resolveAvatarTraits,
   resolveHeightScale,
   escapeSvgAttr,
-  LOBSTER_BACKGROUND_MOTION_MODES,
+  SHELL_FINISHES,
+  SHELL_MARKINGS,
+  SHELL_PALETTES,
+  stripSvgSmilAnimation,
 } from './lobster-avatar'
+
+const attr = (svg: string | null, name: string) => svg?.match(new RegExp(`${name}="([^"]+)"`))?.[1]
 
 describe('lobster-avatar', () => {
   it('validates critters as the only avatar style', () => {
@@ -149,42 +157,6 @@ describe('lobster-avatar', () => {
     }
   })
 
-  it('generates deterministic SVG for the same seed with full character and background layers', () => {
-    const config = { style: 'critters' as const, seed: 'lobster-alpha' }
-    const svg1 = generateLobsterAvatarSvg(config)
-    const svg2 = generateLobsterAvatarSvg(config)
-    expect(svg1).toBeTruthy()
-    expect(svg1).toBe(svg2)
-    expect(svg1).toContain('viewBox="-65 -35 230 230"')
-    expect(svg1).toContain('data-avatar-slot="fullBody"')
-    expect(svg1).toContain('id="lobster-background-layer"')
-    expect(svg1).toContain('id="lobster-ground-shadow"')
-    expect(svg1).toContain('id="lobster-antennae-layer"')
-    expect(svg1).toContain('id="lobster-antenna-left"')
-    expect(svg1).toContain('id="lobster-antenna-right"')
-    expect(svg1).toContain('id="lobster-flank-limbs"')
-    expect(svg1).toContain('id="lobster-flank-left"')
-    expect(svg1).toContain('id="lobster-flank-right"')
-    expect(svg1).toContain('id="lobster-legs-layer"')
-    expect(svg1).toContain('id="lobster-abdomen-layer"')
-    expect(svg1).toContain('id="lobster-tail-fan-layer"')
-    expect(svg1).toContain('id="lobster-claws-layer"')
-    expect(svg1).toContain('id="lobster-arms-layer"')
-    expect(svg1).toContain('id="lobster-brow-layer"')
-    expect(svg1).toContain('id="lobster-brow-left"')
-    expect(svg1).toContain('id="lobster-brow-right"')
-    expect(svg1).toContain('id="lobster-carapace-layer"')
-    expect(svg1).toContain('id="lobster-eyes-layer"')
-    expect(svg1).toContain('class="lobster-idle-layer lobster-idle-carapace"')
-    expect(svg1).toContain('id="lobster-arm-left"')
-    expect(svg1).toContain('id="lobster-arm-right"')
-    expect(svg1).toContain('id="lobster-claw-left"')
-    expect(svg1).toContain('id="lobster-claw-right"')
-    expect(generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })).toContain(
-      `viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`
-    )
-  })
-
   it('renders multi-stop 2-color angular linear gradient and dual radial spotlights in defs', () => {
     const svg = generateLobsterAvatarSvg({
       style: 'critters',
@@ -199,34 +171,6 @@ describe('lobster-avatar', () => {
     expect(svg).toContain('stop-color="#020b14"')
     expect(svg).toContain('stop-color="#01060c"')
     expect(svg).toContain('id="pattern-circuit"')
-  })
-
-  it('aligns abdomen top width to match the carapace bottom width across variants', () => {
-    const seeds = {
-      round: 'seed-0', // cw = 40 (left = 10, right = 90)
-      peak: 'seed-2',  // cw = 32 (left = 18, right = 82)
-      wedge: 'seed-3', // cw = 30 (left = 20, right = 80)
-      bell: 'seed-6',  // cw = 44 (left = 6, right = 94)
-      dome: 'seed-18', // cw = 34 (left = 16, right = 84)
-    }
-
-    const expectedX = {
-      round: { left: 10, right: 90 },
-      peak: { left: 18, right: 82 },
-      wedge: { left: 20, right: 80 },
-      bell: { left: 6, right: 94 },
-      dome: { left: 16, right: 84 },
-    }
-
-    for (const [variant, seed] of Object.entries(seeds)) {
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
-      expect(svg).toBeTruthy()
-
-      // Somite 1 starts at Y=102 with exact left and right bounds matching the carapace bottom
-      const expected = expectedX[variant as keyof typeof expectedX]
-      const somite1Pattern = new RegExp(`M\\s*${expected.left}\\s*102[\\s\\S]*?${expected.right}\\s*102\\s*Z`)
-      expect(svg).toMatch(somite1Pattern)
-    }
   })
 
   it('computes deterministic seeded background theme, pattern, texture, density, glow, pulse, sparkles, and motion', () => {
@@ -380,493 +324,231 @@ describe('lobster-avatar', () => {
     expect(svgConstellationsSpin).toContain('id="pat-triangle_constellations-')
   })
 
-  it('supports transparent background when requested and omits texture and background layers', () => {
-    const svg = generateLobsterAvatarSvg({
-      style: 'critters',
-      seed: 'larva-test',
-      backgroundTexture: 'chitin',
-      transparentBackground: true,
-    })
-    expect(svg).not.toContain('id="lobster-background-layer"')
-    expect(svg).not.toContain('id="lobster-texture-layer"')
-    expect(svg).toContain('id="lobster-antennae-layer"')
-    expect(svg).toContain('id="lobster-claws-layer"')
-  })
-
-  it('renders different antenna variations across seeds with left and right sub-layers', () => {
-    const seeds = ['larva-seed-a', 'larva-seed-b', 'larva-seed-c', 'larva-seed-d', 'larva-seed-e']
-    const variants = new Set<string>()
-    for (const seed of seeds) {
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
-      expect(svg).toContain('id="lobster-antenna-left"')
-      expect(svg).toContain('id="lobster-antenna-right"')
-      const match = svg?.match(/data-antenna="([^"]+)"/)
-      if (match?.[1]) {
-        variants.add(match[1])
-      }
-    }
-    expect(variants.size).toBeGreaterThan(1)
-  })
-
-  it('renders different tail poses including straight down (center) and sweeps', () => {
-    const seeds = ['larva-0', 'larva-1', 'larva-2', 'larva-3', 'larva-4', 'larva-5', 'larva-6']
-    const poses = new Set<string>()
-    for (const seed of seeds) {
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
-      const match = svg?.match(/data-tail-pose="([^"]+)"/)
-      if (match?.[1]) {
-        poses.add(match[1])
-      }
-    }
-    expect(poses.has('center')).toBe(true)
-    expect(poses.size).toBeGreaterThan(1)
-  })
-
   it('produces random larva seeds', () => {
     expect(randomLobsterSeed()).toMatch(/^larva-/)
   })
 
-  it('restricts crustacean eyes to open Pixar-compatible variants (round, bigPupils, wide), excluding dots, happy lines, and wink', () => {
-    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).toEqual(['round', 'bigPupils', 'wide'])
-    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).not.toContain('wink')
-    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).not.toContain('dots')
-    expect(LOBSTER_CRUSTACEAN_OPTIONS.eyesVariant).not.toContain('happy')
+  it('renders deterministic SVG with the backdrop, ground shadow, and idle layers', () => {
+    const config = { style: 'critters' as const, seed: 'lobster-alpha' }
+    const svg = generateLobsterAvatarSvg(config)
+    expect(svg).toBe(generateLobsterAvatarSvg(config))
+    expect(svg).toContain(`viewBox="${LOBSTER_FULL_BODY_VIEWBOX}"`)
+    expect(svg).toContain('data-avatar-slot="fullBody"')
+    expect(svg).toContain('id="lobster-background-layer"')
+    for (const layer of ['carapace', 'abdomen', 'tail', 'flank-limbs', 'antenna-left', 'antenna-right', 'claw-left', 'claw-right', 'brow-left', 'brow-right', 'blink']) {
+      expect(svg).toContain(`lobster-idle-${layer}`)
+    }
+    expect(svg).not.toContain('NaN')
+    expect(svg).not.toContain('undefined')
   })
 
-  it('renders eyelid hoods over open eyes with white sclera and iris to soften staring look', () => {
-    const openEyeSeeds = [
-      { seed: 'seed-eye-6', variant: 'round' },
-      { seed: 'seed-eye-0', variant: 'bigPupils' },
-      { seed: 'seed-eye-4', variant: 'wide' },
-    ]
+  it('renders legacy configs with only style and seed as a lobster', () => {
+    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'legacy-unit-42' })
+    expect(attr(svg, 'data-race')).toBe('lobster')
+    expect(resolveAvatarTraits({ style: 'critters', seed: 'legacy-unit-42' }).race).toBe('lobster')
+  })
 
-    for (const { seed, variant } of openEyeSeeds) {
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
-      expect(svg, variant).toContain('id="lobster-eyelids-layer"')
-      expect(svg, variant).toContain('id="lobster-eyelid-left"')
-      expect(svg, variant).toContain('id="lobster-eyelid-right"')
-      expect(hasLobsterEyelids(svg!)).toBe(true)
+  it('keeps backdrop picks from the original seed hash so existing members keep their scene', () => {
+    // Backdrop, eyes, and height are seeded exactly as before the rig rewrite.
+    const seeded = getLobsterAvatarSeededOptions('larva-crimson-vanguard')
+    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'larva-crimson-vanguard' })
+    expect(attr(svg, 'data-theme')).toBe(seeded.theme.id)
+    expect(attr(svg, 'data-pattern')).toBe(seeded.pattern.id)
+    expect(attr(svg, 'data-eye-color')).toBe(seeded.eyeColor)
+  })
+
+  it('keeps configs saved before races existed in the original red and orange shells', () => {
+    for (let i = 0; i < 20; i++) {
+      expect(['coral', 'crimson', 'tangerine']).toContain(resolveAvatarTraits({ style: 'critters', seed: `legacy-${i}` }).shellColor)
     }
   })
 
-  it('renders large Pixar eyes and eyelids across all seeds, replacing legacy dot and smile variants', () => {
-    const dotsSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-1' })
-    expect(dotsSvg).toContain('lobster-eyelids-layer')
-    expect(hasLobsterEyelids(dotsSvg!)).toBe(true)
-    expect(hasLobsterPixarEyes(dotsSvg!)).toBe(true)
-
-    const happySvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-3' })
-    expect(happySvg).toContain('lobster-eyelids-layer')
-    expect(hasLobsterEyelids(happySvg!)).toBe(true)
-    expect(hasLobsterPixarEyes(happySvg!)).toBe(true)
+  it('renders both races in both frames with a race-specific portrait crop', () => {
+    for (const race of AVATAR_RACES) {
+      const config = { style: 'critters' as const, seed: `race-${race}`, race }
+      const full = generateLobsterAvatarSvg(config)
+      const portrait = generateLobsterAvatarSvg(config, 128, { frame: 'portrait' })
+      expect(attr(full, 'data-race')).toBe(race)
+      expect(full).toContain(`viewBox="${LOBSTER_FULL_BODY_VIEWBOX}"`)
+      expect(portrait).toContain(`viewBox="${AVATAR_PORTRAIT_VIEWBOXES[race]}"`)
+      expect(portrait).toContain('data-avatar-slot="portrait"')
+    }
+    expect(AVATAR_PORTRAIT_VIEWBOXES.lobster).toBe(LOBSTER_PORTRAIT_VIEWBOX)
+    expect(AVATAR_PORTRAIT_VIEWBOXES.crab).not.toBe(LOBSTER_PORTRAIT_VIEWBOX)
   })
 
-  it('renders eyelids filled with matching lobster chitin color', () => {
-    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-6' })
-    const colorMatch = svg?.match(/fill="(#(?:c2410c|be123c|ea580c|dc2626|b91c1c|991b1b|e11d48|f97316))"/i)
-    const chitinColor = colorMatch?.[1]
-    expect(chitinColor).toBeTruthy()
-
-    const eyelidMatch = svg?.match(/<g id="lobster-eyelid-left"[^>]*>[\s\S]*?<path d="[^"]+" fill="([^"]+)"/)
-    expect(eyelidMatch?.[1]).toBe(chitinColor)
+  it('gives the crab its own body without the lobster tail and abdomen', () => {
+    const crab = generateLobsterAvatarSvg({ style: 'critters', seed: 'crab-body', race: 'crab' })
+    expect(crab).not.toContain('lobster-idle-tail')
+    expect(crab).not.toContain('lobster-idle-abdomen')
+    expect(crab).toContain('lobster-idle-claw-left')
   })
 
-  it('supports all 7 modular eyelid styles (open, relaxed, cheerful_squint, focused, chill, angry, worried)', () => {
-    expect(LOBSTER_EYELID_STYLES).toEqual([
-      'open',
-      'relaxed',
-      'cheerful_squint',
-      'focused',
-      'chill',
-      'angry',
-      'worried',
-    ])
+  it('renders every shell colour, finish, and pattern without broken markup', () => {
+    for (const palette of SHELL_PALETTES) {
+      for (const finish of SHELL_FINISHES) {
+        const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'paint', shellColor: palette.id, shellFinish: finish })
+        expect(attr(svg, 'data-shell')).toBe(palette.id)
+        expect(attr(svg, 'data-finish')).toBe(finish)
+        expect(svg).not.toContain('NaN')
+        expect(svg).not.toContain('undefined')
+      }
+    }
+    for (const marking of SHELL_MARKINGS) {
+      for (const race of AVATAR_RACES) {
+        const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'paint', marking, race })
+        expect(attr(svg, 'data-marking')).toBe(marking)
+        expect(svg).not.toContain('NaN')
+      }
+    }
+  })
 
-    for (const style of LOBSTER_EYELID_STYLES) {
-      const svg = generateLobsterAvatarSvg({
+  it('renders every headwear option on both races', () => {
+    for (const accessory of AVATAR_ACCESSORIES) {
+      for (const race of AVATAR_RACES) {
+        const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'gear', accessory, race })
+        expect(attr(svg, 'data-accessory')).toBe(accessory)
+        expect(svg).not.toContain('NaN')
+      }
+    }
+  })
+
+  it('renders every expression, eye colour, eye shape, and pupil', () => {
+    for (const eyelidStyle of LOBSTER_EYELID_STYLES) {
+      expect(attr(generateLobsterAvatarSvg({ style: 'critters', seed: 'eyes', eyelidStyle }), 'data-expression')).toBe(eyelidStyle)
+    }
+    for (const eyeColor of LOBSTER_EYE_COLORS) {
+      expect(attr(generateLobsterAvatarSvg({ style: 'critters', seed: 'eyes', eyeColor }), 'data-eye-color')).toBe(eyeColor)
+    }
+    for (const eyeVariant of LOBSTER_EYE_VARIANTS) {
+      expect(attr(generateLobsterAvatarSvg({ style: 'critters', seed: 'eyes', eyeVariant }), 'data-eye-variant')).toBe(eyeVariant)
+    }
+    for (const pupilVariant of LOBSTER_PUPIL_VARIANTS) {
+      expect(attr(generateLobsterAvatarSvg({ style: 'critters', seed: 'eyes', pupilVariant }), 'data-pupil-variant')).toBe(pupilVariant)
+    }
+  })
+
+  it('varies the new look traits across seeds', () => {
+    const shells = new Set<string>()
+    const markings = new Set<string>()
+    const accessories = new Set<string>()
+    for (let i = 0; i < 24; i++) {
+      const traits = resolveAvatarTraits({ style: 'critters', seed: `variety-${i}`, race: 'lobster' })
+      shells.add(traits.shellColor)
+      markings.add(traits.marking)
+      accessories.add(traits.accessory)
+    }
+    expect(shells.size).toBeGreaterThan(3)
+    expect(markings.size).toBeGreaterThan(2)
+    expect(accessories.size).toBeGreaterThan(2)
+  })
+
+  it('parses new trait fields and drops values outside the catalogs', () => {
+    expect(
+      parseLobsterAvatarConfig({
         style: 'critters',
-        seed: 'seed-eye-6',
-        eyelidStyle: style,
+        seed: 'unit-1',
+        race: 'crab',
+        shellColor: 'jade',
+        shellFinish: 'chrome',
+        marking: 'tiger',
+        mouth: 'fang',
+        antennae: 'plume',
+        claws: 'crusher',
+        pose: 'flex',
+        accessory: 'crown',
       })
-      expect(svg, style).toContain(`data-eyelid-style="${style}"`)
-      expect(svg, style).toContain('id="lobster-eyelids-layer"')
-      expect(svg, style).toContain('id="lobster-eyelid-left"')
-      expect(svg, style).toContain('id="lobster-eyelid-right"')
+    ).toMatchObject({ race: 'crab', shellColor: 'jade', shellFinish: 'chrome', marking: 'tiger', mouth: 'fang', antennae: 'plume', claws: 'crusher', pose: 'flex', accessory: 'crown' })
+
+    expect(
+      parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-2', race: 'shrimp', shellColor: '#ff0000', accessory: 'top_hat"><script>' })
+    ).toEqual({ style: 'critters', seed: 'unit-2' })
+  })
+
+  it('ignores unknown trait values that reach the renderer without parsing', () => {
+    const svg = generateLobsterAvatarSvg({
+      style: 'critters',
+      seed: 'raw-config',
+      race: 'shrimp' as never,
+      marking: 'x"><script>' as never,
+      accessory: 'x"><script>' as never,
+    })
+    expect(attr(svg, 'data-race')).toBe('lobster')
+    expect(svg).not.toContain('<script>')
+  })
+
+  it('pins every resolved trait when a look is saved', () => {
+    const locked = lockAvatarConfig({ style: 'critters', seed: 'lock-me', race: 'crab' })
+    for (const key of AVATAR_TRAIT_KEYS) {
+      expect(locked[key as keyof typeof locked]).toBeDefined()
     }
+    expect(locked.race).toBe('crab')
+    // Only the per-render id prefix may differ; the drawing itself must match.
+    const normalize = (svg: string | null) => svg?.replace(/av[a-z0-9]+-/g, 'id-')
+    expect(normalize(generateLobsterAvatarSvg(locked))).toBe(normalize(generateLobsterAvatarSvg({ style: 'critters', seed: 'lock-me', race: 'crab' })))
+    expect(parseLobsterAvatarConfig(JSON.parse(JSON.stringify(locked)))).toEqual(locked)
   })
 
-  it('renders angled expressive eyelids for angry and worried styles', () => {
-    const angrySvg = generateLobsterAvatarSvg({
-      style: 'critters',
-      seed: 'seed-eye-6',
-      eyelidStyle: 'angry',
-      eyeVariant: 'round',
-    })
-    expect(angrySvg).toContain('data-eyelid-style="angry"')
-    expect(angrySvg).toContain('M -0.1 6.54 C -0.1 4.93 4.77 1.3 10 1.3')
-
-    const worriedSvg = generateLobsterAvatarSvg({
-      style: 'critters',
-      seed: 'seed-eye-6',
-      eyelidStyle: 'worried',
-      eyeVariant: 'round',
-    })
-    expect(worriedSvg).toContain('data-eyelid-style="worried"')
-    expect(worriedSvg).toContain('M -0.1 13.76 C -0.1 8.25 4.77 1.3 10 1.3')
+  it('rerolls a fresh look while keeping the chosen race', () => {
+    const crab = rerollAvatarConfig({ race: 'crab' })
+    expect(crab.race).toBe('crab')
+    expect(crab.seed).toMatch(/^larva-/)
+    expect(rerollAvatarConfig({ race: 'lobster' }).race).toBe('lobster')
   })
 
-  it('renders sculpted lower eyelids for cheerful_squint style', () => {
-    const squintSvg = generateLobsterAvatarSvg({
-      style: 'critters',
-      seed: 'seed-eye-6',
-      eyelidStyle: 'cheerful_squint',
-      eyeVariant: 'round',
-    })
-    expect(squintSvg).toContain('data-eyelid-style="cheerful_squint"')
-    // Lower eyelid path starts at y=16.99
-    expect(squintSvg).toContain('M -0.1 16.99 Q 10 15.69 20.1 16.99')
-    expect(squintSvg).toContain('M 25.9 16.99 Q 36 15.69 46.1 16.99')
+  it('supports a transparent background that omits the backdrop and texture', () => {
+    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'larva-test', backgroundTexture: 'chitin', transparentBackground: true })
+    expect(svg).not.toContain('id="lobster-background-layer"')
+    expect(svg).not.toContain('id="lobster-texture-layer"')
+    expect(svg).toContain('lobster-idle-claw-left')
   })
 
-  it('deterministically seeds eyelid style from avatar seed', () => {
-    const seededA = getLobsterAvatarSeededOptions('larva-alpha')
-    const seededB = getLobsterAvatarSeededOptions('larva-beta')
-
-    expect(LOBSTER_EYELID_STYLES).toContain(seededA.eyelidStyle)
-    expect(LOBSTER_EYELID_STYLES).toContain(seededB.eyelidStyle)
-    expect(getLobsterAvatarSeededOptions('larva-alpha').eyelidStyle).toBe(seededA.eyelidStyle)
+  it('strips SMIL animation for static renders', () => {
+    const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'larva-test', backgroundMotion: 'drift_diagonal' })!
+    expect(svg).toContain('<animate')
+    expect(stripSvgSmilAnimation(svg)).not.toMatch(/<animate/)
   })
 
-  describe('pixar eye and pupil styling', () => {
-    it('renders 3D Pixar-styled eyes with spherical sclera, vibrant iris, pupil, and specular catchlights for open eye variants', () => {
-      const openEyeSeeds = [
-        { seed: 'seed-eye-6', variant: 'round' },
-        { seed: 'seed-eye-0', variant: 'bigPupils' },
-        { seed: 'seed-eye-4', variant: 'wide' },
-      ]
-
-      for (const { seed, variant } of openEyeSeeds) {
-        const svg = generateLobsterAvatarSvg({ style: 'critters', seed })
-        expect(svg, variant).toBeTruthy()
-        expect(hasLobsterPixarEyes(svg!), variant).toBe(true)
-        expect(svg, variant).toContain('class="lobster-pixar-eyes"')
-        expect(svg, variant).toContain('id="pixar-sclera-left"')
-        expect(svg, variant).toContain('id="pixar-sclera-right"')
-        expect(svg, variant).toContain('id="pixar-iris-left"')
-        expect(svg, variant).toContain('id="pixar-iris-right"')
-        expect(svg, variant).toContain('id="pixar-glint-key-left"')
-        expect(svg, variant).toContain('id="pixar-glint-bounce-left"')
-        expect(svg, variant).toContain('id="pixar-glint-spark-left"')
-        expect(svg, variant).toContain('id="pixar-cornea-arc-left"')
-        // Eyelid layer is preserved and placed over the Pixar eyes
-        expect(hasLobsterEyelids(svg!), variant).toBe(true)
-      }
-    })
-
-    it('supports all 6 Pixar eye color palettes with custom radial gradients', () => {
-      for (const color of LOBSTER_EYE_COLORS) {
-        const svg = generateLobsterAvatarSvg({
-          style: 'critters',
-          seed: 'seed-eye-6',
-          eyeColor: color,
-        })
-        expect(svg, color).toBeTruthy()
-        expect(hasLobsterPixarEyes(svg!), color).toBe(true)
-        expect(svg, color).toContain(`data-eye-color="${color}"`)
-        expect(svg, color).toContain(`id="pixar-iris-grad-${color}"`)
-        expect(svg, color).toContain(`id="pixar-caustic-grad-${color}"`)
-      }
-    })
-
-    it('supports all 3 eye variants (round, wide, tall) with scaled geometry', () => {
-      for (const variant of LOBSTER_EYE_VARIANTS) {
-        const svg = generateLobsterAvatarSvg({
-          style: 'critters',
-          seed: 'seed-eye-6',
-          eyeVariant: variant,
-        })
-        expect(svg, variant).toBeTruthy()
-        expect(svg, variant).toContain(`data-eye-variant="${variant}"`)
-        if (variant === 'round') {
-          expect(svg).toContain('<circle id="pixar-sclera-left" cx="10" cy="13" r="9.5"')
-        } else if (variant === 'wide') {
-          expect(svg).toContain('<ellipse id="pixar-sclera-left" cx="10" cy="13" rx="10.2" ry="9"')
-        } else if (variant === 'tall') {
-          expect(svg).toContain('<ellipse id="pixar-sclera-left" cx="10" cy="13" rx="8.8" ry="10.4"')
-        }
-      }
-    })
-
-    it('supports all 4 pupil variants (standard, big, sparkle, keen)', () => {
-      for (const pupil of LOBSTER_PUPIL_VARIANTS) {
-        const svg = generateLobsterAvatarSvg({
-          style: 'critters',
-          seed: 'seed-eye-6',
-          eyeVariant: 'round',
-          pupilVariant: pupil,
-        })
-        expect(svg, pupil).toBeTruthy()
-        expect(svg, pupil).toContain(`data-pupil-variant="${pupil}"`)
-        if (pupil === 'sparkle') {
-          expect(svg).toContain('id="pixar-glint-star-left"')
-          expect(svg).toContain('id="pixar-glint-extra-left"')
-        } else if (pupil === 'big') {
-          expect(svg).toContain('<circle id="pixar-pupil-left" cx="10" cy="13" r="4.16"')
-        } else if (pupil === 'keen') {
-          expect(svg).toContain('<circle id="pixar-pupil-left" cx="10" cy="13" r="2.43"')
-        } else if (pupil === 'standard') {
-          expect(svg).toContain('<circle id="pixar-pupil-left" cx="10" cy="13" r="3.2"')
-        }
-      }
-    })
-
-    it('applies 3D Pixar eyes universally across all avatar seeds (no dots or happy smile eyes)', () => {
-      const seed1Svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-1' })
-      expect(hasLobsterPixarEyes(seed1Svg!)).toBe(true)
-      expect(seed1Svg).toContain('lobster-pixar-eyes')
-
-      const seed3Svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-eye-3' })
-      expect(hasLobsterPixarEyes(seed3Svg!)).toBe(true)
-      expect(seed3Svg).toContain('lobster-pixar-eyes')
-    })
+  it('caches generated SVG and data URIs', () => {
+    const config = { style: 'critters' as const, seed: 'cache-me' }
+    const uri = generateLobsterAvatarDataUri(config)
+    expect(uri).toMatch(/^data:image\/svg\+xml/)
+    expect(generateLobsterAvatarDataUri(config)).toBe(uri)
+    expect(generateLobsterAvatarSvg(config)).toBe(generateLobsterAvatarSvg(config))
   })
 
-  it('efficiently caches generated SVG and Data URI strings in LRU cache', () => {
-    const config = { style: 'critters' as const, seed: 'perf-cache-test' }
-    const svg1 = generateLobsterAvatarSvg(config, 256)
-    const svg2 = generateLobsterAvatarSvg(config, 256)
-    expect(svg1).toBe(svg2) // Identical cached string reference
-
-    const uri1 = generateLobsterAvatarDataUri(config, 256)
-    const uri2 = generateLobsterAvatarDataUri(config, 256)
-    expect(uri1).toBe(uri2) // Identical cached string reference
-  })
-
-  describe('height dimension & position compensation', () => {
-    it('defines 4 standard height presets with labels and scale factors', () => {
+  describe('height', () => {
+    it('defines four presets with labels and scale factors', () => {
       expect(LOBSTER_HEIGHTS).toEqual(['short', 'regular', 'tall', 'towering'])
-      expect(LOBSTER_HEIGHT_SCALES.short).toBe(0.88)
-      expect(LOBSTER_HEIGHT_SCALES.regular).toBe(1.0)
-      expect(LOBSTER_HEIGHT_SCALES.tall).toBe(1.14)
-      expect(LOBSTER_HEIGHT_SCALES.towering).toBe(1.25)
-      expect(LOBSTER_HEIGHT_LABELS.short).toContain('Compact')
-      expect(LOBSTER_HEIGHT_LABELS.towering).toContain('Towering')
+      expect(LOBSTER_HEIGHT_SCALES.regular).toBe(1)
+      expect(LOBSTER_HEIGHT_SCALES.short).toBeLessThan(1)
+      expect(LOBSTER_HEIGHT_SCALES.towering).toBeGreaterThan(LOBSTER_HEIGHT_SCALES.tall)
+      for (const h of LOBSTER_HEIGHTS) expect(LOBSTER_HEIGHT_LABELS[h]).toBeTruthy()
     })
 
-    it('resolves height scale for presets, aliases, and bounded numbers', () => {
-      expect(resolveHeightScale('short')).toBe(0.88)
-      expect(resolveHeightScale('compact')).toBe(0.88)
-      expect(resolveHeightScale('regular')).toBe(1.0)
-      expect(resolveHeightScale('standard')).toBe(1.0)
-      expect(resolveHeightScale('medium')).toBe(1.0)
-      expect(resolveHeightScale('tall')).toBe(1.14)
-      expect(resolveHeightScale('towering')).toBe(1.25)
-      expect(resolveHeightScale('colossal')).toBe(1.25)
-      expect(resolveHeightScale(undefined)).toBe(1.0)
-
-      // Numeric scale
-      expect(resolveHeightScale(1.15)).toBe(1.15)
-      expect(resolveHeightScale(0.8)).toBe(0.8)
-      expect(resolveHeightScale(88)).toBe(0.88) // Normalized from percentage
-      expect(resolveHeightScale(140)).toBe(1.4) // Upper clamp
-      expect(resolveHeightScale(0.5)).toBe(0.75) // Lower clamp
+    it('resolves presets, aliases, and bounded numbers', () => {
+      expect(resolveHeightScale('regular')).toBe(1)
+      expect(resolveHeightScale('TALL')).toBe(LOBSTER_HEIGHT_SCALES.tall)
+      expect(resolveHeightScale(1.9)).toBe(1.4)
+      expect(resolveHeightScale(0.1)).toBe(0.75)
+      expect(resolveHeightScale(undefined)).toBe(1)
     })
 
-    it('computes exact torso metrics anchored at pelvis with monotonic somites', () => {
-      const regular = getLobsterTorsoMetrics('regular')
-      expect(regular.torsoDelta).toBe(0)
-      expect(regular.headYOffset).toBe(0)
-      expect(regular.frameShift).toBe(0)
-      expect(regular.s1_top).toBe(102)
-      expect(regular.s5_bot).toBe(151)
-
-      const short = getLobsterTorsoMetrics('short')
-      expect(short.torsoDelta).toBeLessThan(0)
-      expect(short.headYOffset).toBeGreaterThan(0) // Upper body moves down to meet lower somite 1
-      expect(short.s1_top).toBeGreaterThan(regular.s1_top)
-      expect(short.s5_bot).toBe(151) // Pelvis anchor constant
-
-      const tall = getLobsterTorsoMetrics('tall')
-      expect(tall.torsoDelta).toBeGreaterThan(0)
-      expect(tall.headYOffset).toBeLessThan(0) // Upper body moves up to give torso headroom
-      expect(tall.s1_top).toBeLessThan(regular.s1_top)
-      expect(tall.s5_bot).toBe(151)
-
-      const towering = getLobsterTorsoMetrics('towering')
-      expect(towering.torsoDelta).toBeGreaterThan(tall.torsoDelta)
-      expect(towering.headYOffset).toBeLessThan(tall.headYOffset)
-      expect(towering.frameShift).toBeGreaterThan(0) // Subtle downward frame compensation
-      expect(towering.s5_bot).toBe(151)
-
-      // Vertical hierarchy verification for all presets
-      for (const h of LOBSTER_HEIGHTS) {
-        const m = getLobsterTorsoMetrics(h)
-        expect(m.s1_top).toBeLessThan(m.s1_bot)
-        expect(m.s1_bot).toBeLessThanOrEqual(m.s2_top + 5)
-        expect(m.s2_top).toBeLessThan(m.s2_bot)
-        expect(m.s3_top).toBeLessThan(m.s3_bot)
-        expect(m.s4_top).toBeLessThan(m.s4_bot)
-        expect(m.s5_top).toBeLessThan(m.s5_bot)
-        expect(m.s5_bot).toBe(151)
-        expect(m.keelTop).toBeLessThan(m.keelBot)
+    it('changes the drawing when height changes, for both races', () => {
+      for (const race of AVATAR_RACES) {
+        const short = generateLobsterAvatarSvg({ style: 'critters', seed: 'h', race, height: 'short' })
+        const tall = generateLobsterAvatarSvg({ style: 'critters', seed: 'h', race, height: 'towering' })
+        expect(short).not.toBe(tall)
       }
-    })
-
-    it('parses height attribute correctly in parseLobsterAvatarConfig', () => {
-      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 'tall' })).toEqual({
-        style: 'critters',
-        seed: 'unit-1',
-        height: 'tall',
-      })
-      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 'compact' })).toEqual({
-        style: 'critters',
-        seed: 'unit-1',
-        height: 'short',
-      })
-      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 1.2 })).toEqual({
-        style: 'critters',
-        seed: 'unit-1',
-        height: 1.2,
-      })
-      // Invalid height is safely omitted
-      expect(parseLobsterAvatarConfig({ style: 'critters', seed: 'unit-1', height: 'invalid-size' })).toEqual({
-        style: 'critters',
-        seed: 'unit-1',
-      })
-    })
-
-    it('deterministically seeds height from avatar seed', () => {
-      const seeded1 = getLobsterAvatarSeededOptions('alpha-seed')
-      const seeded2 = getLobsterAvatarSeededOptions('beta-seed')
-      expect(LOBSTER_HEIGHTS).toContain(seeded1.height)
-      expect(LOBSTER_HEIGHTS).toContain(seeded2.height)
-      expect(getLobsterAvatarSeededOptions('alpha-seed').height).toBe(seeded1.height)
-    })
-
-    it('generates pristine baseline SVG with no offset wrappers when height is regular', () => {
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'baseline-test', height: 'regular' })
-      expect(svg).toContain('data-height="regular"')
-      expect(svg).not.toContain('id="lobster-carapace-offset"')
-      expect(svg).not.toContain('id="lobster-arms-offset"')
-      expect(svg).not.toContain('id="lobster-head-top-offset"')
-      expect(svg).not.toContain('id="lobster-legs-offset"')
-      expect(svg).toContain('viewBox="-65 -35 230 230"')
-    })
-
-    it('renders position-compensated offset wrappers for short height without clipping', () => {
-      const metrics = getLobsterTorsoMetrics('short')
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'short-test', height: 'short' })
-      expect(svg).toContain('data-height="short"')
-      expect(svg).toContain(`id="lobster-carapace-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain(`id="lobster-arms-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain(`id="lobster-head-top-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain(`id="lobster-sparkles-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain('viewBox="-65 -35 230 230"')
-    })
-
-    it('renders position-compensated offset wrappers and frameShift for towering height', () => {
-      const metrics = getLobsterTorsoMetrics('towering')
-      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'tower-test', height: 'towering' })
-      expect(svg).toContain('data-height="towering"')
-      expect(svg).toContain(`id="lobster-carapace-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain(`id="lobster-arms-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain(`id="lobster-head-top-offset" transform="translate(0, ${metrics.headYOffset})"`)
-      expect(svg).toContain(`id="lobster-tail-fan-offset" transform="translate(0, ${metrics.frameShift})"`)
-      expect(svg).toContain(`id="lobster-legs-offset" transform="translate(0, ${metrics.frameShift})"`)
-      expect(svg).toContain(`id="lobster-ground-shadow-offset" transform="translate(0, ${metrics.frameShift})"`)
-      expect(svg).toContain('viewBox="-65 -35 230 230"')
-    })
-
-    it('retains perfect Somite 1 width alignment with carapace chest width across heights', () => {
-      const metrics = getLobsterTorsoMetrics('tall')
-      const domeSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'seed-18', height: 'tall' })
-      // CARAPACE_BOTTOM_HALF_WIDTHS['dome'] = 34 -> Somite 1 top width = 50 - 34 = 16 to 50 + 34 = 84
-      expect(domeSvg).toContain(`M 16 ${metrics.s1_top}`)
-      expect(domeSvg).toContain(`84 ${metrics.s1_top} Z`)
-    })
-
-    it('compensates arm and claw length proportionally based on height', () => {
-      const regularMetrics = getLobsterTorsoMetrics('regular')
-      const shortMetrics = getLobsterTorsoMetrics('short')
-      const tallMetrics = getLobsterTorsoMetrics('tall')
-      const toweringMetrics = getLobsterTorsoMetrics('towering')
-
-      expect(regularMetrics.armScale).toBe(1.0)
-      expect(shortMetrics.armScale).toBe(0.9) // Shorter arms for compact torso
-      expect(tallMetrics.armScale).toBe(1.12) // Longer arms for elongated torso
-      expect(toweringMetrics.armScale).toBe(1.21) // Longest arms for towering torso
-
-      // Regular emits no scale wrapper groups
-      const regularSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'arm-test', height: 'regular' })
-      expect(regularSvg).toContain('data-arm-scale="1"')
-      expect(regularSvg).not.toContain('id="lobster-arm-left-scale"')
-      expect(regularSvg).not.toContain('id="lobster-claw-left-scale"')
-
-      // Towering emits scaled arms and claws anchored from shoulders (34, 80) and (66, 80)
-      const toweringSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'arm-test', height: 'towering' })
-      expect(toweringSvg).toContain(`data-arm-scale="${toweringMetrics.armScale}"`)
-      expect(toweringSvg).toContain(
-        `id="lobster-arm-left-scale" transform="translate(34, 80) scale(${toweringMetrics.armScale}) translate(-34, -80)"`
-      )
-      expect(toweringSvg).toContain(
-        `id="lobster-arm-right-scale" transform="translate(66, 80) scale(${toweringMetrics.armScale}) translate(-66, -80)"`
-      )
-      expect(toweringSvg).toContain(
-        `id="lobster-claw-left-scale" transform="translate(34, 80) scale(${toweringMetrics.armScale}) translate(-34, -80)"`
-      )
-      expect(toweringSvg).toContain(
-        `id="lobster-claw-right-scale" transform="translate(66, 80) scale(${toweringMetrics.armScale}) translate(-66, -80)"`
-      )
-
-      // Short emits compact scaled arms and claws
-      const shortSvg = generateLobsterAvatarSvg({ style: 'critters', seed: 'arm-test', height: 'short' })
-      expect(shortSvg).toContain(`data-arm-scale="${shortMetrics.armScale}"`)
-      expect(shortSvg).toContain(
-        `id="lobster-arm-left-scale" transform="translate(34, 80) scale(${shortMetrics.armScale}) translate(-34, -80)"`
-      )
-      expect(shortSvg).toContain(
-        `id="lobster-claw-left-scale" transform="translate(34, 80) scale(${shortMetrics.armScale}) translate(-34, -80)"`
-      )
-    })
-
-    it('allows explicit armScale override in config', () => {
-      const customSvg = generateLobsterAvatarSvg({
-        style: 'critters',
-        seed: 'arm-test',
-        height: 'regular',
-        armScale: 1.3,
-      })
-      expect(customSvg).toContain('data-arm-scale="1.3"')
-      expect(customSvg).toContain('id="lobster-arm-left-scale" transform="translate(34, 80) scale(1.3) translate(-34, -80)"')
-      expect(customSvg).toContain('id="lobster-claw-left-scale" transform="translate(34, 80) scale(1.3) translate(-34, -80)"')
     })
   })
 
-  describe('generateLobsterAvatarSilhouetteSvg', () => {
-    it('generates canonical portrait silhouette SVG matching avatar system geometry', () => {
-      const svg = generateLobsterAvatarSilhouetteSvg({ frame: 'portrait', size: 128 })
-      expect(svg).toBeTruthy()
-      expect(svg).toContain(`viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`)
-      expect(svg).toContain('data-avatar-slot="portrait"')
+  describe('silhouette', () => {
+    it('renders a portrait-framed placeholder', () => {
+      const svg = generateLobsterAvatarSilhouetteSvg()
       expect(svg).toContain('data-avatar-silhouette="true"')
-      expect(svg).toContain('width="128"')
-      expect(svg).toContain('height="128"')
-      // Contains antennae whips and beacons
-      expect(svg).toContain('sil-beacon-glow')
-      expect(svg).toContain('sil-benthic-grad')
-    })
-
-    it('generates portrait silhouette SVG consistently across frame options', () => {
-      const svg = generateLobsterAvatarSilhouetteSvg({ frame: 'fullBody' })
-      expect(svg).toBeTruthy()
       expect(svg).toContain(`viewBox="${LOBSTER_PORTRAIT_VIEWBOX}"`)
-      expect(svg).toContain('data-avatar-slot="portrait"')
-    })
-
-    it('generates valid silhouette data URI', () => {
-      const uri = generateLobsterAvatarSilhouetteDataUri({ frame: 'portrait' })
-      expect(uri).toMatch(/^data:image\/svg\+xml;charset=utf-8,/)
-      expect(decodeURIComponent(uri)).toContain('data-avatar-silhouette="true"')
+      expect(generateLobsterAvatarSilhouetteDataUri()).toMatch(/^data:image\/svg\+xml/)
     })
   })
 })
