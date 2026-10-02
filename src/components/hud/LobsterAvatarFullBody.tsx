@@ -78,7 +78,8 @@ export const LobsterAvatarFullBody: React.FC<LobsterAvatarFullBodyProps> = React
         <LobsterAvatarDisplay
           src={pickedUrl}
           alt={alt}
-          pixelResolution={64}
+          pixelated={false}
+          crt={false}
           outputSize={size}
           maskRadial={false}
           animated={hasMotionLease}

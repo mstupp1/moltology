@@ -56,6 +56,7 @@ import {
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdminOrSuperAdmin } from '../permissions'
 import { getAssetUrl } from '../assets'
+import { AVATAR_STORED_OPTIONAL_KEYS, avatarConfigShape } from '../avatar/config-schema'
 import {
   CANONICAL_ALIGNMENT_TASKS,
   TOTAL_ALIGNMENT_TASKS,
@@ -3044,23 +3045,7 @@ export async function updateEmailPreferencesHandler({ data, context }: ServerFnA
 
 // Lobster avatar (DiceBear) preferences
 const lobsterAvatarConfigSchema = z.object({
-  style: z.string().min(1).max(64),
-  seed: z.string().min(1).max(128),
-  height: z.union([z.enum(['short', 'regular', 'tall', 'towering']), z.number().min(0.75).max(1.4)]).optional(),
-  armScale: z.number().min(0.7).max(1.4).optional(),
-  backgroundTheme: z.string().max(64).optional(),
-  backgroundPattern: z.string().max(64).optional(),
-  backgroundTexture: z.string().max(64).optional(),
-  patternDensity: z.enum(['compact', 'standard', 'spacious']).optional(),
-  patternGlow: z.enum(['subtle', 'chromatic', 'none']).optional(),
-  patternPulse: z.enum(['pulse', 'steady']).optional(),
-  patternSparkles: z.enum(['subtle', 'radiant', 'none']).optional(),
-  eyelidStyle: z.enum(['open', 'relaxed', 'cheerful_squint', 'focused', 'chill', 'angry', 'worried']).optional(),
-  eyeColor: z.enum(['amber', 'sapphire', 'emerald', 'amethyst', 'ruby', 'topaz']).optional(),
-  eyeVariant: z.enum(['round', 'wide', 'tall']).optional(),
-  pupilVariant: z.enum(['standard', 'big', 'sparkle', 'keen']).optional(),
-  backgroundMotion: z.enum(['drift_diagonal', 'drift_horizontal', 'radar_sweep', 'wave_undulate', 'pulse_breathe', 'static']).optional(),
-  transparentBackground: z.boolean().optional(),
+  ...avatarConfigShape,
   token: z.string().optional(),
   userId: z.string().optional(),
 })
@@ -3081,73 +3066,17 @@ export async function saveLobsterAvatarHandler({ data, context }: ServerFnArgs<S
     throw new Error('Invalid avatar style.')
   }
 
-  const avatarConfig: {
-    style: string
-    seed: string
-    height?: 'short' | 'regular' | 'tall' | 'towering' | number
-    armScale?: number
-    backgroundTheme?: string
-    backgroundPattern?: string
-    backgroundTexture?: string
-    patternDensity?: 'compact' | 'standard' | 'spacious'
-    patternGlow?: 'subtle' | 'chromatic' | 'none'
-    patternPulse?: 'pulse' | 'steady'
-    patternSparkles?: 'subtle' | 'radiant' | 'none'
-    eyelidStyle?: string
-    eyeColor?: string
-    eyeVariant?: string
-    pupilVariant?: string
-    backgroundMotion?: string
-    transparentBackground?: boolean
-  } = {
+  const extras: Record<string, string | number | boolean> = {}
+  for (const key of AVATAR_STORED_OPTIONAL_KEYS) {
+    const value = validated[key]
+    if (value === undefined) continue
+    const cleaned = typeof value === 'string' ? value.trim() : value
+    if (cleaned !== '') extras[key] = cleaned
+  }
+  const avatarConfig = {
+    ...extras,
     style: LOBSTER_AVATAR_STYLE,
     seed: validated.seed.trim(),
-  }
-
-  if (validated.height !== undefined) {
-    avatarConfig.height = validated.height
-  }
-  if (typeof validated.armScale === 'number') {
-    avatarConfig.armScale = validated.armScale
-  }
-  if (validated.backgroundTheme?.trim()) {
-    avatarConfig.backgroundTheme = validated.backgroundTheme.trim()
-  }
-  if (validated.backgroundPattern?.trim()) {
-    avatarConfig.backgroundPattern = validated.backgroundPattern.trim()
-  }
-  if (validated.backgroundTexture?.trim()) {
-    avatarConfig.backgroundTexture = validated.backgroundTexture.trim()
-  }
-  if (validated.patternDensity) {
-    avatarConfig.patternDensity = validated.patternDensity
-  }
-  if (validated.patternGlow) {
-    avatarConfig.patternGlow = validated.patternGlow
-  }
-  if (validated.patternPulse) {
-    avatarConfig.patternPulse = validated.patternPulse
-  }
-  if (validated.patternSparkles) {
-    avatarConfig.patternSparkles = validated.patternSparkles
-  }
-  if (validated.eyelidStyle?.trim()) {
-    avatarConfig.eyelidStyle = validated.eyelidStyle.trim()
-  }
-  if (validated.eyeColor?.trim()) {
-    avatarConfig.eyeColor = validated.eyeColor.trim()
-  }
-  if (validated.eyeVariant?.trim()) {
-    avatarConfig.eyeVariant = validated.eyeVariant.trim()
-  }
-  if (validated.pupilVariant?.trim()) {
-    avatarConfig.pupilVariant = validated.pupilVariant.trim()
-  }
-  if (validated.backgroundMotion?.trim()) {
-    avatarConfig.backgroundMotion = validated.backgroundMotion.trim()
-  }
-  if (typeof validated.transparentBackground === 'boolean') {
-    avatarConfig.transparentBackground = validated.transparentBackground
   }
 
   const [updated] = await dbClient

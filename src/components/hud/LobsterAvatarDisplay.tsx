@@ -241,7 +241,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
           <div
             ref={animatedRef}
             data-testid="lobster-avatar-inline-svg"
-            className={`lobster-avatar-animated ${spriteClasses} [&>svg]:w-full [&>svg]:h-full [image-rendering:pixelated] [image-rendering:crisp-edges]`}
+            className={`lobster-avatar-animated ${spriteClasses} [&>svg]:w-full [&>svg]:h-full`}
             style={idleStyle}
             dangerouslySetInnerHTML={{ __html: animatedSvgMarkup }}
             role="img"
@@ -251,7 +251,7 @@ export const LobsterAvatarDisplay: React.FC<LobsterAvatarDisplayProps> = React.m
           <img
             src={displaySrc}
             alt={alt}
-            className={`${spriteClasses} object-cover [image-rendering:pixelated] [image-rendering:crisp-edges]`}
+            className={`${spriteClasses} object-cover ${pixelated ? '[image-rendering:pixelated] [image-rendering:crisp-edges]' : ''}`}
           />
         )}
 

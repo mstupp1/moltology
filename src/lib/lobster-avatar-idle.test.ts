@@ -3,29 +3,22 @@ import {
   decodeSvgDataUri,
   getIdleAnimationPhaseOffset,
   resolveIdleAnimationPhase,
-  LOBSTER_IDLE_LAYER_IDS,
+  LOBSTER_IDLE_LAYER_CLASSES,
 } from './lobster-avatar-idle'
+import { generateLobsterAvatarSvg } from './lobster-avatar'
 
 const SAMPLE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="red"/></svg>'
 const SAMPLE_URI = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(SAMPLE_SVG)}`
 
 describe('lobster-avatar-idle', () => {
-  it('exports expected idle layer ids', () => {
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-carapace-layer')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-claw-left')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-claw-right')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-antennae-layer')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-antenna-left')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-antenna-right')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-brow-layer')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-brow-left')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-brow-right')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-eyelids-layer')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-eyelid-left')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-eyelid-right')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-flank-limbs')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-flank-left')
-    expect(LOBSTER_IDLE_LAYER_IDS).toContain('lobster-flank-right')
+  it('lists the idle layer classes every race renders', () => {
+    for (const race of ['lobster', 'crab'] as const) {
+      const svg = generateLobsterAvatarSvg({ style: 'critters', seed: 'idle-check', race, pose: 'cheer' }, 128)!
+      for (const cls of LOBSTER_IDLE_LAYER_CLASSES) {
+        if (race === 'crab' && (cls === 'lobster-idle-tail' || cls === 'lobster-idle-flank-limbs' || cls === 'lobster-idle-abdomen')) continue
+        expect(svg, `${race} ${cls}`).toContain(cls)
+      }
+    }
   })
 
   it('decodes percent-encoded svg data uris', () => {

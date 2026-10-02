@@ -130,7 +130,8 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
           <LobsterAvatarDisplay
             src={animatedUri}
             alt={alt}
-            pixelResolution={64}
+            pixelated={false}
+            crt={false}
             outputSize={size}
             maskRadial={false}
             animationSeed={resolvedSeed}
@@ -157,7 +158,7 @@ export const LobsterAvatarPortrait: React.FC<LobsterAvatarPortraitProps> = React
             loading={loading}
             decoding="async"
             data-testid="lobster-avatar-portrait-image"
-            className={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] [image-rendering:pixelated] [image-rendering:crisp-edges] ${
+            className={`w-full h-full object-cover brightness-[0.96] contrast-[1.12] saturate-[1.15] ${
               interactive ? 'transition-transform duration-300 group-hover:scale-[1.03]' : ''
             }`}
           />

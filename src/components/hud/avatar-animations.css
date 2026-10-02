@@ -1,267 +1,135 @@
-/* Layered lobster avatar idle — one shared breath cycle, limbs follow, frame anchored */
+/*
+ * Layered avatar idle: one shared breath cycle, limbs follow, feet stay planted.
+ * Origins use fill-box percentages so they hold for every race, pose, and height.
+ */
 .lobster-avatar-animated {
   --lobster-breath-duration: 4.4s;
-  --lobster-drift-duration: 8.8s;
+  --lobster-blink-duration: 5.6s;
+  --lobster-idle-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
   contain: layout paint;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
 
-/* Inhale peak @ 50% — torso expands from fixed waist/feet anchors */
-@keyframes lobsterIdleAbdomenBreath {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.018); }
-}
-
-@keyframes lobsterIdleCarapaceBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); }
-  50% { transform: translate3d(0, -2px, 0) scaleY(1.012); }
-}
-
-/* Brow root follows head vertical breath cycle */
-@keyframes lobsterIdleBrowBreath {
+@keyframes lobsterIdleBob {
   0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -2px, 0); }
+  50% { transform: translate3d(0, -1.6px, 0); }
 }
 
-/* Left eyebrow lifts & perks upward on inhale */
-@keyframes lobsterIdleBrowLeftBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(-0.4px, -1.8px, 0) rotate(4deg); }
-}
-
-/* Right eyebrow lifts & perks upward on inhale */
-@keyframes lobsterIdleBrowRightBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(0.4px, -1.8px, 0) rotate(-4deg); }
-}
-
-/* Eyelids micro-breath/perk in sync with brows and breath cycle */
-@keyframes lobsterIdleEyelidLeftBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(-0.2px, -0.6px, 0) rotate(1.5deg); }
-}
-
-/* Right eyelid micro-breath/perk in sync with brows and breath cycle */
-@keyframes lobsterIdleEyelidRightBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(0.2px, -0.6px, 0) rotate(-1.5deg); }
-}
-
-/* Limbs open slightly on inhale — mirrors chest expansion */
-@keyframes lobsterIdleArmLeftBreath {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-1.5deg); }
-}
-
-@keyframes lobsterIdleArmRightBreath {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(1.5deg); }
-}
-
-@keyframes lobsterIdleClawLeftBreath {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(-2deg); }
-}
-
-@keyframes lobsterIdleClawRightBreath {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(2deg); }
-}
-
-/* Tail rises with pelvic inhale — same breath phase */
-@keyframes lobsterIdleTailBreath {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(2deg); }
-}
-
-/* Flank limbs expand with lower abdomen inhale */
-@keyframes lobsterIdleFlankBreath {
+@keyframes lobsterIdleAbdomen {
   0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.018); }
+  50% { transform: scaleY(1.016); }
 }
 
-/* Left thin flank legs flex outward to the left */
-@keyframes lobsterIdleFlankLeftBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(-1px, 0, 0) rotate(-3deg); }
+@keyframes lobsterIdleAntennaLeft {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-5deg); }
 }
 
-/* Right thin flank legs flex outward to the right in opposite direction */
-@keyframes lobsterIdleFlankRightBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(1px, 0, 0) rotate(3deg); }
+@keyframes lobsterIdleAntennaRight {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
 }
 
-/* Antenna root moves along vertically with head/carapace breath */
-@keyframes lobsterIdleAntennaBreath {
+@keyframes lobsterIdleClawLeft {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-3deg); }
+}
+
+@keyframes lobsterIdleClawRight {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes lobsterIdleTail {
+  0%, 100% { transform: rotate(0deg) scaleX(1); }
+  50% { transform: rotate(1.5deg) scaleX(1.03); }
+}
+
+@keyframes lobsterIdleFlank {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(1.03); }
+}
+
+@keyframes lobsterIdleBrow {
   0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -2px, 0); }
+  50% { transform: translate3d(0, -0.9px, 0); }
 }
 
-/* Left antenna drifts/sways slightly leftward on breath expansion */
-@keyframes lobsterIdleAntennaLeftBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(-1.2px, 0, 0) rotate(-3.5deg); }
-}
-
-/* Right antenna drifts/sways slightly rightward on breath expansion */
-@keyframes lobsterIdleAntennaRightBreath {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(1.2px, 0, 0) rotate(3.5deg); }
-}
-
-.lobster-avatar-animated .lobster-idle-abdomen {
-  transform-box: fill-box;
-  transform-origin: 50px 102px;
-  animation: lobsterIdleAbdomenBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+/* Lids stay open most of the cycle, then close for a quick blink. */
+@keyframes lobsterIdleBlink {
+  0%, 92%, 100% { opacity: 0; }
+  93.5%, 96% { opacity: 1; }
 }
 
 .lobster-avatar-animated .lobster-idle-carapace {
   transform-box: fill-box;
-  transform-origin: 50px 99px;
-  animation: lobsterIdleCarapaceBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 50% 100%;
+  animation: lobsterIdleBob var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
-.lobster-avatar-animated .lobster-idle-brow {
+.lobster-avatar-animated .lobster-idle-abdomen {
   transform-box: fill-box;
-  transform-origin: 50% 50%;
-  animation: lobsterIdleBrowBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 50% 100%;
+  animation: lobsterIdleAbdomen var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
-.lobster-avatar-animated .lobster-idle-brow-left {
+.lobster-avatar-animated .lobster-idle-antenna-left {
   transform-box: fill-box;
-  transform-origin: 100% 60%;
-  animation: lobsterIdleBrowLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 100% 100%;
+  animation: lobsterIdleAntennaLeft var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
-.lobster-avatar-animated .lobster-idle-brow-right {
+.lobster-avatar-animated .lobster-idle-antenna-right {
   transform-box: fill-box;
-  transform-origin: 0% 60%;
-  animation: lobsterIdleBrowRightBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-eyelids {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-eyelid-left {
-  transform-box: fill-box;
-  transform-origin: 100% 60%;
-  animation: lobsterIdleEyelidLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-eyelid-right {
-  transform-box: fill-box;
-  transform-origin: 0% 60%;
-  animation: lobsterIdleEyelidRightBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-arm-left {
-  transform-box: fill-box;
-  transform-origin: 28px 88px;
-  animation: lobsterIdleArmLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-arm-right {
-  transform-box: fill-box;
-  transform-origin: 72px 88px;
-  animation: lobsterIdleArmRightBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 0% 100%;
+  animation: lobsterIdleAntennaRight var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
 .lobster-avatar-animated .lobster-idle-claw-left {
   transform-box: fill-box;
-  transform-origin: 28px 92px;
-  animation: lobsterIdleClawLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 50% 50%;
+  animation: lobsterIdleClawLeft var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
 .lobster-avatar-animated .lobster-idle-claw-right {
   transform-box: fill-box;
-  transform-origin: 72px 92px;
-  animation: lobsterIdleClawRightBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 50% 50%;
+  animation: lobsterIdleClawRight var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
 .lobster-avatar-animated .lobster-idle-tail {
   transform-box: fill-box;
-  transform-origin: 50px 134px;
-  animation: lobsterIdleTailBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 50% 0%;
+  animation: lobsterIdleTail var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
 .lobster-avatar-animated .lobster-idle-flank-limbs {
   transform-box: fill-box;
   transform-origin: 50% 0%;
-  animation: lobsterIdleFlankBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  animation: lobsterIdleFlank var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
-.lobster-avatar-animated .lobster-idle-flank-left {
+.lobster-avatar-animated .lobster-idle-brow-left,
+.lobster-avatar-animated .lobster-idle-brow-right {
   transform-box: fill-box;
-  transform-origin: 100% 20%;
-  animation: lobsterIdleFlankLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+  transform-origin: 50% 50%;
+  animation: lobsterIdleBrow var(--lobster-breath-duration) ease-in-out infinite;
+  animation-delay: var(--lobster-idle-delay);
 }
 
-.lobster-avatar-animated .lobster-idle-flank-right {
-  transform-box: fill-box;
-  transform-origin: 0% 20%;
-  animation: lobsterIdleFlankRightBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
+.lobster-avatar-animated .lobster-idle-blink {
+  animation: lobsterIdleBlink var(--lobster-blink-duration) linear infinite;
+  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-blink-duration));
 }
-
-.lobster-avatar-animated .lobster-idle-antennae {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: lobsterIdleAntennaBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-antenna-left {
-  transform-box: fill-box;
-  transform-origin: 90% 95%;
-  animation: lobsterIdleAntennaLeftBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-.lobster-avatar-animated .lobster-idle-antenna-right {
-  transform-box: fill-box;
-  transform-origin: 10% 95%;
-  animation: lobsterIdleAntennaRightBreath var(--lobster-breath-duration) ease-in-out infinite;
-  animation-delay: calc(var(--lobster-idle-phase, 0) * -1 * var(--lobster-breath-duration));
-  will-change: transform;
-}
-
-/* Legs stay planted — no idle animation to preserve frame stability */
 
 @media (prefers-reduced-motion: reduce) {
   .lobster-avatar-animated .lobster-idle-layer {

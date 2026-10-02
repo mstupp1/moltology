@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { EyeOff, Lock, Mail, Radio, Settings, Shuffle, Sparkles } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { EyeOff, Mail, Radio, Settings, Sparkles } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useHeavyVfx } from '@/hooks/useHeavyVfx'
@@ -18,12 +18,13 @@ import { useHudPersist } from '@/hooks/useHudPersist'
 import {
   LOBSTER_AVATAR_STYLE,
   clearCachedProfileAvatarUrl,
-  getLobsterAvatarSeededOptions,
+  lockAvatarConfig,
   parseLobsterAvatarConfig,
   randomLobsterSeed,
   type LobsterAvatarConfig,
 } from '@/lib/lobster-avatar'
-import { LobsterAvatarPortrait } from '../LobsterAvatarPortrait'
+import { AvatarCreatorPanel } from '../avatar/AvatarCreatorPanel'
+import { AvatarCreatorPreview } from '../avatar/AvatarCreatorPreview'
 import { ConnectedAccounts } from './ConnectedAccounts'
 import { PremiumSettingsSection } from './PremiumSettingsSection'
 
@@ -35,23 +36,10 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
   const { heavyVfxDisabled, toggleHeavyVfx } = useHeavyVfx()
 
   const [emailOptIn, setEmailOptIn] = useState(false)
-  const [draftSeed, setDraftSeed] = useState('')
+  const [draftConfig, setDraftConfig] = useState<LobsterAvatarConfig | null>(null)
   const [designation, setDesignation] = useState('')
   const [savedDesignation, setSavedDesignation] = useState('')
   const [loading, setLoading] = useState(true)
-
-  const draftHeight = useMemo(
-    () => getLobsterAvatarSeededOptions(draftSeed.trim() || 'larva-initiate').height,
-    [draftSeed]
-  )
-
-  const draftConfig = useMemo((): LobsterAvatarConfig => {
-    return {
-      style: LOBSTER_AVATAR_STYLE,
-      seed: draftSeed,
-      height: draftHeight,
-    }
-  }, [draftSeed, draftHeight])
 
   const loadProfile = useCallback(async () => {
     if (!userId) return
@@ -68,8 +56,7 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
       setDesignation(nextHandle)
       setSavedDesignation(nextHandle)
       const parsed = parseLobsterAvatarConfig(profile?.avatarConfig)
-      const nextSeed = parsed?.seed ?? randomLobsterSeed()
-      setDraftSeed(nextSeed)
+      setDraftConfig(parsed ?? { style: LOBSTER_AVATAR_STYLE, seed: randomLobsterSeed() })
     } catch {
       toast.error('Could not load settings.')
     } finally {
@@ -103,18 +90,9 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
     }
   }
 
-  const handleRandomize = () => {
-    const nextSeed = randomLobsterSeed()
-    setDraftSeed(nextSeed)
-  }
-
   const handleSaveAvatar = async () => {
-    if (!userId || !draftSeed.trim()) return
-    const config: LobsterAvatarConfig = {
-      style: LOBSTER_AVATAR_STYLE,
-      seed: draftSeed.trim(),
-      height: draftHeight,
-    }
+    if (!userId || !draftConfig?.seed.trim()) return
+    const config = lockAvatarConfig(draftConfig)
     try {
       await persist.run('settings-avatar', async () => {
         const token = await getAuthJWTToken()
@@ -197,57 +175,26 @@ export const SettingsPage: React.FC<{ oauthError?: string }> = ({ oauthError }) 
                 Avatar
               </h2>
               <p className="text-xs text-[#839493] font-sans mt-0.5">
-                Shows on your chassis page when saved.
+                Build your character. It shows on your chassis page, in the forum, and across the HUD once saved.
               </p>
             </div>
 
             <div className="flex flex-col items-center gap-4">
-              <LobsterAvatarPortrait
-                config={draftConfig}
-                size={320}
-                alt="Avatar preview"
-                className="w-48 h-48 sm:w-56 sm:h-56 mx-auto"
-                interactive
-                animated
-                animationSeed={draftSeed}
-                loading="eager"
-              />
+              {draftConfig ? (
+                <>
+                  <AvatarCreatorPreview config={draftConfig} className="max-w-[280px]" />
+                  <AvatarCreatorPanel value={draftConfig} onChange={setDraftConfig} disabled={loading} />
+                </>
+              ) : null}
 
-              {/* Seed Number */}
-              <div className="w-full max-w-xs space-y-1.5 pt-1">
-                <div className="text-[11px] font-grotesk tracking-wider uppercase">
-                  <span className="text-[#839493]">Seed Number</span>
-                </div>
-                <div className="px-3 py-2 bg-[#020810]/60 border border-[#3a4a49]/40 rounded-sm flex items-center justify-between gap-2">
-                  <span
-                    data-testid="settings-seed-number"
-                    className="font-mono text-xs text-[#00c3ff] font-medium tracking-wider truncate select-all"
-                    title={draftSeed}
-                  >
-                    {draftSeed || 'None'}
-                  </span>
-                  <Lock className="w-3.5 h-3.5 text-[#00c3ff]/40 shrink-0" />
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={handleRandomize}
-                  className="px-4 py-2 border border-[#3a4a49] hover:border-[#00c3ff]/50 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors inline-flex items-center gap-2"
-                >
-                  <Shuffle className="w-4 h-4" />
-                  Randomize
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveAvatar}
-                  disabled={!draftSeed.trim()}
-                  className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Save Avatar
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleSaveAvatar}
+                disabled={!draftConfig?.seed.trim()}
+                className="px-4 py-2 bg-[#00c3ff]/20 hover:bg-[#00c3ff]/30 border border-[#00c3ff]/60 text-[#00c3ff] font-grotesk font-bold text-xs uppercase tracking-widest chamfer-corner transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Save Avatar
+              </button>
             </div>
           </div>
 

@@ -1,66 +1,77 @@
-import { Style, Avatar } from '@dicebear/core'
-import type { StyleDefinition } from '@dicebear/core'
-import critters from '@dicebear/styles/critters.json' with { type: 'json' }
-import { S3_BASE_URL } from './assets'
+/**
+ * Member avatars: config parsing, seeded traits, and SVG generation for every race.
+ *
+ * Characters are drawn by the hand-built rigs in `./avatar/` (no third-party sprite):
+ * - `avatar/traits.ts`   option catalogs and labels for the character creator
+ * - `avatar/paint.ts`    shell gradients, finishes, markings, and the shared part painter
+ * - `avatar/parts.ts`    eyes, mouths, claws, arms, antennae, accessories
+ * - `avatar/races.ts`    lobster and crab body rigs
+ * - `avatar/backdrop.ts` themes, animated patterns, textures, sparkles
+ *
+ * Saved configs only store what the member chose. Anything missing is rolled from the seed,
+ * so configs saved before the creator existed keep rendering.
+ */
+import {
+  LOBSTER_BACKGROUND_MOTION_MODES,
+  LOBSTER_BACKGROUND_PATTERNS,
+  LOBSTER_BACKGROUND_PATTERN_MAP,
+  LOBSTER_BACKGROUND_TEXTURES,
+  LOBSTER_BACKGROUND_TEXTURE_MAP,
+  LOBSTER_BACKGROUND_THEMES,
+  LOBSTER_BACKGROUND_THEME_MAP,
+  LOBSTER_PATTERN_DENSITIES,
+  LOBSTER_PATTERN_GLOWS,
+  LOBSTER_PATTERN_PULSES,
+  LOBSTER_PATTERN_SPARKLES,
+  escapeSvgAttr,
+  getPatternGlowFilterDef,
+  renderLobsterSparkles,
+  type BackgroundMotionConfig,
+  type BackgroundMotionMode,
+  type BackgroundPattern,
+  type BackgroundTexture,
+  type BackgroundTheme,
+  type PatternDensity,
+  type PatternGlow,
+  type PatternPulse,
+  type PatternSparkles,
+} from './avatar/backdrop'
+import { paintDefs, type PaintContext } from './avatar/paint'
+import { AVATAR_EYE_COLORS, eyeDefs } from './avatar/parts'
+import { renderCharacter } from './avatar/races'
+import {
+  AVATAR_ACCESSORIES,
+  AVATAR_ANTENNAE,
+  AVATAR_CLAWS,
+  AVATAR_MOUTHS,
+  AVATAR_POSES,
+  AVATAR_RACES,
+  SHELL_FINISHES,
+  SHELL_MARKINGS,
+  SHELL_PALETTES,
+  SHELL_PALETTE_MAP,
+  isOneOf,
+  pickFrom,
+  seededRandom,
+  type AvatarAccessory,
+  type AvatarAntennae,
+  type AvatarClaws,
+  type AvatarMouth,
+  type AvatarPose,
+  type AvatarRace,
+  type ShellFinish,
+  type ShellMarking,
+} from './avatar/traits'
 
+export * from './avatar/backdrop'
+export * from './avatar/traits'
+
+/** Stored style tag. Kept from the first avatar version so saved configs stay valid. */
 export const LOBSTER_AVATAR_STYLE = 'critters' as const
 
-export interface BackgroundTheme {
-  id: string
-  name: string
-  label: string
-  /** Primary Base Color (Dark Benthic/Stygian Void tone) */
-  primaryColor: string
-  /** Secondary Ambient Color (Luminous Bioluminescent/Cyber tone) */
-  secondaryColor: string
-  /** Direction angle in degrees for linear gradient (default: 135deg) */
-  gradientAngle?: number
-  /** Legacy compatibility aliases */
-  topColor: string
-  bottomColor: string
-  accentColor: string
-  gridColor: string
-  glowColor: string
-  /** Optional secondary floor/ambient glow */
-  glowSecondaryColor?: string
-}
-
-export type BackgroundMotionMode =
-  | 'drift_diagonal'
-  | 'drift_horizontal'
-  | 'radar_sweep'
-  | 'wave_undulate'
-  | 'pulse_breathe'
-  | 'static'
-
-export const LOBSTER_BACKGROUND_MOTION_MODES: readonly BackgroundMotionMode[] = [
-  'drift_diagonal',
-  'drift_horizontal',
-  'radar_sweep',
-  'wave_undulate',
-  'pulse_breathe',
-  'static',
-] as const
-
-export function escapeSvgAttr(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-}
-
-export type PatternDensity = 'compact' | 'standard' | 'spacious'
-export type PatternGlow = 'subtle' | 'chromatic' | 'none'
-export type PatternPulse = 'pulse' | 'steady'
-export type PatternSparkles = 'subtle' | 'radiant' | 'none'
 export type EyelidStyle = 'open' | 'relaxed' | 'cheerful_squint' | 'focused' | 'chill' | 'angry' | 'worried'
-export type LobsterEyeColor = 'amber' | 'sapphire' | 'emerald' | 'amethyst' | 'ruby' | 'topaz'
+export type LobsterEyeColor = (typeof AVATAR_EYE_COLORS)[number]
 
-export const LOBSTER_PATTERN_DENSITIES: readonly PatternDensity[] = ['compact', 'standard', 'spacious'] as const
-export const LOBSTER_PATTERN_GLOWS: readonly PatternGlow[] = ['subtle', 'chromatic', 'none'] as const
-export const LOBSTER_PATTERN_PULSES: readonly PatternPulse[] = ['pulse', 'steady'] as const
-export const LOBSTER_PATTERN_SPARKLES: readonly PatternSparkles[] = ['subtle', 'radiant', 'none'] as const
 export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
   'open',
   'relaxed',
@@ -71,51 +82,34 @@ export const LOBSTER_EYELID_STYLES: readonly EyelidStyle[] = [
   'worried',
 ] as const
 
-export const LOBSTER_EYE_COLORS: readonly LobsterEyeColor[] = [
-  'amber',
-  'sapphire',
-  'emerald',
-  'amethyst',
-  'ruby',
-  'topaz',
-] as const
+export const LOBSTER_EYE_COLORS: readonly LobsterEyeColor[] = AVATAR_EYE_COLORS
 
 export const LOBSTER_EYE_COLOR_LABELS: Readonly<Record<LobsterEyeColor, string>> = {
-  amber: 'Warm Amber (Pixar Hazel)',
-  sapphire: 'Ocean Sapphire (Cyan Blue)',
-  emerald: 'Abyssal Emerald (Benthic Green)',
-  amethyst: 'Mystic Amethyst (Deep Violet)',
-  ruby: 'Incandescent Ruby (Fiery Ember)',
-  topaz: 'Golden Topaz (Molten Honey)',
+  amber: 'Amber',
+  sapphire: 'Sapphire',
+  emerald: 'Emerald',
+  amethyst: 'Amethyst',
+  ruby: 'Ruby',
+  topaz: 'Topaz',
 }
 
 export const LOBSTER_EYE_VARIANTS = ['round', 'wide', 'tall'] as const
 export type LobsterEyeVariant = (typeof LOBSTER_EYE_VARIANTS)[number]
 
 export const LOBSTER_EYE_VARIANT_LABELS: Readonly<Record<LobsterEyeVariant, string>> = {
-  round: 'Spherical (Classic Pixar)',
-  wide: 'Wide (Curious)',
-  tall: 'Elongated (Doe-eyed)',
+  round: 'Round',
+  wide: 'Wide',
+  tall: 'Tall',
 }
 
 export const LOBSTER_PUPIL_VARIANTS = ['standard', 'big', 'sparkle', 'keen'] as const
 export type LobsterPupilVariant = (typeof LOBSTER_PUPIL_VARIANTS)[number]
 
 export const LOBSTER_PUPIL_VARIANT_LABELS: Readonly<Record<LobsterPupilVariant, string>> = {
-  standard: 'Standard Velvet',
-  big: 'Big Wonder (Dilated)',
-  sparkle: 'Radiant Sparkle',
-  keen: 'Keen Focus',
-}
-
-export const PATTERN_DENSITY_SCALES: Record<PatternDensity, number> = {
-  compact: 0.75,
-  standard: 1.0,
-  spacious: 1.35,
-}
-
-export function getDensityScale(density?: PatternDensity): number {
-  return (density && PATTERN_DENSITY_SCALES[density]) ?? 1.0
+  standard: 'Classic',
+  big: 'Big and soft',
+  sparkle: 'Starry',
+  keen: 'Sharp',
 }
 
 export type LobsterHeight = 'short' | 'regular' | 'tall' | 'towering'
@@ -135,10 +129,10 @@ export const LOBSTER_HEIGHT_MAP: Readonly<Record<string, LobsterHeight>> = {
 }
 
 export const LOBSTER_HEIGHT_LABELS: Readonly<Record<LobsterHeight, string>> = {
-  short: 'Compact (Shorter)',
-  regular: 'Standard (Baseline)',
-  tall: 'Elongated (Tall)',
-  towering: 'Towering (Colossal)',
+  short: 'Short',
+  regular: 'Regular',
+  tall: 'Tall',
+  towering: 'Towering',
 }
 
 export const LOBSTER_HEIGHT_SCALES: Readonly<Record<LobsterHeight, number>> = {
@@ -160,189 +154,18 @@ export function resolveHeightScale(height?: LobsterHeight | string | number): nu
   return 1.0
 }
 
-export interface LobsterTorsoMetrics {
-  torsoDelta: number
-  headYOffset: number
-  frameShift: number
-  armScale: number
-  s1_top: number
-  s1_bot: number
-  s2_top: number
-  s2_bot: number
-  s3_top: number
-  s3_bot: number
-  s4_top: number
-  s4_bot: number
-  s5_top: number
-  s5_bot: number
-  keelTop: number
-  keelBot: number
-  flankY1: number
-  flankY2: number
-}
-
-/**
- * Computes parametric torso somite coordinates and position compensation offsets
- * for all attached anatomical layers based on character height.
- */
-export function getLobsterTorsoMetrics(height?: LobsterHeight | string | number): LobsterTorsoMetrics {
-  const scale = resolveHeightScale(height)
-  // Baseline torso somites span 49 units (from s1_top=102 to s5_bot=151).
-  // torsoDelta represents the delta length added to the torso.
-  // When scale = 1.0 -> torsoDelta = 0.
-  // When scale = 0.88 ('short') -> torsoDelta = -6.
-  // When scale = 1.14 ('tall') -> torsoDelta = +6.
-  // When scale = 1.25 ('towering') -> torsoDelta = +12.
-  const torsoDelta = Math.min(14, Math.max(-8, Math.round((scale - 1.0) * 48)))
-
-  // Arm scale compensation: arms lengthen on tall/towering to match elongated torso,
-  // and shorten on compact/short to keep claws comfortably above ground/knees.
-  const armScale = scale === 1.0 ? 1.0 : Number((1.0 + (scale - 1.0) * 0.85).toFixed(2))
-
-  // Pelvis anchor line is at Y = 151
-  const pelvisBot = 151
-  // Baseline somite stepping was 9 units across 4 intervals (36 units)
-  const step = (36 + torsoDelta) / 4
-  const plateHeight = Math.round(step + 4)
-
-  const s5_bot = pelvisBot
-  const s5_top = s5_bot - plateHeight
-
-  const s4_bot = Math.round(s5_bot - step)
-  const s4_top = s4_bot - plateHeight
-
-  const s3_bot = Math.round(s5_bot - 2 * step)
-  const s3_top = s3_bot - plateHeight
-
-  const s2_bot = Math.round(s5_bot - 3 * step)
-  const s2_top = s2_bot - plateHeight
-
-  const s1_bot = Math.round(s5_bot - 4 * step)
-  const s1_top = s1_bot - plateHeight
-
-  // Upward translation needed for the upper body (carapace, arms, claws, brow, antennae)
-  // Baseline s1_top was 102. When s1_top is 90, headYOffset is -12 (moves up by 12).
-  const headYOffset = s1_top - 102
-
-  // Frame compensation to keep full character gracefully framed within the 230x230 viewBox
-  const frameShift = Math.round(Math.max(0, torsoDelta - 4) * 0.4)
-
-  return {
-    torsoDelta,
-    headYOffset,
-    frameShift,
-    armScale,
-    s1_top,
-    s1_bot,
-    s2_top,
-    s2_bot,
-    s3_top,
-    s3_bot,
-    s4_top,
-    s4_bot,
-    s5_top,
-    s5_bot,
-    keelTop: s1_top + 2,
-    keelBot: s5_top + 10,
-    flankY1: s1_top,
-    flankY2: s2_bot,
-  }
-}
-
-export function getPatternGlowFilterDef(glow: PatternGlow, theme: BackgroundTheme): string {
-  if (glow === 'none') return ''
-  const filterId = `pat-glow-${glow}-${theme.id}`
-  if (glow === 'chromatic') {
-    return `
-      <filter id="${filterId}" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="-0.8" dy="0" stdDeviation="1.2" flood-color="#00f3ff" flood-opacity="0.45" />
-        <feDropShadow dx="0.8" dy="0" stdDeviation="1.2" flood-color="#ff0055" flood-opacity="0.38" />
-      </filter>`
-  }
-  return `
-    <filter id="${filterId}" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="${theme.accentColor}" flood-opacity="0.48" />
-    </filter>`
-}
-
-export function renderLobsterSparkles(theme: BackgroundTheme, sparkles: PatternSparkles, _seed: string): string {
-  if (sparkles === 'none') return ''
-
-  const sparkleCount = sparkles === 'radiant' ? 16 : 8
-  // Curated bioluminescent glints clustered organically around the lobster's face/eyes/rostrum & antenna halo
-  const baseSparkles = [
-    // 1. Direct facial aura & brow glints (active in both subtle and radiant modes)
-    { x: 26, y: 34, size: 2.6, dur: 2.6, delay: 0.1 }, // Left upper orbital brow
-    { x: 74, y: 34, size: 2.6, dur: 2.8, delay: 0.9 }, // Right upper orbital brow
-    { x: 19, y: 44, size: 2.2, dur: 3.1, delay: 1.4 }, // Left cheek & eye flank
-    { x: 81, y: 44, size: 2.2, dur: 3.3, delay: 0.5 }, // Right cheek & eye flank
-    { x: 50, y: 16, size: 3.0, dur: 2.9, delay: 1.8 }, // Central rostrum / crown beacon
-    { x: 36, y: 18, size: 2.0, dur: 3.4, delay: 0.3 }, // Left antenna base feeler
-    { x: 64, y: 18, size: 2.0, dur: 3.0, delay: 1.2 }, // Right antenna base feeler
-    { x: 50, y: 56, size: 2.4, dur: 2.7, delay: 0.7 }, // Rostrum tip / chin glint
-
-    // 2. Extended facial halo & antenna glints (added in radiant mode)
-    { x: 14, y: 26, size: 2.8, dur: 3.5, delay: 1.6 }, // Left antenna sweep halo
-    { x: 86, y: 26, size: 2.8, dur: 3.2, delay: 0.4 }, // Right antenna sweep halo
-    { x: 28, y: 64, size: 2.0, dur: 2.8, delay: 1.0 }, // Left mandible flank
-    { x: 72, y: 64, size: 2.0, dur: 2.8, delay: 1.5 }, // Right mandible flank
-    { x: 44, y: 8, size: 2.2, dur: 3.6, delay: 0.8 },  // High crown apex left
-    { x: 56, y: 8, size: 2.2, dur: 3.3, delay: 1.9 },  // High crown apex right
-    { x: 12, y: 54, size: 2.5, dur: 2.9, delay: 0.6 }, // Outer left pincers aura
-    { x: 88, y: 54, size: 2.5, dur: 3.1, delay: 1.3 }, // Outer right pincers aura
-  ]
-
-  const items = baseSparkles.slice(0, sparkleCount)
-
-  const elements = items.map((s, idx) => {
-    const r = s.size
-    const star = `M 0 ${-r * 1.8} Q 0 0 ${r * 1.8} 0 Q 0 0 0 ${r * 1.8} Q 0 0 ${-r * 1.8} 0 Q 0 0 0 ${-r * 1.8} Z`
-    return `
-      <g transform="translate(${s.x}, ${s.y})">
-        <animate attributeName="opacity" values="0.05;0.95;0.05" dur="${s.dur}s" begin="${s.delay}s" repeatCount="indefinite" />
-        <path d="${star}" fill="${idx % 2 === 0 ? theme.secondaryColor : theme.accentColor}" opacity="0.85" />
-        <circle cx="0" cy="0" r="${(r * 0.45).toFixed(1)}" fill="#ffffff" opacity="0.95" />
-      </g>`
-  }).join('')
-
-  return `
-    <g id="lobster-sparkles-layer" data-sparkles="${sparkles}">
-      ${elements}
-    </g>`
-}
-
-export interface BackgroundMotionConfig {
-  mode: BackgroundMotionMode
-  duration: number
-  direction: 'normal' | 'reverse'
-}
-
-export interface BackgroundPattern {
-  id: string
-  name: string
-  label: string
-  render: (
-    theme: BackgroundTheme,
-    patternId: string,
-    motion?: BackgroundMotionConfig,
-    density?: PatternDensity,
-    glow?: PatternGlow,
-    pulse?: PatternPulse
-  ) => string
-}
-
-export interface BackgroundTexture {
-  id: string
-  name: string
-  label: string
-  assetPath: string
-  publicUrl: string
-  opacity?: number
-}
-
 export interface LobsterAvatarConfig {
   style: typeof LOBSTER_AVATAR_STYLE
   seed: string
+  race?: AvatarRace
+  shellColor?: string
+  shellFinish?: ShellFinish
+  marking?: ShellMarking
+  mouth?: AvatarMouth
+  antennae?: AvatarAntennae
+  claws?: AvatarClaws
+  pose?: AvatarPose
+  accessory?: AvatarAccessory
   height?: LobsterHeight | number
   armScale?: number
   backgroundTheme?: string
@@ -360,11 +183,53 @@ export interface LobsterAvatarConfig {
   transparentBackground?: boolean
 }
 
-const crittersStyle = new Style(critters as StyleDefinition)
+/** Every look trait, fully resolved from a config plus its seed. */
+export interface ResolvedAvatarTraits {
+  race: AvatarRace
+  shellColor: string
+  shellFinish: ShellFinish
+  marking: ShellMarking
+  mouth: AvatarMouth
+  antennae: AvatarAntennae
+  claws: AvatarClaws
+  pose: AvatarPose
+  accessory: AvatarAccessory
+  height: LobsterHeight | number
+  eyelidStyle: EyelidStyle
+  eyeColor: LobsterEyeColor
+  eyeVariant: LobsterEyeVariant
+  pupilVariant: LobsterPupilVariant
+  backgroundTheme: string
+  backgroundPattern: string
+  backgroundTexture: string
+}
+
+/** Config keys the character creator writes. */
+export const AVATAR_TRAIT_KEYS = [
+  'race',
+  'shellColor',
+  'shellFinish',
+  'marking',
+  'mouth',
+  'antennae',
+  'claws',
+  'pose',
+  'accessory',
+  'height',
+  'eyelidStyle',
+  'eyeColor',
+  'eyeVariant',
+  'pupilVariant',
+  'backgroundTheme',
+  'backgroundPattern',
+  'backgroundTexture',
+] as const satisfies readonly (keyof ResolvedAvatarTraits)[]
 
 export function isValidLobsterAvatarStyle(styleId: string): boolean {
   return styleId === LOBSTER_AVATAR_STYLE
 }
+
+const lower = (v: unknown) => (typeof v === 'string' ? v.trim().toLowerCase() : v)
 
 export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | null {
   if (!raw) return null
@@ -385,83 +250,39 @@ export function parseLobsterAvatarConfig(raw: unknown): LobsterAvatarConfig | nu
   if (!seed || seed.length > 128) return null
 
   const config: LobsterAvatarConfig = { style: LOBSTER_AVATAR_STYLE, seed }
+  if (isOneOf(AVATAR_RACES, lower(obj.race))) config.race = lower(obj.race) as AvatarRace
+  if (typeof obj.shellColor === 'string' && SHELL_PALETTE_MAP[obj.shellColor.trim()]) config.shellColor = obj.shellColor.trim()
+  if (isOneOf(SHELL_FINISHES, lower(obj.shellFinish))) config.shellFinish = lower(obj.shellFinish) as ShellFinish
+  if (isOneOf(SHELL_MARKINGS, lower(obj.marking))) config.marking = lower(obj.marking) as ShellMarking
+  if (isOneOf(AVATAR_MOUTHS, lower(obj.mouth))) config.mouth = lower(obj.mouth) as AvatarMouth
+  if (isOneOf(AVATAR_ANTENNAE, lower(obj.antennae))) config.antennae = lower(obj.antennae) as AvatarAntennae
+  if (isOneOf(AVATAR_CLAWS, lower(obj.claws))) config.claws = lower(obj.claws) as AvatarClaws
+  if (isOneOf(AVATAR_POSES, lower(obj.pose))) config.pose = lower(obj.pose) as AvatarPose
+  if (isOneOf(AVATAR_ACCESSORIES, lower(obj.accessory))) config.accessory = lower(obj.accessory) as AvatarAccessory
   if (typeof obj.height === 'string') {
     const norm = obj.height.toLowerCase().trim()
-    if (norm in LOBSTER_HEIGHT_MAP) {
-      config.height = LOBSTER_HEIGHT_MAP[norm]
-    }
+    if (norm in LOBSTER_HEIGHT_MAP) config.height = LOBSTER_HEIGHT_MAP[norm]
   } else if (typeof obj.height === 'number' && Number.isFinite(obj.height)) {
     config.height = obj.height
   }
   if (typeof obj.armScale === 'number' && Number.isFinite(obj.armScale)) {
     config.armScale = Math.min(1.4, Math.max(0.7, Number(obj.armScale.toFixed(2))))
   }
-  if (typeof obj.backgroundTheme === 'string' && obj.backgroundTheme.trim()) {
-    config.backgroundTheme = obj.backgroundTheme.trim()
-  }
-  if (typeof obj.backgroundPattern === 'string' && obj.backgroundPattern.trim()) {
-    config.backgroundPattern = obj.backgroundPattern.trim()
-  }
-  if (typeof obj.backgroundTexture === 'string' && obj.backgroundTexture.trim()) {
-    config.backgroundTexture = obj.backgroundTexture.trim()
-  }
-  if (
-    typeof obj.patternDensity === 'string' &&
-    (obj.patternDensity === 'compact' || obj.patternDensity === 'standard' || obj.patternDensity === 'spacious')
-  ) {
-    config.patternDensity = obj.patternDensity as PatternDensity
-  }
-  if (
-    typeof obj.patternGlow === 'string' &&
-    (obj.patternGlow === 'subtle' || obj.patternGlow === 'chromatic' || obj.patternGlow === 'none')
-  ) {
-    config.patternGlow = obj.patternGlow as PatternGlow
-  }
-  if (
-    typeof obj.patternPulse === 'string' &&
-    (obj.patternPulse === 'pulse' || obj.patternPulse === 'steady')
-  ) {
-    config.patternPulse = obj.patternPulse as PatternPulse
-  }
-  if (
-    typeof obj.patternSparkles === 'string' &&
-    (obj.patternSparkles === 'subtle' || obj.patternSparkles === 'radiant' || obj.patternSparkles === 'none')
-  ) {
-    config.patternSparkles = obj.patternSparkles as PatternSparkles
-  }
-  if (
-    typeof obj.eyelidStyle === 'string' &&
-    (LOBSTER_EYELID_STYLES as readonly string[]).includes(obj.eyelidStyle)
-  ) {
-    config.eyelidStyle = obj.eyelidStyle as EyelidStyle
-  }
-  if (
-    typeof obj.eyeColor === 'string' &&
-    (LOBSTER_EYE_COLORS as readonly string[]).includes(obj.eyeColor.trim().toLowerCase())
-  ) {
-    config.eyeColor = obj.eyeColor.trim().toLowerCase() as LobsterEyeColor
-  }
-  if (
-    typeof obj.eyeVariant === 'string' &&
-    (LOBSTER_EYE_VARIANTS as readonly string[]).includes(obj.eyeVariant.trim().toLowerCase())
-  ) {
-    config.eyeVariant = obj.eyeVariant.trim().toLowerCase() as LobsterEyeVariant
-  }
-  if (
-    typeof obj.pupilVariant === 'string' &&
-    (LOBSTER_PUPIL_VARIANTS as readonly string[]).includes(obj.pupilVariant.trim().toLowerCase())
-  ) {
-    config.pupilVariant = obj.pupilVariant.trim().toLowerCase() as LobsterPupilVariant
-  }
-  if (
-    typeof obj.backgroundMotion === 'string' &&
-    (LOBSTER_BACKGROUND_MOTION_MODES as readonly string[]).includes(obj.backgroundMotion.trim())
-  ) {
+  if (typeof obj.backgroundTheme === 'string' && obj.backgroundTheme.trim()) config.backgroundTheme = obj.backgroundTheme.trim()
+  if (typeof obj.backgroundPattern === 'string' && obj.backgroundPattern.trim()) config.backgroundPattern = obj.backgroundPattern.trim()
+  if (typeof obj.backgroundTexture === 'string' && obj.backgroundTexture.trim()) config.backgroundTexture = obj.backgroundTexture.trim()
+  if (isOneOf(LOBSTER_PATTERN_DENSITIES, obj.patternDensity)) config.patternDensity = obj.patternDensity
+  if (isOneOf(LOBSTER_PATTERN_GLOWS, obj.patternGlow)) config.patternGlow = obj.patternGlow
+  if (isOneOf(LOBSTER_PATTERN_PULSES, obj.patternPulse)) config.patternPulse = obj.patternPulse
+  if (isOneOf(LOBSTER_PATTERN_SPARKLES, obj.patternSparkles)) config.patternSparkles = obj.patternSparkles
+  if (isOneOf(LOBSTER_EYELID_STYLES, obj.eyelidStyle)) config.eyelidStyle = obj.eyelidStyle
+  if (isOneOf(LOBSTER_EYE_COLORS, lower(obj.eyeColor))) config.eyeColor = lower(obj.eyeColor) as LobsterEyeColor
+  if (isOneOf(LOBSTER_EYE_VARIANTS, lower(obj.eyeVariant))) config.eyeVariant = lower(obj.eyeVariant) as LobsterEyeVariant
+  if (isOneOf(LOBSTER_PUPIL_VARIANTS, lower(obj.pupilVariant))) config.pupilVariant = lower(obj.pupilVariant) as LobsterPupilVariant
+  if (typeof obj.backgroundMotion === 'string' && isOneOf(LOBSTER_BACKGROUND_MOTION_MODES, obj.backgroundMotion.trim())) {
     config.backgroundMotion = obj.backgroundMotion.trim() as BackgroundMotionMode
   }
-  if (typeof obj.transparentBackground === 'boolean') {
-    config.transparentBackground = obj.transparentBackground
-  }
+  if (typeof obj.transparentBackground === 'boolean') config.transparentBackground = obj.transparentBackground
   return config
 }
 
@@ -474,667 +295,7 @@ export function randomLobsterSeed(): string {
   return `larva-${Math.random().toString(36).slice(2, 10)}`
 }
 
-/**
- * 12 Canonical 2-Color On-Brand Benthic & Cyber Background Color Themes
- * High-contrast dark oceanic and HUD environments that make red/coral chitin pop vibrantly.
- */
-export const LOBSTER_BACKGROUND_THEMES: readonly BackgroundTheme[] = [
-  // 0: Deep Benthic Void Matrix (Classic Moltology deep abyss)
-  {
-    id: 'deep_abyss',
-    name: 'Benthic Void',
-    label: 'Deep Void',
-    primaryColor: '#020b14',
-    secondaryColor: '#00c3ff',
-    topColor: '#061828',
-    bottomColor: '#01060c',
-    accentColor: '#00c3ff',
-    gridColor: 'rgba(0, 195, 255, 0.16)',
-    glowColor: 'rgba(0, 195, 255, 0.32)',
-    glowSecondaryColor: 'rgba(2, 132, 199, 0.20)',
-    gradientAngle: 135,
-  },
-  // 1: Sub-Benthic Hydro Trench (Bioluminescent cyan deep ocean)
-  {
-    id: 'bio_cyan',
-    name: 'Hydro Trench',
-    label: 'Hydro Cyan',
-    primaryColor: '#011520',
-    secondaryColor: '#38bdf8',
-    topColor: '#03293a',
-    bottomColor: '#010d14',
-    accentColor: '#38bdf8',
-    gridColor: 'rgba(56, 189, 248, 0.18)',
-    glowColor: 'rgba(0, 255, 255, 0.34)',
-    glowSecondaryColor: 'rgba(6, 182, 212, 0.22)',
-    gradientAngle: 150,
-  },
-  // 2: Algal Mariana Depths (Sub-benthic emerald algae flora)
-  {
-    id: 'hydro_emerald',
-    name: 'Algal Depths',
-    label: 'Emerald Algae',
-    primaryColor: '#011710',
-    secondaryColor: '#34d399',
-    topColor: '#042e24',
-    bottomColor: '#010f0b',
-    accentColor: '#34d399',
-    gridColor: 'rgba(52, 211, 153, 0.18)',
-    glowColor: 'rgba(52, 211, 153, 0.32)',
-    glowSecondaryColor: 'rgba(16, 185, 129, 0.20)',
-    gradientAngle: 125,
-  },
-  // 3: Synaptic Void Rift (Deep purple-indigo neural trench)
-  {
-    id: 'abyssal_indigo',
-    name: 'Synaptic Void',
-    label: 'Void Indigo',
-    primaryColor: '#080214',
-    secondaryColor: '#a78bfa',
-    topColor: '#1d0e38',
-    bottomColor: '#06010f',
-    accentColor: '#a78bfa',
-    gridColor: 'rgba(167, 139, 250, 0.18)',
-    glowColor: 'rgba(167, 139, 250, 0.30)',
-    glowSecondaryColor: 'rgba(192, 132, 252, 0.18)',
-    gradientAngle: 140,
-  },
-  // 4: Hydrothermal Magma Vent (Volcanic crustacean vent basalt)
-  {
-    id: 'thermal_vent',
-    name: 'Thermal Vent',
-    label: 'Magma Vent',
-    primaryColor: '#160404',
-    secondaryColor: '#f97316',
-    topColor: '#300d0a',
-    bottomColor: '#0c0202',
-    accentColor: '#ff5540',
-    gridColor: 'rgba(255, 85, 64, 0.18)',
-    glowColor: 'rgba(255, 85, 64, 0.32)',
-    glowSecondaryColor: 'rgba(249, 115, 22, 0.22)',
-    gradientAngle: 130,
-  },
-  // 5: Titanium Chitin Alloy (Sub-dermal metallic armor plate)
-  {
-    id: 'titanium_slate',
-    name: 'Titanium Alloy',
-    label: 'Slate Alloy',
-    primaryColor: '#070e14',
-    secondaryColor: '#7dd3fc',
-    topColor: '#182735',
-    bottomColor: '#05090e',
-    accentColor: '#7dd3fc',
-    gridColor: 'rgba(125, 211, 252, 0.16)',
-    glowColor: 'rgba(125, 211, 252, 0.28)',
-    glowSecondaryColor: 'rgba(148, 163, 184, 0.20)',
-    gradientAngle: 160,
-  },
-  // 6: Sacred Mariana Relic (Ancient amber sediment glow)
-  {
-    id: 'sacred_amber',
-    name: 'Sacred Relic',
-    label: 'Amber Relic',
-    primaryColor: '#140a02',
-    secondaryColor: '#fbbf24',
-    topColor: '#2d1c05',
-    bottomColor: '#0a0501',
-    accentColor: '#fbbf24',
-    gridColor: 'rgba(251, 191, 36, 0.18)',
-    glowColor: 'rgba(251, 191, 36, 0.30)',
-    glowSecondaryColor: 'rgba(217, 119, 6, 0.20)',
-    gradientAngle: 120,
-  },
-  // 7: Cobalt Superconductor (High-frequency electric core)
-  {
-    id: 'cobalt_pulse',
-    name: 'Superconductor',
-    label: 'Cobalt Pulse',
-    primaryColor: '#020718',
-    secondaryColor: '#60a5fa',
-    topColor: '#0d2047',
-    bottomColor: '#020510',
-    accentColor: '#60a5fa',
-    gridColor: 'rgba(96, 165, 250, 0.20)',
-    glowColor: 'rgba(96, 165, 250, 0.35)',
-    glowSecondaryColor: 'rgba(37, 99, 235, 0.22)',
-    gradientAngle: 145,
-  },
-  // 8: Mariana Aurora (Abyssal marine into deep aurora teal & violet)
-  {
-    id: 'mariana_aurora',
-    name: 'Mariana Aurora',
-    label: 'Aurora Teal',
-    primaryColor: '#01121c',
-    secondaryColor: '#2dd4bf',
-    topColor: '#082a33',
-    bottomColor: '#0a081a',
-    accentColor: '#2dd4bf',
-    gridColor: 'rgba(45, 212, 191, 0.18)',
-    glowColor: 'rgba(45, 212, 191, 0.32)',
-    glowSecondaryColor: 'rgba(168, 85, 247, 0.18)',
-    gradientAngle: 135,
-  },
-  // 9: Bioluminescent Orchid (Deep velvet purple into electric orchid)
-  {
-    id: 'bio_orchid',
-    name: 'Bioluminescent Orchid',
-    label: 'Bio Orchid',
-    primaryColor: '#10041a',
-    secondaryColor: '#e879f9',
-    topColor: '#240a38',
-    bottomColor: '#040d1a',
-    accentColor: '#e879f9',
-    gridColor: 'rgba(232, 121, 249, 0.18)',
-    glowColor: 'rgba(232, 121, 249, 0.30)',
-    glowSecondaryColor: 'rgba(0, 240, 255, 0.18)',
-    gradientAngle: 155,
-  },
-  // 10: Solar Flare (Deep crimson dusk into coral rose luminescence)
-  {
-    id: 'solar_flare',
-    name: 'Solar Flare',
-    label: 'Solar Dusk',
-    primaryColor: '#1c0805',
-    secondaryColor: '#fb7185',
-    topColor: '#38100c',
-    bottomColor: '#10041f',
-    accentColor: '#fb7185',
-    gridColor: 'rgba(251, 113, 133, 0.18)',
-    glowColor: 'rgba(251, 113, 133, 0.30)',
-    glowSecondaryColor: 'rgba(245, 158, 11, 0.18)',
-    gradientAngle: 125,
-  },
-  // 11: Quantum Horizon (Sub-zero deep abyss into dual cyan spotlight & violet)
-  {
-    id: 'quantum_horizon',
-    name: 'Quantum Horizon',
-    label: 'Quantum Sky',
-    primaryColor: '#040a16',
-    secondaryColor: '#00ffff',
-    topColor: '#091c33',
-    bottomColor: '#170928',
-    accentColor: '#00ffff',
-    gridColor: 'rgba(0, 255, 255, 0.18)',
-    glowColor: 'rgba(0, 255, 255, 0.34)',
-    glowSecondaryColor: 'rgba(147, 51, 234, 0.20)',
-    gradientAngle: 140,
-  },
-]
-
-export const LOBSTER_BACKGROUND_THEME_MAP: Record<string, BackgroundTheme> = Object.fromEntries(
-  LOBSTER_BACKGROUND_THEMES.map((theme) => [theme.id, theme])
-)
-
-/**
- * Curated Vector Background Patterns (7 User-Selected Canonical Core & Modifications)
- * High-density seamless geometric tiles and dynamic vector fields with continuous looping motion.
- */
-export const LOBSTER_BACKGROUND_PATTERNS: readonly BackgroundPattern[] = [
-  // 1. 3D Cubes (Isometric Tumbling Cubes)
-  {
-    id: 'isometric_cubes',
-    name: '3D Isometric Cubes',
-    label: '3D Cubes',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 14
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const isHorizontal = motion?.mode === 'drift_horizontal'
-      const scale = getDensityScale(density)
-      const w = (60 * scale).toFixed(2)
-      const h = (103.92 * scale).toFixed(2)
-      const toX = (dir * 60 * scale).toFixed(2)
-      const toY = (isHorizontal ? 0 : dir * 103.92 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-isometric-cubes"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <g transform="scale(${scale})"${glowAttr} stroke="${theme.secondaryColor}" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">
-              <!-- Center Cube (30, 0) -->
-              <polygon points="30,0 60,17.32 30,34.64 0,17.32" fill="${theme.secondaryColor}" fill-opacity="0.38" />
-              <polygon points="0,17.32 30,34.64 30,69.28 0,51.96" fill="${theme.accentColor}" fill-opacity="0.22" />
-              <polygon points="30,34.64 60,17.32 60,51.96 30,69.28" fill="${theme.primaryColor}" fill-opacity="0.09" />
-
-              <!-- Left Staggered Cube (0, 51.96) -->
-              <polygon points="0,51.96 30,69.28 0,86.6 -30,69.28" fill="${theme.secondaryColor}" fill-opacity="0.38" />
-              <polygon points="-30,69.28 0,86.6 0,121.24 -30,103.92" fill="${theme.accentColor}" fill-opacity="0.22" />
-              <polygon points="0,86.6 30,69.28 30,103.92 0,121.24" fill="${theme.primaryColor}" fill-opacity="0.09" />
-
-              <!-- Right Staggered Cube (60, 51.96) -->
-              <polygon points="60,51.96 90,69.28 60,86.6 30,69.28" fill="${theme.secondaryColor}" fill-opacity="0.38" />
-              <polygon points="30,69.28 60,86.6 60,121.24 30,103.92" fill="${theme.accentColor}" fill-opacity="0.22" />
-              <polygon points="60,86.6 90,69.28 90,103.92 60,121.24" fill="${theme.primaryColor}" fill-opacity="0.09" />
-
-              <!-- Bottom Center Repeat (30, 103.92) -->
-              <polygon points="30,103.92 60,121.24 30,138.56 0,121.24" fill="${theme.secondaryColor}" fill-opacity="0.38" />
-              <polygon points="0,121.24 30,138.56 30,173.2 0,155.88" fill="${theme.accentColor}" fill-opacity="0.22" />
-              <polygon points="30,138.56 60,121.24 60,155.88 30,173.2" fill="${theme.primaryColor}" fill-opacity="0.09" />
-
-              <!-- Top-Left Repeat (0, -51.96) -->
-              <polygon points="0,-51.96 30,-34.64 0,-17.32 -30,-34.64" fill="${theme.secondaryColor}" fill-opacity="0.38" />
-              <polygon points="-30,-34.64 0,-17.32 0,17.32 -30,0" fill="${theme.accentColor}" fill-opacity="0.22" />
-              <polygon points="0,-17.32 30,-34.64 30,0 0,17.32" fill="${theme.primaryColor}" fill-opacity="0.09" />
-
-              <!-- Top-Right Repeat (60, -51.96) -->
-              <polygon points="60,-51.96 90,-34.64 60,-17.32 30,-34.64" fill="${theme.secondaryColor}" fill-opacity="0.38" />
-              <polygon points="30,-34.64 60,-17.32 60,17.32 30,0" fill="${theme.accentColor}" fill-opacity="0.22" />
-              <polygon points="60,-17.32 90,-34.64 90,0 60,17.32" fill="${theme.primaryColor}" fill-opacity="0.09" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-  // 2. Bubbles (Clean Floating Bubbles without satellite dots or outer halos)
-  {
-    id: 'benthic_bubbles',
-    name: 'Bioluminescent Floating Bubbles',
-    label: 'Bubbles',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 12
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const scale = getDensityScale(density)
-      const w = (60 * scale).toFixed(2)
-      const h = (60 * scale).toFixed(2)
-      const toX = motion?.mode === 'drift_diagonal' ? (dir * 60 * scale).toFixed(2) : '0'
-      const toY = (-60 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="4.5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-bubbles"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <!-- Clean floating bubbles with internal specular highlights, no satellite dots -->
-            <g transform="scale(${scale})"${glowAttr} stroke="${theme.secondaryColor}" fill="none">
-              <!-- Bubble 1 -->
-              <circle cx="15" cy="18" r="9" stroke-width="1.5" opacity="0.38" fill="${theme.secondaryColor}" fill-opacity="0.06" />
-              <ellipse cx="12.5" cy="14.5" rx="2.5" ry="1.2" transform="rotate(-30 12.5 14.5)" fill="${theme.secondaryColor}" opacity="0.6" stroke="none" />
-              <!-- Bubble 2 -->
-              <circle cx="46" cy="12" r="5.5" stroke-width="1.3" opacity="0.32" fill="${theme.secondaryColor}" fill-opacity="0.06" />
-              <ellipse cx="44" cy="10" rx="1.5" ry="0.8" transform="rotate(-30 44 10)" fill="${theme.secondaryColor}" opacity="0.6" stroke="none" />
-              <!-- Bubble 3 (Large) -->
-              <circle cx="42" cy="42" r="13" stroke-width="1.8" stroke="${theme.accentColor}" opacity="0.42" fill="${theme.accentColor}" fill-opacity="0.08" />
-              <ellipse cx="38" cy="36.5" rx="4" ry="1.8" transform="rotate(-30 38 36.5)" fill="#ffffff" opacity="0.5" stroke="none" />
-              <!-- Bubble 4 -->
-              <circle cx="18" cy="48" r="6.5" stroke-width="1.3" opacity="0.34" fill="${theme.secondaryColor}" fill-opacity="0.06" />
-              <ellipse cx="16" cy="46" rx="1.8" ry="0.9" transform="rotate(-30 16 46)" fill="${theme.secondaryColor}" opacity="0.6" stroke="none" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-  // 3. Circuits (Cyber Circuit Board PCB Traces)
-  {
-    id: 'circuit_board',
-    name: 'Cyber Circuit Board',
-    label: 'Circuits',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 14
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const isHorizontal = motion?.mode === 'drift_horizontal'
-      const scale = getDensityScale(density)
-      const w = (100 * scale).toFixed(2)
-      const h = (100 * scale).toFixed(2)
-      const toX = (dir * 100 * scale).toFixed(2)
-      const toY = (isHorizontal ? 0 : dir * 100 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-circuit"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <g transform="scale(${scale})"${glowAttr}>
-              <!-- Continuous PCB traces matching exactly at (0, y) <-> (100, y) and (x, 0) <-> (x, 100) -->
-              <path d="M 0 20 H 30 L 40 30 H 70 L 80 20 H 100 M 0 50 H 20 L 30 60 H 60 L 70 50 H 100 M 0 80 H 40 L 50 70 H 75 L 85 80 H 100 M 20 0 V 20 M 80 0 V 20 M 20 80 V 100 M 80 80 V 100 M 50 30 V 50 M 30 60 V 80 M 70 50 V 70" stroke="${theme.accentColor}" stroke-width="1.6" fill="none" opacity="0.28" />
-              <path d="M 10 0 V 100 M 90 0 V 100 M 0 35 H 100 M 0 65 H 100" stroke="${theme.secondaryColor}" stroke-width="1.0" fill="none" opacity="0.16" stroke-dasharray="8 6" />
-              <circle cx="30" cy="20" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
-              <circle cx="70" cy="30" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="20" cy="50" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
-              <circle cx="60" cy="60" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="40" cy="80" r="2.8" fill="${theme.secondaryColor}" opacity="0.75" />
-              <circle cx="75" cy="70" r="2.8" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="50" cy="30" r="2.2" fill="${theme.secondaryColor}" opacity="0.55" />
-              <circle cx="70" cy="50" r="2.2" fill="${theme.accentColor}" opacity="0.55" />
-              <rect x="42" y="42" width="16" height="16" fill="none" stroke="${theme.secondaryColor}" stroke-width="1.4" opacity="0.4" />
-              <circle cx="50" cy="50" r="2.2" fill="${theme.secondaryColor}" opacity="0.7" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-  // 4. Hexagons (Cybernetic Honeycomb Mesh)
-  {
-    id: 'cyber_hex_mesh',
-    name: 'Cybernetic Honeycomb Mesh',
-    label: 'Hexagons',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 14
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const isHorizontal = motion?.mode === 'drift_horizontal'
-      const scale = getDensityScale(density)
-      const w = (48.5 * scale).toFixed(2)
-      const h = (84 * scale).toFixed(2)
-      const toX = (dir * 48.5 * scale).toFixed(2)
-      const toY = (isHorizontal ? 0 : dir * 84 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-hex-mesh"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <g transform="scale(${scale})"${glowAttr} stroke="${theme.accentColor}" stroke-width="1.3" fill="none" opacity="0.32" stroke-linejoin="round" stroke-linecap="round">
-              <!-- Center Hexagon (24.25, 28) -->
-              <path d="M 24.25 0 L 48.5 14 L 48.5 42 L 24.25 56 L 0 42 L 0 14 Z" />
-              <!-- Left Staggered Hexagon (0, 70) -->
-              <path d="M 0 42 L 24.25 56 L 24.25 84 L 0 98 L -24.25 84 L -24.25 56 Z" />
-              <!-- Right Staggered Hexagon (48.5, 70) -->
-              <path d="M 48.5 42 L 72.75 56 L 72.75 84 L 48.5 98 L 24.25 84 L 24.25 56 Z" />
-              <!-- Bottom Center Repeat (24.25, 112) -->
-              <path d="M 24.25 84 L 48.5 98 L 48.5 126 L 24.25 140 L 0 126 L 0 98 Z" />
-              <!-- Top Left Repeat (0, -14) -->
-              <path d="M 0 -42 L 24.25 -28 L 24.25 0 L 0 14 L -24.25 0 L -24.25 -28 Z" />
-              <!-- Top Right Repeat (48.5, -14) -->
-              <path d="M 48.5 -42 L 72.75 -28 L 72.75 0 L 48.5 14 L 24.25 0 L 24.25 -28 Z" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-  // 5. Overlapping Circles with Dots in Middle (Sacred Vesica Piscis Matrix)
-  {
-    id: 'overlapping_circles',
-    name: 'Overlapping Circles Matrix',
-    label: 'Overlapping Circles',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 14
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const isSpin = motion?.mode === 'radar_sweep'
-      const scale = getDensityScale(density)
-      const w = (40 * scale).toFixed(2)
-      const h = (40 * scale).toFixed(2)
-      const toX = (dir * 40 * scale).toFixed(2)
-      const toY = (dir * 40 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? isSpin
-          ? `<animateTransform attributeName="patternTransform" type="rotate" from="0 50 50" to="${dir * 360} 50 50" dur="${dur * 1.5}s" repeatCount="indefinite" />`
-          : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-overlapping-circles"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <!-- Overlapping circles -->
-            <g transform="scale(${scale})"${glowAttr}>
-              <g stroke="${theme.accentColor}" stroke-width="1.4" fill="none" opacity="0.28">
-                <circle cx="20" cy="20" r="20" />
-                <circle cx="0" cy="0" r="20" stroke="${theme.secondaryColor}" />
-                <circle cx="40" cy="0" r="20" stroke="${theme.secondaryColor}" />
-                <circle cx="0" cy="40" r="20" stroke="${theme.secondaryColor}" />
-                <circle cx="40" cy="40" r="20" stroke="${theme.secondaryColor}" />
-              </g>
-              <!-- Prominent center and intersection dots -->
-              <circle cx="20" cy="20" r="2.8" fill="${theme.secondaryColor}" opacity="0.85" />
-              <circle cx="0" cy="0" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-              <circle cx="40" cy="0" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-              <circle cx="0" cy="40" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-              <circle cx="40" cy="40" r="2.8" fill="${theme.accentColor}" opacity="0.85" />
-              <circle cx="20" cy="0" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-              <circle cx="0" cy="20" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-              <circle cx="40" cy="20" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-              <circle cx="20" cy="40" r="1.8" fill="${theme.secondaryColor}" opacity="0.6" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-  // 6. Triangle Constellations (Interconnected Triangulated Node Network)
-  {
-    id: 'triangle_constellations',
-    name: 'Triangle Constellations Network',
-    label: 'Triangle Constellations',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 14
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const isSpin = motion?.mode === 'radar_sweep'
-      const scale = getDensityScale(density)
-      const w = (60 * scale).toFixed(2)
-      const h = (51.96 * scale).toFixed(2)
-      const toX = (dir * 60 * scale).toFixed(2)
-      const toY = (dir * 51.96 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? isSpin
-          ? `<animateTransform attributeName="patternTransform" type="rotate" from="0 50 50" to="${dir * 360} 50 50" dur="${dur * 1.5}s" repeatCount="indefinite" />`
-          : `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-triangle-constellations"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <g transform="scale(${scale})"${glowAttr}>
-              <!-- Subtle shaded facet polygons -->
-              <polygon points="0,0 30,25.98 0,25.98" fill="${theme.secondaryColor}" fill-opacity="0.06" />
-              <polygon points="30,0 60,0 30,25.98" fill="${theme.accentColor}" fill-opacity="0.04" />
-              <polygon points="30,25.98 60,25.98 30,51.96" fill="${theme.secondaryColor}" fill-opacity="0.06" />
-              <polygon points="0,25.98 30,51.96 0,51.96" fill="${theme.accentColor}" fill-opacity="0.04" />
-
-              <!-- Constellation primary triangulated network lines -->
-              <path d="M 0 0 L 30 25.98 L 60 0 M 0 25.98 L 30 0 L 60 25.98 M 0 25.98 L 30 51.96 L 60 25.98 M 0 51.96 L 30 25.98 L 60 51.96 M 0 0 H 60 M 0 25.98 H 60 M 0 51.96 H 60 M 0 0 V 51.96 M 30 0 V 51.96 M 60 0 V 51.96" stroke="${theme.accentColor}" stroke-width="1.2" fill="none" opacity="0.3" stroke-linejoin="round" stroke-linecap="round" />
-              
-              <!-- Dashed secondary constellation link rays -->
-              <path d="M 0 0 L 30 51.96 M 30 0 L 60 51.96 M 30 0 L 0 51.96 M 60 0 L 30 51.96" stroke="${theme.secondaryColor}" stroke-width="0.8" fill="none" opacity="0.18" stroke-dasharray="4 4" />
-
-              <!-- Glowing constellation node stars -->
-              <circle cx="0" cy="0" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
-              <circle cx="30" cy="0" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="60" cy="0" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
-              <circle cx="0" cy="25.98" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="30" cy="25.98" r="3.0" fill="${theme.secondaryColor}" opacity="0.9" />
-              <circle cx="30" cy="25.98" r="5.5" fill="none" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.35" />
-              <circle cx="60" cy="25.98" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="0" cy="51.96" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
-              <circle cx="30" cy="51.96" r="2.0" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="60" cy="51.96" r="2.4" fill="${theme.secondaryColor}" opacity="0.8" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-  // 7. Dense Lattice (Intricate Geometric Diamond & Cross Matrix)
-  {
-    id: 'dense_lattice',
-    name: 'Dense Geometric Chitin Lattice',
-    label: 'Dense Lattice',
-    render: (theme, patId, motion, density, glow, pulse) => {
-      const pId = `pat-${patId}-${theme.id}`
-      const isMoving = motion && motion.mode !== 'static'
-      const dur = motion?.duration ?? 14
-      const dir = motion?.direction === 'reverse' ? -1 : 1
-      const isHorizontal = motion?.mode === 'drift_horizontal'
-      const scale = getDensityScale(density)
-      const w = (30 * scale).toFixed(2)
-      const h = (30 * scale).toFixed(2)
-      const toX = (dir * 30 * scale).toFixed(2)
-      const toY = (isHorizontal ? 0 : dir * 30 * scale).toFixed(2)
-      const glowAttr = glow && glow !== 'none' ? ` filter="url(#pat-glow-${glow}-${theme.id})"` : ''
-      const animPulse = pulse === 'pulse'
-        ? `<animate attributeName="opacity" values="0.65;1.0;0.65" dur="5s" repeatCount="indefinite" />`
-        : ''
-
-      const animTransform = isMoving
-        ? `<animateTransform attributeName="patternTransform" type="translate" from="0 0" to="${toX} ${toY}" dur="${dur}s" repeatCount="indefinite" />`
-        : ''
-
-      return `<g id="pattern-dense-lattice"${isMoving ? ` data-motion="${escapeSvgAttr(motion.mode)}"` : ''}>
-        ${animPulse}
-        <defs>
-          <pattern id="${pId}" width="${w}" height="${h}" patternUnits="userSpaceOnUse" patternTransform="translate(0, 0)">
-            ${animTransform}
-            <g transform="scale(${scale})"${glowAttr}>
-              <g stroke="${theme.accentColor}" stroke-width="1.1" fill="none" opacity="0.25">
-                <path d="M 0 15 L 15 0 L 30 15 L 15 30 Z" />
-                <path d="M 0 0 L 15 15 L 0 30 M 30 0 L 15 15 L 30 30" />
-                <line x1="0" y1="15" x2="30" y2="15" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.5" />
-                <line x1="15" y1="0" x2="15" y2="30" stroke="${theme.secondaryColor}" stroke-width="0.8" opacity="0.5" />
-              </g>
-              <circle cx="15" cy="15" r="1.8" fill="${theme.secondaryColor}" opacity="0.75" />
-              <circle cx="0" cy="0" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="30" cy="0" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="0" cy="30" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-              <circle cx="30" cy="30" r="1.6" fill="${theme.accentColor}" opacity="0.75" />
-            </g>
-          </pattern>
-        </defs>
-        <rect x="-80" y="-50" width="260" height="260" fill="url(#${pId})" />
-      </g>`
-    },
-  },
-]
-
-export const LOBSTER_BACKGROUND_PATTERN_MAP: Record<string, BackgroundPattern> = Object.fromEntries(
-  LOBSTER_BACKGROUND_PATTERNS.map((pat) => [pat.id, pat])
-)
-
-/**
- * 6 Canonical Homepage PBR Surface Textures (+ none)
- * Rich material underlays that give tactile depth to UI cards, CTA buttons, and avatar backgrounds.
- */
-export const LOBSTER_BACKGROUND_TEXTURES: readonly BackgroundTexture[] = [
-  {
-    id: 'chitin',
-    name: 'Chitin Plates',
-    label: 'Chitin Plating',
-    assetPath: '/images/chitin_texture_bg.jpg',
-    publicUrl: `${S3_BASE_URL}/images/chitin_texture_bg.jpg`,
-    opacity: 0.40,
-  },
-  {
-    id: 'hex',
-    name: 'Hex Lattice',
-    label: 'Hex Lattice',
-    assetPath: '/images/pbr_hex_lattice.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_hex_lattice.webp`,
-    opacity: 0.38,
-  },
-  {
-    id: 'alloy',
-    name: 'Benthic Alloy',
-    label: 'Benthic Alloy',
-    assetPath: '/images/pbr_benthic_alloy.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_benthic_alloy.webp`,
-    opacity: 0.35,
-  },
-  {
-    id: 'carbon',
-    name: 'Carbon Weave',
-    label: 'Carbon Weave',
-    assetPath: '/images/pbr_carbon_weave.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_carbon_weave.webp`,
-    opacity: 0.38,
-  },
-  {
-    id: 'basalt',
-    name: 'Deep Basalt',
-    label: 'Deep Basalt',
-    assetPath: '/images/pbr_deep_basalt.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_deep_basalt.webp?v=2`,
-    opacity: 0.35,
-  },
-  {
-    id: 'circuit',
-    name: 'Circuit Matrix',
-    label: 'Circuit Matrix',
-    assetPath: '/images/pbr_circuit_matrix.webp',
-    publicUrl: `${S3_BASE_URL}/images/pbr_circuit_matrix.webp?v=2`,
-    opacity: 0.38,
-  },
-  {
-    id: 'none',
-    name: 'None',
-    label: 'Solid Void',
-    assetPath: '',
-    publicUrl: '',
-    opacity: 0,
-  },
-]
-
-export const LOBSTER_BACKGROUND_TEXTURE_MAP: Record<string, BackgroundTexture> = Object.fromEntries(
-  LOBSTER_BACKGROUND_TEXTURES.map((tex) => [tex.id, tex])
-)
-
-/**
- * Returns the deterministic chassis & telemetry attributes computed from an avatar seed.
- */
-export function getLobsterAvatarSeededOptions(seed: string): {
+export interface SeededAvatarOptions {
   theme: BackgroundTheme
   pattern: BackgroundPattern
   texture: BackgroundTexture
@@ -1148,10 +309,27 @@ export function getLobsterAvatarSeededOptions(seed: string): {
   pupilVariant: LobsterPupilVariant
   height: LobsterHeight
   motion: BackgroundMotionConfig
-  clawPose: ClawPose
-  antennaStyle: AntennaStyle
-  tailPose: 'right' | 'left' | 'center'
-} {
+  pose: AvatarPose
+  antennae: AvatarAntennae
+  shellColor: string
+  /** Shell for configs saved before races existed: the original red and orange family. */
+  legacyShellColor: string
+  shellFinish: ShellFinish
+  marking: ShellMarking
+  mouth: AvatarMouth
+  claws: AvatarClaws
+  accessory: AvatarAccessory
+}
+
+const LEGACY_POSES: readonly AvatarPose[] = ['cheer', 'wave', 'wave', 'rest']
+const LEGACY_ANTENNAE: readonly AvatarAntennae[] = ['whip', 'bolt', 'curl', 'beacon', 'plume']
+const LEGACY_SHELL_COLORS: readonly string[] = ['coral', 'crimson', 'tangerine']
+
+/**
+ * Deterministic traits for a seed. Backdrop, eyes, height, pose, and antennae use the same
+ * hashes as the first avatar version, so members keep those picks after the redraw.
+ */
+export function getLobsterAvatarSeededOptions(seed: string): SeededAvatarOptions {
   let hash1 = 0
   let hash2 = 0
   let hash3 = 0
@@ -1180,52 +358,7 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     hash12 = (((hash12 << 5) - hash12) + ch * 97 + 71) | 0
   }
 
-  const poseIndex = Math.abs(hash1) % LOBSTER_CLAW_POSES.length
-  const clawPose = LOBSTER_CLAW_POSES[poseIndex]
-
-  const antennaIndex = Math.abs(hash2) % ANTENNA_VARIANTS.length
-  const antennaStyle = ANTENNA_VARIANTS[antennaIndex]
-
-  const tailPoseIndex = Math.abs(hash1) % 3
-  const tailPose = tailPoseIndex === 0 ? 'right' : tailPoseIndex === 1 ? 'left' : 'center'
-
-  const themeIndex = Math.abs(hash3) % LOBSTER_BACKGROUND_THEMES.length
-  const theme = LOBSTER_BACKGROUND_THEMES[themeIndex]
-
-  const patternIndex = Math.abs(hash4) % LOBSTER_BACKGROUND_PATTERNS.length
-  const pattern = LOBSTER_BACKGROUND_PATTERNS[patternIndex]
-
-  const textureIndex = Math.abs(hash6) % LOBSTER_BACKGROUND_TEXTURES.length
-  const texture = LOBSTER_BACKGROUND_TEXTURES[textureIndex]
-
-  const densityIndex = Math.abs(hash7) % LOBSTER_PATTERN_DENSITIES.length
-  const density = LOBSTER_PATTERN_DENSITIES[densityIndex]
-
-  const glowIndex = Math.abs(hash8) % LOBSTER_PATTERN_GLOWS.length
-  const glow = LOBSTER_PATTERN_GLOWS[glowIndex]
-
-  const pulseIndex = Math.abs(hash9) % LOBSTER_PATTERN_PULSES.length
-  const pulse = LOBSTER_PATTERN_PULSES[pulseIndex]
-
-  const sparkleIndex = Math.abs(hash10) % LOBSTER_PATTERN_SPARKLES.length
-  const sparkles = LOBSTER_PATTERN_SPARKLES[sparkleIndex]
-
-  const eyelidStyleIndex = Math.abs(hash7 ^ hash8) % LOBSTER_EYELID_STYLES.length
-  const eyelidStyle = LOBSTER_EYELID_STYLES[eyelidStyleIndex]
-
-  const eyeColorIndex = Math.abs(hash12) % LOBSTER_EYE_COLORS.length
-  const eyeColor = LOBSTER_EYE_COLORS[eyeColorIndex]
-
-  const eyeVariantIndex = Math.abs(hash3 ^ hash11) % LOBSTER_EYE_VARIANTS.length
-  const eyeVariant = LOBSTER_EYE_VARIANTS[eyeVariantIndex]
-
-  const pupilVariantIndex = Math.abs(hash4 ^ hash12) % LOBSTER_PUPIL_VARIANTS.length
-  const pupilVariant = LOBSTER_PUPIL_VARIANTS[pupilVariantIndex]
-
-  const heightIndex = Math.abs(hash11) % LOBSTER_HEIGHTS.length
-  const height = LOBSTER_HEIGHTS[heightIndex]
-
-  // Active looping motion modes for the 7 curated patterns (always moving)
+  const pattern = LOBSTER_BACKGROUND_PATTERNS[Math.abs(hash4) % LOBSTER_BACKGROUND_PATTERNS.length]
   const patternMotionModes: Record<string, BackgroundMotionMode[]> = {
     isometric_cubes: ['drift_diagonal', 'drift_horizontal'],
     benthic_bubbles: ['wave_undulate', 'drift_diagonal'],
@@ -1235,945 +368,82 @@ export function getLobsterAvatarSeededOptions(seed: string): {
     triangle_constellations: ['wave_undulate', 'radar_sweep'],
     dense_lattice: ['drift_diagonal', 'drift_horizontal'],
   }
-
   const compatibleModes = patternMotionModes[pattern.id] ?? ['drift_diagonal', 'drift_horizontal']
-  const motionModeIndex = Math.abs(hash5) % compatibleModes.length
-  const motionMode = compatibleModes[motionModeIndex]
-
-  // Seeded duration (active, crisp looping cycles: 10s - 16s)
   const durations = [10, 12, 14, 16]
-  const duration = durations[Math.abs(hash5 >> 3) % durations.length]
-  const direction: 'normal' | 'reverse' = (hash5 & 1) === 0 ? 'normal' : 'reverse'
 
-  const motion: BackgroundMotionConfig = {
-    mode: motionMode,
-    duration,
-    direction,
-  }
+  const rng = seededRandom(seed)
+  const accessoryRoll = rng()
 
   return {
-    theme,
+    theme: LOBSTER_BACKGROUND_THEMES[Math.abs(hash3) % LOBSTER_BACKGROUND_THEMES.length],
     pattern,
-    texture,
-    density,
-    glow,
-    pulse,
-    sparkles,
-    eyelidStyle,
-    eyeColor,
-    eyeVariant,
-    pupilVariant,
-    height,
-    motion,
-    clawPose,
-    antennaStyle,
-    tailPose,
+    texture: LOBSTER_BACKGROUND_TEXTURES[Math.abs(hash6) % LOBSTER_BACKGROUND_TEXTURES.length],
+    density: LOBSTER_PATTERN_DENSITIES[Math.abs(hash7) % LOBSTER_PATTERN_DENSITIES.length],
+    glow: LOBSTER_PATTERN_GLOWS[Math.abs(hash8) % LOBSTER_PATTERN_GLOWS.length],
+    pulse: LOBSTER_PATTERN_PULSES[Math.abs(hash9) % LOBSTER_PATTERN_PULSES.length],
+    sparkles: LOBSTER_PATTERN_SPARKLES[Math.abs(hash10) % LOBSTER_PATTERN_SPARKLES.length],
+    eyelidStyle: LOBSTER_EYELID_STYLES[Math.abs(hash7 ^ hash8) % LOBSTER_EYELID_STYLES.length],
+    eyeColor: LOBSTER_EYE_COLORS[Math.abs(hash12) % LOBSTER_EYE_COLORS.length],
+    eyeVariant: LOBSTER_EYE_VARIANTS[Math.abs(hash3 ^ hash11) % LOBSTER_EYE_VARIANTS.length],
+    pupilVariant: LOBSTER_PUPIL_VARIANTS[Math.abs(hash4 ^ hash12) % LOBSTER_PUPIL_VARIANTS.length],
+    height: LOBSTER_HEIGHTS[Math.abs(hash11) % LOBSTER_HEIGHTS.length],
+    motion: {
+      mode: compatibleModes[Math.abs(hash5) % compatibleModes.length],
+      duration: durations[Math.abs(hash5 >> 3) % durations.length],
+      direction: (hash5 & 1) === 0 ? 'normal' : 'reverse',
+    },
+    pose: LEGACY_POSES[Math.abs(hash1) % LEGACY_POSES.length],
+    antennae: LEGACY_ANTENNAE[Math.abs(hash2) % LEGACY_ANTENNAE.length],
+    shellColor: pickFrom(rng, SHELL_PALETTES).id,
+    legacyShellColor: pickFrom(seededRandom(`${seed}:legacy-shell`), LEGACY_SHELL_COLORS),
+    shellFinish: pickFrom(rng, SHELL_FINISHES),
+    marking: rng() < 0.3 ? 'none' : pickFrom(rng, SHELL_MARKINGS),
+    mouth: pickFrom(rng, AVATAR_MOUTHS),
+    claws: pickFrom(rng, AVATAR_CLAWS),
+    accessory: accessoryRoll < 0.45 ? 'none' : pickFrom(rng, AVATAR_ACCESSORIES),
   }
 }
 
-export const LOBSTER_CRUSTACEAN_OPTIONS = {
-  // 🦞 1. Always exactly 2 antennae (dual feelers)
-  topVariant: ['antennae'] as const,
-  topProbability: 100,
-
-  // 🦞 2. Strictly Red & Red-Adjacent Chitin Colors
-  bodyColor: [
-    'c2410c', // Coral Red / Lobster Tangerine
-    'be123c', // Crimson Shell
-    'ea580c', // Terracotta Red
-    'dc2626', // Vibrant Scarlet Red
-    'b91c1c', // Deep Crimson
-    '991b1b', // Sub-Benthic Dark Red
-    'e11d48', // Ruby Rose
-    'f97316', // Sunset Orange-Red
-  ],
-
-  // 🦞 3. Red-Adjacent & Warm Underbelly Accent Palette (Soft Harmonious Tones)
-  accentColor: [
-    'fed7aa', // Pale Tan Ribbed Underbelly Plates (Canonical)
-    'fdba74', // Warm Peach Underbelly
-    'fca5a5', // Soft Coral Underbelly
-    'f87171', // Light Crustacean Coral
-    'ffffff', // Pure Pearl White
-  ],
-
-  // 🦞 4. Smooth, Organic Crustacean Carapace Silhouettes
-  bodyVariant: ['dome', 'round', 'bell', 'wedge', 'peak'] as const,
-
-  // 🦞 5. Segmented Horizontal Carapace / Underbelly Ridges
-  patternVariant: ['belly', 'bars', 'stripes', 'speckles'] as const,
-  patternProbability: 95,
-
-  // 🦞 6. Pixar-style Friendly Eyes (Strictly open 3D Pixar ocular variants; no dots or smiling lines)
-  eyesVariant: ['round', 'bigPupils', 'wide'] as const,
-
-  // 🦞 7. Warm, expressive smiles
-  mouthVariant: ['smile', 'tinySmile', 'grin', 'laugh', 'teeth', 'open'] as const,
-}
-
-export interface ChitinGradientPalette {
-  /** Upper / outer highlight tone (adjacent warm/luminous hue) */
-  highlight: string
-  /** Mid-body primary tone */
-  primary: string
-  /** Lower / inner shadow tone (adjacent deep benthic hue) */
-  anchor: string
-}
-
-/**
- * Curated adjacent-color (analogous) palettes for each canonical chitin tone.
- * Creates an organic, volumetric 3D studio sheen without flat plastic coloring.
- */
-export const LOBSTER_CHITIN_GRADIENT_PALETTES: Readonly<Record<string, ChitinGradientPalette>> = {
-  // 1. Coral Red / Lobster Tangerine -> Molten Amber Gold highlight & Sub-Benthic Carmine shadow
-  '#c2410c': { highlight: '#f59e0b', primary: '#c2410c', anchor: '#991b1b' },
-  // 2. Crimson Shell -> Solar Rose highlight & Deep Velvet Amethyst shadow
-  '#be123c': { highlight: '#fb7185', primary: '#be123c', anchor: '#881337' },
-  // 3. Terracotta Red -> Warm Apricot highlight & Burnished Iron Rust shadow
-  '#ea580c': { highlight: '#fb923c', primary: '#ea580c', anchor: '#9a3412' },
-  // 4. Vibrant Scarlet Red -> Fiery Magma Orange highlight & Deep Trench Crimson shadow
-  '#dc2626': { highlight: '#f97316', primary: '#dc2626', anchor: '#991b1b' },
-  // 5. Deep Crimson -> Radiant Ruby Flame highlight & Abyssal Maroon shadow
-  '#b91c1c': { highlight: '#ef4444', primary: '#b91c1c', anchor: '#7f1d1d' },
-  // 6. Sub-Benthic Dark Red -> Smoldering Carmine highlight & Hadal Trench Wine shadow
-  '#991b1b': { highlight: '#dc2626', primary: '#991b1b', anchor: '#450a0a' },
-  // 7. Ruby Rose -> Solar Peach highlight & Royal Benthic Magenta shadow
-  '#e11d48': { highlight: '#fb7185', primary: '#e11d48', anchor: '#9f1239' },
-  // 8. Sunset Orange-Red -> Sunlit Amber Gold highlight & Deep Terracotta shadow
-  '#f97316': { highlight: '#fbbf24', primary: '#f97316', anchor: '#ea580c' },
-}
-
-export function getChitinGradientPalette(primaryColor: string): ChitinGradientPalette {
-  const norm = primaryColor.toLowerCase()
-  return (
-    LOBSTER_CHITIN_GRADIENT_PALETTES[norm] ?? {
-      highlight: '#f59e0b',
-      primary: primaryColor,
-      anchor: '#991b1b',
-    }
-  )
-}
-
-interface ClawPose {
-  name: string
-  leftArm: string
-  rightArm: string
-  leftClaw: { x: number; y: number; rot: number; scale?: number; flipX?: boolean }
-  rightClaw: { x: number; y: number; rot: number; scale?: number; flipX?: boolean }
-}
-
-/**
- * Iconic Cartoon Lobster Claw Component
- * Origin is at the wrist collar (0,0). Pincer horns point UP (-Y).
- * Sculpted with beefy crusher/pincer geometry, pronounced pollex thumb, and curved sickle blade.
- */
-const CLAW_PATH =
-  'M -8 2 C -14 2 -18 -6 -18 -16 C -18 -28 -12 -38 -2 -42 C 4 -44 9 -36 7 -26 C 5 -18 6 -12 10 -8 C 14 -12 22 -24 30 -18 C 35 -13 28 -2 20 4 C 14 9 6 11 0 11 C -5 11 -8 8 -8 2 Z'
-
-/**
- * 4 Modular Crustacean Claw Poses
- * Muscular arm trunks emerge beneath the carapace, with oversized cartoon lobster pincers stamped on wrists.
- */
-const LOBSTER_CLAW_POSES: readonly ClawPose[] = [
-  // 0: Dual Cheerful Raised Claws (Both open upwards at 45 deg)
-  {
-    name: 'dual_cheer',
-    leftArm: 'M 34 80 C 18 78 8 68 4 52 C 0 44 8 36 16 42 C 22 52 28 72 36 88 Z',
-    rightArm: 'M 66 80 C 82 78 92 68 96 52 C 100 44 92 36 84 42 C 78 52 72 72 64 88 Z',
-    leftClaw: { x: 6, y: 40, rot: -25, scale: 1.25 },
-    rightClaw: { x: 94, y: 40, rot: 25, scale: 1.25, flipX: true },
-  },
-  // 1: Right Wave / Victory (Right raised UP, Left lowered hanging naturally at side)
-  {
-    name: 'victory_right',
-    leftArm: 'M 34 78 C 18 78 8 82 4 88 C 0 94 6 102 14 98 C 22 94 28 86 36 90 Z',
-    rightArm: 'M 66 80 C 82 78 94 64 98 44 C 102 36 94 30 86 36 C 80 50 72 74 64 90 Z',
-    leftClaw: { x: 2, y: 92, rot: -105, scale: 1.15 },
-    rightClaw: { x: 98, y: 32, rot: 30, scale: 1.25, flipX: true },
-  },
-  // 2: Left Wave / Victory (Left raised UP, Right lowered hanging naturally at side)
-  {
-    name: 'victory_left',
-    leftArm: 'M 34 80 C 18 78 6 64 2 44 C -2 36 6 30 14 36 C 20 50 28 74 36 90 Z',
-    rightArm: 'M 66 78 C 82 78 92 82 96 88 C 100 94 94 102 86 98 C 78 94 72 86 64 90 Z',
-    leftClaw: { x: 2, y: 32, rot: -30, scale: 1.25 },
-    rightClaw: { x: 98, y: 92, rot: 105, scale: 1.15, flipX: true },
-  },
-  // 3: Hip Rest / Lowered (Both arms relaxed, both claws hanging naturally at sides)
-  {
-    name: 'hip_rest',
-    leftArm: 'M 34 78 C 18 78 8 82 4 88 C 0 94 6 102 14 98 C 22 94 28 86 36 90 Z',
-    rightArm: 'M 66 78 C 82 78 92 82 96 88 C 100 94 94 102 86 98 C 78 94 72 86 64 90 Z',
-    leftClaw: { x: 2, y: 92, rot: -105, scale: 1.2 },
-    rightClaw: { x: 98, y: 92, rot: 105, scale: 1.2, flipX: true },
-  },
-]
-
-function renderClawElement(
-  claw: { x: number; y: number; rot: number; scale?: number; flipX?: boolean },
-  color: string
-): string {
-  const flip = claw.flipX ? 'scale(-1, 1)' : ''
-  const scale = `scale(${claw.scale ?? 1})`
-  return `
-    <g transform="translate(${claw.x}, ${claw.y}) rotate(${claw.rot}) ${scale} ${flip}">
-      <!-- Shadow -->
-      <path d="${CLAW_PATH}" fill="#020810" opacity="0.24" transform="translate(1.5, 2)" />
-      <!-- Base Chitin Claw -->
-      <path d="${CLAW_PATH}" fill="${color}" />
-      <!-- Inner Pincer Groove Accent -->
-      <path d="M 0 -8 C 4 -12 8 -12 12 -6" stroke="#020810" stroke-width="1.8" fill="none" opacity="0.25" stroke-linecap="round" />
-      <!-- Joint collar at base -->
-      <ellipse cx="0" cy="7" rx="9" ry="4.5" fill="${color}" opacity="0.9" />
-      <ellipse cx="0" cy="7" rx="9" ry="4.5" fill="none" stroke="#020810" stroke-width="1.5" opacity="0.2" />
-      <!-- Specular Highlight on Big Sickle Claw -->
-      <ellipse cx="-6" cy="-18" rx="3" ry="9" fill="#ffffff" opacity="0.32" transform="rotate(-15 -6 -18)" />
-    </g>`
-}
-
-function wrapDiceBearUsesInCarapaceLayer(svg: string, headYOffset = 0): string {
-  const bodyPeakIndex = svg.search(/<use[^>]+#body-/)
-  const startIndex = bodyPeakIndex !== -1 ? bodyPeakIndex : svg.indexOf('<use')
-  if (startIndex === -1) return svg
-
-  const useTagPattern = /<use[^>]*\/>/g
-  useTagPattern.lastIndex = startIndex
-
-  const matches: { start: number; end: number }[] = []
-  let match: RegExpExecArray | null
-  while ((match = useTagPattern.exec(svg)) !== null) {
-    if (match.index < startIndex) continue
-    if (matches.length > 0) {
-      const gap = svg.slice(matches[matches.length - 1].end, match.index).trim()
-      if (gap) break
-    }
-    matches.push({ start: match.index, end: match.index + match[0].length })
-  }
-
-  if (matches.length === 0) return svg
-
-  const blockStart = matches[0].start
-  const blockEnd = matches[matches.length - 1].end
-  const usesBlock = svg.slice(blockStart, blockEnd)
-  const eyesWrappedBlock = usesBlock.replace(
-    /(<use[^>]*(?:xlink:)?href="#eyes-[^"]+"[^>]*\/>)/,
-    '<g id="lobster-eyes-layer">$1</g>'
-  )
-  const innerCarapace = `<g id="lobster-carapace-layer" class="lobster-idle-layer lobster-idle-carapace">${eyesWrappedBlock}</g>`
-  const wrapped =
-    headYOffset !== 0
-      ? `<g id="lobster-carapace-offset" transform="translate(0, ${headYOffset})">${innerCarapace}</g>`
-      : innerCarapace
-  return svg.slice(0, blockStart) + wrapped + svg.slice(blockEnd)
-}
-
-export function hasLobsterEyelids(svg: string): boolean {
-  return svg.includes('lobster-eyelids-layer')
-}
-
-export function hasLobsterPixarEyes(svg: string): boolean {
-  return svg.includes('lobster-pixar-eyes')
-}
-
-interface PixarEyePalette {
-  irisStops: { offset: string; color: string }[]
-  causticStops: { offset: string; color: string; opacity?: number }[]
-  limbal: string
-}
-
-const PIXAR_EYE_PALETTES: Record<LobsterEyeColor, PixarEyePalette> = {
-  amber: {
-    irisStops: [
-      { offset: '0%', color: '#1c0a02' },
-      { offset: '22%', color: '#632008' },
-      { offset: '48%', color: '#b4400a' },
-      { offset: '70%', color: '#ea580c' },
-      { offset: '86%', color: '#f59e0b' },
-      { offset: '94%', color: '#451a03' },
-      { offset: '100%', color: '#0c0502' },
-    ],
-    causticStops: [
-      { offset: '0%', color: '#fef08a', opacity: 0.95 },
-      { offset: '40%', color: '#fbbf24', opacity: 0.65 },
-      { offset: '80%', color: '#ea580c', opacity: 0.2 },
-      { offset: '100%', color: '#ea580c', opacity: 0 },
-    ],
-    limbal: '#0c0502',
-  },
-  sapphire: {
-    irisStops: [
-      { offset: '0%', color: '#020817' },
-      { offset: '22%', color: '#0f294a' },
-      { offset: '48%', color: '#1d4ed8' },
-      { offset: '70%', color: '#2563eb' },
-      { offset: '86%', color: '#38bdf8' },
-      { offset: '94%', color: '#0c2340' },
-      { offset: '100%', color: '#020617' },
-    ],
-    causticStops: [
-      { offset: '0%', color: '#bae6fd', opacity: 0.95 },
-      { offset: '40%', color: '#38bdf8', opacity: 0.65 },
-      { offset: '80%', color: '#0284c7', opacity: 0.2 },
-      { offset: '100%', color: '#0284c7', opacity: 0 },
-    ],
-    limbal: '#020617',
-  },
-  emerald: {
-    irisStops: [
-      { offset: '0%', color: '#02140a' },
-      { offset: '22%', color: '#064e3b' },
-      { offset: '48%', color: '#047857' },
-      { offset: '70%', color: '#059669' },
-      { offset: '86%', color: '#34d399' },
-      { offset: '94%', color: '#042f1a' },
-      { offset: '100%', color: '#021208' },
-    ],
-    causticStops: [
-      { offset: '0%', color: '#a7f3d0', opacity: 0.95 },
-      { offset: '40%', color: '#34d399', opacity: 0.65 },
-      { offset: '80%', color: '#059669', opacity: 0.2 },
-      { offset: '100%', color: '#059669', opacity: 0 },
-    ],
-    limbal: '#021208',
-  },
-  amethyst: {
-    irisStops: [
-      { offset: '0%', color: '#0f031c' },
-      { offset: '22%', color: '#3b0764' },
-      { offset: '48%', color: '#6b21a8' },
-      { offset: '70%', color: '#9333ea' },
-      { offset: '86%', color: '#c084fc' },
-      { offset: '94%', color: '#2a0845' },
-      { offset: '100%', color: '#0b0214' },
-    ],
-    causticStops: [
-      { offset: '0%', color: '#f5d0fe', opacity: 0.95 },
-      { offset: '40%', color: '#d8b4fe', opacity: 0.65 },
-      { offset: '80%', color: '#9333ea', opacity: 0.2 },
-      { offset: '100%', color: '#9333ea', opacity: 0 },
-    ],
-    limbal: '#0b0214',
-  },
-  ruby: {
-    irisStops: [
-      { offset: '0%', color: '#170307' },
-      { offset: '22%', color: '#4c0519' },
-      { offset: '48%', color: '#9f1239' },
-      { offset: '70%', color: '#e11d48' },
-      { offset: '86%', color: '#fb7185' },
-      { offset: '94%', color: '#380512' },
-      { offset: '100%', color: '#0f0205' },
-    ],
-    causticStops: [
-      { offset: '0%', color: '#fecdd3', opacity: 0.95 },
-      { offset: '40%', color: '#fb7185', opacity: 0.65 },
-      { offset: '80%', color: '#e11d48', opacity: 0.2 },
-      { offset: '100%', color: '#e11d48', opacity: 0 },
-    ],
-    limbal: '#0f0205',
-  },
-  topaz: {
-    irisStops: [
-      { offset: '0%', color: '#180e02' },
-      { offset: '22%', color: '#543004' },
-      { offset: '48%', color: '#a16207' },
-      { offset: '70%', color: '#ca8a04' },
-      { offset: '86%', color: '#facc15' },
-      { offset: '94%', color: '#422006' },
-      { offset: '100%', color: '#0d0701' },
-    ],
-    causticStops: [
-      { offset: '0%', color: '#fef9c3', opacity: 0.95 },
-      { offset: '40%', color: '#fde047', opacity: 0.65 },
-      { offset: '80%', color: '#ca8a04', opacity: 0.2 },
-      { offset: '100%', color: '#ca8a04', opacity: 0 },
-    ],
-    limbal: '#0d0701',
-  },
-}
-
-function renderPixarEyesDefs(paletteId: LobsterEyeColor): string {
-  const p = PIXAR_EYE_PALETTES[paletteId] ?? PIXAR_EYE_PALETTES.amber
-  const irisStopsMarkup = p.irisStops
-    .map((s) => `<stop offset="${s.offset}" stop-color="${s.color}" />`)
-    .join('')
-  const causticStopsMarkup = p.causticStops
-    .map(
-      (s) =>
-        `<stop offset="${s.offset}" stop-color="${s.color}"${s.opacity !== undefined ? ` stop-opacity="${s.opacity}"` : ''} />`
-    )
-    .join('')
-
-  return `
-    <radialGradient id="pixar-sclera-3d" cx="38%" cy="35%" r="65%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="55%" stop-color="#f8fafc" />
-      <stop offset="80%" stop-color="#e2e8f0" />
-      <stop offset="93%" stop-color="#cbd5e1" />
-      <stop offset="100%" stop-color="#94a3b8" />
-    </radialGradient>
-    <linearGradient id="pixar-brow-shadow" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0a0f1d" stop-opacity="0.5" />
-      <stop offset="40%" stop-color="#0a0f1d" stop-opacity="0.15" />
-      <stop offset="100%" stop-color="#0a0f1d" stop-opacity="0" />
-    </linearGradient>
-    <radialGradient id="pixar-iris-grad-${paletteId}" cx="50%" cy="48%" r="52%">
-      ${irisStopsMarkup}
-    </radialGradient>
-    <radialGradient id="pixar-caustic-grad-${paletteId}" cx="50%" cy="75%" r="45%">
-      ${causticStopsMarkup}
-    </radialGradient>
-  `
-}
-
-function renderPixarEye(
-  side: 'left' | 'right',
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number,
-  irisR: number,
-  pupilR: number,
-  paletteId: LobsterEyeColor,
-  pupilVariant: LobsterPupilVariant = 'standard'
-): string {
-  const p = PIXAR_EYE_PALETTES[paletteId] ?? PIXAR_EYE_PALETTES.amber
-  const scleraTag =
-    rx === ry
-      ? `<circle id="pixar-sclera-${side}" cx="${cx}" cy="${cy}" r="${rx}" fill="url(#pixar-sclera-3d)" />`
-      : `<ellipse id="pixar-sclera-${side}" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#pixar-sclera-3d)" />`
-
-  const cxKey = cx + irisR * 0.32
-  const cyKey = cy - irisR * 0.32
-  const keyScale = pupilVariant === 'big' ? 1.22 : 1.0
-  const rxKey = Number((irisR * 0.24 * keyScale).toFixed(2))
-  const ryKey = Number((irisR * 0.18 * keyScale).toFixed(2))
-  const causticOpacity = pupilVariant === 'keen' ? '0.94' : '0.8'
-
-  let extraGlints = ''
-  if (pupilVariant === 'sparkle') {
-    const starX = Number((cx - pupilR * 0.42).toFixed(2))
-    const starY = Number((cy - pupilR * 0.42).toFixed(2))
-    extraGlints = `
-      <!-- Starry Sparkle Glints -->
-      <polygon id="pixar-glint-star-${side}" points="${starX},${(starY - 1.2).toFixed(2)} ${(starX + 0.35).toFixed(2)},${(starY - 0.35).toFixed(2)} ${(starX + 1.2).toFixed(2)},${starY} ${(starX + 0.35).toFixed(2)},${(starY + 0.35).toFixed(2)} ${starX},${(starY + 1.2).toFixed(2)} ${(starX - 0.35).toFixed(2)},${(starY + 0.35).toFixed(2)} ${(starX - 1.2).toFixed(2)},${starY} ${(starX - 0.35).toFixed(2)},${(starY - 0.35).toFixed(2)}" fill="#ffffff" opacity="0.95" />
-      <circle id="pixar-glint-extra-${side}" cx="${(cx - irisR * 0.16).toFixed(2)}" cy="${(cy - irisR * 0.44).toFixed(2)}" r="${(irisR * 0.08).toFixed(2)}" fill="#ffffff" opacity="0.9" />`
-  }
-
-  return `
-    <g id="pixar-eye-${side}" class="pixar-eye-orb">
-      <!-- 3D Spherical Sclera -->
-      ${scleraTag}
-      <!-- Brow / Socket Shadow -->
-      <path id="pixar-socket-shadow-${side}" d="M ${(cx - rx).toFixed(2)} ${cy} A ${rx} ${ry} 0 0 1 ${(cx + rx).toFixed(2)} ${cy} A ${rx} ${(ry * 0.35).toFixed(2)} 0 0 0 ${(cx - rx).toFixed(2)} ${cy} Z" fill="url(#pixar-brow-shadow)" />
-      <!-- Dark Limbal Ring -->
-      <circle id="pixar-limbal-${side}" cx="${cx}" cy="${cy}" r="${irisR}" fill="${p.limbal}" />
-      <!-- Luminous Multi-tone Iris -->
-      <circle id="pixar-iris-${side}" cx="${cx}" cy="${cy}" r="${(irisR - 0.28).toFixed(2)}" fill="url(#pixar-iris-grad-${paletteId})" />
-      <!-- Lower Iris Caustic Glow -->
-      <ellipse id="pixar-caustic-${side}" cx="${cx}" cy="${(cy + irisR * 0.26).toFixed(2)}" rx="${(irisR * 0.72).toFixed(2)}" ry="${(irisR * 0.45).toFixed(2)}" fill="url(#pixar-caustic-grad-${paletteId})" opacity="${causticOpacity}" />
-      <!-- Deep Velvet Pupil -->
-      <circle id="pixar-pupil-${side}" cx="${cx}" cy="${cy}" r="${pupilR}" fill="#050508" />
-      <circle id="pixar-pupil-core-${side}" cx="${cx}" cy="${cy}" r="${(pupilR * 0.5).toFixed(2)}" fill="#010103" />
-      <!-- Pixar Catchlights -->
-      <ellipse id="pixar-glint-key-${side}" cx="${cxKey.toFixed(2)}" cy="${cyKey.toFixed(2)}" rx="${rxKey}" ry="${ryKey}" transform="rotate(-25 ${cxKey.toFixed(2)} ${cyKey.toFixed(2)})" fill="#ffffff" opacity="0.98" />
-      <circle id="pixar-glint-spark-${side}" cx="${(cx + irisR * 0.28).toFixed(2)}" cy="${(cy - irisR * 0.35).toFixed(2)}" r="${(irisR * 0.09).toFixed(2)}" fill="#ffffff" />
-      <circle id="pixar-glint-bounce-${side}" cx="${(cx - irisR * 0.28).toFixed(2)}" cy="${(cy + irisR * 0.30).toFixed(2)}" r="${(irisR * 0.10).toFixed(2)}" fill="#ffffff" opacity="0.55" />
-      <circle id="pixar-glint-rim-${side}" cx="${(cx + irisR * 0.40).toFixed(2)}" cy="${(cy - irisR * 0.10).toFixed(2)}" r="${(irisR * 0.06).toFixed(2)}" fill="#ffffff" opacity="0.75" />${extraGlints}
-      <!-- Cornea Curvature Sheen -->
-      <path id="pixar-cornea-arc-${side}" d="M ${(cx - rx * 0.65).toFixed(2)} ${(cy - ry * 0.32).toFixed(2)} Q ${cx} ${(cy - ry * 0.74).toFixed(2)} ${(cx + rx * 0.65).toFixed(2)} ${(cy - ry * 0.32).toFixed(2)} Q ${cx} ${(cy - ry * 0.52).toFixed(2)} ${(cx - rx * 0.65).toFixed(2)} ${(cy - ry * 0.32).toFixed(2)} Z" fill="#ffffff" opacity="0.24" />
-    </g>
-  `
-}
-
-function renderEyelidElement(
-  side: 'left' | 'right',
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number,
-  style: EyelidStyle,
-  chitinColor: string
-): string {
-  const x0 = Number((cx - (rx + 0.6)).toFixed(2))
-  const x1 = Number((cx + (rx + 0.6)).toFixed(2))
-  const topY = Number((cy - ry - 2.2).toFixed(2))
-  const midX = cx
-
-  const sideId = `lobster-eyelid-${side}`
-  const sideClass = `lobster-idle-layer lobster-idle-eyelid-${side}`
-
-  if (side === 'left') {
-    switch (style) {
-      case 'open': {
-        const yCut = Number((cy - ry * 0.55).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="open">
-            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'relaxed': {
-        const yCut = Number((cy - ry * 0.22).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="relaxed">
-            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.7).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.7).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)} Q ${midX} ${(topY + 1.4).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'cheerful_squint': {
-        const yUpper = Number((cy - ry * 0.45).toFixed(2))
-        const yLower = Number((cy + ry * 0.42).toFixed(2))
-        const botY = Number((cy + ry + 2.2).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="cheerful_squint">
-            <!-- Upper Lid Hood -->
-            <path d="M ${x0} ${yUpper} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x0} ${yUpper} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x1} ${yUpper}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-            <!-- Lower Smiling Eyelid -->
-            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower} C ${x1} ${(cy + ry * 0.75).toFixed(2)} ${(cx + rx * 0.55).toFixed(2)} ${botY} ${midX} ${botY} C ${(cx - rx * 0.55).toFixed(2)} ${botY} ${x0} ${(cy + ry * 0.75).toFixed(2)} ${x0} ${yLower} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)} Q ${midX} ${(botY - 1.3).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'focused': {
-        const yOuter = Number((cy - ry * 0.45).toFixed(2))
-        const yInner = Number((cy - ry * 0.18).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="focused">
-            <path d="M ${x0} ${yOuter} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.6).toFixed(2)} ${x1} ${yInner} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x0} ${yOuter} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yOuter} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x1} ${yInner}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'chill': {
-        const yCut = Number((cy + ry * 0.05).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="chill">
-            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)} Q ${midX} ${(topY + 1.5).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'angry': {
-        const yOuter = Number((cy - ry * 0.68).toFixed(2))
-        const yInner = Number((cy + ry * 0.08).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="angry">
-            <path d="M ${x0} ${yOuter} C ${x0} ${(cy - ry * 0.85).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yOuter} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yInner}" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'worried': {
-        const yOuter = Number((cy + ry * 0.08).toFixed(2))
-        const yInner = Number((cy - ry * 0.68).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="worried">
-            <path d="M ${x0} ${yOuter} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.85).toFixed(2)} ${x1} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yOuter} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yInner}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-    }
-  } else {
-    // Right Eye
-    switch (style) {
-      case 'open': {
-        const yCut = Number((cy - ry * 0.55).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="open">
-            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'relaxed': {
-        const yCut = Number((cy - ry * 0.22).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="relaxed">
-            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.7).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.7).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.4).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)} Q ${midX} ${(topY + 1.4).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.6).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'cheerful_squint': {
-        const yUpper = Number((cy - ry * 0.45).toFixed(2))
-        const yLower = Number((cy + ry * 0.42).toFixed(2))
-        const botY = Number((cy + ry + 2.2).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="cheerful_squint">
-            <!-- Upper Lid Hood -->
-            <path d="M ${x0} ${yUpper} C ${x0} ${(cy - ry * 0.8).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x0} ${yUpper} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yUpper} Q ${midX} ${(yUpper - 1.4).toFixed(2)} ${x1} ${yUpper}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-            <!-- Lower Smiling Eyelid -->
-            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower} C ${x1} ${(cy + ry * 0.75).toFixed(2)} ${(cx + rx * 0.55).toFixed(2)} ${botY} ${midX} ${botY} C ${(cx - rx * 0.55).toFixed(2)} ${botY} ${x0} ${(cy + ry * 0.75).toFixed(2)} ${x0} ${yLower} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yLower} Q ${midX} ${(yLower - 1.3).toFixed(2)} ${x1} ${yLower}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)} Q ${midX} ${(botY - 1.3).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy + ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.25" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'focused': {
-        const yOuter = Number((cy - ry * 0.45).toFixed(2))
-        const yInner = Number((cy - ry * 0.18).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="focused">
-            <path d="M ${x0} ${yInner} C ${x0} ${(cy - ry * 0.6).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.8).toFixed(2)} ${x1} ${yOuter} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x0} ${yInner} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yInner} Q ${midX} ${(yOuter - 0.4).toFixed(2)} ${x1} ${yOuter}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.7).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'chill': {
-        const yCut = Number((cy + ry * 0.05).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="chill">
-            <path d="M ${x0} ${yCut} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x0} ${yCut} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yCut} Q ${midX} ${(yCut - 1.5).toFixed(2)} ${x1} ${yCut}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)} Q ${midX} ${(topY + 1.5).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.55).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'angry': {
-        const yOuter = Number((cy - ry * 0.68).toFixed(2))
-        const yInner = Number((cy + ry * 0.08).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="angry">
-            <path d="M ${x0} ${yInner} C ${x0} ${(cy - ry * 0.5).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.85).toFixed(2)} ${x1} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yInner} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yOuter}" stroke="#020810" stroke-width="1.3" opacity="0.4" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-      case 'worried': {
-        const yOuter = Number((cy + ry * 0.08).toFixed(2))
-        const yInner = Number((cy - ry * 0.68).toFixed(2))
-        return `
-          <g id="${sideId}" class="${sideClass}" data-eyelid-style="worried">
-            <path d="M ${x0} ${yInner} C ${x0} ${(cy - ry * 0.85).toFixed(2)} ${(cx - rx * 0.55).toFixed(2)} ${topY} ${midX} ${topY} C ${(cx + rx * 0.55).toFixed(2)} ${topY} ${x1} ${(cy - ry * 0.5).toFixed(2)} ${x1} ${yOuter} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x0} ${yInner} Z" fill="${chitinColor}" />
-            <path d="M ${x0} ${yInner} Q ${midX} ${(cy - ry * 0.35).toFixed(2)} ${x1} ${yOuter}" stroke="#020810" stroke-width="1.2" opacity="0.35" stroke-linecap="round" fill="none" />
-            <path d="M ${(cx - rx * 0.6).toFixed(2)} ${(cy - ry * 0.72).toFixed(2)} Q ${midX} ${(topY + 1.2).toFixed(2)} ${(cx + rx * 0.6).toFixed(2)} ${(cy - ry * 0.45).toFixed(2)}" stroke="#ffffff" stroke-width="1.0" opacity="0.3" stroke-linecap="round" fill="none" />
-          </g>`
-      }
-    }
+/** Resolve every look trait: explicit config values win, the seed fills the rest. */
+export function resolveAvatarTraits(config: LobsterAvatarConfig): ResolvedAvatarTraits {
+  const seeded = getLobsterAvatarSeededOptions(config.seed)
+  return {
+    race: isOneOf(AVATAR_RACES, config.race) ? config.race : 'lobster',
+    // Configs saved before races existed keep a red or orange shell, like the original lobsters.
+    shellColor:
+      config.shellColor && SHELL_PALETTE_MAP[config.shellColor]
+        ? config.shellColor
+        : config.race
+          ? seeded.shellColor
+          : seeded.legacyShellColor,
+    shellFinish: isOneOf(SHELL_FINISHES, config.shellFinish) ? config.shellFinish : seeded.shellFinish,
+    marking: isOneOf(SHELL_MARKINGS, config.marking) ? config.marking : seeded.marking,
+    mouth: isOneOf(AVATAR_MOUTHS, config.mouth) ? config.mouth : seeded.mouth,
+    antennae: isOneOf(AVATAR_ANTENNAE, config.antennae) ? config.antennae : seeded.antennae,
+    claws: isOneOf(AVATAR_CLAWS, config.claws) ? config.claws : seeded.claws,
+    pose: isOneOf(AVATAR_POSES, config.pose) ? config.pose : seeded.pose,
+    accessory: isOneOf(AVATAR_ACCESSORIES, config.accessory) ? config.accessory : seeded.accessory,
+    height: config.height ?? seeded.height,
+    eyelidStyle: config.eyelidStyle && isOneOf(LOBSTER_EYELID_STYLES, config.eyelidStyle) ? config.eyelidStyle : seeded.eyelidStyle,
+    eyeColor: isOneOf(LOBSTER_EYE_COLORS, lower(config.eyeColor)) ? (lower(config.eyeColor) as LobsterEyeColor) : seeded.eyeColor,
+    eyeVariant: isOneOf(LOBSTER_EYE_VARIANTS, lower(config.eyeVariant)) ? (lower(config.eyeVariant) as LobsterEyeVariant) : seeded.eyeVariant,
+    pupilVariant: isOneOf(LOBSTER_PUPIL_VARIANTS, lower(config.pupilVariant)) ? (lower(config.pupilVariant) as LobsterPupilVariant) : seeded.pupilVariant,
+    backgroundTheme: (config.backgroundTheme && LOBSTER_BACKGROUND_THEME_MAP[config.backgroundTheme]?.id) || seeded.theme.id,
+    backgroundPattern: (config.backgroundPattern && LOBSTER_BACKGROUND_PATTERN_MAP[config.backgroundPattern]?.id) || seeded.pattern.id,
+    backgroundTexture: (config.backgroundTexture && LOBSTER_BACKGROUND_TEXTURE_MAP[config.backgroundTexture]?.id) || seeded.texture.id,
   }
 }
 
-function injectLobsterEyelids(
-  svg: string,
-  chitinColor = '#c2410c',
-  eyelidStyle: EyelidStyle = 'relaxed',
-  chitinFill?: string,
-  eyeColor?: LobsterEyeColor | string,
-  eyeVariant?: LobsterEyeVariant | string,
-  pupilVariant?: LobsterPupilVariant | string
-): string {
-  const fillToUse = chitinFill || chitinColor
-  const eyesLayerMatch = svg.match(
-    /<g id="lobster-eyes-layer">\s*(<use\b[^>]*(?:xlink:)?href="#(eyes-[^"]+)"[^>]*\/>)\s*<\/g>/
-  )
-  if (!eyesLayerMatch) return svg
-
-  const [fullEyesLayer, useTag, symbolId] = eyesLayerMatch
-  const transformMatch = useTag.match(/transform="([^"]+)"/)
-  const transform = transformMatch?.[1] ?? ''
-  const transformAttr = transform ? ` transform="${transform}"` : ''
-
-  const resolvedColor: LobsterEyeColor =
-    eyeColor && LOBSTER_EYE_COLORS.includes(eyeColor.trim().toLowerCase() as LobsterEyeColor)
-      ? (eyeColor.trim().toLowerCase() as LobsterEyeColor)
-      : 'amber'
-
-  const resolvedEyeVariant: LobsterEyeVariant =
-    eyeVariant && (LOBSTER_EYE_VARIANTS as readonly string[]).includes(eyeVariant.trim().toLowerCase())
-      ? (eyeVariant.trim().toLowerCase() as LobsterEyeVariant)
-      : symbolId.includes('wide')
-        ? 'tall'
-        : 'round'
-
-  const resolvedPupilVariant: LobsterPupilVariant =
-    pupilVariant && (LOBSTER_PUPIL_VARIANTS as readonly string[]).includes(pupilVariant.trim().toLowerCase())
-      ? (pupilVariant.trim().toLowerCase() as LobsterPupilVariant)
-      : symbolId.includes('bigPupils')
-        ? 'big'
-        : 'standard'
-
-  let rx = 9.5
-  let ry = 9.5
-  let baseIrisR = 6.4
-  let basePupilR = 3.2
-
-  if (resolvedEyeVariant === 'wide') {
-    rx = 10.2
-    ry = 9.0
-    baseIrisR = 6.6
-    basePupilR = 3.2
-  } else if (resolvedEyeVariant === 'tall') {
-    rx = 8.8
-    ry = 10.4
-    baseIrisR = 6.2
-    basePupilR = 3.2
-  }
-
-  let irisR = baseIrisR
-  let pupilR = basePupilR
-
-  if (resolvedPupilVariant === 'big') {
-    pupilR = Number((basePupilR * 1.30).toFixed(2))
-    irisR = Number((baseIrisR * 1.08).toFixed(2))
-  } else if (resolvedPupilVariant === 'keen') {
-    pupilR = Number((basePupilR * 0.76).toFixed(2))
-    irisR = baseIrisR
-  } else if (resolvedPupilVariant === 'sparkle') {
-    pupilR = basePupilR
-    irisR = baseIrisR
-  }
-
-  const leftEye = renderPixarEye('left', 10, 13, rx, ry, irisR, pupilR, resolvedColor, resolvedPupilVariant)
-  const rightEye = renderPixarEye('right', 36, 13, rx, ry, irisR, pupilR, resolvedColor, resolvedPupilVariant)
-  const defs = renderPixarEyesDefs(resolvedColor)
-
-  const eyelidGroups = [
-    renderEyelidElement('left', 10, 13, rx, ry, eyelidStyle, fillToUse),
-    renderEyelidElement('right', 36, 13, rx, ry, eyelidStyle, fillToUse),
-  ]
-
-  const eyelidsBlock = `<g id="lobster-eyelids-layer" class="lobster-idle-layer lobster-idle-eyelids" data-eyelid-style="${escapeSvgAttr(eyelidStyle)}"${transformAttr}>${eyelidGroups.join('')}</g>`
-
-  const replacement = `<g id="lobster-eyes-layer"><defs>${defs}</defs><g class="lobster-pixar-eyes" data-eye-color="${escapeSvgAttr(resolvedColor)}" data-eye-variant="${escapeSvgAttr(resolvedEyeVariant)}" data-pupil-variant="${escapeSvgAttr(resolvedPupilVariant)}"${transformAttr}>${leftEye}${rightEye}</g>${eyelidsBlock}</g>`
-  return svg.replace(fullEyesLayer, replacement)
-}
-
-interface AntennaStyle {
-  name: string
-  render: (chitinColor: string) => string
-}
-
-/**
- * 5 Modular Crustacean & Cyber Antenna Variants
- * Selected deterministically from seed hash.
- * Styled with soft translucent contrast highlights matching DiceBear chest patterns and freckles.
- */
-const ANTENNA_VARIANTS: readonly AntennaStyle[] = [
-  // 0: Classic Sweeping Whips (Long outward curve with sensory spheres and inner antennules)
-  {
-    name: 'sweeping_whips',
-    render: (chitin) => `
-      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="sweeping_whips">
-        <!-- Left Antenna & Antennule -->
-        <g id="lobster-antenna-left" class="lobster-idle-layer lobster-idle-antenna-left">
-          <!-- Left Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 43 32 C 40 10 30 -10 14 -24" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <circle cx="14" cy="-24" r="4.5" fill="#020810" />
-            <path d="M 46 28 C 45 15 42 4 38 -5" stroke="#020810" stroke-width="2.5" stroke-linecap="round" fill="none" />
-            <circle cx="38" cy="-5" r="3" fill="#020810" />
-          </g>
-          <!-- Primary Left Long Antenna -->
-          <path d="M 43 32 C 40 10 30 -10 14 -24" stroke="${chitin}" stroke-width="3" stroke-linecap="round" fill="none" />
-          <path d="M 42 28 C 39 10 30 -8 15 -21" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.35" fill="none" />
-          <circle cx="14" cy="-24" r="3.8" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.4" />
-          <!-- Secondary Left Inner Antennule -->
-          <path d="M 46 28 C 45 15 42 4 38 -5" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <circle cx="38" cy="-5" r="2.4" fill="#ffffff" opacity="0.85" />
-        </g>
-        <!-- Right Antenna & Antennule -->
-        <g id="lobster-antenna-right" class="lobster-idle-layer lobster-idle-antenna-right">
-          <!-- Right Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 57 32 C 60 10 70 -10 86 -24" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <circle cx="86" cy="-24" r="4.5" fill="#020810" />
-            <path d="M 54 28 C 55 15 58 4 62 -5" stroke="#020810" stroke-width="2.5" stroke-linecap="round" fill="none" />
-            <circle cx="62" cy="-5" r="3" fill="#020810" />
-          </g>
-          <!-- Primary Right Long Antenna -->
-          <path d="M 57 32 C 60 10 70 -10 86 -24" stroke="${chitin}" stroke-width="3" stroke-linecap="round" fill="none" />
-          <path d="M 58 28 C 61 10 70 -8 85 -21" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" opacity="0.35" fill="none" />
-          <circle cx="86" cy="-24" r="3.8" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.4" />
-          <!-- Secondary Right Inner Antennule -->
-          <path d="M 54 28 C 55 15 58 4 62 -5" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <circle cx="62" cy="-5" r="2.4" fill="#ffffff" opacity="0.85" />
-        </g>
-      </g>`,
-  },
-  // 1: Cyber Lightning / Angular Stepped Sensors (Techy zig-zag with diamond nodes)
-  {
-    name: 'cyber_lightning',
-    render: (chitin) => `
-      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="cyber_lightning">
-        <!-- Left Cyber Lightning Antenna -->
-        <g id="lobster-antenna-left" class="lobster-idle-layer lobster-idle-antenna-left">
-          <!-- Left Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 43 30 L 36 12 L 42 2 L 26 -14 L 16 -26" stroke="#020810" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-            <rect x="13" y="-29" width="6" height="6" transform="rotate(45 16 -26)" fill="#020810" />
-            <path d="M 46 28 L 44 14 L 40 4" stroke="#020810" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          </g>
-          <!-- Primary Left Lightning Antenna -->
-          <path d="M 43 30 L 36 12 L 42 2 L 26 -14 L 16 -26" stroke="${chitin}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <rect x="13" y="-29" width="6" height="6" transform="rotate(45 16 -26)" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.4" />
-          <circle cx="42" cy="2" r="2" fill="#ffffff" opacity="0.75" />
-          <!-- Inner Feeler Probe Left -->
-          <path d="M 46 28 L 44 14 L 40 4" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <circle cx="40" cy="4" r="2" fill="#ffffff" opacity="0.85" />
-        </g>
-        <!-- Right Cyber Lightning Antenna -->
-        <g id="lobster-antenna-right" class="lobster-idle-layer lobster-idle-antenna-right">
-          <!-- Right Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 57 30 L 64 12 L 58 2 L 74 -14 L 84 -26" stroke="#020810" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-            <rect x="81" y="-29" width="6" height="6" transform="rotate(45 84 -26)" fill="#020810" />
-            <path d="M 54 28 L 56 14 L 60 4" stroke="#020810" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          </g>
-          <!-- Primary Right Lightning Antenna -->
-          <path d="M 57 30 L 64 12 L 58 2 L 74 -14 L 84 -26" stroke="${chitin}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <rect x="81" y="-29" width="6" height="6" transform="rotate(45 84 -26)" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.4" />
-          <circle cx="58" cy="2" r="2" fill="#ffffff" opacity="0.75" />
-          <!-- Inner Feeler Probe Right -->
-          <path d="M 54 28 L 56 14 L 60 4" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <circle cx="60" cy="4" r="2" fill="#ffffff" opacity="0.85" />
-        </g>
-      </g>`,
-  },
-  // 2: Spiral Horns / Ram Feeler Coils (Playful curly loops at tips)
-  {
-    name: 'spiral_horns',
-    render: (chitin) => `
-      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="spiral_horns">
-        <!-- Left Spiral Horn -->
-        <g id="lobster-antenna-left" class="lobster-idle-layer lobster-idle-antenna-left">
-          <!-- Left Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 43 30 C 40 8 20 0 14 -12 C 8 -22 18 -30 26 -22 C 30 -16 26 -10 18 -14" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <path d="M 46 28 C 45 16 40 8 36 2" stroke="#020810" stroke-width="2.5" stroke-linecap="round" fill="none" />
-          </g>
-          <!-- Left Spiral Horn Base -->
-          <path d="M 43 30 C 40 8 20 0 14 -12 C 8 -22 18 -30 26 -22 C 30 -16 26 -10 18 -14" stroke="${chitin}" stroke-width="3.2" stroke-linecap="round" fill="none" />
-          <circle cx="26" cy="-22" r="3.2" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.2" />
-          <!-- Inner Curly Feeler Left -->
-          <path d="M 46 28 C 45 16 40 8 36 2" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <circle cx="36" cy="2" r="2" fill="#ffffff" opacity="0.85" />
-        </g>
-        <!-- Right Spiral Horn -->
-        <g id="lobster-antenna-right" class="lobster-idle-layer lobster-idle-antenna-right">
-          <!-- Right Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 57 30 C 60 8 80 0 86 -12 C 92 -22 82 -30 74 -22 C 70 -16 74 -10 82 -14" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <path d="M 54 28 C 55 16 60 8 64 2" stroke="#020810" stroke-width="2.5" stroke-linecap="round" fill="none" />
-          </g>
-          <!-- Right Spiral Horn Base -->
-          <path d="M 57 30 C 60 8 80 0 86 -12 C 92 -22 82 -30 74 -22 C 70 -16 74 -10 82 -14" stroke="${chitin}" stroke-width="3.2" stroke-linecap="round" fill="none" />
-          <circle cx="74" cy="-22" r="3.2" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.2" />
-          <!-- Inner Curly Feeler Right -->
-          <path d="M 54 28 C 55 16 60 8 64 2" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <circle cx="64" cy="2" r="2" fill="#ffffff" opacity="0.85" />
-        </g>
-      </g>`,
-  },
-  // 3: Twin Radar Beacons (Tall vertical masts with horizontal sensor fins & pulse rings)
-  {
-    name: 'twin_beacons',
-    render: (chitin) => `
-      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="twin_beacons">
-        <!-- Left Beacon Mast -->
-        <g id="lobster-antenna-left" class="lobster-idle-layer lobster-idle-antenna-left">
-          <!-- Left Shadow -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 44 30 C 43 10 40 -10 36 -28" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <path d="M 30 -10 L 42 -10" stroke="#020810" stroke-width="2.5" stroke-linecap="round" />
-            <circle cx="36" cy="-28" r="5" fill="#020810" />
-          </g>
-          <!-- Left Beacon Mast Base -->
-          <path d="M 44 30 C 43 10 40 -10 36 -28" stroke="${chitin}" stroke-width="3" stroke-linecap="round" fill="none" />
-          <path d="M 30 -10 L 42 -10" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.5" />
-          <circle cx="36" cy="-28" r="5.5" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.35" />
-          <circle cx="36" cy="-28" r="3.8" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.4" />
-        </g>
-        <!-- Right Beacon Mast -->
-        <g id="lobster-antenna-right" class="lobster-idle-layer lobster-idle-antenna-right">
-          <!-- Right Shadow -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 56 30 C 57 10 60 -10 64 -28" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <path d="M 58 -10 L 70 -10" stroke="#020810" stroke-width="2.5" stroke-linecap="round" />
-            <circle cx="64" cy="-28" r="5" fill="#020810" />
-          </g>
-          <!-- Right Beacon Mast Base -->
-          <path d="M 56 30 C 57 10 60 -10 64 -28" stroke="${chitin}" stroke-width="3" stroke-linecap="round" fill="none" />
-          <path d="M 58 -10 L 70 -10" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.5" />
-          <circle cx="64" cy="-28" r="5.5" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.35" />
-          <circle cx="64" cy="-28" r="3.8" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.4" />
-        </g>
-        <!-- Center Transceiver array -->
-        <ellipse cx="50" cy="26" rx="6" ry="2.5" fill="#ffffff" opacity="0.25" />
-      </g>`,
-  },
-  // 4: Plumed Crest (3-Pronged majestic feather plumes / fan antennules)
-  {
-    name: 'plumed_crest',
-    render: (chitin) => `
-      <g id="lobster-antennae-layer" class="lobster-idle-layer lobster-idle-antennae" data-antenna="plumed_crest">
-        <!-- Left 3-Prong Crest -->
-        <g id="lobster-antenna-left" class="lobster-idle-layer lobster-idle-antenna-left">
-          <!-- Left Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 43 30 C 40 8 28 -8 16 -24" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <path d="M 38 18 C 30 10 18 4 10 -4" stroke="#020810" stroke-width="2.5" stroke-linecap="round" fill="none" />
-            <path d="M 34 2 C 30 -8 30 -16 28 -22" stroke="#020810" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          </g>
-          <!-- Left 3-Prong Crest Base -->
-          <path d="M 43 30 C 40 8 28 -8 16 -24" stroke="${chitin}" stroke-width="3" stroke-linecap="round" fill="none" />
-          <circle cx="16" cy="-24" r="3.2" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.2" />
-          <path d="M 38 18 C 30 10 18 4 10 -4" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <circle cx="10" cy="-4" r="2.2" fill="#ffffff" opacity="0.85" />
-          <path d="M 34 2 C 30 -8 30 -16 28 -22" stroke="${chitin}" stroke-width="2" stroke-linecap="round" fill="none" />
-          <circle cx="28" cy="-22" r="2" fill="#ffffff" opacity="0.85" />
-        </g>
-        <!-- Right 3-Prong Crest -->
-        <g id="lobster-antenna-right" class="lobster-idle-layer lobster-idle-antenna-right">
-          <!-- Right Shadows -->
-          <g opacity="0.25" transform="translate(1.5, 2)">
-            <path d="M 57 30 C 60 8 72 -8 84 -24" stroke="#020810" stroke-width="3.5" stroke-linecap="round" fill="none" />
-            <path d="M 62 18 C 70 10 82 4 90 -4" stroke="#020810" stroke-width="2.5" stroke-linecap="round" fill="none" />
-            <path d="M 66 2 C 70 -8 70 -16 72 -22" stroke="#020810" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          </g>
-          <!-- Right 3-Prong Crest Base -->
-          <path d="M 57 30 C 60 8 72 -8 84 -24" stroke="${chitin}" stroke-width="3" stroke-linecap="round" fill="none" />
-          <circle cx="84" cy="-24" r="3.2" fill="#ffffff" opacity="0.9" stroke="${chitin}" stroke-width="1.2" />
-          <path d="M 62 18 C 70 10 82 4 90 -4" stroke="${chitin}" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <circle cx="90" cy="-4" r="2.2" fill="#ffffff" opacity="0.85" />
-          <path d="M 66 2 C 70 -8 70 -16 72 -22" stroke="${chitin}" stroke-width="2" stroke-linecap="round" fill="none" />
-          <circle cx="72" cy="-22" r="2" fill="#ffffff" opacity="0.85" />
-        </g>
-      </g>`,
-  },
-]
-
-export const CARAPACE_BOTTOM_HALF_WIDTHS: Readonly<Record<string, number>> = {
-  wedge: 30, // x from 20 to 80 (width 60)
-  peak: 32, // x from 18 to 82 (width 64)
-  dome: 34, // x from 16 to 84 (width 68)
-  round: 40, // x from 10 to 90 (width 80)
-  bell: 44, // x from 6 to 94 (width 88)
-  // Fallbacks
-  block: 38,
-  squat: 42,
-  blob: 36,
-  tilt: 28,
-  lean: 28,
-  tower: 22,
-  chimney: 22,
-  wedgeInv: 24,
-  steps: 36,
-}
-
-/**
- * Injects articulated lobster pincers, specular highlights, a sculpted chitin brow ridge,
- * modular antennae styles, anthropomorphic standing legs, and ground-resting fan tail
- * into the generated DiceBear SVG.
- */
+/** Full-body square frame. The character stands on y=185 around the x=50 centre line. */
 export const LOBSTER_FULL_BODY_VIEWBOX = '-65 -35 230 230' as const
-/** Close-up of head, eyes, antennae, and upper claws matching canonical close-up framing. */
-export const LOBSTER_PORTRAIT_VIEWBOX = '-3 -10 106 106' as const
+/** Head-and-shoulders close-up used by every static portrait. */
+export const LOBSTER_PORTRAIT_VIEWBOX = '-9 -11 118 118' as const
+
+/** Portrait framing per race, so every face sits in the same spot of the porthole. */
+export const AVATAR_PORTRAIT_VIEWBOXES: Readonly<Record<AvatarRace, string>> = {
+  lobster: LOBSTER_PORTRAIT_VIEWBOX,
+  crab: '-9 19 118 118',
+}
 
 export type LobsterAvatarFrame = 'portrait' | 'fullBody'
 
@@ -2192,133 +462,48 @@ export function stripSvgSmilAnimation(svg: string): string {
     .replace(/<animate\b[^>]*>[\s\S]*?<\/animate>/gi, '')
 }
 
-function injectLobsterChitinLayers(
-  rawSvg: string,
-  configOrSeed: LobsterAvatarConfig | string,
-  options?: { frame?: LobsterAvatarFrame }
-): string {
-  const seed = typeof configOrSeed === 'string' ? configOrSeed : configOrSeed.seed
-  const config = typeof configOrSeed === 'object' ? configOrSeed : { style: LOBSTER_AVATAR_STYLE, seed }
+function hashString(value: string): string {
+  let h = 2166136261
+  for (let i = 0; i < value.length; i++) {
+    h ^= value.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (h >>> 0).toString(36)
+}
 
-  // Extract generated chitin shell fill color from SVG or fallback to canonical coral red
-  const colorMatch = rawSvg.match(/fill="(#(?:c2410c|be123c|ea580c|dc2626|b91c1c|991b1b|e11d48|f97316))"/i)
-  const chitinColor = colorMatch ? colorMatch[1] : '#c2410c'
-  const chitinPalette = getChitinGradientPalette(chitinColor)
-  const safeSeed = seed.replace(/[^a-zA-Z0-9_-]/g, '') || 'default'
-  const chitinGradId = `lobster-chitin-grad-${safeSeed}`
-  const chitinFill = `url(#${chitinGradId})`
+function renderBackdrop(
+  config: LobsterAvatarConfig,
+  traits: ResolvedAvatarTraits,
+  seeded: SeededAvatarOptions
+): { defs: string; layer: string; theme: BackgroundTheme } {
+  const theme = LOBSTER_BACKGROUND_THEME_MAP[traits.backgroundTheme] ?? seeded.theme
+  const pattern = LOBSTER_BACKGROUND_PATTERN_MAP[traits.backgroundPattern] ?? seeded.pattern
+  const texture = LOBSTER_BACKGROUND_TEXTURE_MAP[traits.backgroundTexture] ?? seeded.texture
+  // Configs can arrive unparsed, so every value is checked against its catalog before it reaches markup.
+  const density = isOneOf(LOBSTER_PATTERN_DENSITIES, config.patternDensity) ? config.patternDensity : seeded.density
+  const glow = isOneOf(LOBSTER_PATTERN_GLOWS, config.patternGlow) ? config.patternGlow : seeded.glow
+  const pulse = isOneOf(LOBSTER_PATTERN_PULSES, config.patternPulse) ? config.patternPulse : seeded.pulse
+  const sparkles = isOneOf(LOBSTER_PATTERN_SPARKLES, config.patternSparkles) ? config.patternSparkles : seeded.sparkles
+  const motion: BackgroundMotionConfig = isOneOf(LOBSTER_BACKGROUND_MOTION_MODES, config.backgroundMotion)
+    ? { mode: config.backgroundMotion, duration: seeded.motion.duration, direction: seeded.motion.direction }
+    : seeded.motion
 
-  // Extract generated carapace body shape to align abdomen width precisely with chest
-  const bodyMatch = rawSvg.match(/id="body-([a-zA-Z0-9]+)-/i)
-  const bodyVariant = bodyMatch ? bodyMatch[1] : 'dome'
-  const cw = CARAPACE_BOTTOM_HALF_WIDTHS[bodyVariant] ?? 34
-
-  const seeded = getLobsterAvatarSeededOptions(seed)
-  const height = config.height ?? 'regular'
-  const metrics = getLobsterTorsoMetrics(height)
-  const {
-    torsoDelta,
-    headYOffset,
-    frameShift,
-    armScale: defaultArmScale,
-    s1_top,
-    s1_bot,
-    s2_top,
-    s2_bot,
-    s3_top,
-    s3_bot,
-    s4_top,
-    s4_bot,
-    s5_top,
-    s5_bot,
-    keelTop,
-    keelBot,
-    flankY1,
-    flankY2,
-  } = metrics
-
-  const armScale =
-    typeof config.armScale === 'number' && Number.isFinite(config.armScale)
-      ? Math.min(1.4, Math.max(0.7, Number(config.armScale.toFixed(2))))
-      : defaultArmScale
-
-  const pose = seeded.clawPose
-  const antennaStyle = seeded.antennaStyle
-  const tailPose = seeded.tailPose
-  const theme = (config.backgroundTheme && LOBSTER_BACKGROUND_THEME_MAP[config.backgroundTheme]) || seeded.theme
-  const pattern = (config.backgroundPattern && LOBSTER_BACKGROUND_PATTERN_MAP[config.backgroundPattern]) || seeded.pattern
-  const texture = (config.backgroundTexture && LOBSTER_BACKGROUND_TEXTURE_MAP[config.backgroundTexture]) || seeded.texture
-  const density = config.patternDensity || seeded.density
-  const glow = config.patternGlow || seeded.glow
-  const pulse = config.patternPulse || seeded.pulse
-  const sparkles = config.patternSparkles || seeded.sparkles
-  const eyelidStyle =
-    config.eyelidStyle && (LOBSTER_EYELID_STYLES as readonly string[]).includes(config.eyelidStyle)
-      ? config.eyelidStyle
-      : seeded.eyelidStyle
-  const eyeColor =
-    config.eyeColor && (LOBSTER_EYE_COLORS as readonly string[]).includes(config.eyeColor.trim().toLowerCase())
-      ? (config.eyeColor.trim().toLowerCase() as LobsterEyeColor)
-      : seeded.eyeColor
-  const eyeVariant =
-    config.eyeVariant && (LOBSTER_EYE_VARIANTS as readonly string[]).includes(config.eyeVariant.trim().toLowerCase())
-      ? (config.eyeVariant.trim().toLowerCase() as LobsterEyeVariant)
-      : seeded.eyeVariant
-  const pupilVariant =
-    config.pupilVariant && (LOBSTER_PUPIL_VARIANTS as readonly string[]).includes(config.pupilVariant.trim().toLowerCase())
-      ? (config.pupilVariant.trim().toLowerCase() as LobsterPupilVariant)
-      : seeded.pupilVariant
-  const motion =
-    config.backgroundMotion &&
-    (LOBSTER_BACKGROUND_MOTION_MODES as readonly string[]).includes(config.backgroundMotion)
-      ? {
-          mode: config.backgroundMotion,
-          duration: seeded.motion.duration,
-          direction: seeded.motion.direction,
-        }
-      : seeded.motion
-  const isTransparent = Boolean(config.transparentBackground)
-
-  // Subtle curved cartoon eyebrows positioned right above the orbital eye sockets
-  const leftEyebrow = 'M 29.5 35 Q 37 30.5 44.5 35'
-  const rightEyebrow = 'M 55.5 35 Q 63 30.5 70.5 35'
-
-  // Render modular antenna variant with crisp primary chitin tone
-  const antennaeLayer = antennaStyle.render(chitinPalette.primary)
-
-  const tailFlip = tailPose === 'left' ? 'transform="translate(100, 0) scale(-1, 1)"' : ''
-  const tailShadowX = tailPose === 'right' ? 108 : tailPose === 'left' ? -8 : 50
-
-  // 0. On-Brand 2-Color Background Defs and Layer
   const bgGradId = `lobster-bg-grad-${theme.id}`
   const bgGlowId = `lobster-bg-glow-${theme.id}`
   const bgFloorGlowId = `lobster-bg-floor-${theme.id}`
-  const texPatternId = `lobster-tex-${texture.id}-${theme.id}`
+  const angle = (((theme.gradientAngle ?? 135) - 90) * Math.PI) / 180
+  const x1 = Math.round(50 - Math.cos(angle) * 50)
+  const y1 = Math.round(50 - Math.sin(angle) * 50)
+  const x2 = Math.round(50 + Math.cos(angle) * 50)
+  const y2 = Math.round(50 + Math.sin(angle) * 50)
 
-  // Compute gradient vector from configured angle
-  const angleDeg = theme.gradientAngle ?? 135
-  const rad = ((angleDeg - 90) * Math.PI) / 180
-  const x1 = Math.round(50 - Math.cos(rad) * 50)
-  const y1 = Math.round(50 - Math.sin(rad) * 50)
-  const x2 = Math.round(50 + Math.cos(rad) * 50)
-  const y2 = Math.round(50 + Math.sin(rad) * 50)
-
-  const chitinGradientDef = `
-      <linearGradient id="${chitinGradId}" x1="25%" y1="0%" x2="75%" y2="100%">
-        <stop offset="0%" stop-color="${chitinPalette.highlight}" />
-        <stop offset="42%" stop-color="${chitinPalette.primary}" />
-        <stop offset="100%" stop-color="${chitinPalette.anchor}" />
-      </linearGradient>`
-
-  const defsLayer = `
-    <defs>
-      ${chitinGradientDef}
+  const defs = `
       <linearGradient id="${bgGradId}" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
         <stop offset="0%" stop-color="${theme.topColor}" />
         <stop offset="45%" stop-color="${theme.primaryColor}" />
         <stop offset="100%" stop-color="${theme.bottomColor}" />
       </linearGradient>
-      <radialGradient id="${bgGlowId}" cx="50%" cy="36%" r="68%">
+      <radialGradient id="${bgGlowId}" cx="50%" cy="40%" r="62%">
         <stop offset="0%" stop-color="${theme.glowColor}" />
         <stop offset="55%" stop-color="${theme.glowColor}" stop-opacity="0.18" />
         <stop offset="100%" stop-color="${theme.glowColor}" stop-opacity="0" />
@@ -2328,518 +513,120 @@ function injectLobsterChitinLayers(
         <stop offset="60%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0.12" />
         <stop offset="100%" stop-color="${theme.glowSecondaryColor ?? theme.glowColor}" stop-opacity="0" />
       </radialGradient>
-      ${getPatternGlowFilterDef(glow, theme)}
-    </defs>`
+      <radialGradient id="lobster-bg-hush-${theme.id}" cx="50%" cy="52%" r="50%">
+        <stop offset="0%" stop-color="${theme.bottomColor}" stop-opacity="0.82" />
+        <stop offset="70%" stop-color="${theme.bottomColor}" stop-opacity="0.35" />
+        <stop offset="100%" stop-color="${theme.bottomColor}" stop-opacity="0" />
+      </radialGradient>
+      ${getPatternGlowFilterDef(glow, theme)}`
 
   const textureLayer =
     texture.id !== 'none' && texture.publicUrl
-      ? `
-      <!-- Subtle PBR Homepage Texture Underlay Layer -->
-      <g id="lobster-texture-layer" data-texture="${texture.id}">
+      ? `<g id="lobster-texture-layer" data-texture="${texture.id}">
         <image href="${texture.publicUrl}" xlink:href="${texture.publicUrl}" x="-80" y="-50" width="260" height="260" preserveAspectRatio="xMidYMid slice" opacity="${texture.opacity ?? 0.38}" style="mix-blend-mode: overlay; pointer-events: none;" />
       </g>`
       : ''
 
-  const sparklesMarkup = renderLobsterSparkles(theme, sparkles, seed)
-  const renderedSparkles =
-    headYOffset !== 0
-      ? `<g id="lobster-sparkles-offset" transform="translate(0, ${headYOffset})">${sparklesMarkup}</g>`
-      : sparklesMarkup
-
-  const backgroundLayer = `
+  const layer = `
     <g id="lobster-background-layer" data-theme="${theme.id}" data-pattern="${pattern.id}" data-density="${density}" data-glow="${glow}" data-pulse="${pulse}" data-sparkles="${sparkles}" data-texture="${texture.id}" data-motion="${escapeSvgAttr(motion.mode)}">
-      <!-- Base 2-Color Angular Gradient -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGradId})" />
-      <!-- Primary Ambient Radial Glow Disc -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgGlowId})" />
-      <!-- Secondary Floor Ambient Counter-Glow -->
       <rect x="-80" y="-50" width="260" height="260" fill="url(#${bgFloorGlowId})" />
       ${textureLayer}
-      <!-- Seeded Animated Vector Background Pattern -->
       ${pattern.render(theme, pattern.id, motion, density, glow, pulse)}
-      <!-- Seeded Bioluminescent Background Sparkles -->
-      ${renderedSparkles}
+      <ellipse cx="50" cy="96" rx="78" ry="96" fill="url(#lobster-bg-hush-${theme.id})" />
+      <g transform="translate(0 ${traits.race === 'crab' ? 26 : 0})">${renderLobsterSparkles(theme, sparkles, config.seed)}</g>
     </g>`
 
-  // Ground Contact Shadow Layer (Distinct pools for feet and ground-resting tail planted at y=187)
-  const rawGroundShadow = `
-    <g id="lobster-ground-shadow">
-      <!-- Center body ground shadow -->
-      <ellipse cx="50" cy="187" rx="34" ry="4.5" fill="#020810" opacity="0.32" />
-      <!-- Left & Right standing feet contact shadows -->
-      <ellipse cx="19" cy="187" rx="15" ry="4.5" fill="#020810" opacity="0.52" />
-      <ellipse cx="81" cy="187" rx="15" ry="4.5" fill="#020810" opacity="0.52" />
-      <!-- Tail ground contact shadow -->
-      <ellipse cx="${tailShadowX}" cy="${tailPose === 'center' ? 192 : 186}" rx="${tailPose === 'center' ? 36 : 22}" ry="${tailPose === 'center' ? 6 : 5.5}" fill="#020810" opacity="0.45" />
-    </g>`
-
-  const groundShadowLayer =
-    frameShift !== 0
-      ? `<g id="lobster-ground-shadow-offset" transform="translate(0, ${frameShift})">${rawGroundShadow}</g>`
-      : rawGroundShadow
-
-  // Massive, Articulated Conical Tail & 5-Blade Fan (Straight Down or Side-Sweeping, lowered toward ground)
-  const rawTailFanLayer =
-    tailPose === 'center'
-      ? `
-    <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="center">
-      <!-- Floor Shadow Layer for Straight Down Tail -->
-      <g opacity="0.28" transform="translate(0, 3)">
-        <ellipse cx="50" cy="190" rx="38" ry="6" fill="#020810" />
-      </g>
-
-      <!-- 4 Conical Symmetrical Somites Descending Vertically Behind Legs -->
-      <!-- Somite T4 (Distal segment of cone) -->
-      <path d="M 39 166 C 39 176 43 182 50 182 C 57 182 61 176 61 166 Z" fill="${chitinFill}" />
-      <path d="M 41 170 Q 50 176 59 170" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
-
-      <!-- Somite T3 -->
-      <path d="M 35 155 C 35 166 40 172 50 172 C 60 172 65 166 65 155 Z" fill="${chitinFill}" />
-      <path d="M 38 159 Q 50 166 62 159" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
-      <!-- Lateral Spines -->
-      <path d="M 35 162 L 27 159 L 34 168 Z" fill="${chitinFill}" />
-      <path d="M 65 162 L 73 159 L 66 168 Z" fill="${chitinFill}" />
-
-      <!-- Somite T2 -->
-      <path d="M 31 144 C 31 156 36 162 50 162 C 64 162 69 156 69 144 Z" fill="${chitinFill}" />
-      <path d="M 34 148 Q 50 156 66 148" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
-      <!-- Lateral Spines -->
-      <path d="M 31 151 L 22 148 L 29 157 Z" fill="${chitinFill}" />
-      <path d="M 69 151 L 78 148 L 71 157 Z" fill="${chitinFill}" />
-
-      <!-- Somite T1 (Fattest Conical Base emerging from Pelvis) -->
-      <path d="M 26 134 C 26 146 32 152 50 152 C 68 152 74 146 74 134 Z" fill="${chitinFill}" />
-      <path d="M 30 138 Q 50 146 70 138" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
-
-      <!-- Joint Collar Node -->
-      <ellipse cx="50" cy="180" rx="8.5" ry="5" fill="${chitinFill}" />
-      <ellipse cx="50" cy="180" rx="5.5" ry="3" fill="#ffffff" opacity="0.3" />
-
-      <!-- 5-Blade Symmetrical Fan (Spreading wide on ground behind legs) -->
-      <!-- Central Telson -->
-      <path d="M 43 179 C 44 190 46 200 50 202 C 54 200 56 190 57 179 Z" fill="${chitinFill}" />
-      <ellipse cx="50" cy="190" rx="4.5" ry="7" fill="#ffffff" opacity="0.3" />
-      <path d="M 50 180 L 50 200" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
-      <circle cx="50" cy="200" r="2" fill="#ffffff" opacity="0.9" />
-
-      <!-- Left Inner Uropod -->
-      <path d="M 45 179 C 36 186 28 196 30 200 C 38 200 45 192 48 180 Z" fill="${chitinFill}" />
-      <path d="M 43 183 C 37 188 32 195 33 198 C 38 198 43 192 46 184" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
-
-      <!-- Right Inner Uropod -->
-      <path d="M 55 179 C 64 186 72 196 70 200 C 62 200 55 192 52 180 Z" fill="${chitinFill}" />
-      <path d="M 57 183 C 63 188 68 195 67 198 C 62 198 57 192 54 184" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.35" />
-
-      <!-- Left Outer Uropod -->
-      <path d="M 46 179 C 30 180 16 188 18 194 C 26 196 38 190 47 180 Z" fill="${chitinFill}" />
-      <path d="M 44 181 C 32 182 21 188 22 192 C 28 193 38 189 45 182" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
-
-      <!-- Right Outer Uropod -->
-      <path d="M 54 179 C 70 180 84 188 82 194 C 74 196 62 190 53 180 Z" fill="${chitinFill}" />
-      <path d="M 56 181 C 68 182 79 188 78 192 C 72 193 62 189 55 182" stroke="#ffffff" stroke-width="1.3" fill="none" opacity="0.35" />
-    </g>`
-      : `
-    <g id="lobster-tail-fan-layer" class="lobster-idle-layer lobster-idle-tail" data-tail-pose="${tailPose}" ${tailFlip}>
-      <!-- Shadow Layer on Floor -->
-      <g opacity="0.28" transform="translate(2.5, 3)">
-        <!-- Conical Trunk Shadow (Fattest at body, tapering to fan) -->
-        <path d="M 34 118 C 64 122 96 138 116 158 C 122 166 126 174 126 182 L 102 192 C 84 184 60 168 40 154 C 26 144 18 136 16 134 Z" fill="#020810" />
-        <!-- Massive Fan Blades Shadow -->
-        <path d="M 116 176 C 128 158 144 152 152 158 C 156 166 144 180 126 186 Z" fill="#020810" />
-        <path d="M 116 176 C 132 166 150 166 156 176 C 158 188 142 194 124 192 Z" fill="#020810" />
-        <path d="M 114 176 C 126 176 144 182 142 192 C 138 202 122 202 112 194 Z" fill="#020810" />
-        <path d="M 110 178 C 118 186 124 198 112 202 C 100 204 96 194 102 186 Z" fill="#020810" />
-        <path d="M 106 180 C 108 190 98 200 86 201 C 76 200 78 190 88 184 Z" fill="#020810" />
-      </g>
-
-      <!-- 4 Conical Segmented Tail Somites (Fattest at body root, tapering to fan) -->
-      <!-- Somite T4 (Distal segment of cone) -->
-      <path d="M 98 154 C 108 164 118 172 122 178 L 104 188 C 96 180 88 170 82 162 Z" fill="${chitinFill}" />
-      <path d="M 100 158 Q 110 167 116 174" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.32" />
-
-      <!-- Somite T3 (Mid-distal segment of cone) -->
-      <path d="M 80 140 C 94 150 108 162 114 170 L 94 180 C 86 172 72 160 62 148 Z" fill="${chitinFill}" />
-      <path d="M 82 144 Q 96 156 106 166" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
-      <!-- Lateral Spine Spur on T3 -->
-      <path d="M 104 156 L 115 152 L 110 164 Z" fill="${chitinFill}" />
-
-      <!-- Somite T2 (Mid-proximal segment of cone) -->
-      <path d="M 58 126 C 78 136 96 150 104 158 L 82 170 C 72 160 54 148 38 136 Z" fill="${chitinFill}" />
-      <path d="M 62 130 Q 82 142 96 152" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
-      <!-- Lateral Spine Spur on T2 -->
-      <path d="M 90 140 L 102 136 L 96 148 Z" fill="${chitinFill}" />
-
-      <!-- Somite T1 (Massive Conical Base emerging from Pelvis/Torso) -->
-      <path d="M 34 118 C 58 122 82 132 94 142 L 68 158 C 52 148 34 138 16 132 Z" fill="${chitinFill}" />
-      <path d="M 38 122 Q 62 130 82 138" stroke="#ffffff" stroke-width="3.4" fill="none" opacity="0.32" />
-
-      <!-- Heavy Tail Fan Joint Collar Node -->
-      <ellipse cx="116" cy="180" rx="8.5" ry="6" fill="${chitinFill}" transform="rotate(25 116 180)" />
-      <ellipse cx="116" cy="180" rx="5.5" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(25 116 180)" />
-
-      <!-- Massive 5-Blade Fan Tail (Flared out on the ground) -->
-      <!-- 1. Upper Outer Uropod (Sweeping High Blade) -->
-      <path d="M 114 176 C 126 158 144 152 152 158 C 156 166 144 180 126 186 Z" fill="${chitinFill}" />
-      <path d="M 118 168 C 130 160 144 158 148 162 C 150 168 140 176 128 180" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
-      <!-- Fluted Ribs -->
-      <path d="M 122 172 L 140 164 M 124 176 L 144 172" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
-
-      <!-- 2. Upper Inner Uropod (Secondary Upper Blade) -->
-      <path d="M 114 176 C 130 166 150 166 156 176 C 158 188 142 194 124 192 Z" fill="${chitinFill}" />
-      <path d="M 122 178 C 136 170 148 170 150 178 C 152 184 140 190 126 190" stroke="#ffffff" stroke-width="1.6" fill="none" opacity="0.35" />
-      <path d="M 124 181 L 146 181 M 124 186 L 144 187" stroke="#ffffff" stroke-width="1.3" opacity="0.25" />
-
-      <!-- 3. Central Telson (Heroic Main Tail Blade with Dorsal Keel & Node) -->
-      <path d="M 114 176 C 126 176 144 182 142 192 C 138 202 122 202 112 194 Z" fill="${chitinFill}" />
-      <ellipse cx="128" cy="190" rx="7" ry="3.5" fill="#ffffff" opacity="0.3" transform="rotate(20 128 190)" />
-      <path d="M 115 178 L 138 193" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" />
-      <circle cx="137" cy="193" r="2" fill="#ffffff" opacity="0.9" />
-
-      <!-- 4. Lower Inner Uropod (Secondary Lower Blade) -->
-      <path d="M 110 178 C 118 186 124 198 112 202 C 100 204 96 194 102 186 Z" fill="${chitinFill}" />
-      <path d="M 108 184 C 112 190 116 196 108 198 C 102 199 100 192 104 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
-
-      <!-- 5. Lower Outer Uropod (Ground-Resting Trailing Blade) -->
-      <path d="M 106 180 C 108 190 98 200 86 201 C 76 200 78 190 88 184 Z" fill="${chitinFill}" />
-      <path d="M 100 185 C 102 191 94 196 88 196 C 82 195 84 190 90 186" stroke="#ffffff" stroke-width="1.4" fill="none" opacity="0.3" />
-    </g>`
-
-  const tailFanLayer =
-    frameShift !== 0
-      ? `<g id="lobster-tail-fan-offset" transform="translate(0, ${frameShift})">${rawTailFanLayer}</g>`
-      : rawTailFanLayer
-
-  // Auxiliary Thoracic Flank Limbs (4 Folded side limbs behind waist)
-  const flankLimbsLayer = `
-    <g id="lobster-flank-limbs" class="lobster-idle-layer lobster-idle-flank-limbs">
-      <!-- Left Flank Limbs (2 thin legs) -->
-      <g id="lobster-flank-left" class="lobster-idle-layer lobster-idle-flank-left">
-        <!-- Left Shadows -->
-        <g opacity="0.2" transform="translate(1.5, 2)">
-          <path d="M 24 ${flankY1} Q 10 ${flankY1 - 2} 4 ${flankY1 + 8} Q 2 ${flankY1 + 16} 2 ${flankY1 + 22}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <path d="M 26 ${flankY2} Q 14 ${flankY2 + 4} 10 ${flankY2 + 14} Q 8 ${flankY2 + 22} 8 ${flankY2 + 30}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        </g>
-        <!-- Base Chitin Flank Limbs Left -->
-        <path d="M 24 ${flankY1} Q 10 ${flankY1 - 2} 4 ${flankY1 + 8} Q 2 ${flankY1 + 16} 2 ${flankY1 + 22}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <circle cx="4" cy="${flankY1 + 8}" r="2.2" fill="${chitinPalette.primary}" />
-        <path d="M 26 ${flankY2} Q 14 ${flankY2 + 4} 10 ${flankY2 + 14} Q 8 ${flankY2 + 22} 8 ${flankY2 + 30}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <circle cx="10" cy="${flankY2 + 14}" r="2.2" fill="${chitinPalette.primary}" />
-      </g>
-      <!-- Right Flank Limbs (2 thin legs) -->
-      <g id="lobster-flank-right" class="lobster-idle-layer lobster-idle-flank-right">
-        <!-- Right Shadows -->
-        <g opacity="0.2" transform="translate(1.5, 2)">
-          <path d="M 76 ${flankY1} Q 90 ${flankY1 - 2} 96 ${flankY1 + 8} Q 98 ${flankY1 + 16} 98 ${flankY1 + 22}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-          <path d="M 74 ${flankY2} Q 86 ${flankY2 + 4} 90 ${flankY2 + 14} Q 92 ${flankY2 + 22} 92 ${flankY2 + 30}" stroke="#020810" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        </g>
-        <!-- Base Chitin Flank Limbs Right -->
-        <path d="M 76 ${flankY1} Q 90 ${flankY1 - 2} 96 ${flankY1 + 8} Q 98 ${flankY1 + 16} 98 ${flankY1 + 22}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-        <circle cx="96" cy="${flankY1 + 8}" r="2.2" fill="${chitinPalette.primary}" />
-        <path d="M 74 ${flankY2} Q 86 ${flankY2 + 4} 90 ${flankY2 + 14} Q 92 ${flankY2 + 22} 92 ${flankY2 + 30}" stroke="${chitinPalette.primary}" stroke-width="3" stroke-linecap="round" fill="none" />
-        <circle cx="90" cy="${flankY2 + 14}" r="2.2" fill="${chitinPalette.primary}" />
-      </g>
-    </g>`
-
-  // Anthropomorphic Bipedal Standing Legs (Planted on ground line y=186 with wide muscular stance)
-  const rawLegsLayer = `
-    <g id="lobster-legs-layer" class="lobster-idle-layer lobster-idle-legs">
-      <!-- Legs Drop Shadow -->
-      <g opacity="0.24" transform="translate(1.5, 2)">
-        <!-- Left Standing Leg -->
-        <path d="M 32 136 C 26 146 18 152 16 158 L 23 161 C 27 152 34 146 39 136 Z" fill="#020810" />
-        <path d="M 16 158 L 13 178 L 20 178 L 23 161 Z" fill="#020810" />
-        <path d="M 6 186 C 6 180 13 177 19 177 C 25 177 30 180 32 186 Z" fill="#020810" />
-        <!-- Right Standing Leg -->
-        <path d="M 68 136 C 74 146 82 152 84 158 L 77 161 C 73 152 66 146 61 136 Z" fill="#020810" />
-        <path d="M 84 158 L 87 178 L 80 178 L 77 161 Z" fill="#020810" />
-        <path d="M 68 186 C 70 180 75 177 81 177 C 87 177 94 180 94 186 Z" fill="#020810" />
-      </g>
-
-      <!-- Left Standing Leg Base Chitin -->
-      <!-- Thigh -->
-      <path d="M 32 136 C 26 146 18 152 16 158 L 23 161 C 27 152 34 146 39 136 Z" fill="${chitinFill}" />
-      <path d="M 30 138 C 25 146 20 151 18 157" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
-      <!-- Armored Knee Plate -->
-      <ellipse cx="20" cy="159" rx="5" ry="3.8" fill="${chitinFill}" />
-      <ellipse cx="20" cy="159" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
-      <!-- Shin / Crus -->
-      <path d="M 16 158 L 13 178 L 20 178 L 23 161 Z" fill="${chitinFill}" />
-      <path d="M 18 162 L 16 176" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
-      <!-- Ankle Joint -->
-      <ellipse cx="17" cy="178" rx="4.5" ry="2.2" fill="${chitinFill}" />
-      <!-- Clawed Standing Boot Foot -->
-      <path d="M 6 186 C 6 179 13 177 19 177 C 25 177 30 179 32 186 Z" fill="${chitinFill}" />
-      <path d="M 6 186 L 32 186" stroke="#020810" stroke-width="1.5" opacity="0.4" />
-      <!-- Toe Claws -->
-      <path d="M 6 186 C 3 186 1 183 4 181 C 7 181 9 183 10 186 Z" fill="#ffffff" opacity="0.85" />
-      <path d="M 28 186 C 30 183 33 181 35 183 C 34 186 32 186 28 186 Z" fill="#ffffff" opacity="0.85" />
-
-      <!-- Right Standing Leg Base Chitin -->
-      <!-- Thigh -->
-      <path d="M 68 136 C 74 146 82 152 84 158 L 77 161 C 73 152 66 146 61 136 Z" fill="${chitinFill}" />
-      <path d="M 70 138 C 75 146 80 151 82 157" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.32" fill="none" />
-      <!-- Armored Knee Plate -->
-      <ellipse cx="80" cy="159" rx="5" ry="3.8" fill="${chitinFill}" />
-      <ellipse cx="80" cy="159" rx="2.8" ry="2" fill="#ffffff" opacity="0.25" />
-      <!-- Shin / Crus -->
-      <path d="M 84 158 L 87 178 L 80 178 L 77 161 Z" fill="${chitinFill}" />
-      <path d="M 82 162 L 84 176" stroke="#ffffff" stroke-width="1.4" opacity="0.25" stroke-linecap="round" />
-      <!-- Ankle Joint -->
-      <ellipse cx="83" cy="178" rx="4.5" ry="2.2" fill="${chitinFill}" />
-      <!-- Clawed Standing Boot Foot -->
-      <path d="M 68 186 C 70 179 75 177 81 177 C 87 177 94 179 94 186 Z" fill="${chitinFill}" />
-      <path d="M 68 186 L 94 186" stroke="#020810" stroke-width="1.5" opacity="0.4" />
-      <!-- Toe Claws -->
-      <path d="M 65 183 C 67 181 70 183 72 186 C 68 186 66 186 65 183 Z" fill="#ffffff" opacity="0.85" />
-      <path d="M 90 186 C 91 183 93 181 96 181 C 99 183 97 186 94 186 Z" fill="#ffffff" opacity="0.85" />
-    </g>`
-
-  const legsLayer =
-    frameShift !== 0
-      ? `<g id="lobster-legs-offset" transform="translate(0, ${frameShift})">${rawLegsLayer}</g>`
-      : rawLegsLayer
-
-  // Parametric Abdomen: Somite 1 top width exactly matches the bottom width of the chest (cw * 2)
-  const w1_top = cw
-  const w1_bot = Math.round(cw * 0.94)
-  const w2_top = w1_bot
-  const w2_bot = Math.round(cw * 0.88)
-  const w3_top = w2_bot
-  const w3_bot = Math.round(cw * 0.82)
-  const w4_top = w3_bot
-  const w4_bot = Math.round(cw * 0.76)
-  const w5_top = w4_bot
-  const w5_bot = Math.round(cw * 0.7)
-
-  const s1_l_top = 50 - w1_top
-  const s1_r_top = 50 + w1_top
-  const s1_l_bot = 50 - w1_bot
-  const s1_r_bot = 50 + w1_bot
-
-  const s2_l_top = 50 - w2_top
-  const s2_r_top = 50 + w2_top
-  const s2_l_bot = 50 - w2_bot
-  const s2_r_bot = 50 + w2_bot
-
-  const s3_l_top = 50 - w3_top
-  const s3_r_top = 50 + w3_top
-  const s3_l_bot = 50 - w3_bot
-  const s3_r_bot = 50 + w3_bot
-
-  const s4_l_top = 50 - w4_top
-  const s4_r_top = 50 + w4_top
-  const s4_l_bot = 50 - w4_bot
-  const s4_r_bot = 50 + w4_bot
-
-  const s5_l_top = 50 - w5_top
-  const s5_r_top = 50 + w5_top
-  const s5_l_bot = 50 - w5_bot
-  const s5_r_bot = 50 + w5_bot
-
-  // Massive, Robust Anthropomorphic Abdominal Pleon Somites (Full-width torso matching carapace width)
-  const abdomenLayer = `
-    <g id="lobster-abdomen-layer" class="lobster-idle-layer lobster-idle-abdomen" data-height="${height}">
-      <!-- Somite 5 / Pelvis Girdle (Y=${s5_top}..${s5_bot}) -->
-      <path d="M ${s5_l_top} ${s5_top} C ${s5_l_top - 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_l_bot - 4} ${s5_bot} ${s5_l_bot} ${s5_bot} L ${s5_r_bot} ${s5_bot} C ${s5_r_bot + 4} ${s5_bot} ${s5_r_top + 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_r_top} ${s5_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s5_l_top} ${s5_top} C ${s5_l_top - 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_l_bot - 4} ${s5_bot} ${s5_l_bot} ${s5_bot} L ${s5_r_bot} ${s5_bot} C ${s5_r_bot + 4} ${s5_bot} ${s5_r_top + 2} ${Math.round((s5_top + s5_bot) / 2)} ${s5_r_top} ${s5_top} Z" fill="${chitinFill}" />
-      <path d="M ${s5_l_top + 4} ${s5_top + 4} C 36 ${s5_top + 10} 64 ${s5_top + 10} ${s5_r_top - 4} ${s5_top + 4}" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
-      <ellipse cx="50" cy="${s5_top + 7}" rx="9" ry="3.5" fill="#ffffff" opacity="0.2" />
-
-      <!-- Somite 4 (Y=${s4_top}..${s4_bot}) -->
-      <path d="M ${s4_l_top} ${s4_top} C ${s4_l_top - 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_l_bot - 3} ${s4_bot} ${s4_l_bot} ${s4_bot} L ${s4_r_bot} ${s4_bot} C ${s4_r_bot + 3} ${s4_bot} ${s4_r_top + 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_r_top} ${s4_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s4_l_top} ${s4_top} C ${s4_l_top - 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_l_bot - 3} ${s4_bot} ${s4_l_bot} ${s4_bot} L ${s4_r_bot} ${s4_bot} C ${s4_r_bot + 3} ${s4_bot} ${s4_r_top + 2} ${Math.round((s4_top + s4_bot) / 2)} ${s4_r_top} ${s4_top} Z" fill="${chitinFill}" />
-      <path d="M ${s4_l_top + 4} ${s4_top + 4} C 34 ${s4_top + 10} 66 ${s4_top + 10} ${s4_r_top - 4} ${s4_top + 4}" stroke="#ffffff" stroke-width="2.4" fill="none" opacity="0.32" />
-
-      <!-- Somite 3 (Y=${s3_top}..${s3_bot}) -->
-      <path d="M ${s3_l_top} ${s3_top} C ${s3_l_top - 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_l_bot - 3} ${s3_bot} ${s3_l_bot} ${s3_bot} L ${s3_r_bot} ${s3_bot} C ${s3_r_bot + 3} ${s3_bot} ${s3_r_top + 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_r_top} ${s3_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s3_l_top} ${s3_top} C ${s3_l_top - 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_l_bot - 3} ${s3_bot} ${s3_l_bot} ${s3_bot} L ${s3_r_bot} ${s3_bot} C ${s3_r_bot + 3} ${s3_bot} ${s3_r_top + 2} ${Math.round((s3_top + s3_bot) / 2)} ${s3_r_top} ${s3_top} Z" fill="${chitinFill}" />
-      <path d="M ${s3_l_top + 4} ${s3_top + 4} C 34 ${s3_top + 10} 66 ${s3_top + 10} ${s3_r_top - 4} ${s3_top + 4}" stroke="#ffffff" stroke-width="2.6" fill="none" opacity="0.32" />
-
-      <!-- Somite 2 (Y=${s2_top}..${s2_bot}) -->
-      <path d="M ${s2_l_top} ${s2_top} C ${s2_l_top - 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_l_bot - 3} ${s2_bot} ${s2_l_bot} ${s2_bot} L ${s2_r_bot} ${s2_bot} C ${s2_r_bot + 3} ${s2_bot} ${s2_r_top + 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_r_top} ${s2_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s2_l_top} ${s2_top} C ${s2_l_top - 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_l_bot - 3} ${s2_bot} ${s2_l_bot} ${s2_bot} L ${s2_r_bot} ${s2_bot} C ${s2_r_bot + 3} ${s2_bot} ${s2_r_top + 2} ${Math.round((s2_top + s2_bot) / 2)} ${s2_r_top} ${s2_top} Z" fill="${chitinFill}" />
-      <path d="M ${s2_l_top + 4} ${s2_top + 4} C 34 ${s2_top + 10} 66 ${s2_top + 10} ${s2_r_top - 4} ${s2_top + 4}" stroke="#ffffff" stroke-width="2.8" fill="none" opacity="0.32" />
-
-      <!-- Somite 1 (Upper thorax transition - starts at y=${s1_top}, matching chest width at y=${s1_top + 4}) -->
-      <path d="M ${s1_l_top} ${s1_top} C ${s1_l_top - 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_l_bot - 3} ${s1_bot} ${s1_l_bot} ${s1_bot} L ${s1_r_bot} ${s1_bot} C ${s1_r_bot + 3} ${s1_bot} ${s1_r_top + 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_r_top} ${s1_top} Z" fill="#020810" opacity="0.2" transform="translate(1, 1.5)" />
-      <path d="M ${s1_l_top} ${s1_top} C ${s1_l_top - 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_l_bot - 3} ${s1_bot} ${s1_l_bot} ${s1_bot} L ${s1_r_bot} ${s1_bot} C ${s1_r_bot + 3} ${s1_bot} ${s1_r_top + 2} ${Math.round((s1_top + s1_bot) / 2)} ${s1_r_top} ${s1_top} Z" fill="${chitinFill}" />
-      <path d="M ${s1_l_top + 4} ${s1_top + 4} C 34 ${s1_top + 10} 66 ${s1_top + 10} ${s1_r_top - 4} ${s1_top + 4}" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.32" />
-
-      <!-- Central Dorsal Keel Highlight -->
-      <path d="M 50 ${keelTop} L 50 ${keelBot}" stroke="#ffffff" stroke-width="2.4" opacity="0.28" stroke-linecap="round" />
-    </g>`
-
-  const leftArmTransform =
-    armScale !== 1 ? `transform="translate(34, 80) scale(${armScale}) translate(-34, -80)"` : ''
-  const rightArmTransform =
-    armScale !== 1 ? `transform="translate(66, 80) scale(${armScale}) translate(-66, -80)"` : ''
-
-  const leftArmWrapped =
-    armScale !== 1
-      ? `<g id="lobster-arm-left-scale" ${leftArmTransform}><g id="lobster-arm-left" class="lobster-idle-layer lobster-idle-arm-left"><path d="${pose.leftArm}" fill="${chitinFill}" /></g></g>`
-      : `<g id="lobster-arm-left" class="lobster-idle-layer lobster-idle-arm-left"><path d="${pose.leftArm}" fill="${chitinFill}" /></g>`
-
-  const rightArmWrapped =
-    armScale !== 1
-      ? `<g id="lobster-arm-right-scale" ${rightArmTransform}><g id="lobster-arm-right" class="lobster-idle-layer lobster-idle-arm-right"><path d="${pose.rightArm}" fill="${chitinFill}" /></g></g>`
-      : `<g id="lobster-arm-right" class="lobster-idle-layer lobster-idle-arm-right"><path d="${pose.rightArm}" fill="${chitinFill}" /></g>`
-
-  const leftArmShadow =
-    armScale !== 1
-      ? `<g ${leftArmTransform}><path d="${pose.leftArm}" fill="#020810" /></g>`
-      : `<path d="${pose.leftArm}" fill="#020810" />`
-
-  const rightArmShadow =
-    armScale !== 1
-      ? `<g ${rightArmTransform}><path d="${pose.rightArm}" fill="#020810" /></g>`
-      : `<path d="${pose.rightArm}" fill="#020810" />`
-
-  const renderedArms = `
-    <g id="lobster-arms-layer" data-pose="${pose.name}" data-arm-scale="${armScale}">
-      <!-- Arm Shadows behind body -->
-      <g opacity="0.22" transform="translate(1.5, 2)">
-        ${leftArmShadow}
-        ${rightArmShadow}
-      </g>
-      <!-- Base Arm Tubes -->
-      ${leftArmWrapped}
-      ${rightArmWrapped}
-    </g>`
-
-  const armsLayer =
-    headYOffset !== 0
-      ? `<g id="lobster-arms-offset" transform="translate(0, ${headYOffset})">${renderedArms}</g>`
-      : renderedArms
-
-  const leftClawWrapped =
-    armScale !== 1
-      ? `<g id="lobster-claw-left-scale" ${leftArmTransform}><g id="lobster-claw-left" class="lobster-idle-layer lobster-idle-claw-left">${renderClawElement(pose.leftClaw, chitinFill)}</g></g>`
-      : `<g id="lobster-claw-left" class="lobster-idle-layer lobster-idle-claw-left">${renderClawElement(pose.leftClaw, chitinFill)}</g>`
-
-  const rightClawWrapped =
-    armScale !== 1
-      ? `<g id="lobster-claw-right-scale" ${rightArmTransform}><g id="lobster-claw-right" class="lobster-idle-layer lobster-idle-claw-right">${renderClawElement(pose.rightClaw, chitinFill)}</g></g>`
-      : `<g id="lobster-claw-right" class="lobster-idle-layer lobster-idle-claw-right">${renderClawElement(pose.rightClaw, chitinFill)}</g>`
-
-  const clawsLayer = `
-    <g id="lobster-claws-layer" data-arm-scale="${armScale}">
-      ${leftClawWrapped}
-      ${rightClawWrapped}
-    </g>`
-
-  const browLayer = `
-    <g id="lobster-brow-layer" class="lobster-idle-layer lobster-idle-brow">
-      <!-- Left Eyebrow -->
-      <g id="lobster-brow-left" class="lobster-idle-layer lobster-idle-brow-left">
-        <path d="${leftEyebrow}" stroke="#020810" stroke-width="2.5" stroke-linecap="round" opacity="0.22" />
-        <path d="${leftEyebrow}" stroke="${chitinPalette.anchor}" stroke-width="1.8" stroke-linecap="round" />
-      </g>
-      <!-- Right Eyebrow -->
-      <g id="lobster-brow-right" class="lobster-idle-layer lobster-idle-brow-right">
-        <path d="${rightEyebrow}" stroke="#020810" stroke-width="2.5" stroke-linecap="round" opacity="0.22" />
-        <path d="${rightEyebrow}" stroke="${chitinPalette.anchor}" stroke-width="1.8" stroke-linecap="round" />
-      </g>
-    </g>`
-
-  // In DiceBear rawSvg, replace solid body color with the adjacent chitin gradient
-  let outputSvg = rawSvg.split(`fill="${chitinColor}"`).join(`fill="${chitinFill}"`)
-
-  // 1. Dedicated frames: full-body square vs close-up portrait. Never CSS-crop one into the other.
-  const frame: LobsterAvatarFrame = options?.frame === 'portrait' ? 'portrait' : 'fullBody'
-  const viewBox = frame === 'portrait' ? LOBSTER_PORTRAIT_VIEWBOX : LOBSTER_FULL_BODY_VIEWBOX
-  outputSvg = outputSvg.replace('viewBox="0 0 100 100"', `viewBox="${viewBox}"`)
-  if (!outputSvg.includes('xmlns:xlink=')) {
-    outputSvg = outputSvg.replace('<svg ', '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ')
-  }
-  outputSvg = outputSvg.replace('<svg ', `<svg data-avatar-slot="${frame}" `)
-
-  // 2. Strip any opaque background rect and outer root 100x100 viewport clipPath for clean alpha transparency
-  outputSvg = outputSvg.replace(/<rect width="100" height="100"[^>]*\/>/g, '')
-  outputSvg = outputSvg.replace(/<clipPath id="clip-[^"]+"><rect width="100" height="100"[^>]*\/><\/clipPath>/g, '')
-  outputSvg = outputSvg.replace(/clip-path="url\(#clip-[^)]+\)"/g, '')
-
-  // 3. Ensure all <use> tags support SVG 1.1 / xlink:href for wide rasterizer and canvas compatibility
-  outputSvg = outputSvg.replace(/<use([^>]+)href="/g, '<use$1xlink:href="')
-
-  // 4. Suppress stubby default critters antennae (so our long sweeping feelers take precedence)
-  outputSvg = outputSvg.replace('<g class="dbcr-t">', '<g class="dbcr-t" opacity="0">')
-
-  // 5. Inject SVG <defs> containing chitin and background gradients
-  if (!isTransparent) {
-    const svgTagIndex = outputSvg.indexOf('>')
-    if (svgTagIndex !== -1) {
-      outputSvg = outputSvg.slice(0, svgTagIndex + 1) + defsLayer + outputSvg.slice(svgTagIndex + 1)
-    }
-  } else {
-    const transparentDefs = `
-    <defs>
-      ${chitinGradientDef}
-    </defs>`
-    const svgTagIndex = outputSvg.indexOf('>')
-    if (svgTagIndex !== -1) {
-      outputSvg = outputSvg.slice(0, svgTagIndex + 1) + transparentDefs + outputSvg.slice(svgTagIndex + 1)
-    }
-  }
-
-  // 6. Inject sub-carapace elements (on-brand background + pattern, ground shadow, tail fan on floor, flank limbs, standing legs, abdomen, arms) behind the main carapace
-  const backgroundLayers =
-    (isTransparent ? '' : backgroundLayer) +
-    groundShadowLayer +
-    tailFanLayer +
-    flankLimbsLayer +
-    legsLayer +
-    abdomenLayer +
-    armsLayer
-
-  const bodyUseIndex = outputSvg.indexOf('<use')
-  const bodyPeakIndex = outputSvg.search(/<use[^>]+#body-/)
-  const insertTarget = bodyPeakIndex !== -1 ? bodyPeakIndex : bodyUseIndex
-
-  if (insertTarget !== -1) {
-    outputSvg = outputSvg.slice(0, insertTarget) + backgroundLayers + outputSvg.slice(insertTarget)
-  } else {
-    const insertIndex = outputSvg.lastIndexOf('</g></svg>')
-    outputSvg = outputSvg.slice(0, insertIndex) + backgroundLayers + outputSvg.slice(insertIndex)
-  }
-
-  outputSvg = wrapDiceBearUsesInCarapaceLayer(outputSvg, headYOffset)
-  outputSvg = injectLobsterEyelids(
-    outputSvg,
-    chitinColor,
-    eyelidStyle,
-    chitinColor,
-    eyeColor,
-    eyeVariant,
-    pupilVariant
-  )
-
-  // 7. Layer claws, brow ridge, and modular antennae on TOP of the carapace and facial plane
-  const endGIndex = outputSvg.lastIndexOf('</g></svg>')
-  if (endGIndex !== -1) {
-    const rawTopLayers = clawsLayer + browLayer + antennaeLayer
-    const topLayers =
-      headYOffset !== 0
-        ? `<g id="lobster-head-top-offset" transform="translate(0, ${headYOffset})">${rawTopLayers}</g>`
-        : rawTopLayers
-    outputSvg = outputSvg.slice(0, endGIndex) + topLayers + outputSvg.slice(endGIndex)
-  }
-
-  return outputSvg
+  return { defs, layer, theme }
 }
 
-function getAvatarCacheKey(
-  config: LobsterAvatarConfig,
-  size: number,
-  options?: GenerateLobsterAvatarOptions
-): string {
-  const frame = options?.frame ?? 'fullBody'
-  const staticMotion = options?.staticMotion ?? frame === 'portrait'
-  return `${config.seed}|${size}|${frame}|${staticMotion ? 'static' : 'live'}|${config.height ?? ''}|${config.armScale ?? ''}|${config.backgroundTheme ?? ''}|${config.backgroundPattern ?? ''}|${config.backgroundTexture ?? ''}|${config.patternDensity ?? ''}|${config.patternGlow ?? ''}|${config.patternPulse ?? ''}|${config.patternSparkles ?? ''}|${config.eyelidStyle ?? ''}|${config.eyeColor ?? ''}|${config.eyeVariant ?? ''}|${config.pupilVariant ?? ''}|${config.backgroundMotion ?? ''}|${config.transparentBackground ? '1' : '0'}`
+function buildAvatarSvg(config: LobsterAvatarConfig, size: number, frame: LobsterAvatarFrame, cacheKey: string): string {
+  const traits = resolveAvatarTraits(config)
+  const seeded = getLobsterAvatarSeededOptions(config.seed)
+  const palette = SHELL_PALETTE_MAP[traits.shellColor] ?? SHELL_PALETTES[0]
+  const isTransparent = Boolean(config.transparentBackground)
+  const backdrop = isTransparent ? null : renderBackdrop(config, traits, seeded)
+
+  const ctx: PaintContext = {
+    uid: `av${hashString(cacheKey)}`,
+    palette,
+    partner: traits.marking === 'split' ? SHELL_PALETTE_MAP[palette.splitWith] ?? null : null,
+    finish: traits.shellFinish,
+    marking: traits.marking,
+    rim: backdrop?.theme.accentColor ?? '#7dd3fc',
+  }
+
+  const character = renderCharacter(
+    {
+      race: traits.race,
+      eyeColor: traits.eyeColor,
+      eyeShape: traits.eyeVariant,
+      pupil: traits.pupilVariant,
+      expression: traits.eyelidStyle,
+      mouth: traits.mouth,
+      antennae: traits.antennae,
+      claws: traits.claws,
+      pose: traits.pose,
+      accessory: traits.accessory,
+      heightScale: resolveHeightScale(traits.height),
+      armScale: typeof config.armScale === 'number' ? Math.min(1.3, Math.max(0.8, config.armScale)) : 1,
+    },
+    ctx
+  )
+
+  const viewBox = frame === 'portrait' ? AVATAR_PORTRAIT_VIEWBOXES[traits.race] : LOBSTER_FULL_BODY_VIEWBOX
+  const dataAttrs = [
+    `data-avatar-slot="${frame}"`,
+    `data-race="${traits.race}"`,
+    `data-shell="${escapeSvgAttr(palette.id)}"`,
+    `data-finish="${traits.shellFinish}"`,
+    `data-marking="${traits.marking}"`,
+    `data-expression="${traits.eyelidStyle}"`,
+    `data-eye-color="${traits.eyeColor}"`,
+    `data-eye-variant="${traits.eyeVariant}"`,
+    `data-pupil-variant="${traits.pupilVariant}"`,
+    `data-accessory="${traits.accessory}"`,
+    `data-antennae="${traits.antennae}"`,
+    `data-pose="${traits.pose}"`,
+    `data-texture="${escapeSvgAttr(traits.backgroundTexture)}"`,
+  ].join(' ')
+
+  return `<svg ${dataAttrs} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${viewBox}" width="${size}" height="${size}" role="img" aria-label="Member avatar">
+  <defs>${backdrop?.defs ?? ''}${paintDefs(ctx)}${eyeDefs(ctx, traits.eyeColor)}</defs>
+  ${backdrop?.layer ?? ''}
+  ${character}
+</svg>`
+}
+
+function getAvatarCacheKey(config: LobsterAvatarConfig, size: number, frame: LobsterAvatarFrame, staticMotion: boolean): string {
+  const ordered = Object.keys(config)
+    .sort()
+    .map((k) => `${k}=${String((config as unknown as Record<string, unknown>)[k])}`)
+    .join('|')
+  return `${ordered}|${size}|${frame}|${staticMotion ? 'static' : 'live'}`
 }
 
 const MAX_GENERATED_AVATAR_CACHE = 128
 const generatedSvgCache = new Map<string, string>()
 const generatedDataUriCache = new Map<string, string>()
+
+function rememberLru(cache: Map<string, string>, key: string, value: string): void {
+  if (cache.size >= MAX_GENERATED_AVATAR_CACHE) {
+    const oldest = cache.keys().next().value
+    if (oldest !== undefined) cache.delete(oldest)
+  }
+  cache.set(key, value)
+}
+
+function readLru(cache: Map<string, string>, key: string): string | undefined {
+  const hit = cache.get(key)
+  if (hit !== undefined) {
+    cache.delete(key)
+    cache.set(key, hit)
+  }
+  return hit
+}
 
 export function clearGeneratedAvatarCache(): void {
   generatedSvgCache.clear()
@@ -2851,36 +638,16 @@ export function generateLobsterAvatarSvg(
   size = 256,
   options?: GenerateLobsterAvatarOptions
 ): string | null {
+  if (!config?.seed) return null
   const frame = options?.frame ?? 'fullBody'
   const staticMotion = options?.staticMotion ?? frame === 'portrait'
-  const resolvedOptions: GenerateLobsterAvatarOptions = { frame, staticMotion }
-  const key = getAvatarCacheKey(config, size, resolvedOptions)
-  const cached = generatedSvgCache.get(key)
-  if (cached !== undefined) {
-    generatedSvgCache.delete(key)
-    generatedSvgCache.set(key, cached)
-    return cached
-  }
+  const key = getAvatarCacheKey(config, size, frame, staticMotion)
+  const cached = readLru(generatedSvgCache, key)
+  if (cached !== undefined) return cached
 
-  const avatar = new Avatar(crittersStyle, {
-    seed: config.seed,
-    size,
-    ...LOBSTER_CRUSTACEAN_OPTIONS,
-  })
-  const rawSvg = avatar.toString()
-  let svg = injectLobsterChitinLayers(rawSvg, config, { frame })
-  if (svg && staticMotion) {
-    svg = stripSvgSmilAnimation(svg)
-  }
-
-  if (svg) {
-    if (generatedSvgCache.size >= MAX_GENERATED_AVATAR_CACHE) {
-      const oldest = generatedSvgCache.keys().next().value
-      if (oldest !== undefined) generatedSvgCache.delete(oldest)
-    }
-    generatedSvgCache.set(key, svg)
-  }
-
+  let svg = buildAvatarSvg(config, size, frame, key)
+  if (staticMotion) svg = stripSvgSmilAnimation(svg)
+  rememberLru(generatedSvgCache, key, svg)
   return svg
 }
 
@@ -2889,27 +656,17 @@ export function generateLobsterAvatarDataUri(
   size = 256,
   options?: GenerateLobsterAvatarOptions
 ): string | null {
+  if (!config?.seed) return null
   const frame = options?.frame ?? 'fullBody'
   const staticMotion = options?.staticMotion ?? frame === 'portrait'
-  const resolvedOptions: GenerateLobsterAvatarOptions = { frame, staticMotion }
-  const key = getAvatarCacheKey(config, size, resolvedOptions)
-  const cached = generatedDataUriCache.get(key)
-  if (cached !== undefined) {
-    generatedDataUriCache.delete(key)
-    generatedDataUriCache.set(key, cached)
-    return cached
-  }
+  const key = getAvatarCacheKey(config, size, frame, staticMotion)
+  const cached = readLru(generatedDataUriCache, key)
+  if (cached !== undefined) return cached
 
-  const svg = generateLobsterAvatarSvg(config, size, resolvedOptions)
+  const svg = generateLobsterAvatarSvg(config, size, { frame, staticMotion })
   if (!svg) return null
   const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
-
-  if (generatedDataUriCache.size >= MAX_GENERATED_AVATAR_CACHE) {
-    const oldest = generatedDataUriCache.keys().next().value
-    if (oldest !== undefined) generatedDataUriCache.delete(oldest)
-  }
-  generatedDataUriCache.set(key, dataUri)
-
+  rememberLru(generatedDataUriCache, key, dataUri)
   return dataUri
 }
 
@@ -2932,70 +689,51 @@ export interface GenerateLobsterAvatarSilhouetteOptions {
   size?: number
 }
 
-const SILHOUETTE_DOME_BODY = 'M 16 106 V 58 a 34 34 0 0 1 68 0 v 48 Z'
-const SILHOUETTE_ANTENNA_LEFT = 'M 43 32 C 40 10 30 -10 14 -24'
-const SILHOUETTE_ANTENNA_RIGHT = 'M 57 32 C 60 10 70 -10 86 -24'
-const SILHOUETTE_ANTENNULE_LEFT = 'M 46 28 C 45 15 42 4 38 -5'
-const SILHOUETTE_ANTENNULE_RIGHT = 'M 54 28 C 55 15 58 4 62 -5'
+/** Empty-state outline: the lobster rig's head, eyes, and antennae in one benthic tone. */
+export const SILHOUETTE_PATHS = {
+  head: 'M50,21 C71,21 85,36 86.5,60 C88,85 82,110 50,113 C18,110 12,85 13.5,60 C15,36 29,21 50,21 Z',
+  antennaLeft: 'M45,24 C43,0 27,-22 1,-28',
+  antennaRight: 'M55,24 C57,0 73,-22 99,-28',
+  eyeLeft: { cx: 36.5, cy: 25, r: 14.5 },
+  eyeRight: { cx: 63.5, cy: 25, r: 14.5 },
+} as const
 
-/**
- * Generates an iconic, clean benthic silhouette SVG directly matching the exact
- * proportions, claw poses, antennae whips, and carapace geometry of the avatar system.
- */
-export function generateLobsterAvatarSilhouetteSvg(
-  options?: GenerateLobsterAvatarSilhouetteOptions
-): string {
+export function generateLobsterAvatarSilhouetteSvg(options?: GenerateLobsterAvatarSilhouetteOptions): string {
   const sizeAttr = options?.size ? ` width="${options.size}" height="${options.size}"` : ''
-
-  return `<svg data-avatar-slot="portrait" data-avatar-silhouette="true" xmlns="http://www.w3.org/2000/svg" viewBox="${LOBSTER_PORTRAIT_VIEWBOX}" fill="none"${sizeAttr} role="img" aria-label="Uncalibrated carapace silhouette">
+  const s = SILHOUETTE_PATHS
+  return `<svg data-avatar-slot="portrait" data-avatar-silhouette="true" xmlns="http://www.w3.org/2000/svg" viewBox="${LOBSTER_PORTRAIT_VIEWBOX}" fill="none"${sizeAttr} role="img" aria-label="Avatar not set yet">
     <defs>
       <linearGradient id="sil-benthic-grad" x1="25%" y1="0%" x2="75%" y2="100%">
         <stop offset="0%" stop-color="#1d5267" />
         <stop offset="45%" stop-color="#0e2d3a" />
         <stop offset="100%" stop-color="#030e14" />
       </linearGradient>
-      <radialGradient id="sil-beacon-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ffffff" />
-        <stop offset="40%" stop-color="#00c3ff" />
-        <stop offset="100%" stop-color="#00c3ff" stop-opacity="0" />
-      </radialGradient>
-      <radialGradient id="sil-ambient-glow" cx="50%" cy="45%" r="55%">
-        <stop offset="0%" stop-color="#00c3ff" stop-opacity="0.18" />
-        <stop offset="100%" stop-color="#00c3ff" stop-opacity="0" />
-      </radialGradient>
     </defs>
-
-    <!-- Ambient Core Aura -->
-    <ellipse cx="50" cy="45" rx="34" ry="32" fill="url(#sil-ambient-glow)" />
-
-    <!-- Antennae & Feelers -->
-    <g stroke="#00c3ff" stroke-linecap="round" fill="none">
-      <path d="${SILHOUETTE_ANTENNA_LEFT}" stroke-width="3" stroke-opacity="0.85" />
-      <path d="${SILHOUETTE_ANTENNA_RIGHT}" stroke-width="3" stroke-opacity="0.85" />
-      <path d="M 42 28 C 39 10 30 -8 15 -21" stroke="#ffffff" stroke-width="1.2" opacity="0.35" />
-      <path d="M 58 28 C 61 10 70 -8 85 -21" stroke="#ffffff" stroke-width="1.2" opacity="0.35" />
-      <path d="${SILHOUETTE_ANTENNULE_LEFT}" stroke-width="2.2" stroke-opacity="0.6" />
-      <path d="${SILHOUETTE_ANTENNULE_RIGHT}" stroke-width="2.2" stroke-opacity="0.6" />
+    <g stroke="#00c3ff" stroke-linecap="round" stroke-opacity="0.75" stroke-width="2.6" fill="none">
+      <path d="${s.antennaLeft}" /><path d="${s.antennaRight}" />
     </g>
-
-    <!-- Sensory Beacons & Nodes -->
-    <circle cx="14" cy="-24" r="4.5" fill="url(#sil-beacon-glow)" />
-    <circle cx="14" cy="-24" r="2" fill="#ffffff" />
-    <circle cx="86" cy="-24" r="4.5" fill="url(#sil-beacon-glow)" />
-    <circle cx="86" cy="-24" r="2" fill="#ffffff" />
-    <circle cx="38" cy="-5" r="2.4" fill="#ffffff" opacity="0.85" />
-    <circle cx="62" cy="-5" r="2.4" fill="#ffffff" opacity="0.85" />
-
-    <!-- Carapace Dome Torso -->
-    <g fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round">
-      <path d="${SILHOUETTE_DOME_BODY}" />
+    <g fill="url(#sil-benthic-grad)" stroke="#00c3ff" stroke-width="1.4" stroke-opacity="0.5">
+      <path d="${s.head}" />
+      <circle cx="${s.eyeLeft.cx}" cy="${s.eyeLeft.cy}" r="${s.eyeLeft.r}" />
+      <circle cx="${s.eyeRight.cx}" cy="${s.eyeRight.cy}" r="${s.eyeRight.r}" />
     </g>
   </svg>`
 }
 
-export function generateLobsterAvatarSilhouetteDataUri(
-  options?: GenerateLobsterAvatarSilhouetteOptions
-): string {
-  const svg = generateLobsterAvatarSilhouetteSvg(options)
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+export function generateLobsterAvatarSilhouetteDataUri(options?: GenerateLobsterAvatarSilhouetteOptions): string {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(generateLobsterAvatarSilhouetteSvg(options))}`
+}
+
+
+/**
+ * Pin every look trait into the config before saving, so the avatar never shifts
+ * if seeded defaults change later.
+ */
+export function lockAvatarConfig(config: LobsterAvatarConfig): LobsterAvatarConfig {
+  return { ...config, ...resolveAvatarTraits(config), style: LOBSTER_AVATAR_STYLE }
+}
+
+/** A fresh random character that keeps the chosen race. */
+export function rerollAvatarConfig(config: Pick<LobsterAvatarConfig, 'race'>): LobsterAvatarConfig {
+  return { style: LOBSTER_AVATAR_STYLE, seed: randomLobsterSeed(), race: config.race ?? 'lobster' }
 }

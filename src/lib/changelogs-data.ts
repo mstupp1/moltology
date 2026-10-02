@@ -14,6 +14,28 @@ export interface ChangelogEntry {
 
 export const INITIAL_CHANGELOGS: ChangelogEntry[] = [
   {
+    slug: '2026-10-02-character-creator-crabs-and-shell-styling',
+    version: '2026.10.02',
+    title: 'Character Creator Rebuild: Crabs, Shell Finishes & Patterns',
+    category: 'Design',
+    tags: ['Design', 'Feature', 'UI/UX'],
+    summary: 'Crustaceans got a cleaner, rounder look, crabs joined the reef, and the character creator now lets you pick shell colors, finishes, patterns, faces, and headwear.',
+    content: `### Crabs Join the Reef
+- Pick a lobster or a crab when you build your character. Crabs get their own wide shell, eye stalks, and sideways stance.
+- Existing characters stay lobsters and keep their scene, eyes, and height.
+
+### A Cleaner, Rounder Look
+- Every character was redrawn with smoother shapes, soft shading, and a rim light that matches the backdrop.
+- Avatars now render crisp at every size instead of pixelated.
+
+### More Ways to Make It Yours
+- Choose from 12 shell colors, 5 finishes (glossy, satin, pearlescent, chrome, bioluminescent), and 9 patterns including tiger stripes, calico, and circuit traces.
+- Pick an expression, mouth, eye shape, antennae, claws, pose, and headwear such as a crown, hard hat, or halo.
+- A live preview shows your full body and your forum portrait side by side while you edit, and "Surprise me" rolls a fresh look without changing your race.
+- All options are free.`,
+    releasedAt: '2026-10-02T23:59:00Z',
+  },
+  {
     slug: '2026-09-24-staff-oversight-hub-interactive-logic-atlas-progression-integrity',
     version: '2026.09.24',
     title: 'Staff Oversight Hub, Interactive Logic Atlas & Progression Integrity',
