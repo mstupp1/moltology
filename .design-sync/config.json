@@ -1,0 +1,187 @@
+{
+  "projectId": "d40b4204-cd63-4f56-a5b4-a940ba353718",
+  "shape": "package",
+  "pkg": "@moltology/hud",
+  "globalName": "MoltologyHud",
+  "buildCmd": "node .design-sync/build-ds.mjs",
+  "srcDir": "../../../src/components/ui",
+  "cssEntry": "styles.css",
+  "docsMap": {
+    "HudButton": "../../groups/actions.md",
+    "AnimatedHamburger": "../../groups/actions.md",
+    "HudCard": "../../groups/layout.md",
+    "HudContainer": "../../groups/layout.md",
+    "HudCardHeader": "../../groups/layout.md",
+    "HudCardTitle": "../../groups/layout.md",
+    "HudCardContent": "../../groups/layout.md",
+    "HudCardFooter": "../../groups/layout.md",
+    "HudBottomSheet": "../../groups/layout.md",
+    "HudInput": "../../groups/forms.md",
+    "HudSelect": "../../groups/forms.md",
+    "Slider": "../../groups/forms.md",
+    "HudBadge": "../../groups/display.md",
+    "HudStatBox": "../../groups/display.md",
+    "RollingNumber": "../../groups/display.md",
+    "MarkdownRenderer": "../../groups/display.md",
+    "HUDSpinner": "../../groups/feedback.md",
+    "HUDPageLoader": "../../groups/feedback.md",
+    "HudSkeleton": "../../groups/feedback.md",
+    "HudGhostSkeleton": "../../groups/feedback.md",
+    "HudGhostCard": "../../groups/feedback.md",
+    "HudGhostStatBox": "../../groups/feedback.md",
+    "HudGhostWidget": "../../groups/feedback.md",
+    "ToastProvider": "../../groups/feedback.md",
+    "HudPagination": "../../groups/navigation.md",
+    "HudDropdownMenu": "../../groups/navigation.md",
+    "HudDropdownMenuTrigger": "../../groups/navigation.md",
+    "HudDropdownMenuPortal": "../../groups/navigation.md",
+    "HudDropdownMenuContent": "../../groups/navigation.md",
+    "HudDropdownMenuItem": "../../groups/navigation.md",
+    "HudDropdownMenuSeparator": "../../groups/navigation.md",
+    "ImageLightbox": "../../groups/media.md",
+    "ImageModal": "../../groups/media.md",
+    "ZoomableImage": "../../groups/media.md",
+    "HeroBackground": "../../groups/media.md",
+    "HeaderBrand": "../../groups/brand.md",
+    "ChromaElement": "../../groups/brand.md"
+  },
+  "dtsPropsFor": {
+    "HudButton": "  variant?: \"cyan\" | \"crimson\" | \"sacred\" | \"dark\" | \"ghost\";\n  size?: \"sm\" | \"md\" | \"lg\";\n  glow?: boolean;\n  fullWidth?: boolean;\n  texture?: boolean;\n  icon?: React.ReactNode;\n  iconPosition?: \"left\" | \"right\";\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;\n  children?: React.ReactNode;\n  ref?: React.Ref;\n  type?: \"button\" | \"submit\" | \"reset\";\n  disabled?: boolean;\n  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;\n  \"aria-label\"?: string;\n  title?: string;",
+    "HudInput": "  label?: string;\n  error?: string;\n  helperText?: string;\n  startIcon?: React.ReactNode;\n  endIcon?: React.ReactNode;\n  fullWidth?: boolean;\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;\n  children?: React.ReactNode;\n  ref?: React.Ref;\n  type?: string;\n  name?: string;\n  value?: string | number;\n  defaultValue?: string | number;\n  placeholder?: string;\n  disabled?: boolean;\n  required?: boolean;\n  autoComplete?: string;\n  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;\n  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;",
+    "HudSelect": "  label?: string;\n  error?: string;\n  helperText?: string;\n  fullWidth?: boolean;\n  options?: HudSelectOption[];\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;\n  children?: React.ReactNode;\n  ref?: React.Ref;\n  name?: string;\n  value?: string;\n  defaultValue?: string;\n  disabled?: boolean;\n  required?: boolean;\n  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;",
+    "Slider": "  min?: number;\n  max?: number;\n  inverted?: boolean;\n  defaultValue?: number[];\n  form?: string;\n  style?: React.CSSProperties;\n  className?: string;\n  dir?: \"ltr\" | \"rtl\";\n  id?: string;\n  children?: React.ReactNode;\n  asChild?: boolean;\n  name?: string;\n  disabled?: boolean;\n  orientation?: \"horizontal\" | \"vertical\";\n  step?: number;\n  minStepsBetweenThumbs?: number;\n  value?: number[];\n  ref?: React.Ref;\n  onValueChange?: (value: number[]) => void;\n  onValueCommit?: (value: number[]) => void;\n  \"aria-label\"?: string;",
+    "HudDropdownMenuItem": "  destructive?: boolean;\n  style?: React.CSSProperties;\n  className?: string;\n  id?: string;\n  children?: React.ReactNode;\n  asChild?: boolean;\n  disabled?: boolean;\n  textValue?: string;\n  ref?: React.Ref;\n  onSelect?: (event: Event) => void;",
+    "HudCard": "  variant?: \"cyan\" | \"crimson\" | \"dark\" | \"ghost\" | \"teal\";\n  texture?: \"none\" | \"chitin\" | \"hex\" | \"alloy\" | \"carbon\" | \"basalt\" | \"circuit\";\n  glow?: boolean;\n  showCornerBrackets?: boolean;\n  interactive?: boolean;\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;\n  children?: React.ReactNode;\n  ref?: React.Ref;\n  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;",
+    "HudStatBox": "  label: string;\n  value: React.ReactNode;\n  subtext?: React.ReactNode;\n  trend?: \"neutral\" | \"up\" | \"down\";\n  trendValue?: string;\n  icon?: React.ReactNode;\n  variant?: \"cyan\" | \"crimson\" | \"neutral\";\n  texture?: \"none\" | \"chitin\" | \"hex\" | \"alloy\" | \"carbon\" | \"basalt\" | \"circuit\";\n  showCornerBrackets?: boolean;\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;\n  children?: React.ReactNode;\n  ref?: React.Ref;\n  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;",
+    "HudDropdownMenu": "  children?: React.ReactNode;\n  dir?: \"ltr\" | \"rtl\";\n  open?: boolean;\n  defaultOpen?: boolean;\n  modal?: boolean;\n  onOpenChange?: (open: boolean) => void;"
+  },
+  "overrides": {
+    "HudButton": {
+      "cardMode": "column"
+    },
+    "HudCard": {
+      "cardMode": "column"
+    },
+    "HudInput": {
+      "cardMode": "column"
+    },
+    "HudBottomSheet": {
+      "cardMode": "single",
+      "viewport": "760x560"
+    },
+    "ImageLightbox": {
+      "cardMode": "single",
+      "viewport": "960x700"
+    },
+    "ImageModal": {
+      "cardMode": "single",
+      "viewport": "960x700"
+    },
+    "HUDPageLoader": {
+      "cardMode": "single",
+      "viewport": "640x380"
+    },
+    "ToastProvider": {
+      "cardMode": "single",
+      "viewport": "640x480"
+    },
+    "HudDropdownMenu": {
+      "cardMode": "single",
+      "viewport": "480x280"
+    },
+    "HudDropdownMenuTrigger": {
+      "cardMode": "single",
+      "viewport": "480x280"
+    },
+    "HudDropdownMenuContent": {
+      "cardMode": "single",
+      "viewport": "480x280"
+    },
+    "HudDropdownMenuItem": {
+      "cardMode": "single",
+      "viewport": "480x280"
+    },
+    "HudDropdownMenuSeparator": {
+      "cardMode": "single",
+      "viewport": "480x280"
+    },
+    "HudDropdownMenuPortal": {
+      "cardMode": "single",
+      "viewport": "480x280"
+    },
+    "HeroBackground": {
+      "cardMode": "single",
+      "viewport": "960x440"
+    },
+    "HudCardHeader": {
+      "cardMode": "column"
+    },
+    "HudCardTitle": {
+      "cardMode": "column"
+    },
+    "HudCardContent": {
+      "cardMode": "column"
+    },
+    "HudCardFooter": {
+      "cardMode": "column"
+    },
+    "HudContainer": {
+      "cardMode": "column"
+    },
+    "HudStatBox": {
+      "cardMode": "column"
+    },
+    "HudSelect": {
+      "cardMode": "column"
+    },
+    "Slider": {
+      "cardMode": "column"
+    },
+    "RollingNumber": {
+      "cardMode": "column"
+    },
+    "HudSkeleton": {
+      "cardMode": "column"
+    },
+    "HudGhostSkeleton": {
+      "cardMode": "column"
+    },
+    "HudGhostCard": {
+      "cardMode": "column"
+    },
+    "HudGhostStatBox": {
+      "cardMode": "column"
+    },
+    "HudGhostWidget": {
+      "cardMode": "column"
+    },
+    "HudPagination": {
+      "cardMode": "column"
+    },
+    "MarkdownRenderer": {
+      "cardMode": "column"
+    },
+    "ChromaElement": {
+      "cardMode": "column"
+    },
+    "ZoomableImage": {
+      "cardMode": "column"
+    },
+    "HudBadge": {
+      "cardMode": "column"
+    },
+    "HUDSpinner": {
+      "cardMode": "column"
+    },
+    "HeaderBrand": {
+      "cardMode": "column"
+    },
+    "AnimatedHamburger": {
+      "cardMode": "column"
+    }
+  },
+  "runtimeFontPrefixes": [
+    "Trajan Pro"
+  ],
+  "readmeHeader": ".design-sync/conventions.md"
+}
