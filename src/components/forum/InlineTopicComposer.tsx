@@ -4,6 +4,7 @@ import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/s
 import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import { useForumStanding } from '@/hooks/useForumStanding'
 import { HudGhostSkeleton } from '@/components/ui/HudGhostLoader'
 import { useForumAuth } from './ForumShell'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
@@ -38,6 +39,7 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
   ) {
     const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
     const persist = useHudPersist()
+    const standing = useForumStanding(isAuthenticated ? userId : null)
     const [isExpanded, setIsExpanded] = useState(false)
     const [categoryId, setCategoryId] = useState(initialCategoryId || categories[0]?.id || '')
     const [title, setTitle] = useState('')
@@ -170,6 +172,24 @@ export const InlineTopicComposer = forwardRef<InlineTopicComposerHandle, InlineT
           >
             Sign In / Join
           </button>
+        </div>
+      )
+    }
+
+    if (standing && !standing.canStartTopics) {
+      return (
+        <div
+          ref={containerRef}
+          className={`chitin-card p-3 sm:p-4 chamfer-corner shadow-lg border border-[#3a4a49] flex items-start gap-2.5 ${className}`}
+          data-testid="inline-composer-locked"
+        >
+          <div className="w-8 h-8 chamfer-corner bg-[#070b0b] border border-[#3a4a49] flex items-center justify-center shrink-0">
+            <Terminal className="w-4 h-4 text-[#839493]" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-[#dfe3e3]">New threads aren't open to you yet</p>
+            <p className="text-[11px] text-[#839493] leading-relaxed">{standing.topicLockReason}</p>
+          </div>
         </div>
       )
     }

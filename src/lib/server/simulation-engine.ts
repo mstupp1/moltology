@@ -29,6 +29,7 @@ import { validateInputGuardrails } from '../ai/guardrails'
 import { normalizeFriendPair } from '../connections'
 import { extractMentionHandles } from '../forum-mentions'
 import { recordForumMentions, recordForumReplyNotifications } from './db-services'
+import { reviewMemberPosts } from './forum-standing'
 import {
   DEFAULT_BOND_CHANCE,
   DEFAULT_CONNECTION_CHANCE,
@@ -1754,7 +1755,7 @@ export async function simulateRelationships(
 }
 
 function shouldRunPhase(
-  phase: 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social',
+  phase: 'spawn' | 'routines' | 'forum' | 'votes' | 'mutations' | 'social' | 'review',
   options: {
     spawnOnly?: boolean
     routinesOnly?: boolean
@@ -1762,6 +1763,7 @@ function shouldRunPhase(
     votesOnly?: boolean
     mutationsOnly?: boolean
     socialOnly?: boolean
+    reviewOnly?: boolean
   }
 ) {
   const anyOnly = Boolean(
@@ -1770,9 +1772,11 @@ function shouldRunPhase(
       options.forumOnly ||
       options.votesOnly ||
       options.mutationsOnly ||
-      options.socialOnly
+      options.socialOnly ||
+      options.reviewOnly
   )
   if (!anyOnly) return true
+  if (phase === 'review') return Boolean(options.reviewOnly)
   if (phase === 'spawn') return Boolean(options.spawnOnly)
   if (phase === 'routines') return Boolean(options.routinesOnly)
   if (phase === 'forum') return Boolean(options.forumOnly)
@@ -1793,6 +1797,7 @@ export async function runSimulationCycle(options: {
   votesOnly?: boolean
   mutationsOnly?: boolean
   socialOnly?: boolean
+  reviewOnly?: boolean
 } = {}) {
   if (process.env.SIMULATION_ENABLED === 'false') {
     console.log('[SimulationCycle] ⏸ Simulation cycle skipped: SIMULATION_ENABLED is explicitly set to false.')
@@ -1923,6 +1928,27 @@ export async function runSimulationCycle(options: {
       )
     } else {
       console.log(`[SimulationCycle] - Relationship skipped: ${bondRes.reason}`)
+    }
+  }
+
+  // 7. Member post review: scores real members' new posts and adjusts Standing.
+  if (shouldRunPhase('review', options)) {
+    console.log('[SimulationCycle] Reviewing new posts from members...')
+    try {
+      const reviewRes = await reviewMemberPosts(dbClient, { dryRun: options.dryRun })
+      results.review = reviewRes
+      for (const item of reviewRes.reviewed) {
+        console.log(
+          `[SimulationCycle]   ${item.kind} ${item.id}: ${item.verdict} (score ${item.qualityScore ?? 'n/a'}, Standing ${item.standingDelta >= 0 ? '+' : ''}${item.standingDelta}${item.sunk ? ', sunk' : ''})`
+        )
+      }
+      console.log(
+        `[SimulationCycle] ✓ Reviewed ${reviewRes.reviewed.length} member posts, ${reviewRes.deferred} deferred, ${reviewRes.standingChanges.length} Standing changes.`
+      )
+    } catch (err) {
+      // Review must never sink the rest of the tick.
+      console.warn('[SimulationCycle] - Member review failed:', err)
+      results.review = { error: err instanceof Error ? err.message : String(err) }
     }
   }
 

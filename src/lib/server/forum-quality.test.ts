@@ -5,6 +5,17 @@ import {
   fallbackForumDecision,
   screenForumSubmission,
 } from '../quality/forum-gate'
+import { assertCanStartTopic } from './forum-standing'
+import { STANDING_COPY } from '../forum-standing'
+
+vi.mock('./forum-standing', () => {
+  const open = { standing: 0, canStartTopics: true, restricted: false, topicLockReason: null }
+  return {
+    assertCanStartTopic: vi.fn(async () => open),
+    assertCanReply: vi.fn(async () => open),
+    loadForumStanding: vi.fn(async () => open),
+  }
+})
 
 vi.mock('../quality/forum-gate', async () => {
   const actual = await vi.importActual<typeof import('../quality/forum-gate')>('../quality/forum-gate')
@@ -75,6 +86,24 @@ describe('forum Jev quality wiring', () => {
       }),
     ).rejects.toThrow(FORUM_QUARANTINE_ERROR)
     expect(insert).not.toHaveBeenCalled()
+  })
+
+  it('refuses a topic from a member whose Standing has not unlocked threads', async () => {
+    vi.mocked(assertCanStartTopic).mockRejectedValueOnce(new Error(STANDING_COPY.topicLockedNew))
+
+    const insert = vi.fn()
+    await expect(
+      createForumTopicHandler({
+        data: {
+          categoryId: CATEGORY_ID,
+          title: 'A brand new account thread',
+          content: 'This body is long enough to pass the length check on its own.',
+        },
+        context: { user: { sub: 'test-user-id' }, db: { insert } as any },
+      }),
+    ).rejects.toThrow(STANDING_COPY.topicLockedNew)
+    expect(insert).not.toHaveBeenCalled()
+    expect(screenForumSubmission).not.toHaveBeenCalled()
   })
 
   it('stores the quality score when Jev allows a topic', async () => {

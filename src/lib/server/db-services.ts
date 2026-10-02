@@ -55,6 +55,8 @@ import {
 } from '../forum-visits'
 import { FORUM_REPORT_COPY, forumReportReasonLabel, validateForumReportInput } from '../forum-reports'
 import { isAdminOrSuperAdmin } from '../permissions'
+import { assertCanReply, assertCanStartTopic, loadForumStanding } from './forum-standing'
+import { shouldSinkReply, type ForumStandingDecision } from '../forum-standing'
 import { getAssetUrl } from '../assets'
 import {
   CANONICAL_ALIGNMENT_TASKS,
@@ -1020,6 +1022,8 @@ export interface ForumPostEntry {
   updatedAt?: string
   deletedAt?: string | null
   voted?: boolean
+  /** Low-signal reply: sorts last and renders collapsed. */
+  sunk?: boolean
 }
 
 /**
@@ -1592,6 +1596,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
           authorStage: forumPosts.authorStage,
           content: forumPosts.content,
           upvotes: forumPosts.upvotes,
+          sunk: forumPosts.sunk,
           createdAt: forumPosts.createdAt,
           updatedAt: forumPosts.updatedAt,
           deletedAt: forumPosts.deletedAt,
@@ -1629,6 +1634,7 @@ export const getForumTopicDetailHandler = async ({ data, context }: ServerFnArgs
         authorStage: p.profileStage ?? p.authorStage,
         content: visibleForumContent(p.content, p.deletedAt),
         upvotes: p.upvotes,
+        sunk: Boolean(p.sunk),
         createdAt: forumIsoOrNow(p.createdAt),
         updatedAt: forumIsoOrNow(p.updatedAt ?? p.createdAt),
         deletedAt: toForumIso(p.deletedAt),
@@ -1704,6 +1710,7 @@ export const createForumTopicHandler = async ({ data, context }: ServerFnArgs<Cr
   }
   const { userId, dbClient, payload } = auth
   assertForumWriteRateLimit(userId)
+  await assertCanStartTopic(dbClient, userId, jwtClaimEmail(payload))
 
   if (!data?.categoryId || !data?.title || !data?.content) {
     throw new Error('Invalid input: Category, title, and content are required.')
@@ -1836,6 +1843,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
   }
   const { userId, dbClient, payload } = auth
   assertForumWriteRateLimit(userId)
+  const standing = await assertCanReply(dbClient, userId, jwtClaimEmail(payload))
 
   if (!data?.topicId || !data?.content) {
     throw new Error('Invalid input: Topic ID and content are required.')
@@ -1920,10 +1928,11 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     }
   }
 
-  await requirePublishableForumPost({
+  const gate = await requirePublishableForumPost({
     title: topicExists.title,
     body: data.content,
   })
+  const qualityScore = gate.source === 'jev' ? gate.qualityScore : null
 
   const [inserted] = await dbClient
     .insert(forumPosts)
@@ -1935,6 +1944,8 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
       authorAvatar,
       authorStage,
       content: data.content.trim(),
+      qualityScore,
+      sunk: shouldSinkReply({ qualityScore, authorStanding: standing.standing }),
     })
     .returning()
 
@@ -2037,6 +2048,7 @@ export const createForumPostHandler = async ({ data, context }: ServerFnArgs<Cre
     authorStage: inserted.authorStage,
     content: inserted.content,
     upvotes: inserted.upvotes,
+    sunk: inserted.sunk,
     createdAt: forumIsoOrNow(inserted.createdAt),
     updatedAt: forumIsoOrNow(inserted.updatedAt ?? inserted.createdAt),
     deletedAt: toForumIso(inserted.deletedAt),
@@ -2862,6 +2874,24 @@ export const toggleForumTopicVoteHandler = async ({ data, context }: ServerFnArg
   return { upvotes: newCount, voted: true }
 }
 
+
+export interface GetForumStandingInput {
+  userId?: string
+  token?: string
+}
+
+/**
+ * Server Function: the signed-in member's forum Standing and what it unlocks.
+ * Signed-out readers get null.
+ */
+export const getForumStandingHandler = async ({
+  data,
+  context,
+}: ServerFnArgs<GetForumStandingInput>): Promise<ForumStandingDecision | null> => {
+  const auth = await resolveWriteAuth({ data, context, requireAuth: false })
+  if (!auth) return null
+  return loadForumStanding(auth.dbClient, auth.userId, jwtClaimEmail(auth.payload))
+}
 
 /**
  * Server Function: Toggle an upvote on a reply (one vote per user).

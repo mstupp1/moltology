@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+vi.mock('./forum-standing', () => {
+  const open = { standing: 0, canStartTopics: true, restricted: false, topicLockReason: null }
+  return {
+    assertCanStartTopic: vi.fn(async () => open),
+    assertCanReply: vi.fn(async () => open),
+    loadForumStanding: vi.fn(async () => open),
+  }
+})
+
 vi.mock('../user-sync', () => ({
   ensureUserProfile: vi.fn().mockResolvedValue(null),
 }))

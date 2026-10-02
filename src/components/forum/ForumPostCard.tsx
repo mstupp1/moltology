@@ -60,6 +60,7 @@ export function ForumPostCard({
   const persist = useHudPersist()
   const toast = useOptionalToast()
   const [collapsed, setCollapsed] = useState(false)
+  const [showSunk, setShowSunk] = useState(false)
   const [copied, setCopied] = useState(false)
   const [editing, setEditing] = useState(false)
   const [confirmingWithdraw, setConfirmingWithdraw] = useState(false)
@@ -299,6 +300,15 @@ export function ForumPostCard({
           <>
             {withdrawn ? (
               <ForumWithdrawnBody className="text-xs sm:text-sm text-[#839493] leading-relaxed italic" />
+            ) : post.sunk && !showSunk && !editing ? (
+              <button
+                type="button"
+                onClick={() => setShowSunk(true)}
+                data-testid="forum-sunk-reply"
+                className="text-xs text-[#839493] italic py-1 pl-1 hover:text-[#00ffff] transition-colors text-left"
+              >
+                Low-signal reply, hidden by default. Show it anyway.
+              </button>
             ) : editing ? (
               <form onSubmit={handleSave} className="space-y-2" data-testid="forum-revise-reply-form">
                 {error && (
