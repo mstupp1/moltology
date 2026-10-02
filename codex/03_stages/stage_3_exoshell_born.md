@@ -24,7 +24,7 @@ summary: "The three Exoshell clearances: the carapace closing, the grip reaching
 - **Shell Hardness**: 60 to 90 percent.
 - **Pincer Torque**: 600 to 950 Nm.
 - **Submergence Depth**: 1,500 to 5,000 meters.
-- **Currency**: The premium catalog opens in full. Gems still buy the things that matter, because the things that matter are still not for sale.
+- **Currency**: The premium catalog opens in full. Gems still unlock the prestige items.
 
 ---
 

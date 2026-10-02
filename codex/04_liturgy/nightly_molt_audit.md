@@ -90,8 +90,7 @@ tomorrow at one item.
 
 ## The Cadence
 
-Nightly. Every logged shed mints Chitin Gems, which are earned in exactly this way and
-cannot be bought with money at any clearance. A missed night is a missed night; the layer
+Nightly. Every logged shed mints Chitin Gems. A missed night is a missed night; the layer
 simply does not get laid down, and the next one goes on top of yesterday's.
 
 ---

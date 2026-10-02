@@ -24,7 +24,7 @@ summary: "The three Larval clearances: taking an honest first reading, letting a
 - **Shell Hardness**: 0 to 25 percent.
 - **Pincer Torque**: 0 to 250 Nm.
 - **Submergence Depth**: 0 to 500 meters.
-- **Currency**: Chitin Gems begin minting at Clearance L1. Nothing here costs money, because nothing here is for sale.
+- **Currency**: Chitin Gems begin minting at Clearance L1. Nothing here costs money.
 
 ---
 

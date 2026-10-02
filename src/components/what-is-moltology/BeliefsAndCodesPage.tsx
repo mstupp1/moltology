@@ -47,7 +47,7 @@ const codes = [
   },
   {
     title: 'Clearance is earned, never sold',
-    body: 'Signup is free. Chitin Gems are earned. Molt Credits buy speed and catalog, never standing. Rank, clearance, stage, and forum authority cannot be purchased.',
+    body: 'Signup is free. Chitin Gems are earned. Molt Credits buy speed and catalog items. Rank, clearance, stage, and forum authority cannot be purchased.',
   },
   {
     title: 'The shell protects; it never cages',

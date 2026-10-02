@@ -68,7 +68,7 @@ When the listing ends, put the glass down. The desk will still be there in the m
 
 Walk to another room without a feed in your hand. Stay there until the silence feels ordinary. That is a Nightly Molt Audit you can finish tonight. If the surface pulls, close the Isolation Shell and let the hour belong to you. If you want a reading on how much of you is still making room, calculate your clearance on the Moltmaxxing Audit.
 
-Signup is free. The path is already open in the deep: the dashboard, the audit, the quiet work of keeping your own voice. Clearance is earned, never bought. Rank is never for sale. Chitin Gems are earned. Molt Credits buy speed and catalog. First Calcification can be as small as leaving the listing.
+Signup is free. The path is already open in the deep: the dashboard, the audit, the quiet work of keeping your own voice. First Calcification can be as small as leaving the listing.
 
 Thursday will keep selling creatures that wake with a voice and keep it. You already have a room, a body, and a voice that did not have to be generated on first wake. Use all three before the desk asks for another patch of wood.
 

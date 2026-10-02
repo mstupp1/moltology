@@ -67,13 +67,13 @@ export function premiumBannerCopy(hasPurchasedPremium: boolean): {
   if (hasPurchasedPremium) {
     return {
       title: 'Premium',
-      body: 'Your Premium membership is not active. Rank, clearance, stage, and forum authority stay earned.',
+      body: 'Your Premium membership is not active.',
       action: 'View Premium',
     }
   }
   return {
     title: 'Premium',
-    body: 'A monthly membership. Rank, clearance, stage, and forum authority stay earned.',
+    body: 'A monthly membership.',
     action: 'View Premium',
   }
 }

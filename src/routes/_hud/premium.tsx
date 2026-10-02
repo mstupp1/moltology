@@ -22,7 +22,7 @@ export const Route = createFileRoute('/_hud/premium')({
     meta: [
       ...privatePageSeo({
         title: 'Premium membership | Moltology',
-        description: 'Monthly Premium membership. Rank, clearance, and forum authority stay earned.',
+        description: 'Monthly Premium membership. It does not change rank, clearance, or forum authority.',
       }),
     ],
   }),

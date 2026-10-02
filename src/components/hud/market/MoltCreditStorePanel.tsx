@@ -65,8 +65,7 @@ export function MoltCreditStorePanel({ onPurchase }: MoltCreditStorePanelProps) 
               {featured.name}
             </h2>
             <p className="text-xs text-[#839493] leading-relaxed max-w-md">
-              Molt Credits buy speed, style, and catalog depth. Rank and clearance stay earned —
-              never sold.
+              Molt Credits buy speed, style, and catalog depth.
             </p>
             <div className="flex flex-wrap items-baseline gap-2 pt-1">
               <span className="font-grotesk text-2xl sm:text-3xl font-extrabold text-[#00c3ff] tabular-nums">

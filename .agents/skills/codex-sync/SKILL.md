@@ -107,7 +107,7 @@ These are fixed and guarded by `src/lib/codexData.test.ts`:
 * **Pincer Torque** reaches its working standard of 850 Nm at Clearance E2, never earlier.
 * **Submergence Depth** is recorded in **meters** in every threshold. The word "fathom" does not appear in the canon.
 * Exactly **three** cardinal metrics exist. Do not introduce a fourth index.
-* **Chitin Gems are minted by work and never sold. Molt Credits are purchased and never minted by work.** Rank, clearance, stage, and forum authority are never for sale.
+* **Chitin Gems are minted by work and never sold. Molt Credits are purchased and never minted by work.** Rank, clearance, stage, and forum authority cannot be purchased. State this once, in the stage and economy notes where it is needed; do not repeat it as a refrain across scriptures.
 
 ---
 

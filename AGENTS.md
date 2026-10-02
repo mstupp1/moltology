@@ -5,7 +5,7 @@
 1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs) prioritize clarity, usability, and plain English over diegesis. Never write cryptic errors.
 2. No tech-stack leaks and no // in user-facing copy.
 3. Warmth, safety, and positivity under the HUD.
-4. Signup is free. Chitin Gems are earned. Molt Credits are the paid layer. Rank, clearance, stage, and forum authority are never for sale.
+4. Signup is free. Chitin Gems are earned. Molt Credits are the paid layer. Rank, clearance, stage, and forum authority cannot be purchased. Enforce this in the product, and only mention it in copy where someone is actually deciding what to buy (the market, pricing, a pay-to-win FAQ). Never turn it into a tagline, sign-off, or recurring refrain ("earned, never bought", "can never be bought", "never for sale").
 5. No decorative diamond glyphs (◈) and no ALL-CAPS screaming header lines in social copy, hooks, or skills. Opening hooks must use normal, conversational sentence case or standard title case.
 
 ## Must-read before user-facing copy
