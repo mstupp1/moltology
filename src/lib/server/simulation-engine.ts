@@ -1,3 +1,5 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import { generateText } from 'ai'
 import { eq, desc, or, inArray, sql } from 'drizzle-orm'
 import { getDb } from '../../db'
@@ -78,6 +80,7 @@ import {
   type ForumPostCandidate,
   type ForumReplyStance,
   type PlannerMember,
+  type PlannerTopic,
 } from '../simulation-social'
 
 export const SIMULATION_MODEL_ID = process.env.SIMULATION_MODEL_ID || 'zai/glm-5.3-flash'
@@ -251,6 +254,76 @@ export function calculateTasksForStage(
   return shuffled.slice(0, taskCount)
 }
 
+export function formatSpawnPersonaPrompt(stage: number): string {
+  const stageTitles: Record<number, string> = {
+    1: 'Stage 1 Larva (eager beginner, mastering daily habits and discipline)',
+    2: 'Stage 2 Soft-Shed (intermediate practitioner navigating the vulnerable soft-shell window)',
+    3: 'Stage 3 Architect (senior biomechanical operator, optimizing pincer torque and systems)',
+    4: 'Stage 4 Ascendant (revered cult elder, liturgical, commanding, guardian of core directives)',
+  }
+
+  return `Generate a unique persona for a member of the Moltology community.
+The member is at ${stageTitles[stage] || stageTitles[1]}.
+
+Rules:
+- The handle must be 1-2 words, optionally with numbers or an underscore (e.g. ChitinForge_42, AbyssalDrifter, ReefCrafter, CarapacePilot, Vaelen_77). Never use spaces in handle.
+- The archetype is a 2-4 word descriptor (e.g. Deep-Sea Biohacker, Relentless Grinder, Carapace Philosopher).
+- The tone describes how they speak in the forum (e.g. Inquisitive, enthusiastic, respectful; or Analytical, concise, metric-focused).
+- The bio is a 1-2 sentence in-character summary of their current focus and progress.
+- Strictly adhere to Moltology lore: chitin, molting, ecdysis, carapace, benthic pressure, alignment, daily routines.
+- NEVER mention real-world tech stacks (no React, Vercel, Postgres, LLM, AI, prompts).
+- Output strictly valid JSON with keys: "handle", "archetype", "tone", "bio". No markdown fences or commentary.`
+}
+
+export function formatForumReplyPrompt(input: {
+  authorPublicName: string
+  stage: number
+  simulatedPersona?: SimulatedPersonaConfig | null
+  directives: string
+  contextStr: string
+}): string {
+  return `You are ${input.authorPublicName} (Stage ${input.stage}).
+${formatPersonaVoiceBlock(input.simulatedPersona)}
+
+${input.directives}
+
+${input.contextStr}
+
+Hard rules:
+- Stay completely in-character in the Moltology world (chitin, molting, ecdysis, discipline, carapace, deep-sea pressure).
+- Keep disagreement civil: challenge methods and metrics, never the person. No insults, shame, or mockery.
+- NEVER use decorative diamond glyphs (◈).
+- NEVER use ALL-CAPS screaming header lines.
+- NEVER leak technical stacks or talk about coding libraries (no React, Vercel, Postgres, LLM).
+- NEVER mention drives, factions, planners, or that you are simulated.
+- Respond in conversational sentence case with no quotation marks or meta commentary.`
+}
+
+export function formatForumTopicPrompt(input: {
+  authorPublicName: string
+  stage: number
+  simulatedPersona?: SimulatedPersonaConfig | null
+  categoryName: string
+  categoryDescription?: string | null
+  drive?: string | null
+}): string {
+  return `You are ${input.authorPublicName} (Stage ${input.stage}).
+${formatPersonaVoiceBlock(input.simulatedPersona)}
+
+Generate a thoughtful new forum discussion thread for the "${input.categoryName}" category (${input.categoryDescription || ''}).
+${formatNewThreadDirective((input.drive as any) || undefined)}
+
+Hard rules:
+- Provide a clear, engaging discussion question or tip (3-5 sentences total).
+- The title must use conversational sentence case or title case. DO NOT SCREAM IN ALL CAPS.
+- DO NOT use decorative diamond glyphs (◈).
+- Strictly adhere to Moltology themes (chitin, molting, ecdysis, discipline, biometric stats, habits).
+- NEVER leak technical stacks (no React, Vercel, Postgres, AI, LLM).
+- NEVER mention drives, factions, planners, or that you are simulated.
+- Challenge methods, not people, if you raise a disagreement.
+- Output strictly valid JSON with keys: "title" and "content". No extra markdown or commentary.`
+}
+
 /**
  * Generates an in-character persona using the AI Gateway.
  */
@@ -262,25 +335,7 @@ export async function generateSimulatedPersona(stage: number): Promise<{
 }> {
   assertAiGatewayKey()
 
-  const stageTitles: Record<number, string> = {
-    1: 'Stage 1 Larva (eager beginner, mastering daily habits and discipline)',
-    2: 'Stage 2 Soft-Shed (intermediate practitioner navigating the vulnerable soft-shell window)',
-    3: 'Stage 3 Architect (senior biomechanical operator, optimizing pincer torque and systems)',
-    4: 'Stage 4 Ascendant (revered cult elder, liturgical, commanding, guardian of core directives)',
-  }
-
-  const prompt = `Generate a unique persona for a member of the Moltology community.
-The member is at ${stageTitles[stage] || stageTitles[1]}.
-
-Rules:
-- The handle must be 1-2 words, optionally with numbers or an underscore (e.g. ChitinForge_42, AbyssalDrifter, ReefCrafter, CarapacePilot, Vaelen_77). Never use spaces in handle.
-- The archetype is a 2-4 word descriptor (e.g. Deep-Sea Biohacker, Relentless Grinder, Carapace Philosopher).
-- The tone describes how they speak in the forum (e.g. Inquisitive, enthusiastic, respectful; or Analytical, concise, metric-focused).
-- The bio is a 1-2 sentence in-character summary of their current focus and progress.
-- Strictly adhere to Moltology lore: chitin, molting, ecdysis, carapace, benthic pressure, alignment, daily routines.
-- NEVER mention real-world tech stacks (no React, Vercel, Postgres, LLM, AI, prompts).
-- Output strictly valid JSON with keys: "handle", "archetype", "tone", "bio". No markdown fences or commentary.`
-
+  const prompt = formatSpawnPersonaPrompt(stage)
   const response = await generateSimulationText({
     prompt,
     temperature: 0.8,
@@ -988,21 +1043,13 @@ export async function simulateForumActivity(
       directives += ` You may naturally address or mention @${mentionCandidate.handle} in conversational flow.`
     }
 
-    const prompt = `You are ${authorPublicName} (Stage ${author.stage}).
-${formatPersonaVoiceBlock(author.simulatedPersona)}
-
-${directives}
-
-${contextStr}
-
-Hard rules:
-- Stay completely in-character in the Moltology world (chitin, molting, ecdysis, discipline, carapace, deep-sea pressure).
-- Keep disagreement civil: challenge methods and metrics, never the person. No insults, shame, or mockery.
-- NEVER use decorative diamond glyphs (◈).
-- NEVER use ALL-CAPS screaming header lines.
-- NEVER leak technical stacks or talk about coding libraries (no React, Vercel, Postgres, LLM).
-- NEVER mention drives, factions, planners, or that you are simulated.
-- Respond in conversational sentence case with no quotation marks or meta commentary.`
+    const prompt = formatForumReplyPrompt({
+      authorPublicName,
+      stage: author.stage,
+      simulatedPersona: author.simulatedPersona,
+      directives,
+      contextStr,
+    })
 
     const aiRes = await generateSimulationText({
       prompt,
@@ -1172,21 +1219,14 @@ Hard rules:
     larvaId: author.larvaId,
   })
 
-  const prompt = `You are ${authorName} (Stage ${author.stage}).
-${formatPersonaVoiceBlock(author.simulatedPersona)}
-
-Generate a thoughtful new forum discussion thread for the "${targetCategory.name}" category (${targetCategory.description}).
-${formatNewThreadDirective(author.simulatedPersona?.drive)}
-
-Hard rules:
-- Provide a clear, engaging discussion question or tip (3-5 sentences total).
-- The title must use conversational sentence case or title case. DO NOT SCREAM IN ALL CAPS.
-- DO NOT use decorative diamond glyphs (◈).
-- Strictly adhere to Moltology themes (chitin, molting, ecdysis, discipline, biometric stats, habits).
-- NEVER leak technical stacks (no React, Vercel, Postgres, AI, LLM).
-- NEVER mention drives, factions, planners, or that you are simulated.
-- Challenge methods, not people, if you raise a disagreement.
-- Output strictly valid JSON with keys: "title" and "content". No extra markdown or commentary.`
+  const prompt = formatForumTopicPrompt({
+    authorPublicName: authorName,
+    stage: author.stage,
+    simulatedPersona: author.simulatedPersona,
+    categoryName: targetCategory.name,
+    categoryDescription: targetCategory.description,
+    drive: author.simulatedPersona?.drive,
+  })
 
   const aiRes = await generateSimulationText({
     prompt,
@@ -1955,3 +1995,932 @@ export async function runSimulationCycle(options: {
   console.log('[SimulationCycle] ✓ Simulation tick completed successfully!')
   return results
 }
+
+export interface SimulationPlanSpawnTask {
+  id: string
+  kind: 'spawn_persona'
+  stage: number
+  origin: {
+    source: MemberJoinSource
+    needsSponsor: boolean
+    sponsorId: string | null
+    sponsorHandle: string | null
+  }
+  prompt: string
+  outputSchema: {
+    handle: string
+    archetype: string
+    tone: string
+    bio: string
+  }
+  generated?: {
+    handle: string
+    archetype: string
+    tone: string
+    bio: string
+  } | string | null
+}
+
+export interface SimulationPlanForumReplyTask {
+  id: string
+  kind: 'forum_reply'
+  topicId: string
+  topicTitle: string
+  targetPostId?: string | null
+  parentId?: string | null
+  isOpFollowUp?: boolean
+  quoteBlock?: string | null
+  authorId: string
+  authorName: string
+  authorStage: number
+  parentAuthorId?: string | null
+  replyStance: ForumReplyStance
+  affinityDelta: number
+  prompt: string
+  outputSchema: {
+    content: string
+  }
+  generated?: {
+    content: string
+  } | string | null
+}
+
+export interface SimulationPlanForumTopicTask {
+  id: string
+  kind: 'forum_topic'
+  category: {
+    id: string
+    slug: string
+    name: string
+  }
+  authorId: string
+  authorName: string
+  authorStage: number
+  prompt: string
+  outputSchema: {
+    title: string
+    content: string
+  }
+  generated?: {
+    title: string
+    content: string
+  } | string | null
+}
+
+export type SimulationPlanTask =
+  | SimulationPlanSpawnTask
+  | SimulationPlanForumReplyTask
+  | SimulationPlanForumTopicTask
+
+export interface SimulationPlan {
+  version: 1
+  createdAt: string
+  options: {
+    dryRun?: boolean
+    forceSpawn?: boolean
+    spawnOnly?: boolean
+    routinesOnly?: boolean
+    forumOnly?: boolean
+    votesOnly?: boolean
+    mutationsOnly?: boolean
+    socialOnly?: boolean
+    reviewOnly?: boolean
+  }
+  tasks: SimulationPlanTask[]
+  meta: {
+    simulatedMemberCount: number
+    tasksCount: number
+  }
+}
+
+export interface PrepareSimulationPlanOptions {
+  dryRun?: boolean
+  forceSpawn?: boolean
+  spawnOnly?: boolean
+  routinesOnly?: boolean
+  forumOnly?: boolean
+  votesOnly?: boolean
+  mutationsOnly?: boolean
+  socialOnly?: boolean
+  reviewOnly?: boolean
+  config?: SimulationGrowthConfig
+  outPath?: string
+  dbClient?: DbClient
+}
+
+/**
+ * Deterministically prepares the 12-hour simulation cycle plan and extracts all
+ * text generation prompts (for acolyte spawning and forum topics/replies) without calling an LLM.
+ */
+export async function prepareSimulationPlan(
+  options: PrepareSimulationPlanOptions = {}
+): Promise<SimulationPlan> {
+  const dbClient = options.dbClient || getDb()
+  const config = options.config || DEFAULT_GROWTH_CONFIG
+
+  const existingMembers = await ensureMemberDrives(
+    dbClient,
+    await listSimulatedMembers(dbClient),
+    options.dryRun
+  )
+  const memberById = new Map(existingMembers.map((m) => [m.id, m]))
+
+  const tasks: SimulationPlanTask[] = []
+
+  // 1. Spawner check
+  if (shouldRunPhase('spawn', options)) {
+    const currentCount = existingMembers.length
+    const spawnProb = getTieredSpawnProbability(currentCount, config.maxSimulatedUsers)
+    if (options.forceSpawn || Math.random() <= spawnProb) {
+      const stage = sampleStage(config.stageWeights)
+      const origin = sampleJoinOrigin(existingMembers.length, config.joinSourceWeights)
+      const sponsor = origin.needsSponsor ? pickWeightedSponsor(existingMembers) : null
+      const joinSource: MemberJoinSource = sponsor ? origin.source : 'organic'
+      const prompt = formatSpawnPersonaPrompt(stage)
+
+      tasks.push({
+        id: 'spawn-acolyte',
+        kind: 'spawn_persona',
+        stage,
+        origin: {
+          source: joinSource,
+          needsSponsor: origin.needsSponsor,
+          sponsorId: sponsor?.id ?? null,
+          sponsorHandle: sponsor ? publicNameFor(sponsor) : null,
+        },
+        prompt,
+        outputSchema: {
+          handle: 'string (1-2 words, optionally numbers/underscore, e.g. ChitinForge_42. No spaces)',
+          archetype: 'string (2-4 words, e.g. Deep-Sea Biohacker)',
+          tone: 'string (e.g. Analytical, concise, metric-focused)',
+          bio: 'string (1-2 sentences in-character summary adhering to Moltology lore)',
+        },
+        generated: null,
+      })
+    }
+  }
+
+  // 2. Forum discussion check
+  if (shouldRunPhase('forum', options) && existingMembers.length > 0) {
+    const actionCount = config.forumActionsPerCycle || 2
+    const categories = await dbClient
+      .select({
+        id: forumCategories.id,
+        slug: forumCategories.slug,
+        name: forumCategories.name,
+        description: forumCategories.description,
+      })
+      .from(forumCategories)
+
+    const recentTopics = await dbClient
+      .select({
+        id: forumTopics.id,
+        userId: forumTopics.userId,
+        title: forumTopics.title,
+        content: forumTopics.content,
+        repliesCount: forumTopics.repliesCount,
+      })
+      .from(forumTopics)
+      .where(eq(forumTopics.isLocked, false))
+      .orderBy(desc(forumTopics.createdAt))
+      .limit(10)
+
+    let existingPosts: Array<{
+      id: string
+      userId: string | null
+      parentId: string | null
+      authorName: string | null
+      content: string
+      createdAt: string | Date | null
+      topicId: string | null
+    }> = []
+
+    if (recentTopics.length > 0) {
+      try {
+        const topicIds = recentTopics.map((topic) => topic.id)
+        const postsQuery = await dbClient
+          .select({
+            id: forumPosts.id,
+            userId: forumPosts.userId,
+            parentId: forumPosts.parentId,
+            authorName: forumPosts.authorName,
+            content: forumPosts.content,
+            createdAt: forumPosts.createdAt,
+            topicId: forumPosts.topicId,
+          })
+          .from(forumPosts)
+          .where(topicIds.length === 1 ? eq(forumPosts.topicId, topicIds[0]) : inArray(forumPosts.topicId, topicIds))
+          .orderBy(desc(forumPosts.createdAt))
+          .limit(80)
+        if (Array.isArray(postsQuery)) {
+          existingPosts = postsQuery
+        }
+      } catch {
+        existingPosts = []
+      }
+    }
+
+    const postsByTopic = new Map<string, ForumPostCandidate[]>()
+    for (const topic of recentTopics) {
+      postsByTopic.set(topic.id, [])
+    }
+    for (const post of existingPosts) {
+      const candidate: ForumPostCandidate = {
+        id: post.id,
+        userId: post.userId,
+        parentId: post.parentId,
+        authorName: post.authorName,
+        authorHandle: memberById.get(post.userId || '')?.handle || null,
+        content: post.content,
+        createdAt: post.createdAt,
+      }
+      if (post.topicId && postsByTopic.has(post.topicId)) {
+        postsByTopic.get(post.topicId)!.push(candidate)
+      } else if (recentTopics.length === 1) {
+        postsByTopic.get(recentTopics[0].id)!.push(candidate)
+      }
+    }
+
+    const plannerTopics: PlannerTopic[] = recentTopics.map((topic) => ({
+      id: topic.id,
+      userId: topic.userId,
+      authorName: memberById.get(topic.userId || '')?.handle || 'Initiate',
+      title: topic.title,
+      content: topic.content,
+      repliesCount: topic.repliesCount ?? 0,
+    }))
+
+    for (let i = 0; i < actionCount; i++) {
+      const decision = planForumAction({
+        members: existingMembers.map(toPlannerMember),
+        topics: plannerTopics,
+        postsByTopic,
+      })
+
+      if (decision.action === 'none' || decision.action === 'ignore' || decision.action === 'upvote') {
+        continue
+      }
+
+      const plannedAuthor = memberById.get(decision.actorId) || existingMembers[0]
+      const replyActions = new Set(['reply_supportive', 'reply_challenging', 'reply_cite_canon'])
+      const shouldReply =
+        Boolean(decision.topicId) &&
+        recentTopics.length > 0 &&
+        (replyActions.has(decision.action) || decision.isOpFollowUp)
+
+      if (shouldReply) {
+        const topic = recentTopics.find((row) => row.id === decision.topicId) || recentTopics[0]
+        const postCandidates = postsByTopic.get(topic.id) || []
+        const author = plannedAuthor
+        const plannedStance: ForumReplyStance =
+          decision.stance || (decision.isOpFollowUp ? 'op_follow_up' : 'supportive')
+
+        const { parentId, targetPost, isOpFollowUp } = chooseForumReplyTarget(
+          {
+            id: topic.id,
+            userId: topic.userId,
+            authorName: memberById.get(topic.userId || '')?.handle || 'Initiate',
+            title: topic.title,
+            content: topic.content,
+          },
+          postCandidates,
+          author.id,
+          {
+            nestedChance: config.forumNestedReplyChance ?? DEFAULT_FORUM_NESTED_REPLY_CHANCE,
+            maxDepth: SIMULATION_MAX_REPLY_DEPTH,
+            affinityBias: affinityBiasForDrive(author.simulatedPersona?.drive),
+            affinities: author.simulatedPersona?.affinities,
+          }
+        )
+        const replyStance: ForumReplyStance = decision.isOpFollowUp || isOpFollowUp ? 'op_follow_up' : plannedStance
+
+        const shouldQuote = Boolean(
+          targetPost && rollChance(config.forumQuoteChance ?? DEFAULT_FORUM_QUOTE_CHANCE)
+        )
+        let quoteSnippet: string | null = null
+        let quoteBlock: string | null = null
+        if (shouldQuote && targetPost) {
+          quoteSnippet = extractQuoteSnippet(targetPost.content, 180)
+          if (quoteSnippet) {
+            quoteBlock = formatDiegeticQuoteBlock(
+              targetPost.authorHandle,
+              targetPost.authorName || 'Initiate',
+              quoteSnippet
+            )
+          }
+        }
+
+        const shouldMention = rollChance(config.forumMentionChance ?? DEFAULT_FORUM_MENTION_CHANCE)
+        let mentionCandidate: { userId: string; handle: string } | null = null
+        if (shouldMention) {
+          const participants = postCandidates
+            .map((p) => ({ userId: p.userId || '', handle: p.authorHandle || null }))
+            .filter((p) => p.userId && p.handle)
+          if (topic.userId && memberById.get(topic.userId)?.handle) {
+            participants.push({ userId: topic.userId, handle: memberById.get(topic.userId)!.handle })
+          }
+          mentionCandidate = pickMentionCandidate(
+            author.id,
+            participants,
+            [],
+            targetPost ? { userId: targetPost.userId, handle: targetPost.authorHandle } : null
+          )
+        }
+
+        const pairMemory = targetPost?.userId
+          ? selectPairMemory(postCandidates, author.id, targetPost.userId, 2)
+          : []
+        const relationshipHint = targetPost?.userId
+          ? formatRelationshipHint(
+              getAffinity(author.simulatedPersona, targetPost.userId),
+              targetPost.authorHandle || memberById.get(targetPost.userId)?.handle
+            )
+          : null
+        const canonCitation =
+          replyStance === 'cite_canon'
+            ? pickCanonCitation(
+                CANONICAL_SCRIPTURES.map((row) => ({
+                  id: row.id,
+                  title: row.title,
+                  mandate: row.mandate,
+                  summary: row.summary,
+                }))
+              )
+            : null
+
+        const authorPublicName = resolveMemberPublicName({
+          userId: author.id,
+          handle: author.handle,
+          larvaId: author.larvaId,
+        })
+
+        let contextStr = `Thread Title: "${topic.title}"\nOriginal Post: "${topic.content}"`
+        if (isOpFollowUp && targetPost) {
+          contextStr += `\n\nYou are the Original Poster (OP). You are following up on this comment by ${targetPost.authorHandle ? `@${targetPost.authorHandle}` : targetPost.authorName}:\n"${targetPost.content}"`
+        } else if (targetPost) {
+          contextStr += `\n\nYou are replying directly to this comment by ${targetPost.authorHandle ? `@${targetPost.authorHandle}` : targetPost.authorName}:\n"${targetPost.content}"`
+        } else if (postCandidates.length > 0) {
+          const recent = postCandidates.slice(0, 2).map((p) => `${p.authorName}: ${p.content}`).join('\n')
+          contextStr += `\n\nRecent replies in thread:\n${recent}`
+        }
+        if (pairMemory.length > 0 && targetPost) {
+          const memoryLines = pairMemory
+            .map((post) => `${post.authorHandle || post.authorName}: ${post.content}`)
+            .join('\n')
+          contextStr += `\n\nRecent exchange with this member:\n${memoryLines}`
+        }
+
+        let directives = `Write a concise forum reply (2 to 4 sentences) to this thread. ${formatForumStanceDirective(replyStance)}`
+        if (targetPost && replyStance !== 'op_follow_up') {
+          directives += ` Engage directly with the specific point made in their comment.`
+        }
+        if (relationshipHint) {
+          directives += ` ${relationshipHint}`
+        }
+        if (canonCitation) {
+          directives += ` ${formatCanonCitationDirective(canonCitation)}`
+        }
+        if (quoteSnippet) {
+          directives += ` Address this quoted statement: "${quoteSnippet}". Do not write blockquote lines yourself; the quote header is formatted automatically.`
+        }
+        if (mentionCandidate) {
+          directives += ` You may naturally address or mention @${mentionCandidate.handle} in conversational flow.`
+        }
+
+        const prompt = formatForumReplyPrompt({
+          authorPublicName,
+          stage: author.stage,
+          simulatedPersona: author.simulatedPersona,
+          directives,
+          contextStr,
+        })
+
+        const parentAuthor = targetPost?.userId ? memberById.get(targetPost.userId) : null
+        const affinityDelta = affinityDeltaForReply(
+          replyStance,
+          author.simulatedPersona?.drive,
+          parentAuthor?.simulatedPersona?.drive
+        )
+
+        tasks.push({
+          id: `forum-reply-${i + 1}`,
+          kind: 'forum_reply',
+          topicId: topic.id,
+          topicTitle: topic.title,
+          targetPostId: targetPost?.id ?? null,
+          parentId,
+          isOpFollowUp: Boolean(isOpFollowUp),
+          quoteBlock,
+          authorId: author.id,
+          authorName: authorPublicName,
+          authorStage: author.stage,
+          parentAuthorId: parentAuthor?.id ?? null,
+          replyStance,
+          affinityDelta,
+          prompt,
+          outputSchema: {
+            content: 'string (2 to 4 sentence in-character forum reply adhering to Moltology lore)',
+          },
+          generated: null,
+        })
+      } else {
+        // Start thread
+        const openCategories = categories.filter((c) => c.slug !== 'rules-announcements')
+        const targetCategory =
+          openCategories.length > 0
+            ? openCategories[Math.floor(Math.random() * openCategories.length)]
+            : categories[0]
+        if (!targetCategory) continue
+
+        const author = plannedAuthor
+        const authorName = resolveMemberPublicName({
+          userId: author.id,
+          handle: author.handle,
+          larvaId: author.larvaId,
+        })
+
+        const prompt = formatForumTopicPrompt({
+          authorPublicName: authorName,
+          stage: author.stage,
+          simulatedPersona: author.simulatedPersona,
+          categoryName: targetCategory.name,
+          categoryDescription: targetCategory.description,
+          drive: author.simulatedPersona?.drive,
+        })
+
+        tasks.push({
+          id: `forum-topic-${i + 1}`,
+          kind: 'forum_topic',
+          category: {
+            id: targetCategory.id,
+            slug: targetCategory.slug,
+            name: targetCategory.name,
+          },
+          authorId: author.id,
+          authorName,
+          authorStage: author.stage,
+          prompt,
+          outputSchema: {
+            title: 'string (engaging title in sentence/title case, NO ALL CAPS, no decorative diamond glyphs)',
+            content: 'string (3 to 5 sentence engaging discussion question or tip adhering to Moltology themes)',
+          },
+          generated: null,
+        })
+      }
+    }
+  }
+
+  const plan: SimulationPlan = {
+    version: 1,
+    createdAt: new Date().toISOString(),
+    options: {
+      dryRun: Boolean(options.dryRun),
+      forceSpawn: Boolean(options.forceSpawn),
+      spawnOnly: Boolean(options.spawnOnly),
+      routinesOnly: Boolean(options.routinesOnly),
+      forumOnly: Boolean(options.forumOnly),
+      votesOnly: Boolean(options.votesOnly),
+      mutationsOnly: Boolean(options.mutationsOnly),
+      socialOnly: Boolean(options.socialOnly),
+      reviewOnly: Boolean(options.reviewOnly),
+    },
+    tasks,
+    meta: {
+      simulatedMemberCount: existingMembers.length,
+      tasksCount: tasks.length,
+    },
+  }
+
+  if (options.outPath) {
+    const dir = path.dirname(options.outPath)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+    fs.writeFileSync(options.outPath, JSON.stringify(plan, null, 2), 'utf8')
+  }
+
+  return plan
+}
+
+/**
+ * Applies a pre-populated simulation plan to the database (or dry-run validates it)
+ * and executes all remaining deterministic routines, votes, mutations, bonds, and reviews.
+ */
+export async function applySimulationPlan(
+  planOrPath: SimulationPlan | string,
+  options: { dryRun?: boolean; dbClient?: DbClient; config?: SimulationGrowthConfig } = {}
+): Promise<Record<string, unknown>> {
+  let plan: SimulationPlan
+  if (typeof planOrPath === 'string') {
+    if (!fs.existsSync(planOrPath)) {
+      throw new Error(`[SimulationEngine] Plan file not found at: ${planOrPath}`)
+    }
+    const raw = fs.readFileSync(planOrPath, 'utf8')
+    plan = JSON.parse(raw)
+  } else {
+    plan = planOrPath
+  }
+
+  const dryRun = options.dryRun !== undefined ? options.dryRun : Boolean(plan.options?.dryRun)
+  const dbClient = options.dbClient || getDb()
+  const config = options.config || DEFAULT_GROWTH_CONFIG
+  const results: Record<string, unknown> = {}
+
+  // 1. Validate that all tasks have been generated
+  for (const task of plan.tasks) {
+    if (!task.generated) {
+      throw new Error(
+        `[SimulationEngine] Cannot apply simulation plan: Task "${task.id}" (${task.kind}) has not been populated with generated text.`
+      )
+    }
+  }
+
+  // 2. Drive backfill
+  results.driveBackfill = await backfillSimulatedDrives(dbClient, { dryRun })
+
+  // 3. Process spawn task if present
+  const spawnTask = plan.tasks.find((t) => t.kind === 'spawn_persona') as SimulationPlanSpawnTask | undefined
+  if (spawnTask) {
+    let rawGen: any = spawnTask.generated
+    if (typeof rawGen === 'string') {
+      try {
+        rawGen = JSON.parse(rawGen.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, ''))
+      } catch {
+        throw new Error(`[SimulationEngine] Failed to parse generated persona JSON: ${rawGen}`)
+      }
+    }
+    const personaObj = rawGen as { handle: string; archetype: string; tone: string; bio: string }
+    const cleanHandle = String(personaObj.handle || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24) || `Acolyte_${Math.floor(Math.random() * 9000 + 1000)}`
+    const bio = String(personaObj.bio || '').slice(0, 200)
+    const archetype = String(personaObj.archetype || '').slice(0, 60)
+    const tone = String(personaObj.tone || '').slice(0, 100)
+
+    const guardBio = validateInputGuardrails(bio)
+    const guardHandle = validateInputGuardrails(cleanHandle)
+    if (!guardBio.allowed || !guardHandle.allowed) {
+      throw new Error(`[SimulationEngine] Generated persona content failed guardrails: ${guardBio.reason || guardHandle.reason}`)
+    }
+
+    const userId = crypto.randomUUID()
+    const larvaId = resolveMemberLarvaId(userId)
+    const stage = spawnTask.stage
+    const origin = spawnTask.origin
+    const referredByUserId = origin.sponsorId
+    const referredByHandle = origin.sponsorHandle
+
+    const currencyMap: Record<number, { credits: string; gems: number; shards: number }> = {
+      1: { credits: '1450.00', gems: 250, shards: 45 },
+      2: { credits: '6500.00', gems: 1200, shards: 180 },
+      3: { credits: '45000.00', gems: 5800, shards: 950 },
+      4: { credits: '250000.00', gems: 35000, shards: 8200 },
+    }
+    const curr = currencyMap[stage] || currencyMap[1]
+    const diceBearStyles = ['bottts', 'pixel-art', 'shapes', 'identicon']
+    const selectedStyle = diceBearStyles[Math.floor(Math.random() * diceBearStyles.length)]
+
+    const simulatedPersona: SimulatedPersonaConfig = {
+      archetype,
+      tone,
+      bio,
+      activityCadence: 'normal',
+      lastSimulatedAt: new Date().toISOString(),
+      drive: sampleDrive(),
+      affinities: {},
+      traits: [],
+      referredByHandle,
+    }
+
+    if (dryRun) {
+      results.spawn = {
+        spawned: true,
+        dryRun: true,
+        userId,
+        handle: cleanHandle,
+        stage,
+        persona: simulatedPersona,
+        joinSource: origin.source,
+        referredByUserId,
+        referredByHandle,
+      }
+    } else {
+      await dbClient.insert(profiles).values({
+        id: userId,
+        handle: cleanHandle,
+        larvaId,
+        stage,
+        isSimulated: true,
+        simulatedPersona,
+        joinSource: origin.source,
+        referredByUserId,
+        moltCredits: curr.credits,
+        chitinGems: curr.gems,
+        synapseShards: curr.shards,
+        depthPressureCoins: stage * 15,
+        avatarConfig: {
+          style: selectedStyle,
+          seed: crypto.randomUUID(),
+        },
+      })
+      await dbClient.insert(userStats).values({
+        userId,
+        pincerTorque: 50 + stage * 12,
+        shellHardness: 40 + stage * 15,
+        processingPower: 60 + stage * 10,
+        durability: 55 + stage * 10,
+        clawStrength: 50 + stage * 12,
+        submergenceDepthRating: 1000 * stage,
+      }).onConflictDoNothing()
+
+      if (origin.sponsorId && (origin.source === 'brought_in' || origin.source === 'word_of_mouth')) {
+        if (origin.source === 'brought_in') {
+          await ensureFriendship(dbClient, origin.sponsorId, userId)
+          await ensureBond(dbClient, 'brought_in', origin.sponsorId, userId)
+          try {
+            await recordConnectionAcceptedEvents(
+              dbClient,
+              { id: origin.sponsorId, handle: origin.sponsorHandle, larvaId: null },
+              { id: userId, handle: cleanHandle, larvaId }
+            )
+          } catch {
+            // Non-fatal
+          }
+        }
+      }
+
+      results.spawn = {
+        spawned: true,
+        dryRun: false,
+        userId,
+        handle: cleanHandle,
+        stage,
+        persona: simulatedPersona,
+        joinSource: origin.source,
+        referredByUserId,
+        referredByHandle,
+      }
+    }
+  } else if (shouldRunPhase('spawn', plan.options)) {
+    results.spawn = { spawned: false, reason: 'No acolyte spawn task in plan.' }
+  }
+
+  // 4. Forum tasks
+  const forumTasks = plan.tasks.filter((t) => t.kind === 'forum_reply' || t.kind === 'forum_topic')
+  const forumResults: any[] = []
+  const existingMembers = await listSimulatedMembers(dbClient)
+  const memberById = new Map(existingMembers.map((m) => [m.id, m]))
+
+  for (const task of forumTasks) {
+    if (task.kind === 'forum_reply') {
+      const replyTask = task as SimulationPlanForumReplyTask
+      let replyContent = typeof replyTask.generated === 'string'
+        ? replyTask.generated
+        : (replyTask.generated as any)?.content || ''
+      replyContent = replyContent.trim().replace(/^["'`]|["'`]$/g, '')
+      if (replyTask.quoteBlock && !replyContent.startsWith('>')) {
+        replyContent = `${replyTask.quoteBlock}${replyContent}`
+      }
+      const guardrail = validateInputGuardrails(replyContent)
+      if (!guardrail.allowed) {
+        throw new Error(`[SimulationEngine] AI generated unsafe forum reply: ${guardrail.reason}`)
+      }
+
+      const author = memberById.get(replyTask.authorId)
+      const parentAuthor = replyTask.parentAuthorId ? memberById.get(replyTask.parentAuthorId) : null
+
+      if (author) {
+        author.simulatedPersona = touchPersona(author.simulatedPersona)
+        await persistSimulatedPersona(dbClient, author.id, author.simulatedPersona, dryRun)
+        await applyPairwiseAffinity(
+          dbClient,
+          author,
+          parentAuthor,
+          replyTask.affinityDelta,
+          dryRun
+        )
+      }
+
+      if (!dryRun) {
+        const [newPost] = await dbClient
+          .insert(forumPosts)
+          .values({
+            topicId: replyTask.topicId,
+            userId: replyTask.authorId,
+            parentId: replyTask.parentId || null,
+            authorName: replyTask.authorName,
+            content: replyContent,
+          })
+          .returning()
+
+        await dbClient
+          .update(forumTopics)
+          .set({
+            repliesCount: sql`${forumTopics.repliesCount} + 1`,
+            lastReplyAt: new Date(),
+          })
+          .where(eq(forumTopics.id, replyTask.topicId))
+
+        const mentionedHandles = extractMentionHandles(replyContent)
+        let mentionedUserIds: string[] = []
+        if (mentionedHandles.length > 0) {
+          try {
+            mentionedUserIds = await recordForumMentions(dbClient, {
+              actorUserId: replyTask.authorId,
+              actorPublicName: replyTask.authorName,
+              content: replyContent,
+              sourceType: 'post',
+              sourceId: newPost.id,
+              topicId: replyTask.topicId,
+              topicSlug: replyTask.topicTitle ? slugifyForumTitle(replyTask.topicTitle) : undefined,
+            })
+          } catch {
+            // Non-fatal
+          }
+        }
+
+        try {
+          await recordForumReplyNotifications(dbClient, {
+            actorUserId: replyTask.authorId,
+            actorPublicName: replyTask.authorName,
+            replyPostId: newPost.id,
+            topicId: replyTask.topicId,
+            parentAuthorUserId: replyTask.parentAuthorId || null,
+            skipUserIds: mentionedUserIds,
+            topicSlug: replyTask.topicTitle ? slugifyForumTitle(replyTask.topicTitle) : undefined,
+          })
+        } catch {
+          // Non-fatal
+        }
+
+        try {
+          await recordForumReplyPostedEvent(dbClient, replyTask.authorId, {
+            postId: newPost.id,
+            topicId: replyTask.topicId,
+            topicTitle: replyTask.topicTitle,
+            topicSlug: slugifyForumTitle(replyTask.topicTitle),
+            categorySlug: 'general-discussion',
+            categoryName: 'Community',
+            mentionedHandles,
+          })
+        } catch {
+          // Non-fatal
+        }
+
+        forumResults.push({
+          action: 'reply',
+          topicId: replyTask.topicId,
+          topicTitle: replyTask.topicTitle,
+          parentId: replyTask.parentId,
+          isOpFollowUp: replyTask.isOpFollowUp,
+          quoted: Boolean(replyTask.quoteBlock),
+          authorHandle: author?.handle,
+          authorName: replyTask.authorName,
+          stance: replyTask.replyStance,
+          content: replyContent,
+          dryRun: false,
+        })
+      } else {
+        forumResults.push({
+          action: 'reply',
+          topicId: replyTask.topicId,
+          topicTitle: replyTask.topicTitle,
+          parentId: replyTask.parentId,
+          isOpFollowUp: replyTask.isOpFollowUp,
+          quoted: Boolean(replyTask.quoteBlock),
+          authorHandle: author?.handle,
+          authorName: replyTask.authorName,
+          stance: replyTask.replyStance,
+          content: replyContent,
+          dryRun: true,
+        })
+      }
+    } else if (task.kind === 'forum_topic') {
+      const topicTask = task as SimulationPlanForumTopicTask
+      let topicData: any = topicTask.generated
+      if (typeof topicData === 'string') {
+        try {
+          topicData = JSON.parse(topicData.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, ''))
+        } catch {
+          throw new Error(`[SimulationEngine] Failed to parse generated forum topic JSON: ${topicData}`)
+        }
+      }
+      const topicObj = topicData as { title: string; content: string }
+      const guardrailTitle = validateInputGuardrails(topicObj.title)
+      const guardrailContent = validateInputGuardrails(topicObj.content)
+      if (!guardrailTitle.allowed || !guardrailContent.allowed) {
+        throw new Error('[SimulationEngine] AI generated unsafe forum topic content.')
+      }
+
+      const author = memberById.get(topicTask.authorId)
+      if (author) {
+        author.simulatedPersona = touchPersona(author.simulatedPersona)
+        await persistSimulatedPersona(dbClient, author.id, author.simulatedPersona, dryRun)
+      }
+
+      if (!dryRun) {
+        const slug = slugifyForumTitle(topicObj.title)
+        const [newTopic] = await dbClient
+          .insert(forumTopics)
+          .values({
+            categoryId: topicTask.category.id,
+            userId: topicTask.authorId,
+            authorName: topicTask.authorName,
+            authorAvatar: '/images/stage1_larva.png',
+            authorStage: topicTask.authorStage,
+            title: topicObj.title.trim().slice(0, 120),
+            slug,
+            content: topicObj.content.trim(),
+            lastReplyAt: new Date(),
+          })
+          .returning()
+
+        try {
+          await recordForumMentions(dbClient, {
+            actorUserId: topicTask.authorId,
+            actorPublicName: topicTask.authorName,
+            content: newTopic.content,
+            sourceType: 'topic',
+            sourceId: newTopic.id,
+            topicId: newTopic.id,
+            topicSlug: newTopic.slug,
+            categorySlug: topicTask.category.slug,
+          })
+        } catch {
+          // Non-fatal
+        }
+
+        try {
+          await recordForumTopicOpenedEvent(dbClient, topicTask.authorId, {
+            id: newTopic.id,
+            title: newTopic.title,
+            slug: newTopic.slug,
+            categorySlug: topicTask.category.slug,
+            categoryName: topicTask.category.name,
+            mentionedHandles: extractMentionHandles(newTopic.content),
+          })
+        } catch {
+          // Non-fatal
+        }
+
+        forumResults.push({
+          action: 'topic',
+          topicId: newTopic.id,
+          categorySlug: topicTask.category.slug,
+          title: newTopic.title,
+          authorName: topicTask.authorName,
+          dryRun: false,
+        })
+      } else {
+        forumResults.push({
+          action: 'topic',
+          categorySlug: topicTask.category.slug,
+          title: topicObj.title,
+          authorHandle: author?.handle,
+          authorName: topicTask.authorName,
+          dryRun: true,
+        })
+      }
+    }
+  }
+
+  if (shouldRunPhase('forum', plan.options)) {
+    results.forum = forumResults.length === 1 ? forumResults[0] : forumResults
+    results.revision = await simulateForumRevision(dbClient, config, { dryRun })
+  }
+
+  // 5. Daily routines
+  if (shouldRunPhase('routines', plan.options)) {
+    results.routines = await simulateDailyRoutines(dbClient, config, { dryRun })
+  }
+
+  // 6. Upvotes
+  if (shouldRunPhase('votes', plan.options)) {
+    results.votes = await simulateForumReactions(dbClient, {
+      dryRun,
+      voteCount: config.forumVoteCount,
+      config,
+    })
+  }
+
+  // 7. Mutations
+  if (shouldRunPhase('mutations', plan.options)) {
+    results.mutation = await mutateSimulatedPersona(dbClient, config, { dryRun })
+  }
+
+  // 8. Social
+  if (shouldRunPhase('social', plan.options)) {
+    results.connection = await simulateConnections(dbClient, config, { dryRun })
+    results.relationship = await simulateRelationships(dbClient, config, { dryRun })
+  }
+
+  // 9. Standing review
+  if (shouldRunPhase('review', plan.options)) {
+    try {
+      results.review = await reviewMemberPosts(dbClient, { dryRun })
+    } catch (err) {
+      results.review = { error: err instanceof Error ? err.message : String(err) }
+    }
+  }
+
+  return results
+}
+
