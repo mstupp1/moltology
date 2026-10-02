@@ -11,6 +11,7 @@ async function main() {
   const votesOnly = args.includes('--votes-only')
   const mutationsOnly = args.includes('--mutations-only')
   const socialOnly = args.includes('--social-only')
+  const reviewOnly = args.includes('--review-only')
 
   try {
     const results = await runSimulationCycle({
@@ -22,6 +23,7 @@ async function main() {
       votesOnly,
       mutationsOnly,
       socialOnly,
+      reviewOnly,
     })
     console.log('[SIMULATE] Result summary:', JSON.stringify(results, null, 2))
     process.exit(0)

@@ -16,6 +16,8 @@ export interface ForumTreePost {
   parentId?: string | null
   upvotes: number
   createdAt: string
+  /** Low-signal replies sort after the rest of their siblings under every sort. */
+  sunk?: boolean
 }
 
 export interface ForumPostTreeNode<T extends ForumTreePost = ForumTreePost> {
@@ -26,6 +28,7 @@ export interface ForumPostTreeNode<T extends ForumTreePost = ForumTreePost> {
 
 function compareSiblings(sort: ForumReplySort) {
   return (a: ForumTreePost, b: ForumTreePost): number => {
+    if (Boolean(a.sunk) !== Boolean(b.sunk)) return a.sunk ? 1 : -1
     if (sort === 'newest') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     }

@@ -133,6 +133,14 @@ describe('buildForumPostTree', () => {
     const rootA = tree.find((n) => n.post.id === 'a')
     expect(rootA?.children.map((n) => n.post.id)).toEqual(['b', 'c'])
   })
+
+  it('sinks low-signal replies below their siblings under every sort', () => {
+    const withSunk = posts.map((p) => (p.id === 'b' ? { ...p, sunk: true } : p))
+    for (const sort of ['oldest', 'newest', 'top'] as const) {
+      const rootA = buildForumPostTree(withSunk, sort).find((n) => n.post.id === 'a')
+      expect(rootA?.children.map((n) => n.post.id)).toEqual(['c', 'b'])
+    }
+  })
 })
 
 describe('forumReplyIndentDepth', () => {

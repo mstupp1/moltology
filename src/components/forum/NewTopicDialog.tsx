@@ -4,6 +4,7 @@ import { createForumTopicFn, ForumCategoryEntry, ForumTopicEntry } from '@/lib/s
 import { getAuthJWTToken } from '@/lib/jwt'
 import { validateForumContent } from '@/lib/community-rules'
 import { useHudPersist } from '@/hooks/useHudPersist'
+import { useForumStanding } from '@/hooks/useForumStanding'
 import { useForumAuth } from './ForumShell'
 import { MentionTextarea } from '@/components/forum/MentionTextarea'
 
@@ -22,6 +23,8 @@ export function NewTopicDialog({
 }: NewTopicDialogProps) {
   const { isAuthenticated, isPending, userId, openAuth } = useForumAuth()
   const persist = useHudPersist()
+  const standing = useForumStanding(isAuthenticated ? userId : null)
+  const locked = Boolean(standing && !standing.canStartTopics)
   const [categoryId, setCategoryId] = useState(initialCategoryId || categories[0]?.id || '')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -78,6 +81,16 @@ export function NewTopicDialog({
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+          {locked && !error && (
+            <div
+              className="p-3 bg-[#171c1c] border border-[#3a4a49] text-[#dfe3e3] text-xs flex items-center gap-2 chamfer-corner"
+              data-testid="new-topic-locked"
+            >
+              <AlertTriangle className="w-4 h-4 shrink-0 text-[#839493]" />
+              <span>{standing?.topicLockReason}</span>
+            </div>
+          )}
+
           {error && (
             <div className="p-3 bg-[#2d0f0f] border border-[#ff5540] text-[#ff5540] text-xs flex items-center gap-2 chamfer-corner">
               <AlertTriangle className="w-4 h-4 shrink-0" />
@@ -150,7 +163,7 @@ export function NewTopicDialog({
             </button>
             <button
               type="submit"
-              disabled={creating || title.trim().length < 5 || content.trim().length < 10}
+              disabled={creating || locked || title.trim().length < 5 || content.trim().length < 10}
               className="px-5 py-1.5 bg-[#00ffff] hover:bg-[#00e6e6] disabled:opacity-50 text-black text-xs font-bold uppercase tracking-wider chamfer-corner transition-all shadow-[0_0_12px_rgba(0,255,255,0.2)]"
             >
               {creating ? 'Posting...' : 'Post'}

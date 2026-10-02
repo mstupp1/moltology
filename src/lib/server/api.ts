@@ -376,6 +376,21 @@ export const createForumTopicFn = createServerFn({ method: 'POST' })
     return createForumTopicHandler(args)
   })
 
+export const getForumStandingFn = createServerFn({ method: 'POST' })
+  .middleware(publicMiddleware)
+  .validator((data: { userId?: string; token?: string }) =>
+    z
+      .object({
+        userId: z.string().optional(),
+        token: z.string().optional(),
+      })
+      .parse(data)
+  )
+  .handler(async (args) => {
+    const { getForumStandingHandler } = await import('./db-services')
+    return getForumStandingHandler(args)
+  })
+
 export const createForumPostFn = createServerFn({ method: 'POST' })
   .middleware(publicMiddleware)
   .validator((data: {

@@ -159,6 +159,8 @@ export const profiles = pgTable('profiles', {
   premiumPeriodEnd: timestamp('premiumPeriodEnd'),
   /** When the last Premium status write was applied. Older webhook events must not overwrite it. */
   premiumSyncedAt: timestamp('premiumSyncedAt'),
+  /** Forum Standing from the 12-hour review and moderation. Upvotes from others are added on read. */
+  standingAdjustment: integer('standingAdjustment').default(0).notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 }, (table) => [
@@ -507,6 +509,8 @@ export const forumTopics = pgTable('forum_topics', {
   discoveryEligible: boolean('discoveryEligible').default(true).notNull(),
   /** Suggested board slug. The member's chosen category is not moved. */
   suggestedCategory: text('suggestedCategory'),
+  /** Set once the 12-hour review has scored this topic. */
+  reviewedAt: timestamp('reviewedAt'),
   lastReplyAt: timestamp('lastReplyAt').defaultNow().notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
@@ -540,6 +544,12 @@ export const forumPosts = pgTable('forum_posts', {
   authorStage: integer('authorStage').default(1).notNull(),
   content: text('content').notNull(),
   upvotes: integer('upvotes').default(0).notNull(),
+  /** 0–100 Jev quality score. Null until a live evaluation lands. */
+  qualityScore: integer('qualityScore'),
+  /** Low-signal reply: sorts last among siblings and renders collapsed. */
+  sunk: boolean('sunk').default(false).notNull(),
+  /** Set once the 12-hour review has scored this reply. */
+  reviewedAt: timestamp('reviewedAt'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   updatedAt: timestamp('updatedAt').defaultNow().notNull(),
   /** Author withdraw — body is sealed, nested replies stay. */

@@ -150,8 +150,12 @@ export function forumTopicQualityFields(decision: ForumGateDecision): {
   }
 }
 
-async function defaultForumEvaluator(input: ForumSubmission): Promise<ForumGateAnswers | null> {
+async function defaultForumEvaluator(
+  input: ForumSubmission,
+  timeoutMs?: number,
+): Promise<ForumGateAnswers | null> {
   const result = await evaluateWithJev({
+    timeoutMs,
     state: {
       title: input.title?.trim() || '',
       body: input.body.trim(),
@@ -164,10 +168,12 @@ async function defaultForumEvaluator(input: ForumSubmission): Promise<ForumGateA
 
 export async function screenForumSubmission(
   input: ForumSubmission,
-  options?: { evaluate?: ForumGateEvaluator },
+  options?: { evaluate?: ForumGateEvaluator; timeoutMs?: number },
 ): Promise<ForumGateDecision> {
   try {
-    const answers = await (options?.evaluate ?? defaultForumEvaluator)(input)
+    const answers = options?.evaluate
+      ? await options.evaluate(input)
+      : await defaultForumEvaluator(input, options?.timeoutMs)
     if (!answers) return fallbackForumDecision()
     return decideForumGate(answers)
   } catch (err) {
