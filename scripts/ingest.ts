@@ -4,6 +4,7 @@ import path from 'node:path'
 import { parseContentFile } from '../src/lib/ingest/parser'
 import { getIngestDb, ingestContentItem } from '../src/lib/ingest/handlers'
 import { IngestContentType, IngestOptions, IngestResult } from '../src/lib/ingest/types'
+import { recordBlogArticle, autoCommitBlogPublish } from './lib/blog-history'
 
 function printHelp() {
   console.log(`
@@ -23,6 +24,8 @@ Options:
       --db <url>             Explicit database connection string.
       --clean, --rm          Automatically delete source file(s) after successful ingestion.
       --dry-run              Validate frontmatter and schema without writing to DB.
+      --commit               Automatically commit ingested file(s) and continuity ledger to git.
+      --no-ledger            Skip updating content/news/blog-history.json for blog posts.
   -s, --silent               Suppress per-file output and only print summary.
   -h, --help                 Display this help menu.
 
@@ -48,6 +51,10 @@ function parseCliArgs(argv: string[]): IngestOptions & { positionalPath?: string
       return options
     } else if (arg === '--dry-run') {
       options.dryRun = true
+    } else if (arg === '--commit') {
+      options.commit = true
+    } else if (arg === '--no-ledger') {
+      options.noLedger = true
     } else if (arg === '--clean' || arg === '--rm') {
       options.clean = true
     } else if (arg === '--dev') {
@@ -175,6 +182,33 @@ async function runCli() {
           console.log(`  ✓ [${typeLabel}] ${actionLabel} "${res.title}" (${res.identifier})${cleanNotice} - ${relPath}`)
         } else {
           console.error(`  ✗ [FAILED] ${relPath}: ${res.error}`)
+        }
+      }
+
+      if (res.success && (res.type === 'blog' || res.type === 'news') && !isDryRun) {
+        if (!args.noLedger) {
+          try {
+            recordBlogArticle({
+              slug: res.identifier,
+              title: res.title,
+              category: parsed.metadata?.category,
+              author: parsed.metadata?.authorName,
+              publishedAt: parsed.metadata?.publishedAt ? new Date(parsed.metadata.publishedAt).toISOString() : new Date().toISOString(),
+              coreHook: parsed.metadata?.summary || '',
+            })
+            if (!args.silent) {
+              console.log(`    ↳ Recorded in content/news/blog-history.json`)
+            }
+          } catch (ledgerErr: any) {
+            console.warn(`    ⚠ Warning: Failed to update blog history ledger: ${ledgerErr.message}`)
+          }
+        }
+
+        if (args.commit) {
+          const commitRes = autoCommitBlogPublish(res.identifier, filePath)
+          if (!args.silent) {
+            console.log(`    ↳ Git: ${commitRes.message}`)
+          }
         }
       }
 

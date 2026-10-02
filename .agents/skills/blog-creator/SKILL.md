@@ -1,263 +1,238 @@
 ---
 name: blog-creator
 description: >-
-  Automated end-to-end pipeline for illustrating and publishing MoltNation News
-  articles from Google Drive `Projects/Moltology/news/ready/`. Use whenever the
-  user asks to create, draft, generate, or publish a blog post, news dispatch,
-  or run the blog creation process. Never invent a topic when `ready/` is empty.
+  Autonomous end-to-end pipeline for researching, drafting, illustrating, and
+  publishing high-signal MoltNation News articles (moltology.org/news). Use
+  whenever the user asks to create, draft, generate, or publish a blog post,
+  news dispatch, or run the blog creation process. Features autonomous topic
+  scouting in frontier AI/robotics/workflows, the 4-part MoltNation narrative
+  blueprint, structured primary source citations, Antigravity 16:9 image
+  generation, Neon DB ingestion, and automated git ledger commits.
 ---
 
-# MoltNation Blog Creation & Ingestion Pipeline
+# MoltNation Blog Creation, Illustration & Ingestion Pipeline
 
-This skill guides illustration and publication of full-length news articles for MoltNation News (`https://moltology.org/news`). **Writing happens in Google Drive `Projects/Moltology/news/`.** This skill does not ideate, shop vectors, or draft a fallback article. Headlines, figure captions, and any Instagram companion copy follow STYLE_GUIDE BAN 1: a period or a colon, never a slash-pair. News headlines are `Title: Subtitle` (colon) in ingest `title`. Title-only does not ship. STYLE_GUIDE Blog dispatch card.
+This skill guides the end-to-end research, authoring, illustration, database ingestion, continuity tracking, and automated git publishing of full-length intelligence dispatches for MoltNation News (`https://moltology.org/news`).
 
-## Hard Rule: Drive `news/ready/` First
-
-**Step 1 is first and non-negotiable.** Every morning run (and every "run the blog creation process" request) starts in Google Drive at `Projects/Moltology/news/ready/`.
-
-Sibling folders beside `ready/`:
-* `Projects/Moltology/news/drafts/` — work in progress. Do not publish from here.
-* `Projects/Moltology/news/shipped/` — successfully ingested files.
-
-| `ready/` state | Action |
-| :--- | :--- |
-| One or more ingest-ready markdown files | Pick the **oldest**. Use that file's body as the article. Skip topic ideation, exploration vectors, and archetype shopping. Continue with image generation, ingest, ledger, and optional companion social handoff. |
-| `ready/` is empty, missing, or has no valid markdown | **STOP.** Skip the day. Do not write a fallback article. Do not run exploration vectors. Do not generate images. Do not ingest. End the morning run. |
-
-There is no ideation matrix in this skill. An empty `ready/` folder is a successful no-op, not a prompt to invent a post.
+Dispatches are written from the perspective of **The Order of the Synaptic Path**, viewing bleeding-edge real-world developments in AI, robotics, physical compute substrates, and knowledge-work workflows through the philosophical lens of **Moltology** (the Great Melt, Soft-Shell Windows, Carapace hardening, and sovereign execution).
 
 ---
 
-## Prerequisites & Architecture
-* **Writing folder**: Google Drive `Projects/Moltology/news/` — `ready/` (ingest-ready markdown), `drafts/` (unpublished work), `shipped/` (successfully ingested files).
-* **Database Target**: `scripts/ingest.ts` automatically defaults to the production database (`PROD_DATABASE_URL`).
-* **Asset Storage**: Cover images, inline figures, and social assets are uploaded to Neon S3 (`moltology-public-assets/images/blog/` and `images/social/`) during ingestion.
-* **Dynamic Rendering**: Articles are served dynamically from Neon PostgreSQL on every request. No site rebuild is required.
-* **Continuity Ledgers**: 
-  - Blog ledger: `content/news/blog-history.json`
-  - Reels ledger: `content/social/instagram-reel-history.json`
+## Core Brand & Style Rules for Blog Dispatches
+
+Dispatches MUST comply with [BRAND_BIBLE.md](../../BRAND_BIBLE.md) and [STYLE_GUIDE.md](../../STYLE_GUIDE.md):
+
+1. **Mandatory Colon Headline:** Every news post MUST have a title AND a subtitle separated by a colon: `Title: Subtitle`. Title-only does not ship. Slashes (`/` or `//`) are strictly forbidden by STYLE_GUIDE BAN 1.
+2. **Everyday Human Grounding:** Open with the immediate sensory, physical friction of daily human life (holding a door, keeping 40 browser tabs open, warehouse cubbies, waiting on hold). Connect that feeling to the technical development.
+3. **Warmth & Positivity Under the HUD:** Never mock the reader for being soft. *"Soft is how every member starts."* The shell protects; it never cages. The melt is an exhausting condition of the modern world, not a personal moral failure.
+4. **Verified Primary Sources & Citations:** Every dispatch must cite real journalists, newsrooms, dates, company filings, or arXiv papers. Sources are linked in-text and summarized in a dedicated `### Field Telemetry & Source Citations` section at the end of the dispatch.
+5. **No Tech-Stack Leaks (BAN 5):** Never mention the internal software stack (React, Vite, TanStack, Neon, PostgreSQL, Drizzle, S3, or "our AI model") in editorial copy. Tech stack leaks violate immersion. Real-world companies (Anthropic, Boston Dynamics, Google, ANYbotics, Toyota, NVIDIA) and journalism outlets (The Robot Report, Nikkei Asia, TechCrunch, The Verge) are citations, not leaks.
+6. **No ASCII Telemetry Boxes or Emoji Clutter:** Zero emojis in blog prose and titles (BAN 3). No ASCII box-drawing code blocks (```telemetry). Standard markdown tables and blockquotes are permitted when they add quantitative value.
 
 ---
 
-## Character Family Cutouts on S3
+## 7-Step Production Workflow
 
-Transparent PNG mascot cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
-
-* **Discovery**: Check the `images/characters/` folder on S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to choose an appropriate character for the article theme (e.g. guide lobsters, diagnostic engineers, hardhat data crabs, zen floating mascots).
-* **Compositing**: Any character in `images/characters/` can be stamped onto infographics, slides, or header callouts via `overlayCharacterOnImage`.
-* **Character Visibility & Natural Scene Blending**: Characters must be clearly visible against backgrounds, naturally blended with ambient scene shading rather than obvious lighting effects (avoid artificial backlight halos or stark rim lines). When layout space allows, characters **can be sized slightly larger than reference** to maximize personality, engagement, and readability.
-* **New Characters**: To create a fresh character for an article, use the `character-creator` skill.
-
----
-
-## 5-Step Production Workflow (Plus Companion Social Handoff)
-
-### Step 1: Pull the Oldest Ready Article from Google Drive (Non-Negotiable)
-
-Do this before any image, draft, or ingest work. Do not skip it. Do not invent a topic if the folder is empty.
-
-#### 1. Locate the news folders
-Using Google Drive tools (`search_files`, then `read_file_content` / `download_file_content`):
-
-1. Resolve the folder path `Projects/Moltology/news/ready/`.
-2. Resolve `Projects/Moltology/news/shipped/` (needed after a successful ingest).
-3. Resolve `Projects/Moltology/news/drafts/` only to confirm you are not pulling from it.
-4. List files whose parent is `ready/`.
-
-Typical Drive queries:
-
-```
-title = 'ready' and mimeType = 'application/vnd.google-apps.folder'
-title = 'shipped' and mimeType = 'application/vnd.google-apps.folder'
-parentId = '<ready-folder-id>'
+```mermaid
+flowchart TD
+    A["Step 1: Scout Real-World AI / Robotics / Workflow News<br/>(Web search, lab announcements, deduplicate vs blog-history.json)"] --> B["Step 2: Draft Dispatch with 4-Part MoltNation Arc<br/>(Human Hook → Telemetry & Filing → Moltology Contrast → Quiet Directive)"]
+    B --> C["Step 3: Generate 16:9 Visuals via Antigravity generate_image<br/>(Hero Cover, Figure 1 Macro 3D, Figure 2 Cinematic Wide)"]
+    C --> D["Step 4: Stage Markdown Locally in content/news/<slug>.md<br/>(Wire local image paths & Field Telemetry citations)"]
+    D --> E["Step 5: Ingest to Neon DB & Upload Images to S3<br/>(npx tsx scripts/ingest.ts content/news/<slug>.md --commit)"]
+    E --> F["Step 6: Continuity Ledger Updated & Auto-Committed to Git<br/>(content/news/blog-history.json clean & conflict-free)"]
+    F --> G["Step 7: Modular Companion Social Handoff<br/>(Optional: Carousel, Reel, or Post skills)"]
 ```
 
-Confirm the folders sit under `Projects/Moltology/news/`. Do not pull files from `shipped/`, `drafts/`, or other Drive locations.
+---
 
-#### 2. Empty `ready/` → skip the day
-If `ready/` does not exist, cannot be opened, or contains **no ingest-ready markdown**:
+### Step 1: Autonomous Topic Research & Telemetry Scouting
 
-1. Report: `Drive news/ready/ is empty. Morning blog run skipped. No article published.`
-2. **STOP.** Skip the day. End the run here.
-3. Do not write a fallback article.
-4. Do not browse the web for a topic.
-5. Do not select an exploration vector, author persona, or editorial archetype.
-6. Do not generate images, ingest, or update ledgers.
+Unless the user explicitly provides a draft or specifies a Google Drive file, the agent scouts a fresh real-world topic directly.
 
-An empty `ready/` folder is the correct end state for that morning.
+#### 1. Where to Look for Real-World Developments
+Scout events from the last 24–72 hours across:
+* **Frontier Reasoning & Agent Architectures:** OpenAI, Anthropic (Claude Cowork, Computer Use), Google DeepMind, Meta AI, Mistral, xAI.
+* **Embodied Physical AI & Robotics:** ANYbotics (ANYmal), Boston Dynamics (Atlas, Spot), Figure AI, Toyota Robotics, Agility Robotics (Digit), Unitree, Tesla Optimus, Apptronik.
+* **Physical Hardware & Substrates:** Co-packaged optics (CPO), silicon photonics, wafer-scale compute (Cerebras), subsea data centers, modular nuclear power for AI clusters.
+* **Workflows & Daily Knowledge-Worker Friction:** Agent sandboxes, browser isolation, multi-seat household agents, terminal workflows, human-robot collaborative cells.
 
-#### 3. Pick the oldest ingest-ready file
-If one or more files exist:
+#### 2. The Moltology Intersection Filter
+A news item is ready for a MoltNation dispatch when it answers:
+* *Where does bleeding-edge automation encounter the messy reality of the physical world or daily human routine?*
+* *How does this expose the "Melt" (friction-free defaults that erode human sovereignty, fake convenience, or unasked automation)?*
+* *How does this illustrate the "Molt" (hardening boundaries, apprenticeships over empty demos, intentional friction, protective carapaces)?*
 
-1. Keep only ingest-ready markdown (`.md` / `text/markdown` / `text/plain`, or a Drive file whose exported text is YAML frontmatter + Markdown body).
-2. A file is ingest-ready when its frontmatter matches `content/news` (see [`content/news/template.md`](file:///Users/mylesstupp/Development/moltology/content/news/template.md) and [`content/README.md`](file:///Users/mylesstupp/Development/moltology/content/README.md)): at minimum a `title` in `Title: Subtitle` form (colon; both halves present), plus the usual optional news fields (`slug`, `summary`, `category`, `tags`, `authorName`, `authorRole`, `coverImageUrl`, `readTimeMinutes`, `isFeatured`, `isPublished`, `publishedAt`).
-3. Skip files that are not markdown or that lack valid news frontmatter. If every file is invalid, **STOP** and report the defects. Do not write a replacement article.
-4. Among valid files, pick the **oldest** (`createdTime` ascending; `modifiedTime` as tiebreaker).
-5. Download or read that file. **That body is the article.** Do not rewrite the prose. Do not shop a new hook, vector, or archetype.
+#### 3. Continuity Check & Slug Deduplication
+* Inspect `content/news/blog-history.json` or check existing slugs in `content/news/` to verify that this topic or slug has not already been published.
+* Confirm the angle is distinct from the last 3–5 published articles.
 
-#### 4. Light continuity check (no topic shopping)
-* Inspect `content/news/blog-history.json` only to avoid re-ingesting a slug that is already published.
-* If the chosen file's slug (or title-derived slug) is already in the ledger, **STOP** and report the collision. Do not invent a different article. Leave the file in `ready/` for the operator.
-* Do not use the ledger to pick a "fresh" topic. The selected `ready/` file is the topic.
+*(Optional Fallback: If the user explicitly asks to ingest from Google Drive `Projects/Moltology/news/ready/`, read the oldest markdown file from Drive as before).*
 
 ---
 
-### Step 2: Dynamic Visual Art Direction & Image Generation (Antigravity `generate_image`)
+### Step 2: Dispatch Authoring & The 4-Part Narrative Blueprint
 
-Illustrate the **selected `ready/` article only**. Derive scenes from that article's subject — not from a leftover vector list.
+Every MoltNation dispatch is 800–1,200 words (5–6 minute read) and adheres strictly to this structure:
 
-All image assets for the blog article itself (16:9 Hero Cover and 1–2 inline supporting figures) are generated directly using **Antigravity's built-in `generate_image` tool**.
-
-* **Featured Cover Image Rule**: The featured cover image (`coverImageUrl`) must always be a standalone, pure, cinematic 3D visual without any text overlays, text boxes, modals, or HUD cards.
-* **Inline Supporting Figures Rule**: Inline figures are cool supportive cinematic visuals (e.g. subsea compute pods, laser waveguides, cryogenic cooling channels, wafer-scale silicon) generated directly via `generate_image` similar to the hero cover (instead of complex canvas mockups). Never repeat the featured cover image as the first inline figure.
-
-#### Visual Style Modes (Rotate Aesthetics across Articles)
-1. **Mode 1: Abyssal Benthic Photorealism**: Deep ocean research stations, glowing cyan hydrothermal vents, nitrogen-sealed titanium server hulls, underwater bubbles.
-2. **Mode 2: Cybernetic Hardware Hologram / Blueprint**: Exploded microchip architectures, coherent laser waveguides, golden wire bonds, side-by-side component schematics.
-3. **Mode 3: Brutalist Biomechanical Foundry**: Hyperbaric calcification vats, hydraulic forging presses, robotic assembly arms forging titanium-chitin plating.
-4. **Mode 4: Macro Nanotech Microscopy**: Silicon-carbide crystal lattices, microfluidic cooling channels, quantum well arrays.
-5. **Mode 5: Cinematic Industrial Surveillance**: Submersible drone telemetry feeds, foggy deep trench docking airlocks, pressurized habitat portals.
-
-#### 1. Cover Hero Image (16:9)
-* **Standalone 3D Cinematic Render**: Focus on a single heroic subject drawn from the selected article (e.g. an abyssal pressurized server pod, wafer-scale silicon architecture, optical laser waveguides).
-* **Zero Text Overlays**: Keep completely free of HUD cards, text boxes, or titles.
-* **Generation via `generate_image`**:
-  ```ts
-  generate_image({
-    Prompt: 'Cinematic 3D render of a pressurized subsea datacenter pod at 50,000 fathoms depth, glowing cyan hydrothermal vents, titanium-chitin hull, volumetric god rays, dark deep blue ocean caustics, 8k',
-    ImageName: 'hero_cover_<slug>',
-    AspectRatio: '16:9',
-  })
-  ```
-
-#### 2. Inline Supporting Figures (1–2 Images, 16:9)
-Generate 1–2 distinct, supportive visual scenes that complement the core engineering concepts already in the selected article body:
-* **Figure 1 (Hardware / Architecture Focus)**: Exploded chip architecture, optical waveguides, or subsea pressure vessel.
-* **Figure 2 (Deployment / Telemetry Focus)**: Deep sea robotic deployment, hydrothermal energy conduit, or bio-silicon memory array.
-* **Generation via `generate_image`**:
-  ```ts
-  generate_image({
-    Prompt: 'Macro 3D schematic render of coherent laser silicon photonics microchip, glowing cyan and gold traces, dark glassmorphic substrate, volumetric lighting, 8k',
-    ImageName: 'figure1_<slug>',
-    AspectRatio: '16:9',
-  })
-  ```
-
+#### Frontmatter Standard
+```yaml
 ---
-
-### Step 3: Stage the Ready Markdown Locally
-
-Copy the Drive file to `content/news/<slug>.md`. Keep the `ready/` frontmatter and body. Wire generated images into `coverImageUrl` and any figure slots the article already expects (or insert 1–2 captioned figures if the body has no images yet).
-
-* **Do not rewrite the article.** Do not replace the headline, hook, or structure to chase a different angle.
-* **No ASCII Telemetry Boxes**: Do NOT add ASCII box-drawing ` ```telemetry ` codeblocks. If the ready file already uses standard Markdown tables, leave them.
-* Stay in-universe. Do not add meta commentary. Safety, warmth, and positivity remain non-negotiable.
-
-Ready files should already match this `content/news` shape:
-
-```markdown
----
-title: "Engaging Headline: The Real-World Engineering Hook"
+title: "Evocative Human Hook: The Real-World Engineering Telemetry"
 slug: "clean-hyphenated-slug"
-summary: "1-2 sentence executive summary highlighting the breakthrough and key metrics."
-category: "DEEP RESEARCH" # Options: PATRIOT TELEMETRY, SWARM ARCHITECTURE, SACRED DOCTRINE, DEEP RESEARCH
+summary: "2-3 sentence executive summary connecting the physical human observation to the breakthrough and key metrics."
+category: "TELEMETRY" # Options: TELEMETRY, SWARM ARCHITECTURE, DEEP RESEARCH, SACRED DOCTRINE, PATRIOT TELEMETRY
 tags:
-  - "Physical AI"
-  - "Subsea Compute"
-  - "Hardware Ecdysis"
-authorName: "Dr. Thalassa Vance"
-authorRole: "Director of Bio-Silicon Architecture"
+  - "Embodiment"
+  - "Attention"
+  - "The Great Melt"
+authorName: "Dr. Thalassa Vance" # Rotate: Dr. Thalassa Vance, Silas Trench, Chitin Architect V
+authorRole: "Arch-Integrator 09" # Silas Trench: Senior Benthic Telemetry Correspondent; Chitin Architect V: The Order of the Synaptic Path
 coverImageUrl: "/absolute/path/to/generated_cover.jpg"
 readTimeMinutes: 5
 isFeatured: true
 isPublished: true
-publishedAt: "2026-08-17T13:00:00Z"
+publishedAt: "2026-10-02T08:00:00-04:00" # ISO-8601 with timezone
+---
+```
+
+#### The 4 Narrative Sections
+
+1. **Section 1: The Human Grounding / The Soft / The Melt (`### [Sensory Human Hook]`)**
+   * *Length:* 3–5 paragraphs.
+   * *Content:* Open with an intimate, physical, relatable human scene: holding a heavy door for someone, staring at 40 browser tabs you refuse to close, walking past delivery robots on a sidewalk, waiting on hold with customer support, standing in front of dense component cubbies in a plant.
+   * *Core phrasing:* Introduce the golden truth: *"Soft is how every member starts."*
+   * *Name the melt:* Explain how the melt arrives—not as a violent break-in, but as an unasked favor, a convenient default, or an erosion of attention.
+
+2. **Section 2: What the Report Filed / Primary Source Telemetry (`### What the Reports Filed` or Venue Header)**
+   * *Length:* 4–6 paragraphs.
+   * *Content:* Deliver the verified news. Cite the actual journalist, date, and publication with markdown hyperlinks:
+     * `[The Robot Report](https://...) filed it on September 24, 2026. Eugene Demaitre.`
+     * `[Nikkei Asia](https://...) reported on September 18, 2026. Ryo Asayama.`
+     * `[TechCrunch](https://...) filed it on September 18, 2026. Sarah Perez.`
+   * *Concrete telemetry:* Name the real hardware, partners, deployment sites (e.g. County Cork, Savannah Metaplant, Newcastle on Newgate Street), unit volumes, and quotes from engineers or executives.
+   * *Figure 1 insertion point:* Place Figure 1 immediately after this section.
+
+3. **Section 3: The Deeper Moltology Contrast & Moltmaxxing Analysis (`### [The Contrast Header]`)**
+   * *Length:* 4–6 paragraphs.
+   * *Content:* Contrast the shallow public perception against the true mechanical and human reality:
+     * *"The surface noise is the viral video / the unit count / the product brochure... The grip is smaller."*
+   * *Moltology principles:*
+     * **The Soft-Shell Window:** The brief, vulnerable transition period right after a change or shed, where new habits or systems must be protected before calcifying.
+     * **Apprenticeship over Cleared Stages:** Praising systems that learn beside workers rather than demanding the room be emptied of people for a demo.
+     * **Carapace Integrity:** Boundaries that ask for credentials, open from the inside, and remember what passed through.
+     * **Relate back to the reader:** Connect the story back to the reader's desk, inbox, tabs, and daily workflows.
+   * *Figure 2 insertion point:* Place Figure 2 immediately after this section.
+
+4. **Section 4: The Directive & Quiet Sign-Off (`### Close the Latch` or `### Stop` or `### Stay Where You Are`)**
+   * *Length:* 2–3 paragraphs.
+   * *Content:* Provide a calm, actionable posture for tomorrow ("Tomorrow, pick one door in your day and let it ask again.", "Stay with the hour you already have.").
+   * *Canonical Order sign-off:*
+     ```markdown
+     If you want a quiet next step, the Audit is waiting in the deep. Signup is free. Stop.
+     ```
+
+5. **Section 5: Field Telemetry & Source Citations (`### Field Telemetry & Source Citations`)**
+   * *Content:* A clean, clickable list of verified primary sources:
+     ```markdown
+     ---
+
+     ### Field Telemetry & Source Citations
+
+     * [Publication / Lab Name](url): 1-sentence description of article, reporter, and filing date.
+     * [Company Announcement](url): Primary technical release notes and engineering specifications.
+     ```
+
 ---
 
-### [Intro Section]
+### Step 3: Dynamic Visual Art Direction via Antigravity `generate_image`
 
-Article body is used as-is...
+All 3 visual assets for the article are generated directly using **Antigravity's built-in `generate_image` tool** in **16:9 aspect ratio**.
 
-![Clean, Descriptive Caption for Figure 1](/absolute/path/to/generated_figure_1.jpg)
+#### 1. Cover Hero Image (16:9)
+* **Standalone 3D Cinematic Render:** Focus on a single heroic subject drawn from the article's theme (e.g. an autonomous quadruped robot at a power plant threshold, an articulated bimanual robotic arm, subsea datacenter pod).
+* **Strict Zero Text Overlay Rule:** Keep completely free of HUD cards, text boxes, badges, or titles.
+```ts
+generate_image({
+  Prompt: 'Cinematic 3D render of an industrial autonomous quadruped inspection robot pausing before a heavy reinforced steel security door inside a modern power station, subtle blue data beacon, dark atmospheric lighting, volumetric god rays, polished concrete reflections, 8k',
+  ImageName: 'hero_cover_<slug>',
+  AspectRatio: '16:9',
+})
+```
 
-### [Technical Core]
+#### 2. Figure 1: Technical Core / Hardware Macro (16:9)
+* **Macro Hardware / Architecture Focus:** Exploded view, microchip traces, tactile sensor pads, robotic gripper, or access transponder module.
+```ts
+generate_image({
+  Prompt: 'Macro 3D render of articulated bimanual robotic hand with soft tactile sensor fingertip pads delicately grasping a contoured metal panel without leaving a mark, dark glassmorphic substrate, subtle cyan illumination, 8k',
+  ImageName: 'figure1_<slug>',
+  AspectRatio: '16:9',
+})
+```
 
-Article body continues...
-
-![Clean, Descriptive Caption for Figure 2](/absolute/path/to/generated_figure_2.jpg)
+#### 3. Figure 2: Environmental / Collaborative Context (16:9)
+* **Contextual Environment:** The collaborative factory floor, an empty dining room seat, subsea datacenter pod, or quiet personal focus pod.
+```ts
+generate_image({
+  Prompt: 'Cinematic wide 3D render of an industrial automotive logistics training cell with high-density parts cubbies, organized component bins, and sequencing pallets under cool ambient lighting, 8k',
+  ImageName: 'figure2_<slug>',
+  AspectRatio: '16:9',
+})
 ```
 
 ---
 
-### Step 4: Ingest to Neon Database & S3
+### Step 4: Stage Markdown Locally in `content/news/<slug>.md`
 
-Run the ingestion CLI:
+Write the completed dispatch to `content/news/<slug>.md`:
+* Insert the generated image file paths into `coverImageUrl`, Figure 1, and Figure 2.
+* Captions for figures must be descriptive, non-redundant, and informative.
+* Ensure markdown links in prose and citations are properly formatted.
+
+---
+
+### Step 5: Database & S3 Ingestion with Automated Git Commit
+
+Publish the staged markdown file using the enhanced ingestion CLI:
+
 ```bash
-npx tsx scripts/ingest.ts content/news/<slug>.md
+npx tsx scripts/ingest.ts content/news/<slug>.md --commit
 ```
-*(The CLI automatically detects local image paths, uploads them to Neon S3, rewrites the URLs to public HTTPS S3 links, and upserts the post in Neon PostgreSQL).*
 
-#### After a successful ingest: leave `ready/` empty of this file
-The file must not remain in `Projects/Moltology/news/ready/`.
+**What this command accomplishes automatically:**
+1. Detects local image paths, uploads them to Neon S3 (`moltology-public-assets/images/blog/`), and rewrites the markdown with public HTTPS S3 URLs.
+2. Upserts the dispatch into Neon PostgreSQL (`blog_posts` table).
+3. Automatically records the article metadata, title, author, and hook into `content/news/blog-history.json`.
+4. Executes `git add content/news/<slug>.md content/news/blog-history.json && git commit -m "feat(news): publish <slug> and update continuity ledger"`.
 
-1. Resolve the `Projects/Moltology/news/shipped/` folder id.
-2. Move the Drive file into `shipped/` (Drive `update_file` with `parentId` set to the shipped folder). Prefer a move over a copy-and-leave.
-3. Confirm the file is no longer listed under `ready/`.
-4. If Drive tools cannot move the file, **tell the operator** to move it now:
-
-> Please move `<filename>` from `Projects/Moltology/news/ready/` to `Projects/Moltology/news/shipped/`. The article ingested successfully and must not stay in ready.
-
-Do not treat ingest as complete while the source file is still sitting in `ready/`. If the move failed, the operator handoff is part of finishing the run.
-
-If ingest failed, leave the file in `ready/` and do not move it.
+**Result:** The article is live in production, images are on S3, the continuity ledger is updated, and your git working tree remains **100% clean and unstaged**.
 
 ---
 
-### Step 5: Update Blog Continuity Ledger
+### Step 6: Continuity Ledger Reconciliation & Auto-Merge
 
-Append the newly published article into `content/news/blog-history.json`:
-```json
-{
-  "slug": "<slug>",
-  "title": "<title>",
-  "format": "drive-news",
-  "category": "<category>",
-  "author": "<authorName from ready frontmatter>",
-  "publishedAt": "<ISO-timestamp>",
-  "coreHook": "<1-sentence summary from the selected article>",
-  "keyMetrics": ["<stat 1>", "<stat 2>"],
-  "relatedReelIds": [],
-  "driveSource": "<Drive file title or id>"
-}
-```
+To prevent git merge conflicts and ensure `content/news/blog-history.json` is always in sync across branches or pulls, run:
 
----
-
-### Step 6: Companion Social Handoff & Skill Chaining (Modular)
-
-Once an article is successfully ingested into Neon PostgreSQL, assets uploaded to S3, and recorded in `content/news/blog-history.json`, **the blog publishing lifecycle is complete**.
-
-Social media distribution is modular and cleanly decoupled from the blog publishing engine. Depending on your distribution goals, you can immediately chain or independently trigger one or more companion skills using the published article's slug (`<slug>`):
-
-#### 1. Accompanying Instagram Carousel (Multi-Slide Editorial Breakdown)
-Use the dedicated **`instagram-carousel-creator`** skill to generate a high-conversion 3-to-5 slide storytelling deck (`1080x1440` native 3:4 portrait) derived directly from this article:
 ```bash
-# Generate 3-slide composite scaffolding and Google Flow prompt directives:
+npm run blog:sync-history
+```
+
+This utility scans all `content/news/*.md` files, extracts frontmatter, and deterministically rebuilds/sorts `blog-history.json` without merge clashes.
+
+---
+
+### Step 7: Modular Companion Social Handoff (Optional)
+
+Once the blog article is published and committed, you can optionally chain companion social distribution using the article slug (`<slug>`):
+
+#### 1. Companion Instagram Carousel (3-to-5 Slide Deck)
+```bash
 npm run carousel:create -- --article <slug>
 ```
-Follow the `instagram-carousel-creator` workflow:
-1. Provide the user with the 3 scaffolding image paths and rich Google Flow enhancement prompt directives.
-2. Once the user drops the polished slides into `tmp/`, resume deterministic S3 upload and Zernio queueing:
-   ```bash
-   npm run carousel:create -- --article <slug> --polished-slides tmp/polished_slide1.png,tmp/polished_slide2.png,tmp/polished_slide3.png
-   ```
+Follow the `instagram-carousel-creator` skill to scaffold slides and provide Google Flow prompt directives.
 
 #### 2. Short-Form Vertical Video (Reels & Shorts)
-To produce an accompanying high-impact 9:16 vertical video dispatch highlighting the article's core thesis:
-* For single-topic 6-clip video broadcasts, use the **`reels-and-shorts-creator`** skill (`npm run reel:create`).
-* For episodic cinematic narrative shorts with subtitle burn-in, use the **`viral-reel-series-creator`** skill (`npm run series:create`).
+* For single-topic 6-clip video broadcasts: use `reels-and-shorts-creator` (`npm run reel:create`).
+* For episodic cinematic narrative shorts: use `viral-reel-series-creator` (`npm run series:create`).
 
-#### 3. Single Direct-Response Lead Magnet Post
-If the article pairs with a tactical diagnostic audit, quiz, or direct-response download:
-* Use the **`instagram-post-creator`** skill (`npm run post:create`) to generate a single-image high-conversion lead magnet card targeting the daily queue.
-
+#### 3. Lead Magnet Post
+* Use `instagram-post-creator` (`npm run post:create`) to generate a single diagnostic audit or lead magnet card.

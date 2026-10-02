@@ -45,6 +45,7 @@
     "db:reset": "tsx src/db/reset.ts && npm run db:setup",
     "codex:sync": "tsx scripts/sync-codex.ts",
     "codex:check": "tsx scripts/sync-codex.ts --check",
+    "blog:sync-history": "tsx scripts/sync-blog-history.ts",
     "logic:sync": "tsx scripts/sync-logic-atlas.ts",
     "logic:check": "tsx scripts/sync-logic-atlas.ts --check",
     "mockups:capture": "tsx scripts/capture-dashboard-mockups.ts",

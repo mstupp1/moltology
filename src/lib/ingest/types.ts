@@ -10,6 +10,9 @@ export interface IngestOptions {
   prod?: boolean
   dev?: boolean
   clean?: boolean
+  commit?: boolean
+  ledger?: boolean
+  noLedger?: boolean
 }
 
 export interface IngestResult {
