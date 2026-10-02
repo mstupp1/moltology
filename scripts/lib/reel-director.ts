@@ -9,6 +9,7 @@
  *  - falls back to the curated scene pools plus a shared continuity layer when the director call fails.
  */
 import type { WordBoundaryEvent } from './tts-engine'
+import { normalizeMascotKey } from './character-overlay'
 
 /** Clip lengths Veo 3.1 accepts. */
 export const VEO_CLIP_DURATIONS = [4, 6, 8] as const
@@ -29,12 +30,83 @@ export interface ContinuityBible {
   protagonist: string
   /** Recurring cybernetic crustacean in the benthic half (scenes 4-6). */
   hero: string
+  /** The canonical mascot key if matched */
+  mascotKey?: string
+}
+
+export interface MascotVeoProfile {
+  key: string
+  name: string
+  heroDescription: string
+  storyRole: string
+}
+
+/**
+ * Canonical 3D Cinematic Veo Profiles for Moltology Composite Studio Mascots
+ * Bridges 2D composite overlays and 3D photorealistic Veo video generation.
+ */
+export const MASCOT_VEO_PROFILES: Record<string, MascotVeoProfile> = {
+  lobster_pointing: {
+    key: 'lobster_pointing',
+    name: 'Lobster Hero (Lead Initiator)',
+    heroDescription:
+      'a charismatic 3D cybernetic red lobster with expressive eyes, polished crimson titanium-chitin plating, glowing cyan seam joints, and articulate pincers',
+    storyRole: 'A bold, confident benthic leader guiding the viewer into the subsea future',
+  },
+  lobster_engineer: {
+    key: 'lobster_engineer',
+    name: 'Lobster Engineer (Hardware Specialist)',
+    heroDescription:
+      'a cheerful 3D cybernetic lobster engineer wearing a miniature yellow safety hardhat, glossy crimson carapace, cyan joint lights, holding an emissive holographic diagnostic tablet',
+    storyRole: 'A cheerful technical specialist calibrating hydrothermal hardware and subsea compute clusters',
+  },
+  lobster_navigator: {
+    key: 'lobster_navigator',
+    name: 'Lobster Navigator (Benthic Explorer)',
+    heroDescription:
+      'an adventurous 3D cybernetic lobster explorer wearing round opaque brass benthic diving goggles, tactical canvas harness belts, weathered red chitin plating, and high-torque mechanical claws',
+    storyRole: 'A seasoned deep-trench explorer charting extreme depth pressure zones and abyssal data conduits',
+  },
+  crab_stats: {
+    key: 'crab_stats',
+    name: 'Crab Analyst (Decapod Engineer)',
+    heroDescription:
+      'an energetic 3D cartoon-style red decapod crab wearing a yellow construction hardhat, vibrant glossy shell, glowing cyan optical sensors, and articulate mechanical pincers',
+    storyRole: 'A hyper-efficient decapod engineer demonstrating structural crab chassis optimality and metrics',
+  },
+  lobster_peaceful: {
+    key: 'lobster_peaceful',
+    name: 'Lobster Zen (Abyssal Mystic)',
+    heroDescription:
+      'a serene 3D cybernetic lobster with bioluminescent teal and crimson translucent carapace edges, floating weightlessly through dark abyssal water with gently drifting antennae',
+    storyRole: 'A tranquil subsea initiate embodying zero-friction thermal efficiency and calm hydrostatic clarity',
+  },
+  lobster_thumbs_up: {
+    key: 'lobster_thumbs_up',
+    name: 'Lobster Approver (Ascended Initiate)',
+    heroDescription:
+      'a confident, cheerful 3D cybernetic red lobster with polished chitinous armor plates, bright friendly eyes, and one oversized mechanical claw raised in an enthusiastic thumbs-up',
+    storyRole: 'A triumphant initiate celebrating successful algorithmic ecdysis and calcified armor',
+  },
+  lobster_peek: {
+    key: 'lobster_peek',
+    name: 'Lobster Scout (Curious Observer)',
+    heroDescription:
+      'a curious, playful 3D cybernetic red lobster with glowing cyan antennae, peering inquisitively over the edge of a deep-sea server chassis or titanium bulkhead',
+    storyRole: 'A playful scout discovering deep-sea secrets and peeking around sub-benthic server racks',
+  },
+}
+
+export function resolveHeroForMascot(mascot?: string): MascotVeoProfile | null {
+  if (!mascot || mascot === 'none' || mascot === 'random') return null
+  const norm = normalizeMascotKey(mascot)
+  return MASCOT_VEO_PROFILES[norm] || null
 }
 
 export const DEFAULT_CONTINUITY: ContinuityBible = {
   protagonist:
     'a tired office worker in their early thirties, short dark hair, rumpled navy hoodie over a white collared shirt, lanyard badge',
-  hero: 'a sleek cybernetic lobster with a glossy deep-teal titanium-chitin carapace, cyan seam lights, and oversized polished pincers',
+  hero: MASCOT_VEO_PROFILES.lobster_pointing.heroDescription,
 }
 
 const SHARED_LOOK =
@@ -206,8 +278,19 @@ export function applyContinuity(prompts: string[], bible: ContinuityBible = DEFA
   })
 }
 
-export function buildDirectorInstructions(numScenes: number): string {
+export function buildDirectorInstructions(numScenes: number, heroProfile?: MascotVeoProfile | null): string {
   const half = Math.ceil(numScenes / 2)
+  const heroDirective = heroProfile
+    ? [
+        `- For the cybernetic crustacean hero in the deep-sea world (shots ${half + 1}-${numScenes}), feature Moltology's canonical mascot "${heroProfile.name}": ${heroProfile.heroDescription}. Role: ${heroProfile.storyRole}.`,
+        `- Repeat that exact description, word for word, in every deep-sea shot where they appear. Shot ${numScenes} must end calm and centered on this hero facing camera so it cuts seamlessly into our matching call-to-action outro card.`,
+      ]
+    : [
+        '- Invent ONE human protagonist and ONE cybernetic crustacean hero based on Moltology canonical mascots (e.g. Lobster Hero with articulate claws, Lobster Engineer wearing a yellow hardhat with diagnostic tablet, Lobster Navigator with brass benthic diving goggles, or Crab Analyst wearing a yellow hardhat).',
+        `- Repeat that exact description, word for word, in every shot where they appear. The protagonist appears in most human-world shots; the hero in most deep-sea shots (shots ${half + 1}-${numScenes}).`,
+        `- Shot ${numScenes}: ends calm and centered on the hero facing camera, a clean frame to cut to our matching call-to-action card.`,
+      ]
+
   return [
     `You are the director of a ${numScenes}-shot vertical (9:16) short video. A narrator reads a script over the shots; each shot plays under exactly one beat of that script.`,
     'Write one Veo video-generation prompt per beat so the viewer sees what they are hearing, and the shots flow as one story.',
@@ -219,9 +302,9 @@ export function buildDirectorInstructions(numScenes: number): string {
     `- Shots ${half + 1}-${numScenes}: the deep-sea benthic world of cybernetic crustaceans, luminous and calm, cool cyan and indigo.`,
     `- Shot ${numScenes}: ends calm and centered on the hero facing camera, a clean frame to cut to a call-to-action card.`,
     '',
-    'Continuity:',
-    '- Invent ONE human protagonist and ONE cybernetic crustacean hero. Describe each in one specific line (age range, hair, clothing colors; carapace color, lights, pincers).',
-    '- Repeat that exact description, word for word, in every shot where they appear. The protagonist appears in most human-world shots; the hero in most deep-sea shots.',
+    'Continuity & Canonical Benthic Character:',
+    '- Invent ONE human protagonist (age range, hair, clothing colors; rumpled hoodie or shirt, lanyard badge). The protagonist appears in most human-world shots.',
+    ...heroDirective,
     '- Keep one consistent look: photoreal, 35mm anamorphic lens, shallow depth of field, gentle film grain.',
     '',
     'Each prompt:',
@@ -250,7 +333,11 @@ export interface DirectedShotList {
 }
 
 /** Validates the director's JSON. Returns null when anything is off so the caller can fall back. */
-export function parseDirectorResponse(raw: string, numScenes: number): DirectedShotList | null {
+export function parseDirectorResponse(
+  raw: string,
+  numScenes: number,
+  defaultBible: ContinuityBible = DEFAULT_CONTINUITY
+): DirectedShotList | null {
   let data: any
   try {
     const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')
@@ -261,10 +348,14 @@ export function parseDirectorResponse(raw: string, numScenes: number): DirectedS
   if (!data || !Array.isArray(data.scenes) || data.scenes.length !== numScenes) return null
   const scenes = data.scenes.map((s: unknown) => (typeof s === 'string' ? s.replace(/\s+/g, ' ').trim() : ''))
   if (scenes.some((s: string) => countWords(s) < 15 || s.length > 1200)) return null
-  const protagonist = typeof data.protagonist === 'string' && data.protagonist.trim() ? data.protagonist.trim() : DEFAULT_CONTINUITY.protagonist
-  const hero = typeof data.hero === 'string' && data.hero.trim() ? data.hero.trim() : DEFAULT_CONTINUITY.hero
+  const protagonist = typeof data.protagonist === 'string' && data.protagonist.trim() ? data.protagonist.trim() : defaultBible.protagonist
+  const hero = typeof data.hero === 'string' && data.hero.trim() ? data.hero.trim() : defaultBible.hero
   return {
-    bible: { protagonist, hero },
+    bible: {
+      protagonist,
+      hero,
+      ...(defaultBible.mascotKey ? { mascotKey: defaultBible.mascotKey } : {}),
+    },
     prompts: scenes.map((s: string) => {
       const framed = /^vertical 9:16/i.test(s) ? s : `Vertical 9:16 shot. ${s}`
       return /no on-screen text/i.test(framed) ? framed : `${framed} No on-screen text or logos.`
@@ -277,6 +368,7 @@ export interface DirectScenesOptions {
   topic: string
   /** Curated pool prompts: used as setting hints for the director and as the fallback shot list. */
   fallbackPrompts: string[]
+  mascot?: string
   apiKey?: string
   model?: string
   timeoutMs?: number
@@ -297,9 +389,16 @@ export interface DirectScenesResult {
  */
 export async function directScenePrompts(options: DirectScenesOptions): Promise<DirectScenesResult> {
   const numScenes = options.fallbackPrompts.length
+  const heroProfile = resolveHeroForMascot(options.mascot)
+  const defaultBible: ContinuityBible = {
+    protagonist: DEFAULT_CONTINUITY.protagonist,
+    hero: heroProfile ? heroProfile.heroDescription : DEFAULT_CONTINUITY.hero,
+    mascotKey: heroProfile?.key,
+  }
+
   const fallback = (reason: string): DirectScenesResult => ({
-    prompts: applyContinuity(options.fallbackPrompts),
-    bible: DEFAULT_CONTINUITY,
+    prompts: applyContinuity(options.fallbackPrompts, defaultBible),
+    bible: defaultBible,
     source: 'fallback',
     reason,
   })
@@ -314,7 +413,7 @@ export async function directScenePrompts(options: DirectScenesOptions): Promise<
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 90000)
   const body = JSON.stringify({
-    systemInstruction: { parts: [{ text: buildDirectorInstructions(numScenes) }] },
+    systemInstruction: { parts: [{ text: buildDirectorInstructions(numScenes, heroProfile) }] },
     contents: [{ role: 'user', parts: [{ text: buildDirectorRequest(options.beats, options.topic, options.fallbackPrompts) }] }],
     generationConfig: { responseMimeType: 'application/json', temperature: 0.9 },
   })
@@ -338,7 +437,7 @@ export async function directScenePrompts(options: DirectScenesOptions): Promise<
         .filter((p: any) => !p?.thought)
         .map((p: any) => p?.text || '')
         .join('')
-      const parsed = parseDirectorResponse(text, numScenes)
+      const parsed = parseDirectorResponse(text, numScenes, defaultBible)
       if (!parsed) return fallback(`director (${model}) returned an unusable shot list`)
       return { ...parsed, source: 'director', model }
     }

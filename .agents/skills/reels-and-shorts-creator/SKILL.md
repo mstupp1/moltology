@@ -25,13 +25,28 @@ The Moltology 6-clip format targets **~35–50 seconds** (each video scene spann
 
 ---
 
-## Character Family Cutouts on S3
+## Character Family Cutouts on S3 & Veo Video Continuity
 
 Transparent PNG character cutouts are hosted in the Neon S3 public assets bucket under `images/characters/` (`https://br-bitter-dew-ayea5tmh.storage.c-5.us-east-2.aws.neon.tech/moltology-public-assets/images/characters/`).
 
-* **Discovery**: Inspect `images/characters/` in S3 or [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts) to select a mascot for hook overlays, watermark accents, or outro CTA cards.
-* **Compositing**: Any character in `images/characters/` can be stamped onto frames or video overlays via `overlayCharacterOnImage` or `scripts/lib/reel-compositor.ts`.
+* **Discovery**: Inspect `images/characters/` in S3, [`scripts/lib/character-overlay.ts`](file:///Users/mylesstupp/Development/moltology/scripts/lib/character-overlay.ts), or [`src/components/composite/MascotOverlay.tsx`](file:///Users/mylesstupp/Development/moltology/src/components/composite/MascotOverlay.tsx).
+* **Compositing**: Any character in `images/characters/` can be stamped onto frames, social composites, or outro cards via `overlayCharacterOnImage` or `scripts/lib/reel-compositor.ts`.
+* **Veo Video Scene Translation**: Canonical mascots translate directly into 3D photorealistic heroes in Veo video clips (Scenes 4–6), creating 100% visual continuity between video footage and the final elevated Composite Studio outro card.
 * **New Characters**: To generate a new mascot with distinct attire, personality, or pose, use the `character-creator` skill.
+
+### Canonical Character-to-Veo Translation Matrix
+
+The shot director (`scripts/lib/reel-director.ts`) and continuity engine automatically map the selected `--mascot` to rich, photorealistic 3D Veo prompts:
+
+| Character Key | Composite Studio Persona | Veo 3.1 Cinematic Video Prompt Description | Narrative Role |
+|---|---|---|---|
+| **`lobster_pointing`** | Hero Lobster (Lead Initiator) | *a charismatic 3D cybernetic red lobster with expressive eyes, polished crimson titanium-chitin plating, glowing cyan seam joints, and articulate pincers* | Bold, confident benthic leader guiding the viewer into the subsea future |
+| **`lobster_engineer`** | Lobster Engineer (Diagnostics) | *a cheerful 3D cybernetic lobster engineer wearing a miniature yellow safety hardhat, glossy crimson carapace, cyan joint lights, holding an emissive holographic diagnostic tablet* | Cheerful technical specialist calibrating hydrothermal hardware and subsea compute clusters |
+| **`lobster_navigator`** | Lobster Navigator (Explorer) | *an adventurous 3D cybernetic lobster explorer wearing round opaque brass benthic diving goggles, tactical canvas harness belts, weathered red chitin plating, and high-torque mechanical claws* | Seasoned deep-trench explorer charting extreme depth pressure zones and abyssal data conduits |
+| **`crab_stats`** | Crab Analyst (Decapod Engineer) | *an energetic 3D cartoon-style red decapod crab wearing a yellow construction hardhat, vibrant glossy shell, glowing cyan optical sensors, and articulate mechanical pincers* | Hyper-efficient decapod engineer demonstrating structural crab chassis optimality and metrics |
+| **`lobster_peaceful`** | Lobster Zen (Abyssal Mystic) | *a serene 3D cybernetic lobster with bioluminescent teal and crimson translucent carapace edges, floating weightlessly through dark abyssal water with gently drifting antennae* | Tranquil subsea initiate embodying zero-friction thermal efficiency and calm hydrostatic clarity |
+| **`lobster_thumbs_up`** | Lobster Approver (Initiate) | *a confident, cheerful 3D cybernetic red lobster with polished chitinous armor plates, bright friendly eyes, and one oversized mechanical claw raised in an enthusiastic thumbs-up* | Triumphant initiate celebrating successful algorithmic ecdysis and calcified armor |
+| **`lobster_peek`** | Lobster Scout (Observer) | *a curious, playful 3D cybernetic red lobster with glowing cyan antennae, peering inquisitively over the edge of a deep-sea server chassis or titanium bulkhead* | Playful scout discovering deep-sea secrets and peeking around sub-benthic server racks |
 
 ---
 
@@ -118,10 +133,10 @@ console.log(ttsResult.providerUsed) // 'fish' | 'edge'
 * Shots 1–2: the everyday human world, with one recurring protagonist described identically in every shot.
 * Shot 3: the frustration peaks (comic, never scary).
 * Shot 4: the transition. The camera pushes into something from the previous shot (a coffee surface, a monitor, a window) and emerges deep underwater.
-* Shots 4–6: the benthic world, with one recurring cybernetic crustacean hero described identically in every shot.
-* Shot 6: ends calm and centered on the hero, a clean hand-off to the elevated CTA outro card.
+* Shots 4–6: the benthic world, featuring the **selected canonical Moltology mascot** (`--mascot <name>`, e.g. Lobster Engineer, Lobster Navigator, Crab Analyst), described identically across each subsea shot for seamless character continuity.
+* Shot 6: ends calm and centered on the hero facing camera, providing a clean, seamless hand-off to the matching Composite Studio elevated CTA outro card.
 
-Every scene also carries a shared look (35mm anamorphic, shallow depth of field, film grain) and a Veo `negativePrompt` against on-screen text, logos, and warped hands, so nothing fights the burned-in captions. If the director call fails, the curated prompts below are used with the same continuity layer (recurring protagonist and hero, shared look) instead of halting. `--no-director` skips the call. The shot list is printed in `--dry-run` too, so you can preview it for free.
+Every scene also carries a shared look (35mm anamorphic, shallow depth of field, film grain) and a Veo `negativePrompt` against on-screen text, logos, and warped hands, so nothing fights the burned-in captions. If the director call fails, the curated prompts below are used with the same continuity layer (recurring protagonist and canonical mascot hero, shared look) instead of halting. `--no-director` skips the call. The shot list is printed in `--dry-run` too, so you can preview it for free.
 
 **Clip lengths follow the beats**: each scene is generated at the shortest Veo length (4, 6 or 8s) that covers its beat with at most 1.35x slow motion, so short beats cost 4s of footage and long beats are not stretched into sluggish slow motion.
 
