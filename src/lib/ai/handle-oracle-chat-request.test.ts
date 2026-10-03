@@ -286,11 +286,10 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
   })
 
-  it('falls through to the next model when the primary provider throws', async () => {
+  it('returns 502 when the provider throws without backup fallback hops', async () => {
     streamTextMock.mockImplementationOnce(() => {
       throw new Error('Provider unavailable')
     })
-    streamTextMock.mockReturnValueOnce({ stream: textStream('Recovered answer') })
 
     const res = await handleOracleChatRequest(
       await authedRequest({
@@ -298,14 +297,14 @@ describe('handleOracleChatRequest', () => {
       })
     )
 
-    expect(res.status).toBe(200)
-    expect(await res.text()).toBe('Recovered answer')
-    expect(streamTextMock).toHaveBeenCalledTimes(2)
+    expect(res.status).toBe(502)
+    const data = await res.json()
+    expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
   })
 
-  it('falls through to the next model when the primary stream is empty', async () => {
+  it('returns 502 when the stream is empty without backup fallback hops', async () => {
     streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
-    streamTextMock.mockReturnValueOnce({ stream: textStream('Secondary answer') })
 
     const res = await handleOracleChatRequest(
       await authedRequest({
@@ -313,17 +312,15 @@ describe('handleOracleChatRequest', () => {
       })
     )
 
-    expect(res.status).toBe(200)
-    expect(await res.text()).toBe('Secondary answer')
-    expect(streamTextMock).toHaveBeenCalledTimes(2)
+    expect(res.status).toBe(502)
+    const data = await res.json()
+    expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
     expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
-    expect(streamTextMock.mock.calls[1]?.[0]?.model).toBe(ORACLE_MODELS[1].id)
   })
 
-  it('returns 502 only after every model in the list fails', async () => {
-    for (const _model of ORACLE_MODELS) {
-      streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
-    }
+  it('returns 502 when GLM Flash fails', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
 
     const res = await handleOracleChatRequest(
       await authedRequest({
@@ -336,25 +333,21 @@ describe('handleOracleChatRequest', () => {
     const data = await res.json()
     expect(data.error).toContain(ORACLE_UNAVAILABLE_MESSAGE)
     expect(data.text).toContain(ORACLE_UNAVAILABLE_MESSAGE)
-    expect(streamTextMock).toHaveBeenCalledTimes(ORACLE_MODELS.length)
+    expect(streamTextMock).toHaveBeenCalledTimes(1)
   })
 
-  it('tries the selected model first, then remaining candidates', async () => {
-    streamTextMock.mockReturnValueOnce({ stream: emptyStream() })
-    streamTextMock.mockReturnValueOnce({ stream: textStream('Fallback after pick') })
+  it('pins candidate model to GLM Flash', async () => {
+    streamTextMock.mockReturnValueOnce({ stream: textStream('Answer') })
 
-    const selected = ORACLE_MODELS[1].id
     const res = await handleOracleChatRequest(
       await authedRequest({
         messages: [{ role: 'user', content: 'Teach me ecdysis' }],
-        model: selected,
       })
     )
 
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('Fallback after pick')
-    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(selected)
-    expect(streamTextMock.mock.calls[1]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
+    expect(await res.text()).toBe('Answer')
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
   })
 
   it('blocks a Jev jailbreak before streaming', async () => {
@@ -434,13 +427,13 @@ describe('handleOracleChatRequest', () => {
     expect(streamTextMock.mock.calls[0]?.[0]?.maxOutputTokens).toBe(ORACLE_MAX_OUTPUT_TOKENS)
   })
 
-  it('uses the fast model and chassis context when Jev says the question is simple', async () => {
+  it('uses GLM Flash model and passes context to buildSystemPrompt', async () => {
     streamTextMock.mockReturnValueOnce({ stream: textStream('Chassis answer') })
     vi.mocked(screenOraclePrompt).mockResolvedValueOnce({
       blocked: false,
       intent: 'chassis_equipment',
       complexityBand: 2,
-      preferredModelId: ORACLE_MODELS[1].id,
+      preferredModelId: ORACLE_MODELS[0].id,
       context: 'chassis',
       source: 'jev',
     })
@@ -452,7 +445,7 @@ describe('handleOracleChatRequest', () => {
     )
 
     expect(res.status).toBe(200)
-    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[1].id)
+    expect(streamTextMock.mock.calls[0]?.[0]?.model).toBe(ORACLE_MODELS[0].id)
     expect(buildSystemPrompt).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Synaptic Oracle' }),
       'chassis',

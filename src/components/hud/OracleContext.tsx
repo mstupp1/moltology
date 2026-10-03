@@ -26,7 +26,7 @@ interface OracleContextType {
   setActiveThreadId: (id: string | null) => void
   threads: OracleThread[]
   isLoadingThreads: boolean
-  refreshThreads: () => Promise<void>
+  refreshThreads: () => Promise<OracleThread[] | void>
   patchThreadLocally: (threadId: string, patch: Partial<OracleThread>) => void
   removeThreadLocally: (threadId: string) => void
   restoreThreadLocally: (thread: OracleThread) => void
@@ -60,6 +60,7 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
   const [threads, setThreads] = useState<OracleThread[]>([])
   const [isLoadingThreads, setIsLoadingThreads] = useState(false)
+  const threadsCountRef = useRef(0)
 
   // Track the route the user was on prior to navigating to /oracle
   const lastNonOracleRouteRef = useRef<string>('/dashboard')
@@ -84,22 +85,27 @@ export const OracleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [currentPath])
 
   // Load threads for authenticated user
-  const refreshThreads = async () => {
+  const refreshThreads = async (): Promise<OracleThread[]> => {
     if (!userId) {
       setThreads([])
-      return
+      return []
     }
-    setIsLoadingThreads(true)
+    // Silent refresh once a list is on screen, so the sidebar updates in place without flashing.
+    const showLoading = threadsCountRef.current === 0
+    if (showLoading) setIsLoadingThreads(true)
     try {
       const data = await getAIThreadsFn({ data: await oracleAuthData(userId) })
       if (Array.isArray(data)) {
+        threadsCountRef.current = data.length
         setThreads(data)
+        return data as OracleThread[]
       }
     } catch (err) {
       console.warn('Failed to load user AI threads:', err)
     } finally {
-      setIsLoadingThreads(false)
+      if (showLoading) setIsLoadingThreads(false)
     }
+    return []
   }
 
   useEffect(() => {

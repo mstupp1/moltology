@@ -123,8 +123,8 @@ export const PromptInput: React.FC<PromptInputProps> = ({
                 )}
               </div>
 
-              {/* Model Selector if provided */}
-              {selectedModel && onSelectModel && (
+              {/* Model Selector if provided and multiple models exist */}
+              {selectedModel && onSelectModel && ORACLE_MODELS.length > 1 && (
                 <div className="relative">
                   <button
                     type="button"

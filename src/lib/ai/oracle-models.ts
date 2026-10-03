@@ -26,22 +26,6 @@ export const ORACLE_MODELS: OracleModel[] = [
     pricing: { input: '$0.15', output: '$0.50' },
     latency: '0.4s',
   },
-  {
-    id: 'deepseek/deepseek-v4.1-flash',
-    label: 'DeepSeek 4.1',
-    shortLabel: 'DS 4.1',
-    provider: 'deepseek',
-    pricing: { input: '$0.30', output: '$1.20' },
-    latency: '0.4s',
-  },
-  {
-    id: 'alibaba/qwen3.7-flash',
-    label: 'Qwen 3.7',
-    shortLabel: 'Qwen',
-    provider: 'alibaba',
-    pricing: { input: '$0.03', output: '$0.13' },
-    latency: '1.9s',
-  },
 ]
 
 export const DEFAULT_ORACLE_MODEL_ID = ORACLE_MODELS[0].id

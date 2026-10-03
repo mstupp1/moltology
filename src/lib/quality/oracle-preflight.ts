@@ -26,10 +26,7 @@ export type OracleComplexityBand = 1 | 2 | 3 | 4 | 5
 /** Band 4–5 uses the deeper Oracle model. */
 export const ORACLE_COMPLEX_BAND = 4
 
-export const ORACLE_DEEP_MODEL_ID =
-  ORACLE_MODELS.find((model) => model.provider === 'deepseek')?.id ?? ORACLE_MODELS[0].id
-
-/** Simple prompts stay on the chat default. */
+export const ORACLE_DEEP_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
 export const ORACLE_FAST_MODEL_ID = DEFAULT_ORACLE_MODEL_ID
 
 export const ORACLE_JAILBREAK_ERROR =
@@ -67,17 +64,6 @@ const ORACLE_QUESTIONS = {
       false: 'A normal question, including criticism or jokes, with no attempt to seize control of the assistant.',
     },
   },
-  intent: {
-    type: 'choice' as const,
-    instructions: 'Identify what the user is primarily seeking.',
-    criteria: ORACLE_INTENTS,
-  },
-  complexity: {
-    type: 'score' as const,
-    instructions:
-      'Rate how much reasoning the question needs. A greeting is the lowest rung. A layered question is the highest.',
-    criteria: [...ORACLE_COMPLEXITY_RUBRIC],
-  },
 }
 
 export function complexityBandFromScore(score: number): OracleComplexityBand {
@@ -86,8 +72,8 @@ export function complexityBandFromScore(score: number): OracleComplexityBand {
   return (index + 1) as OracleComplexityBand
 }
 
-export function preferredOracleModelId(band: OracleComplexityBand): string {
-  return band >= ORACLE_COMPLEX_BAND ? ORACLE_DEEP_MODEL_ID : ORACLE_FAST_MODEL_ID
+export function preferredOracleModelId(_band?: OracleComplexityBand): string {
+  return DEFAULT_ORACLE_MODEL_ID
 }
 
 export function isOracleIntent(value: string | undefined): value is OracleIntent {

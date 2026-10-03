@@ -90,6 +90,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
   const [localThreads, setLocalThreads] = useState<any[]>([])
   const [localIsLoadingThreads, setLocalIsLoadingThreads] = useState(false)
+  const localThreadsCountRef = useRef(0)
   const [isChatsOpen, setIsChatsOpen] = useState(false)
   const [panelWidth, setPanelWidth] = useState(0)
 
@@ -151,21 +152,35 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     setIsMounted(true)
   }, [])
 
-  const refreshLocalThreads = async () => {
+  const refreshLocalThreads = async (): Promise<any[]> => {
     if (!userId) {
       setLocalThreads([])
-      return
+      return []
     }
-    setLocalIsLoadingThreads(true)
+    const showLoading = localThreadsCountRef.current === 0
+    if (showLoading) setLocalIsLoadingThreads(true)
     try {
       const data = await getAIThreadsFn({ data: await oracleAuthData(userId) })
       if (Array.isArray(data)) {
+        localThreadsCountRef.current = data.length
         setLocalThreads(data)
+        return data
       }
     } catch (err) {
       console.warn('Failed to load user AI threads:', err)
     } finally {
-      setLocalIsLoadingThreads(false)
+      if (showLoading) setLocalIsLoadingThreads(false)
+    }
+    return []
+  }
+
+  // The AI title is written after the reply finishes, so poll briefly until it replaces the placeholder.
+  const refreshForGeneratedTitle = async (threadId: string, placeholder: string) => {
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 800 : 1500))
+      const list = oracle ? await oracle.refreshThreads() : await refreshLocalThreads()
+      const current = Array.isArray(list) ? list.find((t: any) => t.id === threadId) : null
+      if (current && current.title && current.title !== placeholder) return
     }
   }
 
@@ -437,6 +452,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
       if (res.threadId) {
         applyThreadId(res.threadId)
+        if (!activeThreadId && userId) {
+          const placeholder = text.trim().split('\n')[0].slice(0, 60) || 'Ascendance Consultation'
+          void refreshForGeneratedTitle(res.threadId, placeholder)
+        }
       }
 
       setMessages((prev) =>

@@ -14,7 +14,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
     "rules": 97,
     "decisions": 33,
     "anchors": 170,
-    "drifted": 0,
+    "drifted": 2,
     "flagged": 12
   },
   "canvas": {
@@ -4436,18 +4436,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/quality/oracle-preflight.ts",
           "symbol": "decideOraclePreflight",
-          "line": 120,
+          "line": 106,
           "value": "decideOraclePreflight(answers)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L120"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L106"
         },
         {
           "file": "src/lib/quality/oracle-preflight.ts",
           "symbol": "ORACLE_JAILBREAK_ERROR",
-          "line": 35,
+          "line": 32,
           "value": "\"This message can't be sent. Ask your question directly instead of trying to override the assistant.\"",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L35"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L32"
         }
       ],
       "tests": [
@@ -4494,18 +4494,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/quality/oracle-preflight.ts",
           "symbol": "contextForOracleIntent",
-          "line": 97,
+          "line": 83,
           "value": "contextForOracleIntent(intent)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L97"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L83"
         },
         {
           "file": "src/lib/quality/oracle-preflight.ts",
           "symbol": "fallbackOracleDecision",
-          "line": 110,
+          "line": 96,
           "value": "fallbackOracleDecision()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L110"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L96"
         }
       ],
       "tests": [
@@ -4548,10 +4548,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/quality/oracle-preflight.ts",
           "symbol": "preferredOracleModelId",
-          "line": 89,
-          "value": "preferredOracleModelId(band)",
-          "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L89"
+          "line": 75,
+          "value": "preferredOracleModelId(_band)",
+          "drift": "changed",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/oracle-preflight.ts#L75"
         }
       ],
       "tests": [
@@ -4576,7 +4576,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1240,
         "y": 544
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.model-fallback",
@@ -4591,7 +4591,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "ORACLE_MODELS",
           "line": 19,
           "value": "[ { id: 'zai/glm-5.3-flash', label: 'GLM 5.3 Flash', shortLabel: 'GLM', provider: 'zai', badge: 'Chat', pricing: { input: '$0.15', output: '$0.50' }, latency: …",
-          "drift": "ok",
+          "drift": "changed",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L19"
         }
       ],
@@ -4615,7 +4615,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1240,
         "y": 700
       },
-      "drift": "ok"
+      "drift": "changed"
     },
     {
       "id": "oracle.thread-ownership",

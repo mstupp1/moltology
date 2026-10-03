@@ -59,7 +59,7 @@ describe('NewChatScreen Component', () => {
     expect(screen.getByText('benthic-vault')).toBeInTheDocument()
   })
 
-  it('allows switching model via cognition model dropdown when showModelPicker is enabled', () => {
+  it('allows viewing model info via cognition model dropdown when showModelPicker is enabled', () => {
     render(
       <NewChatScreen
         userId="usr_test"
@@ -73,14 +73,14 @@ describe('NewChatScreen Component', () => {
     const modelBtn = screen.getByRole('button', { name: /Select Cognition Model/i })
     fireEvent.click(modelBtn)
 
-    expect(screen.getAllByText('Qwen 3.7').length).toBeGreaterThan(0)
-    const qwenOptions = screen.getAllByRole('button', { name: /Qwen 3.7/i })
-    fireEvent.click(qwenOptions[qwenOptions.length - 1])
+    expect(screen.getAllByText('GLM 5.3 Flash').length).toBeGreaterThan(0)
+    const glmOptions = screen.getAllByRole('button', { name: /GLM 5.3 Flash/i })
+    fireEvent.click(glmOptions[glmOptions.length - 1])
 
-    expect(mockOnSelectModel).toHaveBeenCalledWith('alibaba/qwen3.7-flash')
+    expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
   })
 
-  it('renders the Chat badge and pricing in model dropdown and allows selecting Qwen 3.7', () => {
+  it('renders the Chat badge and pricing in model dropdown and allows selecting GLM 5.3 Flash', () => {
     render(
       <NewChatScreen
         userId="usr_test"
@@ -101,17 +101,15 @@ describe('NewChatScreen Component', () => {
     expect(screen.getByText('Out / 1M')).toBeInTheDocument()
     expect(screen.getByText('Latency')).toBeInTheDocument()
 
-    // Pricing & latency values
+    // Pricing & latency values for GLM Flash
     expect(screen.getByText('$0.15')).toBeInTheDocument()
-    expect(screen.getByText('$1.20')).toBeInTheDocument()
+    expect(screen.getByText('$0.50')).toBeInTheDocument()
     expect(screen.getAllByText('0.4s').length).toBeGreaterThan(0)
-    expect(screen.getByText('$0.03')).toBeInTheDocument()
-    expect(screen.getByText('1.9s')).toBeInTheDocument()
 
-    const qwenOption = screen.getByRole('button', { name: /Qwen 3.7/i })
-    fireEvent.click(qwenOption)
+    const glmOption = screen.getAllByRole('button', { name: /GLM 5.3 Flash/i })[0]
+    fireEvent.click(glmOption)
 
-    expect(mockOnSelectModel).toHaveBeenCalledWith('alibaba/qwen3.7-flash')
+    expect(mockOnSelectModel).toHaveBeenCalledWith('zai/glm-5.3-flash')
   })
 
   it('submits typed prompt on submit click and Enter key press', () => {

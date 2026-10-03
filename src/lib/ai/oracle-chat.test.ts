@@ -28,11 +28,9 @@ describe('oracle-chat helpers', () => {
     expect(ORACLE_TITLE_MODEL_ID).toBe('zai/glm-5.3-flash')
   })
 
-  it('keeps GLM 5.3 Flash, DeepSeek 4.1, and Qwen 3.7 in the picker', () => {
+  it('pins ORACLE_MODELS to GLM 5.3 Flash', () => {
     expect(ORACLE_MODELS.map((m) => m.id)).toEqual([
       'zai/glm-5.3-flash',
-      'deepseek/deepseek-v4.1-flash',
-      'alibaba/qwen3.7-flash',
     ])
   })
 
@@ -55,19 +53,16 @@ describe('oracle-chat helpers', () => {
     expect(a).toMatch(/Guest|account|Sign up/i)
   })
 
-  it('returns the default model first in the cascade candidate list', () => {
+  it('returns the default model in the candidate list', () => {
     const expected = ORACLE_MODELS.map((m) => m.id)
     expect(getOracleCandidateModelIds()).toEqual(expected)
     expect(getOracleCandidateModelIds('unknown-model')).toEqual(expected)
-    expect(getOracleCandidateModelIds('alibaba/qwen3.7-flash')[0]).toBe('alibaba/qwen3.7-flash')
+    expect(getOracleCandidateModelIds('zai/glm-5.3-flash')[0]).toBe('zai/glm-5.3-flash')
   })
 
-  it('lets an explicit model pick beat a Jev preference', () => {
-    const deep = ORACLE_MODELS[0].id
-    const fast = ORACLE_MODELS[1].id
-    expect(orderOracleModels(undefined, fast)[0]).toBe(fast)
-    expect(orderOracleModels(deep, fast)[0]).toBe(deep)
-    expect(orderOracleModels()[0]).toBe(deep)
+  it('always resolves candidate models to GLM Flash', () => {
+    expect(orderOracleModels()[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
+    expect(orderOracleModels('zai/glm-5.3-flash')[0]).toBe(DEFAULT_ORACLE_MODEL_ID)
   })
 
   it('formats plain unavailable messages with optional gateway detail', () => {

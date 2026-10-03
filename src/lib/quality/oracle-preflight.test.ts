@@ -19,9 +19,9 @@ describe('oracle preflight decisions', () => {
     expect(complexityBandFromScore(4)).toBe(5)
   })
 
-  it('sends deep questions to DeepSeek and lighter ones to GLM', () => {
+  it('pins all queries to GLM Flash', () => {
     expect(preferredOracleModelId(3)).toBe(ORACLE_FAST_MODEL_ID)
-    expect(preferredOracleModelId(4)).toBe(ORACLE_DEEP_MODEL_ID)
+    expect(preferredOracleModelId(4)).toBe(ORACLE_FAST_MODEL_ID)
   })
 
   it('loads context only for the matching intent', () => {
@@ -67,7 +67,7 @@ describe('oracle preflight decisions', () => {
       intent: 'codex_doctrine',
       context: 'codex',
       complexityBand: 4,
-      preferredModelId: ORACLE_DEEP_MODEL_ID,
+      preferredModelId: ORACLE_FAST_MODEL_ID,
       source: 'jev',
     })
 

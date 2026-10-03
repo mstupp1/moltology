@@ -35,8 +35,8 @@ export function getOracleCandidateModelIds(selectedModelId?: string): string[] {
 }
 
 /**
- * An explicit picker choice wins. Otherwise the preflight complexity pick leads,
- * then the remaining models stay as fallbacks.
+ * Returns candidate model list pinned to GLM 5.3 Flash for maximum KV cache hits
+ * and predictable execution without multi-model fallback hops.
  */
 export function orderOracleModels(requestedModelId?: string, preferredModelId?: string): string[] {
   return getOracleCandidateModelIds(requestedModelId || preferredModelId)
