@@ -3,12 +3,12 @@ id: forum
 title: Forum & moderation
 order: 7
 color: '#00ffc8'
-summary: Member posts pass local safety checks, a rate limit, and a Jev quality gate. Flags are soft and staff review them in Covenant Watch.
+summary: Member posts pass sign-in, a rate limit, Standing gates, local safety checks, and a moderation-model quality gate. Flags are soft and staff review them in Covenant Watch.
 rules:
   - id: forum.write-pipeline
     title: Forum write pipeline
     kind: flow
-    statement: Creating or editing a topic or reply runs sign-in, the rate limit, length and safety checks, and the Jev gate, in that order, before anything is stored.
+    statement: Creating or editing a topic or reply runs sign-in, the rate limit, length and safety checks, and the moderation gate, in that order, before anything is stored. New topics and replies also pass the Standing gates right after the rate limit.
     dependsOn: [access.write-auth]
     anchors:
       - file: src/lib/server/db-services.ts
@@ -34,9 +34,18 @@ rules:
         label: Over 10 writes a minute?
         next:
           - { to: slow, label: 'yes' }
-          - { to: local, label: 'no' }
+          - { to: standing, label: 'no' }
       - id: slow
         label: Posting too quickly
+        kind: outcome
+        tone: warn
+      - id: standing
+        label: Standing allows this post?
+        next:
+          - { to: locked, label: 'no' }
+          - { to: local, label: 'yes' }
+      - id: locked
+        label: Thread or reply limit message
         kind: outcome
         tone: warn
       - id: local
@@ -49,7 +58,7 @@ rules:
         kind: outcome
         tone: block
       - id: jev
-        label: Jev prohibited score
+        label: Moderation prohibited score
         kind: action
         next:
           - { to: quarantine, label: '> 0.8' }
@@ -109,20 +118,28 @@ rules:
         symbol: containsHarmfulContent
     tests: [src/lib/community-rules.test.ts]
   - id: forum.jev-shared
-    title: Shared Jev settings
+    title: Shared moderation model settings
     kind: threshold
-    statement: Jev acts only on a clear yes, above 0.8 confidence, with a 1,200 ms default budget and no retries. A timeout or outage returns nothing, and callers fall back to local checks.
+    statement: Short inputs (up to 1,500 characters) go to Laya, which is free. Longer ones go to Jev, because Laya rejects them. Both act only on a clear yes, above 0.8 confidence, with a 1,200 ms default budget and no retries. A timeout or outage returns nothing, and callers fall back to local checks.
+    flag:
+      level: watch
+      note: The gateway refuses the zero data retention option on the Hobby plan. Turning it back on makes every evaluation fail open. In spot checks Laya also scored subtle jailbreaks lower than Jev.
     anchors:
       - file: src/lib/quality/jev.ts
         symbol: JEV_HIGH_CONFIDENCE
       - file: src/lib/quality/jev.ts
         symbol: JEV_EVAL_TIMEOUT_MS
       - file: src/lib/quality/jev.ts
+        symbol: LAYA_STATE_MAX_CHARS
+      - file: src/lib/quality/jev.ts
+        symbol: moderationModelFor
+      - file: src/lib/quality/jev.ts
         symbol: evaluateWithJev
+    tests: [src/lib/quality/jev.test.ts]
   - id: forum.quarantine
     title: Prohibited posts never insert
     kind: gate
-    statement: When Jev is more than 80% sure a post is spam, harassment, solicitation, or leaks secrets, it is refused with a plain message and never stored.
+    statement: When the moderation model is more than 80% sure a post is spam, harassment, solicitation, or leaks secrets, it is refused with a plain message and never stored.
     dependsOn: [forum.jev-shared, forum.write-pipeline]
     anchors:
       - file: src/lib/quality/forum-gate.ts
@@ -142,7 +159,7 @@ rules:
   - id: forum.fail-open
     title: Forum gate fails open
     kind: invariant
-    statement: If Jev is unavailable, the post is allowed after the local checks, and a fallback never wipes a score Jev gave earlier.
+    statement: If the moderation model is unavailable, the post is allowed after the local checks without a score, and a fallback never wipes an earlier score. The Standing review rescreens unscored posts later.
     dependsOn: [forum.jev-shared]
     anchors:
       - file: src/lib/quality/forum-gate.ts

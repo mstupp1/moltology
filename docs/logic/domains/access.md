@@ -56,7 +56,7 @@ rules:
   - id: access.hidden-pages
     title: Hidden pages
     kind: gate
-    statement: Pages listed in HIDDEN_PAGES (Subterranean Vats and Premium) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.
+    statement: Pages listed in HIDDEN_PAGES (Subterranean Vats, Premium, and the merch Store) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.
     dependsOn: [access.staff]
     anchors:
       - file: src/lib/hidden-pages.ts

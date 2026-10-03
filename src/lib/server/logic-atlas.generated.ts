@@ -7,26 +7,26 @@ import type { LogicAtlas } from '../logic-atlas/types'
 
 export const LOGIC_ATLAS: LogicAtlas = {
   "version": 1,
-  "syncedAt": "2026-10-02",
+  "syncedAt": "2026-10-03",
   "repoUrl": "https://github.com/mstupp1/moltology",
   "stats": {
-    "domains": 10,
-    "rules": 88,
-    "decisions": 31,
-    "anchors": 148,
-    "drifted": 11,
-    "flagged": 10
+    "domains": 11,
+    "rules": 97,
+    "decisions": 33,
+    "anchors": 170,
+    "drifted": 0,
+    "flagged": 12
   },
   "canvas": {
-    "width": 5569,
-    "height": 2692
+    "width": 5693,
+    "height": 2820
   },
   "domains": [
     {
       "id": "economy",
       "title": "Economy & currencies",
       "color": "#ffb020",
-      "summary": "Two currencies with a locked split. Chitin Gems are earned, Molt Credits are bought, and standing is never for sale.",
+      "summary": "Two currencies with a locked split. Chitin Gems are earned, Molt Credits are bought, and rank and authority cannot be purchased.",
       "overviewHtml": "<p>The economy is a locked design decision in <code>BRAND_BIBLE.md</code> §4 and hard rule 4 in <code>AGENTS.md</code>. Every paid feature must be checked against the red line before it ships.</p>\n<p>Today the market is a demo. No real Credits are sold and nothing is enforced on the server.</p>",
       "box": {
         "x": 0,
@@ -100,8 +100,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Self-hosted Better Auth with email and password plus Google. Sessions are cookie-cached, and writes use short-lived JWTs.",
       "overviewHtml": "<p>Auth moved off Managed Neon Auth because its background polling kept Neon compute awake and blew the compute budget. Identity for writes is always a verified JWT, never a client-supplied id.</p>",
       "box": {
-        "x": 0,
-        "y": 1084,
+        "x": 3920,
+        "y": 0,
         "width": 1773,
         "height": 538
       },
@@ -123,7 +123,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "New accounts pass a honeypot, a timing signal, a disposable-domain list, and a Jev bot check. Screening fails open when the model is down.",
       "overviewHtml": "<p>Screening uses cheap local checks first, then asks Jev only when needed. Every path fails open, because a false block costs a real member.</p>",
       "box": {
-        "x": 1869,
+        "x": 0,
         "y": 1084,
         "width": 2364,
         "height": 680
@@ -146,10 +146,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "premium",
       "title": "Premium & billing",
       "color": "#d27bff",
-      "summary": "A Stripe monthly membership in soft launch behind the staff gate. It does not sell standing, and it unlocks nothing yet.",
+      "summary": "A Stripe monthly membership in soft launch behind the staff gate. Its only benefit so far is a 10x Oracle allowance.",
       "overviewHtml": "<p>Premium is a subscription, not a currency. It sits beside the economy and must stay on the right side of the red line. During the soft launch, only staff can see, buy, or turn Premium on without a charge.</p>",
       "box": {
-        "x": 4329,
+        "x": 2460,
         "y": 1084,
         "width": 1240,
         "height": 496
@@ -169,11 +169,11 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "forum",
       "title": "Forum & moderation",
       "color": "#00ffc8",
-      "summary": "Member posts pass local safety checks, a rate limit, and a Jev quality gate. Flags are soft and staff review them in Covenant Watch.",
+      "summary": "Member posts pass sign-in, a rate limit, Standing gates, local safety checks, and a moderation-model quality gate. Flags are soft and staff review them in Covenant Watch.",
       "overviewHtml": "<p>Moderation is deliberately light. The gate refuses only clear abuse. Everything else is published, and low quality is handled by keeping it out of Hot, not by deleting it. Staff act on flags by hand.</p>",
       "box": {
-        "x": 0,
-        "y": 1860,
+        "x": 3796,
+        "y": 1084,
         "width": 1780,
         "height": 808
       },
@@ -197,17 +197,19 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "oracle",
       "title": "Oracle AI",
       "color": "#ff5fa2",
-      "summary": "The Oracle chat checks rate and input locally, classifies the prompt with Jev, routes it to a fast or deep model, and falls back through a model chain.",
-      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, then spends a small Jev call to route the question to the cheapest model that can answer it.</p>",
+      "summary": "The Oracle checks rate, input, and each member's usage allowance, screens the prompt with the moderation model, routes it to a fast or deep model, and falls back through a model chain.",
+      "overviewHtml": "<p>The Oracle is the most expensive surface, because every message is a billed model call. The pipeline refuses abuse cheaply first, caps each member&#39;s allowance, then spends a free moderation call to route the question to the cheapest model that can answer it.</p>",
       "box": {
-        "x": 1876,
-        "y": 1860,
-        "width": 948,
+        "x": 0,
+        "y": 1988,
+        "width": 1532,
         "height": 832
       },
       "ruleIds": [
         "oracle.request-pipeline",
         "oracle.rate-limit",
+        "oracle.usage-allowance",
+        "oracle.request-caps",
         "oracle.input-guardrails",
         "oracle.jailbreak-gate",
         "oracle.intent-context",
@@ -223,8 +225,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "Members claim one unique handle, and feeds only show real activity from the member and their friends. Empty stays honest.",
       "overviewHtml": "<p>Social surfaces follow one rule. Show real people and real activity, or show nothing. A quiet new account sees an honest, empty stream instead of fake veterans.</p>",
       "box": {
-        "x": 2920,
-        "y": 1860,
+        "x": 1628,
+        "y": 1988,
         "width": 612,
         "height": 784
       },
@@ -245,8 +247,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "summary": "The app runs inside Neon Free and Vercel Hobby limits. Retention windows, polling rules, and the asset budget keep it there.",
       "overviewHtml": "<p>Most cost decisions trace back to two limits: Neon Free compute hours and Vercel Hobby Active CPU. Anything that polls, keeps compute awake, or grows storage without bound has to justify itself here.</p>",
       "box": {
-        "x": 3628,
-        "y": 1860,
+        "x": 2336,
+        "y": 1988,
         "width": 904,
         "height": 652
       },
@@ -258,6 +260,28 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "data.canonical-content",
         "data.migrations-via-ci",
         "data.asset-budget"
+      ]
+    },
+    {
+      "id": "standing",
+      "title": "Forum Standing",
+      "color": "#f7e463",
+      "summary": "Standing is a member's forum reputation, from upvotes plus review adjustments. It decides who can start threads, which replies sink, and who is limited.",
+      "overviewHtml": "<p>Standing is the forum&#39;s reputation score. It comes from other members&#39; upvotes and gates the actions that cost the community the most: new threads and high reply volume.</p>",
+      "box": {
+        "x": 3336,
+        "y": 1988,
+        "width": 1196,
+        "height": 520
+      },
+      "ruleIds": [
+        "standing.score",
+        "standing.thread-gate",
+        "standing.restricted",
+        "standing.sunk-replies",
+        "standing.review",
+        "standing.gain-cap",
+        "standing.simulated-votes"
       ]
     }
   ],
@@ -275,7 +299,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "4.1 The Duality",
           "line": 211,
           "value": "Moltology runs on two currencies, and the distinction is a locked design decision.",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L211"
         },
         {
@@ -283,7 +307,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "Hard list",
           "line": 3,
           "value": "1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L3"
         }
       ],
@@ -305,12 +329,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 116,
         "y": 76
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "economy.red-line",
       "domain": "economy",
-      "title": "Standing is never for sale",
+      "title": "Rank and authority can't be bought",
       "kind": "invariant",
       "status": "active",
       "statement": "Rank, clearance, stage, forum authority, and prestige titles cannot be bought with Molt Credits or Premium. Credits may add speed and style only.",
@@ -320,7 +344,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "4.4 The Red Line",
           "line": 237,
           "value": "Progress and standing cannot be purchased. No Clearance, no Stage, no forum",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/BRAND_BIBLE.md#L237"
         }
       ],
@@ -330,7 +354,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [
         "progression.stage-from-xp",
-        "premium.no-standing"
+        "premium.no-standing",
+        "oracle.usage-allowance",
+        "standing.score"
       ],
       "decisions": [
         "lock-two-currency-economy"
@@ -341,7 +367,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 232
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "economy.signup-free",
@@ -356,7 +382,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "Hard list",
           "line": 3,
           "value": "1. Stay in the bit in narrative content, lore, and public copy. Functional UI utilities (form validation, error boundaries, system warnings, permission dialogs…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/AGENTS.md#L3"
         }
       ],
@@ -374,7 +400,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 232
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "economy.starting-balances",
@@ -497,7 +523,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "MarketShopPage",
           "line": 22,
           "value": "MarketShopPage()",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/components/hud/market/MarketShopPage.tsx#L22"
         }
       ],
@@ -523,7 +549,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 904,
         "y": 388
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "economy.simulated-gem-grants",
@@ -536,10 +562,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/simulation-engine.ts",
           "symbol": "simulateDailyRoutines",
-          "line": 585,
+          "line": 640,
           "value": "simulateDailyRoutines(dbClient, config, options)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L585"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/simulation-engine.ts#L640"
         }
       ],
       "tests": [],
@@ -654,10 +680,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3613,
+          "line": 3479,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3613"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3479"
         }
       ],
       "tests": [
@@ -704,10 +730,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "toggleDailyAlignmentTaskHandler",
-          "line": 3613,
+          "line": 3479,
           "value": "toggleDailyAlignmentTaskHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3613"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3479"
         }
       ],
       "tests": [
@@ -742,10 +768,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3436,
+          "line": 3302,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3436"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3302"
         },
         {
           "file": "src/lib/progression.ts",
@@ -878,10 +904,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "syncUserProgression",
-          "line": 3436,
+          "line": 3302,
           "value": "syncUserProgression(dbClient, userId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3436"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3302"
         }
       ],
       "tests": [],
@@ -1133,7 +1159,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "profiles",
           "line": 122,
           "value": "pgTable('profiles', { id: text('id').primaryKey(), role: text('role').default('user').notNull(), // 'user' | 'admin' | 'super_admin' larvaId: text('larvaId').d…",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/db/schema.ts#L122"
         }
       ],
@@ -1154,7 +1180,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 904,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.hidden-pages",
@@ -1162,14 +1188,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Hidden pages",
       "kind": "gate",
       "status": "active",
-      "statement": "Pages listed in HIDDEN_PAGES (Subterranean Vats and Premium) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.",
+      "statement": "Pages listed in HIDDEN_PAGES (Subterranean Vats, Premium, and the merch Store) stay out of navigation and search for members and show a plain unavailable notice. Staff see them faded in the sidebar and can open them.",
       "anchors": [
         {
           "file": "src/lib/hidden-pages.ts",
           "symbol": "HIDDEN_PAGES",
           "line": 8,
           "value": "[ { id: 'subterranean', path: '/subterranean', }, { id: 'premium', path: '/premium', }, { id: 'store', path: '/store', }, ] as const",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/hidden-pages.ts#L8"
         },
         {
@@ -1202,7 +1228,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 28,
         "y": 544
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "access.admin-only-paths",
@@ -2339,7 +2365,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "signup.pipeline"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "standing.thread-gate"
+      ],
       "decisions": [
         "signup-screening"
       ],
@@ -2370,10 +2398,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "submitLeadHandler",
-          "line": 3200,
+          "line": 3066,
           "value": "submitLeadHandler(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3200"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L3066"
         }
       ],
       "tests": [
@@ -2415,10 +2443,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "shouldShowPremiumDashboardBanner",
-          "line": 90,
+          "line": 92,
           "value": "shouldShowPremiumDashboardBanner(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L90"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L92"
         }
       ],
       "tests": [
@@ -2452,23 +2480,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Premium grants no standing",
       "kind": "invariant",
       "status": "active",
-      "statement": "Premium must never grant rank, clearance, stage, forum authority, or Chitin Gems. The entitlement list is empty until benefits are defined.",
+      "statement": "Premium must never grant rank, clearance, stage, forum authority, Standing, or Chitin Gems. Its only listed benefit is 10 times the free Oracle allowance.",
       "anchors": [
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "listPremiumEntitlements",
-          "line": 101,
+          "line": 103,
           "value": "listPremiumEntitlements(_isPremium)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L101"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L103"
         },
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "PREMIUM_PAGE_COPY",
-          "line": 38,
+          "line": 40,
           "value": "{ title: 'Premium membership', eyebrow: 'Monthly membership', description: 'Premium does not change your rank, clearance, stage, or forum authority. Chitin Gem…",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L38"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L40"
         }
       ],
       "tests": [
@@ -2480,9 +2508,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "economy.red-line"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "oracle.usage-allowance"
+      ],
       "decisions": [
-        "premium-soft-launch"
+        "premium-soft-launch",
+        "oracle-usage-and-moderation"
       ],
       "flag": null,
       "flow": null,
@@ -2503,18 +2534,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "isCurrentPremiumStatus",
-          "line": 105,
+          "line": 109,
           "value": "isCurrentPremiumStatus(status)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L105"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L109"
         },
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "subscriptionStatusImpliesPurchase",
-          "line": 109,
+          "line": 113,
           "value": "subscriptionStatusImpliesPurchase(status)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L109"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L113"
         },
         {
           "file": "src/db/schema.ts",
@@ -2559,10 +2590,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "premiumPriceMatchesProduct",
-          "line": 494,
+          "line": 498,
           "value": "premiumPriceMatchesProduct(priceProduct, expectedProductId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L494"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L498"
         },
         {
           "file": "src/lib/server/premium.ts",
@@ -2600,7 +2631,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Webhooks must be signed",
       "kind": "gate",
       "status": "active",
-      "statement": "The Stripe webhook verifies the signature before any membership write. A missing secret returns 500, and a bad signature returns 400.",
+      "statement": "The Stripe webhook verifies the signature before any membership or merch write. A missing secret returns 500, and a bad signature returns 400. Completed merch checkouts are handed to merch fulfillment, and everything else goes to membership sync.",
       "anchors": [
         {
           "file": "src/lib/stripe-webhook.ts",
@@ -2615,7 +2646,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "symbol": "handleStripeWebhookRequest",
           "line": 428,
           "value": "handleStripeWebhookRequest(request)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/premium.ts#L428"
         }
       ],
@@ -2638,7 +2669,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 948,
         "y": 208
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "premium.event-sync",
@@ -2651,18 +2682,18 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "interpretPremiumStripeEvent",
-          "line": 261,
+          "line": 265,
           "value": "interpretPremiumStripeEvent(event)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L261"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L265"
         },
         {
           "file": "src/lib/premium-membership.ts",
           "symbol": "reducePremiumMembership",
-          "line": 177,
+          "line": 181,
           "value": "reducePremiumMembership(previous, input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L177"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/premium-membership.ts#L181"
         },
         {
           "file": "src/lib/server/premium.ts",
@@ -2935,10 +2966,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/db/enable-rls.ts",
           "symbol": "applyPremiumColumnGuard",
-          "line": 718,
+          "line": 727,
           "value": "applyPremiumColumnGuard()",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/enable-rls.ts#L718"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/db/enable-rls.ts#L727"
         }
       ],
       "tests": [],
@@ -3004,23 +3035,23 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Forum write pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Creating or editing a topic or reply runs sign-in, the rate limit, length and safety checks, and the Jev gate, in that order, before anything is stored.",
+      "statement": "Creating or editing a topic or reply runs sign-in, the rate limit, length and safety checks, and the moderation gate, in that order, before anything is stored. New topics and replies also pass the Standing gates right after the rate limit.",
       "anchors": [
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumTopicHandler",
-          "line": 1707,
+          "line": 1571,
           "value": "createForumTopicHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1707"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1571"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "requirePublishableForumPost",
-          "line": 1047,
+          "line": 911,
           "value": "requirePublishableForumPost(input)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1047"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L911"
         }
       ],
       "tests": [
@@ -3041,7 +3072,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "forum.content-limits",
         "forum.content-safety",
         "forum.quarantine",
-        "forum.locked-threads"
+        "forum.locked-threads",
+        "standing.thread-gate"
       ],
       "decisions": [],
       "flag": null,
@@ -3053,7 +3085,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "start",
             "tone": "neutral",
             "position": {
-              "x": 204,
+              "x": 197,
               "y": 0
             },
             "width": 208,
@@ -3065,7 +3097,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "check",
             "tone": "neutral",
             "position": {
-              "x": 204,
+              "x": 197,
               "y": 86
             },
             "width": 208,
@@ -3077,7 +3109,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "block",
             "position": {
-              "x": 7,
+              "x": 0,
               "y": 228
             },
             "width": 208,
@@ -3089,7 +3121,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "check",
             "tone": "neutral",
             "position": {
-              "x": 239,
+              "x": 232,
               "y": 228
             },
             "width": 208,
@@ -3101,8 +3133,32 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "warn",
             "position": {
-              "x": 41,
+              "x": 35,
               "y": 370
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "standing",
+            "label": "Standing allows this post?",
+            "kind": "check",
+            "tone": "neutral",
+            "position": {
+              "x": 267,
+              "y": 370
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "locked",
+            "label": "Thread or reply limit message",
+            "kind": "outcome",
+            "tone": "warn",
+            "position": {
+              "x": 69,
+              "y": 512
             },
             "width": 208,
             "height": 46
@@ -3113,8 +3169,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "check",
             "tone": "neutral",
             "position": {
-              "x": 273,
-              "y": 370
+              "x": 301,
+              "y": 512
             },
             "width": 208,
             "height": 46
@@ -3125,20 +3181,20 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "block",
             "position": {
-              "x": 76,
-              "y": 512
+              "x": 104,
+              "y": 654
             },
             "width": 208,
             "height": 46
           },
           {
             "id": "jev",
-            "label": "Jev prohibited score",
+            "label": "Moderation prohibited score",
             "kind": "action",
             "tone": "neutral",
             "position": {
-              "x": 308,
-              "y": 512
+              "x": 336,
+              "y": 654
             },
             "width": 208,
             "height": 46
@@ -3149,8 +3205,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "block",
             "position": {
-              "x": 0,
-              "y": 654
+              "x": 28,
+              "y": 796
             },
             "width": 208,
             "height": 46
@@ -3161,8 +3217,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "check",
             "tone": "neutral",
             "position": {
-              "x": 232,
-              "y": 654
+              "x": 260,
+              "y": 796
             },
             "width": 208,
             "height": 46
@@ -3173,8 +3229,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "warn",
             "position": {
-              "x": 93,
-              "y": 796
+              "x": 121,
+              "y": 938
             },
             "width": 208,
             "height": 46
@@ -3185,8 +3241,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "allow",
             "position": {
-              "x": 325,
-              "y": 796
+              "x": 353,
+              "y": 938
             },
             "width": 208,
             "height": 46
@@ -3218,10 +3274,22 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": "yes"
           },
           {
-            "id": "rate-1-local",
+            "id": "rate-1-standing",
             "source": "rate",
-            "target": "local",
+            "target": "standing",
             "label": "no"
+          },
+          {
+            "id": "standing-0-locked",
+            "source": "standing",
+            "target": "locked",
+            "label": "no"
+          },
+          {
+            "id": "standing-1-local",
+            "source": "standing",
+            "target": "local",
+            "label": "yes"
           },
           {
             "id": "local-0-invalid",
@@ -3266,14 +3334,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": "no"
           }
         ],
-        "width": 533,
-        "height": 842
+        "width": 561,
+        "height": 984
       },
       "position": {
         "x": 116,
         "y": 364
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.rate-limit",
@@ -3421,37 +3489,58 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "forum.jev-shared",
       "domain": "forum",
-      "title": "Shared Jev settings",
+      "title": "Shared moderation model settings",
       "kind": "threshold",
       "status": "active",
-      "statement": "Jev acts only on a clear yes, above 0.8 confidence, with a 1,200 ms default budget and no retries. A timeout or outage returns nothing, and callers fall back to local checks.",
+      "statement": "Short inputs (up to 1,500 characters) go to Laya, which is free. Longer ones go to Jev, because Laya rejects them. Both act only on a clear yes, above 0.8 confidence, with a 1,200 ms default budget and no retries. A timeout or outage returns nothing, and callers fall back to local checks.",
       "anchors": [
         {
           "file": "src/lib/quality/jev.ts",
           "symbol": "JEV_HIGH_CONFIDENCE",
-          "line": 13,
+          "line": 41,
           "value": "0.8",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L13"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L41"
         },
         {
           "file": "src/lib/quality/jev.ts",
           "symbol": "JEV_EVAL_TIMEOUT_MS",
-          "line": 10,
+          "line": 38,
           "value": "1_200",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L10"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L38"
+        },
+        {
+          "file": "src/lib/quality/jev.ts",
+          "symbol": "LAYA_STATE_MAX_CHARS",
+          "line": 17,
+          "value": "1_500",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L17"
+        },
+        {
+          "file": "src/lib/quality/jev.ts",
+          "symbol": "moderationModelFor",
+          "line": 32,
+          "value": "moderationModelFor(state)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L32"
         },
         {
           "file": "src/lib/quality/jev.ts",
           "symbol": "evaluateWithJev",
-          "line": 32,
+          "line": 60,
           "value": "evaluateWithJev(args)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L32"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.ts#L60"
         }
       ],
-      "tests": [],
+      "tests": [
+        {
+          "file": "src/lib/quality/jev.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/jev.test.ts"
+        }
+      ],
       "dependsOn": [],
       "usedBy": [
         "signup.jev-budget",
@@ -3460,9 +3549,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.jailbreak-gate"
       ],
       "decisions": [
-        "jev-quality-gates"
+        "jev-quality-gates",
+        "oracle-usage-and-moderation"
       ],
-      "flag": null,
+      "flag": {
+        "level": "watch",
+        "note": "The gateway refuses the zero data retention option on the Hobby plan. Turning it back on makes every evaluation fail open. In spot checks Laya also scored subtle jailbreaks lower than Jev."
+      },
       "flow": null,
       "position": {
         "x": 1284,
@@ -3476,7 +3569,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Prohibited posts never insert",
       "kind": "gate",
       "status": "active",
-      "statement": "When Jev is more than 80% sure a post is spam, harassment, solicitation, or leaks secrets, it is refused with a plain message and never stored.",
+      "statement": "When the moderation model is more than 80% sure a post is spam, harassment, solicitation, or leaks secrets, it is refused with a plain message and never stored.",
       "anchors": [
         {
           "file": "src/lib/quality/forum-gate.ts",
@@ -3545,7 +3638,9 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "forum.quarantine"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "standing.sunk-replies"
+      ],
       "decisions": [
         "jev-quality-gates"
       ],
@@ -3563,14 +3658,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Forum gate fails open",
       "kind": "invariant",
       "status": "active",
-      "statement": "If Jev is unavailable, the post is allowed after the local checks, and a fallback never wipes a score Jev gave earlier.",
+      "statement": "If the moderation model is unavailable, the post is allowed after the local checks without a score, and a fallback never wipes an earlier score. The Standing review rescreens unscored posts later.",
       "anchors": [
         {
           "file": "src/lib/quality/forum-gate.ts",
           "symbol": "screenForumSubmission",
           "line": 169,
           "value": "screenForumSubmission(input, options)",
-          "drift": "changed",
+          "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/quality/forum-gate.ts#L169"
         },
         {
@@ -3591,9 +3686,12 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [
         "forum.jev-shared"
       ],
-      "usedBy": [],
+      "usedBy": [
+        "standing.review"
+      ],
       "decisions": [
-        "jev-quality-gates"
+        "jev-quality-gates",
+        "oracle-usage-and-moderation"
       ],
       "flag": null,
       "flow": null,
@@ -3601,7 +3699,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 1488,
         "y": 520
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.author-only-edits",
@@ -3614,10 +3712,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertForumAuthor",
-          "line": 1055,
+          "line": 919,
           "value": "assertForumAuthor(rowUserId, actorId, action)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1055"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L919"
         }
       ],
       "tests": [
@@ -3660,10 +3758,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "createForumPostHandler",
-          "line": 1840,
+          "line": 1704,
           "value": "createForumPostHandler({ data, context })",
-          "drift": "changed",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1840"
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L1704"
         }
       ],
       "tests": [
@@ -3685,7 +3783,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "x": 320,
         "y": 520
       },
-      "drift": "changed"
+      "drift": "ok"
     },
     {
       "id": "forum.peer-flags",
@@ -3750,26 +3848,26 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "assertCovenantSteward",
-          "line": 2483,
+          "line": 2349,
           "value": "assertCovenantSteward(dbClient, userId, payload)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2483"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2349"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "reviewForumReportHandler",
-          "line": 2786,
+          "line": 2652,
           "value": "reviewForumReportHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2786"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2652"
         },
         {
           "file": "src/lib/server/db-services.ts",
           "symbol": "removeForumReportTargetHandler",
-          "line": 2856,
+          "line": 2722,
           "value": "removeForumReportTargetHandler({ data, context, })",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2856"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/db-services.ts#L2722"
         }
       ],
       "tests": [
@@ -3835,15 +3933,15 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Oracle request pipeline",
       "kind": "flow",
       "status": "active",
-      "statement": "Every Oracle message passes the rate limit, local input guardrails, and a Jev preflight before anything else. Guests then get a canned reply with no model stream; members get a routed, streamed answer.",
+      "statement": "Every Oracle message passes the flood guard, a last-turn check, and local input guardrails. Guests then get a canned reply with no model call. Members are checked against their usage allowance and the jailbreak preflight before a routed, streamed answer.",
       "anchors": [
         {
           "file": "src/lib/ai/handle-oracle-chat-request.ts",
           "symbol": "handleOracleChatRequest",
-          "line": 64,
+          "line": 74,
           "value": "handleOracleChatRequest(request)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L64"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.ts#L74"
         }
       ],
       "tests": [
@@ -3855,13 +3953,14 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "dependsOn": [],
       "usedBy": [
         "oracle.rate-limit",
+        "oracle.usage-allowance",
+        "oracle.request-caps",
         "oracle.input-guardrails"
       ],
-      "decisions": [],
-      "flag": {
-        "level": "watch",
-        "note": "Guests reach the Jev preflight before the guest check, so each guest message spends one Jev call. Moving the guest check earlier would save that call."
-      },
+      "decisions": [
+        "oracle-usage-and-moderation"
+      ],
+      "flag": null,
       "flow": {
         "steps": [
           {
@@ -3878,7 +3977,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "rate",
-            "label": "Over 30 a minute?",
+            "label": "Over 30 a minute here?",
             "kind": "check",
             "tone": "neutral",
             "position": {
@@ -3902,7 +4001,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
           },
           {
             "id": "guard",
-            "label": "Length, injection, harm",
+            "label": "Last turn, length, injection, harm",
             "kind": "check",
             "tone": "neutral",
             "position": {
@@ -3925,37 +4024,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "height": 46
           },
           {
-            "id": "preflight",
-            "label": "Jev preflight",
-            "kind": "action",
-            "tone": "neutral",
-            "position": {
-              "x": 267,
-              "y": 370
-            },
-            "width": 208,
-            "height": 46
-          },
-          {
-            "id": "jailbreak",
-            "label": "Refused (jailbreak)",
-            "kind": "outcome",
-            "tone": "block",
-            "position": {
-              "x": 69,
-              "y": 512
-            },
-            "width": 208,
-            "height": 46
-          },
-          {
             "id": "identity",
             "label": "Verified JWT?",
             "kind": "check",
             "tone": "neutral",
             "position": {
-              "x": 301,
-              "y": 512
+              "x": 267,
+              "y": 370
             },
             "width": 208,
             "height": 46
@@ -3966,6 +4041,30 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "kind": "outcome",
             "tone": "neutral",
             "position": {
+              "x": 69,
+              "y": 512
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "usage",
+            "label": "Over minute or daily allowance?",
+            "kind": "check",
+            "tone": "neutral",
+            "position": {
+              "x": 301,
+              "y": 512
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "over",
+            "label": "429 with Retry-After",
+            "kind": "outcome",
+            "tone": "warn",
+            "position": {
               "x": 104,
               "y": 654
             },
@@ -3973,8 +4072,8 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "height": 46
           },
           {
-            "id": "route",
-            "label": "Pick context and model",
+            "id": "preflight",
+            "label": "Moderation preflight",
             "kind": "action",
             "tone": "neutral",
             "position": {
@@ -3985,13 +4084,37 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "height": 46
           },
           {
+            "id": "jailbreak",
+            "label": "Refused (jailbreak)",
+            "kind": "outcome",
+            "tone": "block",
+            "position": {
+              "x": 139,
+              "y": 796
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "route",
+            "label": "Record usage, pick context and model",
+            "kind": "action",
+            "tone": "neutral",
+            "position": {
+              "x": 371,
+              "y": 796
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
             "id": "stream",
             "label": "Stream with fallback chain",
             "kind": "outcome",
             "tone": "allow",
             "position": {
-              "x": 336,
-              "y": 740
+              "x": 371,
+              "y": 882
             },
             "width": 208,
             "height": 46
@@ -4023,22 +4146,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": "fail"
           },
           {
-            "id": "guard-1-preflight",
+            "id": "guard-1-identity",
             "source": "guard",
-            "target": "preflight",
-            "label": "pass"
-          },
-          {
-            "id": "preflight-0-jailbreak",
-            "source": "preflight",
-            "target": "jailbreak",
-            "label": "jailbreak"
-          },
-          {
-            "id": "preflight-1-identity",
-            "source": "preflight",
             "target": "identity",
-            "label": "ok or down"
+            "label": "pass"
           },
           {
             "id": "identity-0-guest",
@@ -4047,10 +4158,34 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": "no"
           },
           {
-            "id": "identity-1-route",
+            "id": "identity-1-usage",
             "source": "identity",
-            "target": "route",
+            "target": "usage",
             "label": "yes"
+          },
+          {
+            "id": "usage-0-over",
+            "source": "usage",
+            "target": "over",
+            "label": "yes"
+          },
+          {
+            "id": "usage-1-preflight",
+            "source": "usage",
+            "target": "preflight",
+            "label": "no"
+          },
+          {
+            "id": "preflight-0-jailbreak",
+            "source": "preflight",
+            "target": "jailbreak",
+            "label": "jailbreak"
+          },
+          {
+            "id": "preflight-1-route",
+            "source": "preflight",
+            "target": "route",
+            "label": "ok or down"
           },
           {
             "id": "route-0-stream",
@@ -4059,11 +4194,11 @@ export const LOGIC_ATLAS: LogicAtlas = {
             "label": null
           }
         ],
-        "width": 544,
-        "height": 786
+        "width": 579,
+        "height": 928
       },
       "position": {
-        "x": 568,
+        "x": 1117,
         "y": 76
       },
       "drift": "ok"
@@ -4071,10 +4206,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
     {
       "id": "oracle.rate-limit",
       "domain": "oracle",
-      "title": "Thirty messages per minute",
+      "title": "Thirty a minute flood guard",
       "kind": "limit",
       "status": "active",
-      "statement": "Each member, or each IP address for guests, can send up to 30 Oracle messages per minute.",
+      "statement": "Each member, or each IP address for guests, can send up to 30 Oracle messages per minute to one server instance. It is a cheap first layer in front of the per-member allowance.",
       "anchors": [
         {
           "file": "src/lib/ai/guardrails.ts",
@@ -4100,11 +4235,143 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "flag": {
         "level": "watch",
-        "note": "Uses the same in-memory limiter as the forum, so limits are per server instance."
+        "note": "Uses the same in-memory limiter as the forum, so limits are per server instance. The durable per-member allowance is the real limit for members."
       },
       "flow": null,
       "position": {
         "x": 320,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.usage-allowance",
+      "domain": "oracle",
+      "title": "Daily allowance, Premium gets 10x",
+      "kind": "limit",
+      "status": "active",
+      "statement": "Free members can send 5 Oracle messages a minute and 30 in any rolling 24 hours. Premium members get 10 times that, 50 a minute and 300 a day. Usage is stored per member, shared across server instances, and deleting a thread does not reset it.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "ORACLE_FREE_LIMITS",
+          "line": 16,
+          "value": "{ perMinute: 5, perDay: 30 }",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L16"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "ORACLE_PREMIUM_LIMITS",
+          "line": 20,
+          "value": "{ perMinute: ORACLE_FREE_LIMITS.perMinute * PREMIUM_LIMIT_MULTIPLIER, perDay: ORACLE_FREE_LIMITS.perDay * PREMIUM_LIMIT_MULTIPLIER, }",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L20"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "decideOracleUsage",
+          "line": 52,
+          "value": "decideOracleUsage(counts, isPremium)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L52"
+        },
+        {
+          "file": "src/lib/ai/service.ts",
+          "symbol": "getOracleUsageSnapshot",
+          "line": 294,
+          "value": "getOracleUsageSnapshot(userId, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L294"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/usage-limits.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.test.ts"
+        },
+        {
+          "file": "src/lib/ai/handle-oracle-chat-request.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/handle-oracle-chat-request.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.request-pipeline",
+        "premium.no-standing",
+        "economy.red-line"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "oracle-usage-and-moderation"
+      ],
+      "flag": {
+        "level": "watch",
+        "note": "If the usage table cannot be read, the request continues with only the per-instance flood guard."
+      },
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "oracle.request-caps",
+      "domain": "oracle",
+      "title": "History and reply size caps",
+      "kind": "limit",
+      "status": "active",
+      "statement": "A request sends at most the newest 20 turns and 16,000 characters of history, and a reply stops at 1,024 tokens. Only user and assistant turns reach the model, and the last turn must be the member's own.",
+      "anchors": [
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "ORACLE_MAX_HISTORY_MESSAGES",
+          "line": 26,
+          "value": "20",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L26"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.ts",
+          "symbol": "ORACLE_MAX_OUTPUT_TOKENS",
+          "line": 28,
+          "value": "1_024",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.ts#L28"
+        },
+        {
+          "file": "src/lib/ai/oracle-chat.ts",
+          "symbol": "toModelMessages",
+          "line": 67,
+          "value": "toModelMessages(messages)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.ts#L67"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/ai/oracle-chat.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-chat.test.ts"
+        },
+        {
+          "file": "src/lib/ai/usage-limits.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/usage-limits.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "oracle.request-pipeline"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "oracle-usage-and-moderation"
+      ],
+      "flag": {
+        "level": "gap",
+        "note": "History still comes from the browser, so a member can rewrite earlier assistant turns. Loading history from stored thread messages would close this."
+      },
+      "flow": null,
+      "position": {
+        "x": 904,
         "y": 232
       },
       "drift": "ok"
@@ -4153,7 +4420,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 1196,
         "y": 232
       },
       "drift": "ok"
@@ -4164,7 +4431,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Paraphrased jailbreaks are refused",
       "kind": "gate",
       "status": "active",
-      "statement": "Jev refuses a message when it is more than 80% sure it is a jailbreak, which catches paraphrases the local patterns miss.",
+      "statement": "The moderation model refuses a message when it is more than 80% sure it is a jailbreak, which catches paraphrases the local patterns miss.",
       "anchors": [
         {
           "file": "src/lib/quality/oracle-preflight.ts",
@@ -4203,7 +4470,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 612,
+        "x": 1196,
         "y": 388
       },
       "drift": "ok"
@@ -4214,7 +4481,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Intent picks the prompt context",
       "kind": "flow",
       "status": "active",
-      "statement": "Doctrine questions load the scripture block, chassis and progression questions load a short block, and casual or unrelated questions use the base prompt. When Jev is down, the full doctrine context is used.",
+      "statement": "Doctrine questions load the scripture block, chassis and progression questions load a short block, and casual or unrelated questions use the base prompt. When the moderation model is down, the full doctrine context is used.",
       "anchors": [
         {
           "file": "src/lib/quality/oracle-preflight.ts",
@@ -4257,7 +4524,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "flag": null,
       "flow": null,
       "position": {
-        "x": 364,
+        "x": 948,
         "y": 544
       },
       "drift": "ok"
@@ -4268,7 +4535,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Complexity band picks the model",
       "kind": "threshold",
       "status": "active",
-      "statement": "Questions rated band 4 or 5 of 5 go to the deep model and simpler ones to the fast model. A model the member picked always wins.",
+      "statement": "Questions rated band 4 or 5 of 5 go to DeepSeek 4.1 Flash and simpler ones to the default, GLM 5.3 Flash. A model the member picked always wins.",
       "anchors": [
         {
           "file": "src/lib/quality/oracle-preflight.ts",
@@ -4300,12 +4567,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "oracle.model-fallback"
       ],
       "decisions": [
-        "jev-quality-gates"
+        "jev-quality-gates",
+        "oracle-usage-and-moderation"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 656,
+        "x": 1240,
         "y": 544
       },
       "drift": "ok"
@@ -4316,13 +4584,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "title": "Ordered model fallback",
       "kind": "flow",
       "status": "active",
-      "statement": "The Oracle tries the preferred model first and waits for the first real token before committing. On an empty stream, error, or timeout it moves to the next model, and it only shows the unavailable message when every model fails.",
+      "statement": "The models are GLM 5.3 Flash (default, also writes thread titles), DeepSeek 4.1 Flash, and Qwen 3.7 Flash. The Oracle tries the preferred model first and waits for the first real token before committing. On an empty stream, error, or timeout it moves to the next model, and it only shows the unavailable message when every model fails.",
       "anchors": [
         {
           "file": "src/lib/ai/oracle-models.ts",
           "symbol": "ORACLE_MODELS",
           "line": 19,
-          "value": "[ { id: 'openai/gpt-6-luna', label: 'GPT-6 Luna', shortLabel: 'Luna', provider: 'openai', badge: 'Chat', pricing: { input: '$0.10', output: '$0.50' }, latency:…",
+          "value": "[ { id: 'zai/glm-5.3-flash', label: 'GLM 5.3 Flash', shortLabel: 'GLM', provider: 'zai', badge: 'Chat', pricing: { input: '$0.15', output: '$0.50' }, latency: …",
           "drift": "ok",
           "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/oracle-models.ts#L19"
         }
@@ -4338,12 +4606,13 @@ export const LOGIC_ATLAS: LogicAtlas = {
       ],
       "usedBy": [],
       "decisions": [
-        "oracle-model-fallback"
+        "oracle-model-fallback",
+        "oracle-usage-and-moderation"
       ],
       "flag": null,
       "flow": null,
       "position": {
-        "x": 656,
+        "x": 1240,
         "y": 700
       },
       "drift": "ok"
@@ -4359,10 +4628,10 @@ export const LOGIC_ATLAS: LogicAtlas = {
         {
           "file": "src/lib/ai/service.ts",
           "symbol": "getOwnedAIThread",
-          "line": 107,
+          "line": 119,
           "value": "getOwnedAIThread(userId, threadId)",
           "drift": "ok",
-          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L107"
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/ai/service.ts#L119"
         }
       ],
       "tests": [
@@ -4983,6 +5252,490 @@ export const LOGIC_ATLAS: LogicAtlas = {
         "y": 76
       },
       "drift": "ok"
+    },
+    {
+      "id": "standing.score",
+      "domain": "standing",
+      "title": "Standing is upvotes plus adjustments",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "A member's Standing is the number of upvotes other members gave their topics and replies, plus any adjustment from the Standing review. Self-votes do not count.",
+      "anchors": [
+        {
+          "file": "src/lib/server/forum-standing.ts",
+          "symbol": "computeMemberStanding",
+          "line": 41,
+          "value": "computeMemberStanding(dbClient, userId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.ts#L41"
+        },
+        {
+          "file": "src/lib/server/forum-standing.ts",
+          "symbol": "countUpvotesReceived",
+          "line": 26,
+          "value": "countUpvotesReceived(dbClient, userId)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.ts#L26"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "economy.red-line"
+      ],
+      "usedBy": [
+        "standing.thread-gate",
+        "standing.restricted",
+        "standing.sunk-replies",
+        "standing.review"
+      ],
+      "decisions": [
+        "forum-standing"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 107,
+        "y": 76
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "standing.thread-gate",
+      "domain": "standing",
+      "title": "Who can start threads",
+      "kind": "gate",
+      "status": "active",
+      "statement": "Anyone can reply right away. Starting a thread needs an account at least 3 days old plus either 3 Standing or 500 XP. The XP path is closed to accounts flagged at signup. Staff are never gated.",
+      "anchors": [
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "evaluateForumStanding",
+          "line": 65,
+          "value": "evaluateForumStanding(input)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L65"
+        },
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "STANDING_TOPIC_MIN",
+          "line": 11,
+          "value": "3",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L11"
+        },
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "STANDING_TOPIC_XP_PATH",
+          "line": 13,
+          "value": "500",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L13"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "standing.score",
+        "forum.write-pipeline",
+        "signup.risk-events"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "forum-standing"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 28,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "standing.restricted",
+      "domain": "standing",
+      "title": "Low Standing limits replies",
+      "kind": "limit",
+      "status": "active",
+      "statement": "At -5 Standing or lower a member cannot start threads and can post at most 3 replies a day.",
+      "anchors": [
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "STANDING_RESTRICTED_AT",
+          "line": 15,
+          "value": "-5",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L15"
+        },
+        {
+          "file": "src/lib/server/forum-standing.ts",
+          "symbol": "assertCanReply",
+          "line": 112,
+          "value": "assertCanReply(dbClient, userId, email, now)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.ts#L112"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.test.ts"
+        },
+        {
+          "file": "src/lib/server/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "standing.score"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "forum-standing"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 320,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "standing.sunk-replies",
+      "domain": "standing",
+      "title": "Weak replies sink",
+      "kind": "threshold",
+      "status": "active",
+      "statement": "A reply is stored collapsed and sorted last when it scores under 50 or its author's Standing is negative.",
+      "anchors": [
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "shouldSinkReply",
+          "line": 94,
+          "value": "shouldSinkReply(input)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L94"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "standing.score",
+        "forum.hot-feed-quality"
+      ],
+      "usedBy": [
+        "standing.simulated-votes"
+      ],
+      "decisions": [
+        "forum-standing"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "standing.review",
+      "domain": "standing",
+      "title": "Standing review",
+      "kind": "flow",
+      "status": "active",
+      "statement": "Each simulation run reviews real members' unreviewed posts from the last 7 days, up to 25 topics and 25 replies. Posts keep their live score, and only posts the live check missed are rescreened. A post scoring 75 or more gets an upvote from a simulated member. One under 25 sinks and costs 1 Standing, and a prohibited one sinks and costs 3.",
+      "anchors": [
+        {
+          "file": "src/lib/server/forum-standing.ts",
+          "symbol": "reviewMemberPosts",
+          "line": 167,
+          "value": "reviewMemberPosts(dbClient, options)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.ts#L167"
+        },
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "reviewOutcome",
+          "line": 120,
+          "value": "reviewOutcome(input)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L120"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "standing.score",
+        "forum.fail-open"
+      ],
+      "usedBy": [
+        "standing.gain-cap"
+      ],
+      "decisions": [
+        "forum-standing",
+        "oracle-usage-and-moderation"
+      ],
+      "flag": null,
+      "flow": {
+        "steps": [
+          {
+            "id": "post",
+            "label": "Unreviewed member post",
+            "kind": "start",
+            "tone": "neutral",
+            "position": {
+              "x": 52,
+              "y": 0
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "scored",
+            "label": "Scored when posted?",
+            "kind": "check",
+            "tone": "neutral",
+            "position": {
+              "x": 52,
+              "y": 86
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "rescreen",
+            "label": "Rescreen with 10 s budget",
+            "kind": "action",
+            "tone": "neutral",
+            "position": {
+              "x": 146,
+              "y": 228
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "deferred",
+            "label": "Left for the next run",
+            "kind": "outcome",
+            "tone": "neutral",
+            "position": {
+              "x": 284,
+              "y": 370
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "verdict",
+            "label": "Score band",
+            "kind": "check",
+            "tone": "neutral",
+            "position": {
+              "x": 52,
+              "y": 370
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "upvote",
+            "label": "Simulated member upvotes",
+            "kind": "outcome",
+            "tone": "allow",
+            "position": {
+              "x": 0,
+              "y": 512
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "neutral",
+            "label": "No change",
+            "kind": "outcome",
+            "tone": "neutral",
+            "position": {
+              "x": 232,
+              "y": 512
+            },
+            "width": 208,
+            "height": 46
+          },
+          {
+            "id": "weak",
+            "label": "Sink and lower Standing",
+            "kind": "outcome",
+            "tone": "block",
+            "position": {
+              "x": 464,
+              "y": 512
+            },
+            "width": 208,
+            "height": 46
+          }
+        ],
+        "links": [
+          {
+            "id": "post-0-scored",
+            "source": "post",
+            "target": "scored",
+            "label": null
+          },
+          {
+            "id": "scored-0-verdict",
+            "source": "scored",
+            "target": "verdict",
+            "label": "yes"
+          },
+          {
+            "id": "scored-1-rescreen",
+            "source": "scored",
+            "target": "rescreen",
+            "label": "no"
+          },
+          {
+            "id": "rescreen-0-deferred",
+            "source": "rescreen",
+            "target": "deferred",
+            "label": "no answer"
+          },
+          {
+            "id": "rescreen-1-verdict",
+            "source": "rescreen",
+            "target": "verdict",
+            "label": "scored"
+          },
+          {
+            "id": "verdict-0-upvote",
+            "source": "verdict",
+            "target": "upvote",
+            "label": "75 or more"
+          },
+          {
+            "id": "verdict-1-neutral",
+            "source": "verdict",
+            "target": "neutral",
+            "label": "25 to 74"
+          },
+          {
+            "id": "verdict-2-weak",
+            "source": "verdict",
+            "target": "weak",
+            "label": "under 25 or prohibited"
+          }
+        ],
+        "width": 672,
+        "height": 558
+      },
+      "position": {
+        "x": 904,
+        "y": 232
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "standing.gain-cap",
+      "domain": "standing",
+      "title": "Two Standing per review run",
+      "kind": "limit",
+      "status": "active",
+      "statement": "One review run can raise an author's Standing by at most 2, counting review upvotes and adjustments together, so a burst of posts cannot farm Standing.",
+      "anchors": [
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "REVIEW_MAX_GAIN_PER_CYCLE",
+          "line": 107,
+          "value": "2",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L107"
+        },
+        {
+          "file": "src/lib/forum-standing.ts",
+          "symbol": "tallyStandingDeltas",
+          "line": 142,
+          "value": "tallyStandingDeltas(entries)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/forum-standing.ts#L142"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/server/forum-standing.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/server/forum-standing.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "standing.review"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "forum-standing",
+        "oracle-usage-and-moderation"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 904,
+        "y": 388
+      },
+      "drift": "ok"
+    },
+    {
+      "id": "standing.simulated-votes",
+      "domain": "standing",
+      "title": "Simulated votes skip weak posts",
+      "kind": "invariant",
+      "status": "active",
+      "statement": "Simulated members never upvote their own posts, collapsed posts, or posts scored under 50. Unscored posts stay eligible.",
+      "anchors": [
+        {
+          "file": "src/lib/simulation-social.ts",
+          "symbol": "isSimulatedVoteWorthy",
+          "line": 18,
+          "value": "isSimulatedVoteWorthy(target)",
+          "drift": "ok",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/simulation-social.ts#L18"
+        }
+      ],
+      "tests": [
+        {
+          "file": "src/lib/simulation-social.test.ts",
+          "url": "https://github.com/mstupp1/moltology/blob/main/src/lib/simulation-social.test.ts"
+        }
+      ],
+      "dependsOn": [
+        "standing.sunk-replies"
+      ],
+      "usedBy": [],
+      "decisions": [
+        "oracle-usage-and-moderation"
+      ],
+      "flag": null,
+      "flow": null,
+      "position": {
+        "x": 612,
+        "y": 388
+      },
+      "drift": "ok"
     }
   ],
   "decisions": [
@@ -5112,7 +5865,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "lock-two-currency-economy",
       "date": "2026-08-25",
       "title": "Lock the two-currency economy",
-      "summary": "Chitin Gems are earned, Molt Credits are bought, signup is free, and standing is never for sale.",
+      "summary": "Chitin Gems are earned, Molt Credits are bought, signup is free, and rank and authority cannot be purchased.",
       "domains": [
         "economy"
       ],
@@ -5142,7 +5895,7 @@ export const LOGIC_ATLAS: LogicAtlas = {
         },
         {
           "heading": "Decision",
-          "html": "<p>Two currencies with a hard split. Chitin Gems are only earned. Molt Credits are the paid layer and buy speed and style. Rank, clearance, stage, and forum authority are never for sale. The rule lives in <code>BRAND_BIBLE.md</code> section 4 and hard rule 4 in <code>AGENTS.md</code>.</p>"
+          "html": "<p>Two currencies with a hard split. Chitin Gems are only earned. Molt Credits are the paid layer and buy speed and style. Rank, clearance, stage, and forum authority cannot be purchased. The rule lives in <code>BRAND_BIBLE.md</code> section 4 and hard rule 4 in <code>AGENTS.md</code>.</p>"
         },
         {
           "heading": "Alternatives",
@@ -6285,6 +7038,103 @@ export const LOGIC_ATLAS: LogicAtlas = {
           "html": "<ul>\n<li>Members cannot grant themselves Premium.</li>\n<li>Staff can still activate or cancel their own membership without a charge, and a cancel still ends a Stripe subscription when one is on file.</li>\n</ul>"
         }
       ]
+    },
+    {
+      "id": "forum-standing",
+      "date": "2026-10-02",
+      "title": "Gate new threads and sink weak replies with Standing",
+      "summary": "Standing comes from upvotes and review adjustments. It gates new threads, caps replies for low-Standing members, and sinks weak replies.",
+      "domains": [
+        "standing",
+        "forum"
+      ],
+      "rules": [
+        "standing.score",
+        "standing.thread-gate",
+        "standing.restricted",
+        "standing.sunk-replies",
+        "standing.review",
+        "standing.gain-cap"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #167",
+          "url": "https://github.com/mstupp1/moltology/pull/167"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>New and low-quality accounts could start threads freely. Traffic is low, so one bad account is very visible.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Track Standing as upvotes from other members plus review adjustments. Starting a thread needs a 3-day-old account and either 3 Standing or 500 XP. At -5 or lower, threads lock and replies are capped at 3 a day. Replies sink when they score under 50 or their author&#39;s Standing is negative. A review step in the simulation turns post scores into Standing.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>Hard bans or manual approval for new accounts were too heavy for a small community. Letting Premium skip the gate is ruled out by the economy red line.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>Brand-new members can only reply until they build some Standing. Real activity from simulated members affects real members&#39; Standing.</p>"
+        }
+      ]
+    },
+    {
+      "id": "oracle-usage-and-moderation",
+      "date": "2026-10-02",
+      "title": "Cap Oracle usage per member and move moderation to Laya",
+      "summary": "Members get a durable daily Oracle allowance with Premium at 10x. Moderation uses free Laya for short inputs and Jev for long ones. The Standing review upvotes strong posts instead of adding hidden points.",
+      "domains": [
+        "oracle",
+        "forum",
+        "premium",
+        "standing"
+      ],
+      "rules": [
+        "oracle.request-pipeline",
+        "oracle.usage-allowance",
+        "oracle.request-caps",
+        "oracle.model-routing",
+        "oracle.model-fallback",
+        "forum.jev-shared",
+        "forum.fail-open",
+        "premium.no-standing",
+        "standing.review",
+        "standing.gain-cap",
+        "standing.simulated-votes"
+      ],
+      "status": "accepted",
+      "supersededBy": null,
+      "sources": [
+        {
+          "kind": "pr",
+          "label": "PR #170",
+          "url": "https://github.com/mstupp1/moltology/pull/170"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Context",
+          "html": "<p>The only Oracle limit was 30 messages a minute, held in one server instance&#39;s memory. Clients could send unlimited history, including their own system messages, and replies had no output cap. An unused chat endpoint skipped the jailbreak check. Every moderation call asked for zero data retention, which the gateway refuses on the Hobby plan, so moderation had silently failed open since launch.</p>"
+        },
+        {
+          "heading": "Decision",
+          "html": "<p>Store one usage row per Oracle call and limit free members to 5 a minute and 30 per rolling 24 hours, with Premium at 10x. Cap history at 20 turns and 16,000 characters and replies at 1,024 tokens. Send guests the canned reply before any model call. Drop the zero data retention flag. Use Laya, which is free, for inputs up to 1,500 characters and Jev for longer ones. Make GLM 5.3 Flash the chat and title default, keep DeepSeek 4.1 Flash for complex questions, and drop GPT-6 Luna. In the Standing review, keep live scores, rescreen only unscored posts, have a simulated member upvote strong posts, and skip weak posts in simulated voting.</p>"
+        },
+        {
+          "heading": "Alternatives",
+          "html": "<p>A token budget per member was more precise but harder to explain than a message count. Keeping Jev for everything costs a little more for better jailbreak recall. Re-scoring every post on each review run added calls without new information.</p>"
+        },
+        {
+          "heading": "Consequences",
+          "html": "<p>A higher Oracle allowance is the first Premium benefit. Moderation data is not covered by zero data retention while the gateway account is on Hobby. History still comes from the browser.</p>"
+        }
+      ]
     }
   ],
   "edges": [
@@ -6703,6 +7553,30 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "crossDomain": false
     },
     {
+      "id": "oracle.request-pipeline->oracle.usage-allowance",
+      "source": "oracle.request-pipeline",
+      "target": "oracle.usage-allowance",
+      "crossDomain": false
+    },
+    {
+      "id": "premium.no-standing->oracle.usage-allowance",
+      "source": "premium.no-standing",
+      "target": "oracle.usage-allowance",
+      "crossDomain": true
+    },
+    {
+      "id": "economy.red-line->oracle.usage-allowance",
+      "source": "economy.red-line",
+      "target": "oracle.usage-allowance",
+      "crossDomain": true
+    },
+    {
+      "id": "oracle.request-pipeline->oracle.request-caps",
+      "source": "oracle.request-pipeline",
+      "target": "oracle.request-caps",
+      "crossDomain": false
+    },
+    {
       "id": "oracle.request-pipeline->oracle.input-guardrails",
       "source": "oracle.request-pipeline",
       "target": "oracle.input-guardrails",
@@ -6790,6 +7664,72 @@ export const LOGIC_ATLAS: LogicAtlas = {
       "id": "data.retention-windows->data.canonical-content",
       "source": "data.retention-windows",
       "target": "data.canonical-content",
+      "crossDomain": false
+    },
+    {
+      "id": "economy.red-line->standing.score",
+      "source": "economy.red-line",
+      "target": "standing.score",
+      "crossDomain": true
+    },
+    {
+      "id": "standing.score->standing.thread-gate",
+      "source": "standing.score",
+      "target": "standing.thread-gate",
+      "crossDomain": false
+    },
+    {
+      "id": "forum.write-pipeline->standing.thread-gate",
+      "source": "forum.write-pipeline",
+      "target": "standing.thread-gate",
+      "crossDomain": true
+    },
+    {
+      "id": "signup.risk-events->standing.thread-gate",
+      "source": "signup.risk-events",
+      "target": "standing.thread-gate",
+      "crossDomain": true
+    },
+    {
+      "id": "standing.score->standing.restricted",
+      "source": "standing.score",
+      "target": "standing.restricted",
+      "crossDomain": false
+    },
+    {
+      "id": "standing.score->standing.sunk-replies",
+      "source": "standing.score",
+      "target": "standing.sunk-replies",
+      "crossDomain": false
+    },
+    {
+      "id": "forum.hot-feed-quality->standing.sunk-replies",
+      "source": "forum.hot-feed-quality",
+      "target": "standing.sunk-replies",
+      "crossDomain": true
+    },
+    {
+      "id": "standing.score->standing.review",
+      "source": "standing.score",
+      "target": "standing.review",
+      "crossDomain": false
+    },
+    {
+      "id": "forum.fail-open->standing.review",
+      "source": "forum.fail-open",
+      "target": "standing.review",
+      "crossDomain": true
+    },
+    {
+      "id": "standing.review->standing.gain-cap",
+      "source": "standing.review",
+      "target": "standing.gain-cap",
+      "crossDomain": false
+    },
+    {
+      "id": "standing.sunk-replies->standing.simulated-votes",
+      "source": "standing.sunk-replies",
+      "target": "standing.simulated-votes",
       "crossDomain": false
     }
   ]
